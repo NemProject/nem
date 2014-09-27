@@ -12,6 +12,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccountDao;
+import org.omg.PortableInterceptor.AdapterStateHelper;
 
 public class BlockMapperTest {
 
@@ -51,6 +52,21 @@ public class BlockMapperTest {
 	}
 
 	@Test
+	public void blockModelWithLessorCanBeMappedToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addLessor();
+
+		// Act:
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+
+		// Assert:
+		context.assertDbModel(dbModel, 0);
+		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
+	}
+
+	@Test
 	public void blockModelWithoutTransactionsCanBeRoundTripped() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -86,6 +102,20 @@ public class BlockMapperTest {
 
 			Assert.assertThat(transactionHash, IsEqual.equalTo(originalTransactionHash));
 		}
+	}
+
+	@Test
+	public void blockModelWithLessorCanBeRoundTripped() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addLessor();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+
+		// Act:
+		final Block model = context.toModel(dbModel);
+
+		// Assert:
+		context.assertModel(model);
 	}
 
 	@Test
@@ -209,6 +239,8 @@ public class BlockMapperTest {
 		private final MockAccountDao accountDao;
 		private final Hash blockGenerationHash;
 		private Hash hash;
+		private Account lessor;
+		private org.nem.nis.dbmodel.Account dbLessor;
 
 		public TestContext() {
 			this.blockGenerationHash = Utils.generateRandomHash();
@@ -240,6 +272,14 @@ public class BlockMapperTest {
 			this.accountDao.addMapping(this.account1, this.dbAccount1);
 			this.accountDao.addMapping(this.account2, this.dbAccount2);
 			this.accountDao.addMapping(this.account3, this.dbAccount3);
+
+		}
+
+		public void addLessor() {
+			this.lessor = Utils.generateRandomAccount();
+			this.dbLessor = this.createDbAccount(this.lessor);
+			this.accountDao.addMapping(this.lessor, this.dbLessor);
+			this.model.setLessor(lessor);
 		}
 
 		private org.nem.nis.dbmodel.Account createDbAccount(final Account account) {
@@ -314,6 +354,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getNextBlockId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(79_876_543_211_237L));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.blockGenerationHash));
+			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(this.dbLessor));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getForger().getPublicKey(), IsEqual.equalTo(signerPublicKey));
@@ -331,6 +372,7 @@ public class BlockMapperTest {
 			Assert.assertThat(rhs.getTotalFee(), IsEqual.equalTo(this.model.getTotalFee()));
 			Assert.assertThat(rhs.getDifficulty(), IsEqual.equalTo(this.model.getDifficulty()));
 			Assert.assertThat(rhs.getGenerationHash(), IsEqual.equalTo(this.model.getGenerationHash()));
+			Assert.assertThat(rhs.getLessor(), IsEqual.equalTo(this.model.getLessor()));
 		}
 	}
 }

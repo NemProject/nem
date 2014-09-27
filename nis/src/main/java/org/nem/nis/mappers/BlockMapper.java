@@ -25,7 +25,8 @@ public class BlockMapper {
 	 * @return The Block db-model.
 	 */
 	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
-		final org.nem.nis.dbmodel.Account forager = accountDao.findByAddress(block.getSigner().getAddress());
+		final org.nem.nis.dbmodel.Account harvester = accountDao.findByAddress(block.getSigner().getAddress());
+		final org.nem.nis.dbmodel.Account lessor = block.getLessor() != null ? accountDao.findByAddress(block.getLessor().getAddress()) : null;
 
 		final Hash blockHash = HashUtils.calculateHash(block);
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
@@ -34,12 +35,13 @@ public class BlockMapper {
 				block.getGenerationHash(),
 				block.getPreviousBlockHash(),
 				block.getTimeStamp().getRawTime(),
-				forager,
+				harvester,
 				block.getSignature().getBytes(),
 				block.getHeight().getRaw(),
 				0L,
 				block.getTotalFee().getNumMicroNem(),
-				block.getDifficulty().getRaw());
+				block.getDifficulty().getRaw(),
+				lessor);
 
 		// TODO 20140923 J-G [QUESTION] but any reason you didn't want to have a transfer hierarchy in the db?
 		// > something like class table inheritance: http://stackoverflow.com/tags/class-table-inheritance/info
@@ -101,6 +103,8 @@ public class BlockMapper {
 
 		final Address foragerAddress = Address.fromPublicKey(dbBlock.getForger().getPublicKey());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
+		final Address lessorAddress = dbBlock.getLessor() != null ? Address.fromPublicKey(dbBlock.getLessor().getPublicKey()) : null;
+		final Account lessor = lessorAddress != null ? accountLookup.findByAddress(lessorAddress) : null;
 
 		final Block block = new org.nem.core.model.Block(
 				forager,
@@ -111,7 +115,7 @@ public class BlockMapper {
 
 		final Long difficulty = dbBlock.getDifficulty();
 		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
-
+		block.setLessor(lessor);
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
 		// TODO 20140921 J-G: not sure if this is a test thing or not, but a number of tests were failing because dbBlock.getBlockImportanceTransfers() was null

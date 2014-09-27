@@ -38,6 +38,11 @@ public class Block {
 	private Account forger;
 	private byte[] forgerProof;
 
+	@ManyToOne
+	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@JoinColumn(name = "harvestedInName")
+	private Account lessor;
+
 	private Long height;
 
 	private Long totalAmount;
@@ -72,7 +77,8 @@ public class Block {
 			final Long height,
 			final Long totalAmount,
 			final Long totalFee,
-			final Long difficulty) {
+			final Long difficulty,
+			final Account lessor) {
 
 		this.shortId = hash.getShortId();
 		this.version = version;
@@ -86,6 +92,8 @@ public class Block {
 		this.totalAmount = totalAmount;
 		this.totalFee = totalFee;
 		this.difficulty = difficulty;
+
+		this.lessor = lessor;
 	}
 
 	public Long getId() {
@@ -159,6 +167,15 @@ public class Block {
 	public void setForgerProof(final byte[] forgerProof) {
 		this.forgerProof = forgerProof;
 	}
+
+	public Account getLessor() {
+		return this.lessor;
+	}
+
+	public void setLessor(final Account lessor) {
+		this.lessor = lessor;
+	}
+
 
 	public Long getHeight() {
 		return this.height;

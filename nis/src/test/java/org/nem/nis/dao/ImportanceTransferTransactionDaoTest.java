@@ -94,7 +94,7 @@ public class ImportanceTransferTransactionDaoTest {
 	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, ImportanceTransfer... dbTransfers) {
 		final Block block = new Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
 				account, new byte[] { 1, 2, 3, 4 },
-				1L, 1L, 1L, 123L);
+				1L, 1L, 1L, 123L, null);
 		this.blockDao.save(block);
 
 		for (final ImportanceTransfer importanceTransfer : dbTransfers) {

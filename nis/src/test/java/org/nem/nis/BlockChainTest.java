@@ -323,7 +323,8 @@ public class BlockChainTest {
 				b.getHeight().getRaw(), // height
 				RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT,
 				0L,
-				123L
+				123L,
+				null
 		);
 
 		final Transfer dbTransaction1 = new Transfer(
