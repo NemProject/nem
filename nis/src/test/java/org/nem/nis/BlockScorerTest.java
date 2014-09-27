@@ -212,7 +212,7 @@ public class BlockScorerTest {
 		final Address signerAddress = block.getSigner().getAddress();
 		final PoiAccountState state = new PoiAccountState(signerAddress);
 		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		Mockito.when(poiFacade.findForwardedStateByAddress(signerAddress, groupedHeight)).thenReturn(state);
+		Mockito.when(poiFacade.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
 
 		// Act:
 		context.scorer.calculateForgerBalance(block);
