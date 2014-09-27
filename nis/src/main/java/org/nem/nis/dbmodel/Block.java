@@ -148,7 +148,7 @@ public class Block {
 		return this.forger;
 	}
 
-	public void setForgerId(final Account forger) {
+	public void setForger(final Account forger) {
 		this.forger = forger;
 	}
 

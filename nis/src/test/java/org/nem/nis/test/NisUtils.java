@@ -28,7 +28,7 @@ public class NisUtils {
 		account.setPublicKey(Utils.generateRandomPublicKey());
 
 		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block();
-		block.setForgerId(account);
+		block.setForger(account);
 		block.setTimeStamp(timeStamp);
 		block.setHeight(10L);
 		block.setForgerProof(Utils.generateRandomBytes(64));
