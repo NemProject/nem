@@ -74,8 +74,9 @@ public class BlockChainValidator {
 				return false;
 			}
 
+			final ValidationContext validationContext = new ValidationContext(block.getHeight(), parentBlock.getHeight());
 			for (final Transaction transaction : block.getTransactions()) {
-				if (ValidationResult.SUCCESS != this.transactionValidator.validate(transaction, new ValidationContext(block.getHeight())) ||
+				if (ValidationResult.SUCCESS != this.transactionValidator.validate(transaction, validationContext) ||
 						!transaction.verify() ||
 						transaction.getSigner().equals(block.getSigner())) {
 					return false;

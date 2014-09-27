@@ -99,6 +99,7 @@ public class UniqueHashTransactionValidatorTest {
 	}
 
 	private static class TestContext {
+		private final BlockHeight confirmedBlockHeight = new BlockHeight(17);
 		private final Transaction transaction = new MockTransaction(Utils.generateRandomAccount(), 7);
 		private final Hash hash = HashUtils.calculateHash(this.transaction);
 
@@ -107,15 +108,18 @@ public class UniqueHashTransactionValidatorTest {
 		private final TransactionValidator validator = new UniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
 
 		private void setTransferDaoForHash() {
-			Mockito.when(this.transferDao.findByHash(this.hash.getRaw())).thenReturn(Mockito.mock(Transfer.class));
+			Mockito.when(this.transferDao.findByHash(this.hash.getRaw(), this.confirmedBlockHeight.getRaw()))
+					.thenReturn(Mockito.mock(Transfer.class));
 		}
 
 		private void setImportanceTransferDaoForHash() {
-			Mockito.when(this.importanceTransferDao.findByHash(this.hash.getRaw())).thenReturn(Mockito.mock(ImportanceTransfer.class));
+			Mockito.when(this.importanceTransferDao.findByHash(this.hash.getRaw()))
+					.thenReturn(Mockito.mock(ImportanceTransfer.class));
 		}
 
 		private ValidationResult validateAtHeight(final long height) {
-			return this.validator.validate(this.transaction, new ValidationContext(new BlockHeight(height)));
+			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight);
+			return this.validator.validate(this.transaction, validationContext);
 		}
 	}
 }

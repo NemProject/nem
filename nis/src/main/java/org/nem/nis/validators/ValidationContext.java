@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
  */
 public class ValidationContext {
 	private final BlockHeight blockHeight;
+	private final BlockHeight confirmedBlockHeight;
 	private final DebitPredicate debitPredicate;
 
 	/**
@@ -22,7 +23,17 @@ public class ValidationContext {
 	 * @param blockHeight The block height.
 	 */
 	public ValidationContext(final BlockHeight blockHeight) {
-		this(blockHeight, (account, amount) -> account.getBalance().compareTo(amount) >= 0);
+		this(blockHeight, blockHeight);
+	}
+
+	/**
+	 * Creates a validation context with a custom block height.
+	 *
+	 * @param blockHeight The block height.
+	 * @param confirmedBlockHeight The confirmed block height.
+	 */
+	public ValidationContext(final BlockHeight blockHeight, final BlockHeight confirmedBlockHeight) {
+		this(blockHeight, confirmedBlockHeight, (account, amount) -> account.getBalance().compareTo(amount) >= 0);
 	}
 
 	/**
@@ -31,7 +42,7 @@ public class ValidationContext {
 	 * @param debitPredicate The debit predicate.
 	 */
 	public ValidationContext(final DebitPredicate debitPredicate) {
-		this(BlockHeight.MAX, debitPredicate);
+		this(BlockHeight.MAX, BlockHeight.MAX, debitPredicate);
 	}
 
 	/**
@@ -40,8 +51,12 @@ public class ValidationContext {
 	 * @param blockHeight The block height.
 	 * @param debitPredicate The debit predicate.
 	 */
-	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate debitPredicate) {
+	public ValidationContext(
+			final BlockHeight blockHeight,
+			final BlockHeight confirmedBlockHeight,
+			final DebitPredicate debitPredicate) {
 		this.blockHeight = blockHeight;
+		this.confirmedBlockHeight = confirmedBlockHeight;
 		this.debitPredicate = debitPredicate;
 	}
 
@@ -52,6 +67,15 @@ public class ValidationContext {
 	 */
 	public BlockHeight getBlockHeight() {
 		return this.blockHeight;
+	}
+
+	/**
+	 * Gets the confirmed block height (all transactions at or below this block height can be considered confirmed).
+	 *
+	 * @return The confirmed block height.
+	 */
+	public BlockHeight getConfirmedBlockHeight() {
+		return this.confirmedBlockHeight;
 	}
 
 	/**

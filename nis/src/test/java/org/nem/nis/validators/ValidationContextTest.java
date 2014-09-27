@@ -16,6 +16,7 @@ public class ValidationContextTest {
 
 		// Assert:
 		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
 		Assert.assertThat(context.getDebitPredicate(), IsNull.notNullValue());
 		assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
 	}
@@ -27,6 +28,7 @@ public class ValidationContextTest {
 
 		// Assert:
 		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
 		Assert.assertThat(context.getDebitPredicate(), IsNull.notNullValue());
 		assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
 	}
@@ -39,17 +41,31 @@ public class ValidationContextTest {
 
 		// Assert:
 		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
 		Assert.assertThat(context.getDebitPredicate(), IsEqual.equalTo(debitPredicate));
 	}
 
 	@Test
-	public void canCreateDefaultContextWithCustomBlockHeightDebitPredicate() {
+	public void canCreateDefaultContextWithCustomCurrentAndConfirmedBlockHeights() {
 		// Arrange:
-		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
-		final ValidationContext context = new ValidationContext(new BlockHeight(11), debitPredicate);
+		final ValidationContext context = new ValidationContext(new BlockHeight(11), new BlockHeight(7));
 
 		// Assert:
 		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(7)));
+		Assert.assertThat(context.getDebitPredicate(), IsNull.notNullValue());
+		assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
+	}
+
+	@Test
+	public void canCreateDefaultContextWithAllCustomParameters() {
+		// Arrange:
+		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
+		final ValidationContext context = new ValidationContext(new BlockHeight(11), new BlockHeight(7), debitPredicate);
+
+		// Assert:
+		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(7)));
 		Assert.assertThat(context.getDebitPredicate(), IsEqual.equalTo(debitPredicate));
 	}
 

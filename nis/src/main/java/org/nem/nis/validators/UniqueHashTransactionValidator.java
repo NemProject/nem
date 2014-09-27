@@ -2,6 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.dao.*;
 
@@ -31,7 +32,12 @@ public class UniqueHashTransactionValidator implements TransactionValidator {
 		}
 
 		final Hash hash = HashUtils.calculateHash(transaction);
-		return null != this.transferDao.findByHash(hash.getRaw()) || null != this.importanceTransferDao.findByHash(hash.getRaw())
+		final BlockHeight blockHeight = context.getConfirmedBlockHeight();
+		// TODO 20140907 J-G update importanceTransferDao.findByHash
+		final boolean isInTransferDao = null != this.transferDao.findByHash(hash.getRaw(), blockHeight.getRaw());
+		//final boolean isInImportanceTransferDao = null != this.importanceTransferDao.findByHash(hash.getRaw(), blockHeight.getRaw());
+		final boolean isInImportanceTransferDao = null != this.importanceTransferDao.findByHash(hash.getRaw());
+		return isInTransferDao || isInImportanceTransferDao
 				? ValidationResult.NEUTRAL
 				: ValidationResult.SUCCESS;
 	}
