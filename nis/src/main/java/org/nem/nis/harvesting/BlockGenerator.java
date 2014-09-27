@@ -98,6 +98,7 @@ public class BlockGenerator {
 
 		// it's the remote harvester that generates a block NOT owner, we won't have owner's key here!
 		final Block newBlock = new Block(harvesterAccount, lastBlock, blockTime);
+		newBlock.setLessor(ownerAccount);
 		newBlock.setDifficulty(difficulty);
 		newBlock.addTransactions(transactions);
 		newBlock.sign();

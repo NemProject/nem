@@ -195,12 +195,16 @@ public class Block extends VerifiableEntity {
 	}
 
 	/**
-	 * Sets the lessor.
+	 * Sets the lessor (if it's different from block signer).
 	 *
 	 * @param lessor The lessor.
 	 */
 	public void setLessor(final Account lessor) {
-		this.lessor = lessor;
+		// TODO: not sure if this check should be here, or maybe it would be better to check
+		// passed value in all calls
+		if (lessor != null && !this.getSigner().equals(lessor)) {
+			this.lessor = lessor;
+		}
 	}
 
 	// endregion
