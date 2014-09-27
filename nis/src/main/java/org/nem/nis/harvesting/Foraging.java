@@ -73,13 +73,4 @@ public class Foraging {
 	public void processTransactions(final Collection<Transaction> transactions) {
 		transactions.stream().forEach(tx -> this.processTransaction(tx));
 	}
-
-	/**
-	 * Returns foraged block or null.
-	 *
-	 * @return Best block that could be created by unlocked accounts.
-	 */
-	public Block forageBlock(final BlockScorer blockScorer) {
-		return this.harvester.harvestBlock();
-	}
 }

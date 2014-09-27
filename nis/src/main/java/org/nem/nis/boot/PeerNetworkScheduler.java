@@ -1,10 +1,11 @@
 package org.nem.nis.boot;
 
 import org.nem.core.async.*;
-import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.core.node.NodeApiId;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.BlockChain;
+import org.nem.nis.*;
+import org.nem.nis.harvesting.Harvester;
 import org.nem.peer.*;
 
 import java.util.*;
@@ -70,18 +71,24 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 *
 	 * @param network The network.
 	 * @param blockChain The block chain.
+	 * @param harvester The harvester.
+	 * @param useNetworkTime true if network time should be used.
 	 */
-	public void addTasks(final PeerNetwork network, final BlockChain blockChain, final boolean useNetworkTime) {
-		this.addForagingTask(network, blockChain);
+	public void addTasks(
+			final PeerNetwork network,
+			final BlockChain blockChain,
+			final Harvester harvester,
+			final boolean useNetworkTime) {
+		this.addForagingTask(network, blockChain, harvester);
 		this.addNetworkTasks(network, useNetworkTime);
 	}
 
-	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain) {
+	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain, final Harvester harvester) {
 		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
 		this.timers.add(new AsyncTimer(
 				this.runnableToFutureSupplier(() -> {
-					final Block block = blockChain.forageBlock();
-					if (null == block) {
+					final Block block = harvester.harvestBlock();
+					if (null == block || !blockChain.processBlock(block).isSuccess()) {
 						return;
 					}
 

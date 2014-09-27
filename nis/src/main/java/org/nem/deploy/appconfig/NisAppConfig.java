@@ -239,6 +239,7 @@ public class NisAppConfig {
 		return new NisPeerNetworkHost(
 				this.accountAnalyzer(),
 				this.blockChain(),
+				this.harvester(),
 				this.chainServices(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),

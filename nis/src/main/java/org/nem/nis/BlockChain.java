@@ -129,19 +129,6 @@ public class BlockChain implements BlockSynchronizer {
 		return block.verify() ? ValidationResult.SUCCESS : ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
 	}
 
-	public Block forageBlock() {
-		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
-		final Block block = this.foraging.forageBlock(scorer);
-
-		// make a full-blown analysis
-		// TODO: we can call it thanks to the "hack" inside processBlock
-		if (block != null && this.processBlock(block) == ValidationResult.SUCCESS) {
-			return block;
-		}
-
-		return null;
-	}
-
 	/**
 	 * Synch algorithm:
 	 * 1. Get peer's last block compare with ours, assuming it's ok
