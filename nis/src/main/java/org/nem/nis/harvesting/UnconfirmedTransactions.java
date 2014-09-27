@@ -92,11 +92,12 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
 		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
+		final TimeInstant entityTime = transaction.getTimeStamp();
+		if (entityTime.compareTo(currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
 		}
 
-		if (transaction.getTimeStamp().compareTo(currentTime.addSeconds(-TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) < 0) {
+		if (entityTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION).compareTo(currentTime) < 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
 		}
 

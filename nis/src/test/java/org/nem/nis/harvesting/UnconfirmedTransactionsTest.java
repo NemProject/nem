@@ -288,6 +288,22 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(0));
 	}
 
+	@Test
+	public void addNewCanAddTransactionAtGenesisTime() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.timeProvider.getCurrentTime()).thenReturn(new TimeInstant(25));
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7, TimeInstant.ZERO);
+		final ValidationResult result = context.transactions.addNew(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+	}
+
 	//endregion
 
 	//region execution
