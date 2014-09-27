@@ -7,6 +7,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
+import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -21,6 +22,8 @@ public class BlockGenerator {
 	private final PoiFacade poiFacade;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockDao blockDao;
+	private final BlockScorer blockScorer;
+	private final BlockValidator blockValidator;
 
 	/**
 	 * Creates a new block generator.
@@ -34,11 +37,15 @@ public class BlockGenerator {
 			final AccountLookup accountLookup,
 			final PoiFacade poiFacade,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final BlockDao blockDao) {
+			final BlockDao blockDao,
+			final BlockScorer blockScorer,
+			final BlockValidator blockValidator) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockDao = blockDao;
+		this.blockScorer = blockScorer;
+		this.blockValidator = blockValidator;
 	}
 
 	/**
@@ -46,33 +53,34 @@ public class BlockGenerator {
 	 *
 	 * @param lastBlock The last block.
 	 * @param harvesterAddress The harvester address.
-	 * @param blockScorer The block scorer.
 	 * @param blockTime The block time.
 	 * @return The block.
 	 */
 	public GeneratedBlock generateNextBlock(
 			final Block lastBlock,
 			final Address harvesterAddress,
-			final BlockScorer blockScorer,
 			final TimeInstant blockTime) {
-		final Block newBlock = this.createBlock(lastBlock, harvesterAddress, blockScorer, blockTime);
+		// remove all expired transactions
+		this.unconfirmedTransactions.dropExpiredTransactions(blockTime);
+
+		final Block newBlock = this.createBlock(lastBlock, harvesterAddress, this.blockScorer, blockTime);
 		LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 
-		final BigInteger hit = blockScorer.calculateHit(newBlock);
+		final BigInteger hit = this.blockScorer.calculateHit(newBlock);
 		LOGGER.info("   hit: 0x" + hit.toString(16));
-		final BigInteger target = blockScorer.calculateTarget(lastBlock, newBlock);
+		final BigInteger target = this.blockScorer.calculateTarget(lastBlock, newBlock);
 		LOGGER.info("target: 0x" + target.toString(16));
 		LOGGER.info("difficulty: " + (newBlock.getDifficulty().getRaw() * 100L) / BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + "%");
 
-		if (hit.compareTo(target) >= 0) {
+		if (hit.compareTo(target) >= 0 || !this.blockValidator.validate(newBlock).isSuccess()) {
 			return null;
 		}
 
-		LOGGER.info(String.format("[HIT] forger balance: %s", blockScorer.calculateForgerBalance(newBlock)));
+		LOGGER.info(String.format("[HIT] forger balance: %s", this.blockScorer.calculateForgerBalance(newBlock)));
 		LOGGER.info(String.format("[HIT] last block: %s", newBlock.getPreviousBlockHash()));
 		LOGGER.info(String.format("[HIT] timestamp diff: %s", newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp())));
 		LOGGER.info(String.format("[HIT] block diff: %s", newBlock.getDifficulty()));
-		final long score = blockScorer.calculateBlockScore(lastBlock, newBlock);
+		final long score = this.blockScorer.calculateBlockScore(lastBlock, newBlock);
 		return new GeneratedBlock(newBlock, score);
 	}
 

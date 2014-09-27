@@ -13,6 +13,7 @@ import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
+import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -180,7 +181,7 @@ public class BlockGeneratorTest {
 
 	//endregion
 
-	//region hit evaluation
+	//region evaluation
 
 	@Test
 	public void blockIsReturnedIfHitIsLessThanTarget() {
@@ -239,6 +240,56 @@ public class BlockGeneratorTest {
 		Mockito.verify(context.scorer, Mockito.never()).calculateBlockScore(Mockito.any(), Mockito.any());
 	}
 
+	@Test
+	public void blockIsReturnedIfValidationSucceeds() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block lastBlock = NisUtils.createRandomBlockWithHeight(7);
+		Mockito.when(context.validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		final GeneratedBlock generatedBlock = context.generateNextBlock(lastBlock);
+		final Block block = generatedBlock.getBlock();
+
+		// Assert:
+		Assert.assertThat(block, IsNull.notNullValue());
+		Mockito.verify(context.validator, Mockito.only()).validate(block);
+	}
+
+	@Test
+	public void blockIsNotReturnedIfValidationFails() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block lastBlock = NisUtils.createRandomBlockWithHeight(7);
+		Mockito.when(context.validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+
+		// Act:
+		final GeneratedBlock generatedBlock = context.generateNextBlock(lastBlock);
+
+		// Assert:
+		Assert.assertThat(generatedBlock, IsNull.nullValue());
+		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any());
+	}
+
+	//endregion
+
+	//region side-effects
+
+	@Test
+	public void generateNextBlockDropsExpiredTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.generateNextBlock(
+				NisUtils.createRandomBlockWithHeight(7),
+				Utils.generateRandomAddress(),
+				new TimeInstant(22));
+
+		// Assert:
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).dropExpiredTransactions(new TimeInstant(22));
+	}
+
 	//endregion
 
 	private static class TestContext {
@@ -246,14 +297,16 @@ public class BlockGeneratorTest {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
+		private final BlockDifficultyScorer difficultyScorer = Mockito.mock(BlockDifficultyScorer.class);
+		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
+		private final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		private final BlockGenerator generator = new BlockGenerator(
 				this.accountLookup,
 				this.poiFacade,
 				this.unconfirmedTransactions,
-				this.blockDao);
-
-		private final BlockDifficultyScorer difficultyScorer = Mockito.mock(BlockDifficultyScorer.class);
-		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
+				this.blockDao,
+				this.scorer,
+				this.validator);
 
 		private TestContext() {
 			final Account signer = Utils.generateRandomAccount();
@@ -269,6 +322,8 @@ public class BlockGeneratorTest {
 			Mockito.when(this.scorer.getDifficultyScorer()).thenReturn(this.difficultyScorer);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.valueOf(5));
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.valueOf(6));
+
+			Mockito.when(this.validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		}
 
 		private GeneratedBlock generateNextBlock(final Block lastBlock) {
@@ -280,7 +335,7 @@ public class BlockGeneratorTest {
 		}
 
 		private GeneratedBlock generateNextBlock(final Block lastBlock, final Address harvesterSignerAddress, final TimeInstant timeInstant) {
-			return this.generator.generateNextBlock(lastBlock, harvesterSignerAddress, this.scorer, timeInstant);
+			return this.generator.generateNextBlock(lastBlock, harvesterSignerAddress, timeInstant);
 		}
 	}
 }

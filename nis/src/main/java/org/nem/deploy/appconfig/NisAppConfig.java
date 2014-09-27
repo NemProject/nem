@@ -162,12 +162,26 @@ public class NisAppConfig {
 	@Bean
 	public Foraging foraging() {
 		return new Foraging(
+				this.harvester(),
+				this.unconfirmedTransactions());
+	}
+
+	@Bean
+	public Harvester harvester() {
+		final PoiFacade poiFacade = this.poiFacade();
+		final BlockGenerator generator = new BlockGenerator(
 				this.accountCache(),
-				this.poiFacade(),
+				poiFacade,
+				this.unconfirmedTransactions(),
 				this.blockDao,
+				new BlockScorer(poiFacade),
+				this.blockValidatorFactory().create(poiFacade));
+		return new Harvester(
+				this.accountCache(),
+				this.timeProvider(),
 				this.blockChainLastBlockLayer,
 				this.unlockedAccounts(),
-				this.unconfirmedTransactions());
+				generator);
 	}
 
 	@Bean
