@@ -167,9 +167,6 @@ public class BlockScorerTest {
 	}
 
 	private static void assertGroupedHeight(final long height, final long expectedGroupedHeight) {
-		// Arrange:
-		final TestContext context = new TestContext();
-
 		// Act:
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(new BlockHeight(height));
 
@@ -243,10 +240,11 @@ public class BlockScorerTest {
 		final long score = context.scorer.calculateForgerBalance(block);
 
 		// Assert:
-		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
 		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
 		Mockito.verify(poiFacade, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
+
 	//endregion
 
 	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block) throws NoSuchFieldException, IllegalAccessException {

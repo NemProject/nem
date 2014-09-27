@@ -12,7 +12,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccountDao;
-import org.omg.PortableInterceptor.AdapterStateHelper;
 
 public class BlockMapperTest {
 
@@ -272,7 +271,6 @@ public class BlockMapperTest {
 			this.accountDao.addMapping(this.account1, this.dbAccount1);
 			this.accountDao.addMapping(this.account2, this.dbAccount2);
 			this.accountDao.addMapping(this.account3, this.dbAccount3);
-
 		}
 
 		public void addLessor() {

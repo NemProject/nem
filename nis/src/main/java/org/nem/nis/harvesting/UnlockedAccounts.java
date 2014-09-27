@@ -40,6 +40,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;
 		}
 
+		// use the latest forwarded state so that remote harvesters that aren't active yet can be unlocked
 		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
 		final PoiAccountState accountState = this.poiFacade.findLatestForwardedStateByAddress(account.getAddress());
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(-1, accountState, currentHeight);

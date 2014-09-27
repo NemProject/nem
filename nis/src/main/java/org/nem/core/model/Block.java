@@ -149,6 +149,7 @@ public class Block extends VerifiableEntity {
 	public Account getLessor() {
 		return this.lessor;
 	}
+
 	//endregion
 
 	//region Setters
@@ -192,10 +193,15 @@ public class Block extends VerifiableEntity {
 		this.difficulty = difficulty;
 	}
 
-
+	/**
+	 * Sets the lessor.
+	 *
+	 * @param lessor The lessor.
+	 */
 	public void setLessor(final Account lessor) {
 		this.lessor = lessor;
 	}
+
 	// endregion
 
 	/**

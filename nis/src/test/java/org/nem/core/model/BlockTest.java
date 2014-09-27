@@ -128,6 +128,7 @@ public class BlockTest {
 		// Assert:
 		Assert.assertThat(block.getLessor(), IsEqual.equalTo(account));
 	}
+
 	//endregion
 
 	//region Serialization

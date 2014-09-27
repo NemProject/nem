@@ -52,12 +52,11 @@ public class BlockGeneratorTest {
 	public void generatedBlockHasCorrectTimeStamp() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
 
 		// Act:
 		final Block block = context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				account,
+				Utils.generateRandomAccount(),
 				new TimeInstant(17)).getBlock();
 
 		// Assert:
@@ -77,27 +76,24 @@ public class BlockGeneratorTest {
 	}
 
 	@Test
-	@Ignore
-	// TODO-CR 20140927 G-J: this test does not make sense? "remote harvester" account is a signer
-	// "owner's" TXes are removed, from the block, and "owner's ballance" is used when calculating block's target
-	public void generatedBlockHasForwardedAccountAsSigner() {
+	public void generatedBlockHasRemoteAccountAsSigner() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account blockSignerAccount = Utils.generateRandomAccount();
-		final Account forwardedAccount = Utils.generateRandomAccount();
+		final Account remoteAccount = Utils.generateRandomAccount();
+		final Account ownerAccount = Utils.generateRandomAccount();
 		Mockito.when(context.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
-				.then(o -> new PoiAccountState(forwardedAccount.getAddress()));
-		Mockito.when(context.accountLookup.findByAddress(Mockito.any())).thenReturn(forwardedAccount);
+				.then(o -> new PoiAccountState(ownerAccount.getAddress()));
+		Mockito.when(context.accountLookup.findByAddress(Mockito.any())).thenReturn(ownerAccount);
 
 		// Act:
 		final Block block = context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				blockSignerAccount).getBlock();
+				remoteAccount).getBlock();
 
 		// Assert:
-		Assert.assertThat(block.getSigner(), IsEqual.equalTo(forwardedAccount));
-		Mockito.verify(context.poiFacade, Mockito.only()).findForwardedStateByAddress(blockSignerAccount.getAddress(), new BlockHeight(8));
-		Mockito.verify(context.accountLookup, Mockito.only()).findByAddress(forwardedAccount.getAddress());
+		Assert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
+		Mockito.verify(context.poiFacade, Mockito.only()).findForwardedStateByAddress(remoteAccount.getAddress(), new BlockHeight(8));
+		Mockito.verify(context.accountLookup, Mockito.only()).findByAddress(ownerAccount.getAddress());
 	}
 
 	@Test
@@ -116,7 +112,6 @@ public class BlockGeneratorTest {
 	public void generatedBlockCanHaveTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account blockSignerAccount = Utils.generateRandomAccount();
 		final List<Transaction> transactions = Arrays.asList(
 				new MockTransaction(7, new TimeInstant(1)),
 				new MockTransaction(11, new TimeInstant(2)),
@@ -126,20 +121,23 @@ public class BlockGeneratorTest {
 		Mockito.when(context.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
 		Mockito.when(filteredTransactions.getAll()).thenReturn(transactions);
 
-		// override TestContext result
-		Mockito.when(context.accountLookup.findByAddress(Mockito.any())).thenReturn(blockSignerAccount);
+		final Account remoteAccount = Utils.generateRandomAccount();
+		final Account ownerAccount = Utils.generateRandomAccount();
+		Mockito.when(context.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
+				.then(o -> new PoiAccountState(ownerAccount.getAddress()));
+		Mockito.when(context.accountLookup.findByAddress(Mockito.any())).thenReturn(ownerAccount);
 
 		// Act:
 		final Block block = context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				blockSignerAccount,
+				remoteAccount,
 				new TimeInstant(11)).getBlock();
 
 		// Assert:
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(3));
 		Assert.assertThat(block.getTransactions(), IsEqual.equalTo(transactions));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1))
-				.getTransactionsForNewBlock(blockSignerAccount.getAddress(), new TimeInstant(11));
+				.getTransactionsForNewBlock(ownerAccount.getAddress(), new TimeInstant(11));
 	}
 
 	@Test
@@ -286,12 +284,11 @@ public class BlockGeneratorTest {
 	public void generateNextBlockDropsExpiredTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
 
 		// Act:
 		context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				account,
+				Utils.generateRandomAccount(),
 				new TimeInstant(22));
 
 		// Assert:
@@ -338,12 +335,12 @@ public class BlockGeneratorTest {
 			return this.generateNextBlock(lastBlock, Utils.generateRandomAccount());
 		}
 
-		private GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterSignerAccount) {
-			return this.generateNextBlock(lastBlock, harvesterSignerAccount, new TimeInstant(7));
+		private GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterSigner) {
+			return this.generateNextBlock(lastBlock, harvesterSigner, new TimeInstant(7));
 		}
 
-		private GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterSignerAccount, final TimeInstant timeInstant) {
-			return this.generator.generateNextBlock(lastBlock, harvesterSignerAccount, timeInstant);
+		private GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterSigner, final TimeInstant timeInstant) {
+			return this.generator.generateNextBlock(lastBlock, harvesterSigner, timeInstant);
 		}
 	}
 }
