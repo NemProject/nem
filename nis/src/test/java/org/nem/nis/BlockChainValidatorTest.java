@@ -2,7 +2,7 @@ package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -321,6 +321,72 @@ public class BlockChainValidatorTest {
 		// Assert:
 		Mockito.verify(executor, Mockito.times(1)).accept(block1);
 		Mockito.verify(executor, Mockito.times(1)).accept(block2);
+	}
+
+	//endregion
+
+	//region validation context
+
+	@Test
+	public void validationContextConfirmedBlockHeightIsConstant() {
+		// Act:
+		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(11);
+
+		// Assert:
+		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
+			Assert.assertThat(
+					contextCaptor.getAllValues().get(i).getConfirmedBlockHeight(),
+					IsEqual.equalTo(new BlockHeight(11)));
+		}
+	}
+
+	@Test
+	public void validationContextCurrentBlockHeightIsIncrementingPerBlock() {
+		// Act:
+		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(11);
+
+		// Assert:
+		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
+			Assert.assertThat(
+					contextCaptor.getAllValues().get(i).getBlockHeight(),
+					IsEqual.equalTo(new BlockHeight(12 + i / 2)));
+		}
+	}
+
+	private static ArgumentCaptor<ValidationContext> captureValidationContext(final long parentBlockHeight) {
+		// Arrange:
+		final TransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
+		factory.transactionValidator = transactionValidator;
+
+		final BlockChainValidator validator = factory.create();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), parentBlockHeight);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		Block previousBlock = null;
+		for (final Block block : blocks) {
+			if (null != previousBlock) {
+				block.setPrevious(previousBlock);
+			}
+
+			block.addTransaction(createValidSignedTransaction());
+			block.addTransaction(createValidSignedTransaction());
+			block.sign();
+
+			previousBlock = block;
+		}
+
+		// Act:
+		final boolean result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(true));
+
+		final ArgumentCaptor<ValidationContext> contextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
+		Mockito.verify(transactionValidator, Mockito.times(6)).validate(Mockito.any(), contextCaptor.capture());
+		return contextCaptor;
 	}
 
 	//endregion

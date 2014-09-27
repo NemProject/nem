@@ -78,13 +78,15 @@ public class BlockChainValidatorIntegrationTest {
 	@Test
 	public void chainIsValidIfTransactionAlreadyExistBeforeMarkerBlock() {
 		// Arrange:
+		final long confirmedBlockHeight = BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 3;
 		final Transaction transaction = createValidSignedTransaction();
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		Mockito.when(factory.transferDao.findByHash(HashUtils.calculateHash(transaction).getRaw()))
+		Mockito.when(factory.transferDao.findByHash(transactionHash.getRaw(), confirmedBlockHeight))
 				.thenReturn(Mockito.mock(Transfer.class));
 		final BlockChainValidator validator = factory.create();
 
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 3);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), confirmedBlockHeight);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
@@ -100,13 +102,15 @@ public class BlockChainValidatorIntegrationTest {
 	@Test
 	public void chainIsInvalidIfTransactionAlreadyExistInDbAtMarkerThread() {
 		// Arrange:
+		final long confirmedBlockHeight = BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2;
 		final Transaction transaction = createValidSignedTransaction();
+		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		Mockito.when(factory.transferDao.findByHash(HashUtils.calculateHash(transaction).getRaw()))
+		Mockito.when(factory.transferDao.findByHash(transactionHash.getRaw(), confirmedBlockHeight))
 				.thenReturn(Mockito.mock(Transfer.class));
 		final BlockChainValidator validator = factory.create();
 
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), confirmedBlockHeight);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);

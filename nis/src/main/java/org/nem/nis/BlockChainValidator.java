@@ -57,6 +57,7 @@ public class BlockChainValidator {
 			return false;
 		}
 
+		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
 		final Set<Hash> chainHashes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
@@ -74,7 +75,7 @@ public class BlockChainValidator {
 				return false;
 			}
 
-			final ValidationContext validationContext = new ValidationContext(block.getHeight(), parentBlock.getHeight());
+			final ValidationContext validationContext = new ValidationContext(block.getHeight(), confirmedBlockHeight);
 			for (final Transaction transaction : block.getTransactions()) {
 				if (ValidationResult.SUCCESS != this.transactionValidator.validate(transaction, validationContext) ||
 						!transaction.verify() ||
