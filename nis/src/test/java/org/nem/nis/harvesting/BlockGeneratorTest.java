@@ -52,11 +52,12 @@ public class BlockGeneratorTest {
 	public void generatedBlockHasCorrectTimeStamp() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final Account account = Utils.generateRandomAccount();
 
 		// Act:
 		final Block block = context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				Utils.generateRandomAddress(),
+				account,
 				new TimeInstant(17)).getBlock();
 
 		// Assert:
@@ -88,7 +89,7 @@ public class BlockGeneratorTest {
 		// Act:
 		final Block block = context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				blockSignerAccount.getAddress()).getBlock();
+				blockSignerAccount).getBlock();
 
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(forwardedAccount));
@@ -125,7 +126,7 @@ public class BlockGeneratorTest {
 		// Act:
 		final Block block = context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				blockSignerAccount.getAddress(),
+				blockSignerAccount,
 				new TimeInstant(11)).getBlock();
 
 		// Assert:
@@ -279,11 +280,12 @@ public class BlockGeneratorTest {
 	public void generateNextBlockDropsExpiredTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final Account account = Utils.generateRandomAccount();
 
 		// Act:
 		context.generateNextBlock(
 				NisUtils.createRandomBlockWithHeight(7),
-				Utils.generateRandomAddress(),
+				account,
 				new TimeInstant(22));
 
 		// Assert:
@@ -327,15 +329,15 @@ public class BlockGeneratorTest {
 		}
 
 		private GeneratedBlock generateNextBlock(final Block lastBlock) {
-			return this.generateNextBlock(lastBlock, Utils.generateRandomAddress());
+			return this.generateNextBlock(lastBlock, Utils.generateRandomAccount());
 		}
 
-		private GeneratedBlock generateNextBlock(final Block lastBlock, final Address harvesterSignerAddress) {
-			return this.generateNextBlock(lastBlock, harvesterSignerAddress, new TimeInstant(7));
+		private GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterSignerAccount) {
+			return this.generateNextBlock(lastBlock, harvesterSignerAccount, new TimeInstant(7));
 		}
 
-		private GeneratedBlock generateNextBlock(final Block lastBlock, final Address harvesterSignerAddress, final TimeInstant timeInstant) {
-			return this.generator.generateNextBlock(lastBlock, harvesterSignerAddress, timeInstant);
+		private GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterSignerAccount, final TimeInstant timeInstant) {
+			return this.generator.generateNextBlock(lastBlock, harvesterSignerAccount, timeInstant);
 		}
 	}
 }

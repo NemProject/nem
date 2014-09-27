@@ -64,7 +64,7 @@ public class HarvesterTest {
 		// Assert:
 		Assert.assertThat(block, IsNull.nullValue());
 		Mockito.verify(context.generator, Mockito.only())
-				.generateNextBlock(Mockito.any(), Mockito.eq(account.getAddress()), Mockito.any());
+				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class HarvesterTest {
 		// Assert:
 		Assert.assertThat(block, IsEqual.equalTo(generatedBlock.getBlock()));
 		Mockito.verify(context.generator, Mockito.only())
-				.generateNextBlock(Mockito.any(), Mockito.eq(account.getAddress()), Mockito.any());
+				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class HarvesterTest {
 
 		final List<Account> accounts = generatedBlocks.stream().map(b -> {
 			final Account account = null == b ? Utils.generateRandomAccount() : b.getBlock().getSigner();
-			Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.eq(account.getAddress()), Mockito.any()))
+			Mockito.when(context.generator.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any()))
 					.thenReturn(b);
 			return account;
 		}).collect(Collectors.toList());

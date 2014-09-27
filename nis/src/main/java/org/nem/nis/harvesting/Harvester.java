@@ -53,7 +53,7 @@ public class Harvester {
 			for (final Account harvester : this.unlockedAccounts) {
 				final GeneratedBlock generatedBlock = this.generator.generateNextBlock(
 						lastBlock,
-						harvester.getAddress(),
+						harvester,
 						blockTime);
 
 				if (null != generatedBlock && (null == bestGeneratedBlock || generatedBlock.getScore() > bestGeneratedBlock.getScore())) {

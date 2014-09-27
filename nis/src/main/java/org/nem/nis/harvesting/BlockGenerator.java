@@ -52,18 +52,18 @@ public class BlockGenerator {
 	 * Generates the next block.
 	 *
 	 * @param lastBlock The last block.
-	 * @param harvesterAddress The harvester address.
+	 * @param harvesterAccount The harvester address.
 	 * @param blockTime The block time.
 	 * @return The block.
 	 */
 	public GeneratedBlock generateNextBlock(
 			final Block lastBlock,
-			final Address harvesterAddress,
+			final Account harvesterAccount,
 			final TimeInstant blockTime) {
 		// remove all expired transactions
 		this.unconfirmedTransactions.dropExpiredTransactions(blockTime);
 
-		final Block newBlock = this.createBlock(lastBlock, harvesterAddress, this.blockScorer, blockTime);
+		final Block newBlock = this.createBlock(lastBlock, harvesterAccount, this.blockScorer, blockTime);
 		LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 
 		final BigInteger hit = this.blockScorer.calculateHit(newBlock);
@@ -86,16 +86,18 @@ public class BlockGenerator {
 
 	private Block createBlock(
 			final Block lastBlock,
-			final Address harvesterAddress,
+			final Account harvesterAccount,
 			final BlockScorer blockScorer,
 			final TimeInstant blockTime) {
 		final BlockHeight harvestedBlockHeight = lastBlock.getHeight().next();
-		final PoiAccountState accountState = this.poiFacade.findForwardedStateByAddress(harvesterAddress, harvestedBlockHeight);
-		final Account harvester = this.accountLookup.findByAddress(accountState.getAddress());
-		final Collection<Transaction> transactions = this.unconfirmedTransactions.getTransactionsForNewBlock(harvesterAddress, blockTime).getAll();
+		final PoiAccountState ownerState = this.poiFacade.findForwardedStateByAddress(harvesterAccount.getAddress(), harvestedBlockHeight);
+		final Account ownerAccount = this.accountLookup.findByAddress(ownerState.getAddress());
+
+		final Collection<Transaction> transactions = this.unconfirmedTransactions.getTransactionsForNewBlock(ownerAccount.getAddress(), blockTime).getAll();
 		final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock.getHeight());
 
-		final Block newBlock = new Block(harvester, lastBlock, blockTime);
+		// it's the remote harvester that generates a block NOT owner, we won't have owner's key here!
+		final Block newBlock = new Block(harvesterAccount, lastBlock, blockTime);
 		newBlock.setDifficulty(difficulty);
 		newBlock.addTransactions(transactions);
 		newBlock.sign();
