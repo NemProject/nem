@@ -17,7 +17,6 @@ import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.nis.service.*;
-import org.nem.nis.validators.TransactionValidator;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -198,14 +197,12 @@ public class AccountControllerTest {
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
-		final UnconfirmedTransactions originalUnconfirmedTransactions = new UnconfirmedTransactions(validator);
+		final UnconfirmedTransactions originalUnconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		final List<Transaction> originalTransactions = Arrays.asList(
 				new MockTransaction(7, new TimeInstant(1)),
 				new MockTransaction(11, new TimeInstant(2)),
 				new MockTransaction(5, new TimeInstant(3)));
-		originalTransactions.forEach(originalUnconfirmedTransactions::add);
+		Mockito.when(originalUnconfirmedTransactions.getAll()).thenReturn(originalTransactions);
 		final TestContext context = new TestContext();
 
 		Mockito.when(context.unconfirmedTransactions.getTransactionsForAccount(address))
