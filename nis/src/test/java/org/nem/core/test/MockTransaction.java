@@ -21,7 +21,11 @@ public class MockTransaction extends Transaction {
 	private int customField;
 	private long minimumFee;
 
-	private Consumer<TransactionObserver> transferAction = to -> { };
+	private Consumer<TransactionObserver> transferAction = o -> {
+		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(o);
+		transferObserver.notifyDebit(this.getSigner(), this.getFee());
+	};
+
 	private int numTransferCalls;
 
 	/**

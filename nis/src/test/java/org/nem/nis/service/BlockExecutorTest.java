@@ -264,11 +264,12 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
-		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(2), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(0), context.transactionSigner, Amount.fromNem(5));
 	}
 
 	@Test
@@ -283,17 +284,19 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
 		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(0), context.realAccount, Amount.fromNem(5));
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(2), context.transactionSigner, Amount.fromNem(5));
 	}
 
 	private static class UndoExecuteRemoteHarvestingNotificationTestContext {
 		private final ExecutorTestContext context = new ExecutorTestContext();
 		private final Account remoteSigner = this.context.addAccount();
 		private final Account realAccount = this.context.addAccount();
+		private final Account transactionSigner = this.context.addAccount();
 
 		final BlockHeight height = new BlockHeight(11);
 		final Block block;
@@ -301,7 +304,7 @@ public class BlockExecutorTest {
 		public UndoExecuteRemoteHarvestingNotificationTestContext() {
 			// Arrange: create a block signed by the remote (remoteSigner) and have remoteSigner forward to realAccount
 			this.block = new Block(this.remoteSigner, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, this.height);
-			final MockTransaction transaction = new MockTransaction(this.realAccount, 1);
+			final MockTransaction transaction = new MockTransaction(this.transactionSigner, 1);
 			transaction.setMinimumFee(Amount.fromNem(5).getNumMicroNem());
 			this.block.addTransaction(transaction);
 

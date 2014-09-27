@@ -57,8 +57,19 @@ public class NisUtils {
 	 * @return The block.
 	 */
 	public static Block createRandomBlockWithHeight(final long height) {
+		return createRandomBlockWithHeight(Utils.generateRandomAccount(), height);
+	}
+
+	/**
+	 * Creates a new random Block with the specified height and signer
+	 *
+	 * @param signer The signer.
+	 * @param height The height.
+	 * @return The block.
+	 */
+	public static Block createRandomBlockWithHeight(final Account signer, final long height) {
 		return new Block(
-				Utils.generateRandomAccount(),
+				signer,
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				TimeInstant.ZERO,

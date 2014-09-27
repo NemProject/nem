@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.nis.dao.*;
-import org.nem.nis.harvesting.Foraging;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -31,6 +31,7 @@ public class BlockChain implements BlockSynchronizer {
 	private final AccountAnalyzer accountAnalyzer;
 	private final Foraging foraging;
 	private final BlockChainServices services;
+	private final UnconfirmedTransactions unconfirmedTransactions;
 	private BlockChainScore score;
 
 	@Autowired(required = true)
@@ -40,13 +41,15 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final Foraging foraging,
-			final BlockChainServices services) {
+			final BlockChainServices services,
+			final UnconfirmedTransactions unconfirmedTransactions) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.foraging = foraging;
 		this.services = services;
+		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.score = BlockChainScore.ZERO;
 	}
 
@@ -124,19 +127,6 @@ public class BlockChain implements BlockSynchronizer {
 
 		// the peer returned a block that can be added to our chain
 		return block.verify() ? ValidationResult.SUCCESS : ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
-	}
-
-	public Block forageBlock() {
-		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
-		final Block block = this.foraging.forageBlock(scorer);
-
-		// make a full-blown analysis
-		// TODO: we can call it thanks to the "hack" inside processBlock
-		if (block != null && this.processBlock(block) == ValidationResult.SUCCESS) {
-			return block;
-		}
-
-		return null;
 	}
 
 	/**
@@ -288,7 +278,7 @@ public class BlockChain implements BlockSynchronizer {
 			final boolean hasOwnChain,
 			final boolean shouldPunishLowerPeerScore) {
 		final UpdateChainResult updateResult = context.updateOurChain(
-				this.foraging,
+				this.unconfirmedTransactions,
 				dbParentBlock,
 				peerChain,
 				ourScore,
@@ -353,7 +343,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		public UpdateChainResult updateOurChain(
-				final Foraging foraging,
+				final UnconfirmedTransactions unconfirmedTransactions,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
@@ -365,7 +355,7 @@ public class BlockChain implements BlockSynchronizer {
 					this.blockChainLastBlockLayer,
 					this.blockDao,
 					this.services,
-					foraging,
+					unconfirmedTransactions,
 					dbParentBlock,
 					peerChain,
 					ourScore,
@@ -400,7 +390,7 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
 		private final BlockChainServices services;
-		private final Foraging foraging;
+		private final UnconfirmedTransactions unconfirmedTransactions;
 		private final Block parentBlock;
 		private final Collection<Block> peerChain;
 		private final BlockChainScore ourScore;
@@ -413,7 +403,7 @@ public class BlockChain implements BlockSynchronizer {
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
 				final BlockChainServices services,
-				final Foraging foraging,
+				final UnconfirmedTransactions unconfirmedTransactions,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
@@ -425,7 +415,7 @@ public class BlockChain implements BlockSynchronizer {
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
 			this.services = services;
-			this.foraging = foraging;
+			this.unconfirmedTransactions = unconfirmedTransactions;
 
 			// do not trust peer, take first block from our db and convert it
 			this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer.getAccountCache());
@@ -511,8 +501,8 @@ public class BlockChain implements BlockSynchronizer {
 				this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
 				this.peerChain.stream()
-						.filter(tr -> this.blockChainLastBlockLayer.addBlockToDb(tr))
-						.forEach(tr -> this.foraging.removeFromUnconfirmedTransactions(tr));
+						.filter(block -> this.blockChainLastBlockLayer.addBlockToDb(block))
+						.forEach(block -> this.unconfirmedTransactions.removeAll(block));
 			}
 		}
 
@@ -533,7 +523,7 @@ public class BlockChain implements BlockSynchronizer {
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
-						.forEach(tr -> this.foraging.addUnconfirmedTransactionWithoutDbCheck(tr));
+						.forEach(tr -> this.unconfirmedTransactions.add(tr, UnconfirmedTransactions.AddOptions.AllowNeutral));
 				currentHeight--;
 			}
 		}

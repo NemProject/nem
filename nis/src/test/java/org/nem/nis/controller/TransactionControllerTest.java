@@ -10,7 +10,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
-import org.nem.nis.harvesting.Foraging;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.service.PushService;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
@@ -42,7 +42,7 @@ public class TransactionControllerTest {
 			final Function<TestContext, T> action,
 			final Function<T, SerializableList<Transaction>> getUnconfirmedTransactions) {
 		// Arrange:
-		Mockito.when(context.foraging.getUnconfirmedTransactionsForNewBlock(Mockito.any())).thenReturn(createTransactionList());
+		Mockito.when(context.unconfirmedTransactions.getAll()).thenReturn(createTransactionList());
 
 		// Act:
 		final T result = action.apply(context);
@@ -51,7 +51,7 @@ public class TransactionControllerTest {
 		// Assert:
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(1));
 		Assert.assertThat(transactions.get(0).getTimeStamp(), IsEqual.equalTo(new TimeInstant(321)));
-		Mockito.verify(context.foraging, Mockito.times(1)).getUnconfirmedTransactionsForNewBlock(Mockito.any());
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getAll();
 		return result;
 	}
 
@@ -69,7 +69,7 @@ public class TransactionControllerTest {
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final PushService pushService = Mockito.mock(PushService.class);
-		private final Foraging foraging = Mockito.mock(Foraging.class);
+		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
@@ -84,7 +84,7 @@ public class TransactionControllerTest {
 			this.controller = new TransactionController(
 					this.accountLookup,
 					this.pushService,
-					this.foraging,
+					this.unconfirmedTransactions,
 					null,
 					this.host);
 		}

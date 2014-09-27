@@ -191,19 +191,22 @@ public class AccountControllerTest {
 	//region transactionsUnconfirmed
 
 	@Test
-	public void transactionsUnconfirmedDelegatesToForaging() {
+	public void transactionsUnconfirmedDelegatesToUnconfirmedTransactions() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 
+		final UnconfirmedTransactions originalUnconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		final List<Transaction> originalTransactions = Arrays.asList(
-				new MockTransaction(7, TimeInstant.ZERO),
-				new MockTransaction(11, TimeInstant.ZERO),
-				new MockTransaction(5, TimeInstant.ZERO));
+				new MockTransaction(7, new TimeInstant(1)),
+				new MockTransaction(11, new TimeInstant(2)),
+				new MockTransaction(5, new TimeInstant(3)));
+		Mockito.when(originalUnconfirmedTransactions.getAll()).thenReturn(originalTransactions);
 		final TestContext context = new TestContext();
 
-		Mockito.when(context.foraging.getUnconfirmedTransactions(address)).thenReturn(originalTransactions);
+		Mockito.when(context.unconfirmedTransactions.getTransactionsForAccount(address))
+				.thenReturn(originalUnconfirmedTransactions);
 
 		// Act:
 		final SerializableList<Transaction> transactions = context.controller.transactionsUnconfirmed(builder);
@@ -212,7 +215,7 @@ public class AccountControllerTest {
 		Assert.assertThat(
 				transactions.asCollection().stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
-		Mockito.verify(context.foraging, Mockito.times(1)).getUnconfirmedTransactions(address);
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getTransactionsForAccount(address);
 	}
 
 	//endregion
@@ -295,7 +298,7 @@ public class AccountControllerTest {
 	//endregion
 
 	private static class TestContext {
-		private final Foraging foraging;
+		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		private final AccountController controller;
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
@@ -306,13 +309,8 @@ public class AccountControllerTest {
 		}
 
 		public TestContext(final AccountIoAdapter accountIoAdapter) {
-			this(Mockito.mock(Foraging.class), accountIoAdapter);
-		}
-
-		public TestContext(final Foraging foraging, final AccountIoAdapter accountIoAdapter) {
-			this.foraging = foraging;
 			this.controller = new AccountController(
-					this.foraging,
+					this.unconfirmedTransactions,
 					this.unlockedAccounts,
 					accountIoAdapter,
 					this.accountInfoFactory,

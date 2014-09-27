@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.validators.*;
 
@@ -19,9 +19,30 @@ public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
-	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(new UnconfirmedTransactionsTransferObserver());
+	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
+	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
+	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 	private final TransactionValidator validator;
+
+	/**
+	 * Options for adding a transaction.
+	 */
+	public enum AddOptions {
+		/**
+		 * Neutral transactions should be added.
+		 */
+		AllowNeutral,
+
+		/**
+		 * Neutral transactions should be rejected.
+		 */
+		RejectNeutral
+	}
+
+	private enum ValidationOptions {
+		ValidateAgainstConfirmedBalance,
+		ValidateAgainstUnconfirmedBalance,
+	}
 
 	/**
 	 * Creates a new unconfirmed transactions collection.
@@ -35,6 +56,16 @@ public class UnconfirmedTransactions {
 		this.validator = builder.build();
 	}
 
+	private UnconfirmedTransactions(
+			final List<Transaction> transactions,
+			final ValidationOptions options,
+			final TransactionValidator validator) {
+		this.validator = validator;
+		for (final Transaction transaction : transactions) {
+			this.add(transaction, AddOptions.AllowNeutral, options == ValidationOptions.ValidateAgainstUnconfirmedBalance);
+		}
+	}
+
 	/**
 	 * Gets the number of unconfirmed transactions.
 	 *
@@ -45,43 +76,56 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Adds an unconfirmed transaction if it has a SUCCESS validation result.
+	 * Gets the unconfirmed balance for the specified account.
 	 *
-	 * @param transaction The transaction.
-	 * @return true if the transaction was added.
+	 * @param account The account.
+	 * @return The unconfirmed balance.
 	 */
-	public ValidationResult addValid(final Transaction transaction) {
-		return this.add(transaction, false, true);
+	public Amount getUnconfirmedBalance(final Account account) {
+		return this.unconfirmedBalances.get(account);
 	}
 
 	/**
-	 * Adds an unconfirmed transaction if it has a SUCCESS or NEUTRAL validation result.
+	 * Adds an unconfirmed transaction.
 	 *
 	 * @param transaction The transaction.
 	 * @return true if the transaction was added.
 	 */
-	public ValidationResult addValidOrNeutral(final Transaction transaction) {
-		return this.add(transaction, true, true);
+	public ValidationResult add(final Transaction transaction) {
+		return this.add(transaction, AddOptions.RejectNeutral);
 	}
 
 	/**
-	 * Adds an unconfirmed transaction if and only if the predicate evaluates to false.
+	 * Adds an unconfirmed transaction.
 	 *
 	 * @param transaction The transaction.
-	 * @param allowNeutral true if transactions should be considered valid if their validation result is NEUTRAL.
-	 * @param execute true if valid transactions should be executed.
+	 * @param options The add options.
 	 * @return true if the transaction was added.
 	 */
-	private ValidationResult add(final Transaction transaction, final boolean allowNeutral, final boolean execute) {
+	public ValidationResult add(final Transaction transaction, final AddOptions options) {
+		return this.add(transaction, options, true);
+	}
+
+	private ValidationResult add(final Transaction transaction, final AddOptions options, final boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (this.transactions.containsKey(transactionHash)) {
+		if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, true)) {
 			return ValidationResult.NEUTRAL;
 		}
 
-		// not sure if adding to cache here is a good idea...
-		this.addToCache(transaction.getSigner());
+		try {
+			return addInternal(transaction, transactionHash, options, execute);
+		} finally {
+			this.pendingTransactions.remove(transactionHash);
+		}
+	}
+
+	private ValidationResult addInternal(
+			final Transaction transaction,
+			final Hash transactionHash,
+			final AddOptions options,
+			final boolean execute) {
 		final ValidationResult validationResult = this.validate(transaction);
-		if (!validationResult.isSuccess() && (!allowNeutral || ValidationResult.NEUTRAL != validationResult)) {
+		if (!isSuccess(validationResult, options)) {
 			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
 			return validationResult;
 		}
@@ -90,23 +134,18 @@ public class UnconfirmedTransactions {
 			transaction.execute(this.transferObserver);
 		}
 
-		// TODO 20140922 J-G above the transaction result is NEUTRAL but here it is FAILURE_HASH_EXISTS
-		// TODO should (1) HASH_EXISTS be neutral status or should we use NEUTRAL here too?
-		// TODO 20140923 G-J I think there might be something wrong with this method. Basically, the only
-		// way, that check below would return FAILURE_HASH_EXISTS, is that if there was parallel add(),
-		// which succeeded first, but we probably wouldn't like .execute() above to be called twice for the same TX.
-		// OTOH making this method synchronized is rather poor idea, as most of the code could run in parallel
-		// (i.e. for different hashes) Should we try to solve it, and if so any idea how?
-		// maybe we should add hash to this.transactions on the top of the func, and here only replace it?
-		// review!
-		final Transaction previousTransaction = this.transactions.putIfAbsent(transactionHash, transaction);
-		return null == previousTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_HASH_EXISTS;
+		this.transactions.put(transactionHash, transaction);
+		return ValidationResult.SUCCESS;
+	}
+
+	private static boolean isSuccess(final ValidationResult result, final AddOptions options) {
+		return (AddOptions.AllowNeutral == options && ValidationResult.NEUTRAL == result) || result.isSuccess();
 	}
 
 	private ValidationResult validate(final Transaction transaction) {
 		return this.validator.validate(
 				transaction,
-				new ValidationContext((account, amount) -> this.unconfirmedBalances.get(account).compareTo(amount) >= 0));
+				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
 	}
 
 	/**
@@ -127,26 +166,31 @@ public class UnconfirmedTransactions {
 		return true;
 	}
 
-	private void addToCache(final Account account) {
-		// it's ok to put reference here, thanks to Account being non-mutable
-		this.unconfirmedBalances.putIfAbsent(account, account.getBalance());
-	}
-
 	/**
 	 * Removes all transactions in the specified block.
 	 *
 	 * @param block The block.
 	 */
-	void removeAll(final Block block) {
+	public void removeAll(final Block block) {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
+
+			// don't call this.remove because transactions should not be removed when undone;
+			// otherwise, the unconfirmed balances would not be correct
 			this.transactions.remove(transactionHash);
 		}
 	}
 
-	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
-		Collections.sort(transactions, (lhs, rhs) -> -1 * lhs.compareTo(rhs));
-		return transactions;
+	/**
+	 * Gets all transactions.
+	 *
+	 * @return All transaction from this unconfirmed transactions.
+	 */
+	public List<Transaction> getAll() {
+		final List<Transaction> transactions = this.transactions.values().stream()
+				.collect(Collectors.toList());
+
+		return this.sortTransactions(transactions);
 	}
 
 	/**
@@ -163,49 +207,9 @@ public class UnconfirmedTransactions {
 		return this.sortTransactions(transactions);
 	}
 
-	/**
-	 * Gets all transactions.
-	 *
-	 * @return All transaction from this unconfirmed transactions.
-	 */
-	public List<Transaction> getAll() {
-		final List<Transaction> transactions = this.transactions.values().stream()
-				.collect(Collectors.toList());
-
-		return this.sortTransactions(transactions);
-	}
-
-	/**
-	 * Executes all transactions.
-	 */
-	private void executeAll() {
-		this.getAll().stream()
-				.forEach(tx -> tx.execute(this.transferObserver));
-	}
-
-	/**
-	 * There might be conflicting transactions on the list of unconfirmed transactions.
-	 * This method iterates over *sorted* list of unconfirmed transactions, filtering out any conflicting ones.
-	 * Currently conflicting transactions are NOT removed from main list of unconfirmed transactions.
-	 *
-	 * @param unconfirmedTransactions sorted list of unconfirmed transactions.
-	 * @return filtered out list of unconfirmed transactions.
-	 */
-	public List<Transaction> removeConflictingTransactions(final List<Transaction> unconfirmedTransactions) {
-		// UnconfirmedTransactions CAN contain conflicting TXes:
-		// a) we need to use unconfirmed balance to avoid some stupid situations (and spamming).
-		// b) B has 0 balance, A->B 10nems, B->X 5nems with 2nem fee, since we check unconfirmed balance,
-		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
-		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
-		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
-		// TODO-CR 20140922 J-G: it would be great to add a test for this exact case ;)
-		final UnconfirmedTransactions filteredTxes = new UnconfirmedTransactions(this.validator);
-
-		unconfirmedTransactions.stream()
-				.forEach(tx -> filteredTxes.add(tx, true, false));
-
-		filteredTxes.executeAll();
-		return filteredTxes.getAll();
+	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
+		Collections.sort(transactions, (lhs, rhs) -> -1 * lhs.compareTo(rhs));
+		return transactions;
 	}
 
 	/**
@@ -216,10 +220,72 @@ public class UnconfirmedTransactions {
 	public void dropExpiredTransactions(final TimeInstant time) {
 		this.transactions.values().stream()
 				.filter(tx -> tx.getDeadline().compareTo(time) < 0)
-				.forEach(obj -> this.remove(obj));
+				.forEach(tx -> this.remove(tx));
 	}
 
-	private class UnconfirmedTransactionsTransferObserver implements TransferObserver {
+	/**
+	 * Gets all transactions for the specified account.
+	 *
+	 * @param address The account address.
+	 * @return The filtered list of transactions.
+	 */
+	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
+			return new UnconfirmedTransactions(
+					this.getAll().stream()
+							.filter(tx -> matchAddress(tx, address))
+							.collect(Collectors.toList()),
+					ValidationOptions.ValidateAgainstUnconfirmedBalance,
+					this.validator);
+	}
+
+	private static boolean matchAddress(final Transaction transaction, final Address address) {
+		if (transaction.getSigner().getAddress().equals(address)) {
+			return true;
+		}
+
+		switch (transaction.getType()) {
+			case TransactionTypes.TRANSFER:
+				return ((TransferTransaction)transaction).getRecipient().getAddress().equals(address);
+
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Gets all the unconfirmed transactions that are eligible for inclusion into the next block.
+	 *
+	 * @param harvesterAddress The harvester's address.
+	 * @param blockTime The block time.
+	 * @return The filtered list of transactions.
+	 */
+	public UnconfirmedTransactions getTransactionsForNewBlock(final Address harvesterAddress, final TimeInstant blockTime) {
+		// in order for a transaction to be eligible for inclusion in a block, it must
+		// (1) occur at or after the block time
+		// (2) be signed by an account other than the harvester
+		// (3) pass validation against the *confirmed* balance
+
+		// this filter validates all transactions against confirmed balance:
+		// a) we need to use unconfirmed balance to avoid some stupid situations (and spamming).
+		// b) B has 0 balance, A->B 10nems, B->X 5nems with 2nem fee, since we check unconfirmed balance,
+		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
+		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
+		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
+		return new UnconfirmedTransactions(
+				this.getTransactionsBefore(blockTime).stream()
+						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
+						.collect(Collectors.toList()),
+				ValidationOptions.ValidateAgainstConfirmedBalance,
+				this.validator);
+	}
+
+	private static class UnconfirmedBalancesObserver implements TransferObserver {
+		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
+
+		public Amount get(final Account account) {
+			return this.unconfirmedBalances.getOrDefault(account, account.getBalance());
+		}
+
 		@Override
 		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
 			this.notifyDebit(sender, amount);
@@ -228,16 +294,21 @@ public class UnconfirmedTransactions {
 
 		@Override
 		public void notifyCredit(final Account account, final Amount amount) {
-			UnconfirmedTransactions.this.addToCache(account);
-			final Amount newBalance = UnconfirmedTransactions.this.unconfirmedBalances.get(account).add(amount);
-			UnconfirmedTransactions.this.unconfirmedBalances.replace(account, newBalance);
+			this.addToCache(account);
+			final Amount newBalance = this.unconfirmedBalances.get(account).add(amount);
+			this.unconfirmedBalances.replace(account, newBalance);
 		}
 
 		@Override
 		public void notifyDebit(final Account account, final Amount amount) {
-			UnconfirmedTransactions.this.addToCache(account);
-			final Amount newBalance = UnconfirmedTransactions.this.unconfirmedBalances.get(account).subtract(amount);
-			UnconfirmedTransactions.this.unconfirmedBalances.replace(account, newBalance);
+			this.addToCache(account);
+			final Amount newBalance = this.unconfirmedBalances.get(account).subtract(amount);
+			this.unconfirmedBalances.replace(account, newBalance);
+		}
+
+		private void addToCache(final Account account) {
+			// it's ok to put reference here, thanks to Account being non-mutable
+			this.unconfirmedBalances.putIfAbsent(account, account.getBalance());
 		}
 	}
 }

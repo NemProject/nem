@@ -7,6 +7,7 @@ import org.nem.core.node.*;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
+import org.nem.nis.harvesting.Harvester;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class NisPeerNetworkHost implements AutoCloseable {
 	private final AccountAnalyzer accountAnalyzer;
 	private final BlockChain blockChain;
+	private final Harvester harvester;
 	private final ChainServices chainServices;
 	private final NisConfiguration nisConfiguration;
 	private final CountingBlockSynchronizer synchronizer;
@@ -41,6 +43,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	public NisPeerNetworkHost(
 			final AccountAnalyzer accountAnalyzer,
 			final BlockChain blockChain,
+			final Harvester harvester,
 			final ChainServices chainServices,
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
@@ -48,6 +51,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final AuditCollection outgoingAudits) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.blockChain = blockChain;
+		this.harvester = harvester;
 		this.chainServices = chainServices;
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
@@ -70,7 +74,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 		this.peerNetworkBootstrapper.compareAndSet(null, this.createPeerNetworkBootstrapper(config));
 		return this.peerNetworkBootstrapper.get().boot().thenAccept(network -> {
 			this.network = network;
-			this.scheduler.addTasks(this.network, this.blockChain, this.nisConfiguration.useNetworkTime());
+			this.scheduler.addTasks(
+					this.network,
+					this.blockChain,
+					this.harvester,
+					this.nisConfiguration.useNetworkTime());
 		});
 	}
 

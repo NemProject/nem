@@ -7,6 +7,7 @@ import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.BlockChain;
+import org.nem.nis.harvesting.Harvester;
 import org.nem.peer.PeerNetwork;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class PeerNetworkSchedulerTest {
 		// Arrange:
 		try (final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(Mockito.mock(TimeProvider.class))) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), true);
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), Mockito.mock(Harvester.class), true);
 			final List<String> taskNames = scheduler.getVisitors().stream()
 					.map(NemAsyncTimerVisitor::getTimerName)
 					.collect(Collectors.toList());
@@ -52,7 +53,7 @@ public class PeerNetworkSchedulerTest {
 		// Arrange:
 		try (final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(Mockito.mock(TimeProvider.class))) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), false);
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), Mockito.mock(Harvester.class), false);
 			final List<String> taskNames = scheduler.getVisitors().stream()
 					.map(NemAsyncTimerVisitor::getTimerName)
 					.collect(Collectors.toList());

@@ -126,7 +126,8 @@ public class NisAppConfig {
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.foraging(),
-				this.blockChainServices());
+				this.blockChainServices(),
+				this.unconfirmedTransactions());
 	}
 
 	@Bean
@@ -161,12 +162,26 @@ public class NisAppConfig {
 	@Bean
 	public Foraging foraging() {
 		return new Foraging(
+				this.harvester(),
+				this.unconfirmedTransactions());
+	}
+
+	@Bean
+	public Harvester harvester() {
+		final PoiFacade poiFacade = this.poiFacade();
+		final BlockGenerator generator = new BlockGenerator(
 				this.accountCache(),
-				this.poiFacade(),
+				poiFacade,
+				this.unconfirmedTransactions(),
 				this.blockDao,
+				new BlockScorer(poiFacade),
+				this.blockValidatorFactory().create(poiFacade));
+		return new Harvester(
+				this.accountCache(),
+				this.timeProvider(),
 				this.blockChainLastBlockLayer,
-				this.transactionValidatorFactory(),
-				this.unlockedAccounts());
+				this.unlockedAccounts(),
+				generator);
 	}
 
 	@Bean
@@ -187,6 +202,11 @@ public class NisAppConfig {
 	@Bean
 	public UnlockedAccounts unlockedAccounts() {
 		return new UnlockedAccounts(this.accountCache(), this.poiFacade(), this.blockChainLastBlockLayer);
+	}
+
+	@Bean
+	public UnconfirmedTransactions unconfirmedTransactions() {
+		return new UnconfirmedTransactions(this.transactionValidator());
 	}
 
 	@Bean
@@ -219,6 +239,7 @@ public class NisAppConfig {
 		return new NisPeerNetworkHost(
 				this.accountAnalyzer(),
 				this.blockChain(),
+				this.harvester(),
 				this.chainServices(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),
