@@ -8,6 +8,7 @@ import org.nem.core.node.Node;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
+import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
@@ -198,10 +199,6 @@ public class BlockChain implements BlockSynchronizer {
 		return NodeInteractionResult.fromValidationResult(validationResult);
 	}
 
-	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
-		block.setPreviousGenerationHash(parent.getGenerationHash());
-	}
-
 	/**
 	 * Checks if passed receivedBlock is correct, and if eligible adds it to db
 	 *
@@ -232,11 +229,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		final BlockChainSyncContext context = this.createSyncContext();
-
-		this.fixGenerationHash(receivedBlock, dbParent);
-
-		// TODO BUG TODO need to set lessor here
-		// this.accountAnalyzer.getPoiFacade().findForwardedStateByAddress();
+		this.fixBlock(receivedBlock, dbParent);
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
@@ -258,6 +251,20 @@ public class BlockChain implements BlockSynchronizer {
 		peerChain.add(receivedBlock);
 
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
+	}
+
+	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
+		// TODO 20140927 J-G not sure if we still need this here since the previous block is also set by the block chain validator
+		fixGenerationHash(block, parent);
+
+		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
+		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
+		final Account lessor = this.accountAnalyzer.getAccountCache().findByAddress(state.getAddress());
+		block.setLessor(lessor);
+	}
+
+	private static void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
+		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
 	private BlockChainSyncContext createSyncContext() {
