@@ -129,6 +129,17 @@ public class BlockTest {
 		Assert.assertThat(block.getLessor(), IsEqual.equalTo(account));
 	}
 
+	@Test
+	public void settingLessorToSignerDoesNotSetLessor() {
+		// Arrange:
+		final Block block = BlockUtils.createBlock(Utils.generateRandomAccount());
+
+		// Act:
+		block.setLessor(block.getSigner());
+
+		// Assert:
+		Assert.assertThat(block.getLessor(), IsNull.nullValue());
+	}
 	//endregion
 
 	//region Serialization
