@@ -277,7 +277,7 @@ public class BlockMapperTest {
 			this.lessor = Utils.generateRandomAccount();
 			this.dbLessor = this.createDbAccount(this.lessor);
 			this.accountDao.addMapping(this.lessor, this.dbLessor);
-			this.model.setLessor(lessor);
+			this.model.setLessor(this.lessor);
 		}
 
 		private org.nem.nis.dbmodel.Account createDbAccount(final Account account) {

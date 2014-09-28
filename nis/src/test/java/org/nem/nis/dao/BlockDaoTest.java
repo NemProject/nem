@@ -627,7 +627,7 @@ public class BlockDaoTest {
 	//endregion
 
 	//region helpers
-	private AccountDaoLookup prepareMapping(Object... accounts) {
+	private AccountDaoLookup prepareMapping(final Object... accounts) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		for (final Object o : accounts) {

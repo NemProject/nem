@@ -172,17 +172,17 @@ public class ImportanceTransfer {
 	}
 
 	public Integer getDirection() {
-		return direction;
+		return this.direction;
 	}
 
-	public void setDirection(Integer direction) {
+	public void setDirection(final Integer direction) {
 		this.direction = direction;
 	}
 
 	public Integer getBlkIndex() {
 		// apparently hibernate does not CHANGE this value, when OrderColumn and OneToMany+mappedBy is used
 		//return this.blkIndex;
-		return block.getBlockImportanceTransfers().indexOf(this);
+		return this.block.getBlockImportanceTransfers().indexOf(this);
 	}
 
 	public void setBlkIndex(final Integer blkIndex) {

@@ -17,7 +17,7 @@ public class ImportanceTransferNotification extends Notification {
 	 * @param lessee The account borrowing the importance.
 	 * @param mode The mode of importance transfer transaction.
 	 */
-	public ImportanceTransferNotification(final Account lessor, final Account lessee, int mode) {
+	public ImportanceTransferNotification(final Account lessor, final Account lessee, final int mode) {
 		super(NotificationType.ImportanceTransfer);
 		this.lessor = lessor;
 		this.lessee = lessee;

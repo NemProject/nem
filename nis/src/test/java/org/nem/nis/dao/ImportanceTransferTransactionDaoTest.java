@@ -91,7 +91,7 @@ public class ImportanceTransferTransactionDaoTest {
 		Assert.assertThat(count3, equalTo(initialCount + 3));
 	}
 
-	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, ImportanceTransfer... dbTransfers) {
+	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final ImportanceTransfer... dbTransfers) {
 		final Block block = new Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
 				account, new byte[] { 1, 2, 3, 4 },
 				1L, 1L, 1L, 123L, null);
@@ -109,8 +109,8 @@ public class ImportanceTransferTransactionDaoTest {
 		final ImportanceTransferTransaction transaction;
 
 		TestContext() {
-			accountDaoLookup = this.prepareMapping(sender, recipient);
-			transaction = this.prepareImportanceTransferTransaction(sender, recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
+			this.accountDaoLookup = this.prepareMapping(this.sender, this.recipient);
+			this.transaction = this.prepareImportanceTransferTransaction(this.sender, this.recipient, 123, ImportanceTransferTransaction.Mode.Deactivate);
 		}
 
 		private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
@@ -141,22 +141,22 @@ public class ImportanceTransferTransactionDaoTest {
 		}
 
 		public ImportanceTransfer createDbTransaction() {
-			return ImportanceTransferMapper.toDbModel(transaction, 12345, accountDaoLookup);
+			return ImportanceTransferMapper.toDbModel(this.transaction, 12345, this.accountDaoLookup);
 		}
 
 		public org.nem.nis.dbmodel.Account getSender() {
-			return accountDaoLookup.findByAddress(sender.getAddress());
+			return this.accountDaoLookup.findByAddress(this.sender.getAddress());
 		}
 
 		public Hash getTransactionHash() {
-			return HashUtils.calculateHash(transaction);
+			return HashUtils.calculateHash(this.transaction);
 		}
 
 		public void assertTransaction(final ImportanceTransfer entity) {
-			Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getKeyPair().getPublicKey()));
-			Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
-			Assert.assertThat(entity.getDirection(), equalTo(transaction.getMode().value()));
-			Assert.assertThat(entity.getSenderProof(), equalTo(transaction.getSignature().getBytes()));
+			Assert.assertThat(entity.getSender().getPublicKey(), equalTo(this.sender.getKeyPair().getPublicKey()));
+			Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(this.recipient.getKeyPair().getPublicKey()));
+			Assert.assertThat(entity.getDirection(), equalTo(this.transaction.getMode().value()));
+			Assert.assertThat(entity.getSenderProof(), equalTo(this.transaction.getSignature().getBytes()));
 		}
 	}
 }

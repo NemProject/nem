@@ -38,7 +38,7 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 	// > or at least add tests for the following functions (eventually)
 
 	@Override
-	public Transfer findByHash(final byte[] txHash, long maxBlockHeight) {
+	public Transfer findByHash(final byte[] txHash, final long maxBlockHeight) {
 		final Transfer transfer = this.transferDao.findByHash(txHash, maxBlockHeight);
 		if (null == transfer) {
 			throw createMissingResourceException(txHash.toString());

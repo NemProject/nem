@@ -59,7 +59,7 @@ public class TransferDaoImpl implements TransferDao {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public Transfer findByHash(final byte[] txHash, long maxBlockHeight) {
+	public Transfer findByHash(final byte[] txHash, final long maxBlockHeight) {
 		final long txId = ByteUtils.bytesToLong(txHash);
 		final Query query = this.getCurrentSession()
 				.createQuery("from Transfer t where t.shortId = :id and t.block.height <= :height")
@@ -68,7 +68,7 @@ public class TransferDaoImpl implements TransferDao {
 		return getByHashQuery(txHash, query);
 	}
 
-	private Transfer getByHashQuery(byte[] txHash, Query query) {
+	private Transfer getByHashQuery(final byte[] txHash, final Query query) {
 		final List<?> userList = query.list();
 		for (final Object transferObject : userList) {
 			final Transfer transfer = (Transfer)transferObject;

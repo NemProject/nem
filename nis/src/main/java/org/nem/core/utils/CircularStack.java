@@ -19,7 +19,7 @@ public class CircularStack<E> implements Iterable<E> {
 	 * @param limit Maximum number of elements on the stack.
 	 */
 	public CircularStack(final int limit) {
-		elements = new ArrayList<>(limit);
+		this.elements = new ArrayList<>(limit);
 		this.limit = limit;
 	}
 
@@ -49,10 +49,10 @@ public class CircularStack<E> implements Iterable<E> {
 	 *
 	 * @param element Element to be added.
 	 */
-	public void push(E element) {
-		elements.add(element);
-		if (elements.size() > limit) {
-			elements.remove(0);
+	public void push(final E element) {
+		this.elements.add(element);
+		if (this.elements.size() > this.limit) {
+			this.elements.remove(0);
 		}
 	}
 
@@ -62,14 +62,14 @@ public class CircularStack<E> implements Iterable<E> {
 	 * @return Most recently added element.
 	 */
 	public E peek() {
-		return elements.get(elements.size() - 1);
+		return this.elements.get(this.elements.size() - 1);
 	}
 
 	/**
 	 * Removes most recently added element.
 	 */
 	public void pop() {
-		elements.remove(elements.size() - 1);
+		this.elements.remove(this.elements.size() - 1);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class CircularStack<E> implements Iterable<E> {
 	 * @return Size of a stack (can be smaller than limit).
 	 */
 	public int size() {
-		return elements.size();
+		return this.elements.size();
 	}
 
 	@Override
