@@ -40,5 +40,4 @@ public interface ImportanceTransferDao {
 	 * @return Transfer having given hash or null.
 	 */
 	ImportanceTransfer findByHash(byte[] txHash, long maxBlockHeight);
-
 }

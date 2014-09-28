@@ -190,7 +190,6 @@ public class NodeController {
 		this.host.boot(localNode);
 	}
 
-
 	//region activePeersMaxChainHeight
 
 	@RequestMapping(value = "/node/active-peers/max-chain-height", method = RequestMethod.GET)

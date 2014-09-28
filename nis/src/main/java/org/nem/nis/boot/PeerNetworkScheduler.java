@@ -1,10 +1,10 @@
 package org.nem.nis.boot;
 
 import org.nem.core.async.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.node.NodeApiId;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.*;
+import org.nem.nis.BlockChain;
 import org.nem.nis.harvesting.Harvester;
 import org.nem.peer.*;
 

@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.*;
 import org.nem.nis.validators.*;
 
@@ -238,13 +238,13 @@ public class UnconfirmedTransactions {
 	 * @return The filtered list of transactions.
 	 */
 	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-			return new UnconfirmedTransactions(
-					this.getAll().stream()
-							.filter(tx -> matchAddress(tx, address))
-							.collect(Collectors.toList()),
-					ValidationOptions.ValidateAgainstUnconfirmedBalance,
-					this.timeProvider,
-					this.validator);
+		return new UnconfirmedTransactions(
+				this.getAll().stream()
+						.filter(tx -> matchAddress(tx, address))
+						.collect(Collectors.toList()),
+				ValidationOptions.ValidateAgainstUnconfirmedBalance,
+				this.timeProvider,
+				this.validator);
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {

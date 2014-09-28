@@ -176,7 +176,6 @@ public class Block {
 		this.lessor = lessor;
 	}
 
-
 	public Long getHeight() {
 		return this.height;
 	}

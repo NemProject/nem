@@ -3,7 +3,6 @@ package org.nem.nis.service;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.peer.connect.HttpConnectorPool;
-import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;

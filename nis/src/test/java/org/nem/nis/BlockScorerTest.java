@@ -1,7 +1,6 @@
 package org.nem.nis;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNot;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;

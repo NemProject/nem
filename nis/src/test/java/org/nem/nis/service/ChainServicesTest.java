@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.connect.FatalPeerException;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.peer.connect.*;
 import org.nem.peer.test.WeakNodeIdentity;
 

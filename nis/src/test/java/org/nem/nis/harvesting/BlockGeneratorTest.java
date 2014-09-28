@@ -2,7 +2,7 @@ package org.nem.nis.harvesting;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;

@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.nis.dao.*;
-import org.nem.nis.harvesting.*;
+import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockChainConstants;

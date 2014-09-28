@@ -200,7 +200,7 @@ public class Block extends VerifiableEntity {
 	 * @param lessor The lessor.
 	 */
 	public void setLessor(final Account lessor) {
-		if (null != lessor  && !this.getSigner().equals(lessor)) {
+		if (null != lessor && !this.getSigner().equals(lessor)) {
 			this.lessor = lessor;
 		}
 	}

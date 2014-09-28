@@ -731,7 +731,9 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context.transactions::addExisting);
 
 		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), new TimeInstant(10));
+		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(
+				Utils.generateRandomAddress(),
+				new TimeInstant(10));
 		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions.getAll());
 
 		// Assert:
@@ -907,7 +909,7 @@ public class UnconfirmedTransactionsTest {
 
 		private TestContext(final TransactionValidator validator) {
 			this.validator = validator;
-			this.transactions =  new UnconfirmedTransactions(this.timeProvider, this.validator);
+			this.transactions = new UnconfirmedTransactions(this.timeProvider, this.validator);
 		}
 	}
 }
