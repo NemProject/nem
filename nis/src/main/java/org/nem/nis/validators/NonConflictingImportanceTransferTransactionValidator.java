@@ -37,6 +37,10 @@ public class NonConflictingImportanceTransferTransactionValidator implements Tra
 				continue;
 			}
 
+			if (transaction == existingTransaction) {
+				continue;
+			}
+
 			if (areConflicting(transaction, (ImportanceTransferTransaction)existingTransaction)) {
 				return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 			}

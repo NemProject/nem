@@ -47,6 +47,21 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 	//endregion
 
 	//region conflicts
+	@Test
+	public void importanceTransferIsNotConflictingWithItself() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account remote = Utils.generateRandomAccount();
+		final Transaction transaction = createImportanceTransferTransaction(signer, remote);
+		final List<Transaction> transactions = Arrays.asList(transaction);
+		final TransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
+
+		// Act:
+		final ValidationResult result = validator.validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
 
 	@Test
 	public void importanceTransferIsNotValidWhenIsSharesSignerWithExistingImportanceTransfer() {
