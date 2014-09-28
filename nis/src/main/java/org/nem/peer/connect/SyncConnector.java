@@ -74,16 +74,6 @@ public interface SyncConnector {
 	// region asynchronous requests
 
 	/**
-	 * TODO 20140927 J-B: do we still need this function?
-	 * TODO 20140928 BR -> J: no, not right now. Unless we want to delegate the sync version to the async version.
-	 * Requests information about the cumulative score of the remote chain.
-	 *
-	 * @param node The remote node.
-	 * @return The completable future containing the cumulative score of the remote chain.
-	 */
-	public CompletableFuture<BlockChainScore> getChainScoreAsync(final Node node);
-
-	/**
 	 * Requests information about the block height of the remote chain.
 	 *
 	 * @param node The remote node.
