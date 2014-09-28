@@ -1,7 +1,6 @@
 package org.nem.nis.dao;
 
-// TODO: i configured intellij to collapse imports when there are at least two imports from the same package
-// BR: Should be fixed with auto formatting..
+import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
@@ -440,6 +439,77 @@ public class TransferDaoTest {
 			Assert.assertThat(((Transfer)entity[0]).getTimeStamp(), equalTo(lastTimestamp));
 			lastTimestamp = lastTimestamp - 1;
 		}
+	}
+
+	@Test
+	public void findByHashReturnsTransferIfMaxBlockHeightIsGreaterOrEqualToTransferBlockHeight() {
+		// Arrange:
+		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+
+		// Act: second parameter is maximum block height
+		final Transfer transfer1_1 = this.transferDao.findByHash(hashes.get(0).getRaw(), 1);
+		final Transfer transfer1_2 = this.transferDao.findByHash(hashes.get(0).getRaw(), 2);
+		final Transfer transfer1_3 = this.transferDao.findByHash(hashes.get(0).getRaw(), 3);
+		final Transfer transfer2 = this.transferDao.findByHash(hashes.get(1).getRaw(), 2);
+		final Transfer transfer3 = this.transferDao.findByHash(hashes.get(2).getRaw(), 3);
+
+		// Assert:
+		Assert.assertThat(transfer1_1, IsNull.notNullValue());
+		Assert.assertThat(transfer1_2, IsNull.notNullValue());
+		Assert.assertThat(transfer1_3, IsNull.notNullValue());
+		Assert.assertThat(transfer2, IsNull.notNullValue());
+		Assert.assertThat(transfer3, IsNull.notNullValue());
+	}
+
+	@Test
+	public void findByHashReturnsNullIfMaxBlockHeightIsLessThanTransferBlockHeight() {
+		// Arrange:
+		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+
+		// Act: second parameter is maximum block height
+		final Transfer transfer1 = this.transferDao.findByHash(hashes.get(1).getRaw(), 1);
+		final Transfer transfer2 = this.transferDao.findByHash(hashes.get(2).getRaw(), 2);
+
+		// Assert:
+		Assert.assertThat(transfer1, IsNull.nullValue());
+		Assert.assertThat(transfer2, IsNull.nullValue());
+	}
+
+	@Test
+	public void findByHashReturnsNullIfHashDoesNotExistInDatabase() {
+		// Arrange:
+		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+
+		// Act: second parameter is maximum block height
+		final Transfer transfer = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);
+
+		// Assert:
+		Assert.assertThat(transfer, IsNull.nullValue());
+	}
+
+	private List<Hash> saveThreeBlocksWithTransactionsInDatabase() {
+		final List<Hash> hashes = new ArrayList<>();
+		final Account sender = Utils.generateRandomAccount();
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+		this.addMapping(mockAccountDao, sender);
+
+		for (int i = 1; i < 4; i++) {
+			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(i * 123), new BlockHeight(i));
+			final Account recipient = Utils.generateRandomAccount();
+			this.addMapping(mockAccountDao, recipient);
+			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
+			final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
+			hashes.add(dbTransfer.getTransferHash());
+
+			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
+			dummyBlock.addTransaction(transferTransaction);
+			dummyBlock.sign();
+			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			this.blockDao.save(dbBlock);
+		}
+
+		return hashes;
 	}
 
 	private TransferTransaction prepareTransferTransaction(final Account sender, final Account recipient, final long amount, final int i) {

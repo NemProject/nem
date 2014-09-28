@@ -33,6 +33,15 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 		return transfer;
 	}
 
+	@Override
+	public Transfer findByHash(final byte[] txHash, long maxBlockHeight) {
+		final Transfer transfer = this.transferDao.findByHash(txHash, maxBlockHeight);
+		if (null == transfer) {
+			throw createMissingResourceException(txHash.toString());
+		}
+		return transfer;
+	}
+
 	//TODO: we should probably delegate in getTransactionsForAccount too and add tests for delegation
 
 	@Override

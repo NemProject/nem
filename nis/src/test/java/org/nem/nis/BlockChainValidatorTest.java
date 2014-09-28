@@ -12,7 +12,7 @@ import org.nem.nis.test.MockBlockScorer;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.*;
 
 public class BlockChainValidatorTest {
 
@@ -247,6 +247,7 @@ public class BlockChainValidatorTest {
 
 	@Test
 	public void chainIsValidIfTransactionAlreadyExistBeforeMarkerBlock() {
+		// Arrange:
 		final MockBlockScorer scorer = new MockBlockScorer();
 		final BlockChainValidator validator = createValidatorTrue(scorer);
 		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 3);
@@ -258,7 +259,38 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
 
+		// Act + Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isValidUsesParentBlockHeightWhenTestingTheExistenceOfTransactions() {
+		// Arrange:
+		BiPredicate<Hash, BlockHeight> transactionExists = Mockito.mock(BiPredicate.class);
+		final MockBlockScorer scorer = new MockBlockScorer();
+		final BlockChainValidator validator = new BlockChainValidator(block -> { }, scorer, 21, transactionExists);
+		final Block parentBlock = createBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		parentBlock.sign();
+		final List<Block> blocks = createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		final Transaction tx1 = createValidSignedTransaction();
+		final Transaction tx2 = createValidSignedTransaction();
+		tx2.setDeadline(tx2.getDeadline().addMinutes(5));
+		tx2.sign();
+		middleBlock.addTransaction(tx1);
+		middleBlock.addTransaction(tx2);
+		middleBlock.sign();
+		final Hash tx1Hash = HashUtils.calculateHash(tx1);
+		final Hash tx2Hash = HashUtils.calculateHash(tx2);
+		Mockito.when(transactionExists.test(tx1Hash, parentBlock.getHeight())).thenReturn(false);
+		Mockito.when(transactionExists.test(tx2Hash, parentBlock.getHeight())).thenReturn(false);
+
+		// Act:
+		validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Mockito.verify(transactionExists, Mockito.times(1)).test(tx1Hash, parentBlock.getHeight());
+		Mockito.verify(transactionExists, Mockito.times(1)).test(tx2Hash, parentBlock.getHeight());
 	}
 
 	@Test
@@ -440,15 +472,15 @@ public class BlockChainValidatorTest {
 	}
 
 	private static BlockChainValidator createValidator(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, o -> false);
+		return new BlockChainValidator(block -> { }, scorer, 21, (o1, o2) -> false);
 	}
 
 	private static BlockChainValidator createValidator(final Consumer<Block> blockExecutor) {
-		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, o -> false);
+		return new BlockChainValidator(blockExecutor, createMockBlockScorer(), 21, (o1, o2) -> false);
 	}
 
 	private static BlockChainValidator createValidatorTrue(final BlockScorer scorer) {
-		return new BlockChainValidator(block -> { }, scorer, 21, o -> true);
+		return new BlockChainValidator(block -> { }, scorer, 21, (o1, o2) -> true);
 	}
 
 	private static BlockChainValidator createValidator() {
