@@ -28,10 +28,12 @@ public class ChainServices {
 	}
 
 	/**
-	 * Gets a value indicating whether or not the local chain is synchronized with the remote node.
+	 * Gets a value indicating whether or not the local chain is synchronized with the given node's active peers.
 	 *
 	 * TODO 20140927 J-B: can you check if my documentation changes are correct?
-	 * @param node The remote node.
+	 * TODO 20140928 BR -> J: The node parameter is usually the local node. The local chain is compared to the chains
+	 * TODO                   of the active peers of the given node.
+	 * @param node The node.
 	 * @return true if the local chain is synchronized, false otherwise.
 	 */
 	public boolean isChainSynchronized(final Node node) {

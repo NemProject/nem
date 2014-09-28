@@ -75,6 +75,7 @@ public interface SyncConnector {
 
 	/**
 	 * TODO 20140927 J-B: do we still need this function?
+	 * TODO 20140928 BR -> J: no, not right now. Unless we want to delegate the sync version to the async version.
 	 * Requests information about the cumulative score of the remote chain.
 	 *
 	 * @param node The remote node.

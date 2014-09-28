@@ -260,10 +260,12 @@ public class NodeControllerTest {
 
 		// Act:
 		// TODO 20140927 J-B: probably should validate the return value too
-		context.controller.activePeersMaxChainHeight();
+		// TODO 20140928 BR -> J: done.
+		BlockHeight height = context.controller.activePeersMaxChainHeight();
 
 		// Assert:
 		Mockito.verify(context.services, Mockito.times(1)).getMaxChainHeightAsync(context.localNode);
+		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(123)));
 	}
 
 	private static JsonDeserializer createLocalNodeDeserializer(final NodeIdentity identity) {
@@ -299,7 +301,7 @@ public class NodeControllerTest {
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			this.services = Mockito.mock(ChainServices.class);
-			Mockito.when(this.services.getMaxChainHeightAsync(localNode)).thenReturn(CompletableFuture.completedFuture(BlockHeight.ONE));
+			Mockito.when(this.services.getMaxChainHeightAsync(localNode)).thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
 
 			this.controller = new NodeController(this.host, this.services);
 		}
