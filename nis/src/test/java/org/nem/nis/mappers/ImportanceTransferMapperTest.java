@@ -107,6 +107,7 @@ public class ImportanceTransferMapperTest {
 			return this.model;
 		}
 
+		@SuppressWarnings("unchecked")
 		public ImportanceTransfer toDbModel(final int blockIndex) {
 			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
 
