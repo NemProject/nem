@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.connect.FatalPeerException;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.serialization.SerializableList;
+import org.nem.core.serialization.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.test.WeakNodeIdentity;
 
@@ -64,6 +64,11 @@ public class ChainServicesTest {
 
 		// Assert:
 		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
+
+		context.verifyNumChainHeightRequests(3);
+		for (final Node peerNode : context.nodes.asCollection()) {
+			context.verifySingleChainHeightRequest(peerNode);
+		}
 	}
 
 	@Test
@@ -80,6 +85,11 @@ public class ChainServicesTest {
 
 		// Assert:
 		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
+
+		context.verifyNumChainHeightRequests(3);
+		for (final Node peerNode : context.nodes.asCollection()) {
+			context.verifySingleChainHeightRequest(peerNode);
+		}
 	}
 
 	@Test
@@ -96,6 +106,11 @@ public class ChainServicesTest {
 
 		// Assert:
 		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(BlockHeight.ONE));
+
+		context.verifyNumChainHeightRequests(3);
+		for (final Node peerNode : context.nodes.asCollection()) {
+			context.verifySingleChainHeightRequest(peerNode);
+		}
 	}
 
 	// endregion
@@ -183,8 +198,15 @@ public class ChainServicesTest {
 			nodes.add(createNode("a"));
 			nodes.add(createNode("b"));
 			nodes.add(createNode("c"));
-
 			return nodes;
+		}
+
+		private void verifyNumChainHeightRequests(final int numExpectedRequests) {
+			Mockito.verify(this.connector, Mockito.times(numExpectedRequests)).getChainHeightAsync(Mockito.any());
+		}
+
+		private void verifySingleChainHeightRequest(final Node expectedNode) {
+			Mockito.verify(this.connector, Mockito.times(1)).getChainHeightAsync(expectedNode);
 		}
 
 		private CompletableFuture<SerializableList<Node>> createNodesFuture() {

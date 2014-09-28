@@ -259,6 +259,7 @@ public class NodeControllerTest {
 		final TestContext context = new TestContext();
 
 		// Act:
+		// TODO 20140927 J-B: probably should validate the return value too
 		context.controller.activePeersMaxChainHeight();
 
 		// Assert:

@@ -74,6 +74,7 @@ public interface SyncConnector {
 	// region asynchronous requests
 
 	/**
+	 * TODO 20140927 J-B: do we still need this function?
 	 * Requests information about the cumulative score of the remote chain.
 	 *
 	 * @param node The remote node.
