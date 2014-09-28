@@ -35,7 +35,7 @@ public class SystemTimeProvider implements TimeProvider {
 
 	@Override
 	public TimeInstant getCurrentTime() {
-		final long time = System.currentTimeMillis();
+		final long time = System.currentTimeMillis() + this.timeOffset.getRaw();
 		return new TimeInstant(getTime(time));
 	}
 
@@ -56,6 +56,7 @@ public class SystemTimeProvider implements TimeProvider {
 	 * TODO-CR J-B: but this seems to be a more precise version of getCurrentTime, so i'm not sure if you are
 	 * TODO    Br -> J This is unfinished, there probably will be getNetworkTime and getNetworkTimeMillis too.
 	 * TODO            I will add tests once I get to this point.
+	 * TODO 20140928 BR -> J: if you want you can eliminate this method if you adjust the getNetworkTime() method accordingly.
 	 *
 	 * @return The current time in milliseconds.
 	 */
