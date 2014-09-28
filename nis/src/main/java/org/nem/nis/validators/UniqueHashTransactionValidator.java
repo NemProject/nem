@@ -35,8 +35,7 @@ public class UniqueHashTransactionValidator implements TransactionValidator {
 		final BlockHeight blockHeight = context.getConfirmedBlockHeight();
 		// TODO 20140907 J-G update importanceTransferDao.findByHash
 		final boolean isInTransferDao = null != this.transferDao.findByHash(hash.getRaw(), blockHeight.getRaw());
-		//final boolean isInImportanceTransferDao = null != this.importanceTransferDao.findByHash(hash.getRaw(), blockHeight.getRaw());
-		final boolean isInImportanceTransferDao = null != this.importanceTransferDao.findByHash(hash.getRaw());
+		final boolean isInImportanceTransferDao = null != this.importanceTransferDao.findByHash(hash.getRaw(), blockHeight.getRaw());
 		return isInTransferDao || isInImportanceTransferDao
 				? ValidationResult.NEUTRAL
 				: ValidationResult.SUCCESS;

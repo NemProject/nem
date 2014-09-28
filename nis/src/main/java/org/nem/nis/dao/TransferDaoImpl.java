@@ -45,18 +45,11 @@ public class TransferDaoImpl implements TransferDao {
 	@Transactional(readOnly = true)
 	public Transfer findByHash(final byte[] txHash) {
 		final long txId = ByteUtils.bytesToLong(txHash);
-		final List<?> userList;
 		final Query query = this.getCurrentSession()
 				.createQuery("from Transfer a where a.shortId = :id")
 				.setParameter("id", txId);
-		userList = query.list();
-		for (final Object transferObject : userList) {
-			final Transfer transfer = (Transfer)transferObject;
-			if (Arrays.equals(txHash, transfer.getTransferHash().getRaw())) {
-				return transfer;
-			}
-		}
-		return null;
+
+		return getByHashQuery(txHash, query);
 	}
 
 	/**
@@ -68,12 +61,15 @@ public class TransferDaoImpl implements TransferDao {
 	@Transactional(readOnly = true)
 	public Transfer findByHash(final byte[] txHash, long maxBlockHeight) {
 		final long txId = ByteUtils.bytesToLong(txHash);
-		final List<?> userList;
 		final Query query = this.getCurrentSession()
 				.createQuery("from Transfer t where t.shortId = :id and t.block.height <= :height")
 				.setParameter("id", txId)
 				.setParameter("height", maxBlockHeight);
-		userList = query.list();
+		return getByHashQuery(txHash, query);
+	}
+
+	private Transfer getByHashQuery(byte[] txHash, Query query) {
+		final List<?> userList = query.list();
 		for (final Object transferObject : userList) {
 			final Transfer transfer = (Transfer)transferObject;
 			if (Arrays.equals(txHash, transfer.getTransferHash().getRaw())) {

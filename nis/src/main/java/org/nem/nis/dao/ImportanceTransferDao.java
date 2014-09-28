@@ -31,4 +31,14 @@ public interface ImportanceTransferDao {
 	 * @return Transfer having given hash or null.
 	 */
 	ImportanceTransfer findByHash(final byte[] txHash);
+
+	/**
+	 * Retrieves ImportanceTransfer from db given it's hash. The search is only up to a given block height
+	 *
+	 * @param txHash hash of a transfer to retrieve.
+	 * @param maxBlockHeight The maximum block height.
+	 * @return Transfer having given hash or null.
+	 */
+	ImportanceTransfer findByHash(byte[] txHash, long maxBlockHeight);
+
 }

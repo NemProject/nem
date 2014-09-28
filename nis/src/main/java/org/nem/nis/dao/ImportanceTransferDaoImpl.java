@@ -39,11 +39,25 @@ public class ImportanceTransferDaoImpl implements ImportanceTransferDao {
 	@Transactional(readOnly = true)
 	public ImportanceTransfer findByHash(final byte[] txHash) {
 		final long txId = ByteUtils.bytesToLong(txHash);
-		final List<?> userList;
 		final Query query = this.getCurrentSession()
 				.createQuery("from ImportanceTransfer a where a.shortId = :id")
 				.setParameter("id", txId);
-		userList = query.list();
+		return getByHashQuery(txHash, query);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ImportanceTransfer findByHash(final byte[] txHash, long maxBlockHeight) {
+		final long txId = ByteUtils.bytesToLong(txHash);
+		final Query query = this.getCurrentSession()
+				.createQuery("from ImportanceTransfer t where t.shortId = :id and t.block.height <= :height")
+				.setParameter("id", txId)
+				.setParameter("height", maxBlockHeight);
+		return getByHashQuery(txHash, query);
+	}
+
+	private ImportanceTransfer getByHashQuery(byte[] txHash, Query query) {
+		final List<?> userList = query.list();
 		for (final Object transferObject : userList) {
 			final ImportanceTransfer transfer = (ImportanceTransfer)transferObject;
 			if (Arrays.equals(txHash, transfer.getTransferHash().getRaw())) {
