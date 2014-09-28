@@ -113,7 +113,7 @@ public class UniqueHashTransactionValidatorTest {
 		}
 
 		private void setImportanceTransferDaoForHash() {
-			Mockito.when(this.importanceTransferDao.findByHash(this.hash.getRaw()))
+			Mockito.when(this.importanceTransferDao.findByHash(this.hash.getRaw(), this.confirmedBlockHeight.getRaw()))
 					.thenReturn(Mockito.mock(ImportanceTransfer.class));
 		}
 
