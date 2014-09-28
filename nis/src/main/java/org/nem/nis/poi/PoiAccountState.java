@@ -6,29 +6,31 @@ import org.nem.nis.secret.*;
 
 /**
  * Class containing extrinsic NIS-account information that is used to calculate POI.
- * TODO-CR 20140808 J->ALL i think the naming is confusing between PoiAccountState and PoiAccountInfo ... should try to think of better names
  */
 public class PoiAccountState {
 	private final Address address;
 	private final AccountImportance importance;
 	private final WeightedBalances weightedBalances;
+	private final RemoteLinks remoteLinks;
 	private BlockHeight height;
 
 	/**
 	 * Creates a new NIS account state.
 	 */
 	public PoiAccountState(final Address address) {
-		this(address, new AccountImportance(), new WeightedBalances(), null);
+		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), null);
 	}
 
 	private PoiAccountState(
 			final Address address,
 			final AccountImportance importance,
 			final WeightedBalances weightedBalances,
+			final RemoteLinks remoteLinks,
 			final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
 		this.weightedBalances = weightedBalances;
+		this.remoteLinks = remoteLinks;
 		this.height = height;
 	}
 
@@ -60,6 +62,15 @@ public class PoiAccountState {
 	}
 
 	/**
+	 * Gets the remote link information.
+	 *
+	 * @return The remote link information.
+	 */
+	public RemoteLinks getRemoteLinks() {
+		return this.remoteLinks;
+	}
+
+	/**
 	 * Returns height of an account.
 	 *
 	 * @return The height of an account - when the account has been created.
@@ -85,6 +96,11 @@ public class PoiAccountState {
 	 * @return A copy of this state.
 	 */
 	public PoiAccountState copy() {
-		return new PoiAccountState(this.address, this.importance.copy(), this.weightedBalances.copy(), this.height);
+		return new PoiAccountState(
+				this.address,
+				this.importance.copy(),
+				this.weightedBalances.copy(),
+				this.remoteLinks.copy(),
+				this.height);
 	}
 }

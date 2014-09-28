@@ -46,6 +46,215 @@ public class PoiFacadeTest {
 
 	//endregion
 
+	//region findLatestForwardedStateByAddress
+
+	@Test
+	public void findLatestForwardedStateByAddressReturnsStateForAddress() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		final PoiAccountState state = facade.findLatestForwardedStateByAddress(address);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(state, IsNull.notNullValue());
+		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
+	}
+
+	@Test
+	public void findLatestForwardedStateByAddressReturnsLocalStateWhenAccountIsHarvestingRemotely() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
+		Assert.assertThat(isLatestLocalState(1, 1, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLatestLocalState(1, 1000, owner), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findLatestForwardedStateByAddressReturnsRemoteStateWhenAccountIsRemoteHarvester() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
+		Assert.assertThat(isLatestLocalState(1, 1, owner), IsEqual.equalTo(false));
+		Assert.assertThat(isLatestLocalState(1, 1000, owner), IsEqual.equalTo(false));
+	}
+
+	private static boolean isLatestLocalState(final int mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+		final PoiAccountState state = facade.findStateByAddress(address);
+		final RemoteLink link = new RemoteLink(
+				Utils.generateRandomAddress(),
+				new BlockHeight(remoteBlockHeight),
+				mode,
+				owner);
+		state.getRemoteLinks().addLink(link);
+
+		// Act:
+		final PoiAccountState forwardedState = facade.findLatestForwardedStateByAddress(address);
+
+		// Assert:
+		return forwardedState.equals(state);
+	}
+
+	//endregion
+
+	//region findForwardedStateByAddress
+
+	@Test
+	public void findForwardedStateByAddressReturnsStateForAddress() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		final PoiAccountState state = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(state, IsNull.notNullValue());
+		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsSameStateForSameAddress() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+
+		// Act:
+		final PoiAccountState state1 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+		final PoiAccountState state2 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(state2, IsEqual.equalTo(state1));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateWhenAccountDoesNotHaveRemoteState() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+		final PoiAccountState state = facade.findStateByAddress(address);
+
+		// Act:
+		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(forwardedState, IsEqual.equalTo(state));
+	}
+
+	//region HarvestingRemotely
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenActiveRemoteIsAgedAtLeastOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
+		Assert.assertThat(isLocalState(1, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(1, 1000, 2880, owner), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenActiveRemoteIsAgedLessThanOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
+		Assert.assertThat(isLocalState(1, 1, 1440, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(1, 1000, 1000, owner), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenInactiveRemoteIsAgedLessThanOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
+		Assert.assertThat(isLocalState(2, 1, 1440, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(2, 1000, 1000, owner), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenInactiveRemoteIsAgedAtLeastOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
+		Assert.assertThat(isLocalState(2, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(2, 1000, 2880, owner), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForHarvestingRemotelyWhenRemoteModeIsUnknown() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.HarvestingRemotely;
+		Assert.assertThat(isLocalState(7, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(0, 1000, 1000, owner), IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	//region RemoteHarvester
+
+	@Test
+	public void findForwardedStateByAddressReturnsForwardedStateForRemoteHarvesterWhenActiveRemoteIsAgedAtLeastOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
+		Assert.assertThat(isLocalState(1, 1, 1441, owner), IsEqual.equalTo(false));
+		Assert.assertThat(isLocalState(1, 1000, 2880, owner), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenActiveRemoteIsAgedLessThanOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
+		Assert.assertThat(isLocalState(1, 1, 1440, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(1, 1000, 1000, owner), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsForwardedStateForRemoteHarvesterWhenInactiveRemoteIsAgedLessThanOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
+		Assert.assertThat(isLocalState(2, 1, 1440, owner), IsEqual.equalTo(false));
+		Assert.assertThat(isLocalState(2, 1000, 1000, owner), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenInactiveRemoteIsAgedAtLeastOneDay() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
+		Assert.assertThat(isLocalState(2, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(2, 1000, 2880, owner), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void findForwardedStateByAddressReturnsLocalStateForRemoteHarvesterWhenRemoteModeIsUnknown() {
+		// Assert:
+		final RemoteLink.Owner owner = RemoteLink.Owner.RemoteHarvester;
+		Assert.assertThat(isLocalState(7, 1, 1441, owner), IsEqual.equalTo(true));
+		Assert.assertThat(isLocalState(0, 1000, 1000, owner), IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	private static boolean isLocalState(final int mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
+		// Assert:		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final PoiFacade facade = createPoiFacade();
+		final PoiAccountState state = facade.findStateByAddress(address);
+		final RemoteLink link = new RemoteLink(
+				Utils.generateRandomAddress(),
+				new BlockHeight(remoteBlockHeight),
+				mode,
+				owner);
+		state.getRemoteLinks().addLink(link);
+
+		// Act:
+		final PoiAccountState forwardedState = facade.findForwardedStateByAddress(address, new BlockHeight(currentBlockHeight));
+
+		// Assert:
+		return forwardedState.equals(state);
+	}
+
+	//endregion
+
 	//region removeFromCache
 
 	@Test

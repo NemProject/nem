@@ -55,7 +55,7 @@ public class AccountInfo implements SerializableEntity {
 
 	private static Address deserializeAddress(final Deserializer deserializer) {
 		final Address addressWithoutPublicKey = Address.readFrom(deserializer, "address", AddressEncoding.COMPRESSED);
-		final Address addressWithPublicKey = Address.readFrom(deserializer, "publicKey", AddressEncoding.PUBLIC_KEY);
+		final Address addressWithPublicKey = Address.readFromOptional(deserializer, "publicKey", AddressEncoding.PUBLIC_KEY);
 		return null != addressWithPublicKey ? addressWithPublicKey : addressWithoutPublicKey;
 	}
 

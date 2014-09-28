@@ -5,13 +5,14 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
+import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockChainConstants;
-import org.nem.nis.service.*;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
-import org.nem.nis.visitors.*;
+import org.nem.nis.visitors.PartialWeightedScoreVisitor;
 import org.nem.peer.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,14 @@ import java.util.stream.Collectors;
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
+	// TODO 20140920 J-G: started some of the refactoring by pulling stuff out into BlockChainServices (i wouldn't dump everything there), but it think it is a good facade that hides a lot of the helpers from this class
+
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
-	private final TransferDao transferDao;
 	private final AccountAnalyzer accountAnalyzer;
-	private final Foraging foraging;
+	private final BlockChainServices services;
+	private final UnconfirmedTransactions unconfirmedTransactions;
 	private BlockChainScore score;
 
 	@Autowired(required = true)
@@ -37,14 +40,14 @@ public class BlockChain implements BlockSynchronizer {
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
-			final TransferDao transferDao,
-			final Foraging foraging) {
+			final BlockChainServices services,
+			final UnconfirmedTransactions unconfirmedTransactions) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
-		this.transferDao = transferDao;
-		this.foraging = foraging;
+		this.services = services;
+		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.score = BlockChainScore.ZERO;
 	}
 
@@ -124,19 +127,6 @@ public class BlockChain implements BlockSynchronizer {
 		return block.verify() ? ValidationResult.SUCCESS : ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
 	}
 
-	public Block forageBlock() {
-		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
-		final Block block = this.foraging.forageBlock(scorer);
-
-		// make a full-blown analysis
-		// TODO: we can call it thanks to the "hack" inside processBlock
-		if (block != null && this.processBlock(block) == ValidationResult.SUCCESS) {
-			return block;
-		}
-
-		return null;
-	}
-
 	/**
 	 * Synch algorithm:
 	 * 1. Get peer's last block compare with ours, assuming it's ok
@@ -185,7 +175,7 @@ public class BlockChain implements BlockSynchronizer {
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
 				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
 			final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-			this.foraging.processTransactions(unconfirmedTransactions);
+			unconfirmedTransactions.forEach(this.unconfirmedTransactions::addNew);
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
@@ -207,10 +197,6 @@ public class BlockChain implements BlockSynchronizer {
 		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
 		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
-	}
-
-	private void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
-		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
 	/**
@@ -243,8 +229,7 @@ public class BlockChain implements BlockSynchronizer {
 		}
 
 		final BlockChainSyncContext context = this.createSyncContext();
-
-		this.fixGenerationHash(receivedBlock, dbParent);
+		this.fixBlock(receivedBlock, dbParent);
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
@@ -268,13 +253,27 @@ public class BlockChain implements BlockSynchronizer {
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
 	}
 
+	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
+		// TODO 20140927 J-G not sure if we still need this here since the previous block is also set by the block chain validator
+		fixGenerationHash(block, parent);
+
+		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
+		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
+		final Account lessor = this.accountAnalyzer.getAccountCache().findByAddress(state.getAddress());
+		block.setLessor(lessor);
+	}
+
+	private static void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
+		block.setPreviousGenerationHash(parent.getGenerationHash());
+	}
+
 	private BlockChainSyncContext createSyncContext() {
 		return new BlockChainSyncContext(
 				this.accountAnalyzer.copy(),
 				this.accountAnalyzer,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
-				this.transferDao,
+				this.services,
 				this.score);
 	}
 
@@ -286,7 +285,7 @@ public class BlockChain implements BlockSynchronizer {
 			final boolean hasOwnChain,
 			final boolean shouldPunishLowerPeerScore) {
 		final UpdateChainResult updateResult = context.updateOurChain(
-				this.foraging,
+				this.unconfirmedTransactions,
 				dbParentBlock,
 				peerChain,
 				ourScore,
@@ -319,10 +318,9 @@ public class BlockChain implements BlockSynchronizer {
 	private static class BlockChainSyncContext {
 		private final AccountAnalyzer accountAnalyzer;
 		private final AccountAnalyzer originalAnalyzer;
-		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
-		private final TransferDao transferDao;
+		private final BlockChainServices services;
 		private final BlockChainScore ourScore;
 
 		private BlockChainSyncContext(
@@ -330,14 +328,13 @@ public class BlockChain implements BlockSynchronizer {
 				final AccountAnalyzer originalAnalyzer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
-				final TransferDao transferDao,
+				final BlockChainServices services,
 				final BlockChainScore ourScore) {
 			this.accountAnalyzer = accountAnalyzer;
 			this.originalAnalyzer = originalAnalyzer;
-			this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
-			this.transferDao = transferDao;
+			this.services = services;
 			this.ourScore = ourScore;
 		}
 
@@ -349,25 +346,11 @@ public class BlockChain implements BlockSynchronizer {
 		 * @return score for iterated blocks.
 		 */
 		public BlockChainScore undoTxesAndGetScore(final BlockHeight commonBlockHeight) {
-			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(this.blockScorer);
-
-			// this is delicate and the order matters, first visitor during unapply changes amount of foraged blocks
-			// second visitor needs that information
-			final List<BlockVisitor> visitors = new ArrayList<>();
-			visitors.add(new UndoBlockVisitor(new AccountsHeightObserver(this.accountAnalyzer), new BlockExecutor(this.accountAnalyzer.getPoiFacade())));
-			visitors.add(scoreVisitor);
-			final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
-			BlockIterator.unwindUntil(
-					this.createLocalBlockLookup(),
-					commonBlockHeight,
-					visitor);
-			this.accountAnalyzer.getPoiFacade().undoVesting(commonBlockHeight);
-
-			return scoreVisitor.getScore();
+			return this.services.undoAndGetScore(this.accountAnalyzer, this.createLocalBlockLookup(), commonBlockHeight);
 		}
 
 		public UpdateChainResult updateOurChain(
-				final Foraging foraging,
+				final UnconfirmedTransactions unconfirmedTransactions,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
@@ -376,11 +359,10 @@ public class BlockChain implements BlockSynchronizer {
 			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
 					this.accountAnalyzer,
 					this.originalAnalyzer,
-					this.blockScorer,
 					this.blockChainLastBlockLayer,
 					this.blockDao,
-					this.transferDao,
-					foraging,
+					this.services,
+					unconfirmedTransactions,
 					dbParentBlock,
 					peerChain,
 					ourScore,
@@ -414,8 +396,8 @@ public class BlockChain implements BlockSynchronizer {
 		private final BlockScorer blockScorer;
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 		private final BlockDao blockDao;
-		private final TransferDao transferDao;
-		private final Foraging foraging;
+		private final BlockChainServices services;
+		private final UnconfirmedTransactions unconfirmedTransactions;
 		private final Block parentBlock;
 		private final Collection<Block> peerChain;
 		private final BlockChainScore ourScore;
@@ -425,11 +407,10 @@ public class BlockChain implements BlockSynchronizer {
 		public BlockChainUpdateContext(
 				final AccountAnalyzer accountAnalyzer,
 				final AccountAnalyzer originalAnalyzer,
-				final BlockScorer blockScorer,
 				final BlockChainLastBlockLayer blockChainLastBlockLayer,
 				final BlockDao blockDao,
-				final TransferDao transferDao,
-				final Foraging foraging,
+				final BlockChainServices services,
+				final UnconfirmedTransactions unconfirmedTransactions,
 				final org.nem.nis.dbmodel.Block dbParentBlock,
 				final Collection<Block> peerChain,
 				final BlockChainScore ourScore,
@@ -437,11 +418,11 @@ public class BlockChain implements BlockSynchronizer {
 
 			this.accountAnalyzer = accountAnalyzer;
 			this.originalAnalyzer = originalAnalyzer;
-			this.blockScorer = blockScorer;
+			this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 			this.blockDao = blockDao;
-			this.transferDao = transferDao;
-			this.foraging = foraging;
+			this.services = services;
+			this.unconfirmedTransactions = unconfirmedTransactions;
 
 			// do not trust peer, take first block from our db and convert it
 			this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer.getAccountCache());
@@ -490,47 +471,13 @@ public class BlockChain implements BlockSynchronizer {
 		 * @return score or -1 if chain is invalid
 		 */
 		private boolean validatePeerChain() {
-			final BlockExecutor executor = new BlockExecutor(this.accountAnalyzer.getPoiFacade());
-			final AccountsHeightObserver observer = new AccountsHeightObserver(this.accountAnalyzer);
-
-			final BlockChainValidator validator = new BlockChainValidator(
-					block -> executor.execute(block, observer),
-					this.blockScorer,
-					BlockChainConstants.BLOCKS_LIMIT,
-					(hash, height) -> (null != this.transferDao.findByHash(hash.getRaw(), height.getRaw())));
-			this.calculatePeerChainDifficulties();
-			return validator.isValid(this.parentBlock, this.peerChain);
+			return this.services.isPeerChainValid(this.accountAnalyzer, this.parentBlock, this.peerChain);
 		}
 
 		private BlockChainScore getPeerChainScore() {
 			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(this.blockScorer);
 			BlockIterator.all(this.parentBlock, this.peerChain, scoreVisitor);
 			return scoreVisitor.getScore();
-		}
-
-		private void calculatePeerChainDifficulties() {
-			final long blockDifference = this.parentBlock.getHeight().getRaw() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION + 1;
-			final BlockHeight blockHeight = new BlockHeight(Math.max(1L, blockDifference));
-
-			final int limit = (int)Math.min(this.parentBlock.getHeight().getRaw(), BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION);
-			final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
-			final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
-
-			for (final Block block : this.peerChain) {
-				final BlockDifficulty difficulty = this.blockScorer.getDifficultyScorer().calculateDifficulty(
-						difficulties,
-						timeStamps,
-						block.getHeight().getRaw());
-				block.setDifficulty(difficulty);
-
-				// apache collections4 only have CircularFifoQueue which as a queue doesn't have .get()
-				difficulties.add(difficulty);
-				timeStamps.add(block.getTimeStamp());
-				if (difficulties.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
-					difficulties.remove(0);
-					timeStamps.remove(0);
-				}
-			}
 		}
 
 		/*
@@ -561,8 +508,8 @@ public class BlockChain implements BlockSynchronizer {
 				this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
 				this.peerChain.stream()
-						.filter(tr -> this.blockChainLastBlockLayer.addBlockToDb(tr))
-						.forEach(tr -> this.foraging.removeFromUnconfirmedTransactions(tr));
+						.filter(block -> this.blockChainLastBlockLayer.addBlockToDb(block))
+						.forEach(block -> this.unconfirmedTransactions.removeAll(block));
 			}
 		}
 
@@ -575,13 +522,15 @@ public class BlockChain implements BlockSynchronizer {
 			while (currentHeight != wantedHeight) {
 				final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
-				// if the transaction is in DB it means at some point
-				// isValid and verify had to be called on it, so we can safely add it
-				// as unconfirmed
+				// if the transaction is in db, we should add it to unconfirmed transactions without a db check
+				// (otherwise, since it is not removed from the database, the database hash check would fail).
+				// at this point, only "state" (in accountAnalyzer and so on) is reverted.
+				// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
+				// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
-						.forEach(tr -> this.foraging.addUnconfirmedTransactionWithoutDbCheck(tr));
+						.forEach(this.unconfirmedTransactions::addExisting);
 				currentHeight--;
 			}
 		}

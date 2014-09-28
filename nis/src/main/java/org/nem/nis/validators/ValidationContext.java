@@ -1,0 +1,89 @@
+package org.nem.nis.validators;
+
+import org.nem.core.model.primitive.BlockHeight;
+
+/**
+ * Contextual information associated with a validation.
+ */
+public class ValidationContext {
+	private final BlockHeight blockHeight;
+	private final BlockHeight confirmedBlockHeight;
+	private final DebitPredicate debitPredicate;
+
+	/**
+	 * Creates a default validation context.
+	 */
+	public ValidationContext() {
+		this(BlockHeight.MAX);
+	}
+
+	/**
+	 * Creates a validation context with a custom block height.
+	 *
+	 * @param blockHeight The block height.
+	 */
+	public ValidationContext(final BlockHeight blockHeight) {
+		this(blockHeight, blockHeight);
+	}
+
+	/**
+	 * Creates a validation context with a custom block height.
+	 *
+	 * @param blockHeight The block height.
+	 * @param confirmedBlockHeight The confirmed block height.
+	 */
+	public ValidationContext(final BlockHeight blockHeight, final BlockHeight confirmedBlockHeight) {
+		this(blockHeight, confirmedBlockHeight, (account, amount) -> account.getBalance().compareTo(amount) >= 0);
+	}
+
+	/**
+	 * Creates a validation context with a custom debit predicate.
+	 *
+	 * @param debitPredicate The debit predicate.
+	 */
+	public ValidationContext(final DebitPredicate debitPredicate) {
+		this(BlockHeight.MAX, BlockHeight.MAX, debitPredicate);
+	}
+
+	/**
+	 * Creates a validation context with a custom block height and debit predicate.
+	 *
+	 * @param blockHeight The block height.
+	 * @param debitPredicate The debit predicate.
+	 */
+	public ValidationContext(
+			final BlockHeight blockHeight,
+			final BlockHeight confirmedBlockHeight,
+			final DebitPredicate debitPredicate) {
+		this.blockHeight = blockHeight;
+		this.confirmedBlockHeight = confirmedBlockHeight;
+		this.debitPredicate = debitPredicate;
+	}
+
+	/**
+	 * Gets the block height.
+	 *
+	 * @return The block height.
+	 */
+	public BlockHeight getBlockHeight() {
+		return this.blockHeight;
+	}
+
+	/**
+	 * Gets the confirmed block height (all transactions at or below this block height can be considered confirmed).
+	 *
+	 * @return The confirmed block height.
+	 */
+	public BlockHeight getConfirmedBlockHeight() {
+		return this.confirmedBlockHeight;
+	}
+
+	/**
+	 * Gets the debit predicate.
+	 *
+	 * @return The debit predicate.
+	 */
+	public DebitPredicate getDebitPredicate() {
+		return this.debitPredicate;
+	}
+}

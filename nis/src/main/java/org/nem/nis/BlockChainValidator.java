@@ -3,12 +3,12 @@ package org.nem.nis;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.time.TimeInstant;
+import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.*;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -16,12 +16,12 @@ import java.util.logging.Logger;
  */
 public class BlockChainValidator {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
-	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 60;
 
 	private final Consumer<Block> executor;
 	private final BlockScorer scorer;
 	private final int maxChainSize;
-	private final BiPredicate<Hash, BlockHeight> transactionExists;
+	private final BlockValidator blockValidator;
+	private final TransactionValidator transactionValidator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -29,16 +29,20 @@ public class BlockChainValidator {
 	 * @param executor The block executor to use.
 	 * @param scorer The block scorer to use.
 	 * @param maxChainSize The maximum chain size.
+	 * @param blockValidator The validator to use for validating blocks.
+	 * @param transactionValidator The validator to use for validating transactions.
 	 */
 	public BlockChainValidator(
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
-			final BiPredicate<Hash, BlockHeight> transactionExists) {
+			final BlockValidator blockValidator,
+			final TransactionValidator transactionValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
-		this.transactionExists = transactionExists;
+		this.blockValidator = blockValidator;
+		this.transactionValidator = transactionValidator;
 	}
 
 	/**
@@ -53,7 +57,7 @@ public class BlockChainValidator {
 			return false;
 		}
 
-		final BlockHeight commonBlockHeight = parentBlock.getHeight();
+		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
 		final Set<Hash> chainHashes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
@@ -62,9 +66,7 @@ public class BlockChainValidator {
 				return false;
 			}
 
-			// TODO-CR: not sure if i like having a hard dependency on NisMain here instead of injecting the TimeProvider
-			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-			if (block.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
+			if (ValidationResult.SUCCESS != this.blockValidator.validate(block)) {
 				return false;
 			}
 
@@ -73,18 +75,17 @@ public class BlockChainValidator {
 				return false;
 			}
 
+			final ValidationContext validationContext = new ValidationContext(block.getHeight(), confirmedBlockHeight);
 			for (final Transaction transaction : block.getTransactions()) {
-				if (ValidationResult.SUCCESS != transaction.checkValidity() ||
+				if (ValidationResult.SUCCESS != this.transactionValidator.validate(transaction, validationContext) ||
 						!transaction.verify() ||
-						transaction.getTimeStamp().compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0 ||
 						transaction.getSigner().equals(block.getSigner())) {
 					return false;
 				}
 
 				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
 					final Hash hash = HashUtils.calculateHash(transaction);
-					if (this.transactionExists.test(hash, commonBlockHeight) ||
-						chainHashes.contains(hash)) {
+					if (chainHashes.contains(hash)) {
 						LOGGER.info("received block with duplicate TX");
 						return false;
 					}

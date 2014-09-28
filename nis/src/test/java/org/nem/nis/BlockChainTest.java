@@ -9,12 +9,15 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
+import org.nem.nis.validators.TransactionValidatorFactory;
 
 import java.lang.reflect.*;
 import java.math.BigInteger;
@@ -48,12 +51,6 @@ public class BlockChainTest {
 		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
 		field.set(null, newValue);
-	}
-
-	@BeforeClass
-	public static void beforeClass() throws Exception {
-		// TODO: is there some way to use mockito for this?
-		setFinalStatic(NisMain.class.getField("TIME_PROVIDER"), new SystemTimeProvider());
 	}
 
 	@Test
@@ -146,13 +143,23 @@ public class BlockChainTest {
 
 		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
 		mockBlockDao.save(parent);
-		final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
-		final Foraging foraging = Mockito.mock(Foraging.class);
-		final BlockChain blockChain = new BlockChain(accountAnalyzer, accountDao, blockChainLastBlockLayer, mockBlockDao, transferDao, foraging);
+		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
+		final BlockChainServices services =
+				new BlockChainServices(
+						mockBlockDao,
+						new BlockTransactionObserverFactory(),
+						NisUtils.createBlockValidatorFactory(),
+						transactionValidatorFactory);
+		final BlockChain blockChain = new BlockChain(
+				accountAnalyzer,
+				accountDao,
+				blockChainLastBlockLayer,
+				mockBlockDao,
+				services,
+				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
 
 		// Act:
-		Assert.assertThat(NisMain.TIME_PROVIDER, IsNot.not(IsNull.nullValue()));
 		final ValidationResult result = blockChain.processBlock(block);
 		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
 		TransferTransaction transaction;
@@ -307,7 +314,8 @@ public class BlockChainTest {
 				b.getHeight().getRaw(), // height
 				RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT,
 				0L,
-				123L
+				123L,
+				null
 		);
 
 		final Transfer dbTransaction1 = new Transfer(

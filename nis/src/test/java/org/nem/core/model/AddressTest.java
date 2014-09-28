@@ -321,18 +321,57 @@ public class AddressTest {
 	}
 
 	@Test
-	public void canRoundtripAddressWithAddressEncoding() {
+	public void canRoundtripAddressWithCompressedEncoding() {
 		// Assert:
-		this.assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false);
+		this.assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false, true);
+		this.assertAddressRoundTripInMode(AddressEncoding.COMPRESSED, false, false);
 	}
 
 	@Test
 	public void canRoundtripAddressWithPublicKeyEncoding() {
 		// Assert:
-		this.assertAddressRoundTripInMode(AddressEncoding.PUBLIC_KEY, true);
+		this.assertAddressRoundTripInMode(AddressEncoding.PUBLIC_KEY, true, true);
+		this.assertAddressRoundTripInMode(AddressEncoding.PUBLIC_KEY, true, false);
 	}
 
-	private void assertAddressRoundTripInMode(final AddressEncoding encoding, final boolean isPublicKeyPreserved) {
+	@Test(expected = MissingRequiredPropertyException.class)
+	public void cannotReadNullAddressWithCompressedEncoding() {
+		// Act:
+		Address.readFrom(createEmptyDeserializer(), "address", AddressEncoding.COMPRESSED);
+	}
+
+	@Test(expected = MissingRequiredPropertyException.class)
+	public void cannotReadNullAddressWithPublicKeyEncoding() {
+		// Act:
+		Address.readFrom(createEmptyDeserializer(), "address", AddressEncoding.PUBLIC_KEY);
+	}
+
+	@Test
+	public void canReadNullAddressWithOptionalCompressedEncoding() {
+		// Act:
+		final Address address = Address.readFromOptional(createEmptyDeserializer(), "address", AddressEncoding.COMPRESSED);
+
+		// Assert:
+		Assert.assertThat(address, IsNull.nullValue());
+	}
+
+	@Test
+	public void canReadNullAddressWithOptionalPublicKeyEncoding() {
+		// Act:
+		final Address address = Address.readFromOptional(createEmptyDeserializer(), "address", AddressEncoding.PUBLIC_KEY);
+
+		// Assert:
+		Assert.assertThat(address, IsNull.nullValue());
+	}
+
+	private static Deserializer createEmptyDeserializer() {
+		return Utils.createDeserializer(new JsonSerializer().getObject());
+	}
+
+	private void assertAddressRoundTripInMode(
+			final AddressEncoding encoding,
+			final boolean isPublicKeyPreserved,
+			final boolean useOptionalReadFrom) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 		final Address originalAddress = Utils.generateRandomAddressWithPublicKey();
@@ -341,7 +380,9 @@ public class AddressTest {
 		Address.writeTo(serializer, "address", originalAddress, encoding);
 
 		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
-		final Address address = Address.readFrom(deserializer, "address", encoding);
+		final Address address = useOptionalReadFrom
+				? Address.readFromOptional(deserializer, "address", encoding)
+				: Address.readFrom(deserializer, "address", encoding);
 
 		// Assert:
 		Assert.assertThat(address, IsEqual.equalTo(originalAddress));

@@ -3,6 +3,7 @@ package org.nem.nis.secret;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.poi.*;
@@ -15,10 +16,12 @@ public class OutlinkObserverTest {
 	public void notifyTransferExecuteAddsSenderOutlink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = context.createObserver(true);
+		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notifyTransfer(context.account1, context.account2, new Amount(752));
+		observer.notify(
+				new BalanceTransferNotification(context.account1, context.account2, new Amount(752)),
+				new BlockNotificationContext(new BlockHeight(111), NotificationTrigger.Execute));
 
 		// Assert (752 * 0.3 = 225.5):
 		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(225), context.account2.getAddress());
@@ -31,10 +34,12 @@ public class OutlinkObserverTest {
 	public void notifyTransferUndoRemovesRecipientOutlink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = context.createObserver(false);
+		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notifyTransfer(context.account2, context.account1, new Amount(752));
+		observer.notify(
+				new BalanceTransferNotification(context.account2, context.account1, new Amount(752)),
+				new BlockNotificationContext(new BlockHeight(111), NotificationTrigger.Undo));
 
 		// Assert (752 * 0.3 = 225.5):
 		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(225), context.account2.getAddress());
@@ -47,10 +52,12 @@ public class OutlinkObserverTest {
 	public void notifyTransferDoesNotAddSelfOutlink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = context.createObserver(true);
+		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notifyTransfer(context.account1, context.account1, new Amount(752));
+		observer.notify(
+				new BalanceTransferNotification(context.account1, context.account1, new Amount(752)),
+				new BlockNotificationContext(new BlockHeight(111), NotificationTrigger.Execute));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);
@@ -76,10 +83,12 @@ public class OutlinkObserverTest {
 	private static void assertNotifyCreditDoesNotChangeOutlinks(final boolean isExecute) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = context.createObserver(isExecute);
+		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notifyCredit(context.account1, new Amount(432));
+		observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account1, new Amount(432)),
+				new BlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);
@@ -104,10 +113,12 @@ public class OutlinkObserverTest {
 	private static void assertNotifyDebitDoesNotChangeOutlinks(final boolean isExecute) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final OutlinkObserver observer = context.createObserver(isExecute);
+		final OutlinkObserver observer = context.createObserver();
 
 		// Act:
-		observer.notifyDebit(context.account1, new Amount(432));
+		observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, context.account1, new Amount(432)),
+				new BlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);
@@ -145,8 +156,8 @@ public class OutlinkObserverTest {
 			this.hook(this.account2, this.importance2, this.weightedBalances2, height);
 		}
 
-		private OutlinkObserver createObserver(final boolean isExecute) {
-			return new OutlinkObserver(this.poiFacade, new BlockHeight(111), isExecute);
+		private OutlinkObserver createObserver() {
+			return new OutlinkObserver(this.poiFacade);
 		}
 
 		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances, final BlockHeight height) {

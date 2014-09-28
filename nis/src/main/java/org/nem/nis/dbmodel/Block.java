@@ -1,9 +1,13 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.*;
 import org.nem.core.crypto.Hash;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.*;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
@@ -34,6 +38,11 @@ public class Block {
 	private Account forger;
 	private byte[] forgerProof;
 
+	@ManyToOne
+	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+	@JoinColumn(name = "harvestedInName")
+	private Account lessor;
+
 	private Long height;
 
 	private Long totalAmount;
@@ -45,7 +54,14 @@ public class Block {
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("blkIndex")
+	@LazyCollection(LazyCollectionOption.TRUE)
 	private List<Transfer> blockTransfers;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
+	@OrderBy("blkIndex")
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@OrderColumn(name = "blkIndex")
+	private List<ImportanceTransfer> blockImportanceTransfers;
 
 	public Block() {
 	}
@@ -61,7 +77,8 @@ public class Block {
 			final Long height,
 			final Long totalAmount,
 			final Long totalFee,
-			final Long difficulty) {
+			final Long difficulty,
+			final Account lessor) {
 
 		this.shortId = hash.getShortId();
 		this.version = version;
@@ -75,6 +92,8 @@ public class Block {
 		this.totalAmount = totalAmount;
 		this.totalFee = totalFee;
 		this.difficulty = difficulty;
+
+		this.lessor = lessor;
 	}
 
 	public Long getId() {
@@ -137,7 +156,7 @@ public class Block {
 		return this.forger;
 	}
 
-	public void setForgerId(final Account forger) {
+	public void setForger(final Account forger) {
 		this.forger = forger;
 	}
 
@@ -148,6 +167,15 @@ public class Block {
 	public void setForgerProof(final byte[] forgerProof) {
 		this.forgerProof = forgerProof;
 	}
+
+	public Account getLessor() {
+		return this.lessor;
+	}
+
+	public void setLessor(final Account lessor) {
+		this.lessor = lessor;
+	}
+
 
 	public Long getHeight() {
 		return this.height;
@@ -195,5 +223,13 @@ public class Block {
 
 	public void setBlockTransfers(final List<Transfer> blockTransfers) {
 		this.blockTransfers = blockTransfers;
+	}
+
+	public List<ImportanceTransfer> getBlockImportanceTransfers() {
+		return this.blockImportanceTransfers;
+	}
+
+	public void setBlockImportanceTransfers(final List<ImportanceTransfer> blockImportanceTransfers) {
+		this.blockImportanceTransfers = blockImportanceTransfers;
 	}
 }

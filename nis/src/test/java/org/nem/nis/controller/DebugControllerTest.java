@@ -63,7 +63,7 @@ public class DebugControllerTest {
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
 		dbBlock.setPrevBlockHash(blockDaoBlock.getPreviousBlockHash().getRaw());
 		dbBlock.setGenerationHash(blockDaoBlock.getGenerationHash().getRaw());
-		dbBlock.setForgerId(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
+		dbBlock.setForger(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
 		dbBlock.setDifficulty(blockDaoBlock.getDifficulty().getRaw());
 		dbBlock.setHeight(blockDaoBlock.getHeight().getRaw());
 		dbBlock.setTimeStamp(blockDaoBlock.getTimeStamp().getRawTime());
@@ -73,7 +73,7 @@ public class DebugControllerTest {
 		final org.nem.nis.dbmodel.Block dbParent = NisUtils.createDbBlockWithTimeStamp(383);
 		dbParent.setPrevBlockHash(blockDaoParent.getPreviousBlockHash().getRaw());
 		dbParent.setGenerationHash(blockDaoParent.getGenerationHash().getRaw());
-		dbParent.setForgerId(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
+		dbParent.setForger(new org.nem.nis.dbmodel.Account("", blockDaoBlock.getSigner().getKeyPair().getPublicKey()));
 		dbParent.setDifficulty(blockDaoParent.getDifficulty().getRaw());
 		dbParent.setHeight(blockDaoParent.getHeight().getRaw());
 		dbParent.setTimeStamp(blockDaoParent.getTimeStamp().getRawTime());

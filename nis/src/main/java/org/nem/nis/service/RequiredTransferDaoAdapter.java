@@ -33,6 +33,10 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 		return transfer;
 	}
 
+	// TODO 20140927 J-G,B: we might want to revisit this class since we're only using a few of the functions of it
+	// > that's probably a good indication that this class shouldn't implement ReadOnlyTransferDao
+	// > or at least add tests for the following functions (eventually)
+
 	@Override
 	public Transfer findByHash(final byte[] txHash, long maxBlockHeight) {
 		final Transfer transfer = this.transferDao.findByHash(txHash, maxBlockHeight);

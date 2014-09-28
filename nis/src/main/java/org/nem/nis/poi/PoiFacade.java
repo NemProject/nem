@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.secret.BlockChainConstants;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,7 +27,8 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	}
 
 	/**
-	 * Finds a poi account state given an address.
+	 * Finds a poi account state given an address. This function will NOT return
+	 * forwarded states.
 	 *
 	 * @param address The address.
 	 * @return The poi account state.
@@ -39,6 +41,73 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 		}
 
 		return state;
+	}
+
+	/**
+	 * Finds the latest poi account state given an address following all forwards.
+	 * - When passed a remote harvester, it will return the state for the "owner" (the account harvesting remotely)
+	 * - Otherwise, it will return the state for the passed in address
+	 * <br/>
+	 * Let's say we have account A and remote account B,
+	 * A has link (B, height, HarvestingRemotely)
+	 * B has link (A, height, RemoteHarvester)
+	 * <br/>
+	 * findForwardedStateByAddress(A *) should return A
+	 * findForwardedStateByAddress(B, h+1439) should return B
+	 * findForwardedStateByAddress(B, h+1440) should return B
+	 * <br/>
+	 *
+	 * @param address The address.
+	 * @return The poi account state.
+	 */
+	public PoiAccountState findLatestForwardedStateByAddress(final Address address) {
+		final PoiAccountState state = this.findStateByAddress(address);
+		final RemoteLinks remoteLinks = state.getRemoteLinks();
+		final RemoteLink remoteLink = remoteLinks.getCurrent();
+		return !remoteLinks.isRemoteHarvester() ? state : this.findStateByAddress(remoteLink.getLinkedAddress());
+	}
+
+	/**
+	 * Finds a poi account state given an address following all forwards at a height.
+	 * - When passed a remote harvester, it will return the state for the "owner" (the account harvesting remotely)
+	 * - Otherwise, it will return the state for the passed in address
+	 * <br/>
+	 * Let's say we have account A and remote account B,
+	 * A has link (B, height, HarvestingRemotely)
+	 * B has link (A, height, RemoteHarvester)
+	 * <br/>
+	 * findForwardedStateByAddress(A *) should return A
+	 * findForwardedStateByAddress(B, h+1439) should return B
+	 * findForwardedStateByAddress(B, h+1440) should return A
+	 * <br/>
+	 *
+	 * @param address The address.
+	 * @param height Height at which check should be performed.
+	 * @return The poi account state.
+	 */
+	public PoiAccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
+		final PoiAccountState state = this.findStateByAddress(address);
+		final RemoteLinks remoteLinks = state.getRemoteLinks();
+		if (!remoteLinks.isRemoteHarvester()) {
+			return state;
+		}
+
+		final RemoteLink remoteLink = remoteLinks.getCurrent();
+		final long settingHeight = height.subtract(remoteLink.getEffectiveHeight());
+		boolean shouldUseRemote = false;
+		switch (ImportanceTransferTransaction.Mode.fromValueOrDefault(remoteLink.getMode())) {
+			case Activate:
+				// the remote is active and operational
+				shouldUseRemote = settingHeight >= BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+				break;
+
+			case Deactivate:
+				// the remote hasn't been deactivated yet
+				shouldUseRemote = settingHeight < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+				break;
+		}
+
+		return !shouldUseRemote ? state : this.findStateByAddress(remoteLink.getLinkedAddress());
 	}
 
 	/**

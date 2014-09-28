@@ -47,6 +47,7 @@ public class TestConf {
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 

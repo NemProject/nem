@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
@@ -166,11 +167,8 @@ public class BlockScorerTest {
 	}
 
 	private static void assertGroupedHeight(final long height, final long expectedGroupedHeight) {
-		// Arrange:
-		final TestContext context = new TestContext();
-
 		// Act:
-		final BlockHeight groupedHeight = context.scorer.getGroupedHeight(new BlockHeight(height));
+		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(new BlockHeight(height));
 
 		// Assert:
 		Assert.assertThat(groupedHeight, IsEqual.equalTo(new BlockHeight(expectedGroupedHeight)));
@@ -202,22 +200,49 @@ public class BlockScorerTest {
 		}
 	}
 
-	private static void assertRecalculateImportancesCalledForHeight(final long height, final long groupedHeight) {
+	private static void assertRecalculateImportancesCalledForHeight(final long height, final long rawGroupedHeight) {
 		// Arrange:
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height);
 
+		final BlockHeight groupedHeight = new BlockHeight(rawGroupedHeight);
 		final Address signerAddress = block.getSigner().getAddress();
-		Mockito.when(poiFacade.findStateByAddress(signerAddress))
-				.thenReturn(new PoiAccountState(signerAddress));
-		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(groupedHeight), 0.75);
+		final PoiAccountState state = new PoiAccountState(signerAddress);
+		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
+		Mockito.when(poiFacade.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
 
 		// Act:
 		context.scorer.calculateForgerBalance(block);
 
 		// Assert:
-		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(new BlockHeight(groupedHeight));
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
+	}
+
+	@Test
+	public void accountAtProperHeightIsForwardedIfRemoteHarvestingAccountIsUsed() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(1442);
+		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(height);
+		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final TestContext context = new TestContext(poiFacade);
+		final Block block = NisUtils.createRandomBlockWithHeight(height.getRaw());
+
+		final Address remoteHarvesterAddress = block.getSigner().getAddress();
+		final Address ownerAddress = Utils.generateRandomAddress();
+		final PoiAccountState remoteState = new PoiAccountState(remoteHarvesterAddress);
+		final PoiAccountState ownerState = new PoiAccountState(ownerAddress);
+		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
+		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
+		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
+
+		// Act:
+		final long score = context.scorer.calculateForgerBalance(block);
+
+		// Assert:
+		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
+		Mockito.verify(poiFacade, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
 
 	//endregion

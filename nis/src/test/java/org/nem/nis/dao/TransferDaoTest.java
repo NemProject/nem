@@ -478,7 +478,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsNullIfHashDoesNotExistInDatabase() {
 		// Arrange:
-		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+		saveThreeBlocksWithTransactionsInDatabase();
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);

@@ -29,6 +29,9 @@ public class TransactionFactory {
 		switch (type) {
 			case TransactionTypes.TRANSFER:
 				return new TransferTransaction(options, deserializer);
+
+			case TransactionTypes.IMPORTANCE_TRANSFER:
+				return new ImportanceTransferTransaction(options, deserializer);
 		}
 
 		throw new IllegalArgumentException("Unknown transaction type: " + type);

@@ -23,6 +23,7 @@ public class Block extends VerifiableEntity {
 	private final List<Transaction> transactions;
 
 	// these are helper fields and shouldn't be serialized
+	private Account lessor;
 	private BlockDifficulty difficulty;
 
 	private Hash generationHash;
@@ -140,6 +141,16 @@ public class Block extends VerifiableEntity {
 		return this.generationHash;
 	}
 
+	/**
+	 * Gets the lessor if block has been harvested by lessee.
+	 * TODO 20140927 we should try to come up with a better name for this
+	 *
+	 * @return Lessor or null.
+	 */
+	public Account getLessor() {
+		return this.lessor;
+	}
+
 	//endregion
 
 	//region Setters
@@ -181,6 +192,17 @@ public class Block extends VerifiableEntity {
 	 */
 	public void setDifficulty(final BlockDifficulty difficulty) {
 		this.difficulty = difficulty;
+	}
+
+	/**
+	 * Sets the lessor (if it's different from block signer).
+	 *
+	 * @param lessor The lessor.
+	 */
+	public void setLessor(final Account lessor) {
+		if (null != lessor  && !this.getSigner().equals(lessor)) {
+			this.lessor = lessor;
+		}
 	}
 
 	// endregion

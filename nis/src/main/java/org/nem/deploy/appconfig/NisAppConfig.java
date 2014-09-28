@@ -9,8 +9,11 @@ import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
+import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
@@ -42,6 +45,9 @@ public class NisAppConfig {
 
 	@Autowired
 	private TransferDao transferDao;
+
+	@Autowired
+	private ImportanceTransferDao importanceTransferDao;
 
 	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
 
@@ -85,11 +91,7 @@ public class NisAppConfig {
 		flyway.setDataSource(this.dataSource());
 		flyway.setClassLoader(NisAppConfig.class.getClassLoader());
 		flyway.setLocations(prop.getProperty("flyway.locations"));
-		// TODO-CR: 20140817 J->B why are different line-endings causing validation to fail?
-		// TODO-CR: 20140901 BR -> J during migration checksums are calculated which give different results for linux
-		// TODO-CR                   and windows line endings. Thus validation fails.
-		// TODO 20140909 J-G gimre?
-		flyway.setValidateOnMigrate(false);
+		flyway.setValidateOnMigrate(Boolean.valueOf(prop.getProperty("flyway.validate")));
 		return flyway;
 	}
 
@@ -97,15 +99,11 @@ public class NisAppConfig {
 	@DependsOn("flyway")
 	public SessionFactory sessionFactory() throws IOException {
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
-
-		// TODO: it would be nicer, no get only hibernate props and add them all at once using .addProperties(properties);
-		// TODO BR: like this?
-		// TODO 20140909 J-G gimre?
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
-
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 
@@ -122,17 +120,60 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockChain blockChain() {
-		return new BlockChain(this.accountAnalyzer(), this.accountDao, this.blockChainLastBlockLayer, this.blockDao, this.transferDao, this.foraging());
+		return new BlockChain(
+				this.accountAnalyzer(),
+				this.accountDao,
+				this.blockChainLastBlockLayer,
+				this.blockDao,
+				this.blockChainServices(),
+				this.unconfirmedTransactions());
 	}
 
 	@Bean
-	public Foraging foraging() {
-		return new Foraging(
-				this.accountCache(),
-				this.poiFacade(),
+	public BlockChainServices blockChainServices() {
+		return new BlockChainServices(
 				this.blockDao,
+				this.blockTransactionObserverFactory(),
+				this.blockValidatorFactory(),
+				this.transactionValidatorFactory());
+	}
+
+	@Bean
+	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
+		return new BlockTransactionObserverFactory();
+	}
+
+	@Bean
+	public BlockValidatorFactory blockValidatorFactory() {
+		return new BlockValidatorFactory(this.timeProvider());
+	}
+
+	@Bean
+	public TransactionValidatorFactory transactionValidatorFactory() {
+		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider());
+	}
+
+	@Bean
+	public TransactionValidator transactionValidator() {
+		return this.transactionValidatorFactory().create(this.poiFacade());
+	}
+
+	@Bean
+	public Harvester harvester() {
+		final PoiFacade poiFacade = this.poiFacade();
+		final BlockGenerator generator = new BlockGenerator(
+				this.accountCache(),
+				poiFacade,
+				this.unconfirmedTransactions(),
+				this.blockDao,
+				new BlockScorer(poiFacade),
+				this.blockValidatorFactory().create(poiFacade));
+		return new Harvester(
+				this.accountCache(),
+				this.timeProvider(),
 				this.blockChainLastBlockLayer,
-				this.transferDao);
+				this.unlockedAccounts(),
+				generator);
 	}
 
 	@Bean
@@ -145,8 +186,19 @@ public class NisAppConfig {
 		return new PoiFacade(new PoiAlphaImportanceGeneratorImpl());
 	}
 
+	@Bean
 	public AccountAnalyzer accountAnalyzer() {
 		return new AccountAnalyzer(this.accountCache(), this.poiFacade());
+	}
+
+	@Bean
+	public UnlockedAccounts unlockedAccounts() {
+		return new UnlockedAccounts(this.accountCache(), this.poiFacade(), this.blockChainLastBlockLayer);
+	}
+
+	@Bean
+	public UnconfirmedTransactions unconfirmedTransactions() {
+		return new UnconfirmedTransactions(this.timeProvider(), this.transactionValidator());
 	}
 
 	@Bean
@@ -179,6 +231,7 @@ public class NisAppConfig {
 		return new NisPeerNetworkHost(
 				this.accountAnalyzer(),
 				this.blockChain(),
+				this.harvester(),
 				this.chainServices(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),

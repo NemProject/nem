@@ -3,7 +3,6 @@ package org.nem.nis.service;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
@@ -70,8 +69,6 @@ public class AccountInfoFactoryTest {
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
 		account.incrementForagedBlocks();
-		account.addMessage(new PlainMessage(new byte[] { 1, 4, 5 }));
-		account.addMessage(new PlainMessage(new byte[] { 8, 12, 4 }));
 		return account;
 	}
 

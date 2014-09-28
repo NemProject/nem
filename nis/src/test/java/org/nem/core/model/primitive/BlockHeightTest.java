@@ -14,6 +14,7 @@ public class BlockHeightTest {
 	public void constantsAreInitializedCorrectly() {
 		// Assert:
 		Assert.assertThat(BlockHeight.ONE, IsEqual.equalTo(new BlockHeight(1)));
+		Assert.assertThat(BlockHeight.MAX, IsEqual.equalTo(new BlockHeight(Long.MAX_VALUE)));
 	}
 
 	//endregion
