@@ -25,13 +25,13 @@ public class EligibleSignerBlockValidatorTest {
 	}
 
 	@Test
-	public void accountHarvestingRemotelyCanotSignBlockIfRemoteIsNotDeactivated() {
+	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsNotDeactivated() {
 		// Assert:
 		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1000, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
 	}
 
 	@Test
-	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotDeactivated() {
+	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsDeactivated() {
 		// Assert:
 		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1440, ValidationResult.SUCCESS, Off);
 	}
@@ -66,7 +66,11 @@ public class EligibleSignerBlockValidatorTest {
 		assertValidationResultForRemoteLinkOwner(null, 1000, ValidationResult.SUCCESS, 1);
 	}
 
-	private static void assertValidationResultForRemoteLinkOwner(final RemoteLink.Owner owner, int blockHeight, final ValidationResult expectedResult, int mode) {
+	private static void assertValidationResultForRemoteLinkOwner(
+			final RemoteLink.Owner owner,
+			int blockHeight,
+			final ValidationResult expectedResult,
+			int mode) {
 		// Arrange:
 		final int changeHeight = 5;
 		final Block block = NisUtils.createRandomBlockWithHeight(changeHeight + blockHeight);

@@ -20,6 +20,7 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 		this.poiFacade = poiFacade;
 	}
 
+	// TODO 20140927 J-G (minor pedantic comment) i would move this below validate because i usually try to have calling functions before callee functions
 	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
 		return ImportanceTransferTransaction.Mode.Activate.value() == remoteLinks.getCurrent().getMode();
 	}
@@ -33,6 +34,10 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 		}
 
 		// currently we can only have Activate and Deactivate, so we're ok to use single boolean for this
+		// TODO 20140927 J-G i wonder if it would be clearer to rename withinOneDay to something like isLastActivateChangeInEffect / isActivatedStatusInEffect
+		// > i also wonder if, as a spam deterrent, isHarvestingRemotely && isActivated && withinOneDay should fail
+		// > (also, i realized that findForwardedStateByAddress is not appropriate because it is actually doing the opposite lookup)
+		// > and thanks for all the test cases :)
 		final boolean isActivated = isRemoteActivated(remoteLinks);
 		final long heightDiff = block.getHeight().subtract(remoteLinks.getCurrent().getEffectiveHeight());
 		final boolean withinOneDay = heightDiff < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
