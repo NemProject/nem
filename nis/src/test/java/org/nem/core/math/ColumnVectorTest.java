@@ -276,7 +276,7 @@ public class ColumnVectorTest {
 		final ColumnVector b = new ColumnVector(2, -4, 1);
 
 		// Act:
-		final ColumnVector result = a.add(b);
+		final ColumnVector result = a.addElementWise(b);
 
 		// Assert:
 		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
@@ -291,8 +291,8 @@ public class ColumnVectorTest {
 		final ColumnVector smallerVector = new ColumnVector(7);
 
 		// Act:
-		ExceptionAssert.assertThrows(v -> largerVector.add(smallerVector), IllegalArgumentException.class);
-		ExceptionAssert.assertThrows(v -> smallerVector.add(largerVector), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> largerVector.addElementWise(smallerVector), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> smallerVector.addElementWise(largerVector), IllegalArgumentException.class);
 	}
 
 	//endregion
@@ -490,6 +490,32 @@ public class ColumnVectorTest {
 
 	//endregion
 
+	//region setNegativesToZero
+	@Test
+	public void removeNegativesSetsNegativeValuesToZero() {
+		// Arrange:
+		final ColumnVector vector1 = new ColumnVector(2, -4, 1);
+		final ColumnVector vector2 = new ColumnVector(-1, 454, 1);
+		final ColumnVector vector3 = new ColumnVector(2, 343, -131);
+		final ColumnVector vector4 = new ColumnVector(-2, -343, -131);
+		final ColumnVector vector5 = new ColumnVector(2, 343, 131);
+
+		// Act:
+		vector1.removeNegatives();
+		vector2.removeNegatives();
+		vector3.removeNegatives();
+		vector4.removeNegatives();
+		vector5.removeNegatives();
+		
+		// Assert:
+		Assert.assertThat(new ColumnVector(2, 0, 1), IsEqual.equalTo(vector1));
+		Assert.assertThat(new ColumnVector(0, 454, 1), IsEqual.equalTo(vector2));
+		Assert.assertThat(new ColumnVector(2, 343, 0), IsEqual.equalTo(vector3));
+		Assert.assertThat(new ColumnVector(0, 0, 0), IsEqual.equalTo(vector4));
+		Assert.assertThat(new ColumnVector(2, 343, 131), IsEqual.equalTo(vector5));
+	}
+	//endregion
+	
 	//region equals / hashCode
 
 	@Test

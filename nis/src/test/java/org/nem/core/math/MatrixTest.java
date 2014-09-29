@@ -414,6 +414,24 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//endregion
 
+	//region add
+
+	@Test
+	public void denseMatrixCanBeAddedToByScalar() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+
+		// Act:
+		final Matrix result = matrix.add(0.1);
+
+		// Assert:
+		Assert.assertThat(
+				result.roundTo(5),
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2.1, 3.1, 5.1, 11.1, 1.1, 8.1 })));
+	}
+
+	//endregion
+	
 	//region multiplyElementWise
 
 	@Test

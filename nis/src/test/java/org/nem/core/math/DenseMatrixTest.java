@@ -2,9 +2,9 @@ package org.nem.core.math;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 
@@ -35,6 +35,23 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 		ExceptionAssert.assertThrows(
 				v -> new DenseMatrix(2, 3, new double[] { 1, 4, 5, 7, 2 }),
 				IllegalArgumentException.class);
+	}
+
+	//endregion
+
+	//region forEach
+
+	@Test
+	public void forEachReturnsAllElements() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 0, 0, 1, -5, 8 });
+
+		// Act:
+		final List<Double> values = new ArrayList<>();
+		matrix.forEach((row, col, value) -> values.add(value));
+
+		// Assert:
+		Assert.assertThat(values, IsEquivalent.equivalentTo(new Double[] { 2.0, 0.0, 0.0, 1.0, -5.0, 8.0 }));
 	}
 
 	//endregion
@@ -85,6 +102,26 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 		Assert.assertThat(matrix.toString(), IsEqual.equalTo(expectedResult));
 	}
 
+	//endregion
+	
+	//region add
+	
+	@Test
+	public void sparseMatrixCanBeAddedToByScalar() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2);
+		matrix.setAt(2, 0, 3);
+		matrix.setAt(1, 1, 5);
+
+		// Act::
+		final Matrix result = matrix.add(0.2);
+
+		// Assert:
+		Assert.assertThat(
+				result,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.2, 0.2, 5.2, 3.2, 0.2 })));
+	}
+	
 	//endregion
 
 	@Override

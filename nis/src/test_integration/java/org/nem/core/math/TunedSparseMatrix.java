@@ -1,5 +1,6 @@
 package org.nem.core.math;
 
+import java.util.*;
 /**
  * BloodyRookie's initial implementation of normalizeColumns and multiply.
  */
@@ -99,7 +100,7 @@ public class TunedSparseMatrix extends Matrix {
 	}
 
 	@Override
-	protected final void forEach(final ReadOnlyElementVisitorFunction func) {
+	public final void forEach(final ReadOnlyElementVisitorFunction func) {
 		for (int i = 0; i < this.numRows; i++) {
 			final double[] rowValues = this.values[i];
 			final int[] rowCols = this.cols[i];
@@ -131,14 +132,20 @@ public class TunedSparseMatrix extends Matrix {
 	}
 
 	@Override
-	public void normalizeColumns() {
-		final double[] vector = new double[this.numRows];
+	public Collection<Integer> normalizeColumns() {
+		final double[] vector = new double[this.numCols];
+		final List<Integer> zeroColumns = new ArrayList<>();
 		for (int i = 0; i < this.numRows; i++) {
 			final double[] rowValues = this.values[i];
 			final int[] rowCols = this.cols[i];
 			final int size = this.maxIndices[i];
 			for (int j = 0; j < size; j++) {
 				vector[rowCols[j]] += Math.abs(rowValues[j]);
+			}
+		}
+		for (int i=0; i<this.numCols; i++) {
+			if (vector[i] == 0.0) {
+				zeroColumns.add(i);
 			}
 		}
 		for (int i = 0; i < this.numRows; i++) {
@@ -152,6 +159,8 @@ public class TunedSparseMatrix extends Matrix {
 				}
 			}
 		}
+
+		return zeroColumns;
 	}
 
 	/**
@@ -212,5 +221,10 @@ public class TunedSparseMatrix extends Matrix {
 	@Override
 	public String toString() {
 		return String.format("[%d x %d]", this.numRows, this.numCols);
+	}
+
+	@Override
+	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
+		throw new RuntimeException("Not implemented");
 	}
 }

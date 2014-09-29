@@ -1,5 +1,6 @@
 package org.nem.core.math;
 
+import java.util.*;
 import java.util.function.*;
 
 /**
@@ -125,9 +126,17 @@ public abstract class Matrix {
 
 	/**
 	 * Normalizes each column of the matrix.
+	 *
+	 * @return the collection of column indices for the which the column only consists of zeros.
 	 */
-	public void normalizeColumns() {
+	public Collection<Integer> normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
+		final List<Integer> zeroColumns = new ArrayList<>();
+		for (int i=0; i<this.numCols; i++) {
+			if (columnSums[i] == 0.0) {
+				zeroColumns.add(i);
+			}
+		}
 		this.forEach(new ElementVisitorFunction() {
 			@Override
 			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
@@ -139,6 +148,8 @@ public abstract class Matrix {
 				setter.accept(value / sum);
 			}
 		});
+
+		return zeroColumns;
 	}
 
 	/**
@@ -193,6 +204,16 @@ public abstract class Matrix {
 	 */
 	public Matrix addElementWise(final Matrix matrix) {
 		return this.join(matrix, true, (l, r) -> l + r);
+	}
+	
+	/**
+	 * Creates a new matrix by adding each value in this matrix by a scalar.
+	 *
+	 * @param scalar The scalar.
+	 * @return The new matrix.
+	 */
+	public Matrix add(final double scalar) {
+		return this.transform(v -> v + scalar);
 	}
 
 	private Matrix join(final Matrix matrix, final boolean isTwoWay, final DoubleBinaryOperator op) {
@@ -387,7 +408,7 @@ public abstract class Matrix {
 	 *
 	 * @param func The function.
 	 */
-	protected void forEach(final ReadOnlyElementVisitorFunction func) {
+	public void forEach(final ReadOnlyElementVisitorFunction func) {
 		this.forEach(new ElementVisitorFunction() {
 			@Override
 			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
@@ -401,7 +422,7 @@ public abstract class Matrix {
 	 * Depending on the implementation, zero elements may or may not be visited.
 	 */
 	@FunctionalInterface
-	protected static interface ReadOnlyElementVisitorFunction {
+	public static interface ReadOnlyElementVisitorFunction {
 
 		/**
 		 * Visits the specified element.
@@ -467,6 +488,13 @@ public abstract class Matrix {
 		 */
 		public void visit(final int row, final int col, final double value, final DoubleConsumer setter);
 	}
+
+	/**
+	 * Get the non-zero matrix row element iterator for a given row index.
+	 *
+	 * @param row The row index.
+	 */
+	public abstract MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row);
 
 	//endregion
 }

@@ -95,6 +95,11 @@ public final class DenseMatrix extends Matrix {
 		}
 	}
 
+	@Override
+	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
+		return new DenseMatrixNonZeroRowElementIterator(row, this);
+	}
+
 	// endregion
 
 	@Override

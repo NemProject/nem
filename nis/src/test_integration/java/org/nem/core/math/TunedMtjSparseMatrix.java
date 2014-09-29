@@ -3,6 +3,8 @@ package org.nem.core.math;
 import no.uib.cipr.matrix.*;
 import no.uib.cipr.matrix.sparse.CompRowMatrix;
 
+import java.util.*;
+
 /**
  * A Matrix implementation that uses CompRowMatrix from MTJ.
  */
@@ -45,12 +47,18 @@ public class TunedMtjSparseMatrix extends Matrix {
 	}
 
 	@Override
-	public void normalizeColumns() {
+	public Collection<Integer> normalizeColumns() {
 		final int[] colIndices = this.matrix.getColumnIndices();
+		final List<Integer> zeroColumns = new ArrayList<>();
 		final double[] values = this.matrix.getData();
-		final double[] colSums = new double[this.matrix.numRows()];
+		final double[] colSums = new double[this.matrix.numColumns()];
 		for (int i = 0; i < colIndices.length; ++i) {
 			colSums[colIndices[i]] += Math.abs(values[i]);
+		}
+		for (int i=0; i<this.matrix.numColumns(); i++) {
+			if (colSums[i] == 0.0) {
+				zeroColumns.add(i);
+			}
 		}
 
 		for (int i = 0; i < colIndices.length; ++i) {
@@ -59,6 +67,8 @@ public class TunedMtjSparseMatrix extends Matrix {
 				values[i] /= sum;
 			}
 		}
+
+		return zeroColumns;
 	}
 
 	@Override
@@ -73,5 +83,10 @@ public class TunedMtjSparseMatrix extends Matrix {
 
 		this.matrix.mult(multiplier, result);
 		return new ColumnVector(result.getData());
+	}
+
+	@Override
+	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
+		throw new RuntimeException("Not implemented");
 	}
 }

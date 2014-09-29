@@ -43,4 +43,9 @@ public class MtjSparseMatrix extends Matrix {
 					entry::set);
 		}
 	}
+
+	@Override
+	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
+		throw new RuntimeException("Not implemented");
+	}
 }

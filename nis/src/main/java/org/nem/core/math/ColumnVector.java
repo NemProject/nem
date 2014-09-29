@@ -146,7 +146,7 @@ public class ColumnVector {
 	 * @param vector The specified vector.
 	 * @return The new vector.
 	 */
-	public ColumnVector add(final ColumnVector vector) {
+	public ColumnVector addElementWise(final ColumnVector vector) {
 		return this.transform(new Supplier<Matrix>() {
 			@Override
 			public Matrix get() {
@@ -192,6 +192,21 @@ public class ColumnVector {
 			@Override
 			public Matrix get() {
 				return ColumnVector.this.matrix.roundTo(numPlaces);
+			}
+		});
+	}
+	
+	/**
+	 * Creates a new ColumnVector by adding each element of this vector to a scalar.
+	 *
+	 * @param scalar The scalar.
+	 * @return The new vector.
+	 */
+	public ColumnVector add(final double scalar) {
+		return this.transform(new Supplier<Matrix>() {
+			@Override
+			public Matrix get() {
+				return ColumnVector.this.matrix.add(scalar);
 			}
 		});
 	}
@@ -400,6 +415,15 @@ public class ColumnVector {
 		return builder.toString();
 	}
 
+	//endregion
+	
+	//region setNegativesToZero
+	/**
+	 * Sets all negative values to zero.
+	 */
+	public void removeNegatives() {
+		this.matrix.removeNegatives();
+	}
 	//endregion
 
 	//region hashCode / equals
