@@ -6,11 +6,13 @@ import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.metadata.ApplicationMetaData;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
@@ -251,6 +253,21 @@ public class NodeControllerTest {
 		Assert.assertThat(nodeArgument.getValue().getIdentity(), IsEqual.equalTo(identity));
 	}
 
+	@Test
+	public void activePeersMaxChainHeightDelegatesToChainServices() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		// TODO 20140927 J-B: probably should validate the return value too
+		// TODO 20140928 BR -> J: done.
+		BlockHeight height = context.controller.activePeersMaxChainHeight();
+
+		// Assert:
+		Mockito.verify(context.services, Mockito.times(1)).getMaxChainHeightAsync(context.localNode);
+		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(123)));
+	}
+
 	private static JsonDeserializer createLocalNodeDeserializer(final NodeIdentity identity) {
 		// Arrange:
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
@@ -271,16 +288,22 @@ public class NodeControllerTest {
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final NodeController controller;
+		private final ChainServices services;
+		private final Node localNode;
 
 		private TestContext() {
+			this.localNode = PeerUtils.createNodeWithName("l");
 			this.network = Mockito.mock(PeerNetwork.class);
-			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+			Mockito.when(this.network.getLocalNode()).thenReturn(this.localNode);
 			Mockito.when(this.network.getNodes()).thenReturn(new NodeCollection());
 
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new NodeController(this.host);
+			this.services = Mockito.mock(ChainServices.class);
+			Mockito.when(this.services.getMaxChainHeightAsync(localNode)).thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
+
+			this.controller = new NodeController(this.host, this.services);
 		}
 	}
 }

@@ -1,11 +1,14 @@
 package org.nem.nis.test;
 
+import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
+import org.nem.nis.dao.*;
 import org.nem.nis.secret.AccountLink;
+import org.nem.nis.validators.*;
 
 import java.util.*;
 
@@ -25,7 +28,7 @@ public class NisUtils {
 		account.setPublicKey(Utils.generateRandomPublicKey());
 
 		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block();
-		block.setForgerId(account);
+		block.setForger(account);
 		block.setTimeStamp(timeStamp);
 		block.setHeight(10L);
 		block.setForgerProof(Utils.generateRandomBytes(64));
@@ -35,6 +38,8 @@ public class NisUtils {
 
 	/**
 	 * Creates a new random Block.
+	 *
+	 * @return The block.
 	 */
 	public static Block createRandomBlock() {
 		return new Block(
@@ -47,10 +52,24 @@ public class NisUtils {
 
 	/**
 	 * Creates a new random Block with the specified height.
+	 *
+	 * @param height The height.
+	 * @return The block.
 	 */
 	public static Block createRandomBlockWithHeight(final long height) {
+		return createRandomBlockWithHeight(Utils.generateRandomAccount(), height);
+	}
+
+	/**
+	 * Creates a new random Block with the specified height and signer
+	 *
+	 * @param signer The signer.
+	 * @param height The height.
+	 * @return The block.
+	 */
+	public static Block createRandomBlockWithHeight(final Account signer, final long height) {
 		return new Block(
-				Utils.generateRandomAccount(),
+				signer,
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				TimeInstant.ZERO,
@@ -59,6 +78,9 @@ public class NisUtils {
 
 	/**
 	 * Creates a new random Block with the specified timestamp.
+	 *
+	 * @param timeStamp The time stamp.
+	 * @return The block.
 	 */
 	public static Block createRandomBlockWithTimeStamp(final int timeStamp) {
 		return new Block(
@@ -67,6 +89,37 @@ public class NisUtils {
 				Utils.generateRandomHash(),
 				new TimeInstant(timeStamp),
 				BlockHeight.ONE);
+	}
+
+	/**
+	 * Creates a new list of blocks.
+	 *
+	 * @param parent The parent block.
+	 * @param numBlocks The number of blocks.
+	 * @return The block list.
+	 */
+	public static List<Block> createBlockList(Block parent, final int numBlocks) {
+		final List<Block> blocks = new ArrayList<>();
+		final Account account = Utils.generateRandomAccount();
+		for (int i = 0; i < numBlocks; ++i) {
+			final Block block = new Block(account, parent, TimeInstant.ZERO);
+			blocks.add(block);
+			parent = block;
+		}
+
+		signAllBlocks(blocks);
+		return blocks;
+	}
+
+	/**
+	 * Signs all blocks.
+	 *
+	 * @param blocks The blocks to sign.
+	 */
+	public static void signAllBlocks(final List<Block> blocks) {
+		for (final Block block : blocks) {
+			block.sign();
+		}
 	}
 
 	/**
@@ -97,5 +150,36 @@ public class NisUtils {
 				new BlockHeight(blockHeight),
 				Amount.fromNem(amount),
 				Address.fromEncoded(address));
+	}
+
+	/**
+	 * Creates a transaction validator factory.
+	 *
+	 * @return The factory.
+	 */
+	public static TransactionValidatorFactory createTransactionValidatorFactory() {
+		return createTransactionValidatorFactory(Mockito.mock(TransferDao.class));
+	}
+
+	/**
+	 * Creates a transaction validator factory.
+	 *
+	 * @param transferDao The transfer dao.
+	 * @return The factory.
+	 */
+	public static TransactionValidatorFactory createTransactionValidatorFactory(final TransferDao transferDao) {
+		return new TransactionValidatorFactory(
+				transferDao,
+				Mockito.mock(ImportanceTransferDao.class),
+				new SystemTimeProvider());
+	}
+
+	/**
+	 * Creates a block validator factory.
+	 *
+	 * @return The factory.
+	 */
+	public static BlockValidatorFactory createBlockValidatorFactory() {
+		return new BlockValidatorFactory(new SystemTimeProvider());
 	}
 }

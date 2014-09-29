@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
-import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.nis.*;
@@ -111,6 +111,24 @@ public class ChainController {
 	public AuthenticatedResponse<BlockChainScore> chainScore(@RequestBody final NodeChallenge challenge) {
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(this.chainScore(), localNode.getIdentity(), challenge);
+	}
+
+	//endregion
+
+	//region chainHeight
+
+	@RequestMapping(value = "/chain/height", method = RequestMethod.GET)
+	@PublicApi
+	public BlockHeight chainHeight() {
+		return new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
+	}
+
+	@RequestMapping(value = "/chain/height", method = RequestMethod.POST)
+	@P2PApi
+	@AuthenticatedApi
+	public AuthenticatedResponse<BlockHeight> chainHeight(@RequestBody final NodeChallenge challenge) {
+		final Node localNode = this.host.getNetwork().getLocalNode();
+		return new AuthenticatedResponse<>(this.chainHeight(), localNode.getIdentity(), challenge);
 	}
 
 	//endregion

@@ -2,12 +2,16 @@ package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class TransactionTest {
 
@@ -49,7 +53,7 @@ public class TransactionTest {
 
 	//endregion
 
-	//region Validation
+	//region Deadline
 
 	@Test
 	public void transactionDeadlineCanBeSet() {
@@ -61,66 +65,7 @@ public class TransactionTest {
 		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(726)));
 	}
 
-	@Test
-	public void transactionWithDeadlineInRangeIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void transactionWithLessThanMinimumDeadlineIsInvalid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp());
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
-	}
-
-	@Test
-	public void transactionWithMinimumDeadlineIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void transactionWithMaximumDeadlineIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void transactionWithGreaterThanMaximumDeadlineIsInvalid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1).addSeconds(1));
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
-	}
-
-	@Test
-	public void checkValidityDelegatesToCheckDerivedValidity() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
-		transaction.setValidationResult(ValidationResult.FAILURE_UNKNOWN);
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_UNKNOWN));
-	}
+	//endregion
 
 	//endregion
 
@@ -204,106 +149,110 @@ public class TransactionTest {
 		return transaction.getFee().getNumMicroNem();
 	}
 
+	@Test
+	public void feeCannotBeSetBelowMinimum() {
+		// Arrange (category spam attack):
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(1000));
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setDeadline(new TimeInstant(60));
+		transaction.setMinimumFee(Amount.fromNem(100).getNumMicroNem());
+		transaction.setFee(Amount.fromNem(200));
+
+		// Bob prefers a more user friendly fee structure
+		transaction.setFee(Amount.fromMicroNem(0));
+		transaction.sign();
+
+		// Assert: the fee is set to the minimum fee
+		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(100)));
+	}
+
 	//endregion
 
 	//region Execute and Undo
 
 	@Test
-	public void executeCommitDelegatesToDerivedClass() {
+	public void executeDelegatesToDerivedClass() {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		// Act:
-		transaction.execute();
+		transaction.execute(Mockito.mock(TransactionObserver.class));
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getNumExecuteCommitCalls(), IsEqual.equalTo(1));
 	}
 
 	@Test
-	public void executeNonCommitDelegatesToDerivedClass() {
+	public void undoDelegatesToDerivedClass() {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
 		// Act:
-		transaction.execute(Mockito.mock(TransferObserver.class));
+		transaction.undo(Mockito.mock(TransactionObserver.class));
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getNumExecuteCommitCalls(), IsEqual.equalTo(0));
 	}
 
 	@Test
-	public void undoCommitDelegatesToDerivedClass() {
+	public void executeExposesAllDerivedClassNotificationsInOrder() {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
 
-		// Act:
-		transaction.undo();
-
-		// Assert:
-		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getNumUndoCommitCalls(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void undoNonCommitDelegatesToDerivedClass() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-
-		// Act:
-		transaction.execute(Mockito.mock(TransferObserver.class));
-
-		// Assert:
-		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getNumUndoCommitCalls(), IsEqual.equalTo(0));
-	}
-
-	@Test
-	public void undoCommitChangesAccountBalances() {
-		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		final Account account2 = Utils.generateRandomAccount();
-		account2.incrementBalance(Amount.fromNem(25));
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setTransferAction(to -> {
-			to.notifyTransfer(account1, account2, Amount.fromNem(12));
-			to.notifyCredit(account1, Amount.fromNem(9));
-			to.notifyDebit(account1, Amount.fromNem(11));
+		transaction.setTransactionAction(o -> {
+			o.notify(new Notification(NotificationType.BalanceTransfer) {
+			});
+			o.notify(new Notification(NotificationType.ImportanceTransfer) {
+			});
+			o.notify(new Notification(NotificationType.BalanceDebit) {
+			});
 		});
 
 		// Act:
-		transaction.undo();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.execute(observer);
 
 		// Assert:
-		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(14)));
-		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(13)));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
+		Assert.assertThat(
+				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceTransfer, NotificationType.ImportanceTransfer, NotificationType.BalanceDebit)));
 	}
 
 	@Test
-	public void executeCommitChangesAccountBalances() {
+	public void undoExposesAllDerivedClassNotificationsInReverseOrder() {
 		// Arrange:
-		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(25));
-		final Account account2 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setTransferAction(to -> {
-			to.notifyTransfer(account1, account2, Amount.fromNem(12));
-			to.notifyCredit(account1, Amount.fromNem(9));
-			to.notifyDebit(account1, Amount.fromNem(11));
+
+		final Account account1 = Utils.generateRandomAccount();
+		final Account account2 = Utils.generateRandomAccount();
+		final Amount amount = Amount.fromNem(12345);
+		transaction.setTransactionAction(o -> {
+			o.notify(new BalanceTransferNotification(account1, account2, amount) {
+			});
+			o.notify(new Notification(NotificationType.ImportanceTransfer) {
+			});
+			o.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account1, amount) {
+			});
 		});
 
 		// Act:
-		transaction.execute();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
 
 		// Assert:
-		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(11)));
-		Assert.assertThat(account2.getBalance(), IsEqual.equalTo(Amount.fromNem(12)));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
+		Assert.assertThat(
+				notificationCaptor.getAllValues().stream().map(Notification::getType).collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(NotificationType.BalanceCredit, NotificationType.ImportanceTransfer, NotificationType.BalanceTransfer)));
 	}
 
 	@Test
-	public void undoCommitAppliesTransactionsInReverseOrder() {
+	public void undoAppliesNotificationsInReverseOrder() {
 		// Arrange:
 		final Account account1 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
@@ -314,14 +263,22 @@ public class TransactionTest {
 		});
 
 		// Act:
-		transaction.undo();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
 
 		// Assert:
-		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(2)));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
+		Assert.assertThat(
+				notificationCaptor.getAllValues().stream()
+						.filter(n -> NotificationType.Account != n.getType())
+						.map(n -> ((BalanceAdjustmentNotification)n).getAmount().getNumNem())
+						.collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(11L, 9L)));
 	}
 
 	@Test
-	public void executeCommitAppliesTransactionsInForwardOrder() {
+	public void executeAppliesNotificationsInForwardOrder() {
 		// Arrange:
 		final Account account1 = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
@@ -332,10 +289,18 @@ public class TransactionTest {
 		});
 
 		// Act:
-		transaction.execute();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.execute(observer);
 
 		// Assert:
-		Assert.assertThat(account1.getBalance(), IsEqual.equalTo(Amount.fromNem(2)));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.atLeastOnce()).notify(notificationCaptor.capture());
+		Assert.assertThat(
+				notificationCaptor.getAllValues().stream()
+						.filter(n -> NotificationType.Account != n.getType())
+						.map(n -> ((BalanceAdjustmentNotification)n).getAmount().getNumNem())
+						.collect(Collectors.toList()),
+				IsEqual.equalTo(Arrays.asList(11L, 9L)));
 	}
 
 	//endregion

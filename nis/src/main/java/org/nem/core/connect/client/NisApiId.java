@@ -66,6 +66,11 @@ public enum NisApiId {
 	 */
 	NIS_REST_CHAIN_LAST_BLOCK("/chain/last-block"),
 
+	/**
+	 * The chain/height API.
+	 */
+	NIS_REST_CHAIN_HEIGHT("/chain/height"),
+
 	//endregion
 
 	//region node/*
@@ -94,6 +99,11 @@ public enum NisApiId {
 	 * The /node/boot API.
 	 */
 	NIS_REST_NODE_BOOT("/node/boot"),
+
+	/**
+	 * The node/active-peers/max-chain-height API.
+	 */
+	NIS_REST_ACTIVE_PEERS_MAX_CHAIN_HEIGHT("/node/active-peers/max-chain-height"),
 
 	//endregion
 

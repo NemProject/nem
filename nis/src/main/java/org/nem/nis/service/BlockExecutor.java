@@ -2,7 +2,9 @@ package org.nem.nis.service;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.core.model.observers.*;
+import org.nem.nis.AccountCache;
+import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,27 +17,21 @@ import java.util.*;
 @Service
 public class BlockExecutor {
 	private final PoiFacade poiFacade;
+	private final AccountCache accountCache;
 
 	/**
 	 * Creates a new block executor.
 	 *
 	 * @param poiFacade The poi facade.
+	 * @param accountCache The account cache.
 	 */
 	@Autowired(required = true)
-	public BlockExecutor(final PoiFacade poiFacade) {
+	public BlockExecutor(final PoiFacade poiFacade, final AccountCache accountCache) {
 		this.poiFacade = poiFacade;
+		this.accountCache = accountCache;
 	}
 
 	//region execute
-
-	/**
-	 * Executes all transactions in the block.
-	 *
-	 * @param block The block.
-	 */
-	public void execute(final Block block) {
-		this.execute(block, new ArrayList<>());
-	}
 
 	/**
 	 * Executes all transactions in the block with a custom observer.
@@ -43,28 +39,15 @@ public class BlockExecutor {
 	 * @param block The block.
 	 * @param observer The observer.
 	 */
-	public void execute(final Block block, final BlockTransferObserver observer) {
-		this.execute(block, Arrays.asList(observer));
-	}
-
-	/**
-	 * Executes all transactions in the block with custom observers.
-	 *
-	 * @param block The block.
-	 * @param observers The observers.
-	 */
-	public void execute(final Block block, final Collection<BlockTransferObserver> observers) {
-		final TransferObserver observer = this.createTransferObserver(block, true, observers);
+	public void execute(final Block block, final BlockTransactionObserver observer) {
+		final NotificationTrigger trigger = NotificationTrigger.Execute;
+		final TransactionObserver transactionObserver = this.createTransactionObserver(block, trigger, observer);
 
 		for (final Transaction transaction : block.getTransactions()) {
-			transaction.execute();
-			transaction.execute(observer);
+			transaction.execute(transactionObserver);
 		}
 
-		final Account signer = block.getSigner();
-		signer.incrementForagedBlocks();
-		signer.incrementBalance(block.getTotalFee());
-		observer.notifyCredit(block.getSigner(), block.getTotalFee());
+		this.notifyBlockHarvested(transactionObserver, block, trigger);
 	}
 
 	//endregion
@@ -72,71 +55,51 @@ public class BlockExecutor {
 	//region undo
 
 	/**
-	 * Undoes all transactions in the block.
-	 *
-	 * @param block The block.
-	 */
-	public void undo(final Block block) {
-		this.undo(block, new ArrayList<>());
-	}
-
-	/**
 	 * Undoes all transactions in the block with a custom observer.
 	 *
 	 * @param block The block.
 	 * @param observer The observer.
 	 */
-	public void undo(final Block block, final BlockTransferObserver observer) {
-		this.undo(block, Arrays.asList(observer));
-	}
+	public void undo(final Block block, final BlockTransactionObserver observer) {
+		final NotificationTrigger trigger = NotificationTrigger.Undo;
+		final TransactionObserver transactionObserver = this.createTransactionObserver(block, trigger, observer);
 
-	/**
-	 * Undoes all transactions in the block with custom observers.
-	 *
-	 * @param block The block.
-	 * @param observers The observers.
-	 */
-	public void undo(final Block block, final Collection<BlockTransferObserver> observers) {
-		final TransferObserver observer = this.createTransferObserver(block, false, observers);
-
-		final Account signer = block.getSigner();
-		observer.notifyDebit(block.getSigner(), block.getTotalFee());
-		signer.decrementForagedBlocks();
-		signer.decrementBalance(block.getTotalFee());
-
+		this.notifyBlockHarvested(transactionObserver, block, trigger);
 		for (final Transaction transaction : getReverseTransactions(block)) {
-			transaction.undo(observer);
-			transaction.undo();
+			transaction.undo(transactionObserver);
 		}
 	}
 
 	//endregion undo
 
+	private void notifyBlockHarvested(final TransactionObserver observer, final Block block, final NotificationTrigger trigger) {
+		// in order for all the downstream observers to behave correctly (without needing to know about remote foraging)
+		// trigger harvest notifications with the forwarded account (where available) instead of the remote account
+		final Address address = block.getSigner().getAddress();
+		final PoiAccountState poiAccountState = this.poiFacade.findForwardedStateByAddress(address, block.getHeight());
+
+		final Account endowed = poiAccountState.getAddress().equals(address)
+				? block.getSigner()
+				: this.accountCache.findByAddress(poiAccountState.getAddress());
+
+		final List<NotificationType> types = NotificationTrigger.Execute == trigger
+				? Arrays.asList(NotificationType.BalanceCredit, NotificationType.HarvestReward)
+				: Arrays.asList(NotificationType.HarvestReward, NotificationType.BalanceDebit);
+
+		for (final NotificationType type : types) {
+			observer.notify(new BalanceAdjustmentNotification(type, endowed, block.getTotalFee()));
+		}
+	}
+
 	private static Iterable<Transaction> getReverseTransactions(final Block block) {
 		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
 
-	private TransferObserver createTransferObserver(
+	private TransactionObserver createTransactionObserver(
 			final Block block,
-			final boolean isExecute,
-			final Collection<BlockTransferObserver> observers) {
-		final List<BlockTransferObserver> blockTransferObservers = new ArrayList<>();
-		blockTransferObservers.add(new WeightedBalancesObserver(this.poiFacade));
-		blockTransferObservers.addAll(observers);
-
-		final TransferObserver aggregateObserver = new AggregateBlockTransferObserverToTransferObserverAdapter(
-				blockTransferObservers,
-				block.getHeight(),
-				isExecute);
-		final TransferObserver outlinkObserver = new OutlinkObserver(this.poiFacade, block.getHeight(), isExecute);
-
-		// in an undo operation, the OutlinkObserver should be run before the balance is updated
-		// (so that the matching link can be found and removed)
-		final List<TransferObserver> transferObservers = Arrays.asList(aggregateObserver, outlinkObserver);
-		if (!isExecute) {
-			Collections.reverse(transferObservers);
-		}
-
-		return new AggregateTransferObserver(transferObservers);
+			final NotificationTrigger trigger,
+			final BlockTransactionObserver observer) {
+		final BlockNotificationContext context = new BlockNotificationContext(block.getHeight(), trigger);
+		return new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
 	}
 }

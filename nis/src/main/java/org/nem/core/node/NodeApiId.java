@@ -36,6 +36,11 @@ public enum NodeApiId {
 	 */
 	REST_CHAIN_SCORE,
 
+	/**
+	 * The chain/height API.
+	 */
+	REST_CHAIN_HEIGHT,
+
 	//endregion
 
 	//region node/*

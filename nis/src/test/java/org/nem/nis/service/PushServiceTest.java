@@ -10,7 +10,9 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
 import org.nem.nis.*;
+import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
+import org.nem.nis.validators.*;
 import org.nem.peer.*;
 
 public class PushServiceTest {
@@ -20,7 +22,9 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionVerifyFailureIncrementsFailedExperience() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		final TestContext context = new TestContext(validator);
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
 		transaction.signBy(Utils.generateRandomAccount());
@@ -30,13 +34,16 @@ public class PushServiceTest {
 
 		// Assert:
 		context.assertSingleUpdateExperience(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE);
-		Mockito.verify(context.network, Mockito.times(0)).broadcast(Mockito.any(), Mockito.any());
+		Mockito.verify(validator, Mockito.never()).validate(Mockito.any());
+		Mockito.verify(context.network, Mockito.never()).broadcast(Mockito.any(), Mockito.any());
 	}
 
 	@Test
 	public void pushTransactionValidFailureIncrementsFailedExperience() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		final TestContext context = new TestContext(validator);
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
 		transaction.sign();
@@ -46,7 +53,8 @@ public class PushServiceTest {
 
 		// Assert:
 		context.assertSingleUpdateExperience(ValidationResult.FAILURE_UNKNOWN);
-		Mockito.verify(context.network, Mockito.times(0)).broadcast(Mockito.any(), Mockito.any());
+		Mockito.verify(validator, Mockito.only()).validate(Mockito.any());
+		Mockito.verify(context.network, Mockito.never()).broadcast(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -83,7 +91,7 @@ public class PushServiceTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.sign();
 
-		Mockito.when(context.foraging.processTransaction(transaction)).thenReturn(result);
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(result);
 
 		// Act:
 		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
@@ -232,7 +240,7 @@ public class PushServiceTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.sign();
 
-		Mockito.when(context.foraging.processTransaction(transaction)).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
 		context.service.pushTransaction(transaction, null);
@@ -256,11 +264,15 @@ public class PushServiceTest {
 		private final Node remoteNode;
 		private final NodeIdentity localNodeIdentity;
 		private final PeerNetwork network;
-		private final Foraging foraging;
+		private final UnconfirmedTransactions unconfirmedTransactions;
 		private final BlockChain blockChain;
 		private final PushService service;
 
 		public TestContext() {
+			this(new UniversalTransactionValidator());
+		}
+
+		public TestContext(final TransactionValidator validator) {
 			this.remoteNodeIdentity = new NodeIdentity(new KeyPair());
 			this.remoteNode = new Node(this.remoteNodeIdentity, NodeEndpoint.fromHost("10.0.0.1"));
 
@@ -274,13 +286,17 @@ public class PushServiceTest {
 			Mockito.when(this.network.getNodes()).thenReturn(collection);
 			Mockito.when(this.network.getLocalNode()).thenReturn(localNode);
 
-			this.foraging = Mockito.mock(Foraging.class);
+			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
 
-			this.service = new PushService(this.foraging, this.blockChain, host);
+			this.service = new PushService(
+					this.unconfirmedTransactions,
+					validator,
+					this.blockChain,
+					host);
 		}
 
 		public void assertNoUpdateExperience() {

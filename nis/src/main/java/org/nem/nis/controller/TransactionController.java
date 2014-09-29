@@ -7,7 +7,9 @@ import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.service.PushService;
+import org.nem.nis.validators.TransactionValidator;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,18 +21,21 @@ import java.util.Collection;
 public class TransactionController {
 	private final AccountLookup accountLookup;
 	private final PushService pushService;
-	private final Foraging foraging;
+	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final TransactionValidator validator;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	TransactionController(
 			final AccountLookup accountLookup,
 			final PushService pushService,
-			final Foraging foraging,
+			final UnconfirmedTransactions unconfirmedTransactions,
+			final TransactionValidator validator,
 			final NisPeerNetworkHost host) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
-		this.foraging = foraging;
+		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.validator = validator;
 		this.host = host;
 	}
 
@@ -38,10 +43,10 @@ public class TransactionController {
 	@ClientApi
 	@Deprecated
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
-		final TransferTransaction transfer = deserializeTransaction(deserializer);
+		final Transaction transfer = deserializeTransaction(deserializer);
 
-		final ValidationResult validationResult = transfer.checkValidity();
-		if (ValidationResult.SUCCESS != transfer.checkValidity()) {
+		final ValidationResult validationResult = this.validator.validate(transfer);
+		if (ValidationResult.SUCCESS != validationResult) {
 			throw new IllegalArgumentException(validationResult.toString());
 		}
 
@@ -52,7 +57,7 @@ public class TransactionController {
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
 	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
-		final TransferTransaction transfer = this.deserializeTransaction(requestAnnounce.getData());
+		final Transaction transfer = this.deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
 		return new NemRequestResult(result);
@@ -75,17 +80,17 @@ public class TransactionController {
 	}
 
 	private Collection<Transaction> getUnconfirmedTransactions() {
-		return this.foraging.getUnconfirmedTransactionsForNewBlock(NisMain.TIME_PROVIDER.getCurrentTime());
+		return this.unconfirmedTransactions.getAll();
 	}
 
-	private TransferTransaction deserializeTransaction(final byte[] bytes) throws Exception {
+	private Transaction deserializeTransaction(final byte[] bytes) throws Exception {
 		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
 			return deserializeTransaction(dataDeserializer);
 		}
 	}
 
-	private static TransferTransaction deserializeTransaction(final Deserializer deserializer) {
-		return (TransferTransaction)TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
+	private static Transaction deserializeTransaction(final Deserializer deserializer) {
+		return TransactionFactory.NON_VERIFIABLE.deserialize(deserializer);
 	}
 
 	private static BinaryDeserializer getDeserializer(final byte[] bytes, final AccountLookup accountLookup) {

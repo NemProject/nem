@@ -219,13 +219,41 @@ public class Address {
 			final AddressEncoding encoding) {
 		switch (encoding) {
 			case PUBLIC_KEY:
-				final byte[] publicKeyBytes = deserializer.readOptionalBytes(label);
-				return null == publicKeyBytes ? null : Address.fromPublicKey(new PublicKey(publicKeyBytes));
+				return createAddressFromPublicKeyBytes(deserializer.readBytes(label));
 
 			case COMPRESSED:
 			default:
-				final String encodedAddress = deserializer.readString(label);
-				return Address.fromEncoded(encodedAddress);
+				return createAddressFromEncodedAddress(deserializer.readString(label));
 		}
+	}
+
+	/**
+	 * Reads an optional object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param encoding The address encoding.
+	 * @param label The optional label.
+	 * @return The read object.
+	 */
+	public static Address readFromOptional(
+			final Deserializer deserializer,
+			final String label,
+			final AddressEncoding encoding) {
+		switch (encoding) {
+			case PUBLIC_KEY:
+				return createAddressFromPublicKeyBytes(deserializer.readOptionalBytes(label));
+
+			case COMPRESSED:
+			default:
+				return createAddressFromEncodedAddress(deserializer.readOptionalString(label));
+		}
+	}
+
+	private static Address createAddressFromPublicKeyBytes(final byte[] bytes) {
+		return null == bytes ? null : Address.fromPublicKey(new PublicKey(bytes));
+	}
+
+	private static Address createAddressFromEncodedAddress(final String encoded) {
+		return null == encoded ? null : Address.fromEncoded(encoded);
 	}
 }

@@ -1,12 +1,12 @@
 package org.nem.core.test;
 
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.function.Consumer;
 
 /**
  * A mock Transaction implementation.
@@ -21,15 +21,12 @@ public class MockTransaction extends Transaction {
 	private int customField;
 	private long minimumFee;
 
-	private List<Integer> executeList = new ArrayList<>();
-	private List<Integer> undoList = new ArrayList<>();
-	private Consumer<TransferObserver> transferAction = to -> { };
+	private Consumer<TransactionObserver> transferAction = o -> {
+		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(o);
+		transferObserver.notifyDebit(this.getSigner(), this.getFee());
+	};
 
-	private int numExecuteCommitCalls;
-	private int numUndoCommitCalls;
 	private int numTransferCalls;
-
-	private ValidationResult validationResult = ValidationResult.SUCCESS;
 
 	/**
 	 * Creates a mock transaction.
@@ -86,6 +83,19 @@ public class MockTransaction extends Transaction {
 	 * Creates a mock transaction.
 	 * This overload is intended to be used for comparison tests.
 	 *
+	 * @param customField The initial custom field value.
+	 * @param timeStamp The transaction timestamp.
+	 */
+	public MockTransaction(final int type, final int customField, final TimeInstant timeStamp) {
+		super(type, VERSION, timeStamp, Utils.generateRandomAccount());
+		this.customField = customField;
+		this.setDeadline(timeStamp.addHours(2));
+	}
+
+	/**
+	 * Creates a mock transaction.
+	 * This overload is intended to be used for comparison tests.
+	 *
 	 * @param type The transaction type.
 	 * @param version The transaction version.
 	 * @param timeStamp The transaction timestamp.
@@ -105,24 +115,6 @@ public class MockTransaction extends Transaction {
 	public MockTransaction(final Deserializer deserializer) {
 		super(deserializer.readInt("type"), DeserializationOptions.VERIFIABLE, deserializer);
 		this.customField = deserializer.readInt("customField");
-	}
-
-	/**
-	 * Gets the number executeCommit was called.
-	 *
-	 * @return The number of times executeCommit was called.
-	 */
-	public int getNumExecuteCommitCalls() {
-		return this.numExecuteCommitCalls;
-	}
-
-	/**
-	 * Gets the number undoCommit was called.
-	 *
-	 * @return The number of times undoCommit was called.
-	 */
-	public int getNumUndoCommitCalls() {
-		return this.numUndoCommitCalls;
 	}
 
 	/**
@@ -153,21 +145,12 @@ public class MockTransaction extends Transaction {
 	}
 
 	/**
-	 * Sets a list that this transaction should add its custom field to when execute is called.
+	 * Sets an action that should be executed when transfer is called.
 	 *
-	 * @param list The list.
+	 * @param transferAction The action.
 	 */
-	public void setExecuteList(final List<Integer> list) {
-		this.executeList = list;
-	}
-
-	/**
-	 * Sets a list that this transaction should add its custom field to when undo is called.
-	 *
-	 * @param list The list.
-	 */
-	public void setUndoList(final List<Integer> list) {
-		this.undoList = list;
+	public void setTransferAction(final Consumer<TransferObserver> transferAction) {
+		this.transferAction = o -> transferAction.accept(new TransactionObserverToTransferObserverAdapter(o));
 	}
 
 	/**
@@ -175,22 +158,8 @@ public class MockTransaction extends Transaction {
 	 *
 	 * @param transferAction The action.
 	 */
-	public void setTransferAction(final Consumer<TransferObserver> transferAction) {
+	public void setTransactionAction(final Consumer<TransactionObserver> transferAction) {
 		this.transferAction = transferAction;
-	}
-
-	/**
-	 * Sets the validation result that should be returned from checkDerivedValidity.
-	 *
-	 * @param validationResult The validation result.
-	 */
-	public void setValidationResult(final ValidationResult validationResult) {
-		this.validationResult = validationResult;
-	}
-
-	@Override
-	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		return this.validationResult;
 	}
 
 	@Override
@@ -205,19 +174,7 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	protected void executeCommit() {
-		++this.numExecuteCommitCalls;
-		this.executeList.add(this.customField);
-	}
-
-	@Override
-	protected void undoCommit() {
-		++this.numUndoCommitCalls;
-		this.undoList.add(this.customField);
-	}
-
-	@Override
-	protected void transfer(final TransferObserver observer) {
+	protected void transfer(final TransactionObserver observer) {
 		this.transferAction.accept(observer);
 		++this.numTransferCalls;
 	}

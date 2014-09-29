@@ -1,19 +1,16 @@
 package org.nem.core.model;
 
 import org.nem.core.messages.MessageFactory;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-
-import java.util.function.BiPredicate;
 
 /**
  * A transaction that represents the exchange of funds and/or a message
  * between a sender and a recipient.
  */
 public class TransferTransaction extends Transaction {
-	private static final int MAX_MESSAGE_SIZE = 512;
-
 	private final Amount amount;
 	private final Message message;
 	private final Account recipient;
@@ -41,6 +38,7 @@ public class TransferTransaction extends Transaction {
 	/**
 	 * Deserializes a transfer transaction.
 	 *
+	 * @param options The deserialization options.
 	 * @param deserializer The deserializer.
 	 */
 	public TransferTransaction(final DeserializationOptions options, final Deserializer deserializer) {
@@ -77,21 +75,13 @@ public class TransferTransaction extends Transaction {
 		return this.message;
 	}
 
-	private int getMessageLength() {
+	/**
+	 * Gets the transaction message length.
+	 *
+	 * @return The transaction message length.
+	 */
+	public int getMessageLength() {
 		return null == this.message ? 0 : this.message.getEncodedPayload().length;
-	}
-
-	@Override
-	public ValidationResult checkDerivedValidity(final BiPredicate<Account, Amount> canDebitPredicate) {
-		if (!canDebitPredicate.test(this.getSigner(), this.amount.add(this.getFee()))) {
-			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-		}
-
-		if (this.getMessageLength() > MAX_MESSAGE_SIZE) {
-			return ValidationResult.FAILURE_MESSAGE_TOO_LARGE;
-		}
-
-		return ValidationResult.SUCCESS;
 	}
 
 	@Override
@@ -123,22 +113,9 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected void executeCommit() {
-		if (0 != this.getMessageLength()) {
-			this.recipient.addMessage(this.message);
-		}
-	}
-
-	@Override
-	protected void undoCommit() {
-		if (0 != this.getMessageLength()) {
-			this.recipient.removeMessage(this.message);
-		}
-	}
-
-	@Override
-	protected void transfer(final TransferObserver observer) {
-		observer.notifyTransfer(this.getSigner(), this.recipient, this.amount);
-		observer.notifyDebit(this.getSigner(), this.getFee());
+	protected void transfer(final TransactionObserver observer) {
+		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(observer);
+		transferObserver.notifyTransfer(this.getSigner(), this.recipient, this.amount);
+		transferObserver.notifyDebit(this.getSigner(), this.getFee());
 	}
 }

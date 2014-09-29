@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNot.not;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 
@@ -55,7 +54,7 @@ public class BlockDaoTest {
 	}
 
 	@Test
-	public void savingBlockSavesTransactions() {
+	public void savingBlockSavesTransferTransactions() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
@@ -72,8 +71,115 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransfers().size(), not(equalTo(0)));
+		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
+	}
+
+	@Test
+	public void savingBlockSavesImportanceTransferTransactions() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account remote = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote);
+		final ImportanceTransferTransaction transaction = this.prepareImportanceTransferTransaction(signer, remote, true);
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
+		emptyBlock.addTransaction(transaction);
+		emptyBlock.sign();
+		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		this.blockDao.save(entity);
+
+		// Assert:
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
+	}
+
+	@Test
+	public void savingBlockSavesTransactions() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account remote = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote);
+		final ImportanceTransferTransaction importanceTransfer = this.prepareImportanceTransferTransaction(signer, remote, true);
+		final TransferTransaction transferTransaction = this.prepareTransferTransaction(signer, remote, 10);
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
+		emptyBlock.addTransaction(importanceTransfer);
+		emptyBlock.addTransaction(transferTransaction);
+		emptyBlock.sign();
+		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		this.blockDao.save(entity);
+
+		// Assert:
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
+	}
+
+	@Test
+	public void savingChangesImportanceTransferBlkIndex() {
+		// Arrange:
+		final Account signer1 = Utils.generateRandomAccount();
+		final Account remote1 = Utils.generateRandomAccount();
+		final Account signer2 = Utils.generateRandomAccount();
+		final Account remote2 = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
+		final ImportanceTransferTransaction importanceTransfer1 = this.prepareImportanceTransferTransaction(signer1, remote1, true);
+		final ImportanceTransferTransaction importanceTransfer2 = this.prepareImportanceTransferTransaction(signer2, remote2, true);
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
+		emptyBlock.addTransaction(importanceTransfer1);
+		emptyBlock.addTransaction(importanceTransfer2);
+		emptyBlock.sign();
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		dbBlock.getBlockImportanceTransfers().get(0).setBlkIndex(24);
+		dbBlock.getBlockImportanceTransfers().get(1).setBlkIndex(12);
+
+		this.blockDao.save(dbBlock);
+
+		// Assert:
+		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(0));
+		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(1));
+	}
+
+	// TransferTransactions does not use OrderColumn, but maybe we should redo that
+	// TODO-CR 20140919 J-G: it probably makes sense to redo that so its used by both
+	// TODO 20140922 G-J: as I've mentioned this will be breaking change but it is on my TODO list (also related to ImportanceTransferDao changes)
+	@Test
+	public void savingDoesNotChangeTransferTransactionBlkIndex() {
+		// Arrange:
+		final Account signer1 = Utils.generateRandomAccount();
+		final Account remote1 = Utils.generateRandomAccount();
+		final Account signer2 = Utils.generateRandomAccount();
+		final Account remote2 = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
+		final TransferTransaction transferTransaction1 = this.prepareTransferTransaction(signer1, remote1, 10);
+		final TransferTransaction transferTransaction2 = this.prepareTransferTransaction(signer2, remote2, 10);
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
+		emptyBlock.addTransaction(transferTransaction1);
+		emptyBlock.addTransaction(transferTransaction2);
+		emptyBlock.sign();
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		dbBlock.getBlockTransfers().get(0).setBlkIndex(24);
+		dbBlock.getBlockTransfers().get(1).setBlkIndex(12);
+
+		this.blockDao.save(dbBlock);
+
+		// Assert:
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
 	}
 	//endregion
 
@@ -124,6 +230,73 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
+	// cause .save does NOT modify blkIndex, and when read, they are ordered by blkIndex
+	@Test
+	public void changingTransferTransactionBlkIndexAffectOrderOfTxes() {
+		// Arrange:
+		final Account signer1 = Utils.generateRandomAccount();
+		final Account remote1 = Utils.generateRandomAccount();
+		final Account signer2 = Utils.generateRandomAccount();
+		final Account remote2 = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
+		final TransferTransaction transferTransaction1 = this.prepareTransferTransaction(signer1, remote1, 10);
+		final TransferTransaction transferTransaction2 = this.prepareTransferTransaction(signer2, remote2, 10);
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
+		emptyBlock.addTransaction(transferTransaction1);
+		emptyBlock.addTransaction(transferTransaction2);
+		emptyBlock.sign();
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		dbBlock.getBlockTransfers().get(0).setBlkIndex(24);
+		dbBlock.getBlockTransfers().get(1).setBlkIndex(12);
+
+		this.blockDao.save(dbBlock);
+		final Block entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
+
+		// Assert:
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(12));
+		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(24));
+	}
+
+	@Test
+	public void changingImportanceTransferBlkIndexDoesNotAffectOrderOfTxes() {
+		// Arrange:
+		final Account signer1 = Utils.generateRandomAccount();
+		final Account remote1 = Utils.generateRandomAccount();
+		final Account signer2 = Utils.generateRandomAccount();
+		final Account remote2 = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer1, remote1, signer2, remote2);
+		final ImportanceTransferTransaction importanceTransfer1 = this.prepareImportanceTransferTransaction(signer1, remote1, true);
+		final ImportanceTransferTransaction importanceTransfer2 = this.prepareImportanceTransferTransaction(signer2, remote2, true);
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer1, 133, 0);
+		emptyBlock.addTransaction(importanceTransfer1);
+		emptyBlock.addTransaction(importanceTransfer2);
+		emptyBlock.sign();
+		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+		dbBlock.getBlockImportanceTransfers().get(0).setBlkIndex(24);
+		dbBlock.getBlockImportanceTransfers().get(1).setBlkIndex(12);
+
+		this.blockDao.save(dbBlock);
+		// Act:
+		final Block entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
+
+		// Assert:
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(2));
+
+		final Hash h1 = entity.getBlockImportanceTransfers().get(0).getTransferHash();
+		final Hash h2 = entity.getBlockImportanceTransfers().get(1).getTransferHash();
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(0));
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(h1, equalTo(HashUtils.calculateHash(importanceTransfer1)));
+		Assert.assertThat(h2, equalTo(HashUtils.calculateHash(importanceTransfer2)));
+	}
+
 	@Test
 	public void getBlocksForAccountDoesNotRetrieveTransfers() {
 		// Arrange:
@@ -142,6 +315,7 @@ public class BlockDaoTest {
 
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
+
 		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
 	}
 
@@ -453,14 +627,15 @@ public class BlockDaoTest {
 	//endregion
 
 	//region helpers
-	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
+	private AccountDaoLookup prepareMapping(Object... accounts) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(),
-				recipient.getKeyPair().getPublicKey());
-		mockAccountDao.addMapping(sender, dbSender);
-		mockAccountDao.addMapping(recipient, dbRecipient);
+		for (final Object o : accounts) {
+			final Account a = (Account)o;
+			final Address address = a.getAddress();
+			final org.nem.nis.dbmodel.Account dbA = new org.nem.nis.dbmodel.Account(address.getEncoded(), address.getPublicKey());
+			mockAccountDao.addMapping(a, dbA);
+		}
 		return new AccountDaoLookupAdapter(mockAccountDao);
 	}
 
@@ -486,6 +661,18 @@ public class BlockDaoTest {
 		);
 		transferTransaction.sign();
 		return transferTransaction;
+	}
+
+	private ImportanceTransferTransaction prepareImportanceTransferTransaction(final Account sender, final Account remote, final boolean isTransfer) {
+		// Arrange:
+		final ImportanceTransferTransaction importanceTransferTransaction = new ImportanceTransferTransaction(
+				new TimeInstant(0),
+				sender,
+				isTransfer ? ImportanceTransferTransaction.Mode.Activate : ImportanceTransferTransaction.Mode.Deactivate,
+				remote
+		);
+		importanceTransferTransaction.sign();
+		return importanceTransferTransaction;
 	}
 	//endregion
 }

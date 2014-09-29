@@ -21,6 +21,7 @@ public class PoiAccountStateTest {
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(state.getWeightedBalances(), IsNull.notNullValue());
 		Assert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
+		Assert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
 		Assert.assertThat(state.getHeight(), IsNull.nullValue());
 	}
 
@@ -78,6 +79,32 @@ public class PoiAccountStateTest {
 		// Assert:
 		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));
 		Assert.assertThat(copyBalances.getUnvested(new BlockHeight(17)), IsEqual.equalTo(Amount.fromNem(1234)));
+	}
+
+	@Test
+	public void copyCopiesHeightRemoteLinks() {
+		// Arrange:
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final RemoteLinks links = state.getRemoteLinks();
+		final RemoteLink link1 = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link2 = new RemoteLink(Address.fromEncoded("b"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		final RemoteLink link3 = new RemoteLink(Address.fromEncoded("c"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
+		links.addLink(link1);
+		links.addLink(link2);
+		links.addLink(link3);
+
+		// Act:
+		final PoiAccountState copy = state.copy();
+
+		// Act:
+		final RemoteLinks copyLinks = copy.getRemoteLinks();
+		copyLinks.removeLink(link3);
+		copyLinks.removeLink(link2);
+
+		// Assert:
+		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
+		Assert.assertThat(copyLinks.isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(copyLinks.getCurrent(), IsNull.nullValue());
 	}
 
 	@Test

@@ -119,6 +119,7 @@ public class NisPeerNetworkHostTest {
 				accountAnalyzer,
 				null,
 				null,
+				null,
 				new NisConfiguration(),
 				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),
 				auditCollection,

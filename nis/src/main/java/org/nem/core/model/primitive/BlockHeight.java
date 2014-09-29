@@ -13,6 +13,11 @@ public class BlockHeight extends AbstractPrimitive<BlockHeight, Long> implements
 	public static final BlockHeight ONE = new BlockHeight(1);
 
 	/**
+	 * Value representing max height.
+	 */
+	public static final BlockHeight MAX = new BlockHeight(Long.MAX_VALUE);
+
+	/**
 	 * Creates a block height.
 	 *
 	 * @param height The block height.

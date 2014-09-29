@@ -4,11 +4,11 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
-import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,18 +22,21 @@ import java.util.stream.*;
  */
 @RestController
 public class AccountController {
-	private final Foraging foraging;
+	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
 	private final AccountInfoFactory accountInfoFactory;
 	private final PoiFacade poiFacade;
 
 	@Autowired(required = true)
 	AccountController(
-			final Foraging foraging,
+			final UnconfirmedTransactions unconfirmedTransactions,
+			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
 			final AccountInfoFactory accountInfoFactory,
 			final PoiFacade poiFacade) {
-		this.foraging = foraging;
+		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
 		this.accountInfoFactory = accountInfoFactory;
 		this.poiFacade = poiFacade;
@@ -55,11 +58,11 @@ public class AccountController {
 	}
 
 	private AccountStatus getAccountStatus(final Address address) {
-		return this.foraging.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
+		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 
 	/**
-	 * Unlocks an account for foraging.
+	 * Unlocks an account for harvesting.
 	 *
 	 * @param privateKey The private key of the account to unlock.
 	 */
@@ -70,7 +73,7 @@ public class AccountController {
 		final KeyPair keyPair = new KeyPair(privateKey);
 		final Account account = this.accountIo.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()));
 		final Account copyOfAccount = account.shallowCopyWithKeyPair(keyPair);
-		final UnlockResult result = this.foraging.addUnlockedAccount(copyOfAccount);
+		final UnlockResult result = this.unlockedAccounts.addUnlockedAccount(copyOfAccount);
 
 		if (UnlockResult.SUCCESS != result) {
 			throw new IllegalArgumentException(result.toString());
@@ -78,7 +81,7 @@ public class AccountController {
 	}
 
 	/**
-	 * Locks an account from foraging.
+	 * Locks an account from harvesting.
 	 *
 	 * @param privateKey The private key of the account to lock.
 	 */
@@ -87,7 +90,7 @@ public class AccountController {
 	@TrustedApi
 	public void accountLock(@RequestBody final PrivateKey privateKey) {
 		final Account account = new Account(new KeyPair(privateKey));
-		this.foraging.removeUnlockedAccount(account);
+		this.unlockedAccounts.removeUnlockedAccount(account);
 	}
 
 	/**
@@ -141,7 +144,7 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		return new SerializableList<>(this.foraging.getUnconfirmedTransactions(address));
+		return new SerializableList<>(this.unconfirmedTransactions.getTransactionsForAccount(address).getAll());
 	}
 
 	/**

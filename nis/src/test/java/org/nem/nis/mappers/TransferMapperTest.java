@@ -195,6 +195,7 @@ public class TransferMapperTest {
 			Assert.assertThat(rhs.getSigner(), IsEqual.equalTo(this.model.getSigner()));
 			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
 			Assert.assertThat(rhs.getRecipient(), IsEqual.equalTo(this.model.getRecipient()));
+			Assert.assertThat(rhs.getRecipient().getAddress().getPublicKey(), IsEqual.equalTo(this.model.getRecipient().getAddress().getPublicKey()));
 			Assert.assertThat(rhs.getAmount(), IsEqual.equalTo(this.model.getAmount()));
 			this.assertAreEqual(this.model.getMessage(), rhs.getMessage());
 		}

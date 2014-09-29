@@ -2,10 +2,14 @@ package org.nem.nis.service;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.AccountCache;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 
@@ -13,497 +17,371 @@ import java.util.*;
 
 public class BlockExecutorTest {
 
-	//region execute / undo basic updates
-
-	@Test
-	public void executeIncrementsForagedBlocks() {
-		// Arrange: initial foraged blocks = 3
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.execute();
-
-		// Assert:
-		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
-	}
-
-	@Test
-	public void executeIncrementsForagerBalanceByTotalFee() {
-		// Arrange: initial balance = 100, total fee = 28
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.execute();
-
-		// Assert:
-		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(128)));
-	}
+	//region execute / undo basic transaction order
 
 	@Test
 	public void executeCallsExecuteOnAllTransactionsInForwardOrder() {
 		// Arrange:
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+		final UndoExecuteTransactionOrderTestContext context = new UndoExecuteTransactionOrderTestContext();
 
 		// Act:
 		context.execute();
 
 		// Assert:
-		Assert.assertThat(context.executeList, IsEquivalent.equivalentTo(new Integer[] { 1, 2 }));
-	}
-
-	@Test
-	public void undoDecrementsForagedBlocks() {
-		// Arrange: initial foraged blocks = 3
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.execute();
-		context.undo();
-
-		// Assert:
-		Assert.assertThat(context.account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-	}
-
-	@Test
-	public void undoDecrementsForagerBalanceByTotalFee() {
-		// Arrange: initial balance = 100, total fee = 28
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
-
-		// Act:
-		context.execute();
-		context.undo();
-
-		// Assert:
-		Assert.assertThat(context.account.getBalance(), IsEqual.equalTo(new Amount(100)));
+		Assert.assertThat(context.executeList, IsEqual.equalTo(Arrays.asList(1, 2, 3)));
 	}
 
 	@Test
 	public void undoCallsUndoOnAllTransactionsInReverseOrder() {
 		// Arrange:
-		final UndoExecuteTestContext context = new UndoExecuteTestContext();
+		final UndoExecuteTransactionOrderTestContext context = new UndoExecuteTransactionOrderTestContext();
 
 		// Act:
 		context.execute();
 		context.undo();
 
 		// Assert:
-		Assert.assertThat(context.undoList, IsEquivalent.equivalentTo(new Integer[] { 2, 1 }));
+		Assert.assertThat(context.undoList, IsEqual.equalTo(Arrays.asList(3, 2, 1)));
 	}
 
-	private final class UndoExecuteTestContext {
+	private final class UndoExecuteTransactionOrderTestContext {
 		private final Account account;
 		private final Block block;
-		private final MockTransaction transaction1;
-		private final MockTransaction transaction2;
+		private final MockTransaction[] transactions;
 		private final List<Integer> executeList = new ArrayList<>();
 		private final List<Integer> undoList = new ArrayList<>();
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade);
+		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
+		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
 
-		public UndoExecuteTestContext() {
+		public UndoExecuteTransactionOrderTestContext() {
 			this.account = Utils.generateRandomAccount();
 			this.account.incrementBalance(new Amount(100));
 			for (int i = 0; i < 3; ++i) {
 				this.account.incrementForagedBlocks();
 			}
 
-			this.transaction1 = this.createTransaction(1, 17);
-			this.transaction2 = this.createTransaction(2, 11);
+			this.transactions = new MockTransaction[] {
+					this.createTransaction(1, 17),
+					this.createTransaction(2, 11),
+					this.createTransaction(3, 4)
+			};
 
 			this.block = BlockUtils.createBlock(this.account);
-			this.block.addTransaction(this.transaction1);
-			this.block.addTransaction(this.transaction2);
+			for (final MockTransaction transaction : this.transactions) {
+				this.block.addTransaction(transaction);
+			}
 
 			final PoiAccountState accountState = new PoiAccountState(this.account.getAddress());
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
-			Mockito.when(this.poiFacade.findStateByAddress(this.account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.poiFacade.findForwardedStateByAddress(this.account.getAddress(), this.block.getHeight()))
+					.thenReturn(accountState);
 		}
 
 		private void execute() {
-			this.executor.execute(this.block);
+			for (final MockTransaction transaction : this.transactions) {
+				transaction.setTransactionAction(o -> this.executeList.add(transaction.getCustomField()));
+			}
+
+			this.executor.execute(this.block, Mockito.mock(BlockTransactionObserver.class));
 		}
 
 		private void undo() {
-			this.executor.undo(this.block);
+			for (final MockTransaction transaction : this.transactions) {
+				transaction.setTransactionAction(o -> this.undoList.add(transaction.getCustomField()));
+			}
+
+			this.executor.undo(this.block, Mockito.mock(BlockTransactionObserver.class));
 		}
 
 		private MockTransaction createTransaction(final int customField, final long fee) {
-			final MockTransaction transaction = BlockUtils.createTransactionWithFee(customField, fee);
-			transaction.setExecuteList(this.executeList);
-			transaction.setUndoList(this.undoList);
-			return transaction;
+			return BlockUtils.createTransactionWithFee(customField, fee);
 		}
 	}
 
 	//endregion
 
-	//region execute / undo notifications
+	//region execute / undo notification propagation
 
 	@Test
-	public void executeDelegatesToSubscribedObserver() {
+	public void executePropagatesAllTransactionNotificationsToSubscribedObserver() {
 		// Arrange:
-		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
-
-		// Assert:
-		assertExecuteNotificationForObservers(Arrays.asList(observer));
-	}
-
-	@Test
-	public void executeDelegatesToAllSubscribedObservers() {
-		// Arrange:
-		final List<BlockTransferObserver> observers = Arrays.asList(
-				Mockito.mock(BlockTransferObserver.class),
-				Mockito.mock(BlockTransferObserver.class),
-				Mockito.mock(BlockTransferObserver.class));
-
-		// Assert:
-		assertExecuteNotificationForObservers(observers);
-	}
-
-	@Test
-	public void undoDelegatesToSubscribedObserver() {
-		// Arrange:
-		final BlockTransferObserver observer = Mockito.mock(BlockTransferObserver.class);
-
-		// Assert:
-		assertUndoNotificationForObservers(Arrays.asList(observer));
-	}
-
-	@Test
-	public void undoDelegatesToAllSubscribedObservers() {
-		// Arrange:
-		final List<BlockTransferObserver> observers = Arrays.asList(
-				Mockito.mock(BlockTransferObserver.class),
-				Mockito.mock(BlockTransferObserver.class),
-				Mockito.mock(BlockTransferObserver.class));
-
-		// Assert:
-		assertUndoNotificationForObservers(observers);
-	}
-
-	private static void assertExecuteNotificationForObservers(final List<BlockTransferObserver> observers) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount().account;
-		final Account account2 = context.addAccount().account;
-
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setFee(Amount.fromNem(7));
-		transaction.setTransferAction(to -> {
-			to.notifyTransfer(account1, account2, Amount.fromNem(12));
-			to.notifyCredit(account1, Amount.fromNem(9));
-			to.notifyDebit(account1, Amount.fromNem(11));
-		});
-
-		final BlockHeight height = new BlockHeight(11);
-		final Block block = context.createBlockWithTransaction(height, Amount.fromNem(7), transaction);
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
 
 		// Act:
-		if (1 == observers.size()) {
-			context.executor.execute(block, observers.get(0));
-		} else {
-			context.executor.execute(block, observers);
-		}
+		context.execute(observer);
 
 		// Assert:
-		Assert.assertThat(!observers.isEmpty(), IsEqual.equalTo(true));
-		for (final BlockTransferObserver observer : observers) {
-			// transaction transfer action
-			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(12));
-			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account2, Amount.fromNem(12));
-			Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, Amount.fromNem(11));
-			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account1, Amount.fromNem(9));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
 
-			// signer fee
-			Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, block.getSigner(), Amount.fromNem(7));
-
-			// total call counts
-			verifyCallCounts(observer, 2, 3, 0, 0);
-		}
+		// check notifications
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), context.account1, Amount.fromNem(11));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), context.account1, Amount.fromNem(9));
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(0), context.account1, context.account2, Amount.fromNem(12));
 	}
 
-	private static void assertUndoNotificationForObservers(final List<BlockTransferObserver> observers) {
+	@Test
+	public void executePropagatesHarvestNotificationsToSubscribedObserver() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount().account;
-		final Account account2 = context.addAccount().account;
-
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-		transaction.setFee(Amount.fromNem(7));
-		transaction.setTransferAction(to -> {
-			to.notifyTransfer(account2, account1, Amount.fromNem(12));
-			to.notifyDebit(account1, Amount.fromNem(9));
-			to.notifyCredit(account1, Amount.fromNem(11));
-		});
-
-		final BlockHeight height = new BlockHeight(11);
-		final Block block = context.createBlockWithTransaction(height, Amount.fromNem(7), transaction);
-		context.executor.execute(block);
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
 
 		// Act:
-		context.executor.undo(block, observers);
+		context.execute(observer);
 
 		// Assert:
-		Assert.assertThat(!observers.isEmpty(), IsEqual.equalTo(true));
-		for (final BlockTransferObserver observer : observers) {
-			// transaction transfer action
-			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, Amount.fromNem(12));
-			Mockito.verify(observer, Mockito.times(1)).notifySendUndo(height, account2, Amount.fromNem(12));
-			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, Amount.fromNem(11));
-			Mockito.verify(observer, Mockito.times(1)).notifySendUndo(height, account1, Amount.fromNem(9));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
 
-			// signer fee
-			Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, block.getSigner(), Amount.fromNem(7));
+		// check notifications
+		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(4), context.block.getSigner(), Amount.fromNem(7));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(3), context.block.getSigner(), Amount.fromNem(7));
+	}
 
-			// total call counts
-			verifyCallCounts(observer, 0, 0, 2, 3);
+	@Test
+	public void executePropagatesProperNotificationContextWithAllNotifications() {
+		// Arrange:
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(observer);
+
+		// Assert:
+		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = ArgumentCaptor.forClass(BlockNotificationContext.class);
+		Mockito.verify(observer, Mockito.times(5)).notify(Mockito.any(), notificationContextCaptor.capture());
+
+		// check notification contexts
+		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
+			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
+			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Execute));
 		}
 	}
 
-	private static void verifyCallCounts(
-			final BlockTransferObserver observer,
-			final int notifySendCounts,
-			final int notifyReceiveCounts,
-			final int notifySendUndoCounts,
-			final int notifyReceiveUndoCounts) {
-		Mockito.verify(observer, Mockito.times(notifySendCounts)).notifySend(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer, Mockito.times(notifyReceiveCounts)).notifyReceive(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer, Mockito.times(notifySendUndoCounts)).notifySendUndo(Mockito.any(), Mockito.any(), Mockito.any());
-		Mockito.verify(observer, Mockito.times(notifyReceiveUndoCounts)).notifyReceiveUndo(Mockito.any(), Mockito.any(), Mockito.any());
+	@Test
+	public void undoPropagatesAllTransactionNotificationsToSubscribedObserver() {
+		// Arrange:
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(Mockito.mock(BlockTransactionObserver.class));
+		context.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
+
+		// check notifications
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(2), context.account1, Amount.fromNem(11));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(3), context.account1, Amount.fromNem(9));
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(4), context.account2, context.account1, Amount.fromNem(12));
+	}
+
+	@Test
+	public void undoPropagatesHarvestNotificationsToSubscribedObserver() {
+		// Arrange:
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(Mockito.mock(BlockTransactionObserver.class));
+		context.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
+
+		// check notifications
+		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(0), context.block.getSigner(), Amount.fromNem(7));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.block.getSigner(), Amount.fromNem(7));
+	}
+
+	@Test
+	public void undoPropagatesProperNotificationContextWithAllNotifications() {
+		// Arrange:
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(Mockito.mock(BlockTransactionObserver.class));
+		context.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = ArgumentCaptor.forClass(BlockNotificationContext.class);
+		Mockito.verify(observer, Mockito.times(5)).notify(Mockito.any(), notificationContextCaptor.capture());
+
+		// check notification contexts
+		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
+			Assert.assertThat(notificationContext.getHeight(), IsEqual.equalTo(context.height));
+			Assert.assertThat(notificationContext.getTrigger(), IsEqual.equalTo(NotificationTrigger.Undo));
+		}
+	}
+
+	private static class UndoExecuteNotificationTestContext {
+		// Arrange:
+		private final ExecutorTestContext context = new ExecutorTestContext();
+		private final Account account1 = this.context.addAccount();
+		private final Account account2 = this.context.addAccount();
+		private final BlockHeight height = new BlockHeight(11);
+		private final Block block;
+
+		public UndoExecuteNotificationTestContext() {
+			final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+			transaction.setFee(Amount.fromNem(7));
+			transaction.setTransactionAction(to -> {
+				to.notify(new BalanceTransferNotification(this.account1, this.account2, Amount.fromNem(12)));
+				to.notify(new BalanceAdjustmentNotification(NotificationType.BalanceCredit, this.account1, Amount.fromNem(9)));
+				to.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.account1, Amount.fromNem(11)));
+			});
+
+			this.block = this.context.createBlockWithTransaction(this.height, Amount.fromNem(7), transaction);
+		}
+
+		private void execute(final BlockTransactionObserver observer) {
+			this.context.executor.execute(this.block, observer);
+		}
+
+		private void undo(final BlockTransactionObserver observer) {
+			this.context.executor.undo(this.block, observer);
+		}
 	}
 
 	//endregion
 
-	//region execute / undo notification updates
+	//region execute / undo remote harvest notifications
 
 	@Test
-	public void executeUpdatesOutlinks() {
+	public void executePropagatesHarvestNotificationsFromRemoteAsEndowedToSubscribedObserver() {
 		// Arrange:
-		final TestContext context = new TestContext();
-		final MockAccountContext accountContext1 = context.addAccount();
-		final MockAccountContext accountContext2 = context.addAccount();
+		final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture(), Mockito.any());
+
+		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
+		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(2), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(0), context.transactionSigner, Amount.fromNem(5));
+	}
+
+	@Test
+	public void undoPropagatesHarvestNotificationsFromRemoteAsEndowedToSubscribedObserver() {
+		// Arrange:
+		final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(Mockito.mock(BlockTransactionObserver.class));
+		context.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture(), Mockito.any());
+
+		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
+		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(0), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(2), context.transactionSigner, Amount.fromNem(5));
+	}
+
+	private static class UndoExecuteRemoteHarvestingNotificationTestContext {
+		private final ExecutorTestContext context = new ExecutorTestContext();
+		private final Account remoteSigner = this.context.addAccount();
+		private final Account realAccount = this.context.addAccount();
+		private final Account transactionSigner = this.context.addAccount();
 
 		final BlockHeight height = new BlockHeight(11);
-		final Block block = context.createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
+		final Block block;
 
-		// Act:
-		context.executor.execute(block);
+		public UndoExecuteRemoteHarvestingNotificationTestContext() {
+			// Arrange: create a block signed by the remote (remoteSigner) and have remoteSigner forward to realAccount
+			this.block = new Block(this.remoteSigner, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, this.height);
+			final MockTransaction transaction = new MockTransaction(this.transactionSigner, 1);
+			transaction.setMinimumFee(Amount.fromNem(5).getNumMicroNem());
+			this.block.addTransaction(transaction);
 
-		// Assert:
-		Mockito.verify(accountContext1.importance, Mockito.times(1)).addOutlink(Mockito.any());
-		Mockito.verify(accountContext2.importance, Mockito.times(0)).addOutlink(Mockito.any());
-	}
+			this.context.setForwardingAccount(this.remoteSigner, this.realAccount);
+		}
 
-	@Test
-	public void undoUpdatesOutlinks() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final MockAccountContext accountContext1 = context.addAccount();
-		final MockAccountContext accountContext2 = context.addAccount();
+		private void execute(final BlockTransactionObserver observer) {
+			this.context.executor.execute(this.block, observer);
+		}
 
-		final BlockHeight height = new BlockHeight(11);
-		final Block block = context.createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
-
-		// Act:
-		context.executor.execute(block);
-		context.executor.undo(block);
-
-		// Assert:
-		Mockito.verify(accountContext1.importance, Mockito.times(1)).removeOutlink(Mockito.any());
-		Mockito.verify(accountContext2.importance, Mockito.times(0)).removeOutlink(Mockito.any());
-	}
-
-	@Test
-	public void executeUpdatesWeightedBalances() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final MockAccountContext accountContext1 = context.addAccount();
-		final MockAccountContext accountContext2 = context.addAccount();
-
-		final BlockHeight height = new BlockHeight(11);
-		final Block block = context.createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
-
-		// Act:
-		context.executor.execute(block);
-
-		// Assert:
-		Mockito.verify(accountContext1.balances, Mockito.times(2)).addSend(Mockito.any(), Mockito.any());
-		Mockito.verify(accountContext2.balances, Mockito.times(1)).addReceive(Mockito.any(), Mockito.any());
-	}
-
-	@Test
-	public void undoUpdatesWeightedBalances() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final MockAccountContext accountContext1 = context.addAccount();
-		final MockAccountContext accountContext2 = context.addAccount();
-
-		final BlockHeight height = new BlockHeight(11);
-		final Block block = context.createBlockWithDefaultTransaction(height, accountContext1.account, accountContext2.account);
-
-		// Act:
-		context.executor.execute(block);
-		context.executor.undo(block);
-
-		// Assert:
-		Mockito.verify(accountContext1.balances, Mockito.times(2)).undoSend(Mockito.any(), Mockito.any());
-		Mockito.verify(accountContext2.balances, Mockito.times(1)).undoReceive(Mockito.any(), Mockito.any());
-	}
-
-	//endregion
-
-	//region execute / undo outlink update ordering
-
-	@Test
-	public void executeAddsOutlinkAfterUpdatingBalances() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account foragerAccount = context.createAccountWithBalance(Amount.fromNem(50));
-		final Block block = BlockUtils.createBlock(foragerAccount);
-		block.addTransaction(BlockUtils.createTransactionWithFee(Amount.fromNem(2)));
-
-		final Amount[] balanceInObserver = new Amount[1];
-		final BlockTransferObserver observer = new BlockTransferObserver() {
-			@Override
-			public void notifySend(final BlockHeight height, final Account account, final Amount amount) {
-			}
-
-			@Override
-			public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
-				if (foragerAccount.getAddress().equals(foragerAccount.getAddress())) {
-					balanceInObserver[0] = account.getBalance();
-				}
-			}
-
-			@Override
-			public void notifySendUndo(final BlockHeight height, final Account account, final Amount amount) {
-			}
-
-			@Override
-			public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
-			}
-		};
-
-		// Act:
-		context.executor.execute(block, Arrays.asList(observer));
-
-		// Assert:
-		Assert.assertThat(balanceInObserver[0], IsEqual.equalTo(Amount.fromNem(52)));
-		Assert.assertThat(foragerAccount.getBalance(), IsEqual.equalTo(Amount.fromNem(52)));
-	}
-
-	@Test
-	public void undoRemovesOutlinkBeforeUpdatingBalances() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account foragerAccount = context.createAccountWithBalance(Amount.fromNem(50));
-		final Block block = BlockUtils.createBlock(foragerAccount);
-		block.addTransaction(BlockUtils.createTransactionWithFee(Amount.fromNem(2)));
-
-		final Amount[] balanceInObserver = new Amount[1];
-		final BlockTransferObserver observer = new BlockTransferObserver() {
-			@Override
-			public void notifySend(final BlockHeight height, final Account account, final Amount amount) {
-			}
-
-			@Override
-			public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
-
-			}
-
-			@Override
-			public void notifySendUndo(final BlockHeight height, final Account account, final Amount amount) {
-			}
-
-			@Override
-			public void notifyReceiveUndo(final BlockHeight height, final Account account, final Amount amount) {
-				if (foragerAccount.getAddress().equals(foragerAccount.getAddress())) {
-					balanceInObserver[0] = account.getBalance();
-				}
-			}
-		};
-
-		// Act:
-		context.executor.execute(block, Arrays.asList(observer));
-		context.executor.undo(block, Arrays.asList(observer));
-
-		// Assert:
-		Assert.assertThat(balanceInObserver[0], IsEqual.equalTo(Amount.fromNem(52)));
-		Assert.assertThat(foragerAccount.getBalance(), IsEqual.equalTo(Amount.fromNem(50)));
-	}
-
-	//endregion
-
-	private static class MockAccountContext {
-		private final Account account;
-		private final AccountImportance importance;
-		private final WeightedBalances balances;
-		private final Address address;
-
-		public MockAccountContext(final PoiFacade poiFacade) {
-			this.account = Mockito.mock(Account.class);
-			this.importance = Mockito.mock(AccountImportance.class);
-			this.balances = Mockito.mock(WeightedBalances.class);
-			this.address = Utils.generateRandomAddress();
-
-			Mockito.when(this.account.getAddress()).thenReturn(this.address);
-
-			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
-			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
-			Mockito.when(accountState.getImportanceInfo()).thenReturn(this.importance);
-
-			Mockito.when(poiFacade.findStateByAddress(this.address)).thenReturn(accountState);
+		private void undo(final BlockTransactionObserver observer) {
+			this.context.executor.undo(this.block, observer);
 		}
 	}
 
-	private static class TestContext {
+	//endregion
+
+	//region delegation
+
+	@Test
+	public void executorDelegatesStateLookupToPoiFacade() {
+		// Arrange:
+		final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
+
+		// Act:
+		context.execute(Mockito.mock(BlockTransactionObserver.class));
+
+		// Assert:
+		Mockito.verify(context.context.poiFacade, Mockito.times(1))
+				.findForwardedStateByAddress(context.remoteSigner.getAddress(), context.height);
+	}
+
+	@Test
+	public void executorDelegatesAccountLookupToAccountCache() {
+		// Arrange:
+		final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
+
+		// Act:
+		context.execute(Mockito.mock(BlockTransactionObserver.class));
+
+		// Assert:
+		Mockito.verify(context.context.accountCache, Mockito.times(1)).findByAddress(context.realAccount.getAddress());
+	}
+
+	//endregion
+
+	private static class ExecutorTestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade);
+		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
+		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
 
-		private MockAccountContext addAccount() {
-			return new MockAccountContext(this.poiFacade);
+		private Account addAccount() {
+			final Account account = Utils.generateRandomAccount();
+			hookAccount(account);
+			return account;
 		}
 
 		private Block createBlockWithTransaction(final BlockHeight height, final Amount amount, final Transaction transaction) {
 			final Block block = BlockUtils.createBlockWithHeight(height);
+			hookAccount(block.getSigner());
 			block.getSigner().incrementBalance(amount);
 			block.addTransaction(transaction);
-
-			final Address address = block.getSigner().getAddress();
-			PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
-			if (null == accountState) {
-				accountState = new PoiAccountState(address);
-				Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(accountState);
-			}
-
-			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, amount);
 			return block;
 		}
 
-		private Block createBlockWithDefaultTransaction(
-				final BlockHeight height,
-				final Account account1,
-				final Account account2) {
-			final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
-			transaction.setFee(Amount.fromNem(7));
-			transaction.setTransferAction(to -> {
-				to.notifyTransfer(account1, account2, Amount.fromNem(12));
-				to.notifyDebit(account1, Amount.fromNem(9));
-				to.notifyCredit(account1, Amount.fromNem(11));
-			});
-
-			return this.createBlockWithTransaction(height, Amount.fromNem(7), transaction);
+		private void hookAccount(final Account account) {
+			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any()))
+					.thenReturn(accountState);
 		}
 
-		private Account createAccountWithBalance(final Amount balance) {
-			final Account account = Utils.generateRandomAccount();
-			account.incrementBalance(balance);
+		private void setForwardingAccount(final Account forwardingAccount, final Account forwardAccount) {
+			Mockito.when(this.accountCache.findByAddress(forwardAccount.getAddress())).thenReturn(forwardAccount);
 
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
-			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, balance);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
-
-			return account;
+			final PoiAccountState accountState = new PoiAccountState(forwardAccount.getAddress());
+			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(forwardingAccount.getAddress()), Mockito.any()))
+					.thenReturn(accountState);
 		}
 	}
 }

@@ -3,16 +3,18 @@ package org.nem.nis.service;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.BlockChainScore;
+import org.nem.core.connect.FatalPeerException;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.serialization.SerializableList;
-import org.nem.nis.BlockChain;
+import org.nem.core.serialization.*;
 import org.nem.peer.connect.*;
 import org.nem.peer.test.WeakNodeIdentity;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ChainServicesTest {
+
+	// region isChainSynchronized
 
 	@Test
 	public void isChainSynchronizedReturnsTrueIfLocalChainHasEqualChainScore() {
@@ -44,22 +46,144 @@ public class ChainServicesTest {
 		Assert.assertThat(context.services.isChainSynchronized(node), IsEqual.equalTo(false));
 	}
 
+	// endregion
+
+	// region getMaxChainHeightAsync
+
+	@Test
+	public void getMaxChainHeightAsyncReturnsMaxHeightOnSuccess() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node node = context.createNode("test");
+		context.setChainHeightForNode(context.nodes.get(0), createBlockHeightFuture(10));
+		context.setChainHeightForNode(context.nodes.get(1), createBlockHeightFuture(30));
+		context.setChainHeightForNode(context.nodes.get(2), createBlockHeightFuture(20));
+
+		// Act:
+		final BlockHeight maxBlockHeight = context.services.getMaxChainHeightAsync(node).join();
+
+		// Assert:
+		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
+
+		context.verifyNumChainHeightRequests(3);
+		for (final Node peerNode : context.nodes.asCollection()) {
+			context.verifySingleChainHeightRequest(peerNode);
+		}
+	}
+
+	@Test
+	public void getMaxChainHeightAsyncIgnoresFailedNodes() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node node = context.createNode("test");
+		context.setChainHeightForNode(context.nodes.get(0), createExceptionalFuture());
+		context.setChainHeightForNode(context.nodes.get(1), createBlockHeightFuture(30));
+		context.setChainHeightForNode(context.nodes.get(2), createExceptionalFuture());
+
+		// Act:
+		final BlockHeight maxBlockHeight = context.services.getMaxChainHeightAsync(node).join();
+
+		// Assert:
+		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
+
+		context.verifyNumChainHeightRequests(3);
+		for (final Node peerNode : context.nodes.asCollection()) {
+			context.verifySingleChainHeightRequest(peerNode);
+		}
+	}
+
+	@Test
+	public void getMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node node = context.createNode("test");
+		context.setChainHeightForNode(context.nodes.get(0), createExceptionalFuture());
+		context.setChainHeightForNode(context.nodes.get(1), createExceptionalFuture());
+		context.setChainHeightForNode(context.nodes.get(2), createExceptionalFuture());
+
+		// Act:
+		final BlockHeight maxBlockHeight = context.services.getMaxChainHeightAsync(node).join();
+
+		// Assert:
+		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(BlockHeight.ONE));
+
+		context.verifyNumChainHeightRequests(3);
+		for (final Node peerNode : context.nodes.asCollection()) {
+			context.verifySingleChainHeightRequest(peerNode);
+		}
+	}
+
+	// endregion
+
+	//region delegation
+
+	@Test
+	public void isChainSynchronizedDelegatesToBlockChainLastBlockChainLayer() {
+		// Arrange:
+		final TestContext context = new TestContext(29);
+		final Node node = context.createNode("test");
+
+		// Act:
+		context.services.isChainSynchronized(node);
+
+		// Assert:
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
+	}
+
+	@Test
+	public void getMaxChainHeightAsyncDelegatesToConnectorPool() {
+		// Arrange:
+		final TestContext context = new TestContext(29);
+		final Node node = context.createNode("test");
+
+		// Act:
+		context.services.getMaxChainHeightAsync(node);
+
+		// Assert:
+		Mockito.verify(context.connectorPool, Mockito.times(1)).getPeerConnector(null);
+		Mockito.verify(context.connectorPool, Mockito.times(3)).getSyncConnector(null);
+	}
+
+	// endregion
+
+	private static CompletableFuture<BlockHeight> createExceptionalFuture() {
+		return CompletableFuture.supplyAsync(() -> {
+			throw new FatalPeerException("badness");
+		});
+	}
+
+	private static CompletableFuture<BlockHeight> createBlockHeightFuture(final long height) {
+		return CompletableFuture.completedFuture(new BlockHeight(height));
+	}
+
 	private class TestContext {
-		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
+		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final HttpConnectorPool connectorPool = Mockito.mock(HttpConnectorPool.class);
 		private final HttpConnector connector = Mockito.mock(HttpConnector.class);
-		private final ChainServices services = new ChainServices(this.blockChain, this.connectorPool);
+		private final ChainServices services = new ChainServices(this.blockChainLastBlockLayer, this.connectorPool);
+		private final SerializableList<Node> nodes = createNodes();
 
 		@SuppressWarnings("unchecked")
-		public TestContext(final long score) {
-			Mockito.when(this.blockChain.getScore()).thenReturn(new BlockChainScore(score));
+		public TestContext() {
 			Mockito.when(this.connectorPool.getPeerConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);
-			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(createNodes());
-			Mockito.when(this.connector.getChainScoreAsync(Mockito.any(Node.class))).thenReturn(
-					CompletableFuture.completedFuture(new BlockChainScore(10)),
-					CompletableFuture.completedFuture(new BlockChainScore(30)),
-					CompletableFuture.completedFuture(new BlockChainScore(20)));
+			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(createNodesFuture());
+		}
+
+		@SuppressWarnings("unchecked")
+		public TestContext(final long height) {
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(height);
+			Mockito.when(this.connectorPool.getPeerConnector(Mockito.any())).thenReturn(this.connector);
+			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);
+			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(createNodesFuture());
+			Mockito.when(this.connector.getChainHeightAsync(Mockito.any(Node.class))).thenReturn(
+					CompletableFuture.completedFuture(new BlockHeight(10)),
+					CompletableFuture.completedFuture(new BlockHeight(30)),
+					CompletableFuture.completedFuture(new BlockHeight(20)));
+		}
+
+		private void setChainHeightForNode(final Node node, final CompletableFuture<BlockHeight> future) {
+			Mockito.when(this.connector.getChainHeightAsync(node)).thenReturn(future);
 		}
 
 		public Node createNode(final String name) {
@@ -69,12 +193,24 @@ public class ChainServicesTest {
 					new NodeMetaData("platform", "FooBar", NodeVersion.ZERO));
 		}
 
-		private CompletableFuture<SerializableList<Node>> createNodes() {
+		public SerializableList<Node> createNodes() {
 			final SerializableList<Node> nodes = new SerializableList<>(3);
 			nodes.add(createNode("a"));
 			nodes.add(createNode("b"));
 			nodes.add(createNode("c"));
-			return CompletableFuture.completedFuture(nodes);
+			return nodes;
+		}
+
+		private void verifyNumChainHeightRequests(final int numExpectedRequests) {
+			Mockito.verify(this.connector, Mockito.times(numExpectedRequests)).getChainHeightAsync(Mockito.any());
+		}
+
+		private void verifySingleChainHeightRequest(final Node expectedNode) {
+			Mockito.verify(this.connector, Mockito.times(1)).getChainHeightAsync(expectedNode);
+		}
+
+		private CompletableFuture<SerializableList<Node>> createNodesFuture() {
+			return CompletableFuture.completedFuture(this.nodes);
 		}
 	}
 }

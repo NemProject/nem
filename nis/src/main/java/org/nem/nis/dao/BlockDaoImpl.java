@@ -60,12 +60,26 @@ public class BlockDaoImpl implements BlockDao {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
 	}
 
+	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
+	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
+		return criteria
+				.setFetchMode("blockTransfers", fetchMode)
+				.setFetchMode("blockImportanceTransfers", fetchMode);
+	}
+
+	private static Criteria setTransfersToJoin(final Criteria criteria) {
+		return setTransfersFetchMode(criteria, FetchMode.JOIN);
+	}
+
+	private static Criteria setTransfersToSelect(final Criteria criteria) {
+		return setTransfersFetchMode(criteria, FetchMode.SELECT);
+	}
+
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
 	public Block findById(final long id) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("id", id));
 		return this.executeSingleQuery(criteria);
 	}
@@ -73,8 +87,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Block findByHeight(final BlockHeight height) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("height", height.getRaw()));
 		return this.executeSingleQuery(criteria);
 	}
@@ -89,8 +102,7 @@ public class BlockDaoImpl implements BlockDao {
 		final byte[] blockHashBytes = blockHash.getRaw();
 		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
 
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("shortId", blockId));
 		final List<Block> blockList = listAndCast(criteria);
 
@@ -138,12 +150,14 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Collection<Block> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
+		// NOTE: there was JOIN used for importanceTransfers here, that was a bug
+		// TODO: add tests.
+		final Criteria criteria = setTransfersToSelect(this.getCurrentSession().createCriteria(Block.class))
 				.setFetchMode("forger", FetchMode.JOIN)
-				.setFetchMode("blockTransfers", FetchMode.SELECT)
 				.add(Restrictions.lt("height", height))
 				.addOrder(Order.desc("height"))
-						// here we were lucky cause blocktransfers is set to select...
+						// setMaxResults limits results, not objects (so in case of join it could be block with
+						// many TXes), but this will work correctly cause blocktransfers is set to select...
 				.setMaxResults(limit)
 						// nested criteria
 				.createCriteria("forger", "f")
@@ -155,9 +169,8 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional
 	public Collection<Block> getBlocksAfter(final long blockHeight, final int blocksCount) {
 		// whatever it takes : DO NOT ADD setMaxResults here!
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.setFetchMode("forger", FetchMode.JOIN)
-				.setFetchMode("blockTransfers", FetchMode.JOIN)
 				.add(Restrictions.gt("height", blockHeight))
 				.add(Restrictions.lt("height", blockHeight + (long)blocksCount))
 				.addOrder(Order.asc("height"));
@@ -177,6 +190,23 @@ public class BlockDaoImpl implements BlockDao {
 				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		final List<Long> txToDelete = listAndCast(getTxes);
+
+		// TODO 20140909 J-G: likewise, i would probably refactor the query construction and delete if !empty
+		// (the differences are the join field name and the transfer table name)
+		// G-J: I need to rewrite this method, as it's probably wrong anyway, but I'll do it later
+		// TODO 20140914 J-G: that's why tests are good :)
+
+		final Query getImportanceTxes = this.getCurrentSession()
+				.createQuery("select tx.id from Block b join b.blockImportanceTransfers tx where b.height > :height")
+				.setParameter("height", blockHeight.getRaw());
+		final List<Long> importanceTxToDelete = listAndCast(getImportanceTxes);
+
+		if (!importanceTxToDelete.isEmpty()) {
+			final Query dropTxes = this.getCurrentSession()
+					.createQuery("delete from ImportanceTransfer t where t.id in (:ids)")
+					.setParameterList("ids", importanceTxToDelete);
+			dropTxes.executeUpdate();
+		}
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")

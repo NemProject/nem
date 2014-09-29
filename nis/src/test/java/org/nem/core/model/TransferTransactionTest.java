@@ -2,8 +2,9 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.messages.*;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -38,6 +39,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
+		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -54,6 +56,7 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
+		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -91,6 +94,29 @@ public class TransferTransactionTest {
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
+	}
+
+	//endregion
+
+	//region Message Length
+
+	@Test
+	public void messageLengthReturnsEncodedLength() {
+		// Arrange:
+		final TransferTransaction transaction = this.createTransactionWithMockMessage(100, 44);
+
+		// Assert:
+		Assert.assertThat(transaction.getMessageLength(), IsEqual.equalTo(100));
+	}
+
+	private TransferTransaction createTransactionWithMockMessage(final int encodedMessageSize, final int decodedMessageSize) {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final MockMessage message = new MockMessage(7);
+		message.setEncodedPayload(new byte[encodedMessageSize]);
+		message.setDecodedPayload(new byte[decodedMessageSize]);
+		return this.createTransferTransaction(signer, recipient, 0, message);
 	}
 
 	//endregion
@@ -163,12 +189,7 @@ public class TransferTransactionTest {
 
 	private Amount calculateMessageFee(final int encodedMessageSize, final int decodedMessageSize) {
 		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
-		final MockMessage message = new MockMessage(7);
-		message.setEncodedPayload(new byte[encodedMessageSize]);
-		message.setDecodedPayload(new byte[decodedMessageSize]);
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 0, message);
+		final TransferTransaction transaction = this.createTransactionWithMockMessage(encodedMessageSize, decodedMessageSize);
 
 		// Act:
 		return transaction.getFee();
@@ -176,145 +197,10 @@ public class TransferTransactionTest {
 
 	//endregion
 
-	//region Valid
-
-	@Test
-	public void checkValidityChecksForMinimumFee() {
-		// Arrange (category spam attack):
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		Transaction transaction = new TransferTransaction(new TimeInstant(1), signer, recipient, Amount.fromNem(1), null);
-		transaction.setDeadline(new TimeInstant(60));
-		transaction.setFee(transaction.getMinimumFee());
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-
-		// Bob prefers a more user friendly fee structure
-		transaction.setFee(Amount.fromMicroNem(0));
-		transaction.sign();
-
-		// Serialization modifies the fee and kills the attack
-		final MockAccountLookup accountLookup = new MockAccountLookup();
-		accountLookup.setMockAccount(signer);
-		accountLookup.setMockAccount(recipient);
-		final JsonSerializer jsonSerializer = new JsonSerializer(true);
-		transaction.serialize(jsonSerializer);
-		final JsonDeserializer deserializer = new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
-		deserializer.readInt("type");
-		transaction = new TransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void checkValidityGivesPrecedenceToFailingCanDebitPredicate() {
-		// Arrange: (sender-balance == amount + fee)
-		final Transaction transaction = this.createTransaction(2, 1, 1);
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(
-				transaction.checkValidity((account, amount) -> false),
-				IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-	}
-
-	@Test
-	public void checkValidityGivesPrecedenceToSucceedingCanDebitPredicate() {
-		// Arrange: (sender-balance < amount + fee)
-		final Transaction transaction = this.createTransaction(2, 2, 1);
-
-		// Assert:
-		Assert.assertThat(transaction.checkValidity(), IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(
-				transaction.checkValidity((account, amount) -> true),
-				IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void transactionsWithNonNegativeAmountAreValid() {
-		// Assert:
-		final ValidationResult expectedResult = ValidationResult.SUCCESS;
-		Assert.assertThat(this.isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 1, 10), IsEqual.equalTo(expectedResult));
-	}
-
-	@Test
-	public void transactionsUpToSignerBalanceAreValid() {
-		// Assert:
-		final ValidationResult expectedResult = ValidationResult.SUCCESS;
-		Assert.assertThat(this.isTransactionAmountValid(100, 10, 1), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 990, 10), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 50, 950), IsEqual.equalTo(expectedResult));
-	}
-
-	@Test
-	public void transactionsExceedingSignerBalanceAreInvalid() {
-		// Assert:
-		final ValidationResult expectedResult = ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-		Assert.assertThat(this.isTransactionAmountValid(1000, 990, 11), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 51, 950), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 1001, 11), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(expectedResult));
-	}
-
-	private TransferTransaction createTransaction(final int senderBalance, final int amount, final int fee) {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(senderBalance));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, amount, null);
-		transaction.setFee(Amount.fromNem(fee));
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
-
-		return transaction;
-	}
-
-	private ValidationResult isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
-		// Arrange:
-		final TransferTransaction transaction = this.createTransaction(senderBalance, amount, fee);
-
-		// Act:
-		return transaction.checkValidity();
-	}
-
-	@Test
-	public void smallMessagesAreValid() {
-		// Assert:
-		Assert.assertThat(this.isMessageSizeValid(0), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(1), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(511), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(this.isMessageSizeValid(512), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void largeMessagesAreInvalid() {
-		// Assert:
-		Assert.assertThat(this.isMessageSizeValid(513), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-		Assert.assertThat(this.isMessageSizeValid(1001), IsEqual.equalTo(ValidationResult.FAILURE_MESSAGE_TOO_LARGE));
-	}
-
-	private ValidationResult isMessageSizeValid(final int messageSize) {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final PlainMessage message = new PlainMessage(new byte[messageSize]);
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 1, message);
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
-
-		// Act:
-		return transaction.checkValidity();
-	}
-
-	//endregion
-
 	//region Execute
 
 	@Test
-	public void executeTransfersAmountAndFeeFromSigner() {
+	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
@@ -323,77 +209,15 @@ public class TransferTransactionTest {
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
-		transaction.execute();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.execute(observer);
 
 		// Assert:
-		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(Amount.fromNem(891L)));
-	}
-
-	@Test
-	public void executeTransfersAmountToRecipient() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.execute();
-
-		// Assert:
-		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(99L)));
-	}
-
-	@Test
-	public void executeDoesNotAppendEmptyMessageToRecipientAccount() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.execute();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
-	}
-
-	@Test
-	public void executeAppendsNonEmptyMessageToRecipientAccount() {
-		// Arrange:
-		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.execute();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
-		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(new byte[] { 0x12, 0x33, 0x0A }));
-	}
-
-	@Test
-	public void executeNonCommitDoesNotAppendNonEmptyMessageToRecipientAccount() {
-		// Arrange:
-		final Message message = new PlainMessage(new byte[] { 0x12, 0x33, 0x0A });
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.execute(Mockito.mock(TransferObserver.class));
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(0));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), recipient);
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), signer, recipient, Amount.fromNem(99));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(10));
 	}
 
 	//endregion
@@ -401,109 +225,24 @@ public class TransferTransactionTest {
 	//region undo
 
 	@Test
-	public void undoTransfersAmountAndFeeToSigner() {
+	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
-		transaction.undo();
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
 
 		// Assert:
-		Assert.assertThat(signer.getBalance(), IsEqual.equalTo(Amount.fromNem(1109L)));
-	}
-
-	@Test
-	public void undoTransfersAmountFromRecipient() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.undo();
-
-		// Assert:
-		Assert.assertThat(recipient.getBalance(), IsEqual.equalTo(Amount.fromNem(1L)));
-	}
-
-	@Test
-	public void undoDoesNotRemoveEmptyMessageFomAccount() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		recipient.addMessage(new PlainMessage(new byte[] { 0x25, 0x52, 0x7F }));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.undo();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(1));
-		Assert.assertThat(
-				recipient.getMessages().get(0).getDecodedPayload(),
-				IsEqual.equalTo(new byte[] { 0x25, 0x52, 0x7F }));
-	}
-
-	@Test
-	public void undoRemovesNonEmptyMessageFromAccount() {
-		// Arrange:
-		final byte[] messageInput1 = Utils.generateRandomBytes();
-		final byte[] messageInput2 = Utils.generateRandomBytes();
-		final Message message = new PlainMessage(messageInput1);
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.undo();
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(3));
-		Assert.assertThat(recipient.getMessages().get(0).getDecodedPayload(), IsEqual.equalTo(messageInput1));
-		Assert.assertThat(recipient.getMessages().get(1).getDecodedPayload(), IsEqual.equalTo(messageInput2));
-		Assert.assertThat(recipient.getMessages().get(2).getDecodedPayload(), IsEqual.equalTo(messageInput2));
-	}
-
-	@Test
-	public void undoNonCommitDoesNotRemoveNonEmptyMessageFromAccount() {
-		// Arrange:
-		final byte[] messageInput1 = Utils.generateRandomBytes();
-		final byte[] messageInput2 = Utils.generateRandomBytes();
-		final Message message = new PlainMessage(messageInput1);
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
-		final Account recipient = Utils.generateRandomAccount();
-		recipient.incrementBalance(Amount.fromNem(100));
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, message);
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		recipient.addMessage(new PlainMessage(messageInput1));
-		recipient.addMessage(new PlainMessage(messageInput2));
-		transaction.setFee(Amount.fromNem(10));
-
-		// Act:
-		transaction.undo(Mockito.mock(TransferObserver.class));
-
-		// Assert:
-		Assert.assertThat(recipient.getMessages().size(), IsEqual.equalTo(4));
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), recipient);
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(1), recipient, signer, Amount.fromNem(99));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(10));
 	}
 
 	//endregion
