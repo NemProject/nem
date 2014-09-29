@@ -1,7 +1,9 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.BlockChainConstants;
 
 /**
  * Block validator that ensures the block signer is valid.
@@ -18,15 +20,32 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 		this.poiFacade = poiFacade;
 	}
 
-	// TODO 20140920 J-G: should we have more specific results?
-	// TODO 20140920 J-G: also, i think this is the logic you wanted, but feel free to correct it if i'm wrong
+	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
+		return ImportanceTransferTransaction.Mode.Activate.value() == remoteLinks.getCurrent().getMode();
+	}
+
 	@Override
 	public ValidationResult validate(final Block block) {
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(block.getSigner().getAddress());
+		final RemoteLinks remoteLinks = accountState.getRemoteLinks();
+		if (remoteLinks.isEmpty()) {
+			return ValidationResult.SUCCESS;
+		}
 
-		// don't allow an account harvesting with a remote account to also harvest
-		return accountState.getRemoteLinks().isHarvestingRemotely()
-				? ValidationResult.FAILURE_ENTITY_UNUSABLE
-				: ValidationResult.SUCCESS;
+		// currently we can only have Activate and Deactivate, so we're ok to use single boolean for this
+		final boolean isActivated = isRemoteActivated(remoteLinks);
+		final long heightDiff = block.getHeight().subtract(remoteLinks.getCurrent().getEffectiveHeight());
+		final boolean withinOneDay = heightDiff < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+		if (remoteLinks.isHarvestingRemotely()) {
+			if ((isActivated && withinOneDay) || (!isActivated && !withinOneDay)) {
+				return ValidationResult.SUCCESS;
+			}
+		} else {
+			if ((isActivated && !withinOneDay) || (!isActivated && withinOneDay)) {
+				return ValidationResult.SUCCESS;
+			}
+		}
+
+		return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 	}
 }

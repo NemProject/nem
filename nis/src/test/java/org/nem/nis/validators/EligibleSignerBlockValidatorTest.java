@@ -9,32 +9,71 @@ import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 
 public class EligibleSignerBlockValidatorTest {
+	private static int On = ImportanceTransferTransaction.Mode.Activate.value();
+	private static int Off = ImportanceTransferTransaction.Mode.Deactivate.value();
 
 	@Test
-	public void accountHarvestingRemotelyCannotSignBlock() {
+	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1000, ValidationResult.SUCCESS, On);
 	}
 
 	@Test
-	public void accountRemoteHarvesterCanSignBlock() {
+	public void accountHarvestingRemotelyCannotSignBlockIfRemoteIsActive() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, ValidationResult.SUCCESS);
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1440, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
+	}
+
+	@Test
+	public void accountHarvestingRemotelyCanotSignBlockIfRemoteIsNotDeactivated() {
+		// Assert:
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1000, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
+	}
+
+	@Test
+	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotDeactivated() {
+		// Assert:
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.HarvestingRemotely, 1440, ValidationResult.SUCCESS, Off);
+	}
+
+	@Test
+	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsNotActive() {
+		// Assert:
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1000, ValidationResult.FAILURE_ENTITY_UNUSABLE, On);
+	}
+
+	@Test
+	public void accountRemoteHarvesterCanSignBlockIfRemoteIsActive() {
+		// Assert:
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1440, ValidationResult.SUCCESS, On);
+	}
+
+	@Test
+	public void accountRemoteHarvesterCanSignBlockIfRemoteIsNotDeactivated() {
+		// Assert:
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1000, ValidationResult.SUCCESS, Off);
+	}
+
+	@Test
+	public void accountRemoteHarvesterCannotSignBlockIfRemoteIsDeactivated() {
+		// Assert:
+		assertValidationResultForRemoteLinkOwner(RemoteLink.Owner.RemoteHarvester, 1440, ValidationResult.FAILURE_ENTITY_UNUSABLE, Off);
 	}
 
 	@Test
 	public void accountWithoutRemoteLinkCanSignBlock() {
 		// Assert:
-		assertValidationResultForRemoteLinkOwner(null, ValidationResult.SUCCESS);
+		assertValidationResultForRemoteLinkOwner(null, 1000, ValidationResult.SUCCESS, 1);
 	}
 
-	private static void assertValidationResultForRemoteLinkOwner(final RemoteLink.Owner owner, final ValidationResult expectedResult) {
+	private static void assertValidationResultForRemoteLinkOwner(final RemoteLink.Owner owner, int blockHeight, final ValidationResult expectedResult, int mode) {
 		// Arrange:
-		final Block block = NisUtils.createRandomBlockWithHeight(5);
+		final int changeHeight = 5;
+		final Block block = NisUtils.createRandomBlockWithHeight(changeHeight + blockHeight);
 
 		final PoiAccountState accountState = new PoiAccountState(block.getSigner().getAddress());
 		if (null != owner) {
-			accountState.getRemoteLinks().addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(8), 1, owner));
+			accountState.getRemoteLinks().addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(changeHeight), mode, owner));
 		}
 
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
