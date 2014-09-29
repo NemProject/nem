@@ -58,7 +58,7 @@ public class EigenTrustConvergencePolicy {
 		ColumnVector sumVector = new ColumnVector(numDimensions);
 		ColumnVector lastTermVector = this.trustMatrix.multiply(this.preTrustVector);
 		do {
-			sumVector = sumVector.add(lastTermVector);
+			sumVector = sumVector.addElementWise(lastTermVector);
 
 			lastTermVector = this.trustMatrix.multiply(lastTermVector);
 			scale += 1.0;

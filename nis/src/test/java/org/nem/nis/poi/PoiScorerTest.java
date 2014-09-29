@@ -52,7 +52,7 @@ public class PoiScorerTest {
 
 		// final: l1norm(l1norm(weighted-outlinks) + weighted-importance)
 		weightedOutlinks.normalize();
-		final ColumnVector expectedFinalScoresVector = weightedOutlinks.add(weightedImportance);
+		final ColumnVector expectedFinalScoresVector = weightedOutlinks.addElementWise(weightedImportance);
 		expectedFinalScoresVector.normalize();
 		Assert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));
 	}

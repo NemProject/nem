@@ -35,7 +35,7 @@ public class LowComTrustProvider implements TrustProvider {
 		if (0 != lowComVectorSum && 0 != this.weight) {
 			trustVector.normalize();
 			lowComVector.scale(lowComVectorSum / this.weight * 100.0);
-			trustVector = trustVector.add(lowComVector);
+			trustVector = trustVector.addElementWise(lowComVector);
 		}
 
 		trustVector.normalize();
