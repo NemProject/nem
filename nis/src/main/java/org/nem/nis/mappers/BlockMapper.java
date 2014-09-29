@@ -119,6 +119,7 @@ public class BlockMapper {
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
 		// TODO 20140921 J-G: not sure if this is a test thing or not, but a number of tests were failing because dbBlock.getBlockImportanceTransfers() was null
+		// TODO 20140929 warning, since proper sorting is not yet in place it is CRUCIAL, to give high FEE while in ALPHA, otherwise funny things can happen
 		if (null != dbBlock.getBlockImportanceTransfers()) {
 			for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
 				final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
