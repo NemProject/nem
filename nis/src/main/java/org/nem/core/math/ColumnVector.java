@@ -132,12 +132,7 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector multiplyElementWise(final ColumnVector vector) {
-		return this.transform(new Supplier<Matrix>() {
-			@Override
-			public Matrix get() {
-				return ColumnVector.this.matrix.multiplyElementWise(vector.matrix);
-			}
-		});
+		return this.transform(() -> ColumnVector.this.matrix.multiplyElementWise(vector.matrix));
 	}
 
 	/**
@@ -147,12 +142,7 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector addElementWise(final ColumnVector vector) {
-		return this.transform(new Supplier<Matrix>() {
-			@Override
-			public Matrix get() {
-				return ColumnVector.this.matrix.addElementWise(vector.matrix);
-			}
-		});
+		return this.transform(() -> ColumnVector.this.matrix.addElementWise(vector.matrix));
 	}
 
 	//endregion
@@ -188,14 +178,9 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector roundTo(final int numPlaces) {
-		return this.transform(new Supplier<Matrix>() {
-			@Override
-			public Matrix get() {
-				return ColumnVector.this.matrix.roundTo(numPlaces);
-			}
-		});
+		return this.transform(() -> ColumnVector.this.matrix.roundTo(numPlaces));
 	}
-	
+
 	/**
 	 * Creates a new ColumnVector by adding each element of this vector to a scalar.
 	 *
@@ -203,12 +188,7 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector add(final double scalar) {
-		return this.transform(new Supplier<Matrix>() {
-			@Override
-			public Matrix get() {
-				return ColumnVector.this.matrix.add(scalar);
-			}
-		});
+		return this.transform(() -> ColumnVector.this.matrix.add(scalar));
 	}
 
 	/**
@@ -218,12 +198,7 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector multiply(final double scalar) {
-		return this.transform(new Supplier<Matrix>() {
-			@Override
-			public Matrix get() {
-				return ColumnVector.this.matrix.multiply(scalar);
-			}
-		});
+		return this.transform(() -> ColumnVector.this.matrix.multiply(scalar));
 	}
 
 	/**
@@ -232,12 +207,7 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector sqrt() {
-		return this.transform(new Supplier<Matrix>() {
-			@Override
-			public Matrix get() {
-				return ColumnVector.this.matrix.sqrt();
-			}
-		});
+		return this.transform(() -> ColumnVector.this.matrix.sqrt());
 	}
 
 	/**
@@ -246,12 +216,7 @@ public class ColumnVector {
 	 * @return The new vector.
 	 */
 	public ColumnVector abs() {
-		return this.transform(new Supplier<Matrix>() {
-			@Override
-			public Matrix get() {
-				return ColumnVector.this.matrix.abs();
-			}
-		});
+		return this.transform(() -> ColumnVector.this.matrix.abs());
 	}
 
 	private ColumnVector transform(final Supplier<Matrix> supplier) {
@@ -418,12 +383,14 @@ public class ColumnVector {
 	//endregion
 	
 	//region setNegativesToZero
+
 	/**
 	 * Sets all negative values to zero.
 	 */
 	public void removeNegatives() {
 		this.matrix.removeNegatives();
 	}
+
 	//endregion
 
 	//region hashCode / equals

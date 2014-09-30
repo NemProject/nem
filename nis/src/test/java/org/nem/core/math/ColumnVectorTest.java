@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class ColumnVectorTest {
 
@@ -270,7 +270,24 @@ public class ColumnVectorTest {
 	//region add
 
 	@Test
-	public void twoVectorsOfSameSizeCanBeAddedTogether() {
+	public void scalarCanBeAddedToVector() {
+		// Arrange:
+		final ColumnVector a = new ColumnVector(2, -4, 1);
+
+		// Act:
+		final ColumnVector result = a.add(8);
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(a)));
+		Assert.assertThat(result, IsEqual.equalTo(new ColumnVector(10, 4, 9)));
+	}
+
+	//endregion
+
+	//region addElementWise
+
+	@Test
+	public void twoVectorsOfSameSizeCanBeAddedTogetherElementWise() {
 		// Arrange:
 		final ColumnVector a = new ColumnVector(7, 5, 11);
 		final ColumnVector b = new ColumnVector(2, -4, 1);
@@ -490,32 +507,30 @@ public class ColumnVectorTest {
 
 	//endregion
 
-	//region setNegativesToZero
+	//region removeNegatives
+
 	@Test
 	public void removeNegativesSetsNegativeValuesToZero() {
 		// Arrange:
-		final ColumnVector vector1 = new ColumnVector(2, -4, 1);
-		final ColumnVector vector2 = new ColumnVector(-1, 454, 1);
-		final ColumnVector vector3 = new ColumnVector(2, 343, -131);
-		final ColumnVector vector4 = new ColumnVector(-2, -343, -131);
-		final ColumnVector vector5 = new ColumnVector(2, 343, 131);
+		final Map<ColumnVector, ColumnVector> testCases = new HashMap<ColumnVector, ColumnVector>() {
+			{ put(new ColumnVector(2, -4, 1), new ColumnVector(2, 0, 1)); }
+			{ put(new ColumnVector(-1, 454, 1), new ColumnVector(0, 454, 1)); }
+			{ put(new ColumnVector(2, 343, -131), new ColumnVector(2, 343, 0)); }
+			{ put(new ColumnVector(-2, -343, -131), new ColumnVector(0, 0, 0)); }
+			{ put(new ColumnVector(2, 343, 131), new ColumnVector(2, 343, 131)); }
+		};
 
 		// Act:
-		vector1.removeNegatives();
-		vector2.removeNegatives();
-		vector3.removeNegatives();
-		vector4.removeNegatives();
-		vector5.removeNegatives();
-		
-		// Assert:
-		Assert.assertThat(new ColumnVector(2, 0, 1), IsEqual.equalTo(vector1));
-		Assert.assertThat(new ColumnVector(0, 454, 1), IsEqual.equalTo(vector2));
-		Assert.assertThat(new ColumnVector(2, 343, 0), IsEqual.equalTo(vector3));
-		Assert.assertThat(new ColumnVector(0, 0, 0), IsEqual.equalTo(vector4));
-		Assert.assertThat(new ColumnVector(2, 343, 131), IsEqual.equalTo(vector5));
+		for (final Map.Entry<ColumnVector, ColumnVector> entry : testCases.entrySet()) {
+			entry.getKey().removeNegatives();
+
+			// Assert:
+			Assert.assertThat(entry.getKey(), IsEqual.equalTo(entry.getValue()));
+		}
 	}
+
 	//endregion
-	
+
 	//region equals / hashCode
 
 	@Test
