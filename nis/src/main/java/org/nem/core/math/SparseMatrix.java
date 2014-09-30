@@ -162,7 +162,24 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
-		return new SparseMatrixNonZeroElementRowIterator(row, values[row], cols[row], maxIndices[row]);
+		final int maxIndex = maxIndices[row];
+		return new MatrixNonZeroElementRowIterator() {
+			private int index;
+
+			@Override
+			public boolean hasNext() {
+				return index < maxIndex;
+			}
+
+			@Override
+			public MatrixElement next() {
+				if (!this.hasNext()) {
+					throw new IndexOutOfBoundsException("index out of range");
+				}
+
+				return new MatrixElement(row, cols[row][index], values[row][index++]);
+			}
+		};
 	}
 
 	//endregion

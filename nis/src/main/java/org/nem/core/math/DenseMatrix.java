@@ -97,7 +97,30 @@ public final class DenseMatrix extends Matrix {
 
 	@Override
 	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
-		return new DenseMatrixNonZeroRowElementIterator(row, this);
+		return new MatrixNonZeroElementRowIterator() {
+			private int index;
+
+			@Override
+			public boolean hasNext() {
+				for (int i=index; i<getColumnCount(); i++) {
+					if (getAt(row, i) != 0.0) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			@Override
+			public MatrixElement next() {
+				while (index < getColumnCount()) {
+					if (getAt(row, index++) != 0.0) {
+						return new MatrixElement(row, index - 1, getAt(row, index - 1));
+					}
+				}
+
+				throw new IndexOutOfBoundsException("index out of range");
+			}
+		};
 	}
 
 	// endregion

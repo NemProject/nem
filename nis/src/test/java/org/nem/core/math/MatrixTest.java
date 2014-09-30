@@ -649,6 +649,70 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//endregion
 
+	//region getNonZeroElementRowIterator
+
+	@Test
+	public void hasNextReturnsTrueIfMoreColumnsAreAvailable() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+
+		// Act + Assert
+		for (int i=0; i<3; i++) {
+			Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(true));
+			iterator.next();
+		}
+	}
+
+	@Test
+	public void hasNextReturnsFalseImmediatelyForZeroRow() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(1);
+
+		// Assert:
+		Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
+		ExceptionAssert.assertThrows(v -> iterator.next(), IndexOutOfBoundsException.class);
+	}
+
+	@Test
+	public void hasNextReturnsFalseAfterAllElementsHaveBeenIteratedForNonZeroRow() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+
+		// Act:
+		for (int i=0; i<3; i++) {
+			iterator.next();
+		}
+
+		// Assert:
+		Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
+		ExceptionAssert.assertThrows(v -> iterator.next(), IndexOutOfBoundsException.class);
+	}
+
+	@Test
+	public void nextReturnsCorrectMatrixElementsInOrder() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+
+		// Act + Assert:
+		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 0, 1.1)));
+		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 1, 2.2)));
+		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 3, 4.4)));
+	}
+
+	private TMatrix createMatrixForIteratorTests() {
+		final TMatrix matrix = this.createMatrix(4, 4);
+		matrix.setAtUnchecked(0, 0, 1.1);
+		matrix.setAtUnchecked(0, 3, 4.4);
+		matrix.setAtUnchecked(0, 1, 2.2);
+		return matrix;
+	}
+
+	//endregion
+
 	//region equals / hashCode
 
 	@Test
