@@ -175,7 +175,7 @@ public class BlockChain implements BlockSynchronizer {
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
 				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
 			final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-			unconfirmedTransactions.forEach(this.unconfirmedTransactions::addNew);
+			unconfirmedTransactions.forEach(tr -> this.unconfirmedTransactions.addNew(tr));
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
@@ -530,7 +530,7 @@ public class BlockChain implements BlockSynchronizer {
 				block.getBlockTransfers().stream()
 						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
 						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
-						.forEach(this.unconfirmedTransactions::addExisting);
+						.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
 				currentHeight--;
 			}
 		}
