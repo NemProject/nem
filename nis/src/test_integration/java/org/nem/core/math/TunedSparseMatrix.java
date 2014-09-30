@@ -1,6 +1,7 @@
 package org.nem.core.math;
 
 import java.util.*;
+
 /**
  * BloodyRookie's initial implementation of normalizeColumns and multiply.
  */
@@ -143,7 +144,7 @@ public class TunedSparseMatrix extends Matrix {
 				vector[rowCols[j]] += Math.abs(rowValues[j]);
 			}
 		}
-		for (int i=0; i<this.numCols; i++) {
+		for (int i = 0; i < this.numCols; i++) {
 			if (vector[i] == 0.0) {
 				zeroColumns.add(i);
 			}

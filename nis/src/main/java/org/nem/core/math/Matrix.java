@@ -132,7 +132,7 @@ public abstract class Matrix {
 	public Collection<Integer> normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
 		final List<Integer> zeroColumns = new ArrayList<>();
-		for (int i=0; i<this.numCols; i++) {
+		for (int i = 0; i < this.numCols; i++) {
 			if (0 == columnSums[i]) {
 				zeroColumns.add(i);
 			}

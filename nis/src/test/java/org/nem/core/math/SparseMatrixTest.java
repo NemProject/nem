@@ -150,7 +150,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	}
 
 	//endregion
-	
+
 	//region getNumEntries
 
 	@Test

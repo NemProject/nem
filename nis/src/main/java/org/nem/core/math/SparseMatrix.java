@@ -80,7 +80,7 @@ public class SparseMatrix extends Matrix {
 			return;
 		}
 
-		int i=0;
+		int i = 0;
 		final int maxIndex = this.maxIndices[row];
 		while (i < maxIndex && this.cols[row][i] < col) {
 			i++;
@@ -111,7 +111,7 @@ public class SparseMatrix extends Matrix {
 		}
 
 		System.arraycopy(this.cols[row], i, this.cols[row], i + 1, this.maxIndices[row] - i);
-		System.arraycopy(this.values[row], i, this.values[row], i+1, this.maxIndices[row] - i);
+		System.arraycopy(this.values[row], i, this.values[row], i + 1, this.maxIndices[row] - i);
 		this.cols[row][i] = col;
 		this.values[row][i] = val;
 		this.maxIndices[row] += 1;
@@ -256,13 +256,13 @@ public class SparseMatrix extends Matrix {
 	}
 
 	/**
- 	* Returns the number of entries (values that have been set) in this sparse matrix.
- 	* 
- 	* @return number of entries in this sparse matrix.
- 	*/
+	 * Returns the number of entries (values that have been set) in this sparse matrix.
+	 *
+	 * @return number of entries in this sparse matrix.
+	 */
 	public int getNumEntries() {
 		int numEntries = 0;
-		for (int i=0; i<this.getRowCount(); i++) {
+		for (int i = 0; i < this.getRowCount(); i++) {
 			numEntries += this.maxIndices[i];
 		}
 		return numEntries;

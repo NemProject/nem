@@ -10,7 +10,7 @@ public class MatrixElementTest {
 	@Test
 	public void canCreateMatrixElement() {
 		// Act:
-		final MatrixElement element = new MatrixElement(5,3,2.34);
+		final MatrixElement element = new MatrixElement(5, 3, 2.34);
 
 		// Assert:
 		Assert.assertThat(element.getRow(), IsEqual.equalTo(5));

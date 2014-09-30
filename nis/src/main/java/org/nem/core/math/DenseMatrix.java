@@ -102,7 +102,7 @@ public final class DenseMatrix extends Matrix {
 
 			@Override
 			public boolean hasNext() {
-				for (int i=index; i<getColumnCount(); i++) {
+				for (int i = index; i < getColumnCount(); i++) {
 					if (getAt(row, i) != 0.0) {
 						return true;
 					}

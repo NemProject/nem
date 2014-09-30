@@ -2,7 +2,7 @@ package org.nem.core.math;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.*;
+import org.nem.core.test.ExceptionAssert;
 
 import java.util.*;
 
@@ -437,7 +437,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	}
 
 	//endregion
-	
+
 	//region multiplyElementWise
 
 	@Test
@@ -658,7 +658,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
 
 		// Act + Assert
-		for (int i=0; i<3; i++) {
+		for (int i = 0; i < 3; i++) {
 			Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(true));
 			iterator.next();
 		}
@@ -682,7 +682,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
 
 		// Act:
-		for (int i=0; i<3; i++) {
+		for (int i = 0; i < 3; i++) {
 			iterator.next();
 		}
 

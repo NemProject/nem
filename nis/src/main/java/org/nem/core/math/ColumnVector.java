@@ -381,7 +381,7 @@ public class ColumnVector {
 	}
 
 	//endregion
-	
+
 	//region setNegativesToZero
 
 	/**

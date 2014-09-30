@@ -55,7 +55,7 @@ public class TunedMtjSparseMatrix extends Matrix {
 		for (int i = 0; i < colIndices.length; ++i) {
 			colSums[colIndices[i]] += Math.abs(values[i]);
 		}
-		for (int i=0; i<this.matrix.numColumns(); i++) {
+		for (int i = 0; i < this.matrix.numColumns(); i++) {
 			if (colSums[i] == 0.0) {
 				zeroColumns.add(i);
 			}
