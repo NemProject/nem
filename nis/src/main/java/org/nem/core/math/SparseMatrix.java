@@ -62,6 +62,8 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	protected final void setAtUnchecked(final int row, final int col, final double val) {
+		// keep the columns sorted in ascending order (needed for SparseBitmap in NodeNeighborhoodMap ctor)
+
 		if (val == 0.0) {
 			for (int i = 0; i < this.maxIndices[row]; ++i) {
 				if (this.cols[row][i] == col) {
@@ -69,25 +71,70 @@ public class SparseMatrix extends Matrix {
 					return;
 				}
 			}
-		} else {
-			final int size = this.cols[row].length;
-			for (int i = 0; i < this.maxIndices[row]; ++i) {
-				if (this.cols[row][i] == col) {
-					this.values[row][i] = val;
-					return;
-				}
-			}
+			return;
+		}
 
-			// New column
-			if (this.maxIndices[row] == size) {
+		if (this.maxIndices[row] == 0) {
+			this.cols[row][0] = col;
+			this.values[row][0] = val;
+			this.maxIndices[row] += 1;
+			return;
+		}
+
+		int i = 0;
+		final int maxIndex = this.maxIndices[row];
+		while (i < maxIndex && this.cols[row][i] < col) {
+			i++;
+		}
+
+		if (i == maxIndex) {
+			if (maxIndex == this.cols[row].length) {
 				this.reallocate(row);
 			}
 
-			this.cols[row][this.maxIndices[row]] = col;
-			this.values[row][this.maxIndices[row]] = val;
+			this.cols[row][i] = col;
+			this.values[row][i] = val;
 			this.maxIndices[row] += 1;
+			return;
 		}
+
+		if (this.cols[row][i] == col) {
+			this.values[row][i] = val;
+			return;
+		}
+
+		this.insertColumn(row, col, val, i);
 	}
+
+	private void insertColumn(final int row, final int col, final double val, final int i) {
+		if (this.maxIndices[row] == this.cols[row].length) {
+			this.reallocate(row);
+		}
+
+		System.arraycopy(this.cols[row], i, this.cols[row], i + 1, this.maxIndices[row] - i);
+		System.arraycopy(this.values[row], i, this.values[row], i + 1, this.maxIndices[row] - i);
+		this.cols[row][i] = col;
+		this.values[row][i] = val;
+		this.maxIndices[row] += 1;
+	}
+
+	// TODO 20140929 J-M can you retry and see if there is still a perf degradation without this
+
+	///**
+	// * Remove all negative or zero values. This is overridden here
+	// * because this version is faster than the base class.
+	// */
+	//public void removeNegatives() {
+	//	for (int i = 0; i < this.numRows; ++i) {
+	//		final double[] rowValues = this.values[i];
+	//		final int size = this.maxIndices[i];
+	//		for (int j = 0; j < size; ++j) {
+	//			while (rowValues[j] < 0.0) {
+	//				this.remove(i, j);
+	//			}
+	//		}
+	//	}
+	//}
 
 	@Override
 	protected final void forEach(final ElementVisitorFunction func) {
@@ -103,7 +150,7 @@ public class SparseMatrix extends Matrix {
 	}
 
 	@Override
-	protected final void forEach(final ReadOnlyElementVisitorFunction func) {
+	public final void forEach(final ReadOnlyElementVisitorFunction func) {
 		for (int i = 0; i < this.numRows; ++i) {
 			final double[] rowValues = this.values[i];
 			final int[] rowCols = this.cols[i];
@@ -112,6 +159,30 @@ public class SparseMatrix extends Matrix {
 				func.visit(i, rowCols[j], rowValues[j]);
 			}
 		}
+	}
+
+	@Override
+	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
+		final int[] cols = this.cols[row];
+		final double[] values = this.values[row];
+		final int maxIndex = this.maxIndices[row];
+		return new MatrixNonZeroElementRowIterator() {
+			private int index;
+
+			@Override
+			public boolean hasNext() {
+				return this.index < maxIndex;
+			}
+
+			@Override
+			public MatrixElement next() {
+				if (!this.hasNext()) {
+					throw new IndexOutOfBoundsException("index out of range");
+				}
+
+				return new MatrixElement(row, cols[this.index], values[this.index++]);
+			}
+		};
 	}
 
 	//endregion
@@ -185,5 +256,18 @@ public class SparseMatrix extends Matrix {
 				row,
 				col,
 				format.format(value));
+	}
+
+	/**
+	 * Returns the number of entries (values that have been set) in this sparse matrix.
+	 *
+	 * @return number of entries in this sparse matrix.
+	 */
+	public int getNumEntries() {
+		int numEntries = 0;
+		for (int i = 0; i < this.getRowCount(); i++) {
+			numEntries += this.maxIndices[i];
+		}
+		return numEntries;
 	}
 }

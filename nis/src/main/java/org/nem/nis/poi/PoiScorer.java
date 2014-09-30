@@ -103,7 +103,7 @@ public class PoiScorer {
 			final ColumnVector outlinkVector,
 			final ColumnVector vestedBalanceVector) {
 
-		final ColumnVector vector = outlinkVector.multiply(2.0).add(vestedBalanceVector);
+		final ColumnVector vector = outlinkVector.multiply(2.0).addElementWise(vestedBalanceVector);
 		vector.normalize();
 		return importanceVector
 				.multiplyElementWise(vector);
@@ -125,7 +125,7 @@ public class PoiScorer {
 		final ColumnVector weightedOutlinks = outlinkVector.multiply(c1);
 		final ColumnVector weightedImportances = importanceVector.multiply(c2);
 
-		return vestedBalanceVector.add(weightedOutlinks).add(weightedImportances);
+		return vestedBalanceVector.addElementWise(weightedOutlinks).addElementWise(weightedImportances);
 	}
 
 	private ColumnVector calculateBloodyRookieNewV2Score(
@@ -138,12 +138,12 @@ public class PoiScorer {
 		final double c1 = 1.5;
 		final double c2 = 0.01;
 
-		final ColumnVector weightedOutlinks = outlinkVector.multiply(c1).add(vestedBalanceVector);
+		final ColumnVector weightedOutlinks = outlinkVector.multiply(c1).addElementWise(vestedBalanceVector);
 		final ColumnVector weightedImportances = importanceVector.multiply(c2);
 
 		weightedOutlinks.normalize();
 
-		return weightedOutlinks.add(weightedImportances);
+		return weightedOutlinks.addElementWise(weightedImportances);
 	}
 
 	private ColumnVector calculateUtopianFutureScore(
@@ -154,14 +154,13 @@ public class PoiScorer {
 		// norm(outlink 2 + PR)*stake + sqrt(abs(stake))
 
 		outlinkVector.normalize();
-		final ColumnVector vector = outlinkVector.multiply(2.0).add(
-				importanceVector);
+		final ColumnVector vector = outlinkVector.multiply(2.0).addElementWise(importanceVector);
 		vector.normalize();
 
 		final ColumnVector sqrtcoindays = vestedBalanceVector.sqrt();
 
 		return vector.multiplyElementWise(
-				vestedBalanceVector).add(sqrtcoindays);
+				vestedBalanceVector).addElementWise(sqrtcoindays);
 	}
 
 	private ColumnVector calculatePythonScore(
@@ -171,7 +170,7 @@ public class PoiScorer {
 		// from the original python prototype
 		outlinkVector.normalize();
 		vestedBalanceVector.normalize();
-		return importanceVector.add(outlinkVector)
+		return importanceVector.addElementWise(outlinkVector)
 				.multiplyElementWise(vestedBalanceVector);
 	}
 
@@ -184,11 +183,11 @@ public class PoiScorer {
 		final double outlinkWeight = 1.25;
 		final double importanceWeight = 0.05;
 
-		final ColumnVector weightedOutlinks = outlinkVector.multiply(outlinkWeight).add(vestedBalanceVector);
+		final ColumnVector weightedOutlinks = outlinkVector.multiply(outlinkWeight).addElementWise(vestedBalanceVector);
 		final ColumnVector weightedImportances = importanceVector.multiply(importanceWeight);
 
 		weightedOutlinks.normalize();
 
-		return weightedOutlinks.add(weightedImportances);
+		return weightedOutlinks.addElementWise(weightedImportances);
 	}
 }

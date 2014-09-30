@@ -2,8 +2,28 @@ package org.nem.core.math;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.test.IsEquivalent;
+
+import java.util.*;
 
 public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
+
+	//region forEach
+
+	@Test
+	public void forEachReturnsAllNonZeroElements() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 0, 0, 1, -5, 8 });
+
+		// Act:
+		final List<Double> values = new ArrayList<>();
+		matrix.forEach((row, col, value) -> values.add(value));
+
+		// Assert: zero-values are excluded
+		Assert.assertThat(values, IsEquivalent.equivalentTo(new Double[] { 2.0, 1.0, -5.0, 8.0 }));
+	}
+
+	//endregion
 
 	//region toString
 
@@ -94,7 +114,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	}
 
 	@Test
-	public void rowCanBeReallocated() {
+	public void rowCanBeReallocatedIfHigherColumnElementDoesNotFit() {
 		// Arrange:
 		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 1);
 		sparseMatrix.setAt(0, 0, 5.0);
@@ -109,6 +129,69 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(2));
 		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(5.0));
 		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(3.0));
+	}
+
+	@Test
+	public void rowCanBeReallocatedIfLowerColumnElementDoesNotFit() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 1);
+		sparseMatrix.setAt(0, 1, 5.0);
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(1));
+
+		// Act:
+		sparseMatrix.setAt(0, 0, 3.0);
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getRowCapacity(0), IsEqual.equalTo(2));
+		Assert.assertThat(sparseMatrix.getAt(0, 1), IsEqual.equalTo(5.0));
+		Assert.assertThat(sparseMatrix.getAt(0, 0), IsEqual.equalTo(3.0));
+	}
+
+	//endregion
+
+	//region getNumEntries
+
+	@Test
+	public void getNumEntriesReturnsTotalNumberOfNonZeroElements() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = new SparseMatrix(5, 5, 1);
+		sparseMatrix.setAt(0, 0, 5.0);
+		sparseMatrix.setAt(3, 0, 1.0);
+		sparseMatrix.setAt(0, 3, 2.0);
+		sparseMatrix.setAt(2, 1, 3.0);
+		sparseMatrix.setAt(1, 2, 0.0);
+		sparseMatrix.setAt(3, 3, -5.0);
+
+		// Act and Assert:
+		Assert.assertThat(sparseMatrix.getNumEntries(), IsEqual.equalTo(5));
+	}
+
+	//endregion
+
+	//region sorted columns
+
+	@Test
+	public void setAtUncheckedKeepsColumnsSorted() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = new SparseMatrix(8, 8, 8);
+
+		// Act:
+		sparseMatrix.setAt(0, 7, 5.0);
+		sparseMatrix.setAt(0, 1, 5.0);
+		sparseMatrix.setAt(0, 0, 5.0);
+		sparseMatrix.setAt(0, 5, 5.0);
+		sparseMatrix.setAt(0, 4, 5.0);
+
+		// Assert:
+		int col = -1;
+		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
+		while (iterator.hasNext()) {
+			final MatrixElement entry = iterator.next();
+			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
+			col = entry.getColumn();
+		}
 	}
 
 	//endregion

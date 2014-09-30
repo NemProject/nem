@@ -307,7 +307,7 @@ public class PoiContext {
 			this.teleportationVector = vector;
 			final ColumnVector onesVector = new ColumnVector(importanceVector.size());
 			onesVector.setAll(1.0);
-			vector = onesVector.add(this.teleportationVector.multiply(-1));
+			vector = onesVector.addElementWise(this.teleportationVector.multiply(-1));
 			vector.scale(importanceVector.size());
 			this.inverseTeleportationVector = vector;
 		}

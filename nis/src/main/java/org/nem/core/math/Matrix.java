@@ -1,5 +1,6 @@
 package org.nem.core.math;
 
+import java.util.*;
 import java.util.function.*;
 
 /**
@@ -125,32 +126,37 @@ public abstract class Matrix {
 
 	/**
 	 * Normalizes each column of the matrix.
+	 *
+	 * @return The indexes of zero columns.
 	 */
-	public void normalizeColumns() {
+	public Collection<Integer> normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				final double sum = columnSums[col];
-				if (0 == sum) {
-					return;
-				}
-
-				setter.accept(value / sum);
+		final List<Integer> zeroColumns = new ArrayList<>();
+		for (int i = 0; i < this.numCols; i++) {
+			if (0 == columnSums[i]) {
+				zeroColumns.add(i);
 			}
+		}
+
+		this.forEach((row, col, value, setter) -> {
+			final double sum = columnSums[col];
+			if (0 == sum) {
+				return;
+			}
+
+			setter.accept(value / sum);
 		});
+
+		return zeroColumns;
 	}
 
 	/**
 	 * Sets all negative values to zero.
 	 */
 	public void removeNegatives() {
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				if (value < 0) {
-					setter.accept(0.0);
-				}
+		this.forEach((row, col, value, setter) -> {
+			if (value < 0) {
+				setter.accept(0.0);
 			}
 		});
 	}
@@ -161,12 +167,7 @@ public abstract class Matrix {
 	 * @param scale The scale factor.
 	 */
 	public final void scale(final double scale) {
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				setter.accept(value / scale);
-			}
-		});
+		this.forEach((row, col, value, setter) -> setter.accept(value / scale));
 	}
 
 	//endregion
@@ -298,6 +299,16 @@ public abstract class Matrix {
 	}
 
 	/**
+	 * Creates a new matrix by adding each value in this matrix by a scalar.
+	 *
+	 * @param scalar The scalar.
+	 * @return The new matrix.
+	 */
+	public Matrix add(final double scalar) {
+		return this.transform(v -> v + scalar);
+	}
+
+	/**
 	 * Creates a new matrix by taking the absolute value of this matrix.
 	 *
 	 * @return The new matrix.
@@ -387,13 +398,8 @@ public abstract class Matrix {
 	 *
 	 * @param func The function.
 	 */
-	protected void forEach(final ReadOnlyElementVisitorFunction func) {
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				func.visit(row, col, value);
-			}
-		});
+	public void forEach(final ReadOnlyElementVisitorFunction func) {
+		this.forEach((row, col, value, setter) -> func.visit(row, col, value));
 	}
 
 	/**
@@ -401,7 +407,7 @@ public abstract class Matrix {
 	 * Depending on the implementation, zero elements may or may not be visited.
 	 */
 	@FunctionalInterface
-	protected static interface ReadOnlyElementVisitorFunction {
+	public static interface ReadOnlyElementVisitorFunction {
 
 		/**
 		 * Visits the specified element.
@@ -467,6 +473,14 @@ public abstract class Matrix {
 		 */
 		public void visit(final int row, final int col, final double value, final DoubleConsumer setter);
 	}
+
+	/**
+	 * Gets the non-zero matrix row element iterator for a given row index.
+	 *
+	 * @param row The row index.
+	 * @return The iterator.
+	 */
+	public abstract MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row);
 
 	//endregion
 }

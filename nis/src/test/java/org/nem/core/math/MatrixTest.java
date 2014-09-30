@@ -4,6 +4,8 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.test.ExceptionAssert;
 
+import java.util.*;
+
 public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//region createMatrix
@@ -214,10 +216,11 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 11, 3, 1, 5, 8 });
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.55, 0.3, 0.05, 0.5, 0.4 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList()));
 	}
 
 	@Test
@@ -226,10 +229,11 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(2, 3);
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 0, 0, 0, 0, 0, 0 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 	}
 
 	@Test
@@ -238,10 +242,11 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(2, 3, new double[] { 2, 0, 0, 0, -2, 0 });
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 1, 0, 0, 0, -1, 0 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(2)));
 	}
 
 	@Test
@@ -252,12 +257,13 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix.setAt(2, 1, 12);
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(
 				matrix,
 				IsEqual.equalTo(this.createMatrix(4, 2, new double[] { 0, 0.25, 0, 0, 0, 0.75, 0, 0 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(0)));
 	}
 
 	//endregion
@@ -410,6 +416,24 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 1, 0, 2, 8, 7, 5 })));
+	}
+
+	//endregion
+
+	//region add
+
+	@Test
+	public void matrixCanBeAddedToByScalar() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
+
+		// Act:
+		final Matrix result = matrix.add(0.1);
+
+		// Assert:
+		Assert.assertThat(
+				result.roundTo(5),
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 2.1, 3.1, 5.1, 11.1, 1.1, 8.1 })));
 	}
 
 	//endregion
@@ -621,6 +645,70 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		Assert.assertThat(
 				this.createMatrix(3, 2, new double[] { 0, 0, 0, 0, 0, 0 }).isZeroMatrix(),
 				IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	//region getNonZeroElementRowIterator
+
+	@Test
+	public void hasNextReturnsTrueIfMoreColumnsAreAvailable() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+
+		// Act + Assert
+		for (int i = 0; i < 3; i++) {
+			Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(true));
+			iterator.next();
+		}
+	}
+
+	@Test
+	public void hasNextReturnsFalseImmediatelyForZeroRow() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(1);
+
+		// Assert:
+		Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
+		ExceptionAssert.assertThrows(v -> iterator.next(), IndexOutOfBoundsException.class);
+	}
+
+	@Test
+	public void hasNextReturnsFalseAfterAllElementsHaveBeenIteratedForNonZeroRow() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+
+		// Act:
+		for (int i = 0; i < 3; i++) {
+			iterator.next();
+		}
+
+		// Assert:
+		Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
+		ExceptionAssert.assertThrows(v -> iterator.next(), IndexOutOfBoundsException.class);
+	}
+
+	@Test
+	public void nextReturnsCorrectMatrixElementsInOrder() {
+		// Arrange:
+		final TMatrix matrix = this.createMatrixForIteratorTests();
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+
+		// Act + Assert:
+		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 0, 1.1)));
+		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 1, 2.2)));
+		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 3, 4.4)));
+	}
+
+	private TMatrix createMatrixForIteratorTests() {
+		final TMatrix matrix = this.createMatrix(4, 4);
+		matrix.setAtUnchecked(0, 0, 1.1);
+		matrix.setAtUnchecked(0, 3, 4.4);
+		matrix.setAtUnchecked(0, 1, 2.2);
+		return matrix;
 	}
 
 	//endregion
