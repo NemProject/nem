@@ -4,9 +4,6 @@ import com.googlecode.javaewah.EWAHCompressedBitmap;
 
 import java.util.*;
 
-// TODO-CR [08062014][J-M]: ask BR to autoformat :)
-// TODO-CR [20140813][M-BR]: going to switch to intelliJ later
-
 /**
  * This is a wrapper for the EWAHCompressedBitmap. The reason we are wrapping it is
  * because EWAHCompressedBitmap requires that bits be set in strictly increasing order
@@ -21,10 +18,10 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * Create a new <code>SparseBitmap</code> from data that are already sorted
+	 * Creates a new <code>SparseBitmap</code> from data that are already sorted
 	 * in strictly ascending order (duplicate values are okay).
 	 *
-	 * @param bitsToSet - indices of bits to
+	 * @param bitsToSet The bits to set.
 	 * @return new <code>SparseBitmap</code> with the given bits set
 	 */
 	public static SparseBitmap createFromSortedData(final int... bitsToSet) {
@@ -32,9 +29,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * Create a new <code>SparseBitmap</code> from data that are not or
-	 * may not be in strictly ascending order. This method will sort the data
-	 * for you.
+	 * Creates a new <code>SparseBitmap</code> from unsorted data.
 	 *
 	 * @param bitsToSet The bits to set.
 	 * @return new <code>SparseBitmap</code> with the given bits set
@@ -47,8 +42,8 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	/**
 	 * Gets the value of the bit at the given index.
 	 *
-	 * @param bitToGet - index of the bit to get the value of
-	 * @return - true if the bit is set, false is the bit is not set at the given <code>bitToGet</code> index
+	 * @param bitToGet The index of the bit to get.
+	 * @return true if the bit is set, false if the bit is not set at the given <code>bitToGet</code> index.
 	 */
 	public boolean get(final int bitToGet) {
 		return this.bitmap.get(bitToGet);
@@ -68,21 +63,21 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	/**
 	 * Set the bit at the given index. Throws an exception if bits are not set in strictly ascending order.
 	 *
-	 * @param bitToSet index of the bit to set
+	 * @param bitToSet The index of the bit to set.
 	 */
 	public void set(final int bitToSet) {
 		// Check that we are setting bits in ascending order (equality with the last value is OK).
-		if (this.bitmap.cardinality() > 0
-				&& bitToSet < this.bitmap.toArray()[this.bitmap.cardinality() - 1]) {
+		if (this.bitmap.cardinality() > 0 && bitToSet < this.bitmap.toArray()[this.bitmap.cardinality() - 1]) {
 			throw new IllegalArgumentException("Must set bits in strictly ascending order.");
 		}
+
 		this.bitmap.set(bitToSet);
 	}
 
 	/**
-	 * Gets the highest bit which is set in the bitmap.
+	 * Gets the highest bit that is set in the bitmap.
 	 *
-	 * @return The highest bit:
+	 * @return The highest bit.
 	 */
 	public int getHighestBit() {
 		return this.bitmap.cardinality() > 0 ? this.bitmap.toArray()[this.bitmap.cardinality() - 1] : 0;
@@ -119,21 +114,14 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return new SparseBitmap(firstMap);
 	}
 
-	/**
-	 * Creates a binary list representation of this bitset
-	 *
-	 * @return List representation of this sparse bitmap.
-	 */
-	public List<Integer> toList() {
-		return this.bitmap.toList();
-	}
+	// TODO 20140929 J-M: please make or / and / andNot static
 
 	/**
 	 * Computes the logical <code>or</code> of the context bitmap
 	 * (<code>this</code>) and the given bitmap.
 	 *
-	 * @param rhs - bitmap to compute the logical <code>or</code> with.
-	 * @return logical <code>or</code> of <code>this</code> bitmap
+	 * @param rhs Bitmap to compute the logical <code>or</code> with.
+	 * @return Logical <code>or</code> of <code>this</code> bitmap
 	 * (context object) and the given bitmap.
 	 */
 	public SparseBitmap or(final SparseBitmap rhs) {
@@ -141,11 +129,23 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
+	 * Computes the logical <code>and</code> of the context bitmap
+	 * (<code>this</code>) and the given bitmap.
+	 *
+	 * @param rhs Bitmap to compute the logical <code>and</code> with.
+	 * @return Logical <code>and</code> of <code>this</code> bitmap
+	 * (context object) and the given bitmap.
+	 */
+	public SparseBitmap and(final SparseBitmap rhs) {
+		return new SparseBitmap(this.bitmap.and(rhs.bitmap));
+	}
+
+	/**
 	 * Computes the logical <code>and not</code> of the context bitmap
 	 * (<code>this</code>) and the given bitmap.
 	 *
-	 * @param rhs - bitmap to compute the logical <code>and not</code> with.
-	 * @return logical <code>and not</code> of <code>this</code> bitmap
+	 * @param rhs Bitmap to compute the logical <code>and not</code> with.
+	 * @return Logical <code>and not</code> of <code>this</code> bitmap
 	 * (context object) and the given bitmap.
 	 */
 	public SparseBitmap andNot(final SparseBitmap rhs) {
@@ -164,12 +164,22 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	/**
-	 * Size.
+	 * The number of bits that are set.
+	 * TODO 20140929 J-B there are some comments that cardinality == size, but it's actually the number of bits set; does this break anything?
 	 *
-	 * @return Size of this sparse bitmap.
+	 * @return The number of bits that are set.
 	 */
 	public int cardinality() {
 		return this.bitmap.cardinality();
+	}
+
+	/**
+	 * Creates a binary list representation of this sparse bitmap.
+	 *
+	 * @return List representation of this sparse bitmap.
+	 */
+	public List<Integer> toList() {
+		return this.bitmap.toList();
 	}
 
 	@Override
@@ -192,6 +202,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		if (!(obj instanceof SparseBitmap)) {
 			return false;
 		}
+
 		final SparseBitmap rhs = (SparseBitmap)obj;
 		return this.bitmap.equals(rhs.bitmap);
 	}
