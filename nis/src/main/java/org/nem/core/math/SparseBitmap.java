@@ -27,7 +27,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * @param bitsToSet - indices of bits to
 	 * @return new <code>SparseBitmap</code> with the given bits set
 	 */
-	public static SparseBitmap createFromSortedData(int... bitsToSet) {
+	public static SparseBitmap createFromSortedData(final int... bitsToSet) {
 		return new SparseBitmap(EWAHCompressedBitmap.bitmapOf(bitsToSet));
 	}
 
@@ -39,7 +39,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * @param bitsToSet The bits to set.
 	 * @return new <code>SparseBitmap</code> with the given bits set
 	 */
-	public static SparseBitmap createFromUnsortedData(int... bitsToSet) {
+	public static SparseBitmap createFromUnsortedData(final int... bitsToSet) {
 		Arrays.sort(bitsToSet);
 		return new SparseBitmap(EWAHCompressedBitmap.bitmapOf(bitsToSet));
 	}
@@ -50,7 +50,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * @param bitToGet - index of the bit to get the value of
 	 * @return - true if the bit is set, false is the bit is not set at the given <code>bitToGet</code> index
 	 */
-	public boolean get(int bitToGet) {
+	public boolean get(final int bitToGet) {
 		return this.bitmap.get(bitToGet);
 	}
 
@@ -61,7 +61,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 *
 	 * @param bitToSet index of the bit to set
 	 */
-	public void setWithoutAscendingCheck(int bitToSet) {
+	public void setWithoutAscendingCheck(final int bitToSet) {
 		this.bitmap.set(bitToSet);
 	}
 
@@ -70,7 +70,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 *
 	 * @param bitToSet index of the bit to set
 	 */
-	public void set(int bitToSet) {
+	public void set(final int bitToSet) {
 		// Check that we are setting bits in ascending order (equality with the last value is OK).
 		if (this.bitmap.cardinality() > 0
 				&& bitToSet < this.bitmap.toArray()[this.bitmap.cardinality() - 1]) {
@@ -101,7 +101,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * @param bitmaps Bitmaps to compute the logical <code>or</code> for
 	 * @return SparseBitmap that has the values set according to the <code>or</code> of the given bitmaps.
 	 */
-	public static SparseBitmap batchOr(SparseBitmap... bitmaps) {
+	public static SparseBitmap batchOr(final SparseBitmap... bitmaps) {
 		if (bitmaps.length < 1) {
 			return SparseBitmap.createFromUnsortedData();
 		}
@@ -136,7 +136,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * @return logical <code>or</code> of <code>this</code> bitmap
 	 * (context object) and the given bitmap.
 	 */
-	public SparseBitmap or(SparseBitmap rhs) {
+	public SparseBitmap or(final SparseBitmap rhs) {
 		return new SparseBitmap(this.bitmap.or(rhs.bitmap));
 	}
 
@@ -148,7 +148,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * @return logical <code>and not</code> of <code>this</code> bitmap
 	 * (context object) and the given bitmap.
 	 */
-	public SparseBitmap andNot(SparseBitmap rhs) {
+	public SparseBitmap andNot(final SparseBitmap rhs) {
 		return new SparseBitmap(this.bitmap.andNot(rhs.bitmap));
 	}
 
@@ -159,7 +159,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * @param rhs given sparse bitmap to compute the size of the intersection of
 	 * @return size of the intersection of <code>this</code> bitmap and the given bitmap.
 	 */
-	public int andCardinality(SparseBitmap rhs) {
+	public int andCardinality(final SparseBitmap rhs) {
 		return this.bitmap.andCardinality(rhs.bitmap);
 	}
 
@@ -188,11 +188,11 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!(obj instanceof SparseBitmap)) {
 			return false;
 		}
-		SparseBitmap rhs = (SparseBitmap)obj;
+		final SparseBitmap rhs = (SparseBitmap)obj;
 		return this.bitmap.equals(rhs.bitmap);
 	}
 }

@@ -452,12 +452,12 @@ public class SparseBitmapTest {
 		final SparseBitmap sb6 = SparseBitmap.createFromSortedData(100, 200, 300, 400, 1337);
 
 		// Act:
-		List<Integer> v1 = sb1.toList();
-		List<Integer> v2 = sb2.toList();
-		List<Integer> v3 = sb3.toList();
-		List<Integer> v4 = sb4.toList();
-		List<Integer> v5 = sb5.toList();
-		List<Integer> v6 = sb6.toList();
+		final List<Integer> v1 = sb1.toList();
+		final List<Integer> v2 = sb2.toList();
+		final List<Integer> v3 = sb3.toList();
+		final List<Integer> v4 = sb4.toList();
+		final List<Integer> v5 = sb5.toList();
+		final List<Integer> v6 = sb6.toList();
 
 		// Assert:
 		Assert.assertThat(v1, IsEqual.equalTo(new ArrayList<>(Arrays.asList(new Integer[] { 0, 1, 2 }))));
@@ -481,12 +481,12 @@ public class SparseBitmapTest {
 		final SparseBitmap sb6 = SparseBitmap.createFromSortedData(100, 200, 300, 400, 1337);
 
 		// Act:
-		Iterator<Integer> v1 = sb1.iterator();
-		Iterator<Integer> v2 = sb2.iterator();
-		Iterator<Integer> v3 = sb3.iterator();
-		Iterator<Integer> v4 = sb4.iterator();
-		Iterator<Integer> v5 = sb5.iterator();
-		Iterator<Integer> v6 = sb6.iterator();
+		final Iterator<Integer> v1 = sb1.iterator();
+		final Iterator<Integer> v2 = sb2.iterator();
+		final Iterator<Integer> v3 = sb3.iterator();
+		final Iterator<Integer> v4 = sb4.iterator();
+		final Iterator<Integer> v5 = sb5.iterator();
+		final Iterator<Integer> v6 = sb6.iterator();
 
 		// Assert:
 		// TODO fix this!
@@ -511,12 +511,12 @@ public class SparseBitmapTest {
 		final SparseBitmap sb6 = SparseBitmap.createFromSortedData(100, 200, 300, 400, 1337);
 
 		// Act:
-		String v1 = sb1.toString();
-		String v2 = sb2.toString();
-		String v3 = sb3.toString();
-		String v4 = sb4.toString();
-		String v5 = sb5.toString();
-		String v6 = sb6.toString();
+		final String v1 = sb1.toString();
+		final String v2 = sb2.toString();
+		final String v3 = sb3.toString();
+		final String v4 = sb4.toString();
+		final String v5 = sb5.toString();
+		final String v6 = sb6.toString();
 
 		// Assert:
 		Assert.assertThat(v1, IsEqual.equalTo("{0,1,2}"));

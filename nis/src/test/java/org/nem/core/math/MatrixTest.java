@@ -655,7 +655,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	public void hasNextReturnsTrueIfMoreColumnsAreAvailable() {
 		// Arrange:
 		final TMatrix matrix = this.createMatrixForIteratorTests();
-		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
 
 		// Act + Assert
 		for (int i = 0; i < 3; i++) {
@@ -668,7 +668,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	public void hasNextReturnsFalseImmediatelyForZeroRow() {
 		// Arrange:
 		final TMatrix matrix = this.createMatrixForIteratorTests();
-		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(1);
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(1);
 
 		// Assert:
 		Assert.assertThat(iterator.hasNext(), IsEqual.equalTo(false));
@@ -679,7 +679,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	public void hasNextReturnsFalseAfterAllElementsHaveBeenIteratedForNonZeroRow() {
 		// Arrange:
 		final TMatrix matrix = this.createMatrixForIteratorTests();
-		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
 
 		// Act:
 		for (int i = 0; i < 3; i++) {
@@ -695,7 +695,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	public void nextReturnsCorrectMatrixElementsInOrder() {
 		// Arrange:
 		final TMatrix matrix = this.createMatrixForIteratorTests();
-		MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(0);
 
 		// Act + Assert:
 		Assert.assertThat(iterator.next(), IsEqual.equalTo(new MatrixElement(0, 0, 1.1)));

@@ -9,8 +9,8 @@ import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 
 public class EligibleSignerBlockValidatorTest {
-	private static int On = ImportanceTransferTransaction.Mode.Activate.value();
-	private static int Off = ImportanceTransferTransaction.Mode.Deactivate.value();
+	private static final int On = ImportanceTransferTransaction.Mode.Activate.value();
+	private static final int Off = ImportanceTransferTransaction.Mode.Deactivate.value();
 
 	@Test
 	public void accountHarvestingRemotelyCanSignBlockIfRemoteIsNotActive() {
@@ -68,9 +68,9 @@ public class EligibleSignerBlockValidatorTest {
 
 	private static void assertValidationResultForRemoteLinkOwner(
 			final RemoteLink.Owner owner,
-			int blockHeight,
+			final int blockHeight,
 			final ValidationResult expectedResult,
-			int mode) {
+			final int mode) {
 		// Arrange:
 		final int changeHeight = 5;
 		final Block block = NisUtils.createRandomBlockWithHeight(changeHeight + blockHeight);

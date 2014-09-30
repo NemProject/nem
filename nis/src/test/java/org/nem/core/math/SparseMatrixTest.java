@@ -186,9 +186,9 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 
 		// Assert:
 		int col = -1;
-		MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
+		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
 		while (iterator.hasNext()) {
-			MatrixElement entry = iterator.next();
+			final MatrixElement entry = iterator.next();
 			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
 			col = entry.getColumn();
 		}

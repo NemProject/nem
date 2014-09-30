@@ -102,7 +102,7 @@ public final class DenseMatrix extends Matrix {
 
 			@Override
 			public boolean hasNext() {
-				for (int i = index; i < getColumnCount(); i++) {
+				for (int i = this.index; i < getColumnCount(); i++) {
 					if (getAt(row, i) != 0.0) {
 						return true;
 					}
@@ -112,9 +112,9 @@ public final class DenseMatrix extends Matrix {
 
 			@Override
 			public MatrixElement next() {
-				while (index < getColumnCount()) {
-					if (getAt(row, index++) != 0.0) {
-						return new MatrixElement(row, index - 1, getAt(row, index - 1));
+				while (this.index < getColumnCount()) {
+					if (getAt(row, this.index++) != 0.0) {
+						return new MatrixElement(row, this.index - 1, getAt(row, this.index - 1));
 					}
 				}
 
