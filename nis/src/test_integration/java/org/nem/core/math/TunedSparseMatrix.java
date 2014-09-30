@@ -225,6 +225,6 @@ public class TunedSparseMatrix extends Matrix {
 
 	@Override
 	public MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row) {
-		throw new RuntimeException("Not implemented");
+		throw new UnsupportedOperationException("this operation is not currently supported");
 	}
 }

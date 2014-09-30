@@ -14,12 +14,21 @@ public class NodeIdTest {
 	}
 
 	@Test
+	public void canBeCreatedAroundZeroId() {
+		// Act:
+		final NodeId id = new NodeId(0);
+
+		// Assert:
+		Assert.assertThat(id.getValue(), IsEqual.equalTo(0));
+	}
+
+	@Test
 	public void canBeCreatedAroundPositiveId() {
 		// Act:
 		final NodeId id = new NodeId(1);
 
 		// Assert:
-		Assert.assertThat(id, IsEqual.equalTo(new NodeId(1)));
+		Assert.assertThat(id.getValue(), IsEqual.equalTo(1));
 	}
 
 	//endregion

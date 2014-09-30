@@ -14,12 +14,21 @@ public class ClusterIdTest {
 	}
 
 	@Test
+	public void canBeCreatedAroundZeroId() {
+		// Act:
+		final ClusterId id = new ClusterId(0);
+
+		// Assert:
+		Assert.assertThat(id.getValue(), IsEqual.equalTo(0));
+	}
+
+	@Test
 	public void canBeCreatedAroundPositiveId() {
 		// Act:
 		final ClusterId id = new ClusterId(1);
 
 		// Assert:
-		Assert.assertThat(id, IsEqual.equalTo(new ClusterId(1)));
+		Assert.assertThat(id.getValue(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -28,7 +37,7 @@ public class ClusterIdTest {
 		final ClusterId id = new ClusterId(new NodeId(1));
 
 		// Assert:
-		Assert.assertThat(id, IsEqual.equalTo(new ClusterId(1)));
+		Assert.assertThat(id.getValue(), IsEqual.equalTo(1));
 	}
 
 	//endregion
