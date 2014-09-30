@@ -103,26 +103,6 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 	}
 
 	//endregion
-	
-	//region add
-	
-	@Test
-	public void sparseMatrixCanBeAddedToByScalar() {
-		// Arrange:
-		final Matrix matrix = this.createMatrix(3, 2);
-		matrix.setAt(2, 0, 3);
-		matrix.setAt(1, 1, 5);
-
-		// Act::
-		final Matrix result = matrix.add(0.2);
-
-		// Assert:
-		Assert.assertThat(
-				result,
-				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.2, 0.2, 5.2, 3.2, 0.2 })));
-	}
-	
-	//endregion
 
 	@Override
 	protected DenseMatrix createMatrix(final int rows, final int cols) {

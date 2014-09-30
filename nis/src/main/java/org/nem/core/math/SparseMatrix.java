@@ -1,10 +1,7 @@
 package org.nem.core.math;
 
-import net.minidev.json.JSONObject;
-import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.utils.FormatUtils;
 
-import java.io.*;
 import java.text.DecimalFormat;
 
 /**
@@ -62,36 +59,7 @@ public class SparseMatrix extends Matrix {
 
 		return 0.0;
 	}
-/*
-	@Override
-	protected final void setAtUnchecked(final int row, final int col, final double val) {
-		if (val == 0.0) {
-			for (int i = 0; i < this.maxIndices[row]; ++i) {
-				if (this.cols[row][i] == col) {
-					this.remove(row, i);
-					return;
-				}
-			}
-		} else {
-			final int size = this.cols[row].length;
-			for (int i = 0; i < this.maxIndices[row]; ++i) {
-				if (this.cols[row][i] == col) {
-					this.values[row][i] = val;
-					return;
-				}
-			}
 
-			// New column
-			if (this.maxIndices[row] == size) {
-				this.reallocate(row);
-			}
-
-			this.cols[row][this.maxIndices[row]] = col;
-			this.values[row][this.maxIndices[row]] = val;
-			this.maxIndices[row] += 1;
-		}
-	}
-*/
 	// This version keeps the columns sorted in ascending order (needed for SparseBitmap in NodeNeighborhoodMap ctor)
 	@Override
 	protected final void setAtUnchecked(final int row, final int col, final double val) {
@@ -149,23 +117,23 @@ public class SparseMatrix extends Matrix {
 		this.maxIndices[row] += 1;
 	}
 
-	// TODO-CR [08062014][J-M]: why did you override? the base class version should be fast enough
-	// TODO-CR [20140813][M-J]: parent.removeNegatives() takes consistently 5-6 ms longer when dealing with 600 accounts. This is way too slow (doing it here only takes 0-1ms, so the base class version is over 5x slower)
-	/**
-	 * Remove all negative or zero values. This is overridden here 
-	 * because this version is faster than the base class.
-	 */
-	public void removeNegatives() {
-		for (int i = 0; i < this.numRows; ++i) {
-			final double[] rowValues = this.values[i];
-			final int size = this.maxIndices[i];
-			for (int j = 0; j < size; ++j) {
-				while (rowValues[j] < 0.0) {
-					this.remove(i, j);
-				}
-			}
-		}
-	}
+	// TODO 20140929 J-M can you retry and see if there is still a perf degradation without this
+
+	///**
+	// * Remove all negative or zero values. This is overridden here
+	// * because this version is faster than the base class.
+	// */
+	//public void removeNegatives() {
+	//	for (int i = 0; i < this.numRows; ++i) {
+	//		final double[] rowValues = this.values[i];
+	//		final int size = this.maxIndices[i];
+	//		for (int j = 0; j < size; ++j) {
+	//			while (rowValues[j] < 0.0) {
+	//				this.remove(i, j);
+	//			}
+	//		}
+	//	}
+	//}
 
 	@Override
 	protected final void forEach(final ElementVisitorFunction func) {
@@ -231,10 +199,6 @@ public class SparseMatrix extends Matrix {
 			this.values[row][colIndex] = this.values[row][lastIndex];
 		}
 
-		// TODO-CR [08062014][J-M]: assuming this was a bug fix, we should add a regression test
-		// TODO-CR [20140806][M-J]: need to look at this
-		this.values[row][lastIndex] = 0.0;
-
 		--this.maxIndices[row];
 	}
 
@@ -285,63 +249,5 @@ public class SparseMatrix extends Matrix {
 			numEntries += this.maxIndices[i];
 		}
 		return numEntries;
-	}
-
-	// TODO-CR [08062014][J-M]: are these just temporary? if not, want to keep it we should them up and/or move them to the test code
-	// TODO-CR [20140806][M-J]: it would be nice to keep these somewhere for testing
-
-	public void save(String fileName) throws IOException {
-		
-		FileOutputStream fos = new FileOutputStream(fileName);
-		ObjectOutputStream out = new ObjectOutputStream(fos);
-		out.writeObject(this.getRowCount());
-		out.writeObject(this.getColumnCount());
-		out.writeObject(this.getNumEntries());
-		for (int i=0; i<this.getRowCount(); i++) {
-			for (int j=0; j<this.maxIndices[i]; j++) {
-				out.writeObject(i);
-				out.writeObject(this.cols[i][j]);
-				out.writeObject(this.getAt(i, cols[i][j]));
-			}
-		}
-		out.flush();
-		out.close();
-		
-		// Must...have..json file...
-		final JsonSerializer serializer = new JsonSerializer();
-		for (int i=0; i<this.getRowCount(); i++) {
-			for (int j=0; j<this.maxIndices[i]; j++) {
-				serializer.writeDouble(i + "," + j, this.getAt(i, cols[i][j]));
-			}
-		}
-		final JSONObject object = serializer.getObject();
-		BufferedWriter writer = null;
-		try {
-			writer = new BufferedWriter(new FileWriter(fileName + ".json"));
-			writer.write(object.toJSONString());
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		finally {
-			writer.close();
-		}
-	}
-	
-	public static SparseMatrix load(String fileName) throws IOException, ClassNotFoundException {
-		FileInputStream fis = new FileInputStream(fileName);
-		ObjectInputStream in = new ObjectInputStream(fis);
-		int rowCount = (int)in.readObject();
-		int columnCount = (int)in.readObject();
-		int numEntries = (int)in.readObject();
-		SparseMatrix matrix = new SparseMatrix(rowCount, columnCount, 8);
-		for (int i=0; i<numEntries; i++) {
-			int row = (int)in.readObject();
-			int col = (int)in.readObject();
-			double val = (double)in.readObject();
-			matrix.setAt(row, col, val);
-		}
-		in.close();
-		return matrix;
 	}
 }

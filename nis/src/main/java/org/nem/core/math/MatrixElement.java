@@ -1,43 +1,46 @@
 package org.nem.core.math;
 
 /**
- * Represents a matrix element consisting of row, a column and a value.
+ * Represents a matrix element consisting of row, a column, and a value.
  */
 public class MatrixElement {
-
-	private final Integer row;
-	private final Integer col;
-	private final Double value;
+	private final int row;
+	private final int col;
+	private final double value;
 
 	/**
 	 * Creates a matrix entry
+	 *
+	 * @param row The row index.
+	 * @param col The column index.
+	 * @param value The value.
 	 */
-	public MatrixElement(final Integer row, final Integer col, final double value) {
+	public MatrixElement(final int row, final int col, final double value) {
 		this.row = row;
 		this.col = col;
 		this.value = value;
 	}
 
 	/**
-	 * Gets the row the matrix element.
+	 * Gets the row index.
 	 *
-	 * @return The row.
+	 * @return The row index.
 	 */
 	public Integer getRow() {
 		return this.row;
 	}
 
 	/**
-	 * Gets the column the matrix element.
+	 * Gets the column index.
 	 *
-	 * @return The column.
+	 * @return The column index.
 	 */
 	public Integer getColumn() {
 		return this.col;
 	}
 
 	/**
-	 * Gets the value of the matrix element.
+	 * Gets the value.
 	 *
 	 * @return The value.
 	 */
@@ -57,7 +60,6 @@ public class MatrixElement {
 		}
 
 		final MatrixElement rhs = (MatrixElement)obj;
-
 		return this.getRow().equals(rhs.getRow()) &&
 				this.getColumn().equals(rhs.getColumn()) &&
 				this.getValue().equals(rhs.getValue());

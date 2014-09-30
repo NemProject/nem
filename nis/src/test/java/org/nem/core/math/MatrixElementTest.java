@@ -3,64 +3,57 @@ package org.nem.core.math;
 import org.hamcrest.core.*;
 import org.junit.*;
 
+import java.util.*;
+
 public class MatrixElementTest {
 
 	@Test
 	public void canCreateMatrixElement() {
-		// Act + Assert:
-		new MatrixElement(5,3,2.34);
+		// Act:
+		final MatrixElement element = new MatrixElement(5,3,2.34);
+
+		// Assert:
+		Assert.assertThat(element.getRow(), IsEqual.equalTo(5));
+		Assert.assertThat(element.getColumn(), IsEqual.equalTo(3));
+		Assert.assertThat(element.getValue(), IsEqual.equalTo(2.34));
 	}
 
 	//region equals / hashCode
 
+	private static final Map<String, MatrixElement> DESC_TO_ELEMENT_MAP = new HashMap<String, MatrixElement>() {
+		{
+			this.put("default", new MatrixElement(5, 4, 7.0));
+			this.put("diff-row", new MatrixElement(6, 4, 7.0));
+			this.put("diff-col", new MatrixElement(5, 3, 7.0));
+			this.put("diff-val", new MatrixElement(5, 4, 7.2));
+		}
+	};
+
 	@Test
-	public void equalsReturnsFalseForNonMatrixEntryObjects() {
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final MatrixElement matrixElement = new MatrixElement(0, 1, 2.0);
+		final MatrixElement element = new MatrixElement(5, 4, 7.0);
 
 		// Assert:
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(matrixElement)));
-		Assert.assertThat(new double[] { 0, 0, 7, 0, 0, 5 }, IsNot.not(IsEqual.equalTo((Object)matrixElement)));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("default"), IsEqual.equalTo(element));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-row"), IsNot.not(IsEqual.equalTo(element)));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-col"), IsNot.not(IsEqual.equalTo(element)));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-val"), IsNot.not(IsEqual.equalTo(element)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(element)));
+		Assert.assertThat(5, IsNot.not(IsEqual.equalTo((Object)element)));
 	}
 
 	@Test
-	public void equalsReturnsFalseForDifferentMatrixEntries() {
+	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final MatrixElement matrixElement = new MatrixElement(0, 1, 2.0);
+		final MatrixElement element = new MatrixElement(5, 4, 7.0);
+		final int hashCode = element.hashCode();
 
 		// Assert:
-		Assert.assertThat(matrixElement, IsNot.not(IsEqual.equalTo(new MatrixElement(1, 1, 2.0))));
-		Assert.assertThat(matrixElement, IsNot.not(IsEqual.equalTo(new MatrixElement(0, 0, 2.0))));
-		Assert.assertThat(matrixElement, IsNot.not(IsEqual.equalTo(new MatrixElement(0, 1, 3.0))));
-	}
-
-	@Test
-	public void equalsReturnsTrueForEqualMatrixElements() {
-		// Arrange:
-		final MatrixElement matrixElement = new MatrixElement(0, 1, 2.0);
-
-		// Assert:
-		Assert.assertThat(matrixElement, IsEqual.equalTo(new MatrixElement(0, 1, 2.0)));
-	}
-
-	@Test
-	public void hashCodesAreEqualForEquivalentMatrixEntries() {
-		// Arrange:
-		final MatrixElement matrixElement = new MatrixElement(0, 1, 2.0);
-
-		// Assert:
-		Assert.assertThat(matrixElement.hashCode(), IsEqual.equalTo(new MatrixElement(0, 1, 2.0).hashCode()));
-		Assert.assertThat(matrixElement.hashCode(), IsEqual.equalTo(new MatrixElement(0, 1, 3.0).hashCode()));
-	}
-
-	@Test
-	public void hashCodesAreNotEqualForInequivalentMatrixEntries() {
-		// Arrange:
-		final MatrixElement matrixElement = new MatrixElement(0, 1, 2.0);
-
-		// Assert:
-		Assert.assertThat(matrixElement.hashCode(), IsNot.not(IsEqual.equalTo(new MatrixElement(1, 1, 2.0).hashCode())));
-		Assert.assertThat(matrixElement.hashCode(), IsNot.not(IsEqual.equalTo(new MatrixElement(0, 0, 2.0).hashCode())));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-row").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-col").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_ELEMENT_MAP.get("diff-val").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion

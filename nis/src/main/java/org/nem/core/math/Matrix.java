@@ -127,26 +127,24 @@ public abstract class Matrix {
 	/**
 	 * Normalizes each column of the matrix.
 	 *
-	 * @return the collection of column indices for the which the column only consists of zeros.
+	 * @return The indexes of zero columns.
 	 */
 	public Collection<Integer> normalizeColumns() {
 		final double[] columnSums = this.getColumnSums(Math::abs);
 		final List<Integer> zeroColumns = new ArrayList<>();
 		for (int i=0; i<this.numCols; i++) {
-			if (columnSums[i] == 0.0) {
+			if (0 == columnSums[i]) {
 				zeroColumns.add(i);
 			}
 		}
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				final double sum = columnSums[col];
-				if (0 == sum) {
-					return;
-				}
 
-				setter.accept(value / sum);
+		this.forEach((row, col, value, setter) -> {
+			final double sum = columnSums[col];
+			if (0 == sum) {
+				return;
 			}
+
+			setter.accept(value / sum);
 		});
 
 		return zeroColumns;
@@ -156,12 +154,9 @@ public abstract class Matrix {
 	 * Sets all negative values to zero.
 	 */
 	public void removeNegatives() {
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				if (value < 0) {
-					setter.accept(0.0);
-				}
+		this.forEach((row, col, value, setter) -> {
+			if (value < 0) {
+				setter.accept(0.0);
 			}
 		});
 	}
@@ -172,12 +167,7 @@ public abstract class Matrix {
 	 * @param scale The scale factor.
 	 */
 	public final void scale(final double scale) {
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				setter.accept(value / scale);
-			}
-		});
+		this.forEach((row, col, value, setter) -> setter.accept(value / scale));
 	}
 
 	//endregion
@@ -204,16 +194,6 @@ public abstract class Matrix {
 	 */
 	public Matrix addElementWise(final Matrix matrix) {
 		return this.join(matrix, true, (l, r) -> l + r);
-	}
-	
-	/**
-	 * Creates a new matrix by adding each value in this matrix by a scalar.
-	 *
-	 * @param scalar The scalar.
-	 * @return The new matrix.
-	 */
-	public Matrix add(final double scalar) {
-		return this.transform(v -> v + scalar);
 	}
 
 	private Matrix join(final Matrix matrix, final boolean isTwoWay, final DoubleBinaryOperator op) {
@@ -319,6 +299,16 @@ public abstract class Matrix {
 	}
 
 	/**
+	 * Creates a new matrix by adding each value in this matrix by a scalar.
+	 *
+	 * @param scalar The scalar.
+	 * @return The new matrix.
+	 */
+	public Matrix add(final double scalar) {
+		return this.transform(v -> v + scalar);
+	}
+
+	/**
 	 * Creates a new matrix by taking the absolute value of this matrix.
 	 *
 	 * @return The new matrix.
@@ -409,12 +399,7 @@ public abstract class Matrix {
 	 * @param func The function.
 	 */
 	public void forEach(final ReadOnlyElementVisitorFunction func) {
-		this.forEach(new ElementVisitorFunction() {
-			@Override
-			public void visit(final int row, final int col, final double value, final DoubleConsumer setter) {
-				func.visit(row, col, value);
-			}
-		});
+		this.forEach((row, col, value, setter) -> func.visit(row, col, value));
 	}
 
 	/**

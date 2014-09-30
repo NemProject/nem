@@ -2,7 +2,9 @@ package org.nem.core.math;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
+
+import java.util.*;
 
 public abstract class MatrixTest<TMatrix extends Matrix> {
 
@@ -214,10 +216,11 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 11, 3, 1, 5, 8 });
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0.2, 0.55, 0.3, 0.05, 0.5, 0.4 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList()));
 	}
 
 	@Test
@@ -226,10 +229,11 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(2, 3);
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 0, 0, 0, 0, 0, 0 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 	}
 
 	@Test
@@ -238,10 +242,11 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		final Matrix matrix = this.createMatrix(2, 3, new double[] { 2, 0, 0, 0, -2, 0 });
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(matrix, IsEqual.equalTo(this.createMatrix(2, 3, new double[] { 1, 0, 0, 0, -1, 0 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(2)));
 	}
 
 	@Test
@@ -252,12 +257,13 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		matrix.setAt(2, 1, 12);
 
 		// Act:
-		matrix.normalizeColumns();
+		final Collection<Integer> zeroColumnIndexes = matrix.normalizeColumns();
 
 		// Assert:
 		Assert.assertThat(
 				matrix,
 				IsEqual.equalTo(this.createMatrix(4, 2, new double[] { 0, 0.25, 0, 0, 0, 0.75, 0, 0 })));
+		Assert.assertThat(zeroColumnIndexes, IsEqual.equalTo(Arrays.asList(0)));
 	}
 
 	//endregion
@@ -417,7 +423,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 	//region add
 
 	@Test
-	public void denseMatrixCanBeAddedToByScalar() {
+	public void matrixCanBeAddedToByScalar() {
 		// Arrange:
 		final Matrix matrix = this.createMatrix(3, 2, new double[] { 2, 3, 5, 11, 1, 8 });
 
