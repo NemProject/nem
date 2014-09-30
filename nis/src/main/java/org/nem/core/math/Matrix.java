@@ -475,9 +475,10 @@ public abstract class Matrix {
 	}
 
 	/**
-	 * Get the non-zero matrix row element iterator for a given row index.
+	 * Gets the non-zero matrix row element iterator for a given row index.
 	 *
 	 * @param row The row index.
+	 * @return The iterator.
 	 */
 	public abstract MatrixNonZeroElementRowIterator getNonZeroElementRowIterator(final int row);
 

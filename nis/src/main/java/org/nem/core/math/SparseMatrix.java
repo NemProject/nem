@@ -60,9 +60,10 @@ public class SparseMatrix extends Matrix {
 		return 0.0;
 	}
 
-	// This version keeps the columns sorted in ascending order (needed for SparseBitmap in NodeNeighborhoodMap ctor)
 	@Override
 	protected final void setAtUnchecked(final int row, final int col, final double val) {
+		// keep the columns sorted in ascending order (needed for SparseBitmap in NodeNeighborhoodMap ctor)
+
 		if (val == 0.0) {
 			for (int i = 0; i < this.maxIndices[row]; ++i) {
 				if (this.cols[row][i] == col) {
