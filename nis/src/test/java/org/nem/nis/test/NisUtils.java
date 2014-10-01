@@ -187,11 +187,11 @@ public class NisUtils {
 	 * Converts an array of integers to an array of node ids.
 	 *
 	 * @param ids The integer array.
-	 * @return The node id array
+	 * @return The node id array.
 	 */
-	public static NodeId[] toNodeIdArray(int... ids) {
-		NodeId[] nodeIds = new NodeId[ids.length];
-		for (int i = 0; i < ids.length; i++) {
+	public static NodeId[] toNodeIdArray(final int... ids) {
+		final NodeId[] nodeIds = new NodeId[ids.length];
+		for (int i = 0; i < ids.length; ++i) {
 			nodeIds[i] = new NodeId(ids[i]);
 		}
 
@@ -202,9 +202,9 @@ public class NisUtils {
 	 * Converts an array of integers to a list of node ids.
 	 *
 	 * @param ids The integer array.
-	 * @return The node id list
+	 * @return The node id list.
 	 */
-	public static List<NodeId> toNodeIdList(int... ids) {
+	public static List<NodeId> toNodeIdList(final int... ids) {
 		return Arrays.asList(NisUtils.toNodeIdArray(ids));
 	}
 }
