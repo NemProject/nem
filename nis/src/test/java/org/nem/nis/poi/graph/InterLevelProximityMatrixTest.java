@@ -176,7 +176,7 @@ public class InterLevelProximityMatrixTest {
 	}
 
 	/**
-	 * <pre></pre>
+	 * <pre>
 	 * Graph:         0----o1----o2
 	 *                o           |
 	 *                |           o
