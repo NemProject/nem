@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dao.*;
+import org.nem.nis.poi.graph.NodeNeighbors;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.validators.*;
 
@@ -206,5 +207,15 @@ public class NisUtils {
 	 */
 	public static List<NodeId> toNodeIdList(final int... ids) {
 		return Arrays.asList(NisUtils.toNodeIdArray(ids));
+	}
+
+	/**
+	 * Converts an array of integers into a NodeNeighbors object.
+	 *
+	 * @param ids The integer array.
+	 * @return The node neighbors.
+	 */
+	public static NodeNeighbors createNeighbors(final int... ids) {
+		return new NodeNeighbors(NisUtils.toNodeIdArray(ids));
 	}
 }

@@ -15,13 +15,13 @@ public class NodeNeighborsTest {
 	@Test
 	public void canCreateNodeNeighborsFromAscendingIds() {
 		// Assert:
-		createTestNodeNeighbors(2, 3, 12);
+		NisUtils.createNeighbors(2, 3, 12);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotCreateNodeNeighborsFromAscendingIds() {
 		// Assert:
-		createTestNodeNeighbors(2, 12, 3);
+		NisUtils.createNeighbors(2, 12, 3);
 	}
 
 	// endregion
@@ -31,7 +31,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void canAddNeighborsInAscendingNodeIdOrder() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 
 		// Act:
 		nodeNeighbors.addNeighbor(new NodeId(15));
@@ -45,7 +45,7 @@ public class NodeNeighborsTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotAddNeighborsInNonAscendingNodeIdOrder() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(1, 2);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(1, 2);
 
 		// Act:
 		nodeNeighbors.addNeighbor(new NodeId(6));
@@ -57,7 +57,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void sizeReturnsTheCorrectSize() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 
 		// Assert:
 		Assert.assertThat(nodeNeighbors.size(), IsEqual.equalTo(3));
@@ -66,7 +66,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void canRemoveAllNeighbors() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 
 		// Act:
 		nodeNeighbors.removeAll();
@@ -78,7 +78,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void containsReturnsTrueIfNodeIdIsContained() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 
 		// Assert:
 		assertNodeNeighborsContain(nodeNeighbors, 2, 3, 6);
@@ -87,7 +87,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void containsReturnsFalseIfNodeIdIsNotContained() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 
 		// Assert:
 		assertNodeNeighborsDoNotContain(nodeNeighbors, 4, 5, 9, 15);
@@ -96,8 +96,8 @@ public class NodeNeighborsTest {
 	@Test
 	public void commonNeighborsSizeReturnsCorrectSize() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
-		NodeNeighbors otherNodeNeighbors = createTestNodeNeighbors(3, 6, 11);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
+		NodeNeighbors otherNodeNeighbors = NisUtils.createNeighbors(3, 6, 11);
 
 		// Assert:
 		Assert.assertThat(nodeNeighbors.commonNeighborsSize(otherNodeNeighbors), IsEqual.equalTo(2));
@@ -108,7 +108,7 @@ public class NodeNeighborsTest {
 		// Arrange:
 		NodeNeighbors nodeNeighbors = Mockito.mock(NodeNeighbors.class);
 		NodeNeighbors otherNodeNeighbors = Mockito.mock(NodeNeighbors.class);
-		Mockito.when(nodeNeighbors.union(new NodeNeighbors[] { otherNodeNeighbors })).thenReturn(createTestNodeNeighbors());
+		Mockito.when(nodeNeighbors.union(new NodeNeighbors[] { otherNodeNeighbors })).thenReturn(NisUtils.createNeighbors());
 		Mockito.when(nodeNeighbors.union(otherNodeNeighbors)).thenCallRealMethod();
 
 		// Act:
@@ -121,36 +121,36 @@ public class NodeNeighborsTest {
 	@Test
 	public void unionWithNodeNeighborsArrayReturnsCorrectResult() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors1 = createTestNodeNeighbors(2, 3, 6);
-		NodeNeighbors nodeNeighbors2 = createTestNodeNeighbors(3, 6, 11);
-		NodeNeighbors nodeNeighbors3 = createTestNodeNeighbors(1);
-		NodeNeighbors nodeNeighbors4 = createTestNodeNeighbors();
-		NodeNeighbors nodeNeighbors5 = createTestNodeNeighbors(29, 30);
+		NodeNeighbors nodeNeighbors1 = NisUtils.createNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors2 = NisUtils.createNeighbors(3, 6, 11);
+		NodeNeighbors nodeNeighbors3 = NisUtils.createNeighbors(1);
+		NodeNeighbors nodeNeighbors4 = NisUtils.createNeighbors();
+		NodeNeighbors nodeNeighbors5 = NisUtils.createNeighbors(29, 30);
 
 		// Act:
 		NodeNeighbors result = nodeNeighbors1.union(new NodeNeighbors[] { nodeNeighbors2, nodeNeighbors3, nodeNeighbors4, nodeNeighbors5 });
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(createTestNodeNeighbors(1, 2, 3, 6, 11, 29, 30)));
+		Assert.assertThat(result, IsEqual.equalTo(NisUtils.createNeighbors(1, 2, 3, 6, 11, 29, 30)));
 	}
 
 	@Test
 	public void differenceWithOtherNodeNeighborsReturnsCorrectResult() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
-		NodeNeighbors otherNodeNeighbors = createTestNodeNeighbors(3, 6, 11);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
+		NodeNeighbors otherNodeNeighbors = NisUtils.createNeighbors(3, 6, 11);
 
 		// Act:
 		NodeNeighbors result = nodeNeighbors.difference(otherNodeNeighbors);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(createTestNodeNeighbors(2)));
+		Assert.assertThat(result, IsEqual.equalTo(NisUtils.createNeighbors(2)));
 	}
 
 	@Test
 	public void toListReturnsListOfNodeIds() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 
 		// Act:
 		List<NodeId> result = nodeNeighbors.toList();
@@ -164,7 +164,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void iteratorHasNextReturnsTrueIfMoreNodeIdsAreAvailable() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 		Iterator<NodeId> iterator = nodeNeighbors.iterator();
 
 		// Assert:
@@ -178,7 +178,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void iteratorHasNextReturnsFalseIfNoMoreNodeIdsAreAvailable() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 		Iterator<NodeId> iterator = nodeNeighbors.iterator();
 
 		// Act:
@@ -193,7 +193,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void iteratorHasNextReturnsFalseForEmptyNodeNeighbors() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors();
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors();
 		Iterator<NodeId> iterator = nodeNeighbors.iterator();
 
 		// Assert:
@@ -203,7 +203,7 @@ public class NodeNeighborsTest {
 	@Test
 	public void iteratorIteratesThroughNodeNeighborsNodeIdsInAscendingOrder() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors = createTestNodeNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors = NisUtils.createNeighbors(2, 3, 6);
 		Iterator<NodeId> iterator = nodeNeighbors.iterator();
 
 		// Assert:
@@ -218,10 +218,10 @@ public class NodeNeighborsTest {
 
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
-		NodeNeighbors nodeNeighbors1 = createTestNodeNeighbors(2, 3, 6);
-		NodeNeighbors nodeNeighbors2 = createTestNodeNeighbors(2, 3, 6);
-		NodeNeighbors nodeNeighbors3 = createTestNodeNeighbors(1, 3, 6);
-		NodeNeighbors nodeNeighbors4 = createTestNodeNeighbors();
+		NodeNeighbors nodeNeighbors1 = NisUtils.createNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors2 = NisUtils.createNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors3 = NisUtils.createNeighbors(1, 3, 6);
+		NodeNeighbors nodeNeighbors4 = NisUtils.createNeighbors();
 
 		// Assert:
 		Assert.assertThat(nodeNeighbors1.hashCode(), IsEqual.equalTo(nodeNeighbors2.hashCode()));
@@ -233,10 +233,10 @@ public class NodeNeighborsTest {
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		NodeNeighbors nodeNeighbors1 = createTestNodeNeighbors(2, 3, 6);
-		NodeNeighbors nodeNeighbors2 = createTestNodeNeighbors(2, 3, 6);
-		NodeNeighbors nodeNeighbors3 = createTestNodeNeighbors(1, 3, 6);
-		NodeNeighbors nodeNeighbors4 = createTestNodeNeighbors();
+		NodeNeighbors nodeNeighbors1 = NisUtils.createNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors2 = NisUtils.createNeighbors(2, 3, 6);
+		NodeNeighbors nodeNeighbors3 = NisUtils.createNeighbors(1, 3, 6);
+		NodeNeighbors nodeNeighbors4 = NisUtils.createNeighbors();
 
 		// Assert:
 		Assert.assertThat(nodeNeighbors1, IsEqual.equalTo(nodeNeighbors2));
@@ -257,9 +257,5 @@ public class NodeNeighborsTest {
 		for (int id : ids) {
 			Assert.assertThat(nodeNeighbors.contains(new NodeId(id)), IsEqual.equalTo(false));
 		}
-	}
-
-	private NodeNeighbors createTestNodeNeighbors(int... ids) {
-		return new NodeNeighbors(NisUtils.toNodeIdArray(ids));
 	}
 }

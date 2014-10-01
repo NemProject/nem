@@ -12,8 +12,8 @@ public class DefaultSimilarityStrategyTest {
 	public void similarityScoreIsCalculatedCorrectlyWhenNodesHaveNoNeighbors() {
 		// Arrange:
 		final NodeNeighborMap neighborMap = Mockito.mock(NodeNeighborMap.class);
-		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(2)));
-		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(5)));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors(5));
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(neighborMap);
 
 		// Assert:
@@ -25,8 +25,8 @@ public class DefaultSimilarityStrategyTest {
 	public void similarityScoreIsCalculatedCorrectlyWhenNodesHaveNoCommonNeighbors() {
 		// Arrange:
 		final NodeNeighborMap neighborMap = Mockito.mock(NodeNeighborMap.class);
-		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(1, 2, 3)));
-		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(4, 5, 6)));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(1, 2, 3));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors(4, 5, 6));
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(neighborMap);
 
 		// Assert:
@@ -38,8 +38,8 @@ public class DefaultSimilarityStrategyTest {
 	public void similarityScoreIsCalculatedCorrectlyWhenNodesHaveCommonNeighbors() {
 		// Arrange:
 		final NodeNeighborMap neighborMap = Mockito.mock(NodeNeighborMap.class);
-		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(0, 1, 2, 3, 4)));
-		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(3, 4, 5, 6)));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(0, 1, 2, 3, 4));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors(3, 4, 5, 6));
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(neighborMap);
 
 		// Assert:
@@ -52,8 +52,8 @@ public class DefaultSimilarityStrategyTest {
 	public void similarityScoreIsCalculatedCorrectlyWhenNodesHaveCommonNeighborsAndBothPivotsAreInNeighborSet() {
 		// Arrange:
 		final NodeNeighborMap neighborMap = Mockito.mock(NodeNeighborMap.class);
-		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(1, 2, 3, 4, 5)));
-		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(new NodeNeighbors(NisUtils.toNodeIdArray(2, 3, 4, 5, 6)));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(1, 2, 3, 4, 5));
+		Mockito.when(neighborMap.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors(2, 3, 4, 5, 6));
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(neighborMap);
 
 		// Assert:
