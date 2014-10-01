@@ -6,7 +6,6 @@ import java.util.*;
 
 /**
  * A cluster represents a set of nodes that share certain similarity (i.e. are closely connected).
- *
  * TODO 20140930 J-M: should this class include the id (center) as a member?
  */
 public class Cluster {

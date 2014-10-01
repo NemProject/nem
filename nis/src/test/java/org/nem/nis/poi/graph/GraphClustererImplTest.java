@@ -21,12 +21,12 @@ public class GraphClustererImplTest {
 			networkWithTwoSimilarConnectedNodesCanBeClustered(clusteringStrategy);
 		}
 	}
-	
+
 	public void networkWithTwoSimilarConnectedNodesCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
 		final TestContext context = new TestContext(clusteringStrategy, 2);
-		context.setNeighborIds(0, Arrays.asList(0,1));
-		context.setNeighborIds(1, Arrays.asList(0,1));
+		context.setNeighborIds(0, Arrays.asList(0, 1));
+		context.setNeighborIds(1, Arrays.asList(0, 1));
 		context.makeAllSimilar();
 
 		// Act:
@@ -49,11 +49,11 @@ public class GraphClustererImplTest {
 			networkWithTwoDissimilarConnectedNodesCanBeClustered(clusteringStrategy);
 		}
 	}
-	
+
 	public void networkWithTwoDissimilarConnectedNodesCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
 		final TestContext context = new TestContext(clusteringStrategy, 2);
-		context.setNeighborIds(0, Arrays.asList(0,1));
+		context.setNeighborIds(0, Arrays.asList(0, 1));
 		context.setNeighborIds(1, Arrays.asList(1));
 
 		// Act:
@@ -76,7 +76,7 @@ public class GraphClustererImplTest {
 			fullyConnectedNetworkResultsInSingleCluster(clusteringStrategy);
 		}
 	}
-	
+
 	public void fullyConnectedNetworkResultsInSingleCluster(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
 		final TestContext context = new TestContext(clusteringStrategy, 5);
@@ -106,7 +106,7 @@ public class GraphClustererImplTest {
 			networkWithTwoClustersAndDissimilarHubCanBeClustered(clusteringStrategy);
 		}
 	}
-	
+
 	public void networkWithTwoClustersAndDissimilarHubCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is the hub
 		final TestContext context = new TestContext(clusteringStrategy, 7);
@@ -143,7 +143,7 @@ public class GraphClustererImplTest {
 			networkWithTwoClustersAndPartiallyDissimilarHubCanBeClustered(clusteringStrategy);
 		}
 	}
-	
+
 	public void networkWithTwoClustersAndPartiallyDissimilarHubCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
 		// TODO: not sure if this test can actually happen (where there is a uni-directional edge)
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is the hub
@@ -181,7 +181,7 @@ public class GraphClustererImplTest {
 			networkWithTwoClustersAndOutlierCanBeClustered(clusteringStrategy);
 		}
 	}
-	
+
 	public void networkWithTwoClustersAndOutlierCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is an outlier
 		final TestContext context = new TestContext(clusteringStrategy, 7);
@@ -217,7 +217,7 @@ public class GraphClustererImplTest {
 			isolatedNodeIsDetectedAsAnOutlier(clusteringStrategy);
 		}
 	}
-	
+
 	public void isolatedNodeIsDetectedAsAnOutlier(final GraphClusteringStrategy clusterer) {
 		// Arrange: { 0, 1, 2, 3 } form clusters; 4 is an isolated outlier
 		final TestContext context = new TestContext(clusterer, 5);
@@ -249,7 +249,7 @@ public class GraphClustererImplTest {
 			dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlier(clusteringStrategy);
 		}
 	}
-	
+
 	public void dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlier(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange: { 0, 1, 2, 3 } form clusters; 4 is an outlier connected to the cluster
 		final TestContext context = new TestContext(clusteringStrategy, 5);
@@ -282,7 +282,7 @@ public class GraphClustererImplTest {
 			nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlier(clusteringStrategy);
 		}
 	}
-	
+
 	public void nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlier(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange: { 0, 1, 2, 3 } form clusters;
 		// 4 is an outlier connected to the cluster
@@ -317,15 +317,17 @@ public class GraphClustererImplTest {
 
 	// TODO: Maybe the following tests are better off in the integration tests
 	//       since they involve calculations in more than one class.
+
 	/**
+	 * <pre>
 	 * First Graph: 0 --- 1
 	 *              | \   |
 	 *              |   \ |
 	 *              3 --- 2
-	 *        
+	 * <br/>
 	 * Similarities:
 	 *        sim(0,1) = (1+1+1)/sqrt(4*3) = sqrt(3/4)
-	 *                 = sim(1,0) 
+	 *                 = sim(1,0)
 	 *                 = sim(0,3) = sim(3,0)
 	 *                 = sim(2,3) = sim(3,2)
 	 *                 = sim(1,2) = sim(2,1) > EPSILON
@@ -333,23 +335,23 @@ public class GraphClustererImplTest {
 	 *                 = sim(2,0) > EPSILON
 	 *        sim(1,3) = (2+0+0)/sqrt(3*3) = 2/3
 	 *                 = sim(3,1) < EPSILON
-	 *                 
+	 * <br/>
 	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
 	 *        com(0) = (0, {1,2,3}, {})
 	 *        com(1) = (1, {0,2}, {})
 	 *        com(2) = (2, {0,1,3}, {})
 	 *        com(3) = (3, {0,2}, {})
-	 *        
+	 * <br/>
 	 * Expected: cluster {0, 1, 2, 3}, no hubs, no outliers
-	 *        
+	 * <br/>
 	 * First Graph: 0 --- 1 (essentially the same graph but we start scanning from a different node)
 	 * (isomorphic) |   / |
 	 *              | /   |
 	 *              3 --- 2
-	 *        
+	 * <br/>
 	 * Similarities:
 	 *        sim(0,1) = (1+1+1)/sqrt(3*4) = sqrt(3/4)
-	 *                 = sim(1,0) 
+	 *                 = sim(1,0)
 	 *                 = sim(0,3) = sim(3,0)
 	 *                 = sim(2,3) = sim(3,2)
 	 *                 = sim(1,2) = sim(2,1) > EPSILON
@@ -357,14 +359,15 @@ public class GraphClustererImplTest {
 	 *                 = sim(2,0) < EPSILON
 	 *        sim(1,3) = (2+1+1)/sqrt(4*4) = 1
 	 *                 = sim(3,1) > EPSILON
-	 *                 
+	 * <br/>
 	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
 	 *        com(0) = (0, {1,3}, {})
 	 *        com(1) = (1, {0,2,3}, {})
 	 *        com(2) = (2, {1,3}, {})
 	 *        com(3) = (3, {0,1,2}, {})
-	 *        
+	 * <br/>
 	 * Expected: cluster {0, 1, 2, 3}, no hubs, no outliers
+	 * </pre>
 	 */
 	@Test
 	public void firstGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -377,7 +380,7 @@ public class GraphClustererImplTest {
 	public void firstGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
 		// Using dense matrix for easier debugging
-		final DenseMatrix outlinkMatrix = new DenseMatrix(4,4);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(4, 4);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(2, 0, 1);
 		outlinkMatrix.setAt(3, 0, 1);
@@ -392,7 +395,7 @@ public class GraphClustererImplTest {
 		// Act:
 		ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-	
+
 		// Assert:
 		List<Cluster> expectedClusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
@@ -400,8 +403,8 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
 		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
-		
-		final DenseMatrix outlinkMatrix2 = new DenseMatrix(4,4);
+
+		final DenseMatrix outlinkMatrix2 = new DenseMatrix(4, 4);
 		outlinkMatrix2.setAt(1, 0, 1);
 		outlinkMatrix2.setAt(3, 0, 1);
 		outlinkMatrix2.setAt(0, 1, 1);
@@ -425,8 +428,9 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
 		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
 	}
-	
+
 	/**
+	 * <pre>
 	 *                   _____                         1-----2--3
 	 *                 /      \                         \    | /|\
 	 * Second graph:  0----1   5   is equivalent to      \   |/ | \
@@ -434,7 +438,7 @@ public class GraphClustererImplTest {
 	 *                | \    2  /                          \ | /   |
 	 *                |  \  /  /                            \|/    |
 	 *                4----3--/                              0-----4
-	 * 
+	 * <br/>
 	 * Similarities:
 	 *        sim(0,1) = (0+1+1)/sqrt(5*3) = 2/sqrt(15)
 	 *                 = sim(1,0) < EPSILON
@@ -454,7 +458,7 @@ public class GraphClustererImplTest {
 	 *                 = sim(4,3) > EPSILON
 	 *        sim(3,5) = (2+1+1)/sqrt(5*4) = 4/sqrt(20)
 	 *                 = sim(5,3) > EPSILON
-	 *        
+	 * <br/>
 	 * Communities in form (node id, similar neighbors, dissimilar neighbors):
 	 *         com(0) = (0, {3,4}, {1,5})
 	 *         com(1) = (1, {}, {0,2})
@@ -462,8 +466,9 @@ public class GraphClustererImplTest {
 	 *         com(3) = (3, {0,4,5}, {2})
 	 *         com(4) = (4, {0,3}, {})
 	 *         com(5) = (5, {2,3}, {0})
-	 *     
+	 * <br/>
 	 * Expected: cluster {0,2,3,4,5}, no hubs, one outlier {1}
+	 * </pre>
 	 */
 	@Test
 	public void secondGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -476,7 +481,7 @@ public class GraphClustererImplTest {
 	public void secondGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
 		// Using dense matrix for easier debugging
-		final DenseMatrix outlinkMatrix = new DenseMatrix(6,6);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(6, 6);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(3, 0, 1);
 		outlinkMatrix.setAt(4, 0, 1);
@@ -499,7 +504,7 @@ public class GraphClustererImplTest {
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-		
+
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 3, 4, 5)));
@@ -510,8 +515,9 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
-	
+
 	/**
+	 * <pre>
 	 * Graph:         0
 	 *               / \
 	 *              /   \
@@ -522,8 +528,9 @@ public class GraphClustererImplTest {
 	 *                  / \
 	 *                 /   \
 	 *                4-----5
-	 *                
+	 * <br/>
 	 * Expected: clusters {0,1,2} and {3,4,5}, no hubs, one outlier {6}
+	 * </pre>
 	 */
 	@Test
 	public void thirdGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -537,7 +544,7 @@ public class GraphClustererImplTest {
 		// Arrange:
 		// This is the example used in the paper:
 		// NCDawareRank: a novel ranking method that exploits the decomposable structure of the web
-		final DenseMatrix outlinkMatrix = new DenseMatrix(7,7);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(7, 7);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(2, 0, 1);
 		outlinkMatrix.setAt(0, 1, 1);
@@ -558,7 +565,7 @@ public class GraphClustererImplTest {
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-		
+
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)),
@@ -570,8 +577,9 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
-	
+
 	/**
+	 * <pre>
 	 * Graph:         0
 	 *               / \
 	 *              /   \
@@ -585,8 +593,9 @@ public class GraphClustererImplTest {
 	 *                  / \
 	 *                 /   \
 	 *                5-----6
-	 *                
+	 * <br/>
 	 * Expected: clusters {0,1,2} and {4,5,6}, one hub {3}, one outlier {7}
+	 * </pre>
 	 */
 	@Test
 	public void forthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -598,7 +607,7 @@ public class GraphClustererImplTest {
 
 	public void forthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(8,8);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(8, 8);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(2, 0, 1);
 		outlinkMatrix.setAt(0, 1, 1);
@@ -617,13 +626,13 @@ public class GraphClustererImplTest {
 		outlinkMatrix.setAt(4, 6, 1);
 		outlinkMatrix.setAt(5, 6, 1);
 		outlinkMatrix.setAt(2, 7, 1);
-		
+
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-		
+
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-		
+
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)),
@@ -637,19 +646,21 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
-	
+
 	/**
+	 * <pre>
 	 * Graph:      0-----1
 	 *             |     |
 	 *             |     |
 	 *             3-----2
-
+	 * <br/>
 	 *                4
 	 *                |
 	 *                |
 	 *                5-----6
-	 *                
+	 * <br/>
 	 * Expected: clusters {0,1,2} and {4,5,6}
+	 * </pre>
 	 */
 	@Test
 	public void fifthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -661,21 +672,21 @@ public class GraphClustererImplTest {
 
 	public void fifthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(7,7);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(7, 7);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(2, 1, 1);
 		outlinkMatrix.setAt(3, 2, 1);
 		outlinkMatrix.setAt(0, 3, 1);
-		
+
 		outlinkMatrix.setAt(5, 4, 1);
 		outlinkMatrix.setAt(6, 5, 1);
-		
+
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-		
+
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-		
+
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)),
@@ -687,17 +698,19 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
-	
+
 	/**
+	 * <pre>
 	 * Graph:      0
 	 *            /|\
 	 *           / | \
 	 *          /  |  \
 	 *         1   2   3
-	 *                
+	 * <br/>
 	 * Expected: clusters: {0,1,2,3}
 	 *           hubs    : none
 	 *           outliers: none
+	 * </pre>
 	 */
 	@Test
 	public void sixthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -709,19 +722,19 @@ public class GraphClustererImplTest {
 
 	public void sixthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(4,4);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(4, 4);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(2, 0, 1);
 		outlinkMatrix.setAt(3, 0, 1);
-		
+
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-		
+
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-		
+
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0,1,2,3)));
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
 		final List<Cluster> expectedHubs = Arrays.asList();
 		final List<Cluster> expectedOutliers = Arrays.asList();
 
@@ -729,13 +742,14 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
-	
+
 	/**
-	 * Graph:      0---1---2---3---4---5 
-	 *                
+	 * <pre>
+	 * Graph:      0---1---2---3---4---5
+	 * </pre>
 	 * Expected: clusters: {0,1,2,3,4,5}
-	 *           hubs    : none
-	 *           outliers: none
+	 * hubs    : none
+	 * outliers: none
 	 */
 	@Test
 	public void seventhGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -747,21 +761,21 @@ public class GraphClustererImplTest {
 
 	public void seventhGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(6,6);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(6, 6);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(2, 1, 1);
 		outlinkMatrix.setAt(3, 2, 1);
 		outlinkMatrix.setAt(4, 3, 1);
 		outlinkMatrix.setAt(5, 4, 1);
-		
+
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-		
+
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-		
+
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0,1,2,3,4,5)));
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
 		final List<Cluster> expectedHubs = Arrays.asList();
 		final List<Cluster> expectedOutliers = Arrays.asList();
 
@@ -769,13 +783,14 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
-	
+
 	/**
+	 * <pre>
 	 * Graph:      0---1---2---3---4
-	 *                
+	 * </pre>
 	 * Expected: clusters: {0,1,2,3,4}
-	 *           hubs    : none
-	 *           outliers: none
+	 * hubs    : none
+	 * outliers: none
 	 */
 	@Test
 	public void eighthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
@@ -787,20 +802,20 @@ public class GraphClustererImplTest {
 
 	public void eighthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(5,5);
+		final DenseMatrix outlinkMatrix = new DenseMatrix(5, 5);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(2, 1, 1);
 		outlinkMatrix.setAt(3, 2, 1);
 		outlinkMatrix.setAt(4, 3, 1);
-		
+
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-		
+
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
 		logClusteringResult(result);
-		
+
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0,1,2,3,4)));
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
 		final List<Cluster> expectedHubs = Arrays.asList();
 		final List<Cluster> expectedOutliers = Arrays.asList();
 
@@ -808,7 +823,7 @@ public class GraphClustererImplTest {
 		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
-	
+
 	private ClusteringResult calculateClusteringResult(final GraphClusteringStrategy graphClusteringStrategy, final Matrix outlinkMatrix) {
 		final NodeNeighborMap nodeNeighbordMap = new NodeNeighborMap(outlinkMatrix);
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighbordMap);
@@ -816,10 +831,10 @@ public class GraphClustererImplTest {
 		final ClusteringResult result = graphClusteringStrategy.cluster(neighborhood);
 		return result;
 	}
-	
+
 	/**
 	 * Log result of clustering.
-	 * 
+	 *
 	 * @param result The clustering result.
 	 */
 	private void logClusteringResult(final ClusteringResult result) {
@@ -830,20 +845,20 @@ public class GraphClustererImplTest {
 		LOGGER.info("Outliers:");
 		result.getOutliers().stream().forEach(c -> LOGGER.info(c.toString()));
 	}
-	
+
 	/**
 	 * Returns a list of all graph clustering strategies to be tested.
-	 * 
+	 *
 	 * @return The list of graph clustering strategies..
 	 */
 	private List<GraphClusteringStrategy> getClusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = new ArrayList<>();
 		clusteringStrategies.add(new Scan());
 		clusteringStrategies.add(new FastScan());
-		
+
 		return clusteringStrategies;
 	}
-	
+
 	private static class TestContext {
 		private final NeighborhoodRepository repository = Mockito.mock(NodeNeighborMap.class);
 		private final SimilarityStrategy similarityStrategy = Mockito.mock(SimilarityStrategy.class);

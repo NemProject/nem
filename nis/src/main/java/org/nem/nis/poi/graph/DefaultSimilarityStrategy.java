@@ -23,7 +23,7 @@ public class DefaultSimilarityStrategy implements SimilarityStrategy {
 		// the sqrt of the product of the numbers of neighbors for each node.
 		// Pivots are included in the calculation.
 
- 		final NodeNeighbors lhsNeighbors = this.neighborMap.getNeighbors(lhs);
+		final NodeNeighbors lhsNeighbors = this.neighborMap.getNeighbors(lhs);
 		final NodeNeighbors rhsNeighbors = this.neighborMap.getNeighbors(rhs);
 
 		final int lhsNeighborsSize = lhsNeighbors.size();

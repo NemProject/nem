@@ -24,7 +24,7 @@ public class InterLevelProximityMatrixTest {
 	final static int GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER = 9;
 	final static int GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER = 10;
 	final static int GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS = 11;
-	
+
 	private static final int UNIQUE_CLUSTER_SCAN = 0;
 	private static final int OUTLIER_SCAN = 1;
 	private static final int SCAN = 2;
@@ -33,16 +33,17 @@ public class InterLevelProximityMatrixTest {
 	private static final List<GraphClusteringStrategy> clusteringStrategies = Arrays.asList(
 			new UniqueClusterScan(),
 			new OutlierScan(),
-			new Scan(), 
+			new Scan(),
 			new FastScan());
-	
+
 	/**
 	 * Graph interpretation: i----oj means i has directed edge to j
 	 */
-	
+
 	/**
+	 * <pre>
 	 * Graph:         0
-	 * 
+	 * </pre>
 	 * Clusters: none
 	 * Hubs: none
 	 * Outliers: {0}
@@ -51,14 +52,14 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithSingleNode() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_SINGLE_NODE, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(1,1,1);
+		final SparseMatrix a = new SparseMatrix(1, 1, 1);
 		a.setAt(0, 0, 1.0);
-		final SparseMatrix r = new SparseMatrix(1,1,1);
+		final SparseMatrix r = new SparseMatrix(1, 1, 1);
 		r.setAt(0, 0, 1.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
@@ -66,8 +67,9 @@ public class InterLevelProximityMatrixTest {
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0     1
-	 * 
+	 * </pre>
 	 * Clusters: none
 	 * Hubs: none
 	 * Outliers: {0}, {1}
@@ -76,15 +78,15 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoUnconnectedNodes() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_TWO_UNCONNECTED_NODES, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(2,2,2);
+		final SparseMatrix a = new SparseMatrix(2, 2, 2);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 1, 1.0);
-		final SparseMatrix r = new SparseMatrix(2,2,2);
+		final SparseMatrix r = new SparseMatrix(2, 2, 2);
 		r.setAt(0, 0, 1.0);
 		r.setAt(1, 1, 1.0);
 
@@ -93,8 +95,9 @@ public class InterLevelProximityMatrixTest {
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0----o1
-	 * 
+	 * </pre>
 	 * Clusters: none
 	 * Hubs: none
 	 * Outliers: {0}, {1}
@@ -103,17 +106,17 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoConnectedNodes() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_TWO_CONNECTED_NODES, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(2,2,2);
+		final SparseMatrix a = new SparseMatrix(2, 2, 2);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 1, 1.0);
-		final SparseMatrix r = new SparseMatrix(2,2,2);
-		r.setAt(0, 0, 1.0/2.0);
-		r.setAt(1, 0, 1.0/2.0);
+		final SparseMatrix r = new SparseMatrix(2, 2, 2);
+		r.setAt(0, 0, 1.0 / 2.0);
+		r.setAt(1, 0, 1.0 / 2.0);
 		r.setAt(1, 1, 1.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
@@ -121,8 +124,9 @@ public class InterLevelProximityMatrixTest {
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0----o1----o2----o3----o4
-	 * 
+	 * </pre>
 	 * Clusters: {1,2,3}
 	 * Hubs: none
 	 * Outliers: {0,4}
@@ -131,52 +135,53 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithLineStructure() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_LINE_STRUCTURE, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		LOGGER.info(interLevel.toString());		
+		LOGGER.info(interLevel.toString());
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(5,1,4);
+		final SparseMatrix a = new SparseMatrix(5, 1, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
 		a.setAt(3, 0, 1.0);
 		a.setAt(4, 0, 1.0);
-		
-		final SparseMatrix r = new SparseMatrix(1,5,6);
-		r.setAt(0, 0, 1.0/5.0);
-		r.setAt(0, 1, 1.0/5.0);
-		r.setAt(0, 2, 1.0/5.0);
-		r.setAt(0, 3, 1.0/5.0);
-		r.setAt(0, 4, 1.0/5.0);
-		
-//		final SparseMatrix a = new SparseMatrix(5,5,4);
-//		a.setAt(0, 0, 1.0);
-//		a.setAt(1, 1, 1.0);
-//		a.setAt(2, 2, 1.0);
-//		a.setAt(3, 3, 1.0);
-//		a.setAt(4, 4, 1.0);
-//		final SparseMatrix r = new SparseMatrix(5,5,6);
-//		r.setAt(0, 0, 1.0/2.0);
-//		r.setAt(1, 0, 1.0/2.0);
-//		r.setAt(1, 1, 1.0/2.0);
-//		r.setAt(2, 1, 1.0/2.0);
-//		r.setAt(2, 2, 1.0/2.0);
-//		r.setAt(3, 2, 1.0/2.0);
-//		r.setAt(3, 3, 1.0/2.0);
-//		r.setAt(4, 3, 1.0/2.0);
-//		r.setAt(4, 4, 1.0);
+
+		final SparseMatrix r = new SparseMatrix(1, 5, 6);
+		r.setAt(0, 0, 1.0 / 5.0);
+		r.setAt(0, 1, 1.0 / 5.0);
+		r.setAt(0, 2, 1.0 / 5.0);
+		r.setAt(0, 3, 1.0 / 5.0);
+		r.setAt(0, 4, 1.0 / 5.0);
+
+		//		final SparseMatrix a = new SparseMatrix(5,5,4);
+		//		a.setAt(0, 0, 1.0);
+		//		a.setAt(1, 1, 1.0);
+		//		a.setAt(2, 2, 1.0);
+		//		a.setAt(3, 3, 1.0);
+		//		a.setAt(4, 4, 1.0);
+		//		final SparseMatrix r = new SparseMatrix(5,5,6);
+		//		r.setAt(0, 0, 1.0/2.0);
+		//		r.setAt(1, 0, 1.0/2.0);
+		//		r.setAt(1, 1, 1.0/2.0);
+		//		r.setAt(2, 1, 1.0/2.0);
+		//		r.setAt(2, 2, 1.0/2.0);
+		//		r.setAt(3, 2, 1.0/2.0);
+		//		r.setAt(3, 3, 1.0/2.0);
+		//		r.setAt(4, 3, 1.0/2.0);
+		//		r.setAt(4, 4, 1.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	/**
+	 * <pre></pre>
 	 * Graph:         0----o1----o2
 	 *                o           |
 	 *                |           o
 	 *                4o----------3
-	 * 
+	 * </pre>
 	 * Clusters: {0,1,2,3,4}
 	 * Hubs: none
 	 * Outliers: none
@@ -185,60 +190,61 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithRingStructure() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_RING_STRUCTURE, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(5,1,4);
+		final SparseMatrix a = new SparseMatrix(5, 1, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
 		a.setAt(3, 0, 1.0);
 		a.setAt(4, 0, 1.0);
-		
-		final SparseMatrix r = new SparseMatrix(1,5,6);
-		r.setAt(0, 0, 1.0/5.0);
-		r.setAt(0, 4, 1.0/5.0);
-		r.setAt(0, 0, 1.0/5.0);
-		r.setAt(0, 1, 1.0/5.0);
-		r.setAt(0, 1, 1.0/5.0);
-		r.setAt(0, 2, 1.0/5.0);
-		r.setAt(0, 2, 1.0/5.0);
-		r.setAt(0, 3, 1.0/5.0);
-		r.setAt(0, 3, 1.0/5.0);
-		r.setAt(0, 4, 1.0/5.0);
-		
-//		final SparseMatrix a = new SparseMatrix(5,5,4);
-//		a.setAt(0, 0, 1.0);
-//		a.setAt(1, 1, 1.0);
-//		a.setAt(2, 2, 1.0);
-//		a.setAt(3, 3, 1.0);
-//		a.setAt(4, 4, 1.0);
-//		final SparseMatrix r = new SparseMatrix(5,5,6);
-//		r.setAt(0, 0, 1.0/2.0);
-//		r.setAt(0, 4, 1.0/2.0);
-//		r.setAt(1, 0, 1.0/2.0);
-//		r.setAt(1, 1, 1.0/2.0);
-//		r.setAt(2, 1, 1.0/2.0);
-//		r.setAt(2, 2, 1.0/2.0);
-//		r.setAt(3, 2, 1.0/2.0);
-//		r.setAt(3, 3, 1.0/2.0);
-//		r.setAt(4, 3, 1.0/2.0);
-//		r.setAt(4, 4, 1.0/2.0);
+
+		final SparseMatrix r = new SparseMatrix(1, 5, 6);
+		r.setAt(0, 0, 1.0 / 5.0);
+		r.setAt(0, 4, 1.0 / 5.0);
+		r.setAt(0, 0, 1.0 / 5.0);
+		r.setAt(0, 1, 1.0 / 5.0);
+		r.setAt(0, 1, 1.0 / 5.0);
+		r.setAt(0, 2, 1.0 / 5.0);
+		r.setAt(0, 2, 1.0 / 5.0);
+		r.setAt(0, 3, 1.0 / 5.0);
+		r.setAt(0, 3, 1.0 / 5.0);
+		r.setAt(0, 4, 1.0 / 5.0);
+
+		//		final SparseMatrix a = new SparseMatrix(5,5,4);
+		//		a.setAt(0, 0, 1.0);
+		//		a.setAt(1, 1, 1.0);
+		//		a.setAt(2, 2, 1.0);
+		//		a.setAt(3, 3, 1.0);
+		//		a.setAt(4, 4, 1.0);
+		//		final SparseMatrix r = new SparseMatrix(5,5,6);
+		//		r.setAt(0, 0, 1.0/2.0);
+		//		r.setAt(0, 4, 1.0/2.0);
+		//		r.setAt(1, 0, 1.0/2.0);
+		//		r.setAt(1, 1, 1.0/2.0);
+		//		r.setAt(2, 1, 1.0/2.0);
+		//		r.setAt(2, 2, 1.0/2.0);
+		//		r.setAt(3, 2, 1.0/2.0);
+		//		r.setAt(3, 3, 1.0/2.0);
+		//		r.setAt(4, 3, 1.0/2.0);
+		//		r.setAt(4, 4, 1.0/2.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0---o1
 	 *                o\  o|
 	 *                | \/ |
 	 *                | /\ |
 	 *                |/  oo
 	 *                3o---2
-	 * 
+	 * </pre>
 	 * Clusters: {0,1,2,3}
 	 * Hubs: none
 	 * Outliers: none
@@ -247,35 +253,36 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithOneClusterAndNoHubAndNoOutlier() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_ONE_CLUSTERS_NO_HUB_NO_OUTLIER, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(4,1,4);
+		final SparseMatrix a = new SparseMatrix(4, 1, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
 		a.setAt(3, 0, 1.0);
 
-		final SparseMatrix r = new SparseMatrix(1,4,4);
-		r.setAt(0, 0, 1.0/4.0);
-		r.setAt(0, 1, 1.0/4.0);
-		r.setAt(0, 2, 1.0/4.0);
-		r.setAt(0, 3, 1.0/4.0);
+		final SparseMatrix r = new SparseMatrix(1, 4, 4);
+		r.setAt(0, 0, 1.0 / 4.0);
+		r.setAt(0, 1, 1.0 / 4.0);
+		r.setAt(0, 2, 1.0 / 4.0);
+		r.setAt(0, 3, 1.0 / 4.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0---o1---o4
 	 *                o\  o|
 	 *                | \/ |
 	 *                | /\ |
 	 *                |/  oo
 	 *                3o---2
-	 * 
+	 * </pre>
 	 * Clusters: {0,1,2,3}
 	 * Hubs: none
 	 * Outliers: {4}
@@ -284,24 +291,24 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithOneClusterAndNoHubAndOneOutlier() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_ONE_CLUSTERS_NO_HUB_ONE_OUTLIER, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(5,2,4);
+		final SparseMatrix a = new SparseMatrix(5, 2, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
 		a.setAt(3, 0, 1.0);
 		a.setAt(4, 1, 1.0);
 
-		final SparseMatrix r = new SparseMatrix(2,5,4);
-		r.setAt(0, 0, 1.0/4.0);
-		r.setAt(0, 1, 1.0/8.0);
-		r.setAt(0, 2, 1.0/4.0);
-		r.setAt(0, 3, 1.0/4.0);
-		r.setAt(1, 1, 1.0/2.0);
+		final SparseMatrix r = new SparseMatrix(2, 5, 4);
+		r.setAt(0, 0, 1.0 / 4.0);
+		r.setAt(0, 1, 1.0 / 8.0);
+		r.setAt(0, 2, 1.0 / 4.0);
+		r.setAt(0, 3, 1.0 / 4.0);
+		r.setAt(1, 1, 1.0 / 2.0);
 		r.setAt(1, 4, 1.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
@@ -309,11 +316,12 @@ public class InterLevelProximityMatrixTest {
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0           4
 	 *               / o         o \
 	 *              o   \       /   o
 	 *             1----o2----o3o----5
-	 *             
+	 * </pre>
 	 * Clusters: {0,1,2}, {3,4,5}
 	 * Hubs: none
 	 * Outliers: none
@@ -322,12 +330,12 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoClustersAndNoHubAndNoOutlier() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(6,2,4);
+		final SparseMatrix a = new SparseMatrix(6, 2, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
@@ -335,20 +343,21 @@ public class InterLevelProximityMatrixTest {
 		a.setAt(4, 1, 1.0);
 		a.setAt(5, 1, 1.0);
 
-		final SparseMatrix r = new SparseMatrix(2,6,4);
-		r.setAt(0, 0, 1.0/3.0);
-		r.setAt(0, 1, 1.0/3.0);
-		r.setAt(0, 2, 1.0/6.0);
-		r.setAt(1, 2, 1.0/6.0);
-		r.setAt(1, 3, 1.0/3.0);
-		r.setAt(1, 4, 1.0/3.0);
-		r.setAt(1, 5, 1.0/3.0);
+		final SparseMatrix r = new SparseMatrix(2, 6, 4);
+		r.setAt(0, 0, 1.0 / 3.0);
+		r.setAt(0, 1, 1.0 / 3.0);
+		r.setAt(0, 2, 1.0 / 6.0);
+		r.setAt(1, 2, 1.0 / 6.0);
+		r.setAt(1, 3, 1.0 / 3.0);
+		r.setAt(1, 4, 1.0 / 3.0);
+		r.setAt(1, 5, 1.0 / 3.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0
 	 *               / o
 	 *              o   \
@@ -359,21 +368,21 @@ public class InterLevelProximityMatrixTest {
 	 *                  / o
 	 *                 o   \
 	 *                4----o5
-	 *                
+	 * </pre>
 	 * Clusters: {0,1,2}, {3,4,5}
 	 * Hubs: none
 	 * Outliers: {6}
-	 */               
+	 */
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoClustersAndNoHubAndOneOutlier() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(7,3,4);
+		final SparseMatrix a = new SparseMatrix(7, 3, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
@@ -381,27 +390,28 @@ public class InterLevelProximityMatrixTest {
 		a.setAt(4, 1, 1.0);
 		a.setAt(5, 1, 1.0);
 		a.setAt(6, 2, 1.0);
-		final SparseMatrix r = new SparseMatrix(3,7,8);
-		r.setAt(0, 0, 1.0/3.0);
-		r.setAt(0, 1, 1.0/3.0);
-		r.setAt(0, 2, 1.0/9.0);
-		r.setAt(1, 2, 1.0/9.0);
-		r.setAt(1, 3, 1.0/3.0);
-		r.setAt(1, 4, 1.0/3.0);
-		r.setAt(1, 5, 1.0/3.0);
-		r.setAt(2, 2, 1.0/3.0);
+		final SparseMatrix r = new SparseMatrix(3, 7, 8);
+		r.setAt(0, 0, 1.0 / 3.0);
+		r.setAt(0, 1, 1.0 / 3.0);
+		r.setAt(0, 2, 1.0 / 9.0);
+		r.setAt(1, 2, 1.0 / 9.0);
+		r.setAt(1, 3, 1.0 / 3.0);
+		r.setAt(1, 4, 1.0 / 3.0);
+		r.setAt(1, 5, 1.0 / 3.0);
+		r.setAt(2, 2, 1.0 / 3.0);
 		r.setAt(2, 6, 1.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
-	
+
 	/**
+	 * <pre>
 	 * Graph:         0                 5
 	 *               / o               o \
 	 *              o   \             /   o
 	 *             1----o2----o3----o4o----6
-	 *             
+	 * </pre>
 	 * Clusters: {0,1,2}, {4,5,6}
 	 * Hubs: {3}
 	 * Outliers: none
@@ -410,12 +420,12 @@ public class InterLevelProximityMatrixTest {
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoClustersAndOneHubAndNoOutlier() {
 		// Arrange:
 		final TestContext context = new TestContext(GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER, clusteringStrategies.get(DEFAULT_CLUSTERER));
-		
+
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		
+
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(7,3,4);
+		final SparseMatrix a = new SparseMatrix(7, 3, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
@@ -424,22 +434,23 @@ public class InterLevelProximityMatrixTest {
 		a.setAt(5, 1, 1.0);
 		a.setAt(6, 1, 1.0);
 
-		final SparseMatrix r = new SparseMatrix(3,7,4);
-		r.setAt(0, 0, 1.0/3.0);
-		r.setAt(0, 1, 1.0/3.0);
-		r.setAt(0, 2, 1.0/6.0);
-		r.setAt(1, 3, 1.0/6.0);
-		r.setAt(1, 4, 1.0/3.0);
-		r.setAt(1, 5, 1.0/3.0);
-		r.setAt(1, 6, 1.0/3.0);
-		r.setAt(2, 2, 1.0/2.0);
-		r.setAt(2, 3, 1.0/2.0);
+		final SparseMatrix r = new SparseMatrix(3, 7, 4);
+		r.setAt(0, 0, 1.0 / 3.0);
+		r.setAt(0, 1, 1.0 / 3.0);
+		r.setAt(0, 2, 1.0 / 6.0);
+		r.setAt(1, 3, 1.0 / 6.0);
+		r.setAt(1, 4, 1.0 / 3.0);
+		r.setAt(1, 5, 1.0 / 3.0);
+		r.setAt(1, 6, 1.0 / 3.0);
+		r.setAt(2, 2, 1.0 / 2.0);
+		r.setAt(2, 3, 1.0 / 2.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	/**
+	 * <pre>
 	 * Graph:         0-------o7-------o5-----o8
 	 *               / o               o \
 	 *              o   \             /   o
@@ -447,7 +458,7 @@ public class InterLevelProximityMatrixTest {
 	 *                         |
 	 *                         o
 	 *                         9
-	 *             
+	 * </pre>
 	 * Clusters: {0,1,2,10}, {4,5,6}
 	 * Hubs: {3}, {7}
 	 * Outliers: {8}, {9}, {10}
@@ -461,7 +472,7 @@ public class InterLevelProximityMatrixTest {
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
 		System.out.println(context.clusters.getClusters());
 		// Assert:
-		final SparseMatrix a = new SparseMatrix(11,6,4);
+		final SparseMatrix a = new SparseMatrix(11, 6, 4);
 		a.setAt(0, 0, 1.0);
 		a.setAt(1, 0, 1.0);
 		a.setAt(2, 0, 1.0);
@@ -474,23 +485,23 @@ public class InterLevelProximityMatrixTest {
 		a.setAt(9, 5, 1.0);
 		a.setAt(10, 0, 1.0);
 
-		final SparseMatrix r = new SparseMatrix(6,11,4);
-		r.setAt(0, 0, 1.0/8.0);
-		r.setAt(0, 1, 1.0/4.0);
-		r.setAt(0, 2, 1.0/8.0);
-		r.setAt(0, 10, 1.0/4.0);
-		r.setAt(1, 3, 1.0/9.0);
-		r.setAt(1, 4, 1.0/3.0);
-		r.setAt(1, 5, 1.0/6.0);
-		r.setAt(1, 6, 1.0/3.0);
-		r.setAt(1, 7, 1.0/6.0);
-		r.setAt(2, 2, 1.0/2.0);
-		r.setAt(2, 3, 1.0/3.0);
-		r.setAt(3, 0, 1.0/2.0);
-		r.setAt(3, 7, 1.0/2.0);
-		r.setAt(4, 5, 1.0/2.0);
+		final SparseMatrix r = new SparseMatrix(6, 11, 4);
+		r.setAt(0, 0, 1.0 / 8.0);
+		r.setAt(0, 1, 1.0 / 4.0);
+		r.setAt(0, 2, 1.0 / 8.0);
+		r.setAt(0, 10, 1.0 / 4.0);
+		r.setAt(1, 3, 1.0 / 9.0);
+		r.setAt(1, 4, 1.0 / 3.0);
+		r.setAt(1, 5, 1.0 / 6.0);
+		r.setAt(1, 6, 1.0 / 3.0);
+		r.setAt(1, 7, 1.0 / 6.0);
+		r.setAt(2, 2, 1.0 / 2.0);
+		r.setAt(2, 3, 1.0 / 3.0);
+		r.setAt(3, 0, 1.0 / 2.0);
+		r.setAt(3, 7, 1.0 / 2.0);
+		r.setAt(4, 5, 1.0 / 2.0);
 		r.setAt(4, 8, 1.0);
-		r.setAt(5, 3, 1.0/3.0);
+		r.setAt(5, 3, 1.0 / 3.0);
 		r.setAt(5, 9, 1.0);
 
 		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
@@ -498,29 +509,29 @@ public class InterLevelProximityMatrixTest {
 	}
 
 	// Begin test infrastructure
-	
+
 	private static SparseMatrix getUndirectedOutlinkMatrixForGraph(final int graphIndex) {
 		SparseMatrix matrix;
 		switch (graphIndex) {
 			case GRAPH_SINGLE_NODE: {
-				matrix = new SparseMatrix(1,1,1);
+				matrix = new SparseMatrix(1, 1, 1);
 				matrix.setAt(0, 0, 1);
 				break;
 			}
 			case GRAPH_TWO_UNCONNECTED_NODES: {
-				matrix = new SparseMatrix(2,2,2);
+				matrix = new SparseMatrix(2, 2, 2);
 				matrix.setAt(0, 0, 1);
 				matrix.setAt(1, 1, 1);
 				break;
 			}
 			case GRAPH_TWO_CONNECTED_NODES: {
-				matrix = new SparseMatrix(2,2,2);
+				matrix = new SparseMatrix(2, 2, 2);
 				matrix.setAt(1, 0, 1);
 				matrix = makeAntiSymmetric(matrix);
 				break;
 			}
 			case GRAPH_LINE_STRUCTURE: {
-				matrix = new SparseMatrix(5,5,4);
+				matrix = new SparseMatrix(5, 5, 4);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 1, 1);
 				matrix.setAt(3, 2, 1);
@@ -529,7 +540,7 @@ public class InterLevelProximityMatrixTest {
 				break;
 			}
 			case GRAPH_RING_STRUCTURE: {
-				matrix = new SparseMatrix(5,5,4);
+				matrix = new SparseMatrix(5, 5, 4);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 1, 1);
 				matrix.setAt(3, 2, 1);
@@ -539,7 +550,7 @@ public class InterLevelProximityMatrixTest {
 				break;
 			}
 			case GRAPH_ONE_CLUSTERS_NO_HUB_NO_OUTLIER: {
-				matrix = new SparseMatrix(4,4,4);
+				matrix = new SparseMatrix(4, 4, 4);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 0, 1);
 				matrix.setAt(2, 1, 1);
@@ -550,7 +561,7 @@ public class InterLevelProximityMatrixTest {
 				break;
 			}
 			case GRAPH_ONE_CLUSTERS_NO_HUB_ONE_OUTLIER: {
-				matrix = new SparseMatrix(5,5,4);
+				matrix = new SparseMatrix(5, 5, 4);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 0, 1);
 				matrix.setAt(2, 1, 1);
@@ -562,7 +573,7 @@ public class InterLevelProximityMatrixTest {
 				break;
 			}
 			case GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER: {
-				matrix = new SparseMatrix(6,6,4);
+				matrix = new SparseMatrix(6, 6, 4);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 1, 1);
 				matrix.setAt(0, 2, 1);
@@ -574,7 +585,7 @@ public class InterLevelProximityMatrixTest {
 				break;
 			}
 			case GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER: {
-				matrix = new SparseMatrix(7,7,8);
+				matrix = new SparseMatrix(7, 7, 8);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(0, 2, 1);
 				matrix.setAt(2, 1, 1);
@@ -587,7 +598,7 @@ public class InterLevelProximityMatrixTest {
 				break;
 			}
 			case GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER: {
-				matrix = new SparseMatrix(7,7,8);
+				matrix = new SparseMatrix(7, 7, 8);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(2, 1, 1);
 				matrix.setAt(0, 2, 1);
@@ -600,7 +611,7 @@ public class InterLevelProximityMatrixTest {
 				break;
 			}
 			case GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS: {
-				matrix = new SparseMatrix(11,11,8);
+				matrix = new SparseMatrix(11, 11, 8);
 				matrix.setAt(1, 0, 1);
 				matrix.setAt(7, 0, 1);
 				matrix.setAt(2, 1, 1);
@@ -621,14 +632,14 @@ public class InterLevelProximityMatrixTest {
 				throw new IllegalArgumentException("unknown graph");
 			}
 		}
-				
+
 		return matrix;
 	}
-	
+
 	private static SparseMatrix makeAntiSymmetric(final SparseMatrix matrix) {
 		return (SparseMatrix)matrix.addElementWise(matrix.transpose().multiply(-1));
 	}
-	
+
 	private static class TestContext {
 		private final Neighborhood neighborhood;
 		private final ClusteringResult clusters;
