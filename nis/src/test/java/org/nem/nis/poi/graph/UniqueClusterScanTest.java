@@ -6,24 +6,41 @@ import org.mockito.Mockito;
 import org.nem.core.model.primitive.ClusterId;
 import org.nem.nis.test.NisUtils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class UniqueClusterScanTest {
 
 	@Test
-	public void clusterReturnsClusteringWithOneClusterZeroHubsAndZeroOutliers() {
+	public void clusterReturnsNoClustersWhenNeighborhoodIsEmpty() {
 		// Arrange:
-		Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
-		UniqueClusterScan scan = new UniqueClusterScan();
-		Mockito.when(neighborhood.size()).thenReturn(5);
+		final Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
+		Mockito.when(neighborhood.size()).thenReturn(0);
+		final GraphClusteringStrategy strategy = new UniqueClusterScan();
 
 		// Act:
-		ClusteringResult result = scan.cluster(neighborhood);
+		final ClusteringResult result = strategy.cluster(neighborhood);
 
 		// Assert:
+		Assert.assertThat(result.numClusters(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void clusterReturnsOneClusterZeroHubsAndZeroOutliersWhenNeighborhoodIsNotEmpty() {
+		// Arrange:
+		final Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
+		Mockito.when(neighborhood.size()).thenReturn(5);
+		final GraphClusteringStrategy strategy = new UniqueClusterScan();
+
+		// Act:
+		final ClusteringResult result = strategy.cluster(neighborhood);
+
+		// Assert:
+		Assert.assertThat(result.numClusters(), IsEqual.equalTo(1));
 		Assert.assertThat(result.getClusters().size(), IsEqual.equalTo(1));
-		for (Cluster cluster : result.getClusters()) {
-			Assert.assertThat(cluster, IsEqual.equalTo(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4))));
-		}
-		Assert.assertThat(result.getHubs().size(), IsEqual.equalTo(0));
-		Assert.assertThat(result.getOutliers().size(), IsEqual.equalTo(0));
+
+		final Cluster expectedCluster = new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4));
+		final List<Cluster> clusters = result.getClusters().stream().collect(Collectors.toList());
+		Assert.assertThat(clusters.get(0), IsEqual.equalTo(expectedCluster));
 	}
 }

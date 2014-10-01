@@ -35,7 +35,7 @@ public class InterLevelProximityMatrix {
 	 * @param outlinkMatrix The final outlink matrix (negative values removed) which represents the directed graph.
 	 */
 	public InterLevelProximityMatrix(final ClusteringResult clusters, final Neighborhood neighborhood, final Matrix outlinkMatrix) {
-		final int numNodes = clusters.getNumNodes();
+		final int numNodes = clusters.numNodes();
 		final int numClusters = clusters.numClusters();
 
 		r = new SparseMatrix(numClusters, numNodes, 5);  //TODO: need to estimate good initial capacity.

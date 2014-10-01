@@ -23,6 +23,7 @@ public class Community {
 			final NodeId pivotId,
 			final NodeNeighbors similarNeighbors,
 			final NodeNeighbors dissimilarNeighbors) {
+		// TODO 20140930 J-M should this constructor ensure that pivotId is contained within similar Neighbors?
 		if (null == similarNeighbors || null == dissimilarNeighbors) {
 			throw new IllegalArgumentException("neighbors cannot be null");
 		}

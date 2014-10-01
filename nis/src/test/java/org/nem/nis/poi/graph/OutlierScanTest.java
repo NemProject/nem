@@ -9,22 +9,37 @@ import org.nem.nis.test.NisUtils;
 public class OutlierScanTest {
 
 	@Test
-	public void clusterReturnsClusteringWithZeroClustersZeroHubsAndNeighborhoodSizeOutliers() {
+	public void clusterReturnsNoClustersWhenNeighborhoodIsEmpty() {
 		// Arrange:
-		Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
-		OutlierScan scan = new OutlierScan();
-		Mockito.when(neighborhood.size()).thenReturn(5);
+		final Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
+		Mockito.when(neighborhood.size()).thenReturn(0);
+		final GraphClusteringStrategy strategy = new OutlierScan();
 
 		// Act:
-		ClusteringResult result = scan.cluster(neighborhood);
+		final ClusteringResult result = strategy.cluster(neighborhood);
 
 		// Assert:
-		Assert.assertThat(result.getClusters().size(), IsEqual.equalTo(0));
-		Assert.assertThat(result.getHubs().size(), IsEqual.equalTo(0));
+		Assert.assertThat(result.numClusters(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void clusterReturnsZeroClustersZeroHubsAndOneOutlierForEachNodeWhenNeighborhoodIsNotEmpty() {
+		// Arrange:
+		final Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
+		Mockito.when(neighborhood.size()).thenReturn(5);
+		final GraphClusteringStrategy strategy = new OutlierScan();
+
+		// Act:
+		final ClusteringResult result = strategy.cluster(neighborhood);
+
+		// Assert:
+		Assert.assertThat(result.numClusters(), IsEqual.equalTo(5));
 		Assert.assertThat(result.getOutliers().size(), IsEqual.equalTo(5));
+
 		int i = 0;
-		for (Cluster outlier : result.getOutliers()) {
-			Assert.assertThat(outlier, IsEqual.equalTo(new Cluster(new ClusterId(i), NisUtils.toNodeIdList(i++))));
+		for (final Cluster outlier : result.getOutliers()) {
+			Assert.assertThat(outlier, IsEqual.equalTo(new Cluster(new ClusterId(i), NisUtils.toNodeIdList(i))));
+			++i;
 		}
 	}
 }

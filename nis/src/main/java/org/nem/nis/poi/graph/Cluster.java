@@ -5,7 +5,9 @@ import org.nem.core.model.primitive.*;
 import java.util.*;
 
 /**
- * A cluster represents a set of nodes which share certain similarity (i.e. are closely connected).
+ * A cluster represents a set of nodes that share certain similarity (i.e. are closely connected).
+ *
+ * TODO 20140930 J-M: should this class include the id (center) as a member?
  */
 public class Cluster {
 	/**
@@ -81,9 +83,10 @@ public class Cluster {
 	}
 
 	//region hashCode / equals
+
 	@Override
 	public int hashCode() {
-		return this.memberIds.stream().map(NodeId::getRaw).reduce(0, (a, b) -> a ^ b);
+		return this.id.getRaw();
 	}
 
 	@Override
@@ -94,7 +97,7 @@ public class Cluster {
 
 		// The id is not relevant for a cluster
 		final Cluster rhs = (Cluster)obj;
-		return this.memberIds.equals(rhs.memberIds);
+		return this.id.equals(rhs.id) && this.memberIds.equals(rhs.memberIds);
 	}
 
 	//endregion
@@ -110,7 +113,6 @@ public class Cluster {
 
 	@Override
 	public String toString() {
-		return "Cluster Id: " + this.id
-				+ "; Member Ids: " + this.memberIds;
+		return String.format("Cluster Id: %s; Member Ids: %s", this.id, this.memberIds);
 	}
 }

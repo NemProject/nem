@@ -37,7 +37,7 @@ public class ClusteringResult {
 
 	private void addClustersToIdMap(final Collection<Cluster> clusters) {
 		clusters.stream()
-				.forEach(c -> { c.getMemberIds().stream().forEach(n -> this.idMap.put(n, c.getId())); });
+				.forEach(c -> c.getMemberIds().stream().forEach(n -> this.idMap.put(n, c.getId())));
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ClusteringResult {
 	 *
 	 * @return the the number of nodes contained in all the clusters
 	 */
-	public int getNumNodes() {
+	public int numNodes() {
 		return this.idMap.size();
 	}
 

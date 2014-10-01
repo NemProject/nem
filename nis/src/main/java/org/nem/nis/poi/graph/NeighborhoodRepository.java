@@ -13,7 +13,7 @@ public interface NeighborhoodRepository {
 	 * @param nodeId The node id.
 	 * @return The node's neighbors.
 	 */
-	public NodeNeighbors getNeighbors(NodeId nodeId);
+	public NodeNeighbors getNeighbors(final NodeId nodeId);
 
 	/**
 	 * Gets the logical size of the map (the actual size might be smaller if the map is very sparse).

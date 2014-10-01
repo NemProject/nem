@@ -19,7 +19,11 @@ public class DefaultSimilarityStrategy implements SimilarityStrategy {
 
 	@Override
 	public double calculateSimilarity(final NodeId lhs, final NodeId rhs) {
-		final NodeNeighbors lhsNeighbors = this.neighborMap.getNeighbors(lhs);
+		// The number of neighbors that are the same for the two input nodes, divided by
+		// the sqrt of the product of the numbers of neighbors for each node.
+		// Pivots are included in the calculation.
+
+ 		final NodeNeighbors lhsNeighbors = this.neighborMap.getNeighbors(lhs);
 		final NodeNeighbors rhsNeighbors = this.neighborMap.getNeighbors(rhs);
 
 		final int lhsNeighborsSize = lhsNeighbors.size();

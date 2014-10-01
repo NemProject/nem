@@ -9,14 +9,14 @@ import java.util.*;
 
 public class ClusteringResultTest {
 
+	//region constructor
+
 	@Test
 	public void resultExposesAllConstructorParameters() {
 		// Arrange:
-		final Collection<Cluster> clusters = Arrays.asList(
-				new Cluster(new ClusterId(7), NisUtils.toNodeIdList(7)),
-				new Cluster(new ClusterId(8), NisUtils.toNodeIdList(8)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11), NisUtils.toNodeIdList(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10), NisUtils.toNodeIdList(10)));
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11)));
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -27,24 +27,49 @@ public class ClusteringResultTest {
 		Assert.assertThat(result.getOutliers(), IsSame.sameInstance(outliers));
 	}
 
+	//endregion
+
+	//region numClusters / numNodes
+
 	@Test
-	public void numClustersCountedCorrectly() {
+	public void numClustersReturnsTotalNumberOfClustersAcrossAllClusterTypes() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11)));
+		final Collection<Cluster> outliers = Arrays.asList(
+				new Cluster(new ClusterId(10)),
+				new Cluster(new ClusterId(12)),
+				new Cluster(new ClusterId(15)));
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert
+		Assert.assertThat(result.numClusters(), IsEqual.equalTo(6));
+	}
+
+	@Test
+	public void numNodesReturnsTotalNumberOfNodesInAllClusters() {
 		// Arrange:
 		final Collection<Cluster> clusters = Arrays.asList(
-				new Cluster(new ClusterId(7), NisUtils.toNodeIdList(7)),
-				new Cluster(new ClusterId(8), NisUtils.toNodeIdList(8)));
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
+				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
 		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11), NisUtils.toNodeIdList(11)));
 		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10), NisUtils.toNodeIdList(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
 
-		// Assert
-		Assert.assertThat(result.numClusters(), IsEqual.equalTo(4));
+		// Assert:
+		Assert.assertThat(result.numNodes(), IsEqual.equalTo(12));
 	}
 
+	//endregion
+
+	//region getIdForNode
+
 	@Test
-	public void idMapIsCorrect() {
+	public void getIdForNodeReturnsClusterInformationForAllClusterMembers() {
 		// Arrange:
 		final Collection<Cluster> clusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
@@ -72,19 +97,34 @@ public class ClusteringResultTest {
 		Assert.assertThat(result.getIdForNode(new NodeId(11)), IsEqual.equalTo(new ClusterId(11)));
 	}
 
+	// TODO 20140930 is this a bug?
 	@Test
-	public void numNodesReturnsCorrectNumberOfNodes() {
+	public void getIdForNodeDoesNotReturnClusterInformationForClusterIds() {
 		// Arrange:
-		final Collection<Cluster> clusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
-				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11), NisUtils.toNodeIdList(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10), NisUtils.toNodeIdList(10)));
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(1)));
+		final Collection<Cluster> hubs = Arrays.asList();
+		final Collection<Cluster> outliers = Arrays.asList();
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
 
 		// Assert:
-		Assert.assertThat(result.getNumNodes(), IsEqual.equalTo(12));
+		Assert.assertThat(result.getIdForNode(new NodeId(0)), IsNull.nullValue());
 	}
+
+	@Test
+	public void getIdForNodeReturnsNullWhenClusterInformationIsUnknown() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(1)));
+		final Collection<Cluster> hubs = Arrays.asList();
+		final Collection<Cluster> outliers = Arrays.asList();
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.getIdForNode(new NodeId(17)), IsNull.nullValue());
+	}
+
+	//endregion
 }

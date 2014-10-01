@@ -5,26 +5,26 @@ import org.nem.core.model.primitive.*;
 import java.util.ArrayList;
 
 /**
- * Trivial clustering: Do not scan at all but build one clusters with all nodes in it.
+ * Trivial clustering: Do not scan at all but build one cluster with all nodes in it.
  * Using this clusterer the NCD-aware algorithm equals the original PR algorithm.
+ *
+ * TODO 20140930 rename to SingleClusterScan
  */
 public class UniqueClusterScan implements GraphClusteringStrategy {
 
 	@Override
 	public ClusteringResult cluster(final Neighborhood neighborhood) {
 		final ArrayList<Cluster> clusters = new ArrayList<>();
-		Cluster cluster;
+		final ClusterId clusterId = new ClusterId(0);
 		if (neighborhood.size() > 0) {
-			cluster = new Cluster(new ClusterId(0));
+			final Cluster cluster = new Cluster(clusterId);
 			for (int i = 0; i < neighborhood.size(); ++i) {
 				cluster.add(new NodeId(i));
 			}
+
 			clusters.add(cluster);
 		}
 
-		ClusteringResult result = new ClusteringResult(clusters, new ArrayList<>(), new ArrayList<>());
-		System.out.println(result.getClusters().size() + " clusters, " + result.getHubs().size() + " hubs, and " + result.getOutliers().size() + " outliers");
-
-		return result;
+		return new ClusteringResult(clusters, new ArrayList<>(), new ArrayList<>());
 	}
 }
