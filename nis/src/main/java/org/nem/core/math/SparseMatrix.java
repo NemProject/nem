@@ -3,6 +3,7 @@ package org.nem.core.math;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 /**
  * Represents a sparse matrix.
@@ -51,13 +52,8 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	protected final double getAtUnchecked(final int row, final int col) {
-		for (int i = 0; i < this.maxIndices[row]; ++i) {
-			if (this.cols[row][i] == col) {
-				return this.values[row][i];
-			}
-		}
-
-		return 0.0;
+		final int i = Arrays.binarySearch(this.cols[row], 0, this.maxIndices[row], col);
+		return i < 0 ? 0.0 : this.values[row][i];
 	}
 
 	@Override

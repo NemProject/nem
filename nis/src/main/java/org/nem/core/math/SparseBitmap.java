@@ -165,7 +165,6 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 
 	/**
 	 * The number of bits that are set.
-	 * TODO 20140929 J-B there are some comments that cardinality == size, but it's actually the number of bits set; does this break anything?
 	 *
 	 * @return The number of bits that are set.
 	 */
