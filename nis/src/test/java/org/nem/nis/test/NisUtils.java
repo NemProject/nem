@@ -182,4 +182,29 @@ public class NisUtils {
 	public static BlockValidatorFactory createBlockValidatorFactory() {
 		return new BlockValidatorFactory(new SystemTimeProvider());
 	}
+
+	/**
+	 * Converts an array of integers to an array of node ids.
+	 *
+	 * @param ids The integer array.
+	 * @return The node id array
+	 */
+	public static NodeId[] toNodeIdArray(int... ids) {
+		NodeId[] nodeIds = new NodeId[ids.length];
+		for (int i = 0; i < ids.length; i++) {
+			nodeIds[i] = new NodeId(ids[i]);
+		}
+
+		return nodeIds;
+	}
+
+	/**
+	 * Converts an array of integers to a list of node ids.
+	 *
+	 * @param ids The integer array.
+	 * @return The node id list
+	 */
+	public static List<NodeId> toNodeIdList(int... ids) {
+		return Arrays.asList(NisUtils.toNodeIdArray(ids));
+	}
 }
