@@ -634,15 +634,15 @@ public class InterLevelProximityMatrixTest {
 		private final ClusteringResult clusters;
 		private final Matrix outlinkMatrix;
 
-		public TestContext(final int graphIndex, GraphClusteringStrategy clusteringStrategy) {
+		public TestContext(final int graphIndex, final GraphClusteringStrategy clusteringStrategy) {
 			this.outlinkMatrix = getUndirectedOutlinkMatrixForGraph(graphIndex);
 
 			// initialize required variables
-			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
+			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
 			this.neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
-			outlinkMatrix.removeNegatives();
-			LOGGER.info(outlinkMatrix.toString());		
-			this.clusters = clusteringStrategy.cluster(neighborhood);
+			this.outlinkMatrix.removeNegatives();
+			LOGGER.info(this.outlinkMatrix.toString());
+			this.clusters = clusteringStrategy.cluster(this.neighborhood);
 		}
 	}
 }

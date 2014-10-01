@@ -38,13 +38,13 @@ public class InterLevelProximityMatrix {
 		final int numNodes = clusters.numNodes();
 		final int numClusters = clusters.numClusters();
 
-		r = new SparseMatrix(numClusters, numNodes, 5);  //TODO: need to estimate good initial capacity.
-		a = new SparseMatrix(numNodes, numClusters, 5); // TODO: need to estimate good initial capacity.
-		clusterIdToNeighborhoodClusterIdsSetIndex = new HashMap<>();
+		this.r = new SparseMatrix(numClusters, numNodes, 5);  //TODO: need to estimate good initial capacity.
+		this.a = new SparseMatrix(numNodes, numClusters, 5); // TODO: need to estimate good initial capacity.
+		this.clusterIdToNeighborhoodClusterIdsSetIndex = new HashMap<>();
 
-		long t0 = System.currentTimeMillis();
+		final long t0 = System.currentTimeMillis();
 		computeMatrices(clusters, neighborhood, outlinkMatrix);
-		long t1 = System.currentTimeMillis();
+		final long t1 = System.currentTimeMillis();
 		System.out.println("computing matrices took " + (t1 - t0) + "ms");
 	}
 
@@ -84,15 +84,15 @@ public class InterLevelProximityMatrix {
 		for (final Cluster cluster : clusters) {
 
 			for (final NodeId id : cluster.getMemberIds()) {
-				a.setAt(id.getRaw(), row, 1);
+				this.a.setAt(id.getRaw(), row, 1);
 			}
 
 			final int clusterSize = cluster.size();
 			final int currentRow = row;
-			Set<Integer> indexSet = clusterIdToNeighborhoodClusterIdsSetIndex.getOrDefault(cluster.getId(),
+			final Set<Integer> indexSet = this.clusterIdToNeighborhoodClusterIdsSetIndex.getOrDefault(cluster.getId(),
 					Collections.newSetFromMap(new ConcurrentHashMap<>()));
 			indexSet.stream()
-					.forEach(i -> r.setAt(currentRow, i, 1.0 / (clusterSize * neighborhoodClusterIdsSet.get(i).cardinality())));
+					.forEach(i -> this.r.setAt(currentRow, i, 1.0 / (clusterSize * neighborhoodClusterIdsSet.get(i).cardinality())));
 
 			++row;
 		}
@@ -110,10 +110,10 @@ public class InterLevelProximityMatrix {
 					.filter(c -> c.getPivotId().getRaw() == id || outlinkMatrix.getAt(c.getPivotId().getRaw(), id) > 0.0)
 					.map(c -> {
 						ClusterId clusterId = clusteringResult.getIdForNode(c.getPivotId());
-						Set<Integer> indexSet = clusterIdToNeighborhoodClusterIdsSetIndex.get(clusterId);
+						Set<Integer> indexSet = this.clusterIdToNeighborhoodClusterIdsSetIndex.get(clusterId);
 						if (indexSet == null) {
 							indexSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
-							clusterIdToNeighborhoodClusterIdsSetIndex.put(clusterId, indexSet);
+							this.clusterIdToNeighborhoodClusterIdsSetIndex.put(clusterId, indexSet);
 						}
 						indexSet.add(id);
 						return clusterId;
@@ -131,7 +131,7 @@ public class InterLevelProximityMatrix {
 	 * @return The matrix r.
 	 */
 	public SparseMatrix getR() {
-		return r;
+		return this.r;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class InterLevelProximityMatrix {
 	 * @return the matrix a.
 	 */
 	public SparseMatrix getA() {
-		return a;
+		return this.a;
 	}
 
 	@Override

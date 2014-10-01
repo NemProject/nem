@@ -46,11 +46,11 @@ public class NodeNeighborMap implements NeighborhoodRepository {
 			while (iterator.hasNext()) {
 				nonZeroEntries.add(iterator.next());
 			}
-			List<MatrixElement> elements = nonZeroEntries.stream()
+			final List<MatrixElement> elements = nonZeroEntries.stream()
 					.distinct()
 					.sorted((e1, e2) -> e1.getColumn().compareTo(e2.getColumn()))
 					.collect(Collectors.toList());
-			for (MatrixElement e : elements) {
+			for (final MatrixElement e : elements) {
 				final NodeId neighborId = new NodeId(e.getColumn());
 				if (nodeNeighbors == null) {
 					nodeNeighbors = new NodeNeighbors(neighborId);
@@ -63,8 +63,8 @@ public class NodeNeighborMap implements NeighborhoodRepository {
 	}
 
 	@Override
-	public NodeNeighbors getNeighbors(NodeId nodeId) {
-		if (nodeId.getRaw() >= logicalSize) {
+	public NodeNeighbors getNeighbors(final NodeId nodeId) {
+		if (nodeId.getRaw() >= this.logicalSize) {
 			throw new IllegalArgumentException("id is out of range");
 		}
 

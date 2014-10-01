@@ -155,8 +155,8 @@ public class Scan implements GraphClusteringStrategy {
 				// Here y = node with id connectedNodeId.
 				final Community community = this.neighborhood.getCommunity(connectedNodeId);
 				if (community.isCore()) {
-					NodeNeighbors dirReach = community.getSimilarNeighbors();
-					for (NodeId nodeId : dirReach) {
+					final NodeNeighbors dirReach = community.getSimilarNeighbors();
+					for (final NodeId nodeId : dirReach) {
 						final int id = nodeId.getRaw();
 						if (null == this.nodeStates[id] ||
 								NON_MEMBER_CLUSTER_ID == this.nodeStates[id]) {

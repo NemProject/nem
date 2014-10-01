@@ -181,7 +181,7 @@ public class FastScan implements GraphClusteringStrategy {
 					this.nodeStates[community.getPivotId().getRaw()] = NON_MEMBER_CLUSTER_ID;
 				}
 			} else {
-				Cluster cluster;
+				final Cluster cluster;
 				ClusterId tmp = new ClusterId(id);
 
 				// Find out if some of the similar neighbors already have an id.
@@ -193,7 +193,7 @@ public class FastScan implements GraphClusteringStrategy {
 						.distinct()
 						.map(ClusterId::new)
 						.collect(Collectors.toList());
-				if (0 < clusterIds.size()) {
+				if (!clusterIds.isEmpty()) {
 					cluster = mergeClusters(clusterIds);
 					tmp = cluster.getId();
 				} else {

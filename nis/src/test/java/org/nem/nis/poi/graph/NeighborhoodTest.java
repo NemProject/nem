@@ -358,11 +358,11 @@ public class NeighborhoodTest {
 		return accountStates;
 	}
 
-	private static PoiAccountState createAccountWithBalance(long numNEM) {
+	private static PoiAccountState createAccountWithBalance(final long numNEM) {
 		return createAccountWithBalance(1, numNEM);
 	}
 
-	private static PoiAccountState createAccountWithBalance(final long blockHeight, long numNEM) {
+	private static PoiAccountState createAccountWithBalance(final long blockHeight, final long numNEM) {
 		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
 		state.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight), Amount.fromNem(numNEM));
 		return state;
@@ -374,7 +374,7 @@ public class NeighborhoodTest {
 		public final long balance;
 		public final int[] amounts;
 
-		public TestAccountInfo(long vestedBalance, long balance, int[] amounts) {
+		public TestAccountInfo(final long vestedBalance, final long balance, final int[] amounts) {
 			this.vestedBalance = vestedBalance;
 			this.balance = balance;
 			this.amounts = null == amounts ? new int[] { } : amounts;

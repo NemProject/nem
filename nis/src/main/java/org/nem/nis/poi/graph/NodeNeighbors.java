@@ -23,7 +23,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 		this.neighborIds = SparseBitmap.createFromSortedData();
 		if (neighborIds.length > 0) {
 			this.maxId = neighborIds[0].getRaw();
-			for (NodeId nodeId : neighborIds) {
+			for (final NodeId nodeId : neighborIds) {
 				if (this.maxId > nodeId.getRaw()) {
 					throw new IllegalArgumentException("ids must be set in strictly ascending order");
 				}
@@ -106,7 +106,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	 */
 	public NodeNeighbors union(final NodeNeighbors[] nodeNeighborsArray) {
 		SparseBitmap bitmap = this.neighborIds;
-		for (NodeNeighbors neighbors : nodeNeighborsArray) {
+		for (final NodeNeighbors neighbors : nodeNeighborsArray) {
 			bitmap = bitmap.or(neighbors.neighborIds);
 		}
 
@@ -150,7 +150,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 				return new NodeId(this.neighborIdsIterator.next());
 			}
 
-			private final Iterator<Integer> neighborIdsIterator = neighborIds.iterator();
+			private final Iterator<Integer> neighborIdsIterator = NodeNeighbors.this.neighborIds.iterator();
 		};
 	}
 

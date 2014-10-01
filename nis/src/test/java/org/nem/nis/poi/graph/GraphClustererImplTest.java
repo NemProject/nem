@@ -17,7 +17,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void networkWithTwoSimilarConnectedNodesCanBeClusteredWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			networkWithTwoSimilarConnectedNodesCanBeClustered(clusteringStrategy);
 		}
 	}
@@ -45,7 +45,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void networkWithTwoDissimilarConnectedNodesCanBeClusteredWithAllClusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			networkWithTwoDissimilarConnectedNodesCanBeClustered(clusteringStrategy);
 		}
 	}
@@ -72,7 +72,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void fullyConnectedNetworkResultsInSingleClusterWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			fullyConnectedNetworkResultsInSingleCluster(clusteringStrategy);
 		}
 	}
@@ -102,7 +102,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void networkWithTwoClustersAndDissimilarHubCanBeClusteredWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			networkWithTwoClustersAndDissimilarHubCanBeClustered(clusteringStrategy);
 		}
 	}
@@ -139,7 +139,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void networkWithTwoClustersAndPartiallyDissimilarHubCanBeClusteredWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			networkWithTwoClustersAndPartiallyDissimilarHubCanBeClustered(clusteringStrategy);
 		}
 	}
@@ -177,12 +177,12 @@ public class GraphClustererImplTest {
 	@Test
 	public void networkWithTwoClustersAndOutlierCanBeClusteredWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			networkWithTwoClustersAndOutlierCanBeClustered(clusteringStrategy);
 		}
 	}
 	
-	public void networkWithTwoClustersAndOutlierCanBeClustered(GraphClusteringStrategy clusteringStrategy) {
+	public void networkWithTwoClustersAndOutlierCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is an outlier
 		final TestContext context = new TestContext(clusteringStrategy, 7);
 		context.setNeighborIds(0, Arrays.asList(0, 2, 4));
@@ -213,7 +213,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void isolatedNodeIsDetectedAsAnOutlierWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			isolatedNodeIsDetectedAsAnOutlier(clusteringStrategy);
 		}
 	}
@@ -245,7 +245,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlierWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlier(clusteringStrategy);
 		}
 	}
@@ -277,8 +277,8 @@ public class GraphClustererImplTest {
 
 	@Test
 	public void nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlierWithAllclusteringStrategies() {
-		List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlier(clusteringStrategy);
 		}
 	}
@@ -369,7 +369,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void firstGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			firstGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -468,7 +468,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void secondGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			secondGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -528,7 +528,7 @@ public class GraphClustererImplTest {
 	@Test
 	public void thirdGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
 		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			thirdGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -590,8 +590,8 @@ public class GraphClustererImplTest {
 	 */
 	@Test
 	public void forthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			forthGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -653,8 +653,8 @@ public class GraphClustererImplTest {
 	 */
 	@Test
 	public void fifthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			fifthGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -701,8 +701,8 @@ public class GraphClustererImplTest {
 	 */
 	@Test
 	public void sixthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			sixthGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -739,8 +739,8 @@ public class GraphClustererImplTest {
 	 */
 	@Test
 	public void seventhGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			seventhGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -779,8 +779,8 @@ public class GraphClustererImplTest {
 	 */
 	@Test
 	public void eighthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
+		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
+		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
 			eighthGraphIsClusteredAsExpected(clusteringStrategy);
 		}
 	}
@@ -813,7 +813,7 @@ public class GraphClustererImplTest {
 		final NodeNeighborMap nodeNeighbordMap = new NodeNeighborMap(outlinkMatrix);
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighbordMap);
 		final Neighborhood neighborhood = new Neighborhood(nodeNeighbordMap, strategy);
-		ClusteringResult result = graphClusteringStrategy.cluster(neighborhood);
+		final ClusteringResult result = graphClusteringStrategy.cluster(neighborhood);
 		return result;
 	}
 	
@@ -860,7 +860,7 @@ public class GraphClustererImplTest {
 					.thenReturn(new NodeNeighbors(neighborIds.stream().map(NodeId::new).sorted().toArray(NodeId[]::new)));
 		}
 
-		public void setSimilarity(final int id1, final int id2, double similarity) {
+		public void setSimilarity(final int id1, final int id2, final double similarity) {
 			Mockito.when(this.similarityStrategy.calculateSimilarity(new NodeId(id1), new NodeId(id2))).thenReturn(similarity);
 			Mockito.when(this.similarityStrategy.calculateSimilarity(new NodeId(id2), new NodeId(id1))).thenReturn(similarity);
 		}
