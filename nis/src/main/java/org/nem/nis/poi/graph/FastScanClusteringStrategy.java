@@ -13,45 +13,27 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 
 	@Override
 	public ClusteringResult cluster(final Neighborhood neighborhood) {
-		final FastScanImpl impl = new FastScanImpl(neighborhood);
+		final FastScan impl = new FastScan(neighborhood);
 		impl.scan();
-		impl.processNonMembers();
-		//System.out.println(impl.getClusters().getClusters().size() + " clusters, " +  impl.getClusters().getHubs().size() + " hubs, and " + impl.getClusters().getOutliers().size() + " outliers");
 		return impl.getClusters();
 	}
 
-	private static final int NON_MEMBER_CLUSTER_ID = -1;
-
 	/**
-	 * FastScanImpl class uses the fast scan algorithm to cluster vertices (nodes) of a (transaction) graph
+	 * FastScan class uses the fast scan algorithm to cluster vertices (nodes) of a (transaction) graph
 	 * into different groups: regular clusters, hubs and outliers.
 	 */
-	private static class FastScanImpl {
-		private final Neighborhood neighborhood;
-		private final Integer neighborhoodSize;
-		private final Integer[] nodeStates;
-		private final List<Cluster> clusters = new ArrayList<>();
-		private final List<Cluster> hubs = new ArrayList<>();
-		private final List<Cluster> outliers = new ArrayList<>();
+	private static class FastScan extends AbstractScan {
 
-		/**
-		 * Creates a FastScanImpl.
-		 *
-		 * @param neighborhood The neighborhood to investigate.
-		 */
-		public FastScanImpl(final Neighborhood neighborhood) {
-			System.out.println("neighborhood size: " + neighborhood.size());
-			this.neighborhood = neighborhood;
-			this.neighborhoodSize = this.neighborhood.size();
-			this.nodeStates = new Integer[this.neighborhoodSize];
+		public FastScan(final Neighborhood neighborhood) {
+			super(neighborhood);
 		}
 
 		/**
 		 * The clustering process:
 		 * Group a neighborhood into clusters, hubs and outliers.
 		 */
-		public void scan() {
-			final long start = System.currentTimeMillis();
+		@Override
+		public void findClusters() {
 			NodeNeighbors visited = new NodeNeighbors();
 			for (int i = 0; i < this.neighborhoodSize; ++i) {
 				if (null != this.nodeStates[i]) {
@@ -86,10 +68,6 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 					unvisitedTwoHopPivots = getVisitedTwoHopUnion(unvisitedTwoHopPivots, visited);
 				}
 			}
-			final long stop = System.currentTimeMillis();
-			System.out.println("FastScanClusteringStrategy needed " + (stop - start) + "ms.");
-			//System.out.println(clusters);
-			//System.out.println(clusters.size() + " clusters, " +  hubs.size() + " hubs, and " + outliers.size() + " outliers");
 		}
 
 		/**
@@ -112,57 +90,6 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 				final Community specialVisit = this.neighborhood.getCommunity(simNeighbor);
 				this.addToCluster(specialVisit, specialVisit.getPivotId());
 			}
-		}
-
-		/**
-		 * Group all nodes that do not belong to a regular cluster into hubs and outliers.
-		 */
-		public void processNonMembers() {
-			for (int i = 0; i < this.neighborhoodSize; ++i) {
-				if (NON_MEMBER_CLUSTER_ID != this.nodeStates[i]) {
-					continue;
-				}
-
-				final Cluster cluster = new Cluster(new ClusterId(i));
-				cluster.add(new NodeId(i));
-				(this.isHub(this.neighborhood.getCommunity(new NodeId(i))) ? this.hubs : this.outliers).add(cluster);
-			}
-		}
-
-		/**
-		 * Determines if the given community is a hub.
-		 *
-		 * @param community The community in question.
-		 * @return True if the community is a hub, false otherwise.
-		 */
-		public boolean isHub(final Community community) {
-			final HashSet<ClusterId> connectedClusterIds = new HashSet<>();
-
-			for (final NodeId simNeighor : community.getSimilarNeighbors()) {
-				final int state = this.nodeStates[simNeighor.getRaw()];
-				if (NON_MEMBER_CLUSTER_ID == state) {
-					continue;
-				}
-
-				connectedClusterIds.add(new ClusterId(state));
-				if (connectedClusterIds.size() > 1) {
-					return true;
-				}
-			}
-
-			for (final NodeId dissimNeighbor : community.getDissimilarNeighbors()) {
-				final int state = this.nodeStates[dissimNeighbor.getRaw()];
-				if (NON_MEMBER_CLUSTER_ID == state) {
-					continue;
-				}
-
-				connectedClusterIds.add(new ClusterId(state));
-				if (connectedClusterIds.size() > 1) {
-					return true;
-				}
-			}
-
-			return false;
 		}
 
 		/**
@@ -247,9 +174,9 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 			for (final NodeId u : newlyVisited) {
 				twoHopAwayNodeNeighbors[index++] = this.neighborhood.getTwoHopAwayNeighbors(u);
 			}
+
 			NodeNeighbors unvisitedTwoHopUnion = NodeNeighbors.union(twoHopAwayNodeNeighbors);
 			unvisitedTwoHopUnion = unvisitedTwoHopUnion.difference(visitedTwoHopUnion);
-
 			return unvisitedTwoHopUnion;
 		}
 
@@ -265,16 +192,8 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 					return cluster;
 				}
 			}
-			throw new IllegalArgumentException("cluster with id " + clusterId + " not found.");
-		}
 
-		/**
-		 * Returns the result of the clustering process.
-		 *
-		 * @return The clustering result.
-		 */
-		public ClusteringResult getClusters() {
-			return new ClusteringResult(this.clusters, this.hubs, this.outliers);
+			throw new IllegalArgumentException("cluster with id " + clusterId + " not found.");
 		}
 	}
 }

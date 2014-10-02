@@ -778,7 +778,7 @@ public abstract class ScanGraphClusteringTest {
 		logClusteringResult(result);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
 		final List<Cluster> expectedHubs = Arrays.asList();
 		final List<Cluster> expectedOutliers = Arrays.asList();
 
@@ -811,7 +811,7 @@ public abstract class ScanGraphClusteringTest {
 		logClusteringResult(result);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
+		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
 		final List<Cluster> expectedHubs = Arrays.asList();
 		final List<Cluster> expectedOutliers = Arrays.asList();
 
@@ -824,8 +824,7 @@ public abstract class ScanGraphClusteringTest {
 		final NodeNeighborMap nodeNeighbordMap = new NodeNeighborMap(outlinkMatrix);
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighbordMap);
 		final Neighborhood neighborhood = new Neighborhood(nodeNeighbordMap, strategy);
-		final ClusteringResult result = graphClusteringStrategy.cluster(neighborhood);
-		return result;
+		return graphClusteringStrategy.cluster(neighborhood);
 	}
 
 	/**
