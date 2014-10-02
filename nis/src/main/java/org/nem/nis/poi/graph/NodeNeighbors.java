@@ -15,7 +15,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 
 	/**
 	 * Creates a new NodeNeighbors object.
-	 * The neighbor ids MUST be sorted in ascending order.
+	 * <em>The neighbor ids MUST be sorted in ascending order.</em>
 	 *
 	 * @param neighborIds The (sorted) neighbor ids.
 	 */
@@ -24,10 +24,6 @@ public class NodeNeighbors implements Iterable<NodeId> {
 		if (neighborIds.length > 0) {
 			this.maxId = neighborIds[0].getRaw();
 			for (final NodeId nodeId : neighborIds) {
-				if (this.maxId > nodeId.getRaw()) {
-					throw new IllegalArgumentException("ids must be set in strictly ascending order");
-				}
-				this.maxId = nodeId.getRaw();
 				this.addNeighbor(nodeId);
 			}
 		}
@@ -40,6 +36,8 @@ public class NodeNeighbors implements Iterable<NodeId> {
 
 	/**
 	 * Gets the number of neighbors.
+	 *
+	 * @return The number of neighbors.
 	 */
 	public int size() {
 		return this.neighborIds.cardinality();
@@ -47,7 +45,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 
 	/**
 	 * Adds a new neighbor.
-	 * Adding new neighbors MUST be in ascending order of ids.
+	 * <em>Adding new neighbors MUST be in ascending order of ids.</em>
 	 *
 	 * @param nodeId The node id.
 	 */
@@ -56,6 +54,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 		if (this.maxId > id) {
 			throw new IllegalArgumentException("ids must be set in strictly ascending order");
 		}
+
 		this.maxId = id;
 		this.neighborIds.setWithoutAscendingCheck(id);
 	}
@@ -79,7 +78,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	}
 
 	/**
-	 * Gets the number of common neighbors of this node's neighbors and another node's neighbors.
+	 * Gets the number neighbors common to this node's neighbors and another node's neighbors.
 	 *
 	 * @param otherNodeNeighbors the other node's neighbors.
 	 * @return The number of common neighbors.
@@ -89,23 +88,14 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	}
 
 	/**
-	 * Creates the union of this node neighbors with the other node neighbors.
-	 *
-	 * @param other The node neighbors.
-	 * @return The union with the other node neighbors.
-	 */
-	public NodeNeighbors union(final NodeNeighbors other) {
-		return union(new NodeNeighbors[] { other });
-	}
-
-	/**
-	 * Creates the union of this node neighbors with an array of other node neighbors.
+	 * Unions all the node neighbors together.
 	 *
 	 * @param nodeNeighborsArray The array of node neighbors.
 	 * @return The union of all node neighbors.
 	 */
-	public NodeNeighbors union(final NodeNeighbors[] nodeNeighborsArray) {
-		SparseBitmap bitmap = this.neighborIds;
+	public static NodeNeighbors union(final NodeNeighbors... nodeNeighborsArray) {
+		// TODO 20141010 should have a createEmpty or something
+		SparseBitmap bitmap = SparseBitmap.createFromUnsortedData();
 		for (final NodeNeighbors neighbors : nodeNeighborsArray) {
 			bitmap = bitmap.or(neighbors.neighborIds);
 		}
@@ -114,10 +104,10 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	}
 
 	/**
-	 * Returns the set theoretic difference of this node neighbors and other node neighbors.
+	 * Returns the set difference of this node neighbors and other node neighbors.
 	 *
 	 * @param other The other node neighbors.
-	 * @return The set theoretic difference.
+	 * @return The set difference.
 	 */
 	public NodeNeighbors difference(final NodeNeighbors other) {
 		return new NodeNeighbors(this.neighborIds.andNot(other.neighborIds));

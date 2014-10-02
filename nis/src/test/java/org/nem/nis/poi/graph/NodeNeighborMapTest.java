@@ -9,6 +9,8 @@ import org.nem.nis.test.NisUtils;
 
 public class NodeNeighborMapTest {
 
+	//region basic
+
 	@Test
 	public void mapCannotBeCreatedAroundNonSquareMatrix() {
 		// Assert:
@@ -18,6 +20,93 @@ public class NodeNeighborMapTest {
 		ExceptionAssert.assertThrows(
 				v -> new NodeNeighborMap(new DenseMatrix(8, 7)),
 				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void getLogicalSizeReturnsLogicalSizeOfMap() {
+		// Arrange:
+		final NodeNeighborMap neighborMap = new NodeNeighborMap(new DenseMatrix(7, 7));
+
+		// Assert:
+		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(7));
+	}
+
+	@Test
+	public void getNeighborsFailsIfNodeIdIsOutsideOfLogicalRange() {
+		// Arrange:
+		final NodeNeighborMap neighborMap = new NodeNeighborMap(new DenseMatrix(7, 7));
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> neighborMap.getNeighbors(new NodeId(7)),
+				IllegalArgumentException.class);
+	}
+
+	//endregion
+
+	//region map contents
+
+	@Test
+	public void nodeAlwaysReportsSelfAsNeighbor() {
+		// Arrange:
+		final Matrix matrix = new SparseMatrix(4, 4, 2);
+
+		// Act:
+		final NodeNeighborMap neighborMap = new NodeNeighborMap(matrix);
+
+		// Assert: even though the matrix is zero, all nodes include themselves as neighbors
+		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3)));
+	}
+
+	@Test
+	public void nodeSharesColumnOrRowWithNeighbors() {
+		// Arrange:
+		// 0010
+		// 0000
+		// 0001
+		// 0000
+		final Matrix matrix = new SparseMatrix(4, 4, 2);
+		matrix.setAt(0, 2, 1);
+		matrix.setAt(2, 3, 1);
+
+		// Act:
+		final NodeNeighborMap neighborMap = new NodeNeighborMap(matrix);
+
+		// Assert:
+		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2, 3)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
+	}
+
+	@Test
+	public void nodeDoesNotExposeDuplicateNeighbors() {
+		// Arrange:
+		// 0010
+		// 0010
+		// 1111
+		// 0010
+		final Matrix matrix = new SparseMatrix(4, 4, 2);
+		for (int i = 0; i < matrix.getRowCount(); ++i) {
+			matrix.setAt(i, 2, 1);
+			matrix.setAt(2, i, 1);
+
+		}
+
+		// Act:
+		final NodeNeighborMap neighborMap = new NodeNeighborMap(matrix);
+
+		// Assert:
+		Assert.assertThat(neighborMap.getLogicalSize(), IsEqual.equalTo(4));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(0)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 2)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(1)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 2)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(2)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 3)));
+		Assert.assertThat(neighborMap.getNeighbors(new NodeId(3)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 3)));
 	}
 
 	@Test
@@ -46,14 +135,5 @@ public class NodeNeighborMapTest {
 		Assert.assertThat(neighborMap.getNeighbors(new NodeId(6)).toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 6)));
 	}
 
-	@Test
-	public void getNeighborsFailsIfNodeIdIsOutsideOfLogicalRange() {
-		// Arrange:
-		final NodeNeighborMap neighborMap = new NodeNeighborMap(new DenseMatrix(7, 7));
-
-		// Assert:
-		ExceptionAssert.assertThrows(
-				v -> neighborMap.getNeighbors(new NodeId(7)),
-				IllegalArgumentException.class);
-	}
+	//endregion
 }

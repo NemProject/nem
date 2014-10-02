@@ -6,8 +6,6 @@ import org.nem.core.model.primitive.NodeId;
 import java.util.*;
 import java.util.stream.Collectors;
 
-// TODO-CR [08062014][J-J]: i will need to look close at this too
-
 /**
  * Maintains a mapping of node ids to neighbor node ids.
  */
@@ -37,22 +35,16 @@ public class NodeNeighborMap implements NeighborhoodRepository {
 			NodeNeighbors nodeNeighbors = null;
 			final List<MatrixElement> nonZeroEntries = new ArrayList<>();
 			nonZeroEntries.add(new MatrixElement(row, row, 1));
-			MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(row);
-			while (iterator.hasNext()) {
-				nonZeroEntries.add(iterator.next());
-			}
+			nonZeroEntries.addAll(getNonZeroRowElements(matrix, row));
+			nonZeroEntries.addAll(getNonZeroRowElements(transposedMatrix, row));
 
-			iterator = transposedMatrix.getNonZeroElementRowIterator(row);
-			while (iterator.hasNext()) {
-				nonZeroEntries.add(iterator.next());
-			}
 			final List<MatrixElement> elements = nonZeroEntries.stream()
 					.distinct()
 					.sorted((e1, e2) -> e1.getColumn().compareTo(e2.getColumn()))
 					.collect(Collectors.toList());
 			for (final MatrixElement e : elements) {
 				final NodeId neighborId = new NodeId(e.getColumn());
-				if (nodeNeighbors == null) {
+				if (null == nodeNeighbors) {
 					nodeNeighbors = new NodeNeighbors(neighborId);
 					this.nodeIdToNodeNeighborsMap.put(nodeId, nodeNeighbors);
 				} else {
@@ -60,6 +52,16 @@ public class NodeNeighborMap implements NeighborhoodRepository {
 				}
 			}
 		}
+	}
+
+	private static Collection<MatrixElement> getNonZeroRowElements(final Matrix matrix, final int row) {
+		final List<MatrixElement> nonZeroElements = new ArrayList<>();
+		final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(row);
+		while (iterator.hasNext()) {
+			nonZeroElements.add(iterator.next());
+		}
+
+		return nonZeroElements;
 	}
 
 	@Override

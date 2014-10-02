@@ -82,7 +82,7 @@ public class FastScan implements GraphClusteringStrategy {
 							specialVisit(v, c);
 						}
 					}
-					visited = visited.union(unvisitedTwoHopPivots);
+					visited = NodeNeighbors.union(visited, unvisitedTwoHopPivots);
 					unvisitedTwoHopPivots = getVisitedTwoHopUnion(unvisitedTwoHopPivots, visited);
 				}
 			}
@@ -247,7 +247,7 @@ public class FastScan implements GraphClusteringStrategy {
 			for (final NodeId u : newlyVisited) {
 				twoHopAwayNodeNeighbors[index++] = this.neighborhood.getTwoHopAwayNeighbors(u);
 			}
-			NodeNeighbors unvisitedTwoHopUnion = new NodeNeighbors().union(twoHopAwayNodeNeighbors);
+			NodeNeighbors unvisitedTwoHopUnion = NodeNeighbors.union(twoHopAwayNodeNeighbors);
 			unvisitedTwoHopUnion = unvisitedTwoHopUnion.difference(visitedTwoHopUnion);
 
 			return unvisitedTwoHopUnion;
