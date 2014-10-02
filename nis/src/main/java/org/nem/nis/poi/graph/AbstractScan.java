@@ -11,11 +11,11 @@ public abstract class AbstractScan {
 	/**
 	 * Special cluster id that indicates the node is not part of any cluster.
 	 */
-	protected static final int NON_MEMBER_CLUSTER_ID = -1;
+	private static final int NON_MEMBER_CLUSTER_ID = -1;
 
 	// TODO: these are protected fields for performance, but not good for design
 	protected final Neighborhood neighborhood;
-	protected final Integer neighborhoodSize;
+	private final Integer neighborhoodSize;
 	protected final Integer[] nodeStates;
 	protected final List<Cluster> clusters = new ArrayList<>();
 
@@ -42,9 +42,30 @@ public abstract class AbstractScan {
 	}
 
 	/**
-	 * Actually finds the clusters.
+	 * Builds a cluster around the specified community.
+	 * <em>This function is only called for unclassified core communities.</em>
+	 *
+	 * @param community The community to cluster around.
 	 */
-	protected abstract void findClusters();
+	protected abstract void cluster(final Community community);
+
+	private void findClusters() {
+		for (int i = 0; i < this.neighborhoodSize; ++i) {
+			if (null != this.nodeStates[i]) {
+				continue;
+			}
+
+			final NodeId nodeId = new NodeId(i);
+			final Community community = this.neighborhood.getCommunity(nodeId);
+			if (!community.isCore()) {
+				this.nodeStates[i] = NON_MEMBER_CLUSTER_ID;
+				continue;
+			}
+
+			// build a community around i
+			cluster(community);
+		}
+	}
 
 	private void processNonMembers() {
 		for (int i = 0; i < this.neighborhoodSize; ++i) {
@@ -91,5 +112,27 @@ public abstract class AbstractScan {
 	 */
 	public ClusteringResult getClusters() {
 		return new ClusteringResult(this.clusters, this.hubs, this.outliers);
+	}
+
+	/**
+	 * Marks a community as non-core.
+	 *
+	 * @param community The community to mark as non-core.
+	 */
+	protected void markAsNonCore(final Community community) {
+		final int pivotId = community.getPivotId().getRaw();
+		if (null == this.nodeStates[pivotId]) {
+			this.nodeStates[pivotId] = NON_MEMBER_CLUSTER_ID;
+		}
+	}
+
+	/**
+	 * Gets a value indicating whether or not the specified node is part of a cluster.
+	 *
+	 * @param id The node id.
+	 * @return true if the specified node is part of a cluster.
+	 */
+	protected boolean isClustered(final int id) {
+		return null != this.nodeStates[id] && NON_MEMBER_CLUSTER_ID != this.nodeStates[id];
 	}
 }

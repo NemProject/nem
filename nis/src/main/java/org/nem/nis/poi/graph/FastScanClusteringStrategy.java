@@ -28,67 +28,53 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 			super(neighborhood);
 		}
 
-		/**
-		 * The clustering process:
-		 * Group a neighborhood into clusters, hubs and outliers.
-		 */
 		@Override
-		public void findClusters() {
+		public void cluster(final Community community) {
 			NodeNeighbors visited = new NodeNeighbors();
-			for (int i = 0; i < this.neighborhoodSize; ++i) {
-				if (null != this.nodeStates[i]) {
-					continue;
-				}
+			visited.addNeighbor(community.getPivotId());
+			this.addToCluster(community);
 
-				final NodeId nodeId = new NodeId(i);
-				visited.removeAll();
-				visited.addNeighbor(nodeId);
+			NodeNeighbors unvisitedTwoHopPivots = this.neighborhood.getTwoHopAwayNeighbors(community.getPivotId());
+			while (0 < unvisitedTwoHopPivots.size()) {
+				this.clusterNeighbors(unvisitedTwoHopPivots);
+				visited = NodeNeighbors.union(visited, unvisitedTwoHopPivots);
+				unvisitedTwoHopPivots = getVisitedTwoHopUnion(unvisitedTwoHopPivots, visited);
+			}
+		}
 
-				final Community community = this.neighborhood.getCommunity(nodeId);
-				addToCluster(community, community.getPivotId());
-
-				NodeNeighbors unvisitedTwoHopPivots = this.neighborhood.getTwoHopAwayNeighbors(nodeId);
-
-				// Handle special case where we are the end of a line
-				if (community.getSimilarNeighbors().size() == 2) {
-					specialVisit(new NodeId(i), community);
-				}
-
-				while (0 < unvisitedTwoHopPivots.size()) {
-					for (final NodeId v : unvisitedTwoHopPivots) {
-						final Community c = this.neighborhood.getCommunity(v);
-						this.addToCluster(c, c.getPivotId());
-
-						// Handle special case where we are the end of a line
-						if (c.getSimilarNeighbors().size() == 2) {
-							specialVisit(v, c);
-						}
-					}
-					visited = NodeNeighbors.union(visited, unvisitedTwoHopPivots);
-					unvisitedTwoHopPivots = getVisitedTwoHopUnion(unvisitedTwoHopPivots, visited);
-				}
+		private void clusterNeighbors(final NodeNeighbors neighbors) {
+			for (final NodeId id : neighbors) {
+				final Community community = this.neighborhood.getCommunity(id);
+				this.addToCluster(community);
 			}
 		}
 
 		/**
-		 * Handle the special case that the node is at the end of a line graph. This doesn't seem
-		 * to work with regular FastScanClusteringStrategy because of the two-hop skipping (pretty sure it is a limitation
-		 * of the published algorithm).
-		 * We handle this case by creating a community around the neighboring node, rather
-		 * than just the two-hop away node. This is done only for that one neighbor and
-		 * does not propagate through subsequent iterations (i.e., we don't get the two-hop
-		 * away nodes for this one neighbor).
+		 * Calls addToClusterWithoutSpecialVisit and handles the special case that the node is at the end of a line graph.
 		 *
-		 * @param curNode - current node
-		 * @param c - community for the current node
+		 * @param community The community to add.
 		 */
-		public void specialVisit(final NodeId curNode, final Community c) {
-			for (final NodeId simNeighbor : c.getSimilarNeighbors()) {
-				if (curNode == simNeighbor) {
+		public void addToCluster(final Community community) {
+			this.addToClusterWithoutSpecialVisit(community);
+
+			if (2 != community.getSimilarNeighbors().size()) {
+				return;
+			}
+
+			// Handle the special case that the node is at the end of a line graph. This doesn't seem
+			// to work with regular FastScanClusteringStrategy because of the two-hop skipping
+			// (pretty sure it is a limitation of the published algorithm).
+			// We handle this case by creating a community around the neighboring node, rather
+			// than just the two-hop away node. This is done only for that one neighbor and
+			// does not propagate through subsequent iterations (i.e., we don't get the two-hop
+			// away nodes for this one neighbor).
+			for (final NodeId neighborId : community.getSimilarNeighbors()) {
+				if (community.getPivotId() == neighborId) {
 					continue;
 				}
-				final Community specialVisit = this.neighborhood.getCommunity(simNeighbor);
-				this.addToCluster(specialVisit, specialVisit.getPivotId());
+
+				final Community neighborCommunity = this.neighborhood.getCommunity(neighborId);
+				this.addToClusterWithoutSpecialVisit(neighborCommunity);
 			}
 		}
 
@@ -98,40 +84,40 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 		 * - then merge the community into that cluster,
 		 * - else create a new cluster,
 		 * else mark community as non member.
+		 * <br/>
+		 * <em>This function should only be called by addToCluster.</em>
 		 *
 		 * @param community The community to add.
-		 * @param id The id for a new cluster.
 		 */
-		private void addToCluster(final Community community, final NodeId id) {
+		private void addToClusterWithoutSpecialVisit(final Community community) {
 			if (!community.isCore()) {
-				if (null == this.nodeStates[community.getPivotId().getRaw()]) {
-					this.nodeStates[community.getPivotId().getRaw()] = NON_MEMBER_CLUSTER_ID;
-				}
-			} else {
-				final Cluster cluster;
-				ClusterId tmp = new ClusterId(id);
+				this.markAsNonCore(community);
+				return;
+			}
 
-				// Find out if some of the similar neighbors already have an id.
-				// This would mean the new cluster overlaps with at least one existing cluster.
-				// In that case we merge the existing clusters and then expand the cluster.
-				final List<ClusterId> clusterIds = community.getSimilarNeighbors().toList().stream()
-						.filter(nodeId -> null != this.nodeStates[nodeId.getRaw()] && NON_MEMBER_CLUSTER_ID != this.nodeStates[nodeId.getRaw()])
-						.map(nodeId -> this.nodeStates[nodeId.getRaw()])
-						.distinct()
-						.map(ClusterId::new)
-						.collect(Collectors.toList());
-				if (!clusterIds.isEmpty()) {
-					cluster = mergeClusters(clusterIds);
-					tmp = cluster.getId();
-				} else {
-					cluster = new Cluster(tmp);
-					this.clusters.add(cluster);
-				}
-				final ClusterId clusterId = tmp;
-				for (final NodeId nodeId : community.getSimilarNeighbors()) {
-					this.nodeStates[nodeId.getRaw()] = clusterId.getRaw();
-					cluster.add(nodeId);
-				}
+			final Cluster cluster;
+			ClusterId clusterId = new ClusterId(community.getPivotId());
+
+			// Find out if some of the similar neighbors already have an id.
+			// This would mean the new cluster overlaps with at least one existing cluster.
+			// In that case we merge the existing clusters and then expand the cluster.
+			final List<ClusterId> clusterIds = community.getSimilarNeighbors().toList().stream()
+					.filter(nodeId -> this.isClustered(nodeId.getRaw()))
+					.map(nodeId -> this.nodeStates[nodeId.getRaw()])
+					.distinct()
+					.map(ClusterId::new)
+					.collect(Collectors.toList());
+			if (!clusterIds.isEmpty()) {
+				cluster = mergeClusters(clusterIds);
+				clusterId = cluster.getId();
+			} else {
+				cluster = new Cluster(clusterId);
+				this.clusters.add(cluster);
+			}
+
+			for (final NodeId nodeId : community.getSimilarNeighbors()) {
+				this.nodeStates[nodeId.getRaw()] = clusterId.getRaw();
+				cluster.add(nodeId);
 			}
 		}
 
@@ -149,6 +135,7 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 			final ClusterId clusterId = clusterIds.get(0);
 			final Cluster cluster = findCluster(clusterId);
 
+			// TODO 20141002: we should add a test were clusters get merged
 			for (int ndx = 1; ndx < clusterIds.size(); ndx++) {
 				final Cluster clusterToMerge = findCluster(clusterIds.get(ndx));
 				cluster.merge(clusterToMerge);

@@ -39,22 +39,10 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 		}
 
 		@Override
-		public void findClusters() {
-			for (int i = 0; i < this.neighborhoodSize; ++i) {
-				if (null != this.nodeStates[i]) {
-					continue;
-				}
-
-				final NodeId nodeId = new NodeId(i);
-				final Community community = this.neighborhood.getCommunity(nodeId);
-				if (!community.isCore()) {
-					this.nodeStates[i] = NON_MEMBER_CLUSTER_ID;
-					continue;
-				}
-
-				// build a community around i
-				this.clusters.add(this.buildCluster(nodeId));
-			}
+		public void cluster(final Community community) {
+			// build a cluster around the community
+			final Cluster cluster = this.buildCluster(community.getPivotId());
+			this.clusters.add(cluster);
 		}
 
 		private Cluster buildCluster(final NodeId pivotId) {
@@ -93,10 +81,6 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 			}
 
 			return cluster;
-		}
-
-		private boolean isClustered(final int id) {
-			return null != this.nodeStates[id] && NON_MEMBER_CLUSTER_ID != this.nodeStates[id];
 		}
 	}
 }
