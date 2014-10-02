@@ -17,6 +17,15 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		this.bitmap = bitmap;
 	}
 
+    /**
+     * Creates a new <code>SparseBitmap</code> that is empty.
+     *
+     * @return new <code>SparseBitmap</code> that is empty (no bits set)
+     */
+    public static SparseBitmap createEmpty() {
+        return new SparseBitmap(EWAHCompressedBitmap.bitmapOf());
+    }
+
 	/**
 	 * Creates a new <code>SparseBitmap</code> from data that are already sorted
 	 * in strictly ascending order (duplicate values are okay).

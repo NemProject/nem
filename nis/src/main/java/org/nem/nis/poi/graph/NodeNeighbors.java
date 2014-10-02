@@ -94,9 +94,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	 * @return The union of all node neighbors.
 	 */
 	public static NodeNeighbors union(final NodeNeighbors... nodeNeighborsArray) {
-		// TODO 20141010 should have a createEmpty or something
-        // TODO 20141002 M-J: I agree. Nice time slip to the future, btw.
-		SparseBitmap bitmap = SparseBitmap.createFromUnsortedData();
+		SparseBitmap bitmap = SparseBitmap.createEmpty();
 		for (final NodeNeighbors neighbors : nodeNeighborsArray) {
 			bitmap = bitmap.or(neighbors.neighborIds);
 		}

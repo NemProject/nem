@@ -4,9 +4,6 @@ import org.nem.core.model.primitive.*;
 
 import java.util.*;
 
-// TODO 20141001 J-M i think it makes more sense to name these classes (FastSca|ScanClusteringStrategy)ClusteringStrategy
-// TODO 20141002 M-J Good idea
-
 /**
  * Implementation of the initial SCAN algorithm, from this paper:
  * Xu, X., Yuruk, N., Feng, Z., & Schweiger, T. A. (2007, August),
