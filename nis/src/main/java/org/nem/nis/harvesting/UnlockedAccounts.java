@@ -45,7 +45,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 		final PoiAccountState accountState = this.poiFacade.findLatestForwardedStateByAddress(account.getAddress());
 		final PoiAccountInfo accountInfo = new PoiAccountInfo(-1, accountState, currentHeight);
 
-		if (!accountInfo.canForage()) {
+		if (!accountInfo.canHarvest()) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
 		}
 

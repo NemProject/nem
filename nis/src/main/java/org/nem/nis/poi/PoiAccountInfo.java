@@ -11,8 +11,7 @@ import java.util.*;
  */
 public class PoiAccountInfo {
 
-	private static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1000);
-	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR / (double)WeightedBalance.DECAY_DENOMINATOR;
+	public static final Amount MIN_HARVESTING_BALANCE = Amount.fromNem(1000);
 
 	private final int index;
 	private final PoiAccountState accountState;
@@ -41,7 +40,9 @@ public class PoiAccountInfo {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
 			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-			final double weight = heightDifference < 0 ? 0.0 : outlink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
+			final double weight = heightDifference < 0
+					? 0.0
+					: outlink.getAmount().getNumMicroNem() * Math.pow(WeightedBalanceDecayConstants.DECAY_BASE, age);
 
 			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));
 			this.increment(outlink.getOtherAccountAddress(), weight);
@@ -71,12 +72,12 @@ public class PoiAccountInfo {
 	}
 
 	/**
-	 * Determines whether or not the account is eligible for foraging.
+	 * Determines whether or not the account is eligible for harvesting.
 	 *
 	 * @return true if the account is eligible.
 	 */
-	public boolean canForage() {
-		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(MIN_FORAGING_BALANCE) >= 0;
+	public boolean canHarvest() {
+		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(MIN_HARVESTING_BALANCE) >= 0;
 	}
 
 	/**

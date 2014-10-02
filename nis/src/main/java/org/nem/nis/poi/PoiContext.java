@@ -144,7 +144,7 @@ public class PoiContext {
 			int i = 0;
 			for (final PoiAccountState accountState : accountStates) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
-				if (!accountInfo.canForage()) {
+				if (!accountInfo.canHarvest()) {
 					continue;
 				}
 

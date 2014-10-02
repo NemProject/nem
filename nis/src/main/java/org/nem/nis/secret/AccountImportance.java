@@ -135,7 +135,7 @@ public class AccountImportance implements SerializableEntity {
 	 */
 	public double getImportance(final BlockHeight blockHeight) {
 		if (this.importanceHeight == null) {
-			LOGGER.warning("your balance haven't vested yet, foraging does not make sense");
+			LOGGER.warning("your balance hasn't vested yet, harvesting does not make sense");
 			return 0.0;
 		}
 		if (0 != this.importanceHeight.compareTo(blockHeight)) {

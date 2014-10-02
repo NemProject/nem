@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.secret.AccountLink;
+import org.nem.nis.secret.*;
 
 import java.util.*;
 
@@ -52,7 +52,7 @@ public class PoiAccountInfoTest {
 		state.getWeightedBalances().addFullyVested(height, vestedBalance);
 
 		// Act:
-		return new PoiAccountInfo(11, state, height).canForage();
+		return new PoiAccountInfo(11, state, height).canHarvest();
 	}
 
 	//region getOutlinks
@@ -90,9 +90,9 @@ public class PoiAccountInfoTest {
 	@Test
 	public void outlinksAreCorrectWhenAccountHasOutlinksWithVariableHeights() {
 		// Arrange:
-		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
-		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
-		final double threeDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+		final double oneDayDecay = WeightedBalanceDecayConstants.DECAY_BASE;
+		final double twoDayDecay = oneDayDecay * oneDayDecay;
+		final double threeDayDecay = twoDayDecay * oneDayDecay;
 
 		// block heights must be in order so that account links have increasing block heights
 		final PoiAccountInfo info = createAccountInfoWithOutlinks(
@@ -153,9 +153,9 @@ public class PoiAccountInfoTest {
 	@Test
 	public void netOutlinksAreCorrectWhenAccountHasOutlinksWithVariableHeights() {
 		// Arrange:
-		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
-		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
-		final double threeDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+		final double oneDayDecay = WeightedBalanceDecayConstants.DECAY_BASE;
+		final double twoDayDecay = oneDayDecay * oneDayDecay;
+		final double threeDayDecay = twoDayDecay * oneDayDecay;
 
 		// block heights must be in order so that account links have increasing block heights
 		final PoiAccountInfo info = createAccountInfoWithOutlinks(
@@ -207,9 +207,9 @@ public class PoiAccountInfoTest {
 	@Test
 	public void outlinkScoreIsComputedCorrectlyWhenAccountHasOutlinksWithVariableHeights() {
 		// Arrange:
-		final double oneDayDecay = PoiAccountInfo.DECAY_BASE;
-		final double twoDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
-		final double threeDayDecay = PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE * PoiAccountInfo.DECAY_BASE;
+		final double oneDayDecay = WeightedBalanceDecayConstants.DECAY_BASE;
+		final double twoDayDecay = oneDayDecay * oneDayDecay;
+		final double threeDayDecay = twoDayDecay * oneDayDecay;
 
 		// block heights must be in order so that account links have increasing block heights
 		final PoiAccountInfo info = createAccountInfoWithOutlinks(
