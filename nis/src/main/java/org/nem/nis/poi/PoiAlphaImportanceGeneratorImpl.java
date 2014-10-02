@@ -27,7 +27,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 	public void updateAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> accountStates,
-			final PoiScorer.ScoringAlg scoringAlg,
+			final PoiScorer poiScorer,
 			final GraphClusteringStrategy clusterer) {
 
 		// This is the draft implementation for calculating proof-of-importance
@@ -54,8 +54,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		final ColumnVector importanceVector = scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutlinkScoreVector(),
-				context.getVestedBalanceVector(),
-				scoringAlg);
+				context.getVestedBalanceVector());
 		context.updateImportances(iterator.getResult(), importanceVector);
 	}
 

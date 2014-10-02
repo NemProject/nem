@@ -586,7 +586,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			final Collection<PoiAccountState> accounts,
 			final GraphClusteringStrategy clusteringStrategy) {
 		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
-		poi.updateAccountImportances(blockHeight, accounts, PoiScorer.ScoringAlg.MAKOTO, clusteringStrategy);
+		poi.updateAccountImportances(blockHeight, accounts, new PoiScorer(), clusteringStrategy);
 		final List<Double> importances = accounts.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());
