@@ -35,16 +35,16 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 			this.addToCluster(community);
 
 			NodeNeighbors unvisitedTwoHopPivots = this.neighborhood.getTwoHopAwayNeighbors(community.getPivotId());
-			while (0 < unvisitedTwoHopPivots.size()) {
+			while (unvisitedTwoHopPivots.size() > 0) {
 				this.clusterNeighbors(unvisitedTwoHopPivots);
 				visited = NodeNeighbors.union(visited, unvisitedTwoHopPivots);
-				unvisitedTwoHopPivots = getVisitedTwoHopUnion(unvisitedTwoHopPivots, visited);
+				unvisitedTwoHopPivots = this.getUnvisitedTwoHopUnion(unvisitedTwoHopPivots, visited);
 			}
 		}
 
 		private void clusterNeighbors(final NodeNeighbors neighbors) {
-			for (final NodeId id : neighbors) {
-				final Community community = this.neighborhood.getCommunity(id);
+			for (final NodeId v : neighbors) {
+				final Community community = this.neighborhood.getCommunity(v);
 				this.addToCluster(community);
 			}
 		}
@@ -69,7 +69,7 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 			// does not propagate through subsequent iterations (i.e., we don't get the two-hop
 			// away nodes for this one neighbor).
 			for (final NodeId neighborId : community.getSimilarNeighbors()) {
-				if (community.getPivotId() == neighborId) {
+				if (community.getPivotId().equals(neighborId)) {
 					continue;
 				}
 
@@ -128,14 +128,14 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 		 * @return The merged cluster.
 		 */
 		private Cluster mergeClusters(final List<ClusterId> clusterIds) {
-			if (0 >= clusterIds.size()) {
+			if (clusterIds.size() <= 0) {
 				throw new IllegalArgumentException("need at least one cluster id to merge");
 			}
 
 			final ClusterId clusterId = clusterIds.get(0);
 			final Cluster cluster = findCluster(clusterId);
 
-			// TODO 20141002: we should add a test were clusters get merged
+			// TODO 20141002: we should add a test where clusterIds.size() >= 2!
 			for (int ndx = 1; ndx < clusterIds.size(); ndx++) {
 				final Cluster clusterToMerge = findCluster(clusterIds.get(ndx));
 				cluster.merge(clusterToMerge);
@@ -150,11 +150,11 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 		 * Returns a collection of all unvisited node ids that are two hops away
 		 * from an already visited collection of nodes.
 		 *
-		 * @param newlyVisited - Nodes visited in the last iteration of the while loop.
-		 * @param visitedTwoHopUnion - nodes visited up until now.
+		 * @param newlyVisited Nodes visited in the last iteration of the while loop.
+		 * @param allVisited All nodes visited up until now.
 		 * @return The collection of nodes that are two hops away from the set of newlyVisited nodes.
 		 */
-		private NodeNeighbors getVisitedTwoHopUnion(final NodeNeighbors newlyVisited, final NodeNeighbors visitedTwoHopUnion) {
+		private NodeNeighbors getUnvisitedTwoHopUnion(final NodeNeighbors newlyVisited, final NodeNeighbors allVisited) {
 			final NodeNeighbors[] twoHopAwayNodeNeighbors = new NodeNeighbors[newlyVisited.size()];
 
 			int index = 0;
@@ -162,25 +162,8 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 				twoHopAwayNodeNeighbors[index++] = this.neighborhood.getTwoHopAwayNeighbors(u);
 			}
 
-			NodeNeighbors unvisitedTwoHopUnion = NodeNeighbors.union(twoHopAwayNodeNeighbors);
-			unvisitedTwoHopUnion = unvisitedTwoHopUnion.difference(visitedTwoHopUnion);
-			return unvisitedTwoHopUnion;
-		}
-
-		/**
-		 * Returns the cluster with a given id from the cluster collection.
-		 *
-		 * @param clusterId The id for the cluster.
-		 * @return The cluster with the wanted id.
-		 */
-		private Cluster findCluster(final ClusterId clusterId) {
-			for (final Cluster cluster : this.clusters) {
-				if (cluster.getId().equals(clusterId)) {
-					return cluster;
-				}
-			}
-
-			throw new IllegalArgumentException("cluster with id " + clusterId + " not found.");
+			final NodeNeighbors newlyVisitedTwoHopAwayNodeNeighbors = NodeNeighbors.union(twoHopAwayNodeNeighbors);
+			return newlyVisitedTwoHopAwayNodeNeighbors.difference(allVisited);
 		}
 	}
 }

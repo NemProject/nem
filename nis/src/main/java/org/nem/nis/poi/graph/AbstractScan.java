@@ -135,4 +135,21 @@ public abstract class AbstractScan {
 	protected boolean isClustered(final int id) {
 		return null != this.nodeStates[id] && NON_MEMBER_CLUSTER_ID != this.nodeStates[id];
 	}
+
+	/**
+	 * Returns the cluster with a given id from the cluster collection.
+	 *
+	 * @param clusterId The id for the cluster.
+	 * @return The cluster with the wanted id.
+	 */
+	protected Cluster findCluster(final ClusterId clusterId) {
+		// TODO 20141002 i guess since the number of expected clusters is small, a linear search is ok here
+		for (final Cluster cluster : this.clusters) {
+			if (cluster.getId().equals(clusterId)) {
+				return cluster;
+			}
+		}
+
+		throw new IllegalArgumentException("cluster with id " + clusterId + " not found.");
+	}
 }
