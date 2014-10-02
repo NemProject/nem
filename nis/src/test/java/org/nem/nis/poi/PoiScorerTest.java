@@ -14,19 +14,18 @@ public class PoiScorerTest {
 		final PoiScorer scorer = new PoiScorer();
 		final double dangleSum = scorer.calculateDangleSum(
 				Arrays.asList(1, 3),
-				PoiContext.TELEPORTATION_PROB,
+				0.4,
 				new ColumnVector(0.1, 0.8, 0.2, 0.5, 0.6, 0.3));
 
-		// Assert:
-		Assert.assertThat(dangleSum, IsEqual.equalTo(0.1625));
+		// Assert: sum(0.8, 0.5) * 0.4 / 6
+		Assert.assertThat(dangleSum, IsEqual.equalTo(1.3 * 0.4 / 6));
 	}
 
 	@Test
 	public void finalScoreIsCalculatedCorrectly() {
 		// Arrange
-		final double importanceWeight = 0.1337; //TODO: was 0.05 // TODO-CR [08062014][J-M]: why did this change?
-		// TODO-CR [20140806][M-J]: with NCDawareRank, I want to see if it is safe to use a larger weight. 5% is too low IMHO
-		// TODO-CR [20140921][M-J]: update: we should do more testing, but this seems safe enough IMHO
+		final double outlinkWeight = 1.25;
+		final double importanceWeight = 0.1337;
 
 		// Act:
 		final PoiScorer scorer = new PoiScorer();
@@ -36,14 +35,15 @@ public class PoiScorerTest {
 				new ColumnVector(80.0, 5.00, 140., 45.0, 40.0, 25.0)); // vested-balance
 
 		// Assert:
-		// weighted-outlinks: outlink * 1.05 + vested-balance
+		// weighted-outlinks: l1norm(outlink * outlinkWeight + vested-balance)
 		final ColumnVector weightedOutlinks = new ColumnVector(
-				4.00 * 1.25 + 80.0,
-				1.00 * 1.25 + 5.00,
-				7.00 * 1.25 + 140.,
-				9.00 * 1.25 + 45.0,
-				2.00 * 1.25 + 40.0,
-				5.00 * 1.25 + 25.0);
+				4.00 * outlinkWeight + 80.0,
+				1.00 * outlinkWeight + 5.00,
+				7.00 * outlinkWeight + 140.,
+				9.00 * outlinkWeight + 45.0,
+				2.00 * outlinkWeight + 40.0,
+				5.00 * outlinkWeight + 25.0);
+		weightedOutlinks.normalize();
 
 		// weighted-importance: importance * 0.05
 		final ColumnVector weightedImportance = new ColumnVector(
@@ -54,8 +54,7 @@ public class PoiScorerTest {
 				0.60 * importanceWeight,
 				0.30 * importanceWeight);
 
-		// final: l1norm(l1norm(weighted-outlinks) + weighted-importance)
-		weightedOutlinks.normalize();
+		// final: l1norm(weighted-outlinks + weighted-importance))
 		final ColumnVector expectedFinalScoresVector = weightedOutlinks.addElementWise(weightedImportance);
 		expectedFinalScoresVector.normalize();
 		Assert.assertThat(finalScoresVector, IsEqual.equalTo(expectedFinalScoresVector));

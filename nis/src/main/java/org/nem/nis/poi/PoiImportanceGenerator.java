@@ -16,7 +16,7 @@ public interface PoiImportanceGenerator {
 	 * @param blockHeight The block height.
 	 * @param accountStates The account states.
 	 */
-	default public void updateAccountImportances(
+	public default void updateAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> accountStates) {
 		this.updateAccountImportances(blockHeight, accountStates, new PoiScorer(), new FastScanClusteringStrategy());

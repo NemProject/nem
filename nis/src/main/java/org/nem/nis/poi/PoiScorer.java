@@ -24,10 +24,10 @@ public class PoiScorer {
 
 		double dangleSum = 0;
 		for (final int i : dangleIndexes) {
-			dangleSum += importanceVector.getAt(i) * teleportationProbability;
+			dangleSum += importanceVector.getAt(i);
 		}
 
-		return dangleSum / importanceVector.size();
+		return dangleSum * teleportationProbability / importanceVector.size();
 	}
 
 	/**
@@ -51,15 +51,18 @@ public class PoiScorer {
 			final ColumnVector importanceVector,
 			final ColumnVector outlinkVector,
 			final ColumnVector vestedBalanceVector) {
-
-		// alg is: l1norm(stakes + outlinkWeight*outlinkVector) + importanceWeight * l1norm(PR)
 		final double outlinkWeight = 1.25;
 		final double importanceWeight = 0.1337;
 
+		// WO: l1norm(max(0, stakes + outlinkWeight*outlinkVector))
 		final ColumnVector weightedOutlinks = outlinkVector.multiply(outlinkWeight).addElementWise(vestedBalanceVector);
-		final ColumnVector weightedImportances = importanceVector.multiply(importanceWeight);
 		weightedOutlinks.removeNegatives();
 		weightedOutlinks.normalize();
+
+		// WI: importanceWeight * PR
+		final ColumnVector weightedImportances = importanceVector.multiply(importanceWeight);
+
+		// WO + WI
 		return weightedOutlinks.addElementWise(weightedImportances);
 	}
 }
