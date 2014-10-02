@@ -5,6 +5,7 @@ import org.nem.core.model.primitive.*;
 import java.util.*;
 
 // TODO 20141001 J-M i think it makes more sense to name these classes (FastSca|Scan)ClusteringStrategy
+// TODO 20141002 M-J Good idea
 
 /**
  * Implementation of the initial SCAN algorithm, from this paper:
@@ -90,6 +91,7 @@ public class Scan implements GraphClusteringStrategy {
 		private boolean isHub(final HashSet<ClusterId> connectedClusterIds, final NodeNeighbors neighbors) {
 			// TODO 20141001 J-M since our graph is bidirectional, can there ever be a case where
 			// > a hub can has two similar neighbors (i can't think of one)?
+            // TODO 20141001 J-M: It depends on GraphConstants.MU.
 			for (final NodeId neighborId : neighbors) {
 				final int state = this.nodeStates[neighborId.getRaw()];
 				if (NON_MEMBER_CLUSTER_ID == state) {

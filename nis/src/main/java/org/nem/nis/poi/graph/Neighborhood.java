@@ -79,6 +79,7 @@ public class Neighborhood {
 		final NodeNeighbors neighbors = this.getCommunity(nodeId).getSimilarNeighbors();
 
 		// TODO 20141001 - i guess we're assuming that if size == 1 the neighborhood just contains the pivot?
+        // TODO 20141002 M-J: yes, that is correct.
 		if (neighbors.size() < 2) {
 			return new NodeNeighbors();
 		}

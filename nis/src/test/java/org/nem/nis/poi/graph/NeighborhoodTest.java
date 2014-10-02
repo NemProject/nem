@@ -193,6 +193,7 @@ public class NeighborhoodTest {
 	}
 
 	// TODO 20141001 - are we sure this is correct?
+    // TODO 20141002 M-J: it depends on our GraphConstants
 	@Test
 	public void getTwoHopAwayNeighborsIncludesPivot() {
 		// Arrange:
@@ -213,6 +214,7 @@ public class NeighborhoodTest {
 				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 7)));
 	}
 	// TODO 20141001 - are we sure this is correct?
+    // TODO 20141002 M-J: it depends on our GraphConstants
 
 	@Test
 	public void getTwoHopAwayNeighborsIncludesDirectNeighbors() {
