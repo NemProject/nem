@@ -52,7 +52,6 @@ public class Scan implements GraphClusteringStrategy {
 		}
 
 		public void scan() {
-			final long start = System.currentTimeMillis();
 			for (int i = 0; i < this.neighborhoodSize; ++i) {
 				if (null != this.nodeStates[i]) {
 					continue;
@@ -68,8 +67,6 @@ public class Scan implements GraphClusteringStrategy {
 				// build a community around i
 				this.clusters.add(this.buildCluster(nodeId));
 			}
-			final long stop = System.currentTimeMillis();
-			System.out.println("Scan needed " + (stop - start) + "ms.");
 		}
 
 		public void processNonMembers() {
@@ -86,9 +83,15 @@ public class Scan implements GraphClusteringStrategy {
 
 		public boolean isHub(final Community community) {
 			final HashSet<ClusterId> connectedClusterIds = new HashSet<>();
+			return isHub(connectedClusterIds, community.getSimilarNeighbors()) ||
+					isHub(connectedClusterIds, community.getDissimilarNeighbors());
+		}
 
-			for (final NodeId simNeighbor : community.getSimilarNeighbors()) {
-				final int state = this.nodeStates[simNeighbor.getRaw()];
+		private boolean isHub(final HashSet<ClusterId> connectedClusterIds, final NodeNeighbors neighbors) {
+			// TODO 20141001 J-M since our graph is bidirectional, can there ever be a case where
+			// > a hub can has two similar neighbors (i can't think of one)?
+			for (final NodeId neighborId : neighbors) {
+				final int state = this.nodeStates[neighborId.getRaw()];
 				if (NON_MEMBER_CLUSTER_ID == state) {
 					continue;
 				}
@@ -98,34 +101,6 @@ public class Scan implements GraphClusteringStrategy {
 					return true;
 				}
 			}
-
-			for (final NodeId dissimNeighbor : community.getDissimilarNeighbors()) {
-				final int state = this.nodeStates[dissimNeighbor.getRaw()];
-				if (NON_MEMBER_CLUSTER_ID == state) {
-					continue;
-				}
-
-				connectedClusterIds.add(new ClusterId(state));
-				if (connectedClusterIds.size() > 1) {
-					return true;
-				}
-			}
-
-			//The above code is not as pretty, but it is faster and we need speed.
-			//			final ArrayDeque<Integer> connections = new ArrayDeque<>();
-			//			connections.addAll(community.getSimilarNeighborIds().toList());
-			//			connections.addAll(community.getDissimilarNeighborIds().toList());
-			//
-			//			while (!connections.isEmpty()) {
-			//				final int neighborId = connections.pop();
-			//				final int neighborClusterId = this.nodeStates[neighborId];
-			//				if (NON_MEMBER_CLUSTER_ID == neighborClusterId)
-			//					continue;
-			//
-			//				connectedClusterIds.add(neighborClusterId);
-			//				if (connectedClusterIds.size() > 1)
-			//					return true;
-			//			}
 
 			return false;
 		}
@@ -148,29 +123,37 @@ public class Scan implements GraphClusteringStrategy {
 			while (!connections.isEmpty()) {
 				final NodeId connectedNodeId = connections.pop();
 
-				// dirReach = {x ∈ V | DirREACHε,μ(y, x)}; 
+				// dirReach = {x ∈ V | DirREACHε,μ(y, x)};
 				// Note that DirREACH requires y to be a core node.
 				// Here y = node with id connectedNodeId.
 				final Community community = this.neighborhood.getCommunity(connectedNodeId);
-				if (community.isCore()) {
-					final NodeNeighbors dirReach = community.getSimilarNeighbors();
-					for (final NodeId nodeId : dirReach) {
-						final int id = nodeId.getRaw();
-						if (null == this.nodeStates[id] ||
-								NON_MEMBER_CLUSTER_ID == this.nodeStates[id]) {
-							if (null == this.nodeStates[id]) {
-								// Need to analyze this node
-								connections.add(nodeId);
-							}
-							// Assign to current cluster and add to community
-							this.nodeStates[id] = pivotId.getRaw();
-							cluster.add(nodeId);
-						}
+				if (!community.isCore()) {
+					continue;
+				}
+
+				final NodeNeighbors dirReach = community.getSimilarNeighbors();
+				for (final NodeId nodeId : dirReach) {
+					final int id = nodeId.getRaw();
+					if (this.isClustered(id)) {
+						continue;
 					}
+
+					if (null == this.nodeStates[id]) {
+						// Need to analyze this node
+						connections.add(nodeId);
+					}
+
+					// Assign to current cluster and add to community
+					this.nodeStates[id] = pivotId.getRaw();
+					cluster.add(nodeId);
 				}
 			}
 
 			return cluster;
+		}
+
+		private boolean isClustered(final int id) {
+			return null != this.nodeStates[id] && NON_MEMBER_CLUSTER_ID != this.nodeStates[id];
 		}
 	}
 }

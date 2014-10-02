@@ -21,6 +21,13 @@ public abstract class ScanGraphClusteringTest {
 	 */
 	protected abstract GraphClusteringStrategy createClusteringStrategy();
 
+	// TODO 20141001 J-M please review the first group of tests for correctness ... i added a few
+
+	/**
+	 * <pre>
+	 *     0 - 1
+	 * </pre>
+	 */
 	@Test
 	public void networkWithTwoSimilarConnectedNodesCanBeClustered() {
 		// Arrange:
@@ -42,12 +49,17 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEquivalent.equivalentTo(expectedOutliers));
 	}
 
+	/**
+	 * <pre>
+	 *     0 - 1
+	 * </pre>
+	 */
 	@Test
 	public void networkWithTwoDissimilarConnectedNodesCanBeClustered() {
 		// Arrange:
 		final TestContext context = new TestContext(this.createClusteringStrategy(), 2);
 		context.setNeighborIds(0, Arrays.asList(0, 1));
-		context.setNeighborIds(1, Arrays.asList(1));
+		context.setNeighborIds(1, Arrays.asList(0, 1));
 
 		// Act:
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
@@ -62,15 +74,25 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEquivalent.equivalentTo(expectedOutliers));
 	}
 
+	/**
+	 * <pre>
+	 *      0 - 1
+	 *     / \ / \
+	 *    2 - \ - 5
+	 *     \ / \ /
+	 *      3 - 4
+	 * </pre>
+	 */
 	@Test
 	public void fullyConnectedNetworkResultsInSingleCluster() {
 		// Arrange:
-		final TestContext context = new TestContext(this.createClusteringStrategy(), 5);
-		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4));
-		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3, 4));
-		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3, 4));
-		context.setNeighborIds(3, Arrays.asList(0, 1, 2, 3, 4));
-		context.setNeighborIds(4, Arrays.asList(0, 1, 2, 3, 4));
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 6);
+		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 4));
+		context.setNeighborIds(1, Arrays.asList(0, 1, 3, 5));
+		context.setNeighborIds(2, Arrays.asList(0, 2, 3, 5));
+		context.setNeighborIds(3, Arrays.asList(1, 2, 3, 4));
+		context.setNeighborIds(4, Arrays.asList(0, 3, 4, 5));
+		context.setNeighborIds(5, Arrays.asList(1, 2, 4, 5));
 		context.makeAllSimilar();
 
 		// Act:
@@ -78,7 +100,7 @@ public abstract class ScanGraphClusteringTest {
 
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
 		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
@@ -87,49 +109,8 @@ public abstract class ScanGraphClusteringTest {
 
 	@Test
 	public void networkWithTwoClustersAndDissimilarHubCanBeClustered() {
-		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is the hub
-		final TestContext context = new TestContext(this.createClusteringStrategy(), 7);
-		context.setNeighborIds(0, Arrays.asList(0, 2, 4));
-		context.setNeighborIds(2, Arrays.asList(0, 2, 4, 6));
-		context.setNeighborIds(4, Arrays.asList(0, 2, 4));
-		context.setNeighborIds(1, Arrays.asList(1, 3, 5, 6));
-		context.setNeighborIds(3, Arrays.asList(1, 3, 5));
-		context.setNeighborIds(5, Arrays.asList(1, 3, 5));
-		context.setNeighborIds(6, Arrays.asList(1, 2, 6));
-		context.makeAllSimilar();
-		context.setSimilarity(6, 1, 0.0);
-		context.setSimilarity(6, 2, 0.0);
-
-		// Act:
-		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
-
-		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4)),
-				new Cluster(new ClusterId(3), NisUtils.toNodeIdList(1, 3, 5)));
-		final List<Cluster> expectedHubs = Arrays.asList(
-				new Cluster(new ClusterId(6), NisUtils.toNodeIdList(6)));
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs(), IsEqual.equalTo(expectedHubs));
-		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void networkWithTwoClustersAndPartiallyDissimilarHubCanBeClustered() {
-		// TODO: not sure if this test can actually happen (where there is a uni-directional edge)
-		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is the hub
-		final TestContext context = new TestContext(this.createClusteringStrategy(), 7);
-		context.setNeighborIds(0, Arrays.asList(0, 2, 4));
-		context.setNeighborIds(2, Arrays.asList(0, 2, 4));
-		context.setNeighborIds(4, Arrays.asList(0, 2, 4));
-		context.setNeighborIds(1, Arrays.asList(1, 3, 5, 6));
-		context.setNeighborIds(3, Arrays.asList(1, 3, 5));
-		context.setNeighborIds(5, Arrays.asList(1, 3, 5));
-		context.setNeighborIds(6, Arrays.asList(1, 2, 6));
-		context.makeAllSimilar();
-		context.setSimilarity(6, 1, 0.0);
-		context.setSimilarity(6, 2, 1.0);
+		// Arrange:
+		final TestContext context = this.createContextForTwoClustersAndHub(0.0, 0.0);
 
 		// Act:
 		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
@@ -146,6 +127,71 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
 	}
 
+	@Test
+	public void networkWithTwoClustersAndPartiallyDissimilarHubIsActuallyTwoClusters() {
+		// Assert:
+		final TestContext context = this.createContextForTwoClustersAndHub(0.0, 1.0);
+
+		// Act:
+		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
+
+		// Assert:
+		final List<Cluster> expectedClusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 4, 6)),
+				new Cluster(new ClusterId(1), NisUtils.toNodeIdList(1, 3, 5)));
+
+		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
+		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
+	}
+
+	/**
+	 * <pre>
+	 *     0             3
+	 *    / \           / \
+	 *   4 - 2  - 6 -  1 - 5
+	 * </pre>
+	 */
+	private TestContext createContextForTwoClustersAndHub(final double similarity1, final double similarity2) {
+		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is the hub
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 7);
+		context.setNeighborIds(0, Arrays.asList(0, 2, 4));
+		context.setNeighborIds(2, Arrays.asList(0, 2, 4, 6));
+		context.setNeighborIds(4, Arrays.asList(0, 2, 4));
+		context.setNeighborIds(1, Arrays.asList(1, 3, 5, 6));
+		context.setNeighborIds(3, Arrays.asList(1, 3, 5));
+		context.setNeighborIds(5, Arrays.asList(1, 3, 5));
+		context.setNeighborIds(6, Arrays.asList(1, 2, 6));
+		context.makeAllSimilar();
+		context.setSimilarity(6, 1, similarity1);
+		context.setSimilarity(6, 2, similarity2);
+		return context;
+	}
+
+	@Test
+	public void networkWithTwoClustersAndSimilarHubIsActuallyOneCluster() {
+		// Arrange:
+		final TestContext context = this.createContextForTwoClustersAndHub(1.0, 1.0);
+
+		// Act:
+		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
+
+		// Assert:
+		final List<Cluster> expectedClusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6)));
+
+		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
+		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
+	}
+
+	/**
+	 * <pre>
+	 *     0            3
+	 *    / \          / \
+	 *   4 - 2 - 6    1 - 5
+	 * </pre>
+	 */
 	@Test
 	public void networkWithTwoClustersAndOutlierCanBeClustered() {
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is an outlier
@@ -175,6 +221,14 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
+	/**
+	 * <pre>
+	 *    0  - 1
+	 *    | \/ |
+	 *    | /\ |
+	 *    2 -  3   4
+	 * </pre>
+	 */
 	@Test
 	public void isolatedNodeIsDetectedAsAnOutlier() {
 		// Arrange: { 0, 1, 2, 3 } form clusters; 4 is an isolated outlier
@@ -200,6 +254,14 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
+	/**
+	 * <pre>
+	 *    0  - 1 - 4
+	 *    | \/ |
+	 *    | /\ |
+	 *    2 -  3
+	 * </pre>
+	 */
 	@Test
 	public void dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlier() {
 		// Arrange: { 0, 1, 2, 3 } form clusters; 4 is an outlier connected to the cluster
@@ -226,6 +288,16 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
+	/**
+	 * <pre>
+	 *  4 - 0  - 2
+	 *  |   | \/ |
+	 *  |   | /\ |
+	 *  |   1 -  3
+	 *  |    \  /
+	 *  \---- 5
+	 * </pre>
+	 */
 	@Test
 	public void nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlier() {
 		// Arrange: { 0, 1, 2, 3 } form clusters;
@@ -252,6 +324,42 @@ public abstract class ScanGraphClusteringTest {
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
 		final List<Cluster> expectedOutliers = Arrays.asList(
 				new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4)),
+				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5)));
+
+		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
+		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
+	}
+
+	/**
+	 * <pre>
+	 *    0  - 1
+	 *    | \/ |
+	 *    | /\ |
+	 *    2 -  3 - 4 - 5
+	 * </pre>
+	 */
+	@Test
+	public void clusterCommunityDoesNotMergeWithNonCoreCommunities() {
+		// Arrange:
+		// { 0, 1, 2, 3, 4 } form a cluster
+		// { 5 } is an outlier connected to 4 but not merged in because 4 is not core
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 6);
+		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3));
+		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3));
+		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3));
+		context.setNeighborIds(3, Arrays.asList(0, 1, 2, 3, 4));
+		context.setNeighborIds(4, Arrays.asList(4, 5));
+		context.setNeighborIds(5, Arrays.asList(4, 5));
+		context.makeAllSimilar();
+
+		// Act:
+		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
+
+		// Assert:
+		final List<Cluster> expectedClusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
+		final List<Cluster> expectedOutliers = Arrays.asList(
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5)));
 
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
