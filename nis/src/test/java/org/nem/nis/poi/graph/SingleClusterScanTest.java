@@ -9,14 +9,14 @@ import org.nem.nis.test.NisUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UniqueClusterScanTest {
+public class SingleClusterScanTest {
 
 	@Test
 	public void clusterReturnsNoClustersWhenNeighborhoodIsEmpty() {
 		// Arrange:
 		final Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
 		Mockito.when(neighborhood.size()).thenReturn(0);
-		final GraphClusteringStrategy strategy = new UniqueClusterScan();
+		final GraphClusteringStrategy strategy = new SingleClusterScan();
 
 		// Act:
 		final ClusteringResult result = strategy.cluster(neighborhood);
@@ -30,7 +30,7 @@ public class UniqueClusterScanTest {
 		// Arrange:
 		final Neighborhood neighborhood = Mockito.mock(Neighborhood.class);
 		Mockito.when(neighborhood.size()).thenReturn(5);
-		final GraphClusteringStrategy strategy = new UniqueClusterScan();
+		final GraphClusteringStrategy strategy = new SingleClusterScan();
 
 		// Act:
 		final ClusteringResult result = strategy.cluster(neighborhood);
