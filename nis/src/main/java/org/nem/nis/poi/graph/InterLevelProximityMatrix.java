@@ -64,7 +64,7 @@ public class InterLevelProximityMatrix {
 		private final Matrix outlinkMatrix;
 		private final Matrix a;
 		private final Matrix r;
-		private final HashMap<ClusterId, Set<Integer>> clusterIdToNeighborhoodClusterIdsSetIndex = new HashMap<>();
+		private final HashMap<ClusterId, SparseBitmap> clusterIdToNeighborhoodClusterIds = new HashMap<>();
 		private int blockNum; // block == cluster; where cluster is { cluster, hub, outlier }
 
 		public MatrixBuilder(
@@ -115,10 +115,12 @@ public class InterLevelProximityMatrix {
 
 				final int clusterSize = cluster.size();
 				final int currentRow = this.blockNum;
-				final Set<Integer> indexSet = this.clusterIdToNeighborhoodClusterIdsSetIndex.getOrDefault(cluster.getId(),
-						Collections.newSetFromMap(new ConcurrentHashMap<>()));
-				indexSet.stream()
+				final SparseBitmap ids = this.clusterIdToNeighborhoodClusterIds.getOrDefault(cluster.getId(), null);
+				if (null != ids) {
+					ids.toList().stream()
 						.forEach(i -> this.r.setAt(currentRow, i, 1.0 / (clusterSize * neighborhoodClusterIdsSet.get(i).cardinality())));
+				}
+
 
 				++this.blockNum;
 			}
@@ -133,12 +135,13 @@ public class InterLevelProximityMatrix {
 						.filter(c -> c.getPivotId().getRaw() == id || this.outlinkMatrix.getAt(c.getPivotId().getRaw(), id) > 0.0)
 						.map(c -> {
 							ClusterId clusterId = this.clusteringResult.getIdForNode(c.getPivotId());
-							Set<Integer> indexSet = this.clusterIdToNeighborhoodClusterIdsSetIndex.get(clusterId);
-							if (indexSet == null) {
-								indexSet = Collections.newSetFromMap(new ConcurrentHashMap<>());
-								this.clusterIdToNeighborhoodClusterIdsSetIndex.put(clusterId, indexSet);
+							SparseBitmap ids = this.clusterIdToNeighborhoodClusterIds.get(clusterId);
+							if (null == ids) {
+								ids = SparseBitmap.createEmpty();
+								this.clusterIdToNeighborhoodClusterIds.put(clusterId, ids);
 							}
-							indexSet.add(id);
+
+							ids.set(id);
 							return clusterId;
 						})
 						.mapToInt(ClusterId::getRaw)
