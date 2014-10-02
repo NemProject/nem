@@ -11,20 +11,20 @@ import org.nem.nis.test.NisUtils;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class GraphClustererImplTest {
-	private static final Logger LOGGER = Logger.getLogger(GraphClustererImplTest.class.getName());
+public abstract class ScanGraphClusteringTest {
+	private static final Logger LOGGER = Logger.getLogger(ScanGraphClusteringTest.class.getName());
+
+	/**
+	 * Creates the GraphClusteringStrategy being tested.
+	 *
+	 * @return The GraphClusteringStrategy being tested
+	 */
+	protected abstract GraphClusteringStrategy createClusteringStrategy();
 
 	@Test
-	public void networkWithTwoSimilarConnectedNodesCanBeClusteredWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			networkWithTwoSimilarConnectedNodesCanBeClustered(clusteringStrategy);
-		}
-	}
-
-	public void networkWithTwoSimilarConnectedNodesCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
+	public void networkWithTwoSimilarConnectedNodesCanBeClustered() {
 		// Arrange:
-		final TestContext context = new TestContext(clusteringStrategy, 2);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 2);
 		context.setNeighborIds(0, Arrays.asList(0, 1));
 		context.setNeighborIds(1, Arrays.asList(0, 1));
 		context.makeAllSimilar();
@@ -43,16 +43,9 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void networkWithTwoDissimilarConnectedNodesCanBeClusteredWithAllClusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			networkWithTwoDissimilarConnectedNodesCanBeClustered(clusteringStrategy);
-		}
-	}
-
-	public void networkWithTwoDissimilarConnectedNodesCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
+	public void networkWithTwoDissimilarConnectedNodesCanBeClustered() {
 		// Arrange:
-		final TestContext context = new TestContext(clusteringStrategy, 2);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 2);
 		context.setNeighborIds(0, Arrays.asList(0, 1));
 		context.setNeighborIds(1, Arrays.asList(1));
 
@@ -70,16 +63,9 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void fullyConnectedNetworkResultsInSingleClusterWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			fullyConnectedNetworkResultsInSingleCluster(clusteringStrategy);
-		}
-	}
-
-	public void fullyConnectedNetworkResultsInSingleCluster(final GraphClusteringStrategy clusteringStrategy) {
+	public void fullyConnectedNetworkResultsInSingleCluster() {
 		// Arrange:
-		final TestContext context = new TestContext(clusteringStrategy, 5);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 5);
 		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4));
 		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3, 4));
 		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3, 4));
@@ -100,16 +86,9 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void networkWithTwoClustersAndDissimilarHubCanBeClusteredWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			networkWithTwoClustersAndDissimilarHubCanBeClustered(clusteringStrategy);
-		}
-	}
-
-	public void networkWithTwoClustersAndDissimilarHubCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
+	public void networkWithTwoClustersAndDissimilarHubCanBeClustered() {
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is the hub
-		final TestContext context = new TestContext(clusteringStrategy, 7);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 7);
 		context.setNeighborIds(0, Arrays.asList(0, 2, 4));
 		context.setNeighborIds(2, Arrays.asList(0, 2, 4, 6));
 		context.setNeighborIds(4, Arrays.asList(0, 2, 4));
@@ -137,17 +116,10 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void networkWithTwoClustersAndPartiallyDissimilarHubCanBeClusteredWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			networkWithTwoClustersAndPartiallyDissimilarHubCanBeClustered(clusteringStrategy);
-		}
-	}
-
-	public void networkWithTwoClustersAndPartiallyDissimilarHubCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
+	public void networkWithTwoClustersAndPartiallyDissimilarHubCanBeClustered() {
 		// TODO: not sure if this test can actually happen (where there is a uni-directional edge)
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is the hub
-		final TestContext context = new TestContext(clusteringStrategy, 7);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 7);
 		context.setNeighborIds(0, Arrays.asList(0, 2, 4));
 		context.setNeighborIds(2, Arrays.asList(0, 2, 4));
 		context.setNeighborIds(4, Arrays.asList(0, 2, 4));
@@ -175,16 +147,9 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void networkWithTwoClustersAndOutlierCanBeClusteredWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			networkWithTwoClustersAndOutlierCanBeClustered(clusteringStrategy);
-		}
-	}
-
-	public void networkWithTwoClustersAndOutlierCanBeClustered(final GraphClusteringStrategy clusteringStrategy) {
+	public void networkWithTwoClustersAndOutlierCanBeClustered() {
 		// Arrange: { 0, 2, 4 } { 1, 3, 5 } form clusters; 6 is an outlier
-		final TestContext context = new TestContext(clusteringStrategy, 7);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 7);
 		context.setNeighborIds(0, Arrays.asList(0, 2, 4));
 		context.setNeighborIds(2, Arrays.asList(0, 2, 4, 6));
 		context.setNeighborIds(4, Arrays.asList(0, 2, 4));
@@ -211,16 +176,9 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void isolatedNodeIsDetectedAsAnOutlierWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			isolatedNodeIsDetectedAsAnOutlier(clusteringStrategy);
-		}
-	}
-
-	public void isolatedNodeIsDetectedAsAnOutlier(final GraphClusteringStrategy clusterer) {
+	public void isolatedNodeIsDetectedAsAnOutlier() {
 		// Arrange: { 0, 1, 2, 3 } form clusters; 4 is an isolated outlier
-		final TestContext context = new TestContext(clusterer, 5);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 5);
 		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3));
 		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3));
 		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3));
@@ -243,16 +201,9 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlierWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlier(clusteringStrategy);
-		}
-	}
-
-	public void dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlier(final GraphClusteringStrategy clusteringStrategy) {
+	public void dissimilarNodeConnectedToSingleClusterIsDetectedAsAnOutlier() {
 		// Arrange: { 0, 1, 2, 3 } form clusters; 4 is an outlier connected to the cluster
-		final TestContext context = new TestContext(clusteringStrategy, 5);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 5);
 		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3));
 		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3, 4));
 		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3));
@@ -276,18 +227,11 @@ public class GraphClustererImplTest {
 	}
 
 	@Test
-	public void nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlierWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlier(clusteringStrategy);
-		}
-	}
-
-	public void nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlier(final GraphClusteringStrategy clusteringStrategy) {
+	public void nodeConnectedToOutlierAndClusterIsDetectedAsAnOutlier() {
 		// Arrange: { 0, 1, 2, 3 } form clusters;
 		// 4 is an outlier connected to the cluster
 		// 5 is an outlier connected to (4) and the cluster (twice)
-		final TestContext context = new TestContext(clusteringStrategy, 6);
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 6);
 		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4));
 		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3, 5));
 		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3));
@@ -370,14 +314,7 @@ public class GraphClustererImplTest {
 	 * </pre>
 	 */
 	@Test
-	public void firstGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			firstGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void firstGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void firstGraphIsClusteredAsExpected() {
 		// Arrange:
 		// Using dense matrix for easier debugging
 		final DenseMatrix outlinkMatrix = new DenseMatrix(4, 4);
@@ -393,7 +330,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.setAt(2, 3, 1);
 
 		// Act:
-		ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -417,7 +354,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix2.setAt(2, 3, 1);
 
 		// Act:
-		result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -471,14 +408,7 @@ public class GraphClustererImplTest {
 	 * </pre>
 	 */
 	@Test
-	public void secondGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			secondGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void secondGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void secondGraphIsClusteredAsExpected() {
 		// Arrange:
 		// Using dense matrix for easier debugging
 		final DenseMatrix outlinkMatrix = new DenseMatrix(6, 6);
@@ -502,7 +432,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.setAt(3, 5, 1);
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -533,14 +463,7 @@ public class GraphClustererImplTest {
 	 * </pre>
 	 */
 	@Test
-	public void thirdGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			thirdGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void thirdGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void thirdGraphIsClusteredAsExpected() {
 		// Arrange:
 		// This is the example used in the paper:
 		// NCDawareRank: a novel ranking method that exploits the decomposable structure of the web
@@ -563,7 +486,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.setAt(2, 6, 1);
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -598,14 +521,7 @@ public class GraphClustererImplTest {
 	 * </pre>
 	 */
 	@Test
-	public void forthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			forthGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void forthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void forthGraphIsClusteredAsExpected() {
 		// Arrange:
 		final DenseMatrix outlinkMatrix = new DenseMatrix(8, 8);
 		outlinkMatrix.setAt(1, 0, 1);
@@ -630,7 +546,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -663,14 +579,7 @@ public class GraphClustererImplTest {
 	 * </pre>
 	 */
 	@Test
-	public void fifthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			fifthGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void fifthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void fifthGraphIsClusteredAsExpected() {
 		// Arrange:
 		final DenseMatrix outlinkMatrix = new DenseMatrix(7, 7);
 		outlinkMatrix.setAt(1, 0, 1);
@@ -684,7 +593,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -713,14 +622,7 @@ public class GraphClustererImplTest {
 	 * </pre>
 	 */
 	@Test
-	public void sixthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			sixthGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void sixthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void sixthGraphIsClusteredAsExpected() {
 		// Arrange:
 		final DenseMatrix outlinkMatrix = new DenseMatrix(4, 4);
 		outlinkMatrix.setAt(1, 0, 1);
@@ -730,7 +632,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -752,14 +654,7 @@ public class GraphClustererImplTest {
 	 * outliers: none
 	 */
 	@Test
-	public void seventhGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			seventhGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void seventhGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void seventhGraphIsClusteredAsExpected() {
 		// Arrange:
 		final DenseMatrix outlinkMatrix = new DenseMatrix(6, 6);
 		outlinkMatrix.setAt(1, 0, 1);
@@ -771,7 +666,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -793,14 +688,7 @@ public class GraphClustererImplTest {
 	 * outliers: none
 	 */
 	@Test
-	public void eighthGraphIsClusteredAsExpectedWithAllclusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
-		for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {
-			eighthGraphIsClusteredAsExpected(clusteringStrategy);
-		}
-	}
-
-	public void eighthGraphIsClusteredAsExpected(final GraphClusteringStrategy clusteringStrategy) {
+	public void eighthGraphIsClusteredAsExpected() {
 		// Arrange:
 		final DenseMatrix outlinkMatrix = new DenseMatrix(5, 5);
 		outlinkMatrix.setAt(1, 0, 1);
@@ -811,7 +699,7 @@ public class GraphClustererImplTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(clusteringStrategy, outlinkMatrix);
+		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
@@ -844,19 +732,6 @@ public class GraphClustererImplTest {
 		result.getHubs().stream().forEach(c -> LOGGER.info(c.toString()));
 		LOGGER.info("Outliers:");
 		result.getOutliers().stream().forEach(c -> LOGGER.info(c.toString()));
-	}
-
-	/**
-	 * Returns a list of all graph clustering strategies to be tested.
-	 *
-	 * @return The list of graph clustering strategies..
-	 */
-	private List<GraphClusteringStrategy> getClusteringStrategies() {
-		final List<GraphClusteringStrategy> clusteringStrategies = new ArrayList<>();
-		clusteringStrategies.add(new Scan());
-		clusteringStrategies.add(new FastScan());
-
-		return clusteringStrategies;
 	}
 
 	private static class TestContext {

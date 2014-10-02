@@ -4,9 +4,7 @@ import org.nem.core.model.primitive.*;
 
 import java.util.*;
 
-// TODO-CR [08062014][J-M]: do we have tests for this and FastScan
-// TODO-CR [08062014][J-M]: i need to look at both in more detail later
-//TODO-CR [20140806][M-J]: yes, tests are in cryptically named classes, though
+// TODO 20141001 J-M i think it makes more sense to name these classes (FastSca|Scan)ClusteringStrategy
 
 /**
  * Implementation of the initial SCAN algorithm, from this paper:
