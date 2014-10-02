@@ -6,11 +6,12 @@ import org.nem.core.model.primitive.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-// TODO-CR [08062014][J-J]: i will need to look at this in more detail too
-
 /**
  * Container for the R and A sparse matrices that make up the inter-level proximity matrix.
  * From the NCDawareRank paper by Nikolakopoulos (WSDM 2013).
+ * <br/>
+ * The R and A matricies here are actually R(T) and A(T) in the paper.
+ * They are transposed because we use right stochastic matrices but the paper uses left stochastic matrices.
  */
 public class InterLevelProximityMatrix {
 	/**
@@ -32,7 +33,7 @@ public class InterLevelProximityMatrix {
 	 *
 	 * @param clusters The results from the clustering process.
 	 * @param neighborhood The neighborhoods of the nodes.
-	 * @param outlinkMatrix The final outlink matrix (negative values removed) which represents the directed graph.
+	 * @param outlinkMatrix The final outlink matrix (negative values removed), which represents the directed graph.
 	 */
 	public InterLevelProximityMatrix(final ClusteringResult clusters, final Neighborhood neighborhood, final Matrix outlinkMatrix) {
 		final int numNodes = clusters.numNodes();
@@ -42,10 +43,7 @@ public class InterLevelProximityMatrix {
 		this.a = new SparseMatrix(numNodes, numClusters, 5); // TODO: need to estimate good initial capacity.
 		this.clusterIdToNeighborhoodClusterIdsSetIndex = new HashMap<>();
 
-		final long t0 = System.currentTimeMillis();
 		computeMatrices(clusters, neighborhood, outlinkMatrix);
-		final long t1 = System.currentTimeMillis();
-		System.out.println("computing matrices took " + (t1 - t0) + "ms");
 	}
 
 	/**
@@ -106,6 +104,7 @@ public class InterLevelProximityMatrix {
 
 		for (int i = 0; i < outlinkMatrix.getColumnCount(); ++i) {
 			final int id = i;
+			// TODO: does it make sense for getNeighboringCommunities to return sorted ids?
 			final SparseBitmap clusterIdsForNode = SparseBitmap.createFromUnsortedData(neighborhood.getNeighboringCommunities(new NodeId(id)).stream()
 					.filter(c -> c.getPivotId().getRaw() == id || outlinkMatrix.getAt(c.getPivotId().getRaw(), id) > 0.0)
 					.map(c -> {
@@ -141,13 +140,5 @@ public class InterLevelProximityMatrix {
 	 */
 	public SparseMatrix getA() {
 		return this.a;
-	}
-
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append(this.r.toString() + System.lineSeparator());
-		builder.append(this.a.toString());
-		return builder.toString();
 	}
 }
