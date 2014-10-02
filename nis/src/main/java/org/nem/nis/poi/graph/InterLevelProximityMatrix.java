@@ -4,7 +4,6 @@ import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Container for the R and A sparse matrices that make up the inter-level proximity matrix.
