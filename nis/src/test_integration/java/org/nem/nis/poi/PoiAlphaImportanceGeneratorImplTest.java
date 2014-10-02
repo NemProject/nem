@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class PoiAlphaImportanceGeneratorImplTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImplTest.class.getName());
 
-	private static final PoiAccountState generalReceiver = createAccountWithBalance(10);
+	private static final PoiAccountState GENERAL_RECEIVER = createAccountWithBalance(10);
 
 	private static final int OUTLINK_STRATEGY_NONE = 0;
 	private static final int OUTLINK_STRATEGY_RANDOM = 1;
@@ -42,14 +42,6 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 	private static final double HIGH_TOLERANCE = 0.1;
 	private static final double LOW_TOLERANCE = 0.05;
-
-	private static final int UNIQUE_CLUSTER_SCAN = 0;
-	private static final int OUTLIER_SCAN = 1;
-	private static final int SCAN = 2;
-	private static final int FAST_SCAN = 3;
-	private static final int DEFAULT_CLUSTERER = FAST_SCAN;
-	private static final List<GraphClusteringStrategy> clusteringStrategies = Arrays.asList(
-			new FastScanClusteringStrategy());
 
 	@Test
 	public void threeSimpleAccounts() {
@@ -66,7 +58,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final List<PoiAccountState> accts = Arrays.asList(a, b, c);
 
 		// Act: calculate importances
-		final ColumnVector importances = getAccountImportances(blockHeight, accts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		final ColumnVector importances = getAccountImportances(blockHeight, accts);
 		System.out.println(importances);
 
 		// Assert
@@ -122,7 +114,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final List<PoiAccountState> accountStates = Arrays.asList(a, b, c, d, e, f, g);
 
 		// Act: calculate importances
-		final ColumnVector importances = getAccountImportances(new BlockHeight(2), accountStates, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		final ColumnVector importances = getAccountImportances(new BlockHeight(2), accountStates);
 		System.out.println(importances);
 
 		// Assert:
@@ -156,7 +148,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		accountStates.addAll(this.createUserAccounts(1, 2, 1000000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 		// Act: calculate importances
-		final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accountStates, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accountStates);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
@@ -181,12 +173,12 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 2; i < 10; i++) {
 			accounts.clear();
-			accounts.add(generalReceiver);
+			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, 80000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, i, 80000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 			// Act: calculate importances
-			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double cumulativeImportanceOtherAccounts = importances.sum() - importances.getAt(0) - importances.getAt(1);
 			final double ratio = importances.getAt(1) / cumulativeImportanceOtherAccounts;
@@ -209,13 +201,13 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 40; i < 400; i = i + 40) {
 			accounts.clear();
-			accounts.add(generalReceiver);
+			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, 8, 8000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, i, i * 5000, 0, 0, OUTLINK_STRATEGY_NONE));
 
 			// Act: calculate importances
-			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
 			for (int j = 2; j < 10; j++) {
@@ -242,13 +234,13 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 1; i < 2; i++) {
 			accounts.clear();
-			accounts.add(generalReceiver);
+			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, 80000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, 8, 80000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, i, i * 8000000, 0, 0, OUTLINK_STRATEGY_NONE));
 
 			// Act: calculate importances
-			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
 			for (int j = 2; j < 10; j++) {
@@ -274,12 +266,12 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 1; i < 10; i++) {
 			accounts.clear();
-			accounts.add(generalReceiver);
+			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, 8000, 1, 400, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, 1, 8000, i, 400, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 			// Act: calculate importances
-			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double ratio = importances.getAt(1) / importances.getAt(2);
 			System.out.print("1 outlink vs. " + i + " outlinks: User 1 importance is " + format.format(importances.getAt(1)));
@@ -299,12 +291,12 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		// Arrange:
 		// The strength of an outlink should have influence on the importance distribution (but how much?).
 		final List<PoiAccountState> accounts = new ArrayList<>();
-		accounts.add(generalReceiver);
+		accounts.add(GENERAL_RECEIVER);
 		accounts.addAll(this.createUserAccounts(1, 2, 100000, 1, 50000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 		accounts.addAll(this.createUserAccounts(1, 2, 100000, 1, 5000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 		// Act: calculate importances
-		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
@@ -326,12 +318,12 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		// Arrange:
 		// The vested balance of an account should have influence on the importance distribution.
 		final List<PoiAccountState> accounts = new ArrayList<>();
-		accounts.add(generalReceiver);
+		accounts.add(GENERAL_RECEIVER);
 		accounts.addAll(this.createUserAccounts(1, 2, 1000000, 1, 5000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 		accounts.addAll(this.createUserAccounts(1, 2, 10000, 1, 5000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 		// Act: calculate importances
-		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
@@ -356,12 +348,12 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final int numAccounts = 10;
 
 		final List<PoiAccountState> accounts = new ArrayList<>();
-		accounts.add(generalReceiver);
+		accounts.add(GENERAL_RECEIVER);
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 110000, 1, 1, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 100000, 1, 50000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 		// Act: calculate importances
-		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 
@@ -390,12 +382,12 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		// Arrange:
 		// Accounts should not just be able to transfer all their balance to another account to boost their score
 		final List<PoiAccountState> accounts = new ArrayList<>();
-		accounts.add(generalReceiver);
+		accounts.add(GENERAL_RECEIVER);
 		accounts.addAll(this.createUserAccounts(1, 2, 20000, 2, 100, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 		accounts.addAll(this.createUserAccounts(1, 2, 20000, 2, 9900, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 		// Act: calculate importances
-		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
@@ -420,12 +412,12 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 4; i < 40; i++) {
 			accounts.clear();
-			accounts.add(generalReceiver);
+			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, 8000, 1, 400, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, i, 8000, 1, 400, OUTLINK_STRATEGY_ALL_TO_ONE));
 
 			// Act: calculate importances
-			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			//			System.out.println("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double cumulativeImportanceOtherAccounts = importances.sum() - importances.getAt(0) - importances.getAt(1);
@@ -455,13 +447,13 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
 		// Warm up phase
-		getAccountImportances(new BlockHeight(10000), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+		getAccountImportances(new BlockHeight(10000), accounts);
 
 		// Act: calculate importances
 		System.out.println("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < 5; i++) {
-			final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+			final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accounts);
 		}
 		final long stop = System.currentTimeMillis();
 		System.out.println("Finished poi calculation.");
@@ -492,7 +484,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 			// Act: calculate importances
 			System.out.println("Starting poi calculation.");
 			final long start = System.currentTimeMillis();
-			getAccountImportances(height, accounts, clusteringStrategies.get(DEFAULT_CLUSTERER));
+			getAccountImportances(height, accounts);
 			final long stop = System.currentTimeMillis();
 			System.out.println("Finished poi calculation.");
 
@@ -553,7 +545,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 						otherAccount = accounts.get(0);
 						break;
 					case OUTLINK_STRATEGY_TO_GENERAL_RECEIVER:
-						otherAccount = generalReceiver;
+						otherAccount = GENERAL_RECEIVER;
 						break;
 				}
 
@@ -583,10 +575,9 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accounts,
-			final GraphClusteringStrategy clusteringStrategy) {
+			final Collection<PoiAccountState> accounts) {
 		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
-		poi.updateAccountImportances(blockHeight, accounts, new PoiScorer(), clusteringStrategy);
+		poi.updateAccountImportances(blockHeight, accounts);
 		final List<Double> importances = accounts.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());
