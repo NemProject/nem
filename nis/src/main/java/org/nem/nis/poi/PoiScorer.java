@@ -31,12 +31,12 @@ public class PoiScorer {
 	 */
 	public double calculateDangleSum(
 			final List<Integer> dangleIndexes,
-			final ColumnVector teleportationVector,
+			final double teleportationProbability,
 			final ColumnVector importanceVector) {
 
 		double dangleSum = 0;
 		for (final int i : dangleIndexes) {
-			dangleSum += importanceVector.getAt(i) * teleportationVector.getAt(i);
+			dangleSum += importanceVector.getAt(i) * teleportationProbability;
 		}
 
 		return dangleSum / importanceVector.size();
@@ -154,7 +154,8 @@ public class PoiScorer {
 		// norm(outlink 2 + PR)*stake + sqrt(abs(stake))
 
 		outlinkVector.normalize();
-		final ColumnVector vector = outlinkVector.multiply(2.0).addElementWise(importanceVector);
+		final ColumnVector vector = outlinkVector.multiply(2.0).addElementWise(
+				importanceVector);
 		vector.normalize();
 
 		final ColumnVector sqrtcoindays = vestedBalanceVector.sqrt();
@@ -180,13 +181,19 @@ public class PoiScorer {
 			final ColumnVector vestedBalanceVector) {
 
 		// alg is: l1norm(stakes + outlinkWeight*outlinkVector) + importanceWeight * l1norm(PR)
-		final double outlinkWeight = 1.25;
-		final double importanceWeight = 0.05;
+		double outlinkWeight = 1.25;
+		//		double importanceWeight = 0.05;
+		double importanceWeight = 0.1337;//TODO: try giving a higher weight now that we use NCDawareRank
 
-		final ColumnVector weightedOutlinks = outlinkVector.multiply(outlinkWeight).addElementWise(vestedBalanceVector);
-		final ColumnVector weightedImportances = importanceVector.multiply(importanceWeight);
-
+		ColumnVector weightedOutlinks = outlinkVector.multiply(outlinkWeight).addElementWise(vestedBalanceVector);
+		ColumnVector weightedImportances = importanceVector.multiply(importanceWeight);
+		weightedOutlinks.removeNegatives();
 		weightedOutlinks.normalize();
+
+		//		System.out.println("vestedBalanceVector: " + vestedBalanceVector);
+		//		System.out.println("outlinkVector: " + outlinkVector);
+		//		System.out.println("weightedOutlinks: " + weightedOutlinks);
+		//		System.out.println("ncdawareranks: " + weightedImportances);
 
 		return weightedOutlinks.addElementWise(weightedImportances);
 	}

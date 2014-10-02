@@ -14,15 +14,20 @@ public class PoiScorerTest {
 		final PoiScorer scorer = new PoiScorer();
 		final double dangleSum = scorer.calculateDangleSum(
 				Arrays.asList(1, 3),
-				new ColumnVector(1, 2, 3, 4, 5, 6),
+				PoiContext.TELEPORTATION_PROB,
 				new ColumnVector(0.1, 0.8, 0.2, 0.5, 0.6, 0.3));
 
 		// Assert:
-		Assert.assertThat(dangleSum, IsEqual.equalTo(0.60));
+		Assert.assertThat(dangleSum, IsEqual.equalTo(0.1625));
 	}
 
 	@Test
 	public void finalScoreIsCalculatedCorrectly() {
+		// Arrange
+		final double importanceWeight = 0.1337; //TODO: was 0.05 // TODO-CR [08062014][J-M]: why did this change?
+		// TODO-CR [20140806][M-J]: with NCDawareRank, I want to see if it is safe to use a larger weight. 5% is too low IMHO
+		// TODO-CR [20140921][M-J]: update: we should do more testing, but this seems safe enough IMHO
+
 		// Act:
 		final PoiScorer scorer = new PoiScorer();
 		final ColumnVector finalScoresVector = scorer.calculateFinalScore(
@@ -43,12 +48,12 @@ public class PoiScorerTest {
 
 		// weighted-importance: importance * 0.05
 		final ColumnVector weightedImportance = new ColumnVector(
-				1.00 * 0.05,
-				0.80 * 0.05,
-				0.20 * 0.05,
-				0.50 * 0.05,
-				0.60 * 0.05,
-				0.30 * 0.05);
+				1.00 * importanceWeight,
+				0.80 * importanceWeight,
+				0.20 * importanceWeight,
+				0.50 * importanceWeight,
+				0.60 * importanceWeight,
+				0.30 * importanceWeight);
 
 		// final: l1norm(l1norm(weighted-outlinks) + weighted-importance)
 		weightedOutlinks.normalize();

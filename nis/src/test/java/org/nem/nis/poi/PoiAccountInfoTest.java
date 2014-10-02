@@ -144,7 +144,9 @@ public class PoiAccountInfoTest {
 
 		// Assert:
 		final List<WeightedLink> expectedLinks = Arrays.asList(
+				new WeightedLink(Address.fromEncoded("acc 0"), 0.0),
 				new WeightedLink(Address.fromEncoded("acc 1"), 3.0e06),
+				new WeightedLink(Address.fromEncoded("acc 2"), -1.0e06),
 				new WeightedLink(Address.fromEncoded("acc 3"), 5.0e06),
 				new WeightedLink(Address.fromEncoded("acc 4"), 7.0e06));
 		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
@@ -159,7 +161,7 @@ public class PoiAccountInfoTest {
 
 		// block heights must be in order so that account links have increasing block heights
 		final PoiAccountInfo info = createAccountInfoWithOutlinks(
-				4322,
+				3 * 1440 + 2,
 				new int[] { 2, 6, 3, 1, 5, 8, 9, 11, 7 },
 				new int[] { 2, 1441, 1442, 1443, 2882, 2883, 4322, 4323, 7000 });
 		info.addInlink(new WeightedLink(Address.fromEncoded("acc 0"), 2.0e06 * threeDayDecay));
@@ -171,7 +173,9 @@ public class PoiAccountInfoTest {
 
 		// Assert:
 		final List<WeightedLink> expectedLinks = Arrays.asList(
+				new WeightedLink(Address.fromEncoded("acc 0"), 0.0),
 				new WeightedLink(Address.fromEncoded("acc 1"), 6.0e06 * twoDayDecay),
+				new WeightedLink(Address.fromEncoded("acc 2"), (3.0e06 - 8.0e06) * oneDayDecay * oneDayDecay),
 				new WeightedLink(Address.fromEncoded("acc 3"), 1.0e06 * oneDayDecay),
 				new WeightedLink(Address.fromEncoded("acc 4"), 5.0e06 * oneDayDecay),
 				new WeightedLink(Address.fromEncoded("acc 5"), 5.5e06),
@@ -201,7 +205,7 @@ public class PoiAccountInfoTest {
 		info.addInlink(new WeightedLink(Address.fromEncoded("acc 4"), 2.0e06));
 
 		// Assert: sum(net out-links)
-		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(1.5e07));
+		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(1.4e07));
 	}
 
 	@Test
@@ -221,7 +225,7 @@ public class PoiAccountInfoTest {
 		info.addInlink(new WeightedLink(Address.fromEncoded("acc 5"), 2.5e06));
 
 		// Assert: sum(net out-links)
-		final double expectedScore = 6.0e06 * twoDayDecay + (1.0e06 + 5.0e06) * oneDayDecay + 5.50e06 + 9.0e06;
+		final double expectedScore = 6.0e06 * twoDayDecay - 5e06 * twoDayDecay + (1.0e06 + 5.0e06) * oneDayDecay + 5.5e06 + 9.0e06;
 		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(expectedScore));
 	}
 
@@ -240,9 +244,7 @@ public class PoiAccountInfoTest {
 
 	private static PoiAccountInfo createAccountInfoWithOutlinks(final int... amounts) {
 		final int[] heights = new int[amounts.length];
-		for (int i = 0; i < amounts.length; ++i) {
-			heights[i] = 1;
-		}
+		Arrays.fill(heights, 1);
 
 		return createAccountInfoWithOutlinks(1, amounts, heights);
 	}

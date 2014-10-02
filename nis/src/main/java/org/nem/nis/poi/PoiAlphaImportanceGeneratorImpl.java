@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.poi.graph.*;
 
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -19,17 +20,19 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
 
-	public static final int DEFAULT_MAX_ITERATIONS = 200;
+	public static final int DEFAULT_MAX_ITERATIONS = 2000;
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	@Override
 	public void updateAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> accountStates,
-			final PoiScorer.ScoringAlg scoringAlg) {
+			final PoiScorer.ScoringAlg scoringAlg,
+			final GraphClusteringStrategy clusterer) {
+
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accountStates, blockHeight);
+		final PoiContext context = new PoiContext(accountStates, blockHeight, clusterer);
 		final PoiScorer scorer = new PoiScorer();
 
 		// (2) run the power iteration algorithm
@@ -72,20 +75,28 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 
 			final double dangleSum = this.scorer.calculateDangleSum(
 					this.context.getDangleIndexes(),
-					this.context.getTeleportationVector(),
+					PoiContext.TELEPORTATION_PROB,
 					prevIterImportances);
 
-			// V(dangle-indexes) * dangle-sum + V(1.0) - V(teleportation)
+			// V(dangle-indexes) * dangle-sum + V(1.0) - V(inverseTeleportation)
 			final ColumnVector poiAdjustmentVector = this.context.getDangleVector()
 					.multiply(dangleSum)
-					.addElementWise(this.context.getInverseTeleportationVector());
+					.add(this.context.getInverseTeleportationProb());
 
 			// M(out-link) * V(importance) .* V(teleportation)
 			final ColumnVector importances = this.context.getOutlinkMatrix()
 					.multiply(prevIterImportances)
-					.multiplyElementWise(this.context.getTeleportationVector());
+					.multiply(PoiContext.TELEPORTATION_PROB);
+			//					.multiplyElementWise(this.context.getTeleportationVector());
 
-			return importances.addElementWise(poiAdjustmentVector);
+			// Inter-Level Proximity calc for NCD-Aware Rank: (R*(last iter) * A)
+			final InterLevelProximityMatrix interLevelMatrix = this.context.getInterLevelMatrix();
+			final ColumnVector interLevel = interLevelMatrix.getA()
+					.multiply(interLevelMatrix.getR().multiply(prevIterImportances))
+					.multiply(PoiContext.INTER_LEVEL_TELEPORTATION_PROB);
+
+			return importances.addElementWise(interLevel)
+					.addElementWise(poiAdjustmentVector);
 		}
 	}
 }

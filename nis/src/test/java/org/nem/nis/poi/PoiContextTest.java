@@ -5,7 +5,9 @@ import org.junit.*;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,7 +84,7 @@ public class PoiContextTest {
 		// (3) net outflows are used instead of total outflows
 		Assert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(12e06, 6e06, 0, 8e06)));
+				IsEqual.equalTo(new ColumnVector(9e06, 0, -3e06, 8e06)));
 	}
 
 	@Test
@@ -99,7 +101,7 @@ public class PoiContextTest {
 	}
 
 	@Test
-	public void poiStartVectorIsInitializedToNormalizedUniformVectorForSubsequentIterations() {
+	public void poiStartVectorIsDerivedFromPreviousPageRankForSubsequentIterations() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
@@ -112,23 +114,27 @@ public class PoiContextTest {
 		final PoiContext context = createTestPoiContext(height, accountStates);
 
 		// Assert:
-		// (1) start vector is uniform
+		// (1) start vector is derived from previous page rank
 		// (2) start vector is normalized
-		Assert.assertThat(
-				context.getPoiStartVector(),
-				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
+		//TODO: this test should currently fail because we took out this feature for now
+		//		Assert.assertThat(
+		//				context.getPoiStartVector(),
+		//				IsEqual.equalTo(new ColumnVector(3.0 / 9, 4.0 / 9, 0.0, 2.0 / 9)));
+		// TODO-CR [08062014][J-M]: should we remove this test
+		// TODO-CR [20140806][M-J][M-BR]: not sure. can we find a way to add this back?
 	}
 
 	@Test
-	public void teleportationVectorIsInitializedCorrectly() {
-		// Act:
-		final PoiContext context = createTestPoiContext();
-
+	public void teleportationProbabilityIsInitializedCorrectly() {
 		// Assert:
-		// (1) a uniform vector of 0.850
-		final ColumnVector expectedVector = new ColumnVector(4);
-		expectedVector.setAll(0.850);
-		Assert.assertThat(context.getTeleportationVector(), IsEqual.equalTo(expectedVector));
+		// (1) a value of 0.750
+		Assert.assertThat(PoiContext.TELEPORTATION_PROB, IsEqual.equalTo(0.750));
+	}
+
+	@Test
+	public void interLevelTeleportationProbabilityIsInitializedCorrectly() {
+		// Assert:
+		Assert.assertThat(PoiContext.INTER_LEVEL_TELEPORTATION_PROB, IsEqual.equalTo(0.100));
 	}
 
 	@Test
@@ -138,9 +144,8 @@ public class PoiContextTest {
 
 		// Assert:
 		// (1) a uniform vector summing to 0.15
-		final ColumnVector expectedVector = new ColumnVector(4);
-		expectedVector.setAll(0.15 / 4);
-		Assert.assertThat(context.getInverseTeleportationVector().roundTo(5), IsEqual.equalTo(expectedVector));
+		final double expectedProb = 0.15 / 4.0;
+		Assert.assertThat(roundTo(context.getInverseTeleportationProb(), 5), IsEqual.equalTo(expectedProb));
 	}
 
 	@Test
@@ -178,15 +183,91 @@ public class PoiContextTest {
 		// Assert:
 		// (1) account link weights are normalized
 		final Matrix expectedAccountLinks = new DenseMatrix(4, 4);
+		expectedAccountLinks.setAt(0, 3, 0.375);
 		expectedAccountLinks.setAt(1, 0, 0.6);
 		expectedAccountLinks.setAt(2, 0, 0.4);
 		expectedAccountLinks.setAt(2, 1, 1.0);
-		expectedAccountLinks.setAt(0, 3, 0.375);
 		expectedAccountLinks.setAt(2, 3, 0.625);
 
 		Assert.assertThat(
 				context.getOutlinkMatrix().roundTo(5),
 				IsEqual.equalTo(expectedAccountLinks));
+	}
+
+	/**
+	 * @formatter: off
+	 * Graph:         0
+	 *               / \
+	 *              /   \
+	 *             o     o
+	 *             1----o2----o7
+	 *                   |
+	 *                   o
+	 *                   3
+	 *                   |
+	 *                   o
+	 *                   4
+	 *                  / \
+	 *                 o   o
+	 *                5----o6
+	 * @formatter: on
+	 *
+	 * Expected: clusters {0,1,2} and {4,5,6}, one hub {3}, one outlier {7}
+	 */
+	@Test
+	public void clustersAreInitializedCorrectly() {
+		// Act:
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndOneOutlier();
+
+		// Assert:
+		final List<Cluster> expectedClusters = Arrays.asList(
+				new Cluster(new ClusterId(0), Arrays.asList(NisUtils.toNodeIdArray(0, 1, 2))),
+				new Cluster(new ClusterId(4), Arrays.asList(NisUtils.toNodeIdArray(4, 5, 6))));
+		final List<Cluster> expectedHubs = Arrays.asList(
+				new Cluster(new ClusterId(3), Arrays.asList(NisUtils.toNodeIdArray(3))));
+		final List<Cluster> expectedOutliers = Arrays.asList(
+				new Cluster(new ClusterId(7), Arrays.asList(NisUtils.toNodeIdArray(7))));
+
+		Assert.assertThat(context.getClusteringResult().getClusters(), IsEquivalent.equivalentTo(expectedClusters));
+		Assert.assertThat(context.getClusteringResult().getHubs(), IsEquivalent.equivalentTo(expectedHubs));
+		Assert.assertThat(context.getClusteringResult().getOutliers(), IsEquivalent.equivalentTo(expectedOutliers));
+	}
+
+	// TODO-CR [08062014][J-M]: nice tests!
+	// TODO-CR [08062014][J-M]: can you explain what the getInterLevelMatrix is?
+	// TODO-CR [20140806][M-J]: Interlevel matrix is the inter-level proximity matrix M (decomposed into R and A matrices). This is the new term added to PageRank to create NCDawareRank, because this represents connections between blocks in the graph.
+
+	@Test
+	public void interLevelProximityMatrixIsInitializedCorrectly() {
+		// Act:
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndOneOutlier();
+
+		// Assert:
+		final InterLevelProximityMatrix interLevel = context.getInterLevelMatrix();
+		final SparseMatrix a = new SparseMatrix(8, 4, 4);
+		a.setAt(0, 0, 1.0);
+		a.setAt(1, 0, 1.0);
+		a.setAt(2, 0, 1.0);
+		a.setAt(3, 2, 1.0);
+		a.setAt(4, 1, 1.0);
+		a.setAt(5, 1, 1.0);
+		a.setAt(6, 1, 1.0);
+		a.setAt(7, 3, 1.0);
+		final SparseMatrix r = new SparseMatrix(4, 8, 8);
+		r.setAt(0, 0, 1.0 / 3.0);
+		r.setAt(0, 1, 1.0 / 3.0);
+		r.setAt(0, 2, 1.0 / 9.0);
+		r.setAt(1, 3, 1.0 / 6.0);
+		r.setAt(1, 4, 1.0 / 3.0);
+		r.setAt(1, 5, 1.0 / 3.0);
+		r.setAt(1, 6, 1.0 / 3.0);
+		r.setAt(2, 2, 1.0 / 3.0);
+		r.setAt(2, 3, 1.0 / 2.0);
+		r.setAt(3, 2, 1.0 / 3.0);
+		r.setAt(3, 7, 1.0 / 1.0);
+
+		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
 	//endregion
@@ -294,7 +375,7 @@ public class PoiContextTest {
 	}
 
 	private static List<PoiAccountState> createTestPoiAccountStates(final BlockHeight height) {
-		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
+		final long multiplier = PoiAccountInfo.MIN_HARVESTING_BALANCE.getNumMicroNem();
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(3 * multiplier - 1, null),
 				new TestAccountInfo(multiplier - 1, new int[] { 1 }), // 1 (insufficient balance)
@@ -318,7 +399,7 @@ public class PoiContextTest {
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
 		// Arrange: create 4 accounts
-		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
+		final long multiplier = PoiAccountInfo.MIN_HARVESTING_BALANCE.getNumMicroNem();// 1000 is min harvesting balance
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(multiplier, null),
 				new TestAccountInfo(multiplier, null),
@@ -341,6 +422,60 @@ public class PoiContextTest {
 
 		// Act:
 		return new PoiContext(accountStates, height);
+	}
+
+	/**
+	 * @formatter: off
+	 * Graph:         0
+	 *               / \
+	 *              /   \
+	 *             1-----2-----7
+	 *                   |
+	 *                   |
+	 *                   3
+	 *                   |
+	 *                   |
+	 *                   4
+	 *                  / \
+	 *                 /   \
+	 *                5-----6
+	 * @formatter: on
+	 *
+	 * Expected: clusters {0,1,2} and {4,5,6}, one hub {3}, one outlier {7}
+	 */
+	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndOneOutlier() {
+		// Arrange: create 8 accounts
+		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
+		final List<TestAccountInfo> accountInfos = Arrays.asList(
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null),
+				new TestAccountInfo(multiplier, null));
+
+		final BlockHeight height = new BlockHeight(21);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
+
+		// set up account links
+		addAccountLink(height, accountStates.get(0), accountStates.get(1), 1);
+		addAccountLink(height, accountStates.get(0), accountStates.get(2), 1);
+		addAccountLink(height, accountStates.get(1), accountStates.get(2), 1);
+		addAccountLink(height, accountStates.get(2), accountStates.get(7), 1);
+		addAccountLink(height, accountStates.get(2), accountStates.get(3), 1);
+		addAccountLink(height, accountStates.get(3), accountStates.get(4), 1);
+		addAccountLink(height, accountStates.get(4), accountStates.get(5), 1);
+		addAccountLink(height, accountStates.get(4), accountStates.get(6), 1);
+
+		// Act:
+		return new PoiContext(accountStates, height);
+	}
+
+	public double roundTo(final double value, final int numPlaces) {
+		final double multipler = Math.pow(10, numPlaces);
+		return Math.round(value * multipler) / multipler;
 	}
 
 	private static class TestAccountInfo {

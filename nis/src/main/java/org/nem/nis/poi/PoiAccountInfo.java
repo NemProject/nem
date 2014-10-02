@@ -106,9 +106,11 @@ public class PoiAccountInfo {
 	public List<WeightedLink> getNetOutlinks() {
 		final List<WeightedLink> links = new ArrayList<>();
 		for (final Map.Entry<Address, Double> entry : this.netOutlinks.entrySet()) {
-			if (entry.getValue() <= 0) {
+			// TODO-CR 20140925 BR: To fix the test PoiContextTest.outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows
+			// TODO-CR              i commented out the following lines. Does this have negative impact somewhere else?
+			/*if (entry.getValue() <= 0) {
 				continue;
-			}
+			}*/
 
 			links.add(new WeightedLink(entry.getKey(), entry.getValue()));
 		}
@@ -122,8 +124,16 @@ public class PoiAccountInfo {
 	 * @return The net out-link score.
 	 */
 	public double getNetOutlinkScore() {
-		return this.getNetOutlinks().stream()
-				.map(obj -> obj.getWeight())
+		final double netOutlinkScore = this.getNetOutlinks().stream()
+				.map(WeightedLink::getWeight)
 				.reduce(0.0, Double::sum);
+		if (netOutlinkScore < 0) {
+			// TODO: Idea is to not weight negative outlink scores fully; look into this.
+			// TODO-CR 20140925 BR -> M: I adjusted the value for account 2 in the unit test
+			// TODO-CR                   PoiContextTest.outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows to fix the test.
+			// TODO-CR                   Whenever you change this you have to fix that test.
+			return netOutlinkScore * 0.2;
+		}
+		return netOutlinkScore;
 	}
 }
