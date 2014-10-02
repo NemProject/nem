@@ -49,10 +49,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	private static final int FAST_SCAN = 3;
 	private static final int DEFAULT_CLUSTERER = FAST_SCAN;
 	private static final List<GraphClusteringStrategy> clusteringStrategies = Arrays.asList(
-			new UniqueClusterScan(),
-			new OutlierScan(),
-			new Scan(),
-			new FastScan());
+			new FastScanClusteringStrategy());
 
 	@Test
 	public void threeSimpleAccounts() {

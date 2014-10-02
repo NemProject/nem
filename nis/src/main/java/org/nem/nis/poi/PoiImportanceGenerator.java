@@ -25,7 +25,7 @@ public interface PoiImportanceGenerator {
 		// in that case, can we inject the step strategy instead of the clustering algo?
 		// then it should be easier to test the steps and we can have two one that's unaware of clustering
 		// and a clustering-aware one that decorates it
-		this.updateAccountImportances(blockHeight, accountStates, PoiScorer.ScoringAlg.MAKOTO, new FastScan());
+		this.updateAccountImportances(blockHeight, accountStates, PoiScorer.ScoringAlg.MAKOTO, new FastScanClusteringStrategy());
 	}
 
 	/**

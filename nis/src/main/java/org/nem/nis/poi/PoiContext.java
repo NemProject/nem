@@ -45,7 +45,7 @@ public class PoiContext {
 	 */
 	public PoiContext(final Iterable<PoiAccountState> accountStates, final BlockHeight height) {
 		//		this(accounts, height, new Scan());
-		this(accountStates, height, new FastScan());
+		this(accountStates, height, new FastScanClusteringStrategy());
 	}
 
 	//region Getters
