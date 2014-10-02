@@ -70,10 +70,6 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 
 		@Override
 		protected ColumnVector stepImpl(final ColumnVector prevIterImportances) {
-			// TODO: expose as functions
-			//PoiContext.TELEPORTATION_PROB
-			//PoiContext.INTER_LEVEL_TELEPORTATION_PROB
-
 			final ColumnVector poiAdjustmentVector = this.createAdjustmentVector(prevIterImportances);
 			final ColumnVector importancesVector = this.createImportancesVector(prevIterImportances);
 			final ColumnVector interLevelVector = this.createInterLeverVector(prevIterImportances);
@@ -86,20 +82,20 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
 			final double dangleSum = this.scorer.calculateDangleSum(
 					this.context.getDangleIndexes(),
-					PoiContext.TELEPORTATION_PROB,
+					this.context.getTeleportationProbability(),
 					prevIterImportances);
 
 			// V(dangle-indexes) * dangle-sum + V(inverseTeleportation)
 			return this.context.getDangleVector()
 					.multiply(dangleSum)
-					.add(this.context.getInverseTeleportationProb());
+					.add(this.context.getInverseTeleportationProbability());
 		}
 
 		private ColumnVector createImportancesVector(final ColumnVector prevIterImportances) {
 			// M(out-link) * V(last iter) .* V(teleportation)
 			return this.context.getOutlinkMatrix()
 					.multiply(prevIterImportances)
-					.multiply(PoiContext.TELEPORTATION_PROB);
+					.multiply(this.context.getTeleportationProbability());
 		}
 
 		private ColumnVector createInterLeverVector(final ColumnVector prevIterImportances) {
@@ -107,7 +103,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 			final InterLevelProximityMatrix interLevelMatrix = this.context.getInterLevelMatrix();
 			return interLevelMatrix.getA()
 					.multiply(interLevelMatrix.getR().multiply(prevIterImportances))
-					.multiply(PoiContext.INTER_LEVEL_TELEPORTATION_PROB);
+					.multiply(this.context.getInterLevelTeleportationProbability());
 		}
 	}
 }

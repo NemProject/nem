@@ -25,7 +25,7 @@ public class PoiContextTest {
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// Act:
-		createTestPoiContext(height, accountStates);
+		createPoiContext(accountStates, height);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -40,7 +40,7 @@ public class PoiContextTest {
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// Act:
-		createTestPoiContext(height, accountStates);
+		createPoiContext(accountStates, height);
 	}
 
 	//endregion
@@ -50,7 +50,7 @@ public class PoiContextTest {
 	@Test
 	public void vestedBalanceVectorIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContext();
+		final PoiContext context = createPoiContext();
 
 		// Assert:
 		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
@@ -63,7 +63,7 @@ public class PoiContextTest {
 	@Test
 	public void outlinkScoreVectorIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContext();
+		final PoiContext context = createPoiContext();
 
 		// Assert:
 		// (1) both foraging-eligible and non-foraging-eligible accounts are represented
@@ -111,7 +111,7 @@ public class PoiContextTest {
 		accountStates.get(4).getImportanceInfo().setLastPageRank(2);
 
 		// Act:
-		final PoiContext context = createTestPoiContext(height, accountStates);
+		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Assert:
 		// (1) start vector is derived from previous page rank
@@ -124,34 +124,45 @@ public class PoiContextTest {
 		// TODO-CR [20140806][M-J][M-BR]: not sure. can we find a way to add this back?
 	}
 
+	//region teleportation probabilities
+
 	@Test
 	public void teleportationProbabilityIsInitializedCorrectly() {
+		// Act:
+		final PoiContext context = createPoiContext();
+
 		// Assert:
 		// (1) a value of 0.750
-		Assert.assertThat(PoiContext.TELEPORTATION_PROB, IsEqual.equalTo(0.750));
+		Assert.assertThat(context.getTeleportationProbability(), IsEqual.equalTo(0.750));
 	}
 
 	@Test
 	public void interLevelTeleportationProbabilityIsInitializedCorrectly() {
+		// Act:
+		final PoiContext context = createPoiContext();
+
 		// Assert:
-		Assert.assertThat(PoiContext.INTER_LEVEL_TELEPORTATION_PROB, IsEqual.equalTo(0.100));
+		// (1) a value of 0.100
+		Assert.assertThat(context.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.100));
 	}
 
 	@Test
 	public void inverseTeleportationVectorIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContext();
+		final PoiContext context = createPoiContext();
 
 		// Assert:
-		// (1) a uniform vector summing to 0.15
+		// (1) (1 - 0.75 - 0.10 = 0.15) / N (4.0)
 		final double expectedProb = 0.15 / 4.0;
-		Assert.assertThat(roundTo(context.getInverseTeleportationProb(), 5), IsEqual.equalTo(expectedProb));
+		Assert.assertThat(roundTo(context.getInverseTeleportationProbability(), 5), IsEqual.equalTo(expectedProb));
 	}
+
+	//endregion
 
 	@Test
 	public void dangleIndexesAreInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContext();
+		final PoiContext context = createPoiContext();
 
 		// Assert:
 		// (1) accounts without out-links are dangling
@@ -163,7 +174,7 @@ public class PoiContextTest {
 	@Test
 	public void dangleVectorIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContext();
+		final PoiContext context = createPoiContext();
 
 		// Assert:
 		// (1) dangle vector is the 1-vector
@@ -279,7 +290,7 @@ public class PoiContextTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
-		final PoiContext context = createTestPoiContext(height, accountStates);
+		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Act:
 		context.updateImportances(new ColumnVector(5, 2, 7, 3), new ColumnVector(4));
@@ -296,7 +307,7 @@ public class PoiContextTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
-		final PoiContext context = createTestPoiContext(height, accountStates);
+		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Act:
 		context.updateImportances(new ColumnVector(4), new ColumnVector(5, 2, 7, 3));
@@ -316,7 +327,7 @@ public class PoiContextTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
-		final PoiContext context = createTestPoiContext(height, accountStates);
+		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -332,7 +343,7 @@ public class PoiContextTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
-		final PoiContext context = createTestPoiContext(height, accountStates);
+		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -387,14 +398,14 @@ public class PoiContextTest {
 		return createTestPoiAccountStates(accountInfos, height);
 	}
 
-	private static PoiContext createTestPoiContext() {
+	private static PoiContext createPoiContext() {
 		final BlockHeight height = new BlockHeight(21);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(height);
-		return createTestPoiContext(height, accountStates);
+		return createPoiContext(accountStates, height);
 	}
 
-	private static PoiContext createTestPoiContext(final BlockHeight height, final List<PoiAccountState> accountStates) {
-		return new PoiContext(accountStates, height);
+	private static PoiContext createPoiContext(final List<PoiAccountState> accountStates, final BlockHeight height) {
+		return new PoiContext(accountStates, height, new FastScanClusteringStrategy());
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
@@ -421,7 +432,7 @@ public class PoiContextTest {
 		addAccountLink(height, accountStates.get(0), accountStates.get(4), 2); // to non-foraging account (included in scores)
 
 		// Act:
-		return new PoiContext(accountStates, height);
+		return createPoiContext(accountStates, height);
 	}
 
 	/**
@@ -470,12 +481,19 @@ public class PoiContextTest {
 		addAccountLink(height, accountStates.get(4), accountStates.get(6), 1);
 
 		// Act:
-		return new PoiContext(accountStates, height);
+		return createPoiContext(accountStates, height);
 	}
 
 	public double roundTo(final double value, final int numPlaces) {
 		final double multipler = Math.pow(10, numPlaces);
 		return Math.round(value * multipler) / multipler;
+	}
+
+
+	private static PoiContext createPoiContext(
+			final Iterable<PoiAccountState> accountStates,
+			final BlockHeight height) {
+		return new PoiContext(accountStates, height, new FastScanClusteringStrategy());
 	}
 
 	private static class TestAccountInfo {
