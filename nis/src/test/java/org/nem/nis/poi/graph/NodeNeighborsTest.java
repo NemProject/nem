@@ -302,7 +302,7 @@ public class NodeNeighborsTest {
 		Assert.assertThat(DESC_TO_NEIGHBORS_MAP.get("diff-more-member-ids"), IsNot.not(IsEqual.equalTo(neighbors)));
 		Assert.assertThat(DESC_TO_NEIGHBORS_MAP.get("diff-empty"), IsNot.not(IsEqual.equalTo(neighbors)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(neighbors)));
-		Assert.assertThat(NisUtils.createNeighbors(2, 3, 6), IsNot.not(IsEqual.equalTo((Object)neighbors)));
+		Assert.assertThat(NisUtils.toNodeIdList(2, 3, 6), IsNot.not(IsEqual.equalTo((Object)neighbors)));
 	}
 
 	@Test
@@ -322,7 +322,6 @@ public class NodeNeighborsTest {
 	//endregion
 
 	//region toString
-
 
 	@Test
 	public void toStringReturnsCorrectRepresentation() {

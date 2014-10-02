@@ -210,7 +210,7 @@ public class NeighborhoodTest {
 		// Assert: 2 is included
 		Assert.assertThat(
 				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(5, 7)));
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 7)));
 	}
 	// TODO 20141001 - are we sure this is correct?
 

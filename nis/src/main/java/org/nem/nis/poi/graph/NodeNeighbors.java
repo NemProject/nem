@@ -137,6 +137,10 @@ public class NodeNeighbors implements Iterable<NodeId> {
 
 			@Override
 			public NodeId next() {
+				if (!this.hasNext()) {
+					throw new IndexOutOfBoundsException("index out of range");
+				}
+
 				return new NodeId(this.neighborIdsIterator.next());
 			}
 
