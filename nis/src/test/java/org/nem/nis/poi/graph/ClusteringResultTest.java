@@ -98,6 +98,7 @@ public class ClusteringResultTest {
 	}
 
 	// TODO 20140930 is this a bug?
+    // TODO 20141002 nope. The ClusterId and NodeId are not the same thing.
 	@Test
 	public void getIdForNodeDoesNotReturnClusterInformationForClusterIds() {
 		// Arrange:
