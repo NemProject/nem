@@ -5,6 +5,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.secret.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Account information used by poi.
@@ -100,22 +101,14 @@ public class PoiAccountInfo {
 
 	/**
 	 * Gets the weighted net outlinks associated with this account.
+	 * The net outlinks can be negative.
 	 *
 	 * @return The weighted net outlinks.
 	 */
 	public List<WeightedLink> getNetOutlinks() {
-		final List<WeightedLink> links = new ArrayList<>();
-		for (final Map.Entry<Address, Double> entry : this.netOutlinks.entrySet()) {
-			// TODO-CR 20140925 BR: To fix the test PoiContextTest.outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows
-			// TODO-CR              i commented out the following lines. Does this have negative impact somewhere else?
-			/*if (entry.getValue() <= 0) {
-				continue;
-			}*/
-
-			links.add(new WeightedLink(entry.getKey(), entry.getValue()));
-		}
-
-		return links;
+		return this.netOutlinks.entrySet().stream()
+				.map(entry -> new WeightedLink(entry.getKey(), entry.getValue()))
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -127,13 +120,8 @@ public class PoiAccountInfo {
 		final double netOutlinkScore = this.getNetOutlinks().stream()
 				.map(WeightedLink::getWeight)
 				.reduce(0.0, Double::sum);
-		if (netOutlinkScore < 0) {
-			// TODO: Idea is to not weight negative outlink scores fully; look into this.
-			// TODO-CR 20140925 BR -> M: I adjusted the value for account 2 in the unit test
-			// TODO-CR                   PoiContextTest.outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows to fix the test.
-			// TODO-CR                   Whenever you change this you have to fix that test.
-			return netOutlinkScore * 0.2;
-		}
-		return netOutlinkScore;
+
+		// give less weight to negative outlinks
+		return netOutlinkScore * (netOutlinkScore < 0 ? 0.2 : 1.0);
 	}
 }
