@@ -89,6 +89,7 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 			// TODO 20141001 J-M since our graph is bidirectional, can there ever be a case where
 			// > a hub can has two similar neighbors (i can't think of one)?
             // TODO 20141001 J-M: It depends on GraphConstants.MU.
+			// TODO :) i meant when MU is 3 (like it is now)
 			for (final NodeId neighborId : neighbors) {
 				final int state = this.nodeStates[neighborId.getRaw()];
 				if (NON_MEMBER_CLUSTER_ID == state) {

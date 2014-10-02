@@ -194,6 +194,7 @@ public class NeighborhoodTest {
 
 	// TODO 20141001 - are we sure this is correct?
     // TODO 20141002 M-J: it depends on our GraphConstants
+	// TODO 20141002 - specifically, should the two-hop away neighbors include the pivot
 	@Test
 	public void getTwoHopAwayNeighborsIncludesPivot() {
 		// Arrange:
@@ -213,9 +214,10 @@ public class NeighborhoodTest {
 				neighbors.toList(),
 				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 7)));
 	}
+
 	// TODO 20141001 - are we sure this is correct?
     // TODO 20141002 M-J: it depends on our GraphConstants
-
+	// TODO 20141002 - specifically, should the two-hop away neighbors include neighbors that are one and two hops away
 	@Test
 	public void getTwoHopAwayNeighborsIncludesDirectNeighbors() {
 		// Arrange:

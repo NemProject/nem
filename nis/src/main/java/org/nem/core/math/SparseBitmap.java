@@ -20,7 +20,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
     /**
      * Creates a new <code>SparseBitmap</code> that is empty.
      *
-     * @return new <code>SparseBitmap</code> that is empty (no bits set)
+     * @return A new <code>SparseBitmap</code> that is empty (no bits set).
      */
     public static SparseBitmap createEmpty() {
         return new SparseBitmap(EWAHCompressedBitmap.bitmapOf());
@@ -31,7 +31,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * in strictly ascending order (duplicate values are okay).
 	 *
 	 * @param bitsToSet The bits to set.
-	 * @return new <code>SparseBitmap</code> with the given bits set
+	 * @return A new <code>SparseBitmap</code> with the given bits set.
 	 */
 	public static SparseBitmap createFromSortedData(final int... bitsToSet) {
 		return new SparseBitmap(EWAHCompressedBitmap.bitmapOf(bitsToSet));
@@ -41,7 +41,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	 * Creates a new <code>SparseBitmap</code> from unsorted data.
 	 *
 	 * @param bitsToSet The bits to set.
-	 * @return new <code>SparseBitmap</code> with the given bits set
+	 * @return A new <code>SparseBitmap</code> with the given bits set.
 	 */
 	public static SparseBitmap createFromUnsortedData(final int... bitsToSet) {
 		Arrays.sort(bitsToSet);

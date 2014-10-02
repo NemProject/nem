@@ -97,8 +97,6 @@ public class ClusteringResultTest {
 		Assert.assertThat(result.getIdForNode(new NodeId(11)), IsEqual.equalTo(new ClusterId(11)));
 	}
 
-	// TODO 20140930 is this a bug?
-    // TODO 20141002 nope. The ClusterId and NodeId are not the same thing.
 	@Test
 	public void getIdForNodeDoesNotReturnClusterInformationForClusterIds() {
 		// Arrange:
