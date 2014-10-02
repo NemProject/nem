@@ -33,8 +33,8 @@ public class InterLevelProximityMatrixTest {
 	private static final List<GraphClusteringStrategy> clusteringStrategies = Arrays.asList(
 			new SingleClusterScan(),
 			new OutlierScan(),
-			new Scan(),
-			new FastScan());
+			new ScanClusteringStrategy(),
+			new FastScanClusteringStrategy());
 
 	/**
 	 * Graph interpretation: i----oj means i has directed edge to j

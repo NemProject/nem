@@ -4,13 +4,13 @@ import org.nem.core.model.primitive.*;
 
 import java.util.*;
 
-// TODO 20141001 J-M i think it makes more sense to name these classes (FastSca|Scan)ClusteringStrategy
+// TODO 20141001 J-M i think it makes more sense to name these classes (FastSca|ScanClusteringStrategy)ClusteringStrategy
 // TODO 20141002 M-J Good idea
 
 /**
  * Implementation of the initial SCAN algorithm, from this paper:
  * Xu, X., Yuruk, N., Feng, Z., & Schweiger, T. A. (2007, August),
- * "Scan: a structural clustering algorithm for networks."
+ * "ScanClusteringStrategy: a structural clustering algorithm for networks."
  * <br/>
  * In Proceedings of the 13th ACM SIGKDD international conference
  * on Knowledge discovery and data mining (pp. 824-833). ACM.
@@ -26,7 +26,7 @@ import java.util.*;
  * The elements of the partition are called clusters.
  * Aside from regular cluster the paper introduces the notions of hubs and outliers.
  */
-public class Scan implements GraphClusteringStrategy {
+public class ScanClusteringStrategy implements GraphClusteringStrategy {
 
 	@Override
 	public ClusteringResult cluster(final Neighborhood neighborhood) {

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
  * Implementation of Shiokawa et al., 2014, "構造的類似度に基づくグラフクラスタリングの高速化 (Fast Structural Similarity Graph Clustering),"
  * http://db-event.jpn.org/deim2014/final/proceedings/D6-2.pdf
  */
-public class FastScan implements GraphClusteringStrategy {
+public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 
 	@Override
 	public ClusteringResult cluster(final Neighborhood neighborhood) {
@@ -87,14 +87,14 @@ public class FastScan implements GraphClusteringStrategy {
 				}
 			}
 			final long stop = System.currentTimeMillis();
-			System.out.println("FastScan needed " + (stop - start) + "ms.");
+			System.out.println("FastScanClusteringStrategy needed " + (stop - start) + "ms.");
 			//System.out.println(clusters);
 			//System.out.println(clusters.size() + " clusters, " +  hubs.size() + " hubs, and " + outliers.size() + " outliers");
 		}
 
 		/**
 		 * Handle the special case that the node is at the end of a line graph. This doesn't seem
-		 * to work with regular FastScan because of the two-hop skipping (pretty sure it is a limitation
+		 * to work with regular FastScanClusteringStrategy because of the two-hop skipping (pretty sure it is a limitation
 		 * of the published algorithm).
 		 * We handle this case by creating a community around the neighboring node, rather
 		 * than just the two-hop away node. This is done only for that one neighbor and

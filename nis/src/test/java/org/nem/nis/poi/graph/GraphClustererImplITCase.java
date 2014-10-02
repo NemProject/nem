@@ -187,8 +187,8 @@
 //	 */
 //	private List<GraphClusteringStrategy> getClusteringStrategies() {
 //		List<GraphClusteringStrategy> clusteringStrategies = new ArrayList<>();
-//		clusteringStrategies.add(new Scan());
-//		clusteringStrategies.add(new FastScan());
+//		clusteringStrategies.add(new ScanClusteringStrategy());
+//		clusteringStrategies.add(new FastScanClusteringStrategy());
 //
 //		return clusteringStrategies;
 //	}

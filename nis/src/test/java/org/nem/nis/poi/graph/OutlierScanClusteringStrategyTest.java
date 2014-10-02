@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.primitive.ClusterId;
 import org.nem.nis.test.NisUtils;
 
-public class OutlierScanTest {
+public class OutlierScanClusteringStrategyTest {
 
 	@Test
 	public void clusterReturnsNoClustersWhenNeighborhoodIsEmpty() {
