@@ -42,7 +42,9 @@ public class PoiContext {
 		this.inverseTeleportationProbability = (1.0 - TELEPORTATION_PROB - INTER_LEVEL_TELEPORTATION_PROB) / this.getPoiStartVector().size();
 	}
 
-	//region Getters
+	//region getters
+
+	//region vectors
 
 	/**
 	 * Gets the vested balance vector.
@@ -70,6 +72,8 @@ public class PoiContext {
 	public ColumnVector getPoiStartVector() {
 		return this.accountProcessor.poiStartVector;
 	}
+
+	//endregion
 
 	//region teleportation probabilities
 
@@ -102,6 +106,8 @@ public class PoiContext {
 
 	//endregion
 
+	//region dangle indexes
+
 	/**
 	 * Gets the dangle indexes.
 	 *
@@ -111,14 +117,9 @@ public class PoiContext {
 		return this.accountProcessor.dangleIndexes;
 	}
 
-	/**
-	 * Gets the dangle vector, where an element has a 0 value if the corresponding account is dangling.
-	 *
-	 * @return The dangle vector.
-	 */
-	public ColumnVector getDangleVector() {
-		return this.accountProcessor.dangleVector;
-	}
+	//endregion
+
+	//region matricies
 
 	/**
 	 * Gets the out-link matrix.
@@ -138,14 +139,7 @@ public class PoiContext {
 		return this.accountProcessor.interLevelMatrix;
 	}
 
-	/**
-	 * Gets the clustering result.
-	 *
-	 * @return The clustering result.
-	 */
-	public ClusteringResult getClusteringResult() {
-		return this.accountProcessor.clusteringResult;
-	}
+	//endregion
 
 	//endregion
 
@@ -164,7 +158,6 @@ public class PoiContext {
 	private static class AccountProcessor {
 		private final BlockHeight height;
 		private final List<Integer> dangleIndexes;
-		private final ColumnVector dangleVector;
 		private final ColumnVector vestedBalanceVector;
 		private final ColumnVector poiStartVector;
 		private final ColumnVector outlinkScoreVector;
@@ -201,9 +194,6 @@ public class PoiContext {
 			if (0 == i) {
 				throw new IllegalArgumentException("there aren't any harvesting eligible accounts");
 			}
-
-			this.dangleVector = new ColumnVector(i);
-			this.dangleVector.setAll(1);
 
 			this.vestedBalanceVector = new ColumnVector(i);
 			this.poiStartVector = new ColumnVector(i);
@@ -291,7 +281,8 @@ public class PoiContext {
 			// This is the point where the dangle indices should be calculated, not earlier!
 			// The normalizeColumns() method returns the dangle indices because during normalization
 			// the column sums need to be calculated anyway.
-			this.dangleIndexes.addAll(this.outlinkMatrix.normalizeColumns());
+			final Collection<Integer> dangleIndexes = this.outlinkMatrix.normalizeColumns();
+			this.dangleIndexes.addAll(dangleIndexes);
 
 			// We should create the NodeNeighborMap after removing negatives
 			this.clusterAccounts();

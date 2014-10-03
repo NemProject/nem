@@ -86,9 +86,9 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 					prevIterImportances);
 
 			// V(dangle-indexes) * dangle-sum + V(inverseTeleportation)
-			return this.context.getDangleVector()
-					.multiply(dangleSum)
-					.add(this.context.getInverseTeleportationProbability());
+			final ColumnVector dangleVector = new ColumnVector(prevIterImportances.size());
+			dangleVector.setAll(this.context.getInverseTeleportationProbability() * dangleSum);
+			return dangleVector;
 		}
 
 		private ColumnVector createImportancesVector(final ColumnVector prevIterImportances) {

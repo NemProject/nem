@@ -345,6 +345,7 @@ public class InterLevelProximityMatrixTest {
 		a.setAt(4, 1, 1.0);
 		a.setAt(5, 1, 1.0);
 		a.setAt(6, 2, 1.0);
+
 		final SparseMatrix r = new SparseMatrix(3, 7, 8);
 		r.setAt(0, 0, 1.0 / 3.0);
 		r.setAt(0, 1, 1.0 / 3.0);
@@ -425,7 +426,7 @@ public class InterLevelProximityMatrixTest {
 
 		// Act:
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(context.clusters, context.neighborhood, context.outlinkMatrix);
-		System.out.println(context.clusters.getClusters());
+
 		// Assert:
 		final SparseMatrix a = new SparseMatrix(11, 6, 4);
 		a.setAt(0, 0, 1.0);
