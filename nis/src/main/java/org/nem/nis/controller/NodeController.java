@@ -195,8 +195,8 @@ public class NodeController {
 	@RequestMapping(value = "/node/active-peers/max-chain-height", method = RequestMethod.GET)
 	@PublicApi
 	public BlockHeight activePeersMaxChainHeight() {
-		final Node localNode = this.host.getNetwork().getLocalNode();
-		final BlockHeight height = this.chainServices.getMaxChainHeightAsync(localNode).join();
+		//final Node localNode = this.host.getNetwork().getLocalNode();
+		final BlockHeight height = this.chainServices.getMaxChainHeightAsync(getActivePeerList().asCollection()).join();
 		return height;
 	}
 
