@@ -341,8 +341,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	@Test
 	public void poiIsFairerThanPOS() {
 		LOGGER.info("Check that POI distributes importance differently than POS");
-		// TODO-CR 20140916 BR: I don't really get what this test verifies.
-		// TODO-CR 20140921 M->BR: The outlink strength for accts was wrong, so I corrected that. Test should verify that accts that transact can gain higher importance than richer accts that do not.
+		// Test should verify that accts that transact can gain higher importance than richer accts that do not.
 		// Arrange:
 		// Accounts with smaller vested balance should be able to have more importance than accounts with high balance and low activity
 		final int numAccounts = 10;
@@ -446,6 +445,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 10000 * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
+        // TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
 		// Warm up phase
 		getAccountImportances(new BlockHeight(10000), accounts);
 

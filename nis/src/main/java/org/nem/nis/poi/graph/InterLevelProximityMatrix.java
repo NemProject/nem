@@ -146,6 +146,7 @@ public class InterLevelProximityMatrix {
 						.mapToInt(ClusterId::getRaw)
 						.toArray();
 				// TODO: does it make sense for getNeighboringCommunities to return sorted ids?
+                // TODO M-J: probably because we use SparseBitmaps in most or all cases
 				neighborhoodClusterIdsSet.add(SparseBitmap.createFromUnsortedData(clusterIdsForNode));
 			}
 

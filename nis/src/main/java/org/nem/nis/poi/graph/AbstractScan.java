@@ -144,6 +144,7 @@ public abstract class AbstractScan {
 	 */
 	protected Cluster findCluster(final ClusterId clusterId) {
 		// TODO 20141002 i guess since the number of expected clusters is small, a linear search is ok here
+        // TODO 20141003 M-J: I think in practice this number should be less than 1000-5000.
 		for (final Cluster cluster : this.clusters) {
 			if (cluster.getId().equals(clusterId)) {
 				return cluster;

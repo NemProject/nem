@@ -117,6 +117,7 @@ public class InterLevelProximityMatrixTest {
 
 	// TODO 20141002 - these tests are dependent on FastScan, i'm not sure if that's good or bad
 	// > i think i would prefer to explicitly specify the clusters
+    // TODO 20141003 M-J: yes, we should refactor this to use mockito
 
 	/**
 	 * <pre>
