@@ -1,5 +1,7 @@
 package org.nem.nis.secret;
 
+import org.nem.core.model.primitive.Amount;
+
 /**
  * Common place to have BlockChain-related constants accessible
  * from both org.nem.nis and org.nem.core packages
@@ -20,4 +22,9 @@ public class BlockChainConstants {
 	 * Number of blocks send and compared during synchronization
 	 */
 	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
+
+    /**
+     * Minimal balance required to forage.
+     */
+    public static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1000);
 }
