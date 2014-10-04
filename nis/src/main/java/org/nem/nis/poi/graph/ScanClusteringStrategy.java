@@ -51,8 +51,12 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 			final ArrayDeque<NodeId> connections = new ArrayDeque<>();
 			final Community pivotCommunity = this.neighborhood.getCommunity(pivotId);
 			connections.addAll(pivotCommunity.getSimilarNeighbors().toList());
+			final HashSet<NodeId> processedIds = new HashSet<>();
 			while (!connections.isEmpty()) {
 				final NodeId connectedNodeId = connections.pop();
+				if (processedIds.contains(connectedNodeId)) {
+					continue;
+				}
 
 				// dirReach = {x ∈ V | DirREACHε,μ(y, x)};
 				// Note that DirREACH requires y to be a core node.
@@ -78,6 +82,8 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 					this.nodeStates[id] = pivotId.getRaw();
 					cluster.add(nodeId);
 				}
+
+				processedIds.add(connectedNodeId);
 			}
 
 			return cluster;

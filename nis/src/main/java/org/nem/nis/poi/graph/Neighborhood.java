@@ -77,25 +77,18 @@ public class Neighborhood {
 	public NodeNeighbors getTwoHopAwayNeighbors(final NodeId nodeId) {
 		// from the paper, the definition of node w is that it is an epsilon neighbor of u
 		final NodeNeighbors neighbors = this.getCommunity(nodeId).getSimilarNeighbors();
-
-		// TODO 20141001 - i guess we're assuming that if size == 1 the neighborhood just contains the pivot?
-        // TODO 20141002 M-J: yes, that is correct.
-		if (neighbors.size() < 2) {
-			return new NodeNeighbors();
-		}
-
-		final NodeNeighbors[] twoHopAwayNeighborsArray = new NodeNeighbors[neighbors.size() - 1];
+		final NodeNeighbors[] twoHopAwayNeighborsArray = new NodeNeighbors[neighbors.size()];
 
 		int index = 0;
 		for (final NodeId neighborId : neighbors) {
-			if (nodeId.equals(neighborId)) {
-				continue;
-			}
-
-			twoHopAwayNeighborsArray[index++] = this.repository.getNeighbors(neighborId);
+			// ignore one-hop neighbors
+			twoHopAwayNeighborsArray[index++] = nodeId.equals(neighborId)
+					? new NodeNeighbors()
+					: this.repository.getNeighbors(neighborId);
 		}
 
-		return NodeNeighbors.union(twoHopAwayNeighborsArray);
+		return NodeNeighbors.union(twoHopAwayNeighborsArray)
+				.difference(new NodeNeighbors(nodeId)); // don't report the starting node as two-hops away
 	}
 
 	/**

@@ -16,32 +16,44 @@ public class NeighborhoodTest {
 
 	@Test
 	public void getCommunityAlwaysTreatsPivotNodeAsSimilar() {
+		// Act:
+		final Community community = getCommunity(2, 2, 0.00);
+
 		// Assert: the pivot node should always be treated as similar even if the similarity score indicates it is not similar with itself
-		assertSimilarNeighbor(2, 2, 0.0);
+		assertCommunity(community, new NodeId(2), NisUtils.toNodeIdList(2), NisUtils.toNodeIdList());
 	}
 
 	@Test
 	public void getCommunityTreatsNodesWithSimilarityScoreGreaterThanEpsilonAsSimilar() {
+		// Act:
+		final Community community = getCommunity(2, 4, 0.651);
+
 		// Assert:
-		assertSimilarNeighbor(2, 4, 0.651);
+		assertCommunity(community, new NodeId(2), NisUtils.toNodeIdList(2, 4), NisUtils.toNodeIdList());
 	}
 
 	@Test
 	public void getCommunityTreatsNodesWithSimilarityScoreEqualToEpsilonAsDissimilar() {
+		// Act:
+		final Community community = getCommunity(2, 4, 0.65);
+
 		// Assert:
-		assertDissimilarNeighbor(2, 4, 0.65);
+		assertCommunity(community, new NodeId(2), NisUtils.toNodeIdList(2), NisUtils.toNodeIdList(4));
 	}
 
 	@Test
 	public void getCommunityTreatsNodesWithSimilarityScoreLessThanEpsilonAsDissimilar() {
+		// Act:
+		final Community community = getCommunity(2, 4, 0.649);
+
 		// Assert:
-		assertDissimilarNeighbor(2, 4, 0.649);
+		assertCommunity(community, new NodeId(2), NisUtils.toNodeIdList(2), NisUtils.toNodeIdList(4));
 	}
 
 	private static Community getCommunity(final int pivotId, final int neighborId, final double similarity) {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
-		Mockito.when(repository.getNeighbors(new NodeId(pivotId))).thenReturn(NisUtils.createNeighbors(neighborId));
+		Mockito.when(repository.getNeighbors(new NodeId(pivotId))).thenReturn(NisUtils.createNeighbors(pivotId, neighborId));
 
 		final SimilarityStrategy strategy = Mockito.mock(SimilarityStrategy.class);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(pivotId), new NodeId(neighborId))).thenReturn(similarity);
@@ -52,31 +64,21 @@ public class NeighborhoodTest {
 		return neighborhood.getCommunity(new NodeId(pivotId));
 	}
 
-	private static void assertSimilarNeighbor(final int pivotId, final int neighborId, final double similarity) {
-		// Act:
-		final Community community = getCommunity(pivotId, neighborId, similarity);
-
-		// Assert:
-		Assert.assertThat(community.getPivotId(), IsEqual.equalTo(new NodeId(pivotId)));
-		Assert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(neighborId)));
-		Assert.assertThat(community.getDissimilarNeighbors().toList().size(), IsEqual.equalTo(0));
-	}
-
-	private static void assertDissimilarNeighbor(final int pivotId, final int neighborId, final double similarity) {
-		// Act:
-		final Community community = getCommunity(pivotId, neighborId, similarity);
-
-		// Assert:
-		Assert.assertThat(community.getPivotId(), IsEqual.equalTo(new NodeId(pivotId)));
-		Assert.assertThat(community.getSimilarNeighbors().toList().size(), IsEqual.equalTo(0));
-		Assert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(neighborId)));
+	private static void assertCommunity(
+			final Community community,
+			final NodeId pivotId,
+			final List<NodeId> similarNodeIds,
+			final List<NodeId> dissimilarNodeIds) {
+		Assert.assertThat(community.getPivotId(), IsEqual.equalTo(pivotId));
+		Assert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(similarNodeIds));
+		Assert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(dissimilarNodeIds));
 	}
 
 	@Test
 	public void getCommunityCreatesCommunityAroundSpecifiedNode() {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
-		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(0, 1, 3, 7, 9));
+		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(0, 1, 2, 3, 7, 9));
 
 		final SimilarityStrategy strategy = Mockito.mock(SimilarityStrategy.class);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(0))).thenReturn(0.72);
@@ -92,7 +94,7 @@ public class NeighborhoodTest {
 
 		// Assert:
 		Assert.assertThat(community.getPivotId(), IsEqual.equalTo(new NodeId(2)));
-		Assert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 7, 9)));
+		Assert.assertThat(community.getSimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 7, 9)));
 		Assert.assertThat(community.getDissimilarNeighbors().toList(), IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3)));
 	}
 
@@ -100,7 +102,7 @@ public class NeighborhoodTest {
 	public void getCommunityCachesCommunityResult() {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
-		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors());
+		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2));
 		final Neighborhood neighborhood = new Neighborhood(repository, Mockito.mock(SimilarityStrategy.class));
 
 		// Act:
@@ -119,12 +121,12 @@ public class NeighborhoodTest {
 	public void getNeighboringCommunitiesReturnsAllNeighboringCommunities() {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
-		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(0, 1, 3, 7, 9));
-		Mockito.when(repository.getNeighbors(new NodeId(0))).thenReturn(NisUtils.createNeighbors(2));
-		Mockito.when(repository.getNeighbors(new NodeId(1))).thenReturn(NisUtils.createNeighbors(2));
-		Mockito.when(repository.getNeighbors(new NodeId(3))).thenReturn(NisUtils.createNeighbors(2));
-		Mockito.when(repository.getNeighbors(new NodeId(7))).thenReturn(NisUtils.createNeighbors(2));
-		Mockito.when(repository.getNeighbors(new NodeId(9))).thenReturn(NisUtils.createNeighbors(2));
+		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(0, 1, 2, 3, 7, 9));
+		Mockito.when(repository.getNeighbors(new NodeId(0))).thenReturn(NisUtils.createNeighbors(0, 2));
+		Mockito.when(repository.getNeighbors(new NodeId(1))).thenReturn(NisUtils.createNeighbors(1, 2));
+		Mockito.when(repository.getNeighbors(new NodeId(3))).thenReturn(NisUtils.createNeighbors(2, 3));
+		Mockito.when(repository.getNeighbors(new NodeId(7))).thenReturn(NisUtils.createNeighbors(2, 7));
+		Mockito.when(repository.getNeighbors(new NodeId(9))).thenReturn(NisUtils.createNeighbors(2, 9));
 		final Neighborhood neighborhood = new Neighborhood(repository, Mockito.mock(SimilarityStrategy.class));
 
 		// Act:
@@ -133,7 +135,7 @@ public class NeighborhoodTest {
 		// Assert:
 		Assert.assertThat(
 				neighboringCommunities.stream().map(Community::getPivotId).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 3, 7, 9)));
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(0, 1, 2, 3, 7, 9)));
 	}
 
 	//endregion
@@ -144,7 +146,7 @@ public class NeighborhoodTest {
 	public void getTwoHopAwayNeighborsReturnsEmptyNodeNeighborsWhenNodeHasZeroSimilarNeighbor() {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
-		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors());
+		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2));
 		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
@@ -189,15 +191,11 @@ public class NeighborhoodTest {
 		// Assert:
 		Assert.assertThat(
 				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 2, 3, 5, 7, 9, 10, 11, 12)));
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(1, 3, 5, 7, 9, 10, 11, 12)));
 	}
 
-	// TODO 20141001 - are we sure this is correct?
-    // TODO 20141002 M-J: it depends on our GraphConstants
-	// TODO 20141002 - specifically, should the two-hop away neighbors include the pivot
-    // TODO 20141003: It seems weird, but I think there was a reason for doing it this way :) I'll try to change it and see if it breaks everything.
 	@Test
-	public void getTwoHopAwayNeighborsIncludesPivot() {
+	public void getTwoHopAwayNeighborsExcludesPivot() {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
 		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2, 3, 4));
@@ -210,18 +208,14 @@ public class NeighborhoodTest {
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
-		// Assert: 2 is included
+		// Assert: 2 is not included
 		Assert.assertThat(
 				neighbors.toList(),
-				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(2, 5, 7)));
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(5, 7)));
 	}
 
-	// TODO 20141001 - are we sure this is correct?
-    // TODO 20141002 M-J: it depends on our GraphConstants
-	// TODO 20141002 - specifically, should the two-hop away neighbors include neighbors that are one and two hops away
-    // TODO 20141003 M-J: this seems wrong to me.
 	@Test
-	public void getTwoHopAwayNeighborsIncludesDirectNeighbors() {
+	public void getTwoHopAwayNeighborsIncludesDirectNeighborsThatAreAlsoTwoHopsAway() {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
 		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2, 3, 4));
@@ -234,10 +228,31 @@ public class NeighborhoodTest {
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
 
-		// Assert: 3 and 4 are included
+		// Assert: 3 (2 -> 4 -> 3) and 4 (2 -> 3 -> 4) are included
 		Assert.assertThat(
 				neighbors.toList(),
 				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(3, 4, 5, 7)));
+	}
+
+	@Test
+	public void getTwoHopAwayNeighborsExcludesDirectNeighborsThatAreNotTwoHopsAway() {
+		// Arrange:
+		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
+		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2, 3, 5));
+		Mockito.when(repository.getNeighbors(new NodeId(3))).thenReturn(NisUtils.createNeighbors(4, 7));
+		Mockito.when(repository.getNeighbors(new NodeId(4))).thenReturn(NisUtils.createNeighbors(3));
+		Mockito.when(repository.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors(4, 8));
+		Mockito.when(repository.getNeighbors(new NodeId(7))).thenReturn(NisUtils.createNeighbors(7));
+		Mockito.when(repository.getNeighbors(new NodeId(8))).thenReturn(NisUtils.createNeighbors(8));
+		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+
+		// Act:
+		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
+
+		// Assert: 3 (2 -> 3 -> 4 -> 3) and 5 are not included
+		Assert.assertThat(
+				neighbors.toList(),
+				IsEquivalent.equivalentTo(NisUtils.toNodeIdArray(4, 7, 8)));
 	}
 
 	@Test
