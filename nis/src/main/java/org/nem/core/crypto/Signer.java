@@ -1,16 +1,12 @@
 package org.nem.core.crypto;
 
-import org.bouncycastle.crypto.digests.SHA3Digest;
-import org.bouncycastle.crypto.signers.*;
-
-import java.math.BigInteger;
-
 /**
- * Wraps EC DSA signing and verification logic.
+ * Wraps DSA signing and verification logic.
  */
 public class Signer {
 
 	private final KeyPair keyPair;
+	private final DsaSigner signer;
 
 	/**
 	 * Creates a signer around a KeyPair.
@@ -19,6 +15,7 @@ public class Signer {
 	 */
 	public Signer(final KeyPair keyPair) {
 		this.keyPair = keyPair;
+		this.signer = CryptoEngines.getDefaultEngine().createDsaSigner(keyPair);
 	}
 
 	/**
@@ -32,13 +29,15 @@ public class Signer {
 			throw new CryptoException("cannot sign without private key");
 		}
 
+		return this.signer.sign(data);
+		/*
 		final ECDSASigner signer = this.createECDSASigner();
 		signer.init(true, this.keyPair.getPrivateKeyParameters());
 		final byte[] hash = Hashes.sha3(data);
 		final BigInteger[] components = signer.generateSignature(hash);
 		final Signature signature = new Signature(components[0], components[1]);
 		signature.makeCanonical();
-		return signature;
+		return signature;*/
 	}
 
 	/**
@@ -53,13 +52,15 @@ public class Signer {
 			return false;
 		}
 
+		return this.signer.verify(data, signature);
+		/*
 		final ECDSASigner signer = this.createECDSASigner();
 		signer.init(false, this.keyPair.getPublicKeyParameters());
 		final byte[] hash = Hashes.sha3(data);
-		return signer.verifySignature(hash, signature.getR(), signature.getS());
+		return signer.verifySignature(hash, signature.getR(), signature.getS());*/
 	}
 
-	private ECDSASigner createECDSASigner() {
+	/*private ECDSASigner createECDSASigner() {
 		return new ECDSASigner(new HMacDSAKCalculator(new SHA3Digest(256)));
-	}
+	}*/
 }

@@ -1,19 +1,11 @@
 package org.nem.core.crypto;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.engines.IESEngine;
-import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
-import org.bouncycastle.crypto.macs.HMac;
-import org.bouncycastle.crypto.params.IESParameters;
-
 /**
- * Wraps EC IES encryption and decryption logic.
+ * Wraps IES encryption and decryption logic.
  */
 public class Cipher {
 
-	private final static IESParameters IES_PARAMETERS;
+	/*private final static IESParameters IES_PARAMETERS;
 
 	static {
 		final byte[] d = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -22,7 +14,8 @@ public class Cipher {
 	}
 
 	private final IESEngine iesEncryptEngine;
-	private final IESEngine iesDecryptEngine;
+	private final IESEngine iesDecryptEngine;*/
+	private final IesCipher cipher;
 
 	/**
 	 * Creates a cipher around a sender KeyPair and recipient KeyPair.
@@ -31,6 +24,8 @@ public class Cipher {
 	 * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
 	 */
 	public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
+		this.cipher = CryptoEngines.getDefaultEngine().createIesCipher(senderKeyPair, recipientKeyPair);
+		/*
 		if (senderKeyPair.hasPrivateKey()) {
 			this.iesEncryptEngine = createIesEngine();
 			this.iesEncryptEngine.init(
@@ -51,7 +46,7 @@ public class Cipher {
 					IES_PARAMETERS);
 		} else {
 			this.iesDecryptEngine = null;
-		}
+		}*/
 	}
 
 	/**
@@ -62,11 +57,13 @@ public class Cipher {
 	 * @throws CryptoException if the encryption operation failed.
 	 */
 	public byte[] encrypt(final byte[] input) {
+		return this.cipher.encrypt(input);
+		/*
 		try {
 			return this.iesEncryptEngine.processBlock(input, 0, input.length);
 		} catch (final InvalidCipherTextException e) {
 			throw new CryptoException(e);
-		}
+		}*/
 	}
 
 	/**
@@ -76,17 +73,19 @@ public class Cipher {
 	 * @return The decrypted message or null if decryption failed.
 	 */
 	public byte[] decrypt(final byte[] input) {
+		return this.cipher.decrypt(input);
+		/*
 		try {
 			return this.iesDecryptEngine.processBlock(input, 0, input.length);
 		} catch (final InvalidCipherTextException e) {
 			return null;
-		}
+		}*/
 	}
 
-	private static IESEngine createIesEngine() {
+	/*private static IESEngine createIesEngine() {
 		return new IESEngine(
 				new ECDHBasicAgreement(),
 				new KDF2BytesGenerator(new SHA1Digest()),
 				new HMac(new SHA1Digest()));
-	}
+	}*/
 }

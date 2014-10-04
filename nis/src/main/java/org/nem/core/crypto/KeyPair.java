@@ -1,15 +1,8 @@
 package org.nem.core.crypto;
 
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
-import org.bouncycastle.crypto.params.*;
-import org.bouncycastle.math.ec.ECPoint;
-
-import java.security.SecureRandom;
-
 public class KeyPair {
 
-	private final static SecureRandom RANDOM = new SecureRandom();
+	//private final static SecureRandom RANDOM = new SecureRandom();
 
 	private final PrivateKey privateKey;
 	private final PublicKey publicKey;
@@ -18,6 +11,11 @@ public class KeyPair {
 	 * Creates a random key pair.
 	 */
 	public KeyPair() {
+		final KeyGenerator generator = CryptoEngines.getDefaultEngine().createKeyGenerator();
+		final KeyPair pair = generator.generateKeyPair();
+		this.privateKey = pair.getPrivateKey();
+		this.publicKey = pair.getPublicKey();
+		/*
 		final ECKeyPairGenerator generator = new ECKeyPairGenerator();
 		final ECKeyGenerationParameters keyGenParams = new ECKeyGenerationParameters(Curves.secp256k1().getParams(), RANDOM);
 		generator.init(keyGenParams);
@@ -28,7 +26,7 @@ public class KeyPair {
 		this.privateKey = new PrivateKey(privateKeyParams.getD());
 
 		final ECPoint point = publicKeyParams.getQ();
-		this.publicKey = new PublicKey(point.getEncoded(true));
+		this.publicKey = new PublicKey(point.getEncoded(true));*/
 	}
 
 	/**
@@ -38,7 +36,7 @@ public class KeyPair {
 	 * @param privateKey The private key.
 	 */
 	public KeyPair(final PrivateKey privateKey) {
-		this(privateKey, publicKeyFromPrivateKey(privateKey));
+		this(privateKey, CryptoEngines.getDefaultEngine().createKeyGenerator().derivePublicKey(privateKey));
 	}
 
 	/**
@@ -60,10 +58,10 @@ public class KeyPair {
 		}
 	}
 
-	private static PublicKey publicKeyFromPrivateKey(final PrivateKey privateKey) {
+	/*private static PublicKey publicKeyFromPrivateKey(final PrivateKey privateKey) {
 		final ECPoint point = Curves.secp256k1().getParams().getG().multiply(privateKey.getRaw());
 		return new PublicKey(point.getEncoded(true));
-	}
+	}*/
 
 	/**
 	 * Gets the private key.
@@ -106,17 +104,17 @@ public class KeyPair {
 	 *
 	 * @return The EC private key parameters.
 	 */
-	public ECPrivateKeyParameters getPrivateKeyParameters() {
+	/*public ECPrivateKeyParameters getPrivateKeyParameters() {
 		return new ECPrivateKeyParameters(this.getPrivateKey().getRaw(), Curves.secp256k1().getParams());
-	}
+	}*/
 
 	/**
 	 * Gets the EC public key parameters.
 	 *
 	 * @return The EC public key parameters.
 	 */
-	public ECPublicKeyParameters getPublicKeyParameters() {
+	/*public ECPublicKeyParameters getPublicKeyParameters() {
 		final ECPoint point = Curves.secp256k1().getParams().getCurve().decodePoint(this.getPublicKey().getRaw());
 		return new ECPublicKeyParameters(point, Curves.secp256k1().getParams());
-	}
+	}*/
 }
