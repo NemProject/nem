@@ -81,7 +81,6 @@ public class NisConfigurationTest {
 	//endregion
 
 	//region nis.nodeLimit
-
 	@Test
 	public void canReadConfigurationWithNodeLimit() {
 		// Arrange:
@@ -106,11 +105,37 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(20));
 	}
+    //endregion
 
+    //region nis.unlockedLimit
+    @Test
+    public void canReadConfigurationWithUnlockedLimit() {
+        // Arrange:
+        final Properties properties = this.getCommonProperties();
+        properties.setProperty("nis.unlockedLimit", "123");
+
+        // Act:
+        final NisConfiguration config = new NisConfiguration(properties);
+
+        // Assert:
+        Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
+    }
+
+
+    @Test
+    public void canReadConfigurationWithoutUnlockedLimit() {
+        // Arrange:
+        final Properties properties = this.getCommonProperties();
+
+        // Act:
+        final NisConfiguration config = new NisConfiguration(properties);
+
+        // Assert:
+        Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(6));
+    }
 	//endregion
 
 	//region nis.bootWithoutAck
-
 	@Test
 	public void canReadConfigurationWithBootWithoutAck() {
 		// Arrange:
