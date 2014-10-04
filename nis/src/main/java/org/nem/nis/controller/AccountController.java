@@ -1,8 +1,10 @@
 package org.nem.nis.controller;
 
+import org.nem.core.connect.client.NisApiId;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
@@ -25,7 +27,8 @@ public class AccountController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
-	private final AccountInfoFactory accountInfoFactory;
+    private final BlockChainLastBlockLayer blockChainLastBlockLayer;
+    private final AccountInfoFactory accountInfoFactory;
 	private final PoiFacade poiFacade;
 
 	@Autowired(required = true)
@@ -33,11 +36,13 @@ public class AccountController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
+            final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
 			final PoiFacade poiFacade) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
+        this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 		this.poiFacade = poiFacade;
 	}
@@ -52,7 +57,8 @@ public class AccountController {
 	@ClientApi
 	public AccountMetaDataPair accountGet(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		final AccountInfo account = this.accountInfoFactory.createInfo(address);
+        final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
+		final AccountInfo account = this.accountInfoFactory.createInfo(address, new BlockHeight(height));
 		final AccountMetaData metaData = new AccountMetaData(this.getAccountStatus(address));
 		return new AccountMetaDataPair(account, metaData);
 	}
