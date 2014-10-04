@@ -175,7 +175,11 @@ public class DebugController {
 			if (null != message && message.canDecode()) {
 				messageText = StringEncoder.getString(message.getDecodedPayload());
 			}
-		}
+		} else if (transaction instanceof ImportanceTransferTransaction) {
+            final ImportanceTransferTransaction transfer = ((ImportanceTransferTransaction)transaction);
+            recipient = transfer.getRemote().getAddress();
+            amount = Amount.fromMicroNem(transfer.getType());
+        }
 
 		return new TransactionDebugInfo(
 				transaction.getTimeStamp(),
