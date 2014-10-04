@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -367,9 +367,6 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
-	// TODO: Maybe the following tests are better off in the integration tests
-	//       since they involve calculations in more than one class.
-
 	/**
 	 * <pre>
 	 * First Graph: 0 --- 1
@@ -554,59 +551,10 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
-	/**
-	 * <pre>
-	 * Graph:         0
-	 *               / \
-	 *              /   \
-	 *             1-----2-----6
-	 *                   |
-	 *                   |
-	 *                   3
-	 *                  / \
-	 *                 /   \
-	 *                4-----5
-	 * <br/>
-	 * Expected: clusters {0,1,2} and {3,4,5}, no hubs, one outlier {6}
-	 * </pre>
-	 */
 	@Test
 	public void thirdGraphIsClusteredAsExpected() {
-		// Arrange:
-		// This is the example used in the paper:
-		// NCDawareRank: a novel ranking method that exploits the decomposable structure of the web
-		final DenseMatrix outlinkMatrix = new DenseMatrix(7, 7);
-		outlinkMatrix.setAt(1, 0, 1);
-		outlinkMatrix.setAt(2, 0, 1);
-		outlinkMatrix.setAt(0, 1, 1);
-		outlinkMatrix.setAt(2, 1, 1);
-		outlinkMatrix.setAt(0, 2, 1);
-		outlinkMatrix.setAt(1, 2, 1);
-		outlinkMatrix.setAt(3, 2, 1);
-		outlinkMatrix.setAt(6, 2, 1);
-		outlinkMatrix.setAt(2, 3, 1);
-		outlinkMatrix.setAt(4, 3, 1);
-		outlinkMatrix.setAt(5, 3, 1);
-		outlinkMatrix.setAt(3, 4, 1);
-		outlinkMatrix.setAt(5, 4, 1);
-		outlinkMatrix.setAt(3, 5, 1);
-		outlinkMatrix.setAt(4, 5, 1);
-		outlinkMatrix.setAt(2, 6, 1);
-
-		// Act:
-		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
-
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)),
-				new Cluster(new ClusterId(3), NisUtils.toNodeIdList(3, 4, 5)));
-		final List<Cluster> expectedOutliers = Arrays.asList(
-				new Cluster(new ClusterId(6), NisUtils.toNodeIdList(6)));
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
+		assertGraphIsClusteredCorrectly(GraphType.GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER);
 	}
 
 	/**
@@ -787,43 +735,31 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
-	/**
-	 * <pre>
-	 * Graph:      0---1---2---3---4
-	 * </pre>
-	 * Expected: clusters: {0,1,2,3,4}
-	 * hubs    : none
-	 * outliers: none
-	 */
 	@Test
 	public void eighthGraphIsClusteredAsExpected() {
-		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(5, 5);
-		outlinkMatrix.setAt(1, 0, 1);
-		outlinkMatrix.setAt(2, 1, 1);
-		outlinkMatrix.setAt(3, 2, 1);
-		outlinkMatrix.setAt(4, 3, 1);
+		// Assert:
+		assertGraphIsClusteredCorrectly(GraphType.GRAPH_LINE_STRUCTURE);
+	}
 
-		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
+	private void assertGraphIsClusteredCorrectly(final GraphType graphType) {
+		// Arrange:
+		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
 
 		// Act:
 		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
 		logClusteringResult(result);
 
 		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
-		final List<Cluster> expectedHubs = Arrays.asList();
-		final List<Cluster> expectedOutliers = Arrays.asList();
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
+		final ClusteringResult expectedResult = IdealizedClusterFactory.create(graphType);
+		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
+		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
+		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
 	}
 
 	private ClusteringResult calculateClusteringResult(final GraphClusteringStrategy graphClusteringStrategy, final Matrix outlinkMatrix) {
-		final NodeNeighborMap nodeNeighbordMap = new NodeNeighborMap(outlinkMatrix);
-		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighbordMap);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighbordMap, strategy);
+		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
+		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
+		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy);
 		return graphClusteringStrategy.cluster(neighborhood);
 	}
 

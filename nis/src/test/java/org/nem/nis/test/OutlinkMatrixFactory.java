@@ -147,6 +147,7 @@ public class OutlinkMatrixFactory {
 			}
 		}
 
+		matrix.removeNegatives();
 		return matrix;
 	}
 

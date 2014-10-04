@@ -33,7 +33,7 @@ public class IdealizedClusterFactory {
 
 			case GRAPH_LINE_STRUCTURE:
 			case GRAPH_RING_STRUCTURE:
-				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
+				clusters.add(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
 				break;
 
 

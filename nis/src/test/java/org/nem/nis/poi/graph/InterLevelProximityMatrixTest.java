@@ -285,8 +285,6 @@ public class InterLevelProximityMatrixTest {
 
 	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphType graphType) {
 		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
-		outlinkMatrix.removeNegatives();
-
 		final ClusteringResult clusteringResult = IdealizedClusterFactory.create(graphType);
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
