@@ -63,7 +63,14 @@ public class AccountController {
 		return new AccountMetaDataPair(account, metaData);
 	}
 
-	private AccountStatus getAccountStatus(final Address address) {
+    @RequestMapping(value = "/account/status", method = RequestMethod.GET)
+    @ClientApi
+    public AccountMetaData accountStatus(final AccountIdBuilder builder) {
+        final Address address = builder.build().getAddress();
+        return new AccountMetaData(getAccountStatus(address));
+    }
+
+    private AccountStatus getAccountStatus(final Address address) {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 
