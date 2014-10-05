@@ -109,7 +109,7 @@ public class AccountInfo implements SerializableEntity {
 	 * @return The remote account status.
 	 */
 	public AccountRemoteStatus getRemoteStatus() {
-		return remoteStatus;
+		return this.remoteStatus;
 	}
 
 	/**
