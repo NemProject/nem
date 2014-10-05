@@ -50,11 +50,8 @@ public class Transfer {
 	private Integer messageType;
 	private byte[] messagePayload;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinTable(name = "block_transfers",
-			joinColumns = { @JoinColumn(name = "transfer_id", referencedColumnName = "id") },
-			inverseJoinColumns = { @JoinColumn(name = "block_id", referencedColumnName = "id") }
-	)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blockId")
 	private Block block;
 
 	public Transfer() {
