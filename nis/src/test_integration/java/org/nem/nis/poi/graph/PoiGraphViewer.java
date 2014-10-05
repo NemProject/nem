@@ -139,7 +139,7 @@ public class PoiGraphViewer {
 	/**
 	 * Set the cluster.
 	 */
-	public void setCluster(Cluster cluster) {
+	public void setCluster(final Cluster cluster) {
 		this.cluster = cluster;
 	}
 
@@ -159,8 +159,8 @@ public class PoiGraphViewer {
 			int edgeCount = 0;
 
 			@Override
-			public void visit(int row, int col, double value) {
-				getGraph().addEdge(edgeCount++, col, row, edgeType);
+			public void visit(final int row, final int col, final double value) {
+				getGraph().addEdge(this.edgeCount++, col, row, edgeType);
 			}
 		});
 	}
@@ -171,19 +171,19 @@ public class PoiGraphViewer {
 	 * The method returns when the window is closed.
 	 */
 	public void showGraph() {
-		JPanel panel = new JPanel(new GridLayout(1, 1));
+		final JPanel panel = new JPanel(new GridLayout(1, 1));
 		panel.add(new GraphZoomScrollPane(this.viewer), BorderLayout.CENTER);
 
-		DefaultModalGraphMouse<Integer, Number> gm = new DefaultModalGraphMouse<>();
+		final DefaultModalGraphMouse<Integer, Number> gm = new DefaultModalGraphMouse<>();
 		gm.setMode(ModalGraphMouse.Mode.TRANSFORMING);
 		this.viewer.setGraphMouse(gm);
 
-		JPanel modePanel = new JPanel();
+		final JPanel modePanel = new JPanel();
 		modePanel.setBorder(BorderFactory.createTitledBorder("Mouse Mode"));
 		gm.getModeComboBox().addItemListener(gm.getModeListener());
 		modePanel.add(gm.getModeComboBox());
 
-		JFrame frame = new JFrame("Poi Graph");
+		final JFrame frame = new JFrame("Poi Graph");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		frame.getContentPane().add(panel, BorderLayout.CENTER);
@@ -193,7 +193,7 @@ public class PoiGraphViewer {
 		while (true) {
 			try {
 				Thread.sleep(1000);
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
 		}

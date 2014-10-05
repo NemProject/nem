@@ -295,7 +295,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyWhenClusterIdsAreNonAscending() {
 		// Arrange:
-		Matrix outlinkMatrix = new DenseMatrix(4, 4);
+		final Matrix outlinkMatrix = new DenseMatrix(4, 4);
 		outlinkMatrix.setAt(1, 0, 1);
 		outlinkMatrix.setAt(0, 2, 1);
 		outlinkMatrix.setAt(3, 0, 1);

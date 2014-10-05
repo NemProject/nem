@@ -18,7 +18,7 @@ public class PoiGraphParameters {
 	 * @param value The value of the parameter.
 	 */
 	public void set(final String name, final String value) {
-		params.put(name, value);
+		this.params.put(name, value);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class PoiGraphParameters {
 	}
 
 	public static PoiGraphParameters getDefaultParams() {
-		PoiGraphParameters params = new PoiGraphParameters();
+		final PoiGraphParameters params = new PoiGraphParameters();
 		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
 		params.set("width", "800");
 		params.set("height", "800");
