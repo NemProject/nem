@@ -144,6 +144,23 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
 	}
 
+	@Test
+	public void networkWithTwoClustersAndSimilarHubIsActuallyOneClusters() {
+		// Assert:
+		final TestContext context = this.createContextForTwoClustersAndHub(1.0, 1.0);
+
+		// Act:
+		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
+
+		// Assert:
+		final List<Cluster> expectedClusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6)));
+
+		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
+		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
+	}
+
 	/**
 	 * <pre>
 	 *     0             3
