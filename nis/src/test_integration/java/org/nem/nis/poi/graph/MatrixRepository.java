@@ -22,7 +22,7 @@ public class MatrixRepository {
 		ExceptionUtils.propagateVoid(
 				() -> {
 					saveJava(matrix, file);
-					saveJson(matrix, new File(file  + ".json"));
+					saveJson(matrix, new File(file + ".json"));
 				});
 	}
 
