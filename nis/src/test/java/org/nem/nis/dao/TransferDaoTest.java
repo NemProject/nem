@@ -39,6 +39,7 @@ public class TransferDaoTest {
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
 		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, accountDaoLookup);
 
+		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
         final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
         addToDummyBlock(dbAccount, entity);
 

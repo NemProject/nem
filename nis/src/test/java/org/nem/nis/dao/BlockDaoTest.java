@@ -125,6 +125,9 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
 	}
 
+	// TODO 20141005 - since i imagine these tests will apply to all transaction types, it might make sense
+	// > to refactor the validation and pass in transactions; although that might be hard, so it's not so important
+
 	@Test
 	public void savingChangesImportanceTransferBlkIndex() {
 		// Arrange:
@@ -255,6 +258,8 @@ public class BlockDaoTest {
 		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
 		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(0));
 		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
+		// TODO 20151005 J-G i guess you're assuming the entity transactions are sorted?
+		// > it might be better to check the hashes like in the following test
 	}
 
 	@Test
