@@ -81,7 +81,7 @@ public class SignerTest {
 
 		// Act:
 		final Signature signature = signer.sign(input);
-		final BigInteger nonCanonicalS = Curves.secp256k1().getParams().getN().subtract(signature.getS());
+		final BigInteger nonCanonicalS = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getS());
 		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
 
 		// Assert:
@@ -109,7 +109,7 @@ public class SignerTest {
 		// Act:
 		final Signature signature = signer.sign(input);
 		final Signature signature2 = new Signature(
-				Curves.secp256k1().getParams().getN().subtract(signature.getR()),
+				CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getR()),
 				signature.getS());
 
 		// Assert:

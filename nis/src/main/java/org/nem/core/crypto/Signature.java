@@ -58,24 +58,6 @@ public class Signature {
 	}
 
 	/**
-	 * Determines if this signature is canonical.
-	 *
-	 * @return true if this signature is canonical.
-	 */
-	public boolean isCanonical() {
-		return this.s.compareTo(Curves.secp256k1().getHalfCurveOrder()) <= 0;
-	}
-
-	/**
-	 * Makes this signature canonical.
-	 */
-	public void makeCanonical() {
-		if (!this.isCanonical()) {
-			this.s = Curves.secp256k1().getParams().getN().subtract(this.s);
-		}
-	}
-
-	/**
 	 * Gets a little-endian 64-byte representation of the signature.
 	 *
 	 * @return a little-endian 64-byte representation of the signature

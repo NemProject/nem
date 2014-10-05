@@ -30,14 +30,6 @@ public class Signer {
 		}
 
 		return this.signer.sign(data);
-		/*
-		final ECDSASigner signer = this.createECDSASigner();
-		signer.init(true, this.keyPair.getPrivateKeyParameters());
-		final byte[] hash = Hashes.sha3(data);
-		final BigInteger[] components = signer.generateSignature(hash);
-		final Signature signature = new Signature(components[0], components[1]);
-		signature.makeCanonical();
-		return signature;*/
 	}
 
 	/**
@@ -48,19 +40,26 @@ public class Signer {
 	 * @return true if the signature is valid.
 	 */
 	public boolean verify(final byte[] data, final Signature signature) {
-		if (!signature.isCanonical()) {
+		if (!signer.isCanonicalSignature(signature)) {
 			return false;
 		}
 
 		return this.signer.verify(data, signature);
-		/*
-		final ECDSASigner signer = this.createECDSASigner();
-		signer.init(false, this.keyPair.getPublicKeyParameters());
-		final byte[] hash = Hashes.sha3(data);
-		return signer.verifySignature(hash, signature.getR(), signature.getS());*/
 	}
 
-	/*private ECDSASigner createECDSASigner() {
-		return new ECDSASigner(new HMacDSAKCalculator(new SHA3Digest(256)));
-	}*/
+	/**
+	 * Determines if the given signature is canonical.
+	 *
+	 * @return true if the given signature is canonical.
+	 */
+	public boolean isCanonicalSignature(final Signature signature) {
+		return signer.isCanonicalSignature(signature);
+	}
+
+	/**
+	 * Makes this signature canonical.
+	 */
+	public Signature makeSignatureCanonical(final Signature signature) {
+		return signer.makeSignatureCanonical(signature);
+	}
 }

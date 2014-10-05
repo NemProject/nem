@@ -21,4 +21,16 @@ public interface DsaSigner {
 	 * @return true if the signature is valid.
 	 */
 	public boolean verify(final byte[] data, final Signature signature);
+
+	/**
+	 * Determines if the signature is canonical.
+	 *
+	 * @return true if the signature is canonical.
+	 */
+	public boolean isCanonicalSignature(final Signature signature);
+
+	/**
+	 * Makes this signature canonical.
+	 */
+	public Signature makeSignatureCanonical(final Signature signature);
 }

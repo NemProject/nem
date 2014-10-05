@@ -1,15 +1,30 @@
 package org.nem.core.crypto;
 
+import org.nem.core.crypto.secp256k1.SecP256K1Engine;
+
 /**
  * Static class that exposes crypto engines.
  */
 public class CryptoEngines {
 
+	private static final CryptoEngine secp256k1Engine;
+
+	static {
+		secp256k1Engine = new SecP256K1Engine();
+	}
+
 	public static CryptoEngine getDefaultEngine() {
-		throw new RuntimeException("Not implemented yet.");
+		return secp256k1Engine;
 	}
 
 	public interface CryptoEngine {
+
+		/**
+		 * Return The underlying curve.
+		 *
+		 * @return The curve.
+		 */
+		public Curve getCurve();
 
 		/**
 		 * Creates a DSA signer.

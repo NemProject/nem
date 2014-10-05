@@ -10,8 +10,6 @@ import java.util.Arrays;
  */
 public class PublicKey implements SerializableEntity {
 
-	//private final static int COMPRESSED_KEY_SIZE = 33;
-
 	public byte[] value;
 
 	/**
@@ -62,17 +60,6 @@ public class PublicKey implements SerializableEntity {
 	 */
 	public boolean isCompressed() {
 		return CryptoEngines.getDefaultEngine().createKeyAnalyzer().isKeyCompressed(this);
-		/*if (COMPRESSED_KEY_SIZE != this.value.length) {
-			return false;
-		}
-
-		switch (this.value[0]) {
-			case 0x02:
-			case 0x03:
-				return true;
-		}
-
-		return false;*/
 	}
 
 	@Override

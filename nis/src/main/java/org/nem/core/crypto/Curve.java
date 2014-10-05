@@ -1,0 +1,31 @@
+package org.nem.core.crypto;
+
+import java.math.BigInteger;
+
+/**
+ * Interface for getting information for a curve.
+ */
+public interface Curve {
+
+	/**
+	 * Gets the name of the curve.
+	 *
+	 * @return The name of the curve.
+	 */
+	public String getName();
+
+	/**
+	 * Gets the group order.
+	 *
+	 * @return The group order.
+	 */
+	public BigInteger getGroupOrder();
+
+	/**
+	 * Gets the curve half order.
+	 *
+	 * @return The curve half order.
+	 */
+	public BigInteger getHalfCurveOrder();
+
+}

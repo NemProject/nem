@@ -69,18 +69,20 @@ public class SignatureTest {
 	public void isCanonicalReturnsTrueForCanonicalSignature() {
 		// Arrange:
 		final Signature signature = createCanonicalSignature();
+		final Signer signer = createSigner();
 
 		// Assert:
-		Assert.assertThat(signature.isCanonical(), IsEqual.equalTo(true));
+		Assert.assertThat(signer.isCanonicalSignature(signature), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
 		final Signature signature = makeNonCanonical(createCanonicalSignature());
+		final Signer signer = createSigner();
 
 		// Assert:
-		Assert.assertThat(signature.isCanonical(), IsEqual.equalTo(false));
+		Assert.assertThat(signer.isCanonicalSignature(signature), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -88,16 +90,16 @@ public class SignatureTest {
 		// Arrange:
 		final Signature signature = createCanonicalSignature();
 		final Signature nonCanonicalSignature = makeNonCanonical(signature);
-
-		Assert.assertThat(nonCanonicalSignature.isCanonical(), IsEqual.equalTo(false));
+		final Signer signer = createSigner();
+		Assert.assertThat(signer.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
 
 		// Act:
-		nonCanonicalSignature.makeCanonical();
+		final Signature canonicalSignature = signer.makeSignatureCanonical(nonCanonicalSignature);
 
 		// Assert:
-		Assert.assertThat(nonCanonicalSignature.isCanonical(), IsEqual.equalTo(true));
+		Assert.assertThat(signer.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
 		Assert.assertThat(nonCanonicalSignature.getR(), IsEqual.equalTo(signature.getR()));
-		Assert.assertThat(nonCanonicalSignature.getS(), IsEqual.equalTo(signature.getS()));
+		Assert.assertThat(canonicalSignature.getS(), IsEqual.equalTo(signature.getS()));
 	}
 
 	//endregion
@@ -230,7 +232,12 @@ public class SignatureTest {
 
 	private static Signature makeNonCanonical(final Signature signature) {
 		// Act:
-		final BigInteger nonCanonicalS = Curves.secp256k1().getParams().getN().subtract(signature.getS());
+		final BigInteger nonCanonicalS = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getS());
 		return new Signature(signature.getR(), nonCanonicalS);
+	}
+
+	private static Signer createSigner() {
+		final KeyPair kp = new KeyPair();
+		return new Signer(kp);
 	}
 }
