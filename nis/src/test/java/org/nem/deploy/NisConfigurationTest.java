@@ -6,6 +6,9 @@ import org.nem.core.crypto.*;
 
 import java.util.Properties;
 
+// TODO 20141005 J-J,G - these tests are probably dumb :)
+// > it might be better to have a can read default config and can read custom config
+
 public class NisConfigurationTest {
 
 	//region nis.bootKey

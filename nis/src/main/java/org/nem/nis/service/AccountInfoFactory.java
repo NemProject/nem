@@ -41,6 +41,9 @@ public class AccountInfoFactory {
 		final Account account = this.accountLookup.findByAddress(address);
         final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
 
+		// TODO 20141005 J-G - i think i would prefer to have this logic in RemoteLinks - something like getRemoteState
+		// > then we can reuse it in other places (e.g. the validator and possibly poi facade)
+		// TODO 20141005 J-G i also think i would prefer to have remote status in AccountMetaData instead of AccountInfo
         final RemoteLinks remoteLinks = accountState.getRemoteLinks();
         AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.REMOTE;
         if (remoteLinks.isEmpty()) {

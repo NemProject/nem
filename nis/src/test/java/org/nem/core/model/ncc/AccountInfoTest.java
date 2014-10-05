@@ -211,6 +211,7 @@ public class AccountInfoTest {
         Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, AccountRemoteStatus.ACTIVE, "foo", 2.3).hashCode()));
     }
 
+	// TODO 20141005 J-G: minor but you can have one function call the other
 	private AccountInfo createAccountInfo(final Address address, final long balance, final int blockAmount, final String label, final double importance) {
 		return new AccountInfo(address, Amount.fromNem(balance), new BlockAmount(blockAmount), AccountRemoteStatus.INACTIVE, label, importance);
 	}

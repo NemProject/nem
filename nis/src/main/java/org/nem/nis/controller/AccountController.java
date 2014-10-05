@@ -1,6 +1,5 @@
 package org.nem.nis.controller;
 
-import org.nem.core.connect.client.NisApiId;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
@@ -47,6 +46,8 @@ public class AccountController {
 		this.poiFacade = poiFacade;
 	}
 
+	// TODO 20141005 J-G: can we move account/get and account/status to a new controller (i think this class has too many dependencies) (e.g. AccountInfoController)
+
 	/**
 	 * Gets information about an account.
 	 *
@@ -56,6 +57,8 @@ public class AccountController {
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
 	public AccountMetaDataPair accountGet(final AccountIdBuilder builder) {
+		// TODO 20141005 J-G: yea, i think it should be easy to move remote status from info to metadata
+		// > everything we need is here ;)
 		final Address address = builder.build().getAddress();
         final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
 		final AccountInfo account = this.accountInfoFactory.createInfo(address, new BlockHeight(height));

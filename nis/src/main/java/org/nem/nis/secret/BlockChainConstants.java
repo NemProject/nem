@@ -23,6 +23,7 @@ public class BlockChainConstants {
 	 */
 	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
 
+	// TODO 20141005 J-G: i guess we should rename to harvest
     /**
      * Minimal balance required to forage.
      */

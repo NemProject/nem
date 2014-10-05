@@ -21,6 +21,8 @@ public class UnlockedAccounts implements Iterable<Account> {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
     private final NisConfiguration nisConfiguration;
 
+	// TODO 20141005 J-G: do we expect the configuration to be "live" (in that changes take effect without restarting NIS)?
+	// > if not, i would prefer to just pass in the limit as an int
 	@Autowired(required = true)
 	public UnlockedAccounts(
 			final AccountLookup accountLookup,

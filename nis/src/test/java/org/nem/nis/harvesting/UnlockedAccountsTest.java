@@ -154,6 +154,9 @@ public class UnlockedAccountsTest {
             accounts.add(account);
         }
 
+		// TODO 20141005 J-G comment is wrong :)
+		// > while i am usually against combining Act and Assert
+		// > there might be some benefit to validating the result of every addUnlockedAccount
         // Act: unlock three accounts and then lock the second one
         context.unlockedAccounts.addUnlockedAccount(accounts.get(0));
         context.unlockedAccounts.addUnlockedAccount(accounts.get(1));
@@ -166,7 +169,7 @@ public class UnlockedAccountsTest {
     }
 
     @Test
-    public void canUnlockIfBelowSerevrLimit() {
+    public void canUnlockIfBelowServerLimit() {
         final TestContext context = new TestContext();
         final List<Account> accounts = new ArrayList<>();
         for (int i = 0; i < 4; ++i) {
@@ -201,6 +204,7 @@ public class UnlockedAccountsTest {
 		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(this.accountLookup, this.poiFacade, this.lastBlockLayer, this.nisConfiguration);
 
         public TestContext() {
+			// TODO 20141005 J-G can you use a class constant for 3 e.g. TEST_SERVER_LIMIT ... i think it will make the tests a little clearer
             Mockito.when(this.nisConfiguration.getUnlockedLimit()).thenReturn(3);
         }
 

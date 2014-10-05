@@ -11,7 +11,9 @@ public class AccountRemoteStatusTest {
 
     @Test
     public void accountRemoteStatusCanBeCreatedFromCorrectStatusString() {
-        assertCanCreate("REMOTE", AccountRemoteStatus.REMOTE);
+		// TODO 20141005 minor, you might want to have a map with these values and loop over them or loop over AccountRemoteStatus.values()
+		// > (just to ensure all the tests will always test all the values)
+		assertCanCreate("REMOTE", AccountRemoteStatus.REMOTE);
         assertCanCreate("INACTIVE", AccountRemoteStatus.INACTIVE);
         assertCanCreate("ACTIVATED", AccountRemoteStatus.ACTIVATED);
         assertCanCreate("ACTIVE", AccountRemoteStatus.ACTIVE);
@@ -29,7 +31,7 @@ public class AccountRemoteStatusTest {
     @Test(expected = IllegalArgumentException.class)
     public void accountRemoteStatusCannotBeCreatedFromIncorrectStatusString() {
         // Arrange:
-        final AccountRemoteStatus statusTest = AccountRemoteStatus.fromString("TEST");
+        AccountRemoteStatus.fromString("TEST");
     }
 
     //endregion

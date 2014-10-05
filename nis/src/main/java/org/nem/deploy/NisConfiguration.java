@@ -103,7 +103,7 @@ public class NisConfiguration extends CommonConfiguration {
     /**
      * Gets the number of regular nodes that this node should communicate with during broadcasts.
      *
-     * @return The number of regular nodes that this node should communicate with during broadcasts
+     * @return The number of regular nodes that this node should communicate with during broadcasts.
      */
     public int getUnlockedLimit() {
         return this.unlockedLimit;

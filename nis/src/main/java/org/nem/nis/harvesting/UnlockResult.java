@@ -20,7 +20,7 @@ public enum UnlockResult {
 	FAILURE_FORAGING_INELIGIBLE,
 
     /**
-     * The account could not be unlocked because limit on the server has been hit
+     * The account could not be unlocked because limit on the server has been hit.
      */
     FAILURE_SERVER_LIMIT
 }

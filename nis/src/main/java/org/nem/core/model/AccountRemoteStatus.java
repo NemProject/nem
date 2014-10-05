@@ -3,16 +3,16 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 
 /**
- * Possible remote account states
+ * Possible remote account states.
  */
 public enum AccountRemoteStatus {
     /**
-     * The account is remote one, and therefore RemoteStatus is not applicable for it
+     * The account is remote one, and therefore RemoteStatus is not applicable for it.
      */
     REMOTE("REMOTE"),
 
     /**
-     * The account has activated remote harvesting (but not yet active)
+     * The account has activated remote harvesting (but not yet active).
      */
     ACTIVATED("ACTIVATED"),
 
@@ -22,7 +22,7 @@ public enum AccountRemoteStatus {
     ACTIVE("ACTIVE"),
 
     /**
-     * The account has deactivated remote harvesting (but remote harvesting is still active)
+     * The account has deactivated remote harvesting (but remote harvesting is still active).
      */
     DEACTIVATED("DEACTIVATED"),
 
