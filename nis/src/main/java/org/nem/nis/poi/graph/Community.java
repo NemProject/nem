@@ -103,7 +103,7 @@ public class Community {
 
 	@Override
 	public int hashCode() {
-		return this.pivotId.getRaw();
+		return this.similarNeighbors.size();
 	}
 
 	@Override
@@ -112,10 +112,10 @@ public class Community {
 			return false;
 		}
 
-		// TODO 20141004 J-M probably doesn't make sense to check pivot equality here
+		// since the pivot is guaranteed to be one of the similar neighbors, and there's nothing special about
+		// the chosen "pivot", don't check the pivot for equality
 		final Community rhs = (Community)obj;
-		return this.pivotId.equals(rhs.pivotId) &&
-				this.similarNeighbors.equals(rhs.similarNeighbors) &&
+		return this.similarNeighbors.equals(rhs.similarNeighbors) &&
 				this.dissimilarNeighbors.equals(rhs.dissimilarNeighbors);
 	}
 
