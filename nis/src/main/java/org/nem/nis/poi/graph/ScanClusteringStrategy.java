@@ -42,14 +42,14 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 		public void cluster(final Community community) {
 			// build a cluster around the community
 			final Cluster cluster = this.buildCluster(community.getPivotId());
-			this.clusters.add(cluster);
+			this.addCluster(cluster);
 		}
 
 		private Cluster buildCluster(final NodeId pivotId) {
 			final Cluster cluster = new Cluster(pivotId);
 
 			final ArrayDeque<NodeId> connections = new ArrayDeque<>();
-			final Community pivotCommunity = this.neighborhood.getCommunity(pivotId);
+			final Community pivotCommunity = this.getNeighborhood().getCommunity(pivotId);
 			connections.addAll(pivotCommunity.getSimilarNeighbors().toList());
 			final HashSet<NodeId> processedIds = new HashSet<>();
 			while (!connections.isEmpty()) {
@@ -61,25 +61,24 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 				// dirReach = {x ∈ V | DirREACHε,μ(y, x)};
 				// Note that DirREACH requires y to be a core node.
 				// Here y = node with id connectedNodeId.
-				final Community community = this.neighborhood.getCommunity(connectedNodeId);
+				final Community community = this.getNeighborhood().getCommunity(connectedNodeId);
 				if (!community.isCore()) {
 					continue;
 				}
 
 				final NodeNeighbors dirReach = community.getSimilarNeighbors();
 				for (final NodeId nodeId : dirReach) {
-					final int id = nodeId.getRaw();
-					if (this.isClustered(id)) {
+					if (this.isClustered(nodeId)) {
 						continue;
 					}
 
-					if (null == this.nodeStates[id]) {
+					if (null == this.getNodeState(nodeId)) {
 						// Need to analyze this node
 						connections.add(nodeId);
 					}
 
 					// Assign to current cluster and add to community
-					this.nodeStates[id] = pivotId.getRaw();
+					this.setNodeState(nodeId, cluster.getId());
 					cluster.add(nodeId);
 				}
 
