@@ -19,7 +19,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	private final AccountLookup accountLookup;
 	private final PoiFacade poiFacade;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-    private final NisConfiguration nisConfiguration;
+	private final NisConfiguration nisConfiguration;
 
 	// TODO 20141005 J-G: do we expect the configuration to be "live" (in that changes take effect without restarting NIS)?
 	// > if not, i would prefer to just pass in the limit as an int
@@ -28,12 +28,12 @@ public class UnlockedAccounts implements Iterable<Account> {
 			final AccountLookup accountLookup,
 			final PoiFacade poiFacade,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-            final NisConfiguration nisConfiguration) {
+			final NisConfiguration nisConfiguration) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.unlocked = new ConcurrentHashSet<>();
-        this.nisConfiguration = nisConfiguration;
+		this.nisConfiguration = nisConfiguration;
 	}
 
 	/**
@@ -42,9 +42,9 @@ public class UnlockedAccounts implements Iterable<Account> {
 	 * @param account The account.
 	 */
 	public UnlockResult addUnlockedAccount(final Account account) {
-        if (this.unlocked.size() == this.nisConfiguration.getUnlockedLimit()) {
-            return UnlockResult.FAILURE_SERVER_LIMIT;
-        }
+		if (this.unlocked.size() == this.nisConfiguration.getUnlockedLimit()) {
+			return UnlockResult.FAILURE_SERVER_LIMIT;
+		}
 
 		if (!this.accountLookup.isKnownAddress(account.getAddress())) {
 			return UnlockResult.FAILURE_UNKNOWN_ACCOUNT;

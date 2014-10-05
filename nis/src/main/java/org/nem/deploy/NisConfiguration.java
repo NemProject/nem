@@ -16,7 +16,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final boolean useBinaryTransport;
 	private final String bootName;
 	private final boolean useNetworkTime;
-    private final int unlockedLimit;
+	private final int unlockedLimit;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -40,7 +40,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
 		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", false);
 		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", false);
-        this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 6);
+		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 6);
 	}
 
 	/**
@@ -99,14 +99,12 @@ public class NisConfiguration extends CommonConfiguration {
 		return this.useNetworkTime;
 	}
 
-
-    /**
-     * Gets the number of regular nodes that this node should communicate with during broadcasts.
-     *
-     * @return The number of regular nodes that this node should communicate with during broadcasts.
-     */
-    public int getUnlockedLimit() {
-        return this.unlockedLimit;
-    }
-
+	/**
+	 * Gets the number of regular nodes that this node should communicate with during broadcasts.
+	 *
+	 * @return The number of regular nodes that this node should communicate with during broadcasts.
+	 */
+	public int getUnlockedLimit() {
+		return this.unlockedLimit;
+	}
 }

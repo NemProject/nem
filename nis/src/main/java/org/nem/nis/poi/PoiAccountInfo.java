@@ -1,7 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.secret.*;
 
 import java.util.*;
@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class PoiAccountInfo {
 
-    public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR / (double)WeightedBalance.DECAY_DENOMINATOR;
+	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR / (double)WeightedBalance.DECAY_DENOMINATOR;
 
 	private final int index;
 	private final PoiAccountState accountState;

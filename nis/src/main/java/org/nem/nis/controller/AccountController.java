@@ -26,8 +26,8 @@ public class AccountController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
-    private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-    private final AccountInfoFactory accountInfoFactory;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
+	private final AccountInfoFactory accountInfoFactory;
 	private final PoiFacade poiFacade;
 
 	@Autowired(required = true)
@@ -35,13 +35,13 @@ public class AccountController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
-            final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
 			final PoiFacade poiFacade) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
-        this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 		this.poiFacade = poiFacade;
 	}
@@ -60,20 +60,20 @@ public class AccountController {
 		// TODO 20141005 J-G: yea, i think it should be easy to move remote status from info to metadata
 		// > everything we need is here ;)
 		final Address address = builder.build().getAddress();
-        final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
+		final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
 		final AccountInfo account = this.accountInfoFactory.createInfo(address, new BlockHeight(height));
 		final AccountMetaData metaData = new AccountMetaData(this.getAccountStatus(address));
 		return new AccountMetaDataPair(account, metaData);
 	}
 
-    @RequestMapping(value = "/account/status", method = RequestMethod.GET)
-    @ClientApi
-    public AccountMetaData accountStatus(final AccountIdBuilder builder) {
-        final Address address = builder.build().getAddress();
-        return new AccountMetaData(getAccountStatus(address));
-    }
+	@RequestMapping(value = "/account/status", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaData accountStatus(final AccountIdBuilder builder) {
+		final Address address = builder.build().getAddress();
+		return new AccountMetaData(getAccountStatus(address));
+	}
 
-    private AccountStatus getAccountStatus(final Address address) {
+	private AccountStatus getAccountStatus(final Address address) {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
 

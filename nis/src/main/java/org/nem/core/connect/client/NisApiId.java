@@ -32,10 +32,10 @@ public enum NisApiId {
 	 */
 	NIS_REST_ACCOUNT_LOOK_UP("/account/get"),
 
-    /**
-     * The /account/status API
-     */
-    NIS_REST_ACCOUNT_STATUS("/account/status"),
+	/**
+	 * The /account/status API
+	 */
+	NIS_REST_ACCOUNT_STATUS("/account/status"),
 
 	/**
 	 * The /account/transfers/all API
