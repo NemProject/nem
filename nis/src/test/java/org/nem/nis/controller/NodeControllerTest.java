@@ -257,12 +257,16 @@ public class NodeControllerTest {
 	public void activePeersMaxChainHeightDelegatesToChainServices() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final NodeCollection nodeCollection = context.network.getNodes();
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.2"), NodeStatus.INACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.4"), NodeStatus.ACTIVE);
 
 		// Act:
 		final BlockHeight height = context.controller.activePeersMaxChainHeight();
 
 		// Assert:
-		Mockito.verify(context.services, Mockito.times(1)).getMaxChainHeightAsync(context.localNode);
+		Mockito.verify(context.services, Mockito.times(1))
+				.getMaxChainHeightAsync(Arrays.asList(PeerUtils.createNodeWithHost("10.0.0.4")));
 		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(123)));
 	}
 
@@ -299,7 +303,8 @@ public class NodeControllerTest {
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			this.services = Mockito.mock(ChainServices.class);
-			Mockito.when(this.services.getMaxChainHeightAsync(this.localNode)).thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
+			Mockito.when(this.services.getMaxChainHeightAsync(Mockito.anyCollectionOf(Node.class)))
+					.thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
 
 			this.controller = new NodeController(this.host, this.services);
 		}
