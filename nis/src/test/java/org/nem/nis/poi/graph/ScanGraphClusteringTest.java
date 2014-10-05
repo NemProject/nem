@@ -146,7 +146,7 @@ public abstract class ScanGraphClusteringTest {
 
 	@Test
 	public void networkWithTwoClustersAndSimilarHubIsActuallyOneCluster() {
-		// Assert:
+		// Arrange:
 		final TestContext context = this.createContextForTwoClustersAndHub(1.0, 1.0);
 
 		// Act:
