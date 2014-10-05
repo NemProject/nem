@@ -36,7 +36,6 @@ public class IdealizedClusterFactory {
 				clusters.add(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4)));
 				break;
 
-
 			case GRAPH_ONE_CLUSTERS_NO_HUB_NO_OUTLIER:
 				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
 				break;

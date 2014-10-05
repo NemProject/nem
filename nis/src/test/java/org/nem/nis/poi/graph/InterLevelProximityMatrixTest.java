@@ -3,7 +3,7 @@ package org.nem.nis.poi.graph;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.ClusterId;
 import org.nem.nis.test.*;
 
 import java.util.*;
@@ -288,7 +288,7 @@ public class InterLevelProximityMatrixTest {
 	 * <pre>
 	 *      0
 	 *    / o \
- 	 *   o  |  o
+	 *   o  |  o
 	 *   1  2  3
 	 * </pre>
 	 */

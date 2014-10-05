@@ -154,5 +154,4 @@ public class OutlinkMatrixFactory {
 	private static Matrix makeAntiSymmetric(final Matrix matrix) {
 		return matrix.addElementWise(matrix.transpose().multiply(-1));
 	}
-
 }

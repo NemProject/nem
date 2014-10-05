@@ -95,7 +95,6 @@ public class NodeNeighborMapTest {
 		for (int i = 0; i < matrix.getRowCount(); ++i) {
 			matrix.setAt(i, 2, 1);
 			matrix.setAt(2, i, 1);
-
 		}
 
 		// Act:

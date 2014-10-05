@@ -215,7 +215,7 @@ public class CommunityTest {
 		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-similar-ids").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("more-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-dissimilar-ids").hashCode(),IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("fewer-dissimilar-ids").hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("diff-id-classifications").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 

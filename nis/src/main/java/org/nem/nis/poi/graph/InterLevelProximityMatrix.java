@@ -116,7 +116,7 @@ public class InterLevelProximityMatrix {
 				final SparseBitmap ids = this.clusterIdToNeighborhoodClusterIds.getOrDefault(cluster.getId(), null);
 				if (null != ids) {
 					ids.toList().stream()
-						.forEach(i -> this.r.setAt(currentRow, i, 1.0 / (clusterSize * neighborhoodClusterIdsSet.get(i).cardinality())));
+							.forEach(i -> this.r.setAt(currentRow, i, 1.0 / (clusterSize * neighborhoodClusterIdsSet.get(i).cardinality())));
 				}
 
 				++this.blockNum;

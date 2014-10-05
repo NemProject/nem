@@ -3,8 +3,8 @@ package org.nem.nis.poi.graph;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.model.primitive.NodeId;
+import org.nem.core.test.IsEquivalent;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;

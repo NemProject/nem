@@ -2,7 +2,7 @@ package org.nem.nis.poi.graph;
 
 import org.nem.core.model.primitive.*;
 
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**

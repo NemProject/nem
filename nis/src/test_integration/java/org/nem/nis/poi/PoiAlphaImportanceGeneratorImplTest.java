@@ -6,7 +6,6 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
-import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
 
 import java.security.SecureRandom;
@@ -445,7 +444,7 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 10000 * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
-        // TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
+		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
 		// Warm up phase
 		getAccountImportances(new BlockHeight(10000), accounts);
 

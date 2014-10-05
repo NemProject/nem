@@ -1,6 +1,6 @@
 package org.nem.nis.poi.graph;
 
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.NodeId;
 
 import java.util.ArrayList;
 

@@ -418,7 +418,6 @@ public class PoiContextTest {
 	 *                 o   o
 	 *                5----o6
 	 * </pre>
-	 *
 	 * Expected: clusters {0,1,2} and {4,5,6}, one hub {3}, one outlier {7}
 	 */
 	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndOneOutlier() {

@@ -282,7 +282,7 @@ public class NodeNeighborsTest {
 
 	private static final Map<String, NodeNeighbors> DESC_TO_NEIGHBORS_MAP = new HashMap<String, NodeNeighbors>() {
 		{
-			this.put("default",  NisUtils.createNeighbors(2, 3, 6));
+			this.put("default", NisUtils.createNeighbors(2, 3, 6));
 			this.put("diff-member-ids", NisUtils.createNeighbors(2, 4, 6));
 			this.put("diff-less-member-ids", NisUtils.createNeighbors(3, 6));
 			this.put("diff-more-member-ids", NisUtils.createNeighbors(2, 3, 7));

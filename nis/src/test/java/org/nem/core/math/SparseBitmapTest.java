@@ -12,19 +12,19 @@ import java.util.stream.*;
  */
 public class SparseBitmapTest {
 
-    //region createEmpty
+	//region createEmpty
 
-    @Test
-    public void createEmptyCanCreateEmptyBitmap() {
-        // Act:
-        final SparseBitmap sb = SparseBitmap.createEmpty();
+	@Test
+	public void createEmptyCanCreateEmptyBitmap() {
+		// Act:
+		final SparseBitmap sb = SparseBitmap.createEmpty();
 
-        // Assert:
-        Assert.assertThat(sb.cardinality(), IsEqual.equalTo(0));
-        Assert.assertThat(sb.get(0), IsEqual.equalTo(false));
-    }
+		// Assert:
+		Assert.assertThat(sb.cardinality(), IsEqual.equalTo(0));
+		Assert.assertThat(sb.get(0), IsEqual.equalTo(false));
+	}
 
-    //endregion
+	//endregion
 
 	//region createFromUnsortedData
 

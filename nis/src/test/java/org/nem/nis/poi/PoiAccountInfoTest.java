@@ -232,12 +232,12 @@ public class PoiAccountInfoTest {
 		// - amounts at future block heights are not present (amounts 11 and 7)
 		final double expectedScore =
 				0 * THREE_DAY_DECAY      // 2 - 2
-				+ 6.0e06 * TWO_DAY_DECAY // 6
-				- 5e06 * TWO_DAY_DECAY   // 3 - 8
-				+ 1.0e06 * ONE_DAY_DECAY // 1
-				+ 5.0e06 * ONE_DAY_DECAY // 5
-				+ 5.5e06                 // 8 - 2.5
-				+ 9.0e06;                // 9
+						+ 6.0e06 * TWO_DAY_DECAY // 6
+						- 5e06 * TWO_DAY_DECAY   // 3 - 8
+						+ 1.0e06 * ONE_DAY_DECAY // 1
+						+ 5.0e06 * ONE_DAY_DECAY // 5
+						+ 5.5e06                 // 8 - 2.5
+						+ 9.0e06;                // 9
 		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(expectedScore));
 	}
 

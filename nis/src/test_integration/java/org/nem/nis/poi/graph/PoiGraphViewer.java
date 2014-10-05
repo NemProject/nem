@@ -11,7 +11,6 @@ import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import org.nem.core.math.Matrix;
 import org.nem.core.math.Matrix.ReadOnlyElementVisitorFunction;
-import org.nem.nis.poi.graph.Cluster;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

@@ -19,14 +19,14 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 
 	//region factories
 
-    /**
-     * Creates a new <code>SparseBitmap</code> that is empty.
-     *
-     * @return A new <code>SparseBitmap</code> that is empty (no bits set).
-     */
-    public static SparseBitmap createEmpty() {
-        return new SparseBitmap(EWAHCompressedBitmap.bitmapOf());
-    }
+	/**
+	 * Creates a new <code>SparseBitmap</code> that is empty.
+	 *
+	 * @return A new <code>SparseBitmap</code> that is empty (no bits set).
+	 */
+	public static SparseBitmap createEmpty() {
+		return new SparseBitmap(EWAHCompressedBitmap.bitmapOf());
+	}
 
 	/**
 	 * Creates a new <code>SparseBitmap</code> from data that are already sorted
