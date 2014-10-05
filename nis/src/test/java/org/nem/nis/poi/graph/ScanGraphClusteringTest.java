@@ -145,7 +145,7 @@ public abstract class ScanGraphClusteringTest {
 	}
 
 	@Test
-	public void networkWithTwoClustersAndSimilarHubIsActuallyOneClusters() {
+	public void networkWithTwoClustersAndSimilarHubIsActuallyOneCluster() {
 		// Assert:
 		final TestContext context = this.createContextForTwoClustersAndHub(1.0, 1.0);
 
@@ -182,23 +182,6 @@ public abstract class ScanGraphClusteringTest {
 		context.setSimilarity(6, 1, similarity1);
 		context.setSimilarity(6, 2, similarity2);
 		return context;
-	}
-
-	@Test
-	public void networkWithTwoClustersAndSimilarHubIsActuallyOneCluster() {
-		// Arrange:
-		final TestContext context = this.createContextForTwoClustersAndHub(1.0, 1.0);
-
-		// Act:
-		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
-
-		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5, 6)));
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	/**
