@@ -20,7 +20,7 @@ public class NodeNeighbors implements Iterable<NodeId> {
 	 * @param neighborIds The (sorted) neighbor ids.
 	 */
 	public NodeNeighbors(final NodeId... neighborIds) {
-		this.neighborIds = SparseBitmap.createFromSortedData();
+		this.neighborIds = SparseBitmap.createEmpty();
 		if (neighborIds.length > 0) {
 			this.maxId = neighborIds[0].getRaw();
 			for (final NodeId nodeId : neighborIds) {

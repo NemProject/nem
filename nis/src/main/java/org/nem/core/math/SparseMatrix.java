@@ -114,24 +114,6 @@ public class SparseMatrix extends Matrix {
 		this.maxIndices[row] += 1;
 	}
 
-	// TODO 20140929 J-M can you retry and see if there is still a perf degradation without this
-
-	///**
-	// * Remove all negative or zero values. This is overridden here
-	// * because this version is faster than the base class.
-	// */
-	//public void removeNegatives() {
-	//	for (int i = 0; i < this.numRows; ++i) {
-	//		final double[] rowValues = this.values[i];
-	//		final int size = this.maxIndices[i];
-	//		for (int j = 0; j < size; ++j) {
-	//			while (rowValues[j] < 0.0) {
-	//				this.remove(i, j);
-	//			}
-	//		}
-	//	}
-	//}
-
 	@Override
 	protected final void forEach(final ElementVisitorFunction func) {
 		for (int i = 0; i < this.numRows; ++i) {

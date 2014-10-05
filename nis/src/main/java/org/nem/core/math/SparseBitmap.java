@@ -17,6 +17,8 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		this.bitmap = bitmap;
 	}
 
+	//region factories
+
     /**
      * Creates a new <code>SparseBitmap</code> that is empty.
      *
@@ -47,6 +49,10 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		Arrays.sort(bitsToSet);
 		return new SparseBitmap(EWAHCompressedBitmap.bitmapOf(bitsToSet));
 	}
+
+	//endregion
+
+	//region get / set
 
 	/**
 	 * Gets the value of the bit at the given index.
@@ -83,14 +89,9 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		this.bitmap.set(bitToSet);
 	}
 
-	/**
-	 * Gets the highest bit that is set in the bitmap.
-	 *
-	 * @return The highest bit.
-	 */
-	public int getHighestBit() {
-		return this.bitmap.cardinality() > 0 ? this.bitmap.toArray()[this.bitmap.cardinality() - 1] : 0;
-	}
+	//endregion
+
+	//region clear
 
 	/**
 	 * Clears all the bits in this sparse bitmap.
@@ -98,6 +99,10 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 	public void clear() {
 		this.bitmap.clear();
 	}
+
+	//endregion
+
+	//region logical operations
 
 	/**
 	 * Creates a new SparseBitmap that is the logical <code>or</code> of all the given bitmaps.
@@ -122,8 +127,6 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 
 		return new SparseBitmap(firstMap);
 	}
-
-	// TODO 20140929 J-M: please make or / and / andNot static
 
 	/**
 	 * Computes the logical <code>or</code> of the context bitmap
@@ -161,6 +164,19 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return new SparseBitmap(this.bitmap.andNot(rhs.bitmap));
 	}
 
+	//endregion
+
+	//region highest bit / cardinality
+
+	/**
+	 * Gets the highest bit that is set in the bitmap.
+	 *
+	 * @return The highest bit.
+	 */
+	public int getHighestBit() {
+		return this.bitmap.cardinality() > 0 ? this.bitmap.toArray()[this.bitmap.cardinality() - 1] : 0;
+	}
+
 	/**
 	 * Size of the intersection of <code>this</code> bitmap and
 	 * the given bitmap.
@@ -181,6 +197,10 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return this.bitmap.cardinality();
 	}
 
+	//endregion
+
+	//region list / iterator
+
 	/**
 	 * Creates a binary list representation of this sparse bitmap.
 	 *
@@ -195,10 +215,9 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		return this.bitmap.iterator();
 	}
 
-	@Override
-	public String toString() {
-		return this.bitmap.toString();
-	}
+	//endregion
+
+	//region hashCode / equals
 
 	@Override
 	public int hashCode() {
@@ -214,4 +233,11 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 		final SparseBitmap rhs = (SparseBitmap)obj;
 		return this.bitmap.equals(rhs.bitmap);
 	}
+
+	@Override
+	public String toString() {
+		return this.bitmap.toString();
+	}
+
+	//endregion
 }

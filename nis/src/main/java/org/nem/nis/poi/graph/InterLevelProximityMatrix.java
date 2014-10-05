@@ -10,7 +10,7 @@ import java.util.*;
  * From the NCDawareRank paper by Nikolakopoulos (WSDM 2013).
  * <br/>
  * The R and A matricies here are actually R(T) and A(T) in the paper.
- * They are transposed because we use right stochastic matrices but the paper uses left stochastic matrices.
+ * They are transposed because we use left stochastic matrices but the paper uses right stochastic matrices.
  */
 public class InterLevelProximityMatrix {
 	/**
@@ -107,7 +107,6 @@ public class InterLevelProximityMatrix {
 		 */
 		private void processClusters(final Collection<Cluster> clusters, final List<SparseBitmap> neighborhoodClusterIdsSet) {
 			for (final Cluster cluster : clusters) {
-
 				for (final NodeId id : cluster.getMemberIds()) {
 					this.a.setAt(id.getRaw(), this.blockNum, 1);
 				}
@@ -120,7 +119,6 @@ public class InterLevelProximityMatrix {
 						.forEach(i -> this.r.setAt(currentRow, i, 1.0 / (clusterSize * neighborhoodClusterIdsSet.get(i).cardinality())));
 				}
 
-
 				++this.blockNum;
 			}
 		}
@@ -131,9 +129,12 @@ public class InterLevelProximityMatrix {
 				final int id = i;
 				final Collection<Community> neighboringCommunities = this.neighborhood.getNeighboringCommunities(new NodeId(id));
 				final int[] clusterIdsForNode = neighboringCommunities.stream()
-						.filter(c -> c.getPivotId().getRaw() == id || this.outlinkMatrix.getAt(c.getPivotId().getRaw(), id) > 0.0)
-						.map(c -> {
-							ClusterId clusterId = this.clusteringResult.getIdForNode(c.getPivotId());
+						.map(community -> community.getPivotId().getRaw())
+						.filter(rawPivotId -> rawPivotId == id || this.outlinkMatrix.getAt(rawPivotId, id) > 0.0)
+						.map(rawPivotId -> {
+							// due to the way this function loops (with id incrementing and only setting id),
+							// a SparseBitmap is safe because bits will be set in order
+							ClusterId clusterId = this.clusteringResult.getIdForNode(new NodeId(rawPivotId));
 							SparseBitmap ids = this.clusterIdToNeighborhoodClusterIds.get(clusterId);
 							if (null == ids) {
 								ids = SparseBitmap.createEmpty();
@@ -145,8 +146,8 @@ public class InterLevelProximityMatrix {
 						})
 						.mapToInt(ClusterId::getRaw)
 						.toArray();
-				// TODO: does it make sense for getNeighboringCommunities to return sorted ids?
-                // TODO M-J: probably because we use SparseBitmaps in most or all cases
+
+				// the cluster ids might not be in order, so we need to sort them first
 				neighborhoodClusterIdsSet.add(SparseBitmap.createFromUnsortedData(clusterIdsForNode));
 			}
 

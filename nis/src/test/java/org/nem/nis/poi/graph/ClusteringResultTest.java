@@ -54,8 +54,8 @@ public class ClusteringResultTest {
 		final Collection<Cluster> clusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11), NisUtils.toNodeIdList(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10), NisUtils.toNodeIdList(10)));
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
@@ -74,8 +74,8 @@ public class ClusteringResultTest {
 		final Collection<Cluster> clusters = Arrays.asList(
 				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
 				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
-		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(11), NisUtils.toNodeIdList(11)));
-		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(10), NisUtils.toNodeIdList(10)));
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
 
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);

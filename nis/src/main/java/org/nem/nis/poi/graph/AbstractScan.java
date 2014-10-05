@@ -13,12 +13,10 @@ public abstract class AbstractScan {
 	 */
 	private static final int NON_MEMBER_CLUSTER_ID = -1;
 
-	// TODO: these are protected fields for performance, but not good for design
-	protected final Neighborhood neighborhood;
+	private final Neighborhood neighborhood;
 	private final Integer neighborhoodSize;
-	protected final Integer[] nodeStates;
-	protected final List<Cluster> clusters = new ArrayList<>();
-
+	private final Integer[] nodeStates;
+	private final List<Cluster> clusters = new ArrayList<>();
 	private final List<Cluster> hubs = new ArrayList<>();
 	private final List<Cluster> outliers = new ArrayList<>();
 
@@ -73,9 +71,9 @@ public abstract class AbstractScan {
 				continue;
 			}
 
-			final Cluster cluster = new Cluster(new ClusterId(i));
-			cluster.add(new NodeId(i));
-			(this.isHub(this.neighborhood.getCommunity(new NodeId(i))) ? this.hubs : this.outliers).add(cluster);
+			final NodeId nodeId = new NodeId(i);
+			final Cluster cluster = new Cluster(nodeId);
+			(this.isHub(this.neighborhood.getCommunity(nodeId)) ? this.hubs : this.outliers).add(cluster);
 		}
 	}
 
@@ -86,10 +84,6 @@ public abstract class AbstractScan {
 	}
 
 	private boolean isHub(final HashSet<ClusterId> connectedClusterIds, final NodeNeighbors neighbors) {
-		// TODO 20141001 J-M since our graph is bidirectional, can there ever be a case where
-		// > a hub can has two similar neighbors (i can't think of one)?
-		// TODO 20141001 J-M: It depends on GraphConstants.MU.
-		// TODO :) i meant when MU is 3 (like it is now)
 		for (final NodeId neighborId : neighbors) {
 			final int state = this.nodeStates[neighborId.getRaw()];
 			if (NON_MEMBER_CLUSTER_ID == state) {
@@ -126,14 +120,67 @@ public abstract class AbstractScan {
 		}
 	}
 
+	//region getters / setters
+
+	/**
+	 * Gets the neighborhood.
+	 *
+	 * @return The neighborhood.
+	 */
+	protected Neighborhood getNeighborhood() {
+		return this.neighborhood;
+	}
+
+	/**
+	 * Gets the state for the specified node id.
+	 *
+	 * @param id The node id.
+	 */
+	protected Integer getNodeState(final NodeId id) {
+		return this.nodeStates[id.getRaw()];
+	}
+
+	/**
+	 * Sets the state for the specified node id.
+	 *
+	 * @param id The node id.
+	 * @param clusterId The cluster id.
+	 */
+	protected Integer setNodeState(final NodeId id, final ClusterId clusterId) {
+		return this.nodeStates[id.getRaw()] = clusterId.getRaw();
+	}
+
 	/**
 	 * Gets a value indicating whether or not the specified node is part of a cluster.
 	 *
 	 * @param id The node id.
 	 * @return true if the specified node is part of a cluster.
 	 */
-	protected boolean isClustered(final int id) {
-		return null != this.nodeStates[id] && NON_MEMBER_CLUSTER_ID != this.nodeStates[id];
+	protected boolean isClustered(final NodeId id) {
+		final Integer state = this.getNodeState(id);
+		return null != state && NON_MEMBER_CLUSTER_ID != state;
+	}
+
+	//endregion
+
+	//region cluster functions
+
+	/**
+	 * Adds the specified cluster.
+	 *
+	 * @param cluster The cluster.
+	 */
+	protected void addCluster(final Cluster cluster) {
+		this.clusters.add(cluster);
+	}
+
+	/**
+	 * Removes the specified cluster.
+	 *
+	 * @param cluster The cluster.
+	 */
+	protected void removeCluster(final Cluster cluster) {
+		this.clusters.remove(cluster);
 	}
 
 	/**
@@ -143,8 +190,7 @@ public abstract class AbstractScan {
 	 * @return The cluster with the wanted id.
 	 */
 	protected Cluster findCluster(final ClusterId clusterId) {
-		// TODO 20141002 i guess since the number of expected clusters is small, a linear search is ok here
-        // TODO 20141003 M-J: I think in practice this number should be less than 1000-5000.
+		// a linear search is ok because the number of expected clusters is small (1000-5000)
 		for (final Cluster cluster : this.clusters) {
 			if (cluster.getId().equals(clusterId)) {
 				return cluster;
@@ -153,4 +199,6 @@ public abstract class AbstractScan {
 
 		throw new IllegalArgumentException("cluster with id " + clusterId + " not found.");
 	}
+
+	//endregion
 }

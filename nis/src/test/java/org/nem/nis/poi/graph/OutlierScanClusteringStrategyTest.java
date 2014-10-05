@@ -3,8 +3,7 @@ package org.nem.nis.poi.graph;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.ClusterId;
-import org.nem.nis.test.NisUtils;
+import org.nem.core.model.primitive.*;
 
 public class OutlierScanClusteringStrategyTest {
 
@@ -38,7 +37,7 @@ public class OutlierScanClusteringStrategyTest {
 
 		int i = 0;
 		for (final Cluster outlier : result.getOutliers()) {
-			Assert.assertThat(outlier, IsEqual.equalTo(new Cluster(new ClusterId(i), NisUtils.toNodeIdList(i))));
+			Assert.assertThat(outlier, IsEqual.equalTo(new Cluster(new NodeId(i))));
 			++i;
 		}
 	}

@@ -23,10 +23,12 @@ public class Community {
 			final NodeId pivotId,
 			final NodeNeighbors similarNeighbors,
 			final NodeNeighbors dissimilarNeighbors) {
-		// TODO 20140930 J-M should this constructor ensure that pivotId is contained within similar Neighbors?
-        // TODO 20141002 M-J probably a good idea, otherwise clustering will fail as currently designed :/
 		if (null == similarNeighbors || null == dissimilarNeighbors) {
 			throw new IllegalArgumentException("neighbors cannot be null");
+		}
+
+		if (!similarNeighbors.contains(pivotId)) {
+			throw new IllegalArgumentException("similar neighbors must contain pivot");
 		}
 
 		this.pivotId = pivotId;
@@ -110,6 +112,7 @@ public class Community {
 			return false;
 		}
 
+		// TODO 20141004 J-M probably doesn't make sense to check pivot equality here
 		final Community rhs = (Community)obj;
 		return this.pivotId.equals(rhs.pivotId) &&
 				this.similarNeighbors.equals(rhs.similarNeighbors) &&
