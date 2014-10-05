@@ -162,7 +162,7 @@ public class TransferMapperTest {
 			return TransferMapper.toModel(dbTransfer, mockAccountLookup);
 		}
 
-		public void assertDbModel(final Transfer dbModel, final int blockIndex) {
+		public void assertDbModel(final Transfer dbModel, int blockId) {
 			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(this.hash));
@@ -174,10 +174,12 @@ public class TransferMapperTest {
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(this.dbRecipient));
-			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getAmount(), IsEqual.equalTo(144L));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
+
+            // leaving for now, as I'm not sure if I can remove it without consequences
+            Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockId));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));

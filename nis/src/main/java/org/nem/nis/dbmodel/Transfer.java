@@ -175,7 +175,7 @@ public class Transfer {
 	}
 
 	public Integer getBlkIndex() {
-		return this.blkIndex;
+        return this.block.getBlockTransfers().indexOf(this);
 	}
 
 	public void setBlkIndex(final Integer blkIndex) {

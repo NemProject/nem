@@ -39,6 +39,9 @@ public class TransferDaoTest {
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
 		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, accountDaoLookup);
 
+        final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+        addToDummyBlock(dbAccount, entity);
+
 		// Act
 		this.transferDao.save(entity);
 
@@ -57,7 +60,10 @@ public class TransferDaoTest {
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
 		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
 
-		// Act
+        final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+        addToDummyBlock(dbAccount, dbTransfer);
+
+        // Act
 		this.transferDao.save(dbTransfer);
 		final Transfer entity = this.transferDao.findByHash(HashUtils.calculateHash(transferTransaction).getRaw());
 
@@ -68,7 +74,6 @@ public class TransferDaoTest {
 		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getAmount(), equalTo(transferTransaction.getAmount().getNumMicroNem()));
-		Assert.assertThat(entity.getBlkIndex(), equalTo(12345));
 		Assert.assertThat(entity.getSenderProof(), equalTo(transferTransaction.getSignature().getBytes()));
 	}
 
@@ -83,6 +88,9 @@ public class TransferDaoTest {
 		final Transfer dbTransfer2 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
 		final Transfer dbTransfer3 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
 		final Long initialCount = this.transferDao.count();
+
+        final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+        addToDummyBlock(dbAccount, dbTransfer1, dbTransfer2, dbTransfer3);
 
 		// Act
 		this.transferDao.save(dbTransfer1);
@@ -539,4 +547,15 @@ public class TransferDaoTest {
 		mockAccountDao.addMapping(recipient, dbRecipient);
 		return new AccountDaoLookupAdapter(mockAccountDao);
 	}
+
+    private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final Transfer... dbTransfers) {
+        final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
+                                                                              account, new byte[] { 1, 2, 3, 4 },
+                                                                              1L, 1L, 1L, 123L, null);
+        this.blockDao.save(block);
+
+        for (final Transfer transfer : dbTransfers) {
+            transfer.setBlock(block);
+        }
+    }
 }

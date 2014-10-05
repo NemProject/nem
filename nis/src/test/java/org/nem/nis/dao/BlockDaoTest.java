@@ -152,11 +152,8 @@ public class BlockDaoTest {
 		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(1));
 	}
 
-	// TransferTransactions does not use OrderColumn, but maybe we should redo that
-	// TODO-CR 20140919 J-G: it probably makes sense to redo that so its used by both
-	// TODO 20140922 G-J: as I've mentioned this will be breaking change but it is on my TODO list (also related to ImportanceTransferDao changes)
 	@Test
-	public void savingDoesNotChangeTransferTransactionBlkIndex() {
+	public void savingChangesTransferTransactionBlkIndex() {
 		// Arrange:
 		final Account signer1 = Utils.generateRandomAccount();
 		final Account remote1 = Utils.generateRandomAccount();
@@ -178,8 +175,8 @@ public class BlockDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(0));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
 	}
 	//endregion
 
@@ -230,9 +227,8 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
-	// cause .save does NOT modify blkIndex, and when read, they are ordered by blkIndex
 	@Test
-	public void changingTransferTransactionBlkIndexAffectOrderOfTxes() {
+	public void changingTransferTransactionBlkIndexDoesNotAffectOrderOfTxes() {
 		// Arrange:
 		final Account signer1 = Utils.generateRandomAccount();
 		final Account remote1 = Utils.generateRandomAccount();
@@ -255,10 +251,10 @@ public class BlockDaoTest {
 		final Block entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
-		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(12));
-		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(0));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(0));
+		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
 	}
 
 	@Test

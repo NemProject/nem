@@ -208,18 +208,18 @@ public class BlockDaoImpl implements BlockDao {
 			dropTxes.executeUpdate();
 		}
 
-		final Query query = this.getCurrentSession()
-				.createQuery("delete from Block a where a.height > :height")
-				.setParameter("height", blockHeight.getRaw());
-		query.executeUpdate();
-
 		if (!txToDelete.isEmpty()) {
 			final Query dropTxes = this.getCurrentSession()
 					.createQuery("delete from Transfer t where t.id in (:ids)")
 					.setParameterList("ids", txToDelete);
 			dropTxes.executeUpdate();
 		}
-	}
+
+        final Query query = this.getCurrentSession()
+                                .createQuery("delete from Block a where a.height > :height")
+                                .setParameter("height", blockHeight.getRaw());
+        query.executeUpdate();
+    }
 
 	private <T> T executeSingleQuery(final Criteria criteria) {
 		final List<T> blockList = listAndCast(criteria);
