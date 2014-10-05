@@ -81,8 +81,8 @@ public abstract class AbstractScan {
 
 	private boolean isHub(final Community community) {
 		final HashSet<ClusterId> connectedClusterIds = new HashSet<>();
-		return isHub(connectedClusterIds, community.getSimilarNeighbors()) ||
-				isHub(connectedClusterIds, community.getDissimilarNeighbors());
+		return isHub(connectedClusterIds, community.getDissimilarNeighbors()) ||
+                isHub(connectedClusterIds, community.getSimilarNeighbors());
 	}
 
 	private boolean isHub(final HashSet<ClusterId> connectedClusterIds, final NodeNeighbors neighbors) {
