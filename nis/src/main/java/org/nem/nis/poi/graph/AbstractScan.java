@@ -73,9 +73,9 @@ public abstract class AbstractScan {
 				continue;
 			}
 
-			final Cluster cluster = new Cluster(new ClusterId(i));
-			cluster.add(new NodeId(i));
-			(this.isHub(this.neighborhood.getCommunity(new NodeId(i))) ? this.hubs : this.outliers).add(cluster);
+			final NodeId nodeId = new NodeId(i);
+			final Cluster cluster = new Cluster(nodeId);
+			(this.isHub(this.neighborhood.getCommunity(nodeId)) ? this.hubs : this.outliers).add(cluster);
 		}
 	}
 

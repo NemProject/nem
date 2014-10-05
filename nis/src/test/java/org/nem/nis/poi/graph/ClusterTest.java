@@ -28,6 +28,17 @@ public class ClusterTest {
 	}
 
 	@Test
+	public void clusterCanBeCreatedAroundNodeId() {
+		// Arrange and act:
+		final Cluster cluster = new Cluster(new NodeId(625));
+
+		// Assert:
+		Assert.assertThat(cluster.getId(), IsEqual.equalTo(new ClusterId(625)));
+		Assert.assertThat(cluster.getMemberIds().size(), IsEqual.equalTo(1));
+		Assert.assertThat(cluster.getMemberIds(), IsEquivalent.equivalentTo(NisUtils.toNodeIdList(625)));
+	}
+
+	@Test
 	public void clusterCanBeCreatedAroundClusterIdAndMemberIds() {
 		// Arrange and act:
 		final Cluster cluster = new Cluster(CLUSTER_ID_1337, NisUtils.toNodeIdList(1338, 1339, 1440, 1541, 1542, 1443, 1444));

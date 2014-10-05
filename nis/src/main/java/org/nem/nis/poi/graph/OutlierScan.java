@@ -13,8 +13,7 @@ public class OutlierScan implements GraphClusteringStrategy {
 	public ClusteringResult cluster(final Neighborhood neighborhood) {
 		final ArrayList<Cluster> clusters = new ArrayList<>();
 		for (int i = 0; i < neighborhood.size(); ++i) {
-			final Cluster cluster = new Cluster(new ClusterId(i));
-			cluster.add(new NodeId(i));
+			final Cluster cluster = new Cluster(new NodeId(i));
 			clusters.add(cluster);
 		}
 

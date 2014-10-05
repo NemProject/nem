@@ -6,8 +6,6 @@ import java.util.*;
 
 /**
  * A cluster represents a set of nodes that share certain similarity (i.e. are closely connected).
- * TODO 20140930 J-M: should this class include the id (center) as a member?
- * TODO 20141002 M-J: yes, unless you can find a way to factor it out that doesn't slow down the clustering
  */
 public class Cluster {
 	/**
@@ -44,6 +42,16 @@ public class Cluster {
 	 */
 	public Cluster(final ClusterId id) {
 		this(id, new ArrayList<>());
+	}
+
+	/**
+	 * Creates a new cluster containing a single node (the cluster id is derived from the node id).
+	 *
+	 * @param id The node id.
+	 */
+	public Cluster(final NodeId id) {
+		this(new ClusterId(id.getRaw()));
+		this.memberIds.add(id);
 	}
 
 	/**

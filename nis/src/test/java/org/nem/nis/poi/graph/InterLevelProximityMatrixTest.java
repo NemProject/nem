@@ -3,7 +3,10 @@ package org.nem.nis.poi.graph;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.test.*;
+
+import java.util.*;
 
 public class InterLevelProximityMatrixTest {
 
@@ -281,6 +284,62 @@ public class InterLevelProximityMatrixTest {
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
+	/**
+	 * <pre>
+	 *      0
+	 *    / o \
+ 	 *   o  |  o
+	 *   1  2  3
+	 * </pre>
+	 */
+	@Test
+	public void matricesAreCalculatedCorrectlyWhenClusterIdsAreNonAscending() {
+		// Arrange:
+		Matrix outlinkMatrix = new DenseMatrix(4, 4);
+		outlinkMatrix.setAt(1, 0, 1);
+		outlinkMatrix.setAt(0, 2, 1);
+		outlinkMatrix.setAt(3, 0, 1);
+
+		// pretend each node is an outlier in its own cluster
+		// the important part of this test is that the cluster ids are in NON-ASCENDING order
+		final ClusteringResult clusteringResult = new ClusteringResult(
+				new ArrayList<>(),
+				new ArrayList<>(),
+				Arrays.asList(
+						new Cluster(new ClusterId(3), NisUtils.toNodeIdList(0)),
+						new Cluster(new ClusterId(2), NisUtils.toNodeIdList(1)),
+						new Cluster(new ClusterId(1), NisUtils.toNodeIdList(2)),
+						new Cluster(new ClusterId(0), NisUtils.toNodeIdList(3))));
+
+		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
+		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
+		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(
+				clusteringResult,
+				neighborhood,
+				outlinkMatrix);
+
+		// Assert:
+		// note that A is not a map of node-id -> cluster-id;
+		// it is a map of node-id to block-number, which is always ascending
+		final SparseMatrix a = new SparseMatrix(4, 4, 2);
+		a.setAt(0, 0, 1.0);
+		a.setAt(1, 1, 1.0);
+		a.setAt(2, 2, 1.0);
+		a.setAt(3, 3, 1.0);
+
+		final SparseMatrix r = new SparseMatrix(4, 4, 2);
+		r.setAt(0, 0, 1.0 / 3.0); // N(0): 3; |A(1..4)|: 1
+		r.setAt(0, 2, 1.0 / 2.0); // N(2): 2
+		r.setAt(1, 0, 1.0 / 3.0); // N(0): 3
+		r.setAt(1, 1, 1.0 / 1.0); // N(1): 1
+		r.setAt(2, 2, 1.0 / 2.0); // N(2): 2
+		r.setAt(3, 0, 1.0 / 3.0); // N(0): 3
+		r.setAt(3, 3, 1.0 / 1.0); // N(3): 1
+
+		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+	}
+
 	//region test infrastructure
 
 	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphType graphType) {
@@ -288,7 +347,6 @@ public class InterLevelProximityMatrixTest {
 		final ClusteringResult clusteringResult = IdealizedClusterFactory.create(graphType);
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
-
 		return new InterLevelProximityMatrix(clusteringResult, neighborhood, outlinkMatrix);
 	}
 

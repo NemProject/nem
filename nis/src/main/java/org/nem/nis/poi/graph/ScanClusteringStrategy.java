@@ -46,7 +46,7 @@ public class ScanClusteringStrategy implements GraphClusteringStrategy {
 		}
 
 		private Cluster buildCluster(final NodeId pivotId) {
-			final Cluster cluster = new Cluster(new ClusterId(pivotId));
+			final Cluster cluster = new Cluster(pivotId);
 
 			final ArrayDeque<NodeId> connections = new ArrayDeque<>();
 			final Community pivotCommunity = this.neighborhood.getCommunity(pivotId);
