@@ -16,19 +16,18 @@ public class MatrixRepository {
 	 * Saves a matrix to the specified file.
 	 *
 	 * @param matrix The matrix.
-	 * @param fileName The file.
-	 * @throws IOException The matrix could not be saved.
+	 * @param file The file.
 	 */
-	public static void save(final Matrix matrix, final String fileName) {
+	public static void save(final Matrix matrix, final File file) {
 		ExceptionUtils.propagateVoid(
 				() -> {
-					saveJava(matrix, fileName);
-					saveJson(matrix, fileName);
+					saveJava(matrix, file);
+					saveJson(matrix, new File(file  + ".json"));
 				});
 	}
 
-	private static void saveJava(final Matrix matrix, final String fileName) throws IOException {
-		try (FileOutputStream fos = new FileOutputStream(fileName);
+	private static void saveJava(final Matrix matrix, final File file) throws IOException {
+		try (FileOutputStream fos = new FileOutputStream(file);
 			 ObjectOutputStream out = new ObjectOutputStream(fos)) {
 			out.writeObject(matrix.getRowCount());
 			out.writeObject(matrix.getColumnCount());
@@ -47,7 +46,7 @@ public class MatrixRepository {
 		}
 	}
 
-	private static void saveJson(final Matrix matrix, final String fileName) throws IOException {
+	private static void saveJson(final Matrix matrix, final File file) throws IOException {
 		final JsonSerializer serializer = new JsonSerializer();
 		for (int i = 0; i < matrix.getRowCount(); ++i) {
 			final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(i);
@@ -58,7 +57,7 @@ public class MatrixRepository {
 		}
 
 		final JSONObject object = serializer.getObject();
-		try (final BufferedWriter writer = new BufferedWriter(new FileWriter(fileName + ".json"))) {
+		try (final BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 			writer.write(object.toJSONString());
 		}
 	}
@@ -66,16 +65,15 @@ public class MatrixRepository {
 	/**
 	 * Loads a matrix from the specified file.
 	 *
-	 * @param fileName The file.
+	 * @param file The file.
 	 * @return matrix The matrix.
 	 */
-	public static Matrix load(final String fileName) {
-		return ExceptionUtils.propagate(() -> loadJava(fileName));
+	public static Matrix load(final File file) {
+		return ExceptionUtils.propagate(() -> loadJava(file));
 	}
 
-	private static Matrix loadJava(final String fileName) throws IOException, ClassNotFoundException {
-
-		try (FileInputStream fis = new FileInputStream(fileName);
+	private static Matrix loadJava(final File file) throws IOException, ClassNotFoundException {
+		try (FileInputStream fis = new FileInputStream(file);
 			 ObjectInputStream in = new ObjectInputStream(fis)) {
 			final int rowCount = (int)in.readObject();
 			final int columnCount = (int)in.readObject();

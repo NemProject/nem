@@ -1,16 +1,38 @@
 package org.nem.nis.poi.graph;
 
+import org.apache.commons.io.FileUtils;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.ClusterId;
 import org.nem.nis.test.NisUtils;
 
-import java.io.IOException;
+import java.io.*;
 import java.security.SecureRandom;
 import java.util.*;
 
 public class GraphClustererImplITCase {
+	private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
+	private static final File TEST_FILE_DIRECTORY = new File(WORKING_DIRECTORY, "test_files");
+	private static final File TEST_MATRIX_FILE = new File(TEST_FILE_DIRECTORY, "test.matrix");
+
+	//region BeforeClass / AfterClass
+
+	@BeforeClass
+	public static void createTestFiles() throws IOException {
+		final boolean result = TEST_FILE_DIRECTORY.mkdir();
+
+		if (!result) {
+			throw new RuntimeException("unable to initialize test suite");
+		}
+	}
+
+	@AfterClass
+	public static void removeTestFiles() throws IOException {
+		FileUtils.deleteDirectory(TEST_FILE_DIRECTORY);
+	}
+
+	//endregion
 
 	@Test
 	public void alphaGraphViewTest() throws IOException {
@@ -50,7 +72,7 @@ public class GraphClustererImplITCase {
 
 	@Test
 	public void alphaGraphTest() {
-		Matrix outlinkMatrix = MatrixRepository.load("outlink.matrix");
+		Matrix outlinkMatrix = MatrixRepository.load(new File("outlink.matrix"));
 
 		List<GraphClusteringStrategy> clusterers = getClusteringStrategies();
 		for (GraphClusteringStrategy clusterer : clusterers) {
@@ -139,8 +161,8 @@ public class GraphClustererImplITCase {
 			}
 		}
 
-		MatrixRepository.save(matrix, "test.matrix");
-		matrix = MatrixRepository.load("test.matrix");
+		MatrixRepository.save(matrix, TEST_MATRIX_FILE);
+		matrix = MatrixRepository.load(TEST_MATRIX_FILE);
 
 		for (int i=0; i<size; i++) {
 			for (int j=0; j<size; j++) {
