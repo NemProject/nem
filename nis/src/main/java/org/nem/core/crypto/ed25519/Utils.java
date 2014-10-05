@@ -1,5 +1,6 @@
 package org.nem.core.crypto.ed25519;
 
+import java.math.BigInteger;
 /**
  * @author str4d
  *
@@ -82,4 +83,41 @@ public class Utils {
         return hex.toString();
     }
 
+	/**
+	 * Converts a 2^8 bit representation to a BigInteger.
+	 * Value: bytes[0] + 2^8 * bytes[1] + ...
+	 *
+	 * @param bytes The 2^8 bit representation.
+	 * @return The BigInteger.
+	 */
+	public static BigInteger toBigInteger(final byte[] bytes) {
+		BigInteger b = BigInteger.ZERO;
+		for (int i=0; i<bytes.length; i++) {
+			b = b.add(BigInteger.ONE.multiply(BigInteger.valueOf(bytes[i] & 0xff)).shiftLeft(i * 8));
+		}
+
+		return b;
+	}
+
+	/**
+	 * Converts a BigInteger to a little endian 32 byte representation.
+	 *
+	 * @param b The BigInteger.
+	 * @return The 32 byte representation.
+	 */
+	public static byte[] toByteArray(final BigInteger b) {
+		if (b.compareTo(BigInteger.ONE.shiftLeft(256)) >= 0) {
+			throw new RuntimeException("only numbers < 2^256 are allowed");
+		}
+		final byte[] bytes = new byte[32];
+		final byte[] original = b.toByteArray();
+
+		// Although b < 2^256, original can have length > 32 with some bytes set to 0.
+		final int offset = original.length > 32? original.length - 32 : 0;
+		for (int i=0; i<original.length - offset; i++) {
+			bytes[original.length - i - offset - 1] = original[i + offset];
+		}
+
+		return bytes;
+	}
 }

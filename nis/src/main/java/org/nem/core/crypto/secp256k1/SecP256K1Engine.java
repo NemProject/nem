@@ -19,7 +19,7 @@ public class SecP256K1Engine implements CryptoEngines.CryptoEngine {
 
 	@Override
 	public KeyGenerator createKeyGenerator() {
-		return new SecP256K1keyGenerator();
+		return new SecP256K1KeyGenerator();
 	}
 
 	@Override
