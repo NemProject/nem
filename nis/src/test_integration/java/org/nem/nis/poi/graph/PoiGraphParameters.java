@@ -6,9 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Property bag that can contain arbitrary poi graph parameters.
  */
 public class PoiGraphParameters {
-
-	// TODO-CR [08062014][J-M]: looks similar to another Parameters class; we should probably have a base parameters class
-	// TODO-CR [08062014][J-M]: no tests
 	private final ConcurrentHashMap<String, String> params = new ConcurrentHashMap<>();
 
 	/**
