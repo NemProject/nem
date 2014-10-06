@@ -13,7 +13,7 @@ import java.math.BigInteger;
 public class SecP256K1Curve implements Curve {
 	private static final SecP256K1Curve SECP256K1;
 	private final ECDomainParameters params;
-	private final BigInteger halfCurveOrder;
+	private final BigInteger halfGroupOrder;
 
 	static {
 		final X9ECParameters params = SECNamedCurves.getByName("secp256k1");
@@ -21,9 +21,9 @@ public class SecP256K1Curve implements Curve {
 		SECP256K1 = new SecP256K1Curve(ecParams, ecParams.getN().shiftRight(1));
 	}
 
-	private SecP256K1Curve(final ECDomainParameters params, final BigInteger halfCurveOrder) {
+	private SecP256K1Curve(final ECDomainParameters params, final BigInteger halfGroupOrder) {
 		this.params = params;
-		this.halfCurveOrder = halfCurveOrder;
+		this.halfGroupOrder = halfGroupOrder;
 	}
 
 	@Override
@@ -37,8 +37,8 @@ public class SecP256K1Curve implements Curve {
 	}
 
 	@Override
-	public BigInteger getHalfCurveOrder() {
-		return this.halfCurveOrder;
+	public BigInteger getHalfGroupOrder() {
+		return this.halfGroupOrder;
 	}
 
 	/**

@@ -22,10 +22,10 @@ public interface Curve {
 	public BigInteger getGroupOrder();
 
 	/**
-	 * Gets the curve half order.
+	 * Gets the group order / 2.
 	 *
-	 * @return The curve half order.
+	 * @return The group order / 2.
 	 */
-	public BigInteger getHalfCurveOrder();
+	public BigInteger getHalfGroupOrder();
 
 }

@@ -50,7 +50,7 @@ public class SecP256K1DsaSigner implements DsaSigner {
 
 	@Override
 	public boolean isCanonicalSignature(final Signature signature) {
-		return signature.getS().compareTo(SecP256K1Curve.secp256k1().getHalfCurveOrder()) <= 0;
+		return signature.getS().compareTo(SecP256K1Curve.secp256k1().getHalfGroupOrder()) <= 0;
 	}
 
 	@Override

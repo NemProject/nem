@@ -24,7 +24,7 @@ public class Ed25519Curve implements org.nem.core.crypto.Curve {
 	}
 
 	@Override
-	public BigInteger getHalfCurveOrder() {
+	public BigInteger getHalfGroupOrder() {
 		return Ed25519Constants.groupOrder.shiftRight(1);
 	}
 
