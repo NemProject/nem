@@ -84,7 +84,8 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
-	@TrustedApi
+    // we want to allow remote harvesting...
+	//@TrustedApi
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
 		final KeyPair keyPair = new KeyPair(privateKey);
 		final Account account = this.accountIo.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()));
@@ -103,7 +104,8 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/lock", method = RequestMethod.POST)
 	@ClientApi
-	@TrustedApi
+    // we want to allow remote harvesting...
+	//@TrustedApi
 	public void accountLock(@RequestBody final PrivateKey privateKey) {
 		final Account account = new Account(new KeyPair(privateKey));
 		this.unlockedAccounts.removeUnlockedAccount(account);
