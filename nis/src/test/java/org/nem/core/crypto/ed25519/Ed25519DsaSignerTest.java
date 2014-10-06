@@ -5,11 +5,48 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.crypto.ed25519.arithmetic.MathUtils;
 
+import java.math.BigInteger;
 import java.util.logging.Logger;
 
 public class Ed25519DsaSignerTest extends DsaSignerTest {
 
 	private static final Logger LOGGER = Logger.getLogger(Ed25519DsaSignerTest.class.getName());
+
+	@Test
+	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
+		// Arrange:
+		initCryptoEngine();
+		final KeyPair kp = new KeyPair();
+		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
+
+		// Act:
+		final Signature signature = dsaSigner.sign(input);
+		final BigInteger nonCanonicalS = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().add(signature.getS());
+		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
+
+		// Assert:
+		Assert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
+		// Arrange:
+		initCryptoEngine();
+		final KeyPair kp = new KeyPair();
+		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
+
+		// Act:
+		final Signature signature = dsaSigner.sign(input);
+		final BigInteger nonCanonicalS = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().add(signature.getS());
+		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
+		Assert.assertThat(dsaSigner.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
+		final Signature canonicalSignature = dsaSigner.makeSignatureCanonical(nonCanonicalSignature);
+
+		// Assert:
+		Assert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
+	}
 
 	/*@Test
 	public void signReturnsExpectedSignature() {
@@ -83,16 +120,16 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 
 		// Act:
 		final long start = System.currentTimeMillis();
-		for (int i=0; i<10000; i++) {
+		for (int i=0; i<5000; i++) {
 			dsaSigner.verify(input, signature);
 		}
 		final long stop = System.currentTimeMillis();
 
 		// Assert (should be less than 500 micro seconds per verification on a decent computer):
 		final long timeInMilliSeconds = stop - start;
-		LOGGER.info(String.format("verify needs %d micro seconds.", timeInMilliSeconds / 10));
+		LOGGER.info(String.format("verify needs %d micro seconds.", timeInMilliSeconds / 5));
 
-		Assert.assertThat(timeInMilliSeconds < 5000, IsEqual.equalTo(true));
+		Assert.assertThat(timeInMilliSeconds < 2500, IsEqual.equalTo(true));
 	}
 
 	@Override

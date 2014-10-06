@@ -102,14 +102,15 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 	@Override
 	public boolean isCanonicalSignature(final Signature signature) {
-		return -1 == signature.getS().compareTo(Ed25519Constants.groupOrder) ||
+		return -1 == signature.getS().compareTo(Ed25519Constants.groupOrder) &&
 				1 == signature.getS().compareTo(BigInteger.ZERO);
 	}
 
 	@Override
 	public Signature makeSignatureCanonical(final Signature signature) {
 		final Ed25519ScalarOps scalarOps = new Ed25519ScalarOps();
-		final byte[] sReduced = scalarOps.reduce(signature.getBinaryS());
+		final byte[] s = Arrays.copyOf(signature.getBinaryS(), 64);
+		final byte[] sReduced = scalarOps.reduce(s);
 
 		return new Signature(signature.getBinaryR(), sReduced);
 	}

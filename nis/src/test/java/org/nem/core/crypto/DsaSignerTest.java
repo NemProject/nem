@@ -2,6 +2,7 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
@@ -57,22 +58,6 @@ public abstract class DsaSignerTest {
 		Assert.assertThat(signature1, IsEqual.equalTo(signature2));
 	}
 
-	@Test
-	public void verifyReturnsFalseForNonCanonicalSignature() {
-		// Arrange:
-		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final Signature signature = dsaSigner.sign(input);
-		final BigInteger nonCanonicalS = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getS());
-		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
-
-		// Assert:
-		Assert.assertThat(dsaSigner.verify(input, nonCanonicalSignature), IsEqual.equalTo(false));
-	}
-
 	@Test(expected = CryptoException.class)
 	public void cannotSignPayloadWithoutPrivateKey() {
 		// Arrange:
@@ -99,6 +84,23 @@ public abstract class DsaSignerTest {
 
 		// Assert:
 		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void verifyCallsIsCanonical() {
+		// Arrange:
+		initCryptoEngine();
+		final KeyPair kp = new KeyPair();
+		final DsaSigner dsaSigner = Mockito.spy(getDsaSigner(kp));
+		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
+		final Signature signature = new Signature(BigInteger.ONE, BigInteger.ONE);
+		//Mockito.when(dsaSigner.verify(input, signature)).thenCallRealMethod();
+
+		// Act:
+		dsaSigner.verify(input, signature);
+
+		// Assert:
+		Mockito.verify(dsaSigner, Mockito.times(1)).isCanonicalSignature(signature);
 	}
 
 	protected abstract DsaSigner getDsaSigner(final KeyPair keyPair);
