@@ -33,6 +33,7 @@ public class NisUtils {
 		block.setHeight(10L);
 		block.setForgerProof(Utils.generateRandomBytes(64));
 		block.setBlockTransfers(new ArrayList<>());
+        block.setBlockImportanceTransfers(new ArrayList<>());
 		return block;
 	}
 

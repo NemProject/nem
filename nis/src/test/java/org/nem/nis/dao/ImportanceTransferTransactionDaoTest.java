@@ -141,7 +141,7 @@ public class ImportanceTransferTransactionDaoTest {
 		}
 
 		public ImportanceTransfer createDbTransaction() {
-			return ImportanceTransferMapper.toDbModel(this.transaction, 12345, this.accountDaoLookup);
+			return ImportanceTransferMapper.toDbModel(this.transaction, 12345, 0, this.accountDaoLookup);
 		}
 
 		public org.nem.nis.dbmodel.Account getSender() {

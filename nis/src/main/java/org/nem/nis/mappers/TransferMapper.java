@@ -22,7 +22,7 @@ public class TransferMapper {
 	 * @param accountDaoLookup The account dao lookup object.
 	 * @return The Transfer db-model.
 	 */
-	public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final AccountDaoLookup accountDaoLookup) {
+	public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final int orderIndex, final AccountDaoLookup accountDaoLookup) {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
 
@@ -38,6 +38,7 @@ public class TransferMapper {
 				// proof
 				transfer.getSignature().getBytes(),
 				recipient,
+                orderIndex, // order
 				blockIndex, // index
 				transfer.getAmount().getNumMicroNem(),
 				0L); // referenced tx

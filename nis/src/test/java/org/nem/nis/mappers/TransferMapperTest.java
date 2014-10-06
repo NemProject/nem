@@ -152,7 +152,7 @@ public class TransferMapperTest {
 		}
 
 		public Transfer toDbModel(final int blockIndex) {
-			return TransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
+			return TransferMapper.toDbModel(this.model, blockIndex, 0, new AccountDaoLookupAdapter(this.accountDao));
 		}
 
 		public TransferTransaction toModel(final Transfer dbTransfer) {

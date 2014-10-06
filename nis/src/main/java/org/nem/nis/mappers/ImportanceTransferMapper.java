@@ -16,7 +16,7 @@ public class ImportanceTransferMapper {
 	 * @param accountDaoLookup The account dao lookup object.
 	 * @return The ImportanceTransfer db-model.
 	 */
-	public static ImportanceTransfer toDbModel(final ImportanceTransferTransaction importanceTransferTransaction, final int blockIndex, final AccountDaoLookup accountDaoLookup) {
+	public static ImportanceTransfer toDbModel(final ImportanceTransferTransaction importanceTransferTransaction, final int blockIndex, final int orderIndex, final AccountDaoLookup accountDaoLookup) {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(importanceTransferTransaction.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(importanceTransferTransaction.getRemote().getAddress());
 
@@ -33,6 +33,7 @@ public class ImportanceTransferMapper {
 				importanceTransferTransaction.getSignature().getBytes(),
 				remote,
 				importanceTransferTransaction.getMode().value(),
+                orderIndex,
 				blockIndex, // index
 				0L); // referenced tx
 

@@ -129,7 +129,7 @@ public class BlockDaoTest {
 	// > to refactor the validation and pass in transactions; although that might be hard, so it's not so important
 
 	@Test
-	public void savingChangesImportanceTransferBlkIndex() {
+	public void savingDoesNotChangeImportanceTransferBlkIndex() {
 		// Arrange:
 		final Account signer1 = Utils.generateRandomAccount();
 		final Account remote1 = Utils.generateRandomAccount();
@@ -151,12 +151,12 @@ public class BlockDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(0));
-		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(12));
 	}
 
 	@Test
-	public void savingChangesTransferTransactionBlkIndex() {
+	public void savingChangesTransferTransactionOrderId() {
 		// Arrange:
 		final Account signer1 = Utils.generateRandomAccount();
 		final Account remote1 = Utils.generateRandomAccount();
@@ -174,12 +174,15 @@ public class BlockDaoTest {
 		// Act:
 		dbBlock.getBlockTransfers().get(0).setBlkIndex(24);
 		dbBlock.getBlockTransfers().get(1).setBlkIndex(12);
+        // TODO?
 
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(0));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getOrderId(), equalTo(0));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getOrderId(), equalTo(1));
+        Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
+        Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
 	}
 	//endregion
 
@@ -254,10 +257,10 @@ public class BlockDaoTest {
 		final Block entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(0));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
-		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(0));
-		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
 		// TODO 20151005 J-G i guess you're assuming the entity transactions are sorted?
 		// > it might be better to check the hashes like in the following test
 	}
@@ -292,8 +295,8 @@ public class BlockDaoTest {
 
 		final Hash h1 = entity.getBlockImportanceTransfers().get(0).getTransferHash();
 		final Hash h2 = entity.getBlockImportanceTransfers().get(1).getTransferHash();
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(12));
 		Assert.assertThat(h1, equalTo(HashUtils.calculateHash(importanceTransfer1)));
 		Assert.assertThat(h2, equalTo(HashUtils.calculateHash(importanceTransfer2)));
 	}

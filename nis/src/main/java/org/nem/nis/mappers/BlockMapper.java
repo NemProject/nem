@@ -62,21 +62,21 @@ public class BlockMapper {
 		// performance is the other reason, haven't tried it, but I guess queries would be quite complicated
 		// (although I might be wrong on this).
 		//
-		// (slightly off-topic, since we want to sort TXes by fees, code below will be changed)
-		//
 		int i = 0;
+        int importanceTransferIndex = 0;
+        int transferIndex = 0;
 		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
 		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(block.getTransactions().size());
 		for (final Transaction transaction : block.getTransactions()) {
 			switch (transaction.getType()) {
 				case TransactionTypes.TRANSFER: {
-					final Transfer dbTransfer = TransferMapper.toDbModel((TransferTransaction)transaction, i++, accountDao);
+					final Transfer dbTransfer = TransferMapper.toDbModel((TransferTransaction)transaction, i++, importanceTransferIndex++, accountDao);
 					dbTransfer.setBlock(dbBlock);
 					transferTransactions.add(dbTransfer);
 				}
 				break;
 				case TransactionTypes.IMPORTANCE_TRANSFER: {
-					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel((ImportanceTransferTransaction)transaction, i++, accountDao);
+					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel((ImportanceTransferTransaction)transaction, i++, transferIndex++, accountDao);
 					dbTransfer.setBlock(dbBlock);
 					importanceTransferTransactions.add(dbTransfer);
 				}
@@ -118,20 +118,20 @@ public class BlockMapper {
 		block.setLessor(lessor);
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
-		// TODO 20140921 J-G: not sure if this is a test thing or not, but a number of tests were failing because dbBlock.getBlockImportanceTransfers() was null
-		// TODO 20140929 warning, since proper sorting is not yet in place it is CRUCIAL, to give high FEE while in ALPHA, otherwise funny things can happen
-		if (null != dbBlock.getBlockImportanceTransfers()) {
-			for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
-				final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
-				block.addTransaction(importanceTransferTransaction);
-			}
-		}
+        final int count =  dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
+        final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
+
+        for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
+            final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
+            transactions.set(dbTransfer.getBlkIndex(), importanceTransferTransaction);
+        }
 
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
 			final TransferTransaction transfer = TransferMapper.toModel(dbTransfer, accountLookup);
-			block.addTransaction(transfer);
+            transactions.set(dbTransfer.getBlkIndex(), transfer);
 		}
 
-		return block;
+        block.addTransactions(transactions);
+        return block;
 	}
 }

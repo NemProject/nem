@@ -42,7 +42,8 @@ public class Transfer {
 	@JoinColumn(name = "recipientId")
 	private Account recipient;
 
-	private Integer blkIndex; // blkIndex inside block
+	private Integer blkIndex; // index inside block
+    private Integer orderId; // index inside list
 
 	private Long amount;
 	private Long referencedTransaction;
@@ -67,7 +68,8 @@ public class Transfer {
 			final Account sender,
 			final byte[] senderProof,
 			final Account recipient,
-			final Integer blkIndex,
+			final Integer orderId,
+            final Integer blkIndex,
 			final Long amount,
 			final Long referencedTransaction
 	) {
@@ -81,6 +83,7 @@ public class Transfer {
 		this.sender = sender;
 		this.senderProof = senderProof;
 		this.recipient = recipient;
+        this.orderId = orderId;
 		this.blkIndex = blkIndex;
 		this.amount = amount;
 		this.referencedTransaction = referencedTransaction;
@@ -175,14 +178,18 @@ public class Transfer {
 	}
 
 	public Integer getBlkIndex() {
-        return this.block.getBlockTransfers().indexOf(this);
+        return this.blkIndex;
 	}
 
 	public void setBlkIndex(final Integer blkIndex) {
 		this.blkIndex = blkIndex;
 	}
 
-	public Long getAmount() {
+    public Integer getOrderId() {
+        return this.block.getBlockTransfers().indexOf(this);
+    }
+
+    public Long getAmount() {
 		return this.amount;
 	}
 

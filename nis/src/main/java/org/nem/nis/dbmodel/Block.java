@@ -53,15 +53,15 @@ public class Block {
 	private Long nextBlockId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-    @OrderBy("blkIndex")
+    @OrderBy("orderId")
     @LazyCollection(LazyCollectionOption.TRUE)
-    @OrderColumn(name = "blkIndex")
+    @OrderColumn(name = "orderId")
 	private List<Transfer> blockTransfers;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-	@OrderBy("blkIndex")
+	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@OrderColumn(name = "blkIndex")
+	@OrderColumn(name = "orderId")
 	private List<ImportanceTransfer> blockImportanceTransfers;
 
 	public Block() {
