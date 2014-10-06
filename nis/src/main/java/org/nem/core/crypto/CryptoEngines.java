@@ -10,14 +10,57 @@ public class CryptoEngines {
 
 	private static final CryptoEngine secp256k1Engine;
 	private static final CryptoEngine ed25519Engine;
+	private static CryptoEngine defaultEngine = initDefaultEngine();
 
 	static {
 		secp256k1Engine = new SecP256K1Engine();
 		ed25519Engine = new Ed25519Engine();
 	}
 
+	/**
+	 * Initializes the default crypto engine (needed for unit tests).
+	 *
+	 * @return The default crypto engine.
+	 */
+	public static CryptoEngine initDefaultEngine() {
+		defaultEngine = secp256k1Engine;
+		return defaultEngine;
+	}
+
+	/**
+	 * Gets the default crypto engine.
+	 *
+	 * @return The default crypto engine.
+	 */
 	public static CryptoEngine getDefaultEngine() {
+		return defaultEngine;
+	}
+
+	/**
+	 * Sets the default crypto engine (needed for unit tests).
+	 *
+	 * @param engine The crypto engine.
+	 */
+	public static void setDefaultEngine(final CryptoEngine engine) {
+		defaultEngine = engine;
+	}
+
+	/**
+	 * Gets the SECP256K1 crypto engine.
+	 *
+	 * @return The SECP256K1 crypto engine.
+	 */
+	public static CryptoEngine secp256k1Engine() {
 		return secp256k1Engine;
+	}
+
+	/**
+	 * Gets the ED25519 crypto engine.
+	 *
+	 * @return The ED25519 crypto engine.
+	 */
+	public static CryptoEngine ed25519Engine() {
+		return ed25519Engine;
 	}
 
 	public interface CryptoEngine {
