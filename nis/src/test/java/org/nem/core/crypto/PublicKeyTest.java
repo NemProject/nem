@@ -2,6 +2,8 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
+import org.nem.core.crypto.ed25519.Ed25519Engine;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -38,6 +40,25 @@ public class PublicKeyTest {
 
 	//endregion
 
+	//region delegation
+
+	@Test
+	public void isCompressedDelegatesToKeyAnalyzer() {
+		final Ed25519Engine engine = Mockito.mock(Ed25519Engine.class);
+		CryptoEngines.setDefaultEngine(engine);
+		final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
+		Mockito.when(engine.createKeyAnalyzer()).thenReturn(analyzer);
+		final PublicKey key = PublicKey.fromHexString("227F");
+
+		// Act:
+		key.isCompressed();
+
+		// Assert:
+		Mockito.verify(analyzer, Mockito.times(1)).isKeyCompressed(key);
+	}
+
+	//endregion
+
 	//region serializer
 
 	@Test
@@ -63,11 +84,12 @@ public class PublicKeyTest {
 	public void compressedKeyMustHaveCorrectLength() {
 		// Arrange:
 		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		final KeyAnalyzer analyzer = CryptoEngines.getDefaultEngine().createKeyAnalyzer();
 
 		// Assert:
-		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, -1).isCompressed(), IsEqual.equalTo(false));
-		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, 0).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, 1).isCompressed(), IsEqual.equalTo(false));
+		Assert.assertThat(analyzer.isKeyCompressed(this.createKeyWithLengthDelta(publicKey, -1)), IsEqual.equalTo(false));
+		Assert.assertThat(analyzer.isKeyCompressed(this.createKeyWithLengthDelta(publicKey, 0)), IsEqual.equalTo(true));
+		Assert.assertThat(analyzer.isKeyCompressed(this.createKeyWithLengthDelta(publicKey, 1)), IsEqual.equalTo(false));
 	}
 
 	private PublicKey createKeyWithLengthDelta(final PublicKey key, final int lengthDelta) {
@@ -75,26 +97,6 @@ public class PublicKeyTest {
 		final byte[] modifiedPublicKey = new byte[key.getRaw().length + lengthDelta];
 		final int numBytesToCopy = Math.min(modifiedPublicKey.length, key.getRaw().length);
 		System.arraycopy(key.getRaw(), 0, modifiedPublicKey, 0, numBytesToCopy);
-		return new PublicKey(modifiedPublicKey);
-	}
-
-	@Test
-	public void compressedKeyMustHaveCorrectFirstByte() {
-		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
-
-		// Assert:
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)1).isCompressed(), IsEqual.equalTo(false));
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)2).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)3).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)4).isCompressed(), IsEqual.equalTo(false));
-	}
-
-	private PublicKey createKeyWithFirstByte(final PublicKey key, final byte firstByte) {
-		// Arrange:
-		final byte[] modifiedPublicKey = new byte[key.getRaw().length];
-		System.arraycopy(key.getRaw(), 0, modifiedPublicKey, 0, modifiedPublicKey.length);
-		modifiedPublicKey[0] = firstByte;
 		return new PublicKey(modifiedPublicKey);
 	}
 

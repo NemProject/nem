@@ -107,54 +107,13 @@ public class SignatureTest {
 	}
 
 	@Test
-	public void binaryCtorSucceedsIfRAndSIsCorrectLength() {
+	public void binaryCtorSucceedsIfRAndSHaveCorrectLength() {
 		// Act:
 		final Signature signature = new Signature(new byte[32], new byte[32]);
 
 		// Assert:
 		Assert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
 		Assert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
-	}
-
-	//endregion
-
-	//region isCanonical / makeCanonical
-
-	@Test
-	public void isCanonicalReturnsTrueForCanonicalSignature() {
-		// Arrange:
-		final Signature signature = createCanonicalSignature();
-		final Signer signer = createSigner();
-
-		// Assert:
-		Assert.assertThat(signer.isCanonicalSignature(signature), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
-		// Arrange:
-		final Signature signature = makeNonCanonical(createCanonicalSignature());
-		final Signer signer = createSigner();
-
-		// Assert:
-		Assert.assertThat(signer.isCanonicalSignature(signature), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
-		// Arrange:
-		final Signature signature = createCanonicalSignature();
-		final Signature nonCanonicalSignature = makeNonCanonical(signature);
-		final Signer signer = createSigner();
-		Assert.assertThat(signer.isCanonicalSignature(nonCanonicalSignature), IsEqual.equalTo(false));
-
-		// Act:
-		final Signature canonicalSignature = signer.makeSignatureCanonical(nonCanonicalSignature);
-
-		// Assert:
-		Assert.assertThat(signer.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
-		Assert.assertThat(nonCanonicalSignature.getR(), IsEqual.equalTo(signature.getR()));
-		Assert.assertThat(canonicalSignature.getS(), IsEqual.equalTo(signature.getS()));
 	}
 
 	//endregion
@@ -273,26 +232,5 @@ public class SignatureTest {
 
 	private static Signature createSignature(final int r, final int s) {
 		return new Signature(new BigInteger(String.format("%d", r)), new BigInteger(String.format("%d", s)));
-	}
-
-	private static Signature createCanonicalSignature() {
-		// Arrange:
-		final KeyPair kp = new KeyPair();
-		final Signer signer = new Signer(kp);
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		return signer.sign(input);
-	}
-
-	private static Signature makeNonCanonical(final Signature signature) {
-		// Act:
-		final BigInteger nonCanonicalS = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getS());
-		return new Signature(signature.getR(), nonCanonicalS);
-	}
-
-	private static Signer createSigner() {
-		final KeyPair kp = new KeyPair();
-		return new Signer(kp);
 	}
 }

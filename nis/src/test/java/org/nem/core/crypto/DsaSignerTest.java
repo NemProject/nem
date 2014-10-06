@@ -44,7 +44,7 @@ public abstract class DsaSignerTest {
 	}
 
 	@Test
-	public void signaturesAreDeterministic() {
+	public void signaturesReturnedBySignAreDeterministic() {
 		// Arrange:
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = getDsaSigner(kp);
@@ -67,6 +67,21 @@ public abstract class DsaSignerTest {
 
 		// Act:
 		dsaSigner.sign(input);
+	}
+
+	@Test
+	public void isCanonicalReturnsTrueForCanonicalSignature() {
+		// Arrange:
+		initCryptoEngine();
+		final KeyPair kp = new KeyPair();
+		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
+
+		// Act:
+		final Signature signature = dsaSigner.sign(input);
+
+		// Assert:
+		Assert.assertThat(dsaSigner.isCanonicalSignature(signature), IsEqual.equalTo(true));
 	}
 
 	@Test

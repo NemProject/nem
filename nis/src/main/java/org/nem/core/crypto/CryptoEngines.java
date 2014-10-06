@@ -23,7 +23,7 @@ public class CryptoEngines {
 	 * @return The default crypto engine.
 	 */
 	public static CryptoEngine initDefaultEngine() {
-		defaultEngine = secp256k1Engine;
+		defaultEngine = ed25519Engine;
 		return defaultEngine;
 	}
 
