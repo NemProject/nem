@@ -50,9 +50,9 @@ public class ImportanceTransferTransactionValidator implements TransactionValida
 
 		switch (transaction.getMode()) {
 			case Activate:
-                if (!predicate.canDebit(transaction.getSigner(), BlockChainConstants.MIN_FORAGING_BALANCE.add(transaction.getFee()))) {
-                    return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-                }
+				if (!predicate.canDebit(transaction.getSigner(), BlockChainConstants.MIN_FORAGING_BALANCE.add(transaction.getFee()))) {
+					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+				}
 
 				// if a remote is already activated, it needs to be deactivated first
 				return !isRemoteActivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_UNUSABLE;

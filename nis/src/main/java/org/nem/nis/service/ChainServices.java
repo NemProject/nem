@@ -55,7 +55,7 @@ public class ChainServices {
 	 * @param nodes The nodes.
 	 * @return The maximum block chain height.
 	 */
-	private CompletableFuture<BlockHeight> getMaxChainHeightAsync(final Collection<Node> nodes) {
+	public CompletableFuture<BlockHeight> getMaxChainHeightAsync(final Collection<Node> nodes) {
 		final List<CompletableFuture<BlockHeight>> chainHeightFutures = nodes.stream()
 				.map(n -> this.connectorPool.getSyncConnector(null).getChainHeightAsync(n).exceptionally(e -> null))
 				.collect(Collectors.toList());

@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
@@ -114,7 +114,7 @@ public class AccountControllerTest {
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 
 		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
-        Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
+		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
 		Mockito.when(context.accountInfoFactory.createInfo(address, BlockHeight.ONE)).thenReturn(accountInfo);
 
 		// Act:
@@ -133,7 +133,7 @@ public class AccountControllerTest {
 		builder.setAddress(address.getEncoded());
 
 		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
-        Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
+		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
 		Mockito.when(context.accountInfoFactory.createInfo(address, BlockHeight.ONE)).thenReturn(Mockito.mock(AccountInfo.class));
 		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(true);
 
@@ -147,31 +147,30 @@ public class AccountControllerTest {
 
 	//endregion
 
-    //region accountStatus
-    @Test
-    public void accountStatusDelegatesToUnlockedAccounts()
-    {
-        assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
-        assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
-    }
+	//region accountStatus
+	@Test
+	public void accountStatusDelegatesToUnlockedAccounts() {
+		assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
+		assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
+	}
 
-    private void assertAccountStatusDelegatesToUnlockedAccounts(final boolean returned, final AccountStatus expectedStatus) {
-        // Arrange:
-        final Address address = Utils.generateRandomAddressWithPublicKey();
-        final AccountIdBuilder builder = new AccountIdBuilder();
-        builder.setAddress(address.getEncoded());
+	private void assertAccountStatusDelegatesToUnlockedAccounts(final boolean returned, final AccountStatus expectedStatus) {
+		// Arrange:
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
 
-        final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
-        Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(returned);
+		final TestContext context = new TestContext(Mockito.mock(AccountIoAdapter.class));
+		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(returned);
 
-        // Act:
-        final AccountMetaData accountMetaData = context.controller.accountStatus(builder);
+		// Act:
+		final AccountMetaData accountMetaData = context.controller.accountStatus(builder);
 
-        // Assert:
-        Mockito.verify(context.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(address);
-        Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(expectedStatus));
-    }
-    //endregion
+		// Assert:
+		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(address);
+		Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(expectedStatus));
+	}
+	//endregion
 
 	//region accountTransfers[All|Incoming|Outgoing]
 
@@ -331,7 +330,7 @@ public class AccountControllerTest {
 		private final AccountController controller;
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-        private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
+		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
@@ -342,7 +341,7 @@ public class AccountControllerTest {
 					this.unconfirmedTransactions,
 					this.unlockedAccounts,
 					accountIoAdapter,
-                    this.blockChainLastBlockLayer,
+					this.blockChainLastBlockLayer,
 					this.accountInfoFactory,
 					this.poiFacade);
 		}
