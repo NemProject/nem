@@ -70,31 +70,13 @@ public abstract class DsaSignerTest {
 	}
 
 	@Test
-	public void replacingRWithGroupOrderMinusRInSignatureRuinsSignature() {
-		// Arrange:
-		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final Signature signature = dsaSigner.sign(input);
-		final Signature signature2 = new Signature(
-				CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getR()),
-				signature.getS());
-
-		// Assert:
-		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void verifyCallsIsCanonical() {
+	public void verifyCallsIsCanonicalSignature() {
 		// Arrange:
 		initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = Mockito.spy(getDsaSigner(kp));
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 		final Signature signature = new Signature(BigInteger.ONE, BigInteger.ONE);
-		//Mockito.when(dsaSigner.verify(input, signature)).thenCallRealMethod();
 
 		// Act:
 		dsaSigner.verify(input, signature);

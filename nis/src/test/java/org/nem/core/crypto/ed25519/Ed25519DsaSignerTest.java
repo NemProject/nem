@@ -48,26 +48,23 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
 	}
 
-	/*@Test
-	public void signReturnsExpectedSignature() {
+	@Test
+	public void replacingRWithGroupOrderPlusRInSignatureRuinsSignature() {
 		// Arrange:
 		initCryptoEngine();
-		final BigInteger k = ArrayUtils.toBigInteger(HexEncoder.getBytes("98a5e3a36e67aaba89888bf093de1ad963e774013b3902bfab356d8b90178a63"));
-		final PrivateKey privateKey = new PrivateKey(k);
-		final PublicKey publicKey = MathUtils.derivePublicKey(privateKey);
-		final KeyPair keyPair = new KeyPair(privateKey, publicKey);
-		final DsaSigner dsaSigner = getDsaSigner(keyPair);
-		//final byte[] input = HexEncoder.getBytes("b4a8f381e70e7a");
-		final byte[] input = HexEncoder.getBytes("b4a8f381e70e7a11");
+		final KeyPair kp = new KeyPair();
+		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
 		// Act:
-		final Signature signature1 = dsaSigner.sign(input);
-		final Signature signature2 = MathUtils.sign(keyPair, input);
+		final Signature signature = dsaSigner.sign(input);
+		final Signature signature2 = new Signature(
+				CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().add(signature.getR()),
+				signature.getS());
 
 		// Assert:
-		Assert.assertThat(signature1, IsEqual.equalTo(signature2));
-		Assert.assertThat(dsaSigner.verify(input, signature1), IsEqual.equalTo(true));
-	}*/
+		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
+	}
 
 	@Test
 	public void signReturnsExpectedSignature() {

@@ -36,6 +36,17 @@ public abstract class KeyGeneratorTest {
 		Assert.assertThat(publicKey.getRaw(), IsEqual.equalTo(kp.getPublicKey().getRaw()));
 	}
 
+	@Test
+	public void generateKeyPairCreatesDifferentInstancesWithDifferentKeys() {
+		// Act:
+		final KeyPair kp1 = getKeyGenerator().generateKeyPair();
+		final KeyPair kp2 = getKeyGenerator().generateKeyPair();
+
+		// Assert:
+		Assert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+		Assert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+	}
+
 	protected abstract KeyGenerator getKeyGenerator();
 	protected abstract void initCryptoEngine();
 }

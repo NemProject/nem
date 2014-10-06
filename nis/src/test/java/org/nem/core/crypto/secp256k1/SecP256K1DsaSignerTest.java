@@ -3,6 +3,7 @@ package org.nem.core.crypto.secp256k1;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
+import org.nem.core.test.Utils;
 import org.nem.core.utils.*;
 
 import java.math.BigInteger;
@@ -58,6 +59,24 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 
 		// Assert:
 		Assert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void replacingRWithGroupOrderMinusRInSignatureRuinsSignature() {
+		// Arrange:
+		initCryptoEngine();
+		final KeyPair kp = new KeyPair();
+		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final byte[] input = Utils.generateRandomBytes();
+
+		// Act:
+		final Signature signature = dsaSigner.sign(input);
+		final Signature signature2 = new Signature(
+				CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getR()),
+				signature.getS());
+
+		// Assert:
+		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
 	}
 
 	@Override
