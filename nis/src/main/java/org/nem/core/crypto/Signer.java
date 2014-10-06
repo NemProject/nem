@@ -5,7 +5,6 @@ package org.nem.core.crypto;
  */
 public class Signer {
 
-	private final KeyPair keyPair;
 	private final DsaSigner signer;
 
 	/**
@@ -14,7 +13,6 @@ public class Signer {
 	 * @param keyPair The KeyPair that should be used for signing and verification.
 	 */
 	public Signer(final KeyPair keyPair) {
-		this.keyPair = keyPair;
 		this.signer = CryptoEngines.getDefaultEngine().createDsaSigner(keyPair);
 	}
 
@@ -25,10 +23,6 @@ public class Signer {
 	 * @return The generated signature.
 	 */
 	public Signature sign(final byte[] data) {
-		if (!this.keyPair.hasPrivateKey()) {
-			throw new CryptoException("cannot sign without private key");
-		}
-
 		return this.signer.sign(data);
 	}
 

@@ -25,6 +25,10 @@ public class SecP256K1DsaSigner implements DsaSigner {
 
 	@Override
 	public Signature sign(final byte[] data) {
+		if (!this.keyPair.hasPrivateKey()) {
+			throw new CryptoException("cannot sign without private key");
+		}
+
 		final ECDSASigner signer = this.createECDSASigner();
 		final ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(this.keyPair.getPrivateKey().getRaw(), SecP256K1Curve.secp256k1().getParams());
 		signer.init(true, privateKeyParameters);

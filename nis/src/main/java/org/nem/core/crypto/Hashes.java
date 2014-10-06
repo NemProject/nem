@@ -27,6 +27,22 @@ public class Hashes {
 	}
 
 	/**
+	 * Gets an instance of a SHA3-512 message digest.
+	 *
+	 * @return The SHA3-512 instance.
+	 */
+	public static MessageDigest getSha3_512Instance() {
+		final MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA3-512", "BC");
+		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+			throw new CryptoException(e);
+		}
+
+		return digest;
+	}
+
+	/**
 	 * Performs a RIPEMD160 hash of the concatenated inputs.
 	 *
 	 * @param inputs The byte arrays to concatenate and hash.

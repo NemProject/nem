@@ -2,11 +2,18 @@ package org.nem.core.crypto.ed25519.arithmetic;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.core.crypto.*;
+import org.nem.core.crypto.KeyPair;
+import org.nem.core.crypto.PrivateKey;
+import org.nem.core.crypto.PublicKey;
+import org.nem.core.crypto.Signature;
+import org.nem.core.crypto.ed25519.Curve;
 import org.nem.core.crypto.ed25519.*;
 import org.nem.core.crypto.ed25519.spec.*;
 
 import java.math.BigInteger;
-import java.security.SecureRandom;
+import java.security.*;
+import java.util.Arrays;
 
 /**
  * Utility class to help with calculations.
@@ -413,6 +420,51 @@ public class MathUtils {
 		}
 
 		return GroupElement.p3(g.getCurve(), g.getX().negate(), g.getY(), g.getZ(), g.getT().negate());
+	}
+
+	/**
+	 * Derives the public key from a private key.
+	 *
+	 * @param privateKey The private key.
+	 * @return The public key.
+	 */
+	public static PublicKey derivePublicKey(final PrivateKey privateKey) {
+		final MessageDigest digest = Hashes.getSha3_512Instance();
+		final byte[] hash = digest.digest(toByteArray(privateKey.getRaw()));
+		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
+		a[31] &= 0x7F;
+		a[31] |= 0x40;
+		a[0] &= 0xF8;
+		final GroupElement pubKey = scalarMultiplyGroupElement(ed25519.getB(), toFieldElement(toBigInteger(a)));
+
+		return new PublicKey(pubKey.toByteArray());
+	}
+
+	/**
+	 * Creates a signature from a key pair and message.
+	 *
+	 * @param keyPair The key pair.
+	 * @param data The message.
+	 * @return The signature.
+	 */
+	public static Signature sign(final KeyPair keyPair, final byte[] data) {
+		final MessageDigest digest = Hashes.getSha3_512Instance();
+		final byte[] hash = digest.digest(toByteArray(keyPair.getPrivateKey().getRaw()));
+		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
+		a[31] &= 0x7F;
+		a[31] |= 0x40;
+		a[0] &= 0xF8;
+		digest.update(Arrays.copyOfRange(hash, 32, 64));
+		final byte[] r = digest.digest(data);
+		final byte[] rReduced = reduceModGroupOrder(r);
+		final GroupElement R = scalarMultiplyGroupElement(ed25519.getB(), toFieldElement(toBigInteger(rReduced)));
+		digest.update(R.toByteArray());
+		digest.update(keyPair.getPublicKey().getRaw());
+		final byte[] h = digest.digest(data);
+		final byte[] hReduced = reduceModGroupOrder(h);
+		BigInteger S = toBigInteger(rReduced).add(toBigInteger(hReduced).multiply(toBigInteger(a))).mod(getGroupOrder());
+
+		return new Signature(R.toByteArray(), toByteArray(S));
 	}
 
 	// Start TODO BR: Remove when finished!
