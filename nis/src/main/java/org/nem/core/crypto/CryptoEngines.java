@@ -33,6 +33,9 @@ public class CryptoEngines {
 	 * @return The default crypto engine.
 	 */
 	public static CryptoEngine getDefaultEngine() {
+		if (null == defaultEngine) {
+			initDefaultEngine();
+		}
 		return defaultEngine;
 	}
 
