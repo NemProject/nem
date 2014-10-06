@@ -4,6 +4,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.crypto.Signature;
 import org.nem.core.crypto.ed25519.arithmetic.*;
+import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
 import java.security.*;
@@ -34,7 +35,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 	@Override
 	public Signature sign(final byte[] data) {
 		// Hash the private key to improve randomness.
-		final byte[] hash = this.digest.digest(Utils.toByteArray(keyPair.getPrivateKey().getRaw()));
+		final byte[] hash = this.digest.digest(ArrayUtils.toByteArray(keyPair.getPrivateKey().getRaw(), 32));
 		this.digest.reset();
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
@@ -53,7 +54,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// encodedR and encodedA are the little endian encodings of the group element R and the public key A and
 		// a is the lower 32 bytes of hash after clamping.
 		this.digest.update(encodedR);
-		// TODO 20141005 BR: is it guaranteed that the public key is available or do we have to calculate it eventually?
 		final byte[] encodedA = this.keyPair.getPublicKey().getRaw();
 		this.digest.update(encodedA);
 		byte[] h = this.digest.digest(data);
@@ -62,8 +62,8 @@ public class Ed25519DsaSigner implements DsaSigner {
 		clamp(a);
 		final byte[] encodedS = scalarOps.multiplyAndAdd(h, a, r);
 
-		// Signature is (RCompressed, S)
-		final Signature signature = new Signature(Utils.toBigInteger(encodedR), Utils.toBigInteger(encodedS));
+		// Signature is (encodedR, encodedS)
+		final Signature signature = new Signature(encodedR, encodedS);
 		if (!isCanonicalSignature(signature)) {
 			throw new CryptoException("Generated signature is not canonical");
 		}
@@ -78,8 +78,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		}
 
 		// h = H(encodedR, encodedA, data).
-		final byte[] encodedR = Utils.toByteArray(signature.getR());
-		// TODO 20141005 BR: is it guaranteed that the public key is available or do we have to calculate it eventually?
+		final byte[] encodedR = signature.getBinaryR();
 		final byte[] encodedA = this.keyPair.getPublicKey().getRaw();
 		final GroupElement A = new GroupElement(Ed25519Constants.curve, encodedA);
 		this.digest.update(encodedR);
@@ -91,9 +90,8 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] hReduced = scalarOps.reduce(h);
 
 		// R = encodedS * B - H(encodedR, encodedA, data) * a * B
-		final byte[] encodedS = Utils.toByteArray(signature.getS());
 		final GroupElement calculatedR = Ed25519Constants.basePoint.doubleScalarMultiplyVariableTime(
-				A.negate(), hReduced, encodedS);
+				A.negate(), hReduced, signature.getBinaryS());
 
 		// Compare calculated R to given R.
 		final byte[] encodedCalculatedR = calculatedR.toByteArray();
@@ -110,15 +108,14 @@ public class Ed25519DsaSigner implements DsaSigner {
 	@Override
 	public Signature makeSignatureCanonical(final Signature signature) {
 		final Ed25519ScalarOps scalarOps = new Ed25519ScalarOps();
-		final byte[] encodedS = Utils.toByteArray(signature.getS());
-		final byte[] encodedSReduced = scalarOps.reduce(encodedS);
+		final byte[] sReduced = scalarOps.reduce(signature.getBinaryS());
 
-		return new Signature(signature.getR(), Utils.toBigInteger(encodedSReduced));
+		return new Signature(signature.getBinaryR(), sReduced);
 	}
 
 	private void clamp(byte[] k) {
 		k[31] &= 0x7F;
 		k[31] |= 0x40;
-		k[ 0] &= 0xF8;
+		k[0] &= 0xF8;
 	}
 }

@@ -36,6 +36,10 @@ public class SecP256K1DsaSigner implements DsaSigner {
 
 	@Override
 	public boolean verify(final byte[] data, final Signature signature) {
+		if (!isCanonicalSignature(signature)) {
+			return false;
+		}
+
 		final ECDSASigner signer = this.createECDSASigner();
 		final ECPoint point = SecP256K1Curve.secp256k1().getParams().getCurve().decodePoint(this.keyPair.getPublicKey().getRaw());
 		final ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(point, SecP256K1Curve.secp256k1().getParams());

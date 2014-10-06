@@ -39,6 +39,39 @@ public class SignatureTest {
 		Assert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
 	}
 
+	@Test
+	public void binaryCtorInitializesFields() {
+		// Arrange:
+		final Signature originalSignature = createSignature("99512345", "12351234");
+
+		// Act:
+		final Signature signature = new Signature(originalSignature.getBinaryR(), originalSignature.getBinaryS());
+
+		// Assert:
+		Assert.assertThat(signature.getR(), IsEqual.equalTo(originalSignature.getR()));
+		Assert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void bigIntegerCtorFailsIfRIsToLarge() {
+		// Arrange:
+		final BigInteger r = BigInteger.ONE.shiftLeft(256);
+		final BigInteger s = new BigInteger("12351234");
+
+		// Act:
+		new Signature(r, s);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void bigIntegerCtorFailsIfSIsToLarge() {
+		// Arrange:
+		final BigInteger r = new BigInteger("12351234");
+		final BigInteger s = BigInteger.ONE.shiftLeft(256);
+
+		// Act:
+		new Signature(r, s);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void byteArrayCtorFailsIfByteArrayIsTooSmall() {
 		// Act:
@@ -51,10 +84,32 @@ public class SignatureTest {
 		new Signature(new byte[65]);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void binaryCtorFailsIfByteArrayOfRIsTooLarge() {
+		// Act:
+		new Signature(new byte[33], new byte[32]);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void binaryCtorFailsIfByteArrayOfSIsTooLarge() {
+		// Act:
+		new Signature(new byte[32], new byte[33]);
+	}
+
 	@Test
 	public void byteArrayCtorSucceedsIfByteArrayIsCorrectLength() {
 		// Act:
 		final Signature signature = new Signature(new byte[64]);
+
+		// Assert:
+		Assert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
+		Assert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
+	}
+
+	@Test
+	public void binaryCtorSucceedsIfRAndSIsCorrectLength() {
+		// Act:
+		final Signature signature = new Signature(new byte[32], new byte[32]);
 
 		// Assert:
 		Assert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));

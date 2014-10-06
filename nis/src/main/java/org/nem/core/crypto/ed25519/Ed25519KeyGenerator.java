@@ -47,6 +47,6 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 	private void clamp(byte[] k) {
 		k[31] &= 0x7F;
 		k[31] |= 0x40;
-		k[ 0] &= 0xF8;
+		k[0] &= 0xF8;
 	}
 }

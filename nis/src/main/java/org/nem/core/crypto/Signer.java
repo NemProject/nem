@@ -40,10 +40,6 @@ public class Signer {
 	 * @return true if the signature is valid.
 	 */
 	public boolean verify(final byte[] data, final Signature signature) {
-		if (!signer.isCanonicalSignature(signature)) {
-			return false;
-		}
-
 		return this.signer.verify(data, signature);
 	}
 
