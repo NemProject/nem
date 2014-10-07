@@ -21,8 +21,6 @@ public abstract class ScanGraphClusteringTest {
 	 */
 	protected abstract GraphClusteringStrategy createClusteringStrategy();
 
-	// TODO 20141001 J-M please review the first group of tests for correctness ... i added a few
-
 	/**
 	 * <pre>
 	 *     0 - 1

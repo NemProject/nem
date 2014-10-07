@@ -20,7 +20,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
 
-	public static final int DEFAULT_MAX_ITERATIONS = 2000;
+	public static final int DEFAULT_MAX_ITERATIONS = 20000;
 	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	@Override

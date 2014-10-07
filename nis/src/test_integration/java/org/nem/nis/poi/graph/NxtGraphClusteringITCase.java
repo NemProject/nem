@@ -142,7 +142,7 @@ public class NxtGraphClusteringITCase {
 	@Test
 	public void poiComparisonTest() throws SQLException {
 		final int startHeight = 0;
-		final int endHeight = 3000;//225000;
+		final int endHeight = 30000;//225000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 
 		// 0. Load transactions.
@@ -336,8 +336,6 @@ public class NxtGraphClusteringITCase {
 
 	private String getDbUrl() {
 		return String.format("jdbc:h2:%s/nem/nxt_db/nxt", System.getProperty("user.home"));
-		//        return String.format("jdbc:h2:%s/nxt", System.getProperty("user.home"));
-
 	}
 
 	private List<PoiAccountState> getGenesisAccounts() throws SQLException {
@@ -498,6 +496,7 @@ public class NxtGraphClusteringITCase {
 
 		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
 		poi.updateAccountImportances(blockHeight, acctStates, new PoiScorer(), clusteringStrategy);
+
 		final List<Double> importances = acctStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());
@@ -507,6 +506,7 @@ public class NxtGraphClusteringITCase {
 			importancesVector.setAt(i, importances.get(i));
 		}
 
+		System.out.println("importances: " + importances);
 		return importancesVector;
 	}
 
