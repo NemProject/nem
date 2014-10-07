@@ -108,7 +108,7 @@ public class NxtGraphClusteringITCase {
 	@Test
 	public void poiComparisonTest() {
 		// Arrange:
-		final int endHeight = 3000;//225000;
+		final int endHeight = 5000;//225000;
 
 		// a) This is the warm up phase. I dunno why it is needed but the first time java needs a lot longer for the calculation
 		getAccountImportances(endHeight, new OutlierScan(), "WARM UP");
