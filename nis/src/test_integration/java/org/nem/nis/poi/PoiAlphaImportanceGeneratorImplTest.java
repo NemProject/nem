@@ -1,12 +1,15 @@
 package org.nem.nis.poi;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.math.ColumnVector;
+import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
+import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
+import org.nem.nis.test.*;
 
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
@@ -41,6 +44,156 @@ public class PoiAlphaImportanceGeneratorImplTest {
 
 	private static final double HIGH_TOLERANCE = 0.1;
 	private static final double LOW_TOLERANCE = 0.05;
+
+	//region clustering tests
+
+	@Test
+	public void fastScanClusteringResultsInSameImportancesAsScan() {
+		// Act:
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new ScanClusteringStrategy(), true);
+
+		// Assert:
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance < 0.001);
+	}
+
+	@Test
+	public void fastScanClusteringResultsInDifferentImportancesThanOutlierScan() {
+		// Act:
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new OutlierScan(), true);
+
+		// Assert:
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
+	}
+
+	@Test
+	public void fastScanClusteringResultsInDifferentImportancesThanSingleClusterScan() {
+		// Act:
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new SingleClusterScan(), true);
+
+		// Assert:
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
+	}
+
+	@Test
+	public void fastScanClusteringResultsInDifferentImportancesThanNoClustering() {
+		// Act:
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new SingleClusterScan(), false);
+
+		// Assert:
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
+	}
+
+	@Test
+	public void fastScanClusteringCorrectlyIdentifiesMostImportantAccount() {
+		// Act:
+		final ColumnVector importances = calculateImportances(new FastScanClusteringStrategy(), true);
+		int maxIndex = 0;
+		int nextMaxIndex = 0;
+		for (int i = 0; i < importances.size(); ++i) {
+			if (importances.getAt(i) > importances.getAt(maxIndex)) {
+				nextMaxIndex = maxIndex;
+				maxIndex = i;
+			} else if (importances.getAt(i) > importances.getAt(nextMaxIndex)) {
+				nextMaxIndex = i;
+			}
+		}
+
+		// Assert: max index and next max index are 4 and 5
+		Assert.assertThat(maxIndex + nextMaxIndex, IsEqual.equalTo(9));
+		Assert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(1));
+	}
+
+	private static double calculateDistanceBetweenFastScanAndOtherImportances(
+			final GraphClusteringStrategy clusteringStrategy,
+			final boolean useClusteringStrategy) {
+		// Act:
+		final ColumnVector fastScanImportances = calculateImportances(new FastScanClusteringStrategy(), true);
+		final ColumnVector otherImportances = calculateImportances(clusteringStrategy, useClusteringStrategy);
+
+		// Assert:
+		final double distance = fastScanImportances.l2Distance(otherImportances);
+		LOGGER.info(String.format("fastScanImportances - %s", fastScanImportances));
+		LOGGER.info(String.format("otherImportances ---- %s", otherImportances));
+		LOGGER.info(String.format("distance - %f", distance));
+		return distance;
+
+	}
+
+	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy, final boolean useClusteringStrategy) {
+		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
+
+		final BlockHeight importanceBlockHeight = new BlockHeight(2);
+		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl(useClusteringStrategy);
+		poi.updateAccountImportances(importanceBlockHeight, accountStates, new PoiScorer(), clusteringStrategy);
+		final List<Double> importances = accountStates.stream()
+				.map(a -> a.getImportanceInfo().getImportance(importanceBlockHeight))
+				.collect(Collectors.toList());
+
+		final ColumnVector importancesVector = new ColumnVector(importances.size());
+		for (int i = 0; i < importances.size(); ++i) {
+			importancesVector.setAt(i, importances.get(i));
+		}
+
+		return importancesVector;
+	}
+
+	private static Collection<PoiAccountState> createAccountStatesFromGraph(final GraphType graphType) {
+		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
+
+		final List<PoiAccountState> accountStates = new ArrayList<>();
+		for (int i = 0; i < outlinkMatrix.getRowCount(); ++i) {
+			final PoiAccountState accountState = new PoiAccountState(Utils.generateRandomAddress());
+			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(1000000000));
+			accountStates.add(accountState);
+		}
+
+		final BlockHeight blockHeight = new BlockHeight(2);
+		for (int i = 0; i < outlinkMatrix.getRowCount(); ++i) {
+			final MatrixNonZeroElementRowIterator iterator = outlinkMatrix.getNonZeroElementRowIterator(i);
+			while (iterator.hasNext()) {
+				final MatrixElement element = iterator.next();
+				final Amount amount = Amount.fromNem(element.getValue().longValue());
+				if (amount.compareTo(Amount.ZERO) > 0) {
+					final PoiAccountState senderAccountState = accountStates.get(element.getColumn());
+					final PoiAccountState recipientAccountState = accountStates.get(element.getRow());
+					senderAccountState.getWeightedBalances().addSend(blockHeight, amount);
+					senderAccountState.getImportanceInfo().addOutlink(
+							new AccountLink(blockHeight, amount, recipientAccountState.getAddress()));
+
+					recipientAccountState.getWeightedBalances().addReceive(blockHeight, amount);
+				}
+			}
+		}
+
+		return accountStates;
+	}
+
+	final void printDifferences(final ColumnVector lhs, final ColumnVector rhs) {
+		Assert.assertThat(lhs.size(), IsEqual.equalTo(rhs.size()));
+		final ColumnVector ratios = new ColumnVector(lhs.size());
+		double diff = 0;
+		for (int i = 0; i < rhs.size(); ++i) {
+			diff += Math.abs(rhs.getAt(i) - lhs.getAt(i));
+			if (lhs.getAt(i) > 0.0) {
+				ratios.setAt(i, rhs.getAt(i) / lhs.getAt(i));
+			} else if (rhs.getAt(i) > 0.0) {
+				ratios.setAt(i, Double.MAX_VALUE);
+			} else {
+				ratios.setAt(i, 1.0);
+			}
+			if (ratios.getAt(i) > 1.001 || ratios.getAt(i) < 0.999) {
+				System.out.println("Account " + i + " importance ratio is " + ratios.getAt(i));
+			}
+		}
+
+		System.out.println(lhs);
+		System.out.println(rhs);
+		System.out.println("ratios: " + ratios);
+		System.out.println("diff: " + diff);
+	}
+
+
+	//endregion
 
 	@Test
 	public void threeSimpleAccounts() {
