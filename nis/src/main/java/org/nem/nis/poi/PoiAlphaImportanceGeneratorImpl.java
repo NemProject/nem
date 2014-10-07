@@ -15,14 +15,33 @@ import java.util.logging.Logger;
  * 2) POI is calculated by the forager after processing new transactions.
  * This algorithm is not currently iterative, so importances are calculated from scratch every time.
  * I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
+ *
+ * TODO 20141006 J-M: we should probably rename this class
  */
 public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
-
 	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
 
-	public static final int DEFAULT_MAX_ITERATIONS = 2000;
-	public static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
+	private static final int DEFAULT_MAX_ITERATIONS = 2000;
+	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
+	private final boolean useInterLevelMatrix;
 
+	/**
+	 * Creates a new generator with default options.
+	 */
+	public PoiAlphaImportanceGeneratorImpl() {
+		this(true);
+	}
+
+	/**
+	 * Creates a new generator with custom options.
+	 *
+	 * @param useInterLevelMatrix true if the inter-level matrix should be used in the calculation.
+	 */
+	public PoiAlphaImportanceGeneratorImpl(final boolean useInterLevelMatrix) {
+		this.useInterLevelMatrix = useInterLevelMatrix;
+	}
+
+	// TODO 20141006 J-J: i'm not sure if we want to vary the scorer and the clusterer
 	@Override
 	public void updateAccountImportances(
 			final BlockHeight blockHeight,
@@ -35,7 +54,11 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		final PoiScorer scorer = new PoiScorer();
 
 		// (2) run the power iteration algorithm
-		final PowerIterator iterator = new PoiPowerIterator(context, scorer, accountStates.size());
+		final PowerIterator iterator = new PoiPowerIterator(
+				context,
+				scorer,
+				accountStates.size(),
+				this.useInterLevelMatrix);
 
 		final long start = System.currentTimeMillis();
 		iterator.run();
@@ -58,14 +81,19 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 	}
 
 	private static class PoiPowerIterator extends PowerIterator {
-
 		private final PoiContext context;
 		private final PoiScorer scorer;
+		private final boolean useInterLevelMatrix;
 
-		public PoiPowerIterator(final PoiContext context, final PoiScorer scorer, final int numAccounts) {
+		public PoiPowerIterator(
+				final PoiContext context,
+				final PoiScorer scorer,
+				final int numAccounts,
+				final boolean useInterLevelMatrix) {
 			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.scorer = scorer;
+			this.useInterLevelMatrix = useInterLevelMatrix;
 		}
 
 		@Override
@@ -74,9 +102,12 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 			final ColumnVector importancesVector = this.createImportancesVector(prevIterImportances);
 			final ColumnVector interLevelVector = this.createInterLeverVector(prevIterImportances);
 
-			return importancesVector
-					.addElementWise(interLevelVector)
-					.addElementWise(poiAdjustmentVector);
+			ColumnVector resultVector = importancesVector.addElementWise(poiAdjustmentVector);
+			if (this.useInterLevelMatrix) {
+				resultVector = resultVector.addElementWise(interLevelVector);
+			}
+
+			return resultVector;
 		}
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
