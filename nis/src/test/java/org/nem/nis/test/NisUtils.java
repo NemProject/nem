@@ -7,7 +7,8 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dao.*;
-import org.nem.nis.poi.graph.NodeNeighbors;
+import org.nem.nis.poi.*;
+import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.validators.*;
 
@@ -154,7 +155,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a transaction validator factory.
+	 * Creates a (mostly real) transaction validator factory.
 	 *
 	 * @return The factory.
 	 */
@@ -163,7 +164,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a transaction validator factory.
+	 * Creates a (mostly real) transaction validator factory.
 	 *
 	 * @param transferDao The transfer dao.
 	 * @return The factory.
@@ -176,12 +177,21 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a block validator factory.
+	 * Creates a (real) block validator factory.
 	 *
 	 * @return The factory.
 	 */
 	public static BlockValidatorFactory createBlockValidatorFactory() {
 		return new BlockValidatorFactory(new SystemTimeProvider());
+	}
+
+	/**
+	 * Creates a (real) importance calculator
+	 *
+	 * @return The calculator.
+	 */
+	public static ImportanceCalculator createImportanceCalculator() {
+		return new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy());
 	}
 
 	/**

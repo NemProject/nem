@@ -1,7 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.secret.*;
 
 import java.util.*;
@@ -11,9 +11,6 @@ import java.util.stream.Collectors;
  * Account information used by poi.
  */
 public class PoiAccountInfo {
-
-	public static final Amount MIN_HARVESTING_BALANCE = Amount.fromNem(1000);
-
 	private final int index;
 	private final PoiAccountState accountState;
 	private final BlockHeight height;
@@ -78,7 +75,7 @@ public class PoiAccountInfo {
 	 * @return true if the account is eligible.
 	 */
 	public boolean canHarvest() {
-		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(MIN_HARVESTING_BALANCE) >= 0;
+		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(BlockChainConstants.MIN_HARVESTING_BALANCE) >= 0;
 	}
 
 	/**

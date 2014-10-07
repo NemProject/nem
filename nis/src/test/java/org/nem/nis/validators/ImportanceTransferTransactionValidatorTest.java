@@ -11,6 +11,25 @@ import org.nem.nis.poi.*;
 
 public class ImportanceTransferTransactionValidatorTest {
 
+	//region signer balance
+
+	@Test
+	public void activateImportanceTransferIsInvalidWithoutMinimumHarvestingBalanceAfterFee() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		transaction.getSigner().decrementBalance(Amount.fromNem(1));
+
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+	}
+
+	// TODO 20141005 J-G: (minor pedantic comment) - can you keep blanklines around //region //endregion :)
+	//endregion
+
 	//region first link
 
 	@Test
@@ -165,6 +184,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		private Transaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
 			final Account signer = Utils.generateRandomAccount();
+			signer.incrementBalance(Amount.fromNem(1001));
 			this.addRemoteLinks(signer);
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,

@@ -196,7 +196,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 	}
 
 	private PoiFacade createPoiFacade() {
-		return new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		return new PoiFacade(Mockito.mock(ImportanceCalculator.class));
 	}
 
 	private static void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {

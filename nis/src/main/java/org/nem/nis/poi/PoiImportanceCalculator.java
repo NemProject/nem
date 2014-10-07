@@ -15,48 +15,57 @@ import java.util.logging.Logger;
  * 2) POI is calculated by the forager after processing new transactions.
  * This algorithm is not currently iterative, so importances are calculated from scratch every time.
  * I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
- *
- * TODO 20141006 J-M: we should probably rename this class
  */
-public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
-	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
+public class PoiImportanceCalculator implements ImportanceCalculator {
+	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculator.class.getName());
 
 	private static final int DEFAULT_MAX_ITERATIONS = 2000;
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
+
+	private final PoiScorer poiScorer;
+	private final GraphClusteringStrategy clusterer;
 	private final boolean useInterLevelMatrix;
 
 	/**
 	 * Creates a new generator with default options.
+	 *
+	 * @param poiScorer The poi scorer to use.
+	 * @param clusterer The graph clusterer to use.
 	 */
-	public PoiAlphaImportanceGeneratorImpl() {
-		this(true);
+	public PoiImportanceCalculator(
+			final PoiScorer poiScorer,
+			final GraphClusteringStrategy clusterer) {
+		this(poiScorer, clusterer, true);
 	}
 
 	/**
 	 * Creates a new generator with custom options.
 	 *
+	 * @param poiScorer The poi scorer to use.
+	 * @param clusterer The graph clusterer to use.
 	 * @param useInterLevelMatrix true if the inter-level matrix should be used in the calculation.
 	 */
-	public PoiAlphaImportanceGeneratorImpl(final boolean useInterLevelMatrix) {
+	public PoiImportanceCalculator(
+			final PoiScorer poiScorer,
+			final GraphClusteringStrategy clusterer,
+			final boolean useInterLevelMatrix) {
 		this.useInterLevelMatrix = useInterLevelMatrix;
+		this.poiScorer = poiScorer;
+		this.clusterer = clusterer;
 	}
 
-	// TODO 20141006 J-J: i'm not sure if we want to vary the scorer and the clusterer
 	@Override
-	public void updateAccountImportances(
+	public void recalculate(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates,
-			final PoiScorer poiScorer,
-			final GraphClusteringStrategy clusterer) {
+			final Collection<PoiAccountState> accountStates) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accountStates, blockHeight, clusterer);
-		final PoiScorer scorer = new PoiScorer();
+		final PoiContext context = new PoiContext(accountStates, blockHeight, this.clusterer);
 
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(
 				context,
-				scorer,
+				this.poiScorer,
 				accountStates.size(),
 				this.useInterLevelMatrix);
 
@@ -73,7 +82,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 		}
 
 		// (3) merge all sub-scores
-		final ColumnVector importanceVector = scorer.calculateFinalScore(
+		final ColumnVector importanceVector = this.poiScorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutlinkScoreVector(),
 				context.getVestedBalanceVector());
