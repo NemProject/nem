@@ -3,7 +3,7 @@ package org.nem.core.crypto;
 /**
  * Interface for encryption and decryption of data.
  */
-public interface IesCipher {
+public interface BlockCipher {
 
 	/**
 	 * Encrypts an arbitrarily-sized message.

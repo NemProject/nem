@@ -91,13 +91,13 @@ public class CryptoEngines {
 		public KeyGenerator createKeyGenerator();
 
 		/**
-		 * Creates a IES cipher.
+		 * Creates a block cipher.
 		 *
 		 * @param senderKeyPair The sender KeyPair. The sender's private key is required for encryption.
 		 * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
 		 * @return The IES cipher.
 		 */
-		public IesCipher createIesCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair);
+		public BlockCipher createBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair);
 
 		/**
 		 * Creates a key analyzer.

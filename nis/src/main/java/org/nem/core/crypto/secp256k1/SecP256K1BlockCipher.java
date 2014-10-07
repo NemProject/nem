@@ -11,9 +11,9 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.nem.core.crypto.*;
 
 /**
- * Implementation of the IES cipher for SECP256K1.
+ * Implementation of the block cipher for SECP256K1.
  */
-public class SecP256K1IesCipher implements IesCipher {
+public class SecP256K1BlockCipher implements BlockCipher {
 
 	private final static IESParameters IES_PARAMETERS;
 
@@ -26,7 +26,7 @@ public class SecP256K1IesCipher implements IesCipher {
 	private final IESEngine iesEncryptEngine;
 	private final IESEngine iesDecryptEngine;
 
-	public SecP256K1IesCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
+	public SecP256K1BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
 		if (senderKeyPair.hasPrivateKey()) {
 			this.iesEncryptEngine = createIesEngine();
 			this.iesEncryptEngine.init(

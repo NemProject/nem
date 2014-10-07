@@ -33,12 +33,12 @@ public abstract class CryptoEngineTest {
 	}
 
 	@Test
-	public void canCreateIesCipher() {
+	public void canCreateBlockCipher() {
 		// Act:
-		final IesCipher iesCipher = getCryptoEngine().createIesCipher(new KeyPair(), new KeyPair());
+		final BlockCipher blockCipher = getCryptoEngine().createBlockCipher(new KeyPair(), new KeyPair());
 
 		// Assert:
-		Assert.assertThat(iesCipher, IsInstanceOf.instanceOf(IesCipher.class));
+		Assert.assertThat(blockCipher, IsInstanceOf.instanceOf(BlockCipher.class));
 	}
 
 	protected abstract CryptoEngines.CryptoEngine getCryptoEngine();

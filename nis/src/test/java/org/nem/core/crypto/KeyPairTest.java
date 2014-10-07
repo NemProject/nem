@@ -5,8 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.ed25519.Ed25519Engine;
 
-// TODO 20141006 BR: When I run all test at once, it seems there is a problem with tests that use mocks
-// TODO 20141006     interfering with tests that do not use mocks, thus some tests fail. Strange.
+// TODO 20141006 BR: Beware of mocks. Since KeyPairContext mocks a lot, even tests not designed to use mocks will end up with mocks.
 public class KeyPairTest {
 
 	@Test
@@ -119,7 +118,7 @@ public class KeyPairTest {
 			Mockito.when(this.analyzer.isKeyCompressed(Mockito.any())).thenReturn(true);
 			Mockito.when(this.engine.createKeyAnalyzer()).thenReturn(this.analyzer);
 			Mockito.when(this.publicKey.isCompressed()).thenReturn(true);
-			this.keyPair = new KeyPair(null, publicKey);
+			this.keyPair = new KeyPair(privateKey, publicKey);
 			Mockito.when(this.engine.createKeyGenerator()).thenReturn(this.generator);
 			Mockito.when(this.generator.generateKeyPair()).thenReturn(this.keyPair);
 			Mockito.when(this.generator.derivePublicKey(privateKey)).thenReturn(publicKey);

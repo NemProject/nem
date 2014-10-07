@@ -23,8 +23,8 @@ public class Ed25519Engine implements CryptoEngines.CryptoEngine {
 	}
 
 	@Override
-	public IesCipher createIesCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-		return new Ed25519IesCipher(senderKeyPair, recipientKeyPair);
+	public BlockCipher createBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
+		return new Ed25519BlockCipher(senderKeyPair, recipientKeyPair);
 	}
 
 	@Override

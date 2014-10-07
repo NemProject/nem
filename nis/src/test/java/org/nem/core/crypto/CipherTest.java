@@ -1,91 +1,66 @@
 package org.nem.core.crypto;
 
-import org.hamcrest.core.*;
-import org.junit.*;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.nem.core.crypto.ed25519.Ed25519Engine;
 import org.nem.core.test.Utils;
 
 public class CipherTest {
 
 	@Test
-	public void encryptedDataCanBeDecrypted() {
+	public void ctorDelegatesToDefaultEngineCreateBlockCipher() {
 		// Arrange:
-		final KeyPair kp = new KeyPair();
-		final Cipher cipher = new Cipher(kp, kp);
-		final byte[] input = Utils.generateRandomBytes();
+		final CipherContext context = new CipherContext();
 
 		// Act:
-		final byte[] encryptedBytes = cipher.encrypt(input);
-		final byte[] decryptedBytes = cipher.decrypt(encryptedBytes);
+		new Cipher(context.pair1, context.pair2);
 
 		// Assert:
-		Assert.assertThat(encryptedBytes, IsNot.not(IsEqual.equalTo(decryptedBytes)));
-		Assert.assertThat(decryptedBytes, IsEqual.equalTo(input));
+		Mockito.verify(context.engine, Mockito.times(1)).createBlockCipher(context.pair1, context.pair2);
 	}
 
 	@Test
-	public void dataCanBeEncryptedWithSenderPrivateKeyAndRecipientPublicKey() {
+	public void encryptDelegatesToBlockCipher() {
 		// Arrange:
-		final KeyPair skp = new KeyPair();
-		final KeyPair rkp = new KeyPair();
-		final Cipher cipher = new Cipher(skp, new KeyPair(rkp.getPublicKey()));
-		final byte[] input = Utils.generateRandomBytes();
+		final CipherContext context = new CipherContext();
+		final Cipher cipher = new Cipher(context.pair1,context. pair2);
+		final byte[] data = Utils.generateRandomBytes();
 
 		// Act:
-		final byte[] encryptedBytes = cipher.encrypt(input);
+		cipher.encrypt(data);
 
 		// Assert:
-		Assert.assertThat(encryptedBytes, IsNot.not(IsEqual.equalTo(input)));
+		Mockito.verify(context.blockCipher, Mockito.times(1)).encrypt(data);
 	}
 
 	@Test
-	public void dataCanBeDecryptedWithSenderPublicKeyAndRecipientPrivateKey() {
+	public void decryptDelegatesToBlockCipher() {
 		// Arrange:
-		final KeyPair skp = new KeyPair();
-		final KeyPair rkp = new KeyPair();
-		final Cipher cipher1 = new Cipher(skp, new KeyPair(rkp.getPublicKey()));
-		final Cipher cipher2 = new Cipher(new KeyPair(skp.getPublicKey()), rkp);
-		final byte[] input = Utils.generateRandomBytes();
+		final CipherContext context = new CipherContext();
+		final Cipher cipher = new Cipher(context.pair1,context. pair2);
+		final byte[] data = Utils.generateRandomBytes();
 
 		// Act:
-		final byte[] encryptedBytes = cipher1.encrypt(input);
-		final byte[] decryptedBytes = cipher2.decrypt(encryptedBytes);
+		final byte[] encryptedData = cipher.encrypt(data);
+		cipher.decrypt(encryptedData);
 
 		// Assert:
-		Assert.assertThat(decryptedBytes, IsEqual.equalTo(input));
+		Mockito.verify(context.blockCipher, Mockito.times(1)).decrypt(encryptedData);
 	}
 
-	@Test
-	public void dataCanBeDecryptedWithSenderPrivateKeyAndRecipientPublicKey() {
-		// Arrange:
-		final KeyPair skp = new KeyPair();
-		final KeyPair rkp = new KeyPair();
-		final Cipher cipher1 = new Cipher(skp, new KeyPair(rkp.getPublicKey()));
-		final Cipher cipher2 = new Cipher(new KeyPair(rkp.getPublicKey()), skp);
-		final byte[] input = Utils.generateRandomBytes();
+	private class CipherContext {
+		private final Ed25519Engine engine = Mockito.mock(Ed25519Engine.class);
+		private final BlockCipher blockCipher = Mockito.mock(BlockCipher.class);
+		private final KeyPair pair1;
+		private final KeyPair pair2;
 
-		// Act:
-		final byte[] encryptedBytes = cipher1.encrypt(input);
-		final byte[] decryptedBytes = cipher2.decrypt(encryptedBytes);
-
-		// Assert:
-		Assert.assertThat(decryptedBytes, IsEqual.equalTo(input));
-	}
-
-	@Test
-	public void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey() {
-		// Arrange:
-		final Cipher cipher1 = new Cipher(new KeyPair(), new KeyPair());
-		final Cipher cipher2 = new Cipher(new KeyPair(), new KeyPair());
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] encryptedBytes1 = cipher1.encrypt(input);
-		final byte[] encryptedBytes2 = cipher2.encrypt(input);
-
-		// Assert:
-		Assert.assertThat(cipher1.decrypt(encryptedBytes1), IsEqual.equalTo(input));
-		Assert.assertThat(cipher1.decrypt(encryptedBytes2), IsNull.nullValue());
-		Assert.assertThat(cipher2.decrypt(encryptedBytes1), IsNull.nullValue());
-		Assert.assertThat(cipher2.decrypt(encryptedBytes2), IsEqual.equalTo(input));
+		private CipherContext() {
+			CryptoEngines.setDefaultEngine(this.engine);
+			Mockito.when(this.engine.createBlockCipher(Mockito.any(), Mockito.any())).thenReturn(this.blockCipher);
+			Mockito.when(this.engine.createKeyGenerator()).thenCallRealMethod();
+			Mockito.when(this.engine.createKeyAnalyzer()).thenCallRealMethod();
+			this.pair1 = new KeyPair();
+			this.pair2 = new KeyPair();
+		}
 	}
 }

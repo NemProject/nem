@@ -3,7 +3,6 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.ed25519.Ed25519Engine;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -40,25 +39,6 @@ public class PublicKeyTest {
 
 	//endregion
 
-	//region delegation
-
-	@Test
-	public void isCompressedDelegatesToKeyAnalyzer() {
-		final Ed25519Engine engine = Mockito.mock(Ed25519Engine.class);
-		CryptoEngines.setDefaultEngine(engine);
-		final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
-		Mockito.when(engine.createKeyAnalyzer()).thenReturn(analyzer);
-		final PublicKey key = PublicKey.fromHexString("227F");
-
-		// Act:
-		key.isCompressed();
-
-		// Assert:
-		Mockito.verify(analyzer, Mockito.times(1)).isKeyCompressed(key);
-	}
-
-	//endregion
-
 	//region serializer
 
 	@Test
@@ -74,30 +54,6 @@ public class PublicKeyTest {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalKey, null);
 		return new PublicKey(deserializer);
-	}
-
-	//endregion
-
-	//region isCompressed
-
-	@Test
-	public void compressedKeyMustHaveCorrectLength() {
-		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
-		final KeyAnalyzer analyzer = CryptoEngines.getDefaultEngine().createKeyAnalyzer();
-
-		// Assert:
-		Assert.assertThat(analyzer.isKeyCompressed(this.createKeyWithLengthDelta(publicKey, -1)), IsEqual.equalTo(false));
-		Assert.assertThat(analyzer.isKeyCompressed(this.createKeyWithLengthDelta(publicKey, 0)), IsEqual.equalTo(true));
-		Assert.assertThat(analyzer.isKeyCompressed(this.createKeyWithLengthDelta(publicKey, 1)), IsEqual.equalTo(false));
-	}
-
-	private PublicKey createKeyWithLengthDelta(final PublicKey key, final int lengthDelta) {
-		// Arrange:
-		final byte[] modifiedPublicKey = new byte[key.getRaw().length + lengthDelta];
-		final int numBytesToCopy = Math.min(modifiedPublicKey.length, key.getRaw().length);
-		System.arraycopy(key.getRaw(), 0, modifiedPublicKey, 0, numBytesToCopy);
-		return new PublicKey(modifiedPublicKey);
 	}
 
 	//endregion
@@ -135,6 +91,25 @@ public class PublicKeyTest {
 	public void toStringReturnsHexRepresentation() {
 		// Assert:
 		Assert.assertThat(new PublicKey(this.TEST_BYTES).toString(), IsEqual.equalTo("22ab71"));
+	}
+
+	//endregion
+
+	//region delegation
+
+	@Test
+	public void isCompressedDelegatesToKeyAnalyzer() {
+		final CryptoEngines.CryptoEngine engine = Mockito.mock(CryptoEngines.CryptoEngine.class);
+		CryptoEngines.setDefaultEngine(engine);
+		final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
+		Mockito.when(engine.createKeyAnalyzer()).thenReturn(analyzer);
+		final PublicKey key = PublicKey.fromHexString("227F");
+
+		// Act:
+		key.isCompressed();
+
+		// Assert:
+		Mockito.verify(analyzer, Mockito.times(1)).isKeyCompressed(key);
 	}
 
 	//endregion

@@ -11,8 +11,11 @@ public class SignerTest {
 
 	@Test
 	public void canCreateSignerFromKeyPair() {
+		// Arrange:
+		final SignerContext context = new SignerContext();
+
 		// Assert:
-		new Signer(new KeyPair());
+		new Signer(context.keyPair);
 	}
 
 	@Test

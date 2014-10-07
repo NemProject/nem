@@ -6,11 +6,8 @@ import org.nem.core.crypto.*;
 import org.nem.core.crypto.ed25519.arithmetic.MathUtils;
 
 import java.math.BigInteger;
-import java.util.logging.Logger;
 
 public class Ed25519DsaSignerTest extends DsaSignerTest {
-
-	private static final Logger LOGGER = Logger.getLogger(Ed25519DsaSignerTest.class.getName());
 
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
@@ -124,9 +121,9 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 
 		// Assert (should be less than 500 micro seconds per verification on a decent computer):
 		final long timeInMilliSeconds = stop - start;
-		LOGGER.info(String.format("verify needs %d micro seconds.", timeInMilliSeconds / 5));
-
-		Assert.assertThat(timeInMilliSeconds < 2500, IsEqual.equalTo(true));
+		Assert.assertTrue(
+				String.format("verify needs %d micro seconds (expected less than 500 micro seconds).", timeInMilliSeconds / 5),
+				timeInMilliSeconds < 2500);
 	}
 
 	@Override

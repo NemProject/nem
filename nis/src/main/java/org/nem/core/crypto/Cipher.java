@@ -5,7 +5,7 @@ package org.nem.core.crypto;
  */
 public class Cipher {
 
-	private final IesCipher cipher;
+	private final BlockCipher cipher;
 
 	/**
 	 * Creates a cipher around a sender KeyPair and recipient KeyPair.
@@ -14,7 +14,7 @@ public class Cipher {
 	 * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
 	 */
 	public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-		this.cipher = CryptoEngines.getDefaultEngine().createIesCipher(senderKeyPair, recipientKeyPair);
+		this.cipher = CryptoEngines.getDefaultEngine().createBlockCipher(senderKeyPair, recipientKeyPair);
 	}
 
 	/**

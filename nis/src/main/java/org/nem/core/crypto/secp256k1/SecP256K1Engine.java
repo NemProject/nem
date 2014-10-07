@@ -23,8 +23,8 @@ public class SecP256K1Engine implements CryptoEngines.CryptoEngine {
 	}
 
 	@Override
-	public IesCipher createIesCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-		return new SecP256K1IesCipher(senderKeyPair, recipientKeyPair);
+	public BlockCipher createBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
+		return new SecP256K1BlockCipher(senderKeyPair, recipientKeyPair);
 	}
 
 	@Override
