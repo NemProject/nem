@@ -34,6 +34,15 @@ public class Ed25519FieldElement extends FieldElement {
     private static final byte[] ZERO = new byte[32];
 
 	/**
+	 * Gets the underlying int array.
+	 *
+	 * @return The int array.
+	 */
+	public int[] getRaw() {
+		return this.t;
+	}
+
+	/**
 	 * Gets a value indicating whether or not the field element is non-zero.
 	 *
 	 * @return 1 if it is non-zero, 0 otherwise.

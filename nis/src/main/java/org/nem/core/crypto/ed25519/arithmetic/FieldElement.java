@@ -51,4 +51,6 @@ public abstract class FieldElement {
     public abstract FieldElement invert();
 
     public abstract FieldElement pow22523();
+
+	public abstract int[] getRaw();
 }

@@ -1,24 +1,18 @@
 package org.nem.core.crypto.ed25519;
 
 import org.nem.core.crypto.*;
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PrivateKey;
-import org.nem.core.crypto.PublicKey;
 import org.nem.core.crypto.ed25519.arithmetic.GroupElement;
 
-import java.security.*;
-import java.util.Arrays;
+import java.security.SecureRandom;
 
 /**
  * Implementation of the key generator for Ed25519.
  */
 public class Ed25519KeyGenerator implements KeyGenerator {
 	private final SecureRandom random;
-	private final MessageDigest digest;
 
 	public Ed25519KeyGenerator() {
 		this.random = new SecureRandom();
-		this.digest = Hashes.getSha3_512Instance();
 	}
 
 	@Override
@@ -34,24 +28,16 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 
 	@Override
 	public PublicKey derivePublicKey(final PrivateKey privateKey) {
-		// Hash the private key to improve randomness.
-		final byte[] hash = digest.digest(Utils.toByteArray(privateKey.getRaw()));
-
-		// Only the lower 32 bytes are used for calculation of the public key.
-		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
-
-		// Clamp to resist small subgroup attacks.
-		clamp(a);
+		final byte[] a = privateKey.prepareForScalarMultiply();
 
 		// a * base point is the public key.
 		final GroupElement pubKey = Ed25519Constants.basePoint.scalarMultiply(a);
 
-		return new PublicKey(pubKey.toByteArray());
-	}
-
-	private void clamp(byte[] k) {
-		k[31] &= 0x7F;
-		k[31] |= 0x40;
-		k[0] &= 0xF8;
+		return new PublicKey(
+				pubKey.toByteArray(),
+				pubKey.getX().getRaw(),
+				pubKey.getY().getRaw(),
+				pubKey.getZ().getRaw(),
+				pubKey.getT().getRaw());
 	}
 }

@@ -1,9 +1,10 @@
 package org.nem.core.crypto;
 
 import org.nem.core.serialization.*;
-import org.nem.core.utils.HexEncoder;
+import org.nem.core.utils.*;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * Represents a private key.
@@ -90,5 +91,14 @@ public class PrivateKey implements SerializableEntity {
 		} catch (final NumberFormatException e) {
 			throw new CryptoException(e);
 		}
+	}
+
+	public byte[] prepareForScalarMultiply() {
+		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(value, 32));
+		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
+		a[31] &= 0x7F;
+		a[31] |= 0x40;
+		a[0] &= 0xF8;
+		return a;
 	}
 }

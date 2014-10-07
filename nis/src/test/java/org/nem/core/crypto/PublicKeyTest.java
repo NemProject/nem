@@ -95,6 +95,100 @@ public class PublicKeyTest {
 
 	//endregion
 
+	//region projective coordinates
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfXHasWrongLength() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[9], new int[10], new int[10], new int[10]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfXIsNull() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, null, new int[10], new int[10], new int[10]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfYHasWrongLength() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[10], new int[9], new int[10], new int[10]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfYIsNull() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[10], null, new int[10], new int[10]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfZHasWrongLength() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[9], new int[10]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfZIsNull() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[10], new int[10], null, new int[10]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfTHasWrongLength() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[10], new int[9]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfTIsNull() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[10], null);
+	}
+
+	@Test
+	public void canCreatePublicKeyWithProjectiveCoordinatesIfAllParamsAreCorrect() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[10], new int[10]);
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void getXThrowsIfXIsNotSet() {
+		// Arrange:
+		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
+
+		// Assert:
+		pulicKey.getX();
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void getYThrowsIfYIsNotSet() {
+		// Arrange:
+		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
+
+		// Assert:
+		pulicKey.getY();
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void getTThrowsIfZIsNotSet() {
+		// Arrange:
+		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
+
+		// Assert:
+		pulicKey.getZ();
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void getTThrowsIfTIsNotSet() {
+		// Arrange:
+		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
+
+		// Assert:
+		pulicKey.getT();
+	}
+
+	//endregion
+
 	//region delegation
 
 	@Test
