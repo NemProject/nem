@@ -104,7 +104,7 @@ public class AccountImportance implements SerializableEntity {
 		if (null == this.importanceHeight || 0 != this.importanceHeight.compareTo(blockHeight)) {
 			this.importanceHeight = blockHeight;
 			this.importance = importance;
-		} else if (this.importanceHeight.compareTo(blockHeight) != 0) {
+		} else if (0 == this.importanceHeight.compareTo(blockHeight)) {
 			throw new IllegalArgumentException("importance already set at given height");
 		}
 	}

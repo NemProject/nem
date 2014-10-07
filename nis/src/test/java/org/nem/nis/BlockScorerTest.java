@@ -108,7 +108,6 @@ public class BlockScorerTest {
 
 		block.setDifficulty(new BlockDifficulty((long)60E12));
 		context.poiFacade.recalculateImportances(block.getHeight());
-		context.getImportanceInfo(blockSigner).setImportance(block.getHeight(), 1572);
 
 		// Act:
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
