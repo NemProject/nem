@@ -14,3 +14,4 @@ nis-*.log*
 /data/
 /logs/
 *.iml
+poiAnalysisData
