@@ -7,11 +7,14 @@ import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountImportance;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * A POI context.
  */
 public class PoiContext {
+	private static final Logger LOGGER = Logger.getLogger(PoiContext.class.getName());
+
 	private static final double TELEPORTATION_PROB = .75; // For NCDawareRank
 	private static final double INTER_LEVEL_TELEPORTATION_PROB = .1; // For NCDawareRank
 
@@ -295,6 +298,11 @@ public class PoiContext {
 			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
 			this.neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
 			this.clusteringResult = this.clusteringStrategy.cluster(this.neighborhood);
+			LOGGER.info(String.format(
+					"clustering completed: { clusters: %d, hubs: %d, outliers: %d }",
+					this.clusteringResult.getClusters().size(),
+					this.clusteringResult.getHubs().size(),
+					this.clusteringResult.getOutliers().size()));
 		}
 
 		private void buildInterLevelProximityMatrix() {
