@@ -75,7 +75,7 @@ public class PoiAccountInfo {
 	 * @return true if the account is eligible.
 	 */
 	public boolean canHarvest() {
-		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(BlockChainConstants.MIN_FORAGING_BALANCE) >= 0;
+		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(BlockChainConstants.MIN_HARVESTING_BALANCE) >= 0;
 	}
 
 	/**

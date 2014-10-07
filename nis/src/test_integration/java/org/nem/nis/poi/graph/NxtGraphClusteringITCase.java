@@ -8,7 +8,7 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.AccountLink;
+import org.nem.nis.secret.*;
 
 import java.io.*;
 import java.sql.*;
@@ -56,8 +56,11 @@ public class NxtGraphClusteringITCase {
 	@Ignore
 	@Test
 	public void canPrintImportances() throws IOException {
-		final String options = "_" + PoiAccountInfo.MIN_HARVESTING_BALANCE.getNumNem() + "min_" + /*"100MinTrans_0.05transProb_" +*/ GraphConstants.MU + "mu_" +
-				GraphConstants.EPSILON + "epsilon";
+		final String options = String.format(
+				"_%smin_%dmu_%fepsilon",
+				BlockChainConstants.MIN_HARVESTING_BALANCE,
+				GraphConstants.MU,
+				GraphConstants.EPSILON);
 
 		// Arrange
 		final int endHeight = 225000;//was 300k
@@ -203,7 +206,7 @@ public class NxtGraphClusteringITCase {
 			final Map<Address, PoiAccountState> accountStateMap,
 			final BlockHeight height) {
 		return  accountStateMap.values().stream()
-				.filter(acct -> acct.getWeightedBalances().getVested(height).compareTo(PoiAccountInfo.MIN_HARVESTING_BALANCE) > 0)
+				.filter(acct -> acct.getWeightedBalances().getVested(height).compareTo(BlockChainConstants.MIN_HARVESTING_BALANCE) > 0)
 				.collect(Collectors.toList());
 	}
 

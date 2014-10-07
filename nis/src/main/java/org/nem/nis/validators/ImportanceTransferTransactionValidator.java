@@ -50,7 +50,7 @@ public class ImportanceTransferTransactionValidator implements TransactionValida
 
 		switch (transaction.getMode()) {
 			case Activate:
-				if (!predicate.canDebit(transaction.getSigner(), BlockChainConstants.MIN_FORAGING_BALANCE.add(transaction.getFee()))) {
+				if (!predicate.canDebit(transaction.getSigner(), BlockChainConstants.MIN_HARVESTING_BALANCE.add(transaction.getFee()))) {
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 				}
 
