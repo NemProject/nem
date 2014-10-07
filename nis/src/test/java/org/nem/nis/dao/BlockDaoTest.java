@@ -301,6 +301,7 @@ public class BlockDaoTest {
 		Assert.assertThat(h2, equalTo(HashUtils.calculateHash(importanceTransfer2)));
 	}
 
+
 	@Test
 	public void getBlocksForAccountDoesNotRetrieveTransfers() {
 		// Arrange:
@@ -321,6 +322,32 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
 
 		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
+	}
+
+	@Test
+	public void getBlocksForAccountReturnsBlockForagedViaRemoteAccount() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account remoteAccount = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remoteAccount, Utils.generateRandomAccount());
+
+		final List<Hash> hashes = new ArrayList<>();
+		for (int i = 0; i < 30; i++) {
+			final Account blockSigner = (i%2 == 0) ? signer : remoteAccount;
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(blockSigner, 456 + i, 0);
+			if (i%2 == 1) {
+				emptyBlock.setLessor(signer);
+			}
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			hashes.add(dbBlock.getBlockHash());
+
+			// Act:
+			this.blockDao.save(dbBlock);
+		}
+		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(25));
 	}
 
 	@Test
