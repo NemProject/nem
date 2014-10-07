@@ -305,8 +305,8 @@ public class NxtGraphClusteringITCase {
 			final Collection<PoiAccountState> acctStates,
 			final GraphClusteringStrategy clusteringStrategy) {
 
-		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
-		poi.updateAccountImportances(blockHeight, acctStates, new PoiScorer(), clusteringStrategy);
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator();
+		importanceCalculator.updateAccountImportances(blockHeight, acctStates, new PoiScorer(), clusteringStrategy);
 		final List<Double> importances = acctStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());

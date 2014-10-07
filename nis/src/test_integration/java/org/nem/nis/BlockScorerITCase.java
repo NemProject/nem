@@ -684,7 +684,7 @@ public class BlockScorerITCase {
 	//	}
 
 	private static BlockScorer createBlockScorer() {
-		return new BlockScorer(new PoiFacade(new PoiAlphaImportanceGeneratorImpl()));
+		return new BlockScorer(new PoiFacade(new PoiImportanceCalculator()));
 	}
 
 	private static Account createAccountWithBalance(final long balance) {

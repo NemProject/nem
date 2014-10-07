@@ -35,7 +35,7 @@ public class DebugControllerTest {
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(
 				new AccountCache(),
-				new PoiFacade(new PoiAlphaImportanceGeneratorImpl()));
+				new PoiFacade(new PoiImportanceCalculator()));
 		final Account signer1 = addRandomAccountWithBalance(accountAnalyzer);
 		final Account signer2 = addRandomAccountWithBalance(accountAnalyzer);
 

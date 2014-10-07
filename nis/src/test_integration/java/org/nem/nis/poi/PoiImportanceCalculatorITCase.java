@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
  * - small transaction spam attack<br/>
  * -
  */
-public class PoiAlphaImportanceGeneratorImplTest {
-	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImplTest.class.getName());
+public class PoiImportanceCalculatorITCase {
+	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorITCase.class.getName());
 
 	private static final PoiAccountState GENERAL_RECEIVER = createAccountWithBalance(10);
 
@@ -123,8 +123,8 @@ public class PoiAlphaImportanceGeneratorImplTest {
 		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
 
 		final BlockHeight importanceBlockHeight = new BlockHeight(2);
-		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl(useClusteringStrategy);
-		poi.updateAccountImportances(importanceBlockHeight, accountStates, new PoiScorer(), clusteringStrategy);
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(useClusteringStrategy);
+		importanceCalculator.updateAccountImportances(importanceBlockHeight, accountStates, new PoiScorer(), clusteringStrategy);
 		final List<Double> importances = accountStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(importanceBlockHeight))
 				.collect(Collectors.toList());
@@ -728,8 +728,8 @@ public class PoiAlphaImportanceGeneratorImplTest {
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> accounts) {
-		final PoiImportanceGenerator poi = new PoiAlphaImportanceGeneratorImpl();
-		poi.updateAccountImportances(blockHeight, accounts);
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator();
+		importanceCalculator.updateAccountImportances(blockHeight, accounts);
 		final List<Double> importances = accounts.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());

@@ -8,7 +8,7 @@ import java.util.Collection;
 /**
  * Interface for calculating the importance of a collection of accounts at a specific block height.
  */
-public interface PoiImportanceGenerator {
+public interface ImportanceCalculator {
 
 	/**
 	 * Updates the importance scores for the specified accounts.

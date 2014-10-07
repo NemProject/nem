@@ -15,11 +15,9 @@ import java.util.logging.Logger;
  * 2) POI is calculated by the forager after processing new transactions.
  * This algorithm is not currently iterative, so importances are calculated from scratch every time.
  * I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
- *
- * TODO 20141006 J-M: we should probably rename this class
  */
-public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
-	private static final Logger LOGGER = Logger.getLogger(PoiAlphaImportanceGeneratorImpl.class.getName());
+public class PoiImportanceCalculator implements ImportanceCalculator {
+	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculator.class.getName());
 
 	private static final int DEFAULT_MAX_ITERATIONS = 2000;
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
@@ -28,7 +26,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 	/**
 	 * Creates a new generator with default options.
 	 */
-	public PoiAlphaImportanceGeneratorImpl() {
+	public PoiImportanceCalculator() {
 		this(true);
 	}
 
@@ -37,7 +35,7 @@ public class PoiAlphaImportanceGeneratorImpl implements PoiImportanceGenerator {
 	 *
 	 * @param useInterLevelMatrix true if the inter-level matrix should be used in the calculation.
 	 */
-	public PoiAlphaImportanceGeneratorImpl(final boolean useInterLevelMatrix) {
+	public PoiImportanceCalculator(final boolean useInterLevelMatrix) {
 		this.useInterLevelMatrix = useInterLevelMatrix;
 	}
 

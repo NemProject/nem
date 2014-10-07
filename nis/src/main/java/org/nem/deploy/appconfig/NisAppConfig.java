@@ -183,7 +183,7 @@ public class NisAppConfig {
 
 	@Bean
 	public PoiFacade poiFacade() {
-		return new PoiFacade(new PoiAlphaImportanceGeneratorImpl());
+		return new PoiFacade(new PoiImportanceCalculator());
 	}
 
 	@Bean

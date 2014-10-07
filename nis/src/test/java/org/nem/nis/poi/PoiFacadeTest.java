@@ -337,9 +337,9 @@ public class PoiFacadeTest {
 	@Test
 	public void copyDoesNotRecalculateImportancesForSameBlock() {
 		// Arrange:
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		facade.recalculateImportances(new BlockHeight(1234));
 
 		// Act:
@@ -348,7 +348,7 @@ public class PoiFacadeTest {
 		copyFacade.recalculateImportances(new BlockHeight(1234));
 
 		// Assert: updateAccountImportances was only called once because the copy is using the cached result from the original
-		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -404,8 +404,8 @@ public class PoiFacadeTest {
 	@Test
 	public void shallowCopyDoesNotRecalculateImportancesForSameBlock() {
 		// Arrange:
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		facade.recalculateImportances(new BlockHeight(1234));
 
 		// Act:
@@ -415,7 +415,7 @@ public class PoiFacadeTest {
 		facade.recalculateImportances(new BlockHeight(1234));
 
 		// Assert: updateAccountImportances was only called once because the copy is using the cached result from the original
-		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -450,8 +450,8 @@ public class PoiFacadeTest {
 	public void recalculateImportancesDelegatesToImportanceGenerator() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(70);
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -459,7 +459,7 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called once and passed a collection with three accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
@@ -467,8 +467,8 @@ public class PoiFacadeTest {
 	public void recalculateImportancesIgnoresAccountsWithGreaterHeight() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(20);
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -476,7 +476,7 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called once and passed a collection with two accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L)));
 	}
 
@@ -484,8 +484,8 @@ public class PoiFacadeTest {
 	public void recalculateImportancesIgnoresNemesisAccount() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(70);
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 		facade.findStateByAddress(NemesisBlock.ADDRESS);
 
@@ -494,22 +494,22 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called once and passed a collection with three accounts (but not the nemesis account)
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
 	@Test
 	public void recalculateImportancesDoesNotRecalculateImportancesForLastBlockHeight() {
 		// Arrange:
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 
 		// Act:
 		facade.recalculateImportances(new BlockHeight(7));
 		facade.recalculateImportances(new BlockHeight(7));
 
 		// Assert: the generator was only called once
-		Mockito.verify(importanceGenerator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -517,9 +517,9 @@ public class PoiFacadeTest {
 		// Arrange:
 		final int height1 = 70;
 		final int height2 = 80;
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -528,7 +528,7 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called twice and passed a collection with three accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceGenerator, Mockito.times(2)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(2)).updateAccountImportances(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
@@ -536,9 +536,9 @@ public class PoiFacadeTest {
 	public void recalculateImportancesUpdatesLastPoiVectorSize() {
 		// Arrange:
 		final int height1 = 70;
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -552,9 +552,9 @@ public class PoiFacadeTest {
 	public void recalculateImportancesUpdatesLastPoiRecalculationHeight() {
 		// Arrange:
 		final int height1 = 70;
-		final PoiImportanceGenerator importanceGenerator = Mockito.mock(PoiImportanceGenerator.class);
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceGenerator);
+		final PoiFacade facade = new PoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -648,6 +648,6 @@ public class PoiFacadeTest {
 	//endregion
 
 	private static PoiFacade createPoiFacade() {
-		return new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		return new PoiFacade(Mockito.mock(ImportanceCalculator.class));
 	}
 }

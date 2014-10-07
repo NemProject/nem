@@ -13,17 +13,17 @@ import java.util.stream.Collectors;
  */
 public class PoiFacade implements Iterable<PoiAccountState> {
 	private final Map<Address, PoiAccountState> addressToStateMap = new ConcurrentHashMap<>();
-	private final PoiImportanceGenerator importanceGenerator;
+	private final ImportanceCalculator importanceCalculator;
 	private BlockHeight lastPoiRecalculationHeight;
 	private int lastPoiVectorSize;
 
 	/**
 	 * Creates a new poi facade.
 	 *
-	 * @param importanceGenerator The importance generator to use.
+	 * @param importanceCalculator The importance calculator to use.
 	 */
-	public PoiFacade(final PoiImportanceGenerator importanceGenerator) {
-		this.importanceGenerator = importanceGenerator;
+	public PoiFacade(final ImportanceCalculator importanceCalculator) {
+		this.importanceCalculator = importanceCalculator;
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 
 		final Collection<PoiAccountState> accountStates = this.getAccountStates(blockHeight);
 		this.lastPoiVectorSize = accountStates.size();
-		this.importanceGenerator.updateAccountImportances(blockHeight, accountStates);
+		this.importanceCalculator.updateAccountImportances(blockHeight, accountStates);
 		this.lastPoiRecalculationHeight = blockHeight;
 	}
 
@@ -200,7 +200,7 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 	 * @return A copy of this repository.
 	 */
 	public PoiFacade copy() {
-		final PoiFacade copy = new PoiFacade(this.importanceGenerator);
+		final PoiFacade copy = new PoiFacade(this.importanceCalculator);
 		for (final Map.Entry<Address, PoiAccountState> entry : this.addressToStateMap.entrySet()) {
 			copy.addressToStateMap.put(entry.getKey(), entry.getValue().copy());
 		}
