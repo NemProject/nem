@@ -7,6 +7,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.*;
+import org.nem.deploy.NisConfiguration;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
@@ -114,7 +115,6 @@ public class UnlockedAccountsTest {
 	//endregion
 
 	//region iterator
-
 	@Test
 	public void canIterateOverAllUnlockedAccounts() {
 		// Arrange:
@@ -142,11 +142,71 @@ public class UnlockedAccountsTest {
 
 	//endregion
 
+	//region unlockedLimit
+	@Test
+	public void cannotUnlockMoreThanLimitAccounts() {
+		final TestContext context = new TestContext();
+		final List<Account> accounts = new ArrayList<>();
+		for (int i = 0; i < 4; ++i) {
+			final Account account = Utils.generateRandomAccount();
+			context.setKnownAddress(account, true);
+			context.setCanForageAtHeight(account, 17, true);
+			accounts.add(account);
+		}
+
+		// TODO 20141005 J-G comment is wrong :)
+		// > while i am usually against combining Act and Assert
+		// > there might be some benefit to validating the result of every addUnlockedAccount
+		// Act: unlock three accounts and then lock the second one
+		context.unlockedAccounts.addUnlockedAccount(accounts.get(0));
+		context.unlockedAccounts.addUnlockedAccount(accounts.get(1));
+		context.unlockedAccounts.addUnlockedAccount(accounts.get(2));
+		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(accounts.get(3));
+
+		// Assert:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(3));
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_SERVER_LIMIT));
+	}
+
+	@Test
+	public void canUnlockIfBelowServerLimit() {
+		final TestContext context = new TestContext();
+		final List<Account> accounts = new ArrayList<>();
+		for (int i = 0; i < 4; ++i) {
+			final Account account = Utils.generateRandomAccount();
+			context.setKnownAddress(account, true);
+			context.setCanForageAtHeight(account, 17, true);
+			accounts.add(account);
+		}
+
+		// Act: unlock three accounts and then lock the second one
+		context.unlockedAccounts.addUnlockedAccount(accounts.get(0));
+		context.unlockedAccounts.addUnlockedAccount(accounts.get(1));
+		context.unlockedAccounts.addUnlockedAccount(accounts.get(2));
+
+		// this should fail
+		context.unlockedAccounts.addUnlockedAccount(accounts.get(3));
+		context.unlockedAccounts.removeUnlockedAccount(accounts.get(2));
+		// this should succeed
+		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(accounts.get(3));
+
+		// Assert:
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(3));
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
+	}
+	//endregion
+
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(this.accountLookup, this.poiFacade, this.lastBlockLayer);
+		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
+		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(this.accountLookup, this.poiFacade, this.lastBlockLayer, this.nisConfiguration);
+
+		public TestContext() {
+			// TODO 20141005 J-G can you use a class constant for 3 e.g. TEST_SERVER_LIMIT ... i think it will make the tests a little clearer
+			Mockito.when(this.nisConfiguration.getUnlockedLimit()).thenReturn(3);
+		}
 
 		private void setKnownAddress(final Account account, final boolean isKnown) {
 			Mockito.when(this.accountLookup.isKnownAddress(account.getAddress())).thenReturn(isKnown);

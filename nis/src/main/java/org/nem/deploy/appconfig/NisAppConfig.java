@@ -193,7 +193,7 @@ public class NisAppConfig {
 
 	@Bean
 	public UnlockedAccounts unlockedAccounts() {
-		return new UnlockedAccounts(this.accountCache(), this.poiFacade(), this.blockChainLastBlockLayer);
+		return new UnlockedAccounts(this.accountCache(), this.poiFacade(), this.blockChainLastBlockLayer, this.nisConfiguration());
 	}
 
 	@Bean

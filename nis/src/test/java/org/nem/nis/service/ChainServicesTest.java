@@ -10,7 +10,9 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.peer.connect.*;
 import org.nem.peer.test.WeakNodeIdentity;
 
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
 public class ChainServicesTest {
 
@@ -52,65 +54,101 @@ public class ChainServicesTest {
 
 	@Test
 	public void getMaxChainHeightAsyncReturnsMaxHeightOnSuccess() {
+		// Assert:
+		assertGetMaxChainHeightAsyncReturnsMaxHeightOnSuccess((context, nodes) -> {
+			final Node node = context.createNode("test");
+			return context.services.getMaxChainHeightAsync(node);
+		});
+	}
+
+	@Test
+	public void getMaxChainHeightAsyncNodeCollectionOverloadReturnsMaxHeightOnSuccess() {
+		// Assert:
+		assertGetMaxChainHeightAsyncReturnsMaxHeightOnSuccess((context, nodes) -> context.services.getMaxChainHeightAsync(nodes));
+	}
+
+	private static void assertGetMaxChainHeightAsyncReturnsMaxHeightOnSuccess(
+			final BiFunction<TestContext, Collection<Node>, CompletableFuture<BlockHeight>> getMaxChainHeightAsync) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Node node = context.createNode("test");
 		context.setChainHeightForNode(context.nodes.get(0), createBlockHeightFuture(10));
 		context.setChainHeightForNode(context.nodes.get(1), createBlockHeightFuture(30));
 		context.setChainHeightForNode(context.nodes.get(2), createBlockHeightFuture(20));
 
 		// Act:
-		final BlockHeight maxBlockHeight = context.services.getMaxChainHeightAsync(node).join();
+		final BlockHeight maxBlockHeight = getMaxChainHeightAsync.apply(context, context.nodes.asCollection()).join();
 
 		// Assert:
 		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
 
 		context.verifyNumChainHeightRequests(3);
-		for (final Node peerNode : context.nodes.asCollection()) {
-			context.verifySingleChainHeightRequest(peerNode);
-		}
+		context.nodes.asCollection().forEach(context::verifySingleChainHeightRequest);
 	}
 
 	@Test
 	public void getMaxChainHeightAsyncIgnoresFailedNodes() {
+		// Assert:
+		assertGetMaxChainHeightAsyncIgnoresFailedNodes((context, nodes) -> {
+			final Node node = context.createNode("test");
+			return context.services.getMaxChainHeightAsync(node);
+		});
+	}
+
+	@Test
+	public void getMaxChainHeightAsyncNodeCollectionOverloadIgnoresFailedNodes() {
+		// Assert:
+		assertGetMaxChainHeightAsyncIgnoresFailedNodes((context, nodes) -> context.services.getMaxChainHeightAsync(nodes));
+	}
+
+	private static void assertGetMaxChainHeightAsyncIgnoresFailedNodes(
+			final BiFunction<TestContext, Collection<Node>, CompletableFuture<BlockHeight>> getMaxChainHeightAsync) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Node node = context.createNode("test");
 		context.setChainHeightForNode(context.nodes.get(0), createExceptionalFuture());
 		context.setChainHeightForNode(context.nodes.get(1), createBlockHeightFuture(30));
 		context.setChainHeightForNode(context.nodes.get(2), createExceptionalFuture());
 
 		// Act:
-		final BlockHeight maxBlockHeight = context.services.getMaxChainHeightAsync(node).join();
+		final BlockHeight maxBlockHeight = getMaxChainHeightAsync.apply(context, context.nodes.asCollection()).join();
 
 		// Assert:
 		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(new BlockHeight(30)));
 
 		context.verifyNumChainHeightRequests(3);
-		for (final Node peerNode : context.nodes.asCollection()) {
-			context.verifySingleChainHeightRequest(peerNode);
-		}
+		context.nodes.asCollection().forEach(context::verifySingleChainHeightRequest);
 	}
 
 	@Test
 	public void getMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail() {
+		// Assert:
+		assertGetMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail((context, nodes) -> {
+			final Node node = context.createNode("test");
+			return context.services.getMaxChainHeightAsync(node);
+		});
+	}
+
+	@Test
+	public void getMaxChainHeightAsyncNodeCollectionOverloadReturnsBlockHeightOneIfAllNodesFail() {
+		// Assert:
+		assertGetMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail((context, nodes) -> context.services.getMaxChainHeightAsync(nodes));
+	}
+
+	private static void assertGetMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail(
+			final BiFunction<TestContext, Collection<Node>, CompletableFuture<BlockHeight>> getMaxChainHeightAsync) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Node node = context.createNode("test");
 		context.setChainHeightForNode(context.nodes.get(0), createExceptionalFuture());
 		context.setChainHeightForNode(context.nodes.get(1), createExceptionalFuture());
 		context.setChainHeightForNode(context.nodes.get(2), createExceptionalFuture());
 
 		// Act:
-		final BlockHeight maxBlockHeight = context.services.getMaxChainHeightAsync(node).join();
+		final BlockHeight maxBlockHeight = getMaxChainHeightAsync.apply(context, context.nodes.asCollection()).join();
 
 		// Assert:
 		Assert.assertThat(maxBlockHeight, IsEqual.equalTo(BlockHeight.ONE));
 
 		context.verifyNumChainHeightRequests(3);
-		for (final Node peerNode : context.nodes.asCollection()) {
-			context.verifySingleChainHeightRequest(peerNode);
-		}
+		context.nodes.asCollection().forEach(context::verifySingleChainHeightRequest);
 	}
 
 	// endregion
@@ -156,7 +194,7 @@ public class ChainServicesTest {
 		return CompletableFuture.completedFuture(new BlockHeight(height));
 	}
 
-	private class TestContext {
+	private static class TestContext {
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final HttpConnectorPool connectorPool = Mockito.mock(HttpConnectorPool.class);
 		private final HttpConnector connector = Mockito.mock(HttpConnector.class);

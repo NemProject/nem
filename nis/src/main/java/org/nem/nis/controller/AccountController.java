@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
@@ -25,6 +26,7 @@ public class AccountController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
 	private final PoiFacade poiFacade;
 
@@ -33,14 +35,18 @@ public class AccountController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
 			final PoiFacade poiFacade) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 		this.poiFacade = poiFacade;
 	}
+
+	// TODO 20141005 J-G: can we move account/get and account/status to a new controller (i think this class has too many dependencies) (e.g. AccountInfoController)
 
 	/**
 	 * Gets information about an account.
@@ -51,10 +57,20 @@ public class AccountController {
 	@RequestMapping(value = "/account/get", method = RequestMethod.GET)
 	@ClientApi
 	public AccountMetaDataPair accountGet(final AccountIdBuilder builder) {
+		// TODO 20141005 J-G: yea, i think it should be easy to move remote status from info to metadata
+		// > everything we need is here ;)
 		final Address address = builder.build().getAddress();
-		final AccountInfo account = this.accountInfoFactory.createInfo(address);
+		final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
+		final AccountInfo account = this.accountInfoFactory.createInfo(address, new BlockHeight(height));
 		final AccountMetaData metaData = new AccountMetaData(this.getAccountStatus(address));
 		return new AccountMetaDataPair(account, metaData);
+	}
+
+	@RequestMapping(value = "/account/status", method = RequestMethod.GET)
+	@ClientApi
+	public AccountMetaData accountStatus(final AccountIdBuilder builder) {
+		final Address address = builder.build().getAddress();
+		return new AccountMetaData(getAccountStatus(address));
 	}
 
 	private AccountStatus getAccountStatus(final Address address) {

@@ -1,19 +1,23 @@
 package org.nem.core.model.ncc;
 
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 
 /**
  * Represents an external view of an account.
+ * TODO 20141005 J-G: i think remote status makes more sense in AccountMetaData, there is more information in my other comments
+ * > i just tend to comment in random order :)
  */
 public class AccountInfo implements SerializableEntity {
 	private final Address address;
 	private final KeyPair keyPair;
 	private final Amount balance;
 	private final BlockAmount numForagedBlocks;
+	private final AccountRemoteStatus remoteStatus;
 	private final String label;
+
 	private final double importance;
 
 	/**
@@ -22,6 +26,7 @@ public class AccountInfo implements SerializableEntity {
 	 * @param address The address.
 	 * @param balance The balance.
 	 * @param numForagedBlocks The number of foraged blocks.
+	 * @param remoteStatus The remote status.
 	 * @param label The label.
 	 * @param importance The importance.
 	 */
@@ -29,12 +34,14 @@ public class AccountInfo implements SerializableEntity {
 			final Address address,
 			final Amount balance,
 			final BlockAmount numForagedBlocks,
+			final AccountRemoteStatus remoteStatus,
 			final String label,
 			final double importance) {
 		this.address = address;
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = balance;
 		this.numForagedBlocks = numForagedBlocks;
+		this.remoteStatus = remoteStatus;
 		this.label = label;
 		this.importance = importance;
 	}
@@ -49,6 +56,7 @@ public class AccountInfo implements SerializableEntity {
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = Amount.readFrom(deserializer, "balance");
 		this.numForagedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
+		this.remoteStatus = AccountRemoteStatus.readFrom(deserializer, "remoteStatus");
 		this.label = deserializer.readOptionalString("label");
 		this.importance = deserializer.readDouble("importance");
 	}
@@ -96,6 +104,15 @@ public class AccountInfo implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the remote account status
+	 *
+	 * @return The remote account status.
+	 */
+	public AccountRemoteStatus getRemoteStatus() {
+		return this.remoteStatus;
+	}
+
+	/**
 	 * Gets the account's label.
 	 *
 	 * @return The account's label.
@@ -120,6 +137,7 @@ public class AccountInfo implements SerializableEntity {
 
 		Amount.writeTo(serializer, "balance", this.getBalance());
 		BlockAmount.writeTo(serializer, "foragedBlocks", this.getNumForagedBlocks());
+		AccountRemoteStatus.writeTo(serializer, "remoteStatus", this.getRemoteStatus());
 		serializer.writeString("label", this.getLabel());
 
 		serializer.writeDouble("importance", this.getImportance());
