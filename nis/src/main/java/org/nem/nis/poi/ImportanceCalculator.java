@@ -11,28 +11,12 @@ import java.util.Collection;
 public interface ImportanceCalculator {
 
 	/**
-	 * Updates the importance scores for the specified accounts.
+	 * Recalculates the importance scores for the specified accounts.
 	 *
 	 * @param blockHeight The block height.
 	 * @param accountStates The account states.
 	 */
-	public default void updateAccountImportances(
+	public void recalculate(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates) {
-		this.updateAccountImportances(blockHeight, accountStates, new PoiScorer(), new FastScanClusteringStrategy());
-	}
-
-	/**
-	 * Updates the importance scores for the specified accounts.
-	 *
-	 * @param blockHeight The block height.
-	 * @param accountStates The account states.
-	 * @param poiScorer The poi scorer.
-	 * @param clusterer The clustering strategy.
-	 */
-	public void updateAccountImportances(
-			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates,
-			final PoiScorer poiScorer,
-			final GraphClusteringStrategy clusterer);
+			final Collection<PoiAccountState> accountStates);
 }

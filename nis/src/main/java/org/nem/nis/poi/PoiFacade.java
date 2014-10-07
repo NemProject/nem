@@ -178,7 +178,7 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 
 		final Collection<PoiAccountState> accountStates = this.getAccountStates(blockHeight);
 		this.lastPoiVectorSize = accountStates.size();
-		this.importanceCalculator.updateAccountImportances(blockHeight, accountStates);
+		this.importanceCalculator.recalculate(blockHeight, accountStates);
 		this.lastPoiRecalculationHeight = blockHeight;
 	}
 

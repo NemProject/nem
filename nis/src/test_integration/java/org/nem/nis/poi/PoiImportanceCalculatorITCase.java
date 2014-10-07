@@ -123,8 +123,8 @@ public class PoiImportanceCalculatorITCase {
 		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
 
 		final BlockHeight importanceBlockHeight = new BlockHeight(2);
-		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(useClusteringStrategy);
-		importanceCalculator.updateAccountImportances(importanceBlockHeight, accountStates, new PoiScorer(), clusteringStrategy);
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(new PoiScorer(), clusteringStrategy, useClusteringStrategy);
+		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		final List<Double> importances = accountStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(importanceBlockHeight))
 				.collect(Collectors.toList());
@@ -728,8 +728,8 @@ public class PoiImportanceCalculatorITCase {
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> accounts) {
-		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator();
-		importanceCalculator.updateAccountImportances(blockHeight, accounts);
+		final ImportanceCalculator importanceCalculator = NisUtils.createImportanceCalculator();
+		importanceCalculator.recalculate(blockHeight, accounts);
 		final List<Double> importances = accounts.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());

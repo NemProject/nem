@@ -347,8 +347,8 @@ public class PoiFacadeTest {
 
 		copyFacade.recalculateImportances(new BlockHeight(1234));
 
-		// Assert: updateAccountImportances was only called once because the copy is using the cached result from the original
-		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
+		// Assert: recalculate was only called once because the copy is using the cached result from the original
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -414,8 +414,8 @@ public class PoiFacadeTest {
 
 		facade.recalculateImportances(new BlockHeight(1234));
 
-		// Assert: updateAccountImportances was only called once because the copy is using the cached result from the original
-		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
+		// Assert: recalculate was only called once because the copy is using the cached result from the original
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -459,7 +459,7 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called once and passed a collection with three accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
@@ -476,7 +476,7 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called once and passed a collection with two accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L)));
 	}
 
@@ -494,7 +494,7 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called once and passed a collection with three accounts (but not the nemesis account)
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
@@ -509,7 +509,7 @@ public class PoiFacadeTest {
 		facade.recalculateImportances(new BlockHeight(7));
 
 		// Assert: the generator was only called once
-		Mockito.verify(importanceCalculator, Mockito.times(1)).updateAccountImportances(Mockito.any(), Mockito.any());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -528,7 +528,7 @@ public class PoiFacadeTest {
 
 		// Assert: the generator was called twice and passed a collection with three accounts
 		final ArgumentCaptor<Collection<PoiAccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceCalculator, Mockito.times(2)).updateAccountImportances(Mockito.any(), argument.capture());
+		Mockito.verify(importanceCalculator, Mockito.times(2)).recalculate(Mockito.any(), argument.capture());
 		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
 	}
 
