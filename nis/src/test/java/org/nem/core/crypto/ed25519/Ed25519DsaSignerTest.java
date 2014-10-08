@@ -114,17 +114,17 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 
 		// Act:
 		final long start = System.currentTimeMillis();
-		for (int i=0; i<5000; i++) {
+		for (int i=0; i<10000; i++) {
 			dsaSigner.verify(input, signature);
 		}
 		final long stop = System.currentTimeMillis();
 
 		// Assert (should be less than 500 micro seconds per verification on a decent computer):
 		final long timeInMilliSeconds = stop - start;
-		System.out.println(String.format("verify needs %d micro seconds.", timeInMilliSeconds / 5));
+		System.out.println(String.format("verify needs %d micro seconds.", timeInMilliSeconds / 10));
 		Assert.assertTrue(
-				String.format("verify needs %d micro seconds (expected less than 500 micro seconds).", timeInMilliSeconds / 5),
-				timeInMilliSeconds < 2500);
+				String.format("verify needs %d micro seconds (expected less than 500 micro seconds).", timeInMilliSeconds / 10),
+				timeInMilliSeconds < 5000);
 	}
 
 	@Override

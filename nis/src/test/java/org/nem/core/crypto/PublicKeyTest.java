@@ -3,6 +3,8 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.crypto.ed25519.Ed25519Constants;
+import org.nem.core.crypto.ed25519.arithmetic.GroupElement;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -10,6 +12,7 @@ public class PublicKeyTest {
 
 	private final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
 	private final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
+	private static final GroupElement A = getA(true);
 
 	//region constructors / factories
 
@@ -95,96 +98,24 @@ public class PublicKeyTest {
 
 	//endregion
 
-	//region projective coordinates
+	//region group element A
 
 	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfXHasWrongLength() {
+	public void ctorWithProjectiveCoordinatesThrowsIfAIsNull() {
 		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[9], new int[10], new int[10], new int[10]);
+		new PublicKey(this.TEST_BYTES, null);
 	}
 
 	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfXIsNull() {
+	public void ctorWithProjectiveCoordinatesThrowsIfAIsNotPrecomputed() {
 		// Assert:
-		new PublicKey(this.TEST_BYTES, null, new int[10], new int[10], new int[10]);
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfYHasWrongLength() {
-		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[10], new int[9], new int[10], new int[10]);
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfYIsNull() {
-		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[10], null, new int[10], new int[10]);
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfZHasWrongLength() {
-		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[9], new int[10]);
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfZIsNull() {
-		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[10], new int[10], null, new int[10]);
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfTHasWrongLength() {
-		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[10], new int[9]);
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void ctorWithProjectiveCoordinatesThrowsIfTIsNull() {
-		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[10], null);
+		new PublicKey(this.TEST_BYTES, getA(false));
 	}
 
 	@Test
 	public void canCreatePublicKeyWithProjectiveCoordinatesIfAllParamsAreCorrect() {
 		// Assert:
-		new PublicKey(this.TEST_BYTES, new int[10], new int[10], new int[10], new int[10]);
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void getXThrowsIfXIsNotSet() {
-		// Arrange:
-		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
-
-		// Assert:
-		pulicKey.getX();
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void getYThrowsIfYIsNotSet() {
-		// Arrange:
-		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
-
-		// Assert:
-		pulicKey.getY();
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void getTThrowsIfZIsNotSet() {
-		// Arrange:
-		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
-
-		// Assert:
-		pulicKey.getZ();
-	}
-
-	@Test (expected = RuntimeException.class)
-	public void getTThrowsIfTIsNotSet() {
-		// Arrange:
-		final PublicKey pulicKey = new PublicKey(this.TEST_BYTES);
-
-		// Assert:
-		pulicKey.getT();
+		new PublicKey(this.TEST_BYTES, A);
 	}
 
 	//endregion
@@ -207,4 +138,18 @@ public class PublicKeyTest {
 	}
 
 	//endregion
+
+	private static GroupElement getA(boolean precompute) {
+		GroupElement A = GroupElement.p3(
+				Ed25519Constants.curve,
+				Ed25519Constants.curve.getField().ZERO,
+				Ed25519Constants.curve.getField().ONE,
+				Ed25519Constants.curve.getField().ONE,
+				Ed25519Constants.curve.getField().ZERO);
+		if (precompute) {
+			A.precompute(false);
+		}
+
+		return A;
+	}
 }

@@ -88,19 +88,16 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// hReduced = h mode group order
 		final byte[] hReduced = this.scalarOps.reduce(h);
 
-		final Field field = Ed25519Constants.curve.getField();
-		final GroupElement minusA = GroupElement.p3(
-				Ed25519Constants.curve,
-				new Ed25519FieldElement(field, this.keyPair.getPublicKey().getX()),
-				new Ed25519FieldElement(field, this.keyPair.getPublicKey().getY()),
-				new Ed25519FieldElement(field, this.keyPair.getPublicKey().getZ()),
-				new Ed25519FieldElement(field, this.keyPair.getPublicKey().getT())
-				).negate();
-		minusA.precompute(false);
+		GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
+		if (null == A) {
+			// Must compute A.
+			A = new GroupElement(Ed25519Constants.curve, encodedA);
+			A.precompute(false);
+		}
 
-		// R = encodedS * B + H(encodedR, encodedA, data) * minusA
+		// R = encodedS * B - H(encodedR, encodedA, data) * A
 		final GroupElement calculatedR = Ed25519Constants.basePoint.doubleScalarMultiplyVariableTime(
-				minusA, hReduced, signature.getBinaryS());
+				A, hReduced, signature.getBinaryS());
 
 		// Compare calculated R to given R.
 		final byte[] encodedCalculatedR = calculatedR.toByteArray();

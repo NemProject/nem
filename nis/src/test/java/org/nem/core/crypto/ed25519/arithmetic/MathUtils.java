@@ -390,7 +390,7 @@ public class MathUtils {
 	}
 
 	/**
-	 * Calculates f1 * g1 + f2 * g2.
+	 * Calculates f1 * g1 - f2 * g2.
 	 *
 	 * @param g1 The first group element.
 	 * @param f1 The first multiplier.
@@ -405,7 +405,7 @@ public class MathUtils {
 			final FieldElement f2) {
 		final GroupElement h1 = scalarMultiplyGroupElement(g1, f1);
 		final GroupElement h2 = scalarMultiplyGroupElement(g2, f2);
-		return addGroupElements(h1, h2);
+		return addGroupElements(h1, h2.negate());
 	}
 
 	/**

@@ -325,6 +325,16 @@ public class GroupElement implements Serializable {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the group element has a
+	 * precomputed table for double scalar multiplication.
+	 *
+	 * @return true if it has the table, false otherwise.
+	 */
+	public boolean isPrecomputedForDoubleScalarMultiplication() {
+		return null != this.dblPrecmp;
+	}
+
+	/**
 	 * Converts the group element to an encoded point on the curve.
 	 *
 	 * @return The encoded point as byte array.
@@ -435,7 +445,58 @@ public class GroupElement implements Serializable {
         }
     }
 
-    /**
+	/**
+	 * Precomputes and returns the group elements for a scalar multiplication as array.
+	 *
+	 * @param curve The curve.
+	 * @param g The given group element.
+	 * @return The precomputed array.
+	 */
+	public static GroupElement[][] precomputeForScalarMultiplication(final Curve curve, final GroupElement g) {
+		GroupElement Bi = g;
+		GroupElement[][] precomputed = new GroupElement[32][8];
+
+		for (int i = 0; i < 32; i++) {
+			GroupElement Bij = Bi;
+			for (int j = 0; j < 8; j++) {
+				final FieldElement recip = Bij.Z.invert();
+				final FieldElement x = Bij.X.multiply(recip);
+				final FieldElement y = Bij.Y.multiply(recip);
+				precomputed[i][j] = precomp(curve, y.add(x), y.subtract(x), x.multiply(y).multiply(curve.get2D()));
+				Bij = Bij.add(Bi.toCached()).toP3();
+			}
+			// Only every second summand is precomputed (16^2 = 256).
+			for (int k = 0; k < 8; k++) {
+				Bi = Bi.add(Bi.toCached()).toP3();
+			}
+		}
+
+		return precomputed;
+	}
+
+	/**
+	 * Precomputes and returns the group elements for a double scalar multiplication as array.
+	 *
+	 * @param curve The curve.
+	 * @param g The given group element.
+	 * @return The precomputed array.
+	 */
+	public static GroupElement[] precomputeForDoubleScalarMultiplication(final Curve curve, final GroupElement g) {
+		GroupElement Bi = g;
+		GroupElement[] precomputed = new GroupElement[8];
+		for (int i = 0; i < 8; i++) {
+			final FieldElement recip = Bi.Z.invert();
+			final FieldElement x = Bi.X.multiply(recip);
+			final FieldElement y = Bi.Y.multiply(recip);
+			precomputed[i] = precomp(curve, y.add(x), y.subtract(x), x.multiply(y).multiply(curve.get2D()));
+			// Bi = edwards(B,edwards(B,Bi))
+			Bi = g.add(g.add(Bi.toCached()).toP3().toCached()).toP3();
+		}
+
+		return precomputed;
+	}
+
+	/**
 	 * Precompute the tables for {@link GroupElement#scalarMultiply(byte[])}
      * and {@link GroupElement#doubleScalarMultiplyVariableTime(GroupElement, byte[], byte[])}.
      *
@@ -919,7 +980,7 @@ public class GroupElement implements Serializable {
     }
 
     /**
-     * r = a * A + b * B where a = a[0]+256*a[1]+...+256^31 a[31],
+     * r = b * B - a * A  where a = a[0]+256*a[1]+...+256^31 a[31],
      * b = b[0]+256*b[1]+...+256^31 b[31] and B is this point.
      *
      * A must have been previously precomputed.
@@ -951,20 +1012,31 @@ public class GroupElement implements Serializable {
                 GroupElement t = r.dbl();
 
                 if (aslide[i] > 0) {
-                    t = t.toP3().madd(A.dblPrecmp[aslide[i]/2]);
+                    t = t.toP3().msub(A.dblPrecmp[aslide[i]/2]);
                 } else if(aslide[i] < 0) {
-                    t = t.toP3().msub(A.dblPrecmp[(-aslide[i])/2]);
+                    t = t.toP3().madd(A.dblPrecmp[(-aslide[i])/2]);
                 }
 
                 if (bslide[i] > 0) {
-                    t = t.toP3().madd(this.dblPrecmp[bslide[i]/2]);
+                    t = t.toP3().madd(Ed25519PrecomputedTable.precomputedForDouble[bslide[i]/2]);
                 } else if(bslide[i] < 0) {
-                    t = t.toP3().msub(this.dblPrecmp[(-bslide[i])/2]);
+                    t = t.toP3().msub(Ed25519PrecomputedTable.precomputedForDouble[(-bslide[i])/2]);
                 }
 
                 r = t.toP2();
             }
         }
+		/*if (aslide[i] > 0) {
+			t = t.toP3().madd(A.dblPrecmp[aslide[i]/2]);
+		} else if(aslide[i] < 0) {
+			t = t.toP3().msub(A.dblPrecmp[(-aslide[i])/2]);
+		}
+
+		if (bslide[i] > 0) {
+			t = t.toP3().madd(this.dblPrecmp[bslide[i]/2]);
+		} else if(bslide[i] < 0) {
+			t = t.toP3().msub(this.dblPrecmp[(-bslide[i])/2]);
+		}*/
 
         return r;
     }

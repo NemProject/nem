@@ -468,7 +468,8 @@ public class GroupElementTest {
 		for (int i = 0; i < 32; i++) {
 			GroupElement h = g;
 			for (int j = 0; j < 8; j++) {
-				Assert.assertThat(MathUtils.toRepresentation(h, GroupElement.Representation.PRECOMP), IsEqual.equalTo(ed25519.getB().precmp[i][j]));
+				Assert.assertThat(MathUtils.toRepresentation(h, GroupElement.Representation.PRECOMP),
+						IsEqual.equalTo(Ed25519PrecomputedTable.precomputedForSingle[i][j]));
 				h = MathUtils.addGroupElements(h, g);
 			}
 			for (int k = 0; k < 8; k++) {
@@ -485,7 +486,8 @@ public class GroupElementTest {
 
 		// Act + Assert:
 		for (int i=0; i<8; i++) {
-			Assert.assertThat(MathUtils.toRepresentation(g, GroupElement.Representation.PRECOMP), IsEqual.equalTo(ed25519.getB().dblPrecmp[i]));
+			Assert.assertThat(MathUtils.toRepresentation(g, GroupElement.Representation.PRECOMP),
+					IsEqual.equalTo(Ed25519PrecomputedTable.precomputedForDouble[i]));
 			g = MathUtils.addGroupElements(g, h);
 		}
 	}
@@ -661,7 +663,7 @@ public class GroupElementTest {
      */
     @Test
     public void testSelect() {
-        GroupElement B = ed25519.getB();
+        GroupElement B = Ed25519Constants.basePoint;
         for (int i = 0; i < 32; i++) {
             // 16^i 0 B
             assertThat(i + ",0", B.select(i, 0),
@@ -698,20 +700,20 @@ public class GroupElementTest {
         GroupElement A = new GroupElement(curve, Utils.hexToBytes("d4cf8595571830644bd14af416954d09ab7159751ad9e0f7a6cbd92379e71a66"));
 
         assertThat("scalarMultiply(0) failed",
-                ed25519.getB().scalarMultiply(zero), is(equalTo(curve.getZero(GroupElement.Representation.P3))));
+				Ed25519Constants.basePoint.scalarMultiply(zero), is(equalTo(curve.getZero(GroupElement.Representation.P3))));
         assertThat("scalarMultiply(1) failed",
-                ed25519.getB().scalarMultiply(one), is(equalTo(ed25519.getB())));
+				Ed25519Constants.basePoint.scalarMultiply(one), is(equalTo(Ed25519Constants.basePoint)));
         assertThat("scalarMultiply(2) failed",
-                ed25519.getB().scalarMultiply(two), is(equalTo(ed25519.getB().dbl())));
+				Ed25519Constants.basePoint.scalarMultiply(two), is(equalTo(Ed25519Constants.basePoint.dbl())));
 
         assertThat("scalarMultiply(a) failed",
-                ed25519.getB().scalarMultiply(a), is(equalTo(A)));
+				Ed25519Constants.basePoint.scalarMultiply(a), is(equalTo(A)));
     }
 
 	@Test
 	public void scalarMultiplyBasePointWithZeroReturnsNeutralElement() {
 		// Arrange:
-		final GroupElement basePoint = ed25519.getB();
+		final GroupElement basePoint = Ed25519Constants.basePoint;
 
 		// Act:
 		final GroupElement g = basePoint.scalarMultiply(curve.getField().ZERO.toByteArray());
@@ -723,7 +725,7 @@ public class GroupElementTest {
 	@Test
 	public void scalarMultiplyBasePointWithOneReturnsBasePoint() {
 		// Arrange:
-		final GroupElement basePoint = ed25519.getB();
+		final GroupElement basePoint = Ed25519Constants.basePoint;
 
 		// Act:
 		final GroupElement g = basePoint.scalarMultiply(curve.getField().ONE.toByteArray());
@@ -737,7 +739,7 @@ public class GroupElementTest {
 	public void scalarMultiplyBasePointReturnsExpectedResult() {
 		for (int i=0; i<100; i++) {
 			// Arrange:
-			final GroupElement basePoint = ed25519.getB();
+			final GroupElement basePoint = Ed25519Constants.basePoint;
 			final FieldElement f = MathUtils.getRandomFieldElement();
 
 			// Act:
@@ -757,7 +759,7 @@ public class GroupElementTest {
         byte[] two = Utils.hexToBytes("0200000000000000000000000000000000000000000000000000000000000000");
         byte[] a = Utils.hexToBytes("d072f8dd9c07fa7bc8d22a4b325d26301ee9202f6db89aa7c3731529e37e437c");
         GroupElement A = new GroupElement(curve, Utils.hexToBytes("d4cf8595571830644bd14af416954d09ab7159751ad9e0f7a6cbd92379e71a66"));
-        GroupElement B = ed25519.getB();
+        GroupElement B = Ed25519Constants.basePoint;
         GroupElement geZero = curve.getZero(GroupElement.Representation.P3);
         geZero.precompute(false);
 
@@ -773,25 +775,22 @@ public class GroupElementTest {
         // 1 * GE(0) + 1 * B = B
         assertThat(B.doubleScalarMultiplyVariableTime(geZero, one, one),
                 is(equalTo(B)));
-        // 1 * B + 1 * B = 2 * B
+        // 1 * B - 1 * B = 0 * B
         assertThat(B.doubleScalarMultiplyVariableTime(B, one, one),
-                is(equalTo(B.dbl())));
-        // 1 * B + 2 * B = 3 * B
-        assertThat(B.doubleScalarMultiplyVariableTime(B, one, two),
-                is(equalTo(B.dbl().toP3().add(B.toCached()))));
-        // 2 * B + 2 * B = 4 * B
-        assertThat(B.doubleScalarMultiplyVariableTime(B, two, two),
-                is(equalTo(B.dbl().toP3().dbl())));
+                is(equalTo(geZero)));
+        // 1 * B - 2 * B = -1 * B
+        assertThat(B.doubleScalarMultiplyVariableTime(B, two, one),
+                is(equalTo(B.negate())));
 
-        // 0 * B + a * B = A
+        // 0 * B - a * B = -A
+        assertThat(B.doubleScalarMultiplyVariableTime(B, a, zero),
+                is(equalTo(A.negate())));
+        // a * B + 0 * B = A
         assertThat(B.doubleScalarMultiplyVariableTime(B, zero, a),
                 is(equalTo(A)));
-        // a * B + 0 * B = A
-        assertThat(B.doubleScalarMultiplyVariableTime(B, a, zero),
-                is(equalTo(A)));
-        // a * B + a * B = 2 * A
+        // a * B - a * B = 0 * A
         assertThat(B.doubleScalarMultiplyVariableTime(B, a, a),
-                is(equalTo(A.dbl())));
+                is(equalTo(geZero)));
     }
 
 	// This test is slow (~6s) due to math utils using an inferior algorithm to calculate the result.
@@ -799,7 +798,7 @@ public class GroupElementTest {
 	public void doubleScalarMultiplyVariableTimeReturnsExpectedResult() {
 		for (int i=0; i<50; i++) {
 			// Arrange:
-			final GroupElement basePoint = ed25519.getB();
+			final GroupElement basePoint = Ed25519Constants.basePoint;
 			final GroupElement g = MathUtils.getRandomGroupElement();
 			g.precompute(false);
 			final FieldElement f1 = MathUtils.getRandomFieldElement();

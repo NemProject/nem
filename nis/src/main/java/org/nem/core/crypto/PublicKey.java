@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.nem.core.crypto.ed25519.arithmetic.GroupElement;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.HexEncoder;
 
@@ -10,15 +11,12 @@ import java.util.Arrays;
  */
 public class PublicKey implements SerializableEntity {
 
-	private final byte[] value;
+	public byte[] value;
 
 	/**
-	 * The following fields are used by Ed25519 to speed up verification.
+	 * The following field is used by Ed25519 to speed up verification.
 	 */
-	private final int[] X;
-	private final int[] Y;
-	private final int[] Z;
-	private final int[] T;
+	private final GroupElement A;
 
 	/**
 	 * Creates a new public key.
@@ -27,43 +25,25 @@ public class PublicKey implements SerializableEntity {
 	 */
 	public PublicKey(final byte[] bytes) {
 		this.value = bytes;
-		this.X = null;
-		this.Y = null;
-		this.Z = null;
-		this.T = null;
+		this.A = null;
 	}
 
 	/**
 	 * Creates a new public key.
 	 *
 	 * @param bytes The raw public key value.
-	 * @param X The projective X coordinate.
-	 * @param Y The projective Y coordinate.
-	 * @param Z The projective Z coordinate.
-	 * @param T The projective T coordinate.
+	 * @param A The corresponding group element.
 	 */
 	public PublicKey(
 			final byte[] bytes,
-			final int[] X,
-			final int[] Y,
-			final int[] Z,
-			final int[] T) {
+			GroupElement A) {
 		this.value = bytes;
+		this.A = A;
 
-		if (null == X ||
-			null == Y ||
-			null == Z ||
-			null == T ||
-			10 != X.length ||
-			10 != Y.length ||
-			10 != Z.length ||
-			10 != T.length) {
-			throw new RuntimeException("Projective coordinate has wrong array length.");
+		if (null == A ||
+			!A.isPrecomputedForDoubleScalarMultiplication()) {
+			throw new RuntimeException("A not prepared for double scalar multiplication.");
 		}
-		this.X = X;
-		this.Y = Y;
-		this.Z = Z;
-		this.T = T;
 	}
 
 	/**
@@ -73,10 +53,7 @@ public class PublicKey implements SerializableEntity {
 	 */
 	public PublicKey(final Deserializer deserializer) {
 		this.value = deserializer.readBytes("value");
-		this.X = null;
-		this.Y = null;
-		this.Z = null;
-		this.T = null;
+		this.A = null;
 	}
 
 	/**
@@ -94,51 +71,12 @@ public class PublicKey implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the projective X coordinate.
+	 * Gets the public key as group element (can return null).
 	 *
-	 * @return The X coordinate.
+	 * @return The group element or null if not set.
 	 */
-	public int[] getX() {
-		if (null == this.X) {
-			throw new RuntimeException("Projective coordinate not set.");
-		}
-		return this.X;
-	}
-
-	/**
-	 * Gets the projective Y coordinate.
-	 *
-	 * @return The Y coordinate.
-	 */
-	public int[] getY() {
-		if (null == this.Y) {
-			throw new RuntimeException("Projective coordinate not set.");
-		}
-		return this.Y;
-	}
-
-	/**
-	 * Gets the projective Z coordinate.
-	 *
-	 * @return The Z coordinate.
-	 */
-	public int[] getZ() {
-		if (null == this.Z) {
-			throw new RuntimeException("Projective coordinate not set.");
-		}
-		return this.Z;
-	}
-
-	/**
-	 * Gets the projective T coordinate.
-	 *
-	 * @return The T coordinate.
-	 */
-	public int[] getT() {
-		if (null == this.T) {
-			throw new RuntimeException("Projective coordinate not set.");
-		}
-		return this.T;
+	public GroupElement getAsGroupElement() {
+		return this.A;
 	}
 
 	/**

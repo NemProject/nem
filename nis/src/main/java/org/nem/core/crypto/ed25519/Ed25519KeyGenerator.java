@@ -32,12 +32,8 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 
 		// a * base point is the public key.
 		final GroupElement pubKey = Ed25519Constants.basePoint.scalarMultiply(a);
+		pubKey.precompute(false);
 
-		return new PublicKey(
-				pubKey.toByteArray(),
-				pubKey.getX().getRaw(),
-				pubKey.getY().getRaw(),
-				pubKey.getZ().getRaw(),
-				pubKey.getT().getRaw());
+		return new PublicKey(pubKey.toByteArray(), pubKey);
 	}
 }
