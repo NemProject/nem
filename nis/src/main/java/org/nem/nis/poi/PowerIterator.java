@@ -1,11 +1,14 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
+import java.util.logging.Logger;
 
 /**
  * An abstract implementation of power iteration algorithm.
  */
 public abstract class PowerIterator {
+
+	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculator.class.getName());
 
 	private final ColumnVector startVector;
 	private final int maxIterations;
@@ -53,6 +56,7 @@ public abstract class PowerIterator {
 			++numIterations;
 		} while (this.maxIterations > numIterations && !this.hasConverged(vector1, vector2));
 
+		LOGGER.info("Iterations required: " + numIterations);
 		this.result = vector2;
 		this.hasConverged = this.hasConverged(vector1, vector2);
 	}

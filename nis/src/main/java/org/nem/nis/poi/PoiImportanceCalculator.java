@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculator.class.getName());
 
-	private static final int DEFAULT_MAX_ITERATIONS = 2000;
+	private static final int DEFAULT_MAX_ITERATIONS = 3000;
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	private final PoiScorer poiScorer;

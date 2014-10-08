@@ -40,7 +40,12 @@ public class PoiContext {
 		this.accountProcessor.process();
 
 		// (2) set the teleportation values
-		this.teleportationProbability = TELEPORTATION_PROB;
+		if (clusterer instanceof SingleClusterScan) {
+			this.teleportationProbability = TELEPORTATION_PROB + INTER_LEVEL_TELEPORTATION_PROB;
+		} else {
+			this.teleportationProbability = TELEPORTATION_PROB;
+		}
+
 		this.interLevelTeleportationProbability = INTER_LEVEL_TELEPORTATION_PROB;
 		this.inverseTeleportationProbability = (1.0 - TELEPORTATION_PROB - INTER_LEVEL_TELEPORTATION_PROB) / this.getPoiStartVector().size();
 	}
