@@ -1,6 +1,6 @@
 package org.nem.core.crypto;
 
-import org.nem.core.crypto.ed25519.arithmetic.GroupElement;
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.HexEncoder;
 
@@ -16,7 +16,7 @@ public class PublicKey implements SerializableEntity {
 	/**
 	 * The following field is used by Ed25519 to speed up verification.
 	 */
-	private final GroupElement A;
+	private final Ed25519GroupElement A;
 
 	/**
 	 * Creates a new public key.
@@ -36,7 +36,7 @@ public class PublicKey implements SerializableEntity {
 	 */
 	public PublicKey(
 			final byte[] bytes,
-			GroupElement A) {
+			Ed25519GroupElement A) {
 		this.value = bytes;
 		this.A = A;
 
@@ -75,7 +75,7 @@ public class PublicKey implements SerializableEntity {
 	 *
 	 * @return The group element or null if not set.
 	 */
-	public GroupElement getAsGroupElement() {
+	public Ed25519GroupElement getAsGroupElement() {
 		return this.A;
 	}
 

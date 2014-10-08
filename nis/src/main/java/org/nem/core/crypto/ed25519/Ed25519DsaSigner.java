@@ -46,7 +46,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] rModQ = Ed25519FieldElement.modQ(r);
 
 		// R = r * base point.
-		final GroupElement R = Ed25519Constants.basePoint.scalarMultiply(r);
+		final Ed25519GroupElement R = Ed25519Constants.basePoint.scalarMultiply(r);
 		final byte[] encodedR = R.toByteArray();
 
 		// S = (r + H(encodedR, encodedA, data) * a) mod group order where
@@ -86,15 +86,15 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// hReduced = h mode group order
 		final byte[] hModQ = Ed25519FieldElement.modQ(h);
 
-		GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
+		Ed25519GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
 		if (null == A) {
 			// Must compute A.
-			A = new GroupElement(Ed25519Constants.curve, encodedA);
+			A = new Ed25519GroupElement(Ed25519Constants.curve, encodedA);
 			A.precompute(false);
 		}
 
 		// R = encodedS * B - H(encodedR, encodedA, data) * A
-		final GroupElement calculatedR = Ed25519Constants.basePoint.doubleScalarMultiplyVariableTime(
+		final Ed25519GroupElement calculatedR = Ed25519Constants.basePoint.doubleScalarMultiplyVariableTime(
 				A, hModQ, signature.getBinaryS());
 
 		// Compare calculated R to given R.

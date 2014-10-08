@@ -8,7 +8,6 @@ import org.nem.core.crypto.PrivateKey;
 import org.nem.core.crypto.PublicKey;
 import org.nem.core.crypto.Signature;
 import org.nem.core.crypto.ed25519.Curve;
-import org.nem.core.crypto.ed25519.*;
 import org.nem.core.crypto.ed25519.spec.*;
 
 import java.math.BigInteger;
@@ -188,12 +187,12 @@ public class MathUtils {
 	 *
 	 * @return The group element.
 	 */
-	public static GroupElement getRandomGroupElement() {
+	public static Ed25519GroupElement getRandomGroupElement() {
 		final byte[] bytes = new byte[32];
 		while (true) {
 			try {
 				random.nextBytes(bytes);
-				return new GroupElement(curve, bytes);
+				return new Ed25519GroupElement(curve, bytes);
 			} catch (IllegalArgumentException e) {
 				// Will fail in about 50%, so try again.
 			}
@@ -207,7 +206,7 @@ public class MathUtils {
 	 * @param bytes the byte array.
 	 * @return The group element.
 	 */
-	public static GroupElement toGroupElement(final byte[] bytes) {
+	public static Ed25519GroupElement toGroupElement(final byte[] bytes) {
 		final boolean shouldBeNegative = (bytes[31] >> 7) != 0;
 		bytes[31] &= 0x7f;
 		final BigInteger y = MathUtils.toBigInteger(bytes);
@@ -219,7 +218,7 @@ public class MathUtils {
 		BigInteger x = tmp.multiply(u).multiply(v.pow(3)).mod(getQ());
 		if (!v.multiply(x).multiply(x).subtract(u).mod(getQ()).equals(BigInteger.ZERO)) {
 			if (!v.multiply(x).multiply(x).add(u).mod(getQ()).equals(BigInteger.ZERO)) {
-				throw new IllegalArgumentException("not a valid GroupElement");
+				throw new IllegalArgumentException("not a valid Ed25519GroupElement");
 			}
 			x = x.multiply(toBigInteger(curve.getI())).mod(getQ());
 		}
@@ -228,18 +227,18 @@ public class MathUtils {
 			x = x.negate().mod(getQ());
 		}
 
-		return GroupElement.p3(curve, toFieldElement(x), toFieldElement(y), getField().ONE, toFieldElement(x.multiply(y).mod(getQ())));
+		return Ed25519GroupElement.p3(curve, toFieldElement(x), toFieldElement(y), getField().ONE, toFieldElement(x.multiply(y).mod(getQ())));
 	}
 
 	/**
 	 * Converts a group element from one representation to another.
-	 * This method is a helper used to test various methods in GroupElement.
+	 * This method is a helper used to test various methods in Ed25519GroupElement.
 	 *
 	 * @param g The group element.
 	 * @param repr The desired representation.
 	 * @return The same group element in the new representation.
 	 */
-	public static GroupElement toRepresentation(final GroupElement g, final GroupElement.Representation repr) {
+	public static Ed25519GroupElement toRepresentation(final Ed25519GroupElement g, final Ed25519GroupElement.Representation repr) {
 		BigInteger x;
 		BigInteger y;
 		final BigInteger gX = toBigInteger(g.getX().toByteArray());
@@ -273,34 +272,34 @@ public class MathUtils {
 		// Now back to the desired representation.
 		switch (repr) {
 			case P2:
-				return GroupElement.p2(
+				return Ed25519GroupElement.p2(
 						curve,
 						toFieldElement(x),
 						toFieldElement(y),
 						getField().ONE);
 			case P3:
-				return GroupElement.p3(
+				return Ed25519GroupElement.p3(
 						curve,
 						toFieldElement(x),
 						toFieldElement(y),
 						getField().ONE,
 						toFieldElement(x.multiply(y).mod(getQ())));
 			case P1P1:
-				return GroupElement.p1p1(
+				return Ed25519GroupElement.p1p1(
 						curve,
 						toFieldElement(x),
 						toFieldElement(y),
 						getField().ONE,
 						getField().ONE);
 			case CACHED:
-				return GroupElement.cached(
+				return Ed25519GroupElement.cached(
 						curve,
 						toFieldElement(y.add(x).mod(getQ())),
 						toFieldElement(y.subtract(x).mod(getQ())),
 						getField().ONE,
 						toFieldElement(d.multiply(new BigInteger("2")).multiply(x).multiply(y).mod(getQ())));
 			case PRECOMP:
-				return GroupElement.precomp(
+				return Ed25519GroupElement.precomp(
 						curve,
 						toFieldElement(y.add(x).mod(getQ())),
 						toFieldElement(y.subtract(x).mod(getQ())),
@@ -313,16 +312,16 @@ public class MathUtils {
 	/**
 	 * Adds two group elements and returns the result in P3 representation.
 	 * It uses BigInteger arithmetic and the affine representation.
-	 * This method is a helper used to test the projective group addition formulas in GroupElement.
+	 * This method is a helper used to test the projective group addition formulas in Ed25519GroupElement.
 	 *
 	 * @param g1 The first group element.
 	 * @param g2 The second group element.
 	 * @return The result of the addition.
 	 */
-	public static GroupElement addGroupElements(final GroupElement g1, final GroupElement g2) {
+	public static Ed25519GroupElement addGroupElements(final Ed25519GroupElement g1, final Ed25519GroupElement g2) {
 		// Relying on a special representation of the group elements.
-		if ((g1.getRepresentation() != GroupElement.Representation.P2 && g1.getRepresentation() != GroupElement.Representation.P3) ||
-			(g2.getRepresentation() != GroupElement.Representation.P2 && g2.getRepresentation() != GroupElement.Representation.P3)) {
+		if ((g1.getRepresentation() != Ed25519GroupElement.Representation.P2 && g1.getRepresentation() != Ed25519GroupElement.Representation.P3) ||
+			(g2.getRepresentation() != Ed25519GroupElement.Representation.P2 && g2.getRepresentation() != Ed25519GroupElement.Representation.P3)) {
 			throw new IllegalArgumentException("g1 and g2 must have representation P2 or P3");
 		}
 
@@ -354,18 +353,18 @@ public class MathUtils {
 				.multiply(BigInteger.ONE.subtract(dx1x2y1y2).modInverse(getQ())).mod(getQ());
 		BigInteger t3 = x3.multiply(y3).mod(getQ());
 
-		return GroupElement.p3(g1.getCurve(), toFieldElement(x3), toFieldElement(y3), getField().ONE, toFieldElement(t3));
+		return Ed25519GroupElement.p3(g1.getCurve(), toFieldElement(x3), toFieldElement(y3), getField().ONE, toFieldElement(t3));
 	}
 
 	/**
 	 * Doubles a group element and returns the result in P3 representation.
 	 * It uses BigInteger arithmetic and the affine representation.
-	 * This method is a helper used to test the projective group doubling formula in GroupElement.
+	 * This method is a helper used to test the projective group doubling formula in Ed25519GroupElement.
 	 *
 	 * @param g The group element.
 	 * @return g+g.
 	 */
-	public static GroupElement doubleGroupElement(final GroupElement g) {
+	public static Ed25519GroupElement doubleGroupElement(final Ed25519GroupElement g) {
 		return addGroupElements(g, g);
 	}
 
@@ -376,9 +375,9 @@ public class MathUtils {
 	 * @param f The field element.
 	 * @return The resulting group element.
 	 */
-	public static GroupElement scalarMultiplyGroupElement(final GroupElement g, final FieldElement f) {
+	public static Ed25519GroupElement scalarMultiplyGroupElement(final Ed25519GroupElement g, final FieldElement f) {
 		final byte[] bytes = f.toByteArray();
-		GroupElement h = curve.getZero(GroupElement.Representation.P3);
+		Ed25519GroupElement h = curve.getZero(Ed25519GroupElement.Representation.P3);
 		for (int i=254; i>=0; i--) {
 			h = doubleGroupElement(h);
 			if (Utils.bit(bytes, i) == 1) {
@@ -398,13 +397,13 @@ public class MathUtils {
 	 * @param f2 The second multiplier.
 	 * @return The resulting group element.
 	 */
-	public static GroupElement doubleScalarMultiplyGroupElements(
-			final GroupElement g1,
+	public static Ed25519GroupElement doubleScalarMultiplyGroupElements(
+			final Ed25519GroupElement g1,
 			final FieldElement f1,
-			final GroupElement g2,
+			final Ed25519GroupElement g2,
 			final FieldElement f2) {
-		final GroupElement h1 = scalarMultiplyGroupElement(g1, f1);
-		final GroupElement h2 = scalarMultiplyGroupElement(g2, f2);
+		final Ed25519GroupElement h1 = scalarMultiplyGroupElement(g1, f1);
+		final Ed25519GroupElement h2 = scalarMultiplyGroupElement(g2, f2);
 		return addGroupElements(h1, h2.negate());
 	}
 
@@ -414,12 +413,12 @@ public class MathUtils {
 	 * @param g The group element.
 	 * @return The negated group element.
 	 */
-	public static GroupElement negateGroupElement(final GroupElement g) {
-		if (g.getRepresentation() != GroupElement.Representation.P3) {
+	public static Ed25519GroupElement negateGroupElement(final Ed25519GroupElement g) {
+		if (g.getRepresentation() != Ed25519GroupElement.Representation.P3) {
 			throw new IllegalArgumentException("g must have representation P3");
 		}
 
-		return GroupElement.p3(g.getCurve(), g.getX().negate(), g.getY(), g.getZ(), g.getT().negate());
+		return Ed25519GroupElement.p3(g.getCurve(), g.getX().negate(), g.getY(), g.getZ(), g.getT().negate());
 	}
 
 	/**
@@ -435,7 +434,7 @@ public class MathUtils {
 		a[31] &= 0x7F;
 		a[31] |= 0x40;
 		a[0] &= 0xF8;
-		final GroupElement pubKey = scalarMultiplyGroupElement(ed25519.getB(), toFieldElement(toBigInteger(a)));
+		final Ed25519GroupElement pubKey = scalarMultiplyGroupElement(ed25519.getB(), toFieldElement(toBigInteger(a)));
 
 		return new PublicKey(pubKey.toByteArray());
 	}
@@ -457,7 +456,7 @@ public class MathUtils {
 		digest.update(Arrays.copyOfRange(hash, 32, 64));
 		final byte[] r = digest.digest(data);
 		final byte[] rReduced = reduceModGroupOrder(r);
-		final GroupElement R = scalarMultiplyGroupElement(ed25519.getB(), toFieldElement(toBigInteger(rReduced)));
+		final Ed25519GroupElement R = scalarMultiplyGroupElement(ed25519.getB(), toFieldElement(toBigInteger(rReduced)));
 		digest.update(R.toByteArray());
 		digest.update(keyPair.getPublicKey().getRaw());
 		final byte[] h = digest.digest(data);
@@ -470,13 +469,17 @@ public class MathUtils {
 	// Start TODO BR: Remove when finished!
 	@Test
 	public void mathUtilsWorkAsExpected() {
-		final GroupElement neutral = GroupElement.p3(curve, curve.getField().ZERO, curve.getField().ONE, curve.getField().ONE, curve.getField().ZERO);
+		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(curve,
+				curve.getField().ZERO,
+				curve.getField().ONE,
+				curve.getField().ONE,
+				curve.getField().ZERO);
 		for (int i=0; i<1000; i++) {
-			final GroupElement g = getRandomGroupElement();
+			final Ed25519GroupElement g = getRandomGroupElement();
 
 			// Act:
-			final GroupElement h1 = addGroupElements(g, neutral);
-			final GroupElement h2 = addGroupElements(neutral, g);
+			final Ed25519GroupElement h1 = addGroupElements(g, neutral);
+			final Ed25519GroupElement h2 = addGroupElements(neutral, g);
 
 			// Assert:
 			Assert.assertThat(g, IsEqual.equalTo(h1));
@@ -484,39 +487,39 @@ public class MathUtils {
 		}
 
 		for (int i=0; i<1000; i++) {
-			GroupElement g = getRandomGroupElement();
+			Ed25519GroupElement g = getRandomGroupElement();
 
 			// P3 -> P2.
-			GroupElement h = toRepresentation(g, GroupElement.Representation.P2);
+			Ed25519GroupElement h = toRepresentation(g, Ed25519GroupElement.Representation.P2);
 			Assert.assertThat(h, IsEqual.equalTo(g));
 			// P3 -> P1P1.
-			h = toRepresentation(g, GroupElement.Representation.P1P1);
+			h = toRepresentation(g, Ed25519GroupElement.Representation.P1P1);
 			Assert.assertThat(g, IsEqual.equalTo(h));
 
 			// P3 -> CACHED.
-			h = toRepresentation(g, GroupElement.Representation.CACHED);
+			h = toRepresentation(g, Ed25519GroupElement.Representation.CACHED);
 			Assert.assertThat(h, IsEqual.equalTo(g));
 
 			// P3 -> P2 -> P3.
-			g = toRepresentation(g, GroupElement.Representation.P2);
-			h = toRepresentation(g, GroupElement.Representation.P3);
+			g = toRepresentation(g, Ed25519GroupElement.Representation.P2);
+			h = toRepresentation(g, Ed25519GroupElement.Representation.P3);
 			Assert.assertThat(g, IsEqual.equalTo(h));
 
 			// P3 -> P2 -> P1P1.
-			g = toRepresentation(g, GroupElement.Representation.P2);
-			h = toRepresentation(g, GroupElement.Representation.P1P1);
+			g = toRepresentation(g, Ed25519GroupElement.Representation.P2);
+			h = toRepresentation(g, Ed25519GroupElement.Representation.P1P1);
 			Assert.assertThat(g, IsEqual.equalTo(h));
 		}
 
 		for (int i=0; i<10; i++) {
 			// Arrange:
-			final GroupElement g = MathUtils.getRandomGroupElement();
+			final Ed25519GroupElement g = MathUtils.getRandomGroupElement();
 
 			// Act:
-			final GroupElement h = MathUtils.scalarMultiplyGroupElement(g, curve.getField().ZERO);
+			final Ed25519GroupElement h = MathUtils.scalarMultiplyGroupElement(g, curve.getField().ZERO);
 
 			// Assert:
-			Assert.assertThat(curve.getZero(GroupElement.Representation.P3), IsEqual.equalTo(h));
+			Assert.assertThat(curve.getZero(Ed25519GroupElement.Representation.P3), IsEqual.equalTo(h));
 		}
 	}
 	// End TODO BR: Remove when finished!

@@ -7,7 +7,8 @@ import org.bouncycastle.crypto.paddings.*;
 import org.bouncycastle.crypto.params.*;
 import org.nem.core.crypto.BlockCipher;
 import org.nem.core.crypto.*;
-import org.nem.core.crypto.ed25519.arithmetic.GroupElement;
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
+import org.nem.core.utils.ArrayUtils;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -107,9 +108,9 @@ public class Ed25519BlockCipher implements BlockCipher {
 	}
 
 	private byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey, final byte[] salt) {
-		final GroupElement senderA = new GroupElement(Ed25519Constants.curve, publicKey.getRaw());
+		final Ed25519GroupElement senderA = new Ed25519GroupElement(Ed25519Constants.curve, publicKey.getRaw());
 		senderA.precompute(true);
-		final byte[] hash = Hashes.getSha3_512Instance().digest(Utils.toByteArray(privateKey.getRaw()));
+		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(privateKey.getRaw(), 32));
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		clamp(a);
 		final byte[] sharedKey = senderA.scalarMultiply(a).toByteArray();

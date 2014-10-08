@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.ed25519.Ed25519Constants;
-import org.nem.core.crypto.ed25519.arithmetic.GroupElement;
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -12,7 +12,7 @@ public class PublicKeyTest {
 
 	private final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
 	private final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
-	private static final GroupElement A = getA(true);
+	private static final Ed25519GroupElement A = getA(true);
 
 	//region constructors / factories
 
@@ -139,8 +139,8 @@ public class PublicKeyTest {
 
 	//endregion
 
-	private static GroupElement getA(boolean precompute) {
-		GroupElement A = GroupElement.p3(
+	private static Ed25519GroupElement getA(boolean precompute) {
+		Ed25519GroupElement A = Ed25519GroupElement.p3(
 				Ed25519Constants.curve,
 				Ed25519Constants.curve.getField().ZERO,
 				Ed25519Constants.curve.getField().ONE,

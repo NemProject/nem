@@ -13,16 +13,16 @@ public class Ed25519Constants {
 	private static final EdDSANamedCurveSpec ed25519 = EdDSANamedCurveTable.getByName("ed25519-sha-512");
 	public static final Curve curve = ed25519.getCurve();
 
-	// Field related constants.
-	public static Ed25519FieldElement ZERO = new Ed25519FieldElement(new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-
 	// Group related constants.
-	public static GroupElement basePoint = getBasePoint();
+	public static Ed25519GroupElement basePoint = getBasePoint();
+	public static Ed25519GroupElement ZERO = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
+	public static Ed25519GroupElement ZERO_P2 = Ed25519GroupElement.p2(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE);
+	public static Ed25519GroupElement ZERO_PRECOMP = Ed25519GroupElement.precomp(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 	public static final BigInteger groupOrder = BigInteger.ONE.shiftLeft(252).add(new BigInteger("27742317777372353535851937790883648493"));
 
 
-	public static GroupElement getBasePoint() {
-		basePoint = new GroupElement(ed25519.getCurve(), HexEncoder.getBytes("5866666666666666666666666666666666666666666666666666666666666666"));
+	public static Ed25519GroupElement getBasePoint() {
+		basePoint = new Ed25519GroupElement(ed25519.getCurve(), HexEncoder.getBytes("5866666666666666666666666666666666666666666666666666666666666666"));
 		basePoint.precompute(true);
 		return basePoint;
 	}

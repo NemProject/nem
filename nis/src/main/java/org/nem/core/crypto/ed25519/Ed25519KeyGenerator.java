@@ -1,7 +1,8 @@
 package org.nem.core.crypto.ed25519;
 
 import org.nem.core.crypto.*;
-import org.nem.core.crypto.ed25519.arithmetic.GroupElement;
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
+import org.nem.core.utils.ArrayUtils;
 
 import java.security.SecureRandom;
 
@@ -21,7 +22,7 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 		this.random.nextBytes(seed);
 
 		// seed is the private key.
-		final PrivateKey privateKey = new PrivateKey(Utils.toBigInteger(seed));
+		final PrivateKey privateKey = new PrivateKey(ArrayUtils.toBigInteger(seed));
 
 		return new KeyPair(privateKey, derivePublicKey(privateKey));
 	}
@@ -31,7 +32,7 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 		final byte[] a = privateKey.prepareForScalarMultiply();
 
 		// a * base point is the public key.
-		final GroupElement pubKey = Ed25519Constants.basePoint.scalarMultiply(a);
+		final Ed25519GroupElement pubKey = Ed25519Constants.basePoint.scalarMultiply(a);
 		pubKey.precompute(false);
 
 		return new PublicKey(pubKey.toByteArray(), pubKey);

@@ -1,6 +1,7 @@
 package org.nem.core.crypto.ed25519;
 
-import org.nem.core.crypto.ed25519.arithmetic.*;
+import org.apache.commons.math3.FieldElement;
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 
 import java.io.Serializable;
 
@@ -17,9 +18,9 @@ public class Curve implements Serializable {
     private final FieldElement d2;
     private final FieldElement I;
 
-    private final GroupElement zeroP2;
-    private final GroupElement zeroP3;
-    private final GroupElement zeroPrecomp;
+    private final Ed25519GroupElement zeroP2;
+    private final Ed25519GroupElement zeroP3;
+    private final Ed25519GroupElement zeroPrecomp;
 
     public Curve(Field f, byte[] d, FieldElement I) {
         this.f = f;
@@ -29,9 +30,9 @@ public class Curve implements Serializable {
 
         FieldElement zero = f.ZERO;
         FieldElement one = f.ONE;
-        zeroP2 = GroupElement.p2(this, zero, one, one);
-        zeroP3 = GroupElement.p3(this, zero, one, one, zero);
-        zeroPrecomp = GroupElement.precomp(this, one, one, zero);
+        zeroP2 = Ed25519GroupElement.p2(this, zero, one, one);
+        zeroP3 = Ed25519GroupElement.p3(this, zero, one, one, zero);
+        zeroPrecomp = Ed25519GroupElement.precomp(this, one, one, zero);
     }
 
     public Field getField() {
@@ -50,7 +51,7 @@ public class Curve implements Serializable {
         return I;
     }
 
-    public GroupElement getZero(GroupElement.Representation repr) {
+    public Ed25519GroupElement getZero(Ed25519GroupElement.Representation repr) {
         switch (repr) {
         case P2:
             return zeroP2;
@@ -63,8 +64,8 @@ public class Curve implements Serializable {
         }
     }
 
-    public GroupElement createPoint(byte[] P, boolean precompute) {
-        GroupElement ge = new GroupElement(this, P);
+    public Ed25519GroupElement createPoint(byte[] P, boolean precompute) {
+        Ed25519GroupElement ge = new Ed25519GroupElement(this, P);
         if (precompute)
             ge.precompute(true);
         return ge;
