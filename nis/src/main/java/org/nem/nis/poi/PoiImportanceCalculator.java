@@ -127,7 +127,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 
 			// V(dangle-indexes) * dangle-sum + V(inverseTeleportation)
 			final ColumnVector dangleVector = new ColumnVector(prevIterImportances.size());
-			dangleVector.setAll(this.context.getInverseTeleportationProbability() * dangleSum);
+			dangleVector.setAll(this.context.getInverseTeleportationProbability() + dangleSum);
 			return dangleVector;
 		}
 
