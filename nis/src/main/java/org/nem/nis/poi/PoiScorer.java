@@ -27,7 +27,8 @@ public class PoiScorer {
 			dangleSum += importanceVector.getAt(i);
 		}
 
-		return dangleSum * teleportationProbability / importanceVector.size();
+		//TODO: review this!
+		return 1;//dangleSum * teleportationProbability / importanceVector.size();
 	}
 
 	/**
