@@ -28,4 +28,28 @@ public class ByteUtils {
 		buffer.putInt(x);
 		return buffer.array();
 	}
+
+	/**
+	 * Constant-time byte comparison.
+	 *
+	 * @return 1 if b and c are equal, 0 otherwise.
+	 */
+	public static int isEqual(final int b, final int c) {
+		int result = 0;
+		final int xor = b ^ c;
+		for (int i = 0; i < 8; i++) {
+			result |= xor >> i;
+		}
+		return (result ^ 0x01) & 0x01;
+	}
+
+	/**
+	 * Constant-time check if byte is negative.
+	 *
+	 * @param b the byte to check.
+	 * @return 1 if the byte is negative, 0 otherwise.
+	 */
+	public static int isNegative(int b) {
+		return (b >> 8) & 1;
+	}
 }

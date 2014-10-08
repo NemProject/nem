@@ -105,4 +105,47 @@ public class ByteUtilsTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(result));
 	}
+
+	//region isEqual
+
+	@Test
+	public void isEqualReturnsOneIfBytesAreEqual() {
+		// Assert:
+		Assert.assertThat(ByteUtils.isEqual(0, 0),   IsEqual.equalTo(1));
+		Assert.assertThat(ByteUtils.isEqual(7, 7),   IsEqual.equalTo(1));
+		Assert.assertThat(ByteUtils.isEqual(64, 64),   IsEqual.equalTo(1));
+		Assert.assertThat(ByteUtils.isEqual(255, 255),   IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void isEqualReturnsZeroIfBytesAreNotEqual() {
+		// Assert:
+		Assert.assertThat(ByteUtils.isEqual(0, 1),   IsEqual.equalTo(0));
+		Assert.assertThat(ByteUtils.isEqual(7, -7),   IsEqual.equalTo(0));
+		Assert.assertThat(ByteUtils.isEqual(64, 63),   IsEqual.equalTo(0));
+		Assert.assertThat(ByteUtils.isEqual(254, 255),   IsEqual.equalTo(0));
+	}
+
+	//endregion
+
+	// region isNegative
+
+	@Test
+	public void isNegativeReturnsOneIfByteIsNegative() {
+		// Assert:
+		Assert.assertThat(ByteUtils.isNegative(-1),   IsEqual.equalTo(1));
+		Assert.assertThat(ByteUtils.isNegative(-100), IsEqual.equalTo(1));
+		Assert.assertThat(ByteUtils.isNegative(-255), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void isNegativeReturnsZeroIfByteIsZeroOrPositive() {
+		// Assert:
+		Assert.assertThat(ByteUtils.isNegative(0),    IsEqual.equalTo(0));
+		Assert.assertThat(ByteUtils.isNegative(1),    IsEqual.equalTo(0));
+		Assert.assertThat(ByteUtils.isNegative(32),   IsEqual.equalTo(0));
+		Assert.assertThat(ByteUtils.isNegative(127),  IsEqual.equalTo(0));
+	}
+
+	//endregion
 }

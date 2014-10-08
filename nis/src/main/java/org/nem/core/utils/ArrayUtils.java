@@ -142,4 +142,28 @@ public class ArrayUtils {
 
 		return max;
 	}
+
+	/**
+	 * Constant-time byte[] comparison.
+	 * @return 1 if b and c are equal, 0 otherwise.
+	 */
+	public static int isEqual(final byte[] b, final byte[] c) {
+		int result = 0;
+		for (int i = 0; i < 32; i++) {
+			result |= b[i] ^ c[i];
+		}
+
+		return ByteUtils.isEqual(result, 0);
+	}
+
+	/**
+	 * Gets the i'th bit of a byte array.
+	 *
+	 * @param h The byte array.
+	 * @param i The bit index.
+	 * @return The value of the i'th bit in h
+	 */
+	public static int getBit(final byte[] h, final int i) {
+		return (h[i >> 3] >> (i & 7)) & 1;
+	}
 }

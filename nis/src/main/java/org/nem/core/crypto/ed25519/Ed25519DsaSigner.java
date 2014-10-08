@@ -15,7 +15,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 	private final KeyPair keyPair;
 	private final MessageDigest digest;
-	private final Ed25519ScalarOps scalarOps;
 
 	/**
 	 * Creates a Ed25519 DSA signer.
@@ -27,7 +26,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 	public Ed25519DsaSigner(final KeyPair keyPair) {
 		this.keyPair = keyPair;
 		this.digest = Hashes.getSha3_512Instance();
-		this.scalarOps = new Ed25519ScalarOps();
 	}
 
 	@Override
@@ -42,10 +40,10 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
 		this.digest.update(hash, 32, 32);
-		byte[] r = this.digest.digest(data);
+		final byte[] r = this.digest.digest(data);
 
 		// Reduce size of r since we are calculating mod group order anyway
-		r = this.scalarOps.reduce(r);
+		final byte[] rModQ = Ed25519FieldElement.modQ(r);
 
 		// R = r * base point.
 		final GroupElement R = Ed25519Constants.basePoint.scalarMultiply(r);
@@ -57,11 +55,11 @@ public class Ed25519DsaSigner implements DsaSigner {
 		this.digest.update(encodedR);
 		final byte[] encodedA = this.keyPair.getPublicKey().getRaw();
 		this.digest.update(encodedA);
-		byte[] h = this.digest.digest(data);
-		h = this.scalarOps.reduce(h);
+		final byte[] h = this.digest.digest(data);
+		final byte[] hModQ = Ed25519FieldElement.modQ(h);
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		clamp(a);
-		final byte[] encodedS = this.scalarOps.multiplyAndAdd(h, a, r);
+		final byte[] encodedS = Ed25519FieldElement.multiplyAndAddModQ(hModQ, a, rModQ);
 
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR, encodedS);
@@ -86,7 +84,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] h = this.digest.digest(data);
 
 		// hReduced = h mode group order
-		final byte[] hReduced = this.scalarOps.reduce(h);
+		final byte[] hModQ = Ed25519FieldElement.modQ(h);
 
 		GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
 		if (null == A) {
@@ -97,11 +95,11 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// R = encodedS * B - H(encodedR, encodedA, data) * A
 		final GroupElement calculatedR = Ed25519Constants.basePoint.doubleScalarMultiplyVariableTime(
-				A, hReduced, signature.getBinaryS());
+				A, hModQ, signature.getBinaryS());
 
 		// Compare calculated R to given R.
 		final byte[] encodedCalculatedR = calculatedR.toByteArray();
-		final int result = Utils.equal(encodedCalculatedR, encodedR);
+		final int result = ArrayUtils.isEqual(encodedCalculatedR, encodedR);
 		return 1 == result;
 	}
 
@@ -113,11 +111,10 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 	@Override
 	public Signature makeSignatureCanonical(final Signature signature) {
-		final Ed25519ScalarOps scalarOps = new Ed25519ScalarOps();
 		final byte[] s = Arrays.copyOf(signature.getBinaryS(), 64);
-		final byte[] sReduced = scalarOps.reduce(s);
+		final byte[] sModQ = Ed25519FieldElement.modQ(s);
 
-		return new Signature(signature.getBinaryR(), sReduced);
+		return new Signature(signature.getBinaryR(), sModQ);
 	}
 
 	private void clamp(byte[] k) {

@@ -1,6 +1,5 @@
 package org.nem.core.crypto;
 
-import org.nem.core.crypto.ed25519.Utils;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
@@ -118,7 +117,7 @@ public class Signature {
 		}
 
 		final Signature rhs = (Signature)obj;
-		return 1 == Utils.equal(this.r, rhs.r) && 1 == Utils.equal(this.s, rhs.s);
+		return 1 == ArrayUtils.isEqual(this.r, rhs.r) && 1 == ArrayUtils.isEqual(this.s, rhs.s);
 	}
 
 	//region inline serialization
