@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class PublicKey implements SerializableEntity {
 
-	public byte[] value;
+	private final byte[] value;
 
 	/**
 	 * The following field is used by Ed25519 to speed up verification.
