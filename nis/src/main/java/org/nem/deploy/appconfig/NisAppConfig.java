@@ -184,7 +184,7 @@ public class NisAppConfig {
 
 	@Bean
 	public PoiFacade poiFacade() {
-		return new PoiFacade(new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy()));
+		return new PoiFacade(new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy(), new PoiOptions()));
 	}
 
 	@Bean

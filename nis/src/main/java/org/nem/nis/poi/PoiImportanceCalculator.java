@@ -27,18 +27,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private final PoiOptions options;
 
 	/**
-	 * Creates a new generator with default options.
-	 *
-	 * @param poiScorer The poi scorer to use.
-	 * @param clusterer The graph clusterer to use.
-	 */
-	public PoiImportanceCalculator(
-			final PoiScorer poiScorer,
-			final GraphClusteringStrategy clusterer) {
-		this(poiScorer, clusterer, new PoiOptions());
-	}
-
-	/**
 	 * Creates a new generator with custom options.
 	 *
 	 * @param poiScorer The poi scorer to use.

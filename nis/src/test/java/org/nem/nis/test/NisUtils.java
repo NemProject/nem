@@ -191,7 +191,7 @@ public class NisUtils {
 	 * @return The calculator.
 	 */
 	public static ImportanceCalculator createImportanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy());
+		return new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy(), new PoiOptions());
 	}
 
 	/**
