@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PoiContextTest {
+	private static final Amount MIN_HARVESTING_BALANCE = new PoiOptions().getMinHarvesterBalance();
 
 	//region construction (failures)
 
@@ -351,7 +352,7 @@ public class PoiContextTest {
 	}
 
 	private static List<PoiAccountState> createDefaultTestAccountStates(final BlockHeight height) {
-		final long multiplier = BlockChainConstants.MIN_HARVESTING_BALANCE.getNumMicroNem();
+		final long multiplier = MIN_HARVESTING_BALANCE.getNumMicroNem();
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(3 * multiplier - 1, null),
 				new TestAccountInfo(multiplier - 1, new int[] { 1 }), // 1 (insufficient balance)
@@ -398,7 +399,7 @@ public class PoiContextTest {
 
 	private static PoiContext createTestPoiContextWithAccountLinks(final PoiOptions poiOptions) {
 		// Arrange: create 4 accounts
-		final long multiplier = BlockChainConstants.MIN_HARVESTING_BALANCE.getNumMicroNem();// 1000 is min harvesting balance
+		final long multiplier = MIN_HARVESTING_BALANCE.getNumMicroNem();// 1000 is min harvesting balance
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(multiplier, null),
 				new TestAccountInfo(multiplier, null),

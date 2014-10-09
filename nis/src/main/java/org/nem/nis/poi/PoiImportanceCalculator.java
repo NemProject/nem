@@ -37,9 +37,9 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final PoiScorer poiScorer,
 			final GraphClusteringStrategy clusterer,
 			final PoiOptions options) {
-		this.options = options;
 		this.poiScorer = poiScorer;
 		this.clusterer = clusterer;
+		this.options = options;
 	}
 
 	@Override

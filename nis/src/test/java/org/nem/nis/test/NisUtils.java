@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dao.*;
+import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
@@ -173,7 +174,8 @@ public class NisUtils {
 		return new TransactionValidatorFactory(
 				transferDao,
 				Mockito.mock(ImportanceTransferDao.class),
-				new SystemTimeProvider());
+				new SystemTimeProvider(),
+				new PoiOptions());
 	}
 
 	/**

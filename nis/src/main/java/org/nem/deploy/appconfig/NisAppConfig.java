@@ -151,7 +151,7 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider());
+		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider(), this.poiOptions());
 	}
 
 	@Bean
@@ -184,7 +184,11 @@ public class NisAppConfig {
 
 	@Bean
 	public PoiFacade poiFacade() {
-		return new PoiFacade(new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy(), new PoiOptions()));
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
+				new PoiScorer(),
+				new FastScanClusteringStrategy(),
+				this.poiOptions());
+		return new PoiFacade(importanceCalculator);
 	}
 
 	@Bean
@@ -194,7 +198,22 @@ public class NisAppConfig {
 
 	@Bean
 	public UnlockedAccounts unlockedAccounts() {
-		return new UnlockedAccounts(this.accountCache(), this.poiFacade(), this.blockChainLastBlockLayer, this.nisConfiguration());
+		return new UnlockedAccounts(
+				this.accountCache(),
+				this.poiFacade(),
+				this.blockChainLastBlockLayer,
+				this.canHarvestPredicate(),
+				this.nisConfiguration());
+	}
+
+	@Bean
+	public CanHarvestPredicate canHarvestPredicate() {
+		return new CanHarvestPredicate(this.poiOptions().getMinHarvesterBalance());
+	}
+
+	@Bean
+	public PoiOptions poiOptions() {
+		return new PoiOptions();
 	}
 
 	@Bean

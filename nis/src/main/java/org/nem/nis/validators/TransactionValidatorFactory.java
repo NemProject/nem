@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.dao.*;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.poi.*;
 
 /**
  * Factory for creating TransactionValidator objects.
@@ -11,6 +11,7 @@ public class TransactionValidatorFactory {
 	private final TransferDao transferDao;
 	private final ImportanceTransferDao importanceTransferDao;
 	private final TimeProvider timeProvider;
+	private final PoiOptions poiOptions;
 
 	/**
 	 * Creates a new factory.
@@ -18,14 +19,17 @@ public class TransactionValidatorFactory {
 	 * @param transferDao The transfer dao.
 	 * @param importanceTransferDao The importance transfer dao.
 	 * @param timeProvider The time provider.
+	 * @param poiOptions The poi options.
 	 */
 	public TransactionValidatorFactory(
 			final TransferDao transferDao,
 			final ImportanceTransferDao importanceTransferDao,
-			final TimeProvider timeProvider) {
+			final TimeProvider timeProvider,
+			final PoiOptions poiOptions) {
 		this.transferDao = transferDao;
 		this.importanceTransferDao = importanceTransferDao;
 		this.timeProvider = timeProvider;
+		this.poiOptions = poiOptions;
 	}
 
 	/**
@@ -39,7 +43,7 @@ public class TransactionValidatorFactory {
 		builder.add(new UniversalTransactionValidator());
 		builder.add(new NonFutureEntityValidator(this.timeProvider));
 		builder.add(new TransferTransactionValidator());
-		builder.add(new ImportanceTransferTransactionValidator(poiFacade));
+		builder.add(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
 		builder.add(new UniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
 		return builder.build();
 	}

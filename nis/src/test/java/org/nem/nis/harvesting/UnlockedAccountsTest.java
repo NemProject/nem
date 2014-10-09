@@ -55,7 +55,7 @@ public class UnlockedAccountsTest {
 	}
 
 	@Test
-	public void cannotUnlockForagingEligibleAccount() {
+	public void canUnlockForagingEligibleAccount() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
@@ -194,14 +194,21 @@ public class UnlockedAccountsTest {
 		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(3));
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
 	}
+
 	//endregion
 
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
+		private final CanHarvestPredicate canHarvestPredicate = Mockito.mock(CanHarvestPredicate.class);
 		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
-		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(this.accountLookup, this.poiFacade, this.lastBlockLayer, this.nisConfiguration);
+		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(
+				this.accountLookup,
+				this.poiFacade,
+				this.lastBlockLayer,
+				this.canHarvestPredicate,
+				this.nisConfiguration);
 
 		public TestContext() {
 			// TODO 20141005 J-G can you use a class constant for 3 e.g. TEST_SERVER_LIMIT ... i think it will make the tests a little clearer
@@ -218,6 +225,8 @@ public class UnlockedAccountsTest {
 			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
 			accountState.getWeightedBalances().addFullyVested(new BlockHeight(lastBlockHeight), Amount.fromNem(canForage ? 10000 : 1));
 			Mockito.when(this.poiFacade.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
+
+			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, new BlockHeight(lastBlockHeight))).thenReturn(canForage);
 		}
 
 		private void assertIsKnownAddressDelegation(final Account account) {

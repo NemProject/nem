@@ -7,6 +7,7 @@ import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 
@@ -56,9 +57,10 @@ public class NxtGraphClusteringITCase {
 	@Ignore
 	@Test
 	public void canPrintImportances() throws IOException {
+		final PoiOptions poiOptions = new PoiOptions();
 		final String options = String.format(
 				"_%smin_%dmu_%fepsilon",
-				BlockChainConstants.MIN_HARVESTING_BALANCE,
+				poiOptions.getMinHarvesterBalance(),
 				GraphConstants.MU,
 				GraphConstants.EPSILON);
 
@@ -205,8 +207,10 @@ public class NxtGraphClusteringITCase {
 	private static Collection<PoiAccountState> selectHarvestingEligibleAccounts(
 			final Map<Address, PoiAccountState> accountStateMap,
 			final BlockHeight height) {
+		final PoiOptions poiOptions = new PoiOptions();
+		final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(poiOptions.getMinHarvesterBalance());
 		return  accountStateMap.values().stream()
-				.filter(acct -> acct.getWeightedBalances().getVested(height).compareTo(BlockChainConstants.MIN_HARVESTING_BALANCE) > 0)
+				.filter(accountState -> canHarvestPredicate.canHarvest(accountState, height))
 				.collect(Collectors.toList());
 	}
 

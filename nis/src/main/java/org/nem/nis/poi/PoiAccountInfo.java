@@ -70,15 +70,6 @@ public class PoiAccountInfo {
 	}
 
 	/**
-	 * Determines whether or not the account is eligible for harvesting.
-	 *
-	 * @return true if the account is eligible.
-	 */
-	public boolean canHarvest() {
-		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(BlockChainConstants.MIN_HARVESTING_BALANCE) >= 0;
-	}
-
-	/**
 	 * Adds an inlink to this account info.
 	 *
 	 * @param inlink The inlink to add.

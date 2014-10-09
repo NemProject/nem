@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountImportance;
 
@@ -196,9 +197,10 @@ public class PoiContext {
 			this.options = options;
 
 			int i = 0;
+			final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(this.options.getMinHarvesterBalance());
 			for (final PoiAccountState accountState : accountStates) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
-				if (!accountInfo.canHarvest()) {
+				if (!canHarvestPredicate.canHarvest(accountState, height)) {
 					continue;
 				}
 

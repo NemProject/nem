@@ -27,37 +27,6 @@ public class PoiAccountInfoTest {
 		Assert.assertThat(info.getState(), IsSame.sameInstance(state));
 	}
 
-	@Test
-	public void cannotForageWhenVestedBalanceIsLessThanMinimumBalance() {
-		// Arrange:
-		final Amount minBalanceMinusOne = Amount.fromMicroNem(999999999);
-
-		// Assert:
-		Assert.assertThat(canForage(Amount.ZERO), IsEqual.equalTo(false));
-		Assert.assertThat(canForage(minBalanceMinusOne), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void canForageWhenVestedBalanceIsAtLeastMinimumBalance() {
-		// Arrange:
-		final Amount minBalance = Amount.fromNem(1000);
-		final Amount twiceMinBalance = Amount.fromNem(2000);
-
-		// Assert:
-		Assert.assertThat(canForage(minBalance), IsEqual.equalTo(true));
-		Assert.assertThat(canForage(twiceMinBalance), IsEqual.equalTo(true));
-	}
-
-	private static boolean canForage(final Amount vestedBalance) {
-		// Arrange:
-		final BlockHeight height = new BlockHeight(33);
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
-		state.getWeightedBalances().addFullyVested(height, vestedBalance);
-
-		// Act:
-		return new PoiAccountInfo(11, state, height).canHarvest();
-	}
-
 	//region getOutlinks
 
 	@Test

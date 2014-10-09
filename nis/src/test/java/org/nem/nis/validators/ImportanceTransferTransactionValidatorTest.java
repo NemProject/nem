@@ -180,7 +180,9 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	private static class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(this.poiFacade);
+		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
+				this.poiFacade,
+				Amount.fromNem(1000));
 
 		private Transaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
 			final Account signer = Utils.generateRandomAccount();
