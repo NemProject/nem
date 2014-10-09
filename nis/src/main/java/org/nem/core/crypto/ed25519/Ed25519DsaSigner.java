@@ -36,7 +36,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// Hash the private key to improve randomness.
 		final byte[] hash = this.digest.digest(ArrayUtils.toByteArray(keyPair.getPrivateKey().getRaw(), 32));
-		this.digest.reset();
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
 		this.digest.update(hash, 32, 32);
@@ -46,7 +45,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] rModQ = Ed25519FieldElement.modQ(r);
 
 		// R = r * base point.
-		final Ed25519GroupElement R = Ed25519Group.BASE_POINT.scalarMultiply(r);
+		final Ed25519GroupElement R = Ed25519Group.BASE_POINT.scalarMultiply(rModQ);
 		final byte[] encodedR = R.toByteArray();
 
 		// S = (r + H(encodedR, encodedA, data) * a) mod group order where
@@ -57,9 +56,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		this.digest.update(encodedA);
 		final byte[] h = this.digest.digest(data);
 		final byte[] hModQ = Ed25519FieldElement.modQ(h);
-		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
-		clamp(a);
-		final byte[] encodedS = Ed25519FieldElement.multiplyAndAddModQ(hModQ, a, rModQ);
+		final byte[] encodedS = Ed25519FieldElement.multiplyAndAddModQ(hModQ, keyPair.getPrivateKey().prepareForScalarMultiply(), rModQ);
 
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR, encodedS);
@@ -115,11 +112,5 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] sModQ = Ed25519FieldElement.modQ(s);
 
 		return new Signature(signature.getBinaryR(), sModQ);
-	}
-
-	private void clamp(byte[] k) {
-		k[31] &= 0x7F;
-		k[31] |= 0x40;
-		k[0] &= 0xF8;
 	}
 }

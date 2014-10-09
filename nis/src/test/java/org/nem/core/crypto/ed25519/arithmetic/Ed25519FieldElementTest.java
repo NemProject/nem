@@ -64,10 +64,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f3 = f1.add(f2);
-			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b3, IsEqual.equalTo(b1.add(b2).mod(Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b3, IsEqual.equalTo(b1.add(b2).mod(Ed25519Field.P)));
 		}
 	}
 
@@ -82,10 +82,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f3 = f1.subtract(f2);
-			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b3, IsEqual.equalTo(b1.subtract(b2).mod(Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b3, IsEqual.equalTo(b1.subtract(b2).mod(Ed25519Field.P)));
 		}
 	}
 
@@ -98,10 +98,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.negate();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.negate().mod(Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b2, IsEqual.equalTo(b1.negate().mod(Ed25519Field.P)));
 		}
 	}
 
@@ -116,10 +116,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f3 = f1.multiply(f2);
-			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b3, IsEqual.equalTo(b1.multiply(b2).mod(Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b3, IsEqual.equalTo(b1.multiply(b2).mod(Ed25519Field.P)));
 		}
 	}
 
@@ -132,10 +132,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.square();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).mod(Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).mod(Ed25519Field.P)));
 		}
 	}
 
@@ -148,10 +148,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.squareAndDouble();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).multiply(new BigInteger("2")).mod(Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).multiply(new BigInteger("2")).mod(Ed25519Field.P)));
 		}
 	}
 
@@ -164,10 +164,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.invert();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.modInverse(Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b2, IsEqual.equalTo(b1.modInverse(Ed25519Field.P)));
 		}
 	}
 
@@ -180,10 +180,10 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.pow22523();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), Ed25519Group.GROUP_ORDER)));
+			Assert.assertThat(b2, IsEqual.equalTo(b1.modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), Ed25519Field.P)));
 		}
 	}
 
@@ -202,7 +202,7 @@ public class Ed25519FieldElementTest {
 			final byte[] reduced2 = MathUtils.reduceModGroupOrder(bytes);
 
 			// Assert:
-			Assert.assertThat(MathUtils.toBigInteger(reduced1).compareTo(Ed25519Group.GROUP_ORDER), IsEqual.equalTo(-1));
+			Assert.assertThat(MathUtils.toBigInteger(reduced1).compareTo(Ed25519Field.P), IsEqual.equalTo(-1));
 			Assert.assertThat(MathUtils.toBigInteger(reduced1).compareTo(new BigInteger("-1")), IsEqual.equalTo(1));
 			Assert.assertThat(reduced1, IsEqual.equalTo(reduced2));
 		}
@@ -221,7 +221,7 @@ public class Ed25519FieldElementTest {
 			final byte[] result2 = MathUtils.multiplyAndAddModGroupOrder(bytes1, bytes2, bytes3);
 
 			// Assert:
-			Assert.assertThat(MathUtils.toBigInteger(result1).compareTo(Ed25519Group.GROUP_ORDER), IsEqual.equalTo(-1));
+			Assert.assertThat(MathUtils.toBigInteger(result1).compareTo(Ed25519Field.P), IsEqual.equalTo(-1));
 			Assert.assertThat(MathUtils.toBigInteger(result1).compareTo(new BigInteger("-1")), IsEqual.equalTo(1));
 			Assert.assertThat(result1, IsEqual.equalTo(result2));
 		}
@@ -250,6 +250,25 @@ public class Ed25519FieldElementTest {
 	}
 
 	@Test
+	public void encodeReturnsCorrectByteArrayIfBitjOfTiIsSetToOne() {
+		for (int i=0; i<10; i++){
+			// Arrange:
+			final int[] t = new int[10];
+			for (int j=0; j<24; j++) {
+				t[i] = 1 << j;
+				final Ed25519FieldElement fieldElement1 = new Ed25519FieldElement(t);
+				final BigInteger b = MathUtils.toBigInteger(t).mod(Ed25519Field.P);
+
+				// Act:
+				final byte[] bytes = fieldElement1.encode();
+
+				// Assert:
+				Assert.assertThat(bytes, IsEqual.equalTo(MathUtils.toByteArray(b)));
+			}
+		}
+	}
+
+	@Test
 	public void encodeReturnsCorrectByteArray() {
 		SecureRandom random = new SecureRandom();
 		for (int i=0; i<10000; i++){
@@ -265,7 +284,7 @@ public class Ed25519FieldElementTest {
 			final byte[] bytes = fieldElement1.encode();
 
 			// Assert:
-			Assert.assertThat(bytes, IsEqual.equalTo(MathUtils.toByteArray(b.mod(Ed25519Group.GROUP_ORDER))));
+			Assert.assertThat(bytes, IsEqual.equalTo(MathUtils.toByteArray(b.mod(Ed25519Field.P))));
 		}
 	}
 
@@ -299,7 +318,7 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f = Ed25519FieldElement.decode(bytes);
-			final BigInteger b2 = MathUtils.toBigInteger(f.getRaw()).mod(Ed25519Group.GROUP_ORDER);
+			final BigInteger b2 = MathUtils.toBigInteger(f.getRaw()).mod(Ed25519Field.P);
 
 			// Assert:
 			Assert.assertThat(b2, IsEqual.equalTo(b1));
@@ -315,7 +334,7 @@ public class Ed25519FieldElementTest {
 			for (int j=0; j<10; j++) {
 				t[j] = random.nextInt(1 << 28) - (1 << 27);
 			}
-			final boolean isNegative = MathUtils.toBigInteger(t).mod(Ed25519Group.GROUP_ORDER).mod(new BigInteger("2")).equals(BigInteger.ONE);
+			final boolean isNegative = MathUtils.toBigInteger(t).mod(Ed25519Field.P).mod(new BigInteger("2")).equals(BigInteger.ONE);
 			final Ed25519FieldElement f = new Ed25519FieldElement(t);
 
 			// Assert:
@@ -373,11 +392,9 @@ public class Ed25519FieldElementTest {
 		// Act:
 		final String fAsString = f.toString();
 		final StringBuilder builder = new StringBuilder();
-		builder.append("[Ed25519FieldElement val=");
 		for (byte b : bytes) {
 			builder.append(String.format("%02x", b));
 		}
-		builder.append("]");
 
 		// Assert:
 		Assert.assertThat(fAsString, IsEqual.equalTo(builder.toString()));

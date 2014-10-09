@@ -27,8 +27,8 @@ public class Ed25519Field {
 
 	private static Ed25519FieldElement getD() {
 		final BigInteger d = new BigInteger("-121665")
-				.multiply(new BigInteger("121666")
-				.modInverse(Ed25519Field.P));
+				.multiply(new BigInteger("121666").modInverse(Ed25519Field.P))
+				.mod(Ed25519Field.P);
 		return Ed25519FieldElement.decode(ArrayUtils.toByteArray(d, 32));
 	}
 }

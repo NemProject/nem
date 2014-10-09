@@ -6,9 +6,6 @@ import org.junit.*;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-
 public class Ed25519GroupElementTest {
 
     @Test
@@ -333,7 +330,7 @@ public class Ed25519GroupElementTest {
 			Ed25519GroupElement h = g;
 			for (int j = 0; j < 8; j++) {
 				Assert.assertThat(MathUtils.toRepresentation(h, Ed25519GroupElement.Representation.PRECOMP),
-						IsEqual.equalTo(g.getPrecomputedForSingle()[i][j]));
+						IsEqual.equalTo(Ed25519Group.BASE_POINT.getPrecomputedForSingle()[i][j]));
 				h = MathUtils.addGroupElements(h, g);
 			}
 			for (int k = 0; k < 8; k++) {
@@ -351,20 +348,10 @@ public class Ed25519GroupElementTest {
 		// Act + Assert:
 		for (int i=0; i<8; i++) {
 			Assert.assertThat(MathUtils.toRepresentation(g, Ed25519GroupElement.Representation.PRECOMP),
-					IsEqual.equalTo(g.getPrecomputedForDouble()[i]));
+					IsEqual.equalTo(Ed25519Group.BASE_POINT.getPrecomputedForDouble()[i]));
 			g = MathUtils.addGroupElements(g, h);
 		}
 	}
-
-    /**
-     * Test method for {@link Ed25519GroupElement#dbl()}.
-     */
-    @Test
-    public void testDbl() {
-        Ed25519GroupElement B = Ed25519Group.BASE_POINT;
-        // 2 * B = B + B
-        assertThat(B.dbl(), IsEqual.equalTo(equalTo(B.add(B.toCached()))));
-    }
 
 	@Test
 	public void dblReturnsExpectedResult() {
@@ -435,14 +422,6 @@ public class Ed25519GroupElementTest {
 	}
 
 	// region hashCode / equals
-    /**
-     * Test method for {@link Ed25519GroupElement#equals(java.lang.Object)}.
-     */
-    @Test
-    public void testEqualsObject() {
-        assertThat(Ed25519GroupElement.p2(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE),
-                IsEqual.equalTo(equalTo(Ed25519Group.ZERO_P2)));
-    }
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
