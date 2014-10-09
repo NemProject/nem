@@ -30,24 +30,28 @@ public class PoiContext {
 	 * @param accountStates The account states.
 	 * @param height The current block height.
 	 * @param clusterer The graph clusterer.
+	 * @param options The poi options.
 	 */
 	public PoiContext(
 			final Iterable<PoiAccountState> accountStates,
 			final BlockHeight height,
-			final GraphClusteringStrategy clusterer) {
+			final GraphClusteringStrategy clusterer,
+			final PoiOptions options) {
 		// (1) build the account vectors and matrices
-		this.accountProcessor = new AccountProcessor(accountStates, height, clusterer);
+		this.accountProcessor = new AccountProcessor(accountStates, height, clusterer, options);
 		this.accountProcessor.process();
 
 		// (2) set the teleportation values
-		if (clusterer instanceof SingleClusterScan) {
-			this.teleportationProbability = TELEPORTATION_PROB + INTER_LEVEL_TELEPORTATION_PROB;
-		} else {
+		if (options.isClusteringEnabled()) {
 			this.teleportationProbability = TELEPORTATION_PROB;
+			this.interLevelTeleportationProbability = INTER_LEVEL_TELEPORTATION_PROB;
+		} else {
+			this.teleportationProbability = TELEPORTATION_PROB + INTER_LEVEL_TELEPORTATION_PROB;
+			this.interLevelTeleportationProbability = 0;
 		}
 
-		this.interLevelTeleportationProbability = INTER_LEVEL_TELEPORTATION_PROB;
-		this.inverseTeleportationProbability = (1.0 - TELEPORTATION_PROB - INTER_LEVEL_TELEPORTATION_PROB) / this.getPoiStartVector().size();
+		final double inverseProbability = (1.0 - this.teleportationProbability - this.interLevelTeleportationProbability);
+		this.inverseTeleportationProbability = inverseProbability / this.getPoiStartVector().size();
 	}
 
 	//region getters
@@ -166,12 +170,14 @@ public class PoiContext {
 	private static class AccountProcessor {
 		private final BlockHeight height;
 		private final List<Integer> dangleIndexes;
+		private final GraphClusteringStrategy clusteringStrategy;
+		private final PoiOptions options;
+
 		private final ColumnVector vestedBalanceVector;
 		private final ColumnVector poiStartVector;
 		private final ColumnVector outlinkScoreVector;
 		private SparseMatrix outlinkMatrix;
 		private InterLevelProximityMatrix interLevelMatrix;
-		private final GraphClusteringStrategy clusteringStrategy;
 		private ClusteringResult clusteringResult;
 		private Neighborhood neighborhood;
 
@@ -179,10 +185,15 @@ public class PoiContext {
 		private final Map<Address, PoiAccountInfo> addressToAccountInfoMap = new HashMap<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
 
-		public AccountProcessor(final Iterable<PoiAccountState> accountStates, final BlockHeight height, final GraphClusteringStrategy clusteringStrategy) {
+		public AccountProcessor(
+				final Iterable<PoiAccountState> accountStates,
+				final BlockHeight height,
+				final GraphClusteringStrategy clusteringStrategy,
+				final PoiOptions options) {
 			this.height = height;
 			this.dangleIndexes = new ArrayList<>();
 			this.clusteringStrategy = clusteringStrategy;
+			this.options = options;
 
 			int i = 0;
 			for (final PoiAccountState accountState : accountStates) {
@@ -283,7 +294,7 @@ public class PoiContext {
 				}
 			}
 
-			this.outlinkMatrix.removeNegatives();
+			this.outlinkMatrix.removeLessThan(this.options.getMinOutlinkWeight().getNumMicroNem());
 
 			// At this point the outlink matrix gets finalized.
 			// This is the point where the dangle indices should be calculated, not earlier!

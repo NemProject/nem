@@ -24,7 +24,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 
 	private final PoiScorer poiScorer;
 	private final GraphClusteringStrategy clusterer;
-	private final boolean useInterLevelMatrix;
+	private final PoiOptions options;
 
 	/**
 	 * Creates a new generator with default options.
@@ -35,7 +35,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	public PoiImportanceCalculator(
 			final PoiScorer poiScorer,
 			final GraphClusteringStrategy clusterer) {
-		this(poiScorer, clusterer, new PoiOptions(Amount.fromNem(1000), Amount.ZERO, true));
+		this(poiScorer, clusterer, new PoiOptions());
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final PoiScorer poiScorer,
 			final GraphClusteringStrategy clusterer,
 			final PoiOptions options) {
-		this.useInterLevelMatrix = options.isClusteringEnabled();
+		this.options = options;
 		this.poiScorer = poiScorer;
 		this.clusterer = clusterer;
 	}
@@ -60,14 +60,14 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final Collection<PoiAccountState> accountStates) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accountStates, blockHeight, this.clusterer);
+		final PoiContext context = new PoiContext(accountStates, blockHeight, this.clusterer, this.options);
 
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(
 				context,
 				this.poiScorer,
 				accountStates.size(),
-				this.useInterLevelMatrix);
+				this.options.isClusteringEnabled());
 
 		final long start = System.currentTimeMillis();
 		iterator.run();

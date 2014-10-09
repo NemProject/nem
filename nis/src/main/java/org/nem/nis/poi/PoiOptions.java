@@ -11,6 +11,13 @@ public class PoiOptions {
 	private final boolean isClusteringEnabled;
 
 	/**
+	 * Creates new default options.
+	 */
+	public PoiOptions() {
+		this(Amount.fromNem(1000), Amount.ZERO, true);
+	}
+
+	/**
 	 * Creates new options.
 	 *
 	 * @param minHarvesterBalance The minimum (vested) balance required for a harvester.

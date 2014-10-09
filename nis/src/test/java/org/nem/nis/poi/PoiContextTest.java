@@ -106,34 +106,37 @@ public class PoiContextTest {
 	//region teleportation probabilities
 
 	@Test
-	public void teleportationProbabilityIsInitializedCorrectly() {
+	public void teleportationProbabilitiesAreCalculatedCorrectlyWhenClusteringIsEnabled() {
 		// Act:
-		final PoiContext context = createPoiContextWithDefaultTestAccountStates();
+		final BlockHeight height = new BlockHeight(21);
+		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
+		final PoiOptions options = new PoiOptions(Amount.fromNem(1000), Amount.ZERO, true);
+		final PoiContext context = new PoiContext(accountStates, height, new FastScanClusteringStrategy(), options);
 
 		// Assert:
-		// (1) a value of 0.750
+		// (1) teleportation: 0.750
+		// (2) inter-level teleporation: 0.100
+		// (3) inverse teleportation: 0.150 / # harvesting-eligible accounts
 		Assert.assertThat(context.getTeleportationProbability(), IsEqual.equalTo(0.750));
-	}
-
-	@Test
-	public void interLevelTeleportationProbabilityIsInitializedCorrectly() {
-		// Act:
-		final PoiContext context = createPoiContextWithDefaultTestAccountStates();
-
-		// Assert:
-		// (1) a value of 0.100
 		Assert.assertThat(context.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.100));
+		Assert.assertThat(context.getInverseTeleportationProbability(), IsEqual.equalTo(0.150 / 4));
 	}
 
 	@Test
-	public void inverseTeleportationVectorIsInitializedCorrectly() {
+	public void teleportationProbabilitiesAreCalculatedCorrectlyWhenClusteringIsNotEnabled() {
 		// Act:
-		final PoiContext context = createPoiContextWithDefaultTestAccountStates();
+		final BlockHeight height = new BlockHeight(21);
+		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
+		final PoiOptions options = new PoiOptions(Amount.fromNem(1000), Amount.ZERO, false);
+		final PoiContext context = new PoiContext(accountStates, height, new FastScanClusteringStrategy(), options);
 
 		// Assert:
-		// (1) (1 - 0.75 - 0.10 = 0.15) / N (4.0)
-		final double expectedProb = 0.15 / 4.0;
-		Assert.assertThat(roundTo(context.getInverseTeleportationProbability(), 5), IsEqual.equalTo(expectedProb));
+		// (1) teleportation: 0.850
+		// (2) inter-level teleporation: 0.000
+		// (3) inverse teleportation: 0.150 / # harvesting-eligible accounts
+		Assert.assertThat(context.getTeleportationProbability(), IsEqual.equalTo(0.850));
+		Assert.assertThat(context.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.000));
+		Assert.assertThat(context.getInverseTeleportationProbability(), IsRoundedEqual.equalTo(0.150 / 4));
 	}
 
 	//endregion
@@ -173,6 +176,29 @@ public class PoiContextTest {
 		expectedAccountLinks.setAt(2, 0, 0.4);
 		expectedAccountLinks.setAt(2, 1, 1.0);
 		expectedAccountLinks.setAt(2, 3, 0.625);
+
+		Assert.assertThat(
+				context.getOutlinkMatrix().roundTo(5),
+				IsEqual.equalTo(expectedAccountLinks));
+	}
+
+	@Test
+	public void outlinkMatrixIsInitializedCorrectlyWhenNonZeroOutlinkWeightIsConfigured() {
+		// Act:
+		// (0, 1, 8), (0, 2, 4), (1, 0, 2), (1, 2, 6), (3, 0, 3), (3, 2, 5)
+		// ==> (0, 1, 6), (0, 2, 4), (1, 2, 6), (3, 2, 5)
+		final PoiOptions options = new PoiOptions(Amount.fromNem(1000), Amount.fromNem(4), true);
+		final PoiContext context = createTestPoiContextWithAccountLinks(options);
+
+		// Assert:
+		// (1) account link weights are normalized
+		// (2) net outlinks are used ((0, 1, 8) + (1, 0, 2) => (0, 1, 6))
+		// (3) net outlinks less than 5 are ignored
+		final Matrix expectedAccountLinks = new DenseMatrix(4, 4);
+		expectedAccountLinks.setAt(1, 0, 0.6);
+		expectedAccountLinks.setAt(2, 0, 0.4);
+		expectedAccountLinks.setAt(2, 1, 1.0);
+		expectedAccountLinks.setAt(2, 3, 1.0);
 
 		Assert.assertThat(
 				context.getOutlinkMatrix().roundTo(5),
@@ -342,11 +368,6 @@ public class PoiContextTest {
 		return createTestPoiAccountStates(accountInfos, height);
 	}
 
-	public double roundTo(final double value, final int numPlaces) {
-		final double multipler = Math.pow(10, numPlaces);
-		return Math.round(value * multipler) / multipler;
-	}
-
 	private static class TestAccountInfo {
 		public final long vestedBalance;
 		public final int[] amounts;
@@ -368,10 +389,14 @@ public class PoiContextTest {
 	}
 
 	private static PoiContext createPoiContext(final List<PoiAccountState> accountStates, final BlockHeight height) {
-		return new PoiContext(accountStates, height, new FastScanClusteringStrategy());
+		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), new PoiOptions());
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
+		return createTestPoiContextWithAccountLinks(new PoiOptions());
+	}
+
+	private static PoiContext createTestPoiContextWithAccountLinks(final PoiOptions poiOptions) {
 		// Arrange: create 4 accounts
 		final long multiplier = BlockChainConstants.MIN_HARVESTING_BALANCE.getNumMicroNem();// 1000 is min harvesting balance
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
@@ -399,7 +424,7 @@ public class PoiContextTest {
 		// - 1: (2, 6) - (8)
 		// - 2: (none) - (4, 6, 5)
 		// - 3: (3, 5) - (none)
-		return createPoiContext(accountStates, height);
+		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), poiOptions);
 	}
 
 	/**

@@ -268,7 +268,7 @@ public class NxtGraphClusteringITCase {
 
 	private SparseMatrix createNetOutlinkMatrix(final long startHeight, final long endHeight) {
 		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight);
-		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), new FastScanClusteringStrategy());
+		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), new FastScanClusteringStrategy(), new PoiOptions());
 		return poiContext.getOutlinkMatrix();
 	}
 
