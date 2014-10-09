@@ -5,12 +5,12 @@ import org.nem.core.utils.*;
 import java.util.Arrays;
 
 /**
- * Class to represent a field element of the finite field p=2^255-19 elements.
+ * Represents a field element of the finite field with p=2^255-19 elements.
  * An element t, entries t[0]...t[9], represents the integer
  * t[0]+2^26 t[1]+2^51 t[2]+2^77 t[3]+2^102 t[4]+...+2^230 t[9].
  * Bounds on each t[i] vary depending on context.
  *
- * Reviewed/commented by Bloody Rookie (nemproject@gmx.de)
+ * This implementation is based on the ref10 implementation of SUPERCOP.
  */
 public class Ed25519FieldElement {
 
@@ -46,7 +46,7 @@ public class Ed25519FieldElement {
 	 */
     public boolean isNonZero() {
         final byte[] s = this.encode();
-        return ArrayUtils.isEqual(s, ZERO) == 0;
+        return 0 == ArrayUtils.isEqual(s, ZERO);
     }
 
     /**
@@ -64,18 +64,18 @@ public class Ed25519FieldElement {
 	 * @return The field element this + val.
      */
     public Ed25519FieldElement add(final Ed25519FieldElement g) {
-        int[] gvalues = g.values;
+        int[] gValues = g.values;
         int[] h = new int[10];
-        h[0] = values[0] + gvalues[0];
-        h[1] = values[1] + gvalues[1];
-        h[2] = values[2] + gvalues[2];
-        h[3] = values[3] + gvalues[3];
-        h[4] = values[4] + gvalues[4];
-        h[5] = values[5] + gvalues[5];
-        h[6] = values[6] + gvalues[6];
-        h[7] = values[7] + gvalues[7];
-        h[8] = values[8] + gvalues[8];
-        h[9] = values[9] + gvalues[9];
+        h[0] = values[0] + gValues[0];
+        h[1] = values[1] + gValues[1];
+        h[2] = values[2] + gValues[2];
+        h[3] = values[3] + gValues[3];
+        h[4] = values[4] + gValues[4];
+        h[5] = values[5] + gValues[5];
+        h[6] = values[6] + gValues[6];
+        h[7] = values[7] + gValues[7];
+        h[8] = values[8] + gValues[8];
+        h[9] = values[9] + gValues[9];
 
         return new Ed25519FieldElement(h);
     }
@@ -95,18 +95,18 @@ public class Ed25519FieldElement {
 	 * @return The field element this - val.
      **/
     public Ed25519FieldElement subtract(final Ed25519FieldElement g) {
-        int[] gvalues = g.values;
+        int[] gValues = g.values;
 		int[] h = new int[10];
-		h[0] = values[0] - gvalues[0];
-		h[1] = values[1] - gvalues[1];
-		h[2] = values[2] - gvalues[2];
-		h[3] = values[3] - gvalues[3];
-		h[4] = values[4] - gvalues[4];
-		h[5] = values[5] - gvalues[5];
-		h[6] = values[6] - gvalues[6];
-		h[7] = values[7] - gvalues[7];
-		h[8] = values[8] - gvalues[8];
-		h[9] = values[9] - gvalues[9];
+		h[0] = values[0] - gValues[0];
+		h[1] = values[1] - gValues[1];
+		h[2] = values[2] - gValues[2];
+		h[3] = values[3] - gValues[3];
+		h[4] = values[4] - gValues[4];
+		h[5] = values[5] - gValues[5];
+		h[6] = values[6] - gValues[6];
+		h[7] = values[7] - gValues[7];
+		h[8] = values[8] - gValues[8];
+		h[9] = values[9] - gValues[9];
 
         return new Ed25519FieldElement(h);
     }
@@ -172,7 +172,7 @@ public class Ed25519FieldElement {
 	 * @return The (reasonably reduced) field element this * val.
 	 */
     public Ed25519FieldElement multiply(final Ed25519FieldElement g) {
-        int[] gvalues = g.values;
+        int[] gValues = g.values;
         int f0 = values[0];
         int f1 = values[1];
         int f2 = values[2];
@@ -183,16 +183,16 @@ public class Ed25519FieldElement {
         int f7 = values[7];
         int f8 = values[8];
         int f9 = values[9];
-        int g0 = gvalues[0];
-        int g1 = gvalues[1];
-        int g2 = gvalues[2];
-        int g3 = gvalues[3];
-        int g4 = gvalues[4];
-        int g5 = gvalues[5];
-        int g6 = gvalues[6];
-        int g7 = gvalues[7];
-        int g8 = gvalues[8];
-        int g9 = gvalues[9];
+        int g0 = gValues[0];
+        int g1 = gValues[1];
+        int g2 = gValues[2];
+        int g3 = gValues[3];
+        int g4 = gValues[4];
+        int g5 = gValues[5];
+        int g6 = gValues[6];
+        int g7 = gValues[7];
+        int g8 = gValues[8];
+        int g9 = gValues[9];
         int g1_19 = 19 * g1; /* 1.959375*2^29 */
         int g2_19 = 19 * g2; /* 1.959375*2^30; still ok */
         int g3_19 = 19 * g3;
@@ -1061,17 +1061,18 @@ public class Ed25519FieldElement {
 	 */
 	public byte[] encode() {
 		// Step 1:
-		int[] gvalues = this.modP().getRaw();
-		int h0 = gvalues[0];
-		int h1 = gvalues[1];
-		int h2 = gvalues[2];
-		int h3 = gvalues[3];
-		int h4 = gvalues[4];
-		int h5 = gvalues[5];
-		int h6 = gvalues[6];
-		int h7 = gvalues[7];
-		int h8 = gvalues[8];
-		int h9 = gvalues[9];
+		Ed25519FieldElement g = this.modP();
+		int[] gValues = g.getRaw();
+		int h0 = gValues[0];
+		int h1 = gValues[1];
+		int h2 = gValues[2];
+		int h3 = gValues[3];
+		int h4 = gValues[4];
+		int h5 = gValues[5];
+		int h6 = gValues[6];
+		int h7 = gValues[7];
+		int h8 = gValues[8];
+		int h9 = gValues[9];
 
 		// Step 2:
 		byte[] s = new byte[32];

@@ -1,5 +1,7 @@
 package org.nem.core.crypto.ed25519;
 
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519Group;
+
 import java.math.BigInteger;
 
 /**
@@ -20,12 +22,12 @@ public class Ed25519Curve implements org.nem.core.crypto.Curve {
 
 	@Override
 	public BigInteger getGroupOrder() {
-		return Ed25519Constants.groupOrder;
+		return Ed25519Group.GROUP_ORDER;
 	}
 
 	@Override
 	public BigInteger getHalfGroupOrder() {
-		return Ed25519Constants.groupOrder.shiftRight(1);
+		return Ed25519Group.GROUP_ORDER.shiftRight(1);
 	}
 
 	public static Ed25519Curve ed25519() {

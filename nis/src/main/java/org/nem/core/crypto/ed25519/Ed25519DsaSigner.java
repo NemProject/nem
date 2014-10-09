@@ -46,7 +46,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] rModQ = Ed25519FieldElement.modQ(r);
 
 		// R = r * base point.
-		final Ed25519GroupElement R = Ed25519Constants.basePoint.scalarMultiply(r);
+		final Ed25519GroupElement R = Ed25519Group.BASE_POINT.scalarMultiply(r);
 		final byte[] encodedR = R.toByteArray();
 
 		// S = (r + H(encodedR, encodedA, data) * a) mod group order where
@@ -89,12 +89,12 @@ public class Ed25519DsaSigner implements DsaSigner {
 		Ed25519GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
 		if (null == A) {
 			// Must compute A.
-			A = new Ed25519GroupElement(Ed25519Constants.curve, encodedA);
-			A.precompute(false);
+			A = new Ed25519GroupElement(encodedA);
+			A.precomputeForDoubleScalarMultiplication();
 		}
 
 		// R = encodedS * B - H(encodedR, encodedA, data) * A
-		final Ed25519GroupElement calculatedR = Ed25519Constants.basePoint.doubleScalarMultiplyVariableTime(
+		final Ed25519GroupElement calculatedR = Ed25519Group.BASE_POINT.doubleScalarMultiplyVariableTime(
 				A, hModQ, signature.getBinaryS());
 
 		// Compare calculated R to given R.
@@ -105,7 +105,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 	@Override
 	public boolean isCanonicalSignature(final Signature signature) {
-		return -1 == signature.getS().compareTo(Ed25519Constants.groupOrder) &&
+		return -1 == signature.getS().compareTo(Ed25519Group.GROUP_ORDER) &&
 				1 == signature.getS().compareTo(BigInteger.ZERO);
 	}
 

@@ -1,6 +1,5 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.crypto.ed25519.*;
 import org.nem.core.utils.*;
 
 import java.io.Serializable;
@@ -8,6 +7,7 @@ import java.util.Arrays;
 
 /**
  * A point on the ED25519 curve which represents a group element.
+ * This implementation is based on the ref10 implementation of SUPERCOP.
  *
  * Literature:
  * [1] Daniel J. Bernstein, Niels Duif, Tanja Lange, Peter Schwabe and Bo-Yin Yang : High-speed high-security signatures
@@ -167,10 +167,9 @@ public class Ed25519GroupElement implements Serializable {
 	 * Set x := β.
 	 * If sign(x) != bit 255 of s then negate x.
 	 *
-	 * @param curve The curve.
 	 * @param s The encoded point.
 	 */
-    public Ed25519GroupElement(final Curve curve, final byte[] s) {
+    public Ed25519GroupElement(final byte[] s) {
         Ed25519FieldElement x, y, yy, u, v, v3, vxx, check;
         y = Ed25519FieldElement.decode(s);
         yy = y.square();
@@ -200,7 +199,7 @@ public class Ed25519GroupElement implements Serializable {
 
             if (check.isNonZero())
                 throw new IllegalArgumentException("not a valid Ed25519GroupElement");
-            x = x.multiply(curve.getI());
+            x = x.multiply(Ed25519Field.I);
         }
 
         if ((x.isNegative() ? 1 : 0) != ArrayUtils.getBit(s, 255)) {
@@ -274,6 +273,24 @@ public class Ed25519GroupElement implements Serializable {
 	}
 
 	/**
+	 * Gets the table with the precomputed group elements for single scalar multiplication.
+	 *
+	 * @return The precomputed table.
+	 */
+	public Ed25519GroupElement[][] getPrecomputedForSingle() {
+		return this.precomputedForSingle;
+	}
+
+	/**
+	 * Gets the table with the precomputed group elements for double scalar multiplication.
+	 *
+	 * @return The precomputed table.
+	 */
+	public Ed25519GroupElement[] getPrecomputedForDouble() {
+		return this.precomputedForDouble;
+	}
+
+	/**
 	 * Converts the group element to an encoded point on the curve.
 	 *
 	 * @return The encoded point as byte array.
@@ -338,43 +355,43 @@ public class Ed25519GroupElement implements Serializable {
 			case P2:
 				switch (repr) {
 					case P2:
-						return this.p2(this.X, this.Y, this.Z);
+						return p2(this.X, this.Y, this.Z);
 					default:
 						throw new IllegalArgumentException();
 				}
 			case P3:
 				switch (repr) {
 					case P2:
-						return this.p2(this.X, this.Y, this.Z);
+						return p2(this.X, this.Y, this.Z);
 					case P3:
-						return this.p3(this.X, this.Y, this.Z, this.T);
+						return p3(this.X, this.Y, this.Z, this.T);
 					case CACHED:
-						return this.cached(this.Y.add(this.X), this.Y.subtract(this.X), this.Z, this.T.multiply(Ed25519Field.DTimes2));
+						return cached(this.Y.add(this.X), this.Y.subtract(this.X), this.Z, this.T.multiply(Ed25519Field.D_Times_TWO));
 					default:
 						throw new IllegalArgumentException();
 				}
 			case P1P1:
 				switch (repr) {
 					case P2:
-						return this.p2(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T));
+						return p2(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T));
 					case P3:
-						return this.p3(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y));
+						return p3(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y));
 					case P1P1:
-						return this.p1p1(this.X, this.Y, this.Z, this.T);
+						return p1p1(this.X, this.Y, this.Z, this.T);
 					default:
 						throw new IllegalArgumentException();
 				}
 			case PRECOMP:
 				switch (repr) {
 					case PRECOMP:
-						return this.precomp(this.X, this.Y, this.Z);
+						return precomp(this.X, this.Y, this.Z);
 					default:
 						throw new IllegalArgumentException();
 				}
 			case CACHED:
 				switch (repr) {
 					case CACHED:
-						return this.cached(this.X, this.Y, this.Z, this.T);
+						return cached(this.X, this.Y, this.Z, this.T);
 					default:
 						throw new IllegalArgumentException();
 				}
@@ -384,15 +401,14 @@ public class Ed25519GroupElement implements Serializable {
     }
 
 	/**
-	 * Precomputes and returns the group elements for a scalar multiplication as array.
-	 *
-	 * @param curve The curve.
-	 * @param g The given group element.
-	 * @return The precomputed array.
+	 * Precomputes the group elements needed to speed up a scalar multiplication.
 	 */
-	public Ed25519GroupElement[][] precomputeForScalarMultiplication(final Curve curve, final Ed25519GroupElement g) {
-		Ed25519GroupElement Bi = g;
-		final Ed25519GroupElement[][] precomputed = new Ed25519GroupElement[32][8];
+	public void precomputeForScalarMultiplication() {
+		if (null != this.precomputedForSingle) {
+			return;
+		}
+		Ed25519GroupElement Bi = this;
+		this.precomputedForSingle = new Ed25519GroupElement[32][8];
 
 		for (int i = 0; i < 32; i++) {
 			Ed25519GroupElement Bij = Bi;
@@ -400,7 +416,7 @@ public class Ed25519GroupElement implements Serializable {
 				final Ed25519FieldElement recip = Bij.Z.invert();
 				final Ed25519FieldElement x = Bij.X.multiply(recip);
 				final Ed25519FieldElement y = Bij.Y.multiply(recip);
-				precomputed[i][j] = this.precomp(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.DTimes2));
+				this.precomputedForSingle[i][j] = precomp(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.D_Times_TWO));
 				Bij = Bij.add(Bi.toCached()).toP3();
 			}
 			// Only every second summand is precomputed (16^2 = 256).
@@ -408,29 +424,24 @@ public class Ed25519GroupElement implements Serializable {
 				Bi = Bi.add(Bi.toCached()).toP3();
 			}
 		}
-
-		return precomputed;
 	}
 
 	/**
-	 * Precomputes and returns the group elements for a double scalar multiplication as array.
-	 *
-	 * @param curve The curve.
-	 * @param g The given group element.
-	 * @return The precomputed array.
+	 * Precomputes the group elements used to speed up a double scalar multiplication.
 	 */
-	public Ed25519GroupElement[] precomputeForDoubleScalarMultiplication(final Curve curve, final Ed25519GroupElement g) {
-		Ed25519GroupElement Bi = g;
-		final Ed25519GroupElement[] precomputed = new Ed25519GroupElement[8];
+	public void precomputeForDoubleScalarMultiplication() {
+		if (null != this.precomputedForDouble) {
+			return;
+		}
+		Ed25519GroupElement Bi = this;
+		this.precomputedForDouble = new Ed25519GroupElement[8];
 		for (int i = 0; i < 8; i++) {
 			final Ed25519FieldElement recip = Bi.Z.invert();
 			final Ed25519FieldElement x = Bi.X.multiply(recip);
 			final Ed25519FieldElement y = Bi.Y.multiply(recip);
-			precomputed[i] = this.precomp(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.DTimes2));
-			Bi = g.add(g.add(Bi.toCached()).toP3().toCached()).toP3();
+			this.precomputedForDouble[i] = precomp(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.D_Times_TWO));
+			Bi = this.add(this.add(Bi.toCached()).toP3().toCached()).toP3();
 		}
-
-		return precomputed;
 	}
 
     /**
@@ -474,7 +485,7 @@ public class Ed25519GroupElement implements Serializable {
 				AA = A.square();
 				Yn = YY.add(XX);
 				Zn = YY.subtract(XX);
-				return this.p1p1(AA.subtract(Yn), Yn, Zn, B.subtract(Zn));
+				return p1p1(AA.subtract(Yn), Yn, Zn, B.subtract(Zn));
 			default:
 				throw new UnsupportedOperationException();
         }
@@ -534,7 +545,7 @@ public class Ed25519GroupElement implements Serializable {
         B = YmX.multiply(q.Y);
         C = q.Z.multiply(this.T);
         D = this.Z.add(this.Z);
-        return this.p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
+        return p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
     }
 
     /**
@@ -564,7 +575,7 @@ public class Ed25519GroupElement implements Serializable {
         B = YmX.multiply(q.X);
         C = q.Z.multiply(this.T);
         D = this.Z.add(this.Z);
-        return this.p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
+        return p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
     }
 
     /**
@@ -606,7 +617,7 @@ public class Ed25519GroupElement implements Serializable {
         C = q.T.multiply(this.T);
         ZZ = this.Z.multiply(q.Z);
         D = ZZ.add(ZZ);
-        return this.p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
+        return p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
     }
 
     /**
@@ -635,7 +646,7 @@ public class Ed25519GroupElement implements Serializable {
         C = q.T.multiply(T);
         ZZ = Z.multiply(q.Z);
         D = ZZ.add(ZZ);
-        return this.p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
+        return p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
     }
 
 	/**
@@ -649,7 +660,7 @@ public class Ed25519GroupElement implements Serializable {
 			throw new UnsupportedOperationException();
 		}
 
-        return Ed25519Constants.ZERO.sub(this.toCached()).toP3();
+        return Ed25519Group.ZERO.sub(this.toCached()).toP3();
     }
 
     @Override
@@ -733,13 +744,11 @@ public class Ed25519GroupElement implements Serializable {
      * Replaces this with u if b == 1.
      * Replaces this with this if b == 0.
      *
-     * Method is package private only so that tests run.
-     *
      * @param u The group element to return if b == 1.
      * @param b in {0, 1}
      * @return u if b == 1; this if b == 0; null otherwise.
      */
-    Ed25519GroupElement cmov(final Ed25519GroupElement u, final int b) {
+	private Ed25519GroupElement cmov(final Ed25519GroupElement u, final int b) {
         Ed25519GroupElement ret = null;
         for (int i = 0; i < b; i++) {
             // Only for b == 1
@@ -759,20 +768,18 @@ public class Ed25519GroupElement implements Serializable {
      *
      * Must have previously precomputed.
      *
-     * Method is package private only so that tests run.
-     *
      * @param pos = i/2 for i in {0, 2, 4,..., 62}
      * @param b = r_i
      * @return The Ed25519GroupElement
      */
-    Ed25519GroupElement select(final int pos, final int b) {
+	private Ed25519GroupElement select(final int pos, final int b) {
         // Is r_i negative?
 		final int bNegative = ByteUtils.isNegative(b);
         // |r_i|
 		final int bAbs = b - (((-bNegative) & b) << 1);
 
         // 16^i |r_i| B
-		final Ed25519GroupElement t = Ed25519Constants.ZERO_PRECOMP
+		final Ed25519GroupElement t = Ed25519Group.ZERO_PRECOMP
                 .cmov(this.precomputedForSingle[pos][0], ByteUtils.isEqual(bAbs, 1))
                 .cmov(this.precomputedForSingle[pos][1], ByteUtils.isEqual(bAbs, 2))
                 .cmov(this.precomputedForSingle[pos][2], ByteUtils.isEqual(bAbs, 3))
@@ -804,7 +811,7 @@ public class Ed25519GroupElement implements Serializable {
 
 		final byte[] e = toRadix16(a);
 
-        Ed25519GroupElement h = Ed25519Constants.ZERO;
+        Ed25519GroupElement h = Ed25519Group.ZERO;
         synchronized(this) {
             for (i = 1; i < 64; i += 2) {
                 t = select(i/2, e[i]);
@@ -886,7 +893,7 @@ public class Ed25519GroupElement implements Serializable {
 		final byte[] aSlide = slide(a);
 		final byte[] bSlide = slide(b);
 
-        Ed25519GroupElement r = Ed25519Constants.ZERO_P2;
+        Ed25519GroupElement r = Ed25519Group.ZERO_P2;
 
         int i;
         for (i = 255; i >= 0; --i) {
@@ -904,9 +911,9 @@ public class Ed25519GroupElement implements Serializable {
                 }
 
                 if (bSlide[i] > 0) {
-                    t = t.toP3().madd(Ed25519PrecomputedTable.precomputedForDouble[bSlide[i]/2]);
+                    t = t.toP3().madd(this.precomputedForDouble[bSlide[i]/2]);
                 } else if(bSlide[i] < 0) {
-                    t = t.toP3().msub(Ed25519PrecomputedTable.precomputedForDouble[(-bSlide[i])/2]);
+                    t = t.toP3().msub(this.precomputedForDouble[(-bSlide[i])/2]);
                 }
 
                 r = t.toP2();

@@ -3,8 +3,7 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.ed25519.Ed25519Constants;
-import org.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
+import org.nem.core.crypto.ed25519.arithmetic.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -141,13 +140,12 @@ public class PublicKeyTest {
 
 	private static Ed25519GroupElement getA(boolean precompute) {
 		Ed25519GroupElement A = Ed25519GroupElement.p3(
-				Ed25519Constants.curve,
-				Ed25519Constants.curve.getField().ZERO,
-				Ed25519Constants.curve.getField().ONE,
-				Ed25519Constants.curve.getField().ONE,
-				Ed25519Constants.curve.getField().ZERO);
+				Ed25519Field.ZERO,
+				Ed25519Field.ONE,
+				Ed25519Field.ONE,
+				Ed25519Field.ZERO);
 		if (precompute) {
-			A.precompute(false);
+			A.precomputeForDoubleScalarMultiplication();
 		}
 
 		return A;

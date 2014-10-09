@@ -10,12 +10,14 @@ import java.math.BigInteger;
  */
 public class Ed25519Field {
 
-	private static final byte[] P = HexEncoder.getBytes("edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f");
+	public static final BigInteger P = new BigInteger(HexEncoder.getBytes("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed"));
 	public static final Ed25519FieldElement ZERO = getFieldElement(0);
 	public static final Ed25519FieldElement ONE = getFieldElement(1);
 	public static final Ed25519FieldElement TWO = getFieldElement(2);
 	public static final Ed25519FieldElement D = getD();
-	public static final Ed25519FieldElement DTimes2 = D.multiply(TWO);
+	public static final Ed25519FieldElement D_Times_TWO = D.multiply(TWO);
+	public static final Ed25519FieldElement I = Ed25519FieldElement.decode(HexEncoder.getBytes(
+			"b0a00e4a271beec478e42fad0618432fa7d7fb3d99004d2b0bdfc14f8024832b"));
 
 	private static Ed25519FieldElement getFieldElement(final int value) {
 		final int[] f = new int[10];
@@ -26,7 +28,7 @@ public class Ed25519Field {
 	private static Ed25519FieldElement getD() {
 		final BigInteger d = new BigInteger("-121665")
 				.multiply(new BigInteger("121666")
-				.modInverse(ArrayUtils.toBigInteger(P)));
+				.modInverse(Ed25519Field.P));
 		return Ed25519FieldElement.decode(ArrayUtils.toByteArray(d, 32));
 	}
 }
