@@ -40,7 +40,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
 		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", false);
 		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", false);
-		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 6);
+		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 2);
 	}
 
 	/**
