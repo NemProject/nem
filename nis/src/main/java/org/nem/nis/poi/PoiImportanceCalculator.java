@@ -1,7 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.graph.*;
 
 import java.util.Collection;
@@ -35,21 +35,21 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	public PoiImportanceCalculator(
 			final PoiScorer poiScorer,
 			final GraphClusteringStrategy clusterer) {
-		this(poiScorer, clusterer, true);
+		this(poiScorer, clusterer, new PoiOptions(Amount.fromNem(1000), Amount.ZERO, true));
 	}
 
 	/**
 	 * Creates a new generator with custom options.
 	 *
 	 * @param poiScorer The poi scorer to use.
-	 * @param clusterer The graph clusterer to use.
-	 * @param useInterLevelMatrix true if the inter-level matrix should be used in the calculation.
+	 * @param clusterer The additional poi options to use.
+	 * @param options The poi options.
 	 */
 	public PoiImportanceCalculator(
 			final PoiScorer poiScorer,
 			final GraphClusteringStrategy clusterer,
-			final boolean useInterLevelMatrix) {
-		this.useInterLevelMatrix = useInterLevelMatrix;
+			final PoiOptions options) {
+		this.useInterLevelMatrix = options.isClusteringEnabled();
 		this.poiScorer = poiScorer;
 		this.clusterer = clusterer;
 	}
