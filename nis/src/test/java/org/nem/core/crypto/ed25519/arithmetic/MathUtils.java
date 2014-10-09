@@ -180,7 +180,23 @@ public class MathUtils {
 		final boolean shouldBeNegative = (bytes[31] >> 7) != 0;
 		bytes[31] &= 0x7f;
 		final BigInteger y = MathUtils.toBigInteger(bytes);
+		final BigInteger x = getAffineXFromAffineY(y, shouldBeNegative);
 
+		return Ed25519GroupElement.p3(
+				toFieldElement(x),
+				toFieldElement(y),
+				Ed25519Field.ONE,
+				toFieldElement(x.multiply(y).mod(Ed25519Field.P)));
+	}
+
+	/**
+	 * Gets the affine x-coordinate from a given affine y-coordinate and the sign of x.
+	 *
+	 * @param y The affine y-coordinate
+	 * @param shouldBeNegative true if the negative solution should be chosen, false otherwise.
+	 * @return The affine x-ccordinate.
+	 */
+	public static BigInteger getAffineXFromAffineY(final BigInteger y, final boolean shouldBeNegative) {
 		// x = sign(x) * sqrt((y^2 - 1) / (d * y^2 + 1))
 		final BigInteger u = y.multiply(y).subtract(BigInteger.ONE).mod(Ed25519Field.P);
 		final BigInteger v = D.multiply(y).multiply(y).add(BigInteger.ONE).mod(Ed25519Field.P);
@@ -197,7 +213,7 @@ public class MathUtils {
 			x = x.negate().mod(Ed25519Field.P);
 		}
 
-		return Ed25519GroupElement.p3(toFieldElement(x), toFieldElement(y), Ed25519Field.ONE, toFieldElement(x.multiply(y).mod(Ed25519Field.P)));
+		return x;
 	}
 
 	/**
@@ -342,7 +358,7 @@ public class MathUtils {
 	 */
 	public static Ed25519GroupElement scalarMultiplyGroupElement(final Ed25519GroupElement g, final Ed25519FieldElement f) {
 		final byte[] bytes = f.encode();
-		Ed25519GroupElement h = Ed25519Group.ZERO;
+		Ed25519GroupElement h = Ed25519Group.ZERO_P3;
 		for (int i=254; i>=0; i--) {
 			h = doubleGroupElement(h);
 			if (ArrayUtils.getBit(bytes, i) == 1) {
@@ -484,7 +500,7 @@ public class MathUtils {
 			final Ed25519GroupElement h = MathUtils.scalarMultiplyGroupElement(g, Ed25519Field.ZERO);
 
 			// Assert:
-			Assert.assertThat(Ed25519Group.ZERO, IsEqual.equalTo(h));
+			Assert.assertThat(Ed25519Group.ZERO_P3, IsEqual.equalTo(h));
 		}
 	}
 	// End TODO BR: Remove when finished!

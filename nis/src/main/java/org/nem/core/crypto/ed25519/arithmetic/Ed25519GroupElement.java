@@ -660,7 +660,7 @@ public class Ed25519GroupElement implements Serializable {
 			throw new UnsupportedOperationException();
 		}
 
-        return Ed25519Group.ZERO.sub(this.toCached()).toP3();
+        return Ed25519Group.ZERO_P3.sub(this.toCached()).toP3();
     }
 
     @Override
@@ -811,7 +811,7 @@ public class Ed25519GroupElement implements Serializable {
 
 		final byte[] e = toRadix16(a);
 
-        Ed25519GroupElement h = Ed25519Group.ZERO;
+        Ed25519GroupElement h = Ed25519Group.ZERO_P3;
         synchronized(this) {
             for (i = 1; i < 64; i += 2) {
                 t = select(i/2, e[i]);

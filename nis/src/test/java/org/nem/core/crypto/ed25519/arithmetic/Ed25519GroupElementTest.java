@@ -469,7 +469,7 @@ public class Ed25519GroupElementTest {
 		final Ed25519GroupElement g = basePoint.scalarMultiply(Ed25519Field.ZERO.encode());
 
 		// Assert:
-		Assert.assertThat(Ed25519Group.ZERO, IsEqual.equalTo(g));
+		Assert.assertThat(Ed25519Group.ZERO_P3, IsEqual.equalTo(g));
 	}
 
 	@Test
