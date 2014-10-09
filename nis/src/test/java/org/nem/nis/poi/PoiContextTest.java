@@ -12,7 +12,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PoiContextTest {
-	private static final Amount MIN_HARVESTING_BALANCE = new PoiOptions().getMinHarvesterBalance();
+	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();
+	private static final Amount MIN_HARVESTING_BALANCE = DEFAULT_OPTIONS.getMinHarvesterBalance();
 
 	//region construction (failures)
 
@@ -111,7 +112,9 @@ public class PoiContextTest {
 		// Act:
 		final BlockHeight height = new BlockHeight(21);
 		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
-		final PoiOptions options = new PoiOptions(Amount.fromNem(1000), Amount.ZERO, true);
+		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
+		poiOptionsBuilder.setIsClusteringEnabled(true);
+		final PoiOptions options = poiOptionsBuilder.create();
 		final PoiContext context = new PoiContext(accountStates, height, new FastScanClusteringStrategy(), options);
 
 		// Assert:
@@ -128,7 +131,9 @@ public class PoiContextTest {
 		// Act:
 		final BlockHeight height = new BlockHeight(21);
 		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
-		final PoiOptions options = new PoiOptions(Amount.fromNem(1000), Amount.ZERO, false);
+		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
+		poiOptionsBuilder.setIsClusteringEnabled(false);
+		final PoiOptions options = poiOptionsBuilder.create();
 		final PoiContext context = new PoiContext(accountStates, height, new FastScanClusteringStrategy(), options);
 
 		// Assert:
@@ -188,7 +193,9 @@ public class PoiContextTest {
 		// Act:
 		// (0, 1, 8), (0, 2, 4), (1, 0, 2), (1, 2, 6), (3, 0, 3), (3, 2, 5)
 		// ==> (0, 1, 6), (0, 2, 4), (1, 2, 6), (3, 2, 5)
-		final PoiOptions options = new PoiOptions(Amount.fromNem(1000), Amount.fromNem(4), true);
+		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
+		poiOptionsBuilder.setMinOutlinkWeight(Amount.fromNem(4));
+		final PoiOptions options = poiOptionsBuilder.create();
 		final PoiContext context = createTestPoiContextWithAccountLinks(options);
 
 		// Assert:
@@ -390,11 +397,11 @@ public class PoiContextTest {
 	}
 
 	private static PoiContext createPoiContext(final List<PoiAccountState> accountStates, final BlockHeight height) {
-		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), new PoiOptions());
+		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), DEFAULT_OPTIONS);
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
-		return createTestPoiContextWithAccountLinks(new PoiOptions());
+		return createTestPoiContextWithAccountLinks(DEFAULT_OPTIONS);
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks(final PoiOptions poiOptions) {

@@ -4,12 +4,13 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.Amount;
 
-public class PoiOptionsTest {
+public class PoiOptionsBuilderTest {
 
 	@Test
 	public void canCreateDefaultOptions() {
 		// Act:
-		final PoiOptions options = new PoiOptions();
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		final PoiOptions options = builder.create();
 
 		// Assert:
 		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
@@ -20,10 +21,11 @@ public class PoiOptionsTest {
 	@Test
 	public void canCreateCustomOptions() {
 		// Act:
-		final PoiOptions options = new PoiOptions(
-				Amount.fromNem(123),
-				Amount.fromNem(777),
-				false);
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setMinHarvesterBalance(Amount.fromNem(123));
+		builder.setMinOutlinkWeight(Amount.fromNem(777));
+		builder.setIsClusteringEnabled(false);
+		final PoiOptions options = builder.create();
 
 		// Assert:
 		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(123)));

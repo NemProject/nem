@@ -123,10 +123,12 @@ public class PoiImportanceCalculatorITCase {
 		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
 
 		final BlockHeight importanceBlockHeight = new BlockHeight(2);
+		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
+		poiOptionsBuilder.setIsClusteringEnabled(useClusteringStrategy);
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
 				new PoiScorer(),
 				clusteringStrategy,
-				new PoiOptions(Amount.fromNem(1000), Amount.ZERO, useClusteringStrategy));
+				poiOptionsBuilder.create());
 		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		final List<Double> importances = accountStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(importanceBlockHeight))

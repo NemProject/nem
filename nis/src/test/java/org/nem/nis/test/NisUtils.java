@@ -7,7 +7,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dao.*;
-import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
@@ -19,6 +18,7 @@ import java.util.*;
  * Static class containing NIS test helper functions.
  */
 public class NisUtils {
+	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
 
 	/**
 	 * Creates a DB Block that can be mapped to a model Block.
@@ -175,7 +175,7 @@ public class NisUtils {
 				transferDao,
 				Mockito.mock(ImportanceTransferDao.class),
 				new SystemTimeProvider(),
-				new PoiOptions());
+				DEFAULT_POI_OPTIONS);
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class NisUtils {
 	 * @return The calculator.
 	 */
 	public static ImportanceCalculator createImportanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy(), new PoiOptions());
+		return new PoiImportanceCalculator(new PoiScorer(), new FastScanClusteringStrategy(), DEFAULT_POI_OPTIONS);
 	}
 
 	/**

@@ -213,7 +213,7 @@ public class NisAppConfig {
 
 	@Bean
 	public PoiOptions poiOptions() {
-		return new PoiOptions();
+		return new PoiOptionsBuilder().create();
 	}
 
 	@Bean
