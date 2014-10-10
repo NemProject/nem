@@ -60,7 +60,7 @@ public class NxtGraphClusteringITCase {
 
 	@Ignore
 	@Test
-	public void canPrintImportances() throws IOException {
+	public void canWriteImportancesToFile() throws IOException {
 		final String options = String.format(
 				"_%smin_%dmu_%fepsilon",
 				DEFAULT_POI_OPTIONS.getMinHarvesterBalance(),
@@ -68,7 +68,7 @@ public class NxtGraphClusteringITCase {
 				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
 
 		// Arrange
-		final int endHeight = 225000;//was 300k
+		final int endHeight = 225000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 
 		// 0. Load account states.
@@ -78,7 +78,8 @@ public class NxtGraphClusteringITCase {
 		final ColumnVector importances = getAccountImportances(
 				new BlockHeight(endHeight),
 				eligibleAccountStates,
-				new FastScanClusteringStrategy());
+				new FastScanClusteringStrategy(),
+				null);
 
 		final List<Long> stakes = eligibleAccountStates.stream()
 				.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(endBlockHeight)).getNumMicroNem())
@@ -102,11 +103,18 @@ public class NxtGraphClusteringITCase {
 				})
 				.collect(Collectors.toList());
 
-		FileUtils.writeStringToFile(new File("importances" + options + ".csv"), Arrays.toString(importances.getRaw()));
-		FileUtils.writeStringToFile(new File("stakes" + options + ".csv"), stakes.toString());
-		FileUtils.writeStringToFile(new File("addresses" + options + ".csv"), addresses.toString());
-		FileUtils.writeStringToFile(new File("outlinkCount" + options + ".csv"), outlinkCounts.toString());
-		FileUtils.writeStringToFile(new File("outlinkSums" + options + ".csv"), outlinkSums.toString());
+		String output = "'address', 'stake', 'importance', 'outlinkCount', 'outlinkSum'\n";
+		for (int i = 0; i < importances.size(); ++i) {
+			output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," + outlinkSums.get(i) + "\n";
+		}
+
+		FileUtils.writeStringToFile(new File("importances" + options + ".csv"), output);
+
+		//FileUtils.writeStringToFile(new File("importances" + options + ".csv"), Arrays.toString(importances.getRaw()));
+		//FileUtils.writeStringToFile(new File("stakes" + options + ".csv"), stakes.toString());
+		//FileUtils.writeStringToFile(new File("addresses" + options + ".csv"), addresses.toString());
+		//FileUtils.writeStringToFile(new File("outlinkCount" + options + ".csv"), outlinkCounts.toString());
+		//FileUtils.writeStringToFile(new File("outlinkSums" + options + ".csv"), outlinkSums.toString());
 	}
 
 	//endregion
@@ -152,7 +160,8 @@ public class NxtGraphClusteringITCase {
 		final ColumnVector importanceVector = getAccountImportances(
 				new BlockHeight(endHeight),
 				eligibleAccountStates,
-				clusteringStrategy);
+				clusteringStrategy,
+				null);
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("Calculating importances needed %d ms.", stop - start));
 		return importanceVector;
@@ -322,9 +331,14 @@ public class NxtGraphClusteringITCase {
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> acctStates,
-			final GraphClusteringStrategy clusteringStrategy) {
-		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
+			final GraphClusteringStrategy clusteringStrategy,
+			PoiOptionsBuilder poiOptionsBuilder) {
+
+		if (null == poiOptionsBuilder) {
+			poiOptionsBuilder = new PoiOptionsBuilder();
+			poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
+		}
+
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(new PoiScorer(), poiOptionsBuilder.create());
 		importanceCalculator.recalculate(blockHeight, acctStates);
 		final List<Double> importances = acctStates.stream()
@@ -337,5 +351,19 @@ public class NxtGraphClusteringITCase {
 		}
 
 		return importancesVector;
+	}
+
+	private static PoiOptionsBuilder createBuilderWithCustomOptions() {
+		// Act:
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setMinHarvesterBalance(Amount.fromNem(123));
+		builder.setMinOutlinkWeight(Amount.fromNem(777));
+		builder.setNegativeOutlinkWeight(0.76);
+		builder.setOutlierWeight(0.82);
+		builder.setMuClusteringValue(5);
+		builder.setEpsilonClusteringValue(0.42);
+		builder.setTeleportationProbability(0.65);
+		builder.setInterLevelTeleportationProbability(0.32);
+		return builder;
 	}
 }
