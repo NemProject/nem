@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
@@ -85,6 +86,15 @@ public class Signature {
 	 */
 	public BigInteger getS() {
 		return ArrayUtils.toBigInteger(this.s);
+	}
+
+	/**
+	 * Gets the s-part of the signature.
+	 *
+	 * @return The s-part of the signature.
+	 */
+	public Ed25519EncodedFieldElement getSAsEncodedFieldElement() {
+		return new Ed25519EncodedFieldElement(this.s);
 	}
 
 	/**

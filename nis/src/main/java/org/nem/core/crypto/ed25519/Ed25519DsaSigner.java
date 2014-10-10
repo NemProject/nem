@@ -39,12 +39,12 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
 		this.digest.update(hash, 32, 32);
-		final byte[] r = this.digest.digest(data);
+		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(this.digest.digest(data));
 
 		// Reduce size of r since we are calculating mod group order anyway
-		final byte[] rModQ = Ed25519FieldElement.modQ(r);
+		final Ed25519EncodedFieldElement rModQ = r.modQ();
 
-		// R = r * base point.
+		// R = rModQ * base point.
 		final Ed25519GroupElement R = Ed25519Group.BASE_POINT.scalarMultiply(rModQ);
 		final byte[] encodedR = R.toByteArray();
 
@@ -52,14 +52,14 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// encodedR and encodedA are the little endian encodings of the group element R and the public key A and
 		// a is the lower 32 bytes of hash after clamping.
 		this.digest.update(encodedR);
-		final byte[] encodedA = this.keyPair.getPublicKey().getRaw();
-		this.digest.update(encodedA);
-		final byte[] h = this.digest.digest(data);
-		final byte[] hModQ = Ed25519FieldElement.modQ(h);
-		final byte[] encodedS = Ed25519FieldElement.multiplyAndAddModQ(hModQ, keyPair.getPrivateKey().prepareForScalarMultiply(), rModQ);
+		this.digest.update(this.keyPair.getPublicKey().getRaw());
+		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
+		final Ed25519EncodedFieldElement hModQ = h.modQ();
+		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(keyPair.getPrivateKey().prepareForScalarMultiply(), rModQ);
 
 		// Signature is (encodedR, encodedS)
-		final Signature signature = new Signature(encodedR, encodedS);
+		// TODO 20142010 BR: change this to new Signature(Ed25519EncodedGroupElement, Ed25519EncodedFieldElement)
+		final Signature signature = new Signature(encodedR, encodedS.getRaw());
 		if (!isCanonicalSignature(signature)) {
 			throw new CryptoException("Generated signature is not canonical");
 		}
@@ -78,21 +78,22 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] encodedA = this.keyPair.getPublicKey().getRaw();
 		this.digest.update(encodedR);
 		this.digest.update(encodedA);
-		final byte[] h = this.digest.digest(data);
+		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
 
-		// hReduced = h mode group order
-		final byte[] hModQ = Ed25519FieldElement.modQ(h);
+		// hReduced = h mod group order
+		final Ed25519EncodedFieldElement hModQ = h.modQ();
 
 		Ed25519GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
 		if (null == A) {
 			// Must compute A.
-			A = new Ed25519GroupElement(encodedA);
+			// TODO 20142010 BR: change this to new Ed25519GroupElement(Ed25519EncodedGroupElement)
+			A = new Ed25519GroupElement(new Ed25519EncodedFieldElement(encodedA));
 			A.precomputeForDoubleScalarMultiplication();
 		}
 
 		// R = encodedS * B - H(encodedR, encodedA, data) * A
 		final Ed25519GroupElement calculatedR = Ed25519Group.BASE_POINT.doubleScalarMultiplyVariableTime(
-				A, hModQ, signature.getBinaryS());
+				A, hModQ, signature.getSAsEncodedFieldElement());
 
 		// Compare calculated R to given R.
 		final byte[] encodedCalculatedR = calculatedR.toByteArray();
@@ -108,9 +109,9 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 	@Override
 	public Signature makeSignatureCanonical(final Signature signature) {
-		final byte[] s = Arrays.copyOf(signature.getBinaryS(), 64);
-		final byte[] sModQ = Ed25519FieldElement.modQ(s);
+		final Ed25519EncodedFieldElement s = new Ed25519EncodedFieldElement(Arrays.copyOf(signature.getBinaryS(), 64));
+		final Ed25519EncodedFieldElement sModQ = s.modQ();
 
-		return new Signature(signature.getBinaryR(), sModQ);
+		return new Signature(signature.getBinaryR(), sModQ.getRaw());
 	}
 }

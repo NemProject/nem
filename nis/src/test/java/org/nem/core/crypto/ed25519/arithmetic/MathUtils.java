@@ -56,13 +56,23 @@ public class MathUtils {
 	}
 
 	/**
+	 * Converts an encoded field element to a BigInteger.
+	 *
+	 * @param encoded The encoded field element.
+	 * @return The BigInteger.
+	 */
+	public static BigInteger toBigInteger(final Ed25519EncodedFieldElement encoded) {
+		return toBigInteger(encoded.getRaw());
+	}
+
+	/**
 	 * Converts a field element to a BigInteger.
 	 *
 	 * @param f The field element.
 	 * @return The BigInteger.
 	 */
 	public static BigInteger toBigInteger(final Ed25519FieldElement f) {
-		return toBigInteger(f.encode());
+		return toBigInteger(f.encode().getRaw());
 	}
 
 	/**
@@ -72,7 +82,7 @@ public class MathUtils {
 	 * @return The field element.
 	 */
 	public static Ed25519FieldElement toFieldElement(final BigInteger b) {
-		return Ed25519FieldElement.decode(toByteArray(b));
+		return new Ed25519EncodedFieldElement(toByteArray(b)).decode();
 	}
 
 	/**
@@ -98,14 +108,24 @@ public class MathUtils {
 	}
 
 	/**
-	 * Reduces an integer in 2^8 bit representation modulo the group order and returns the result.
+	 * Converts a BigInteger to an encoded field element.
 	 *
-	 * @param bytes The integer in 2^8 bit representation.
-	 * @return The mod group order reduced integer.
+	 * @param b The BigInteger.
+	 * @return The encoded field element.
 	 */
-	public static byte[] reduceModGroupOrder(final byte[] bytes) {
-		final BigInteger b = toBigInteger(bytes).mod(Ed25519Group.GROUP_ORDER);
-		return toByteArray(b);
+	public static Ed25519EncodedFieldElement toEncodedFieldElement(final BigInteger b) {
+		return new Ed25519EncodedFieldElement(toByteArray(b));
+	}
+
+	/**
+	 * Reduces an encoded field element modulo the group order and returns the result.
+	 *
+	 * @param encoded The encoded field element.
+	 * @return The mod group order reduced encoded field element.
+	 */
+	public static Ed25519EncodedFieldElement reduceModGroupOrder(final Ed25519EncodedFieldElement encoded) {
+		final BigInteger b = toBigInteger(encoded).mod(Ed25519Group.GROUP_ORDER);
+		return toEncodedFieldElement(b);
 	}
 
 	/**
@@ -117,9 +137,12 @@ public class MathUtils {
 	 * @param c The third integer.
 	 * @return The mod group order reduced result.
 	 */
-	public static byte[] multiplyAndAddModGroupOrder(final byte[] a, final byte[] b, final byte[] c) {
+	public static Ed25519EncodedFieldElement multiplyAndAddModGroupOrder(
+			final Ed25519EncodedFieldElement a,
+			final Ed25519EncodedFieldElement b,
+			final Ed25519EncodedFieldElement c) {
 		final BigInteger result = toBigInteger(a).multiply(toBigInteger(b)).add(toBigInteger(c)).mod(Ed25519Group.GROUP_ORDER);
-		return toByteArray(result);
+		return toEncodedFieldElement(result);
 	}
 
 	/**
@@ -147,6 +170,17 @@ public class MathUtils {
 		return new Ed25519FieldElement(t);
 	}
 
+	/**
+	 * Returns a random 32 byte encoded field element.
+	 *
+	 * @return The encoded field element.
+	 */
+	public static Ed25519EncodedFieldElement getRandomEncodedFieldElement(final int length) {
+		final byte[] bytes = getRandomByteArray(length);
+		bytes[31] &= 0x7f;
+		return new Ed25519EncodedFieldElement(bytes);
+	}
+
 	// endregion
 
 	// region group element
@@ -162,7 +196,7 @@ public class MathUtils {
 		while (true) {
 			try {
 				random.nextBytes(bytes);
-				return new Ed25519GroupElement(bytes);
+				return new Ed25519GroupElement(new Ed25519EncodedFieldElement(bytes));
 			} catch (IllegalArgumentException e) {
 				// Will fail in about 50%, so try again.
 			}
@@ -357,7 +391,7 @@ public class MathUtils {
 	 * @return The resulting group element.
 	 */
 	public static Ed25519GroupElement scalarMultiplyGroupElement(final Ed25519GroupElement g, final Ed25519FieldElement f) {
-		final byte[] bytes = f.encode();
+		final byte[] bytes = f.encode().getRaw();
 		Ed25519GroupElement h = Ed25519Group.ZERO_P3;
 		for (int i=254; i>=0; i--) {
 			h = doubleGroupElement(h);
@@ -435,13 +469,13 @@ public class MathUtils {
 		a[31] |= 0x40;
 		a[0] &= 0xF8;
 		digest.update(Arrays.copyOfRange(hash, 32, 64));
-		final byte[] r = digest.digest(data);
-		final byte[] rReduced = reduceModGroupOrder(r);
+		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(digest.digest(data));
+		final Ed25519EncodedFieldElement rReduced = reduceModGroupOrder(r);
 		final Ed25519GroupElement R = scalarMultiplyGroupElement(Ed25519Group.BASE_POINT, toFieldElement(toBigInteger(rReduced)));
 		digest.update(R.toByteArray());
 		digest.update(keyPair.getPublicKey().getRaw());
-		final byte[] h = digest.digest(data);
-		final byte[] hReduced = reduceModGroupOrder(h);
+		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(digest.digest(data));
+		final Ed25519EncodedFieldElement hReduced = reduceModGroupOrder(h);
 		BigInteger S = toBigInteger(rReduced).add(toBigInteger(hReduced).multiply(toBigInteger(a))).mod(Ed25519Group.GROUP_ORDER);
 
 		return new Signature(R.toByteArray(), toByteArray(S));

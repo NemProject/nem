@@ -18,13 +18,13 @@ public class Ed25519Group {
 
 
 	public static Ed25519GroupElement getBasePoint() {
-		BASE_POINT = fromEncoded(HexEncoder.getBytes("5866666666666666666666666666666666666666666666666666666666666666"));
+		BASE_POINT = fromEncoded(new Ed25519EncodedFieldElement(HexEncoder.getBytes("5866666666666666666666666666666666666666666666666666666666666666")));
 		BASE_POINT.precomputeForScalarMultiplication();
 		BASE_POINT.precomputeForDoubleScalarMultiplication();
 		return BASE_POINT;
 	}
 
-	public static Ed25519GroupElement fromEncoded(final byte[] encoded) {
+	public static Ed25519GroupElement fromEncoded(final Ed25519EncodedFieldElement encoded) {
 		return new Ed25519GroupElement(encoded);
 	}
 }

@@ -19,7 +19,7 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 			final PublicKey publicKey = generator.derivePublicKey(kp.getPrivateKey());
 
 			// Assert (throws if not on the curve):
-			new Ed25519GroupElement(publicKey.getRaw());
+			new Ed25519GroupElement(new Ed25519EncodedFieldElement(publicKey.getRaw()));
 		}
 	}
 

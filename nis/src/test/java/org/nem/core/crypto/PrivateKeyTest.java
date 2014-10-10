@@ -146,7 +146,7 @@ public class PrivateKeyTest {
 		final PrivateKey privateKey = new PrivateKey(new BigInteger(Utils.generateRandomBytes(32)));
 
 		// Act:
-		final byte[] a = privateKey.prepareForScalarMultiply();
+		final byte[] a = privateKey.prepareForScalarMultiply().getRaw();
 
 		// Assert:
 		Assert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));

@@ -14,13 +14,13 @@ public class Ed25519FieldElementTest {
 	// region constructor
 
 	@Test
-	public void canConstructFieldElementFromArrayWithCorrectLength() {
+	public void canCreateFieldElementFromArrayWithCorrectLength() {
 		// Assert:
 		new Ed25519FieldElement(new int[10]);
 	}
 
 	@Test (expected = IllegalArgumentException.class)
-	public void cannotConstructFieldElementFromArrayWithIncorrectLength() {
+	public void cannotCreateFieldElementFromArrayWithIncorrectLength() {
 		// Assert:
 		new Ed25519FieldElement(new int[9]);
 	}
@@ -51,7 +51,7 @@ public class Ed25519FieldElementTest {
 
 	// endregion
 
-	// region mod q arithmetic
+	// region mod p arithmetic
 
 	@Test
 	public void addReturnsCorrectResult() {
@@ -189,117 +189,19 @@ public class Ed25519FieldElementTest {
 
 	// endregion
 
-	// region modulo group order arithmetic
-
-	@Test
-	public void reduceReturnsExpectedResult() {
-		for (int i=0; i<1000; i++) {
-			// Arrange:
-			final byte[] bytes = MathUtils.getRandomByteArray(64);
-
-			// Act:
-			final byte[] reduced1 = Ed25519FieldElement.modQ(bytes);
-			final byte[] reduced2 = MathUtils.reduceModGroupOrder(bytes);
-
-			// Assert:
-			Assert.assertThat(MathUtils.toBigInteger(reduced1).compareTo(Ed25519Field.P), IsEqual.equalTo(-1));
-			Assert.assertThat(MathUtils.toBigInteger(reduced1).compareTo(new BigInteger("-1")), IsEqual.equalTo(1));
-			Assert.assertThat(reduced1, IsEqual.equalTo(reduced2));
-		}
-	}
-
-	@Test
-	public void multiplyAndAddReturnsExpectedResult() {
-		for (int i=0; i<1000; i++) {
-			// Arrange:
-			final byte[] bytes1 = MathUtils.getRandomByteArray(32);
-			final byte[] bytes2 = MathUtils.getRandomByteArray(32);
-			final byte[] bytes3 = MathUtils.getRandomByteArray(32);
-
-			// Act:
-			final byte[] result1 = Ed25519FieldElement.multiplyAndAddModQ(bytes1, bytes2, bytes3);
-			final byte[] result2 = MathUtils.multiplyAndAddModGroupOrder(bytes1, bytes2, bytes3);
-
-			// Assert:
-			Assert.assertThat(MathUtils.toBigInteger(result1).compareTo(Ed25519Field.P), IsEqual.equalTo(-1));
-			Assert.assertThat(MathUtils.toBigInteger(result1).compareTo(new BigInteger("-1")), IsEqual.equalTo(1));
-			Assert.assertThat(result1, IsEqual.equalTo(result2));
-		}
-	}
-
-	// endregion
-
-	// region encoding / decoding
-
-	@Test
-	public void encodeReturnsCorrectByteArrayForSimpleFieldElements() {
-		// Arrange:
-		final int[] t1 = new int[10];
-		final int[] t2 = new int[10];
-		t2[0] = 1;
-		final Ed25519FieldElement fieldElement1 = new Ed25519FieldElement(t1);
-		final Ed25519FieldElement fieldElement2 = new Ed25519FieldElement(t2);
-
-		// Act:
-		final byte[] bytes1 = fieldElement1.encode();
-		final byte[] bytes2 = fieldElement2.encode();
-
-		// Assert:
-		Assert.assertThat(bytes1, IsEqual.equalTo(MathUtils.toByteArray(BigInteger.ZERO)));
-		Assert.assertThat(bytes2, IsEqual.equalTo(MathUtils.toByteArray(BigInteger.ONE)));
-	}
-
-	@Test
-	public void encodeReturnsCorrectByteArrayIfBitjOfTiIsSetToOne() {
-		for (int i=0; i<10; i++){
-			// Arrange:
-			final int[] t = new int[10];
-			for (int j=0; j<24; j++) {
-				t[i] = 1 << j;
-				final Ed25519FieldElement fieldElement1 = new Ed25519FieldElement(t);
-				final BigInteger b = MathUtils.toBigInteger(t).mod(Ed25519Field.P);
-
-				// Act:
-				final byte[] bytes = fieldElement1.encode();
-
-				// Assert:
-				Assert.assertThat(bytes, IsEqual.equalTo(MathUtils.toByteArray(b)));
-			}
-		}
-	}
-
-	@Test
-	public void encodeReturnsCorrectByteArray() {
-		SecureRandom random = new SecureRandom();
-		for (int i=0; i<10000; i++){
-			// Arrange:
-			final int[] t = new int[10];
-			for (int j=0; j<10; j++) {
-				t[j] = random.nextInt(1 << 28) - (1 << 27);
-			}
-			final Ed25519FieldElement fieldElement1 = new Ed25519FieldElement(t);
-			final BigInteger b = MathUtils.toBigInteger(t);
-
-			// Act:
-			final byte[] bytes = fieldElement1.encode();
-
-			// Assert:
-			Assert.assertThat(bytes, IsEqual.equalTo(MathUtils.toByteArray(b.mod(Ed25519Field.P))));
-		}
-	}
+	// regiondecode
 
 	@Test
 	public void decodeReturnsCorrectFieldElementForSimpleByteArrays() {
 		// Arrange:
-		final byte[] bytes1 = new byte[32];
-		final byte[] bytes2 = new byte[32];
-		bytes2[0] = 1;
+		final Ed25519EncodedFieldElement encoded1 = MathUtils.toEncodedFieldElement(BigInteger.ZERO);
+		final Ed25519EncodedFieldElement encoded2 = MathUtils.toEncodedFieldElement(BigInteger.ONE);
 
 		// Act:
-		final Ed25519FieldElement f1 = Ed25519FieldElement.decode(bytes1);
-		final Ed25519FieldElement f2 = Ed25519FieldElement.decode(bytes2);
-		final BigInteger b1 = MathUtils.toBigInteger(f1.getRaw());
-		final BigInteger b2 = MathUtils.toBigInteger(f2.getRaw());
+		final Ed25519FieldElement f1 = encoded1.decode();
+		final Ed25519FieldElement f2 = encoded2.decode();
+		final BigInteger b1 = MathUtils.toBigInteger(f1);
+		final BigInteger b2 = MathUtils.toBigInteger(f2);
 
 		// Assert:
 		Assert.assertThat(b1, IsEqual.equalTo(BigInteger.ZERO));
@@ -317,13 +219,17 @@ public class Ed25519FieldElementTest {
 			final BigInteger b1 = MathUtils.toBigInteger(bytes);
 
 			// Act:
-			final Ed25519FieldElement f = Ed25519FieldElement.decode(bytes);
+			final Ed25519FieldElement f = new Ed25519EncodedFieldElement(bytes).decode();
 			final BigInteger b2 = MathUtils.toBigInteger(f.getRaw()).mod(Ed25519Field.P);
 
 			// Assert:
 			Assert.assertThat(b2, IsEqual.equalTo(b1));
 		}
 	}
+
+	// endregion
+
+	// region isNegative
 
 	@Test
 	public void isNegativeReturnsCorrectResult() {
@@ -350,7 +256,7 @@ public class Ed25519FieldElementTest {
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
 		final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
-		final Ed25519FieldElement f2 = Ed25519FieldElement.decode(f1.encode());
+		final Ed25519FieldElement f2 = f1.encode().decode();
 		final Ed25519FieldElement f3 = MathUtils.getRandomFieldElement();
 		final Ed25519FieldElement f4 = MathUtils.getRandomFieldElement();
 
@@ -365,7 +271,7 @@ public class Ed25519FieldElementTest {
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
-		final Ed25519FieldElement f2 = Ed25519FieldElement.decode(f1.encode());
+		final Ed25519FieldElement f2 = f1.encode().decode();
 		final Ed25519FieldElement f3 = MathUtils.getRandomFieldElement();
 		final Ed25519FieldElement f4 = MathUtils.getRandomFieldElement();
 
@@ -387,7 +293,7 @@ public class Ed25519FieldElementTest {
 		for (int i=0; i<32; i++) {
 			bytes[i] = (byte)(i+1);
 		}
-		final Ed25519FieldElement f = Ed25519FieldElement.decode(bytes);
+		final Ed25519FieldElement f = new Ed25519EncodedFieldElement(bytes).decode();
 
 		// Act:
 		final String fAsString = f.toString();

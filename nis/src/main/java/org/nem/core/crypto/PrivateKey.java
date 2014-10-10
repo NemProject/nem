@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
@@ -93,12 +94,12 @@ public class PrivateKey implements SerializableEntity {
 		}
 	}
 
-	public byte[] prepareForScalarMultiply() {
+	public Ed25519EncodedFieldElement prepareForScalarMultiply() {
 		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(value, 32));
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		a[31] &= 0x7F;
 		a[31] |= 0x40;
 		a[0] &= 0xF8;
-		return a;
+		return new Ed25519EncodedFieldElement(a);
 	}
 }

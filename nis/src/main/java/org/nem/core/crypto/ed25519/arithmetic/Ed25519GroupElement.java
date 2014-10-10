@@ -166,12 +166,13 @@ public class Ed25519GroupElement implements Serializable {
 	 * If v * β = -u multiply β with i=sqrt(-1).
 	 * Set x := β.
 	 * If sign(x) != bit 255 of s then negate x.
+	 * TODO 20141009 BR: change parameter to Ed25519EncodedGroupElement.
 	 *
-	 * @param s The encoded point.
+	 * @param encoded The encoded field element.
 	 */
-    public Ed25519GroupElement(final byte[] s) {
+    public Ed25519GroupElement(final Ed25519EncodedFieldElement encoded) {
         Ed25519FieldElement x, y, yy, u, v, v3, vxx, check;
-        y = Ed25519FieldElement.decode(s);
+        y = encoded.decode();
         yy = y.square();
 
         // u = y^2-1	
@@ -202,7 +203,7 @@ public class Ed25519GroupElement implements Serializable {
             x = x.multiply(Ed25519Field.I);
         }
 
-        if ((x.isNegative() ? 1 : 0) != ArrayUtils.getBit(s, 255)) {
+        if ((x.isNegative() ? 1 : 0) != ArrayUtils.getBit(encoded.getRaw(), 255)) {
             x = x.negate();
         }
 
@@ -302,7 +303,7 @@ public class Ed25519GroupElement implements Serializable {
 				Ed25519FieldElement recip = Z.invert();
 				Ed25519FieldElement x = X.multiply(recip);
 				Ed25519FieldElement y = Y.multiply(recip);
-				byte[] s = y.encode();
+				byte[] s = y.encode().getRaw();
 				s[s.length-1] |= (x.isNegative() ? (byte) 0x80 : 0);
 				return s;
 			default:
@@ -805,11 +806,11 @@ public class Ed25519GroupElement implements Serializable {
      * @param a = a[0]+256*a[1]+...+256^31 a[31]
      * @return the Ed25519GroupElement
      */
-    public Ed25519GroupElement scalarMultiply(final byte[] a) {
+    public Ed25519GroupElement scalarMultiply(final Ed25519EncodedFieldElement a) {
         Ed25519GroupElement t;
         int i;
 
-		final byte[] e = toRadix16(a);
+		final byte[] e = toRadix16(a.getRaw());
 
         Ed25519GroupElement h = Ed25519Group.ZERO_P3;
         synchronized(this) {
@@ -879,19 +880,23 @@ public class Ed25519GroupElement implements Serializable {
     }
 
     /**
-     * r = b * B - a * A  where a = a[0]+256*a[1]+...+256^31 a[31],
-     * b = b[0]+256*b[1]+...+256^31 b[31] and B is this point.
+     * r = b * B - a * A  where
+	 * a and b are encoded field elements and
+	 * B is this point.
      *
      * A must have been previously precomputed.
      *
      * @param A in P3 representation.
-     * @param a = a[0]+256*a[1]+...+256^31 a[31]
-     * @param b = b[0]+256*b[1]+...+256^31 b[31]
+     * @param a = The first encoded field element.
+     * @param b = The second encoded field element.
      * @return the Ed25519GroupElement
      */
-    public Ed25519GroupElement doubleScalarMultiplyVariableTime(final Ed25519GroupElement A, final byte[] a, final byte[] b) {
-		final byte[] aSlide = slide(a);
-		final byte[] bSlide = slide(b);
+    public Ed25519GroupElement doubleScalarMultiplyVariableTime(
+			final Ed25519GroupElement A,
+			final Ed25519EncodedFieldElement a,
+			final Ed25519EncodedFieldElement b) {
+		final byte[] aSlide = slide(a.getRaw());
+		final byte[] bSlide = slide(b.getRaw());
 
         Ed25519GroupElement r = Ed25519Group.ZERO_P2;
 

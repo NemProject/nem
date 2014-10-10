@@ -80,7 +80,7 @@ public class Ed25519GroupElementTest {
 			final byte[] bytes = g.toByteArray();
 
 			// Act:
-			final Ed25519GroupElement h1 = new Ed25519GroupElement(bytes);
+			final Ed25519GroupElement h1 = new Ed25519GroupElement(new Ed25519EncodedFieldElement(bytes));
 			final Ed25519GroupElement h2 = MathUtils.toGroupElement(bytes);
 
 			// Assert:

@@ -145,11 +145,13 @@ public class ArrayUtils {
 
 	/**
 	 * Constant-time byte[] comparison.
+	 *
 	 * @return 1 if b and c are equal, 0 otherwise.
 	 */
 	public static int isEqual(final byte[] b, final byte[] c) {
 		int result = 0;
-		for (int i = 0; i < 32; i++) {
+		result |= b.length - c.length;
+		for (int i = 0; i < b.length; i++) {
 			result |= b[i] ^ c[i];
 		}
 
