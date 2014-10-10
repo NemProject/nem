@@ -182,11 +182,11 @@ public class ImportanceTransferTransactionValidatorTest {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
 				this.poiFacade,
-				Amount.fromNem(1000));
+				Amount.fromNem(2000));
 
 		private Transaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
 			final Account signer = Utils.generateRandomAccount();
-			signer.incrementBalance(Amount.fromNem(1001));
+			signer.incrementBalance(Amount.fromNem(2001));
 			this.addRemoteLinks(signer);
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,

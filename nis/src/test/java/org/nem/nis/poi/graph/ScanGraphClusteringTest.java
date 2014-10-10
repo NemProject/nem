@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 
 public abstract class ScanGraphClusteringTest {
 	private static final Logger LOGGER = Logger.getLogger(ScanGraphClusteringTest.class.getName());
-	private static final double EPSILON = 0.65;
 
 	/**
 	 * Creates the GraphClusteringStrategy being tested.

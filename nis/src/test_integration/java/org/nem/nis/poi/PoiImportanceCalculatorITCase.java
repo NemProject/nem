@@ -123,7 +123,9 @@ public class PoiImportanceCalculatorITCase {
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
 		if (null == clusteringStrategy) {
-			poiOptionsBuilder.setTeleportationProbability(0.85);
+			final PoiOptions defaultOptions = poiOptionsBuilder.create();
+			final double totalTeleportationProbability = defaultOptions.getTeleportationProbability() + defaultOptions.getInterLevelTeleportationProbability();
+			poiOptionsBuilder.setTeleportationProbability(totalTeleportationProbability);
 			poiOptionsBuilder.setInterLevelTeleportationProbability(0.00);
 		}
 

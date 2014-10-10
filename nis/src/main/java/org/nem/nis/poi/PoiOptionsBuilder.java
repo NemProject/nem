@@ -37,7 +37,6 @@ public class PoiOptionsBuilder {
 		this.minOutlinkWeight = minOutlinkWeight;
 	}
 
-
 	/**
 	 * Sets the weight given to (net) negative outlinks.
 	 *
@@ -110,9 +109,6 @@ public class PoiOptionsBuilder {
 	}
 
 	//endregion
-
-//	//negativeOutlinkWeights = [0, 20, 40, 60, 80, 100]
-//	//outlierWeights = [0.85, 0.9, 0.95]
 
 	/**
 	 * Creates a new poi options.

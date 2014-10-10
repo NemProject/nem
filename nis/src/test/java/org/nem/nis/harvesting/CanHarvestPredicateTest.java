@@ -11,7 +11,7 @@ public class CanHarvestPredicateTest {
 	@Test
 	public void cannotHarvestWhenVestedBalanceIsLessThanMinimumBalance() {
 		// Arrange:
-		final Amount minBalanceMinusOne = Amount.fromMicroNem(999999999);
+		final Amount minBalanceMinusOne = Amount.fromMicroNem(22222221);
 
 		// Assert:
 		Assert.assertThat(canHarvest(Amount.ZERO), IsEqual.equalTo(false));
@@ -21,8 +21,8 @@ public class CanHarvestPredicateTest {
 	@Test
 	public void canHarvestWhenVestedBalanceIsAtLeastMinimumBalance() {
 		// Arrange:
-		final Amount minBalance = Amount.fromNem(1000);
-		final Amount twiceMinBalance = Amount.fromNem(2000);
+		final Amount minBalance = Amount.fromNem(22222222);
+		final Amount twiceMinBalance = Amount.fromNem(44444444);
 
 		// Assert:
 		Assert.assertThat(canHarvest(minBalance), IsEqual.equalTo(true));
@@ -36,6 +36,6 @@ public class CanHarvestPredicateTest {
 		state.getWeightedBalances().addFullyVested(height, vestedBalance);
 
 		// Act:
-		return new CanHarvestPredicate(Amount.fromNem(1000)).canHarvest(state, height);
+		return new CanHarvestPredicate(Amount.fromMicroNem(22222222)).canHarvest(state, height);
 	}
 }

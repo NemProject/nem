@@ -9,7 +9,6 @@ import org.nem.nis.test.*;
 import java.util.*;
 
 public class InterLevelProximityMatrixTest {
-	private static final double EPSILON = 0.65;
 
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithSingleNode() {

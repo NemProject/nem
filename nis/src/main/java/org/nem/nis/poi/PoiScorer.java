@@ -27,7 +27,6 @@ public class PoiScorer {
 			dangleSum += importanceVector.getAt(i);
 		}
 
-		//TODO: Do we need to also include the interlevel-teleportation prob?
 		return dangleSum * teleportationProbability / importanceVector.size();
 	}
 

@@ -56,9 +56,9 @@ public abstract class PowerIterator {
 			++numIterations;
 		} while (this.maxIterations > numIterations && !this.hasConverged(vector1, vector2));
 
-		LOGGER.info("Iterations required: " + numIterations);
 		this.result = vector2;
 		this.hasConverged = this.hasConverged(vector1, vector2);
+		LOGGER.info(String.format("Iterations required: %d; converged?: %s", numIterations, this.hasConverged));
 	}
 
 	/**

@@ -78,19 +78,19 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		private final PoiContext context;
 		private final PoiOptions options;
 		private final PoiScorer scorer;
-		private final boolean useInterLevelMatrix;
+		private final boolean useClustering;
 
 		public PoiPowerIterator(
 				final PoiContext context,
 				final PoiOptions options,
 				final PoiScorer scorer,
 				final int numAccounts,
-				final boolean useInterLevelMatrix) {
+				final boolean useClustering) {
 			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.options = options;
 			this.scorer = scorer;
-			this.useInterLevelMatrix = useInterLevelMatrix;
+			this.useClustering = useClustering;
 		}
 
 		@Override
@@ -99,21 +99,22 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final ColumnVector importancesVector = this.createImportancesVector(prevIterImportances);
 
 			ColumnVector resultVector = importancesVector.addElementWise(poiAdjustmentVector);
-			if (this.useInterLevelMatrix) {
+			if (this.useClustering) {
 				final ColumnVector interLevelVector = this.createInterLeverVector(prevIterImportances);
 				final ColumnVector outlierVector = this.createOutlierVector();
 				resultVector = resultVector
 						.addElementWise(interLevelVector)
-						.addElementWise(outlierVector);
+						.multiplyElementWise(outlierVector);
 			}
 
 			return resultVector;
 		}
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
+			final double totalTeleportationProbability = this.options.getTeleportationProbability() + this.options.getInterLevelTeleportationProbability();
 			final double dangleSum = this.scorer.calculateDangleSum(
 					this.context.getDangleIndexes(),
-					this.options.getTeleportationProbability(),
+					totalTeleportationProbability,
 					prevIterImportances);
 
 			// V(dangle-sum + inverseTeleportation / N)

@@ -13,7 +13,6 @@ import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.test.NisUtils;
 
-import javax.xml.transform.sax.SAXSource;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 public class NxtGraphClusteringITCase {
 	private static final Logger LOGGER = Logger.getLogger(NxtGraphClusteringITCase.class.getName());
 	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
-	private static final double EPSILON = 0.65;
 
 	@Test
 	public void canQueryNxtTransactionTable() {
@@ -79,8 +77,7 @@ public class NxtGraphClusteringITCase {
 		final ColumnVector importances = getAccountImportances(
 				new BlockHeight(endHeight),
 				eligibleAccountStates,
-				new FastScanClusteringStrategy(),
-				null);
+				new FastScanClusteringStrategy());
 
 		final List<Long> stakes = eligibleAccountStates.stream()
 				.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(endBlockHeight)).getNumMicroNem())
@@ -123,7 +120,13 @@ public class NxtGraphClusteringITCase {
 		final Set<Double> outlierWeights = Sets.newSet(0.85, 0.9, 0.95, 1.0);
 		final Set<Integer> mus = Sets.newSet(1, 2, 3, 4, 5);
 		final Set<Double> epsilons = Sets.newSet(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95);
-		final Set<TeleportationProbs> teleporationProbs = Sets.newSet(new TeleportationProbs(0.75, 0.1), new TeleportationProbs(0.65, 0.1), new TeleportationProbs(0.55, 0.1), new TeleportationProbs(0.75, 0.2), new TeleportationProbs(0.65, 0.2), new TeleportationProbs(0.55, 0.2));
+		final Set<TeleportationProbabilities> teleporationProbabilities = Sets.newSet(
+				new TeleportationProbabilities(0.75, 0.1),
+				new TeleportationProbabilities(0.65, 0.1),
+				new TeleportationProbabilities(0.55, 0.1),
+				new TeleportationProbabilities(0.75, 0.2),
+				new TeleportationProbabilities(0.65, 0.2),
+				new TeleportationProbabilities(0.55, 0.2));
 
 		// how I learned to stop worrying and love the loop
 		for (final long minHarvesterBalance : minHarvesterBalances) {
@@ -132,7 +135,7 @@ public class NxtGraphClusteringITCase {
 					for (final double outlierWeight : outlierWeights) {
 						for (final int mu : mus) {
 							for (final double epsilon : epsilons) {
-								for (final TeleportationProbs teleporationProb : teleporationProbs) {
+								for (final TeleportationProbabilities teleporationPair : teleporationProbabilities) {
 									final PoiOptionsBuilder optionsBuilder = createBuilderWithCustomOptions(
 											minHarvesterBalance,
 											minOutlinkWeight,
@@ -140,11 +143,8 @@ public class NxtGraphClusteringITCase {
 											outlierWeight,
 											mu,
 											epsilon,
-											teleporationProb.teleporationProb,
-											teleporationProb.interLevelTeleporationProb
-									);
-
-									final PoiOptions poiOptions = optionsBuilder.create();
+											teleporationPair.teleporationProb,
+											teleporationPair.interLevelTeleporationProb);
 
 									final String options = String.format(
 											"_%sminBalance_%sminOutlink_%snegOutlink_%soutlierWeight_%smu_%sepsilon_%stelPro_%sinterLevelProb",
@@ -154,8 +154,8 @@ public class NxtGraphClusteringITCase {
 											outlierWeight,
 											mu,
 											epsilon,
-											teleporationProb.teleporationProb,
-											teleporationProb.interLevelTeleporationProb);
+											teleporationPair.teleporationProb,
+											teleporationPair.interLevelTeleporationProb);
 
 									// Arrange
 									final int endHeight = 225000;
@@ -168,7 +168,6 @@ public class NxtGraphClusteringITCase {
 									final ColumnVector importances = getAccountImportances(
 											new BlockHeight(endHeight),
 											eligibleAccountStates,
-											new FastScanClusteringStrategy(),
                                             optionsBuilder);
 
 									final List<Long> stakes = eligibleAccountStates.stream()
@@ -185,11 +184,11 @@ public class NxtGraphClusteringITCase {
 
 									final List<Long> outlinkSums = eligibleAccountStates.stream()
 											.map(acct -> {
-												final ArrayList<Long> amts = new ArrayList<>();
+												final ArrayList<Long> amounts = new ArrayList<>();
 												acct.getImportanceInfo()
 														.getOutlinksIterator(endBlockHeight)
-														.forEachRemaining(i -> amts.add(i.getAmount().getNumMicroNem()));
-												return amts.stream().mapToLong(i -> i).sum();
+														.forEachRemaining(i -> amounts.add(i.getAmount().getNumMicroNem()));
+												return amounts.stream().mapToLong(i -> i).sum();
 											})
 											.collect(Collectors.toList());
 
@@ -251,8 +250,7 @@ public class NxtGraphClusteringITCase {
 		final ColumnVector importanceVector = getAccountImportances(
 				new BlockHeight(endHeight),
 				eligibleAccountStates,
-				clusteringStrategy,
-				null);
+				clusteringStrategy);
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("Calculating importances needed %d ms.", stop - start));
 		return importanceVector;
@@ -422,14 +420,16 @@ public class NxtGraphClusteringITCase {
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> acctStates,
-			final GraphClusteringStrategy clusteringStrategy,
-			PoiOptionsBuilder poiOptionsBuilder) {
+			final GraphClusteringStrategy clusteringStrategy) {
+		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
+		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
+		return  getAccountImportances(blockHeight, acctStates, poiOptionsBuilder);
+	}
 
-		if (null == poiOptionsBuilder) {
-			poiOptionsBuilder = new PoiOptionsBuilder();
-			poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
-		}
-
+	private static ColumnVector getAccountImportances(
+			final BlockHeight blockHeight,
+			final Collection<PoiAccountState> acctStates,
+			final PoiOptionsBuilder poiOptionsBuilder) {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(new PoiScorer(), poiOptionsBuilder.create());
 		importanceCalculator.recalculate(blockHeight, acctStates);
 		final List<Double> importances = acctStates.stream()
@@ -466,11 +466,11 @@ public class NxtGraphClusteringITCase {
 		return builder;
 	}
 
-	private class TeleportationProbs {
+	private class TeleportationProbabilities {
 		final double teleporationProb;
 		final double interLevelTeleporationProb;
 
-		 TeleportationProbs(final double teleporationProb, final double interLevelTeleporationProb) {
+		 TeleportationProbabilities(final double teleporationProb, final double interLevelTeleporationProb) {
 			this.teleporationProb = teleporationProb;
 			this.interLevelTeleporationProb = interLevelTeleporationProb;
 		}

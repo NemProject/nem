@@ -380,7 +380,7 @@ public class PoiContextTest {
 
 	private static PoiContext createTestPoiContextWithAccountLinks(final PoiOptions poiOptions) {
 		// Arrange: create 4 accounts
-		final long multiplier = MIN_HARVESTING_BALANCE.getNumMicroNem();// 1000 is min harvesting balance
+		final long multiplier = MIN_HARVESTING_BALANCE.getNumMicroNem(); // 1000 is min harvesting balance
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(multiplier, null),
 				new TestAccountInfo(multiplier, null),
@@ -405,7 +405,7 @@ public class PoiContextTest {
 		// - 0: (8, 4, 2) - (2, 3) -- 9
 		// - 1: (2, 6) - (8) -------- 0
 		// - 2: (none) - (4, 6, 5) -- -15
-		// - 3: (3, 5) - (none) ----- 9
+		// - 3: (3, 5) - (none) ----- 8
 		return new PoiContext(accountStates, height, poiOptions);
 	}
 
