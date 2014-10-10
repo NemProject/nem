@@ -23,22 +23,18 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	private final PoiScorer poiScorer;
-	private final GraphClusteringStrategy clusterer;
 	private final PoiOptions options;
 
 	/**
 	 * Creates a new generator with custom options.
 	 *
 	 * @param poiScorer The poi scorer to use.
-	 * @param clusterer The additional poi options to use.
 	 * @param options The poi options.
 	 */
 	public PoiImportanceCalculator(
 			final PoiScorer poiScorer,
-			final GraphClusteringStrategy clusterer,
 			final PoiOptions options) {
 		this.poiScorer = poiScorer;
-		this.clusterer = clusterer;
 		this.options = options;
 	}
 
@@ -48,7 +44,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final Collection<PoiAccountState> accountStates) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accountStates, blockHeight, this.clusterer, this.options);
+		final PoiContext context = new PoiContext(accountStates, blockHeight, this.options);
 
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(

@@ -271,7 +271,7 @@ public class NxtGraphClusteringITCase {
 
 	private SparseMatrix createNetOutlinkMatrix(final long startHeight, final long endHeight) {
 		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight);
-		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), new FastScanClusteringStrategy(), DEFAULT_POI_OPTIONS);
+		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), DEFAULT_POI_OPTIONS);
 		return poiContext.getOutlinkMatrix();
 	}
 
@@ -307,7 +307,9 @@ public class NxtGraphClusteringITCase {
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> acctStates,
 			final GraphClusteringStrategy clusteringStrategy) {
-		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(new PoiScorer(), clusteringStrategy, DEFAULT_POI_OPTIONS);
+		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
+		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(new PoiScorer(), poiOptionsBuilder.create());
 		importanceCalculator.recalculate(blockHeight, acctStates);
 		final List<Double> importances = acctStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))

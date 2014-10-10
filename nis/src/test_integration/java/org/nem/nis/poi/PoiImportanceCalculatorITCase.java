@@ -50,7 +50,7 @@ public class PoiImportanceCalculatorITCase {
 	@Test
 	public void fastScanClusteringResultsInSameImportancesAsScan() {
 		// Act:
-		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new ScanClusteringStrategy(), true);
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new ScanClusteringStrategy());
 
 		// Assert:
 		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance < 0.001);
@@ -59,7 +59,7 @@ public class PoiImportanceCalculatorITCase {
 	@Test
 	public void fastScanClusteringResultsInDifferentImportancesThanOutlierScan() {
 		// Act:
-		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new OutlierScan(), true);
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new OutlierScan());
 
 		// Assert:
 		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
@@ -68,7 +68,7 @@ public class PoiImportanceCalculatorITCase {
 	@Test
 	public void fastScanClusteringResultsInDifferentImportancesThanSingleClusterScan() {
 		// Act:
-		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new SingleClusterScan(), true);
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new SingleClusterScan());
 
 		// Assert:
 		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
@@ -77,7 +77,7 @@ public class PoiImportanceCalculatorITCase {
 	@Test
 	public void fastScanClusteringResultsInDifferentImportancesThanNoClustering() {
 		// Act:
-		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new SingleClusterScan(), false);
+		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(null);
 
 		// Assert:
 		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
@@ -86,7 +86,7 @@ public class PoiImportanceCalculatorITCase {
 	@Test
 	public void fastScanClusteringCorrectlyIdentifiesMostImportantAccount() {
 		// Act:
-		final ColumnVector importances = calculateImportances(new FastScanClusteringStrategy(), true);
+		final ColumnVector importances = calculateImportances(new FastScanClusteringStrategy());
 		int maxIndex = 0;
 		int nextMaxIndex = 0;
 		for (int i = 0; i < importances.size(); ++i) {
@@ -103,12 +103,10 @@ public class PoiImportanceCalculatorITCase {
 		Assert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(1));
 	}
 
-	private static double calculateDistanceBetweenFastScanAndOtherImportances(
-			final GraphClusteringStrategy clusteringStrategy,
-			final boolean useClusteringStrategy) {
+	private static double calculateDistanceBetweenFastScanAndOtherImportances(final GraphClusteringStrategy clusteringStrategy) {
 		// Act:
-		final ColumnVector fastScanImportances = calculateImportances(new FastScanClusteringStrategy(), true);
-		final ColumnVector otherImportances = calculateImportances(clusteringStrategy, useClusteringStrategy);
+		final ColumnVector fastScanImportances = calculateImportances(new FastScanClusteringStrategy());
+		final ColumnVector otherImportances = calculateImportances(clusteringStrategy);
 
 		// Assert:
 		final double distance = fastScanImportances.l2Distance(otherImportances);
@@ -119,15 +117,19 @@ public class PoiImportanceCalculatorITCase {
 
 	}
 
-	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy, final boolean useClusteringStrategy) {
+	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy) {
 		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
 
-		final BlockHeight importanceBlockHeight = new BlockHeight(2);
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setIsClusteringEnabled(useClusteringStrategy);
+		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
+		if (null == clusteringStrategy) {
+			poiOptionsBuilder.setTeleportationProbability(0.85);
+			poiOptionsBuilder.setInterLevelTeleportationProbability(0.00);
+		}
+
+		final BlockHeight importanceBlockHeight = new BlockHeight(2);
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
 				new PoiScorer(),
-				clusteringStrategy,
 				poiOptionsBuilder.create());
 		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		final List<Double> importances = accountStates.stream()
@@ -172,31 +174,6 @@ public class PoiImportanceCalculatorITCase {
 
 		return accountStates;
 	}
-
-	final void printDifferences(final ColumnVector lhs, final ColumnVector rhs) {
-		Assert.assertThat(lhs.size(), IsEqual.equalTo(rhs.size()));
-		final ColumnVector ratios = new ColumnVector(lhs.size());
-		double diff = 0;
-		for (int i = 0; i < rhs.size(); ++i) {
-			diff += Math.abs(rhs.getAt(i) - lhs.getAt(i));
-			if (lhs.getAt(i) > 0.0) {
-				ratios.setAt(i, rhs.getAt(i) / lhs.getAt(i));
-			} else if (rhs.getAt(i) > 0.0) {
-				ratios.setAt(i, Double.MAX_VALUE);
-			} else {
-				ratios.setAt(i, 1.0);
-			}
-			if (ratios.getAt(i) > 1.001 || ratios.getAt(i) < 0.999) {
-				System.out.println("Account " + i + " importance ratio is " + ratios.getAt(i));
-			}
-		}
-
-		System.out.println(lhs);
-		System.out.println(rhs);
-		System.out.println("ratios: " + ratios);
-		System.out.println("diff: " + diff);
-	}
-
 
 	//endregion
 

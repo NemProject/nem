@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.Amount;
+import org.nem.nis.poi.graph.GraphClusteringStrategy;
 
 /**
  * Options that influence the POI calculation.
@@ -27,6 +28,13 @@ public interface PoiOptions {
 	 * @return true if clustering should be enabled.
 	 */
 	public boolean isClusteringEnabled();
+
+	/**
+	 * Gets the clustering strategy.
+	 *
+	 * @return The graph clustering strategy.
+	 */
+	public GraphClusteringStrategy getClusteringStrategy();
 
 	/**
 	 * Gets the teleportation probability.

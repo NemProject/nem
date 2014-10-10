@@ -186,7 +186,6 @@ public class NisAppConfig {
 	public PoiFacade poiFacade() {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
 				new PoiScorer(),
-				new FastScanClusteringStrategy(),
 				this.poiOptions());
 		return new PoiFacade(importanceCalculator);
 	}

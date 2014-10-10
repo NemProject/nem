@@ -355,7 +355,7 @@ public class PoiContextTest {
 	}
 
 	private static PoiContext createPoiContext(final List<PoiAccountState> accountStates, final BlockHeight height) {
-		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), DEFAULT_OPTIONS);
+		return new PoiContext(accountStates, height, DEFAULT_OPTIONS);
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
@@ -390,7 +390,7 @@ public class PoiContextTest {
 		// - 1: (2, 6) - (8)
 		// - 2: (none) - (4, 6, 5)
 		// - 3: (3, 5) - (none)
-		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), poiOptions);
+		return new PoiContext(accountStates, height, poiOptions);
 	}
 
 	/**

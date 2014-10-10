@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.Amount;
+import org.nem.nis.poi.graph.*;
 
 /**
  * A builder for creating poi options.
@@ -8,9 +9,9 @@ import org.nem.core.model.primitive.Amount;
 public class PoiOptionsBuilder {
 	private Amount minHarvesterBalance = Amount.fromNem(1000);
 	private Amount minOutlinkWeight = Amount.ZERO;
-	private boolean isClusteringEnabled = true;
 	private double teleportationProbability = .75; // For NCDawareRank
 	private double interLevelTeleportationProbability = .1; // For NCDawareRank
+	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
 
 	/**
 	 * Sets the minimum (vested) balance required for a harvester.
@@ -31,12 +32,12 @@ public class PoiOptionsBuilder {
 	}
 
 	/**
-	 * Sets a value indicating whether or not clustering should be enabled.
+	 * Sets the graph clustering strategy.
 	 *
-	 * @param isClusteringEnabled true if clustering should be enabled.
+	 * @param strategy The clustering strategy.
 	 */
-	public void setIsClusteringEnabled(final boolean isClusteringEnabled) {
-		this.isClusteringEnabled = isClusteringEnabled;
+	public void setClusteringStrategy(final GraphClusteringStrategy strategy) {
+		this.clusteringStrategy = strategy;
 	}
 
 	/**
@@ -83,7 +84,12 @@ public class PoiOptionsBuilder {
 
 			@Override
 			public boolean isClusteringEnabled() {
-				return PoiOptionsBuilder.this.isClusteringEnabled;
+				return null != this.getClusteringStrategy();
+			}
+
+			@Override
+			public GraphClusteringStrategy getClusteringStrategy() {
+				return PoiOptionsBuilder.this.clusteringStrategy;
 			}
 
 			@Override

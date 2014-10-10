@@ -23,16 +23,14 @@ public class PoiContext {
 	 *
 	 * @param accountStates The account states.
 	 * @param height The current block height.
-	 * @param clusterer The graph clusterer.
 	 * @param options The poi options.
 	 */
 	public PoiContext(
 			final Iterable<PoiAccountState> accountStates,
 			final BlockHeight height,
-			final GraphClusteringStrategy clusterer,
 			final PoiOptions options) {
 		// (1) build the account vectors and matrices
-		this.accountProcessor = new AccountProcessor(accountStates, height, clusterer, options);
+		this.accountProcessor = new AccountProcessor(accountStates, height, options);
 		this.accountProcessor.process();
 	}
 
@@ -121,7 +119,6 @@ public class PoiContext {
 	private static class AccountProcessor {
 		private final BlockHeight height;
 		private final List<Integer> dangleIndexes;
-		private final GraphClusteringStrategy clusteringStrategy;
 		private final PoiOptions options;
 
 		private final ColumnVector vestedBalanceVector;
@@ -139,11 +136,9 @@ public class PoiContext {
 		public AccountProcessor(
 				final Iterable<PoiAccountState> accountStates,
 				final BlockHeight height,
-				final GraphClusteringStrategy clusteringStrategy,
 				final PoiOptions options) {
 			this.height = height;
 			this.dangleIndexes = new ArrayList<>();
-			this.clusteringStrategy = clusteringStrategy;
 			this.options = options;
 
 			int i = 0;
@@ -265,11 +260,12 @@ public class PoiContext {
 		private void clusterAccounts() {
 			if (!this.options.isClusteringEnabled()) {
 				LOGGER.info(String.format("clustering is bypassed"));
+				return;
 			}
 
 			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
 			this.neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
-			this.clusteringResult = this.clusteringStrategy.cluster(this.neighborhood);
+			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
 			LOGGER.info(String.format(
 					"clustering completed: { clusters: %d, hubs: %d, outliers: %d }",
 					this.clusteringResult.getClusters().size(),
