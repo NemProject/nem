@@ -197,7 +197,6 @@ public class NxtGraphClusteringITCase {
 				//System.out.println("amount*2: " + amount.getNumMicroNem()*2);
 			}
 
-
 			senderAccountState.getWeightedBalances().addSend(blockHeight, amount);
 			senderAccountState.getImportanceInfo().addOutlink(
 					new AccountLink(blockHeight, amount, recipientAccountState.getAddress()));
