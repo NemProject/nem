@@ -230,4 +230,21 @@ public class NisUtils {
 	public static NodeNeighbors createNeighbors(final int... ids) {
 		return new NodeNeighbors(NisUtils.toNodeIdArray(ids));
 	}
+
+	/**
+	 * Creates a new neighborhood with default clustering parameters.
+	 *
+	 * @param repository The neighborhood repository.
+	 * @param similarityStrategy The similarity strategy.
+	 * @return The neighborhood.
+	 */
+	public static Neighborhood createNeighborhood(
+			final NeighborhoodRepository repository,
+			final SimilarityStrategy similarityStrategy) {
+		return new Neighborhood(
+				repository,
+				similarityStrategy,
+				DEFAULT_POI_OPTIONS.getMuClusteringValue(),
+				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
+	}
 }

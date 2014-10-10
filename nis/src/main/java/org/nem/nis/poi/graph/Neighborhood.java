@@ -11,22 +11,26 @@ import java.util.stream.Collectors;
 public class Neighborhood {
 	private final NeighborhoodRepository repository;
 	private final SimilarityStrategy similarityStrategy;
-	private final Map<NodeId, Community> communityCache;
+	private final int mu;
 	private final double epsilon;
+	private final Map<NodeId, Community> communityCache;
 
 	/**
 	 * Creates a new neighborhood.
 	 *
 	 * @param repository The neighborhood repository.
 	 * @param similarityStrategy The similarity strategy.
+	 * @param mu The minimum number of neighbors with high structural similarity that a core community must have.
 	 * @param epsilon The structural similarity threshold that will cause nodes to be considered highly similar.
 	 */
 	public Neighborhood(
 			final NeighborhoodRepository repository,
 			final SimilarityStrategy similarityStrategy,
+			final int mu,
 			final double epsilon) {
 		this.repository = repository;
 		this.similarityStrategy = similarityStrategy;
+		this.mu = mu;
 		this.epsilon = epsilon;
 		this.communityCache = new HashMap<>();
 	}
@@ -57,7 +61,7 @@ public class Neighborhood {
 			(similarity > this.epsilon ? epsilonNeighbors : nonEpsilonNeighbors).addNeighbor(neighborId);
 		}
 
-		return new Community(nodeId, epsilonNeighbors, nonEpsilonNeighbors);
+		return new Community(nodeId, epsilonNeighbors, nonEpsilonNeighbors, this.mu);
 	}
 
 	/**

@@ -119,7 +119,7 @@ public class GraphClustererImplITCase {
 				long stop = System.currentTimeMillis();
 				System.out.println("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
 				final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighbordMap);
-				final Neighborhood neighborhood = new Neighborhood(nodeNeighbordMap, strategy, EPSILON);
+				final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighbordMap, strategy);
 				start = System.currentTimeMillis();
 				final ClusteringResult result = clusteringStrategy.cluster(neighborhood);
 				stop = System.currentTimeMillis();
@@ -188,7 +188,7 @@ public class GraphClustererImplITCase {
 		final long stop = System.currentTimeMillis();
 		System.out.println("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy, EPSILON);
+		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, strategy);
 		final ClusteringResult result = clusterer.cluster(neighborhood);
 		return result;
 	}

@@ -11,6 +11,7 @@ public class Community {
 	private final NodeId pivotId;
 	private final NodeNeighbors similarNeighbors;
 	private final NodeNeighbors dissimilarNeighbors;
+	private final int mu;
 
 	/**
 	 * Creates a new community.
@@ -18,11 +19,13 @@ public class Community {
 	 * @param pivotId The pivot node id.
 	 * @param similarNeighbors The similar node neighbors.
 	 * @param dissimilarNeighbors The dissimilar node neighbors.
+	 * @param mu The minimum number of neighbors with high structural similarity that a core community must have.
 	 */
 	public Community(
 			final NodeId pivotId,
 			final NodeNeighbors similarNeighbors,
-			final NodeNeighbors dissimilarNeighbors) {
+			final NodeNeighbors dissimilarNeighbors,
+			final int mu) {
 		if (null == similarNeighbors || null == dissimilarNeighbors) {
 			throw new IllegalArgumentException("neighbors cannot be null");
 		}
@@ -34,15 +37,17 @@ public class Community {
 		this.pivotId = pivotId;
 		this.similarNeighbors = similarNeighbors;
 		this.dissimilarNeighbors = dissimilarNeighbors;
+		this.mu	= mu;
 	}
 
 	/**
 	 * Creates a new isolated community.
 	 *
 	 * @param pivotId The pivot node id.
+	 * @param mu The minimum number of neighbors with high structural similarity that a core community must have.
 	 */
-	public Community(final NodeId pivotId) {
-		this(pivotId, new NodeNeighbors(pivotId), new NodeNeighbors());
+	public Community(final NodeId pivotId, final int mu) {
+		this(pivotId, new NodeNeighbors(pivotId), new NodeNeighbors(), mu);
 	}
 
 	/**
@@ -87,7 +92,7 @@ public class Community {
 	 * @return true if this community is core.
 	 */
 	public boolean isCore() {
-		return this.similarNeighbors.size() >= GraphConstants.MU;
+		return this.similarNeighbors.size() >= this.mu;
 	}
 
 	/**

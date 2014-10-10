@@ -750,7 +750,7 @@ public abstract class ScanGraphClusteringTest {
 	private ClusteringResult calculateClusteringResult(final GraphClusteringStrategy graphClusteringStrategy, final Matrix outlinkMatrix) {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy, EPSILON);
+		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, strategy);
 		return graphClusteringStrategy.cluster(neighborhood);
 	}
 
@@ -771,7 +771,7 @@ public abstract class ScanGraphClusteringTest {
 	private static class TestContext {
 		private final NeighborhoodRepository repository = Mockito.mock(NodeNeighborMap.class);
 		private final SimilarityStrategy similarityStrategy = Mockito.mock(SimilarityStrategy.class);
-		private final Neighborhood neighborhood = new Neighborhood(this.repository, this.similarityStrategy, EPSILON);
+		private final Neighborhood neighborhood = NisUtils.createNeighborhood(this.repository, this.similarityStrategy);
 		private final GraphClusteringStrategy clusteringStrategy;
 
 		public TestContext(final GraphClusteringStrategy clusteringStrategy, final int neighborhoodSize) {

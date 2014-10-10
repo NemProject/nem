@@ -10,6 +10,7 @@ import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
+import org.nem.nis.test.NisUtils;
 
 import javax.xml.transform.sax.SAXSource;
 import java.io.*;
@@ -63,8 +64,8 @@ public class NxtGraphClusteringITCase {
 		final String options = String.format(
 				"_%smin_%dmu_%fepsilon",
 				DEFAULT_POI_OPTIONS.getMinHarvesterBalance(),
-				GraphConstants.MU,
-				GraphConstants.EPSILON);
+				DEFAULT_POI_OPTIONS.getMuClusteringValue(),
+				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
 
 		// Arrange
 		final int endHeight = 225000;//was 300k
@@ -297,7 +298,7 @@ public class NxtGraphClusteringITCase {
 		final long stop = System.currentTimeMillis();
 		LOGGER.info("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy, EPSILON);
+		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, strategy);
 		return clusterer.cluster(neighborhood);
 	}
 

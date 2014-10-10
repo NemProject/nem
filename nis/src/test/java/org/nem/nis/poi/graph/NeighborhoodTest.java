@@ -306,6 +306,6 @@ public class NeighborhoodTest {
 	private static Neighborhood createNeighborhood(
 			final NeighborhoodRepository repository,
 			final SimilarityStrategy similarityStrategy) {
-		return new Neighborhood(repository, similarityStrategy, 0.65);
+		return NisUtils.createNeighborhood(repository, similarityStrategy);
 	}
 }

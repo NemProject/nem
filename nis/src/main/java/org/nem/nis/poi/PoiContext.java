@@ -267,6 +267,7 @@ public class PoiContext {
 			this.neighborhood = new Neighborhood(
 					nodeNeighborMap,
 					new DefaultSimilarityStrategy(nodeNeighborMap),
+					this.options.getMuClusteringValue(),
 					this.options.getEpsilonClusteringValue());
 			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
 			LOGGER.info(String.format(
