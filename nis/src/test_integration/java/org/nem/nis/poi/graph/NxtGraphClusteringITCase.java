@@ -169,7 +169,7 @@ public class NxtGraphClusteringITCase {
 											new BlockHeight(endHeight),
 											eligibleAccountStates,
 											new FastScanClusteringStrategy(),
-											null);
+                                            optionsBuilder);
 
 									final List<Long> stakes = eligibleAccountStates.stream()
 											.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(endBlockHeight)).getNumMicroNem())
