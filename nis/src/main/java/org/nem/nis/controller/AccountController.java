@@ -84,6 +84,7 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
+	// TODO 20141010 J-G i think it still makes sense to reject if remote AND the private key is NOT for a remote account
     // we want to allow remote harvesting...
 	//@TrustedApi
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
