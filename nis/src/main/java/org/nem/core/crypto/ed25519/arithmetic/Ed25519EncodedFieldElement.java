@@ -64,7 +64,7 @@ public class Ed25519EncodedFieldElement {
 	 *
 	 * @return The field element in its 2^25.5 bit representation.
 	 */
-	public  Ed25519FieldElement decode() {
+	public Ed25519FieldElement decode() {
 		long h0 = fourBytesToLong(this.values, 0);
 		long h1 = threeBytesToLong(this.values, 4) << 6;
 		long h2 = threeBytesToLong(this.values, 7) << 5;

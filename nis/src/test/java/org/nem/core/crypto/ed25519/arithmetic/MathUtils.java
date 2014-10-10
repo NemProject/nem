@@ -196,11 +196,21 @@ public class MathUtils {
 		while (true) {
 			try {
 				random.nextBytes(bytes);
-				return new Ed25519GroupElement(new Ed25519EncodedFieldElement(bytes));
+				return new Ed25519EncodedGroupElement(bytes).decode();
 			} catch (IllegalArgumentException e) {
 				// Will fail in about 50%, so try again.
 			}
 		}
+	}
+
+	/**
+	 * Gets a random encoded group element.
+	 * It's NOT guaranteed that the created encoded group element is a multiple of the base point.
+	 *
+	 * @return The encoded group element.
+	 */
+	public static Ed25519EncodedGroupElement getRandomEncodedGroupElement() {
+		return getRandomGroupElement().encode();
 	}
 
 	/**
@@ -234,8 +244,7 @@ public class MathUtils {
 		// x = sign(x) * sqrt((y^2 - 1) / (d * y^2 + 1))
 		final BigInteger u = y.multiply(y).subtract(BigInteger.ONE).mod(Ed25519Field.P);
 		final BigInteger v = D.multiply(y).multiply(y).add(BigInteger.ONE).mod(Ed25519Field.P);
-		final BigInteger tmp = u.multiply(v.pow(7)).modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), Ed25519Field.P).mod(Ed25519Field.P);
-		BigInteger x = tmp.multiply(u).multiply(v.pow(3)).mod(Ed25519Field.P);
+		BigInteger x = getSqrtOfFraction(u, v);
 		if (!v.multiply(x).multiply(x).subtract(u).mod(Ed25519Field.P).equals(BigInteger.ZERO)) {
 			if (!v.multiply(x).multiply(x).add(u).mod(Ed25519Field.P).equals(BigInteger.ZERO)) {
 				throw new IllegalArgumentException("not a valid Ed25519GroupElement");
@@ -248,6 +257,19 @@ public class MathUtils {
 		}
 
 		return x;
+	}
+
+	/**
+	 * Calculates and returns the square root of a fraction of u and v.
+	 * The sign is unpredictable.
+	 *
+	 * @param u The nominator.
+	 * @param v The denominator.
+	 * @return Plus or minus the square root
+	 */
+	public static BigInteger getSqrtOfFraction(final BigInteger u, final BigInteger v) {
+		final BigInteger tmp = u.multiply(v.pow(7)).modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), Ed25519Field.P).mod(Ed25519Field.P);
+		return tmp.multiply(u).multiply(v.pow(3)).mod(Ed25519Field.P);
 	}
 
 	/**
@@ -268,6 +290,10 @@ public class MathUtils {
 
 		// Switch to affine coordinates.
 		switch (g.getRepresentation()) {
+			case AFFINE:
+				x = gX;
+				y = gY;
+				break;
 			case P2:
 			case P3:
 				x = gX.multiply(gZ.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
@@ -291,6 +317,11 @@ public class MathUtils {
 
 		// Now back to the desired representation.
 		switch (repr) {
+			case AFFINE:
+				return Ed25519GroupElement.affine(
+						toFieldElement(x),
+						toFieldElement(y),
+						Ed25519Field.ONE);
 			case P2:
 				return Ed25519GroupElement.p2(
 						toFieldElement(x),
@@ -451,7 +482,7 @@ public class MathUtils {
 		a[0] &= 0xF8;
 		final Ed25519GroupElement pubKey = scalarMultiplyGroupElement(Ed25519Group.BASE_POINT, toFieldElement(toBigInteger(a)));
 
-		return new PublicKey(pubKey.toByteArray());
+		return new PublicKey(pubKey.encode().getRaw());
 	}
 
 	/**
@@ -472,13 +503,13 @@ public class MathUtils {
 		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(digest.digest(data));
 		final Ed25519EncodedFieldElement rReduced = reduceModGroupOrder(r);
 		final Ed25519GroupElement R = scalarMultiplyGroupElement(Ed25519Group.BASE_POINT, toFieldElement(toBigInteger(rReduced)));
-		digest.update(R.toByteArray());
+		digest.update(R.encode().getRaw());
 		digest.update(keyPair.getPublicKey().getRaw());
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(digest.digest(data));
 		final Ed25519EncodedFieldElement hReduced = reduceModGroupOrder(h);
 		BigInteger S = toBigInteger(rReduced).add(toBigInteger(hReduced).multiply(toBigInteger(a))).mod(Ed25519Group.GROUP_ORDER);
 
-		return new Signature(R.toByteArray(), toByteArray(S));
+		return new Signature(R.encode().getRaw(), toByteArray(S));
 	}
 
 	// Start TODO BR: Remove when finished!

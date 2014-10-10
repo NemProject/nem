@@ -3,10 +3,10 @@ package org.nem.core.crypto.ed25519.arithmetic;
 import java.util.Arrays;
 
 /**
- * Represents a field element of the finite field with p=2^255-19 elements.
- * An element t, entries t[0]...t[9], represents the integer
- * t[0]+2^26 t[1]+2^51 t[2]+2^77 t[3]+2^102 t[4]+...+2^230 t[9].
- * Bounds on each t[i] vary depending on context.
+ * Represents a element of the finite field with p=2^255-19 elements.
+ * values[0] ... values[9], represent the integer
+ * values[0] + 2^26 * values[1] + 2^51 * values[2] + 2^77 * values[3] + 2^102 * values[4] + ... + 2^230 * values[9].
+ * Bounds on each values[i] vary depending on context.
  *
  * This implementation is based on the ref10 implementation of SUPERCOP.
  */
@@ -949,6 +949,34 @@ public class Ed25519FieldElement {
 		// 2^252 - 3
         return multiply(f0);
     }
+
+	/**
+	 * Calculates and returns one of the square root of u / v.
+	 * The sign of the square root cannot be predicted from u and v.
+	 *
+	 * 	 x = (u * v^3) * (u * v^7)^((p - 5) / 8) ==> x^2 = +-(u / v).
+	 *
+	 * @param u The nominator of the fraction.
+	 * @param v The denominator of the fraction.
+	 * @return The square root of u / v.
+	 */
+	public static Ed25519FieldElement sqrt(final Ed25519FieldElement u, final Ed25519FieldElement v) {
+		Ed25519FieldElement x, v3;
+
+		// v3 = v^3
+		v3 = v.square().multiply(v);
+
+		// x = (v3^2) * v * u = u * v^7
+		x = v3.square().multiply(v).multiply(u);
+
+		//  x = (u * v^7)^((q - 5) / 8)
+		x = x.pow22523();
+
+		// x = u * v^3 * (u * v^7)^((q - 5) / 8)
+		x = v3.multiply(u).multiply(x);
+
+		return x;
+	}
 
 	/**
 	 * Reduce this field element modulo field size p = 2^255 - 19 and return the result.

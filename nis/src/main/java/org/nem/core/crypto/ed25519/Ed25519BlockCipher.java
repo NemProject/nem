@@ -107,9 +107,9 @@ public class Ed25519BlockCipher implements BlockCipher {
 	}
 
 	private byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey, final byte[] salt) {
-		final Ed25519GroupElement senderA = new Ed25519GroupElement(new Ed25519EncodedFieldElement(publicKey.getRaw()));
+		final Ed25519GroupElement senderA = new Ed25519EncodedGroupElement(publicKey.getRaw()).decode();
 		senderA.precomputeForScalarMultiplication();
-		final byte[] sharedKey = senderA.scalarMultiply(privateKey.prepareForScalarMultiply()).toByteArray();
+		final byte[] sharedKey = senderA.scalarMultiply(privateKey.prepareForScalarMultiply()).encode().getRaw();
 		for (int i = 0; i < 32; i++) {
 			sharedKey[i] ^= salt[i];
 		}

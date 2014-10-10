@@ -1,9 +1,8 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
-import org.nem.core.utils.*;
+import org.nem.core.utils.ByteUtils;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 /**
  * A point on the ED25519 curve which represents a group element.
@@ -22,6 +21,7 @@ public class Ed25519GroupElement implements Serializable {
 	/**
 	 * Available representations for a group element.
 	 *
+	 * AFFINE: Affine representation (x, y).
 	 * P2: Projective representation (X:Y:Z) satisfying x=X/Z, y=Y/Z.
 	 * P3: Extended projective representation (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT.
 	 * P1P1: Completed representation ((X:Z), (Y:T)) satisfying x=X/Z, y=Y/T.
@@ -29,7 +29,8 @@ public class Ed25519GroupElement implements Serializable {
 	 * CACHED: Cached representation (Y+X, Y-X, Z, 2dT)
 	 */
     public enum Representation {
-        P2,
+		AFFINE,
+		P2,
         P3,
         P1P1,
         PRECOMP,
@@ -53,6 +54,21 @@ public class Ed25519GroupElement implements Serializable {
 	Ed25519GroupElement[] precomputedForDouble;
 
 	/**
+	 * Creates a new group element in AFFINE representation.
+	 *
+	 * @param x The x coordinate.
+	 * @param y The y coordinate.
+	 * @param Z The Z coordinate.
+	 * @return The group element in P2 representation.
+	 */
+	public static Ed25519GroupElement affine(
+			final Ed25519FieldElement x,
+			final Ed25519FieldElement y,
+			final Ed25519FieldElement Z) {
+		return new Ed25519GroupElement(Representation.AFFINE, x, y, Z, null);
+	}
+
+	/**
 	 * Creates a new group element in P2 representation.
 	 *
 	 * @param X The X coordinate.
@@ -60,12 +76,12 @@ public class Ed25519GroupElement implements Serializable {
 	 * @param Z The Z coordinate.
 	 * @return The group element in P2 representation.
 	 */
-    public static Ed25519GroupElement p2(
+	public static Ed25519GroupElement p2(
 			final Ed25519FieldElement X,
 			final Ed25519FieldElement Y,
 			final Ed25519FieldElement Z) {
-        return new Ed25519GroupElement(Representation.P2, X, Y, Z, null);
-    }
+		return new Ed25519GroupElement(Representation.P2, X, Y, Z, null);
+	}
 
 	/**
 	 * Creates a new group element in P3 representation.
@@ -156,65 +172,6 @@ public class Ed25519GroupElement implements Serializable {
     }
 
 	/**
-	 * Creates a group element for a curve from a given encoded point.
-	 *
-	 * A point (x,y) is encoded by storing y in bit 0 to bit 254 and the sign of x in bit 255.
-	 * x is recovered in the following way:
-	 *
-	 * x = sign(x) * sqrt((y^2 - 1) / (d * y^2 + 1)) = sign(x) * sqrt(u / v) with u = y^2 - 1 and v = d * y^2 + 1.
-	 * Setting β = (u * v^3) * (u * v^7)^((q - 5) / 8) one has β^2 = +-(u / v).
-	 * If v * β = -u multiply β with i=sqrt(-1).
-	 * Set x := β.
-	 * If sign(x) != bit 255 of s then negate x.
-	 * TODO 20141009 BR: change parameter to Ed25519EncodedGroupElement.
-	 *
-	 * @param encoded The encoded field element.
-	 */
-    public Ed25519GroupElement(final Ed25519EncodedFieldElement encoded) {
-        Ed25519FieldElement x, y, yy, u, v, v3, vxx, check;
-        y = encoded.decode();
-        yy = y.square();
-
-        // u = y^2-1	
-        u = yy.subtract(Ed25519Field.ONE);
-
-        // v = dy^2+1
-        v = yy.multiply(Ed25519Field.D).add(Ed25519Field.ONE);
-
-        // v3 = v^3
-        v3 = v.square().multiply(v);
-
-        // x = (v3^2)vu, aka x = uv^7
-        x = v3.square().multiply(v).multiply(u);	
-
-        //  x = (uv^7)^((q-5)/8)
-        x = x.pow22523();
-
-        // x = uv^3(uv^7)^((q-5)/8)
-        x = v3.multiply(u).multiply(x);
-
-        vxx = x.square().multiply(v);
-        check = vxx.subtract(u);			// vx^2-u
-        if (check.isNonZero()) {
-            check = vxx.add(u);				// vx^2+u
-
-            if (check.isNonZero())
-                throw new IllegalArgumentException("not a valid Ed25519GroupElement");
-            x = x.multiply(Ed25519Field.I);
-        }
-
-        if ((x.isNegative() ? 1 : 0) != ArrayUtils.getBit(encoded.getRaw(), 255)) {
-            x = x.negate();
-        }
-
- 		this.repr = Representation.P3;
-		this.X = x;
-		this.Y = y;
-		this.Z = Ed25519Field.ONE;
-		this.T = this.X.multiply(this.Y);
-    }
-
-	/**
 	 * Gets the representation of the group element.
 	 *
 	 * @return The representation.
@@ -296,7 +253,7 @@ public class Ed25519GroupElement implements Serializable {
 	 *
 	 * @return The encoded point as byte array.
 	 */
-    public byte[] toByteArray() {
+    public Ed25519EncodedGroupElement encode() {
         switch (this.repr) {
 			case P2:
 			case P3:
@@ -305,9 +262,9 @@ public class Ed25519GroupElement implements Serializable {
 				Ed25519FieldElement y = Y.multiply(recip);
 				byte[] s = y.encode().getRaw();
 				s[s.length-1] |= (x.isNegative() ? (byte) 0x80 : 0);
-				return s;
+				return new Ed25519EncodedGroupElement(s);
 			default:
-				return toP2().toByteArray();
+				return toP2().encode();
         }
     }
 
@@ -666,7 +623,7 @@ public class Ed25519GroupElement implements Serializable {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(this.toByteArray());
+        return this.encode().hashCode();
     }
 
     @Override
@@ -716,28 +673,29 @@ public class Ed25519GroupElement implements Serializable {
     /**
      * Convert a to 2^16 representation.
      *
-     * @param a = a[0]+256*a[1]+...+256^31 a[31]
+     * @param encoded The encode field element.
      * @return 64 bytes, each between -8 and 7
      */
-    private static byte[] toRadix16(final byte[] a) {
-        final byte[] e = new byte[64];
-        int i;
-        for (i = 0; i < 32; i++) {
-            e[2*i+0] = (byte) (a[i] & 15);
-            e[2*i+1] = (byte) ((a[i] >> 4) & 15);
-        }
-        /* each e[i] is between 0 and 15 */
-        /* e[63] is between 0 and 7 */
-        int carry = 0;
-        for (i = 0; i < 63; i++) {
-            e[i] += carry;
-            carry = e[i] + 8;
-            carry >>= 4;
-            e[i] -= carry << 4;
-        }
-        e[63] += carry;
-        /* each e[i] is between -8 and 7 */
-        return e;
+    private static byte[] toRadix16(final Ed25519EncodedFieldElement encoded) {
+		final byte[] a = encoded.getRaw();
+		final byte[] e = new byte[64];
+		int i;
+		for (i = 0; i < 32; i++) {
+			e[2*i+0] = (byte) (a[i] & 15);
+			e[2*i+1] = (byte) ((a[i] >> 4) & 15);
+		}
+		/* each e[i] is between 0 and 15 */
+		/* e[63] is between 0 and 7 */
+		int carry = 0;
+		for (i = 0; i < 63; i++) {
+			e[i] += carry;
+			carry = e[i] + 8;
+			carry >>= 4;
+			e[i] -= carry << 4;
+		}
+		e[63] += carry;
+
+		return e;
     }
 
     /**
@@ -810,7 +768,7 @@ public class Ed25519GroupElement implements Serializable {
         Ed25519GroupElement t;
         int i;
 
-		final byte[] e = toRadix16(a.getRaw());
+		final byte[] e = toRadix16(a);
 
         Ed25519GroupElement h = Ed25519Group.ZERO_P3;
         synchronized(this) {
@@ -831,7 +789,7 @@ public class Ed25519GroupElement implements Serializable {
     }
 
     /**
-     * Calculates a sliding-windows base 2 representation for a given value a.
+     * Calculates a sliding-windows base 2 representation for a given encoded field element a.
 	 * To learn more about it see [6] page 8.
 	 *
 	 * Output: r which satisfies
@@ -839,11 +797,12 @@ public class Ed25519GroupElement implements Serializable {
      *
      * Method is package private only so that tests run.
      *
-	 * @param a = a[0]+256*a[1]+...+256^31 a[31].
+	 * @param encoded The encoded field element.
      * @return The byte array r in the above described form.
      */
-    static byte[] slide(final byte[] a) {
-        byte[] r = new byte[256];
+    static byte[] slide(final Ed25519EncodedFieldElement encoded) {
+		final byte[] a = encoded.getRaw();
+        final byte[] r = new byte[256];
 
         // Put each bit of 'a' into a separate byte, 0 or 1
         for (int i = 0; i < 256; ++i) {
@@ -895,8 +854,8 @@ public class Ed25519GroupElement implements Serializable {
 			final Ed25519GroupElement A,
 			final Ed25519EncodedFieldElement a,
 			final Ed25519EncodedFieldElement b) {
-		final byte[] aSlide = slide(a.getRaw());
-		final byte[] bSlide = slide(b.getRaw());
+		final byte[] aSlide = slide(a);
+		final byte[] bSlide = slide(b);
 
         Ed25519GroupElement r = Ed25519Group.ZERO_P2;
 
@@ -929,23 +888,24 @@ public class Ed25519GroupElement implements Serializable {
     }
 
     /**
-     * Verify that a point is on its curve.
-     * @return true if the point lies on its curve.
+     * Verify that the group element satisfies the curve equation.
+	 *
+     * @return true if the group element satisfies the curve equation, false otherwise.
      */
-    public boolean isOnCurve() {
+    public boolean satisfiesCurveEquation() {
 		switch (repr) {
 			case P2:
 			case P3:
 				Ed25519FieldElement recip = Z.invert();
 				Ed25519FieldElement x = X.multiply(recip);
 				Ed25519FieldElement y = Y.multiply(recip);
-				Ed25519FieldElement xx = x.square();
-				Ed25519FieldElement yy = y.square();
-				Ed25519FieldElement dxxyy = Ed25519Field.D.multiply(xx).multiply(yy);
-				return Ed25519Field.ONE.add(dxxyy).add(xx).equals(yy);
+				Ed25519FieldElement xSquare = x.square();
+				Ed25519FieldElement ySquare = y.square();
+				Ed25519FieldElement dXSquareYSquare = Ed25519Field.D.multiply(xSquare).multiply(ySquare);
+				return Ed25519Field.ONE.add(dXSquareYSquare).add(xSquare).equals(ySquare);
 
 			default:
-				return toP2().isOnCurve();
+				return toP2().satisfiesCurveEquation();
 		}
     }
 

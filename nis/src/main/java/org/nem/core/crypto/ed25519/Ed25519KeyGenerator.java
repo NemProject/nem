@@ -35,6 +35,6 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 		final Ed25519GroupElement pubKey = Ed25519Group.BASE_POINT.scalarMultiply(a);
 		pubKey.precomputeForDoubleScalarMultiplication();
 
-		return new PublicKey(pubKey.toByteArray(), pubKey);
+		return new PublicKey(pubKey.encode().getRaw(), pubKey);
 	}
 }

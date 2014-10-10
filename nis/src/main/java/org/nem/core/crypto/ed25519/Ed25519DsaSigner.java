@@ -46,20 +46,19 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// R = rModQ * base point.
 		final Ed25519GroupElement R = Ed25519Group.BASE_POINT.scalarMultiply(rModQ);
-		final byte[] encodedR = R.toByteArray();
+		final Ed25519EncodedGroupElement encodedR = R.encode();
 
 		// S = (r + H(encodedR, encodedA, data) * a) mod group order where
 		// encodedR and encodedA are the little endian encodings of the group element R and the public key A and
 		// a is the lower 32 bytes of hash after clamping.
-		this.digest.update(encodedR);
+		this.digest.update(encodedR.getRaw());
 		this.digest.update(this.keyPair.getPublicKey().getRaw());
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
 		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(keyPair.getPrivateKey().prepareForScalarMultiply(), rModQ);
 
 		// Signature is (encodedR, encodedS)
-		// TODO 20142010 BR: change this to new Signature(Ed25519EncodedGroupElement, Ed25519EncodedFieldElement)
-		final Signature signature = new Signature(encodedR, encodedS.getRaw());
+		final Signature signature = new Signature(encodedR.getRaw(), encodedS.getRaw());
 		if (!isCanonicalSignature(signature)) {
 			throw new CryptoException("Generated signature is not canonical");
 		}
@@ -74,10 +73,10 @@ public class Ed25519DsaSigner implements DsaSigner {
 		}
 
 		// h = H(encodedR, encodedA, data).
-		final byte[] encodedR = signature.getBinaryR();
-		final byte[] encodedA = this.keyPair.getPublicKey().getRaw();
-		this.digest.update(encodedR);
-		this.digest.update(encodedA);
+		final byte[] rawEncodedR = signature.getBinaryR();
+		final byte[] rawEncodedA = this.keyPair.getPublicKey().getRaw();
+		this.digest.update(rawEncodedR);
+		this.digest.update(rawEncodedA);
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
 
 		// hReduced = h mod group order
@@ -86,8 +85,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		Ed25519GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
 		if (null == A) {
 			// Must compute A.
-			// TODO 20142010 BR: change this to new Ed25519GroupElement(Ed25519EncodedGroupElement)
-			A = new Ed25519GroupElement(new Ed25519EncodedFieldElement(encodedA));
+			A = new Ed25519EncodedGroupElement(rawEncodedA).decode();
 			A.precomputeForDoubleScalarMultiplication();
 		}
 
@@ -96,8 +94,8 @@ public class Ed25519DsaSigner implements DsaSigner {
 				A, hModQ, signature.getSAsEncodedFieldElement());
 
 		// Compare calculated R to given R.
-		final byte[] encodedCalculatedR = calculatedR.toByteArray();
-		final int result = ArrayUtils.isEqual(encodedCalculatedR, encodedR);
+		final byte[] encodedCalculatedR = calculatedR.encode().getRaw();
+		final int result = ArrayUtils.isEqual(encodedCalculatedR, rawEncodedR);
 		return 1 == result;
 	}
 

@@ -23,7 +23,7 @@ public class Ed25519EncodedFieldElementTest {
 	}
 
 	@Test (expected = IllegalArgumentException.class)
-	public void cannotCreateEncodedFieldElementFromArrayWithIncorrectLength() {
+	public void cannotBeCreatedFromArrayWithIncorrectLength() {
 		// Assert:
 		new Ed25519EncodedFieldElement(new byte[50]);
 	}
@@ -135,7 +135,7 @@ public class Ed25519EncodedFieldElementTest {
 
 	@Test
 	public void encodeReturnsCorrectByteArray() {
-		SecureRandom random = new SecureRandom();
+		final SecureRandom random = new SecureRandom();
 		for (int i=0; i<10000; i++){
 			// Arrange:
 			final int[] t = new int[10];
@@ -157,7 +157,7 @@ public class Ed25519EncodedFieldElementTest {
 
 	@Test
 	public void isNegativeReturnsCorrectResult() {
-		SecureRandom random = new SecureRandom();
+		final SecureRandom random = new SecureRandom();
 		for (int i=0; i<10000; i++) {
 			// Arrange:
 			final byte[] values = new byte[32];

@@ -187,9 +187,31 @@ public class Ed25519FieldElementTest {
 		}
 	}
 
+	@Test
+	public void sqrtReturnsCorrectResult() {
+		for (int i=0; i<1000; i++) {
+			// Arrange:
+			final Ed25519EncodedFieldElement y = MathUtils.getRandomEncodedFieldElement(32);
+			y.getRaw()[31] &= 0xf8;
+			final Ed25519FieldElement ySquare = y.decode().square();
+			final Ed25519FieldElement n1 = ySquare.subtract(Ed25519Field.ONE);
+			final Ed25519FieldElement d1 = Ed25519Field.D.multiply(ySquare).add(Ed25519Field.ONE);
+			final BigInteger b1 = MathUtils.toBigInteger(n1).mod(Ed25519Field.P);
+			final BigInteger b2 = MathUtils.toBigInteger(d1).mod(Ed25519Field.P);
+
+			// Act:
+			final Ed25519FieldElement f = Ed25519FieldElement.sqrt(n1, d1);
+			final BigInteger b3 = MathUtils.toBigInteger(f).mod(Ed25519Field.P);
+			final BigInteger b4 = MathUtils.getSqrtOfFraction(b1, b2).mod(Ed25519Field.P);
+
+			// Assert:
+			Assert.assertThat(b3, IsEqual.equalTo(b4));
+		}
+	}
+
 	// endregion
 
-	// regiondecode
+	// region decode
 
 	@Test
 	public void decodeReturnsCorrectFieldElementForSimpleByteArrays() {

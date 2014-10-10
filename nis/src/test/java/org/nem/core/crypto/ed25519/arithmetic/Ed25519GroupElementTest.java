@@ -10,7 +10,10 @@ public class Ed25519GroupElementTest {
 
     @Test
     public void canBeCreatedWithP2Coordinates() {
+		// Arrange:
 		final Ed25519GroupElement g = Ed25519GroupElement.p2(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE);
+
+		// Assert:
 		Assert.assertThat(g.getRepresentation(), IsEqual.equalTo(Ed25519GroupElement.Representation.P2));
 		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
 		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
@@ -20,7 +23,10 @@ public class Ed25519GroupElementTest {
 
     @Test
 	public void canBeCreatedWithP3Coordinates() {
+		// Arrange:
 		final Ed25519GroupElement g = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
+
+		// Assert:
 		Assert.assertThat(g.getRepresentation(), IsEqual.equalTo(Ed25519GroupElement.Representation.P3));
 		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
 		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
@@ -29,7 +35,10 @@ public class Ed25519GroupElementTest {
 
     @Test
 	public void canBeCreatedWithP1P1Coordinates() {
+		// Arrange:
 		final Ed25519GroupElement g = Ed25519GroupElement.p1p1(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ONE);
+
+		// Assert:
 		Assert.assertThat(g.getRepresentation(), IsEqual.equalTo(Ed25519GroupElement.Representation.P1P1));
 		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
 		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
@@ -39,7 +48,10 @@ public class Ed25519GroupElementTest {
 
     @Test
 	public void canBeCreatedWithPrecompCoordinates() {
+		// Arrange:
 		final Ed25519GroupElement g = Ed25519GroupElement.precomp(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
+
+		// Assert:
 		Assert.assertThat(g.getRepresentation(), IsEqual.equalTo(Ed25519GroupElement.Representation.PRECOMP));
 		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ONE));
 		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
@@ -49,7 +61,10 @@ public class Ed25519GroupElementTest {
 
     @Test
 	public void canBeCreatedWithCachedCoordinates() {
+		// Arrange:
 		final Ed25519GroupElement g = Ed25519GroupElement.cached(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
+
+		// Assert:
 		Assert.assertThat(g.getRepresentation(), IsEqual.equalTo(Ed25519GroupElement.Representation.CACHED));
 		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ONE));
 		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
@@ -59,12 +74,15 @@ public class Ed25519GroupElementTest {
 
     @Test
 	public void canBeCreatedWithSpecifiedCoordinates() {
+		// Arrange:
 		final Ed25519GroupElement g = new Ed25519GroupElement(
 				Ed25519GroupElement.Representation.P3,
 				Ed25519Field.ZERO,
 				Ed25519Field.ONE,
 				Ed25519Field.ONE,
 				Ed25519Field.ZERO);
+
+		// Assert:
 		Assert.assertThat(g.getRepresentation(), IsEqual.equalTo(Ed25519GroupElement.Representation.P3));
 		Assert.assertThat(g.getX(), IsEqual.equalTo(Ed25519Field.ZERO));
 		Assert.assertThat(g.getY(), IsEqual.equalTo(Ed25519Field.ONE));
@@ -73,15 +91,15 @@ public class Ed25519GroupElementTest {
     }
 
 	@Test
-	public void constructorUsingByteArrayReturnsExpectedResult() {
+	public void constructorUsingEncodedGroupElementReturnsExpectedResult() {
 		for (int i=0; i<100; i++) {
 			// Arrange:
 			final Ed25519GroupElement g = MathUtils.getRandomGroupElement();
-			final byte[] bytes = g.toByteArray();
+			final Ed25519EncodedGroupElement encoded = g.encode();
 
 			// Act:
-			final Ed25519GroupElement h1 = new Ed25519GroupElement(new Ed25519EncodedFieldElement(bytes));
-			final Ed25519GroupElement h2 = MathUtils.toGroupElement(bytes);
+			final Ed25519GroupElement h1 = encoded.decode();
+			final Ed25519GroupElement h2 = MathUtils.toGroupElement(encoded.getRaw());
 
 			// Assert:
 			Assert.assertThat(h1, IsEqual.equalTo(h2));
@@ -89,20 +107,20 @@ public class Ed25519GroupElementTest {
 	}
 
 	 @Test
-	 public void toByteArrayReturnsExpectedResult() {
+	 public void encodeReturnsExpectedResult() {
 		 for (int i=0; i<100; i++) {
 			 // Arrange:
 			 final Ed25519GroupElement g = MathUtils.getRandomGroupElement();
 
 			 // Act:
-			 final byte[] gBytes = g.toByteArray();
+			 final Ed25519EncodedGroupElement encoded = g.encode();
 			 final byte[] bytes = MathUtils.toByteArray(MathUtils.toBigInteger(g.getY()));
 			 if (MathUtils.toBigInteger(g.getX()).mod(new BigInteger("2")).equals(MathUtils.toBigInteger(Ed25519Field.ONE))) {
 				 bytes[31] |= 0x80;
 			 }
 
 			 // Assert:
-			 Assert.assertThat(Arrays.equals(gBytes, bytes), IsEqual.equalTo(true));
+			 Assert.assertThat(Arrays.equals(encoded.getRaw(), bytes), IsEqual.equalTo(true));
 		 }
 	 }
 
@@ -460,6 +478,27 @@ public class Ed25519GroupElementTest {
 
 	// endregion
 
+	// region toString
+
+	@Test
+	public void toStringReturnsCorrectRepresentation() {
+		// Arrange:
+		final Ed25519GroupElement g = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
+
+		// Act:
+		final String gAsString = g.toString();
+		final String expectedString = String.format("X=%s\nY=%s\nZ=%s\nT=%s\n",
+				"0000000000000000000000000000000000000000000000000000000000000000",
+				"0100000000000000000000000000000000000000000000000000000000000000",
+				"0100000000000000000000000000000000000000000000000000000000000000",
+				"0000000000000000000000000000000000000000000000000000000000000000");
+
+		// Assert:
+		Assert.assertThat(gAsString, IsEqual.equalTo(expectedString));
+	}
+
+	// endregion
+
 	@Test
 	public void scalarMultiplyBasePointWithZeroReturnsNeutralElement() {
 		// Arrange:
@@ -524,25 +563,25 @@ public class Ed25519GroupElementTest {
 	// endregion
 
 	@Test
-	public void isOnCurveReturnsTrueForPointsOnTheCurve() {
+	public void satisfiesCurveEquationReturnsTrueForPointsOnTheCurve() {
 		for (int i=0; i<100; i++) {
 			// Arrange:
 			final Ed25519GroupElement g = MathUtils.getRandomGroupElement();
 
 			// Assert:
-			Assert.assertThat(g.isOnCurve(), IsEqual.equalTo(true));
+			Assert.assertThat(g.satisfiesCurveEquation(), IsEqual.equalTo(true));
 		}
 	}
 
 	@Test
-	public void isOnCurveReturnsFalseForPointsNotOnTheCurve() {
+	public void satisfiesCurveEquationReturnsFalseForPointsNotOnTheCurve() {
 		for (int i=0; i<100; i++) {
 			// Arrange:
 			final Ed25519GroupElement g = MathUtils.getRandomGroupElement();
 			final Ed25519GroupElement h = Ed25519GroupElement.p2(g.getX(), g.getY(), g.getZ().multiply(Ed25519Field.TWO));
 
 			// Assert (can only fail for 5*Z^2=1):
-			Assert.assertThat(h.isOnCurve(), IsEqual.equalTo(false));
+			Assert.assertThat(h.satisfiesCurveEquation(), IsEqual.equalTo(false));
 		}
 	}
 }
