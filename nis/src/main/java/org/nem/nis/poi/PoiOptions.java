@@ -27,4 +27,27 @@ public interface PoiOptions {
 	 * @return true if clustering should be enabled.
 	 */
 	public boolean isClusteringEnabled();
+
+	/**
+	 * Gets the teleportation probability.
+	 *
+	 * @return The teleportation probability.
+	 */
+	public double getTeleportationProbability();
+
+	/**
+	 * Gets the inter-level teleportation probability.
+	 *
+	 * @return The inter-level teleportation probability.
+	 */
+	public double getInterLevelTeleportationProbability();
+
+	/**
+	 * Gets the inverse teleportation probability.
+	 *
+	 * @return The inverse teleportation probability.
+	 */
+	public default double getInverseTeleportationProbability() {
+		return 1.0 - this.getTeleportationProbability() - this.getInterLevelTeleportationProbability();
+	}
 }

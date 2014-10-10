@@ -16,14 +16,7 @@ import java.util.logging.Logger;
 public class PoiContext {
 	private static final Logger LOGGER = Logger.getLogger(PoiContext.class.getName());
 
-	private static final double TELEPORTATION_PROB = .75; // For NCDawareRank
-	private static final double INTER_LEVEL_TELEPORTATION_PROB = .1; // For NCDawareRank
-
 	private final AccountProcessor accountProcessor;
-
-	private final double teleportationProbability;
-	private final double interLevelTeleportationProbability;
-	private final double inverseTeleportationProbability;
 
 	/**
 	 * Creates a new context.
@@ -41,18 +34,6 @@ public class PoiContext {
 		// (1) build the account vectors and matrices
 		this.accountProcessor = new AccountProcessor(accountStates, height, clusterer, options);
 		this.accountProcessor.process();
-
-		// (2) set the teleportation values
-		if (options.isClusteringEnabled()) {
-			this.teleportationProbability = TELEPORTATION_PROB;
-			this.interLevelTeleportationProbability = INTER_LEVEL_TELEPORTATION_PROB;
-		} else {
-			this.teleportationProbability = TELEPORTATION_PROB + INTER_LEVEL_TELEPORTATION_PROB;
-			this.interLevelTeleportationProbability = 0;
-		}
-
-		final double inverseProbability = (1.0 - this.teleportationProbability - this.interLevelTeleportationProbability);
-		this.inverseTeleportationProbability = inverseProbability / this.getPoiStartVector().size();
 	}
 
 	//region getters
@@ -84,37 +65,6 @@ public class PoiContext {
 	 */
 	public ColumnVector getPoiStartVector() {
 		return this.accountProcessor.poiStartVector;
-	}
-
-	//endregion
-
-	//region teleportation probabilities
-
-	/**
-	 * Gets the teleportation probability.
-	 *
-	 * @return The teleportation probability.
-	 */
-	public double getTeleportationProbability() {
-		return this.teleportationProbability;
-	}
-
-	/**
-	 * Gets the inter-level teleportation probability.
-	 *
-	 * @return The inter-level teleportation probability.
-	 */
-	public double getInterLevelTeleportationProbability() {
-		return this.interLevelTeleportationProbability;
-	}
-
-	/**
-	 * Gets the inverse teleportation probability.
-	 *
-	 * @return The inverse teleportation probability.
-	 */
-	public double getInverseTeleportationProbability() {
-		return this.inverseTeleportationProbability;
 	}
 
 	//endregion
@@ -313,6 +263,10 @@ public class PoiContext {
 		}
 
 		private void clusterAccounts() {
+			if (!this.options.isClusteringEnabled()) {
+				LOGGER.info(String.format("clustering is bypassed"));
+			}
+
 			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
 			this.neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
 			this.clusteringResult = this.clusteringStrategy.cluster(this.neighborhood);

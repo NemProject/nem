@@ -9,6 +9,8 @@ public class PoiOptionsBuilder {
 	private Amount minHarvesterBalance = Amount.fromNem(1000);
 	private Amount minOutlinkWeight = Amount.ZERO;
 	private boolean isClusteringEnabled = true;
+	private double teleportationProbability = .75; // For NCDawareRank
+	private double interLevelTeleportationProbability = .1; // For NCDawareRank
 
 	/**
 	 * Sets the minimum (vested) balance required for a harvester.
@@ -37,14 +39,29 @@ public class PoiOptionsBuilder {
 		this.isClusteringEnabled = isClusteringEnabled;
 	}
 
-//	//clusteringAlgs = ['SingleClusterScan', 'OutlierScan', 'FastScanClusteringStrategy']
-	//minHarvesterBalances = [1, 100, 500, 1000, 10000, 100000]
-	//minOutlinkWeights = [0, 1, 100, 1000, 10000]
+	/**
+	 * Sets the teleportation probability.
+	 *
+	 * @param probability The teleportation probability.
+	 */
+	public void setTeleportationProbability(final double probability) {
+		this.teleportationProbability = probability;
+	}
+
+	/**
+	 * Sets the inter-level teleportation probability.
+	 *
+	 * @param probability The inter-level teleportation probability.
+	 */
+	public void setInterLevelTeleportationProbability(final double probability) {
+		this.interLevelTeleportationProbability = probability;
+	}
+
+	//	//clusteringAlgs = ['SingleClusterScan', 'OutlierScan', 'FastScanClusteringStrategy']
 //	//negativeOutlinkWeights = [0, 20, 40, 60, 80, 100]
 //	//outlierWeights = [0.85, 0.9, 0.95]
 //	//mus = [1, 2, 3, 4, 5]
 //	//epsilons = [0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95]
-//	//teleporationProbs = [(0.75, 0.1), (0.65, 0.1), (0.55, 0.1), (0.75, 0.2), (0.65, 0.2), (0.55, 0.2)]
 
 	/**
 	 * Creates a new poi options.
@@ -67,6 +84,16 @@ public class PoiOptionsBuilder {
 			@Override
 			public boolean isClusteringEnabled() {
 				return PoiOptionsBuilder.this.isClusteringEnabled;
+			}
+
+			@Override
+			public double getTeleportationProbability() {
+				return PoiOptionsBuilder.this.teleportationProbability;
+			}
+
+			@Override
+			public double getInterLevelTeleportationProbability() {
+				return PoiOptionsBuilder.this.interLevelTeleportationProbability;
 			}
 		};
 	}
