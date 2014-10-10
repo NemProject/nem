@@ -79,15 +79,18 @@ public class PoiContextTest {
 	@Test
 	public void outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithAccountLinks();
+		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
+		poiOptionsBuilder.setNegativeOutlinkWeight(0.4);
+		final PoiContext context = createTestPoiContextWithAccountLinks(poiOptionsBuilder.create());
 
 		// Assert:
 		// (1) only harvesting-eligible accounts (0, 1, 2, 3) are represented
-		// (2) calculation delegates to PoiAccountInfo (negative outflows are scaled)
-		// (3) net outflows are used instead of total outflows
+		// (2) calculation delegates to PoiAccountInfo
+		// (3) negative outflows are scaled
+		// (4) net outflows are used instead of total outflows
 		Assert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(9e06, 0, -3e06, 8e06)));
+				IsEqual.equalTo(new ColumnVector(9e06, 0, 0.4 * -15e06, 8e06)));
 	}
 
 	@Test
@@ -101,6 +104,19 @@ public class PoiContextTest {
 		Assert.assertThat(
 				context.getPoiStartVector(),
 				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
+	}
+
+	@Test
+	public void outlierVectorIsSetCorrectly() {
+		// Act:
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndOneOutlier();
+
+		// Assert:
+		// (1) values corresponding to outliers are 1
+		// (2) values corresponding to non-outliers are 0
+		Assert.assertThat(
+				context.getOutlierVector(),
+				IsEqual.equalTo(new ColumnVector(0, 0, 0, 0, 0, 0, 0, 1)));
 	}
 
 	//endregion
@@ -386,10 +402,10 @@ public class PoiContextTest {
 		addAccountLink(height, accountStates.get(0), accountStates.get(4), 2); // to non-foraging account (included in scores)
 
 		// outlinks
-		// - 0: (8, 4, 2) - (2, 3)
-		// - 1: (2, 6) - (8)
-		// - 2: (none) - (4, 6, 5)
-		// - 3: (3, 5) - (none)
+		// - 0: (8, 4, 2) - (2, 3) -- 9
+		// - 1: (2, 6) - (8) -------- 0
+		// - 2: (none) - (4, 6, 5) -- -15
+		// - 3: (3, 5) - (none) ----- 9
 		return new PoiContext(accountStates, height, poiOptions);
 	}
 

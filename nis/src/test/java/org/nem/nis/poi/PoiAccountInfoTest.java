@@ -181,8 +181,8 @@ public class PoiAccountInfoTest {
 		info.addInlink(new WeightedLink(Address.fromEncoded("acc 2"), 2.0e06));
 		info.addInlink(new WeightedLink(Address.fromEncoded("acc 4"), 2.0e06));
 
-		// Assert: 0.2 * (sum(2, 3, 1, 5, 9) - sum(20, 2, 2))
-		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(0.2 * -0.4e07));
+		// Assert: (sum(2, 3, 1, 5, 9) - sum(20, 2, 2))
+		Assert.assertThat(info.getNetOutlinkScore(), IsEqual.equalTo(-0.4e07));
 	}
 
 	@Test

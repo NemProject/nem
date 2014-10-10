@@ -105,11 +105,8 @@ public class PoiAccountInfo {
 	 * @return The net out-link score.
 	 */
 	public double getNetOutlinkScore() {
-		final double netOutlinkScore = this.getNetOutlinks().stream()
+		return this.getNetOutlinks().stream()
 				.map(WeightedLink::getWeight)
 				.reduce(0.0, Double::sum);
-
-		// give less weight to negative outlinks
-		return netOutlinkScore * (netOutlinkScore < 0 ? 0.2 : 1.0);
 	}
 }
