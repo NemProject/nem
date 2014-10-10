@@ -23,22 +23,18 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	private final PoiScorer poiScorer;
-	private final GraphClusteringStrategy clusterer;
 	private final PoiOptions options;
 
 	/**
 	 * Creates a new generator with custom options.
 	 *
 	 * @param poiScorer The poi scorer to use.
-	 * @param clusterer The additional poi options to use.
 	 * @param options The poi options.
 	 */
 	public PoiImportanceCalculator(
 			final PoiScorer poiScorer,
-			final GraphClusteringStrategy clusterer,
 			final PoiOptions options) {
 		this.poiScorer = poiScorer;
-		this.clusterer = clusterer;
 		this.options = options;
 	}
 
@@ -48,11 +44,12 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final Collection<PoiAccountState> accountStates) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accountStates, blockHeight, this.clusterer, this.options);
+		final PoiContext context = new PoiContext(accountStates, blockHeight, this.options);
 
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(
 				context,
+				this.options,
 				this.poiScorer,
 				accountStates.size(),
 				this.options.isClusteringEnabled());
@@ -79,16 +76,19 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 
 	private static class PoiPowerIterator extends PowerIterator {
 		private final PoiContext context;
+		private final PoiOptions options;
 		private final PoiScorer scorer;
 		private final boolean useInterLevelMatrix;
 
 		public PoiPowerIterator(
 				final PoiContext context,
+				final PoiOptions options,
 				final PoiScorer scorer,
 				final int numAccounts,
 				final boolean useInterLevelMatrix) {
 			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
+			this.options = options;
 			this.scorer = scorer;
 			this.useInterLevelMatrix = useInterLevelMatrix;
 		}
@@ -110,12 +110,13 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
 			final double dangleSum = this.scorer.calculateDangleSum(
 					this.context.getDangleIndexes(),
-					this.context.getTeleportationProbability(),
+					this.options.getTeleportationProbability(),
 					prevIterImportances);
 
-			// V(dangle-indexes) * dangle-sum + V(inverseTeleportation)
-			final ColumnVector dangleVector = new ColumnVector(prevIterImportances.size());
-			dangleVector.setAll(this.context.getInverseTeleportationProbability() + dangleSum);
+			// V(dangle-sum + inverseTeleportation / N)
+			final int size = prevIterImportances.size();
+			final ColumnVector dangleVector = new ColumnVector(size);
+			dangleVector.setAll(dangleSum + this.options.getInverseTeleportationProbability() / size);
 			return dangleVector;
 		}
 
@@ -123,7 +124,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			// M(out-link) * V(last iter) .* V(teleportation)
 			return this.context.getOutlinkMatrix()
 					.multiply(prevIterImportances)
-					.multiply(this.context.getTeleportationProbability());
+					.multiply(this.options.getTeleportationProbability());
 		}
 
 		private ColumnVector createInterLeverVector(final ColumnVector prevIterImportances) {
@@ -131,7 +132,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final InterLevelProximityMatrix interLevelMatrix = this.context.getInterLevelMatrix();
 			return interLevelMatrix.getA()
 					.multiply(interLevelMatrix.getR().multiply(prevIterImportances))
-					.multiply(this.context.getInterLevelTeleportationProbability());
+					.multiply(this.options.getInterLevelTeleportationProbability());
 		}
 	}
 }

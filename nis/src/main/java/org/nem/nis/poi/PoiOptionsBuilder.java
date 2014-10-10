@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.Amount;
+import org.nem.nis.poi.graph.*;
 
 /**
  * A builder for creating poi options.
@@ -8,7 +9,9 @@ import org.nem.core.model.primitive.Amount;
 public class PoiOptionsBuilder {
 	private Amount minHarvesterBalance = Amount.fromNem(1000);
 	private Amount minOutlinkWeight = Amount.ZERO;
-	private boolean isClusteringEnabled = true;
+	private double teleportationProbability = .75; // For NCDawareRank
+	private double interLevelTeleportationProbability = .1; // For NCDawareRank
+	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
 
 	/**
 	 * Sets the minimum (vested) balance required for a harvester.
@@ -29,22 +32,37 @@ public class PoiOptionsBuilder {
 	}
 
 	/**
-	 * Sets a value indicating whether or not clustering should be enabled.
+	 * Sets the graph clustering strategy.
 	 *
-	 * @param isClusteringEnabled true if clustering should be enabled.
+	 * @param strategy The clustering strategy.
 	 */
-	public void setIsClusteringEnabled(final boolean isClusteringEnabled) {
-		this.isClusteringEnabled = isClusteringEnabled;
+	public void setClusteringStrategy(final GraphClusteringStrategy strategy) {
+		this.clusteringStrategy = strategy;
 	}
 
-//	//clusteringAlgs = ['SingleClusterScan', 'OutlierScan', 'FastScanClusteringStrategy']
-	//minHarvesterBalances = [1, 100, 500, 1000, 10000, 100000]
-	//minOutlinkWeights = [0, 1, 100, 1000, 10000]
+	/**
+	 * Sets the teleportation probability.
+	 *
+	 * @param probability The teleportation probability.
+	 */
+	public void setTeleportationProbability(final double probability) {
+		this.teleportationProbability = probability;
+	}
+
+	/**
+	 * Sets the inter-level teleportation probability.
+	 *
+	 * @param probability The inter-level teleportation probability.
+	 */
+	public void setInterLevelTeleportationProbability(final double probability) {
+		this.interLevelTeleportationProbability = probability;
+	}
+
+	//	//clusteringAlgs = ['SingleClusterScan', 'OutlierScan', 'FastScanClusteringStrategy']
 //	//negativeOutlinkWeights = [0, 20, 40, 60, 80, 100]
 //	//outlierWeights = [0.85, 0.9, 0.95]
 //	//mus = [1, 2, 3, 4, 5]
 //	//epsilons = [0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95]
-//	//teleporationProbs = [(0.75, 0.1), (0.65, 0.1), (0.55, 0.1), (0.75, 0.2), (0.65, 0.2), (0.55, 0.2)]
 
 	/**
 	 * Creates a new poi options.
@@ -66,7 +84,22 @@ public class PoiOptionsBuilder {
 
 			@Override
 			public boolean isClusteringEnabled() {
-				return PoiOptionsBuilder.this.isClusteringEnabled;
+				return null != this.getClusteringStrategy();
+			}
+
+			@Override
+			public GraphClusteringStrategy getClusteringStrategy() {
+				return PoiOptionsBuilder.this.clusteringStrategy;
+			}
+
+			@Override
+			public double getTeleportationProbability() {
+				return PoiOptionsBuilder.this.teleportationProbability;
+			}
+
+			@Override
+			public double getInterLevelTeleportationProbability() {
+				return PoiOptionsBuilder.this.interLevelTeleportationProbability;
 			}
 		};
 	}

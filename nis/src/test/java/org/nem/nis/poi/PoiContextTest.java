@@ -105,48 +105,6 @@ public class PoiContextTest {
 
 	//endregion
 
-	//region teleportation probabilities
-
-	@Test
-	public void teleportationProbabilitiesAreCalculatedCorrectlyWhenClusteringIsEnabled() {
-		// Act:
-		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
-		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setIsClusteringEnabled(true);
-		final PoiOptions options = poiOptionsBuilder.create();
-		final PoiContext context = new PoiContext(accountStates, height, new FastScanClusteringStrategy(), options);
-
-		// Assert:
-		// (1) teleportation: 0.750
-		// (2) inter-level teleporation: 0.100
-		// (3) inverse teleportation: 0.150 / # harvesting-eligible accounts
-		Assert.assertThat(context.getTeleportationProbability(), IsEqual.equalTo(0.750));
-		Assert.assertThat(context.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.100));
-		Assert.assertThat(context.getInverseTeleportationProbability(), IsEqual.equalTo(0.150 / 4));
-	}
-
-	@Test
-	public void teleportationProbabilitiesAreCalculatedCorrectlyWhenClusteringIsNotEnabled() {
-		// Act:
-		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
-		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setIsClusteringEnabled(false);
-		final PoiOptions options = poiOptionsBuilder.create();
-		final PoiContext context = new PoiContext(accountStates, height, new FastScanClusteringStrategy(), options);
-
-		// Assert:
-		// (1) teleportation: 0.850
-		// (2) inter-level teleporation: 0.000
-		// (3) inverse teleportation: 0.150 / # harvesting-eligible accounts
-		Assert.assertThat(context.getTeleportationProbability(), IsEqual.equalTo(0.850));
-		Assert.assertThat(context.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.000));
-		Assert.assertThat(context.getInverseTeleportationProbability(), IsRoundedEqual.equalTo(0.150 / 4));
-	}
-
-	//endregion
-
 	//region dangle indexes
 
 	@Test
@@ -397,7 +355,7 @@ public class PoiContextTest {
 	}
 
 	private static PoiContext createPoiContext(final List<PoiAccountState> accountStates, final BlockHeight height) {
-		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), DEFAULT_OPTIONS);
+		return new PoiContext(accountStates, height, DEFAULT_OPTIONS);
 	}
 
 	private static PoiContext createTestPoiContextWithAccountLinks() {
@@ -432,7 +390,7 @@ public class PoiContextTest {
 		// - 1: (2, 6) - (8)
 		// - 2: (none) - (4, 6, 5)
 		// - 3: (3, 5) - (none)
-		return new PoiContext(accountStates, height, new FastScanClusteringStrategy(), poiOptions);
+		return new PoiContext(accountStates, height, poiOptions);
 	}
 
 	/**
