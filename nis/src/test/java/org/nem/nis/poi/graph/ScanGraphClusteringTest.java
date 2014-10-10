@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 public abstract class ScanGraphClusteringTest {
 	private static final Logger LOGGER = Logger.getLogger(ScanGraphClusteringTest.class.getName());
+	private static final double EPSILON = 0.65;
 
 	/**
 	 * Creates the GraphClusteringStrategy being tested.
@@ -749,7 +750,7 @@ public abstract class ScanGraphClusteringTest {
 	private ClusteringResult calculateClusteringResult(final GraphClusteringStrategy graphClusteringStrategy, final Matrix outlinkMatrix) {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy);
+		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, strategy);
 		return graphClusteringStrategy.cluster(neighborhood);
 	}
 
@@ -770,7 +771,7 @@ public abstract class ScanGraphClusteringTest {
 	private static class TestContext {
 		private final NeighborhoodRepository repository = Mockito.mock(NodeNeighborMap.class);
 		private final SimilarityStrategy similarityStrategy = Mockito.mock(SimilarityStrategy.class);
-		private final Neighborhood neighborhood = new Neighborhood(this.repository, this.similarityStrategy);
+		private final Neighborhood neighborhood = NisUtils.createNeighborhood(this.repository, this.similarityStrategy);
 		private final GraphClusteringStrategy clusteringStrategy;
 
 		public TestContext(final GraphClusteringStrategy clusteringStrategy, final int neighborhoodSize) {

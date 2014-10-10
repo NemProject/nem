@@ -18,8 +18,12 @@ public class PoiOptionsBuilderTest {
 		// Assert:
 		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
 		Assert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(options.getNegativeOutlinkWeight(), IsEqual.equalTo(0.20));
+		Assert.assertThat(options.getOutlierWeight(), IsEqual.equalTo(1.00));
 		Assert.assertThat(options.isClusteringEnabled(), IsEqual.equalTo(true));
 		Assert.assertThat(options.getClusteringStrategy(), IsInstanceOf.instanceOf(FastScanClusteringStrategy.class));
+		Assert.assertThat(options.getMuClusteringValue(), IsEqual.equalTo(3));
+		Assert.assertThat(options.getEpsilonClusteringValue(), IsEqual.equalTo(0.65));
 		Assert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.75));
 		Assert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.10));
 		Assert.assertThat(options.getInverseTeleportationProbability(), IsEqual.equalTo(0.15));
@@ -57,6 +61,10 @@ public class PoiOptionsBuilderTest {
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setMinHarvesterBalance(Amount.fromNem(123));
 		builder.setMinOutlinkWeight(Amount.fromNem(777));
+		builder.setNegativeOutlinkWeight(0.76);
+		builder.setOutlierWeight(0.82);
+		builder.setMuClusteringValue(5);
+		builder.setEpsilonClusteringValue(0.42);
 		builder.setTeleportationProbability(0.65);
 		builder.setInterLevelTeleportationProbability(0.32);
 		return builder;
@@ -66,6 +74,10 @@ public class PoiOptionsBuilderTest {
 		// Assert:
 		Assert.assertThat(options.getMinHarvesterBalance(), IsEqual.equalTo(Amount.fromNem(123)));
 		Assert.assertThat(options.getMinOutlinkWeight(), IsEqual.equalTo(Amount.fromNem(777)));
+		Assert.assertThat(options.getNegativeOutlinkWeight(), IsEqual.equalTo(0.76));
+		Assert.assertThat(options.getOutlierWeight(), IsEqual.equalTo(0.82));
+		Assert.assertThat(options.getMuClusteringValue(), IsEqual.equalTo(5));
+		Assert.assertThat(options.getEpsilonClusteringValue(), IsEqual.equalTo(0.42));
 		Assert.assertThat(options.getTeleportationProbability(), IsEqual.equalTo(0.65));
 		Assert.assertThat(options.getInterLevelTeleportationProbability(), IsEqual.equalTo(0.32));
 		Assert.assertThat(options.getInverseTeleportationProbability(), IsRoundedEqual.equalTo(0.03));

@@ -9,9 +9,15 @@ import org.nem.nis.poi.graph.*;
 public class PoiOptionsBuilder {
 	private Amount minHarvesterBalance = Amount.fromNem(1000);
 	private Amount minOutlinkWeight = Amount.ZERO;
+	private double negativeOutlinkWeight = 0.2;
+	private double outlierWeight = 1.0;
 	private double teleportationProbability = .75; // For NCDawareRank
 	private double interLevelTeleportationProbability = .1; // For NCDawareRank
 	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
+	private int mu = 3;
+	private double epsilon = 0.65;
+
+	//region weights
 
 	/**
 	 * Sets the minimum (vested) balance required for a harvester.
@@ -31,6 +37,29 @@ public class PoiOptionsBuilder {
 		this.minOutlinkWeight = minOutlinkWeight;
 	}
 
+
+	/**
+	 * Sets the weight given to (net) negative outlinks.
+	 *
+	 * @param weight The weight.
+	 */
+	public void setNegativeOutlinkWeight(final double weight) {
+		this.negativeOutlinkWeight = weight;
+	}
+
+	/**
+	 * Sets the weight given to outlier nodes.
+	 *
+	 * @param weight The weight.
+	 */
+	public void setOutlierWeight(final double weight) {
+		this.outlierWeight = weight;
+	}
+
+	//endregion
+
+	//region clustering
+
 	/**
 	 * Sets the graph clustering strategy.
 	 *
@@ -39,6 +68,28 @@ public class PoiOptionsBuilder {
 	public void setClusteringStrategy(final GraphClusteringStrategy strategy) {
 		this.clusteringStrategy = strategy;
 	}
+
+	/**
+	 * Sets the mu clustering variable.
+	 *
+	 * @param mu The mu value.
+	 */
+	public void setMuClusteringValue(final int mu) {
+		this.mu = mu;
+	}
+
+	/**
+	 * Sets the epsilon clustering variable.
+	 *
+	 * @param epsilon The epsilon value.
+	 */
+	public void setEpsilonClusteringValue(final double epsilon) {
+		this.epsilon = epsilon;
+	}
+
+	//endregion
+
+	//region teleportation
 
 	/**
 	 * Sets the teleportation probability.
@@ -58,11 +109,10 @@ public class PoiOptionsBuilder {
 		this.interLevelTeleportationProbability = probability;
 	}
 
-	//	//clusteringAlgs = ['SingleClusterScan', 'OutlierScan', 'FastScanClusteringStrategy']
+	//endregion
+
 //	//negativeOutlinkWeights = [0, 20, 40, 60, 80, 100]
 //	//outlierWeights = [0.85, 0.9, 0.95]
-//	//mus = [1, 2, 3, 4, 5]
-//	//epsilons = [0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95]
 
 	/**
 	 * Creates a new poi options.
@@ -83,6 +133,16 @@ public class PoiOptionsBuilder {
 			}
 
 			@Override
+			public double getNegativeOutlinkWeight() {
+				return PoiOptionsBuilder.this.negativeOutlinkWeight;
+			}
+
+			@Override
+			public double getOutlierWeight() {
+				return PoiOptionsBuilder.this.outlierWeight;
+			}
+
+			@Override
 			public boolean isClusteringEnabled() {
 				return null != this.getClusteringStrategy();
 			}
@@ -90,6 +150,16 @@ public class PoiOptionsBuilder {
 			@Override
 			public GraphClusteringStrategy getClusteringStrategy() {
 				return PoiOptionsBuilder.this.clusteringStrategy;
+			}
+
+			@Override
+			public int getMuClusteringValue() {
+				return PoiOptionsBuilder.this.mu;
+			}
+
+			@Override
+			public double getEpsilonClusteringValue() {
+				return PoiOptionsBuilder.this.epsilon;
 			}
 
 			@Override

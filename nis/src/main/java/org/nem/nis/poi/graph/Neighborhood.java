@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 public class Neighborhood {
 	private final NeighborhoodRepository repository;
 	private final SimilarityStrategy similarityStrategy;
+	private final int mu;
+	private final double epsilon;
 	private final Map<NodeId, Community> communityCache;
 
 	/**
@@ -18,10 +20,18 @@ public class Neighborhood {
 	 *
 	 * @param repository The neighborhood repository.
 	 * @param similarityStrategy The similarity strategy.
+	 * @param mu The minimum number of neighbors with high structural similarity that a core community must have.
+	 * @param epsilon The structural similarity threshold that will cause nodes to be considered highly similar.
 	 */
-	public Neighborhood(final NeighborhoodRepository repository, final SimilarityStrategy similarityStrategy) {
+	public Neighborhood(
+			final NeighborhoodRepository repository,
+			final SimilarityStrategy similarityStrategy,
+			final int mu,
+			final double epsilon) {
 		this.repository = repository;
 		this.similarityStrategy = similarityStrategy;
+		this.mu = mu;
+		this.epsilon = epsilon;
 		this.communityCache = new HashMap<>();
 	}
 
@@ -48,10 +58,10 @@ public class Neighborhood {
 		// this is guaranteed to traverse in increasing order
 		for (final NodeId neighborId : this.repository.getNeighbors(nodeId)) {
 			final double similarity = nodeId.equals(neighborId) ? 1.0 : this.similarityStrategy.calculateSimilarity(nodeId, neighborId);
-			(similarity > GraphConstants.EPSILON ? epsilonNeighbors : nonEpsilonNeighbors).addNeighbor(neighborId);
+			(similarity > this.epsilon ? epsilonNeighbors : nonEpsilonNeighbors).addNeighbor(neighborId);
 		}
 
-		return new Community(nodeId, epsilonNeighbors, nonEpsilonNeighbors);
+		return new Community(nodeId, epsilonNeighbors, nonEpsilonNeighbors, this.mu);
 	}
 
 	/**

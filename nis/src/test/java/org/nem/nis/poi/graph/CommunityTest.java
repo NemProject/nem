@@ -12,11 +12,11 @@ import java.util.*;
  * Tests for the Community class.
  */
 public class CommunityTest {
-
 	private static final NodeId NODE_ID_2 = new NodeId(2);
 	private static final NodeId NODE_ID_3 = new NodeId(3);
 	private static final NodeId NODE_ID_5 = new NodeId(5);
 	private static final NodeId NODE_ID_7 = new NodeId(7);
+	private static final int MU = 3;
 
 	//region construction
 
@@ -24,23 +24,20 @@ public class CommunityTest {
 	public void communityCannotBeCreatedAroundNullSets() {
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new Community(NODE_ID_7, null, NisUtils.createNeighbors()),
+				v -> new Community(NODE_ID_7, null, NisUtils.createNeighbors(), MU),
 				IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(
-				v -> new Community(NODE_ID_7, NisUtils.createNeighbors(), null),
+				v -> new Community(NODE_ID_7, NisUtils.createNeighbors(), null, MU),
 				IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(
-				v -> new Community(NODE_ID_7, null, null),
+				v -> new Community(NODE_ID_7, null, null, MU),
 				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void communityWithSimilarAndDissimilarNeighborsCanBeCreated() {
 		// Arrange:
-		final Community community = new Community(
-				new NodeId(4),
-				NisUtils.createNeighbors(1, 4),
-				NisUtils.createNeighbors(3, 7, 8));
+		final Community community = new Community(new NodeId(4), NisUtils.createNeighbors(1, 4), NisUtils.createNeighbors(3, 7, 8), MU);
 
 		// Assert:
 		assertCommunity(community, 4, NisUtils.toNodeIdList(1, 4), NisUtils.toNodeIdList(3, 7, 8), false);
@@ -50,17 +47,14 @@ public class CommunityTest {
 	public void communityCannotBeCreatedIfSimilarNeighborsDoesNotContainPivot() {
 		// Arrange:
 		ExceptionAssert.assertThrows(
-				v -> new Community(NODE_ID_5, NisUtils.createNeighbors(1, 4), NisUtils.createNeighbors()),
+				v -> new Community(NODE_ID_5, NisUtils.createNeighbors(1, 4), NisUtils.createNeighbors(), MU),
 				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void communityWithOnlySimilarNeighborsCanBeCreated() {
 		// Arrange:
-		final Community community = new Community(
-				new NodeId(4),
-				NisUtils.createNeighbors(1, 4),
-				NisUtils.createNeighbors());
+		final Community community = new Community(new NodeId(4), NisUtils.createNeighbors(1, 4), NisUtils.createNeighbors(), MU);
 
 		// Assert:
 		assertCommunity(community, 4, NisUtils.toNodeIdList(1, 4), NisUtils.toNodeIdList(), false);
@@ -70,14 +64,14 @@ public class CommunityTest {
 	public void communityWithOnlyDissimilarNeighborsCannotBeCreated() {
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> new Community(NODE_ID_5, NisUtils.createNeighbors(), NisUtils.createNeighbors(3, 7, 8)),
+				v -> new Community(NODE_ID_5, NisUtils.createNeighbors(), NisUtils.createNeighbors(3, 7, 8), MU),
 				IllegalArgumentException.class);
 	}
 
 	@Test
 	public void isolatedCommunityCanBeCreated() {
 		// Arrange:
-		final Community community = new Community(NODE_ID_5, NisUtils.createNeighbors(5), NisUtils.createNeighbors());
+		final Community community = new Community(NODE_ID_5, NisUtils.createNeighbors(5), NisUtils.createNeighbors(), MU);
 
 		// Assert:
 		assertCommunity(community, 5, NisUtils.toNodeIdList(5), NisUtils.toNodeIdList(), true);
@@ -86,7 +80,7 @@ public class CommunityTest {
 	@Test
 	public void isolatedCommunityCanBeCreatedWithoutSpecifyingNeighborIdCollections() {
 		// Arrange:
-		final Community community = new Community(NODE_ID_5);
+		final Community community = new Community(NODE_ID_5, MU);
 
 		// Assert:
 		assertCommunity(community, 5, NisUtils.toNodeIdList(5), NisUtils.toNodeIdList(), true);
@@ -98,7 +92,8 @@ public class CommunityTest {
 		final Community community = new Community(
 				new NodeId(5),
 				NisUtils.createNeighbors(1, 1, 5, 5),
-				NisUtils.createNeighbors(3, 3, 7, 7, 8, 8));
+				NisUtils.createNeighbors(3, 3, 7, 7, 8, 8),
+				MU);
 
 		// Assert:
 		assertCommunity(community, 5, NisUtils.toNodeIdList(1, 5), NisUtils.toNodeIdList(3, 7, 8), false);
@@ -126,7 +121,8 @@ public class CommunityTest {
 		final Community community = new Community(
 				NODE_ID_5,
 				NisUtils.createNeighbors(1, 4, 5),
-				NisUtils.createNeighbors(3, 7, 8, 9));
+				NisUtils.createNeighbors(3, 7, 8, 9),
+				MU);
 
 		// Assert:
 		Assert.assertThat(community.size(), IsEqual.equalTo(7));
@@ -138,14 +134,14 @@ public class CommunityTest {
 
 	private static final Map<String, Community> NAME_TO_COMMUNITY_MAP = new HashMap<String, Community>() {
 		{
-			put("MU_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 4, 7), NisUtils.createNeighbors(8)));
-			put("MU+1_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 4, 5, 7), NisUtils.createNeighbors(8)));
-			put("MU-1_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 7), NisUtils.createNeighbors(8)));
-			put("1_SIMILAR_NEIGHBOR", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 7), NisUtils.createNeighbors()));
-			put("1_DISSIMILAR_NEIGHBOR", new Community(NODE_ID_7, NisUtils.createNeighbors(0, 7), NisUtils.createNeighbors(1)));
-			put("2_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 2, 7), NisUtils.createNeighbors()));
-			put("2_DISSIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(7), NisUtils.createNeighbors(1, 2)));
-			put("2_TOTAL_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(0, 7), NisUtils.createNeighbors(1)));
+			put("MU_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 4, 7), NisUtils.createNeighbors(8), MU));
+			put("MU+1_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 4, 5, 7), NisUtils.createNeighbors(8), MU));
+			put("MU-1_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 7), NisUtils.createNeighbors(8), MU));
+			put("1_SIMILAR_NEIGHBOR", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 7), NisUtils.createNeighbors(), MU));
+			put("1_DISSIMILAR_NEIGHBOR", new Community(NODE_ID_7, NisUtils.createNeighbors(0, 7), NisUtils.createNeighbors(1), MU));
+			put("2_SIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(1, 2, 7), NisUtils.createNeighbors(), MU));
+			put("2_DISSIMILAR_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(7), NisUtils.createNeighbors(1, 2), MU));
+			put("2_TOTAL_NEIGHBORS", new Community(NODE_ID_7, NisUtils.createNeighbors(0, 7), NisUtils.createNeighbors(1), MU));
 		}
 	};
 
@@ -170,22 +166,22 @@ public class CommunityTest {
 		{
 			final NodeNeighbors similarNeighbors = NisUtils.createNeighbors(2, 5, 7);
 			final NodeNeighbors dissimilarNeighbors = NisUtils.createNeighbors(0, 3);
-			this.put("default", new Community(NODE_ID_2, similarNeighbors, dissimilarNeighbors));
-			this.put("diff-pivot-id", new Community(NODE_ID_7, similarNeighbors, dissimilarNeighbors));
-			this.put("diff-similar-ids", new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 8), dissimilarNeighbors));
-			this.put("more-similar-ids", new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 7, 8), dissimilarNeighbors));
-			this.put("fewer-similar-ids", new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5), dissimilarNeighbors));
-			this.put("diff-dissimilar-ids", new Community(NODE_ID_2, similarNeighbors, NisUtils.createNeighbors(0, 4)));
-			this.put("more-dissimilar-ids", new Community(NODE_ID_2, similarNeighbors, NisUtils.createNeighbors(0, 3, 4)));
-			this.put("fewer-dissimilar-ids", new Community(NODE_ID_2, similarNeighbors, NisUtils.createNeighbors(0)));
-			this.put("diff-id-classifications", new Community(NODE_ID_3, dissimilarNeighbors, similarNeighbors));
+			this.put("default", new Community(NODE_ID_2, similarNeighbors, dissimilarNeighbors, MU));
+			this.put("diff-pivot-id", new Community(NODE_ID_7, similarNeighbors, dissimilarNeighbors, MU));
+			this.put("diff-similar-ids", new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 8), dissimilarNeighbors, MU));
+			this.put("more-similar-ids", new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 7, 8), dissimilarNeighbors, MU));
+			this.put("fewer-similar-ids", new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5), dissimilarNeighbors, MU));
+			this.put("diff-dissimilar-ids", new Community(NODE_ID_2, similarNeighbors, NisUtils.createNeighbors(0, 4), MU));
+			this.put("more-dissimilar-ids", new Community(NODE_ID_2, similarNeighbors, NisUtils.createNeighbors(0, 3, 4), MU));
+			this.put("fewer-dissimilar-ids", new Community(NODE_ID_2, similarNeighbors, NisUtils.createNeighbors(0), MU));
+			this.put("diff-id-classifications", new Community(NODE_ID_3, dissimilarNeighbors, similarNeighbors, MU));
 		}
 	};
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
-		final Community community = new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 7), NisUtils.createNeighbors(0, 3));
+		final Community community = new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 7), NisUtils.createNeighbors(0, 3), MU);
 
 		// Assert:
 		Assert.assertThat(DESC_TO_COMMUNITY_MAP.get("default"), IsEqual.equalTo(community));
@@ -204,7 +200,7 @@ public class CommunityTest {
 	@Test
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
-		final Community community = new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 7), NisUtils.createNeighbors(1, 3));
+		final Community community = new Community(NODE_ID_2, NisUtils.createNeighbors(2, 5, 7), NisUtils.createNeighbors(1, 3), MU);
 		final int hashCode = community.hashCode();
 
 		// Assert:
@@ -229,7 +225,8 @@ public class CommunityTest {
 		final Community community = new Community(
 				NODE_ID_5,
 				NisUtils.createNeighbors(1, 4, 5),
-				NisUtils.createNeighbors(3, 7, 8));
+				NisUtils.createNeighbors(3, 7, 8),
+				MU);
 
 		// Assert:
 		final String expectedString =
