@@ -235,7 +235,9 @@ public class PoiContext {
 
 				// update the outlink score
 				final int rowIndex = accountInfo.getIndex();
-				final double outlinkScore = accountInfo.getNetOutlinkScore();
+				final double score = accountInfo.getNetOutlinkScore();
+				final double multiplier = score < 0 ? this.options.getNegativeOutlinkWeight() : 1.0;
+				final double outlinkScore = score * multiplier;
 				if (0.0 != outlinkScore) {
 					this.outlinkScoreVector.setAt(rowIndex, outlinkScore);
 				}
