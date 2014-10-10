@@ -8,7 +8,7 @@ import org.nem.nis.poi.graph.GraphClusteringStrategy;
  */
 public interface PoiOptions {
 
-	//region min weights
+	//region weights
 
 	/**
 	 * Gets the minimum (vested) balance required for a harvester.
@@ -23,6 +23,20 @@ public interface PoiOptions {
 	 * @return The minimum outlink weight.
 	 */
 	public Amount getMinOutlinkWeight();
+
+	/**
+	 * Gets the weight given to (net) negative outlinks.
+	 *
+	 * @return The weight.
+	 */
+	public double getNegativeOutlinkWeight();
+
+	/**
+	 * Gets the weight given to outlier nodes.
+	 *
+	 * @return The weight.
+	 */
+	public double getOutlierWeight();
 
 	//endregion
 

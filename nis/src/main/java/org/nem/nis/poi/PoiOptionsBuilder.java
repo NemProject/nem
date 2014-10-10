@@ -9,13 +9,15 @@ import org.nem.nis.poi.graph.*;
 public class PoiOptionsBuilder {
 	private Amount minHarvesterBalance = Amount.fromNem(1000);
 	private Amount minOutlinkWeight = Amount.ZERO;
+	private double negativeOutlinkWeight = 0.2;
+	private double outlierWeight = 1.0;
 	private double teleportationProbability = .75; // For NCDawareRank
 	private double interLevelTeleportationProbability = .1; // For NCDawareRank
 	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
 	private int mu = 3;
 	private double epsilon = 0.65;
 
-	//region min weights
+	//region weights
 
 	/**
 	 * Sets the minimum (vested) balance required for a harvester.
@@ -33,6 +35,25 @@ public class PoiOptionsBuilder {
 	 */
 	public void setMinOutlinkWeight(final Amount minOutlinkWeight) {
 		this.minOutlinkWeight = minOutlinkWeight;
+	}
+
+
+	/**
+	 * Sets the weight given to (net) negative outlinks.
+	 *
+	 * @param weight The weight.
+	 */
+	public void setNegativeOutlinkWeight(final double weight) {
+		this.negativeOutlinkWeight = weight;
+	}
+
+	/**
+	 * Sets the weight given to outlier nodes.
+	 *
+	 * @param weight The weight.
+	 */
+	public void setOutlierWeight(final double weight) {
+		this.outlierWeight = weight;
 	}
 
 	//endregion
@@ -92,8 +113,6 @@ public class PoiOptionsBuilder {
 
 //	//negativeOutlinkWeights = [0, 20, 40, 60, 80, 100]
 //	//outlierWeights = [0.85, 0.9, 0.95]
-//	//mus = [1, 2, 3, 4, 5]
-//	//epsilons = [0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95]
 
 	/**
 	 * Creates a new poi options.
@@ -111,6 +130,16 @@ public class PoiOptionsBuilder {
 			@Override
 			public Amount getMinOutlinkWeight() {
 				return PoiOptionsBuilder.this.minOutlinkWeight;
+			}
+
+			@Override
+			public double getNegativeOutlinkWeight() {
+				return PoiOptionsBuilder.this.negativeOutlinkWeight;
+			}
+
+			@Override
+			public double getOutlierWeight() {
+				return PoiOptionsBuilder.this.outlierWeight;
 			}
 
 			@Override
