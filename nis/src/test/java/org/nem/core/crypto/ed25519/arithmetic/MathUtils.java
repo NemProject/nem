@@ -186,7 +186,7 @@ public class MathUtils {
 	// region group element
 
 	/**
-	 * Gets a random group element in P3 representation.
+	 * Gets a random group element in P3 coordinates.
 	 * It's NOT guaranteed that the created group element is a multiple of the base point.
 	 *
 	 * @return The group element.
@@ -273,14 +273,14 @@ public class MathUtils {
 	}
 
 	/**
-	 * Converts a group element from one representation to another.
+	 * Converts a group element from one coordinate system to another.
 	 * This method is a helper used to test various methods in Ed25519GroupElement.
 	 *
 	 * @param g The group element.
-	 * @param repr The desired representation.
-	 * @return The same group element in the new representation.
+	 * @param newCoordinateSystem The desired coordinate system.
+	 * @return The same group element in the new coordinate system.
 	 */
-	public static Ed25519GroupElement toRepresentation(final Ed25519GroupElement g, final Ed25519GroupElement.Representation repr) {
+	public static Ed25519GroupElement toRepresentation(final Ed25519GroupElement g, final CoordinateSystem newCoordinateSystem) {
 		BigInteger x;
 		BigInteger y;
 		final BigInteger gX = toBigInteger(g.getX().encode());
@@ -289,7 +289,7 @@ public class MathUtils {
 		final BigInteger gT = null == g.getT()? null : toBigInteger(g.getT().encode());
 
 		// Switch to affine coordinates.
-		switch (g.getRepresentation()) {
+		switch (g.getCoordinateSystem()) {
 			case AFFINE:
 				x = gX;
 				y = gY;
@@ -299,7 +299,7 @@ public class MathUtils {
 				x = gX.multiply(gZ.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				y = gY.multiply(gZ.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				break;
-			case P1P1:
+			case P1xP1:
 				x = gX.multiply(gZ.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				y = gY.multiply(gT.modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				break;
@@ -307,7 +307,7 @@ public class MathUtils {
 				x = gX.subtract(gY).multiply(gZ.multiply(new BigInteger("2")).modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				y = gX.add(gY).multiply(gZ.multiply(new BigInteger("2")).modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				break;
-			case PRECOMP:
+			case PRECOMPUTED:
 				x = gX.subtract(gY).multiply(new BigInteger("2").modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				y = gX.add(gY).multiply(new BigInteger("2").modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
 				break;
@@ -315,8 +315,8 @@ public class MathUtils {
 				throw new UnsupportedOperationException();
 		}
 
-		// Now back to the desired representation.
-		switch (repr) {
+		// Now back to the desired coordinate system.
+		switch (newCoordinateSystem) {
 			case AFFINE:
 				return Ed25519GroupElement.affine(
 						toFieldElement(x),
@@ -333,7 +333,7 @@ public class MathUtils {
 						toFieldElement(y),
 						Ed25519Field.ONE,
 						toFieldElement(x.multiply(y).mod(Ed25519Field.P)));
-			case P1P1:
+			case P1xP1:
 				return Ed25519GroupElement.p1p1(
 						toFieldElement(x),
 						toFieldElement(y),
@@ -345,8 +345,8 @@ public class MathUtils {
 						toFieldElement(y.subtract(x).mod(Ed25519Field.P)),
 						Ed25519Field.ONE,
 						toFieldElement(D.multiply(new BigInteger("2")).multiply(x).multiply(y).mod(Ed25519Field.P)));
-			case PRECOMP:
-				return Ed25519GroupElement.precomp(
+			case PRECOMPUTED:
+				return Ed25519GroupElement.precomputed(
 						toFieldElement(y.add(x).mod(Ed25519Field.P)),
 						toFieldElement(y.subtract(x).mod(Ed25519Field.P)),
 						toFieldElement(D.multiply(new BigInteger("2")).multiply(x).multiply(y).mod(Ed25519Field.P)));
@@ -356,8 +356,8 @@ public class MathUtils {
 	}
 
 	/**
-	 * Adds two group elements and returns the result in P3 representation.
-	 * It uses BigInteger arithmetic and the affine representation.
+	 * Adds two group elements and returns the result in P3 coordinate system.
+	 * It uses BigInteger arithmetic and the affine coordinate system.
 	 * This method is a helper used to test the projective group addition formulas in Ed25519GroupElement.
 	 *
 	 * @param g1 The first group element.
@@ -365,10 +365,10 @@ public class MathUtils {
 	 * @return The result of the addition.
 	 */
 	public static Ed25519GroupElement addGroupElements(final Ed25519GroupElement g1, final Ed25519GroupElement g2) {
-		// Relying on a special representation of the group elements.
-		if ((g1.getRepresentation() != Ed25519GroupElement.Representation.P2 && g1.getRepresentation() != Ed25519GroupElement.Representation.P3) ||
-			(g2.getRepresentation() != Ed25519GroupElement.Representation.P2 && g2.getRepresentation() != Ed25519GroupElement.Representation.P3)) {
-			throw new IllegalArgumentException("g1 and g2 must have representation P2 or P3");
+		// Relying on a special coordinate system of the group elements.
+		if ((g1.getCoordinateSystem() != CoordinateSystem.P2 && g1.getCoordinateSystem() != CoordinateSystem.P3) ||
+			(g2.getCoordinateSystem() != CoordinateSystem.P2 && g2.getCoordinateSystem() != CoordinateSystem.P3)) {
+			throw new IllegalArgumentException("g1 and g2 must have coordinate system P2 or P3");
 		}
 
 		// Projective coordinates
@@ -403,8 +403,8 @@ public class MathUtils {
 	}
 
 	/**
-	 * Doubles a group element and returns the result in P3 representation.
-	 * It uses BigInteger arithmetic and the affine representation.
+	 * Doubles a group element and returns the result in the P3 coordinate system.
+	 * It uses BigInteger arithmetic and the affine coordinate system.
 	 * This method is a helper used to test the projective group doubling formula in Ed25519GroupElement.
 	 *
 	 * @param g The group element.
@@ -460,8 +460,8 @@ public class MathUtils {
 	 * @return The negated group element.
 	 */
 	public static Ed25519GroupElement negateGroupElement(final Ed25519GroupElement g) {
-		if (g.getRepresentation() != Ed25519GroupElement.Representation.P3) {
-			throw new IllegalArgumentException("g must have representation P3");
+		if (g.getCoordinateSystem() != CoordinateSystem.P3) {
+			throw new IllegalArgumentException("g must have coordinate system P3");
 		}
 
 		return Ed25519GroupElement.p3(g.getX().negate(), g.getY(), g.getZ(), g.getT().negate());
@@ -536,24 +536,24 @@ public class MathUtils {
 			Ed25519GroupElement g = getRandomGroupElement();
 
 			// P3 -> P2.
-			Ed25519GroupElement h = toRepresentation(g, Ed25519GroupElement.Representation.P2);
+			Ed25519GroupElement h = toRepresentation(g, CoordinateSystem.P2);
 			Assert.assertThat(h, IsEqual.equalTo(g));
-			// P3 -> P1P1.
-			h = toRepresentation(g, Ed25519GroupElement.Representation.P1P1);
+			// P3 -> P1xP1.
+			h = toRepresentation(g, CoordinateSystem.P1xP1);
 			Assert.assertThat(g, IsEqual.equalTo(h));
 
 			// P3 -> CACHED.
-			h = toRepresentation(g, Ed25519GroupElement.Representation.CACHED);
+			h = toRepresentation(g, CoordinateSystem.CACHED);
 			Assert.assertThat(h, IsEqual.equalTo(g));
 
 			// P3 -> P2 -> P3.
-			g = toRepresentation(g, Ed25519GroupElement.Representation.P2);
-			h = toRepresentation(g, Ed25519GroupElement.Representation.P3);
+			g = toRepresentation(g, CoordinateSystem.P2);
+			h = toRepresentation(g, CoordinateSystem.P3);
 			Assert.assertThat(g, IsEqual.equalTo(h));
 
-			// P3 -> P2 -> P1P1.
-			g = toRepresentation(g, Ed25519GroupElement.Representation.P2);
-			h = toRepresentation(g, Ed25519GroupElement.Representation.P1P1);
+			// P3 -> P2 -> P1xP1.
+			g = toRepresentation(g, CoordinateSystem.P2);
+			h = toRepresentation(g, CoordinateSystem.P1xP1);
 			Assert.assertThat(g, IsEqual.equalTo(h));
 		}
 

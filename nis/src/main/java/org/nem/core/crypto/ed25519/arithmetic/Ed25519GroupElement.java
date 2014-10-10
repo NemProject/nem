@@ -18,26 +18,7 @@ import java.io.Serializable;
  */
 public class Ed25519GroupElement implements Serializable {
 
-	/**
-	 * Available representations for a group element.
-	 *
-	 * AFFINE: Affine representation (x, y).
-	 * P2: Projective representation (X:Y:Z) satisfying x=X/Z, y=Y/Z.
-	 * P3: Extended projective representation (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT.
-	 * P1P1: Completed representation ((X:Z), (Y:T)) satisfying x=X/Z, y=Y/T.
-	 * PRECOMP: Precomputed representation (y+x, y-x, 2dxy).
-	 * CACHED: Cached representation (Y+X, Y-X, Z, 2dT)
-	 */
-    public enum Representation {
-		AFFINE,
-		P2,
-        P3,
-        P1P1,
-        PRECOMP,
-        CACHED
-    }
-
-	private final Representation repr;
+	private final CoordinateSystem coordinateSystem;
 	private final Ed25519FieldElement X;
 	private final Ed25519FieldElement Y;
 	private final Ed25519FieldElement Z;
@@ -54,117 +35,117 @@ public class Ed25519GroupElement implements Serializable {
 	Ed25519GroupElement[] precomputedForDouble;
 
 	/**
-	 * Creates a new group element in AFFINE representation.
+	 * Creates a new group element using the AFFINE coordinate system.
 	 *
 	 * @param x The x coordinate.
 	 * @param y The y coordinate.
 	 * @param Z The Z coordinate.
-	 * @return The group element in P2 representation.
+	 * @return The group element using the P2 coordinate system.
 	 */
 	public static Ed25519GroupElement affine(
 			final Ed25519FieldElement x,
 			final Ed25519FieldElement y,
 			final Ed25519FieldElement Z) {
-		return new Ed25519GroupElement(Representation.AFFINE, x, y, Z, null);
+		return new Ed25519GroupElement(CoordinateSystem.AFFINE, x, y, Z, null);
 	}
 
 	/**
-	 * Creates a new group element in P2 representation.
+	 * Creates a new group element using the P2 coordinate system.
 	 *
 	 * @param X The X coordinate.
 	 * @param Y The Y coordinate.
 	 * @param Z The Z coordinate.
-	 * @return The group element in P2 representation.
+	 * @return The group element using the P2 coordinate system.
 	 */
 	public static Ed25519GroupElement p2(
 			final Ed25519FieldElement X,
 			final Ed25519FieldElement Y,
 			final Ed25519FieldElement Z) {
-		return new Ed25519GroupElement(Representation.P2, X, Y, Z, null);
+		return new Ed25519GroupElement(CoordinateSystem.P2, X, Y, Z, null);
 	}
 
 	/**
-	 * Creates a new group element in P3 representation.
+	 * Creates a new group element using the P3 coordinate system.
 	 *
 	 * @param X The X coordinate.
 	 * @param Y The Y coordinate.
 	 * @param Z The Z coordinate.
 	 * @param T The T coordinate.
-	 * @return The group element in P3 representation.
+	 * @return The group element using the P3 coordinate system.
 	 */
     public static Ed25519GroupElement p3(
 			final Ed25519FieldElement X,
 			final Ed25519FieldElement Y,
 			final Ed25519FieldElement Z,
 			final Ed25519FieldElement T) {
-        return new Ed25519GroupElement(Representation.P3, X, Y, Z, T);
+        return new Ed25519GroupElement(CoordinateSystem.P3, X, Y, Z, T);
     }
 
 	/**
-	 * Creates a new group element in P1P1 representation.
+	 * Creates a new group element using the P1xP1 coordinate system.
 	 *
 	 * @param X The X coordinate.
 	 * @param Y The Y coordinate.
 	 * @param Z The Z coordinate.
 	 * @param T The T coordinate.
-	 * @return The group element in P1P1 representation.
+	 * @return The group element using the P1xP1 coordinate system.
 	 */
 	public static Ed25519GroupElement p1p1(
 			final Ed25519FieldElement X,
 			final Ed25519FieldElement Y,
 			final Ed25519FieldElement Z,
 			final Ed25519FieldElement T) {
-        return new Ed25519GroupElement(Representation.P1P1, X, Y, Z, T);
+        return new Ed25519GroupElement(CoordinateSystem.P1xP1, X, Y, Z, T);
     }
 
 	/**
-	 * Creates a new group element in PRECOMP representation.
+	 * Creates a new group element using the PRECOMPUTED coordinate system.
 	 *
-	 * @param ypx The y + x value.
-	 * @param ymx The y - x value.
+	 * @param yPlusx The y + x value.
+	 * @param yMinusx The y - x value.
 	 * @param xy2d The 2 * d * x * y value.
-	 * @return The group element in PRECOMP representation.
+	 * @return The group element using the PRECOMPUTED coordinate system.
 	 */
-    public static Ed25519GroupElement precomp(
-			final Ed25519FieldElement ypx,
-			final Ed25519FieldElement ymx,
+    public static Ed25519GroupElement precomputed(
+			final Ed25519FieldElement yPlusx,
+			final Ed25519FieldElement yMinusx,
 			final Ed25519FieldElement xy2d) {
-        return new Ed25519GroupElement(Representation.PRECOMP, ypx, ymx, xy2d, null);
+        return new Ed25519GroupElement(CoordinateSystem.PRECOMPUTED, yPlusx, yMinusx, xy2d, null);
     }
 
 	/**
-	 * Creates a new group element in CACHED representation.
+	 * Creates a new group element using the CACHED coordinate system.
 	 *
-	 * @param YpX The Y + X value.
-	 * @param YmX The Y - X value.
+	 * @param YPlusX The Y + X value.
+	 * @param YMinusX The Y - X value.
 	 * @param Z The Z coordinate.
 	 * @param T2d The 2 * d * T value.
-	 * @return The group element in CACHED representation.
+	 * @return The group element using the CACHED coordinate system.
 	 */
     public static Ed25519GroupElement cached(
-			final Ed25519FieldElement YpX,
-			final Ed25519FieldElement YmX,
+			final Ed25519FieldElement YPlusX,
+			final Ed25519FieldElement YMinusX,
 			final Ed25519FieldElement Z,
 			final Ed25519FieldElement T2d) {
-        return new Ed25519GroupElement(Representation.CACHED, YpX, YmX, Z, T2d);
+        return new Ed25519GroupElement(CoordinateSystem.CACHED, YPlusX, YMinusX, Z, T2d);
     }
 
 	/**
 	 * Creates a group element for a curve.
 	 *
-	 * @param repr The representation used to represent the group element.
+	 * @param coordinateSystem The coordinate system used for the group element.
 	 * @param X The X coordinate.
 	 * @param Y The Y coordinate.
 	 * @param Z The Z coordinate.
 	 * @param T The T coordinate.
 	 */
     public Ed25519GroupElement(
-			final Representation repr,
+			final CoordinateSystem coordinateSystem,
 			final Ed25519FieldElement X,
 			final Ed25519FieldElement Y,
 			final Ed25519FieldElement Z,
 			final Ed25519FieldElement T) {
-        this.repr = repr;
+        this.coordinateSystem = coordinateSystem;
         this.X = X;
         this.Y = Y;
         this.Z = Z;
@@ -172,17 +153,17 @@ public class Ed25519GroupElement implements Serializable {
     }
 
 	/**
-	 * Gets the representation of the group element.
+	 * Gets the coordinate system for the group element.
 	 *
-	 * @return The representation.
+	 * @return The coordinate system.
 	 */
-	public Representation getRepresentation() {
-		return this.repr;
+	public CoordinateSystem getCoordinateSystem() {
+		return this.coordinateSystem;
 	}
 
 	/**
 	 * Gets the X value of the group element.
-	 * This is for most representation the projective X coordinate.
+	 * This is for most coordinate systems the projective X coordinate.
 	 *
 	 * @return The X value.
 	 */
@@ -192,7 +173,7 @@ public class Ed25519GroupElement implements Serializable {
 
 	/**
 	 * Gets the Y value of the group element.
-	 * This is for most representation the projective Y coordinate.
+	 * This is for most coordinate systems the projective Y coordinate.
 	 *
 	 * @return The Y value.
 	 */
@@ -202,7 +183,7 @@ public class Ed25519GroupElement implements Serializable {
 
 	/**
 	 * Gets the Z value of the group element.
-	 * This is for most representation the projective Z coordinate.
+	 * This is for most coordinate systems the projective Z coordinate.
 	 *
 	 * @return The Z value.
 	 */
@@ -212,7 +193,7 @@ public class Ed25519GroupElement implements Serializable {
 
 	/**
 	 * Gets the T value of the group element.
-	 * This is for most representation the projective T coordinate.
+	 * This is for most coordinate systems the projective T coordinate.
 	 *
 	 * @return The T value.
 	 */
@@ -254,7 +235,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The encoded point as byte array.
 	 */
     public Ed25519EncodedGroupElement encode() {
-        switch (this.repr) {
+        switch (this.coordinateSystem) {
 			case P2:
 			case P3:
 				Ed25519FieldElement recip = Z.invert();
@@ -269,56 +250,55 @@ public class Ed25519GroupElement implements Serializable {
     }
 
 	/**
-	 * Converts the group element to the P2 representation.
+	 * Converts the group element to the P2 coordinate system.
 	 *
-	 * @return The group element in the P2 representation.
+	 * @return The group element in the P2 coordinate system.
 	 */
     public Ed25519GroupElement toP2() {
-        return toRep(Representation.P2);
+        return toRep(CoordinateSystem.P2);
     }
 
 	/**
-	 * Converts the group element to the P3 representation.
+	 * Converts the group element to the P3 coordinate system.
 	 *
-	 * @return The group element in the P3 representation.
+	 * @return The group element in the P3 coordinate system.
 	 */
     public Ed25519GroupElement toP3() {
-        return toRep(Representation.P3);
+        return toRep(CoordinateSystem.P3);
     }
 
 	/**
-	 * Converts the group element to the CACHED representation.
+	 * Converts the group element to the CACHED coordinate system.
 	 *
-	 * @return The group element in the CACHED representation.
+	 * @return The group element in the CACHED coordinate system.
 	 */
     public Ed25519GroupElement toCached() {
-        return toRep(Representation.CACHED);
+        return toRep(CoordinateSystem.CACHED);
     }
 
     /**
-     * Convert a Ed25519GroupElement from one Representation to another.
-	 * TODO-CR: Add additional conversion?
+     * Convert a Ed25519GroupElement from one coordinate system to another.
      *
      * Supported conversions:
      * - P3 -> P2
      * - P3 -> CACHED (1 multiply, 1 add, 1 subtract)
-     * - P1P1 -> P2 (3 multiply)
-     * - P1P1 -> P3 (4 multiply)
+     * - P1xP1 -> P2 (3 multiply)
+     * - P1xP1 -> P3 (4 multiply)
 	 *
-     * @param repr The representation to convert to.
-     * @return A new group element in the given representation.
+     * @param newCoordinateSystem The coordinate system to convert to.
+     * @return A new group element in the new coordinate system.
      */
-    private Ed25519GroupElement toRep(final Representation repr) {
-        switch (this.repr) {
+    private Ed25519GroupElement toRep(final CoordinateSystem newCoordinateSystem) {
+        switch (this.coordinateSystem) {
 			case P2:
-				switch (repr) {
+				switch (newCoordinateSystem) {
 					case P2:
 						return p2(this.X, this.Y, this.Z);
 					default:
 						throw new IllegalArgumentException();
 				}
 			case P3:
-				switch (repr) {
+				switch (newCoordinateSystem) {
 					case P2:
 						return p2(this.X, this.Y, this.Z);
 					case P3:
@@ -328,26 +308,26 @@ public class Ed25519GroupElement implements Serializable {
 					default:
 						throw new IllegalArgumentException();
 				}
-			case P1P1:
-				switch (repr) {
+			case P1xP1:
+				switch (newCoordinateSystem) {
 					case P2:
 						return p2(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T));
 					case P3:
 						return p3(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y));
-					case P1P1:
+					case P1xP1:
 						return p1p1(this.X, this.Y, this.Z, this.T);
 					default:
 						throw new IllegalArgumentException();
 				}
-			case PRECOMP:
-				switch (repr) {
-					case PRECOMP:
-						return precomp(this.X, this.Y, this.Z);
+			case PRECOMPUTED:
+				switch (newCoordinateSystem) {
+					case PRECOMPUTED:
+						return precomputed(this.X, this.Y, this.Z);
 					default:
 						throw new IllegalArgumentException();
 				}
 			case CACHED:
-				switch (repr) {
+				switch (newCoordinateSystem) {
 					case CACHED:
 						return cached(this.X, this.Y, this.Z, this.T);
 					default:
@@ -371,10 +351,10 @@ public class Ed25519GroupElement implements Serializable {
 		for (int i = 0; i < 32; i++) {
 			Ed25519GroupElement Bij = Bi;
 			for (int j = 0; j < 8; j++) {
-				final Ed25519FieldElement recip = Bij.Z.invert();
-				final Ed25519FieldElement x = Bij.X.multiply(recip);
-				final Ed25519FieldElement y = Bij.Y.multiply(recip);
-				this.precomputedForSingle[i][j] = precomp(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.D_Times_TWO));
+				final Ed25519FieldElement inverse = Bij.Z.invert();
+				final Ed25519FieldElement x = Bij.X.multiply(inverse);
+				final Ed25519FieldElement y = Bij.Y.multiply(inverse);
+				this.precomputedForSingle[i][j] = precomputed(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.D_Times_TWO));
 				Bij = Bij.add(Bi.toCached()).toP3();
 			}
 			// Only every second summand is precomputed (16^2 = 256).
@@ -394,19 +374,19 @@ public class Ed25519GroupElement implements Serializable {
 		Ed25519GroupElement Bi = this;
 		this.precomputedForDouble = new Ed25519GroupElement[8];
 		for (int i = 0; i < 8; i++) {
-			final Ed25519FieldElement recip = Bi.Z.invert();
-			final Ed25519FieldElement x = Bi.X.multiply(recip);
-			final Ed25519FieldElement y = Bi.Y.multiply(recip);
-			this.precomputedForDouble[i] = precomp(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.D_Times_TWO));
+			final Ed25519FieldElement inverse = Bi.Z.invert();
+			final Ed25519FieldElement x = Bi.X.multiply(inverse);
+			final Ed25519FieldElement y = Bi.Y.multiply(inverse);
+			this.precomputedForDouble[i] = precomputed(y.add(x), y.subtract(x), x.multiply(y).multiply(Ed25519Field.D_Times_TWO));
 			Bi = this.add(this.add(Bi.toCached()).toP3().toCached()).toP3();
 		}
 	}
 
     /**
-	 * Doubles a given group element p in P^2 or P^3 representation and returns the result in P x P representation.
+	 * Doubles a given group element p in P^2 or P^3 coordinate system and returns the result in P x P coordinate system.
 	 * r = 2 * p where p = (X : Y : Z) or p = (X : Y : Z : T)
 	 *
-	 * r in P x P representation:
+	 * r in P x P coordinate system:
 	 *
 	 * r = ((X' : Z'), (Y' : T')) where
 	 * X' = (X + Y)^2 - (Y^2 + X^2)
@@ -414,14 +394,14 @@ public class Ed25519GroupElement implements Serializable {
 	 * Z' = y^2 - X^2
 	 * T' = 2 * Z^2 - (y^2 - X^2)
 	 *
-	 * r converted from P x P to P^2 representation:
+	 * r converted from P x P to P^2 coordinate system:
 	 *
 	 * r = (X'' : Y'' : Z'') where
 	 * X'' = X' * Z' = ((X + Y)^2 - Y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
 	 * Y'' = Y' * T' = (Y^2 + X^2) * (2 * Z^2 - (y^2 - X^2))
 	 * Z'' = Z' * T' = (y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
 	 *
-	 * Formula for the P^2 representation is in agreement with the formula given in [4] page 12 (with a = -1)
+	 * Formula for the P^2 coordinate system is in agreement with the formula given in [4] page 12 (with a = -1)
 	 * up to a common factor -1 which does not matter:
 	 *
 	 * B = (X + Y)^2; C = X^2; D = Y^2; E = -C = -X^2; F := E + D = Y^2 - X^2; H = Z^2; J = F − 2 * H;
@@ -429,33 +409,32 @@ public class Ed25519GroupElement implements Serializable {
 	 * Y3 = F · (E − D) = Z' * (-Y');
 	 * Z3 = F · J = Z' * (-T').
 	 *
-     * @return The P1P1 representation
+     * @return The doubled group element in the P x P coordinate system.
      */
     public Ed25519GroupElement dbl() {
-        switch (this.repr) {
+        switch (this.coordinateSystem) {
 			case P2:
 			case P3:
-				Ed25519FieldElement XX, YY, B, A, AA, Yn, Zn;
-				XX = this.X.square();
-				YY = this.Y.square();
+				Ed25519FieldElement XSquare, YSquare, B, A, ASquare, YSquarePlusXSquare, YSquareMinusXSquare;
+				XSquare = this.X.square();
+				YSquare = this.Y.square();
 				B = this.Z.squareAndDouble();
 				A = this.X.add(this.Y);
-				AA = A.square();
-				Yn = YY.add(XX);
-				Zn = YY.subtract(XX);
-				return p1p1(AA.subtract(Yn), Yn, Zn, B.subtract(Zn));
+				ASquare = A.square();
+				YSquarePlusXSquare = YSquare.add(XSquare);
+				YSquareMinusXSquare = YSquare.subtract(XSquare);
+				return p1p1(ASquare.subtract(YSquarePlusXSquare), YSquarePlusXSquare, YSquareMinusXSquare, B.subtract(YSquareMinusXSquare));
 			default:
 				throw new UnsupportedOperationException();
         }
     }
 
     /**
-     * Ed25519GroupElement addition using the twisted Edwards addition law with
-     * extended coordinates (Hisil2008).
-	 * this must be in P^3 representation and q in PRECOMP representation.
-     * r = p + q where p = this = (X1 : Y1 : Z1 : T1), q = (q.X, q.Y, q.Z) = (Y2/Z2 + X2/Z2, Y2/Z2 - X2/Z2, 2 * d * X2/Z2 * Y2/Z2)
+     * Ed25519GroupElement addition using the twisted Edwards addition law for extended coordinates.
+	 * this must be given in P^3 coordinate system and g in PRECOMPUTED coordinate system.
+     * r = this + g where this = (X1 : Y1 : Z1 : T1), g = (g.X, g.Y, g.Z) = (Y2/Z2 + X2/Z2, Y2/Z2 - X2/Z2, 2 * d * X2/Z2 * Y2/Z2)
 	 *
-	 * r in P x P representation:
+	 * r in P x P coordinate system:
 	 *
 	 * r = ((X' : Z'), (Y' : T')) where
 	 * X' = (Y1 + X1) * q.X - (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)) * 1/Z2
@@ -469,7 +448,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * Z' = (D + C) * 1/Z2
 	 * T' = (D - C) * 1/Z2
 	 *
-	 * r converted from P x P to P^2 representation:
+	 * r converted from P x P to P^2 coordinate system:
 	 *
 	 * r = (X'' : Y'' : Z'' : T'') where
 	 * X'' = X' * Z' = (B - A) * (D + C) * 1/Z2^2
@@ -477,7 +456,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * Z'' = Z' * T' = (D + C) * (D - C) * 1/Z2^2
 	 * T'' = X' * Y' = (B - A) * (B + A) * 1/Z2^2
 	 *
-	 * TODO-CR BR: Formula for the P^2 representation is not in agreement with the formula given in [2] page 6
+	 * TODO-CR BR: Formula for the P^2 coordinate system is not in agreement with the formula given in [2] page 6
 	 * TODO-CR BR: (the common factor 1/Z2^2 does not matter):
 	 * E = B - A, F = D - C, G = D + C, H = B + A
 	 * X3 = E * F = (B - A) * (D - C);
@@ -485,64 +464,64 @@ public class Ed25519GroupElement implements Serializable {
 	 * Z3 = F * G = (D - C) * (D + C);
 	 * T3 = E * H = (B - A) * (B + A);
 	 *
-     * @param q the PRECOMP representation of the Ed25519GroupElement to add.
-     * @return the P1P1 representation of the result.
+     * @param g The group element to add.
+     * @return The resulting group element in the P x P coordinate system.
      */
-    private Ed25519GroupElement madd(Ed25519GroupElement q) {
-        if (this.repr != Representation.P3) {
+    private Ed25519GroupElement madd(Ed25519GroupElement g) {
+        if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
-        if (q.repr != Representation.PRECOMP) {
+        if (g.coordinateSystem != CoordinateSystem.PRECOMPUTED) {
 			throw new IllegalArgumentException();
 		}
 
-        Ed25519FieldElement YpX, YmX, A, B, C, D;
-        YpX = this.Y.add(this.X);
-        YmX = this.Y.subtract(this.X);
-        A = YpX.multiply(q.X);
-        B = YmX.multiply(q.Y);
-        C = q.Z.multiply(this.T);
+        Ed25519FieldElement YPlusX, YMinusX, A, B, C, D;
+        YPlusX = this.Y.add(this.X);
+        YMinusX = this.Y.subtract(this.X);
+        A = YPlusX.multiply(g.X);
+        B = YMinusX.multiply(g.Y);
+        C = g.Z.multiply(this.T);
         D = this.Z.add(this.Z);
+
         return p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
     }
 
     /**
-     * Ed25519GroupElement subtraction using the twisted Edwards addition law with
-     * extended coordinates (Hisil2008).
-	 * this must be in P^3 representation and q in PRECOMP representation.
-	 * r = p - q where p = this = (X1 : Y1 : Z1 : T1), q = (q.X, q.Y, q.Z) = (Y2/Z2 + X2/Z2, Y2/Z2 - X2/Z2, 2 * d * X2/Z2 * Y2/Z2)
+     * Ed25519GroupElement subtraction using the twisted Edwards addition law for extended coordinates.
+	 * this must be given in P^3 coordinate system and g in PRECOMPUTED coordinate system.
+	 * r = this - g where this = (X1 : Y1 : Z1 : T1), g = (g.X, g.Y, g.Z) = (Y2/Z2 + X2/Z2, Y2/Z2 - X2/Z2, 2 * d * X2/Z2 * Y2/Z2)
 	 *
-	 * Negating q means negating the value of X2 and T2 (the latter is irrelevant here).
+	 * Negating g means negating the value of X2 and T2 (the latter is irrelevant here).
 	 * The formula is in accordance to the above addition.
 	 *
-     * @param q the PRECOMP representation of the Ed25519GroupElement to subtract.
-     * @return the P1P1 representation of the result.
+     * @param g he group element to subtract.
+     * @return The result in the P x P coordinate system.
      */
-    private Ed25519GroupElement msub(Ed25519GroupElement q) {
-        if (this.repr != Representation.P3) {
+    private Ed25519GroupElement msub(Ed25519GroupElement g) {
+        if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
-        if (q.repr != Representation.PRECOMP) {
+        if (g.coordinateSystem != CoordinateSystem.PRECOMPUTED) {
 			throw new IllegalArgumentException();
 		}
 
-        Ed25519FieldElement YpX, YmX, A, B, C, D;
-        YpX = this.Y.add(this.X);
-        YmX = this.Y.subtract(this.X);
-        A = YpX.multiply(q.Y);
-        B = YmX.multiply(q.X);
-        C = q.Z.multiply(this.T);
+        Ed25519FieldElement YPlusX, YMinusX, A, B, C, D;
+        YPlusX = this.Y.add(this.X);
+        YMinusX = this.Y.subtract(this.X);
+        A = YPlusX.multiply(g.Y);
+        B = YMinusX.multiply(g.X);
+        C = g.Z.multiply(this.T);
         D = this.Z.add(this.Z);
+
         return p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
     }
 
     /**
-     * Ed25519GroupElement addition using the twisted Edwards addition law with
-     * extended coordinates (Hisil2008).
-	 * this must be in P^3 representation and q in CACHED representation.
-	 * r = p + q where p = this = (X1 : Y1 : Z1 : T1), q = (q.X, q.Y, q.Z, q.T) = (Y2 + X2, Y2 - X2, Z2, 2 * d * T2)
+     * Ed25519GroupElement addition using the twisted Edwards addition law for extended coordinates.
+	 * this must be given in P^3 coordinate system and g in CACHED coordinate system.
+	 * r = this + g where this = (X1 : Y1 : Z1 : T1), g = (g.X, g.Y, g.Z, g.T) = (Y2 + X2, Y2 - X2, Z2, 2 * d * T2)
 	 *
-	 * r in P x P representation:
+	 * r in P x P coordinate system.:
 	 * X' = (Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)
 	 * Y' = (Y1 + X1) * (Y2 + X2) + (Y1 - X1) * (Y2 - X2)
 	 * Z' = 2 * Z1 * Z2 + 2 * d * T1 * T2
@@ -556,54 +535,55 @@ public class Ed25519GroupElement implements Serializable {
 	 *
 	 * Same result as in madd() (up to a common factor which does not matter).
 	 *
-	 * @param q the CACHED representation of the Ed25519GroupElement to add.
-     * @return the P1P1 representation of the result.
+	 * @param g The group element to add.
+     * @return The result in the P x P coordinate system.
      */
-    public Ed25519GroupElement add(Ed25519GroupElement q) {
-        if (this.repr != Representation.P3) {
+    public Ed25519GroupElement add(Ed25519GroupElement g) {
+        if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
-        if (q.repr != Representation.CACHED) {
+        if (g.coordinateSystem != CoordinateSystem.CACHED) {
 			throw new IllegalArgumentException();
 		}
 
-        Ed25519FieldElement YpX, YmX, A, B, C, ZZ, D;
-        YpX = this.Y.add(this.X);
-        YmX = this.Y.subtract(this.X);
-        A = YpX.multiply(q.X);
-        B = YmX.multiply(q.Y);
-        C = q.T.multiply(this.T);
-        ZZ = this.Z.multiply(q.Z);
-        D = ZZ.add(ZZ);
+        Ed25519FieldElement YPlusX, YMinusX, ZSquare, A, B, C, D;
+        YPlusX = this.Y.add(this.X);
+        YMinusX = this.Y.subtract(this.X);
+        A = YPlusX.multiply(g.X);
+        B = YMinusX.multiply(g.Y);
+        C = g.T.multiply(this.T);
+        ZSquare = this.Z.multiply(g.Z);
+        D = ZSquare.add(ZSquare);
+
         return p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
     }
 
     /**
-     * Ed25519GroupElement subtraction using the twisted Edwards addition law with
-     * extended coordinates (Hisil2008).
+     * Ed25519GroupElement subtraction using the twisted Edwards addition law for extended coordinates.
  	 *
-	 * Negating q means negating the value of the coordinate X2 and T2.
+	 * Negating g means negating the value of the coordinate X2 and T2.
 	 * The formula is in accordance to the above addition.
 	 *
-     * @param q the PRECOMP representation of the Ed25519GroupElement to subtract.
-     * @return the P1P1 representation of the result.
+     * @param g The group element to subtract.
+     * @return The result in the P x P coordinate system.
      */
-    public Ed25519GroupElement sub(Ed25519GroupElement q) {
-        if (this.repr != Representation.P3) {
+    public Ed25519GroupElement sub(Ed25519GroupElement g) {
+        if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
-        if (q.repr != Representation.CACHED) {
+        if (g.coordinateSystem != CoordinateSystem.CACHED) {
 			throw new IllegalArgumentException();
 		}
 
-        Ed25519FieldElement YpX, YmX, A, B, C, ZZ, D;
-        YpX = Y.add(X);
-        YmX = Y.subtract(X);
-        A = YpX.multiply(q.Y);
-        B = YmX.multiply(q.X);
-        C = q.T.multiply(T);
-        ZZ = Z.multiply(q.Z);
-        D = ZZ.add(ZZ);
+        Ed25519FieldElement YPlusX, YMinusX, ZSquare, A, B, C, D;
+        YPlusX = Y.add(X);
+        YMinusX = Y.subtract(X);
+        A = YPlusX.multiply(g.Y);
+        B = YMinusX.multiply(g.X);
+        C = g.T.multiply(T);
+        ZSquare = Z.multiply(g.Z);
+        D = ZSquare.add(ZSquare);
+
         return p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
     }
 
@@ -614,7 +594,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The negative of this group element.
 	 */
     public Ed25519GroupElement negate() {
-        if (this.repr != Representation.P3) {
+        if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
 
@@ -632,38 +612,42 @@ public class Ed25519GroupElement implements Serializable {
 			return false;
 		}
         Ed25519GroupElement ge = (Ed25519GroupElement) obj;
-        if (!this.repr.equals(ge.repr)) {
+        if (!this.coordinateSystem.equals(ge.coordinateSystem)) {
             try {
-                ge = ge.toRep(this.repr);
+                ge = ge.toRep(this.coordinateSystem);
             } catch (Exception e) {
                 return false;
             }
         }
-        switch (this.repr) {
+        switch (this.coordinateSystem) {
 			case P2:
 			case P3:
 				if (this.Z.equals(ge.Z)) {
 					return this.X.equals(ge.X) && this.Y.equals(ge.Y);
 				}
+
 				final Ed25519FieldElement x1 = this.X.multiply(ge.Z);
 				final Ed25519FieldElement y1 = this.Y.multiply(ge.Z);
 				final Ed25519FieldElement x2 = ge.X.multiply(this.Z);
 				final Ed25519FieldElement y2 = ge.Y.multiply(this.Z);
+
 				return x1.equals(x2) && y1.equals(y2);
-			case P1P1:
+			case P1xP1:
 				return toP2().equals(ge);
-			case PRECOMP:
+			case PRECOMPUTED:
 				return this.X.equals(ge.X) && this.Y.equals(ge.Y) && this.Z.equals(ge.Z);
 			case CACHED:
 				if (this.Z.equals(ge.Z)) {
 					return this.X.equals(ge.X) && this.Y.equals(ge.Y) && this.T.equals(ge.T);
 				}
+
 				final Ed25519FieldElement x3 = this.X.multiply(ge.Z);
 				final Ed25519FieldElement y3 = this.Y.multiply(ge.Z);
 				final Ed25519FieldElement t3 = this.T.multiply(ge.Z);
 				final Ed25519FieldElement x4 = ge.X.multiply(this.Z);
 				final Ed25519FieldElement y4 = ge.Y.multiply(this.Z);
 				final Ed25519FieldElement t4 = ge.T.multiply(this.Z);
+
 				return x3.equals(x4) && y3.equals(y4) && t3.equals(t4);
 			default:
 				return false;
@@ -671,7 +655,7 @@ public class Ed25519GroupElement implements Serializable {
     }
 
     /**
-     * Convert a to 2^16 representation.
+     * Convert a to 2^16 bit representation.
      *
      * @param encoded The encode field element.
      * @return 64 bytes, each between -8 and 7
@@ -738,7 +722,7 @@ public class Ed25519GroupElement implements Serializable {
 		final int bAbs = b - (((-bNegative) & b) << 1);
 
         // 16^i |r_i| B
-		final Ed25519GroupElement t = Ed25519Group.ZERO_PRECOMP
+		final Ed25519GroupElement t = Ed25519Group.ZERO_PRECOMPUTED
                 .cmov(this.precomputedForSingle[pos][0], ByteUtils.isEqual(bAbs, 1))
                 .cmov(this.precomputedForSingle[pos][1], ByteUtils.isEqual(bAbs, 2))
                 .cmov(this.precomputedForSingle[pos][2], ByteUtils.isEqual(bAbs, 3))
@@ -748,7 +732,7 @@ public class Ed25519GroupElement implements Serializable {
                 .cmov(this.precomputedForSingle[pos][6], ByteUtils.isEqual(bAbs, 7))
                 .cmov(this.precomputedForSingle[pos][7], ByteUtils.isEqual(bAbs, 8));
         // -16^i |r_i| B
-		final Ed25519GroupElement tMinus = precomp(t.Y, t.X, t.Z.negate());
+		final Ed25519GroupElement tMinus = precomputed(t.Y, t.X, t.Z.negate());
         // 16^i r_i B
         return t.cmov(tMinus, bNegative);
     }
@@ -759,29 +743,25 @@ public class Ed25519GroupElement implements Serializable {
      * will be at the start of the method (and cached for later calls). 
      * Constant time.
      *
-     * Preconditions: (TODO: Check this applies here)
-     *   a[31] <= 127
-     * @param a = a[0]+256*a[1]+...+256^31 a[31]
-     * @return the Ed25519GroupElement
+     * @param a The encoded field element.
+     * @return The resulting group element.
      */
     public Ed25519GroupElement scalarMultiply(final Ed25519EncodedFieldElement a) {
-        Ed25519GroupElement t;
+        Ed25519GroupElement g;
         int i;
-
 		final byte[] e = toRadix16(a);
-
         Ed25519GroupElement h = Ed25519Group.ZERO_P3;
         synchronized(this) {
             for (i = 1; i < 64; i += 2) {
-                t = select(i/2, e[i]);
-                h = h.madd(t).toP3();
+                g = select(i/2, e[i]);
+                h = h.madd(g).toP3();
             }
 
             h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
 
             for (i = 0; i < 64; i += 2) {
-                t = select(i/2, e[i]);
-                h = h.madd(t).toP3();
+                g = select(i/2, e[i]);
+                h = h.madd(g).toP3();
             }
         }
 
@@ -843,12 +823,12 @@ public class Ed25519GroupElement implements Serializable {
 	 * a and b are encoded field elements and
 	 * B is this point.
      *
-     * A must have been previously precomputed.
+     * A must have been previously precomputed for double scalar multiplication.
      *
-     * @param A in P3 representation.
+     * @param A in P3 coordinate system.
      * @param a = The first encoded field element.
      * @param b = The second encoded field element.
-     * @return the Ed25519GroupElement
+     * @return The resulting group element.
      */
     public Ed25519GroupElement doubleScalarMultiplyVariableTime(
 			final Ed25519GroupElement A,
@@ -856,7 +836,6 @@ public class Ed25519GroupElement implements Serializable {
 			final Ed25519EncodedFieldElement b) {
 		final byte[] aSlide = slide(a);
 		final byte[] bSlide = slide(b);
-
         Ed25519GroupElement r = Ed25519Group.ZERO_P2;
 
         int i;
@@ -865,7 +844,7 @@ public class Ed25519GroupElement implements Serializable {
         }
 
         synchronized(this) {
-            for (; i >= 0; --i) {
+            for (; i>=0; --i) {
                 Ed25519GroupElement t = r.dbl();
 
                 if (aSlide[i] > 0) {
@@ -893,12 +872,12 @@ public class Ed25519GroupElement implements Serializable {
      * @return true if the group element satisfies the curve equation, false otherwise.
      */
     public boolean satisfiesCurveEquation() {
-		switch (repr) {
+		switch (coordinateSystem) {
 			case P2:
 			case P3:
-				Ed25519FieldElement recip = Z.invert();
-				Ed25519FieldElement x = X.multiply(recip);
-				Ed25519FieldElement y = Y.multiply(recip);
+				Ed25519FieldElement inverse = Z.invert();
+				Ed25519FieldElement x = X.multiply(inverse);
+				Ed25519FieldElement y = Y.multiply(inverse);
 				Ed25519FieldElement xSquare = x.square();
 				Ed25519FieldElement ySquare = y.square();
 				Ed25519FieldElement dXSquareYSquare = Ed25519Field.D.multiply(xSquare).multiply(ySquare);

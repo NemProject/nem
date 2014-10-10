@@ -14,7 +14,7 @@ public class Ed25519Group {
 	public static Ed25519GroupElement BASE_POINT = getBasePoint();
 	public static Ed25519GroupElement ZERO_P3 = Ed25519GroupElement.p3(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 	public static Ed25519GroupElement ZERO_P2 = Ed25519GroupElement.p2(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE);
-	public static Ed25519GroupElement ZERO_PRECOMP = Ed25519GroupElement.precomp(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
+	public static Ed25519GroupElement ZERO_PRECOMPUTED = Ed25519GroupElement.precomputed(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
 
 	public static Ed25519GroupElement getBasePoint() {

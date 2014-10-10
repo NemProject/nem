@@ -25,7 +25,7 @@ public class Ed25519EncodedGroupElementTest {
 
 			// Act:
 			final Ed25519FieldElement affineX1 = encoded.getAffineX();
-			final Ed25519FieldElement affineX2 = MathUtils.toRepresentation(encoded.decode(), Ed25519GroupElement.Representation.AFFINE).getX();
+			final Ed25519FieldElement affineX2 = MathUtils.toRepresentation(encoded.decode(), CoordinateSystem.AFFINE).getX();
 
 			// Assert:
 			Assert.assertThat(affineX1, IsEqual.equalTo(affineX2));
@@ -40,7 +40,7 @@ public class Ed25519EncodedGroupElementTest {
 
 			// Act:
 			final Ed25519FieldElement affineY1 = encoded.getAffineY();
-			final Ed25519FieldElement affineY2 = MathUtils.toRepresentation(encoded.decode(), Ed25519GroupElement.Representation.AFFINE).getY();
+			final Ed25519FieldElement affineY2 = MathUtils.toRepresentation(encoded.decode(), CoordinateSystem.AFFINE).getY();
 
 			// Assert:
 			Assert.assertThat(affineY1, IsEqual.equalTo(affineY2));
