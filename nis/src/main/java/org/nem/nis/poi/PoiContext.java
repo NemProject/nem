@@ -65,6 +65,15 @@ public class PoiContext {
 		return this.accountProcessor.poiStartVector;
 	}
 
+	/**
+	 * Gets the outlier vector.
+	 *
+	 * @return The outlier vector.
+	 */
+	public ColumnVector getOutlierVector() {
+		return this.accountProcessor.outlierVector;
+	}
+
 	//endregion
 
 	//region dangle indexes
@@ -124,6 +133,7 @@ public class PoiContext {
 		private final ColumnVector vestedBalanceVector;
 		private final ColumnVector poiStartVector;
 		private final ColumnVector outlinkScoreVector;
+		private final ColumnVector outlierVector;
 		private SparseMatrix outlinkMatrix;
 		private InterLevelProximityMatrix interLevelMatrix;
 		private ClusteringResult clusteringResult;
@@ -164,6 +174,7 @@ public class PoiContext {
 			this.vestedBalanceVector = new ColumnVector(i);
 			this.poiStartVector = new ColumnVector(i);
 			this.outlinkScoreVector = new ColumnVector(i);
+			this.outlierVector = new ColumnVector(i);
 		}
 
 		public void process() {
@@ -277,6 +288,10 @@ public class PoiContext {
 					this.clusteringResult.getClusters().size(),
 					this.clusteringResult.getHubs().size(),
 					this.clusteringResult.getOutliers().size()));
+
+			for (final Cluster cluster : this.clusteringResult.getOutliers()) {
+				this.outlierVector.setAt(cluster.getId().getRaw(), 1.0);
+			}
 		}
 
 		private void buildInterLevelProximityMatrix() {

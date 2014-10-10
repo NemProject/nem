@@ -106,6 +106,19 @@ public class PoiContextTest {
 				IsEqual.equalTo(new ColumnVector(0.25, 0.25, 0.25, 0.25)));
 	}
 
+	@Test
+	public void outlierVectorIsSetCorrectly() {
+		// Act:
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndOneOutlier();
+
+		// Assert:
+		// (1) values corresponding to outliers are 1
+		// (2) values corresponding to non-outliers are 0
+		Assert.assertThat(
+				context.getOutlierVector(),
+				IsEqual.equalTo(new ColumnVector(0, 0, 0, 0, 0, 0, 0, 1)));
+	}
+
 	//endregion
 
 	//region dangle indexes
