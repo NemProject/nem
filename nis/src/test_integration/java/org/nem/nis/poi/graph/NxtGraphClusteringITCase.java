@@ -268,15 +268,16 @@ public class NxtGraphClusteringITCase {
 		final Map<Address, PoiAccountState> accountStateMap = new HashMap<>();
 
 		// 1. Create accounts in the genesis block.
-		final PoiAccountState genesis = createAccountWithBalance(Address.fromEncoded("1739068987193023818"), 1, 1000000000000000l);
+		final Amount nxtGenesisAmount = Amount.fromNem(1000000000); // 10^9
+		final PoiAccountState genesis = createAccountWithBalance(Address.fromEncoded("1739068987193023818"), 1, nxtGenesisAmount);
 		accountStateMap.put(genesis.getAddress(), genesis);
 
 		// 2. Iterate through transactions, creating new accounts as needed.
 		for (final NxtTransaction trans : transactions) {
-			final Amount amount = Amount.fromMicroNem(trans.getAmount() / 100); // TODO 20141006 J-M why / 100 ?
+			final Amount amount = Amount.fromMicroNem(trans.getAmount() / 100000000); // NXT stores NXT * 10^8 (ignore micro nem)
 			final Address sender = Address.fromEncoded(Long.toString(trans.getSenderId()));
 			final Address recipient = Address.fromEncoded(Long.toString(trans.getRecipientId()));
-			final BlockHeight blockHeight = new BlockHeight(trans.getHeight() + 1); // TODO 20141006 J-M why + 1 ?
+			final BlockHeight blockHeight = new BlockHeight(trans.getHeight() + 1); // NXT blocks start at 0 but NEM blocks start at 1
 
 			if (!accountStateMap.containsKey(recipient)) {
 				accountStateMap.put(recipient, new PoiAccountState(recipient));
@@ -411,9 +412,9 @@ public class NxtGraphClusteringITCase {
 		});
 	}
 
-	private static PoiAccountState createAccountWithBalance(final Address address, final long blockHeight, final long numNEM) {
+	private static PoiAccountState createAccountWithBalance(final Address address, final long blockHeight, final Amount amount) {
 		final PoiAccountState state = new PoiAccountState(address);
-		state.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight), Amount.fromMicroNem(numNEM));
+		state.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight), amount);
 		return state;
 	}
 
