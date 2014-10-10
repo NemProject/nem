@@ -108,7 +108,6 @@ public class BlockScorerTest {
 
 		block.setDifficulty(new BlockDifficulty((long)60E12));
 		context.poiFacade.recalculateImportances(block.getHeight());
-		context.getImportanceInfo(blockSigner).setImportance(block.getHeight(), 1572);
 
 		// Act:
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
@@ -281,7 +280,7 @@ public class BlockScorerTest {
 		private final BlockScorer scorer;
 
 		private TestContext() {
-			this(new PoiFacade((blockHeight, accountStates, scoringAlg) -> {
+			this(new PoiFacade((blockHeight, accountStates) -> {
 				for (final PoiAccountState accountState : accountStates) {
 					final Amount balance = accountState.getWeightedBalances().getUnvested(blockHeight);
 					final double importance = balance.getNumMicroNem() / 1000.0;

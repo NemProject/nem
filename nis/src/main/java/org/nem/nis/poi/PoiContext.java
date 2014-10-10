@@ -3,40 +3,40 @@ package org.nem.nis.poi;
 import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.harvesting.CanHarvestPredicate;
+import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountImportance;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * A POI context.
  */
 public class PoiContext {
-
-	private static final double TELEPORTATION_PROB = .85;
+	private static final Logger LOGGER = Logger.getLogger(PoiContext.class.getName());
 
 	private final AccountProcessor accountProcessor;
-
-	private final ColumnVector teleportationVector;
-	private final ColumnVector inverseTeleportationVector;
 
 	/**
 	 * Creates a new context.
 	 *
 	 * @param accountStates The account states.
 	 * @param height The current block height.
+	 * @param options The poi options.
 	 */
-	public PoiContext(final Iterable<PoiAccountState> accountStates, final BlockHeight height) {
+	public PoiContext(
+			final Iterable<PoiAccountState> accountStates,
+			final BlockHeight height,
+			final PoiOptions options) {
 		// (1) build the account vectors and matrices
-		this.accountProcessor = new AccountProcessor(accountStates, height);
+		this.accountProcessor = new AccountProcessor(accountStates, height, options);
 		this.accountProcessor.process();
-
-		// (2) build the teleportation vectors
-		final TeleportationBuilder tb = new TeleportationBuilder(this.getPoiStartVector());
-		this.teleportationVector = tb.teleportationVector;
-		this.inverseTeleportationVector = tb.inverseTeleportationVector;
 	}
 
-	//region Getters
+	//region getters
+
+	//region vectors
 
 	/**
 	 * Gets the vested balance vector.
@@ -66,22 +66,17 @@ public class PoiContext {
 	}
 
 	/**
-	 * Gets the teleportation vector.
+	 * Gets the outlier vector.
 	 *
-	 * @return The teleportation vector.
+	 * @return The outlier vector.
 	 */
-	public ColumnVector getTeleportationVector() {
-		return this.teleportationVector;
+	public ColumnVector getOutlierVector() {
+		return this.accountProcessor.outlierVector;
 	}
 
-	/**
-	 * Gets the inverse teleportation vector.
-	 *
-	 * @return The inverse teleportation vector.
-	 */
-	public ColumnVector getInverseTeleportationVector() {
-		return this.inverseTeleportationVector;
-	}
+	//endregion
+
+	//region dangle indexes
 
 	/**
 	 * Gets the dangle indexes.
@@ -92,14 +87,9 @@ public class PoiContext {
 		return this.accountProcessor.dangleIndexes;
 	}
 
-	/**
-	 * Gets the dangle vector, where an element has a 0 value if the corresponding account is dangling.
-	 *
-	 * @return The dangle vector.
-	 */
-	public ColumnVector getDangleVector() {
-		return this.accountProcessor.dangleVector;
-	}
+	//endregion
+
+	//region matricies
 
 	/**
 	 * Gets the out-link matrix.
@@ -109,6 +99,17 @@ public class PoiContext {
 	public SparseMatrix getOutlinkMatrix() {
 		return this.accountProcessor.outlinkMatrix;
 	}
+
+	/**
+	 * Gets the inter-level proximity matrix.
+	 *
+	 * @return The inter-level proximity matrix.
+	 */
+	public InterLevelProximityMatrix getInterLevelMatrix() {
+		return this.accountProcessor.interLevelMatrix;
+	}
+
+	//endregion
 
 	//endregion
 
@@ -127,24 +128,34 @@ public class PoiContext {
 	private static class AccountProcessor {
 		private final BlockHeight height;
 		private final List<Integer> dangleIndexes;
-		private final ColumnVector dangleVector;
+		private final PoiOptions options;
+
 		private final ColumnVector vestedBalanceVector;
 		private final ColumnVector poiStartVector;
 		private final ColumnVector outlinkScoreVector;
+		private final ColumnVector outlierVector;
 		private SparseMatrix outlinkMatrix;
+		private InterLevelProximityMatrix interLevelMatrix;
+		private ClusteringResult clusteringResult;
+		private Neighborhood neighborhood;
 
 		private final List<PoiAccountInfo> accountInfos = new ArrayList<>();
 		private final Map<Address, PoiAccountInfo> addressToAccountInfoMap = new HashMap<>();
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
 
-		public AccountProcessor(final Iterable<PoiAccountState> accountStates, final BlockHeight height) {
+		public AccountProcessor(
+				final Iterable<PoiAccountState> accountStates,
+				final BlockHeight height,
+				final PoiOptions options) {
 			this.height = height;
 			this.dangleIndexes = new ArrayList<>();
+			this.options = options;
 
 			int i = 0;
+			final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(this.options.getMinHarvesterBalance());
 			for (final PoiAccountState accountState : accountStates) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
-				if (!accountInfo.canForage()) {
+				if (!canHarvestPredicate.canHarvest(accountState, height)) {
 					continue;
 				}
 
@@ -157,15 +168,13 @@ public class PoiContext {
 			}
 
 			if (0 == i) {
-				throw new IllegalArgumentException("there aren't any foraging eligible accounts");
+				throw new IllegalArgumentException("there aren't any harvesting eligible accounts");
 			}
-
-			this.dangleVector = new ColumnVector(i);
-			this.dangleVector.setAll(1);
 
 			this.vestedBalanceVector = new ColumnVector(i);
 			this.poiStartVector = new ColumnVector(i);
 			this.outlinkScoreVector = new ColumnVector(i);
+			this.outlierVector = new ColumnVector(i);
 		}
 
 		public void process() {
@@ -207,23 +216,6 @@ public class PoiContext {
 		}
 
 		private void createStartVector() {
-			// TODO: BR: After unwinding a chain to height x in order to resolve a fork, the start vector is different
-			//           from the start vector we use when growing an incomplete chain at height x. This results in
-			//           a slightly different importance value. This in turn leads to a slightly different target for
-			//           a block and could in theory lead to an unresolvable fork. Better use a constant vector for now.
-
-			// (1) Assign the start vector to the last page rank
-			//			int i = 0;
-			//			for (final PoiAccountInfo accountInfo : this.accountInfos) {
-			//				final AccountImportance importance = accountInfo.getAccount().getImportanceInfo();
-			//				this.poiStartVector.setAt(i, importance.getLastPageRank());
-			//				++i;
-			//			}
-			//
-			//			// (2) normalize the start vector
-			//			if (this.poiStartVector.isZeroVector())
-			//				this.poiStartVector.setAll(1.0);
-
 			this.poiStartVector.setAll(1.0);
 			this.poiStartVector.normalize();
 		}
@@ -254,62 +246,56 @@ public class PoiContext {
 
 				// update the outlink score
 				final int rowIndex = accountInfo.getIndex();
-				final double outlinkScore = accountInfo.getNetOutlinkScore();
-				if (0.0 == outlinkScore) {
-					this.dangleIndexes.add(rowIndex);
-				} else {
+				final double score = accountInfo.getNetOutlinkScore();
+				final double multiplier = score < 0 ? this.options.getNegativeOutlinkWeight() : 1.0;
+				final double outlinkScore = score * multiplier;
+				if (0.0 != outlinkScore) {
 					this.outlinkScoreVector.setAt(rowIndex, outlinkScore);
 				}
 			}
 
-			this.outlinkMatrix.removeNegatives();
-			this.outlinkMatrix.normalizeColumns();
+			this.outlinkMatrix.removeLessThan(this.options.getMinOutlinkWeight().getNumMicroNem());
+
+			// At this point the outlink matrix gets finalized.
+			// This is the point where the dangle indices should be calculated, not earlier!
+			// The normalizeColumns() method returns the dangle indices because during normalization
+			// the column sums need to be calculated anyway.
+			final Collection<Integer> dangleIndexes = this.outlinkMatrix.normalizeColumns();
+			this.dangleIndexes.addAll(dangleIndexes);
+
+			if (!this.options.isClusteringEnabled()) {
+				LOGGER.info("clustering is bypassed");
+				return;
+			}
+
+			// We should cluster the accounts
+			this.clusterAccounts();
+
+			// Now we can build the inter-level proximity matrix (because we need directed edges for this)
+			this.buildInterLevelProximityMatrix();
 		}
-	}
 
-	private static class TeleportationBuilder {
+		private void clusterAccounts() {
+			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
+			this.neighborhood = new Neighborhood(
+					nodeNeighborMap,
+					new DefaultSimilarityStrategy(nodeNeighborMap),
+					this.options.getMuClusteringValue(),
+					this.options.getEpsilonClusteringValue());
+			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
+			LOGGER.info(String.format(
+					"clustering completed: { clusters: %d, hubs: %d, outliers: %d }",
+					this.clusteringResult.getClusters().size(),
+					this.clusteringResult.getHubs().size(),
+					this.clusteringResult.getOutliers().size()));
 
-		private final ColumnVector teleportationVector;
-		private final ColumnVector inverseTeleportationVector;
+			for (final Cluster cluster : this.clusteringResult.getOutliers()) {
+				this.outlierVector.setAt(cluster.getId().getRaw(), 1.0);
+			}
+		}
 
-		public TeleportationBuilder(final ColumnVector importanceVector) {
-			//			// (1) build the teleportation vector
-			//			final int numAccounts = importanceVector.getSize();
-			//
-			//			// TODO: not sure if we should have non-zero teleportation for accounts that can't forage
-			//			// TODO: After POI is up and running, we should try pruning accounts that can't forage
-			//
-			//			// Assign a value between .7 and .95 based on the amount of NEM in an account
-			//			// It seems that more NEM = higher teleportation seems to work better
-			//			// NOTE: at this point the importance vector contains normalized account balances
-			//			final double maxImportance = importanceVector.max();
-			//
-			//			// calculate teleportation probabilities based on normalized amount of NEM owned
-			//			final ColumnVector minProbVector = new ColumnVector(importanceVector.getSize());
-			//			minProbVector.setAll(MIN_TELEPORTATION_PROB);
-			//
-			//			final double teleportationDelta = MAX_TELEPORTATION_PROB - MIN_TELEPORTATION_PROB;
-			//			this.teleportationVector = minProbVector.add(importanceVector.multiply(teleportationDelta / maxImportance));
-			//
-			//			// (2) build the inverse teleportation vector: 1 - V(teleportation)
-			//			final ColumnVector onesVector = new ColumnVector(numAccounts);
-			//			onesVector.setAll(1.0);
-			//			this.inverseTeleportationVector = onesVector.add(this.teleportationVector.multiply(-1));
-			//
-			//			// (3) Normalize by the number of accounts (1/N)
-			//			final double numAccountNorm =  1d / numAccounts;
-			//
-			//			this.teleportationVector.multiply(numAccountNorm);
-			//			this.inverseTeleportationVector.multiply(numAccountNorm);
-
-			ColumnVector vector = new ColumnVector(importanceVector.size());
-			vector.setAll(TELEPORTATION_PROB);
-			this.teleportationVector = vector;
-			final ColumnVector onesVector = new ColumnVector(importanceVector.size());
-			onesVector.setAll(1.0);
-			vector = onesVector.addElementWise(this.teleportationVector.multiply(-1));
-			vector.scale(importanceVector.size());
-			this.inverseTeleportationVector = vector;
+		private void buildInterLevelProximityMatrix() {
+			this.interLevelMatrix = new InterLevelProximityMatrix(this.clusteringResult, this.neighborhood, this.outlinkMatrix);
 		}
 	}
 }

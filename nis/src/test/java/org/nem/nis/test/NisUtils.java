@@ -7,6 +7,8 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dao.*;
+import org.nem.nis.poi.*;
+import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.validators.*;
 
@@ -16,6 +18,7 @@ import java.util.*;
  * Static class containing NIS test helper functions.
  */
 public class NisUtils {
+	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
 
 	/**
 	 * Creates a DB Block that can be mapped to a model Block.
@@ -153,7 +156,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a transaction validator factory.
+	 * Creates a (mostly real) transaction validator factory.
 	 *
 	 * @return The factory.
 	 */
@@ -162,7 +165,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a transaction validator factory.
+	 * Creates a (mostly real) transaction validator factory.
 	 *
 	 * @param transferDao The transfer dao.
 	 * @return The factory.
@@ -171,15 +174,77 @@ public class NisUtils {
 		return new TransactionValidatorFactory(
 				transferDao,
 				Mockito.mock(ImportanceTransferDao.class),
-				new SystemTimeProvider());
+				new SystemTimeProvider(),
+				DEFAULT_POI_OPTIONS);
 	}
 
 	/**
-	 * Creates a block validator factory.
+	 * Creates a (real) block validator factory.
 	 *
 	 * @return The factory.
 	 */
 	public static BlockValidatorFactory createBlockValidatorFactory() {
 		return new BlockValidatorFactory(new SystemTimeProvider());
+	}
+
+	/**
+	 * Creates a (real) importance calculator
+	 *
+	 * @return The calculator.
+	 */
+	public static ImportanceCalculator createImportanceCalculator() {
+		return new PoiImportanceCalculator(new PoiScorer(), DEFAULT_POI_OPTIONS);
+	}
+
+	/**
+	 * Converts an array of integers to an array of node ids.
+	 *
+	 * @param ids The integer array.
+	 * @return The node id array.
+	 */
+	public static NodeId[] toNodeIdArray(final int... ids) {
+		final NodeId[] nodeIds = new NodeId[ids.length];
+		for (int i = 0; i < ids.length; ++i) {
+			nodeIds[i] = new NodeId(ids[i]);
+		}
+
+		return nodeIds;
+	}
+
+	/**
+	 * Converts an array of integers to a list of node ids.
+	 *
+	 * @param ids The integer array.
+	 * @return The node id list.
+	 */
+	public static List<NodeId> toNodeIdList(final int... ids) {
+		return Arrays.asList(NisUtils.toNodeIdArray(ids));
+	}
+
+	/**
+	 * Converts an array of integers into a NodeNeighbors object.
+	 *
+	 * @param ids The integer array.
+	 * @return The node neighbors.
+	 */
+	public static NodeNeighbors createNeighbors(final int... ids) {
+		return new NodeNeighbors(NisUtils.toNodeIdArray(ids));
+	}
+
+	/**
+	 * Creates a new neighborhood with default clustering parameters.
+	 *
+	 * @param repository The neighborhood repository.
+	 * @param similarityStrategy The similarity strategy.
+	 * @return The neighborhood.
+	 */
+	public static Neighborhood createNeighborhood(
+			final NeighborhoodRepository repository,
+			final SimilarityStrategy similarityStrategy) {
+		return new Neighborhood(
+				repository,
+				similarityStrategy,
+				DEFAULT_POI_OPTIONS.getMuClusteringValue(),
+				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
 	}
 }

@@ -3,6 +3,7 @@ package org.nem.core.math;
 import org.nem.core.utils.FormatUtils;
 
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 /**
  * Represents a sparse matrix.
@@ -51,13 +52,8 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	protected final double getAtUnchecked(final int row, final int col) {
-		for (int i = 0; i < this.maxIndices[row]; ++i) {
-			if (this.cols[row][i] == col) {
-				return this.values[row][i];
-			}
-		}
-
-		return 0.0;
+		final int i = Arrays.binarySearch(this.cols[row], 0, this.maxIndices[row], col);
+		return i < 0 ? 0.0 : this.values[row][i];
 	}
 
 	@Override
@@ -117,24 +113,6 @@ public class SparseMatrix extends Matrix {
 		this.values[row][i] = val;
 		this.maxIndices[row] += 1;
 	}
-
-	// TODO 20140929 J-M can you retry and see if there is still a perf degradation without this
-
-	///**
-	// * Remove all negative or zero values. This is overridden here
-	// * because this version is faster than the base class.
-	// */
-	//public void removeNegatives() {
-	//	for (int i = 0; i < this.numRows; ++i) {
-	//		final double[] rowValues = this.values[i];
-	//		final int size = this.maxIndices[i];
-	//		for (int j = 0; j < size; ++j) {
-	//			while (rowValues[j] < 0.0) {
-	//				this.remove(i, j);
-	//			}
-	//		}
-	//	}
-	//}
 
 	@Override
 	protected final void forEach(final ElementVisitorFunction func) {

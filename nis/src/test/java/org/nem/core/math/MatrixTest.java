@@ -590,7 +590,7 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 
 	//endregion
 
-	//region removeNegatives
+	//region removeNegatives / removeLessThan
 
 	@Test
 	public void removeNegativesZerosOutAllElementsWithNegativeValues() {
@@ -604,6 +604,20 @@ public abstract class MatrixTest<TMatrix extends Matrix> {
 		Assert.assertThat(
 				matrix,
 				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 2, 0, 0, 0, 8 })));
+	}
+
+	@Test
+	public void removeLessThanZerosOutAllElementsLessThanSpecifiedValue() {
+		// Arrange:
+		final Matrix matrix = this.createMatrix(3, 2, new double[] { -3, 1.4, 1.6, 1.5, -1, 1 });
+
+		// Act:
+		matrix.removeLessThan(1.5);
+
+		// Assert:
+		Assert.assertThat(
+				matrix,
+				IsEqual.equalTo(this.createMatrix(3, 2, new double[] { 0, 0, 1.6, 1.5, 0, 0 })));
 	}
 
 	//endregion

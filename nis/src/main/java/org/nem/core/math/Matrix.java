@@ -154,8 +154,17 @@ public abstract class Matrix {
 	 * Sets all negative values to zero.
 	 */
 	public void removeNegatives() {
+		this.removeLessThan(0);
+	}
+
+	/**
+	 * Sets all values less than the specified value to zero.
+	 *
+	 * @param minValue The minimum value that should not be set to zero.
+	 */
+	public void removeLessThan(final double minValue) {
 		this.forEach((row, col, value, setter) -> {
-			if (value < 0) {
+			if (value < minValue) {
 				setter.accept(0.0);
 			}
 		});
