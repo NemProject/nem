@@ -9,6 +9,7 @@ import org.nem.nis.test.*;
 import java.util.*;
 
 public class InterLevelProximityMatrixTest {
+	private static final double EPSILON = 0.65;
 
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithSingleNode() {
@@ -312,7 +313,7 @@ public class InterLevelProximityMatrixTest {
 						new Cluster(new ClusterId(0), NisUtils.toNodeIdList(3))));
 
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
+		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap), EPSILON);
 		final InterLevelProximityMatrix interLevel = new InterLevelProximityMatrix(
 				clusteringResult,
 				neighborhood,
@@ -346,7 +347,7 @@ public class InterLevelProximityMatrixTest {
 		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
 		final ClusteringResult clusteringResult = IdealizedClusterFactory.create(graphType);
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
+		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap), EPSILON);
 		return new InterLevelProximityMatrix(clusteringResult, neighborhood, outlinkMatrix);
 	}
 

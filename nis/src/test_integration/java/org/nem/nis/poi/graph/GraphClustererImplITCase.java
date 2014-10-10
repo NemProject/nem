@@ -15,6 +15,7 @@ public class GraphClustererImplITCase {
 	private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
 	private static final File TEST_FILE_DIRECTORY = new File(WORKING_DIRECTORY, "test_files");
 	private static final File TEST_MATRIX_FILE = new File(TEST_FILE_DIRECTORY, "test.matrix");
+	private static final double EPSILON = 0.65;
 
 	//region BeforeClass / AfterClass
 
@@ -118,7 +119,7 @@ public class GraphClustererImplITCase {
 				long stop = System.currentTimeMillis();
 				System.out.println("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
 				final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighbordMap);
-				final Neighborhood neighborhood = new Neighborhood(nodeNeighbordMap, strategy);
+				final Neighborhood neighborhood = new Neighborhood(nodeNeighbordMap, strategy, EPSILON);
 				start = System.currentTimeMillis();
 				final ClusteringResult result = clusteringStrategy.cluster(neighborhood);
 				stop = System.currentTimeMillis();
@@ -187,7 +188,7 @@ public class GraphClustererImplITCase {
 		final long stop = System.currentTimeMillis();
 		System.out.println("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy);
+		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy, EPSILON);
 		final ClusteringResult result = clusterer.cluster(neighborhood);
 		return result;
 	}

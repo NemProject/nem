@@ -8,6 +8,8 @@ import org.nem.nis.poi.graph.GraphClusteringStrategy;
  */
 public interface PoiOptions {
 
+	//region min weights
+
 	/**
 	 * Gets the minimum (vested) balance required for a harvester.
 	 *
@@ -22,6 +24,10 @@ public interface PoiOptions {
 	 */
 	public Amount getMinOutlinkWeight();
 
+	//endregion
+
+	//region clustering
+
 	/**
 	 * Gets a value indicating whether or not clustering is enabled.
 	 *
@@ -35,6 +41,31 @@ public interface PoiOptions {
 	 * @return The graph clustering strategy.
 	 */
 	public GraphClusteringStrategy getClusteringStrategy();
+
+	/**
+	 * Gets the mu clustering variable.
+	 * <br/>
+	 * The minimum number of neighbors with high structural similarity that
+	 * a node must have to be considered core.
+	 * A node itself is considered as neighbor of itself (it is in its set of similar neighbors).
+	 *
+	 * @return The mu value.
+	 */
+	public int getMuClusteringValue();
+
+	/**
+	 * Gets the epsilon clustering variable.
+	 * <br/>
+	 * The structural similarity threshold that will cause nodes to be considered
+	 * highly similar (if they have a similarity greater than this value).
+	 *
+	 * @return The epsilon value.
+	 */
+	public double getEpsilonClusteringValue();
+
+	//endregion
+
+	//region teleportation
 
 	/**
 	 * Gets the teleportation probability.
@@ -58,4 +89,6 @@ public interface PoiOptions {
 	public default double getInverseTeleportationProbability() {
 		return 1.0 - this.getTeleportationProbability() - this.getInterLevelTeleportationProbability();
 	}
+
+	//endregion
 }

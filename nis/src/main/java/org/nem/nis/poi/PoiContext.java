@@ -264,7 +264,10 @@ public class PoiContext {
 			}
 
 			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
-			this.neighborhood = new Neighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
+			this.neighborhood = new Neighborhood(
+					nodeNeighborMap,
+					new DefaultSimilarityStrategy(nodeNeighborMap),
+					this.options.getEpsilonClusteringValue());
 			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
 			LOGGER.info(String.format(
 					"clustering completed: { clusters: %d, hubs: %d, outliers: %d }",

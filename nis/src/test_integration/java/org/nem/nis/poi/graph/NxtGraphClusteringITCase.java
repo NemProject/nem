@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class NxtGraphClusteringITCase {
 	private static final Logger LOGGER = Logger.getLogger(NxtGraphClusteringITCase.class.getName());
 	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
+	private static final double EPSILON = 0.65;
 
 	@Test
 	public void canQueryNxtTransactionTable() {
@@ -296,7 +297,7 @@ public class NxtGraphClusteringITCase {
 		final long stop = System.currentTimeMillis();
 		LOGGER.info("NodeNeighborMap ctor needed " + (stop - start) + "ms.");
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
-		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy);
+		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy, EPSILON);
 		return clusterer.cluster(neighborhood);
 	}
 

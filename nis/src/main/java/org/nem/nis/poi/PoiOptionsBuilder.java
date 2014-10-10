@@ -12,6 +12,10 @@ public class PoiOptionsBuilder {
 	private double teleportationProbability = .75; // For NCDawareRank
 	private double interLevelTeleportationProbability = .1; // For NCDawareRank
 	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
+	private int mu = 3;
+	private double epsilon = 0.65;
+
+	//region min weights
 
 	/**
 	 * Sets the minimum (vested) balance required for a harvester.
@@ -31,6 +35,10 @@ public class PoiOptionsBuilder {
 		this.minOutlinkWeight = minOutlinkWeight;
 	}
 
+	//endregion
+
+	//region clustering
+
 	/**
 	 * Sets the graph clustering strategy.
 	 *
@@ -39,6 +47,28 @@ public class PoiOptionsBuilder {
 	public void setClusteringStrategy(final GraphClusteringStrategy strategy) {
 		this.clusteringStrategy = strategy;
 	}
+
+	/**
+	 * Sets the mu clustering variable.
+	 *
+	 * @param mu The mu value.
+	 */
+	public void setMuClusteringValue(final int mu) {
+		this.mu = mu;
+	}
+
+	/**
+	 * Sets the epsilon clustering variable.
+	 *
+	 * @param epsilon The epsilon value.
+	 */
+	public void setEpsilonClusteringValue(final double epsilon) {
+		this.epsilon = epsilon;
+	}
+
+	//endregion
+
+	//region teleportation
 
 	/**
 	 * Sets the teleportation probability.
@@ -58,7 +88,8 @@ public class PoiOptionsBuilder {
 		this.interLevelTeleportationProbability = probability;
 	}
 
-	//	//clusteringAlgs = ['SingleClusterScan', 'OutlierScan', 'FastScanClusteringStrategy']
+	//endregion
+
 //	//negativeOutlinkWeights = [0, 20, 40, 60, 80, 100]
 //	//outlierWeights = [0.85, 0.9, 0.95]
 //	//mus = [1, 2, 3, 4, 5]
@@ -90,6 +121,16 @@ public class PoiOptionsBuilder {
 			@Override
 			public GraphClusteringStrategy getClusteringStrategy() {
 				return PoiOptionsBuilder.this.clusteringStrategy;
+			}
+
+			@Override
+			public int getMuClusteringValue() {
+				return PoiOptionsBuilder.this.mu;
+			}
+
+			@Override
+			public double getEpsilonClusteringValue() {
+				return PoiOptionsBuilder.this.epsilon;
 			}
 
 			@Override

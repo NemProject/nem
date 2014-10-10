@@ -58,7 +58,7 @@ public class NeighborhoodTest {
 		final SimilarityStrategy strategy = Mockito.mock(SimilarityStrategy.class);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(pivotId), new NodeId(neighborId))).thenReturn(similarity);
 
-		final Neighborhood neighborhood = new Neighborhood(repository, strategy);
+		final Neighborhood neighborhood = createNeighborhood(repository, strategy);
 
 		// Act:
 		return neighborhood.getCommunity(new NodeId(pivotId));
@@ -87,7 +87,7 @@ public class NeighborhoodTest {
 		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(7))).thenReturn(0.8);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(2), new NodeId(9))).thenReturn(0.699);
 
-		final Neighborhood neighborhood = new Neighborhood(repository, strategy);
+		final Neighborhood neighborhood = createNeighborhood(repository, strategy);
 
 		// Act:
 		final Community community = neighborhood.getCommunity(new NodeId(2));
@@ -103,7 +103,7 @@ public class NeighborhoodTest {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
 		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2));
-		final Neighborhood neighborhood = new Neighborhood(repository, Mockito.mock(SimilarityStrategy.class));
+		final Neighborhood neighborhood = createNeighborhood(repository, Mockito.mock(SimilarityStrategy.class));
 
 		// Act:
 		final Community community1 = neighborhood.getCommunity(new NodeId(2));
@@ -127,7 +127,7 @@ public class NeighborhoodTest {
 		Mockito.when(repository.getNeighbors(new NodeId(3))).thenReturn(NisUtils.createNeighbors(2, 3));
 		Mockito.when(repository.getNeighbors(new NodeId(7))).thenReturn(NisUtils.createNeighbors(2, 7));
 		Mockito.when(repository.getNeighbors(new NodeId(9))).thenReturn(NisUtils.createNeighbors(2, 9));
-		final Neighborhood neighborhood = new Neighborhood(repository, Mockito.mock(SimilarityStrategy.class));
+		final Neighborhood neighborhood = createNeighborhood(repository, Mockito.mock(SimilarityStrategy.class));
 
 		// Act:
 		final Collection<Community> neighboringCommunities = neighborhood.getNeighboringCommunities(new NodeId(2));
@@ -147,7 +147,7 @@ public class NeighborhoodTest {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
 		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2));
-		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+		final Neighborhood neighborhood = createNeighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
@@ -161,7 +161,7 @@ public class NeighborhoodTest {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
 		Mockito.when(repository.getNeighbors(new NodeId(2))).thenReturn(NisUtils.createNeighbors(2));
-		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+		final Neighborhood neighborhood = createNeighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
@@ -183,7 +183,7 @@ public class NeighborhoodTest {
 		Mockito.when(repository.getNeighbors(new NodeId(11))).thenReturn(NisUtils.createNeighbors(3, 7));
 		Mockito.when(repository.getNeighbors(new NodeId(12))).thenReturn(NisUtils.createNeighbors());
 		Mockito.when(repository.getNeighbors(new NodeId(9))).thenReturn(NisUtils.createNeighbors(7));
-		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+		final Neighborhood neighborhood = createNeighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
@@ -203,7 +203,7 @@ public class NeighborhoodTest {
 		Mockito.when(repository.getNeighbors(new NodeId(4))).thenReturn(NisUtils.createNeighbors(7));
 		Mockito.when(repository.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors());
 		Mockito.when(repository.getNeighbors(new NodeId(7))).thenReturn(NisUtils.createNeighbors());
-		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+		final Neighborhood neighborhood = createNeighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
@@ -223,7 +223,7 @@ public class NeighborhoodTest {
 		Mockito.when(repository.getNeighbors(new NodeId(4))).thenReturn(NisUtils.createNeighbors(3, 7));
 		Mockito.when(repository.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors(3));
 		Mockito.when(repository.getNeighbors(new NodeId(7))).thenReturn(NisUtils.createNeighbors(4));
-		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+		final Neighborhood neighborhood = createNeighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
@@ -244,7 +244,7 @@ public class NeighborhoodTest {
 		Mockito.when(repository.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors(4, 8));
 		Mockito.when(repository.getNeighbors(new NodeId(7))).thenReturn(NisUtils.createNeighbors(7));
 		Mockito.when(repository.getNeighbors(new NodeId(8))).thenReturn(NisUtils.createNeighbors(8));
-		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+		final Neighborhood neighborhood = createNeighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
@@ -265,7 +265,7 @@ public class NeighborhoodTest {
 		Mockito.when(repository.getNeighbors(new NodeId(5))).thenReturn(NisUtils.createNeighbors());
 		Mockito.when(repository.getNeighbors(new NodeId(8))).thenReturn(NisUtils.createNeighbors());
 		Mockito.when(repository.getNeighbors(new NodeId(9))).thenReturn(NisUtils.createNeighbors());
-		final Neighborhood neighborhood = new Neighborhood(repository, createAlwaysSimilarStrategy());
+		final Neighborhood neighborhood = createNeighborhood(repository, createAlwaysSimilarStrategy());
 
 		// Act:
 		final NodeNeighbors neighbors = neighborhood.getTwoHopAwayNeighbors(new NodeId(2));
@@ -291,7 +291,7 @@ public class NeighborhoodTest {
 		// Arrange:
 		final NeighborhoodRepository repository = Mockito.mock(NeighborhoodRepository.class);
 		Mockito.when(repository.getLogicalSize()).thenReturn(18);
-		final Neighborhood neighborhood = new Neighborhood(repository, Mockito.mock(SimilarityStrategy.class));
+		final Neighborhood neighborhood = createNeighborhood(repository, Mockito.mock(SimilarityStrategy.class));
 
 		// Act:
 		final int size = neighborhood.size();
@@ -302,4 +302,10 @@ public class NeighborhoodTest {
 	}
 
 	//endregion
+
+	private static Neighborhood createNeighborhood(
+			final NeighborhoodRepository repository,
+			final SimilarityStrategy similarityStrategy) {
+		return new Neighborhood(repository, similarityStrategy, 0.65);
+	}
 }

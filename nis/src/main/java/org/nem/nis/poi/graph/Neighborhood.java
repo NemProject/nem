@@ -12,16 +12,22 @@ public class Neighborhood {
 	private final NeighborhoodRepository repository;
 	private final SimilarityStrategy similarityStrategy;
 	private final Map<NodeId, Community> communityCache;
+	private final double epsilon;
 
 	/**
 	 * Creates a new neighborhood.
 	 *
 	 * @param repository The neighborhood repository.
 	 * @param similarityStrategy The similarity strategy.
+	 * @param epsilon The structural similarity threshold that will cause nodes to be considered highly similar.
 	 */
-	public Neighborhood(final NeighborhoodRepository repository, final SimilarityStrategy similarityStrategy) {
+	public Neighborhood(
+			final NeighborhoodRepository repository,
+			final SimilarityStrategy similarityStrategy,
+			final double epsilon) {
 		this.repository = repository;
 		this.similarityStrategy = similarityStrategy;
+		this.epsilon = epsilon;
 		this.communityCache = new HashMap<>();
 	}
 
@@ -48,7 +54,7 @@ public class Neighborhood {
 		// this is guaranteed to traverse in increasing order
 		for (final NodeId neighborId : this.repository.getNeighbors(nodeId)) {
 			final double similarity = nodeId.equals(neighborId) ? 1.0 : this.similarityStrategy.calculateSimilarity(nodeId, neighborId);
-			(similarity > GraphConstants.EPSILON ? epsilonNeighbors : nonEpsilonNeighbors).addNeighbor(neighborId);
+			(similarity > this.epsilon ? epsilonNeighbors : nonEpsilonNeighbors).addNeighbor(neighborId);
 		}
 
 		return new Community(nodeId, epsilonNeighbors, nonEpsilonNeighbors);
