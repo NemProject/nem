@@ -3,6 +3,7 @@ package org.nem.nis.poi.graph;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.internal.util.collections.Sets;
 import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
@@ -108,13 +109,103 @@ public class NxtGraphClusteringITCase {
 			output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," + outlinkSums.get(i) + "\n";
 		}
 
-		FileUtils.writeStringToFile(new File("importances" + options + ".csv"), output);
+		FileUtils.writeStringToFile(new File("kaiseki/importances" + options + ".csv"), output);
+	}
 
-		//FileUtils.writeStringToFile(new File("importances" + options + ".csv"), Arrays.toString(importances.getRaw()));
-		//FileUtils.writeStringToFile(new File("stakes" + options + ".csv"), stakes.toString());
-		//FileUtils.writeStringToFile(new File("addresses" + options + ".csv"), addresses.toString());
-		//FileUtils.writeStringToFile(new File("outlinkCount" + options + ".csv"), outlinkCounts.toString());
-		//FileUtils.writeStringToFile(new File("outlinkSums" + options + ".csv"), outlinkSums.toString());
+	@Ignore
+	@Test
+	public void canWriteImportancesToFileForManyDifferentParameters() throws IOException {
+
+		// compute Cartesian product of considered parameters
+		final Set<Long> minHarvesterBalances = Sets.newSet(1l, 100l, 500l, 1000l, 10000l, 100000l);
+		final Set<Long> minOutlinkWeights = Sets.newSet(0l, 1l, 100l, 1000l, 10000l);
+		final Set<Double> negativeOutlinkWeights = Sets.newSet(0., 20., 40., 60., 80., 100.);
+		final Set<Double> outlierWeights = Sets.newSet(0.85, 0.9, 0.95, 1.0);
+		final Set<Integer> mus = Sets.newSet(1, 2, 3, 4, 5);
+		final Set<Double> epsilons = Sets.newSet(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95);
+		final Set<TeleportationProbs> teleporationProbs = Sets.newSet(new TeleportationProbs(0.75, 0.1), new TeleportationProbs(0.65, 0.1), new TeleportationProbs(0.55, 0.1), new TeleportationProbs(0.75, 0.2), new TeleportationProbs(0.65, 0.2), new TeleportationProbs(0.55, 0.2));
+
+		// how I learned to stop worrying and love the loop
+		for (final long minHarvesterBalance : minHarvesterBalances) {
+			for (final long minOutlinkWeight : minOutlinkWeights) {
+				for (final double negativeOutlinkWeight : negativeOutlinkWeights) {
+					for (final double outlierWeight : outlierWeights) {
+						for (final int mu : mus) {
+							for (final double epsilon : epsilons) {
+								for (final TeleportationProbs teleporationProb : teleporationProbs) {
+									final PoiOptionsBuilder optionsBuilder = createBuilderWithCustomOptions(
+											minHarvesterBalance,
+											minOutlinkWeight,
+											negativeOutlinkWeight,
+											outlierWeight,
+											mu,
+											epsilon,
+											teleporationProb.teleporationProb,
+											teleporationProb.interLevelTeleporationProb
+									);
+
+									final PoiOptions poiOptions = optionsBuilder.create();
+
+									final String options = String.format(
+											"_%sminBalance_%sminOutlink_%snegOutlink_%soutlierWeight_%smu_%sepsilon_%stelPro_%sinterLevelProb",
+											minHarvesterBalance,
+											minOutlinkWeight,
+											negativeOutlinkWeight,
+											outlierWeight,
+											mu,
+											epsilon,
+											teleporationProb.teleporationProb,
+											teleporationProb.interLevelTeleporationProb);
+
+									// Arrange
+									final int endHeight = 225000;
+									final BlockHeight endBlockHeight = new BlockHeight(endHeight);
+
+									// 0. Load account states.
+									final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight);
+
+									// 1. calc importances
+									final ColumnVector importances = getAccountImportances(
+											new BlockHeight(endHeight),
+											eligibleAccountStates,
+											new FastScanClusteringStrategy(),
+											null);
+
+									final List<Long> stakes = eligibleAccountStates.stream()
+											.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(endBlockHeight)).getNumMicroNem())
+											.collect(Collectors.toList());
+
+									final List<String> addresses = eligibleAccountStates.stream()
+											.map(acct -> acct.getAddress().getEncoded())
+											.collect(Collectors.toList());
+
+									final List<Integer> outlinkCounts = eligibleAccountStates.stream()
+											.map(acct -> acct.getImportanceInfo().getOutlinksSize(endBlockHeight))
+											.collect(Collectors.toList());
+
+									final List<Long> outlinkSums = eligibleAccountStates.stream()
+											.map(acct -> {
+												final ArrayList<Long> amts = new ArrayList<>();
+												acct.getImportanceInfo()
+														.getOutlinksIterator(endBlockHeight)
+														.forEachRemaining(i -> amts.add(i.getAmount().getNumMicroNem()));
+												return amts.stream().mapToLong(i -> i).sum();
+											})
+											.collect(Collectors.toList());
+
+									String output = "'address', 'stake', 'importance', 'outlinkCount', 'outlinkSum'\n";
+									for (int i = 0; i < importances.size(); ++i) {
+										output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," + outlinkSums.get(i) + "\n";
+									}
+
+									FileUtils.writeStringToFile(new File("kaiseki/importances" + options + ".csv"), output);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	//endregion
@@ -353,17 +444,35 @@ public class NxtGraphClusteringITCase {
 		return importancesVector;
 	}
 
-	private static PoiOptionsBuilder createBuilderWithCustomOptions() {
+	private static PoiOptionsBuilder createBuilderWithCustomOptions(
+			final long minHarvesterBalance,
+			final long minOutlinkWeight,
+			final double negativeOutlinkWeight,
+			final double outlierWeight,
+			final int mu,
+			final double epsilon,
+			final double teleporationProb,
+			final double interLevelTeleportationProb) {
 		// Act:
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
-		builder.setMinHarvesterBalance(Amount.fromNem(123));
-		builder.setMinOutlinkWeight(Amount.fromNem(777));
-		builder.setNegativeOutlinkWeight(0.76);
-		builder.setOutlierWeight(0.82);
-		builder.setMuClusteringValue(5);
-		builder.setEpsilonClusteringValue(0.42);
-		builder.setTeleportationProbability(0.65);
-		builder.setInterLevelTeleportationProbability(0.32);
+		builder.setMinHarvesterBalance(Amount.fromNem(minHarvesterBalance));
+		builder.setMinOutlinkWeight(Amount.fromNem(minOutlinkWeight));
+		builder.setNegativeOutlinkWeight(negativeOutlinkWeight);
+		builder.setOutlierWeight(outlierWeight);
+		builder.setMuClusteringValue(mu);
+		builder.setEpsilonClusteringValue(epsilon);
+		builder.setTeleportationProbability(teleporationProb);
+		builder.setInterLevelTeleportationProbability(interLevelTeleportationProb);
 		return builder;
+	}
+
+	private class TeleportationProbs {
+		final double teleporationProb;
+		final double interLevelTeleporationProb;
+
+		 TeleportationProbs(final double teleporationProb, final double interLevelTeleporationProb) {
+			this.teleporationProb = teleporationProb;
+			this.interLevelTeleporationProb = interLevelTeleporationProb;
+		}
 	}
 }

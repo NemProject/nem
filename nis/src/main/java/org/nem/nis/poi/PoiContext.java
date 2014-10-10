@@ -271,7 +271,7 @@ public class PoiContext {
 			// We should cluster the accounts
 			this.clusterAccounts();
 
-			// Now we can build the inter-level proximity matrix (because we need directed edges for this
+			// Now we can build the inter-level proximity matrix (because we need directed edges for this)
 			this.buildInterLevelProximityMatrix();
 		}
 
