@@ -152,6 +152,7 @@ public class TransferMapperTest {
 		}
 
 		public Transfer toDbModel(final int blockIndex) {
+			// TODO 20141010 J-G guess we should validate orderIndex like blockIndex
 			return TransferMapper.toDbModel(this.model, blockIndex, 0, new AccountDaoLookupAdapter(this.accountDao));
 		}
 
@@ -179,7 +180,8 @@ public class TransferMapperTest {
 			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
 
             // leaving for now, as I'm not sure if I can remove it without consequences
-            Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockId));
+			// TODO 20141010 J-G why would you want to remove it?
+			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockId));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));

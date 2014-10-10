@@ -109,6 +109,7 @@ public class ImportanceTransferMapperTest {
 
 		@SuppressWarnings("unchecked")
 		public ImportanceTransfer toDbModel(final int blockIndex) {
+			// TODO 20141010 J-G guess we should validate orderIndex like blockIndex
 			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, 0, new AccountDaoLookupAdapter(this.accountDao));
 
 			// TODO 20140923 J-G i'm not following what you're doing here

@@ -76,6 +76,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getAmount(), equalTo(transferTransaction.getAmount().getNumMicroNem()));
 		Assert.assertThat(entity.getSenderProof(), equalTo(transferTransaction.getSignature().getBytes()));
+		// TODO 20141010 J-G why did you remove the blockindex assert (and should we add one for order index)?
 	}
 
 	@Test

@@ -172,13 +172,14 @@ public class BlockDaoTest {
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
+		// TODO 20141010 J-G: i imagine you want to set the order id here
 		dbBlock.getBlockTransfers().get(0).setBlkIndex(24);
 		dbBlock.getBlockTransfers().get(1).setBlkIndex(12);
-        // TODO?
 
 		this.blockDao.save(dbBlock);
 
 		// Assert:
+		// TODO 20141010 J-G: you don't need to revalidate getBlkIndex here; do you have a test like this for importance transfer?
 		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getOrderId(), equalTo(0));
 		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getOrderId(), equalTo(1));
         Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
@@ -347,6 +348,7 @@ public class BlockDaoTest {
 		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
 
 		// Assert:
+		// TODO 20151010 J-G can you add a comment explaining why 25 is expected?
 		Assert.assertThat(entities1.size(), equalTo(25));
 	}
 

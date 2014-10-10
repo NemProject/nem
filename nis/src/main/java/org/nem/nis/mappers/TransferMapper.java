@@ -19,10 +19,15 @@ public class TransferMapper {
 	 *
 	 * @param transfer The transfer transaction model.
 	 * @param blockIndex The index of the transfer within the owning block.
+	 * @param orderIndex The index of the transfer within the owning block's collection of similar transactions.
 	 * @param accountDaoLookup The account dao lookup object.
 	 * @return The Transfer db-model.
 	 */
-	public static Transfer toDbModel(final TransferTransaction transfer, final int blockIndex, final int orderIndex, final AccountDaoLookup accountDaoLookup) {
+	public static Transfer toDbModel(
+			final TransferTransaction transfer,
+			final int blockIndex,
+			final int orderIndex,
+			final AccountDaoLookup accountDaoLookup) {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
 

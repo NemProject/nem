@@ -196,26 +196,26 @@ public class BlockMapperTest {
 	}
 
     @Test
-    public void blockModelWithTransactionsSortedByFeeCanBeRoundTripped() {
+    public void blockModelWithSortedTransactionsCanBeRoundTripped() {
+		// TODO 20141010 J-G: do we also need a test that the transactions are saved sorted or do the dao tests cover that?
+		// > actually, it looks like the previous test (blockModelWithTransactionsCanBeMappedToDbModel) is validating that, right?
         // Arrange:
         final int NUM_TRANSACTIONS_A = 2;
         final int NUM_TRANSACTIONS_B = 3;
         final TestContext context = new TestContext();
 
         // order matters, let's assume fees were such that block have been created in such order
-        context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
-        context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(150),
-                                                                       context.account1,
-                                                                       ImportanceTransferTransaction.Mode.Activate,
-                                                                       context.account2));
-        context.model.addTransaction(new TransferTransaction(new TimeInstant(200), context.account2, context.account3, new Amount(11), null));
-        context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(250), context.account3, ImportanceTransferTransaction.Mode.Activate, context.account2));
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
+		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(150), context.account1, mode, context.account2));
+		context.model.addTransaction(new TransferTransaction(new TimeInstant(200), context.account2, context.account3, new Amount(11), null));
+        context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(250), context.account3, mode, context.account2));
         context.model.addTransaction(new TransferTransaction(new TimeInstant(300), context.account3, context.account1, new Amount(4), null));
         for (final Transaction transaction : context.model.getTransactions()) {
             transaction.sign();
         }
-        context.signModel();
 
+        context.signModel();
         final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
         // Act:
