@@ -109,14 +109,14 @@ public class PoiContextTest {
 	@Test
 	public void outlierVectorIsSetCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndOneOutlier();
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers();
 
 		// Assert:
 		// (1) values corresponding to outliers are 1
 		// (2) values corresponding to non-outliers are 0
 		Assert.assertThat(
 				context.getOutlierVector(),
-				IsEqual.equalTo(new ColumnVector(0, 0, 0, 0, 0, 0, 0, 1)));
+				IsEqual.equalTo(new ColumnVector(0, 0, 1, 0, 0, 0, 0, 1, 0, 1)));
 	}
 
 	//endregion
@@ -430,15 +430,10 @@ public class PoiContextTest {
 	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndOneOutlier() {
 		// Arrange: create 8 accounts
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
-		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null));
+		final List<TestAccountInfo> accountInfos = new ArrayList<>();
+		for (int i = 0; i < 8; ++i) {
+			accountInfos.add(new TestAccountInfo(multiplier, null));
+		}
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
@@ -453,6 +448,52 @@ public class PoiContextTest {
 		addAccountLink(height, accountStates.get(4), accountStates.get(5), 1);
 		addAccountLink(height, accountStates.get(4), accountStates.get(6), 1);
 		addAccountLink(height, accountStates.get(5), accountStates.get(6), 1);
+
+		// Act:
+		return createPoiContext(accountStates, height);
+	}
+
+	/**
+	 * <pre>
+	 * Graph:         0
+	 *               / \
+	 *              o   o
+	 *             1----o4----o7
+	 *                   |
+	 *                   o
+	 *              9o---3
+	 *              |    |
+	 *              o    o
+	 *              2    5
+	 *                  / \
+	 *                 o   o
+	 *                8----o6
+	 * </pre>
+	 * Expected: clusters {0,1,4} and {5,6,8}, one hub {3}, three outlier {2,7,9}
+	 */
+	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndThreeOutliers() {
+		// Arrange: create 10 accounts
+		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
+		final List<TestAccountInfo> accountInfos = new ArrayList<>();
+		for (int i = 0; i < 10; ++i) {
+			accountInfos.add(new TestAccountInfo(multiplier, null));
+		}
+
+		final BlockHeight height = new BlockHeight(21);
+		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
+
+		// set up account links
+		addAccountLink(height, accountStates.get(0), accountStates.get(1), 1);
+		addAccountLink(height, accountStates.get(0), accountStates.get(4), 1);
+		addAccountLink(height, accountStates.get(1), accountStates.get(4), 1);
+		addAccountLink(height, accountStates.get(4), accountStates.get(7), 1);
+		addAccountLink(height, accountStates.get(4), accountStates.get(3), 1);
+		addAccountLink(height, accountStates.get(3), accountStates.get(5), 1);
+		addAccountLink(height, accountStates.get(3), accountStates.get(9), 1);
+		addAccountLink(height, accountStates.get(5), accountStates.get(8), 1);
+		addAccountLink(height, accountStates.get(5), accountStates.get(6), 1);
+		addAccountLink(height, accountStates.get(8), accountStates.get(6), 1);
+		addAccountLink(height, accountStates.get(9), accountStates.get(2), 1);
 
 		// Act:
 		return createPoiContext(accountStates, height);

@@ -53,7 +53,7 @@ public class PoiImportanceCalculatorITCase {
 		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new ScanClusteringStrategy());
 
 		// Assert:
-		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance < 0.001);
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance < 0.00001);
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class PoiImportanceCalculatorITCase {
 		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new OutlierScan());
 
 		// Assert:
-		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.00001);
 	}
 
 	@Test
@@ -71,7 +71,7 @@ public class PoiImportanceCalculatorITCase {
 		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(new SingleClusterScan());
 
 		// Assert:
-		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.00001);
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class PoiImportanceCalculatorITCase {
 		final double distance = calculateDistanceBetweenFastScanAndOtherImportances(null);
 
 		// Assert:
-		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.001);
+		Assert.assertTrue(String.format("distance %f should be greater than threshold", distance), distance > 0.00001);
 	}
 
 	@Test
