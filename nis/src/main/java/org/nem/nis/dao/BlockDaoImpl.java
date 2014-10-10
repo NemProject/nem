@@ -2,6 +2,7 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
@@ -151,17 +152,21 @@ public class BlockDaoImpl implements BlockDao {
 
 	private Collection<Block> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
 		// NOTE: there was JOIN used for importanceTransfers here, that was a bug
-		// TODO: add tests.
 		final Criteria criteria = setTransfersToSelect(this.getCurrentSession().createCriteria(Block.class))
 				.setFetchMode("forger", FetchMode.JOIN)
+				.setFetchMode("lessor", FetchMode.JOIN)
 				.add(Restrictions.lt("height", height))
 				.addOrder(Order.desc("height"))
 						// setMaxResults limits results, not objects (so in case of join it could be block with
 						// many TXes), but this will work correctly cause blocktransfers is set to select...
 				.setMaxResults(limit)
 						// nested criteria
-				.createCriteria("forger", "f")
-				.add(Restrictions.eq("f.printableKey", account.getAddress().getEncoded()));
+				.createAlias("forger", "f")
+				.createAlias("lessor", "l", JoinType.LEFT_OUTER_JOIN)
+				.add(Restrictions.disjunction(
+						Restrictions.eq("f.printableKey", account.getAddress().getEncoded()),
+						Restrictions.eq("l.printableKey", account.getAddress().getEncoded())
+				));
 		return listAndCast(criteria);
 	}
 
@@ -208,17 +213,17 @@ public class BlockDaoImpl implements BlockDao {
 			dropTxes.executeUpdate();
 		}
 
-		final Query query = this.getCurrentSession()
-				.createQuery("delete from Block a where a.height > :height")
-				.setParameter("height", blockHeight.getRaw());
-		query.executeUpdate();
-
 		if (!txToDelete.isEmpty()) {
 			final Query dropTxes = this.getCurrentSession()
 					.createQuery("delete from Transfer t where t.id in (:ids)")
 					.setParameterList("ids", txToDelete);
 			dropTxes.executeUpdate();
 		}
+
+		final Query query = this.getCurrentSession()
+								.createQuery("delete from Block a where a.height > :height")
+								.setParameter("height", blockHeight.getRaw());
+		query.executeUpdate();
 	}
 
 	private <T> T executeSingleQuery(final Criteria criteria) {

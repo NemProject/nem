@@ -39,15 +39,12 @@ public class ImportanceTransfer {
 
 	private Integer direction;
 
-	private Integer blkIndex; // blkIndex inside block
+	private Integer blkIndex; // index inside block
+    private Integer orderId; // index inside list
 
 	private Long referencedTransaction;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	//@JoinTable(name = "block_importancetransfers",
-	//		joinColumns = { @JoinColumn(name = "importancetransfer_id", referencedColumnName = "id") },
-	//		inverseJoinColumns = { @JoinColumn(name = "block_id", referencedColumnName = "id") }
-	//)
 	@JoinColumn(name = "blockId")
 	private Block block;
 
@@ -65,8 +62,9 @@ public class ImportanceTransfer {
 			final byte[] senderProof,
 			final Account remote,
 			final Integer direction,
-			final Integer blkIndex,
-			final Long referencedTransaction
+            final Integer orderId,
+            final Integer blkIndex,
+            final Long referencedTransaction
 	) {
 		this.shortId = hash.getShortId();
 		this.transferHash = hash.getRaw();
@@ -79,7 +77,8 @@ public class ImportanceTransfer {
 		this.senderProof = senderProof;
 		this.remote = remote;
 		this.direction = direction;
-		this.blkIndex = blkIndex;
+        this.orderId = orderId;
+        this.blkIndex = blkIndex;
 		this.referencedTransaction = referencedTransaction;
 	}
 
@@ -180,16 +179,18 @@ public class ImportanceTransfer {
 	}
 
 	public Integer getBlkIndex() {
-		// apparently hibernate does not CHANGE this value, when OrderColumn and OneToMany+mappedBy is used
-		//return this.blkIndex;
-		return this.block.getBlockImportanceTransfers().indexOf(this);
+		return this.blkIndex;
 	}
 
 	public void setBlkIndex(final Integer blkIndex) {
 		this.blkIndex = blkIndex;
 	}
 
-	public Long getReferencedTransaction() {
+    public Integer getOrderId() {
+        return this.block.getBlockImportanceTransfers().indexOf(this);
+    }
+
+    public Long getReferencedTransaction() {
 		return this.referencedTransaction;
 	}
 
