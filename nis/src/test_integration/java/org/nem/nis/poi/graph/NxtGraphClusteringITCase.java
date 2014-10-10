@@ -11,6 +11,7 @@ import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 
+import javax.xml.transform.sax.SAXSource;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
@@ -183,6 +184,20 @@ public class NxtGraphClusteringITCase {
 
 			final PoiAccountState senderAccountState = accountStateMap.get(sender);
 			final PoiAccountState recipientAccountState = accountStateMap.get(recipient);
+			final long balance = senderAccountState.getWeightedBalances().getVested(blockHeight).getNumMicroNem() + senderAccountState.getWeightedBalances().getUnvested(blockHeight).getNumMicroNem();
+
+			// We need to add some balance sometimes because the transactions don't account for fees earned from forged blocks
+			final long remainingBalance = balance - amount.getNumMicroNem();
+			if (remainingBalance < 0) {
+				//System.out.println("balance: " + balance);
+				senderAccountState.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight.getRaw()), Amount.fromMicroNem(amount.getNumMicroNem()));
+				//final long balance2 = senderAccountState.getWeightedBalances().getVested(blockHeight).getNumMicroNem() + senderAccountState.getWeightedBalances().getUnvested(blockHeight).getNumMicroNem();
+				//System.out.println("balance2: " + balance2);
+				//System.out.println("amount: " + amount.getNumMicroNem());
+				//System.out.println("amount*2: " + amount.getNumMicroNem()*2);
+			}
+
+
 			senderAccountState.getWeightedBalances().addSend(blockHeight, amount);
 			senderAccountState.getImportanceInfo().addOutlink(
 					new AccountLink(blockHeight, amount, recipientAccountState.getAddress()));
