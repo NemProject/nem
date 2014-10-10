@@ -263,19 +263,19 @@ public class PoiContext {
 			final Collection<Integer> dangleIndexes = this.outlinkMatrix.normalizeColumns();
 			this.dangleIndexes.addAll(dangleIndexes);
 
-			// We should create the NodeNeighborMap after removing negatives
+			if (!this.options.isClusteringEnabled()) {
+				LOGGER.info("clustering is bypassed");
+				return;
+			}
+
+			// We should cluster the accounts
 			this.clusterAccounts();
 
-			// Now we can build the inter-level proximity matrix (because we need directed edges for this)s
+			// Now we can build the inter-level proximity matrix (because we need directed edges for this
 			this.buildInterLevelProximityMatrix();
 		}
 
 		private void clusterAccounts() {
-			if (!this.options.isClusteringEnabled()) {
-				LOGGER.info(String.format("clustering is bypassed"));
-				return;
-			}
-
 			final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(this.outlinkMatrix);
 			this.neighborhood = new Neighborhood(
 					nodeNeighborMap,
