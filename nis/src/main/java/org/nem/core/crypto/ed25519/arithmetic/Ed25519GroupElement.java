@@ -459,7 +459,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * Z'' = Z' * T' = (D + C) * (D - C) * 1/Z2^2
 	 * T'' = X' * Y' = (B - A) * (B + A) * 1/Z2^2
 	 *
-	 * TODO-CR BR: Formula for the P^2 coordinate system is not in agreement with the formula given in [2] page 6
+	 * TODO-CR BR: Formula above for the P^2 coordinate system is not in agreement with the formula given in [2] page 6
 	 * TODO-CR BR: (the common factor 1/Z2^2 does not matter)
 	 * TODO-CR BR: where is my mistake?
 	 * E = B - A, F = D - C, G = D + C, H = B + A
@@ -471,7 +471,7 @@ public class Ed25519GroupElement implements Serializable {
      * @param g The group element to add.
      * @return The resulting group element in the P x P coordinate system.
      */
-    private Ed25519GroupElement prcomputedAdd(Ed25519GroupElement g) {
+    private Ed25519GroupElement precomputedAdd(Ed25519GroupElement g) {
         if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -758,14 +758,14 @@ public class Ed25519GroupElement implements Serializable {
         synchronized(this) {
             for (i = 1; i < 64; i += 2) {
                 g = select(i/2, e[i]);
-                h = h.prcomputedAdd(g).toP3();
+                h = h.precomputedAdd(g).toP3();
             }
 
             h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
 
             for (i = 0; i < 64; i += 2) {
                 g = select(i/2, e[i]);
-                h = h.prcomputedAdd(g).toP3();
+                h = h.precomputedAdd(g).toP3();
             }
         }
 
@@ -854,11 +854,11 @@ public class Ed25519GroupElement implements Serializable {
                 if (aSlide[i] > 0) {
                     t = t.toP3().precomputedSubtract(A.precomputedForDouble[aSlide[i] / 2]);
                 } else if(aSlide[i] < 0) {
-                    t = t.toP3().prcomputedAdd(A.precomputedForDouble[(-aSlide[i]) / 2]);
+                    t = t.toP3().precomputedAdd(A.precomputedForDouble[(-aSlide[i]) / 2]);
                 }
 
                 if (bSlide[i] > 0) {
-                    t = t.toP3().prcomputedAdd(this.precomputedForDouble[bSlide[i] / 2]);
+                    t = t.toP3().precomputedAdd(this.precomputedForDouble[bSlide[i] / 2]);
                 } else if(bSlide[i] < 0) {
                     t = t.toP3().precomputedSubtract(this.precomputedForDouble[(-bSlide[i]) / 2]);
                 }
