@@ -90,7 +90,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @param T The T coordinate.
 	 * @return The group element using the P1xP1 coordinate system.
 	 */
-	public static Ed25519GroupElement p1p1(
+	public static Ed25519GroupElement p1xp1(
 			final Ed25519FieldElement X,
 			final Ed25519FieldElement Y,
 			final Ed25519FieldElement Z,
@@ -238,11 +238,12 @@ public class Ed25519GroupElement implements Serializable {
         switch (this.coordinateSystem) {
 			case P2:
 			case P3:
-				Ed25519FieldElement recip = Z.invert();
-				Ed25519FieldElement x = X.multiply(recip);
-				Ed25519FieldElement y = Y.multiply(recip);
+				Ed25519FieldElement inverse = Z.invert();
+				Ed25519FieldElement x = X.multiply(inverse);
+				Ed25519FieldElement y = Y.multiply(inverse);
 				byte[] s = y.encode().getRaw();
 				s[s.length-1] |= (x.isNegative() ? (byte) 0x80 : 0);
+
 				return new Ed25519EncodedGroupElement(s);
 			default:
 				return toP2().encode();
@@ -255,7 +256,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The group element in the P2 coordinate system.
 	 */
     public Ed25519GroupElement toP2() {
-        return toRep(CoordinateSystem.P2);
+        return toCoordinateSystem(CoordinateSystem.P2);
     }
 
 	/**
@@ -264,7 +265,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The group element in the P3 coordinate system.
 	 */
     public Ed25519GroupElement toP3() {
-        return toRep(CoordinateSystem.P3);
+        return toCoordinateSystem(CoordinateSystem.P3);
     }
 
 	/**
@@ -273,7 +274,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The group element in the CACHED coordinate system.
 	 */
     public Ed25519GroupElement toCached() {
-        return toRep(CoordinateSystem.CACHED);
+        return toCoordinateSystem(CoordinateSystem.CACHED);
     }
 
     /**
@@ -288,7 +289,7 @@ public class Ed25519GroupElement implements Serializable {
      * @param newCoordinateSystem The coordinate system to convert to.
      * @return A new group element in the new coordinate system.
      */
-    private Ed25519GroupElement toRep(final CoordinateSystem newCoordinateSystem) {
+    private Ed25519GroupElement toCoordinateSystem(final CoordinateSystem newCoordinateSystem) {
         switch (this.coordinateSystem) {
 			case P2:
 				switch (newCoordinateSystem) {
@@ -315,7 +316,7 @@ public class Ed25519GroupElement implements Serializable {
 					case P3:
 						return p3(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y));
 					case P1xP1:
-						return p1p1(this.X, this.Y, this.Z, this.T);
+						return p1xp1(this.X, this.Y, this.Z, this.T);
 					default:
 						throw new IllegalArgumentException();
 				}
@@ -423,7 +424,7 @@ public class Ed25519GroupElement implements Serializable {
 				ASquare = A.square();
 				YSquarePlusXSquare = YSquare.add(XSquare);
 				YSquareMinusXSquare = YSquare.subtract(XSquare);
-				return p1p1(ASquare.subtract(YSquarePlusXSquare), YSquarePlusXSquare, YSquareMinusXSquare, B.subtract(YSquareMinusXSquare));
+				return p1xp1(ASquare.subtract(YSquarePlusXSquare), YSquarePlusXSquare, YSquareMinusXSquare, B.subtract(YSquareMinusXSquare));
 			default:
 				throw new UnsupportedOperationException();
         }
@@ -437,11 +438,13 @@ public class Ed25519GroupElement implements Serializable {
 	 * r in P x P coordinate system:
 	 *
 	 * r = ((X' : Z'), (Y' : T')) where
-	 * X' = (Y1 + X1) * q.X - (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)) * 1/Z2
-	 * Y' = (Y1 + X1) * q.X + (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) + (Y1 - X1) * (Y2 - X2)) * 1/Z2
-	 * Z' = 2 * Z1 + T1 * q.Z = 2 * Z1 + T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 + 2 * d * T1 * T2) * 1/Z2
-	 * T' = 2 * Z1 - T1 * q.Z = 2 * Z1 - T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 - 2 * d * T1 * T2) * 1/Z2
+	 * X' = (Y1 + X1) * g.X - (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)) * 1/Z2
+	 * Y' = (Y1 + X1) * g.X + (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) + (Y1 - X1) * (Y2 - X2)) * 1/Z2
+	 * Z' = 2 * Z1 + T1 * g.Z = 2 * Z1 + T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 + 2 * d * T1 * T2) * 1/Z2
+	 * T' = 2 * Z1 - T1 * g.Z = 2 * Z1 - T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 - 2 * d * T1 * T2) * 1/Z2
 	 *
+	 * TODO-CR BR: Formula for the P x P coordinate system is in agreement with the formula given in
+	 * TODO-CR BR: file ge25519.c method add_p1p1() in ref implementation.
 	 * Setting A = (Y1 - X1) * (Y2 - X2), B = (Y1 + X1) * (Y2 + X2), C = 2 * d * T1 * T2, D = 2 * Z1 * Z2 we get
 	 * X' = (B - A) * 1/Z2
 	 * Y' = (B + A) * 1/Z2
@@ -457,7 +460,8 @@ public class Ed25519GroupElement implements Serializable {
 	 * T'' = X' * Y' = (B - A) * (B + A) * 1/Z2^2
 	 *
 	 * TODO-CR BR: Formula for the P^2 coordinate system is not in agreement with the formula given in [2] page 6
-	 * TODO-CR BR: (the common factor 1/Z2^2 does not matter):
+	 * TODO-CR BR: (the common factor 1/Z2^2 does not matter)
+	 * TODO-CR BR: where is my mistake?
 	 * E = B - A, F = D - C, G = D + C, H = B + A
 	 * X3 = E * F = (B - A) * (D - C);
 	 * Y3 = G * H = (D + C) * (B + A);
@@ -467,7 +471,7 @@ public class Ed25519GroupElement implements Serializable {
      * @param g The group element to add.
      * @return The resulting group element in the P x P coordinate system.
      */
-    private Ed25519GroupElement madd(Ed25519GroupElement g) {
+    private Ed25519GroupElement prcomputedAdd(Ed25519GroupElement g) {
         if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -483,7 +487,7 @@ public class Ed25519GroupElement implements Serializable {
         C = g.Z.multiply(this.T);
         D = this.Z.add(this.Z);
 
-        return p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
+        return p1xp1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
     }
 
     /**
@@ -497,7 +501,7 @@ public class Ed25519GroupElement implements Serializable {
      * @param g he group element to subtract.
      * @return The result in the P x P coordinate system.
      */
-    private Ed25519GroupElement msub(Ed25519GroupElement g) {
+    private Ed25519GroupElement precomputedSubtract(Ed25519GroupElement g) {
         if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -513,7 +517,7 @@ public class Ed25519GroupElement implements Serializable {
         C = g.Z.multiply(this.T);
         D = this.Z.add(this.Z);
 
-        return p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
+        return p1xp1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
     }
 
     /**
@@ -555,7 +559,7 @@ public class Ed25519GroupElement implements Serializable {
         ZSquare = this.Z.multiply(g.Z);
         D = ZSquare.add(ZSquare);
 
-        return p1p1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
+        return p1xp1(A.subtract(B), A.add(B), D.add(C), D.subtract(C));
     }
 
     /**
@@ -567,7 +571,7 @@ public class Ed25519GroupElement implements Serializable {
      * @param g The group element to subtract.
      * @return The result in the P x P coordinate system.
      */
-    public Ed25519GroupElement sub(Ed25519GroupElement g) {
+    public Ed25519GroupElement subtract(Ed25519GroupElement g) {
         if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -584,7 +588,7 @@ public class Ed25519GroupElement implements Serializable {
         ZSquare = Z.multiply(g.Z);
         D = ZSquare.add(ZSquare);
 
-        return p1p1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
+        return p1xp1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
     }
 
 	/**
@@ -598,7 +602,7 @@ public class Ed25519GroupElement implements Serializable {
 			throw new UnsupportedOperationException();
 		}
 
-        return Ed25519Group.ZERO_P3.sub(this.toCached()).toP3();
+        return Ed25519Group.ZERO_P3.subtract(this.toCached()).toP3();
     }
 
     @Override
@@ -614,7 +618,7 @@ public class Ed25519GroupElement implements Serializable {
         Ed25519GroupElement ge = (Ed25519GroupElement) obj;
         if (!this.coordinateSystem.equals(ge.coordinateSystem)) {
             try {
-                ge = ge.toRep(this.coordinateSystem);
+                ge = ge.toCoordinateSystem(this.coordinateSystem);
             } catch (Exception e) {
                 return false;
             }
@@ -754,14 +758,14 @@ public class Ed25519GroupElement implements Serializable {
         synchronized(this) {
             for (i = 1; i < 64; i += 2) {
                 g = select(i/2, e[i]);
-                h = h.madd(g).toP3();
+                h = h.prcomputedAdd(g).toP3();
             }
 
             h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
 
             for (i = 0; i < 64; i += 2) {
                 g = select(i/2, e[i]);
-                h = h.madd(g).toP3();
+                h = h.prcomputedAdd(g).toP3();
             }
         }
 
@@ -848,15 +852,15 @@ public class Ed25519GroupElement implements Serializable {
                 Ed25519GroupElement t = r.dbl();
 
                 if (aSlide[i] > 0) {
-                    t = t.toP3().msub(A.precomputedForDouble[aSlide[i] / 2]);
+                    t = t.toP3().precomputedSubtract(A.precomputedForDouble[aSlide[i] / 2]);
                 } else if(aSlide[i] < 0) {
-                    t = t.toP3().madd(A.precomputedForDouble[(-aSlide[i]) / 2]);
+                    t = t.toP3().prcomputedAdd(A.precomputedForDouble[(-aSlide[i]) / 2]);
                 }
 
                 if (bSlide[i] > 0) {
-                    t = t.toP3().madd(this.precomputedForDouble[bSlide[i]/2]);
+                    t = t.toP3().prcomputedAdd(this.precomputedForDouble[bSlide[i] / 2]);
                 } else if(bSlide[i] < 0) {
-                    t = t.toP3().msub(this.precomputedForDouble[(-bSlide[i])/2]);
+                    t = t.toP3().precomputedSubtract(this.precomputedForDouble[(-bSlide[i]) / 2]);
                 }
 
                 r = t.toP2();

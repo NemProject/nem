@@ -334,7 +334,7 @@ public class MathUtils {
 						Ed25519Field.ONE,
 						toFieldElement(x.multiply(y).mod(Ed25519Field.P)));
 			case P1xP1:
-				return Ed25519GroupElement.p1p1(
+				return Ed25519GroupElement.p1xp1(
 						toFieldElement(x),
 						toFieldElement(y),
 						Ed25519Field.ONE,

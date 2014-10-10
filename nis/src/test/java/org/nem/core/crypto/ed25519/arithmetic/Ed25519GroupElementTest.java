@@ -36,7 +36,7 @@ public class Ed25519GroupElementTest {
     @Test
 	public void canBeCreatedWithP1P1Coordinates() {
 		// Arrange:
-		final Ed25519GroupElement g = Ed25519GroupElement.p1p1(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ONE);
+		final Ed25519GroupElement g = Ed25519GroupElement.p1xp1(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ONE);
 
 		// Assert:
 		Assert.assertThat(g.getCoordinateSystem(), IsEqual.equalTo(CoordinateSystem.P1xP1));
@@ -431,7 +431,7 @@ public class Ed25519GroupElementTest {
 			final Ed25519GroupElement g2 = MathUtils.getRandomGroupElement();
 
 			// Act:
-			final Ed25519GroupElement h1 = g1.sub(g2.toCached());
+			final Ed25519GroupElement h1 = g1.subtract(g2.toCached());
 			final Ed25519GroupElement h2 = MathUtils.addGroupElements(g1, MathUtils.negateGroupElement(g2));
 
 			// Assert:
