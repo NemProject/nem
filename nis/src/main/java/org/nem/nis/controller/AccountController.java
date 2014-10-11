@@ -85,6 +85,8 @@ public class AccountController {
 	@RequestMapping(value = "/account/unlock", method = RequestMethod.POST)
 	@ClientApi
 	// TODO 20141010 J-G i think it still makes sense to reject if remote AND the private key is NOT for a remote account
+	// TODO 20141010 J-G actually, i don't think this api is good enough as-is ... in its current form, i can "borrow"
+	// > any nis for my harvesting purposes ... i think we need a ticket / token to allow a NIS to reject unauthorized harvesters
     // we want to allow remote harvesting...
 	//@TrustedApi
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
