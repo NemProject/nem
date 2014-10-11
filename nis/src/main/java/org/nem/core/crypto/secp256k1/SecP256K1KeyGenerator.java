@@ -24,9 +24,9 @@ public class SecP256K1KeyGenerator implements KeyGenerator {
 		final AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
 		final ECPrivateKeyParameters privateKeyParams = (ECPrivateKeyParameters)keyPair.getPrivate();
 		final ECPublicKeyParameters publicKeyParams = (ECPublicKeyParameters)keyPair.getPublic();
-		@SuppressWarnings("LocalCanBeFinal") PrivateKey privateKey = new PrivateKey(privateKeyParams.getD());
+		PrivateKey privateKey = new PrivateKey(privateKeyParams.getD());
 		final ECPoint point = publicKeyParams.getQ();
-		@SuppressWarnings("LocalCanBeFinal") PublicKey publicKey = new PublicKey(point.getEncoded(true));
+		PublicKey publicKey = new PublicKey(point.getEncoded(true));
 		return new KeyPair(privateKey, publicKey);
 	}
 
