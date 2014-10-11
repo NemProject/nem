@@ -34,7 +34,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final ImportanceTransfer dbTransaction = testContext.createDbTransaction();
 
 		final org.nem.nis.dbmodel.Account account = testContext.getSender();
-		addToDummyBlock(account, dbTransaction);
+		this.addToDummyBlock(account, dbTransaction);
 
 		// Act
 		this.importanceTransferDao.save(dbTransaction);
@@ -52,7 +52,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final ImportanceTransfer dbTransaction = testContext.createDbTransaction();
 
 		final org.nem.nis.dbmodel.Account account = testContext.getSender();
-		addToDummyBlock(account, dbTransaction);
+		this.addToDummyBlock(account, dbTransaction);
 
 		// Act
 		this.importanceTransferDao.save(dbTransaction);
@@ -75,7 +75,7 @@ public class ImportanceTransferTransactionDaoTest {
 		final Long initialCount = this.importanceTransferDao.count();
 
 		final org.nem.nis.dbmodel.Account account = testContext.getSender();
-		addToDummyBlock(account, dbTransfer1, dbTransfer2, dbTransfer3);
+		this.addToDummyBlock(account, dbTransfer1, dbTransfer2, dbTransfer3);
 
 		// Act
 		this.importanceTransferDao.save(dbTransfer1);
@@ -141,7 +141,7 @@ public class ImportanceTransferTransactionDaoTest {
 		}
 
 		public ImportanceTransfer createDbTransaction() {
-			return ImportanceTransferMapper.toDbModel(this.transaction, 12345, this.accountDaoLookup);
+			return ImportanceTransferMapper.toDbModel(this.transaction, 12345, 0, this.accountDaoLookup);
 		}
 
 		public org.nem.nis.dbmodel.Account getSender() {

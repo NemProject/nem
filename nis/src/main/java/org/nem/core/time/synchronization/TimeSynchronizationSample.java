@@ -56,16 +56,14 @@ public class TimeSynchronizationSample implements Comparable<TimeSynchronization
 
 	/**
 	 * Gets the offset that the local node's network time has to the remote node's network time.
-	 *
+	 * <pre>
 	 * S=Send, R=Receive
-	 *
-	 * @formatter:off
 	 * remote node   ----------R------S------->
 	 *                        o        \
 	 *                      /           \    time
 	 *                    /              o
 	 * local node    ---S-----------------R--->
-	 * @formatter:on
+	 * </pre>
 	 *
 	 * @return The offset in ms.
 	 */

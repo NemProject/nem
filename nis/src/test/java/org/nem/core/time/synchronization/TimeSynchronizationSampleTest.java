@@ -68,7 +68,7 @@ public class TimeSynchronizationSampleTest {
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
 		final TimeSynchronizationSample sample = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
-		final HashMap<String, TimeSynchronizationSample> sampleMap = createTestTimeSynchronizationSampleList();
+		final HashMap<String, TimeSynchronizationSample> sampleMap = this.createTestTimeSynchronizationSampleList();
 
 		// Assert:
 		Assert.assertThat(sampleMap.get("default"), IsEqual.equalTo(sample));
@@ -83,7 +83,7 @@ public class TimeSynchronizationSampleTest {
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final TimeSynchronizationSample sample = TimeSyncUtils.createTimeSynchronizationSample(KEY_PAIR, 5, 17, 25, 23);
-		final HashMap<String, TimeSynchronizationSample> sampleMap = createTestTimeSynchronizationSampleList();
+		final HashMap<String, TimeSynchronizationSample> sampleMap = this.createTestTimeSynchronizationSampleList();
 
 		// Assert:
 		Assert.assertThat(sampleMap.get("default").hashCode(), IsEqual.equalTo(sample.hashCode()));

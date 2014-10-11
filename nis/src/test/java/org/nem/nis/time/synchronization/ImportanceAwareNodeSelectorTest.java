@@ -179,7 +179,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	//endregion
 
 	private static class TestContext {
-		private final PoiFacade poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		private final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);

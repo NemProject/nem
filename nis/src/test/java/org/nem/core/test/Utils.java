@@ -23,9 +23,8 @@ public class Utils {
 	 * @return A random public key.
 	 */
 	public static PublicKey generateRandomPublicKey() {
-		final byte[] bytes = Utils.generateRandomBytes(33);
-		bytes[0] = 0x02;
-		return new PublicKey(bytes);
+		final KeyPair pair = new KeyPair();
+		return pair.getPublicKey();
 	}
 
 	/**

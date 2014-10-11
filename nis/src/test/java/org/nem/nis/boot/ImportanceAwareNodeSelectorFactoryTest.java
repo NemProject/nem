@@ -23,7 +23,7 @@ public class ImportanceAwareNodeSelectorFactoryTest {
 				15,
 				config.getTrustProvider(),
 				new PeerNetworkState(config, new NodeExperiences(), new NodeCollection()),
-				createPoiFacade());
+				this.createPoiFacade());
 
 		// Assert:
 		Assert.assertThat(factory.createNodeSelector(), IsNull.notNullValue());

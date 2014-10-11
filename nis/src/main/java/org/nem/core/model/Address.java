@@ -110,11 +110,9 @@ public class Address {
 	 */
 	public boolean isValid() {
 		// this check should prevent leading and trailing whitespace
-		// TODO: we can't release this change now, as there is a bug in current nemesis block,
-		// quote: "I've added such (invalid) account by mistake to nemesis block"
-		// you can check it by un-commenting and running test added to NemesisBlockTest
-		//		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length())
-		//			return false;
+		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length()) {
+			return false;
+		}
 
 		final byte[] encodedBytes;
 

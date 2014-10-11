@@ -358,13 +358,13 @@ public class BlockExecutorTest {
 
 		private Account addAccount() {
 			final Account account = Utils.generateRandomAccount();
-			hookAccount(account);
+			this.hookAccount(account);
 			return account;
 		}
 
 		private Block createBlockWithTransaction(final BlockHeight height, final Amount amount, final Transaction transaction) {
 			final Block block = BlockUtils.createBlockWithHeight(height);
-			hookAccount(block.getSigner());
+			this.hookAccount(block.getSigner());
 			block.getSigner().incrementBalance(amount);
 			block.addTransaction(transaction);
 			return block;

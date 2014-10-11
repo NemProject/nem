@@ -48,6 +48,12 @@ public class HashesTest {
 	}
 
 	@Test
+	public void sha3_512InstanceCanBeCreated() {
+		// Assert:
+		Hashes.getSha3_512Instance();
+	}
+
+	@Test
 	public void sha3GeneratesDifferentHashForDifferentInputs() {
 		// Arrange:
 		final byte[] input1 = Utils.generateRandomBytes();

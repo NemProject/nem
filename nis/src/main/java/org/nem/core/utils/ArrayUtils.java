@@ -142,4 +142,34 @@ public class ArrayUtils {
 
 		return max;
 	}
+
+	/**
+	 * Constant-time byte[] comparison. The constant time behavior eliminates side channel attacks.
+	 *
+	 * @return 1 if b and c are equal, 0 otherwise.
+	 */
+	public static int isEqual(final byte[] b, final byte[] c) {
+		// TODO 20141010 J-B: can you explain what you're doing here?
+		// > how is this faster than Arrays.equal?
+		// TODO 20141011 BR -> J it's not about speed but about constant time behavior which eliminates side channel attacks.
+		// TODO 20141011 J-B: can we rename to something like isEqual- ConstantTime / Secure / pick your favorite suffix
+		int result = 0;
+		result |= b.length - c.length;
+		for (int i = 0; i < b.length; i++) {
+			result |= b[i] ^ c[i];
+		}
+
+		return ByteUtils.isEqual(result, 0);
+	}
+
+	/**
+	 * Gets the i'th bit of a byte array.
+	 *
+	 * @param h The byte array.
+	 * @param i The bit index.
+	 * @return The value of the i'th bit in h
+	 */
+	public static int getBit(final byte[] h, final int i) {
+		return (h[i >> 3] >> (i & 7)) & 1;
+	}
 }

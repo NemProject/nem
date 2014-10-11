@@ -172,13 +172,9 @@ public class AccountImportanceTest {
 		ai.setImportance(new BlockHeight(5), 17);
 
 		// Act:
-		ai.setImportance(new BlockHeight(5), 11);
-		final double importance = ai.getImportance(new BlockHeight(5));
-
-		// Assert: the importance was not updated and has its initial value
-		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
-		Assert.assertThat(importance, IsEqual.equalTo(17.0));
-		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
+		ExceptionAssert.assertThrows(
+				v -> ai.setImportance(new BlockHeight(5), 11),
+				IllegalArgumentException.class);
 	}
 
 	@Test

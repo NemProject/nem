@@ -514,11 +514,11 @@ public class ColumnVectorTest {
 		// Arrange:
 		final Map<ColumnVector, ColumnVector> testCases = new HashMap<ColumnVector, ColumnVector>() {
 			{
-				put(new ColumnVector(2, -4, 1), new ColumnVector(2, 0, 1));
-				put(new ColumnVector(-1, 454, 1), new ColumnVector(0, 454, 1));
-				put(new ColumnVector(2, 343, -131), new ColumnVector(2, 343, 0));
-				put(new ColumnVector(-2, -343, -131), new ColumnVector(0, 0, 0));
-				put(new ColumnVector(2, 343, 131), new ColumnVector(2, 343, 131));
+				this.put(new ColumnVector(2, -4, 1), new ColumnVector(2, 0, 1));
+				this.put(new ColumnVector(-1, 454, 1), new ColumnVector(0, 454, 1));
+				this.put(new ColumnVector(2, 343, -131), new ColumnVector(2, 343, 0));
+				this.put(new ColumnVector(-2, -343, -131), new ColumnVector(0, 0, 0));
+				this.put(new ColumnVector(2, 343, 131), new ColumnVector(2, 343, 131));
 			}
 		};
 

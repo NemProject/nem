@@ -39,6 +39,39 @@ public class SignatureTest {
 		Assert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
 	}
 
+	@Test
+	public void binaryCtorInitializesFields() {
+		// Arrange:
+		final Signature originalSignature = createSignature("99512345", "12351234");
+
+		// Act:
+		final Signature signature = new Signature(originalSignature.getBinaryR(), originalSignature.getBinaryS());
+
+		// Assert:
+		Assert.assertThat(signature.getR(), IsEqual.equalTo(originalSignature.getR()));
+		Assert.assertThat(signature.getS(), IsEqual.equalTo(originalSignature.getS()));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void bigIntegerCtorFailsIfRIsToLarge() {
+		// Arrange:
+		final BigInteger r = BigInteger.ONE.shiftLeft(256);
+		final BigInteger s = new BigInteger("12351234");
+
+		// Act:
+		new Signature(r, s);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void bigIntegerCtorFailsIfSIsToLarge() {
+		// Arrange:
+		final BigInteger r = new BigInteger("12351234");
+		final BigInteger s = BigInteger.ONE.shiftLeft(256);
+
+		// Act:
+		new Signature(r, s);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void byteArrayCtorFailsIfByteArrayIsTooSmall() {
 		// Act:
@@ -51,6 +84,18 @@ public class SignatureTest {
 		new Signature(new byte[65]);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void binaryCtorFailsIfByteArrayOfRIsTooLarge() {
+		// Act:
+		new Signature(new byte[33], new byte[32]);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void binaryCtorFailsIfByteArrayOfSIsTooLarge() {
+		// Act:
+		new Signature(new byte[32], new byte[33]);
+	}
+
 	@Test
 	public void byteArrayCtorSucceedsIfByteArrayIsCorrectLength() {
 		// Act:
@@ -61,43 +106,14 @@ public class SignatureTest {
 		Assert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
-	//endregion
-
-	//region isCanonical / makeCanonical
-
 	@Test
-	public void isCanonicalReturnsTrueForCanonicalSignature() {
-		// Arrange:
-		final Signature signature = createCanonicalSignature();
-
-		// Assert:
-		Assert.assertThat(signature.isCanonical(), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
-		// Arrange:
-		final Signature signature = makeNonCanonical(createCanonicalSignature());
-
-		// Assert:
-		Assert.assertThat(signature.isCanonical(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
-		// Arrange:
-		final Signature signature = createCanonicalSignature();
-		final Signature nonCanonicalSignature = makeNonCanonical(signature);
-
-		Assert.assertThat(nonCanonicalSignature.isCanonical(), IsEqual.equalTo(false));
-
+	public void binaryCtorSucceedsIfRAndSHaveCorrectLength() {
 		// Act:
-		nonCanonicalSignature.makeCanonical();
+		final Signature signature = new Signature(new byte[32], new byte[32]);
 
 		// Assert:
-		Assert.assertThat(nonCanonicalSignature.isCanonical(), IsEqual.equalTo(true));
-		Assert.assertThat(nonCanonicalSignature.getR(), IsEqual.equalTo(signature.getR()));
-		Assert.assertThat(nonCanonicalSignature.getS(), IsEqual.equalTo(signature.getS()));
+		Assert.assertThat(signature.getR(), IsEqual.equalTo(BigInteger.ZERO));
+		Assert.assertThat(signature.getS(), IsEqual.equalTo(BigInteger.ZERO));
 	}
 
 	//endregion
@@ -126,6 +142,40 @@ public class SignatureTest {
 				createSignature(Utils.createString('0', 64), Utils.createString('F', 64)),
 				createSignature("99512345", "12351234")
 		};
+	}
+
+	//endregion
+
+	//region getBinaryR / getBinaryS
+
+	@Test
+	public void getBinaryRReturnsRAsByteArray() {
+		// Arrange:
+		final byte[] originalR = new byte[32];
+		originalR[15] = 123;
+		final byte[] s = new byte[32];
+		final Signature signature = new Signature(originalR, s);
+
+		// Act:
+		final byte[] r = signature.getBinaryR();
+
+		// Assert:
+		Assert.assertThat(r, IsEqual.equalTo(originalR));
+	}
+
+	@Test
+	public void getBinarySReturnsSAsByteArray() {
+		// Arrange:
+		final byte[] r = new byte[32];
+		final byte[] originalS = new byte[32];
+		originalS[15] = 123;
+		final Signature signature = new Signature(r, originalS);
+
+		// Act:
+		final byte[] s = signature.getBinaryS();
+
+		// Assert:
+		Assert.assertThat(s, IsEqual.equalTo(originalS));
 	}
 
 	//endregion
@@ -216,21 +266,5 @@ public class SignatureTest {
 
 	private static Signature createSignature(final int r, final int s) {
 		return new Signature(new BigInteger(String.format("%d", r)), new BigInteger(String.format("%d", s)));
-	}
-
-	private static Signature createCanonicalSignature() {
-		// Arrange:
-		final KeyPair kp = new KeyPair();
-		final Signer signer = new Signer(kp);
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		return signer.sign(input);
-	}
-
-	private static Signature makeNonCanonical(final Signature signature) {
-		// Act:
-		final BigInteger nonCanonicalS = Curves.secp256k1().getParams().getN().subtract(signature.getS());
-		return new Signature(signature.getR(), nonCanonicalS);
 	}
 }

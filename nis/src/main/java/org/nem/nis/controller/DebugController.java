@@ -176,10 +176,10 @@ public class DebugController {
 				messageText = StringEncoder.getString(message.getDecodedPayload());
 			}
 		} else if (transaction instanceof ImportanceTransferTransaction) {
-            final ImportanceTransferTransaction transfer = ((ImportanceTransferTransaction)transaction);
-            recipient = transfer.getRemote().getAddress();
-            amount = Amount.fromMicroNem(transfer.getType());
-        }
+			final ImportanceTransferTransaction transfer = ((ImportanceTransferTransaction)transaction);
+			recipient = transfer.getRemote().getAddress();
+			amount = Amount.fromMicroNem(transfer.getType());
+		}
 
 		return new TransactionDebugInfo(
 				transaction.getTimeStamp(),

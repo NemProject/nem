@@ -11,22 +11,24 @@ import org.nem.nis.poi.*;
 
 public class ImportanceTransferTransactionValidatorTest {
 
-    //region signer balance
+	//region signer balance
 
-    @Test
-    public void activateImportanceTransferIsInvalidWithoutBalance() {
-        // Arrange:
-        final TestContext context = new TestContext();
-        final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
-        transaction.getSigner().decrementBalance(Amount.fromNem(1));
+	@Test
+	public void activateImportanceTransferIsInvalidWithoutMinimumHarvestingBalanceAfterFee() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		transaction.getSigner().decrementBalance(Amount.fromNem(1));
 
-        // Act:
-        final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
 
-        // Assert:
-        Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-    }
-    //endregion
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+	}
+
+	// TODO 20141005 J-G: (minor pedantic comment) - can you keep blanklines around //region //endregion :)
+	//endregion
 
 	//region first link
 
@@ -178,11 +180,13 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	private static class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(this.poiFacade);
+		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
+				this.poiFacade,
+				Amount.fromNem(2000));
 
 		private Transaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
 			final Account signer = Utils.generateRandomAccount();
-            signer.incrementBalance(Amount.fromNem(1001));
+			signer.incrementBalance(Amount.fromNem(2001));
 			this.addRemoteLinks(signer);
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,

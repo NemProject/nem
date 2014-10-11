@@ -1,28 +1,11 @@
 package org.nem.core.crypto;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.bouncycastle.crypto.agreement.ECDHBasicAgreement;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.crypto.engines.IESEngine;
-import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
-import org.bouncycastle.crypto.macs.HMac;
-import org.bouncycastle.crypto.params.IESParameters;
-
 /**
- * Wraps EC IES encryption and decryption logic.
+ * Wraps IES encryption and decryption logic.
  */
-public class Cipher {
+public class Cipher implements BlockCipher {
 
-	private final static IESParameters IES_PARAMETERS;
-
-	static {
-		final byte[] d = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-		final byte[] e = new byte[] { 8, 7, 6, 5, 4, 3, 2, 1 };
-		IES_PARAMETERS = new IESParameters(d, e, 64);
-	}
-
-	private final IESEngine iesEncryptEngine;
-	private final IESEngine iesDecryptEngine;
+	private final BlockCipher cipher;
 
 	/**
 	 * Creates a cipher around a sender KeyPair and recipient KeyPair.
@@ -31,62 +14,16 @@ public class Cipher {
 	 * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
 	 */
 	public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-		if (senderKeyPair.hasPrivateKey()) {
-			this.iesEncryptEngine = createIesEngine();
-			this.iesEncryptEngine.init(
-					true,
-					senderKeyPair.getPrivateKeyParameters(),
-					recipientKeyPair.getPublicKeyParameters(),
-					IES_PARAMETERS);
-		} else {
-			this.iesEncryptEngine = null;
-		}
-
-		if (recipientKeyPair.hasPrivateKey()) {
-			this.iesDecryptEngine = createIesEngine();
-			this.iesDecryptEngine.init(
-					false,
-					recipientKeyPair.getPrivateKeyParameters(),
-					senderKeyPair.getPublicKeyParameters(),
-					IES_PARAMETERS);
-		} else {
-			this.iesDecryptEngine = null;
-		}
+		this.cipher = CryptoEngines.getDefaultEngine().createBlockCipher(senderKeyPair, recipientKeyPair);
 	}
 
-	/**
-	 * Encrypts an arbitrarily-sized message.
-	 *
-	 * @param input The message to encrypt.
-	 * @return The encrypted message.
-	 * @throws CryptoException if the encryption operation failed.
-	 */
+	@Override
 	public byte[] encrypt(final byte[] input) {
-		try {
-			return this.iesEncryptEngine.processBlock(input, 0, input.length);
-		} catch (final InvalidCipherTextException e) {
-			throw new CryptoException(e);
-		}
+		return this.cipher.encrypt(input);
 	}
 
-	/**
-	 * Decrypts an arbitrarily-sized message.
-	 *
-	 * @param input The message to decrypt.
-	 * @return The decrypted message or null if decryption failed.
-	 */
+	@Override
 	public byte[] decrypt(final byte[] input) {
-		try {
-			return this.iesDecryptEngine.processBlock(input, 0, input.length);
-		} catch (final InvalidCipherTextException e) {
-			return null;
-		}
-	}
-
-	private static IESEngine createIesEngine() {
-		return new IESEngine(
-				new ECDHBasicAgreement(),
-				new KDF2BytesGenerator(new SHA1Digest()),
-				new HMac(new SHA1Digest()));
+		return this.cipher.decrypt(input);
 	}
 }

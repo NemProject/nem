@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 public class ArrayUtilsTest {
 	//region duplicate
@@ -255,6 +256,62 @@ public class ArrayUtilsTest {
 
 		// Assert:
 		Assert.assertThat(new BigInteger("0000A5", 16), IsEqual.equalTo(result));
+	}
+
+	//endregion
+
+	//region isEqual
+
+	@Test
+	public void isEqualsReturnsOneForEqualByteArrays() {
+		// TODO 20141010 J-b: i'm not sure if we need to loop in this test
+		// TODO 20141011 BR -> J: you only want to test a specfic setup?
+
+		// Arrange:
+		final SecureRandom random = new SecureRandom();
+		final byte[] bytes1 = new byte[32];
+		final byte[] bytes2 = new byte[32];
+		for (int i = 0; i < 100; i++) {
+			random.nextBytes(bytes1);
+			System.arraycopy(bytes1, 0, bytes2, 0, 32);
+
+			// Assert:
+			Assert.assertThat(ArrayUtils.isEqual(bytes1, bytes2), IsEqual.equalTo(1));
+		}
+	}
+
+	@Test
+	public void isEqualsReturnsZeroForUnequalByteArrays() {
+		// Arrange:
+		final SecureRandom random = new SecureRandom();
+		final byte[] bytes1 = new byte[32];
+		final byte[] bytes2 = new byte[32];
+		random.nextBytes(bytes1);
+		for (int i = 0; i < 32; i++) {
+			System.arraycopy(bytes1, 0, bytes2, 0, 32);
+			bytes2[i] = (byte)(bytes2[i] ^ 0xff);
+
+			// Assert:
+			Assert.assertThat(ArrayUtils.isEqual(bytes1, bytes2), IsEqual.equalTo(0));
+		}
+	}
+
+	//endregion
+
+	//region getBit
+
+	@Test
+	public void getBitReturnZeroIfBitIsNotSet() {
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 0 }, 0), IsEqual.equalTo(0));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 15), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void getBitReturnOneIfBitIsSet() {
+		// Assert:
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 8 }, 3), IsEqual.equalTo(1));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 9), IsEqual.equalTo(1));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 16), IsEqual.equalTo(1));
 	}
 
 	//endregion

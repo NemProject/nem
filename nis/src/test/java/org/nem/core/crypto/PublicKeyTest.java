@@ -2,6 +2,8 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
+import org.nem.core.crypto.ed25519.arithmetic.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
@@ -9,6 +11,7 @@ public class PublicKeyTest {
 
 	private final byte[] TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x71 };
 	private final byte[] MODIFIED_TEST_BYTES = new byte[] { 0x22, (byte)0xAB, 0x72 };
+	private static final Ed25519GroupElement A = getA(true);
 
 	//region constructors / factories
 
@@ -57,49 +60,6 @@ public class PublicKeyTest {
 
 	//endregion
 
-	//region isCompressed
-
-	@Test
-	public void compressedKeyMustHaveCorrectLength() {
-		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
-
-		// Assert:
-		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, -1).isCompressed(), IsEqual.equalTo(false));
-		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, 0).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(this.createKeyWithLengthDelta(publicKey, 1).isCompressed(), IsEqual.equalTo(false));
-	}
-
-	private PublicKey createKeyWithLengthDelta(final PublicKey key, final int lengthDelta) {
-		// Arrange:
-		final byte[] modifiedPublicKey = new byte[key.getRaw().length + lengthDelta];
-		final int numBytesToCopy = Math.min(modifiedPublicKey.length, key.getRaw().length);
-		System.arraycopy(key.getRaw(), 0, modifiedPublicKey, 0, numBytesToCopy);
-		return new PublicKey(modifiedPublicKey);
-	}
-
-	@Test
-	public void compressedKeyMustHaveCorrectFirstByte() {
-		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
-
-		// Assert:
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)1).isCompressed(), IsEqual.equalTo(false));
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)2).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)3).isCompressed(), IsEqual.equalTo(true));
-		Assert.assertThat(this.createKeyWithFirstByte(publicKey, (byte)4).isCompressed(), IsEqual.equalTo(false));
-	}
-
-	private PublicKey createKeyWithFirstByte(final PublicKey key, final byte firstByte) {
-		// Arrange:
-		final byte[] modifiedPublicKey = new byte[key.getRaw().length];
-		System.arraycopy(key.getRaw(), 0, modifiedPublicKey, 0, modifiedPublicKey.length);
-		modifiedPublicKey[0] = firstByte;
-		return new PublicKey(modifiedPublicKey);
-	}
-
-	//endregion
-
 	//region equals / hashCode
 
 	@Test
@@ -136,4 +96,58 @@ public class PublicKeyTest {
 	}
 
 	//endregion
+
+	//region group element A
+
+	@Test(expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfAIsNull() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, null);
+	}
+
+	@Test(expected = RuntimeException.class)
+	public void ctorWithProjectiveCoordinatesThrowsIfAIsNotPrecomputed() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, getA(false));
+	}
+
+	@Test
+	public void canCreatePublicKeyWithProjectiveCoordinatesIfAllParamsAreCorrect() {
+		// Assert:
+		new PublicKey(this.TEST_BYTES, A);
+	}
+
+	//endregion
+
+	//region delegation
+
+	@Test
+	public void isCompressedDelegatesToKeyAnalyzer() {
+		final CryptoEngines.CryptoEngine engine = Mockito.mock(CryptoEngines.CryptoEngine.class);
+		CryptoEngines.setDefaultEngine(engine);
+		final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
+		Mockito.when(engine.createKeyAnalyzer()).thenReturn(analyzer);
+		final PublicKey key = PublicKey.fromHexString("227F");
+
+		// Act:
+		key.isCompressed();
+
+		// Assert:
+		Mockito.verify(analyzer, Mockito.times(1)).isKeyCompressed(key);
+	}
+
+	//endregion
+
+	private static Ed25519GroupElement getA(final boolean precompute) {
+		final Ed25519GroupElement A = Ed25519GroupElement.p3(
+				Ed25519Field.ZERO,
+				Ed25519Field.ONE,
+				Ed25519Field.ONE,
+				Ed25519Field.ZERO);
+		if (precompute) {
+			A.precomputeForDoubleScalarMultiplication();
+		}
+
+		return A;
+	}
 }

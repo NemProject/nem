@@ -137,4 +137,22 @@ public class PrivateKeyTest {
 	}
 
 	//endregion
+
+	//region prepareForScalarMultiply
+
+	@Test
+	public void prepareForScalarMultiplyReturnsClampedValue() {
+		// Arrange:
+		final PrivateKey privateKey = new PrivateKey(new BigInteger(Utils.generateRandomBytes(32)));
+
+		// Act:
+		final byte[] a = privateKey.prepareForScalarMultiply().getRaw();
+
+		// Assert:
+		Assert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));
+		Assert.assertThat(a[31] & 0x80, IsEqual.equalTo(0x0));
+		Assert.assertThat(a[0] & 0x7, IsEqual.equalTo(0x0));
+	}
+
+	//endregion
 }

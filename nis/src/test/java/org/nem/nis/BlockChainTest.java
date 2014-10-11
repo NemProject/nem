@@ -115,7 +115,7 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithSameScoreGetsRejectedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates, scoringAlg) ->
+		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
@@ -328,7 +328,8 @@ public class BlockChainTest {
 				// proof
 				tx1.getSignature().getBytes(),
 				DB_RECIPIENT1,
-				0, // index
+				0, // order
+				0, // block index
 				RECIPIENT1_AMOUNT,
 				0L // referenced tx
 		);
@@ -344,7 +345,8 @@ public class BlockChainTest {
 				// proof
 				tx1.getSignature().getBytes(),
 				DB_RECIPIENT2,
-				0, // index
+				1, // order
+				1, // block index
 				RECIPIENT2_AMOUNT,
 				0L // referenced tx
 		);

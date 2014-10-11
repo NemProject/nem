@@ -37,7 +37,11 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, accountDaoLookup);
+		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, 0, accountDaoLookup);
+
+		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
+		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		this.addToDummyBlock(dbAccount, entity);
 
 		// Act
 		this.transferDao.save(entity);
@@ -55,7 +59,10 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
-		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
+		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
+
+		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		this.addToDummyBlock(dbAccount, dbTransfer);
 
 		// Act
 		this.transferDao.save(dbTransfer);
@@ -68,8 +75,8 @@ public class TransferDaoTest {
 		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
 		Assert.assertThat(entity.getAmount(), equalTo(transferTransaction.getAmount().getNumMicroNem()));
-		Assert.assertThat(entity.getBlkIndex(), equalTo(12345));
 		Assert.assertThat(entity.getSenderProof(), equalTo(transferTransaction.getSignature().getBytes()));
+		// TODO 20141010 J-G why did you remove the blockindex assert (and should we add one for order index)?
 	}
 
 	@Test
@@ -79,10 +86,13 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final Transfer dbTransfer1 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
-		final Transfer dbTransfer2 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
-		final Transfer dbTransfer3 = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
+		final Transfer dbTransfer1 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
+		final Transfer dbTransfer2 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
+		final Transfer dbTransfer3 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
 		final Long initialCount = this.transferDao.count();
+
+		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		this.addToDummyBlock(dbAccount, dbTransfer1, dbTransfer2, dbTransfer3);
 
 		// Act
 		this.transferDao.save(dbTransfer1);
@@ -444,7 +454,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsTransferIfMaxBlockHeightIsGreaterOrEqualToTransferBlockHeight() {
 		// Arrange:
-		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase();
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer1_1 = this.transferDao.findByHash(hashes.get(0).getRaw(), 1);
@@ -464,7 +474,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsNullIfMaxBlockHeightIsLessThanTransferBlockHeight() {
 		// Arrange:
-		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase();
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer1 = this.transferDao.findByHash(hashes.get(1).getRaw(), 1);
@@ -478,7 +488,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsNullIfHashDoesNotExistInDatabase() {
 		// Arrange:
-		saveThreeBlocksWithTransactionsInDatabase();
+		this.saveThreeBlocksWithTransactionsInDatabase();
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);
@@ -499,7 +509,7 @@ public class TransferDaoTest {
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
 			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-			final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, accountDaoLookup);
+			final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
 			hashes.add(dbTransfer.getTransferHash());
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
@@ -538,5 +548,16 @@ public class TransferDaoTest {
 		mockAccountDao.addMapping(sender, dbSender);
 		mockAccountDao.addMapping(recipient, dbRecipient);
 		return new AccountDaoLookupAdapter(mockAccountDao);
+	}
+
+	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final Transfer... dbTransfers) {
+		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
+				account, new byte[] { 1, 2, 3, 4 },
+				1L, 1L, 1L, 123L, null);
+		this.blockDao.save(block);
+
+		for (final Transfer transfer : dbTransfers) {
+			transfer.setBlock(block);
+		}
 	}
 }

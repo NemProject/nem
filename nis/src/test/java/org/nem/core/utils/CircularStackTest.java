@@ -7,7 +7,7 @@ public class CircularStackTest {
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void peekOnEmptyStackThrowsException() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		intStack.peek();
@@ -16,7 +16,7 @@ public class CircularStackTest {
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void popFromEmptyStackThrowsException() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		intStack.pop();
@@ -25,7 +25,7 @@ public class CircularStackTest {
 	@Test
 	public void canAddSingleElementToCircularStack() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		intStack.push(123);
@@ -38,7 +38,7 @@ public class CircularStackTest {
 	@Test
 	public void canAddLimitElementsToCircularStack() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		intStack.push(555);
@@ -53,7 +53,7 @@ public class CircularStackTest {
 	@Test
 	public void addingMoreThanLimitElementsToCircularStackAgesOutOlderElements() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		for (int i = 0; i < 100; ++i) {
@@ -68,7 +68,7 @@ public class CircularStackTest {
 	@Test
 	public void poppingFromStackDecreasesSizeByOne() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		for (int i = 0; i < 100; ++i) {
@@ -87,8 +87,8 @@ public class CircularStackTest {
 	@Test
 	public void canCopyLargerToSmaller() {
 		// Arrange:
-		final CircularStack<Integer> source = createStack(10);
-		final CircularStack<Integer> destination = createStack(3);
+		final CircularStack<Integer> source = this.createStack(10);
+		final CircularStack<Integer> destination = this.createStack(3);
 
 		// Act:
 		for (int i = 0; i < 10; ++i) {
@@ -109,8 +109,8 @@ public class CircularStackTest {
 	@Test
 	public void canCopySmallerToLarger() {
 		// Arrange:
-		final CircularStack<Integer> source = createStack(3);
-		final CircularStack<Integer> destination = createStack(10);
+		final CircularStack<Integer> source = this.createStack(3);
+		final CircularStack<Integer> destination = this.createStack(10);
 
 		// Act:
 		for (int i = 0; i < 3; ++i) {
@@ -131,8 +131,8 @@ public class CircularStackTest {
 	@Test
 	public void copyIsAShallowCopy() {
 		// Arrange:
-		final CircularStack<Integer> stack1 = createStack(3);
-		final CircularStack<Integer> stack2 = createStack(3);
+		final CircularStack<Integer> stack1 = this.createStack(3);
+		final CircularStack<Integer> stack2 = this.createStack(3);
 
 		// Act:
 		for (int i = 0; i < 10; ++i) {
@@ -157,7 +157,7 @@ public class CircularStackTest {
 	@Test
 	public void canIterateOverStackFromOldestToNewestElement() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		for (int i = 0; i < 3; ++i) {
@@ -175,7 +175,7 @@ public class CircularStackTest {
 	@Test
 	public void canIterateOverStackFromNewestToOldestElementByPoppingAllElements() {
 		// Arrange:
-		final CircularStack<Integer> intStack = createStack(3);
+		final CircularStack<Integer> intStack = this.createStack(3);
 
 		// Act:
 		for (int i = 0; i < 3; ++i) {

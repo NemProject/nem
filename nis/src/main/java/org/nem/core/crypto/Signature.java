@@ -4,14 +4,16 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 /**
  * A EC signature.
  */
 public class Signature {
+	private static final BigInteger MAXIMUM_VALUE = BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE);
 
-	private final BigInteger r;
-	private BigInteger s;
+	private final byte[] r;
+	private final byte[] s;
 
 	/**
 	 * Creates a new signature.
@@ -20,8 +22,12 @@ public class Signature {
 	 * @param s The s-part of the signature.
 	 */
 	public Signature(final BigInteger r, final BigInteger s) {
-		this.r = r;
-		this.s = s;
+		if (0 < r.compareTo(MAXIMUM_VALUE) || 0 < s.compareTo(MAXIMUM_VALUE)) {
+			throw new IllegalArgumentException("r and s must fit into 32 bytes");
+		}
+
+		this.r = ArrayUtils.toByteArray(r, 32);
+		this.s = ArrayUtils.toByteArray(s, 32);
 	}
 
 	/**
@@ -35,9 +41,26 @@ public class Signature {
 		}
 
 		final byte[][] parts = ArrayUtils.split(bytes, 32);
-		this.r = ArrayUtils.toBigInteger(parts[0]);
-		this.s = ArrayUtils.toBigInteger(parts[1]);
+		this.r = parts[0];
+		this.s = parts[1];
 	}
+
+	/**
+	 * Creates a new signature.
+	 *
+	 * @param r The binary representation of r.
+	 * @param s The binary representation of s.
+	 */
+	public Signature(final byte[] r, final byte[] s) {
+		if (32 != r.length || 32 != s.length) {
+			throw new IllegalArgumentException("binary signature representation of r and s must both have 32 bytes length");
+		}
+
+		this.r = r;
+		this.s = s;
+	}
+
+	// TODO 20141010 J-B: should add some tests for the new getBinary[R|S] functions
 
 	/**
 	 * Gets the r-part of the signature.
@@ -45,6 +68,15 @@ public class Signature {
 	 * @return The r-part of the signature.
 	 */
 	public BigInteger getR() {
+		return ArrayUtils.toBigInteger(this.r);
+	}
+
+	/**
+	 * Gets the r-part of the signature.
+	 *
+	 * @return The r-part of the signature.
+	 */
+	public byte[] getBinaryR() {
 		return this.r;
 	}
 
@@ -54,25 +86,16 @@ public class Signature {
 	 * @return The s-part of the signature.
 	 */
 	public BigInteger getS() {
-		return this.s;
+		return ArrayUtils.toBigInteger(this.s);
 	}
 
 	/**
-	 * Determines if this signature is canonical.
+	 * Gets the s-part of the signature.
 	 *
-	 * @return true if this signature is canonical.
+	 * @return The s-part of the signature.
 	 */
-	public boolean isCanonical() {
-		return this.s.compareTo(Curves.secp256k1().getHalfCurveOrder()) <= 0;
-	}
-
-	/**
-	 * Makes this signature canonical.
-	 */
-	public void makeCanonical() {
-		if (!this.isCanonical()) {
-			this.s = Curves.secp256k1().getParams().getN().subtract(this.s);
-		}
+	public byte[] getBinaryS() {
+		return this.s;
 	}
 
 	/**
@@ -81,14 +104,12 @@ public class Signature {
 	 * @return a little-endian 64-byte representation of the signature
 	 */
 	public byte[] getBytes() {
-		final byte[] rBytes = ArrayUtils.toByteArray(this.r, 32);
-		final byte[] sBytes = ArrayUtils.toByteArray(this.s, 32);
-		return ArrayUtils.concat(rBytes, sBytes);
+		return ArrayUtils.concat(this.r, this.s);
 	}
 
 	@Override
 	public int hashCode() {
-		return this.r.hashCode() ^ this.s.hashCode();
+		return Arrays.hashCode(this.r) ^ Arrays.hashCode(this.s);
 	}
 
 	@Override
@@ -98,7 +119,9 @@ public class Signature {
 		}
 
 		final Signature rhs = (Signature)obj;
-		return 0 == this.r.compareTo(rhs.r) && 0 == this.s.compareTo(rhs.s);
+		// TODO 20141010 J-B: Arrays.equal?
+		// TODO 20141011 BR -> J: Arrays.equal is as far as I know not a constant time method.
+		return 1 == ArrayUtils.isEqual(this.r, rhs.r) && 1 == ArrayUtils.isEqual(this.s, rhs.s);
 	}
 
 	//region inline serialization

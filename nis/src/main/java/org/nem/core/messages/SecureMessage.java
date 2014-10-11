@@ -119,8 +119,7 @@ public class SecureMessage extends Message {
 				return false;
 			}
 
-			return (senderKeyPair.hasPrivateKey() && recipientKeyPair.hasPublicKey()) ||
-					(recipientKeyPair.hasPrivateKey() && senderKeyPair.hasPublicKey());
+			return senderKeyPair.hasPrivateKey() || recipientKeyPair.hasPrivateKey();
 		}
 
 		public byte[] getEncoded() {

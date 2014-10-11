@@ -66,7 +66,7 @@ public class AccountTest {
 		final Account account = new Account(expectedAccountId, Amount.fromNem(124), new BlockAmount(4), "blah");
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.getKeyPair().getPublicKey(), IsNull.notNullValue());
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(124)));
 		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
@@ -98,7 +98,6 @@ public class AccountTest {
 		account.setPublicKey(keyPair.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 	}
 
@@ -112,7 +111,6 @@ public class AccountTest {
 		account.setPublicKey(keyPair.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(true));
 		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));

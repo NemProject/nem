@@ -1,5 +1,6 @@
 package org.nem.core.crypto;
 
+import org.nem.core.crypto.ed25519.arithmetic.Ed25519GroupElement;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.HexEncoder;
 
@@ -10,9 +11,16 @@ import java.util.Arrays;
  */
 public class PublicKey implements SerializableEntity {
 
-	private final static int COMPRESSED_KEY_SIZE = 33;
+	private final byte[] value;
 
-	public byte[] value;
+	/**
+	 * The following field is used by Ed25519 to speed up verification.
+	 * TODO 20141010 J-B why is this here?
+	 * TODO 20141011 BR -> J: as stated above it is needed to speed up signature verification.
+	 * TODO                   If not here, where should I keep the information?
+	 * TODO 20141010 J-B: i need to look closer at how it's being used
+	 */
+	private final Ed25519GroupElement A;
 
 	/**
 	 * Creates a new public key.
@@ -21,6 +29,24 @@ public class PublicKey implements SerializableEntity {
 	 */
 	public PublicKey(final byte[] bytes) {
 		this.value = bytes;
+		this.A = null;
+	}
+
+	/**
+	 * Creates a new public key.
+	 *
+	 * @param bytes The raw public key value.
+	 * @param A The corresponding group element.
+	 */
+	public PublicKey(
+			final byte[] bytes,
+			final Ed25519GroupElement A) {
+		this.value = bytes;
+		this.A = A;
+
+		if (null == A || !A.isPrecomputedForDoubleScalarMultiplication()) {
+			throw new RuntimeException("A not prepared for double scalar multiplication.");
+		}
 	}
 
 	/**
@@ -30,6 +56,7 @@ public class PublicKey implements SerializableEntity {
 	 */
 	public PublicKey(final Deserializer deserializer) {
 		this.value = deserializer.readBytes("value");
+		this.A = null;
 	}
 
 	/**
@@ -47,6 +74,15 @@ public class PublicKey implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the public key as group element (can return null).
+	 *
+	 * @return The group element or null if not set.
+	 */
+	public Ed25519GroupElement getAsGroupElement() {
+		return this.A;
+	}
+
+	/**
 	 * Gets the raw public key value.
 	 *
 	 * @return The raw public key value.
@@ -61,17 +97,7 @@ public class PublicKey implements SerializableEntity {
 	 * @return true if the public key is in compressed form.
 	 */
 	public boolean isCompressed() {
-		if (COMPRESSED_KEY_SIZE != this.value.length) {
-			return false;
-		}
-
-		switch (this.value[0]) {
-			case 0x02:
-			case 0x03:
-				return true;
-		}
-
-		return false;
+		return CryptoEngines.getDefaultEngine().createKeyAnalyzer().isKeyCompressed(this);
 	}
 
 	@Override

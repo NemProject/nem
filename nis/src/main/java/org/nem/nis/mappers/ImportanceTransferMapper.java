@@ -10,18 +10,24 @@ import org.nem.nis.dbmodel.ImportanceTransfer;
 public class ImportanceTransferMapper {
 	/**
 	 * Converts a ImportanceTransferTransaction model to a ImportanceTransfer db-model.
+	 * TODO 20141010 J-G: do we need both blockIndex and orderIndex?
 	 *
 	 * @param importanceTransferTransaction The transfer transaction model.
 	 * @param blockIndex The index of the transfer within the owning block.
+	 * @param orderIndex The index of the transfer within the owning block's collection of similar transactions.
 	 * @param accountDaoLookup The account dao lookup object.
 	 * @return The ImportanceTransfer db-model.
 	 */
-	public static ImportanceTransfer toDbModel(final ImportanceTransferTransaction importanceTransferTransaction, final int blockIndex, final AccountDaoLookup accountDaoLookup) {
+	public static ImportanceTransfer toDbModel(
+			final ImportanceTransferTransaction importanceTransferTransaction,
+			final int blockIndex,
+			final int orderIndex,
+			final AccountDaoLookup accountDaoLookup) {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(importanceTransferTransaction.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(importanceTransferTransaction.getRemote().getAddress());
 
 		final Hash txHash = HashUtils.calculateHash(importanceTransferTransaction);
-		final ImportanceTransfer dbTransfer = new ImportanceTransfer(
+		return new ImportanceTransfer(
 				txHash,
 				importanceTransferTransaction.getVersion(),
 				importanceTransferTransaction.getType(),
@@ -33,10 +39,9 @@ public class ImportanceTransferMapper {
 				importanceTransferTransaction.getSignature().getBytes(),
 				remote,
 				importanceTransferTransaction.getMode().value(),
+				orderIndex,
 				blockIndex, // index
-				0L); // referenced tx
-
-		return dbTransfer;
+				0L);
 	}
 
 	/**
