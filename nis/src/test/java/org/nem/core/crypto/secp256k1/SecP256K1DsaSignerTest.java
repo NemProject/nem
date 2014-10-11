@@ -25,6 +25,8 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(HexEncoder.getString(signature.getBytes()), IsEqual.equalTo(expectedSignature));
 	}
 
+	// TODO 20141010 J-B: i think verifyReturnsFalseForNonCanonicalSignature is still valid
+
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
@@ -79,6 +81,8 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
 	}
 
+	// TODO 201401010: i wonder if we should move the speed tests out of the unit tests?
+	// > don't do this now as i'm not sure it's worth it :), but these might be too slow to be in the regular batch of tests
 	@Test
 	public void verifyHasExpectedSpeed() {
 		// Arrange:

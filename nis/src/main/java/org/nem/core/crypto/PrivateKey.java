@@ -94,6 +94,7 @@ public class PrivateKey implements SerializableEntity {
 		}
 	}
 
+	// TODO 20141010 J-B why is this here?
 	public Ed25519EncodedFieldElement prepareForScalarMultiply() {
 		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(this.value, 32));
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);

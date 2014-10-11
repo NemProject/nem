@@ -1,6 +1,7 @@
 package org.nem.core.crypto;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.nem.core.utils.ExceptionUtils;
 
 import java.security.*;
 import java.util.logging.Logger;
@@ -26,20 +27,19 @@ public class Hashes {
 		return hash("SHA3-256", inputs);
 	}
 
+	// TODO 20141010 J-B: should we just replace sha3 with this?
+	// > i would also prefer to hide the message digest in this class
+	// > (like the other overloads)
+
 	/**
 	 * Gets an instance of a SHA3-512 message digest.
 	 *
 	 * @return The SHA3-512 instance.
 	 */
 	public static MessageDigest getSha3_512Instance() {
-		final MessageDigest digest;
-		try {
-			digest = MessageDigest.getInstance("SHA3-512", "BC");
-		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-			throw new CryptoException(e);
-		}
-
-		return digest;
+		return ExceptionUtils.propagate(
+				() -> MessageDigest.getInstance("SHA3-512", "BC"),
+				CryptoException::new);
 	}
 
 	/**
@@ -54,16 +54,16 @@ public class Hashes {
 	}
 
 	private static byte[] hash(final String algorithm, final byte[]... inputs) {
-		try {
-			final MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
+		return ExceptionUtils.propagate(
+				() -> {
+					final MessageDigest digest = MessageDigest.getInstance(algorithm, "BC");
 
-			for (final byte[] input : inputs) {
-				digest.update(input);
-			}
+					for (final byte[] input : inputs) {
+						digest.update(input);
+					}
 
-			return digest.digest();
-		} catch (NoSuchAlgorithmException | NoSuchProviderException e) {
-			throw new CryptoException(e);
-		}
+					return digest.digest();
+				},
+				CryptoException::new);
 	}
 }

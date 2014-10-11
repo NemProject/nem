@@ -3,7 +3,7 @@ package org.nem.core.crypto;
 /**
  * Wraps DSA signing and verification logic.
  */
-public class Signer {
+public class Signer implements DsaSigner {
 
 	private final DsaSigner signer;
 
@@ -16,39 +16,22 @@ public class Signer {
 		this.signer = CryptoEngines.getDefaultEngine().createDsaSigner(keyPair);
 	}
 
-	/**
-	 * Signs the SHA3 hash of an arbitrarily sized message.
-	 *
-	 * @param data The message to sign.
-	 * @return The generated signature.
-	 */
+	@Override
 	public Signature sign(final byte[] data) {
 		return this.signer.sign(data);
 	}
 
-	/**
-	 * Verifies that the signature is valid.
-	 *
-	 * @param data The original message.
-	 * @param signature The generated signature.
-	 * @return true if the signature is valid.
-	 */
+	@Override
 	public boolean verify(final byte[] data, final Signature signature) {
 		return this.signer.verify(data, signature);
 	}
 
-	/**
-	 * Determines if the given signature is canonical.
-	 *
-	 * @return true if the given signature is canonical.
-	 */
+	@Override
 	public boolean isCanonicalSignature(final Signature signature) {
 		return this.signer.isCanonicalSignature(signature);
 	}
 
-	/**
-	 * Makes this signature canonical.
-	 */
+	@Override
 	public Signature makeSignatureCanonical(final Signature signature) {
 		return this.signer.makeSignatureCanonical(signature);
 	}

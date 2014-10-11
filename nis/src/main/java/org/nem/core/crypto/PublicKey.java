@@ -15,6 +15,7 @@ public class PublicKey implements SerializableEntity {
 
 	/**
 	 * The following field is used by Ed25519 to speed up verification.
+	 * TODO 20141010 J-B why is this here?
 	 */
 	private final Ed25519GroupElement A;
 

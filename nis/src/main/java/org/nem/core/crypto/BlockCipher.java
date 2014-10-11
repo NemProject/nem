@@ -10,7 +10,6 @@ public interface BlockCipher {
 	 *
 	 * @param input The message to encrypt.
 	 * @return The encrypted message.
-	 * @throws CryptoException if the encryption operation failed.
 	 */
 	public byte[] encrypt(final byte[] input);
 

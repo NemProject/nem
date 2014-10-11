@@ -61,10 +61,9 @@ public class SecP256K1DsaSigner implements DsaSigner {
 
 	@Override
 	public Signature makeSignatureCanonical(final Signature signature) {
-		if (isCanonicalSignature(signature)) {
-			return signature;
-		}
-		return new Signature(signature.getR(), SecP256K1Curve.secp256k1().getParams().getN().subtract(signature.getS()));
+		return isCanonicalSignature(signature)
+				? signature
+				: new Signature(signature.getR(), SecP256K1Curve.secp256k1().getParams().getN().subtract(signature.getS()));
 	}
 
 	private ECDSASigner createECDSASigner() {

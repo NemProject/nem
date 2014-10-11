@@ -73,6 +73,7 @@ public class KeyPair {
 
 	/**
 	 * Determines if the current key pair has a public key.
+	 * TODO 20141010 J-B: we should probably remove this, since public key can't really ever be null.
 	 *
 	 * @return true if the current key pair has a public key.
 	 */

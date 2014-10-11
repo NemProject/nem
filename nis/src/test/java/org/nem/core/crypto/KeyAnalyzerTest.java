@@ -21,7 +21,7 @@ public abstract class KeyAnalyzerTest {
 		// Arrange:
 		initCryptoEngine();
 		final KeyAnalyzer analyzer = getKeyAnalyzer();
-		final PublicKey key = new PublicKey(new byte[35]);
+		final PublicKey key = new PublicKey(new byte[35]); // TODO 20141010 J-B might be safer to get a real public key and resize it -1
 
 		// Act + Assert:
 		Assert.assertThat(analyzer.isKeyCompressed(key), IsEqual.equalTo(false));

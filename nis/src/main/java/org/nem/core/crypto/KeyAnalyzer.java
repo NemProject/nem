@@ -6,7 +6,7 @@ package org.nem.core.crypto;
 public interface KeyAnalyzer {
 
 	/**
-	 * Gets a value indication whether or not hte public key is compressed.
+	 * Gets a value indicating whether or not the public key is compressed.
 	 *
 	 * @param publicKey The public key.
 	 * @return true if the public key is compressed, false otherwise.

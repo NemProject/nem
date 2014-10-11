@@ -3,7 +3,7 @@ package org.nem.core.crypto;
 /**
  * Wraps IES encryption and decryption logic.
  */
-public class Cipher {
+public class Cipher implements BlockCipher {
 
 	private final BlockCipher cipher;
 
@@ -17,23 +17,12 @@ public class Cipher {
 		this.cipher = CryptoEngines.getDefaultEngine().createBlockCipher(senderKeyPair, recipientKeyPair);
 	}
 
-	/**
-	 * Encrypts an arbitrarily-sized message.
-	 *
-	 * @param input The message to encrypt.
-	 * @return The encrypted message.
-	 * @throws CryptoException if the encryption operation failed.
-	 */
+	@Override
 	public byte[] encrypt(final byte[] input) {
 		return this.cipher.encrypt(input);
 	}
 
-	/**
-	 * Decrypts an arbitrarily-sized message.
-	 *
-	 * @param input The message to decrypt.
-	 * @return The decrypted message or null if decryption failed.
-	 */
+	@Override
 	public byte[] decrypt(final byte[] input) {
 		return this.cipher.decrypt(input);
 	}

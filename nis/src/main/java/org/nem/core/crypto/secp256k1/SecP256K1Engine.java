@@ -4,6 +4,7 @@ import org.nem.core.crypto.*;
 
 /**
  * Class that wraps the SECP256K1 specific implementation.
+ * TODO 20141010 J-B should this be called SecP256K1CRYPTOEngine?
  */
 public class SecP256K1Engine implements CryptoEngines.CryptoEngine {
 

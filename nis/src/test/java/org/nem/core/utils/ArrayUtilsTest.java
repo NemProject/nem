@@ -264,6 +264,8 @@ public class ArrayUtilsTest {
 
 	@Test
 	public void isEqualsReturnsOneForEqualByteArrays() {
+		// TODO 20141010 J-b: i'm not sure if we need to loop in this test
+
 		// Arrange:
 		final SecureRandom random = new SecureRandom();
 		final byte[] bytes1 = new byte[32];

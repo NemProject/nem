@@ -21,13 +21,15 @@ public class KeyPairTest {
 	}
 
 	@Test
-	public void ctorCanCreateNewKeyPairWithCompressedPublicKey() {
+	public void ctorCreatesNewKeyPairWithCompressedPublicKey() {
 		// Act:
 		final KeyPair kp = new KeyPair();
 
 		// Assert:
 		Assert.assertThat(kp.getPublicKey().isCompressed(), IsEqual.equalTo(true));
 	}
+
+	// TODO 20141010 J-B: ctorCreatesDifferentInstancesWithDifferentKeys still seems valid
 
 	@Test
 	public void ctorCanCreateKeyPairAroundPrivateKey() {

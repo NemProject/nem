@@ -36,6 +36,7 @@ public class CryptoEngines {
 		if (null == defaultEngine) {
 			initDefaultEngine();
 		}
+
 		return defaultEngine;
 	}
 

@@ -11,7 +11,6 @@ import java.util.Arrays;
  * A EC signature.
  */
 public class Signature {
-
 	private static final BigInteger MAXIMUM_VALUE = BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE);
 
 	private final byte[] r;
@@ -27,6 +26,7 @@ public class Signature {
 		if (0 < r.compareTo(MAXIMUM_VALUE) || 0 < s.compareTo(MAXIMUM_VALUE)) {
 			throw new IllegalArgumentException("r and s must fit into 32 bytes");
 		}
+
 		this.r = ArrayUtils.toByteArray(r, 32);
 		this.s = ArrayUtils.toByteArray(s, 32);
 	}
@@ -61,6 +61,8 @@ public class Signature {
 		this.s = s;
 	}
 
+	// TODO 20141010 J-B: should add some tests for the new getBinary[R|S] functions
+
 	/**
 	 * Gets the r-part of the signature.
 	 *
@@ -90,6 +92,7 @@ public class Signature {
 
 	/**
 	 * Gets the s-part of the signature.
+	 * TODO 20141010 J-B why is this here?
 	 *
 	 * @return The s-part of the signature.
 	 */
@@ -127,6 +130,7 @@ public class Signature {
 		}
 
 		final Signature rhs = (Signature)obj;
+		// TODO 20141010 J-B: Arrays.equal?
 		return 1 == ArrayUtils.isEqual(this.r, rhs.r) && 1 == ArrayUtils.isEqual(this.s, rhs.s);
 	}
 

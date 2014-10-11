@@ -55,6 +55,9 @@ public class CipherTest {
 		private final KeyPair pair2;
 
 		private CipherContext() {
+			// TODO 20141010 J-B: i think setDefaultEngine will make the tests brittle (i.e. it will prevent some tests from running
+			// > deterministically in parallel); not a problem for now, but could be a problem if we hook up with something like travis ci
+			// > a workaround would be to have an overloaded constructor that is passed the engine
 			CryptoEngines.setDefaultEngine(this.engine);
 			Mockito.when(this.engine.createBlockCipher(Mockito.any(), Mockito.any())).thenReturn(this.blockCipher);
 			Mockito.when(this.engine.createKeyGenerator()).thenCallRealMethod();

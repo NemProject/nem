@@ -75,12 +75,14 @@ public class SecP256K1BlockCipher implements BlockCipher {
 				new HMac(new SHA1Digest()));
 	}
 
+	// TODO 20141010 - we should probably move these to a utils class since Signer is using these too
+
 	/**
 	 * Gets the EC private key parameters.
 	 *
 	 * @return The EC private key parameters.
 	 */
-	public ECPrivateKeyParameters getPrivateKeyParameters(final PrivateKey privateKey) {
+	private ECPrivateKeyParameters getPrivateKeyParameters(final PrivateKey privateKey) {
 		return new ECPrivateKeyParameters(privateKey.getRaw(), SecP256K1Curve.secp256k1().getParams());
 	}
 
@@ -89,7 +91,7 @@ public class SecP256K1BlockCipher implements BlockCipher {
 	 *
 	 * @return The EC public key parameters.
 	 */
-	public ECPublicKeyParameters getPublicKeyParameters(final PublicKey publicKey) {
+	private ECPublicKeyParameters getPublicKeyParameters(final PublicKey publicKey) {
 		final ECPoint point = SecP256K1Curve.secp256k1().getParams().getCurve().decodePoint(publicKey.getRaw());
 		return new ECPublicKeyParameters(point, SecP256K1Curve.secp256k1().getParams());
 	}

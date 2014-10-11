@@ -35,6 +35,10 @@ public class ByteUtils {
 	 * @return 1 if b and c are equal, 0 otherwise.
 	 */
 	public static int isEqual(final int b, final int c) {
+		// TODO 20141010 J-B: can you explain what you're doing here?
+		// > are you treating the ints as bytes? if so, wouldn't this be faster:
+		// (b & 0xFF) == (c & 0xFF)
+
 		int result = 0;
 		final int xor = b ^ c;
 		for (int i = 0; i < 8; i++) {
@@ -50,6 +54,7 @@ public class ByteUtils {
 	 * @return 1 if the byte is negative, 0 otherwise.
 	 */
 	public static int isNegative(final int b) {
+		// TODO 20141010 J-B: b & 0x80 (probably doesn't matter bc java should optimize)
 		return (b >> 8) & 1;
 	}
 }

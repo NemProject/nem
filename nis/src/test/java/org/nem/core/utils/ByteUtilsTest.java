@@ -108,6 +108,9 @@ public class ByteUtilsTest {
 
 	//region isEqual
 
+	// TODO 20141010 J-B: you should have a test where the lobyte is equal and the hibyte is not equal
+	// > (since you appear to only be comparing the lobyte)
+
 	@Test
 	public void isEqualReturnsOneIfBytesAreEqual() {
 		// Assert:
