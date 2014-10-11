@@ -114,7 +114,6 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info(String.format("otherImportances ---- %s", otherImportances));
 		LOGGER.info(String.format("distance - %f", distance));
 		return distance;
-
 	}
 
 	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy) {

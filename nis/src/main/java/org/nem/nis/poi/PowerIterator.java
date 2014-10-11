@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
+
 import java.util.logging.Logger;
 
 /**

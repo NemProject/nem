@@ -53,9 +53,9 @@ public class Block {
 	private Long nextBlockId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
-    @OrderBy("orderId")
-    @LazyCollection(LazyCollectionOption.TRUE)
-    @OrderColumn(name = "orderId")
+	@OrderBy("orderId")
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@OrderColumn(name = "orderId")
 	private List<Transfer> blockTransfers;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)

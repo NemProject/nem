@@ -182,8 +182,8 @@ public class BlockDaoTest {
 		// TODO 20141010 J-G: you don't need to revalidate getBlkIndex here; do you have a test like this for importance transfer?
 		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getOrderId(), equalTo(0));
 		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getOrderId(), equalTo(1));
-        Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
-        Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
 	}
 	//endregion
 
@@ -302,7 +302,6 @@ public class BlockDaoTest {
 		Assert.assertThat(h2, equalTo(HashUtils.calculateHash(importanceTransfer2)));
 	}
 
-
 	@Test
 	public void getBlocksForAccountDoesNotRetrieveTransfers() {
 		// Arrange:
@@ -334,9 +333,9 @@ public class BlockDaoTest {
 
 		final List<Hash> hashes = new ArrayList<>();
 		for (int i = 0; i < 30; i++) {
-			final Account blockSigner = (i%2 == 0) ? signer : remoteAccount;
+			final Account blockSigner = (i % 2 == 0) ? signer : remoteAccount;
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(blockSigner, 456 + i, 0);
-			if (i%2 == 1) {
+			if (i % 2 == 1) {
 				emptyBlock.setLessor(signer);
 			}
 			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);

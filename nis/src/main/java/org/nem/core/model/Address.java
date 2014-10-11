@@ -110,8 +110,9 @@ public class Address {
 	 */
 	public boolean isValid() {
 		// this check should prevent leading and trailing whitespace
-		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length())
+		if (NUM_DECODED_BYTES_LENGTH != this.encoded.length()) {
 			return false;
+		}
 
 		final byte[] encodedBytes;
 

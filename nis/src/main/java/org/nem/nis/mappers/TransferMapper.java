@@ -43,7 +43,7 @@ public class TransferMapper {
 				// proof
 				transfer.getSignature().getBytes(),
 				recipient,
-                orderIndex, // order
+				orderIndex, // order
 				blockIndex, // index
 				transfer.getAmount().getNumMicroNem(),
 				0L); // referenced tx

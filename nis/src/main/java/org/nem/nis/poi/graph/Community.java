@@ -37,7 +37,7 @@ public class Community {
 		this.pivotId = pivotId;
 		this.similarNeighbors = similarNeighbors;
 		this.dissimilarNeighbors = dissimilarNeighbors;
-		this.mu	= mu;
+		this.mu = mu;
 	}
 
 	/**

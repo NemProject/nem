@@ -11,7 +11,6 @@ import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.poi.graph.FastScanClusteringStrategy;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
 import org.nem.nis.validators.*;

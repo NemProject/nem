@@ -221,8 +221,8 @@ public class BlockDaoImpl implements BlockDao {
 		}
 
 		final Query query = this.getCurrentSession()
-								.createQuery("delete from Block a where a.height > :height")
-								.setParameter("height", blockHeight.getRaw());
+				.createQuery("delete from Block a where a.height > :height")
+				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
 	}
 

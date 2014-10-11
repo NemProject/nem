@@ -1,7 +1,7 @@
 package org.nem.nis.poi.graph;
 
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.internal.util.collections.Sets;
 import org.nem.core.math.*;
@@ -10,11 +10,11 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.*;
+import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.NisUtils;
 
 import java.io.*;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -93,11 +93,11 @@ public class NxtGraphClusteringITCase {
 
 		final List<Long> outlinkSums = eligibleAccountStates.stream()
 				.map(acct -> {
-							final ArrayList<Long> amts = new ArrayList<>();
-							acct.getImportanceInfo()
-									.getOutlinksIterator(endBlockHeight)
-									.forEachRemaining(i -> amts.add(i.getAmount().getNumMicroNem()));
-							return amts.stream().mapToLong(i -> i).sum();
+					final ArrayList<Long> amts = new ArrayList<>();
+					acct.getImportanceInfo()
+							.getOutlinksIterator(endBlockHeight)
+							.forEachRemaining(i -> amts.add(i.getAmount().getNumMicroNem()));
+					return amts.stream().mapToLong(i -> i).sum();
 				})
 				.collect(Collectors.toList());
 
@@ -168,10 +168,11 @@ public class NxtGraphClusteringITCase {
 									final ColumnVector importances = getAccountImportances(
 											new BlockHeight(endHeight),
 											eligibleAccountStates,
-                                            optionsBuilder);
+											optionsBuilder);
 
 									final List<Long> stakes = eligibleAccountStates.stream()
-											.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(endBlockHeight)).getNumMicroNem())
+											.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(
+													endBlockHeight)).getNumMicroNem())
 											.collect(Collectors.toList());
 
 									final List<String> addresses = eligibleAccountStates.stream()
@@ -194,7 +195,8 @@ public class NxtGraphClusteringITCase {
 
 									String output = "'address', 'stake', 'importance', 'outlinkCount', 'outlinkSum'\n";
 									for (int i = 0; i < importances.size(); ++i) {
-										output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," + outlinkSums.get(i) + "\n";
+										output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," +
+												outlinkSums.get(i) + "\n";
 									}
 
 									FileUtils.writeStringToFile(new File("kaiseki/importances" + options + ".csv"), output);
@@ -285,7 +287,8 @@ public class NxtGraphClusteringITCase {
 
 			final PoiAccountState senderAccountState = accountStateMap.get(sender);
 			final PoiAccountState recipientAccountState = accountStateMap.get(recipient);
-			final long balance = senderAccountState.getWeightedBalances().getVested(blockHeight).getNumMicroNem() + senderAccountState.getWeightedBalances().getUnvested(blockHeight).getNumMicroNem();
+			final long balance = senderAccountState.getWeightedBalances().getVested(blockHeight).getNumMicroNem() +
+					senderAccountState.getWeightedBalances().getUnvested(blockHeight).getNumMicroNem();
 
 			// We need to add some balance sometimes because the transactions don't account for fees earned from forged blocks
 			final long remainingBalance = balance - amount.getNumMicroNem();
@@ -323,7 +326,7 @@ public class NxtGraphClusteringITCase {
 			final Map<Address, PoiAccountState> accountStateMap,
 			final BlockHeight height) {
 		final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
-		return  accountStateMap.values().stream()
+		return accountStateMap.values().stream()
 				.filter(accountState -> canHarvestPredicate.canHarvest(accountState, height))
 				.collect(Collectors.toList());
 	}
@@ -405,7 +408,7 @@ public class NxtGraphClusteringITCase {
 	private static Collection<NxtTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
 		return ExceptionUtils.propagate(() -> {
 			// Arrange:
-			try (final NxtDatabaseRepository repository = new NxtDatabaseRepository())  {
+			try (final NxtDatabaseRepository repository = new NxtDatabaseRepository()) {
 				// Act:
 				return repository.loadTransactionData(startHeight, stopHeight);
 			}
@@ -424,7 +427,7 @@ public class NxtGraphClusteringITCase {
 			final GraphClusteringStrategy clusteringStrategy) {
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
-		return  getAccountImportances(blockHeight, acctStates, poiOptionsBuilder);
+		return getAccountImportances(blockHeight, acctStates, poiOptionsBuilder);
 	}
 
 	private static ColumnVector getAccountImportances(
@@ -471,7 +474,7 @@ public class NxtGraphClusteringITCase {
 		final double teleporationProb;
 		final double interLevelTeleporationProb;
 
-		 TeleportationProbabilities(final double teleporationProb, final double interLevelTeleporationProb) {
+		TeleportationProbabilities(final double teleporationProb, final double interLevelTeleporationProb) {
 			this.teleporationProb = teleporationProb;
 			this.interLevelTeleporationProb = interLevelTeleporationProb;
 		}

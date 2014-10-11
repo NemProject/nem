@@ -43,7 +43,7 @@ public class Transfer {
 	private Account recipient;
 
 	private Integer blkIndex; // index inside block
-    private Integer orderId; // index inside list
+	private Integer orderId; // index inside list
 
 	private Long amount;
 	private Long referencedTransaction;
@@ -51,8 +51,8 @@ public class Transfer {
 	private Integer messageType;
 	private byte[] messagePayload;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blockId")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "blockId")
 	private Block block;
 
 	public Transfer() {
@@ -69,7 +69,7 @@ public class Transfer {
 			final byte[] senderProof,
 			final Account recipient,
 			final Integer orderId,
-            final Integer blkIndex,
+			final Integer blkIndex,
 			final Long amount,
 			final Long referencedTransaction
 	) {
@@ -83,7 +83,7 @@ public class Transfer {
 		this.sender = sender;
 		this.senderProof = senderProof;
 		this.recipient = recipient;
-        this.orderId = orderId;
+		this.orderId = orderId;
 		this.blkIndex = blkIndex;
 		this.amount = amount;
 		this.referencedTransaction = referencedTransaction;
@@ -178,18 +178,18 @@ public class Transfer {
 	}
 
 	public Integer getBlkIndex() {
-        return this.blkIndex;
+		return this.blkIndex;
 	}
 
 	public void setBlkIndex(final Integer blkIndex) {
 		this.blkIndex = blkIndex;
 	}
 
-    public Integer getOrderId() {
-        return this.block.getBlockTransfers().indexOf(this);
-    }
+	public Integer getOrderId() {
+		return this.block.getBlockTransfers().indexOf(this);
+	}
 
-    public Long getAmount() {
+	public Long getAmount() {
 		return this.amount;
 	}
 

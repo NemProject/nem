@@ -179,7 +179,7 @@ public class TransferMapperTest {
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
 
-            // leaving for now, as I'm not sure if I can remove it without consequences
+			// leaving for now, as I'm not sure if I can remove it without consequences
 			// TODO 20141010 J-G why would you want to remove it?
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockId));
 

@@ -1,6 +1,5 @@
 package org.nem.nis.poi.graph;
 
-
 /**
  * A representation of a NXT transaction.
  */

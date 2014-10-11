@@ -44,8 +44,8 @@ public class BlockMapper {
 				lessor);
 
 		int i = 0;
-        int importanceTransferIndex = 0;
-        int transferIndex = 0;
+		int importanceTransferIndex = 0;
+		int transferIndex = 0;
 		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
 		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(block.getTransactions().size());
 		for (final Transaction transaction : block.getTransactions()) {
@@ -107,20 +107,20 @@ public class BlockMapper {
 		block.setLessor(lessor);
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
-        final int count =  dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
-        final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
+		final int count = dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
+		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
 
-        for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
-            final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
-            transactions.set(dbTransfer.getBlkIndex(), importanceTransferTransaction);
-        }
+		for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
+			final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
+			transactions.set(dbTransfer.getBlkIndex(), importanceTransferTransaction);
+		}
 
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
 			final TransferTransaction transfer = TransferMapper.toModel(dbTransfer, accountLookup);
-            transactions.set(dbTransfer.getBlkIndex(), transfer);
+			transactions.set(dbTransfer.getBlkIndex(), transfer);
 		}
 
-        block.addTransactions(transactions);
-        return block;
+		block.addTransactions(transactions);
+		return block;
 	}
 }

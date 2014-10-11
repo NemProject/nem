@@ -1,7 +1,6 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.graph.*;
 
 import java.util.Collection;
 

@@ -10,8 +10,8 @@ import org.nem.nis.dbmodel.ImportanceTransfer;
 public class ImportanceTransferMapper {
 	/**
 	 * Converts a ImportanceTransferTransaction model to a ImportanceTransfer db-model.
-	 *
 	 * TODO 20141010 J-G: do we need both blockIndex and orderIndex?
+	 *
 	 * @param importanceTransferTransaction The transfer transaction model.
 	 * @param blockIndex The index of the transfer within the owning block.
 	 * @param orderIndex The index of the transfer within the owning block's collection of similar transactions.
@@ -39,7 +39,7 @@ public class ImportanceTransferMapper {
 				importanceTransferTransaction.getSignature().getBytes(),
 				remote,
 				importanceTransferTransaction.getMode().value(),
-                orderIndex,
+				orderIndex,
 				blockIndex, // index
 				0L);
 	}

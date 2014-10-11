@@ -1,8 +1,8 @@
 package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.core.model.primitive.*;
-import org.nem.nis.poi.graph.*;
+import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.poi.graph.InterLevelProximityMatrix;
 
 import java.util.Collection;
 import java.util.logging.Logger;

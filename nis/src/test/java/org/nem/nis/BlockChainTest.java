@@ -329,7 +329,7 @@ public class BlockChainTest {
 				tx1.getSignature().getBytes(),
 				DB_RECIPIENT1,
 				0, // order
-                0, // block index
+				0, // block index
 				RECIPIENT1_AMOUNT,
 				0L // referenced tx
 		);
@@ -346,7 +346,7 @@ public class BlockChainTest {
 				tx1.getSignature().getBytes(),
 				DB_RECIPIENT2,
 				1, // order
-                1, // block index
+				1, // block index
 				RECIPIENT2_AMOUNT,
 				0L // referenced tx
 		);

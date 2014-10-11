@@ -40,8 +40,8 @@ public class TransferDaoTest {
 		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, 0, accountDaoLookup);
 
 		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
-        final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-        addToDummyBlock(dbAccount, entity);
+		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		addToDummyBlock(dbAccount, entity);
 
 		// Act
 		this.transferDao.save(entity);
@@ -61,10 +61,10 @@ public class TransferDaoTest {
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
 		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
 
-        final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-        addToDummyBlock(dbAccount, dbTransfer);
+		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		addToDummyBlock(dbAccount, dbTransfer);
 
-        // Act
+		// Act
 		this.transferDao.save(dbTransfer);
 		final Transfer entity = this.transferDao.findByHash(HashUtils.calculateHash(transferTransaction).getRaw());
 
@@ -91,8 +91,8 @@ public class TransferDaoTest {
 		final Transfer dbTransfer3 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
 		final Long initialCount = this.transferDao.count();
 
-        final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-        addToDummyBlock(dbAccount, dbTransfer1, dbTransfer2, dbTransfer3);
+		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		addToDummyBlock(dbAccount, dbTransfer1, dbTransfer2, dbTransfer3);
 
 		// Act
 		this.transferDao.save(dbTransfer1);
@@ -121,7 +121,6 @@ public class TransferDaoTest {
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
 			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.addTransaction(transferTransaction);
@@ -510,7 +509,7 @@ public class TransferDaoTest {
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
 			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-			final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i-1, accountDaoLookup);
+			final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
 			hashes.add(dbTransfer.getTransferHash());
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
@@ -551,14 +550,14 @@ public class TransferDaoTest {
 		return new AccountDaoLookupAdapter(mockAccountDao);
 	}
 
-    private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final Transfer... dbTransfers) {
-        final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
-                                                                              account, new byte[] { 1, 2, 3, 4 },
-                                                                              1L, 1L, 1L, 123L, null);
-        this.blockDao.save(block);
+	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final Transfer... dbTransfers) {
+		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
+				account, new byte[] { 1, 2, 3, 4 },
+				1L, 1L, 1L, 123L, null);
+		this.blockDao.save(block);
 
-        for (final Transfer transfer : dbTransfers) {
-            transfer.setBlock(block);
-        }
-    }
+		for (final Transfer transfer : dbTransfers) {
+			transfer.setBlock(block);
+		}
+	}
 }
