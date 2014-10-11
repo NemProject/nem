@@ -13,7 +13,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void signerProducesCorrectSignatureUsing256bitSha3() {
 		// Arrange
-		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair(new PrivateKey(BigInteger.valueOf(1L)));
 		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 
@@ -26,11 +25,29 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	}
 
 	// TODO 20141010 J-B: i think verifyReturnsFalseForNonCanonicalSignature is still valid
+	// TODO 20141011 BR -> J: added the test though I don't think we need it as we have
+	// TODO                   1) DsaSignerTest.verifyCallsIsCanonicalSignature to ensure IsCanonicalSignature is called and
+	// TODO                   2) isCanonicalReturnsFalseForNonCanonicalSignature to ensure IsCanonicalSignature returns false for non-canonical signatures.
+
+	@Test
+	public void verifyReturnsFalseForNonCanonicalSignature() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
+		final byte[] input = Utils.generateRandomBytes();
+
+		// Act:
+		final Signature signature = dsaSigner.sign(input);
+		final BigInteger nonCanonicalS = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().subtract(signature.getS());
+		final Signature nonCanonicalSignature = new Signature(signature.getR(), nonCanonicalS);
+
+		// Assert:
+		Assert.assertThat(dsaSigner.verify(input, nonCanonicalSignature), IsEqual.equalTo(false));
+	}
 
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -47,7 +64,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -66,7 +82,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void replacingRWithGroupOrderMinusRInSignatureRuinsSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
@@ -86,7 +101,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void verifyHasExpectedSpeed() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -104,7 +118,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		}
 		final long stop = System.currentTimeMillis();
 
-		// Assert (should be less than 500 micro seconds per verification on a decent computer):
+		// Assert (should be less than 2500 micro seconds per verification on a decent computer):
 		final long timeInMilliSeconds = stop - start;
 		System.out.println(String.format("verify needs %d micro seconds.", timeInMilliSeconds * 2));
 		Assert.assertTrue(
@@ -118,7 +132,8 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	}
 
 	@Override
-	protected void initCryptoEngine() {
+	@Before
+	public void initCryptoEngine() {
 		CryptoEngines.setDefaultEngine(CryptoEngines.secp256k1Engine());
 	}
 }

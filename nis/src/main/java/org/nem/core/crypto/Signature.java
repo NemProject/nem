@@ -1,6 +1,5 @@
 package org.nem.core.crypto;
 
-import org.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.*;
 
@@ -92,16 +91,6 @@ public class Signature {
 
 	/**
 	 * Gets the s-part of the signature.
-	 * TODO 20141010 J-B why is this here?
-	 *
-	 * @return The s-part of the signature.
-	 */
-	public Ed25519EncodedFieldElement getSAsEncodedFieldElement() {
-		return new Ed25519EncodedFieldElement(this.s);
-	}
-
-	/**
-	 * Gets the s-part of the signature.
 	 *
 	 * @return The s-part of the signature.
 	 */
@@ -131,6 +120,7 @@ public class Signature {
 
 		final Signature rhs = (Signature)obj;
 		// TODO 20141010 J-B: Arrays.equal?
+		// TODO 20141011 BR -> J: Arrays.equal is as far as I know not a constant time method.
 		return 1 == ArrayUtils.isEqual(this.r, rhs.r) && 1 == ArrayUtils.isEqual(this.s, rhs.s);
 	}
 

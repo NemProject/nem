@@ -2,7 +2,7 @@ package org.nem.core.crypto;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.crypto.ed25519.Ed25519Engine;
+import org.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import org.nem.core.test.Utils;
 
 import java.math.BigInteger;
@@ -83,7 +83,7 @@ public class SignerTest {
 	}
 
 	private class SignerContext {
-		private final Ed25519Engine engine = Mockito.mock(Ed25519Engine.class);
+		private final Ed25519CryptoEngine engine = Mockito.mock(Ed25519CryptoEngine.class);
 		private final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
 		private final DsaSigner dsaSigner = Mockito.mock(DsaSigner.class);
 		private final byte[] data = Utils.generateRandomBytes();

@@ -72,7 +72,6 @@ public abstract class DsaSignerTest {
 	@Test
 	public void isCanonicalReturnsTrueForCanonicalSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -87,7 +86,6 @@ public abstract class DsaSignerTest {
 	@Test
 	public void verifyCallsIsCanonicalSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = Mockito.spy(this.getDsaSigner(kp));
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -102,5 +100,6 @@ public abstract class DsaSignerTest {
 
 	protected abstract DsaSigner getDsaSigner(final KeyPair keyPair);
 
-	protected abstract void initCryptoEngine();
+	@Before
+	public abstract void initCryptoEngine();
 }

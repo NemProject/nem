@@ -6,6 +6,15 @@ import org.junit.*;
 public abstract class CryptoEngineTest {
 
 	@Test
+	public void canGetCurve() {
+		// Act:
+		final Curve curve = this.getCryptoEngine().getCurve();
+
+		// Assert:
+		Assert.assertThat(curve, IsInstanceOf.instanceOf(Curve.class));
+	}
+
+	@Test
 	public void canCreateDsaSigner() {
 		// Act:
 		final DsaSigner signer = this.getCryptoEngine().createDsaSigner(new KeyPair());

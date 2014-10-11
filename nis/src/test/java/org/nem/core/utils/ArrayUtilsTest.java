@@ -265,6 +265,7 @@ public class ArrayUtilsTest {
 	@Test
 	public void isEqualsReturnsOneForEqualByteArrays() {
 		// TODO 20141010 J-b: i'm not sure if we need to loop in this test
+		// TODO 20141011 BR -> J: you only want to test a specfic setup?
 
 		// Arrange:
 		final SecureRandom random = new SecureRandom();

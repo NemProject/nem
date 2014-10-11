@@ -110,6 +110,7 @@ public class ByteUtilsTest {
 
 	// TODO 20141010 J-B: you should have a test where the lobyte is equal and the hibyte is not equal
 	// > (since you appear to only be comparing the lobyte)
+	// TODO 20141011 BR -> J: ok.
 
 	@Test
 	public void isEqualReturnsOneIfBytesAreEqual() {
@@ -118,6 +119,7 @@ public class ByteUtilsTest {
 		Assert.assertThat(ByteUtils.isEqual(7, 7), IsEqual.equalTo(1));
 		Assert.assertThat(ByteUtils.isEqual(64, 64), IsEqual.equalTo(1));
 		Assert.assertThat(ByteUtils.isEqual(255, 255), IsEqual.equalTo(1));
+		Assert.assertThat(ByteUtils.isEqual(75 + 256, 75 + 256 * 2), IsEqual.equalTo(1));
 	}
 
 	@Test

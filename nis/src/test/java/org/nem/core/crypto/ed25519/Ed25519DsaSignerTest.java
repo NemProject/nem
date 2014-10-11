@@ -12,7 +12,6 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -29,7 +28,6 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -48,7 +46,6 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void replacingRWithGroupOrderPlusRInSignatureRuinsSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -66,7 +63,6 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void signReturnsExpectedSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
 		for (int i = 0; i < 20; i++) {
 			final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
@@ -84,7 +80,6 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void signReturnsVerifiableSignature() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
 		for (int i = 0; i < 20; i++) {
 			final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
@@ -101,7 +96,6 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void verifyHasExpectedSpeed() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -133,7 +127,8 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	}
 
 	@Override
-	protected void initCryptoEngine() {
+	@Before
+	public void initCryptoEngine() {
 		CryptoEngines.setDefaultEngine(CryptoEngines.ed25519Engine());
 	}
 }

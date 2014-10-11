@@ -3,7 +3,7 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.ed25519.Ed25519Engine;
+import org.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 
 // TODO 20141006 BR: Beware of mocks. Since KeyPairContext mocks a lot, even tests not designed to use mocks will end up with mocks.
 public class KeyPairTest {
@@ -16,7 +16,6 @@ public class KeyPairTest {
 		// Assert:
 		Assert.assertThat(kp.hasPrivateKey(), IsEqual.equalTo(true));
 		Assert.assertThat(kp.getPrivateKey(), IsNull.notNullValue());
-		Assert.assertThat(kp.hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(kp.getPublicKey(), IsNull.notNullValue());
 	}
 
@@ -30,6 +29,21 @@ public class KeyPairTest {
 	}
 
 	// TODO 20141010 J-B: ctorCreatesDifferentInstancesWithDifferentKeys still seems valid
+	// TODO 20141011 BR -> J: Done.
+	@Test
+	public void ctorCreatesDifferentInstancesWithDifferentKeys() {
+		// Arrange:
+		final KeyPairContext context = new KeyPairContext();
+		Mockito.when(context.engine.createKeyGenerator()).thenCallRealMethod();
+
+		// Act:
+		final KeyPair kp1 = new KeyPair();
+		final KeyPair kp2 = new KeyPair();
+
+		// Assert:
+		Assert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));
+		Assert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
+	}
 
 	@Test
 	public void ctorCanCreateKeyPairAroundPrivateKey() {
@@ -42,7 +56,6 @@ public class KeyPairTest {
 		// Assert:
 		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
 		Assert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(kp1.getPrivateKey()));
-		Assert.assertThat(kp2.hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}
 
@@ -57,7 +70,6 @@ public class KeyPairTest {
 		// Assert:
 		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(false));
 		Assert.assertThat(kp2.getPrivateKey(), IsNull.nullValue());
-		Assert.assertThat(kp2.hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}
 
@@ -108,21 +120,21 @@ public class KeyPairTest {
 	}
 
 	private class KeyPairContext {
-		private final Ed25519Engine engine = Mockito.mock(Ed25519Engine.class);
+		private final Ed25519CryptoEngine engine = Mockito.mock(Ed25519CryptoEngine.class);
 		private final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
 		private final KeyGenerator generator = Mockito.mock(KeyGenerator.class);
 		private final PrivateKey privateKey = Mockito.mock(PrivateKey.class);
 		private final PublicKey publicKey = Mockito.mock(PublicKey.class);
-		private final KeyPair keyPair;
+		private final KeyPair keyPair1;
 
 		private KeyPairContext() {
 			CryptoEngines.setDefaultEngine(this.engine);
 			Mockito.when(this.analyzer.isKeyCompressed(Mockito.any())).thenReturn(true);
 			Mockito.when(this.engine.createKeyAnalyzer()).thenReturn(this.analyzer);
 			Mockito.when(this.publicKey.isCompressed()).thenReturn(true);
-			this.keyPair = new KeyPair(this.privateKey, this.publicKey);
+			this.keyPair1 = new KeyPair(this.privateKey, this.publicKey);
 			Mockito.when(this.engine.createKeyGenerator()).thenReturn(this.generator);
-			Mockito.when(this.generator.generateKeyPair()).thenReturn(this.keyPair);
+			Mockito.when(this.generator.generateKeyPair()).thenReturn(this.keyPair1);
 			Mockito.when(this.generator.derivePublicKey(this.privateKey)).thenReturn(this.publicKey);
 		}
 	}

@@ -8,7 +8,6 @@ public abstract class KeyAnalyzerTest {
 	@Test
 	public void isKeyCompressedReturnsTrueForCompressedPublicKey() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyAnalyzer analyzer = this.getKeyAnalyzer();
 		final KeyPair keyPair = new KeyPair();
 
@@ -19,9 +18,11 @@ public abstract class KeyAnalyzerTest {
 	@Test
 	public void isKeyCompressedReturnsFalseIfKeyHasWrongLength() {
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyAnalyzer analyzer = this.getKeyAnalyzer();
-		final PublicKey key = new PublicKey(new byte[35]); // TODO 20141010 J-B might be safer to get a real public key and resize it -1
+		final KeyPair keyPair = new KeyPair();
+		// TODO 20141010 J-B might be safer to get a real public key and resize it -1
+		// TODO 20141011 BR -> J: you mean like this?
+		final PublicKey key = new PublicKey(new byte[keyPair.getPublicKey().getRaw().length + 1]);
 
 		// Act + Assert:
 		Assert.assertThat(analyzer.isKeyCompressed(key), IsEqual.equalTo(false));
@@ -29,5 +30,6 @@ public abstract class KeyAnalyzerTest {
 
 	protected abstract KeyAnalyzer getKeyAnalyzer();
 
-	protected abstract void initCryptoEngine();
+	@Before
+	public abstract void initCryptoEngine();
 }

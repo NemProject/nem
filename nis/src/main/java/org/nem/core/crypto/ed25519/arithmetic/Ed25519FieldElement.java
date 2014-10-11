@@ -885,7 +885,6 @@ public class Ed25519FieldElement {
 	/**
 	 * Computes this field element to the power of (2^252 - 3) and returns the result.
 	 * This is a helper function for calculating the square root.
-	 * TODO-CR BR: I think it makes sense to have a sqrt function.
 	 *
 	 * @return This field element to the power of (2^252 - 3).
 	 */

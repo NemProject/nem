@@ -151,6 +151,7 @@ public class ArrayUtils {
 	public static int isEqual(final byte[] b, final byte[] c) {
 		// TODO 20141010 J-B: can you explain what you're doing here?
 		// > how is this faster than Arrays.equal?
+		// TODO 20141011 BR -> J it's not about speed but about constant time behavior which eliminates side channel attacks.
 		int result = 0;
 		result |= b.length - c.length;
 		for (int i = 0; i < b.length; i++) {

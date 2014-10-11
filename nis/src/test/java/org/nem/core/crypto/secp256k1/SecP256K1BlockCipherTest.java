@@ -1,5 +1,6 @@
 package org.nem.core.crypto.secp256k1;
 
+import org.junit.Before;
 import org.nem.core.crypto.*;
 
 public class SecP256K1BlockCipherTest extends BlockCipherTest {
@@ -10,7 +11,8 @@ public class SecP256K1BlockCipherTest extends BlockCipherTest {
 	}
 
 	@Override
-	protected void initCryptoEngine() {
+	@Before
+	public void initCryptoEngine() {
 		CryptoEngines.setDefaultEngine(CryptoEngines.secp256k1Engine());
 	}
 }

@@ -66,7 +66,6 @@ public class SecP256K1KeyGeneratorTest extends KeyGeneratorTest {
 		}};
 
 		// Arrange:
-		this.initCryptoEngine();
 		final KeyGenerator generator = this.getKeyGenerator();
 		for (final Map.Entry<String, String> entry : priv2Pub.entrySet()) {
 			final String privateKey = entry.getKey();
@@ -85,7 +84,8 @@ public class SecP256K1KeyGeneratorTest extends KeyGeneratorTest {
 	}
 
 	@Override
-	protected void initCryptoEngine() {
+	@Before
+	public void initCryptoEngine() {
 		CryptoEngines.setDefaultEngine(CryptoEngines.secp256k1Engine());
 	}
 }

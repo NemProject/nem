@@ -146,6 +146,40 @@ public class SignatureTest {
 
 	//endregion
 
+	//region getBinaryR / getBinaryS
+
+	@Test
+	public void getBinaryRReturnsRAsByteArray() {
+		// Arrange:
+		final byte[] originalR = new byte[32];
+		originalR[15] = 123;
+		final byte[] s = new byte[32];
+		final Signature signature = new Signature(originalR, s);
+
+		// Act:
+		final byte[] r = signature.getBinaryR();
+
+		// Assert:
+		Assert.assertThat(r, IsEqual.equalTo(originalR));
+	}
+
+	@Test
+	public void getBinarySReturnsSAsByteArray() {
+		// Arrange:
+		final byte[] r = new byte[32];
+		final byte[] originalS = new byte[32];
+		originalS[15] = 123;
+		final Signature signature = new Signature(r, originalS);
+
+		// Act:
+		final byte[] s = signature.getBinaryS();
+
+		// Assert:
+		Assert.assertThat(s, IsEqual.equalTo(originalS));
+	}
+
+	//endregion
+
 	//region equals / hashCode
 
 	@Test

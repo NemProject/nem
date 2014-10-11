@@ -38,6 +38,11 @@ public class ByteUtils {
 		// TODO 20141010 J-B: can you explain what you're doing here?
 		// > are you treating the ints as bytes? if so, wouldn't this be faster:
 		// (b & 0xFF) == (c & 0xFF)
+		// TODO 20141011 BR -> J the method was "stolen" from the original github project. It's all about constant time behavior.
+		// TODO 20141011         All the implementation I have seen use a "complex" strategy. Bernstein uses for int comparisons:
+		// TODO 20141011         https://www.cipherdyne.org/lcov-results/openssh-6.6p1/openssh-6.6p1/verify.c.gcov.html
+		// TODO 20141011         And yes, it's abused to compare only bytes as the input will have 8 relevant bits in our case (see Ed25519GroupElement.select()).
+		// TODO 20141011         You may change it if you can guarantee constant time behavior.
 
 		int result = 0;
 		final int xor = b ^ c;

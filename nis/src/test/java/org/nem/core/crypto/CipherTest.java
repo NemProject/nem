@@ -2,7 +2,7 @@ package org.nem.core.crypto;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.crypto.ed25519.Ed25519Engine;
+import org.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import org.nem.core.test.Utils;
 
 public class CipherTest {
@@ -49,7 +49,7 @@ public class CipherTest {
 	}
 
 	private class CipherContext {
-		private final Ed25519Engine engine = Mockito.mock(Ed25519Engine.class);
+		private final Ed25519CryptoEngine engine = Mockito.mock(Ed25519CryptoEngine.class);
 		private final BlockCipher blockCipher = Mockito.mock(BlockCipher.class);
 		private final KeyPair pair1;
 		private final KeyPair pair2;
@@ -58,6 +58,8 @@ public class CipherTest {
 			// TODO 20141010 J-B: i think setDefaultEngine will make the tests brittle (i.e. it will prevent some tests from running
 			// > deterministically in parallel); not a problem for now, but could be a problem if we hook up with something like travis ci
 			// > a workaround would be to have an overloaded constructor that is passed the engine
+			// TODO 20141011 BR -> J: "overloaded constructor that is passed the engine" not sure I can follow, the classes still use getDefaultEngine().
+			// TODO                   Or should getDefaultEngine() be replaced?
 			CryptoEngines.setDefaultEngine(this.engine);
 			Mockito.when(this.engine.createBlockCipher(Mockito.any(), Mockito.any())).thenReturn(this.blockCipher);
 			Mockito.when(this.engine.createKeyGenerator()).thenCallRealMethod();

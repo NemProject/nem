@@ -95,6 +95,8 @@ public class PrivateKey implements SerializableEntity {
 	}
 
 	// TODO 20141010 J-B why is this here?
+	// TODO 20141011 BR -> J: it is used in 3 places  (BlockCipher, DsaSigner, KeyGenerator).
+	// TODO                   So if I remove this here I need a helper method somewhere else.
 	public Ed25519EncodedFieldElement prepareForScalarMultiply() {
 		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(this.value, 32));
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);

@@ -30,6 +30,8 @@ public class Hashes {
 	// TODO 20141010 J-B: should we just replace sha3 with this?
 	// > i would also prefer to hide the message digest in this class
 	// > (like the other overloads)
+	// TODO 20141011 BR -> J: We need both sha3-256 (for secp256k1) and sha3-512 (for ed25519).
+	// TODO 20141011          Aside from that, sure we can hide the message digest. You want to do this?
 
 	/**
 	 * Gets an instance of a SHA3-512 message digest.
