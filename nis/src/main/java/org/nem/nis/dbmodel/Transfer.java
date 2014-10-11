@@ -42,7 +42,8 @@ public class Transfer {
 	@JoinColumn(name = "recipientId")
 	private Account recipient;
 
-	private Integer blkIndex; // blkIndex inside block
+	private Integer blkIndex; // index inside block
+	private Integer orderId; // index inside list
 
 	private Long amount;
 	private Long referencedTransaction;
@@ -51,10 +52,7 @@ public class Transfer {
 	private byte[] messagePayload;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinTable(name = "block_transfers",
-			joinColumns = { @JoinColumn(name = "transfer_id", referencedColumnName = "id") },
-			inverseJoinColumns = { @JoinColumn(name = "block_id", referencedColumnName = "id") }
-	)
+	@JoinColumn(name = "blockId")
 	private Block block;
 
 	public Transfer() {
@@ -70,6 +68,7 @@ public class Transfer {
 			final Account sender,
 			final byte[] senderProof,
 			final Account recipient,
+			final Integer orderId,
 			final Integer blkIndex,
 			final Long amount,
 			final Long referencedTransaction
@@ -84,6 +83,7 @@ public class Transfer {
 		this.sender = sender;
 		this.senderProof = senderProof;
 		this.recipient = recipient;
+		this.orderId = orderId;
 		this.blkIndex = blkIndex;
 		this.amount = amount;
 		this.referencedTransaction = referencedTransaction;
@@ -183,6 +183,10 @@ public class Transfer {
 
 	public void setBlkIndex(final Integer blkIndex) {
 		this.blkIndex = blkIndex;
+	}
+
+	public Integer getOrderId() {
+		return this.block.getBlockTransfers().indexOf(this);
 	}
 
 	public Long getAmount() {

@@ -125,8 +125,11 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
 	}
 
+	// TODO 20141005 - since i imagine these tests will apply to all transaction types, it might make sense
+	// > to refactor the validation and pass in transactions; although that might be hard, so it's not so important
+
 	@Test
-	public void savingChangesImportanceTransferBlkIndex() {
+	public void savingDoesNotChangeImportanceTransferBlkIndex() {
 		// Arrange:
 		final Account signer1 = Utils.generateRandomAccount();
 		final Account remote1 = Utils.generateRandomAccount();
@@ -148,15 +151,12 @@ public class BlockDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(0));
-		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(12));
 	}
 
-	// TransferTransactions does not use OrderColumn, but maybe we should redo that
-	// TODO-CR 20140919 J-G: it probably makes sense to redo that so its used by both
-	// TODO 20140922 G-J: as I've mentioned this will be breaking change but it is on my TODO list (also related to ImportanceTransferDao changes)
 	@Test
-	public void savingDoesNotChangeTransferTransactionBlkIndex() {
+	public void savingChangesTransferTransactionOrderId() {
 		// Arrange:
 		final Account signer1 = Utils.generateRandomAccount();
 		final Account remote1 = Utils.generateRandomAccount();
@@ -172,12 +172,16 @@ public class BlockDaoTest {
 		final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
+		// TODO 20141010 J-G: i imagine you want to set the order id here
 		dbBlock.getBlockTransfers().get(0).setBlkIndex(24);
 		dbBlock.getBlockTransfers().get(1).setBlkIndex(12);
 
 		this.blockDao.save(dbBlock);
 
 		// Assert:
+		// TODO 20141010 J-G: you don't need to revalidate getBlkIndex here; do you have a test like this for importance transfer?
+		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getOrderId(), equalTo(0));
+		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getOrderId(), equalTo(1));
 		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
 		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
 	}
@@ -230,9 +234,8 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
-	// cause .save does NOT modify blkIndex, and when read, they are ordered by blkIndex
 	@Test
-	public void changingTransferTransactionBlkIndexAffectOrderOfTxes() {
+	public void changingTransferTransactionBlkIndexDoesNotAffectOrderOfTxes() {
 		// Arrange:
 		final Account signer1 = Utils.generateRandomAccount();
 		final Account remote1 = Utils.generateRandomAccount();
@@ -257,8 +260,10 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
 		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
-		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(12));
-		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(24));
+		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
+		// TODO 20151005 J-G i guess you're assuming the entity transactions are sorted?
+		// > it might be better to check the hashes like in the following test
 	}
 
 	@Test
@@ -291,8 +296,8 @@ public class BlockDaoTest {
 
 		final Hash h1 = entity.getBlockImportanceTransfers().get(0).getTransferHash();
 		final Hash h2 = entity.getBlockImportanceTransfers().get(1).getTransferHash();
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(entity.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(12));
 		Assert.assertThat(h1, equalTo(HashUtils.calculateHash(importanceTransfer1)));
 		Assert.assertThat(h2, equalTo(HashUtils.calculateHash(importanceTransfer2)));
 	}
@@ -317,6 +322,33 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
 
 		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
+	}
+
+	@Test
+	public void getBlocksForAccountReturnsBlockForagedViaRemoteAccount() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account remoteAccount = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remoteAccount, Utils.generateRandomAccount());
+
+		final List<Hash> hashes = new ArrayList<>();
+		for (int i = 0; i < 30; i++) {
+			final Account blockSigner = (i % 2 == 0) ? signer : remoteAccount;
+			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(blockSigner, 456 + i, 0);
+			if (i % 2 == 1) {
+				emptyBlock.setLessor(signer);
+			}
+			final Block dbBlock = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+			hashes.add(dbBlock.getBlockHash());
+
+			// Act:
+			this.blockDao.save(dbBlock);
+		}
+		final Collection<Block> entities1 = this.blockDao.getBlocksForAccount(signer, hashes.get(29), 25);
+
+		// Assert:
+		// TODO 20151010 J-G can you add a comment explaining why 25 is expected?
+		Assert.assertThat(entities1.size(), equalTo(25));
 	}
 
 	@Test

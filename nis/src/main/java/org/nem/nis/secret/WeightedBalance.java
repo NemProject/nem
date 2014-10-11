@@ -6,8 +6,6 @@ import org.nem.core.model.primitive.*;
  * Calculates vested and unvested balances at a specified block height.
  */
 public class WeightedBalance implements Comparable<WeightedBalance> {
-	public static final long DECAY_NUMERATOR = 9;
-	public static final long DECAY_DENOMINATOR = 10;
 	public static final WeightedBalance ZERO = new WeightedBalance(Amount.ZERO, BlockHeight.ONE, Amount.ZERO, 0, 0);
 
 	private final BlockHeight blockHeight;
@@ -98,7 +96,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @return The next weighted balance.
 	 */
 	public WeightedBalance next() {
-		final long newUv = this.unvestedBalance * DECAY_NUMERATOR / DECAY_DENOMINATOR;
+		final long newUv = this.unvestedBalance * WeightedBalanceDecayConstants.DECAY_NUMERATOR / WeightedBalanceDecayConstants.DECAY_DENOMINATOR;
 		final long move = this.unvestedBalance - newUv;
 
 		final long blocksPerDay = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;

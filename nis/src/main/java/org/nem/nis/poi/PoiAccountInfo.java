@@ -1,19 +1,16 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.secret.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Account information used by poi.
  */
 public class PoiAccountInfo {
-
-	private static final Amount MIN_FORAGING_BALANCE = Amount.fromNem(1000);
-	public static final double DECAY_BASE = (double)WeightedBalance.DECAY_NUMERATOR / (double)WeightedBalance.DECAY_DENOMINATOR;
-
 	private final int index;
 	private final PoiAccountState accountState;
 	private final BlockHeight height;
@@ -41,7 +38,9 @@ public class PoiAccountInfo {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
 			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-			final double weight = heightDifference < 0 ? 0.0 : outlink.getAmount().getNumMicroNem() * Math.pow(DECAY_BASE, age);
+			final double weight = heightDifference < 0
+					? 0.0
+					: outlink.getAmount().getNumMicroNem() * Math.pow(WeightedBalanceDecayConstants.DECAY_BASE, age);
 
 			this.outlinks.add(new WeightedLink(outlink.getOtherAccountAddress(), weight));
 			this.increment(outlink.getOtherAccountAddress(), weight);
@@ -71,15 +70,6 @@ public class PoiAccountInfo {
 	}
 
 	/**
-	 * Determines whether or not the account is eligible for foraging.
-	 *
-	 * @return true if the account is eligible.
-	 */
-	public boolean canForage() {
-		return this.accountState.getWeightedBalances().getVested(this.height).compareTo(MIN_FORAGING_BALANCE) >= 0;
-	}
-
-	/**
 	 * Adds an inlink to this account info.
 	 *
 	 * @param inlink The inlink to add.
@@ -99,20 +89,14 @@ public class PoiAccountInfo {
 
 	/**
 	 * Gets the weighted net outlinks associated with this account.
+	 * The net outlinks can be negative.
 	 *
 	 * @return The weighted net outlinks.
 	 */
 	public List<WeightedLink> getNetOutlinks() {
-		final List<WeightedLink> links = new ArrayList<>();
-		for (final Map.Entry<Address, Double> entry : this.netOutlinks.entrySet()) {
-			if (entry.getValue() <= 0) {
-				continue;
-			}
-
-			links.add(new WeightedLink(entry.getKey(), entry.getValue()));
-		}
-
-		return links;
+		return this.netOutlinks.entrySet().stream()
+				.map(entry -> new WeightedLink(entry.getKey(), entry.getValue()))
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -122,7 +106,7 @@ public class PoiAccountInfo {
 	 */
 	public double getNetOutlinkScore() {
 		return this.getNetOutlinks().stream()
-				.map(obj -> obj.getWeight())
+				.map(WeightedLink::getWeight)
 				.reduce(0.0, Double::sum);
 	}
 }

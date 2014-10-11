@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockChainConstants;
 
@@ -10,14 +10,19 @@ import org.nem.nis.secret.BlockChainConstants;
  */
 public class ImportanceTransferTransactionValidator implements TransactionValidator {
 	private final PoiFacade poiFacade;
+	private final Amount minHarvesterBalance;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param poiFacade The poi facade.
+	 * @param minHarvesterBalance The minimum balance required for a harvester.
 	 */
-	public ImportanceTransferTransactionValidator(final PoiFacade poiFacade) {
+	public ImportanceTransferTransactionValidator(
+			final PoiFacade poiFacade,
+			final Amount minHarvesterBalance) {
 		this.poiFacade = poiFacade;
+		this.minHarvesterBalance = minHarvesterBalance;
 	}
 
 	@Override
@@ -26,9 +31,7 @@ public class ImportanceTransferTransactionValidator implements TransactionValida
 			return ValidationResult.SUCCESS;
 		}
 
-		return this.validate(context.getBlockHeight(), (ImportanceTransferTransaction)transaction)
-				? ValidationResult.SUCCESS
-				: ValidationResult.FAILURE_ENTITY_UNUSABLE;
+		return this.validate(context.getBlockHeight(), (ImportanceTransferTransaction)transaction, context.getDebitPredicate());
 	}
 
 	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
@@ -44,21 +47,25 @@ public class ImportanceTransferTransactionValidator implements TransactionValida
 	}
 
 	// TODO 20140920 J-G: should we have more specific results?
-	private boolean validate(final BlockHeight height, final ImportanceTransferTransaction transaction) {
+	private ValidationResult validate(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
 		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
-			return false;
+			return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 		}
 
 		switch (transaction.getMode()) {
 			case Activate:
+				if (!predicate.canDebit(transaction.getSigner(), this.minHarvesterBalance.add(transaction.getFee()))) {
+					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
+				}
+
 				// if a remote is already activated, it needs to be deactivated first
-				return !isRemoteActivated(remoteLinks);
+				return !isRemoteActivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_UNUSABLE;
 
 			case Deactivate:
 			default:
 				// if a remote is already deactivated, it needs to be activated first
-				return !isRemoteDeactivated(remoteLinks);
+				return !isRemoteDeactivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_UNUSABLE;
 		}
 	}
 }

@@ -134,7 +134,7 @@ public class AccountsHeightObserverTest {
 	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
 		final AccountCache accountCache = new AccountCache();
-		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(accountCache, poiFacade);
 		final AccountsHeightObserver observer = new AccountsHeightObserver(accountAnalyzer);
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());

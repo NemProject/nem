@@ -76,7 +76,7 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		this.poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		this.poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
 		this.syncStrategy = createSynchronizationStrategy(this.poiFacade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
@@ -249,7 +249,7 @@ public class Network {
 	}
 
 	private PoiFacade resetFacade() {
-		this.poiFacade = new PoiFacade(Mockito.mock(PoiImportanceGenerator.class));
+		this.poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
 		this.syncStrategy = createSynchronizationStrategy(this.poiFacade);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);

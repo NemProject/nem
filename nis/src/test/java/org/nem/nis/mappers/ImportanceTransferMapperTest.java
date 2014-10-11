@@ -109,7 +109,8 @@ public class ImportanceTransferMapperTest {
 
 		@SuppressWarnings("unchecked")
 		public ImportanceTransfer toDbModel(final int blockIndex) {
-			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, new AccountDaoLookupAdapter(this.accountDao));
+			// TODO 20141010 J-G guess we should validate orderIndex like blockIndex
+			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, 0, new AccountDaoLookupAdapter(this.accountDao));
 
 			// TODO 20140923 J-G i'm not following what you're doing here
 			// TODO 20140924 G-J: this was made to make .getBlock and .getBlkIndex inside asserts
