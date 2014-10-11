@@ -163,7 +163,7 @@ public class TransferMapperTest {
 			return TransferMapper.toModel(dbTransfer, mockAccountLookup);
 		}
 
-		public void assertDbModel(final Transfer dbModel, int blockId) {
+		public void assertDbModel(final Transfer dbModel, final int blockId) {
 			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(this.hash));
