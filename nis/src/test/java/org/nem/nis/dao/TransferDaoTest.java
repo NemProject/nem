@@ -41,7 +41,7 @@ public class TransferDaoTest {
 
 		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
 		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		addToDummyBlock(dbAccount, entity);
+		this.addToDummyBlock(dbAccount, entity);
 
 		// Act
 		this.transferDao.save(entity);
@@ -62,7 +62,7 @@ public class TransferDaoTest {
 		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
 
 		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		addToDummyBlock(dbAccount, dbTransfer);
+		this.addToDummyBlock(dbAccount, dbTransfer);
 
 		// Act
 		this.transferDao.save(dbTransfer);
@@ -92,7 +92,7 @@ public class TransferDaoTest {
 		final Long initialCount = this.transferDao.count();
 
 		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		addToDummyBlock(dbAccount, dbTransfer1, dbTransfer2, dbTransfer3);
+		this.addToDummyBlock(dbAccount, dbTransfer1, dbTransfer2, dbTransfer3);
 
 		// Act
 		this.transferDao.save(dbTransfer1);
@@ -454,7 +454,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsTransferIfMaxBlockHeightIsGreaterOrEqualToTransferBlockHeight() {
 		// Arrange:
-		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase();
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer1_1 = this.transferDao.findByHash(hashes.get(0).getRaw(), 1);
@@ -474,7 +474,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsNullIfMaxBlockHeightIsLessThanTransferBlockHeight() {
 		// Arrange:
-		final List<Hash> hashes = saveThreeBlocksWithTransactionsInDatabase();
+		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase();
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer1 = this.transferDao.findByHash(hashes.get(1).getRaw(), 1);
@@ -488,7 +488,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsNullIfHashDoesNotExistInDatabase() {
 		// Arrange:
-		saveThreeBlocksWithTransactionsInDatabase();
+		this.saveThreeBlocksWithTransactionsInDatabase();
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);

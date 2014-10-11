@@ -19,12 +19,12 @@ public class ImportanceTransferTransactionTest {
 
 	@Test
 	public void ctorCanCreateImportanceTransfer() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Activate);
+		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Activate);
 	}
 
 	@Test
 	public void ctorCanCreateImportanceTransferRevert() {
-		assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Deactivate);
+		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Deactivate);
 	}
 
 	private void assertCtorCanCreateImportanceTransfer(final ImportanceTransferTransaction.Mode mode) {
@@ -65,13 +65,13 @@ public class ImportanceTransferTransactionTest {
 	@Test
 	public void deserializationFailsWhenAddressIsMissing() {
 		// Assert:
-		assertDeserializationFailure(jsonObject -> jsonObject.put("remoteAccount", null));
+		this.assertDeserializationFailure(jsonObject -> jsonObject.put("remoteAccount", null));
 	}
 
 	@Test
 	public void deserializationFailsWhenModeIsInvalid() {
 		// Assert:
-		assertDeserializationFailure(jsonObject -> jsonObject.put("mode", 123));
+		this.assertDeserializationFailure(jsonObject -> jsonObject.put("mode", 123));
 	}
 
 	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer) {
@@ -102,12 +102,12 @@ public class ImportanceTransferTransactionTest {
 
 	@Test
 	public void canRoundTripImportanceTransfer() {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Activate);
+		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Activate);
 	}
 
 	@Test
 	public void canRoundTripImportanceTransferRevert() {
-		assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Deactivate);
+		this.assertImportanceTransferCanBeRoundTripped(ImportanceTransferTransaction.Mode.Deactivate);
 	}
 
 	public void assertImportanceTransferCanBeRoundTripped(final ImportanceTransferTransaction.Mode mode) {

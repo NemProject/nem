@@ -18,7 +18,7 @@ public class ValidationContextTest {
 		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
 		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
 		Assert.assertThat(context.getDebitPredicate(), IsNull.notNullValue());
-		assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
+		this.assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
 	}
 
 	@Test
@@ -30,7 +30,7 @@ public class ValidationContextTest {
 		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
 		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
 		Assert.assertThat(context.getDebitPredicate(), IsNull.notNullValue());
-		assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
+		this.assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
 	}
 
 	@Test
@@ -54,7 +54,7 @@ public class ValidationContextTest {
 		Assert.assertThat(context.getBlockHeight(), IsEqual.equalTo(new BlockHeight(11)));
 		Assert.assertThat(context.getConfirmedBlockHeight(), IsEqual.equalTo(new BlockHeight(7)));
 		Assert.assertThat(context.getDebitPredicate(), IsNull.notNullValue());
-		assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
+		this.assertDefaultDebitPredicateBehavior(context.getDebitPredicate());
 	}
 
 	@Test

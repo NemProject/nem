@@ -12,9 +12,9 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
 		// Act:
@@ -29,9 +29,9 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
 		// Act:
@@ -48,9 +48,9 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void replacingRWithGroupOrderPlusRInSignatureRuinsSignature() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
 		// Act:
@@ -66,10 +66,10 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void signReturnsExpectedSignature() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
 		for (int i = 0; i < 20; i++) {
-			final DsaSigner dsaSigner = getDsaSigner(keyPair);
+			final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 			final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
 			// Act:
@@ -84,10 +84,10 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void signReturnsVerifiableSignature() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
 		for (int i = 0; i < 20; i++) {
-			final DsaSigner dsaSigner = getDsaSigner(keyPair);
+			final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 			final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
 			// Act:
@@ -101,9 +101,9 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void verifyHasExpectedSpeed() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(keyPair);
+		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 		final Signature signature = dsaSigner.sign(input);
 

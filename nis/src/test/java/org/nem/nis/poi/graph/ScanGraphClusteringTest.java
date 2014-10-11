@@ -428,8 +428,8 @@ public abstract class ScanGraphClusteringTest {
 		outlinkMatrix.setAt(2, 3, 1);
 
 		// Act:
-		ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		List<Cluster> expectedClusters = Arrays.asList(
@@ -452,8 +452,8 @@ public abstract class ScanGraphClusteringTest {
 		outlinkMatrix2.setAt(2, 3, 1);
 
 		// Act:
-		result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		expectedClusters = Arrays.asList(
@@ -530,8 +530,8 @@ public abstract class ScanGraphClusteringTest {
 		outlinkMatrix.setAt(3, 5, 1);
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
@@ -546,7 +546,7 @@ public abstract class ScanGraphClusteringTest {
 	@Test
 	public void thirdGraphIsClusteredAsExpected() {
 		// Assert:
-		assertGraphIsClusteredCorrectly(GraphType.GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER);
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER);
 	}
 
 	/**
@@ -594,8 +594,8 @@ public abstract class ScanGraphClusteringTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
@@ -639,8 +639,8 @@ public abstract class ScanGraphClusteringTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(
@@ -678,8 +678,8 @@ public abstract class ScanGraphClusteringTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
@@ -712,8 +712,8 @@ public abstract class ScanGraphClusteringTest {
 		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
@@ -728,7 +728,7 @@ public abstract class ScanGraphClusteringTest {
 	@Test
 	public void eighthGraphIsClusteredAsExpected() {
 		// Assert:
-		assertGraphIsClusteredCorrectly(GraphType.GRAPH_LINE_STRUCTURE);
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_LINE_STRUCTURE);
 	}
 
 	private void assertGraphIsClusteredCorrectly(final GraphType graphType) {
@@ -736,8 +736,8 @@ public abstract class ScanGraphClusteringTest {
 		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
 
 		// Act:
-		final ClusteringResult result = calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		logClusteringResult(result);
+		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		this.logClusteringResult(result);
 
 		// Assert:
 		final ClusteringResult expectedResult = IdealizedClusterFactory.create(graphType);

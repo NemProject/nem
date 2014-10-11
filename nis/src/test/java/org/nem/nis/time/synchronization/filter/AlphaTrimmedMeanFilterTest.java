@@ -11,12 +11,12 @@ public class AlphaTrimmedMeanFilterTest {
 
 	@Test
 	public void filterDiscardsSamplesAtBothEnds() {
-		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableSortedSamples(0, 20));
+		this.assertFilterWorksAsExpected(TimeSyncUtils.createTolerableSortedSamples(0, 20));
 	}
 
 	@Test
 	public void filterCanHandleUnsortedList() {
-		assertFilterWorksAsExpected(TimeSyncUtils.createTolerableUnsortedSamples(0, 20));
+		this.assertFilterWorksAsExpected(TimeSyncUtils.createTolerableUnsortedSamples(0, 20));
 	}
 
 	private void assertFilterWorksAsExpected(final List<TimeSynchronizationSample> originalSamples) {

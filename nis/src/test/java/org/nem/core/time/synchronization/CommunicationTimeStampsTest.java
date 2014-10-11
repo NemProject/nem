@@ -46,7 +46,7 @@ public class CommunicationTimeStampsTest {
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
 		// Arrange:
 		final CommunicationTimeStamps timeStamps = new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17));
-		final HashMap<String, CommunicationTimeStamps> timeStampsMap = createTestCommunicationTimeStampsForEqualityTests();
+		final HashMap<String, CommunicationTimeStamps> timeStampsMap = this.createTestCommunicationTimeStampsForEqualityTests();
 
 		// Assert:
 		Assert.assertThat(timeStampsMap.get("default"), IsEqual.equalTo(timeStamps));
@@ -60,7 +60,7 @@ public class CommunicationTimeStampsTest {
 	public void hashCodesAreEqualForEquivalentObjects() {
 		// Arrange:
 		final CommunicationTimeStamps timeStamps = new CommunicationTimeStamps(new NetworkTimeStamp(5), new NetworkTimeStamp(17));
-		final HashMap<String, CommunicationTimeStamps> timeStampsMap = createTestCommunicationTimeStampsForEqualityTests();
+		final HashMap<String, CommunicationTimeStamps> timeStampsMap = this.createTestCommunicationTimeStampsForEqualityTests();
 
 		// Assert:
 		Assert.assertThat(timeStampsMap.get("default").hashCode(), IsEqual.equalTo(timeStamps.hashCode()));

@@ -199,13 +199,13 @@ public class ChainServicesTest {
 		private final HttpConnectorPool connectorPool = Mockito.mock(HttpConnectorPool.class);
 		private final HttpConnector connector = Mockito.mock(HttpConnector.class);
 		private final ChainServices services = new ChainServices(this.blockChainLastBlockLayer, this.connectorPool);
-		private final SerializableList<Node> nodes = createNodes();
+		private final SerializableList<Node> nodes = this.createNodes();
 
 		@SuppressWarnings("unchecked")
 		public TestContext() {
 			Mockito.when(this.connectorPool.getPeerConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);
-			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(createNodesFuture());
+			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(this.createNodesFuture());
 		}
 
 		@SuppressWarnings("unchecked")
@@ -213,7 +213,7 @@ public class ChainServicesTest {
 			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(height);
 			Mockito.when(this.connectorPool.getPeerConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);
-			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(createNodesFuture());
+			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(this.createNodesFuture());
 			Mockito.when(this.connector.getChainHeightAsync(Mockito.any(Node.class))).thenReturn(
 					CompletableFuture.completedFuture(new BlockHeight(10)),
 					CompletableFuture.completedFuture(new BlockHeight(30)),
@@ -233,9 +233,9 @@ public class ChainServicesTest {
 
 		public SerializableList<Node> createNodes() {
 			final SerializableList<Node> nodes = new SerializableList<>(3);
-			nodes.add(createNode("a"));
-			nodes.add(createNode("b"));
-			nodes.add(createNode("c"));
+			nodes.add(this.createNode("a"));
+			nodes.add(this.createNode("b"));
+			nodes.add(this.createNode("c"));
 			return nodes;
 		}
 

@@ -150,8 +150,8 @@ public class AccountControllerTest {
 	//region accountStatus
 	@Test
 	public void accountStatusDelegatesToUnlockedAccounts() {
-		assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
-		assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
+		this.assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
+		this.assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
 	}
 
 	private void assertAccountStatusDelegatesToUnlockedAccounts(final boolean returned, final AccountStatus expectedStatus) {

@@ -13,7 +13,7 @@ public abstract class DsaSignerTest {
 	public void signedDataCanBeVerified() {
 		// Arrange:
 		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -28,8 +28,8 @@ public abstract class DsaSignerTest {
 		// Arrange:
 		final KeyPair kp1 = new KeyPair();
 		final KeyPair kp2 = new KeyPair();
-		final DsaSigner dsaSigner1 = getDsaSigner(kp1);
-		final DsaSigner dsaSigner2 = getDsaSigner(kp2);
+		final DsaSigner dsaSigner1 = this.getDsaSigner(kp1);
+		final DsaSigner dsaSigner2 = this.getDsaSigner(kp2);
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -47,7 +47,7 @@ public abstract class DsaSignerTest {
 	public void signaturesReturnedBySignAreDeterministic() {
 		// Arrange:
 		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -62,7 +62,7 @@ public abstract class DsaSignerTest {
 	public void cannotSignPayloadWithoutPrivateKey() {
 		// Arrange:
 		final KeyPair kp = new KeyPair(Utils.generateRandomPublicKey());
-		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -72,9 +72,9 @@ public abstract class DsaSignerTest {
 	@Test
 	public void isCanonicalReturnsTrueForCanonicalSignature() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = getDsaSigner(kp);
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
 		// Act:
@@ -87,9 +87,9 @@ public abstract class DsaSignerTest {
 	@Test
 	public void verifyCallsIsCanonicalSignature() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
-		final DsaSigner dsaSigner = Mockito.spy(getDsaSigner(kp));
+		final DsaSigner dsaSigner = Mockito.spy(this.getDsaSigner(kp));
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 		final Signature signature = new Signature(BigInteger.ONE, BigInteger.ONE);
 

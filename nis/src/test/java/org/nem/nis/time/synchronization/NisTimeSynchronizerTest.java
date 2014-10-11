@@ -102,9 +102,9 @@ public class NisTimeSynchronizerTest {
 		private TimeSynchronizationContext() throws ExecutionException, InterruptedException {
 			this.networkState = Mockito.mock(PeerNetworkState.class);
 			Mockito.when(this.networkState.getNodeAge()).thenReturn(this.age);
-			this.nodes = createPartnerNodes();
-			final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList = createCommunicationTimeStamps();
-			this.samples = createSamples(this.nodes, timeStampsList);
+			this.nodes = this.createPartnerNodes();
+			final List<CompletableFuture<CommunicationTimeStamps>> timeStampsList = this.createCommunicationTimeStamps();
+			this.samples = this.createSamples(this.nodes, timeStampsList);
 			Mockito.when(this.selector.selectNodes()).thenReturn(this.nodes);
 			Mockito.when(this.systemTimeProvider.getNetworkTime()).thenReturn(
 					new NetworkTimeStamp(0),

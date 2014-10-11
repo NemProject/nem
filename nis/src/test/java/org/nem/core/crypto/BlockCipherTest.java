@@ -12,9 +12,9 @@ public abstract class BlockCipherTest {
 	@Test
 	public void encryptedDataCanBeDecrypted() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair kp = new KeyPair();
-		final BlockCipher blockCipher = getBlockCipher(kp, kp);
+		final BlockCipher blockCipher = this.getBlockCipher(kp, kp);
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -29,10 +29,10 @@ public abstract class BlockCipherTest {
 	@Test
 	public void dataCanBeEncryptedWithSenderPrivateKeyAndRecipientPublicKey() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair skp = new KeyPair();
 		final KeyPair rkp = new KeyPair();
-		final BlockCipher blockCipher = getBlockCipher(skp, new KeyPair(rkp.getPublicKey()));
+		final BlockCipher blockCipher = this.getBlockCipher(skp, new KeyPair(rkp.getPublicKey()));
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -45,11 +45,11 @@ public abstract class BlockCipherTest {
 	@Test
 	public void dataCanBeDecryptedWithSenderPublicKeyAndRecipientPrivateKey() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair skp = new KeyPair();
 		final KeyPair rkp = new KeyPair();
-		final BlockCipher blockCipher1 = getBlockCipher(skp, new KeyPair(rkp.getPublicKey()));
-		final BlockCipher blockCipher2 = getBlockCipher(new KeyPair(skp.getPublicKey()), rkp);
+		final BlockCipher blockCipher1 = this.getBlockCipher(skp, new KeyPair(rkp.getPublicKey()));
+		final BlockCipher blockCipher2 = this.getBlockCipher(new KeyPair(skp.getPublicKey()), rkp);
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -63,11 +63,11 @@ public abstract class BlockCipherTest {
 	@Test
 	public void dataCanBeDecryptedWithSenderPrivateKeyAndRecipientPublicKey() {
 		// Arrange:
-		initCryptoEngine();
+		this.initCryptoEngine();
 		final KeyPair skp = new KeyPair();
 		final KeyPair rkp = new KeyPair();
-		final BlockCipher blockCipher1 = getBlockCipher(skp, new KeyPair(rkp.getPublicKey()));
-		final BlockCipher blockCipher2 = getBlockCipher(new KeyPair(rkp.getPublicKey()), skp);
+		final BlockCipher blockCipher1 = this.getBlockCipher(skp, new KeyPair(rkp.getPublicKey()));
+		final BlockCipher blockCipher2 = this.getBlockCipher(new KeyPair(rkp.getPublicKey()), skp);
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
@@ -81,9 +81,9 @@ public abstract class BlockCipherTest {
 	@Test
 	public void dataEncryptedWithPrivateKeyCanOnlyBeDecryptedByMatchingPublicKey() {
 		// Arrange:
-		initCryptoEngine();
-		final BlockCipher blockCipher1 = getBlockCipher(new KeyPair(), new KeyPair());
-		final BlockCipher blockCipher2 = getBlockCipher(new KeyPair(), new KeyPair());
+		this.initCryptoEngine();
+		final BlockCipher blockCipher1 = this.getBlockCipher(new KeyPair(), new KeyPair());
+		final BlockCipher blockCipher2 = this.getBlockCipher(new KeyPair(), new KeyPair());
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:

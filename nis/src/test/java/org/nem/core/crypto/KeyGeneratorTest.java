@@ -8,8 +8,8 @@ public abstract class KeyGeneratorTest {
 	@Test
 	public void generateKeyPairReturnsNewKeyPair() {
 		// Arrange:
-		initCryptoEngine();
-		final KeyGenerator generator = getKeyGenerator();
+		this.initCryptoEngine();
+		final KeyGenerator generator = this.getKeyGenerator();
 
 		// Act:
 		final KeyPair kp = generator.generateKeyPair();
@@ -24,8 +24,8 @@ public abstract class KeyGeneratorTest {
 	@Test
 	public void derivePublicKeyReturnsPublicKey() {
 		// Arrange:
-		initCryptoEngine();
-		final KeyGenerator generator = getKeyGenerator();
+		this.initCryptoEngine();
+		final KeyGenerator generator = this.getKeyGenerator();
 		final KeyPair kp = generator.generateKeyPair();
 
 		// Act:
@@ -39,8 +39,8 @@ public abstract class KeyGeneratorTest {
 	@Test
 	public void generateKeyPairCreatesDifferentInstancesWithDifferentKeys() {
 		// Act:
-		final KeyPair kp1 = getKeyGenerator().generateKeyPair();
-		final KeyPair kp2 = getKeyGenerator().generateKeyPair();
+		final KeyPair kp1 = this.getKeyGenerator().generateKeyPair();
+		final KeyPair kp2 = this.getKeyGenerator().generateKeyPair();
 
 		// Assert:
 		Assert.assertThat(kp2.getPrivateKey(), IsNot.not(IsEqual.equalTo(kp1.getPrivateKey())));

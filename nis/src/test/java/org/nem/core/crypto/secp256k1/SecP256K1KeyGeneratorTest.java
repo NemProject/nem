@@ -66,8 +66,8 @@ public class SecP256K1KeyGeneratorTest extends KeyGeneratorTest {
 		}};
 
 		// Arrange:
-		initCryptoEngine();
-		final KeyGenerator generator = getKeyGenerator();
+		this.initCryptoEngine();
+		final KeyGenerator generator = this.getKeyGenerator();
 		for (final Map.Entry<String, String> entry : priv2Pub.entrySet()) {
 			final String privateKey = entry.getKey();
 

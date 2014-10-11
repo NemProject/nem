@@ -10,8 +10,8 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 	@Test
 	public void derivedPublicKeyIsValidPointOnCurve() {
 		// Arrange:
-		initCryptoEngine();
-		final KeyGenerator generator = getKeyGenerator();
+		this.initCryptoEngine();
+		final KeyGenerator generator = this.getKeyGenerator();
 		for (int i = 0; i < 100; i++) {
 			final KeyPair kp = generator.generateKeyPair();
 
@@ -26,8 +26,8 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 	@Test
 	public void derivePublicKeyReturnsExpectedPublicKey() {
 		// Arrange:
-		initCryptoEngine();
-		final KeyGenerator generator = getKeyGenerator();
+		this.initCryptoEngine();
+		final KeyGenerator generator = this.getKeyGenerator();
 		for (int i = 0; i < 100; i++) {
 			final KeyPair kp = generator.generateKeyPair();
 
