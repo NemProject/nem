@@ -36,7 +36,7 @@ public class PublicKey implements SerializableEntity {
 	 */
 	public PublicKey(
 			final byte[] bytes,
-			Ed25519GroupElement A) {
+			final Ed25519GroupElement A) {
 		this.value = bytes;
 		this.A = A;
 

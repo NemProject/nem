@@ -232,7 +232,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void decodeReturnsCorrectFieldElement() {
-		SecureRandom random = new SecureRandom();
+		final SecureRandom random = new SecureRandom();
 		for (int i = 0; i < 10000; i++) {
 			// Arrange:
 			final byte[] bytes = new byte[32];
@@ -255,7 +255,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void isNegativeReturnsCorrectResult() {
-		SecureRandom random = new SecureRandom();
+		final SecureRandom random = new SecureRandom();
 		for (int i = 0; i < 10000; i++) {
 			// Arrange:
 			final int[] t = new int[10];
@@ -320,7 +320,7 @@ public class Ed25519FieldElementTest {
 		// Act:
 		final String fAsString = f.toString();
 		final StringBuilder builder = new StringBuilder();
-		for (byte b : bytes) {
+		for (final byte b : bytes) {
 			builder.append(String.format("%02x", b));
 		}
 

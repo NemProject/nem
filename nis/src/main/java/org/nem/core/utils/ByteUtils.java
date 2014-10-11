@@ -49,7 +49,7 @@ public class ByteUtils {
 	 * @param b the byte to check.
 	 * @return 1 if the byte is negative, 0 otherwise.
 	 */
-	public static int isNegative(int b) {
+	public static int isNegative(final int b) {
 		return (b >> 8) & 1;
 	}
 }

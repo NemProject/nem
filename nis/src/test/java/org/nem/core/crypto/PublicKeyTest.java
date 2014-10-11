@@ -138,8 +138,8 @@ public class PublicKeyTest {
 
 	//endregion
 
-	private static Ed25519GroupElement getA(boolean precompute) {
-		Ed25519GroupElement A = Ed25519GroupElement.p3(
+	private static Ed25519GroupElement getA(final boolean precompute) {
+		final Ed25519GroupElement A = Ed25519GroupElement.p3(
 				Ed25519Field.ZERO,
 				Ed25519Field.ONE,
 				Ed25519Field.ONE,

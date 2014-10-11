@@ -43,13 +43,13 @@ public class Signer {
 	 * @return true if the given signature is canonical.
 	 */
 	public boolean isCanonicalSignature(final Signature signature) {
-		return signer.isCanonicalSignature(signature);
+		return this.signer.isCanonicalSignature(signature);
 	}
 
 	/**
 	 * Makes this signature canonical.
 	 */
 	public Signature makeSignatureCanonical(final Signature signature) {
-		return signer.makeSignatureCanonical(signature);
+		return this.signer.makeSignatureCanonical(signature);
 	}
 }

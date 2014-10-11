@@ -95,7 +95,7 @@ public class PrivateKey implements SerializableEntity {
 	}
 
 	public Ed25519EncodedFieldElement prepareForScalarMultiply() {
-		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(value, 32));
+		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(this.value, 32));
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		a[31] &= 0x7F;
 		a[31] |= 0x40;

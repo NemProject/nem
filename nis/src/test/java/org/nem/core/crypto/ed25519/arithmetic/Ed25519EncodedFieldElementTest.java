@@ -221,7 +221,7 @@ public class Ed25519EncodedFieldElementTest {
 		// Act:
 		final String encodedAsString = encoded.toString();
 		final StringBuilder builder = new StringBuilder();
-		for (byte b : bytes) {
+		for (final byte b : bytes) {
 			builder.append(String.format("%02x", b));
 		}
 

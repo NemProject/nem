@@ -41,10 +41,10 @@ public class Ed25519BlockCipher implements BlockCipher {
 		this.random.nextBytes(ivData);
 
 		// Setup block cipher.
-		BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, true);
+		final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, true);
 
 		// Encode.
-		byte[] buf = new byte[cipher.getOutputSize(input.length)];
+		final byte[] buf = new byte[cipher.getOutputSize(input.length)];
 		int len = cipher.processBytes(input, 0, input.length, buf, 0);
 		try {
 			len += cipher.doFinal(buf, len);
@@ -52,7 +52,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 			return null;
 		}
 
-		byte[] result = new byte[salt.length + ivData.length + len];
+		final byte[] result = new byte[salt.length + ivData.length + len];
 		System.arraycopy(salt, 0, result, 0, salt.length);
 		System.arraycopy(ivData, 0, result, salt.length, ivData.length);
 		System.arraycopy(buf, 0, result, salt.length + ivData.length, len);
@@ -74,10 +74,10 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final byte[] sharedKey = getSharedKey(this.recipientKeyPair.getPrivateKey(), this.senderKeyPair.getPublicKey(), salt);
 
 		// Setup block cipher.
-		BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, false);
+		final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, false);
 
 		// Decode.
-		byte[] buf = new byte[cipher.getOutputSize(encData.length)];
+		final byte[] buf = new byte[cipher.getOutputSize(encData.length)];
 		int len = cipher.processBytes(encData, 0, encData.length, buf, 0);
 		try {
 			len += cipher.doFinal(buf, len);
@@ -86,7 +86,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 		}
 
 		// Remove padding
-		byte[] out = new byte[len];
+		final byte[] out = new byte[len];
 		System.arraycopy(buf, 0, out, 0, len);
 
 		return out;
@@ -94,12 +94,12 @@ public class Ed25519BlockCipher implements BlockCipher {
 
 	private BufferedBlockCipher setupBlockCipher(final byte[] sharedKey, final byte[] ivData, final boolean forEncryption) {
 		// Setup cipher parameters with key and IV.
-		KeyParameter keyParam = new KeyParameter(sharedKey);
-		CipherParameters params = new ParametersWithIV(keyParam, ivData);
+		final KeyParameter keyParam = new KeyParameter(sharedKey);
+		final CipherParameters params = new ParametersWithIV(keyParam, ivData);
 
 		// Setup AES cipher in CBC mode with PKCS7 padding.
-		BlockCipherPadding padding = new PKCS7Padding();
-		BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), padding);
+		final BlockCipherPadding padding = new PKCS7Padding();
+		final BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), padding);
 		cipher.reset();
 		cipher.init(forEncryption, params);
 

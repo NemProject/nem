@@ -72,7 +72,7 @@ public class KeyPairTest {
 	@Test
 	public void ctorCreatesKeyGenerator() {
 		// Arrange:
-		KeyPairContext context = new KeyPairContext();
+		final KeyPairContext context = new KeyPairContext();
 
 		// Act:
 		new KeyPair();
@@ -84,7 +84,7 @@ public class KeyPairTest {
 	@Test
 	public void ctorDelegatesKeyGenerationToKeyGenerator() {
 		// Arrange:
-		KeyPairContext context = new KeyPairContext();
+		final KeyPairContext context = new KeyPairContext();
 
 		// Act:
 		new KeyPair();
@@ -96,7 +96,7 @@ public class KeyPairTest {
 	@Test
 	public void ctorWithPrivateKeyDelegatesToDerivePublicKey() {
 		// Arrange:
-		KeyPairContext context = new KeyPairContext();
+		final KeyPairContext context = new KeyPairContext();
 
 		// Act:
 		new KeyPair(context.privateKey);
@@ -118,10 +118,10 @@ public class KeyPairTest {
 			Mockito.when(this.analyzer.isKeyCompressed(Mockito.any())).thenReturn(true);
 			Mockito.when(this.engine.createKeyAnalyzer()).thenReturn(this.analyzer);
 			Mockito.when(this.publicKey.isCompressed()).thenReturn(true);
-			this.keyPair = new KeyPair(privateKey, publicKey);
+			this.keyPair = new KeyPair(this.privateKey, this.publicKey);
 			Mockito.when(this.engine.createKeyGenerator()).thenReturn(this.generator);
 			Mockito.when(this.generator.generateKeyPair()).thenReturn(this.keyPair);
-			Mockito.when(this.generator.derivePublicKey(privateKey)).thenReturn(publicKey);
+			Mockito.when(this.generator.derivePublicKey(this.privateKey)).thenReturn(this.publicKey);
 		}
 	}
 }

@@ -95,7 +95,7 @@ public class SignerTest {
 			Mockito.when(this.analyzer.isKeyCompressed(Mockito.any())).thenReturn(true);
 			Mockito.when(this.engine.createKeyAnalyzer()).thenReturn(this.analyzer);
 			this.keyPair = new KeyPair(null, new PublicKey(Utils.generateRandomBytes(32)));
-			Mockito.when(this.engine.createDsaSigner(keyPair)).thenReturn(this.dsaSigner);
+			Mockito.when(this.engine.createDsaSigner(this.keyPair)).thenReturn(this.dsaSigner);
 			Mockito.when(this.dsaSigner.isCanonicalSignature(this.signature)).thenReturn(true);
 			Mockito.when(this.dsaSigner.makeSignatureCanonical(this.signature)).thenReturn(this.signature);
 		}

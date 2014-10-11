@@ -208,7 +208,7 @@ public class MathUtils {
 			try {
 				random.nextBytes(bytes);
 				return new Ed25519EncodedGroupElement(bytes).decode();
-			} catch (IllegalArgumentException e) {
+			} catch (final IllegalArgumentException e) {
 				// Will fail in about 50%, so try again.
 			}
 		}
@@ -292,8 +292,8 @@ public class MathUtils {
 	 * @return The same group element in the new coordinate system.
 	 */
 	public static Ed25519GroupElement toRepresentation(final Ed25519GroupElement g, final CoordinateSystem newCoordinateSystem) {
-		BigInteger x;
-		BigInteger y;
+		final BigInteger x;
+		final BigInteger y;
 		final BigInteger gX = toBigInteger(g.getX().encode());
 		final BigInteger gY = toBigInteger(g.getY().encode());
 		final BigInteger gZ = toBigInteger(g.getZ().encode());
@@ -403,12 +403,12 @@ public class MathUtils {
 		// x3 = (x1 * y2 + x2 * y1) / (1 + d * x1 * x2 * y1 * y2) and
 		// y3 = (x1 * x2 + y1 * y2) / (1 - d * x1 * x2 * y1 * y2) and
 		// d = -121665/121666
-		BigInteger dx1x2y1y2 = D.multiply(g1x).multiply(g2x).multiply(g1y).multiply(g2y).mod(Ed25519Field.P);
-		BigInteger x3 = g1x.multiply(g2y).add(g2x.multiply(g1y))
+		final BigInteger dx1x2y1y2 = D.multiply(g1x).multiply(g2x).multiply(g1y).multiply(g2y).mod(Ed25519Field.P);
+		final BigInteger x3 = g1x.multiply(g2y).add(g2x.multiply(g1y))
 				.multiply(BigInteger.ONE.add(dx1x2y1y2).modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
-		BigInteger y3 = g1x.multiply(g2x).add(g1y.multiply(g2y))
+		final BigInteger y3 = g1x.multiply(g2x).add(g1y.multiply(g2y))
 				.multiply(BigInteger.ONE.subtract(dx1x2y1y2).modInverse(Ed25519Field.P)).mod(Ed25519Field.P);
-		BigInteger t3 = x3.multiply(y3).mod(Ed25519Field.P);
+		final BigInteger t3 = x3.multiply(y3).mod(Ed25519Field.P);
 
 		return Ed25519GroupElement.p3(toFieldElement(x3), toFieldElement(y3), Ed25519Field.ONE, toFieldElement(t3));
 	}
@@ -518,7 +518,7 @@ public class MathUtils {
 		digest.update(keyPair.getPublicKey().getRaw());
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(digest.digest(data));
 		final Ed25519EncodedFieldElement hReduced = reduceModGroupOrder(h);
-		BigInteger S = toBigInteger(rReduced).add(toBigInteger(hReduced).multiply(toBigInteger(a))).mod(Ed25519Group.GROUP_ORDER);
+		final BigInteger S = toBigInteger(rReduced).add(toBigInteger(hReduced).multiply(toBigInteger(a))).mod(Ed25519Group.GROUP_ORDER);
 
 		return new Signature(R.encode().getRaw(), toByteArray(S));
 	}

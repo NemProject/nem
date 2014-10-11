@@ -55,7 +55,7 @@ public class Ed25519EncodedFieldElement {
 	 * @return 1 if it is non-zero, 0 otherwise.
 	 */
 	public boolean isNonZero() {
-		return 0 == ArrayUtils.isEqual(this.values, ZERO);
+		return 0 == ArrayUtils.isEqual(this.values, this.ZERO);
 	}
 
 	/**
@@ -75,16 +75,16 @@ public class Ed25519EncodedFieldElement {
 		long h7 = threeBytesToLong(this.values, 23) << 5;
 		long h8 = threeBytesToLong(this.values, 26) << 4;
 		long h9 = (threeBytesToLong(this.values, 29) & 0x7FFFFF) << 2;
-		long carry0;
-		long carry1;
-		long carry2;
-		long carry3;
-		long carry4;
-		long carry5;
-		long carry6;
-		long carry7;
-		long carry8;
-		long carry9;
+		final long carry0;
+		final long carry1;
+		final long carry2;
+		final long carry3;
+		final long carry4;
+		final long carry5;
+		final long carry6;
+		final long carry7;
+		final long carry8;
+		final long carry9;
 
 		// Remember: 2^255 congruent 19 modulo p
 		carry9 = (h9 + (long)(1 << 24)) >> 25;
@@ -119,7 +119,7 @@ public class Ed25519EncodedFieldElement {
 		h9 += carry8;
 		h8 -= carry8 << 26;
 
-		int[] h = new int[10];
+		final int[] h = new int[10];
 		h[0] = (int)h0;
 		h[1] = (int)h1;
 		h[2] = (int)h2;
@@ -158,12 +158,12 @@ public class Ed25519EncodedFieldElement {
 		long s15 = 0x1FFFFF & (threeBytesToLong(this.values, 39) >> 3);
 		long s16 = 0x1FFFFF & threeBytesToLong(this.values, 42);
 		long s17 = 0x1FFFFF & (fourBytesToLong(this.values, 44) >> 5);
-		long s18 = 0x1FFFFF & (threeBytesToLong(this.values, 47) >> 2);
-		long s19 = 0x1FFFFF & (fourBytesToLong(this.values, 49) >> 7);
-		long s20 = 0x1FFFFF & (fourBytesToLong(this.values, 52) >> 4);
-		long s21 = 0x1FFFFF & (threeBytesToLong(this.values, 55) >> 1);
-		long s22 = 0x1FFFFF & (fourBytesToLong(this.values, 57) >> 6);
-		long s23 = (fourBytesToLong(this.values, 60) >> 3);
+		final long s18 = 0x1FFFFF & (threeBytesToLong(this.values, 47) >> 2);
+		final long s19 = 0x1FFFFF & (fourBytesToLong(this.values, 49) >> 7);
+		final long s20 = 0x1FFFFF & (fourBytesToLong(this.values, 52) >> 4);
+		final long s21 = 0x1FFFFF & (threeBytesToLong(this.values, 55) >> 1);
+		final long s22 = 0x1FFFFF & (fourBytesToLong(this.values, 57) >> 6);
+		final long s23 = (fourBytesToLong(this.values, 60) >> 3);
 		long carry0;
 		long carry1;
 		long carry2;
@@ -176,11 +176,11 @@ public class Ed25519EncodedFieldElement {
 		long carry9;
 		long carry10;
 		long carry11;
-		long carry12;
-		long carry13;
-		long carry14;
-		long carry15;
-		long carry16;
+		final long carry12;
+		final long carry13;
+		final long carry14;
+		final long carry15;
+		final long carry16;
 
 		/**
 		 * Lots of magic numbers :)
@@ -453,7 +453,7 @@ public class Ed25519EncodedFieldElement {
 		s10 -= carry10 << 21;
 
 		// s0, ..., s11 got 21 bits each.
-		byte[] result = new byte[32];
+		final byte[] result = new byte[32];
 		result[0] = (byte)(s0 >> 0);
 		result[1] = (byte)(s0 >> 8);
 		result[2] = (byte)((s0 >> 16) | (s1 << 5));
@@ -501,42 +501,42 @@ public class Ed25519EncodedFieldElement {
 	 * @param c The third encoded field element which is added.
 	 */
 	public Ed25519EncodedFieldElement multiplyAndAddModQ(final Ed25519EncodedFieldElement b, final Ed25519EncodedFieldElement c) {
-		long a0 = 0x1FFFFF & threeBytesToLong(this.values, 0);
-		long a1 = 0x1FFFFF & (fourBytesToLong(this.values, 2) >> 5);
-		long a2 = 0x1FFFFF & (threeBytesToLong(this.values, 5) >> 2);
-		long a3 = 0x1FFFFF & (fourBytesToLong(this.values, 7) >> 7);
-		long a4 = 0x1FFFFF & (fourBytesToLong(this.values, 10) >> 4);
-		long a5 = 0x1FFFFF & (threeBytesToLong(this.values, 13) >> 1);
-		long a6 = 0x1FFFFF & (fourBytesToLong(this.values, 15) >> 6);
-		long a7 = 0x1FFFFF & (threeBytesToLong(this.values, 18) >> 3);
-		long a8 = 0x1FFFFF & threeBytesToLong(this.values, 21);
-		long a9 = 0x1FFFFF & (fourBytesToLong(this.values, 23) >> 5);
-		long a10 = 0x1FFFFF & (threeBytesToLong(this.values, 26) >> 2);
-		long a11 = (fourBytesToLong(this.values, 28) >> 7);
-		long b0 = 0x1FFFFF & threeBytesToLong(b.values, 0);
-		long b1 = 0x1FFFFF & (fourBytesToLong(b.values, 2) >> 5);
-		long b2 = 0x1FFFFF & (threeBytesToLong(b.values, 5) >> 2);
-		long b3 = 0x1FFFFF & (fourBytesToLong(b.values, 7) >> 7);
-		long b4 = 0x1FFFFF & (fourBytesToLong(b.values, 10) >> 4);
-		long b5 = 0x1FFFFF & (threeBytesToLong(b.values, 13) >> 1);
-		long b6 = 0x1FFFFF & (fourBytesToLong(b.values, 15) >> 6);
-		long b7 = 0x1FFFFF & (threeBytesToLong(b.values, 18) >> 3);
-		long b8 = 0x1FFFFF & threeBytesToLong(b.values, 21);
-		long b9 = 0x1FFFFF & (fourBytesToLong(b.values, 23) >> 5);
-		long b10 = 0x1FFFFF & (threeBytesToLong(b.values, 26) >> 2);
-		long b11 = (fourBytesToLong(b.values, 28) >> 7);
-		long c0 = 0x1FFFFF & threeBytesToLong(c.values, 0);
-		long c1 = 0x1FFFFF & (fourBytesToLong(c.values, 2) >> 5);
-		long c2 = 0x1FFFFF & (threeBytesToLong(c.values, 5) >> 2);
-		long c3 = 0x1FFFFF & (fourBytesToLong(c.values, 7) >> 7);
-		long c4 = 0x1FFFFF & (fourBytesToLong(c.values, 10) >> 4);
-		long c5 = 0x1FFFFF & (threeBytesToLong(c.values, 13) >> 1);
-		long c6 = 0x1FFFFF & (fourBytesToLong(c.values, 15) >> 6);
-		long c7 = 0x1FFFFF & (threeBytesToLong(c.values, 18) >> 3);
-		long c8 = 0x1FFFFF & threeBytesToLong(c.values, 21);
-		long c9 = 0x1FFFFF & (fourBytesToLong(c.values, 23) >> 5);
-		long c10 = 0x1FFFFF & (threeBytesToLong(c.values, 26) >> 2);
-		long c11 = (fourBytesToLong(c.values, 28) >> 7);
+		final long a0 = 0x1FFFFF & threeBytesToLong(this.values, 0);
+		final long a1 = 0x1FFFFF & (fourBytesToLong(this.values, 2) >> 5);
+		final long a2 = 0x1FFFFF & (threeBytesToLong(this.values, 5) >> 2);
+		final long a3 = 0x1FFFFF & (fourBytesToLong(this.values, 7) >> 7);
+		final long a4 = 0x1FFFFF & (fourBytesToLong(this.values, 10) >> 4);
+		final long a5 = 0x1FFFFF & (threeBytesToLong(this.values, 13) >> 1);
+		final long a6 = 0x1FFFFF & (fourBytesToLong(this.values, 15) >> 6);
+		final long a7 = 0x1FFFFF & (threeBytesToLong(this.values, 18) >> 3);
+		final long a8 = 0x1FFFFF & threeBytesToLong(this.values, 21);
+		final long a9 = 0x1FFFFF & (fourBytesToLong(this.values, 23) >> 5);
+		final long a10 = 0x1FFFFF & (threeBytesToLong(this.values, 26) >> 2);
+		final long a11 = (fourBytesToLong(this.values, 28) >> 7);
+		final long b0 = 0x1FFFFF & threeBytesToLong(b.values, 0);
+		final long b1 = 0x1FFFFF & (fourBytesToLong(b.values, 2) >> 5);
+		final long b2 = 0x1FFFFF & (threeBytesToLong(b.values, 5) >> 2);
+		final long b3 = 0x1FFFFF & (fourBytesToLong(b.values, 7) >> 7);
+		final long b4 = 0x1FFFFF & (fourBytesToLong(b.values, 10) >> 4);
+		final long b5 = 0x1FFFFF & (threeBytesToLong(b.values, 13) >> 1);
+		final long b6 = 0x1FFFFF & (fourBytesToLong(b.values, 15) >> 6);
+		final long b7 = 0x1FFFFF & (threeBytesToLong(b.values, 18) >> 3);
+		final long b8 = 0x1FFFFF & threeBytesToLong(b.values, 21);
+		final long b9 = 0x1FFFFF & (fourBytesToLong(b.values, 23) >> 5);
+		final long b10 = 0x1FFFFF & (threeBytesToLong(b.values, 26) >> 2);
+		final long b11 = (fourBytesToLong(b.values, 28) >> 7);
+		final long c0 = 0x1FFFFF & threeBytesToLong(c.values, 0);
+		final long c1 = 0x1FFFFF & (fourBytesToLong(c.values, 2) >> 5);
+		final long c2 = 0x1FFFFF & (threeBytesToLong(c.values, 5) >> 2);
+		final long c3 = 0x1FFFFF & (fourBytesToLong(c.values, 7) >> 7);
+		final long c4 = 0x1FFFFF & (fourBytesToLong(c.values, 10) >> 4);
+		final long c5 = 0x1FFFFF & (threeBytesToLong(c.values, 13) >> 1);
+		final long c6 = 0x1FFFFF & (fourBytesToLong(c.values, 15) >> 6);
+		final long c7 = 0x1FFFFF & (threeBytesToLong(c.values, 18) >> 3);
+		final long c8 = 0x1FFFFF & threeBytesToLong(c.values, 21);
+		final long c9 = 0x1FFFFF & (fourBytesToLong(c.values, 23) >> 5);
+		final long c10 = 0x1FFFFF & (threeBytesToLong(c.values, 26) >> 2);
+		final long c11 = (fourBytesToLong(c.values, 28) >> 7);
 		long s0;
 		long s1;
 		long s2;
@@ -578,12 +578,12 @@ public class Ed25519EncodedFieldElement {
 		long carry14;
 		long carry15;
 		long carry16;
-		long carry17;
-		long carry18;
-		long carry19;
-		long carry20;
-		long carry21;
-		long carry22;
+		final long carry17;
+		final long carry18;
+		final long carry19;
+		final long carry20;
+		final long carry21;
+		final long carry22;
 
 		s0 = c0 + a0 * b0;
 		s1 = c1 + a0 * b1 + a1 * b0;
@@ -925,7 +925,7 @@ public class Ed25519EncodedFieldElement {
 		s11 += carry10;
 		s10 -= carry10 << 21;
 
-		byte[] result = new byte[32];
+		final byte[] result = new byte[32];
 		result[0] = (byte)(s0 >> 0);
 		result[1] = (byte)(s0 >> 8);
 		result[2] = (byte)((s0 >> 16) | (s1 << 5));

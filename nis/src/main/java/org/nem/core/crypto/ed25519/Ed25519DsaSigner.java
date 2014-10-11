@@ -33,7 +33,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		}
 
 		// Hash the private key to improve randomness.
-		final byte[] hash = this.digest.digest(ArrayUtils.toByteArray(keyPair.getPrivateKey().getRaw(), 32));
+		final byte[] hash = this.digest.digest(ArrayUtils.toByteArray(this.keyPair.getPrivateKey().getRaw(), 32));
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
 		this.digest.update(hash, 32, 32);
@@ -53,7 +53,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		this.digest.update(this.keyPair.getPublicKey().getRaw());
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
-		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(keyPair.getPrivateKey().prepareForScalarMultiply(), rModQ);
+		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(this.keyPair.getPrivateKey().prepareForScalarMultiply(), rModQ);
 
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR.getRaw(), encodedS.getRaw());

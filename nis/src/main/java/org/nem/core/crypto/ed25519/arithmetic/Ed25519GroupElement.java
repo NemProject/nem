@@ -238,10 +238,10 @@ public class Ed25519GroupElement implements Serializable {
 		switch (this.coordinateSystem) {
 			case P2:
 			case P3:
-				Ed25519FieldElement inverse = Z.invert();
-				Ed25519FieldElement x = X.multiply(inverse);
-				Ed25519FieldElement y = Y.multiply(inverse);
-				byte[] s = y.encode().getRaw();
+				final Ed25519FieldElement inverse = this.Z.invert();
+				final Ed25519FieldElement x = this.X.multiply(inverse);
+				final Ed25519FieldElement y = this.Y.multiply(inverse);
+				final byte[] s = y.encode().getRaw();
 				s[s.length - 1] |= (x.isNegative() ? (byte)0x80 : 0);
 
 				return new Ed25519EncodedGroupElement(s);
@@ -312,9 +312,9 @@ public class Ed25519GroupElement implements Serializable {
 			case P1xP1:
 				switch (newCoordinateSystem) {
 					case P2:
-						return p2(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T));
+						return p2(this.X.multiply(this.T), this.Y.multiply(this.Z), this.Z.multiply(this.T));
 					case P3:
-						return p3(this.X.multiply(this.T), Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y));
+						return p3(this.X.multiply(this.T), this.Y.multiply(this.Z), this.Z.multiply(this.T), this.X.multiply(this.Y));
 					case P1xP1:
 						return p1xp1(this.X, this.Y, this.Z, this.T);
 					default:
@@ -416,7 +416,13 @@ public class Ed25519GroupElement implements Serializable {
 		switch (this.coordinateSystem) {
 			case P2:
 			case P3:
-				Ed25519FieldElement XSquare, YSquare, B, A, ASquare, YSquarePlusXSquare, YSquareMinusXSquare;
+				final Ed25519FieldElement XSquare;
+				final Ed25519FieldElement YSquare;
+				final Ed25519FieldElement B;
+				final Ed25519FieldElement A;
+				final Ed25519FieldElement ASquare;
+				final Ed25519FieldElement YSquarePlusXSquare;
+				final Ed25519FieldElement YSquareMinusXSquare;
 				XSquare = this.X.square();
 				YSquare = this.Y.square();
 				B = this.Z.squareAndDouble();
@@ -471,7 +477,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @param g The group element to add.
 	 * @return The resulting group element in the P x P coordinate system.
 	 */
-	private Ed25519GroupElement precomputedAdd(Ed25519GroupElement g) {
+	private Ed25519GroupElement precomputedAdd(final Ed25519GroupElement g) {
 		if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -479,7 +485,12 @@ public class Ed25519GroupElement implements Serializable {
 			throw new IllegalArgumentException();
 		}
 
-		Ed25519FieldElement YPlusX, YMinusX, A, B, C, D;
+		final Ed25519FieldElement YPlusX;
+		final Ed25519FieldElement YMinusX;
+		final Ed25519FieldElement A;
+		final Ed25519FieldElement B;
+		final Ed25519FieldElement C;
+		final Ed25519FieldElement D;
 		YPlusX = this.Y.add(this.X);
 		YMinusX = this.Y.subtract(this.X);
 		A = YPlusX.multiply(g.X);
@@ -501,7 +512,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @param g he group element to subtract.
 	 * @return The result in the P x P coordinate system.
 	 */
-	private Ed25519GroupElement precomputedSubtract(Ed25519GroupElement g) {
+	private Ed25519GroupElement precomputedSubtract(final Ed25519GroupElement g) {
 		if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -509,7 +520,12 @@ public class Ed25519GroupElement implements Serializable {
 			throw new IllegalArgumentException();
 		}
 
-		Ed25519FieldElement YPlusX, YMinusX, A, B, C, D;
+		final Ed25519FieldElement YPlusX;
+		final Ed25519FieldElement YMinusX;
+		final Ed25519FieldElement A;
+		final Ed25519FieldElement B;
+		final Ed25519FieldElement C;
+		final Ed25519FieldElement D;
 		YPlusX = this.Y.add(this.X);
 		YMinusX = this.Y.subtract(this.X);
 		A = YPlusX.multiply(g.Y);
@@ -542,7 +558,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @param g The group element to add.
 	 * @return The result in the P x P coordinate system.
 	 */
-	public Ed25519GroupElement add(Ed25519GroupElement g) {
+	public Ed25519GroupElement add(final Ed25519GroupElement g) {
 		if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -550,7 +566,13 @@ public class Ed25519GroupElement implements Serializable {
 			throw new IllegalArgumentException();
 		}
 
-		Ed25519FieldElement YPlusX, YMinusX, ZSquare, A, B, C, D;
+		final Ed25519FieldElement YPlusX;
+		final Ed25519FieldElement YMinusX;
+		final Ed25519FieldElement ZSquare;
+		final Ed25519FieldElement A;
+		final Ed25519FieldElement B;
+		final Ed25519FieldElement C;
+		final Ed25519FieldElement D;
 		YPlusX = this.Y.add(this.X);
 		YMinusX = this.Y.subtract(this.X);
 		A = YPlusX.multiply(g.X);
@@ -571,7 +593,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @param g The group element to subtract.
 	 * @return The result in the P x P coordinate system.
 	 */
-	public Ed25519GroupElement subtract(Ed25519GroupElement g) {
+	public Ed25519GroupElement subtract(final Ed25519GroupElement g) {
 		if (this.coordinateSystem != CoordinateSystem.P3) {
 			throw new UnsupportedOperationException();
 		}
@@ -579,13 +601,19 @@ public class Ed25519GroupElement implements Serializable {
 			throw new IllegalArgumentException();
 		}
 
-		Ed25519FieldElement YPlusX, YMinusX, ZSquare, A, B, C, D;
-		YPlusX = Y.add(X);
-		YMinusX = Y.subtract(X);
+		final Ed25519FieldElement YPlusX;
+		final Ed25519FieldElement YMinusX;
+		final Ed25519FieldElement ZSquare;
+		final Ed25519FieldElement A;
+		final Ed25519FieldElement B;
+		final Ed25519FieldElement C;
+		final Ed25519FieldElement D;
+		YPlusX = this.Y.add(this.X);
+		YMinusX = this.Y.subtract(this.X);
 		A = YPlusX.multiply(g.Y);
 		B = YMinusX.multiply(g.X);
-		C = g.T.multiply(T);
-		ZSquare = Z.multiply(g.Z);
+		C = g.T.multiply(this.T);
+		ZSquare = this.Z.multiply(g.Z);
 		D = ZSquare.add(ZSquare);
 
 		return p1xp1(A.subtract(B), A.add(B), D.subtract(C), D.add(C));
@@ -619,7 +647,7 @@ public class Ed25519GroupElement implements Serializable {
 		if (!this.coordinateSystem.equals(ge.coordinateSystem)) {
 			try {
 				ge = ge.toCoordinateSystem(this.coordinateSystem);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				return false;
 			}
 		}
@@ -877,15 +905,15 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return true if the group element satisfies the curve equation, false otherwise.
 	 */
 	public boolean satisfiesCurveEquation() {
-		switch (coordinateSystem) {
+		switch (this.coordinateSystem) {
 			case P2:
 			case P3:
-				Ed25519FieldElement inverse = Z.invert();
-				Ed25519FieldElement x = X.multiply(inverse);
-				Ed25519FieldElement y = Y.multiply(inverse);
-				Ed25519FieldElement xSquare = x.square();
-				Ed25519FieldElement ySquare = y.square();
-				Ed25519FieldElement dXSquareYSquare = Ed25519Field.D.multiply(xSquare).multiply(ySquare);
+				final Ed25519FieldElement inverse = this.Z.invert();
+				final Ed25519FieldElement x = this.X.multiply(inverse);
+				final Ed25519FieldElement y = this.Y.multiply(inverse);
+				final Ed25519FieldElement xSquare = x.square();
+				final Ed25519FieldElement ySquare = y.square();
+				final Ed25519FieldElement dXSquareYSquare = Ed25519Field.D.multiply(xSquare).multiply(ySquare);
 				return Ed25519Field.ONE.add(dXSquareYSquare).add(xSquare).equals(ySquare);
 
 			default:

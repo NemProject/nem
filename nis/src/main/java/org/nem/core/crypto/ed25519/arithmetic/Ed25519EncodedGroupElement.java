@@ -54,7 +54,13 @@ public class Ed25519EncodedGroupElement {
 	 * @return the affine x-coordinate.
 	 */
 	public Ed25519FieldElement getAffineX() {
-		Ed25519FieldElement x, y, ySquare, u, v, vxSquare, checkForZero;
+		Ed25519FieldElement x;
+		final Ed25519FieldElement y;
+		final Ed25519FieldElement ySquare;
+		final Ed25519FieldElement u;
+		final Ed25519FieldElement v;
+		final Ed25519FieldElement vxSquare;
+		Ed25519FieldElement checkForZero;
 		y = this.getAffineY();
 		ySquare = y.square();
 
@@ -108,7 +114,8 @@ public class Ed25519EncodedGroupElement {
 		if (!(obj instanceof Ed25519EncodedGroupElement)) {
 			return false;
 		}
-		Ed25519EncodedGroupElement encoded = (Ed25519EncodedGroupElement)obj;
+
+		final Ed25519EncodedGroupElement encoded = (Ed25519EncodedGroupElement)obj;
 		return 1 == ArrayUtils.isEqual(this.values, encoded.values);
 	}
 

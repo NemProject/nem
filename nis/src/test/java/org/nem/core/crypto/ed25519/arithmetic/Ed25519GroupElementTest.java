@@ -361,7 +361,7 @@ public class Ed25519GroupElementTest {
 	public void dblPrecomputedTableContainsExpectedGroupElements() {
 		// Arrange:
 		Ed25519GroupElement g = Ed25519Group.BASE_POINT;
-		Ed25519GroupElement h = MathUtils.addGroupElements(g, g);
+		final Ed25519GroupElement h = MathUtils.addGroupElements(g, g);
 
 		// Act + Assert:
 		for (int i = 0; i < 8; i++) {
