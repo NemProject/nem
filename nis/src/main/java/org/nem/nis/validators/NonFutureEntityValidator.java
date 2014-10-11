@@ -21,12 +21,12 @@ public class NonFutureEntityValidator implements BlockValidator, TransactionVali
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		return validateTimeStamp(block.getTimeStamp());
+		return this.validateTimeStamp(block.getTimeStamp());
 	}
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		return validateTimeStamp(transaction.getTimeStamp());
+		return this.validateTimeStamp(transaction.getTimeStamp());
 	}
 
 	private ValidationResult validateTimeStamp(final TimeInstant timeInstant) {

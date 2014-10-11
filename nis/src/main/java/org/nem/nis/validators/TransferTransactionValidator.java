@@ -15,7 +15,7 @@ public class TransferTransactionValidator implements TransactionValidator {
 			return ValidationResult.SUCCESS;
 		}
 
-		return validate((TransferTransaction)transaction, context.getDebitPredicate());
+		return this.validate((TransferTransaction)transaction, context.getDebitPredicate());
 	}
 
 	private ValidationResult validate(final TransferTransaction transaction, final DebitPredicate predicate) {

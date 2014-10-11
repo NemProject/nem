@@ -176,7 +176,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.httpConnectorPool,
 				this.synchronizer,
 				this.chainServices,
-				createTimeSynchronizationStrategy());
+				this.createTimeSynchronizationStrategy());
 	}
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {

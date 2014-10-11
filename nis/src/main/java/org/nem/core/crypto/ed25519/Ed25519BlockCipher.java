@@ -33,14 +33,14 @@ public class Ed25519BlockCipher implements BlockCipher {
 		this.random.nextBytes(salt);
 
 		// Derive shared key.
-		final byte[] sharedKey = getSharedKey(this.senderKeyPair.getPrivateKey(), this.recipientKeyPair.getPublicKey(), salt);
+		final byte[] sharedKey = this.getSharedKey(this.senderKeyPair.getPrivateKey(), this.recipientKeyPair.getPublicKey(), salt);
 
 		// Setup IV.
 		final byte[] ivData = new byte[16];
 		this.random.nextBytes(ivData);
 
 		// Setup block cipher.
-		final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, true);
+		final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, true);
 
 		// Encode.
 		final byte[] buf = new byte[cipher.getOutputSize(input.length)];
@@ -71,10 +71,10 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final byte[] encData = Arrays.copyOfRange(input, 48, input.length);
 
 		// Derive shared key.
-		final byte[] sharedKey = getSharedKey(this.recipientKeyPair.getPrivateKey(), this.senderKeyPair.getPublicKey(), salt);
+		final byte[] sharedKey = this.getSharedKey(this.recipientKeyPair.getPrivateKey(), this.senderKeyPair.getPublicKey(), salt);
 
 		// Setup block cipher.
-		final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, false);
+		final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, false);
 
 		// Decode.
 		// TODO 20141011 J-B: consider refactoring this block (same as in encode)

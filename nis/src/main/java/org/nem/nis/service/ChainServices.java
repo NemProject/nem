@@ -34,7 +34,7 @@ public class ChainServices {
 	 * @return true if the local chain is synchronized, false otherwise.
 	 */
 	public boolean isChainSynchronized(final Node node) {
-		final BlockHeight maxHeight = getMaxChainHeightAsync(node).join();
+		final BlockHeight maxHeight = this.getMaxChainHeightAsync(node).join();
 		return new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()).compareTo(maxHeight) >= 0;
 	}
 

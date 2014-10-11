@@ -790,7 +790,7 @@ public class Ed25519FieldElement {
 		// TODO 20141011: seems like these comments are off since they are using * instead of ^ in many places
 
 		// 2 == 2 * 1
-		f0 = square();
+		f0 = this.square();
 
 		// 4 == 2 * 2
 		f1 = f0.square();
@@ -801,7 +801,7 @@ public class Ed25519FieldElement {
 		}
 
 		// 9 == 8 + 1
-		f1 = multiply(f1);
+		f1 = this.multiply(f1);
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
@@ -911,7 +911,7 @@ public class Ed25519FieldElement {
 		Ed25519FieldElement f0, f1, f2;
 
 		// 2 == 2 * 1
-		f0 = square();
+		f0 = this.square();
 
 		// 4 == 2 * 2
 		f1 = f0.square();
@@ -922,7 +922,7 @@ public class Ed25519FieldElement {
 		}
 
 		// z9 = z1*z8
-		f1 = multiply(f1);
+		f1 = this.multiply(f1);
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
@@ -1022,7 +1022,7 @@ public class Ed25519FieldElement {
 		}
 
 		// 2^252 - 3
-		return multiply(f0);
+		return this.multiply(f0);
 	}
 
 	/**
@@ -1237,7 +1237,7 @@ public class Ed25519FieldElement {
 	 * @return true if this is in {1,3,5,...,q-2}, false otherwise.
 	 */
 	public boolean isNegative() {
-		return encode().isNegative();
+		return this.encode().isNegative();
 	}
 
 	@Override

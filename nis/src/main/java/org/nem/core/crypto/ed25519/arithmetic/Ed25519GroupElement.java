@@ -254,7 +254,7 @@ public class Ed25519GroupElement implements Serializable {
 
 				return new Ed25519EncodedGroupElement(s);
 			default:
-				return toP2().encode();
+				return this.toP2().encode();
 		}
 	}
 
@@ -264,7 +264,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The group element in the P2 coordinate system.
 	 */
 	public Ed25519GroupElement toP2() {
-		return toCoordinateSystem(CoordinateSystem.P2);
+		return this.toCoordinateSystem(CoordinateSystem.P2);
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The group element in the P3 coordinate system.
 	 */
 	public Ed25519GroupElement toP3() {
-		return toCoordinateSystem(CoordinateSystem.P3);
+		return this.toCoordinateSystem(CoordinateSystem.P3);
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @return The group element in the CACHED coordinate system.
 	 */
 	public Ed25519GroupElement toCached() {
-		return toCoordinateSystem(CoordinateSystem.CACHED);
+		return this.toCoordinateSystem(CoordinateSystem.CACHED);
 	}
 
 	/**
@@ -674,7 +674,7 @@ public class Ed25519GroupElement implements Serializable {
 
 				return x1.equals(x2) && y1.equals(y2);
 			case P1xP1:
-				return toP2().equals(ge);
+				return this.toP2().equals(ge);
 			case PRECOMPUTED:
 				return this.X.equals(ge.X) && this.Y.equals(ge.Y) && this.Z.equals(ge.Z);
 			case CACHED:
@@ -794,14 +794,14 @@ public class Ed25519GroupElement implements Serializable {
 		Ed25519GroupElement h = Ed25519Group.ZERO_P3;
 		synchronized (this) {
 			for (i = 1; i < 64; i += 2) {
-				g = select(i / 2, e[i]);
+				g = this.select(i / 2, e[i]);
 				h = h.precomputedAdd(g).toP3();
 			}
 
 			h = h.dbl().toP2().dbl().toP2().dbl().toP2().dbl().toP3();
 
 			for (i = 0; i < 64; i += 2) {
-				g = select(i / 2, e[i]);
+				g = this.select(i / 2, e[i]);
 				h = h.precomputedAdd(g).toP3();
 			}
 		}
@@ -926,7 +926,7 @@ public class Ed25519GroupElement implements Serializable {
 				return Ed25519Field.ONE.add(dXSquareYSquare).add(xSquare).equals(ySquare);
 
 			default:
-				return toP2().satisfiesCurveEquation();
+				return this.toP2().satisfiesCurveEquation();
 		}
 	}
 

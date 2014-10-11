@@ -62,12 +62,12 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 			throw new TimeSynchronizationException("No synchronization samples available to calculate network time.");
 		}
 
-		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
+		final double cumulativeImportance = filteredSamples.stream().mapToDouble(s -> this.getAccountImportance(s.getNode().getIdentity().getAddress())).sum();
 		final double viewSizePercentage = (double)filteredSamples.size() / (double)this.poiFacade.getLastPoiVectorSize();
 		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
 		final double sum = filteredSamples.stream()
 				.mapToDouble(s -> {
-					final double importance = getAccountImportance(s.getNode().getIdentity().getAddress());
+					final double importance = this.getAccountImportance(s.getNode().getIdentity().getAddress());
 					return s.getTimeOffsetToRemote() * importance * scaling;
 				})
 				.sum();

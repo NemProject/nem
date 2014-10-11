@@ -39,7 +39,7 @@ public class NxtGraphClusteringITCase {
 	public void canPrintStakes() {
 		// Act:
 		final Collection<NxtTransaction> transactionData = loadTransactionData(0, 300000);
-		final HashMap<Long, Long> stakes = getStakes(transactionData);
+		final HashMap<Long, Long> stakes = this.getStakes(transactionData);
 		LOGGER.info(stakes.toString());
 	}
 
@@ -365,7 +365,7 @@ public class NxtGraphClusteringITCase {
 		final long startHeight = 0;
 		final long stopHeight = 10000;
 
-		final SparseMatrix outlinkMatrix = createNetOutlinkMatrix(startHeight, stopHeight);
+		final SparseMatrix outlinkMatrix = this.createNetOutlinkMatrix(startHeight, stopHeight);
 		final PoiGraphParameters params = PoiGraphParameters.getDefaultParams();
 		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
 		final PoiGraphViewer viewer = new PoiGraphViewer(outlinkMatrix, params);
@@ -379,7 +379,7 @@ public class NxtGraphClusteringITCase {
 		final int startHeight = 100000;
 		final int stopHeight = 200000;//300000;
 
-		final SparseMatrix outlinkMatrix = createNetOutlinkMatrix(startHeight, stopHeight);
+		final SparseMatrix outlinkMatrix = this.createNetOutlinkMatrix(startHeight, stopHeight);
 		final ClusteringResult result = calculateClusteringResult(new FastScanClusteringStrategy(), outlinkMatrix);
 		LOGGER.info(String.format("The clusterer found %d regular clusters, %d hubs, and %d outliers",
 				result.getClusters().size(),

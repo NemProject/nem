@@ -121,7 +121,7 @@ public class UnconfirmedTransactions {
 		}
 
 		try {
-			return addInternal(transaction, transactionHash, options, execute);
+			return this.addInternal(transaction, transactionHash, options, execute);
 		} finally {
 			this.pendingTransactions.remove(transactionHash);
 		}

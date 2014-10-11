@@ -87,7 +87,7 @@ public class InterLevelProximityMatrix {
 		 */
 		private void build() {
 			// 0) For every node compute the set of cluster ids which cover the entire neighborhood of the node
-			final List<SparseBitmap> neighborhoodClusterIdsSet = computeNeighborhoodClusterIdsSet();
+			final List<SparseBitmap> neighborhoodClusterIdsSet = this.computeNeighborhoodClusterIdsSet();
 
 			// 1) Regular clusters
 			this.processClusters(this.clusteringResult.getClusters(), neighborhoodClusterIdsSet);

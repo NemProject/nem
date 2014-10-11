@@ -61,7 +61,7 @@ public abstract class AbstractScan {
 			}
 
 			// build a community around i
-			cluster(community);
+			this.cluster(community);
 		}
 	}
 
@@ -79,8 +79,8 @@ public abstract class AbstractScan {
 
 	private boolean isHub(final Community community) {
 		final HashSet<ClusterId> connectedClusterIds = new HashSet<>();
-		return isHub(connectedClusterIds, community.getDissimilarNeighbors()) ||
-				isHub(connectedClusterIds, community.getSimilarNeighbors());
+		return this.isHub(connectedClusterIds, community.getDissimilarNeighbors()) ||
+				this.isHub(connectedClusterIds, community.getSimilarNeighbors());
 	}
 
 	private boolean isHub(final HashSet<ClusterId> connectedClusterIds, final NodeNeighbors neighbors) {

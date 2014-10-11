@@ -108,7 +108,7 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 					.map(ClusterId::new)
 					.collect(Collectors.toList());
 			if (!clusterIds.isEmpty()) {
-				cluster = mergeClusters(clusterIds);
+				cluster = this.mergeClusters(clusterIds);
 				clusterId = cluster.getId();
 			} else {
 				cluster = new Cluster(clusterId);
@@ -133,11 +133,11 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 			}
 
 			final ClusterId clusterId = clusterIds.get(0);
-			final Cluster cluster = findCluster(clusterId);
+			final Cluster cluster = this.findCluster(clusterId);
 
 			// TODO 20141002: we should add a test where clusterIds.size() >= 2!
 			for (int ndx = 1; ndx < clusterIds.size(); ndx++) {
-				final Cluster clusterToMerge = findCluster(clusterIds.get(ndx));
+				final Cluster clusterToMerge = this.findCluster(clusterIds.get(ndx));
 				cluster.merge(clusterToMerge);
 				clusterToMerge.getMemberIds().stream().forEach(id -> this.setNodeState(id, clusterId));
 				this.removeCluster(clusterToMerge);

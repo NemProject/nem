@@ -45,7 +45,7 @@ public class GraphClustererImplITCase {
 		final int numAccounts = 15;
 		final int numEntries = 10 * numAccounts;
 		final TestContext context = new TestContext();
-		outlinkMatrix = createOutlinkMatrix(context, numAccounts, numEntries);
+		outlinkMatrix = this.createOutlinkMatrix(context, numAccounts, numEntries);
 
 		final PoiGraphParameters params = PoiGraphParameters.getDefaultParams();
 		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
@@ -74,10 +74,10 @@ public class GraphClustererImplITCase {
 	public void alphaGraphTest() {
 		final Matrix outlinkMatrix = MatrixRepository.load(new File("outlink.matrix"));
 
-		final List<GraphClusteringStrategy> clusterers = getClusteringStrategies();
+		final List<GraphClusteringStrategy> clusterers = this.getClusteringStrategies();
 		for (final GraphClusteringStrategy clusterer : clusterers) {
 			final long start = System.currentTimeMillis();
-			final ClusteringResult result = calculateClusteringResult(clusterer, outlinkMatrix);
+			final ClusteringResult result = this.calculateClusteringResult(clusterer, outlinkMatrix);
 			final long stop = System.currentTimeMillis();
 			System.out.println(
 					"For " + outlinkMatrix.getColumnCount() + " accounts " + clusterer.getClass().getSimpleName() + " clustering needed " + (stop - start) +
@@ -97,7 +97,7 @@ public class GraphClustererImplITCase {
 		//		SparseMatrix outlinkMatrix = allOneOutlinkMatrix(4);
 		final int numAccounts = 25000;
 		final int numEntries = 2 * numAccounts;
-		SparseMatrix outlinkMatrix = createOutlinkMatrix(context, numAccounts, numEntries);
+		SparseMatrix outlinkMatrix = this.createOutlinkMatrix(context, numAccounts, numEntries);
 		//		outlinkMatrix.save("test_clusters");
 		System.out.println("Before makeAntiSymmetric: numEmtries=" + outlinkMatrix.getNumEntries());
 		outlinkMatrix = makeAntiSymmetric(outlinkMatrix);
@@ -109,7 +109,7 @@ public class GraphClustererImplITCase {
 		//		viewer.saveGraph();
 
 		System.out.println("After makeAntiSymmetric: numEmtries=" + outlinkMatrix.getNumEntries());
-		final List<GraphClusteringStrategy> clusteringStrategies = getClusteringStrategies();
+		final List<GraphClusteringStrategy> clusteringStrategies = this.getClusteringStrategies();
 		final long totalStart = System.currentTimeMillis();
 		for (int i = 0; i < 5; i++) {
 			for (final GraphClusteringStrategy clusteringStrategy : clusteringStrategies) {

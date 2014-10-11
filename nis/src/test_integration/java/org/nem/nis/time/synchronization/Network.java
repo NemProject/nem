@@ -77,11 +77,11 @@ public class Network {
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
 		this.poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
-		this.syncStrategy = createSynchronizationStrategy(this.poiFacade);
+		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
 		for (int i = 1; i <= networkSize; i++) {
-			final TimeAwareNode node = createNode();
+			final TimeAwareNode node = this.createNode();
 			this.nodes.add(node);
 			cumulativeInaccuracy += node.getClockInaccuary().getRaw();
 			if (node.isEvil()) {
@@ -185,25 +185,25 @@ public class Network {
 		final int ticksUntilClockInaccuracy = (int)(HOUR / TICK_INTERVALL);
 		for (int i = 0; i < numberOfTicks; i++) {
 			if (loggingInterval > 0 && i % ticksUntilLog == 0) {
-				updateStatistics();
-				logStatistics();
+				this.updateStatistics();
+				this.logStatistics();
 			}
 			if (this.nodeSettings.hasClockAdjustment() && i % ticksUntilClockAdjustment == 0) {
-				clockAdjustment();
+				this.clockAdjustment();
 			}
 			if (this.nodeSettings.hasUnstableClock() && i % ticksUntilClockInaccuracy == 0) {
 				this.nodes.stream().forEach(TimeAwareNode::applyClockInaccuracy);
 			}
-			tick();
+			this.tick();
 		}
 	}
 
 	public void tick() {
 		this.realTime += TICK_INTERVALL;
-		final List<TimeAwareNode> nodesToUpdate = getNodesToUpdate(TICK_INTERVALL);
+		final List<TimeAwareNode> nodesToUpdate = this.getNodesToUpdate(TICK_INTERVALL);
 		nodesToUpdate.stream().forEach(n -> {
-			Set<TimeAwareNode> partners = selectSyncPartnersForNode(n);
-			List<TimeSynchronizationSample> samples = createSynchronizationSamples(n, partners);
+			Set<TimeAwareNode> partners = this.selectSyncPartnersForNode(n);
+			List<TimeSynchronizationSample> samples = this.createSynchronizationSamples(n, partners);
 			n.updateNetworkTime(samples);
 		});
 	}
@@ -218,7 +218,7 @@ public class Network {
 		final List<TimeAwareNode> nodesToUpdate = new ArrayList<>();
 		this.nodes.stream().forEach(n -> {
 			if (n.decrementUpdateCounter(timePassed) < 0) {
-				n.setUpdateCounter(getUpdateInterval(n.getAge()));
+				n.setUpdateCounter(this.getUpdateInterval(n.getAge()));
 				nodesToUpdate.add(n);
 			}
 		});
@@ -228,7 +228,7 @@ public class Network {
 
 	private void testUpdateIntervall() {
 		for (int i = 0; i < 20; i++) {
-			log(String.format("Age %d: %ds", i, getUpdateInterval(new NodeAge(i)) / 1000));
+			log(String.format("Age %d: %ds", i, this.getUpdateInterval(new NodeAge(i)) / 1000));
 		}
 	}
 
@@ -250,12 +250,12 @@ public class Network {
 
 	private PoiFacade resetFacade() {
 		this.poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
-		this.syncStrategy = createSynchronizationStrategy(this.poiFacade);
+		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
 		this.nodeId = 1;
-		oldNodes.stream().forEach(n -> this.nodes.add(createNode(n)));
+		oldNodes.stream().forEach(n -> this.nodes.add(this.createNode(n)));
 		return this.poiFacade;
 	}
 
@@ -296,7 +296,7 @@ public class Network {
 		this.resetFacade();
 		final int numberOfNewNodes = (int)(this.nodes.size() * percentage / 100);
 		for (int i = 1; i <= numberOfNewNodes; i++) {
-			this.nodes.add(createNode());
+			this.nodes.add(this.createNode());
 		}
 		this.initializeFacade(this.poiFacade);
 	}
@@ -309,7 +309,7 @@ public class Network {
 	 */
 	public void join(final Network network, final String newName) {
 		this.resetFacade();
-		network.getNodes().stream().forEach(n -> this.nodes.add(createNode(n)));
+		network.getNodes().stream().forEach(n -> this.nodes.add(this.createNode(n)));
 		this.name = newName;
 		this.initializeFacade(this.poiFacade);
 	}
@@ -430,9 +430,9 @@ public class Network {
 	 * Updates the statistical values.
 	 */
 	public void updateStatistics() {
-		this.mean = calculateMean();
-		this.standardDeviation = calculateStandardDeviation();
-		this.maxDeviationFromMean = calculateMaxDeviationFromMean();
+		this.mean = this.calculateMean();
+		this.standardDeviation = this.calculateStandardDeviation();
+		this.maxDeviationFromMean = this.calculateMaxDeviationFromMean();
 		this.hasConverged = this.standardDeviation < TOLERABLE_MAX_STANDARD_DEVIATION;
 	}
 
@@ -443,7 +443,7 @@ public class Network {
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final String entry = String.format(
 				"%s : %s mean offset to real time: %sms, standard deviation: %sms, max. deviation from mean: %sms",
-				getRealTimeString(),
+				this.getRealTimeString(),
 				this.getName(),
 				format.format(this.mean),
 				format.format(this.standardDeviation),

@@ -49,7 +49,7 @@ public class TransferDaoImpl implements TransferDao {
 				.createQuery("from Transfer a where a.shortId = :id")
 				.setParameter("id", txId);
 
-		return getByHashQuery(txHash, query);
+		return this.getByHashQuery(txHash, query);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class TransferDaoImpl implements TransferDao {
 				.createQuery("from Transfer t where t.shortId = :id and t.block.height <= :height")
 				.setParameter("id", txId)
 				.setParameter("height", maxBlockHeight);
-		return getByHashQuery(txHash, query);
+		return this.getByHashQuery(txHash, query);
 	}
 
 	private Transfer getByHashQuery(final byte[] txHash, final Query query) {

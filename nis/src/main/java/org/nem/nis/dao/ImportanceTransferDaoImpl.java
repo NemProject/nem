@@ -42,7 +42,7 @@ public class ImportanceTransferDaoImpl implements ImportanceTransferDao {
 		final Query query = this.getCurrentSession()
 				.createQuery("from ImportanceTransfer a where a.shortId = :id")
 				.setParameter("id", txId);
-		return getByHashQuery(txHash, query);
+		return this.getByHashQuery(txHash, query);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class ImportanceTransferDaoImpl implements ImportanceTransferDao {
 				.createQuery("from ImportanceTransfer t where t.shortId = :id and t.block.height <= :height")
 				.setParameter("id", txId)
 				.setParameter("height", maxBlockHeight);
-		return getByHashQuery(txHash, query);
+		return this.getByHashQuery(txHash, query);
 	}
 
 	private ImportanceTransfer getByHashQuery(final byte[] txHash, final Query query) {

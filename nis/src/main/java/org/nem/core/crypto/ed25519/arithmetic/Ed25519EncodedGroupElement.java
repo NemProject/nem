@@ -36,8 +36,8 @@ public class Ed25519EncodedGroupElement {
 	 * @return The group element.
 	 */
 	public Ed25519GroupElement decode() {
-		final Ed25519FieldElement x = getAffineX();
-		final Ed25519FieldElement y = getAffineY();
+		final Ed25519FieldElement x = this.getAffineX();
+		final Ed25519FieldElement y = this.getAffineY();
 		return Ed25519GroupElement.p3(x, y, Ed25519Field.ONE, x.multiply(y));
 	}
 

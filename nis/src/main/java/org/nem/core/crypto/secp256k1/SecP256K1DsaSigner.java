@@ -37,12 +37,12 @@ public class SecP256K1DsaSigner implements DsaSigner {
 		final byte[] hash = Hashes.sha3(data);
 		final BigInteger[] components = signer.generateSignature(hash);
 		final Signature signature = new Signature(components[0], components[1]);
-		return makeSignatureCanonical(signature);
+		return this.makeSignatureCanonical(signature);
 	}
 
 	@Override
 	public boolean verify(final byte[] data, final Signature signature) {
-		if (!isCanonicalSignature(signature)) {
+		if (!this.isCanonicalSignature(signature)) {
 			return false;
 		}
 
@@ -61,7 +61,7 @@ public class SecP256K1DsaSigner implements DsaSigner {
 
 	@Override
 	public Signature makeSignatureCanonical(final Signature signature) {
-		return isCanonicalSignature(signature)
+		return this.isCanonicalSignature(signature)
 				? signature
 				: new Signature(signature.getR(), SecP256K1Curve.secp256k1().getParams().getN().subtract(signature.getS()));
 	}

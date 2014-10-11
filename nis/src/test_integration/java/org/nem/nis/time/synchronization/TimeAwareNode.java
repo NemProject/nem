@@ -196,7 +196,7 @@ public class TimeAwareNode {
 	 * @return The communication time stamps.
 	 */
 	public CommunicationTimeStamps createCommunicationTimeStamps(final int roundTripTime) {
-		if (isEvil()) {
+		if (this.isEvil()) {
 			return new CommunicationTimeStamps(
 					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + 30000),
 					new NetworkTimeStamp(System.currentTimeMillis() + this.timeOffset.getRaw() + 30000));

@@ -60,7 +60,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR.getRaw(), encodedS.getRaw());
-		if (!isCanonicalSignature(signature)) {
+		if (!this.isCanonicalSignature(signature)) {
 			// TODO 20141011 - if we get here, this indicates a bug in our code?
 			throw new CryptoException("Generated signature is not canonical");
 		}
@@ -72,7 +72,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 	public boolean verify(final byte[] data, final Signature signature) {
 		// TODO 20141011 - does any of the validation here make sense:
 		// https://github.com/jedisct1/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/open.c
-		if (!isCanonicalSignature(signature)) {
+		if (!this.isCanonicalSignature(signature)) {
 			return false;
 		}
 

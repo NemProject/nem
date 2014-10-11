@@ -31,8 +31,8 @@ public class SecP256K1BlockCipher implements BlockCipher {
 			this.iesEncryptEngine = createIesEngine();
 			this.iesEncryptEngine.init(
 					true,
-					getPrivateKeyParameters(senderKeyPair.getPrivateKey()),
-					getPublicKeyParameters(recipientKeyPair.getPublicKey()),
+					this.getPrivateKeyParameters(senderKeyPair.getPrivateKey()),
+					this.getPublicKeyParameters(recipientKeyPair.getPublicKey()),
 					IES_PARAMETERS);
 		} else {
 			this.iesEncryptEngine = null;
@@ -42,8 +42,8 @@ public class SecP256K1BlockCipher implements BlockCipher {
 			this.iesDecryptEngine = createIesEngine();
 			this.iesDecryptEngine.init(
 					false,
-					getPrivateKeyParameters(recipientKeyPair.getPrivateKey()),
-					getPublicKeyParameters(senderKeyPair.getPublicKey()),
+					this.getPrivateKeyParameters(recipientKeyPair.getPrivateKey()),
+					this.getPublicKeyParameters(senderKeyPair.getPublicKey()),
 					IES_PARAMETERS);
 		} else {
 			this.iesDecryptEngine = null;

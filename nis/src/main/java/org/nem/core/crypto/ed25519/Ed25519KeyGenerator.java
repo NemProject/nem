@@ -24,7 +24,7 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 		// seed is the private key.
 		final PrivateKey privateKey = new PrivateKey(ArrayUtils.toBigInteger(seed));
 
-		return new KeyPair(privateKey, derivePublicKey(privateKey));
+		return new KeyPair(privateKey, this.derivePublicKey(privateKey));
 	}
 
 	@Override

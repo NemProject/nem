@@ -126,7 +126,7 @@ public class PoiGraphViewer {
 		this.viewer.getRenderContext().setLabelOffset(20);
 		this.viewer.getRenderContext().getMultiLayerTransformer().getTransformer(Layer.LAYOUT).setScale(0.95, 0.95, this.viewer.getCenter());
 
-		buildGraph(this.adjacencyMatrix, this.params);
+		this.buildGraph(this.adjacencyMatrix, this.params);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class PoiGraphViewer {
 
 			@Override
 			public void visit(final int row, final int col, final double value) {
-				getGraph().addEdge(this.edgeCount++, col, row, edgeType);
+				PoiGraphViewer.this.getGraph().addEdge(this.edgeCount++, col, row, edgeType);
 			}
 		});
 	}

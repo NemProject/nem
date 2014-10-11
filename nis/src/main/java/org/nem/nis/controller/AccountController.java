@@ -70,7 +70,7 @@ public class AccountController {
 	@ClientApi
 	public AccountMetaData accountStatus(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		return new AccountMetaData(getAccountStatus(address));
+		return new AccountMetaData(this.getAccountStatus(address));
 	}
 
 	private AccountStatus getAccountStatus(final Address address) {
