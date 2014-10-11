@@ -28,5 +28,6 @@ public abstract class KeyAnalyzerTest {
 	}
 
 	protected abstract KeyAnalyzer getKeyAnalyzer();
+
 	protected abstract void initCryptoEngine();
 }

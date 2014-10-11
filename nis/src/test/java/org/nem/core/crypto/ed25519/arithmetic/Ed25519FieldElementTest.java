@@ -19,7 +19,7 @@ public class Ed25519FieldElementTest {
 		new Ed25519FieldElement(new int[10]);
 	}
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotCreateFieldElementFromArrayWithIncorrectLength() {
 		// Assert:
 		new Ed25519FieldElement(new int[9]);
@@ -55,7 +55,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void addReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final Ed25519FieldElement f2 = MathUtils.getRandomFieldElement();
@@ -73,7 +73,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void subtractReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final Ed25519FieldElement f2 = MathUtils.getRandomFieldElement();
@@ -91,7 +91,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void negateReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final BigInteger b1 = MathUtils.toBigInteger(f1);
@@ -107,7 +107,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void multiplyReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final Ed25519FieldElement f2 = MathUtils.getRandomFieldElement();
@@ -125,7 +125,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void squareReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final BigInteger b1 = MathUtils.toBigInteger(f1);
@@ -141,7 +141,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void squareAndDoubleReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final BigInteger b1 = MathUtils.toBigInteger(f1);
@@ -157,7 +157,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void invertReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final BigInteger b1 = MathUtils.toBigInteger(f1);
@@ -173,7 +173,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void pow22523ReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
 			final BigInteger b1 = MathUtils.toBigInteger(f1);
@@ -189,7 +189,7 @@ public class Ed25519FieldElementTest {
 
 	@Test
 	public void sqrtReturnsCorrectResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519EncodedFieldElement y = MathUtils.getRandomEncodedFieldElement(32);
 			y.getRaw()[31] &= 0xf8;
@@ -233,7 +233,7 @@ public class Ed25519FieldElementTest {
 	@Test
 	public void decodeReturnsCorrectFieldElement() {
 		SecureRandom random = new SecureRandom();
-		for (int i=0; i<10000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			// Arrange:
 			final byte[] bytes = new byte[32];
 			random.nextBytes(bytes);
@@ -256,10 +256,10 @@ public class Ed25519FieldElementTest {
 	@Test
 	public void isNegativeReturnsCorrectResult() {
 		SecureRandom random = new SecureRandom();
-		for (int i=0; i<10000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			// Arrange:
 			final int[] t = new int[10];
-			for (int j=0; j<10; j++) {
+			for (int j = 0; j < 10; j++) {
 				t[j] = random.nextInt(1 << 28) - (1 << 27);
 			}
 			final boolean isNegative = MathUtils.toBigInteger(t).mod(Ed25519Field.P).mod(new BigInteger("2")).equals(BigInteger.ONE);
@@ -312,8 +312,8 @@ public class Ed25519FieldElementTest {
 	public void toStringReturnsCorrectRepresentation() {
 		// Arrange:
 		final byte[] bytes = new byte[32];
-		for (int i=0; i<32; i++) {
-			bytes[i] = (byte)(i+1);
+		for (int i = 0; i < 32; i++) {
+			bytes[i] = (byte)(i + 1);
 		}
 		final Ed25519FieldElement f = new Ed25519EncodedFieldElement(bytes).decode();
 

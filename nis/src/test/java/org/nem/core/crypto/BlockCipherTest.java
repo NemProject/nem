@@ -95,5 +95,6 @@ public abstract class BlockCipherTest {
 	}
 
 	protected abstract BlockCipher getBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair);
+
 	protected abstract void initCryptoEngine();
 }

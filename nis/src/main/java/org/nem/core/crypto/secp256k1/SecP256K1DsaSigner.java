@@ -30,7 +30,9 @@ public class SecP256K1DsaSigner implements DsaSigner {
 		}
 
 		final ECDSASigner signer = this.createECDSASigner();
-		final ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(this.keyPair.getPrivateKey().getRaw(), SecP256K1Curve.secp256k1().getParams());
+		final ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(
+				this.keyPair.getPrivateKey().getRaw(),
+				SecP256K1Curve.secp256k1().getParams());
 		signer.init(true, privateKeyParameters);
 		final byte[] hash = Hashes.sha3(data);
 		final BigInteger[] components = signer.generateSignature(hash);

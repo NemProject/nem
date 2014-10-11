@@ -268,7 +268,7 @@ public class ArrayUtilsTest {
 		final SecureRandom random = new SecureRandom();
 		final byte[] bytes1 = new byte[32];
 		final byte[] bytes2 = new byte[32];
-		for (int i=0; i<100; i++) {
+		for (int i = 0; i < 100; i++) {
 			random.nextBytes(bytes1);
 			System.arraycopy(bytes1, 0, bytes2, 0, 32);
 
@@ -284,7 +284,7 @@ public class ArrayUtilsTest {
 		final byte[] bytes1 = new byte[32];
 		final byte[] bytes2 = new byte[32];
 		random.nextBytes(bytes1);
-		for (int i=0; i<32; i++) {
+		for (int i = 0; i < 32; i++) {
 			System.arraycopy(bytes1, 0, bytes2, 0, 32);
 			bytes2[i] = (byte)(bytes2[i] ^ 0xff);
 
@@ -299,16 +299,16 @@ public class ArrayUtilsTest {
 
 	@Test
 	public void getBitReturnZeroIfBitIsNotSet() {
-		Assert.assertThat(ArrayUtils.getBit(new byte[] {0}, 0), IsEqual.equalTo(0));
-		Assert.assertThat(ArrayUtils.getBit(new byte[] {1, 2, 3}, 15), IsEqual.equalTo(0));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 0 }, 0), IsEqual.equalTo(0));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 15), IsEqual.equalTo(0));
 	}
 
 	@Test
 	public void getBitReturnOneIfBitIsSet() {
 		// Assert:
-		Assert.assertThat(ArrayUtils.getBit(new byte[] {8}, 3), IsEqual.equalTo(1));
-		Assert.assertThat(ArrayUtils.getBit(new byte[] {1, 2, 3}, 9), IsEqual.equalTo(1));
-		Assert.assertThat(ArrayUtils.getBit(new byte[] {1, 2, 3}, 16), IsEqual.equalTo(1));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 8 }, 3), IsEqual.equalTo(1));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 9), IsEqual.equalTo(1));
+		Assert.assertThat(ArrayUtils.getBit(new byte[] { 1, 2, 3 }, 16), IsEqual.equalTo(1));
 	}
 
 	//endregion

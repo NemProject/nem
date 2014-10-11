@@ -4,7 +4,7 @@ public enum CoordinateSystem {
 
 	/**
 	 * Available coordinate systems for a group element:
-	 *
+	 * <br/>
 	 * AFFINE: Affine coordinate system (x, y).
 	 * P2: Projective coordinate system (X:Y:Z) satisfying x=X/Z, y=Y/Z.
 	 * P3: Extended projective coordinate system (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT.

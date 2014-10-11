@@ -68,7 +68,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		// Arrange:
 		initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
-		for (int i=0; i<20; i++) {
+		for (int i = 0; i < 20; i++) {
 			final DsaSigner dsaSigner = getDsaSigner(keyPair);
 			final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
@@ -86,7 +86,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		// Arrange:
 		initCryptoEngine();
 		final KeyPair keyPair = new KeyPair();
-		for (int i=0; i<20; i++) {
+		for (int i = 0; i < 20; i++) {
 			final DsaSigner dsaSigner = getDsaSigner(keyPair);
 			final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 
@@ -108,13 +108,13 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		final Signature signature = dsaSigner.sign(input);
 
 		// Warm up
-		for (int i=0; i<3000; i++) {
+		for (int i = 0; i < 3000; i++) {
 			dsaSigner.verify(input, signature);
 		}
 
 		// Act:
 		final long start = System.currentTimeMillis();
-		for (int i=0; i<10000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			dsaSigner.verify(input, signature);
 		}
 		final long stop = System.currentTimeMillis();

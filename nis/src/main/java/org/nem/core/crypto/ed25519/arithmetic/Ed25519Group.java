@@ -16,7 +16,6 @@ public class Ed25519Group {
 	public static Ed25519GroupElement ZERO_P2 = Ed25519GroupElement.p2(Ed25519Field.ZERO, Ed25519Field.ONE, Ed25519Field.ONE);
 	public static Ed25519GroupElement ZERO_PRECOMPUTED = Ed25519GroupElement.precomputed(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
-
 	public static Ed25519GroupElement getBasePoint() {
 		BASE_POINT = new Ed25519EncodedGroupElement(HexEncoder.getBytes("5866666666666666666666666666666666666666666666666666666666666666")).decode();
 		BASE_POINT.precomputeForScalarMultiplication();

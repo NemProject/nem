@@ -101,5 +101,6 @@ public abstract class DsaSignerTest {
 	}
 
 	protected abstract DsaSigner getDsaSigner(final KeyPair keyPair);
+
 	protected abstract void initCryptoEngine();
 }

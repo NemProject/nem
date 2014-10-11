@@ -89,13 +89,13 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		final Signature signature = dsaSigner.sign(input);
 
 		// Warm up
-		for (int i=0; i<500; i++) {
+		for (int i = 0; i < 500; i++) {
 			dsaSigner.verify(input, signature);
 		}
 
 		// Act:
 		final long start = System.currentTimeMillis();
-		for (int i=0; i<500; i++) {
+		for (int i = 0; i < 500; i++) {
 			dsaSigner.verify(input, signature);
 		}
 		final long stop = System.currentTimeMillis();
@@ -104,7 +104,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		final long timeInMilliSeconds = stop - start;
 		System.out.println(String.format("verify needs %d micro seconds.", timeInMilliSeconds * 2));
 		Assert.assertTrue(
-				String.format("verify needs %d micro seconds (expected less than 500 micro seconds).", timeInMilliSeconds  * 2),
+				String.format("verify needs %d micro seconds (expected less than 500 micro seconds).", timeInMilliSeconds * 2),
 				timeInMilliSeconds < 2500);
 	}
 

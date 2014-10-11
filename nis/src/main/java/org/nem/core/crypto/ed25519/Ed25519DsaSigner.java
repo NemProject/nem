@@ -19,8 +19,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 	/**
 	 * Creates a Ed25519 DSA signer.
 	 *
-	 *
-	 *
 	 * @param keyPair The key pair to use.
 	 */
 	public Ed25519DsaSigner(final KeyPair keyPair) {

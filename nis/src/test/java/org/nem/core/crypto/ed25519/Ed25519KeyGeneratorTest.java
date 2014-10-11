@@ -12,7 +12,7 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 		// Arrange:
 		initCryptoEngine();
 		final KeyGenerator generator = getKeyGenerator();
-		for (int i=0; i<100; i++) {
+		for (int i = 0; i < 100; i++) {
 			final KeyPair kp = generator.generateKeyPair();
 
 			// Act:
@@ -28,7 +28,7 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 		// Arrange:
 		initCryptoEngine();
 		final KeyGenerator generator = getKeyGenerator();
-		for (int i=0; i<100; i++) {
+		for (int i = 0; i < 100; i++) {
 			final KeyPair kp = generator.generateKeyPair();
 
 			// Act:

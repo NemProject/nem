@@ -99,13 +99,13 @@ public class PublicKeyTest {
 
 	//region group element A
 
-	@Test (expected = RuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void ctorWithProjectiveCoordinatesThrowsIfAIsNull() {
 		// Assert:
 		new PublicKey(this.TEST_BYTES, null);
 	}
 
-	@Test (expected = RuntimeException.class)
+	@Test(expected = RuntimeException.class)
 	public void ctorWithProjectiveCoordinatesThrowsIfAIsNotPrecomputed() {
 		// Assert:
 		new PublicKey(this.TEST_BYTES, getA(false));

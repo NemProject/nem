@@ -11,7 +11,7 @@ public class Ed25519EncodedGroupElementTest {
 		new Ed25519EncodedGroupElement(new byte[32]);
 	}
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedFromArrayWithIncorrectLength() {
 		// Assert:
 		new Ed25519EncodedGroupElement(new byte[30]);
@@ -19,7 +19,7 @@ public class Ed25519EncodedGroupElementTest {
 
 	@Test
 	public void getAffineXReturnsExpectedResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519EncodedGroupElement encoded = MathUtils.getRandomGroupElement().encode();
 
@@ -34,7 +34,7 @@ public class Ed25519EncodedGroupElementTest {
 
 	@Test
 	public void getAffineYReturnsExpectedResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519EncodedGroupElement encoded = MathUtils.getRandomEncodedGroupElement();
 

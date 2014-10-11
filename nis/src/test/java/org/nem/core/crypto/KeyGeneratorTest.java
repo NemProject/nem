@@ -48,5 +48,6 @@ public abstract class KeyGeneratorTest {
 	}
 
 	protected abstract KeyGenerator getKeyGenerator();
+
 	protected abstract void initCryptoEngine();
 }

@@ -22,7 +22,7 @@ public class Ed25519EncodedFieldElementTest {
 		new Ed25519EncodedFieldElement(new byte[64]);
 	}
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void cannotBeCreatedFromArrayWithIncorrectLength() {
 		// Assert:
 		new Ed25519EncodedFieldElement(new byte[50]);
@@ -58,7 +58,7 @@ public class Ed25519EncodedFieldElementTest {
 
 	@Test
 	public void modQReturnsExpectedResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519EncodedFieldElement encoded = new Ed25519EncodedFieldElement(MathUtils.getRandomByteArray(64));
 
@@ -75,7 +75,7 @@ public class Ed25519EncodedFieldElementTest {
 
 	@Test
 	public void multiplyAndAddmodQReturnsExpectedResult() {
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519EncodedFieldElement encoded1 = MathUtils.getRandomEncodedFieldElement(32);
 			final Ed25519EncodedFieldElement encoded2 = MathUtils.getRandomEncodedFieldElement(32);
@@ -116,10 +116,10 @@ public class Ed25519EncodedFieldElementTest {
 
 	@Test
 	public void encodeReturnsCorrectByteArrayIfBitjOfTiIsSetToOne() {
-		for (int i=0; i<10; i++){
+		for (int i = 0; i < 10; i++) {
 			// Arrange:
 			final int[] t = new int[10];
-			for (int j=0; j<24; j++) {
+			for (int j = 0; j < 24; j++) {
 				t[i] = 1 << j;
 				final Ed25519FieldElement fieldElement = new Ed25519FieldElement(t);
 				final BigInteger b = MathUtils.toBigInteger(t).mod(Ed25519Field.P);
@@ -136,10 +136,10 @@ public class Ed25519EncodedFieldElementTest {
 	@Test
 	public void encodeReturnsCorrectByteArray() {
 		final SecureRandom random = new SecureRandom();
-		for (int i=0; i<10000; i++){
+		for (int i = 0; i < 10000; i++) {
 			// Arrange:
 			final int[] t = new int[10];
-			for (int j=0; j<10; j++) {
+			for (int j = 0; j < 10; j++) {
 				t[j] = random.nextInt(1 << 28) - (1 << 27);
 			}
 			final Ed25519FieldElement fieldElement = new Ed25519FieldElement(t);
@@ -158,7 +158,7 @@ public class Ed25519EncodedFieldElementTest {
 	@Test
 	public void isNegativeReturnsCorrectResult() {
 		final SecureRandom random = new SecureRandom();
-		for (int i=0; i<10000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			// Arrange:
 			final byte[] values = new byte[32];
 			random.nextBytes(values);
@@ -213,8 +213,8 @@ public class Ed25519EncodedFieldElementTest {
 	public void toStringReturnsCorrectRepresentation() {
 		// Arrange:
 		final byte[] bytes = new byte[32];
-		for (int i=0; i<32; i++) {
-			bytes[i] = (byte)(i+1);
+		for (int i = 0; i < 32; i++) {
+			bytes[i] = (byte)(i + 1);
 		}
 		final Ed25519EncodedFieldElement encoded = new Ed25519EncodedFieldElement(bytes);
 

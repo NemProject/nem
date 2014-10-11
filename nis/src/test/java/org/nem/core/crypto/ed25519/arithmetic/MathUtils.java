@@ -17,7 +17,18 @@ import java.util.Arrays;
  * Utility class to help with calculations.
  */
 public class MathUtils {
-	private static final int[] exponents = {0, 26, 26 + 25, 2*26 + 25, 2*26 + 2*25, 3*26 + 2*25, 3*26 + 3*25, 4*26 + 3*25, 4*26 + 4*25, 5*26 + 4*25};
+	private static final int[] exponents = {
+			0,
+			26,
+			26 + 25,
+			2 * 26 + 25,
+			2 * 26 + 2 * 25,
+			3 * 26 + 2 * 25,
+			3 * 26 + 3 * 25,
+			4 * 26 + 3 * 25,
+			4 * 26 + 4 * 25,
+			5 * 26 + 4 * 25
+	};
 	private static final SecureRandom random = new SecureRandom();
 	private static final BigInteger D = new BigInteger("-121665").multiply(new BigInteger("121666").modInverse(Ed25519Field.P));
 
@@ -32,7 +43,7 @@ public class MathUtils {
 	 */
 	public static BigInteger toBigInteger(final int[] t) {
 		BigInteger b = BigInteger.ZERO;
-		for (int i=0; i<10; i++) {
+		for (int i = 0; i < 10; i++) {
 			b = b.add(BigInteger.ONE.multiply(BigInteger.valueOf(t[i])).shiftLeft(exponents[i]));
 		}
 
@@ -48,7 +59,7 @@ public class MathUtils {
 	 */
 	public static BigInteger toBigInteger(final byte[] bytes) {
 		BigInteger b = BigInteger.ZERO;
-		for (int i=0; i<bytes.length; i++) {
+		for (int i = 0; i < bytes.length; i++) {
 			b = b.add(BigInteger.ONE.multiply(BigInteger.valueOf(bytes[i] & 0xff)).shiftLeft(i * 8));
 		}
 
@@ -99,8 +110,8 @@ public class MathUtils {
 		final byte[] original = b.toByteArray();
 
 		// Although b < 2^256, original can have length > 32 with some bytes set to 0.
-		final int offset = original.length > 32? original.length - 32 : 0;
-		for (int i=0; i<original.length - offset; i++) {
+		final int offset = original.length > 32 ? original.length - 32 : 0;
+		for (int i = 0; i < original.length - offset; i++) {
 			bytes[original.length - i - offset - 1] = original[i + offset];
 		}
 
@@ -164,7 +175,7 @@ public class MathUtils {
 	 */
 	public static Ed25519FieldElement getRandomFieldElement() {
 		final int[] t = new int[10];
-		for (int j=0; j<10; j++) {
+		for (int j = 0; j < 10; j++) {
 			t[j] = random.nextInt(1 << 25) - (1 << 24);
 		}
 		return new Ed25519FieldElement(t);
@@ -286,7 +297,7 @@ public class MathUtils {
 		final BigInteger gX = toBigInteger(g.getX().encode());
 		final BigInteger gY = toBigInteger(g.getY().encode());
 		final BigInteger gZ = toBigInteger(g.getZ().encode());
-		final BigInteger gT = null == g.getT()? null : toBigInteger(g.getT().encode());
+		final BigInteger gT = null == g.getT() ? null : toBigInteger(g.getT().encode());
 
 		// Switch to affine coordinates.
 		switch (g.getCoordinateSystem()) {
@@ -367,7 +378,7 @@ public class MathUtils {
 	public static Ed25519GroupElement addGroupElements(final Ed25519GroupElement g1, final Ed25519GroupElement g2) {
 		// Relying on a special coordinate system of the group elements.
 		if ((g1.getCoordinateSystem() != CoordinateSystem.P2 && g1.getCoordinateSystem() != CoordinateSystem.P3) ||
-			(g2.getCoordinateSystem() != CoordinateSystem.P2 && g2.getCoordinateSystem() != CoordinateSystem.P3)) {
+				(g2.getCoordinateSystem() != CoordinateSystem.P2 && g2.getCoordinateSystem() != CoordinateSystem.P3)) {
 			throw new IllegalArgumentException("g1 and g2 must have coordinate system P2 or P3");
 		}
 
@@ -424,7 +435,7 @@ public class MathUtils {
 	public static Ed25519GroupElement scalarMultiplyGroupElement(final Ed25519GroupElement g, final Ed25519FieldElement f) {
 		final byte[] bytes = f.encode().getRaw();
 		Ed25519GroupElement h = Ed25519Group.ZERO_P3;
-		for (int i=254; i>=0; i--) {
+		for (int i = 254; i >= 0; i--) {
 			h = doubleGroupElement(h);
 			if (ArrayUtils.getBit(bytes, i) == 1) {
 				h = addGroupElements(h, g);
@@ -520,7 +531,7 @@ public class MathUtils {
 				Ed25519Field.ONE,
 				Ed25519Field.ONE,
 				Ed25519Field.ZERO);
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			final Ed25519GroupElement g = getRandomGroupElement();
 
 			// Act:
@@ -532,7 +543,7 @@ public class MathUtils {
 			Assert.assertThat(g, IsEqual.equalTo(h2));
 		}
 
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			Ed25519GroupElement g = getRandomGroupElement();
 
 			// P3 -> P2.
@@ -557,7 +568,7 @@ public class MathUtils {
 			Assert.assertThat(g, IsEqual.equalTo(h));
 		}
 
-		for (int i=0; i<10; i++) {
+		for (int i = 0; i < 10; i++) {
 			// Arrange:
 			final Ed25519GroupElement g = MathUtils.getRandomGroupElement();
 

@@ -27,5 +27,4 @@ public interface Curve {
 	 * @return The group order / 2.
 	 */
 	public BigInteger getHalfGroupOrder();
-
 }

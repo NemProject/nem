@@ -23,7 +23,7 @@ public class CipherTest {
 	public void encryptDelegatesToBlockCipher() {
 		// Arrange:
 		final CipherContext context = new CipherContext();
-		final Cipher cipher = new Cipher(context.pair1,context. pair2);
+		final Cipher cipher = new Cipher(context.pair1, context.pair2);
 		final byte[] data = Utils.generateRandomBytes();
 
 		// Act:
@@ -37,7 +37,7 @@ public class CipherTest {
 	public void decryptDelegatesToBlockCipher() {
 		// Arrange:
 		final CipherContext context = new CipherContext();
-		final Cipher cipher = new Cipher(context.pair1,context. pair2);
+		final Cipher cipher = new Cipher(context.pair1, context.pair2);
 		final byte[] data = Utils.generateRandomBytes();
 
 		// Act:

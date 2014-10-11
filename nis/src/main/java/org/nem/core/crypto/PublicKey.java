@@ -40,8 +40,7 @@ public class PublicKey implements SerializableEntity {
 		this.value = bytes;
 		this.A = A;
 
-		if (null == A ||
-			!A.isPrecomputedForDoubleScalarMultiplication()) {
+		if (null == A || !A.isPrecomputedForDoubleScalarMultiplication()) {
 			throw new RuntimeException("A not prepared for double scalar multiplication.");
 		}
 	}
