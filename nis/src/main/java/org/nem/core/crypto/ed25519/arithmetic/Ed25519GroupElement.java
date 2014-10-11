@@ -32,7 +32,9 @@ public class Ed25519GroupElement implements Serializable {
 	/**
 	 * Precomputed table for a double scalar multiplication
 	 */
-	Ed25519GroupElement[] precomputedForDouble;
+	private Ed25519GroupElement[] precomputedForDouble;
+
+	//region constructors
 
 	/**
 	 * Creates a new group element using the AFFINE coordinate system.
@@ -152,6 +154,10 @@ public class Ed25519GroupElement implements Serializable {
 		this.T = T;
 	}
 
+	//endregion
+
+	//region accessors
+
 	/**
 	 * Gets the coordinate system for the group element.
 	 *
@@ -228,6 +234,8 @@ public class Ed25519GroupElement implements Serializable {
 	public Ed25519GroupElement[] getPrecomputedForDouble() {
 		return this.precomputedForDouble;
 	}
+
+	//endregion
 
 	/**
 	 * Converts the group element to an encoded point on the curve.
@@ -346,6 +354,7 @@ public class Ed25519GroupElement implements Serializable {
 		if (null != this.precomputedForSingle) {
 			return;
 		}
+
 		Ed25519GroupElement Bi = this;
 		this.precomputedForSingle = new Ed25519GroupElement[32][8];
 

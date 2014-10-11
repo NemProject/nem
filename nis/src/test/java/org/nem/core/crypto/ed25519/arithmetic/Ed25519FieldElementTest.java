@@ -51,7 +51,11 @@ public class Ed25519FieldElementTest {
 
 	// endregion
 
+	// TODO 20141011 J-B: add a getRaw test
+
 	// region mod p arithmetic
+
+	// TODO 20141011 J-B: i think it might help to have an assertEquals(FieldElement, BigInteger) that does the mod and compare
 
 	@Test
 	public void addReturnsCorrectResult() {
@@ -187,6 +191,7 @@ public class Ed25519FieldElementTest {
 		}
 	}
 
+	// TODO 20141011 J-B: i'm not sure if i follow what this test is doing
 	@Test
 	public void sqrtReturnsCorrectResult() {
 		for (int i = 0; i < 1000; i++) {
@@ -262,6 +267,7 @@ public class Ed25519FieldElementTest {
 			for (int j = 0; j < 10; j++) {
 				t[j] = random.nextInt(1 << 28) - (1 << 27);
 			}
+			// TODO 20141011 J-B: can you more directly check negative on the BigInteger
 			final boolean isNegative = MathUtils.toBigInteger(t).mod(Ed25519Field.P).mod(new BigInteger("2")).equals(BigInteger.ONE);
 			final Ed25519FieldElement f = new Ed25519FieldElement(t);
 

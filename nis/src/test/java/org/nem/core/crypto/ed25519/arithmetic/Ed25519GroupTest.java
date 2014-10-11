@@ -46,11 +46,11 @@ public class Ed25519GroupTest {
 	}
 
 	@Test
-	public void zeroPrecompIsAsExpected() {
+	public void zeroPrecomputedIsAsExpected() {
 		// Arrange:
-		final Ed25519GroupElement zeroPrecomp = Ed25519GroupElement.precomputed(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
+		final Ed25519GroupElement zeroPrecomputed = Ed25519GroupElement.precomputed(Ed25519Field.ONE, Ed25519Field.ONE, Ed25519Field.ZERO);
 
 		// Assert:
-		Assert.assertThat(zeroPrecomp, IsEqual.equalTo(Ed25519Group.ZERO_PRECOMPUTED));
+		Assert.assertThat(zeroPrecomputed, IsEqual.equalTo(Ed25519Group.ZERO_PRECOMPUTED));
 	}
 }

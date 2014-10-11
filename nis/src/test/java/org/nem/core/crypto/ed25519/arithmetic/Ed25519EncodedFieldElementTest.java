@@ -54,6 +54,10 @@ public class Ed25519EncodedFieldElementTest {
 
 	// endregion
 
+	// TODO 20141011 J-B consider adding some tests for:
+	// > getRaw
+	// > decode / encode - i guess a roundtrip test is sufficient
+
 	// region modulo group order arithmetic
 
 	@Test
@@ -74,7 +78,7 @@ public class Ed25519EncodedFieldElementTest {
 	}
 
 	@Test
-	public void multiplyAndAddmodQReturnsExpectedResult() {
+	public void multiplyAndAddModQReturnsExpectedResult() {
 		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519EncodedFieldElement encoded1 = MathUtils.getRandomEncodedFieldElement(32);
@@ -115,7 +119,7 @@ public class Ed25519EncodedFieldElementTest {
 	}
 
 	@Test
-	public void encodeReturnsCorrectByteArrayIfBitjOfTiIsSetToOne() {
+	public void encodeReturnsCorrectByteArrayIfJthBitOfTiIsSetToOne() {
 		for (int i = 0; i < 10; i++) {
 			// Arrange:
 			final int[] t = new int[10];

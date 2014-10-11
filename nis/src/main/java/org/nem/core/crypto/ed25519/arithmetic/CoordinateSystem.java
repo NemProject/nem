@@ -1,22 +1,37 @@
 package org.nem.core.crypto.ed25519.arithmetic;
 
+/**
+ * Available coordinate systems for a group element.
+ */
 public enum CoordinateSystem {
 
 	/**
-	 * Available coordinate systems for a group element:
-	 * <br/>
-	 * AFFINE: Affine coordinate system (x, y).
-	 * P2: Projective coordinate system (X:Y:Z) satisfying x=X/Z, y=Y/Z.
-	 * P3: Extended projective coordinate system (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT.
-	 * P1xP1: Completed coordinate system ((X:Z), (Y:T)) satisfying x=X/Z, y=Y/T.
-	 * PRECOMPUTED: Precomputed coordinate system (y+x, y-x, 2dxy).
-	 * CACHED: Cached coordinate system (Y+X, Y-X, Z, 2dT)
+	 * Affine coordinate system (x, y).
 	 */
 	AFFINE,
-	P2,
-	P3,
-	P1xP1,
-	PRECOMPUTED,
-	CACHED
 
+	/**
+	 * Projective coordinate system (X:Y:Z) satisfying x=X/Z, y=Y/Z.
+	 */
+	P2,
+
+	/**
+	 * Extended projective coordinate system (X:Y:Z:T) satisfying x=X/Z, y=Y/Z, XY=ZT.
+	 */
+	P3,
+
+	/**
+	 * Completed coordinate system ((X:Z), (Y:T)) satisfying x=X/Z, y=Y/T.
+	 */
+	P1xP1,
+
+	/**
+	 * Precomputed coordinate system (y+x, y-x, 2dxy).
+	 */
+	PRECOMPUTED,
+
+	/**
+	 * Cached coordinate system (Y+X, Y-X, Z, 2dT).
+	 */
+	CACHED
 }

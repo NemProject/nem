@@ -11,7 +11,6 @@ import java.util.Arrays;
  * This implementation is based on the ref10 implementation of SUPERCOP.
  */
 public class Ed25519FieldElement {
-
 	private final int[] values;
 
 	/**
@@ -47,17 +46,21 @@ public class Ed25519FieldElement {
 
 	/**
 	 * Adds the given field element to this and returns the result.
-	 * h = this + g
+	 * <b>h = this + g</b>
+	 *
+	 * <pre>
 	 * Preconditions:
-	 * |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-	 * |g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+	 *     |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+	 *        |g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 	 * Postconditions:
-	 * |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+	 *        |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+	 * </pre>
 	 *
 	 * @param g The field element to add.
 	 * @return The field element this + val.
 	 */
 	public Ed25519FieldElement add(final Ed25519FieldElement g) {
+		// TODO 2014 J-B: can we loop here? or would that be bad?
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
 		h[0] = this.values[0] + gValues[0];
@@ -70,20 +73,19 @@ public class Ed25519FieldElement {
 		h[7] = this.values[7] + gValues[7];
 		h[8] = this.values[8] + gValues[8];
 		h[9] = this.values[9] + gValues[9];
-
 		return new Ed25519FieldElement(h);
 	}
 
 	/**
 	 * Subtract the given field element from this and returns the result.
-	 * h = this - g
-	 * <br/>
+	 * <b>h = this - g</b>
+	 * <pre>
 	 * Preconditions:
-	 * |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-	 * |g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
-	 * <br/>
+	 *     |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+	 *        |g| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 	 * Postconditions:
-	 * |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+	 *        |h| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+	 * </pre>
 	 *
 	 * @param g The field element to subtract.
 	 * @return The field element this - val.
@@ -101,17 +103,18 @@ public class Ed25519FieldElement {
 		h[7] = this.values[7] - gValues[7];
 		h[8] = this.values[8] - gValues[8];
 		h[9] = this.values[9] - gValues[9];
-
 		return new Ed25519FieldElement(h);
 	}
 
 	/**
 	 * Negates this field element and return the result.
-	 * h = -this
+	 * <b>h = -this</b>
+	 * <pre>
 	 * Preconditions:
-	 * |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+	 *     |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
 	 * Postconditions:
-	 * |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+	 *        |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
+	 * </pre>
 	 *
 	 * @return The field element (-1) * this.
 	 */
@@ -127,29 +130,35 @@ public class Ed25519FieldElement {
 		h[7] = -this.values[7];
 		h[8] = -this.values[8];
 		h[9] = -this.values[9];
-
 		return new Ed25519FieldElement(h);
 	}
 
 	/**
 	 * Multiplies this field element with the given field element and returns the result.
-	 * h = this * g
+	 * <b>h = this * g</b>
 	 * Preconditions:
-	 * |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
-	 * |g| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+	 * <pre>
+	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+	 *        |g| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 * Postconditions:
-	 * |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 * </pre>
 	 * Notes on implementation strategy:
+	 * <br/>
 	 * Using schoolbook multiplication. Karatsuba would save a little in some
 	 * cost models.
+	 * <br/>
 	 * Most multiplications by 2 and 19 are 32-bit precomputations; cheaper than
 	 * 64-bit postcomputations.
+	 * <br/>
 	 * There is one remaining multiplication by 19 in the carry chain; one *19
 	 * precomputation can be merged into this, but the resulting data flow is
 	 * considerably less clean.
+	 * <br/>
 	 * There are 12 carries below. 10 of them are 2-way parallelizable and
 	 * vectorizable. Can get away with 11 carries, but then data flow is much
 	 * deeper.
+	 * <br/>
 	 * With tighter constraints on inputs can squeeze carries into int32.
 	 *
 	 * @param g The field element to multiply.
@@ -415,11 +424,13 @@ public class Ed25519FieldElement {
 
 	/**
 	 * Squares this field element and returns the result.
-	 * h = this * this
+	 * <b>h = this * this</b>
+	 * <pre>
 	 * Preconditions:
-	 * |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 * Postconditions:
-	 * |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 * </pre>
 	 * See multiply for discussion of implementation strategy.
 	 *
 	 * @return The square of this field element.
@@ -581,13 +592,18 @@ public class Ed25519FieldElement {
 		return new Ed25519FieldElement(h);
 	}
 
+	// TODO 2014 J-B: i also noticed that the reformatting made this code less similar with ref10
+	// > if you want we can disable reformatting here
+
 	/**
 	 * Squares this field element, multiplies by two and returns the result.
-	 * h = 2 * this * this
+	 * <b>h = 2 * this * this</b>
+	 * <pre>
 	 * Preconditions:
-	 * |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
 	 * Postconditions:
-	 * |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 * </pre>
 	 * See multiply for discussion of implementation strategy.
 	 *
 	 * @return The square of this field element times 2.
@@ -692,6 +708,7 @@ public class Ed25519FieldElement {
 		final long carry8;
 		final long carry9;
 
+		// TODO 20141011: this is the only difference from square; can we refactor?
 		h0 += h0;
 		h1 += h1;
 		h2 += h2;
@@ -769,6 +786,8 @@ public class Ed25519FieldElement {
 	 */
 	public Ed25519FieldElement invert() {
 		Ed25519FieldElement f0, f1, f2, f3;
+
+		// TODO 20141011: seems like these comments are off since they are using * instead of ^ in many places
 
 		// 2 == 2 * 1
 		f0 = square();
@@ -991,6 +1010,9 @@ public class Ed25519FieldElement {
 		// 2^250 - 2^0
 		f0 = f1.multiply(f0);
 
+		// TODO 20141011: seems like everything above is the same; refactor?
+		// > (if i am to believe the comments; as the variable names are different)
+
 		// 2^251 - 2^1
 		f0 = f0.square();
 
@@ -1034,26 +1056,30 @@ public class Ed25519FieldElement {
 	/**
 	 * Reduce this field element modulo field size p = 2^255 - 19 and return the result.
 	 * The idea for the modulo p reduction algorithm is as follows:
+	 * <pre>
 	 * Assumption:
 	 * p = 2^255 - 19
 	 * h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 <= |hi| < 2^27 for all i=0,...,9.
 	 * h congruent r modulo p, i.e. h = r + q * p for some suitable 0 <= r < p and an integer q.
+	 *
 	 * Then q = [2^-255 * (h + 19 * 2^-25 * h9 + 1/2)] where [x] = floor(x).
+	 *
 	 * Proof:
 	 * We begin with some very raw estimation for the bounds of some expressions:
-	 * |h| < 2^230 * 2^30 = 2^260 ==> |r + q * p| < 2^260 ==> |q| < 2^10.
-	 * ==> -1/4 <= a := 19^2 * 2^-255 * q < 1/4.
-	 * |h - 2^230 * h9| = |h0 + ... + 2^204 * h8| < 2^204 * 2^30 = 2^234.
-	 * ==> -1/4 <= b := 19 * 2^-255 * (h - 2^230 * h9) < 1/4
+	 *     |h| < 2^230 * 2^30 = 2^260 ==> |r + q * p| < 2^260 ==> |q| < 2^10.
+	 *         ==> -1/4 <= a := 19^2 * 2^-255 * q < 1/4.
+	 *     |h - 2^230 * h9| = |h0 + ... + 2^204 * h8| < 2^204 * 2^30 = 2^234.
+	 *         ==> -1/4 <= b := 19 * 2^-255 * (h - 2^230 * h9) < 1/4
 	 * Therefore 0 < 1/2 - a - b < 1.
 	 * Set x := r + 19 * 2^-255 * r + 1/2 - a - b then
-	 * 0 <= x < 255 - 20 + 19 + 1 = 2^255 ==> 0 <= 2^-255 * x < 1. Since q is an integer we have
-	 * [q + 2^-255 * x] = q        (1)
+	 *     0 <= x < 255 - 20 + 19 + 1 = 2^255 ==> 0 <= 2^-255 * x < 1. Since q is an integer we have
+	 *     [q + 2^-255 * x] = q        (1)
 	 * Have a closer look at x:
-	 * x = h - q * (2^255 - 19) + 19 * 2^-255 * (h - q * (2^255 - 19)) + 1/2 - 19^2 * 2^-255 * q - 19 * 2^-255 * (h - 2^230 * h9)
-	 * = h - q * 2^255 + 19 * q + 19 * 2^-255 * h - 19 * q + 19^2 * 2^-255 * q + 1/2 - 19^2 * 2^-255 * q - 19 * 2^-255 * h + 19 * 2^-25 * h9
-	 * = h + 19 * 2^-25 * h9 + 1/2 - q^255.
+	 *     x = h - q * (2^255 - 19) + 19 * 2^-255 * (h - q * (2^255 - 19)) + 1/2 - 19^2 * 2^-255 * q - 19 * 2^-255 * (h - 2^230 * h9)
+	 *       = h - q * 2^255 + 19 * q + 19 * 2^-255 * h - 19 * q + 19^2 * 2^-255 * q + 1/2 - 19^2 * 2^-255 * q - 19 * 2^-255 * h + 19 * 2^-25 * h9
+	 *       = h + 19 * 2^-25 * h9 + 1/2 - q^255.
 	 * Inserting the expression for x into (1) we get the desired expression for q.
+	 * </pre>
 	 *
 	 * @return The mod p reduced field element;
 	 */
@@ -1203,8 +1229,10 @@ public class Ed25519FieldElement {
 	/**
 	 * Return true if this is in {1,3,5,...,q-2}
 	 * Return false if this is in {0,2,4,...,q-1}
+	 * <pre>
 	 * Preconditions:
-	 * |x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+	 *     |x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
+	 * </pre>
 	 *
 	 * @return true if this is in {1,3,5,...,q-2}, false otherwise.
 	 */

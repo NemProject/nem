@@ -16,7 +16,6 @@ import java.util.Arrays;
  * Implementation of the block cipher for Ed25519.
  */
 public class Ed25519BlockCipher implements BlockCipher {
-
 	private final KeyPair senderKeyPair;
 	private final KeyPair recipientKeyPair;
 	private final SecureRandom random;
@@ -62,6 +61,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 
 	@Override
 	public byte[] decrypt(final byte[] input) {
+		// TODO 20141011 J-B: consider adding a test that decryption fails if input is too small
 		if (input.length < 64) {
 			return null;
 		}
@@ -77,6 +77,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final BufferedBlockCipher cipher = setupBlockCipher(sharedKey, ivData, false);
 
 		// Decode.
+		// TODO 20141011 J-B: consider refactoring this block (same as in encode)
 		final byte[] buf = new byte[cipher.getOutputSize(encData.length)];
 		int len = cipher.processBytes(encData, 0, encData.length, buf, 0);
 		try {
@@ -102,7 +103,6 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), padding);
 		cipher.reset();
 		cipher.init(forEncryption, params);
-
 		return cipher;
 	}
 
@@ -110,9 +110,11 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final Ed25519GroupElement senderA = new Ed25519EncodedGroupElement(publicKey.getRaw()).decode();
 		senderA.precomputeForScalarMultiplication();
 		final byte[] sharedKey = senderA.scalarMultiply(privateKey.prepareForScalarMultiply()).encode().getRaw();
+		// TODO 20141011 J-B: consider using a constant for the key / salt length
 		for (int i = 0; i < 32; i++) {
 			sharedKey[i] ^= salt[i];
 		}
+
 		return Hashes.sha3(sharedKey);
 	}
 }

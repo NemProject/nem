@@ -50,6 +50,11 @@ public class SecP256K1Curve implements Curve {
 		return this.params;
 	}
 
+	/**
+	 * Gets the SECP256K1 instance.
+	 *
+	 * @return The SECP256K1 instance.
+	 */
 	public static SecP256K1Curve secp256k1() {
 		return SECP256K1;
 	}

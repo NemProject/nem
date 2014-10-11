@@ -10,12 +10,19 @@ import java.math.BigInteger;
  */
 public class Ed25519Field {
 
+	/**
+	 * P: 2^255 - 19
+	 */
 	public static final BigInteger P = new BigInteger(HexEncoder.getBytes("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffed"));
 	public static final Ed25519FieldElement ZERO = getFieldElement(0);
 	public static final Ed25519FieldElement ONE = getFieldElement(1);
 	public static final Ed25519FieldElement TWO = getFieldElement(2);
 	public static final Ed25519FieldElement D = getD();
 	public static final Ed25519FieldElement D_Times_TWO = D.multiply(TWO);
+
+	/**
+	 * I ^ 2 = -1
+	 */
 	public static final Ed25519FieldElement I = new Ed25519EncodedFieldElement(HexEncoder.getBytes(
 			"b0a00e4a271beec478e42fad0618432fa7d7fb3d99004d2b0bdfc14f8024832b")).decode();
 

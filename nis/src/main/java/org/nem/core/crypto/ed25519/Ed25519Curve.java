@@ -30,6 +30,11 @@ public class Ed25519Curve implements org.nem.core.crypto.Curve {
 		return Ed25519Group.GROUP_ORDER.shiftRight(1);
 	}
 
+	/**
+	 * Gets the Ed25519 instance.
+	 *
+	 * @return The Ed25519 instance.
+	 */
 	public static Ed25519Curve ed25519() {
 		return ED25519;
 	}

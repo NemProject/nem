@@ -6,7 +6,6 @@ import org.nem.core.crypto.*;
  * Implementation of the key analyzer for Ed25519.
  */
 public class Ed25519KeyAnalyzer implements KeyAnalyzer {
-
 	private final static int COMPRESSED_KEY_SIZE = 32;
 
 	@Override

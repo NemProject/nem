@@ -17,6 +17,8 @@ public class Ed25519EncodedGroupElementTest {
 		new Ed25519EncodedGroupElement(new byte[30]);
 	}
 
+	// TODO 20141011 J-B: i guess we should have a decode / getRaw test too
+
 	@Test
 	public void getAffineXReturnsExpectedResult() {
 		for (int i = 0; i < 1000; i++) {
@@ -46,6 +48,7 @@ public class Ed25519EncodedGroupElementTest {
 			Assert.assertThat(affineY1, IsEqual.equalTo(affineY2));
 		}
 	}
+
 	// region hashCode / equals
 
 	@Test

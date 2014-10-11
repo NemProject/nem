@@ -11,7 +11,8 @@ import java.util.Arrays;
  */
 public class Ed25519EncodedFieldElement {
 
-	private final byte[] ZERO;
+	// TODO 20141011 J-B: if this class gets created a lot we can avoid recreating the zero vector each time
+	final byte[] ZERO;
 	private final byte[] values;
 
 	/**

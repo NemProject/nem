@@ -36,7 +36,7 @@ public class Ed25519FieldTest {
 
 	@Test
 	public void dIsAsExpected() {
-		// Arange:
+		// Arrange:
 		final BigInteger D = new BigInteger("37095705934669439343138083508754565189542113879843219016388785533085940283555");
 
 		// Assert:
@@ -45,7 +45,7 @@ public class Ed25519FieldTest {
 
 	@Test
 	public void dTimesTwoIsAsExpected() {
-		// Arange:
+		// Arrange:
 		final BigInteger DTimesTwo = new BigInteger("16295367250680780974490674513165176452449235426866156013048779062215315747161");
 
 		// Assert:
@@ -54,7 +54,7 @@ public class Ed25519FieldTest {
 
 	@Test
 	public void iIsAsExpected() {
-		// Arange:
+		// Arrange:
 		final BigInteger I = new BigInteger("19681161376707505956807079304988542015446066515923890162744021073123829784752");
 
 		// Assert (i^2 == -1):

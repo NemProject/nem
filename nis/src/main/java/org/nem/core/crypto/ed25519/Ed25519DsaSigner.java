@@ -36,7 +36,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] hash = this.digest.digest(ArrayUtils.toByteArray(this.keyPair.getPrivateKey().getRaw(), 32));
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
-		this.digest.update(hash, 32, 32);
+		this.digest.update(hash, 32, 32); // only include the last 32 bytes of the private key hash
 		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(this.digest.digest(data));
 
 		// Reduce size of r since we are calculating mod group order anyway
@@ -50,6 +50,9 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// encodedR and encodedA are the little endian encodings of the group element R and the public key A and
 		// a is the lower 32 bytes of hash after clamping.
 		this.digest.update(encodedR.getRaw());
+		// TODO 20141011 - why are we adding the public key to the hash?
+		// > this implementation doesn't seem to be doing that https://github.com/jedisct1/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/sign.c
+		// > i understand the reason for adding the private key above (to add randomness to prevent against PS3-like attacks)
 		this.digest.update(this.keyPair.getPublicKey().getRaw());
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
@@ -58,6 +61,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR.getRaw(), encodedS.getRaw());
 		if (!isCanonicalSignature(signature)) {
+			// TODO 20141011 - if we get here, this indicates a bug in our code?
 			throw new CryptoException("Generated signature is not canonical");
 		}
 
@@ -66,6 +70,8 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 	@Override
 	public boolean verify(final byte[] data, final Signature signature) {
+		// TODO 20141011 - does any of the validation here make sense:
+		// https://github.com/jedisct1/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/open.c
 		if (!isCanonicalSignature(signature)) {
 			return false;
 		}
