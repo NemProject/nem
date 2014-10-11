@@ -6,10 +6,6 @@ import org.nem.core.test.Utils;
 
 public abstract class BlockCipherTest {
 
-	// TODO 20141010 J-B: consider marking initCryptoEngine with @Before (or having a before function that calls it if that doesn't work)
-	// > instead of calling it in each test
-	// TODO 20141011 BR -> J: Thanks for the hint. Done. (needed to declare initCryptoEngine public but that shouldn't be a problem or is it?)
-
 	@Test
 	public void encryptedDataCanBeDecrypted() {
 		// Arrange:

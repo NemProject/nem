@@ -28,8 +28,6 @@ public class KeyPairTest {
 		Assert.assertThat(kp.getPublicKey().isCompressed(), IsEqual.equalTo(true));
 	}
 
-	// TODO 20141010 J-B: ctorCreatesDifferentInstancesWithDifferentKeys still seems valid
-	// TODO 20141011 BR -> J: Done.
 	@Test
 	public void ctorCreatesDifferentInstancesWithDifferentKeys() {
 		// Arrange:

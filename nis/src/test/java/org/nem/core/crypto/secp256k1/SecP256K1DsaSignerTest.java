@@ -24,11 +24,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(HexEncoder.getString(signature.getBytes()), IsEqual.equalTo(expectedSignature));
 	}
 
-	// TODO 20141010 J-B: i think verifyReturnsFalseForNonCanonicalSignature is still valid
-	// TODO 20141011 BR -> J: added the test though I don't think we need it as we have
-	// TODO                   1) DsaSignerTest.verifyCallsIsCanonicalSignature to ensure IsCanonicalSignature is called and
-	// TODO                   2) isCanonicalReturnsFalseForNonCanonicalSignature to ensure IsCanonicalSignature returns false for non-canonical signatures.
-
 	@Test
 	public void verifyReturnsFalseForNonCanonicalSignature() {
 		// Arrange:

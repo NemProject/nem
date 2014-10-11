@@ -30,7 +30,7 @@ public class ByteUtils {
 	}
 
 	/**
-	 * Constant-time byte comparison.
+	 * Constant-time byte comparison. The constant time behavior eliminates side channel attacks.
 	 *
 	 * @return 1 if b and c are equal, 0 otherwise.
 	 */
@@ -43,6 +43,7 @@ public class ByteUtils {
 		// TODO 20141011         https://www.cipherdyne.org/lcov-results/openssh-6.6p1/openssh-6.6p1/verify.c.gcov.html
 		// TODO 20141011         And yes, it's abused to compare only bytes as the input will have 8 relevant bits in our case (see Ed25519GroupElement.select()).
 		// TODO 20141011         You may change it if you can guarantee constant time behavior.
+		// TODO 20141010 J-B: i withdraw my comments / just rename with a suffix (isNegative too)
 
 		int result = 0;
 		final int xor = b ^ c;
@@ -53,7 +54,7 @@ public class ByteUtils {
 	}
 
 	/**
-	 * Constant-time check if byte is negative.
+	 * Constant-time check if byte is negative. The constant time behavior eliminates side channel attacks.
 	 *
 	 * @param b the byte to check.
 	 * @return 1 if the byte is negative, 0 otherwise.

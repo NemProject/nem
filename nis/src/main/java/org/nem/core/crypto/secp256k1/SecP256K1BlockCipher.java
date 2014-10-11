@@ -78,6 +78,8 @@ public class SecP256K1BlockCipher implements BlockCipher {
 	// TODO 20141010 - we should probably move these to a utils class since Signer is using these too
 	// TODO 20141011 BR -> J: I was trying to avoid bouncy caste specific classes being used outside crypto package.
 	// TODO                   Not a good idea?
+	// TODO 20141011 J-BR: 'I was trying to avoid bouncy caste specific classes' - no a good idea; i meant a utils class
+	// >                   in secp256k
 
 	/**
 	 * Gets the EC private key parameters.

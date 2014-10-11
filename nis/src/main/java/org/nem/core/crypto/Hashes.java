@@ -32,6 +32,7 @@ public class Hashes {
 	// > (like the other overloads)
 	// TODO 20141011 BR -> J: We need both sha3-256 (for secp256k1) and sha3-512 (for ed25519).
 	// TODO 20141011          Aside from that, sure we can hide the message digest. You want to do this?
+	// TODO 20141011 J-BR: yea, i think i would prefer to have all the hash functions look the same
 
 	/**
 	 * Gets an instance of a SHA3-512 message digest.

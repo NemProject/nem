@@ -20,8 +20,6 @@ public abstract class KeyAnalyzerTest {
 		// Arrange:
 		final KeyAnalyzer analyzer = this.getKeyAnalyzer();
 		final KeyPair keyPair = new KeyPair();
-		// TODO 20141010 J-B might be safer to get a real public key and resize it -1
-		// TODO 20141011 BR -> J: you mean like this?
 		final PublicKey key = new PublicKey(new byte[keyPair.getPublicKey().getRaw().length + 1]);
 
 		// Act + Assert:
