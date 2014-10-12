@@ -61,6 +61,7 @@ public class Signature {
 	}
 
 	// TODO 20141010 J-B: should add some tests for the new getBinary[R|S] functions
+	// TODO 20141012 BR -> J: done.
 
 	/**
 	 * Gets the r-part of the signature.

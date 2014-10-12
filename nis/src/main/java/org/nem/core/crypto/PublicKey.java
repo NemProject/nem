@@ -19,6 +19,7 @@ public class PublicKey implements SerializableEntity {
 	 * TODO 20141011 BR -> J: as stated above it is needed to speed up signature verification.
 	 * TODO                   If not here, where should I keep the information?
 	 * TODO 20141010 J-B: i need to look closer at how it's being used
+	 * TODO 20141012 BR -> J: I would leave here for now although we will not use it right now.
 	 */
 	private final Ed25519GroupElement A;
 
