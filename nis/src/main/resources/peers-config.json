@@ -9,7 +9,7 @@
             },
             "identity": {
                 "name": "alice2",
-                "public-key": "02c621aba26b261b629edddd912aac1acd8be7b9f0c798823fe4ed0fa65d69d80e"
+                "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350"
             }
         },
         {
@@ -20,7 +20,7 @@
             },
             "identity": {
                 "name": "alice3",
-                "public-key": "0336cabee030463a5d7df818d1e76a843d065a5b6841ccefe16e5805a754038b7a"
+                "public-key": "708fbae6f7dc43b19e18a783d99535650504b60abd27b12137d17227ee3d5e84"
             }
         },
         {
@@ -31,7 +31,7 @@
             },
             "identity": {
                 "name": "alice4",
-                "public-key": "03327f6bc7311e96f257e4fbde0351cf40ae7cea6a0662019d4140d43b24519b17"
+                "public-key": "c7e68c147fe246caaf6f09d3a1b54a5744b1d3f55a22a8557c3a063d70669262"
             }
         },
         {
@@ -42,7 +42,7 @@
             },
             "identity": {
                 "name": "bob",
-                "public-key": "0350f94f8c3a04a4f47356ba749b74418a55511d88a56d180998130d8c26b28bfd"
+                "public-key": "7b1cd05cf440d067f9893069a4af148ed1f141d9000d849bf766b99d9a59f344"
             }
         },
         {
@@ -53,7 +53,7 @@
             },
             "identity": {
                 "name": "san",
-                "public-key": "03249c6b972d2f79b6dd8f7381643394aad6d203e785fbea87861fd877f1c5b3d6"
+                "public-key": "8fe59fe88b25b9b202843755200974a0509057c0ed3f8684fad91a0da6549d76"
             }
         },
         {
@@ -64,7 +64,7 @@
             },
             "identity": {
                 "name": "go",
-                "public-key": "02f1b676a94c013763ad76d15f5ae8bb4a72acab115375ad5d8195f42b32305cd6"
+                "public-key": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
             }
         },
         {
@@ -75,7 +75,7 @@
             },
             "identity": {
                 "name": "hachi",
-                "public-key": "0331df4cf39e26286522d06ef69e2e9b7505876e8e7498fcd576b92853e73a591a"
+                "public-key": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"
             }
         },
         {
@@ -86,7 +86,7 @@
             },
             "identity": {
                 "name": "jusan",
-                "public-key": "021c6fe195b65ee6975b782227ade755339ae98235c5b763590d4bb57d6f08c7c2"
+                "public-key": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
             }
         },
         {
@@ -97,7 +97,7 @@
             },
             "identity": {
                 "name": "nijuichi",
-                "public-key": "023c904975a5d3ce7bf6bd91ad9e9cda6482ae09f20f4db9a5521dd078cd4918fe"
+                "public-key": "f8a02001a36b0ffa8fd8f753cab0e513b76d4e9ceea45536493fc2df83af5f65"
             }
         },
         {
@@ -108,7 +108,7 @@
             },
             "identity": {
                 "name": "pat",
-                "public-key": "02bb032b4eaf976090d00776259602b09baebf06908d7855372d2a4eb1db21042a"
+                "public-key": "494e58ec8855c7a6087411506cbadbce35ce0ee76ba0baf2305c2196606fac41"
             }
         },
         {
@@ -119,7 +119,7 @@
             },
             "identity": {
                 "name": "nemtrader-jaded",
-                "public-key": "03c8f8b2efbc0e068457e2e3bd18bf370f79bf713c5eaa441cc325867090ddc1b4"
+                "public-key": "7ebf6f3fe7417ae8d5218cb3ace87acc72fa7d30bca97ce3519333c5f6ed3a82"
             }
         },
         {
@@ -130,7 +130,7 @@
             },
             "identity": {
                 "name": "rigel",
-                "public-key": "03f9e8e717e79d38096e5dfb7ec0e7ebe12ac803fed495d2c82d703d689db25ab9"
+                "public-key": "f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56"
             }
         },
         {
@@ -141,7 +141,7 @@
             },
             "identity": {
                 "name": "nemdeck",
-                "public-key": "039e48b4b867ffc3028ed71f2627106d1005f37e889db3a78870302dcfb0485a2e"
+                "public-key": "e80e3aefc762e28caa72b998791132444f9bdb572f0296c306fb1fa7c1a130c1"
             }
         },
         {
@@ -152,7 +152,7 @@
             },
             "identity": {
                 "name": "Trudy<3",
-                "public-key": "03c55bd250e56c292ed4c898b0883676313283251d21b6a9099bb989db99d736d2"
+                "public-key": "f457167a134b60275ddad5baa40f9160c8728fb6943513c94384e1986006d852"
             }
         }
     ]

@@ -23,10 +23,10 @@ public class NemesisBlock extends Block {
 	public final static Amount AMOUNT = Amount.fromNem(4000000000L);
 
 	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
-			"038ecc7a57d3d932330ad1521a4afbd36beacd8d7bb885537350f79f7f834f51c8");
+			"8cbaf60f67f35e06dbc1229889fc4629aebbdecaa0e3242cf3a1f612f56f7c16");
 
 	private final static Hash NEMESIS_GENERATION_HASH = Hash.fromHexString(
-			"c5d54f3ed495daec32b4cbba7a44555f9ba83ea068e5f1923e9edb774d207cd8");
+			"cd8a687ff49984ccc87f2a22219acb76fe2a3c6cdcf20863bae3252c2a0dc20f");
 
 	private final static String NEMESIS_BLOCK_FILE = "nemesis-block.json";
 
