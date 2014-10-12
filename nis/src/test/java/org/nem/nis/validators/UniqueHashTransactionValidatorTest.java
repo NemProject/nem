@@ -7,78 +7,34 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.function.Consumer;
 
 public class UniqueHashTransactionValidatorTest {
-	private static final long MARKER_HEIGHT = BlockMarkerConstants.FATAL_TX_BUG_HEIGHT;
 
-	//region transaction already exists in transfer dao before marker height
+	//region transaction already exists in transfer dao
 
 	@Test
-	public void validateReturnsSuccessIfTransactionAlreadyExistsInTransferDaoBeforeMarkerHeight() {
+	public void validateReturnsNeutralIfTransactionAlreadyExistsInTransferDao() {
 		// Assert:
-		assertSuccessIfTransactionAlreadyExistsInDaoBeforeMarkerHeight(TestContext::setTransferDaoForHash);
+		assertNeutralIfTransactionAlreadyExistsInDao(TestContext::setTransferDaoForHash);
 	}
 
 	@Test
-	public void validateReturnsSuccessIfTransactionAlreadyExistsInImportanceTransferDaoBeforeMarkerHeight() {
+	public void validateReturnsNeutralIfTransactionAlreadyExistsInImportanceTransferDao() {
 		// Assert:
-		assertSuccessIfTransactionAlreadyExistsInDaoBeforeMarkerHeight(TestContext::setImportanceTransferDaoForHash);
+		assertNeutralIfTransactionAlreadyExistsInDao(TestContext::setImportanceTransferDaoForHash);
 	}
 
-	private static void assertSuccessIfTransactionAlreadyExistsInDaoBeforeMarkerHeight(final Consumer<TestContext> setTransactionInDao) {
+	private static void assertNeutralIfTransactionAlreadyExistsInDao(final Consumer<TestContext> setTransactionInDao) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		setTransactionInDao.accept(context);
 
 		// Act:
-		final ValidationResult result = context.validateAtHeight(MARKER_HEIGHT - 1);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	//endregion
-
-	//region transaction already exists in transfer dao at / after market height
-
-	@Test
-	public void validateReturnsNeutralIfTransactionAlreadyExistsInTransferDaoAtMarkerHeight() {
-		// Assert:
-		assertNeutralIfTransactionAlreadyExistsInDaoAtHeight(MARKER_HEIGHT, TestContext::setTransferDaoForHash);
-	}
-
-	@Test
-	public void validateReturnsNeutralIfTransactionAlreadyExistsInImportanceTransferDaoAtMarkerHeight() {
-		// Assert:
-		assertNeutralIfTransactionAlreadyExistsInDaoAtHeight(MARKER_HEIGHT, TestContext::setImportanceTransferDaoForHash);
-	}
-
-	@Test
-	public void validateReturnsNeutralIfTransactionAlreadyExistsInTransferDaoAfterMarkerHeight() {
-		// Assert:
-		assertNeutralIfTransactionAlreadyExistsInDaoAtHeight(MARKER_HEIGHT + 1, TestContext::setTransferDaoForHash);
-	}
-
-	@Test
-	public void validateReturnsNeutralIfTransactionAlreadyExistsInImportanceTransferDaoAfterMarkerHeight() {
-		// Assert:
-		assertNeutralIfTransactionAlreadyExistsInDaoAtHeight(MARKER_HEIGHT + 1, TestContext::setImportanceTransferDaoForHash);
-	}
-
-	private static void assertNeutralIfTransactionAlreadyExistsInDaoAtHeight(
-			final long height,
-			final Consumer<TestContext> setTransactionInDao) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		setTransactionInDao.accept(context);
-
-		// Act:
-		final ValidationResult result = context.validateAtHeight(height);
+		final ValidationResult result = context.validateAtHeight(10);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -87,12 +43,12 @@ public class UniqueHashTransactionValidatorTest {
 	//endregion
 
 	@Test
-	public void validateReturnsSuccessIfTransactionDoesNotExistInAnyDaoAfterMarkerHeight() {
+	public void validateReturnsSuccessIfTransactionDoesNotExistInAnyDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		final ValidationResult result = context.validateAtHeight(MARKER_HEIGHT + 1);
+		final ValidationResult result = context.validateAtHeight(10);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));

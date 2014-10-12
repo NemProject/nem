@@ -238,9 +238,9 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void chainIsInvalidIfOneBlockContainsTheSameTransactionTwiceAfterMarkerThread() {
+	public void chainIsInvalidIfOneBlockContainsTheSameTransactionTwice() {
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
@@ -254,9 +254,9 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void chainIsInvalidIfTwoBlocksContainTheSameTransactionAfterMarkerThread() {
+	public void chainIsInvalidIfTwoBlocksContainTheSameTransaction() {
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.FATAL_TX_BUG_HEIGHT - 2);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
 		parentBlock.sign();
 
 		final MockTransaction tx = createValidSignedTransaction();

@@ -83,14 +83,13 @@ public class BlockChainValidator {
 					return false;
 				}
 
-				if (block.getHeight().getRaw() >= BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
-					final Hash hash = HashUtils.calculateHash(transaction);
-					if (chainHashes.contains(hash)) {
-						LOGGER.info("received block with duplicate TX");
-						return false;
-					}
-					chainHashes.add(hash);
+				final Hash hash = HashUtils.calculateHash(transaction);
+				if (chainHashes.contains(hash)) {
+					LOGGER.info("received block with duplicate TX");
+					return false;
 				}
+
+				chainHashes.add(hash);
 			}
 
 			parentBlock = block;

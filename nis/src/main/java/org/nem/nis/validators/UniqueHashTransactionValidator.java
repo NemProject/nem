@@ -27,13 +27,8 @@ public class UniqueHashTransactionValidator implements TransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (context.getBlockHeight().getRaw() < BlockMarkerConstants.FATAL_TX_BUG_HEIGHT) {
-			return ValidationResult.SUCCESS;
-		}
-
 		final Hash hash = HashUtils.calculateHash(transaction);
 		final BlockHeight blockHeight = context.getConfirmedBlockHeight();
-		// TODO 20140907 J-G update importanceTransferDao.findByHash
 		final boolean isInTransferDao = null != this.transferDao.findByHash(hash.getRaw(), blockHeight.getRaw());
 		final boolean isInImportanceTransferDao = null != this.importanceTransferDao.findByHash(hash.getRaw(), blockHeight.getRaw());
 		return isInTransferDao || isInImportanceTransferDao

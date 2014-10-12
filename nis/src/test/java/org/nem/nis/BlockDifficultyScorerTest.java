@@ -28,16 +28,7 @@ public class BlockDifficultyScorerTest {
 	}
 
 	@Test
-	public void blocksWithInitialDiffAndTimeDiffOf60sChangesTheDiffInOldBlockScorer() {
-		// Arrange:
-		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTimeOld(T);
-
-		// Assert:
-		Assert.assertThat(blockDifficulty, IsNot.not(IsEqual.equalTo(D)));
-	}
-
-	@Test
-	public void blocksWithInitialDiffAndTimeDiffOf60sShouldntChangeTheDiff() {
+	public void blocksWithInitialDiffAndTimeDiffOf60sShouldNotChangeTheDiff() {
 		// Arrange:
 		final BlockDifficulty blockDifficulty = this.getBlockDifficultyVariableTime(T);
 
@@ -64,10 +55,6 @@ public class BlockDifficultyScorerTest {
 	}
 
 	private BlockDifficulty getBlockDifficultyVariableTime(final int time) {
-		return this.getBlockDifficultyVariableTimeAtHeight(time, BlockMarkerConstants.DIFFICULTY_FIX_HEIGHT + 100);
-	}
-
-	private BlockDifficulty getBlockDifficultyVariableTimeOld(final int time) {
 		return this.getBlockDifficultyVariableTimeAtHeight(time, 100);
 	}
 
