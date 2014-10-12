@@ -133,7 +133,7 @@ public class NisConfigurationTest {
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Assert:
-		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(6));
+		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(2));
 	}
 	//endregion
 
