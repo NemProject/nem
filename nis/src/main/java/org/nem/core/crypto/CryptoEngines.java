@@ -2,6 +2,7 @@ package org.nem.core.crypto;
 
 import org.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import org.nem.core.crypto.secp256k1.SecP256K1CryptoEngine;
+import org.nem.core.model.NemesisBlock;
 
 /**
  * Static class that exposes crypto engines.
@@ -46,6 +47,13 @@ public class CryptoEngines {
 	 * @param engine The crypto engine.
 	 */
 	public static void setDefaultEngine(final CryptoEngine engine) {
+		// TODO 20141012: this fixes the majority of the affected tests, but a few still fail
+		// > because they use the default engine to check the validity of the nemesis address
+		// the NemesisBlock depends on the "real" default engine,
+		// so make sure it is initialized before changing the default engine
+		//noinspection ResultOfMethodCallIgnored
+		NemesisBlock.GENERATION_HASH.equals(Hash.ZERO);
+
 		defaultEngine = engine;
 	}
 
