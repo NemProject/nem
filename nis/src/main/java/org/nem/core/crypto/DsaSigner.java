@@ -3,7 +3,7 @@ package org.nem.core.crypto;
 /**
  * Interface that supports signing and verification of arbitrarily sized message.
  */
-public interface NewDsaSigner {
+public interface DsaSigner {
 
 	/**
 	 * Signs the SHA3 hash of an arbitrarily sized message.
