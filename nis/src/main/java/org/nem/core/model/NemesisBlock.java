@@ -22,11 +22,14 @@ public class NemesisBlock extends Block {
 	 */
 	public final static Amount AMOUNT = Amount.fromNem(4000000000L);
 
+	/**
+	 * The nemesis generation hash.
+	 */
+	public final static Hash GENERATION_HASH = Hash.fromHexString(
+			"cd8a687ff49984ccc87f2a22219acb76fe2a3c6cdcf20863bae3252c2a0dc20f");
+
 	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
 			"8cbaf60f67f35e06dbc1229889fc4629aebbdecaa0e3242cf3a1f612f56f7c16");
-
-	private final static Hash NEMESIS_GENERATION_HASH = Hash.fromHexString(
-			"cd8a687ff49984ccc87f2a22219acb76fe2a3c6cdcf20863bae3252c2a0dc20f");
 
 	private final static String NEMESIS_BLOCK_FILE = "nemesis-block.json";
 
@@ -37,7 +40,7 @@ public class NemesisBlock extends Block {
 
 	private NemesisBlock(final Deserializer deserializer) {
 		super(BlockTypes.NEMESIS, DeserializationOptions.VERIFIABLE, deserializer);
-		this.setGenerationHash(NEMESIS_GENERATION_HASH);
+		this.setGenerationHash(GENERATION_HASH);
 	}
 
 	/**

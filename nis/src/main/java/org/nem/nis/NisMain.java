@@ -66,7 +66,7 @@ public class NisMain {
 			System.exit(-1);
 		}
 		LOGGER.info(String.format("first block generation hash: %s", dbBlock.getGenerationHash()));
-		if (!dbBlock.getGenerationHash().equals(Hash.fromHexString("cd8a687ff49984ccc87f2a22219acb76fe2a3c6cdcf20863bae3252c2a0dc20f"))) {
+		if (!dbBlock.getGenerationHash().equals(NemesisBlock.GENERATION_HASH)) {
 			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
 			System.exit(-1);
 		}

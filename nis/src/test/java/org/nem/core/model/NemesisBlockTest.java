@@ -107,12 +107,21 @@ public class NemesisBlockTest {
 	}
 
 	@Test
-	public void accountConstantIsConsistentWithNemesisBlock() {
+	public void addressConstantIsConsistentWithNemesisBlock() {
 		// Arrange:
 		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
 		Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(NemesisBlock.ADDRESS));
+	}
+
+	@Test
+	public void generationHashConstantIsConsistentWithNemesisBlock() {
+		// Arrange:
+		final Block block = NEMESIS_BLOCK;
+
+		// Assert:
+		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(NemesisBlock.GENERATION_HASH));
 	}
 
 	//endregion
