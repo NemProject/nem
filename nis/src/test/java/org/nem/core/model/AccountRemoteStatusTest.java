@@ -11,13 +11,10 @@ public class AccountRemoteStatusTest {
 
 	@Test
 	public void accountRemoteStatusCanBeCreatedFromCorrectStatusString() {
-		// TODO 20141005 minor, you might want to have a map with these values and loop over them or loop over AccountRemoteStatus.values()
-		// > (just to ensure all the tests will always test all the values)
-		assertCanCreate("REMOTE", AccountRemoteStatus.REMOTE);
-		assertCanCreate("INACTIVE", AccountRemoteStatus.INACTIVE);
-		assertCanCreate("ACTIVATED", AccountRemoteStatus.ACTIVATED);
-		assertCanCreate("ACTIVE", AccountRemoteStatus.ACTIVE);
-		assertCanCreate("DEACTIVATED", AccountRemoteStatus.DEACTIVATED);
+		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values())
+		{
+			assertCanCreate(accountRemoteStatus.toString(), accountRemoteStatus);
+		}
 	}
 
 	private static void assertCanCreate(final String statusString, final AccountRemoteStatus accountRemoteStatus) {
@@ -40,11 +37,10 @@ public class AccountRemoteStatusTest {
 
 	@Test
 	public void canWriteAccountStatus() {
-		assertCanWrite("REMOTE");
-		assertCanWrite("INACTIVE");
-		assertCanWrite("ACTIVATED");
-		assertCanWrite("ACTIVE");
-		assertCanWrite("DEACTIVATED");
+		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values())
+		{
+			assertCanWrite(accountRemoteStatus.toString());
+		}
 	}
 
 	private static void assertCanWrite(final String statusString) {
@@ -63,11 +59,10 @@ public class AccountRemoteStatusTest {
 
 	@Test
 	public void canRoundtripAccountStatus() {
-		assertCanRoundtrip("REMOTE");
-		assertCanRoundtrip("INACTIVE");
-		assertCanRoundtrip("ACTIVATED");
-		assertCanRoundtrip("ACTIVE");
-		assertCanRoundtrip("DEACTIVATED");
+		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values())
+		{
+			assertCanRoundtrip(accountRemoteStatus.toString());
+		}
 	}
 
 	private static void assertCanRoundtrip(final String statusString) {
