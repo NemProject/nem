@@ -801,7 +801,7 @@ public class Ed25519FieldElement {
 
 		// 2^252 - 2^2
 		// TODO 20141013 J-B: can we rename to something like pow2to252sub4
-		f1 = pow22524();
+		f1 = this.pow22524();
 
 		// 2^255 - 2^5
 		for (int i = 1; i < 4; ++i) {
@@ -846,7 +846,7 @@ public class Ed25519FieldElement {
 		f0 = this.square();
 
 		// 9
-		f1 = pow29();
+		f1 = this.pow29();
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);

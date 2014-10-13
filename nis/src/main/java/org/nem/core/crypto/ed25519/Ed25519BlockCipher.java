@@ -45,7 +45,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, true);
 
 		// Encode.
-		final byte[] buf = transform(cipher, input);
+		final byte[] buf = this.transform(cipher, input);
 		if (null == buf) {
 			return null;
 		}
@@ -74,7 +74,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, false);
 
 		// Decode.
-		return transform(cipher, encData);
+		return this.transform(cipher, encData);
 	}
 
 	private byte[] transform(final BufferedBlockCipher cipher, final byte[] data) {

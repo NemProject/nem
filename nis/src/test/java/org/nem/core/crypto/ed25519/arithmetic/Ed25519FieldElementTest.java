@@ -192,7 +192,7 @@ public class Ed25519FieldElementTest {
 			final Ed25519FieldElement fraction = u.multiply(v.invert());
 
 			// Act:
-			Ed25519FieldElement sqrt = Ed25519FieldElement.sqrt(uSquare, vSquare);
+			final Ed25519FieldElement sqrt = Ed25519FieldElement.sqrt(uSquare, vSquare);
 
 			// Assert:
 			// (u / v)^4 == (sqrt(u^2 / v^2))^4.
