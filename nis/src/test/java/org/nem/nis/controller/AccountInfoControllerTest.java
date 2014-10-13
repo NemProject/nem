@@ -22,16 +22,19 @@ public class AccountInfoControllerTest {
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+		final AccountRemoteStatus accountRemoteStatus = Mockito.mock(AccountRemoteStatus.class);
 
 		final TestContext context = new TestContext();
 		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
-		Mockito.when(context.accountInfoFactory.createInfo(address, BlockHeight.ONE)).thenReturn(accountInfo);
+		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfo);
+		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(accountRemoteStatus);
 
 		// Act:
 		final AccountMetaDataPair metaDataPair = context.controller.accountGet(builder);
 
 		// Assert:
-		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address, BlockHeight.ONE);
+		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
+		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).getRemoteStatus(address, BlockHeight.ONE);
 		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
 	}
 
@@ -44,7 +47,8 @@ public class AccountInfoControllerTest {
 
 		final TestContext context = new TestContext();
 		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
-		Mockito.when(context.accountInfoFactory.createInfo(address, BlockHeight.ONE)).thenReturn(Mockito.mock(AccountInfo.class));
+		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
+		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(Mockito.mock(AccountRemoteStatus.class));
 		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(true);
 
 		// Act:

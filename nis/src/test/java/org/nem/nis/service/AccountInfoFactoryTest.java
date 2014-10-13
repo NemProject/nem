@@ -18,7 +18,7 @@ public class AccountInfoFactoryTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.factory.createInfo(context.address, BlockHeight.ONE);
+		context.factory.createInfo(context.address);
 
 		// Assert:
 		Mockito.verify(context.accountLookup, Mockito.times(1)).findByAddress(context.address);
@@ -30,7 +30,7 @@ public class AccountInfoFactoryTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.factory.createInfo(context.address, BlockHeight.ONE);
+		context.factory.createInfo(context.address);
 
 		// Assert:
 		Mockito.verify(context.poiFacade, Mockito.times(1)).findStateByAddress(context.address);
@@ -43,7 +43,7 @@ public class AccountInfoFactoryTest {
 		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
 
 		// Act:
-		final AccountInfo info = context.factory.createInfo(context.address, BlockHeight.ONE);
+		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
 		assertAccountInfo(info, context.address, 0.796);
@@ -55,7 +55,7 @@ public class AccountInfoFactoryTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final AccountInfo info = context.factory.createInfo(context.address, BlockHeight.ONE);
+		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
 		assertAccountInfo(info, context.address, 0.0);
