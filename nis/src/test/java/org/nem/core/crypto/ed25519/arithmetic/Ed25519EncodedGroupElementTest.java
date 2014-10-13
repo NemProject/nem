@@ -17,9 +17,6 @@ public class Ed25519EncodedGroupElementTest {
 		new Ed25519EncodedGroupElement(new byte[30]);
 	}
 
-	// TODO 20141011 J-B: i guess we should have a decode / getRaw test too
-	// TODO 20141013 BR -> J: done.
-
 	// region getRaw
 
 	@Test

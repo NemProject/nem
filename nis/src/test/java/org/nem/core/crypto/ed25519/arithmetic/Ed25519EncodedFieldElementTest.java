@@ -54,11 +54,6 @@ public class Ed25519EncodedFieldElementTest {
 
 	// endregion
 
-	// TODO 20141011 J-B consider adding some tests for:
-	// > getRaw
-	// > decode / encode - i guess a roundtrip test is sufficient
-	// TODO 20141013 BR -> J: done.
-
 	// region getRaw
 
 	@Test

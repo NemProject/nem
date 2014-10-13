@@ -12,11 +12,7 @@ import java.util.Arrays;
  */
 public class Ed25519Utils {
 
-	// TODO 20141010 J-B why is this here?
-	// TODO 20141011 BR -> J: it is used in 3 places  (BlockCipher, DsaSigner, KeyGenerator).
-	// TODO                   So if I remove this here I need a helper method somewhere else.
-	// TODO 20141011 J-B: i haven't gotten through all the ed stuff, but a helper function seems to make sense on the surface
-	// TODO 20141012 BR -> J: Moved it to here.
+	// TODO 20141013 J-B: can we change the parameter to PrivateKey?
 	/**
 	 * Prepares a private key's raw value for scalar multiplication.
 	 * The hashing is for achieving better randomness and the clamping prevents small subgroup attacks.

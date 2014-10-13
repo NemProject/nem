@@ -51,8 +51,6 @@ public class Ed25519FieldElementTest {
 
 	// endregion
 
-	// TODO 20141011 J-B: add a getRaw test
-	// TODO 20141013 BR -> J: done.
 	// region getRaw
 
 	@Test
@@ -70,10 +68,7 @@ public class Ed25519FieldElementTest {
 
 	// endregion
 
-
 	// region mod p arithmetic
-
-	// TODO 20141011 J-B: i think it might help to have an assertEquals(FieldElement, BigInteger) that does the mod and compare
 
 	@Test
 	public void addReturnsCorrectResult() {
@@ -186,9 +181,6 @@ public class Ed25519FieldElementTest {
 		}
 	}
 
-	// TODO 20141011 J-B: i'm not sure if i follow what this test is doing
-	// TODO 20141013 BR -> J: I admit the test was not good. I changed the test to make it (hopefully) easier to understand.
-	// TODO                   See also comments for Ed25519FieldElement.sqrt().
 	@Test
 	public void sqrtReturnsCorrectResult() {
 		for (int i = 0; i < 1000; i++) {
@@ -207,11 +199,11 @@ public class Ed25519FieldElementTest {
 			Assert.assertThat(fraction.square().square(), IsEqual.equalTo(sqrt.square().square()));
 
 			// (u / v) == +-1 * sqrt(u^2 / v^2) or (u / v) == +-i * sqrt(u^2 / v^2)
-			Assert.assertThat(differsOnlyByAFactorOfAForthRootOfOne(fraction, sqrt), IsEqual.equalTo(true));
+			Assert.assertThat(differsOnlyByAFactorOfAFourthRootOfOne(fraction, sqrt), IsEqual.equalTo(true));
 		}
 	}
 
-	private boolean differsOnlyByAFactorOfAForthRootOfOne(final Ed25519FieldElement x, final Ed25519FieldElement root) {
+	private static boolean differsOnlyByAFactorOfAFourthRootOfOne(final Ed25519FieldElement x, final Ed25519FieldElement root) {
 		final Ed25519FieldElement rootTimesI = root.multiply(Ed25519Field.I);
 		return x.equals(root) ||
 				x.equals(root.negate()) ||
@@ -219,7 +211,7 @@ public class Ed25519FieldElementTest {
 				x.equals(rootTimesI.negate());
 	}
 
-	private void assertEquals(final Ed25519FieldElement f, final BigInteger b) {
+	private static void assertEquals(final Ed25519FieldElement f, final BigInteger b) {
 		final BigInteger b2 = MathUtils.toBigInteger(f);
 		Assert.assertThat(b2.mod(Ed25519Field.P), IsEqual.equalTo(b.mod(Ed25519Field.P)));
 	}
@@ -277,8 +269,8 @@ public class Ed25519FieldElementTest {
 			for (int j = 0; j < 10; j++) {
 				t[j] = random.nextInt(1 << 28) - (1 << 27);
 			}
-			// TODO 20141011 J-B: can you more directly check negative on the BigInteger
-			// TODO 20141013 BR -> J: not sure I understand what you mean.
+
+			// the lowest bit indicates negativity if it is one
 			final boolean isNegative = MathUtils.toBigInteger(t).mod(Ed25519Field.P).mod(new BigInteger("2")).equals(BigInteger.ONE);
 			final Ed25519FieldElement f = new Ed25519FieldElement(t);
 

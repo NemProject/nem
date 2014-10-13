@@ -62,6 +62,7 @@ public class AccountInfoControllerTest {
 	//endregion
 
 	//region accountStatus
+
 	@Test
 	public void accountStatusDelegatesToUnlockedAccounts() {
 		this.assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
@@ -84,6 +85,7 @@ public class AccountInfoControllerTest {
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(address);
 		Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(expectedStatus));
 	}
+
 	//endregion
 
 	private static class TestContext {

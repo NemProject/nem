@@ -62,6 +62,7 @@ public class Ed25519FieldElement {
 	public Ed25519FieldElement add(final Ed25519FieldElement g) {
 		// TODO 2014 J-B: can we loop here? or would that be bad?
 		// TODO 20141013 BR -> J: I don't think it would raise security issues, probably just a bit slower.
+		// TODO 20141013 J-BR: i think the loop is cleaner, but i'll leave it up to you
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
 		h[0] = this.values[0] + gValues[0];
@@ -593,10 +594,6 @@ public class Ed25519FieldElement {
 		return new Ed25519FieldElement(h);
 	}
 
-	// TODO 2014 J-B: i also noticed that the reformatting made this code less similar with ref10
-	// TODO 20141013 BR -> J: either way is fine with me.
-	// > if you want we can disable reformatting here
-
 	/**
 	 * Squares this field element, multiplies by two and returns the result.
 	 * <b>h = 2 * this * this</b>
@@ -712,6 +709,7 @@ public class Ed25519FieldElement {
 
 		// TODO 20141011: this is the only difference from square; can we refactor?
 		// TODO 20141013 BR -> J: sure. Just not sure about how to name the method. squareAndOptionalDouble(final boolean dbl)?
+		// TODO 20141013 J-BR: that name is fine
 		h0 += h0;
 		h1 += h1;
 		h2 += h2;
@@ -790,22 +788,20 @@ public class Ed25519FieldElement {
 	public Ed25519FieldElement invert() {
 		Ed25519FieldElement f0, f1;
 
-		// TODO 20141011: seems like these comments are off since they are using * instead of ^ in many places
-		// TODO 20141012: G-J?: I believe comments are ok, they describe how exponent is created
-		//  (describing value itself would be tedious and would only obfuscate information
-		// TODO 20141013: BR -> J: I agree with gimre, purpose is to keep track of the exponents.
-		// TODO                    Comments are taken from Matthijs van Duin's curve25519.java.
+		// comments describe how exponent is created
 
 		// 2 == 2 * 1
 		f0 = this.square();
 
-		// 4 == 2 * 2
-		f1 = pow29();
+		// 9 == 9
+		// TODO 20141013 J-B: can we rename to something like pow2to9
+		f1 = this.pow29();
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
 
 		// 2^252 - 2^2
+		// TODO 20141013 J-B: can we rename to something like pow2to252sub4
 		f1 = pow22524();
 
 		// 2^255 - 2^5
@@ -833,8 +829,6 @@ public class Ed25519FieldElement {
 		f = f.square();
 
 		// 8 == 2 * 4
-		// TODO G-B: I know it was this way in original code, but this loop is pretty much senseless, isn't it? :)
-		// TODO 20141013 BR -> G: you  are right, I oversaw it :)
 		f = f.square();
 
 		// 9 == 1 + 8
@@ -942,12 +936,6 @@ public class Ed25519FieldElement {
 		// 2^250 - 2^0
 		f0 = f1.multiply(f0);
 
-		// TODO 20141011: seems like everything above is the same; refactor?
-		// > (if i am to believe the comments; as the variable names are different)
-		// TODO 20141012 (G): I've checked code, and comments are right, so I guess
-		// common part could be extracted
-		// TODO 20141013 BR -> J, G: yes, either refactor to Matthijs van Duin's version or like I did (invert() and sqrt() without additional parameter).
-
 		// 2^251 - 2^1
 		f0 = f0.square();
 
@@ -975,7 +963,7 @@ public class Ed25519FieldElement {
 		x = v3.square().multiply(v).multiply(u);
 
 		//  x = (u * v^7)^((q - 5) / 8)
-		x = x.pow22524().multiply(x);
+		x = x.pow22524().multiply(x); // 2^252 - 3
 
 		// x = u * v^3 * (u * v^7)^((q - 5) / 8)
 		x = v3.multiply(u).multiply(x);

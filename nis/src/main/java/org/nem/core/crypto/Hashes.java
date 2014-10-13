@@ -34,6 +34,9 @@ public class Hashes {
 	// TODO 20141011          Aside from that, sure we can hide the message digest. You want to do this?
 	// TODO 20141011 J-BR: yea, i think i would prefer to have all the hash functions look the same
 	// TODO 20141012 BR -> J: sorry to ask again. So I should code it like sha3_256(...) and sha3_512(...) ?
+	// TODO 20141011 J-BR yep:
+	// sha3_256(final byte[]... inputs)
+	// sha3_512(final byte[]... inputs)
 
 	/**
 	 * Gets an instance of a SHA3-512 message digest.

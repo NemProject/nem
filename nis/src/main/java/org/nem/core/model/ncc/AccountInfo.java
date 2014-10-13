@@ -7,8 +7,6 @@ import org.nem.core.serialization.*;
 
 /**
  * Represents an external view of an account.
- * TODO 20141005 J-G: i think remote status makes more sense in AccountMetaData, there is more information in my other comments
- * > i just tend to comment in random order :)
  */
 public class AccountInfo implements SerializableEntity {
 	private final Address address;

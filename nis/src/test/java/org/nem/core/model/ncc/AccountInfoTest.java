@@ -178,7 +178,6 @@ public class AccountInfoTest {
 		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 9, "foo", 2.3)));
 		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "bar", 2.3)));
 		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 3.3)));
-		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 2.3)));
 
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
 		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)info)));
@@ -201,7 +200,6 @@ public class AccountInfoTest {
 		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 9, "foo", 2.3).hashCode()));
 		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "bar", 2.3).hashCode()));
 		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 3.3).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 2.3).hashCode()));
 	}
 
 	private AccountInfo createAccountInfo(final Address address, final long balance, final int blockAmount, final String label, final double importance) {

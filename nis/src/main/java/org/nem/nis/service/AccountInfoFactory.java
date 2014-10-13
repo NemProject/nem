@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 // TODO 20141013 G-J: not sure if getRemoteStatus should be here, and if so, this probably should be renamed
+// TODO 20141013 J-G: i guess you didn't like it in RemoteLinks for some reason?
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
 	private final PoiFacade poiFacade;
@@ -55,7 +56,8 @@ public class AccountInfoFactory {
 		final RemoteLinks remoteLinks = accountState.getRemoteLinks();
 
 		// TODO 20141005 J-G - i think i would prefer to have this logic in RemoteLinks - something like getRemoteState
-		// > then we can reuse it in other places (e.g. the validator and possibly poi facade)
+		// TODO 20141013 J-G - can we reuse this function in other places too? (e.g. the validator and possibly poi facade)
+		// TODO 20141013 J-G - definitely should test this function
 
 		AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.REMOTE;
 		if (remoteLinks.isEmpty()) {
