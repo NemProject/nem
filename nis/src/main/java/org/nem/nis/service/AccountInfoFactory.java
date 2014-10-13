@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
  * Service for creating account info models.
  */
 @Service
+// TODO 20141013 G-J: not sure if getRemoteStatus should be here, and if so, this probably should be renamed
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
 	private final PoiFacade poiFacade;
@@ -50,7 +51,6 @@ public class AccountInfoFactory {
 	}
 
 	public AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final Account account = this.accountLookup.findByAddress(address);
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
 		final RemoteLinks remoteLinks = accountState.getRemoteLinks();
 
