@@ -256,7 +256,7 @@ public class AccountControllerTest {
 	//endregion
 
 	private static class TestContext {
-        private final AccountController controller;
+		private final AccountController controller;
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
