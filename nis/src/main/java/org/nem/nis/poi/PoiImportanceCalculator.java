@@ -2,9 +2,9 @@ package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.graph.InterLevelProximityMatrix;
+import org.nem.nis.poi.graph.*;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -22,19 +22,19 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static final int DEFAULT_MAX_ITERATIONS = 3000;
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
-	private final PoiScorer poiScorer;
+	private final ImportanceScorer scorer;
 	private final PoiOptions options;
 
 	/**
 	 * Creates a new generator with custom options.
 	 *
-	 * @param poiScorer The poi scorer to use.
+	 * @param scorer The poi scorer to use.
 	 * @param options The poi options.
 	 */
 	public PoiImportanceCalculator(
-			final PoiScorer poiScorer,
+			final ImportanceScorer scorer,
 			final PoiOptions options) {
-		this.poiScorer = poiScorer;
+		this.scorer = scorer;
 		this.options = options;
 	}
 
@@ -50,7 +50,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		final PowerIterator iterator = new PoiPowerIterator(
 				context,
 				this.options,
-				this.poiScorer,
+				this.scorer,
 				accountStates.size(),
 				this.options.isClusteringEnabled());
 
@@ -67,7 +67,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		// (3) merge all sub-scores
-		final ColumnVector importanceVector = this.poiScorer.calculateFinalScore(
+		final ColumnVector importanceVector = this.scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutlinkScoreVector(),
 				context.getVestedBalanceVector());
@@ -77,13 +77,13 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static class PoiPowerIterator extends PowerIterator {
 		private final PoiContext context;
 		private final PoiOptions options;
-		private final PoiScorer scorer;
+		private final ImportanceScorer scorer;
 		private final boolean useClustering;
 
 		public PoiPowerIterator(
 				final PoiContext context,
 				final PoiOptions options,
-				final PoiScorer scorer,
+				final ImportanceScorer scorer,
 				final int numAccounts,
 				final boolean useClustering) {
 			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
@@ -112,7 +112,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
 			final double totalTeleportationProbability = this.options.getTeleportationProbability() + this.options.getInterLevelTeleportationProbability();
-			final double dangleSum = this.scorer.calculateDangleSum(
+			final double dangleSum = calculateDangleSum(
 					this.context.getDangleIndexes(),
 					totalTeleportationProbability,
 					prevIterImportances);
@@ -146,6 +146,27 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			return interLevelMatrix.getA()
 					.multiply(interLevelMatrix.getR().multiply(prevIterImportances))
 					.multiply(this.options.getInterLevelTeleportationProbability());
+		}
+
+		/**
+		 * Calculates the weighted teleporation sum of all dangling accounts.
+		 *
+		 * @param dangleIndexes The indexes of dangling accounts.
+		 * @param teleportationProbability The teleportation probability.
+		 * @param importanceVector The importance (weights).
+		 * @return The weighted teleporation sum of all dangling accounts.
+		 */
+		private double calculateDangleSum(
+				final List<Integer> dangleIndexes,
+				final double teleportationProbability,
+				final ColumnVector importanceVector) {
+
+			double dangleSum = 0;
+			for (final int i : dangleIndexes) {
+				dangleSum += importanceVector.getAt(i);
+			}
+
+			return dangleSum * teleportationProbability / importanceVector.size();
 		}
 	}
 }

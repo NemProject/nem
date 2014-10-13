@@ -9,6 +9,7 @@ import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.*;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class PoiImportanceCalculatorTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorTest.class.getName());
 	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();
+	private static ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
 
 	@Test
 	public void fastScanClusteringResultsInSameImportancesAsScan() {
@@ -285,6 +287,105 @@ public class PoiImportanceCalculatorTest {
 		}
 	}
 
+	// region spam scenario
+
+	/**
+	 * Given 2 6-rings, the right one got only few edges, the left one got many edges.
+	 * Try to find parameters so that the left ring has (ideally) not more importance than the right ring.
+	 * (because the transaction within a ring should not matter to the overall importance of a ring.)
+	 *
+	 * Outcome: Independent of the used algorithm it seems it doesn't matter at all if there are additional transactions.
+	 *          This is probably due to the normalization of the columns of the outlink matrix.
+	 *
+	 * <pre>
+	 *           1------o2                 7------o8
+	 *         o \     /  \              o          \
+	 *       /             o           /             o
+	 *     0--  many txs  --3         6               9
+	 *      o              /          o              /
+	 *       \  /       \ O            \            O
+	 *        5o---------4             11o--------10
+	 * </pre>
+	 */
+	@Test
+	public void spamLinksDoNotHaveABigImpactOnImportance() {
+		// Arrange:
+		// - all accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = setupAccountStatesForRings();
+
+		// Construct basic ring connections
+		final Matrix outlinkMatrix = setupBasicRingStructure();
+
+		// Add random transactions to the left ring
+		final SecureRandom random = new SecureRandom();
+		for (int i = 0; i < 100; ++i) {
+			outlinkMatrix.incrementAt(random.nextInt(6), random.nextInt(6), 20);
+		}
+
+		final BlockHeight height1 = new BlockHeight(2);
+		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
+		addOutlinksFromGraph(accountStates, height1, outlinkMatrix);
+		DEFAULT_IMPORTANCE_SCORER = new PageRankScorer();
+
+		// Act:
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setClusteringStrategy(new SingleClusterScan());
+		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
+		builder.setTeleportationProbability(0.85);
+		builder.setInterLevelTeleportationProbability(0.15);
+
+		// Normal page rank
+		LOGGER.info("normal page rank:");
+		final ColumnVector normalImportances = calculateImportances(builder.create(), height1, accountStates);
+		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
+
+		// NCD aware page rank
+		LOGGER.info("NCD aware page rank:");
+		final ColumnVector ncdAwareImportances = calculateImportances(builder2.create(), height2, accountStates);
+		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
+
+		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
+		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+
+		// Ideally the ratio should be within a small range.
+		Assert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
+		Assert.assertThat(ratio2 > 0.95 && ratio2 < 1.05, IsEqual.equalTo(true));
+	}
+
+	private List<PoiAccountState> setupAccountStatesForRings() {
+		// All accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = new ArrayList<>();
+		for (int i=0; i<12; i++) {
+			accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
+		}
+
+		return accountStates;
+	}
+
+	private Matrix setupBasicRingStructure() {
+		// Construct basic ring connections
+		final Matrix outlinkMatrix = new DenseMatrix(12, 12);
+		outlinkMatrix.setAt(0, 5, 100);
+		outlinkMatrix.setAt(6, 11, 100);
+		for (int i = 0; i < 5; ++i) {
+			outlinkMatrix.setAt(i + 1, i, 100);
+			outlinkMatrix.setAt(i + 7, i + 6, 100);
+		}
+
+		return outlinkMatrix;
+	}
+
+	private double ringImportanceSum(final ColumnVector importances, final int ring) {
+		double sum = 0.0;
+		for (int i=0; i<6; i++) {
+			sum += importances.getAt(i + 6 * (ring - 1));
+		}
+
+		return sum;
+	}
+
+	// endregion
+
 	/**
 	 * a --o b   c
 	 */
@@ -374,7 +475,7 @@ public class PoiImportanceCalculatorTest {
 			final BlockHeight importanceBlockHeight,
 			final Collection<PoiAccountState> accountStates) {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
-				new PoiScorer(),
+				DEFAULT_IMPORTANCE_SCORER,
 				options);
 		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		return getImportances(importanceBlockHeight, accountStates);
@@ -424,6 +525,15 @@ public class PoiImportanceCalculatorTest {
 		LOGGER.info(String.format("importances: %s", importancesVector));
 		return importancesVector;
 
+	}
+
+	private class PageRankScorer implements ImportanceScorer {
+
+		@Override
+		public ColumnVector calculateFinalScore(final ColumnVector importanceVector, final ColumnVector outlinkVector, final ColumnVector vestedBalanceVector) {
+			importanceVector.normalize();
+			return importanceVector;
+		}
 	}
 
 	//endregion
