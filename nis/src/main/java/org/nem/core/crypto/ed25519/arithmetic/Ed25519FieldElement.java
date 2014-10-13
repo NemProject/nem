@@ -788,6 +788,8 @@ public class Ed25519FieldElement {
 		Ed25519FieldElement f0, f1, f2, f3;
 
 		// TODO 20141011: seems like these comments are off since they are using * instead of ^ in many places
+		// TODO 20141012: G-J?: I believe comments are ok, they describe how exponent is created
+		//  (describing value itself would be tedious and would only obfuscate information
 
 		// 2 == 2 * 1
 		f0 = this.square();
@@ -917,11 +919,12 @@ public class Ed25519FieldElement {
 		f1 = f0.square();
 
 		// 8 == 2 * 4
+		// TODO G-B: I know it was this way in original code, but this loop is pretty much senseless, isn't it? :)
 		for (int i = 1; i < 2; ++i) {
 			f1 = f1.square();
 		}
 
-		// z9 = z1*z8
+		// 9 == 1 + 8
 		f1 = this.multiply(f1);
 
 		// 11 == 9 + 2
@@ -1012,6 +1015,8 @@ public class Ed25519FieldElement {
 
 		// TODO 20141011: seems like everything above is the same; refactor?
 		// > (if i am to believe the comments; as the variable names are different)
+		// TODO 20141012 (G): I've checked code, and comments are right, so I guess
+		// common part could be extracted
 
 		// 2^251 - 2^1
 		f0 = f0.square();
