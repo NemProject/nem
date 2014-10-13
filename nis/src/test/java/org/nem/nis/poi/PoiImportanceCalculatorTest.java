@@ -206,6 +206,26 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	/**
+	 * TODO 20141013 BR -> J: what we are really interested in is the importance calculated by the page rank part. Here are the (unweighted) numbers:
+	 * TODO                   In your scenario 0, 1 and 6 are outliers, 2, 3, 4, 5 and 7, 8, 9, 10 build a cluster each.
+	 * 0.117 0.103 0.069 0.081 0.091 0.098 0.103 0.069 0.081 0.091 0.098 original importance
+	 * I must say I don't really understand why the importances rise from node 2 onwards: 2 < 3 < 4 < 5 < 1
+	 * 1 should transfer more importance to 2 than 4 transfers to 5.
+	 *
+	 * Variation of the teleportation probabilities shows this behavior (TP = teleportation prob., ITLP = inter level teleportation prob.):
+	 *  TP   ILTP
+	 * 0.8  | 0.1  | 0.120 0.104 0.068 0.080 0.090 0.098 0.104 0.068 0.080 0.090 0.098
+	 * 0.6  | 0.3  | 0.131 0.097 0.070 0.083 0.090 0.094 0.097 0.070 0.083 0.090 0.094
+	 * 0.45 | 0.45 | 0.144 0.090 0.073 0.084 0.089 0.091 0.090 0.073 0.084 0.089 0.091
+	 * 0.3  | 0.6  | 0.163 0.084 0.075 0.085 0.087 0.088 0.084 0.075 0.085 0.087 0.088
+	 * 0.1  | 0.8  | 0.201 0.075 0.078 0.082 0.082 0.082 0.075 0.078 0.082 0.082 0.082
+	 * 0 gets more and more important and the nodes within a cluster get more and more equal.
+	 *
+	 * Here are the values for SingleClusterScan (should be the same as normal page rank):
+	 * 0.108 0.104 0.069 0.082 0.092 0.099 0.104 0.069 0.082 0.092 0.099 original importance
+	 * The ncd-aware algorithm pushes 0 which is good. Again I don't understand why 2 has such a low importance.
+	 */
+	/**
 	 * <pre>
 	 *     4----o5----o1 --o0o-- 6----o7----o8
 	 *     o           |         o           |
@@ -240,7 +260,10 @@ public class PoiImportanceCalculatorTest {
 		addOutlinksFromGraph(accountStates, height, outlinkMatrix);
 
 		// Act:
-		final ColumnVector importances = calculateImportances(DEFAULT_OPTIONS, height, accountStates);
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setTeleportationProbability(0.8);
+		builder.setInterLevelTeleportationProbability(0.1);
+		final ColumnVector importances = calculateImportances(builder.create(), height, accountStates);
 		final ColumnVector balances = getBalances(height, accountStates);
 
 		// Assert:
