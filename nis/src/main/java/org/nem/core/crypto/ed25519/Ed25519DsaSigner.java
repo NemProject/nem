@@ -53,15 +53,21 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// TODO 20141011 - why are we adding the public key to the hash?
 		// > this implementation doesn't seem to be doing that https://github.com/jedisct1/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/sign.c
 		// > i understand the reason for adding the private key above (to add randomness to prevent against PS3-like attacks)
+		// TODO 20141012 BR -> J: From the original paper (High-speed high-security signatures.pdf) where A is the public key:
+		// TODO                  "the use of A is an inexpensive way to alleviate concerns that several public keys could be attacked simultaneously"
+		// TODO                  The libsodium code does the same as this code, it just looks strange ^^ Or am I wrong?
 		this.digest.update(this.keyPair.getPublicKey().getRaw());
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
-		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(this.keyPair.getPrivateKey().prepareForScalarMultiply(), rModQ);
+		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(Ed25519Utils.prepareForScalarMultiply(this.keyPair.getPrivateKey().getRaw()), rModQ);
 
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR.getRaw(), encodedS.getRaw());
 		if (!this.isCanonicalSignature(signature)) {
 			// TODO 20141011 - if we get here, this indicates a bug in our code?
+			// TODO 20141012 BR -> J: yes, isCanonicalSignature checks 0 < encodedS < group order.
+			// TODO                   encodedS was calculated mod group order so if it is bigger, something failed.
+			// TODO                   I excluded encodedS == 0 as valid signature, not sure if that is needed.
 			throw new CryptoException("Generated signature is not canonical");
 		}
 
@@ -72,6 +78,11 @@ public class Ed25519DsaSigner implements DsaSigner {
 	public boolean verify(final byte[] data, final Signature signature) {
 		// TODO 20141011 - does any of the validation here make sense:
 		// https://github.com/jedisct1/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/open.c
+		// TODO 20141012 BR -> J: 1) First test is worse than isCanonicalSignature since it only checks bit 253-255 of S. It still could be > group order.
+		// TODO                   2) Second test is same as "if (null == A) {" below.
+		// TODO                   3) Third test checks if the raw value of the public key is 0. In that case A is the affine point (+-i, 0).
+		// TODO                      Does this cause problems? hmmm...need to think about it.
+
 		if (!this.isCanonicalSignature(signature)) {
 			return false;
 		}

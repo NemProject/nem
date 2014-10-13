@@ -29,7 +29,7 @@ public class Ed25519BlockCipher implements BlockCipher {
 	@Override
 	public byte[] encrypt(final byte[] input) {
 		// Setup salt.
-		final byte[] salt = new byte[32];
+		final byte[] salt = new byte[recipientKeyPair.getPublicKey().getRaw().length];
 		this.random.nextBytes(salt);
 
 		// Derive shared key.
@@ -43,31 +43,30 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, true);
 
 		// Encode.
-		final byte[] buf = new byte[cipher.getOutputSize(input.length)];
-		int len = cipher.processBytes(input, 0, input.length, buf, 0);
-		try {
-			len += cipher.doFinal(buf, len);
-		} catch (final InvalidCipherTextException e) {
+		final int[] length = new int[1];
+		final byte[] buf = transform(cipher, input, length);
+		if (null == buf) {
 			return null;
 		}
 
-		final byte[] result = new byte[salt.length + ivData.length + len];
+		final byte[] result = new byte[salt.length + ivData.length + length[0]];
 		System.arraycopy(salt, 0, result, 0, salt.length);
 		System.arraycopy(ivData, 0, result, salt.length, ivData.length);
-		System.arraycopy(buf, 0, result, salt.length + ivData.length, len);
-
+		System.arraycopy(buf, 0, result, salt.length + ivData.length, length[0]);
 		return result;
 	}
 
 	@Override
 	public byte[] decrypt(final byte[] input) {
 		// TODO 20141011 J-B: consider adding a test that decryption fails if input is too small
+		// TODO 20141012 BR -> J: done.
 		if (input.length < 64) {
 			return null;
 		}
 
-		final byte[] salt = Arrays.copyOfRange(input, 0, 32);
-		final byte[] ivData = Arrays.copyOfRange(input, 32, 48);
+		final int keyLength = this.senderKeyPair.getPublicKey().getRaw().length;
+		final byte[] salt = Arrays.copyOfRange(input, 0, keyLength);
+		final byte[] ivData = Arrays.copyOfRange(input, keyLength, 48);
 		final byte[] encData = Arrays.copyOfRange(input, 48, input.length);
 
 		// Derive shared key.
@@ -78,19 +77,29 @@ public class Ed25519BlockCipher implements BlockCipher {
 
 		// Decode.
 		// TODO 20141011 J-B: consider refactoring this block (same as in encode)
-		final byte[] buf = new byte[cipher.getOutputSize(encData.length)];
-		int len = cipher.processBytes(encData, 0, encData.length, buf, 0);
-		try {
-			len += cipher.doFinal(buf, len);
-		} catch (final InvalidCipherTextException e) {
+		// TODO 20141012 BR -> J: Doesn't look much better imo ^^
+		final int[] length = new int[1];
+		final byte[] buf = transform(cipher, encData, length);
+		if (null == buf) {
 			return null;
 		}
 
 		// Remove padding
-		final byte[] out = new byte[len];
-		System.arraycopy(buf, 0, out, 0, len);
-
+		final byte[] out = new byte[length[0]];
+		System.arraycopy(buf, 0, out, 0, length[0]);
 		return out;
+	}
+
+	private byte[] transform(final BufferedBlockCipher cipher, final byte[] data, final int[] length) {
+		final byte[] buf = new byte[cipher.getOutputSize(data.length)];
+		length[0] = cipher.processBytes(data, 0, data.length, buf, 0);
+		try {
+			length[0] += cipher.doFinal(buf, length[0]);
+		} catch (final InvalidCipherTextException e) {
+			return null;
+		}
+
+		return buf;
 	}
 
 	private BufferedBlockCipher setupBlockCipher(final byte[] sharedKey, final byte[] ivData, final boolean forEncryption) {
@@ -109,9 +118,10 @@ public class Ed25519BlockCipher implements BlockCipher {
 	private byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey, final byte[] salt) {
 		final Ed25519GroupElement senderA = new Ed25519EncodedGroupElement(publicKey.getRaw()).decode();
 		senderA.precomputeForScalarMultiplication();
-		final byte[] sharedKey = senderA.scalarMultiply(privateKey.prepareForScalarMultiply()).encode().getRaw();
+		final byte[] sharedKey = senderA.scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey.getRaw())).encode().getRaw();
 		// TODO 20141011 J-B: consider using a constant for the key / salt length
-		for (int i = 0; i < 32; i++) {
+		// TODO 20141012 BR -> J: salt length is now coupled to the public key length.
+		for (int i = 0; i < publicKey.getRaw().length; i++) {
 			sharedKey[i] ^= salt[i];
 		}
 

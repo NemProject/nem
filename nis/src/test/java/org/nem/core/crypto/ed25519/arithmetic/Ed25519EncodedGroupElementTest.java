@@ -18,6 +18,41 @@ public class Ed25519EncodedGroupElementTest {
 	}
 
 	// TODO 20141011 J-B: i guess we should have a decode / getRaw test too
+	// TODO 20141013 BR -> J: done.
+
+	// region getRaw
+
+	@Test
+	public void getRawReturnsUnderlyingArray() {
+		// Act:
+		final byte[] values = new byte[32];
+		values[0] = 5;
+		values[6] = 15;
+		values[23] = -67;
+		final Ed25519EncodedGroupElement encoded = new Ed25519EncodedGroupElement(values);
+
+		// Assert:
+		Assert.assertThat(values, IsEqual.equalTo(encoded.getRaw()));
+	}
+
+	// endregion
+
+	// region encode / decode
+
+	@Test
+	public void decodePlusEncodeDoesNotAlterTheEncodedGroupElement() {
+		// Act:
+		for (int i = 0; i < 1000; i++) {
+			// Arrange:
+			final Ed25519EncodedGroupElement original = MathUtils.getRandomEncodedGroupElement();
+			final Ed25519EncodedGroupElement encoded = original.decode().encode();
+
+			// Assert:
+			Assert.assertThat(encoded, IsEqual.equalTo(original));
+		}
+	}
+
+	// endregion
 
 	@Test
 	public void getAffineXReturnsExpectedResult() {

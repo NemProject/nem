@@ -79,6 +79,7 @@ public class Ed25519EncodedGroupElement {
 			checkForZero = vxSquare.add(u);
 			if (checkForZero.isNonZero()) {
 				// TODO 20141011: does indicate a bug in our code or can we get here with bad input?
+				// TODO 20141013 BR -> J: yes, it means the given affine point (x,y) is not on the curve since β^2 != +-(u / v).
 				throw new IllegalArgumentException("not a valid Ed25519EncodedGroupElement.");
 			}
 

@@ -12,6 +12,7 @@ import java.util.Arrays;
 public class Ed25519EncodedFieldElement {
 
 	// TODO 20141011 J-B: if this class gets created a lot we can avoid recreating the zero vector each time
+	// TODO 20141013 BR -> J: sure.
 	final byte[] ZERO;
 	private final byte[] values;
 
@@ -21,11 +22,14 @@ public class Ed25519EncodedFieldElement {
 	 * @param values The byte array that holds the values.
 	 */
 	public Ed25519EncodedFieldElement(final byte[] values) {
-		if (32 != values.length && 64 != values.length) {
+		if (32 == values.length) {
+			this.ZERO = Ed25519Field.ZERO_SHORT;
+		} else if (64 == values.length) {
+			this.ZERO = Ed25519Field.ZERO_LONG;
+		} else {
 			throw new IllegalArgumentException("Invalid 2^8 bit representation.");
 		}
 		this.values = values;
-		this.ZERO = new byte[values.length];
 	}
 
 	/**

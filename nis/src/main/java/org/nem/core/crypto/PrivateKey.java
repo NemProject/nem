@@ -1,11 +1,9 @@
 package org.nem.core.crypto;
 
-import org.nem.core.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
 import org.nem.core.serialization.*;
-import org.nem.core.utils.*;
+import org.nem.core.utils.HexEncoder;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 /**
  * Represents a private key.
@@ -92,18 +90,5 @@ public class PrivateKey implements SerializableEntity {
 		} catch (final NumberFormatException e) {
 			throw new CryptoException(e);
 		}
-	}
-
-	// TODO 20141010 J-B why is this here?
-	// TODO 20141011 BR -> J: it is used in 3 places  (BlockCipher, DsaSigner, KeyGenerator).
-	// TODO                   So if I remove this here I need a helper method somewhere else.
-	// TODO 20141011 J-B: i haven't gotten through all the ed stuff, but a helper function seems to make sense on the surface
-	public Ed25519EncodedFieldElement prepareForScalarMultiply() {
-		final byte[] hash = Hashes.getSha3_512Instance().digest(ArrayUtils.toByteArray(this.value, 32));
-		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
-		a[31] &= 0x7F;
-		a[31] |= 0x40;
-		a[0] &= 0xF8;
-		return new Ed25519EncodedFieldElement(a);
 	}
 }
