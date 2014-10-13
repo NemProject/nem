@@ -331,8 +331,6 @@ public class PoiImportanceCalculatorTest {
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setClusteringStrategy(new SingleClusterScan());
 		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
-		builder.setTeleportationProbability(0.85);
-		builder.setInterLevelTeleportationProbability(0.15);
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
@@ -351,6 +349,83 @@ public class PoiImportanceCalculatorTest {
 		Assert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
 		Assert.assertThat(ratio2 > 0.95 && ratio2 < 1.05, IsEqual.equalTo(true));
 	}
+
+	// endregion
+
+	// region transfer of importance between clusters
+
+	/**
+	 * Given 2 6-rings with a link between them, analyze the influence of weight between normal page rank matrix and ILP-matrix.
+	 * The ratio for the normal page rank is 1.582
+	 *
+	 * Outcome:
+	 * TP   | ILTP | ratio ring 1 : ring 2
+	 * 0.85 | 0.0  | 2.1357
+	 * 0.75 | 0.1  | 2.0570
+	 * 0.65 | 0.2  | 1.9799
+	 * 0.55 | 0.3  | 1.9050
+	 * 0.45 | 0.4  | 1.8329
+	 * 0.35 | 0.5  | 1.7645
+	 * 0.25 | 0.6  | 1.6995
+	 * 0.15 | 0.7  | 1.6376
+	 * 0.05 | 0.8  | 1.5786
+	 *
+	 * With our standard parameters the ncd aware algorithm tends to transfer more importance from one cluster to another than normal page rank.
+	 * The difference is not that huge though.
+	 *
+	 * <pre>
+	 *           1------o2                 7------o8
+	 *         o          \              o          \
+	 *       /             o           /             o
+	 *     0                3o-------6               9
+	 *      o              /          o              /
+	 *       \            O            \            O
+	 *        5o---------4             11o--------10
+	 * </pre>
+	 */
+	@Test
+	public void linkFromRightBlockToLeftBlockTransfersImportanceToLeftBlock() {
+		// Arrange:
+		// - all accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = setupAccountStatesForRings();
+
+		// Construct basic ring connections
+		final Matrix outlinkMatrix = setupBasicRingStructure();
+
+		// Link blocks
+		outlinkMatrix.setAt(3, 6, 100);
+
+		final BlockHeight height1 = new BlockHeight(2);
+		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
+		addOutlinksFromGraph(accountStates, height1, outlinkMatrix);
+		DEFAULT_IMPORTANCE_SCORER = new PageRankScorer();
+
+		// Act:
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setClusteringStrategy(new SingleClusterScan());
+		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
+		builder2.setTeleportationProbability(0.75);
+		builder2.setInterLevelTeleportationProbability(0.1);
+
+		// Normal page rank
+		LOGGER.info("normal page rank:");
+		final ColumnVector normalImportances = calculateImportances(builder.create(), height1, accountStates);
+		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
+
+		// NCD aware page rank
+		LOGGER.info("NCD aware page rank:");
+		final ColumnVector ncdAwareImportances = calculateImportances(builder2.create(), height2, accountStates);
+		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
+
+		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
+		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+
+		// There should have been some importance transferred from the right ring to the left one.
+		Assert.assertThat(ratio1 > 1, IsEqual.equalTo(true));
+		Assert.assertThat(ratio2 > 1 , IsEqual.equalTo(true));
+	}
+
+	// endregion
 
 	private List<PoiAccountState> setupAccountStatesForRings() {
 		// All accounts start with 2000 NEM
@@ -383,8 +458,6 @@ public class PoiImportanceCalculatorTest {
 
 		return sum;
 	}
-
-	// endregion
 
 	/**
 	 * a --o b   c
