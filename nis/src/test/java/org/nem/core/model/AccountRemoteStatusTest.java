@@ -11,8 +11,7 @@ public class AccountRemoteStatusTest {
 
 	@Test
 	public void accountRemoteStatusCanBeCreatedFromCorrectStatusString() {
-		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values())
-		{
+		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values()) {
 			assertCanCreate(accountRemoteStatus.toString(), accountRemoteStatus);
 		}
 	}
@@ -37,8 +36,7 @@ public class AccountRemoteStatusTest {
 
 	@Test
 	public void canWriteAccountStatus() {
-		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values())
-		{
+		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values()) {
 			assertCanWrite(accountRemoteStatus.toString());
 		}
 	}
@@ -59,8 +57,7 @@ public class AccountRemoteStatusTest {
 
 	@Test
 	public void canRoundtripAccountStatus() {
-		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values())
-		{
+		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values()) {
 			assertCanRoundtrip(accountRemoteStatus.toString());
 		}
 	}

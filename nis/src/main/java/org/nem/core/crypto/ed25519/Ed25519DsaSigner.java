@@ -53,7 +53,9 @@ public class Ed25519DsaSigner implements DsaSigner {
 		this.digest.update(this.keyPair.getPublicKey().getRaw());
 		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
-		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(Ed25519Utils.prepareForScalarMultiply(this.keyPair.getPrivateKey().getRaw()), rModQ);
+		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(
+				Ed25519Utils.prepareForScalarMultiply(this.keyPair.getPrivateKey().getRaw()),
+				rModQ);
 
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR.getRaw(), encodedS.getRaw());

@@ -8,7 +8,7 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.controller.requests.AccountIdBuilder;
-import org.nem.nis.harvesting.*;
+import org.nem.nis.harvesting.UnlockedAccounts;
 import org.nem.nis.service.*;
 
 public class AccountInfoControllerTest {

@@ -16,7 +16,7 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
-import org.nem.nis.service.*;
+import org.nem.nis.service.AccountIoAdapter;
 
 import java.util.*;
 import java.util.function.BiFunction;

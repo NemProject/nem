@@ -413,8 +413,8 @@ public class PoiImportanceCalculatorTest {
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> accountStates) {
 		final List<Double> importances = accountStates.stream()
-			.map(a -> a.getImportanceInfo().getImportance(blockHeight))
-			.collect(Collectors.toList());
+				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
+				.collect(Collectors.toList());
 
 		final ColumnVector importancesVector = new ColumnVector(importances.size());
 		for (int i = 0; i < importances.size(); ++i) {
@@ -423,7 +423,6 @@ public class PoiImportanceCalculatorTest {
 
 		LOGGER.info(String.format("importances: %s", importancesVector));
 		return importancesVector;
-
 	}
 
 	//endregion

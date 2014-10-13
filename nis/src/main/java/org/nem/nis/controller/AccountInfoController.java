@@ -3,11 +3,9 @@ package org.nem.nis.controller;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.AccountIdBuilder;
-import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.harvesting.UnlockedAccounts;
 import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +28,7 @@ public class AccountInfoController {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
 	}
+
 	/**
 	 * Gets information about an account.
 	 *
@@ -59,5 +58,4 @@ public class AccountInfoController {
 	private AccountStatus getAccountStatus(final Address address) {
 		return this.unlockedAccounts.isAccountUnlocked(address) ? AccountStatus.UNLOCKED : AccountStatus.LOCKED;
 	}
-
 }

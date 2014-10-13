@@ -19,7 +19,6 @@ public class Ed25519BlockCipherTest extends BlockCipherTest {
 		Assert.assertThat(decryptedBytes, IsNull.nullValue());
 	}
 
-
 	@Override
 	protected BlockCipher getBlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
 		return new Ed25519BlockCipher(senderKeyPair, recipientKeyPair);

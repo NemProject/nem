@@ -13,6 +13,7 @@ import java.util.Arrays;
 public class Ed25519Utils {
 
 	// TODO 20141013 J-B: can we change the parameter to PrivateKey?
+
 	/**
 	 * Prepares a private key's raw value for scalar multiplication.
 	 * The hashing is for achieving better randomness and the clamping prevents small subgroup attacks.

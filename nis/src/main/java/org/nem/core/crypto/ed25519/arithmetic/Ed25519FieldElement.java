@@ -47,7 +47,6 @@ public class Ed25519FieldElement {
 	/**
 	 * Adds the given field element to this and returns the result.
 	 * <b>h = this + g</b>
-	 *
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.
@@ -350,7 +349,7 @@ public class Ed25519FieldElement {
 		h4 -= carry4 << 26;
 		/* |h0| <= 2^25 */
 		/* |h4| <= 2^25 */
-        /* |h1| <= 1.71*2^59 */
+		/* |h1| <= 1.71*2^59 */
         /* |h5| <= 1.71*2^59 */
 
 		carry1 = (h1 + (long)(1 << 24)) >> 25;
@@ -813,7 +812,6 @@ public class Ed25519FieldElement {
 		return f1.multiply(f0);
 	}
 
-
 	/**
 	 * Computes this field element to the power of (2^9) and returns the result.
 	 *
@@ -979,9 +977,9 @@ public class Ed25519FieldElement {
 	 * p = 2^255 - 19
 	 * h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 <= |hi| < 2^27 for all i=0,...,9.
 	 * h congruent r modulo p, i.e. h = r + q * p for some suitable 0 <= r < p and an integer q.
-	 *
+	 * <br/>
 	 * Then q = [2^-255 * (h + 19 * 2^-25 * h9 + 1/2)] where [x] = floor(x).
-	 *
+	 * <br/>
 	 * Proof:
 	 * We begin with some very raw estimation for the bounds of some expressions:
 	 *     |h| < 2^230 * 2^30 = 2^260 ==> |r + q * p| < 2^260 ==> |q| < 2^10.
