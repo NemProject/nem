@@ -22,7 +22,7 @@ public class AccountInfoControllerTest {
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
-		final AccountRemoteStatus accountRemoteStatus = Mockito.mock(AccountRemoteStatus.class);
+		final AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.ACTIVATED;
 
 		final TestContext context = new TestContext();
 		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
@@ -48,7 +48,7 @@ public class AccountInfoControllerTest {
 		final TestContext context = new TestContext();
 		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
 		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
-		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(Mockito.mock(AccountRemoteStatus.class));
+		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(AccountRemoteStatus.DEACTIVATED);
 		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(true);
 
 		// Act:
@@ -65,11 +65,11 @@ public class AccountInfoControllerTest {
 
 	@Test
 	public void accountStatusDelegatesToUnlockedAccounts() {
-		this.assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
-		this.assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
+		assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
+		assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
 	}
 
-	private void assertAccountStatusDelegatesToUnlockedAccounts(final boolean returned, final AccountStatus expectedStatus) {
+	private static void assertAccountStatusDelegatesToUnlockedAccounts(final boolean returned, final AccountStatus expectedStatus) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final AccountIdBuilder builder = new AccountIdBuilder();
@@ -77,12 +77,14 @@ public class AccountInfoControllerTest {
 
 		final TestContext context = new TestContext();
 		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(returned);
+		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(17L);
 
 		// Act:
 		final AccountMetaData accountMetaData = context.controller.accountStatus(builder);
 
 		// Assert:
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(address);
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
 		Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(expectedStatus));
 	}
 

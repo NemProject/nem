@@ -143,7 +143,7 @@ public class AccountInfoTest {
 		Assert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(2.3));
 
 		// 6 "real" properties and 1 "hidden" (ordering) property
-		final int expectedProperties = 7 + 1;
+		final int expectedProperties = 6 + 1;
 		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
 
