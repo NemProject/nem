@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
  * Service for creating account info models.
  */
 @Service
+// TODO 20141013 G-J: not sure if getRemoteStatus should be here, and if so, this probably should be renamed
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
 	private final PoiFacade poiFacade;
@@ -34,17 +35,28 @@ public class AccountInfoFactory {
 	 * Creates an account info for a specified account.
 	 *
 	 * @param address The account address.
-	 * @param height
 	 * @return The info.
 	 */
-	public AccountInfo createInfo(final Address address, final BlockHeight height) {
+	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
 
+		final AccountImportance ai = accountState.getImportanceInfo();
+		return new AccountInfo(
+				account.getAddress(),
+				account.getBalance(),
+				account.getForagedBlocks(),
+				account.getLabel(),
+				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
+	}
+
+	public AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
+		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
+		final RemoteLinks remoteLinks = accountState.getRemoteLinks();
+
 		// TODO 20141005 J-G - i think i would prefer to have this logic in RemoteLinks - something like getRemoteState
 		// > then we can reuse it in other places (e.g. the validator and possibly poi facade)
-		// TODO 20141005 J-G i also think i would prefer to have remote status in AccountMetaData instead of AccountInfo
-		final RemoteLinks remoteLinks = accountState.getRemoteLinks();
+
 		AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.REMOTE;
 		if (remoteLinks.isEmpty()) {
 			accountRemoteStatus = AccountRemoteStatus.INACTIVE;
@@ -59,13 +71,6 @@ public class AccountInfoFactory {
 			}
 		}
 
-		final AccountImportance ai = accountState.getImportanceInfo();
-		return new AccountInfo(
-				account.getAddress(),
-				account.getBalance(),
-				account.getForagedBlocks(),
-				accountRemoteStatus,
-				account.getLabel(),
-				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
+		return accountRemoteStatus;
 	}
 }
