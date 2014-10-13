@@ -19,6 +19,8 @@ public class Ed25519Field {
 	public static final Ed25519FieldElement TWO = getFieldElement(2);
 	public static final Ed25519FieldElement D = getD();
 	public static final Ed25519FieldElement D_Times_TWO = D.multiply(TWO);
+	public static final byte[] ZERO_SHORT = new byte[32];
+	public static final byte[] ZERO_LONG = new byte[64];
 
 	/**
 	 * I ^ 2 = -1

@@ -61,6 +61,7 @@ public class Ed25519FieldElement {
 	 */
 	public Ed25519FieldElement add(final Ed25519FieldElement g) {
 		// TODO 2014 J-B: can we loop here? or would that be bad?
+		// TODO 20141013 BR -> J: I don't think it would raise security issues, probably just a bit slower.
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
 		h[0] = this.values[0] + gValues[0];
@@ -593,6 +594,7 @@ public class Ed25519FieldElement {
 	}
 
 	// TODO 2014 J-B: i also noticed that the reformatting made this code less similar with ref10
+	// TODO 20141013 BR -> J: either way is fine with me.
 	// > if you want we can disable reformatting here
 
 	/**
@@ -709,6 +711,7 @@ public class Ed25519FieldElement {
 		final long carry9;
 
 		// TODO 20141011: this is the only difference from square; can we refactor?
+		// TODO 20141013 BR -> J: sure. Just not sure about how to name the method. squareAndOptionalDouble(final boolean dbl)?
 		h0 += h0;
 		h1 += h1;
 		h2 += h2;
@@ -785,117 +788,28 @@ public class Ed25519FieldElement {
 	 * @return The inverse of this field element.
 	 */
 	public Ed25519FieldElement invert() {
-		Ed25519FieldElement f0, f1, f2, f3;
+		Ed25519FieldElement f0, f1;
 
 		// TODO 20141011: seems like these comments are off since they are using * instead of ^ in many places
 		// TODO 20141012: G-J?: I believe comments are ok, they describe how exponent is created
 		//  (describing value itself would be tedious and would only obfuscate information
+		// TODO 20141013: BR -> J: I agree with gimre, purpose is to keep track of the exponents.
+		// TODO                    Comments are taken from Matthijs van Duin's curve25519.java.
 
 		// 2 == 2 * 1
 		f0 = this.square();
 
 		// 4 == 2 * 2
-		f1 = f0.square();
-
-		// 8 == 2 * 4
-		for (int i = 1; i < 2; ++i) {
-			f1 = f1.square();
-		}
-
-		// 9 == 8 + 1
-		f1 = this.multiply(f1);
+		f1 = pow29();
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
 
-		// 22 == 2 * 11
-		f2 = f0.square();
-
-		// 31 == 22 + 9
-		f1 = f1.multiply(f2);
-
-		// 2^6 - 2^1
-		f2 = f1.square();
-
-		// 2^10 - 2^5
-		for (int i = 1; i < 5; ++i) {
-			f2 = f2.square();
-		}
-
-		// 2^10 - 2^0
-		f1 = f2.multiply(f1);
-
-		// 2^11 - 2^1
-		f2 = f1.square();
-
-		// 2^20 - 2^10
-		for (int i = 1; i < 10; ++i) {
-			f2 = f2.square();
-		}
-
-		// 2^20 - 2^0
-		f2 = f2.multiply(f1);
-
-		// 2^21 - 2^1
-		f3 = f2.square();
-
-		// 2^40 - 2^20
-		for (int i = 1; i < 20; ++i) {
-			f3 = f3.square();
-		}
-
-		// 2^40 - 2^0
-		f2 = f3.multiply(f2);
-
-		// 2^41 - 2^1
-		f2 = f2.square();
-
-		// 2^50 - 2^10
-		for (int i = 1; i < 10; ++i) {
-			f2 = f2.square();
-		}
-
-		// 2^50 - 2^0
-		f1 = f2.multiply(f1);
-
-		// 2^51 - 2^1
-		f2 = f1.square();
-
-		// 2^100 - 2^50
-		for (int i = 1; i < 50; ++i) {
-			f2 = f2.square();
-		}
-
-		// 2^100 - 2^0
-		f2 = f2.multiply(f1);
-
-		// 2^101 - 2^1
-		f3 = f2.square();
-
-		// 2^200 - 2^100
-		for (int i = 1; i < 100; ++i) {
-			f3 = f3.square();
-		}
-
-		// 2^200 - 2^0
-		f2 = f3.multiply(f2);
-
-		// 2^201 - 2^1
-		f2 = f2.square();
-
-		// 2^250 - 2^50
-		for (int i = 1; i < 50; ++i) {
-			f2 = f2.square();
-		}
-
-		// 2^250 - 2^0
-		f1 = f2.multiply(f1);
-
-		// 2^251 - 2^1
-		f1 = f1.square();
+		// 2^252 - 2^2
+		f1 = pow22524();
 
 		// 2^255 - 2^5
-		for (int i = 1; i < 5; ++i) {
+		for (int i = 1; i < 4; ++i) {
 			f1 = f1.square();
 		}
 
@@ -903,29 +817,44 @@ public class Ed25519FieldElement {
 		return f1.multiply(f0);
 	}
 
+
 	/**
-	 * Computes this field element to the power of (2^252 - 3) and returns the result.
+	 * Computes this field element to the power of (2^9) and returns the result.
+	 *
+	 * @return This field element to the power of (2^9).
+	 */
+	private Ed25519FieldElement pow29() {
+		Ed25519FieldElement f;
+
+		// 2 == 2 * 1
+		f = this.square();
+
+		// 4 == 2 * 2
+		f = f.square();
+
+		// 8 == 2 * 4
+		// TODO G-B: I know it was this way in original code, but this loop is pretty much senseless, isn't it? :)
+		// TODO 20141013 BR -> G: you  are right, I oversaw it :)
+		f = f.square();
+
+		// 9 == 1 + 8
+		return this.multiply(f);
+	}
+
+	/**
+	 * Computes this field element to the power of (2^252 - 4) and returns the result.
 	 * This is a helper function for calculating the square root.
 	 *
-	 * @return This field element to the power of (2^252 - 3).
+	 * @return This field element to the power of (2^252 - 4).
 	 */
-	public Ed25519FieldElement pow22523() {
+	private Ed25519FieldElement pow22524() {
 		Ed25519FieldElement f0, f1, f2;
 
 		// 2 == 2 * 1
 		f0 = this.square();
 
-		// 4 == 2 * 2
-		f1 = f0.square();
-
-		// 8 == 2 * 4
-		// TODO G-B: I know it was this way in original code, but this loop is pretty much senseless, isn't it? :)
-		for (int i = 1; i < 2; ++i) {
-			f1 = f1.square();
-		}
-
-		// 9 == 1 + 8
-		f1 = this.multiply(f1);
+		// 9
+		f1 = pow29();
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
@@ -1017,23 +946,19 @@ public class Ed25519FieldElement {
 		// > (if i am to believe the comments; as the variable names are different)
 		// TODO 20141012 (G): I've checked code, and comments are right, so I guess
 		// common part could be extracted
+		// TODO 20141013 BR -> J, G: yes, either refactor to Matthijs van Duin's version or like I did (invert() and sqrt() without additional parameter).
 
 		// 2^251 - 2^1
 		f0 = f0.square();
 
 		// 2^252 - 2^2
-		for (int i = 1; i < 2; ++i) {
-			f0 = f0.square();
-		}
-
-		// 2^252 - 3
-		return this.multiply(f0);
+		return f0.square();
 	}
 
 	/**
-	 * Calculates and returns one of the square root of u / v.
-	 * The sign of the square root cannot be predicted from u and v.
+	 * Calculates and returns one of the square roots of u / v.
 	 * x = (u * v^3) * (u * v^7)^((p - 5) / 8) ==> x^2 = +-(u / v).
+	 * Note that this means x can be sqrt(u / v), -sqrt(u / v), +i * sqrt(u / v), -i * sqrt(u / v).
 	 *
 	 * @param u The nominator of the fraction.
 	 * @param v The denominator of the fraction.
@@ -1050,7 +975,7 @@ public class Ed25519FieldElement {
 		x = v3.square().multiply(v).multiply(u);
 
 		//  x = (u * v^7)^((q - 5) / 8)
-		x = x.pow22523();
+		x = x.pow22524().multiply(x);
 
 		// x = u * v^3 * (u * v^7)^((q - 5) / 8)
 		x = v3.multiply(u).multiply(x);

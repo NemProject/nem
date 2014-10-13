@@ -43,6 +43,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
 	}
 
+	// Can rarely fail due to R not fitting into 32 bytes after adding the group order to it.
 	@Test
 	public void replacingRWithGroupOrderPlusRInSignatureRuinsSignature() {
 		// Arrange:
