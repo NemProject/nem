@@ -27,12 +27,12 @@ public class AccountMetaDataPairTest {
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(address, AccountStatus.LOCKED, AccountRemoteStatus.ACTIVATED);
+		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(address, AccountStatus.LOCKED, AccountRemoteStatus.ACTIVATING);
 
 		// Assert:
 		Assert.assertThat(metaDataPair.getAccount().getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
-		Assert.assertThat(metaDataPair.getMetaData().getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVATED));
+		Assert.assertThat(metaDataPair.getMetaData().getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVATING));
 	}
 
 	private static AccountMetaDataPair createRoundTrippedPair(

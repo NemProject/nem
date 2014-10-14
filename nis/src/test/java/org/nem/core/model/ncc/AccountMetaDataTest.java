@@ -21,11 +21,11 @@ public class AccountMetaDataTest {
 	@Test
 	public void canRoundTripAccountMetaData() {
 		// Arrange:
-		final AccountMetaData metaData = createRoundTrippedAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATED);
+		final AccountMetaData metaData = createRoundTrippedAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING);
 
 		// Assert:
 		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
-		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATED));
+		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
 	}
 
 	private static AccountMetaData createAccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus) {

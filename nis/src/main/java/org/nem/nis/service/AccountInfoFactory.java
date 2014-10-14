@@ -67,9 +67,9 @@ public class AccountInfoFactory {
 			final long heightDiff = height.subtract(remoteLinks.getCurrent().getEffectiveHeight());
 			final boolean withinOneDay = heightDiff < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 			if (isActivated) {
-				accountRemoteStatus = withinOneDay ? AccountRemoteStatus.ACTIVATED : AccountRemoteStatus.ACTIVE;
+				accountRemoteStatus = withinOneDay ? AccountRemoteStatus.ACTIVATING : AccountRemoteStatus.ACTIVE;
 			} else {
-				accountRemoteStatus = withinOneDay ? AccountRemoteStatus.DEACTIVATED : AccountRemoteStatus.INACTIVE;
+				accountRemoteStatus = withinOneDay ? AccountRemoteStatus.DEACTIVATING : AccountRemoteStatus.INACTIVE;
 			}
 		}
 

@@ -14,7 +14,7 @@ public enum AccountRemoteStatus {
 	/**
 	 * The account has activated remote harvesting (but not yet active).
 	 */
-	ACTIVATED("ACTIVATED"),
+	ACTIVATING("ACTIVATING"),
 
 	/**
 	 * The account has activated remote harvesting and remote harvesting is active.
@@ -24,7 +24,7 @@ public enum AccountRemoteStatus {
 	/**
 	 * The account has deactivated remote harvesting (but remote harvesting is still active).
 	 */
-	DEACTIVATED("DEACTIVATED"),
+	DEACTIVATING("DEACTIVATING"),
 
 	/**
 	 * The account has inactive remote harvesting,

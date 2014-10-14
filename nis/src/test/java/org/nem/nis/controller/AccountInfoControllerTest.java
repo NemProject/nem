@@ -22,7 +22,7 @@ public class AccountInfoControllerTest {
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
-		final AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.ACTIVATED;
+		final AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.ACTIVATING;
 
 		final TestContext context = new TestContext();
 		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
@@ -48,7 +48,7 @@ public class AccountInfoControllerTest {
 		final TestContext context = new TestContext();
 		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
 		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
-		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(AccountRemoteStatus.DEACTIVATED);
+		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(AccountRemoteStatus.DEACTIVATING);
 		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(true);
 
 		// Act:
