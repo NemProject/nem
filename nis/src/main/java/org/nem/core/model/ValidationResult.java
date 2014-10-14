@@ -73,7 +73,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because the chain could not be validated.
 	 */
-	FAILURE_CHAIN_INVALID(13);
+	FAILURE_CHAIN_INVALID(13),
+
+	/**
+	 * Validation failed because conflicting importance transfer is present
+	 */
+	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14);
 
 	private final int value;
 

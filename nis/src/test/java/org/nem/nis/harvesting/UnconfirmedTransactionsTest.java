@@ -182,7 +182,7 @@ public class UnconfirmedTransactionsTest {
 		final ValidationResult result = context.transactions.addExisting(t2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
 	}
 
