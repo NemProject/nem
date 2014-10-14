@@ -59,10 +59,9 @@ public class Ed25519FieldElement {
 	 * @return The field element this + val.
 	 */
 	public Ed25519FieldElement add(final Ed25519FieldElement g) {
-		// TODO 2014 J-B: can we loop here? or would that be bad?
-		// TODO 20141013 BR -> J: I don't think it would raise security issues, probably just a bit slower.
 		// TODO 20141013 J-BR: i think the loop is cleaner, but i'll leave it up to you
 		// TODO 20141014 BR -> J: done (verify() is about 5-10% slower now).
+		// TODO 20141014 J-BR: i ran with and without the loops and didn't see any difference, we can revert if you're seeing that big of a difference
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
 		for (int i=0; i<10; i++) {
@@ -407,6 +406,42 @@ public class Ed25519FieldElement {
 	}
 
 	/**
+	 * Squares this field element and returns the result.
+	 * <b>h = this * this</b>
+	 * <pre>
+	 * Preconditions:
+	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+	 * Postconditions:
+	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 * </pre>
+	 * See multiply for discussion of implementation strategy.
+	 *
+	 * @return The square of this field element.
+	 */
+	public Ed25519FieldElement square() {
+		return this.squareAndOptionalDouble(false);
+	}
+
+	/**
+	 * Squares this field element, multiplies by two and returns the result.
+	 * <b>h = 2 * this * this</b>
+	 * <pre>
+	 * Preconditions:
+	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
+	 * Postconditions:
+	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
+	 * </pre>
+	 * See multiply for discussion of implementation strategy.
+	 *
+	 * @return The square of this field element times 2.
+	 */
+	public Ed25519FieldElement squareAndDouble() {
+		return this.squareAndOptionalDouble(true);
+	}
+
+	// TODO 20141014 J-BR: i hope you're ok with this change ... i don't think squareAndOptionalDouble should be public
+
+	/**
 	 * Squares this field element, optionally multiplies by two and returns the result.
 	 * <b>h = 2 * this * this</b> if dbl is true or
 	 * <b>h = this * this</b> if dbl is false.
@@ -420,7 +455,7 @@ public class Ed25519FieldElement {
 	 *
 	 * @return The square of this field element times 2.
 	 */
-	public Ed25519FieldElement squareAndOptionalDouble(final boolean dbl) {
+	private Ed25519FieldElement squareAndOptionalDouble(final boolean dbl) {
 		final int f0 = this.values[0];
 		final int f1 = this.values[1];
 		final int f2 = this.values[2];
@@ -520,10 +555,6 @@ public class Ed25519FieldElement {
 		final long carry8;
 		final long carry9;
 
-		// TODO 20141011: this is the only difference from square; can we refactor?
-		// TODO 20141013 BR -> J: sure. Just not sure about how to name the method. squareAndOptionalDouble(final boolean dbl)?
-		// TODO 20141013 J-BR: that name is fine
-		// TODO 20141014 BR -> J: done.
 		if (dbl) {
 			h0 += h0;
 			h1 += h1;
@@ -607,24 +638,20 @@ public class Ed25519FieldElement {
 		// comments describe how exponent is created
 
 		// 2 == 2 * 1
-		f0 = this.squareAndOptionalDouble(false);
+		f0 = this.square();
 
 		// 9 == 9
-		// TODO 20141013 J-B: can we rename to something like pow2to9
-		// TODO 20141014 BR -> J: done.
 		f1 = this.pow2to9();
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
 
 		// 2^252 - 2^2
-		// TODO 20141013 J-B: can we rename to something like pow2to252sub4
-		// TODO 20141014 BR -> J: done.
 		f1 = this.pow2to252sub4();
 
 		// 2^255 - 2^5
 		for (int i = 1; i < 4; ++i) {
-			f1 = f1.squareAndOptionalDouble(false);
+			f1 = f1.square();
 		}
 
 		// 2^255 - 21
@@ -640,13 +667,13 @@ public class Ed25519FieldElement {
 		Ed25519FieldElement f;
 
 		// 2 == 2 * 1
-		f = this.squareAndOptionalDouble(false);
+		f = this.square();
 
 		// 4 == 2 * 2
-		f = f.squareAndOptionalDouble(false);
+		f = f.square();
 
 		// 8 == 2 * 4
-		f = f.squareAndOptionalDouble(false);
+		f = f.square();
 
 		// 9 == 1 + 8
 		return this.multiply(f);
@@ -662,7 +689,7 @@ public class Ed25519FieldElement {
 		Ed25519FieldElement f0, f1, f2;
 
 		// 2 == 2 * 1
-		f0 = this.squareAndOptionalDouble(false);
+		f0 = this.square();
 
 		// 9
 		f1 = this.pow2to9();
@@ -671,93 +698,93 @@ public class Ed25519FieldElement {
 		f0 = f0.multiply(f1);
 
 		// 22 == 2 * 11
-		f0 = f0.squareAndOptionalDouble(false);
+		f0 = f0.square();
 
 		// 31 == 22 + 9
 		f0 = f1.multiply(f0);
 
 		// 2^6 - 2^1
-		f1 = f0.squareAndOptionalDouble(false);
+		f1 = f0.square();
 
 		// 2^10 - 2^5
 		for (int i = 1; i < 5; ++i) {
-			f1 = f1.squareAndOptionalDouble(false);
+			f1 = f1.square();
 		}
 
 		// 2^10 - 2^0
 		f0 = f1.multiply(f0);
 
 		// 2^11 - 2^1
-		f1 = f0.squareAndOptionalDouble(false);
+		f1 = f0.square();
 
 		// 2^20 - 2^10
 		for (int i = 1; i < 10; ++i) {
-			f1 = f1.squareAndOptionalDouble(false);
+			f1 = f1.square();
 		}
 
 		// 2^20 - 2^0
 		f1 = f1.multiply(f0);
 
 		// 2^21 - 2^1
-		f2 = f1.squareAndOptionalDouble(false);
+		f2 = f1.square();
 
 		// 2^40 - 2^20
 		for (int i = 1; i < 20; ++i) {
-			f2 = f2.squareAndOptionalDouble(false);
+			f2 = f2.square();
 		}
 
 		// 2^40 - 2^0
 		f1 = f2.multiply(f1);
 
 		// 2^41 - 2^1
-		f1 = f1.squareAndOptionalDouble(false);
+		f1 = f1.square();
 
 		// 2^50 - 2^10
 		for (int i = 1; i < 10; ++i) {
-			f1 = f1.squareAndOptionalDouble(false);
+			f1 = f1.square();
 		}
 
 		// 2^50 - 2^0
 		f0 = f1.multiply(f0);
 
 		// 2^51 - 2^1
-		f1 = f0.squareAndOptionalDouble(false);
+		f1 = f0.square();
 
 		// 2^100 - 2^50
 		for (int i = 1; i < 50; ++i) {
-			f1 = f1.squareAndOptionalDouble(false);
+			f1 = f1.square();
 		}
 
 		// 2^100 - 2^0
 		f1 = f1.multiply(f0);
 
 		// 2^101 - 2^1
-		f2 = f1.squareAndOptionalDouble(false);
+		f2 = f1.square();
 
 		// 2^200 - 2^100
 		for (int i = 1; i < 100; ++i) {
-			f2 = f2.squareAndOptionalDouble(false);
+			f2 = f2.square();
 		}
 
 		// 2^200 - 2^0
 		f1 = f2.multiply(f1);
 
 		// 2^201 - 2^1
-		f1 = f1.squareAndOptionalDouble(false);
+		f1 = f1.square();
 
 		// 2^250 - 2^50
 		for (int i = 1; i < 50; ++i) {
-			f1 = f1.squareAndOptionalDouble(false);
+			f1 = f1.square();
 		}
 
 		// 2^250 - 2^0
 		f0 = f1.multiply(f0);
 
 		// 2^251 - 2^1
-		f0 = f0.squareAndOptionalDouble(false);
+		f0 = f0.square();
 
 		// 2^252 - 2^2
-		return f0.squareAndOptionalDouble(false);
+		return f0.square();
 	}
 
 	/**
@@ -774,10 +801,10 @@ public class Ed25519FieldElement {
 		final Ed25519FieldElement v3;
 
 		// v3 = v^3
-		v3 = v.squareAndOptionalDouble(false).multiply(v);
+		v3 = v.square().multiply(v);
 
 		// x = (v3^2) * v * u = u * v^7
-		x = v3.squareAndOptionalDouble(false).multiply(v).multiply(u);
+		x = v3.square().multiply(v).multiply(u);
 
 		//  x = (u * v^7)^((q - 5) / 8)
 		x = x.pow2to252sub4().multiply(x); // 2^252 - 3

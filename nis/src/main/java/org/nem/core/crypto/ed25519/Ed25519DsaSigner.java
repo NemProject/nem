@@ -42,7 +42,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 		final byte[] hash = Hashes.sha3_512(ArrayUtils.toByteArray(this.getKeyPair().getPrivateKey().getRaw(), 32));
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
-
 		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(Hashes.sha3_512(
 				Arrays.copyOfRange(hash, 32, 64),		// only include the last 32 bytes of the private key hash
 				data));
@@ -69,12 +68,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// Signature is (encodedR, encodedS)
 		final Signature signature = new Signature(encodedR.getRaw(), encodedS.getRaw());
 		if (!this.isCanonicalSignature(signature)) {
-			// TODO 20141011 - if we get here, this indicates a bug in our code?
-			// TODO 20141012 BR -> J: yes, isCanonicalSignature checks 0 < encodedS < group order.
-			// TODO                   encodedS was calculated mod group order so if it is bigger, something failed.
-			// TODO                   I excluded encodedS == 0 as valid signature, not sure if that is needed.
-			// TODO 20141013 J-B is there any way we can add a test that can hit this?
-			// TODO 20141014 BR -> J: done (had to add method getKeyPair() for testing if the exception is thrown).
 			throw new CryptoException("Generated signature is not canonical");
 		}
 
@@ -83,18 +76,11 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 	@Override
 	public boolean verify(final byte[] data, final Signature signature) {
-		// TODO 20141011 - does any of the validation here make sense:
-		// https://github.com/jedisct1/libsodium/blob/master/src/libsodium/crypto_sign/ed25519/ref10/open.c
-		// TODO 20141012 BR -> J: 1) First test is worse than isCanonicalSignature since it only checks bit 253-255 of S. It still could be > group order.
-		// TODO                   2) Second test is same as "if (null == A) {" below.
-		// TODO                   3) Third test checks if the raw value of the public key is 0. In that case A is the affine point (+-i, 0).
-		// TODO                      Does this cause problems? hmmm...need to think about it.
-		// ToDO 20141014 BR -> J: let's do the test, it's fast so it doesn't hurt.
-
 		if (!this.isCanonicalSignature(signature)) {
 			return false;
 		}
 
+		// TODO 20141014: can you add a test for this?
 		if (1 == ArrayUtils.isEqualConstantTime(this.getKeyPair().getPublicKey().getRaw(), new byte[32])) {
 			return false;
 		}

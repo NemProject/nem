@@ -144,7 +144,7 @@ public class Ed25519FieldElementTest {
 			final BigInteger b1 = MathUtils.toBigInteger(f1);
 
 			// Act:
-			final Ed25519FieldElement f2 = f1.squareAndOptionalDouble(false);
+			final Ed25519FieldElement f2 = f1.square();
 
 			// Assert:
 			assertEquals(f2, b1.multiply(b1));
@@ -159,7 +159,7 @@ public class Ed25519FieldElementTest {
 			final BigInteger b1 = MathUtils.toBigInteger(f1);
 
 			// Act:
-			final Ed25519FieldElement f2 = f1.squareAndOptionalDouble(true);
+			final Ed25519FieldElement f2 = f1.squareAndDouble();
 
 			// Assert:
 			assertEquals(f2, b1.multiply(b1).multiply(new BigInteger("2")));
@@ -186,9 +186,9 @@ public class Ed25519FieldElementTest {
 		for (int i = 0; i < 1000; i++) {
 			// Arrange:
 			final Ed25519FieldElement u = MathUtils.getRandomFieldElement();
-			final Ed25519FieldElement uSquare = u.squareAndOptionalDouble(false);
+			final Ed25519FieldElement uSquare = u.square();
 			final Ed25519FieldElement v = MathUtils.getRandomFieldElement();
-			final Ed25519FieldElement vSquare = v.squareAndOptionalDouble(false);
+			final Ed25519FieldElement vSquare = v.square();
 			final Ed25519FieldElement fraction = u.multiply(v.invert());
 
 			// Act:
@@ -196,8 +196,7 @@ public class Ed25519FieldElementTest {
 
 			// Assert:
 			// (u / v)^4 == (sqrt(u^2 / v^2))^4.
-			Assert.assertThat(fraction.squareAndOptionalDouble(false).squareAndOptionalDouble(false),
-					IsEqual.equalTo(sqrt.squareAndOptionalDouble(false).squareAndOptionalDouble(false)));
+			Assert.assertThat(fraction.square().square(), IsEqual.equalTo(sqrt.square().square()));
 
 			// (u / v) == +-1 * sqrt(u^2 / v^2) or (u / v) == +-i * sqrt(u^2 / v^2)
 			Assert.assertThat(differsOnlyByAFactorOfAFourthRootOfOne(fraction, sqrt), IsEqual.equalTo(true));
@@ -271,7 +270,7 @@ public class Ed25519FieldElementTest {
 				t[j] = random.nextInt(1 << 28) - (1 << 27);
 			}
 
-			// odd numbers are negative.
+			// odd numbers are negative
 			final boolean isNegative = MathUtils.toBigInteger(t).mod(Ed25519Field.P).mod(new BigInteger("2")).equals(BigInteger.ONE);
 			final Ed25519FieldElement f = new Ed25519FieldElement(t);
 

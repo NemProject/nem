@@ -44,9 +44,6 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(dsaSigner.isCanonicalSignature(canonicalSignature), IsEqual.equalTo(true));
 	}
 
-	// Can rarely fail due to R not fitting into 32 bytes after adding the group order to it.
-	// TODO 2014103: i think i saw that failure too, can we guard against it, so that the test always passes?
-	// > for instance, we can loop until we get a valid r
 	@Test
 	public void replacingRWithGroupOrderPlusRInSignatureRuinsSignature() {
 		// Arrange:

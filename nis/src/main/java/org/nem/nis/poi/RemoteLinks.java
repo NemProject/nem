@@ -85,6 +85,8 @@ public class RemoteLinks {
 		return this.isEmpty() ? null : this.remoteLinks.peek();
 	}
 
+	// TODO 20131014 J-G: tests for this function ;)
+
 	public RemoteStatus getRemoteStatus(final BlockHeight height) {
 		if (this.isEmpty()) {
 			return RemoteStatus.NOT_SET;

@@ -432,11 +432,11 @@ public class Ed25519GroupElement implements Serializable {
 				final Ed25519FieldElement ASquare;
 				final Ed25519FieldElement YSquarePlusXSquare;
 				final Ed25519FieldElement YSquareMinusXSquare;
-				XSquare = this.X.squareAndOptionalDouble(false);
-				YSquare = this.Y.squareAndOptionalDouble(false);
-				B = this.Z.squareAndOptionalDouble(true);
+				XSquare = this.X.square();
+				YSquare = this.Y.square();
+				B = this.Z.squareAndDouble();
 				A = this.X.add(this.Y);
-				ASquare = A.squareAndOptionalDouble(false);
+				ASquare = A.square();
 				YSquarePlusXSquare = YSquare.add(XSquare);
 				YSquareMinusXSquare = YSquare.subtract(XSquare);
 				return p1xp1(ASquare.subtract(YSquarePlusXSquare), YSquarePlusXSquare, YSquareMinusXSquare, B.subtract(YSquareMinusXSquare));
@@ -920,8 +920,8 @@ public class Ed25519GroupElement implements Serializable {
 				final Ed25519FieldElement inverse = this.Z.invert();
 				final Ed25519FieldElement x = this.X.multiply(inverse);
 				final Ed25519FieldElement y = this.Y.multiply(inverse);
-				final Ed25519FieldElement xSquare = x.squareAndOptionalDouble(false);
-				final Ed25519FieldElement ySquare = y.squareAndOptionalDouble(false);
+				final Ed25519FieldElement xSquare = x.square();
+				final Ed25519FieldElement ySquare = y.square();
 				final Ed25519FieldElement dXSquareYSquare = Ed25519Field.D.multiply(xSquare).multiply(ySquare);
 				return Ed25519Field.ONE.add(dXSquareYSquare).add(xSquare).equals(ySquare);
 

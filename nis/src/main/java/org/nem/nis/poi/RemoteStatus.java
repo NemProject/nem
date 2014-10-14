@@ -1,5 +1,7 @@
 package org.nem.nis.poi;
 
+// TODO 20141014 J-G: comments
+
 public enum RemoteStatus {
 	NOT_SET,
 

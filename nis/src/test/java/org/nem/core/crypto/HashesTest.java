@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 public class HashesTest {
 
+	// TODO 20141010 J-J refactor some of these tests
+
 	//region sha3_256
 
 	@Test

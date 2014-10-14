@@ -13,9 +13,6 @@ import org.springframework.stereotype.Service;
  * Service for creating account info models.
  */
 @Service
-// TODO 20141013 G-J: not sure if getRemoteStatus should be here, and if so, this probably should be renamed
-// TODO 20141013 J-G: i guess you didn't like it in RemoteLinks for some reason?
-// TODO 20141014 G-J: hadn't got time yesterday :]
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
 	private final PoiFacade poiFacade;
@@ -52,6 +49,9 @@ public class AccountInfoFactory {
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
 	}
 
+	// TODO 20141014 J-G - can't this move to the caller (is it called more than once)?
+	// > you can also add a function to the enum to do the mapping (RemoteStatus.toAccountRemoteStatus())
+	// TODO 20141014 J-G - the tests you added are good, but i'd move them to RemoteStatus
 	public AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
