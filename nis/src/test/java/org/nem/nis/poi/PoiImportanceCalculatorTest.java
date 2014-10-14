@@ -355,36 +355,84 @@ public class PoiImportanceCalculatorTest {
 	// region transfer of importance between clusters
 
 	/**
-	 * Given 2 6-rings with a link between them, analyze the influence of weight between normal page rank matrix and ILP-matrix.
-	 * The ratio for the normal page rank is 1.582
+	 * Given 2 6-rings with a link between them, analyze the difference between normal page rank matrix and ILP-matrix.
+	 * (TP = teleportation probability, ILTP = inter level teleportation probability, PR = normal page rank)
+	 *
+	 * a) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
+	 *    The ratio for the normal page rank is 2.1398
+	 * TP   | ILTP | ratio ring 1 : ring 2
+	 * 0.85 | 0.0  |       2.1398
+	 * 0.75 | 0.1  |       2.0999
+	 * 0.65 | 0.2  |       2.0586
+	 * 0.55 | 0.3  |       2.0166
+	 * 0.45 | 0.4  |       1.9741
+	 * 0.35 | 0.5  |       1.9327
+	 * 0.25 | 0.6  |       1.8929
+	 * 0.15 | 0.7  |       1.8562
+	 * 0.05 | 0.8  |       1.8245
 	 *
 	 * Outcome:
-	 * TP   | ILTP | ratio ring 1 : ring 2
-	 * 0.85 | 0.0  | 2.1357
-	 * 0.75 | 0.1  | 2.0570
-	 * 0.65 | 0.2  | 1.9799
-	 * 0.55 | 0.3  | 1.9050
-	 * 0.45 | 0.4  | 1.8329
-	 * 0.35 | 0.5  | 1.7645
-	 * 0.25 | 0.6  | 1.6995
-	 * 0.15 | 0.7  | 1.6376
-	 * 0.05 | 0.8  | 1.5786
-	 *
-	 * With our standard parameters the ncd aware algorithm tends to transfer more importance from one cluster to another than normal page rank.
+	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer less importance from one cluster to another than normal page rank.
 	 * The difference is not that huge though.
 	 *
+	 * b) Connection between ring 1 and ring 2 is a factor 100 weaker than the connections within the ring.
+	 *    The ratio for the normal page rank is 1.01841
+	 * TP   | ILTP | ratio ring 1 : ring 2
+	 * 0.85 | 0.0  |       1.0184
+	 * 0.75 | 0.1  |       1.1267
+	 * 0.65 | 0.2  |       1.2331
+	 * 0.55 | 0.3  |       1.3360
+	 * 0.45 | 0.4  |       1.4346
+	 * 0.35 | 0.5  |       1.5280
+	 * 0.25 | 0.6  |       1.6153
+	 * 0.15 | 0.7  |       1.6970
+	 * 0.05 | 0.8  |       1.7737
+	 *
+	 * Outcome:
+	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer more importance from one cluster to another than normal page rank.
+	 * The difference is not that huge though.
+	 *
+	 * c) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
+	 *    ILTP is set to 0.1 for ncd aware page rank and 0.0 for normal page rank. TP is varied.
+	 *                  PR                  ncd aware
+	 * TP   | ratio ring 1 : ring 2 | ratio ring 1 : ring 2
+	 * 1.00 |     7.281 * 10^75     |        ---
+	 * 0.99 |        21.854         |        ---
+	 * 0.98 |        11.289         |        ---
+	 * 0.95 |        4.9520 <------ | ----   ---
+	 * 0.90 |        2.8410         |    |   3106.8314
+	 * 0.89 |        2.6494         |    |   21.029
+	 * 0.88 |        2.4897         |    |   10.9181
+	 * 0.87 |        2.3555         |    |   7.5296
+	 * 0.86 |        2.2399         |    |   5.8320
+	 * 0.85 |        2.1398         |    --- 4.8137
+	 * 0.80 |        1.7916         |        2.7770
+	 * 0.75 |        1.5839         |        2.0999
+	 * 0.70 |        1.4467         |        1.7632
+	 * 0.65 |        1.3498         |        1.5631
+	 * 0.55 |
+	 * 0.45 |
+	 * 0.35 |
+	 * 0.25 |
+	 * 0.15 |
+	 * 0.05 |
+	 *
+	 * Outcome:
+	 * Only the sum TP + ILTP plays a role. As it goes near one, more and more importance gets transferred from ring 2 to ring 1.
+	 *
 	 * <pre>
+	 *             ring 1                   ring 2
 	 *           1------o2                 7------o8
-	 *         o          \              o          \
-	 *       /             o           /             o
-	 *     0                3o-------6               9
-	 *      o              /          o              /
-	 *       \            O            \            O
-	 *        5o---------4             11o--------10
+	 *         o         |\              o |        \
+	 *       /           | o           /   |         o
+	 *     0             |   3o-------6    |          9
+	 *      o            |  /          o   |         /
+	 *       \           oo             \ o         O
+	 *        5o---------4              11o-------10
 	 * </pre>
 	 */
 	@Test
-	public void linkFromRightBlockToLeftBlockTransfersImportanceToLeftBlock() {
+	public void linkFromRingTwoToRingOneTransfersImportanceToLeftBlock() {
 		// Arrange:
 		// - all accounts start with 2000 NEM
 		final List<PoiAccountState> accountStates = setupAccountStatesForRings();
@@ -394,6 +442,8 @@ public class PoiImportanceCalculatorTest {
 
 		// Link blocks
 		outlinkMatrix.setAt(3, 6, 100);
+		outlinkMatrix.setAt(4, 2, 1);
+		outlinkMatrix.setAt(11, 7, 1);
 
 		final BlockHeight height1 = new BlockHeight(2);
 		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
@@ -403,8 +453,10 @@ public class PoiImportanceCalculatorTest {
 		// Act:
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setClusteringStrategy(new SingleClusterScan());
+		builder.setTeleportationProbability(1.00);
+		builder.setInterLevelTeleportationProbability(0.0);
 		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
-		builder2.setTeleportationProbability(0.75);
+		builder2.setTeleportationProbability(0.86);
 		builder2.setInterLevelTeleportationProbability(0.1);
 
 		// Normal page rank
