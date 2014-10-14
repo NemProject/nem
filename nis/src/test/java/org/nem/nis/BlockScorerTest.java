@@ -18,15 +18,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class BlockScorerTest {
-
-	private static final byte[] PUBKEY_BYTES = new byte[] {
-			(byte)0x02,
-			(byte)0xF0, (byte)0xF1, (byte)0xF2, (byte)0xF3, (byte)0xF4, (byte)0xF5, (byte)0xF6, (byte)0xF7,
-			(byte)0xE0, (byte)0xE1, (byte)0xE2, (byte)0xE3, (byte)0xE4, (byte)0xE5, (byte)0xE6, (byte)0xE7,
-			(byte)0xD0, (byte)0xD1, (byte)0xD2, (byte)0xD3, (byte)0xD4, (byte)0xD5, (byte)0xD6, (byte)0xD7,
-			(byte)0xC0, (byte)0xC1, (byte)0xC2, (byte)0xC3, (byte)0xC4, (byte)0xC5, (byte)0xC6, (byte)0xC7
-	};
-
+	
 	private static final byte[] HASH_BYTES = new byte[] {
 			(byte)0xF7, (byte)0xF6, (byte)0xF5, (byte)0xF4, (byte)0xF3, (byte)0xF2, (byte)0xF1, (byte)0xF0,
 			(byte)0xE7, (byte)0xE6, (byte)0xE5, (byte)0xE4, (byte)0xE3, (byte)0xE2, (byte)0xE1, (byte)0xE0,
@@ -37,8 +29,7 @@ public class BlockScorerTest {
 	@Test
 	public void hitIsCalculatedCorrectly() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair(new PublicKey(PUBKEY_BYTES));
-		final Account blockSigner = new Account(keyPair);
+		final Account blockSigner = Utils.generateRandomAccount();
 		final BlockScorer scorer = createScorer();
 		final Block previousBlock = new Block(blockSigner, Hash.ZERO, new Hash(HASH_BYTES), TimeInstant.ZERO, new BlockHeight(11));
 
