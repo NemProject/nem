@@ -78,7 +78,6 @@ public class Ed25519EncodedGroupElement {
 		if (checkForZero.isNonZero()) {
 			checkForZero = vxSquare.add(u);
 			if (checkForZero.isNonZero()) {
-				// TODO 20141011: does indicate a bug in our code or can we get here with bad input?
 				throw new IllegalArgumentException("not a valid Ed25519EncodedGroupElement.");
 			}
 
@@ -117,7 +116,7 @@ public class Ed25519EncodedGroupElement {
 		}
 
 		final Ed25519EncodedGroupElement encoded = (Ed25519EncodedGroupElement)obj;
-		return 1 == ArrayUtils.isEqual(this.values, encoded.values);
+		return 1 == ArrayUtils.isEqualConstantTime(this.values, encoded.values);
 	}
 
 	@Override

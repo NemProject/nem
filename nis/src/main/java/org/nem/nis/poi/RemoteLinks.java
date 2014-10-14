@@ -1,6 +1,9 @@
 package org.nem.nis.poi;
 
+import org.nem.core.model.ImportanceTransferTransaction;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.CircularStack;
+import org.nem.nis.secret.BlockChainConstants;
 
 /**
  * A collection of remote states associated with an account.
@@ -80,6 +83,34 @@ public class RemoteLinks {
 	 */
 	public RemoteLink getCurrent() {
 		return this.isEmpty() ? null : this.remoteLinks.peek();
+	}
+
+	// TODO 20131014 J-G: tests for this function ;)
+
+	public RemoteStatus getRemoteStatus(final BlockHeight height) {
+		if (this.isEmpty()) {
+			return RemoteStatus.NOT_SET;
+		}
+
+		// currently we can only have Activate and Deactivate, so we're ok to use single boolean for this
+
+		final boolean isActivated = ImportanceTransferTransaction.Mode.Activate.value() == this.getCurrent().getMode();
+		final long heightDiff = height.subtract(this.getCurrent().getEffectiveHeight());
+		final boolean withinOneDay = heightDiff < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+
+		if (this.isHarvestingRemotely()) {
+			if (isActivated) {
+				return withinOneDay ? RemoteStatus.OWNER_ACTIVATING : RemoteStatus.OWNER_ACTIVE;
+			} else {
+				return withinOneDay ? RemoteStatus.OWNER_DEACTIVATING : RemoteStatus.OWNER_INACTIVE;
+			}
+		} else {
+			if (isActivated) {
+				return withinOneDay ? RemoteStatus.REMOTE_ACTIVATING : RemoteStatus.REMOTE_ACTIVE;
+			} else {
+				return withinOneDay ? RemoteStatus.REMOTE_DEACTIVATING : RemoteStatus.REMOTE_INACTIVE;
+			}
+		}
 	}
 
 	/**

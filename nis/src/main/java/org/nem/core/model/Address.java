@@ -59,7 +59,7 @@ public class Address {
 
 	private static String generateEncoded(final byte version, final byte[] publicKey) {
 		// step 1: sha3 hash of the public key
-		final byte[] sha3PublicKeyHash = Hashes.sha3(publicKey);
+		final byte[] sha3PublicKeyHash = Hashes.sha3_256(publicKey);
 
 		// step 2: ripemd160 hash of (1)
 		final byte[] ripemd160StepOneHash = Hashes.ripemd160(sha3PublicKeyHash);
@@ -79,7 +79,7 @@ public class Address {
 
 	private static byte[] generateChecksum(final byte[] input) {
 		// step 1: sha3 hash of (input
-		final byte[] sha3StepThreeHash = Hashes.sha3(input);
+		final byte[] sha3StepThreeHash = Hashes.sha3_256(input);
 
 		// step 2: get the first X bytes of (1)
 		return Arrays.copyOfRange(sha3StepThreeHash, 0, NUM_CHECKSUM_BYTES);

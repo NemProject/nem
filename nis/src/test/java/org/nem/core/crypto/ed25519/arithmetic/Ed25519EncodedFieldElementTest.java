@@ -54,9 +54,39 @@ public class Ed25519EncodedFieldElementTest {
 
 	// endregion
 
-	// TODO 20141011 J-B consider adding some tests for:
-	// > getRaw
-	// > decode / encode - i guess a roundtrip test is sufficient
+	// region getRaw
+
+	@Test
+	public void getRawReturnsUnderlyingArray() {
+		// Act:
+		final byte[] values = new byte[32];
+		values[0] = 5;
+		values[6] = 15;
+		values[23] = -67;
+		final Ed25519EncodedFieldElement encoded = new Ed25519EncodedFieldElement(values);
+
+		// Assert:
+		Assert.assertThat(values, IsEqual.equalTo(encoded.getRaw()));
+	}
+
+	// endregion
+
+	// region encode / decode
+
+	@Test
+	public void decodePlusEncodeDoesNotAlterTheEncodedFieldElement() {
+		// Act:
+		for (int i = 0; i < 1000; i++) {
+			// Arrange:
+			final Ed25519EncodedFieldElement original = MathUtils.getRandomEncodedFieldElement(32);
+			final Ed25519EncodedFieldElement encoded = original.decode().encode();
+
+			// Assert:
+			Assert.assertThat(encoded, IsEqual.equalTo(original));
+		}
+	}
+
+	// endregion
 
 	// region modulo group order arithmetic
 

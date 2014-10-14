@@ -3,6 +3,7 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
+import org.nem.core.crypto.CryptoEngines;
 import org.nem.core.messages.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
@@ -153,6 +154,7 @@ public class TransferTransactionTest {
 	@Test
 	public void feeIsWaivedForNemesisAccount() {
 		// Arrange:
+		CryptoEngines.setDefaultEngine(CryptoEngines.ed25519Engine());
 		final Account nemesisAccount = new Account(NemesisBlock.ADDRESS);
 
 		// Assert:

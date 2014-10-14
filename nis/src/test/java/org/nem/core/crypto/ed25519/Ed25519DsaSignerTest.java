@@ -2,6 +2,7 @@ package org.nem.core.crypto.ed25519;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.crypto.ed25519.arithmetic.MathUtils;
 
@@ -46,15 +47,21 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void replacingRWithGroupOrderPlusRInSignatureRuinsSignature() {
 		// Arrange:
+		final BigInteger groupOrder = CryptoEngines.getDefaultEngine().getCurve().getGroupOrder();
 		final KeyPair kp = new KeyPair();
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
-		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
+		Signature signature;
+		byte[] input;
+		while (true) {
+			input = org.nem.core.test.Utils.generateRandomBytes();
+			signature = dsaSigner.sign(input);
+			if (signature.getR().add(groupOrder).compareTo(BigInteger.ONE.shiftLeft(256)) < 0) {
+				break;
+			}
+		}
 
 		// Act:
-		final Signature signature = dsaSigner.sign(input);
-		final Signature signature2 = new Signature(
-				CryptoEngines.getDefaultEngine().getCurve().getGroupOrder().add(signature.getR()),
-				signature.getS());
+		final Signature signature2 = new Signature(groupOrder.add(signature.getR()), signature.getS());
 
 		// Assert:
 		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
@@ -91,6 +98,20 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 			// Assert:
 			Assert.assertThat(dsaSigner.verify(input, signature1), IsEqual.equalTo(true));
 		}
+	}
+
+	@Test(expected = CryptoException.class)
+	public void signThrowsIfGeneratedSignatureIsNotCanonical() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Ed25519DsaSigner dsaSigner = Mockito.mock(Ed25519DsaSigner.class);
+		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
+		Mockito.when(dsaSigner.getKeyPair()).thenReturn(keyPair);
+		Mockito.when(dsaSigner.sign(input)).thenCallRealMethod();
+		Mockito.when(dsaSigner.isCanonicalSignature(Mockito.any())).thenReturn(false);
+
+		// Act:
+		dsaSigner.sign(input);
 	}
 
 	@Test

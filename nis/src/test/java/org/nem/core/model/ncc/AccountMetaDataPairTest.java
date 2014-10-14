@@ -13,7 +13,7 @@ public class AccountMetaDataPairTest {
 	public void canCreateAccountMetaDataPair() {
 		// Arrange:
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
-		final AccountMetaData metaData = new AccountMetaData(AccountStatus.UNLOCKED);
+		final AccountMetaData metaData = new AccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE);
 		final AccountMetaDataPair entity = new AccountMetaDataPair(accountInfo, metaData);
 
 		// Assert:
@@ -27,20 +27,22 @@ public class AccountMetaDataPairTest {
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(address, AccountStatus.LOCKED);
+		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(address, AccountStatus.LOCKED, AccountRemoteStatus.ACTIVATING);
 
 		// Assert:
 		Assert.assertThat(metaDataPair.getAccount().getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Assert.assertThat(metaDataPair.getMetaData().getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVATING));
 	}
 
 	private static AccountMetaDataPair createRoundTrippedPair(
 			final Address address,
-			final AccountStatus status) {
+			final AccountStatus status,
+			final AccountRemoteStatus remoteStatus) {
 		// Arrange:
-		final AccountMetaData metaData = new AccountMetaData(status);
+		final AccountMetaData metaData = new AccountMetaData(status, remoteStatus);
 		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(
-				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, AccountRemoteStatus.INACTIVE, null, 0.0),
+				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
 				metaData);
 
 		// Act:

@@ -60,8 +60,6 @@ public class Signature {
 		this.s = s;
 	}
 
-	// TODO 20141010 J-B: should add some tests for the new getBinary[R|S] functions
-
 	/**
 	 * Gets the r-part of the signature.
 	 *
@@ -119,9 +117,7 @@ public class Signature {
 		}
 
 		final Signature rhs = (Signature)obj;
-		// TODO 20141010 J-B: Arrays.equal?
-		// TODO 20141011 BR -> J: Arrays.equal is as far as I know not a constant time method.
-		return 1 == ArrayUtils.isEqual(this.r, rhs.r) && 1 == ArrayUtils.isEqual(this.s, rhs.s);
+		return 1 == ArrayUtils.isEqualConstantTime(this.r, rhs.r) && 1 == ArrayUtils.isEqualConstantTime(this.s, rhs.s);
 	}
 
 	//region inline serialization

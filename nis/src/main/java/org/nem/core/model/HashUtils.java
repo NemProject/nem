@@ -26,7 +26,7 @@ public abstract class HashUtils {
 	 */
 	public static Hash calculateHash(final SerializableEntity entity) {
 		final byte[] data = BinarySerializer.serializeToBytes(entity);
-		return new Hash(Hashes.sha3(data));
+		return new Hash(Hashes.sha3_256(data));
 	}
 
 	/**
@@ -37,6 +37,6 @@ public abstract class HashUtils {
 	 * @return The hash.
 	 */
 	public static Hash nextHash(final Hash hash, final PublicKey publicKey) {
-		return new Hash(Hashes.sha3(hash.getRaw(), publicKey.getRaw()));
+		return new Hash(Hashes.sha3_256(hash.getRaw(), publicKey.getRaw()));
 	}
 }

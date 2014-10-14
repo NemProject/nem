@@ -97,7 +97,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = validator.validate(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
 	}
 
 	//endregion

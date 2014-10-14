@@ -19,17 +19,19 @@ public class Ed25519BlockCipher implements BlockCipher {
 	private final KeyPair senderKeyPair;
 	private final KeyPair recipientKeyPair;
 	private final SecureRandom random;
+	private final int keyLength;
 
 	public Ed25519BlockCipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
 		this.senderKeyPair = senderKeyPair;
 		this.recipientKeyPair = recipientKeyPair;
 		this.random = new SecureRandom();
+		this.keyLength = recipientKeyPair.getPublicKey().getRaw().length;
 	}
 
 	@Override
 	public byte[] encrypt(final byte[] input) {
 		// Setup salt.
-		final byte[] salt = new byte[32];
+		final byte[] salt = new byte[this.keyLength];
 		this.random.nextBytes(salt);
 
 		// Derive shared key.
@@ -43,31 +45,26 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, true);
 
 		// Encode.
-		final byte[] buf = new byte[cipher.getOutputSize(input.length)];
-		int len = cipher.processBytes(input, 0, input.length, buf, 0);
-		try {
-			len += cipher.doFinal(buf, len);
-		} catch (final InvalidCipherTextException e) {
+		final byte[] buf = this.transform(cipher, input);
+		if (null == buf) {
 			return null;
 		}
 
-		final byte[] result = new byte[salt.length + ivData.length + len];
+		final byte[] result = new byte[salt.length + ivData.length + buf.length];
 		System.arraycopy(salt, 0, result, 0, salt.length);
 		System.arraycopy(ivData, 0, result, salt.length, ivData.length);
-		System.arraycopy(buf, 0, result, salt.length + ivData.length, len);
-
+		System.arraycopy(buf, 0, result, salt.length + ivData.length, buf.length);
 		return result;
 	}
 
 	@Override
 	public byte[] decrypt(final byte[] input) {
-		// TODO 20141011 J-B: consider adding a test that decryption fails if input is too small
 		if (input.length < 64) {
 			return null;
 		}
 
-		final byte[] salt = Arrays.copyOfRange(input, 0, 32);
-		final byte[] ivData = Arrays.copyOfRange(input, 32, 48);
+		final byte[] salt = Arrays.copyOfRange(input, 0, this.keyLength);
+		final byte[] ivData = Arrays.copyOfRange(input, this.keyLength, 48);
 		final byte[] encData = Arrays.copyOfRange(input, 48, input.length);
 
 		// Derive shared key.
@@ -77,20 +74,19 @@ public class Ed25519BlockCipher implements BlockCipher {
 		final BufferedBlockCipher cipher = this.setupBlockCipher(sharedKey, ivData, false);
 
 		// Decode.
-		// TODO 20141011 J-B: consider refactoring this block (same as in encode)
-		final byte[] buf = new byte[cipher.getOutputSize(encData.length)];
-		int len = cipher.processBytes(encData, 0, encData.length, buf, 0);
+		return this.transform(cipher, encData);
+	}
+
+	private byte[] transform(final BufferedBlockCipher cipher, final byte[] data) {
+		final byte[] buf = new byte[cipher.getOutputSize(data.length)];
+		int length = cipher.processBytes(data, 0, data.length, buf, 0);
 		try {
-			len += cipher.doFinal(buf, len);
+			length += cipher.doFinal(buf, length);
 		} catch (final InvalidCipherTextException e) {
 			return null;
 		}
 
-		// Remove padding
-		final byte[] out = new byte[len];
-		System.arraycopy(buf, 0, out, 0, len);
-
-		return out;
+		return Arrays.copyOf(buf, length);
 	}
 
 	private BufferedBlockCipher setupBlockCipher(final byte[] sharedKey, final byte[] ivData, final boolean forEncryption) {
@@ -109,12 +105,11 @@ public class Ed25519BlockCipher implements BlockCipher {
 	private byte[] getSharedKey(final PrivateKey privateKey, final PublicKey publicKey, final byte[] salt) {
 		final Ed25519GroupElement senderA = new Ed25519EncodedGroupElement(publicKey.getRaw()).decode();
 		senderA.precomputeForScalarMultiplication();
-		final byte[] sharedKey = senderA.scalarMultiply(privateKey.prepareForScalarMultiply()).encode().getRaw();
-		// TODO 20141011 J-B: consider using a constant for the key / salt length
-		for (int i = 0; i < 32; i++) {
+		final byte[] sharedKey = senderA.scalarMultiply(Ed25519Utils.prepareForScalarMultiply(privateKey)).encode().getRaw();
+		for (int i = 0; i < this.keyLength; i++) {
 			sharedKey[i] ^= salt[i];
 		}
 
-		return Hashes.sha3(sharedKey);
+		return Hashes.sha3_256(sharedKey);
 	}
 }

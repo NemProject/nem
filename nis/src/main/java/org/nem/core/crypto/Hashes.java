@@ -23,8 +23,19 @@ public class Hashes {
 	 * @return The hash of the concatenated inputs.
 	 * @throws CryptoException if the hash operation failed.
 	 */
-	public static byte[] sha3(final byte[]... inputs) {
+	public static byte[] sha3_256(final byte[]... inputs) {
 		return hash("SHA3-256", inputs);
+	}
+
+	/**
+	 * Performs a SHA3-512 hash of the concatenated inputs.
+	 *
+	 * @param inputs The byte arrays to concatenate and hash.
+	 * @return The hash of the concatenated inputs.
+	 * @throws CryptoException if the hash operation failed.
+	 */
+	public static byte[] sha3_512(final byte[]... inputs) {
+		return hash("SHA3-512", inputs);
 	}
 
 	// TODO 20141010 J-B: should we just replace sha3 with this?
@@ -33,17 +44,11 @@ public class Hashes {
 	// TODO 20141011 BR -> J: We need both sha3-256 (for secp256k1) and sha3-512 (for ed25519).
 	// TODO 20141011          Aside from that, sure we can hide the message digest. You want to do this?
 	// TODO 20141011 J-BR: yea, i think i would prefer to have all the hash functions look the same
-
-	/**
-	 * Gets an instance of a SHA3-512 message digest.
-	 *
-	 * @return The SHA3-512 instance.
-	 */
-	public static MessageDigest getSha3_512Instance() {
-		return ExceptionUtils.propagate(
-				() -> MessageDigest.getInstance("SHA3-512", "BC"),
-				CryptoException::new);
-	}
+	// TODO 20141012 BR -> J: sorry to ask again. So I should code it like sha3_256(...) and sha3_512(...) ?
+	// TODO 20141011 J-BR yep:
+	// sha3_256(final byte[]... inputs)
+	// sha3_512(final byte[]... inputs)
+	// TODO 20141014 BR -> J: done.
 
 	/**
 	 * Performs a RIPEMD160 hash of the concatenated inputs.

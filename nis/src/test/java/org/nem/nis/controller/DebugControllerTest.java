@@ -69,6 +69,7 @@ public class DebugControllerTest {
 		dbBlock.setTimeStamp(blockDaoBlock.getTimeStamp().getRawTime());
 		dbBlock.setForgerProof(new byte[64]);
 		dbBlock.setBlockTransfers(new ArrayList<>());
+		dbBlock.setBlockImportanceTransfers(new ArrayList<>());
 
 		final org.nem.nis.dbmodel.Block dbParent = NisUtils.createDbBlockWithTimeStamp(383);
 		dbParent.setPrevBlockHash(blockDaoParent.getPreviousBlockHash().getRaw());

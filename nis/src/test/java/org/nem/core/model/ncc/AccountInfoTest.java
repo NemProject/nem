@@ -3,7 +3,7 @@ package org.nem.core.model.ncc;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
@@ -20,7 +20,6 @@ public class AccountInfoTest {
 				Address.fromEncoded("test"),
 				Amount.fromNem(1234),
 				new BlockAmount(7),
-				AccountRemoteStatus.INACTIVE,
 				"my account",
 				2.3);
 
@@ -29,7 +28,6 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getKeyPair(), IsNull.nullValue());
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
-		Assert.assertThat(info.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.INACTIVE));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
@@ -44,7 +42,6 @@ public class AccountInfoTest {
 				address,
 				Amount.fromNem(1234),
 				new BlockAmount(7),
-				AccountRemoteStatus.INACTIVE,
 				"my account",
 				2.3);
 
@@ -53,7 +50,6 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
-		Assert.assertThat(info.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.INACTIVE));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
@@ -124,7 +120,6 @@ public class AccountInfoTest {
 
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(747L)));
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
-		Assert.assertThat(info.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.INACTIVE));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
@@ -144,12 +139,11 @@ public class AccountInfoTest {
 		Assert.assertThat(deserializer.readOptionalBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747000000L));
 		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
-		Assert.assertThat(deserializer.readString("remoteStatus"), IsEqual.equalTo(AccountRemoteStatus.INACTIVE.toString()));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
 		Assert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(2.3));
 
 		// 6 "real" properties and 1 "hidden" (ordering) property
-		final int expectedProperties = 7 + 1;
+		final int expectedProperties = 6 + 1;
 		Assert.assertThat(serializer.getObject().size(), IsEqual.equalTo(expectedProperties));
 	}
 
@@ -159,7 +153,6 @@ public class AccountInfoTest {
 				address,
 				Amount.fromNem(747),
 				new BlockAmount(3),
-				AccountRemoteStatus.INACTIVE,
 				"alpha gamma",
 				2.3);
 	}
@@ -185,7 +178,6 @@ public class AccountInfoTest {
 		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 9, "foo", 2.3)));
 		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "bar", 2.3)));
 		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 3.3)));
-		Assert.assertThat(info, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, AccountRemoteStatus.ACTIVE, "foo", 2.3)));
 
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(info)));
 		Assert.assertThat(new BigInteger("1235"), IsNot.not(IsEqual.equalTo((Object)info)));
@@ -208,16 +200,10 @@ public class AccountInfoTest {
 		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 9, "foo", 2.3).hashCode()));
 		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "bar", 2.3).hashCode()));
 		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, "foo", 3.3).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(this.createAccountInfo(address, 17, 5, AccountRemoteStatus.ACTIVE, "foo", 2.3).hashCode()));
 	}
 
-	// TODO 20141005 J-G: minor but you can have one function call the other
 	private AccountInfo createAccountInfo(final Address address, final long balance, final int blockAmount, final String label, final double importance) {
-		return new AccountInfo(address, Amount.fromNem(balance), new BlockAmount(blockAmount), AccountRemoteStatus.INACTIVE, label, importance);
-	}
-
-	private AccountInfo createAccountInfo(final Address address, final long balance, final int blockAmount, final AccountRemoteStatus accountRemoteStatus, final String label, final double importance) {
-		return new AccountInfo(address, Amount.fromNem(balance), new BlockAmount(blockAmount), accountRemoteStatus, label, importance);
+		return new AccountInfo(address, Amount.fromNem(balance), new BlockAmount(blockAmount), label, importance);
 	}
 
 	//endregion

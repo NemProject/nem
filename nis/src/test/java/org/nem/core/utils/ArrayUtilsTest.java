@@ -276,7 +276,7 @@ public class ArrayUtilsTest {
 			System.arraycopy(bytes1, 0, bytes2, 0, 32);
 
 			// Assert:
-			Assert.assertThat(ArrayUtils.isEqual(bytes1, bytes2), IsEqual.equalTo(1));
+			Assert.assertThat(ArrayUtils.isEqualConstantTime(bytes1, bytes2), IsEqual.equalTo(1));
 		}
 	}
 
@@ -292,7 +292,7 @@ public class ArrayUtilsTest {
 			bytes2[i] = (byte)(bytes2[i] ^ 0xff);
 
 			// Assert:
-			Assert.assertThat(ArrayUtils.isEqual(bytes1, bytes2), IsEqual.equalTo(0));
+			Assert.assertThat(ArrayUtils.isEqualConstantTime(bytes1, bytes2), IsEqual.equalTo(0));
 		}
 	}
 

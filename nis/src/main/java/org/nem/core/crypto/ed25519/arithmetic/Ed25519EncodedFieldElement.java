@@ -10,8 +10,6 @@ import java.util.Arrays;
  * The length of the array must be 32 or 64.
  */
 public class Ed25519EncodedFieldElement {
-
-	// TODO 20141011 J-B: if this class gets created a lot we can avoid recreating the zero vector each time
 	final byte[] ZERO;
 	private final byte[] values;
 
@@ -21,11 +19,18 @@ public class Ed25519EncodedFieldElement {
 	 * @param values The byte array that holds the values.
 	 */
 	public Ed25519EncodedFieldElement(final byte[] values) {
-		if (32 != values.length && 64 != values.length) {
-			throw new IllegalArgumentException("Invalid 2^8 bit representation.");
+		switch (values.length) {
+			case 32:
+				this.ZERO = Ed25519Field.ZERO_SHORT;
+				break;
+			case 64:
+				this.ZERO = Ed25519Field.ZERO_LONG;
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid 2^8 bit representation.");
 		}
+
 		this.values = values;
-		this.ZERO = new byte[values.length];
 	}
 
 	/**
@@ -56,7 +61,7 @@ public class Ed25519EncodedFieldElement {
 	 * @return 1 if it is non-zero, 0 otherwise.
 	 */
 	public boolean isNonZero() {
-		return 0 == ArrayUtils.isEqual(this.values, this.ZERO);
+		return 0 == ArrayUtils.isEqualConstantTime(this.values, this.ZERO);
 	}
 
 	/**
@@ -990,7 +995,7 @@ public class Ed25519EncodedFieldElement {
 		}
 
 		final Ed25519EncodedFieldElement encoded = (Ed25519EncodedFieldElement)obj;
-		return 1 == ArrayUtils.isEqual(this.values, encoded.values);
+		return 1 == ArrayUtils.isEqualConstantTime(this.values, encoded.values);
 	}
 
 	@Override

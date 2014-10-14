@@ -3,14 +3,10 @@ package org.nem.core.crypto.ed25519.arithmetic;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PrivateKey;
-import org.nem.core.crypto.PublicKey;
-import org.nem.core.crypto.Signature;
 import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
-import java.security.*;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
@@ -485,8 +481,7 @@ public class MathUtils {
 	 * @return The public key.
 	 */
 	public static PublicKey derivePublicKey(final PrivateKey privateKey) {
-		final MessageDigest digest = Hashes.getSha3_512Instance();
-		final byte[] hash = digest.digest(toByteArray(privateKey.getRaw()));
+		final byte[] hash = Hashes.sha3_512(toByteArray(privateKey.getRaw()));
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		a[31] &= 0x7F;
 		a[31] |= 0x40;
@@ -504,19 +499,20 @@ public class MathUtils {
 	 * @return The signature.
 	 */
 	public static Signature sign(final KeyPair keyPair, final byte[] data) {
-		final MessageDigest digest = Hashes.getSha3_512Instance();
-		final byte[] hash = digest.digest(toByteArray(keyPair.getPrivateKey().getRaw()));
+		final byte[] hash = Hashes.sha3_512(toByteArray(keyPair.getPrivateKey().getRaw()));
 		final byte[] a = Arrays.copyOfRange(hash, 0, 32);
 		a[31] &= 0x7F;
 		a[31] |= 0x40;
 		a[0] &= 0xF8;
-		digest.update(Arrays.copyOfRange(hash, 32, 64));
-		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(digest.digest(data));
+		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(Hashes.sha3_512(
+				Arrays.copyOfRange(hash, 32, 64),
+				data));
 		final Ed25519EncodedFieldElement rReduced = reduceModGroupOrder(r);
 		final Ed25519GroupElement R = scalarMultiplyGroupElement(Ed25519Group.BASE_POINT, toFieldElement(toBigInteger(rReduced)));
-		digest.update(R.encode().getRaw());
-		digest.update(keyPair.getPublicKey().getRaw());
-		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(digest.digest(data));
+		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(Hashes.sha3_512(
+				R.encode().getRaw(),
+				keyPair.getPublicKey().getRaw(),
+				data));
 		final Ed25519EncodedFieldElement hReduced = reduceModGroupOrder(h);
 		final BigInteger S = toBigInteger(rReduced).add(toBigInteger(hReduced).multiply(toBigInteger(a))).mod(Ed25519Group.GROUP_ORDER);
 

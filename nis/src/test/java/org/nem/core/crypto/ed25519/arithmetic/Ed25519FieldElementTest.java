@@ -51,11 +51,24 @@ public class Ed25519FieldElementTest {
 
 	// endregion
 
-	// TODO 20141011 J-B: add a getRaw test
+	// region getRaw
+
+	@Test
+	public void getRawReturnsUnderlyingArray() {
+		// Act:
+		final int[] values = new int[10];
+		values[0] = 5;
+		values[6] = 15;
+		values[8] = -67;
+		final Ed25519FieldElement f = new Ed25519FieldElement(values);
+
+		// Assert:
+		Assert.assertThat(values, IsEqual.equalTo(f.getRaw()));
+	}
+
+	// endregion
 
 	// region mod p arithmetic
-
-	// TODO 20141011 J-B: i think it might help to have an assertEquals(FieldElement, BigInteger) that does the mod and compare
 
 	@Test
 	public void addReturnsCorrectResult() {
@@ -68,10 +81,9 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f3 = f1.add(f2);
-			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b3, IsEqual.equalTo(b1.add(b2).mod(Ed25519Field.P)));
+			assertEquals(f3, b1.add(b2));
 		}
 	}
 
@@ -86,10 +98,9 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f3 = f1.subtract(f2);
-			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b3, IsEqual.equalTo(b1.subtract(b2).mod(Ed25519Field.P)));
+			assertEquals(f3, b1.subtract(b2));
 		}
 	}
 
@@ -102,10 +113,9 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.negate();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.negate().mod(Ed25519Field.P)));
+			assertEquals(f2, b1.negate());
 		}
 	}
 
@@ -120,10 +130,9 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f3 = f1.multiply(f2);
-			final BigInteger b3 = MathUtils.toBigInteger(f3).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b3, IsEqual.equalTo(b1.multiply(b2).mod(Ed25519Field.P)));
+			assertEquals(f3, b1.multiply(b2));
 		}
 	}
 
@@ -136,10 +145,9 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.square();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).mod(Ed25519Field.P)));
+			assertEquals(f2, b1.multiply(b1));
 		}
 	}
 
@@ -152,10 +160,9 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.squareAndDouble();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.multiply(b1).multiply(new BigInteger("2")).mod(Ed25519Field.P)));
+			assertEquals(f2, b1.multiply(b1).multiply(new BigInteger("2")));
 		}
 	}
 
@@ -168,50 +175,45 @@ public class Ed25519FieldElementTest {
 
 			// Act:
 			final Ed25519FieldElement f2 = f1.invert();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
 
 			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.modInverse(Ed25519Field.P)));
+			assertEquals(f2, b1.modInverse(Ed25519Field.P));
 		}
 	}
 
-	@Test
-	public void pow22523ReturnsCorrectResult() {
-		for (int i = 0; i < 1000; i++) {
-			// Arrange:
-			final Ed25519FieldElement f1 = MathUtils.getRandomFieldElement();
-			final BigInteger b1 = MathUtils.toBigInteger(f1);
-
-			// Act:
-			final Ed25519FieldElement f2 = f1.pow22523();
-			final BigInteger b2 = MathUtils.toBigInteger(f2).mod(Ed25519Field.P);
-
-			// Assert:
-			Assert.assertThat(b2, IsEqual.equalTo(b1.modPow(BigInteger.ONE.shiftLeft(252).subtract(new BigInteger("3")), Ed25519Field.P)));
-		}
-	}
-
-	// TODO 20141011 J-B: i'm not sure if i follow what this test is doing
 	@Test
 	public void sqrtReturnsCorrectResult() {
 		for (int i = 0; i < 1000; i++) {
 			// Arrange:
-			final Ed25519EncodedFieldElement y = MathUtils.getRandomEncodedFieldElement(32);
-			y.getRaw()[31] &= 0xf8;
-			final Ed25519FieldElement ySquare = y.decode().square();
-			final Ed25519FieldElement n1 = ySquare.subtract(Ed25519Field.ONE);
-			final Ed25519FieldElement d1 = Ed25519Field.D.multiply(ySquare).add(Ed25519Field.ONE);
-			final BigInteger b1 = MathUtils.toBigInteger(n1).mod(Ed25519Field.P);
-			final BigInteger b2 = MathUtils.toBigInteger(d1).mod(Ed25519Field.P);
+			final Ed25519FieldElement u = MathUtils.getRandomFieldElement();
+			final Ed25519FieldElement uSquare = u.square();
+			final Ed25519FieldElement v = MathUtils.getRandomFieldElement();
+			final Ed25519FieldElement vSquare = v.square();
+			final Ed25519FieldElement fraction = u.multiply(v.invert());
 
 			// Act:
-			final Ed25519FieldElement f = Ed25519FieldElement.sqrt(n1, d1);
-			final BigInteger b3 = MathUtils.toBigInteger(f).mod(Ed25519Field.P);
-			final BigInteger b4 = MathUtils.getSqrtOfFraction(b1, b2).mod(Ed25519Field.P);
+			final Ed25519FieldElement sqrt = Ed25519FieldElement.sqrt(uSquare, vSquare);
 
 			// Assert:
-			Assert.assertThat(b3, IsEqual.equalTo(b4));
+			// (u / v)^4 == (sqrt(u^2 / v^2))^4.
+			Assert.assertThat(fraction.square().square(), IsEqual.equalTo(sqrt.square().square()));
+
+			// (u / v) == +-1 * sqrt(u^2 / v^2) or (u / v) == +-i * sqrt(u^2 / v^2)
+			Assert.assertThat(differsOnlyByAFactorOfAFourthRootOfOne(fraction, sqrt), IsEqual.equalTo(true));
 		}
+	}
+
+	private static boolean differsOnlyByAFactorOfAFourthRootOfOne(final Ed25519FieldElement x, final Ed25519FieldElement root) {
+		final Ed25519FieldElement rootTimesI = root.multiply(Ed25519Field.I);
+		return x.equals(root) ||
+				x.equals(root.negate()) ||
+				x.equals(rootTimesI) ||
+				x.equals(rootTimesI.negate());
+	}
+
+	private static void assertEquals(final Ed25519FieldElement f, final BigInteger b) {
+		final BigInteger b2 = MathUtils.toBigInteger(f);
+		Assert.assertThat(b2.mod(Ed25519Field.P), IsEqual.equalTo(b.mod(Ed25519Field.P)));
 	}
 
 	// endregion
@@ -267,7 +269,8 @@ public class Ed25519FieldElementTest {
 			for (int j = 0; j < 10; j++) {
 				t[j] = random.nextInt(1 << 28) - (1 << 27);
 			}
-			// TODO 20141011 J-B: can you more directly check negative on the BigInteger
+
+			// odd numbers are negative
 			final boolean isNegative = MathUtils.toBigInteger(t).mod(Ed25519Field.P).mod(new BigInteger("2")).equals(BigInteger.ONE);
 			final Ed25519FieldElement f = new Ed25519FieldElement(t);
 

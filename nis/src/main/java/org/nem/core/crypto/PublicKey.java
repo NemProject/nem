@@ -15,10 +15,7 @@ public class PublicKey implements SerializableEntity {
 
 	/**
 	 * The following field is used by Ed25519 to speed up verification.
-	 * TODO 20141010 J-B why is this here?
-	 * TODO 20141011 BR -> J: as stated above it is needed to speed up signature verification.
-	 * TODO                   If not here, where should I keep the information?
-	 * TODO 20141010 J-B: i need to look closer at how it's being used
+	 * TODO 20141014 J-B: i suppose this is fine for now although i would prefer a higher-level cache, but not now
 	 */
 	private final Ed25519GroupElement A;
 

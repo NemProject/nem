@@ -6,8 +6,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.engines.IESEngine;
 import org.bouncycastle.crypto.generators.KDF2BytesGenerator;
 import org.bouncycastle.crypto.macs.HMac;
-import org.bouncycastle.crypto.params.*;
-import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.crypto.params.IESParameters;
 import org.nem.core.crypto.*;
 
 /**
@@ -31,8 +30,8 @@ public class SecP256K1BlockCipher implements BlockCipher {
 			this.iesEncryptEngine = createIesEngine();
 			this.iesEncryptEngine.init(
 					true,
-					this.getPrivateKeyParameters(senderKeyPair.getPrivateKey()),
-					this.getPublicKeyParameters(recipientKeyPair.getPublicKey()),
+					SecP256K1Utils.getPrivateKeyParameters(senderKeyPair.getPrivateKey()),
+					SecP256K1Utils.getPublicKeyParameters(recipientKeyPair.getPublicKey()),
 					IES_PARAMETERS);
 		} else {
 			this.iesEncryptEngine = null;
@@ -42,8 +41,8 @@ public class SecP256K1BlockCipher implements BlockCipher {
 			this.iesDecryptEngine = createIesEngine();
 			this.iesDecryptEngine.init(
 					false,
-					this.getPrivateKeyParameters(recipientKeyPair.getPrivateKey()),
-					this.getPublicKeyParameters(senderKeyPair.getPublicKey()),
+					SecP256K1Utils.getPrivateKeyParameters(recipientKeyPair.getPrivateKey()),
+					SecP256K1Utils.getPublicKeyParameters(senderKeyPair.getPublicKey()),
 					IES_PARAMETERS);
 		} else {
 			this.iesDecryptEngine = null;
@@ -73,30 +72,5 @@ public class SecP256K1BlockCipher implements BlockCipher {
 				new ECDHBasicAgreement(),
 				new KDF2BytesGenerator(new SHA1Digest()),
 				new HMac(new SHA1Digest()));
-	}
-
-	// TODO 20141010 - we should probably move these to a utils class since Signer is using these too
-	// TODO 20141011 BR -> J: I was trying to avoid bouncy caste specific classes being used outside crypto package.
-	// TODO                   Not a good idea?
-	// TODO 20141011 J-BR: 'I was trying to avoid bouncy caste specific classes' - no a good idea; i meant a utils class
-	// >                   in secp256k
-
-	/**
-	 * Gets the EC private key parameters.
-	 *
-	 * @return The EC private key parameters.
-	 */
-	private ECPrivateKeyParameters getPrivateKeyParameters(final PrivateKey privateKey) {
-		return new ECPrivateKeyParameters(privateKey.getRaw(), SecP256K1Curve.secp256k1().getParams());
-	}
-
-	/**
-	 * Gets the EC public key parameters.
-	 *
-	 * @return The EC public key parameters.
-	 */
-	private ECPublicKeyParameters getPublicKeyParameters(final PublicKey publicKey) {
-		final ECPoint point = SecP256K1Curve.secp256k1().getParams().getCurve().decodePoint(publicKey.getRaw());
-		return new ECPublicKeyParameters(point, SecP256K1Curve.secp256k1().getParams());
 	}
 }

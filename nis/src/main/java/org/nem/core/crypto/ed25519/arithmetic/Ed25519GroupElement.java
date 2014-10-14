@@ -758,20 +758,20 @@ public class Ed25519GroupElement implements Serializable {
 	 */
 	private Ed25519GroupElement select(final int pos, final int b) {
 		// Is r_i negative?
-		final int bNegative = ByteUtils.isNegative(b);
+		final int bNegative = ByteUtils.isNegativeConstantTime(b);
 		// |r_i|
 		final int bAbs = b - (((-bNegative) & b) << 1);
 
 		// 16^i |r_i| B
 		final Ed25519GroupElement t = Ed25519Group.ZERO_PRECOMPUTED
-				.cmov(this.precomputedForSingle[pos][0], ByteUtils.isEqual(bAbs, 1))
-				.cmov(this.precomputedForSingle[pos][1], ByteUtils.isEqual(bAbs, 2))
-				.cmov(this.precomputedForSingle[pos][2], ByteUtils.isEqual(bAbs, 3))
-				.cmov(this.precomputedForSingle[pos][3], ByteUtils.isEqual(bAbs, 4))
-				.cmov(this.precomputedForSingle[pos][4], ByteUtils.isEqual(bAbs, 5))
-				.cmov(this.precomputedForSingle[pos][5], ByteUtils.isEqual(bAbs, 6))
-				.cmov(this.precomputedForSingle[pos][6], ByteUtils.isEqual(bAbs, 7))
-				.cmov(this.precomputedForSingle[pos][7], ByteUtils.isEqual(bAbs, 8));
+				.cmov(this.precomputedForSingle[pos][0], ByteUtils.isEqualConstantTime(bAbs, 1))
+				.cmov(this.precomputedForSingle[pos][1], ByteUtils.isEqualConstantTime(bAbs, 2))
+				.cmov(this.precomputedForSingle[pos][2], ByteUtils.isEqualConstantTime(bAbs, 3))
+				.cmov(this.precomputedForSingle[pos][3], ByteUtils.isEqualConstantTime(bAbs, 4))
+				.cmov(this.precomputedForSingle[pos][4], ByteUtils.isEqualConstantTime(bAbs, 5))
+				.cmov(this.precomputedForSingle[pos][5], ByteUtils.isEqualConstantTime(bAbs, 6))
+				.cmov(this.precomputedForSingle[pos][6], ByteUtils.isEqualConstantTime(bAbs, 7))
+				.cmov(this.precomputedForSingle[pos][7], ByteUtils.isEqualConstantTime(bAbs, 8));
 		// -16^i |r_i| B
 		final Ed25519GroupElement tMinus = precomputed(t.Y, t.X, t.Z.negate());
 		// 16^i r_i B

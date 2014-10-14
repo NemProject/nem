@@ -29,13 +29,13 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 
 	@Override
 	public PublicKey derivePublicKey(final PrivateKey privateKey) {
-		final Ed25519EncodedFieldElement a = privateKey.prepareForScalarMultiply();
+		final Ed25519EncodedFieldElement a = Ed25519Utils.prepareForScalarMultiply(privateKey);
 
 		// a * base point is the public key.
 		final Ed25519GroupElement pubKey = Ed25519Group.BASE_POINT.scalarMultiply(a);
-		// TODO 20141011 J-B: why are you calling precomputeForDoubleScalarMultiplication here?
-		pubKey.precomputeForDoubleScalarMultiplication();
 
-		return new PublicKey(pubKey.encode().getRaw(), pubKey);
+		// verification of signatures will be about twice as fast when pre-calculating
+		// a suitable table of group elements.
+		return new PublicKey(pubKey.encode().getRaw());
 	}
 }
