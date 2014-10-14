@@ -2,7 +2,6 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockChainConstants;
 
 /**
  * Block validator that ensures the block signer is valid.
@@ -35,5 +34,4 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 
 		return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 	}
-
 }

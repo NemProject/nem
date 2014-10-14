@@ -100,7 +100,7 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		}
 	}
 
-	@Test (expected = CryptoException.class)
+	@Test(expected = CryptoException.class)
 	public void signThrowsIfGeneratedSignatureIsNotCanonical() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();

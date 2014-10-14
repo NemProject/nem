@@ -43,7 +43,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
 		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(Hashes.sha3_512(
-				Arrays.copyOfRange(hash, 32, 64),		// only include the last 32 bytes of the private key hash
+				Arrays.copyOfRange(hash, 32, 64),        // only include the last 32 bytes of the private key hash
 				data));
 
 		// Reduce size of r since we are calculating mod group order anyway

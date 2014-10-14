@@ -64,7 +64,7 @@ public class Ed25519FieldElement {
 		// TODO 20141014 J-BR: i ran with and without the loops and didn't see any difference, we can revert if you're seeing that big of a difference
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
-		for (int i=0; i<10; i++) {
+		for (int i = 0; i < 10; i++) {
 			h[i] = this.values[i] + gValues[i];
 		}
 
@@ -88,7 +88,7 @@ public class Ed25519FieldElement {
 	public Ed25519FieldElement subtract(final Ed25519FieldElement g) {
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
-		for (int i=0; i<10; i++) {
+		for (int i = 0; i < 10; i++) {
 			h[i] = this.values[i] - gValues[i];
 		}
 
@@ -109,7 +109,7 @@ public class Ed25519FieldElement {
 	 */
 	public Ed25519FieldElement negate() {
 		final int[] h = new int[10];
-		for (int i=0; i<10; i++) {
+		for (int i = 0; i < 10; i++) {
 			h[i] = -this.values[i];
 		}
 
@@ -332,7 +332,7 @@ public class Ed25519FieldElement {
 		/* |h0| <= 2^25 */
 		/* |h4| <= 2^25 */
 		/* |h1| <= 1.71*2^59 */
-        /* |h5| <= 1.71*2^59 */
+		/* |h5| <= 1.71*2^59 */
 
 		carry1 = (h1 + (long)(1 << 24)) >> 25;
 		h2 += carry1;

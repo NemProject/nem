@@ -116,7 +116,6 @@ public class AccountInfoFactoryTest {
 		assertQueryLessor(AccountRemoteStatus.ACTIVE, ImportanceTransferTransaction.Mode.Activate, new BlockHeight(1441));
 	}
 
-
 	@Test
 	public void statusReturnsDeactivatingIfDeactivateAndWithin() {
 		assertQueryLessor(AccountRemoteStatus.DEACTIVATING, ImportanceTransferTransaction.Mode.Deactivate, new BlockHeight(2));
