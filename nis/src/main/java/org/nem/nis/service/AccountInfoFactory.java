@@ -54,25 +54,21 @@ public class AccountInfoFactory {
 
 	public AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
-		final RemoteLinks remoteLinks = accountState.getRemoteLinks();
-		return getAccountRemoteStatus(remoteLinks, height);
-	}
+		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
+		switch (remoteStatus) {
+			case NOT_SET:
+				return AccountRemoteStatus.INACTIVE;
+			case OWNER_INACTIVE:
+				return AccountRemoteStatus.INACTIVE;
+			case OWNER_ACTIVATING:
+				return AccountRemoteStatus.ACTIVATING;
+			case OWNER_ACTIVE:
+				return AccountRemoteStatus.ACTIVE;
+			case OWNER_DEACTIVATING:
+				return AccountRemoteStatus.DEACTIVATING;
 
-	private AccountRemoteStatus getAccountRemoteStatus(final RemoteLinks self, final BlockHeight height) {
-		AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.REMOTE;
-		if (self.isEmpty()) {
-			accountRemoteStatus = AccountRemoteStatus.INACTIVE;
-		} else if (self.isHarvestingRemotely()) {
-			final boolean isActivated = ImportanceTransferTransaction.Mode.Activate.value() == self.getCurrent().getMode();
-			final long heightDiff = height.subtract(self.getCurrent().getEffectiveHeight());
-			final boolean withinOneDay = heightDiff < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-			if (isActivated) {
-				accountRemoteStatus = withinOneDay ? AccountRemoteStatus.ACTIVATING : AccountRemoteStatus.ACTIVE;
-			} else {
-				accountRemoteStatus = withinOneDay ? AccountRemoteStatus.DEACTIVATING : AccountRemoteStatus.INACTIVE;
-			}
+			default:
+				return AccountRemoteStatus.REMOTE;
 		}
-
-		return accountRemoteStatus;
 	}
 }
