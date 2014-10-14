@@ -94,7 +94,7 @@ public class AccountInfoFactoryTest {
 		assertQueryRemote(ImportanceTransferTransaction.Mode.Deactivate, new BlockHeight(2000));
 	}
 
-	private void assertQueryRemote(final ImportanceTransferTransaction.Mode mode, final BlockHeight height) {
+	private static void assertQueryRemote(final ImportanceTransferTransaction.Mode mode, final BlockHeight height) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.createRemoteHarvesterLink(mode.value());
@@ -126,7 +126,7 @@ public class AccountInfoFactoryTest {
 		assertQueryLessor(AccountRemoteStatus.INACTIVE, ImportanceTransferTransaction.Mode.Deactivate, new BlockHeight(1441));
 	}
 
-	private void assertQueryLessor(final AccountRemoteStatus expectedState, final ImportanceTransferTransaction.Mode mode, final BlockHeight height) {
+	private static void assertQueryLessor(final AccountRemoteStatus expectedState, final ImportanceTransferTransaction.Mode mode, final BlockHeight height) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.createHarvestingLink(mode.value());
