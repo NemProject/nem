@@ -5,7 +5,6 @@ import org.nem.core.crypto.ed25519.arithmetic.*;
 import org.nem.core.utils.ArrayUtils;
 
 import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.Arrays;
 
 /**
@@ -14,7 +13,6 @@ import java.util.Arrays;
 public class Ed25519DsaSigner implements DsaSigner {
 
 	private final KeyPair keyPair;
-	private final MessageDigest digest;
 
 	/**
 	 * Creates a Ed25519 DSA signer.
@@ -23,21 +21,31 @@ public class Ed25519DsaSigner implements DsaSigner {
 	 */
 	public Ed25519DsaSigner(final KeyPair keyPair) {
 		this.keyPair = keyPair;
-		this.digest = Hashes.getSha3_512Instance();
+	}
+
+	/**
+	 * Gets the underlying key pair.
+	 *
+	 * @return The key pair.
+	 */
+	public KeyPair getKeyPair() {
+		return this.keyPair;
 	}
 
 	@Override
 	public Signature sign(final byte[] data) {
-		if (!this.keyPair.hasPrivateKey()) {
+		if (!this.getKeyPair().hasPrivateKey()) {
 			throw new CryptoException("cannot sign without private key");
 		}
 
 		// Hash the private key to improve randomness.
-		final byte[] hash = this.digest.digest(ArrayUtils.toByteArray(this.keyPair.getPrivateKey().getRaw(), 32));
+		final byte[] hash = Hashes.sha3_512(ArrayUtils.toByteArray(this.getKeyPair().getPrivateKey().getRaw(), 32));
 
 		// r = H(hash_b,...,hash_2b-1, data) where b=256.
-		this.digest.update(hash, 32, 32); // only include the last 32 bytes of the private key hash
-		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(this.digest.digest(data));
+
+		final Ed25519EncodedFieldElement r = new Ed25519EncodedFieldElement(Hashes.sha3_512(
+				Arrays.copyOfRange(hash, 32, 64),		// only include the last 32 bytes of the private key hash
+				data));
 
 		// Reduce size of r since we are calculating mod group order anyway
 		final Ed25519EncodedFieldElement rModQ = r.modQ();
@@ -49,12 +57,13 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// S = (r + H(encodedR, encodedA, data) * a) mod group order where
 		// encodedR and encodedA are the little endian encodings of the group element R and the public key A and
 		// a is the lower 32 bytes of hash after clamping.
-		this.digest.update(encodedR.getRaw());
-		this.digest.update(this.keyPair.getPublicKey().getRaw());
-		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
+		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(Hashes.sha3_512(
+				encodedR.getRaw(),
+				this.getKeyPair().getPublicKey().getRaw(),
+				data));
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
 		final Ed25519EncodedFieldElement encodedS = hModQ.multiplyAndAddModQ(
-				Ed25519Utils.prepareForScalarMultiply(this.keyPair.getPrivateKey().getRaw()),
+				Ed25519Utils.prepareForScalarMultiply(this.getKeyPair().getPrivateKey()),
 				rModQ);
 
 		// Signature is (encodedR, encodedS)
@@ -65,6 +74,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 			// TODO                   encodedS was calculated mod group order so if it is bigger, something failed.
 			// TODO                   I excluded encodedS == 0 as valid signature, not sure if that is needed.
 			// TODO 20141013 J-B is there any way we can add a test that can hit this?
+			// TODO 20141014 BR -> J: done (had to add method getKeyPair() for testing if the exception is thrown).
 			throw new CryptoException("Generated signature is not canonical");
 		}
 
@@ -79,22 +89,28 @@ public class Ed25519DsaSigner implements DsaSigner {
 		// TODO                   2) Second test is same as "if (null == A) {" below.
 		// TODO                   3) Third test checks if the raw value of the public key is 0. In that case A is the affine point (+-i, 0).
 		// TODO                      Does this cause problems? hmmm...need to think about it.
+		// ToDO 20141014 BR -> J: let's do the test, it's fast so it doesn't hurt.
 
 		if (!this.isCanonicalSignature(signature)) {
 			return false;
 		}
 
+		if (1 == ArrayUtils.isEqualConstantTime(this.getKeyPair().getPublicKey().getRaw(), new byte[32])) {
+			return false;
+		}
+
 		// h = H(encodedR, encodedA, data).
 		final byte[] rawEncodedR = signature.getBinaryR();
-		final byte[] rawEncodedA = this.keyPair.getPublicKey().getRaw();
-		this.digest.update(rawEncodedR);
-		this.digest.update(rawEncodedA);
-		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(this.digest.digest(data));
+		final byte[] rawEncodedA = this.getKeyPair().getPublicKey().getRaw();
+		final Ed25519EncodedFieldElement h = new Ed25519EncodedFieldElement(Hashes.sha3_512(
+				rawEncodedR,
+				rawEncodedA,
+				data));
 
 		// hReduced = h mod group order
 		final Ed25519EncodedFieldElement hModQ = h.modQ();
 
-		Ed25519GroupElement A = this.keyPair.getPublicKey().getAsGroupElement();
+		Ed25519GroupElement A = this.getKeyPair().getPublicKey().getAsGroupElement();
 		if (null == A) {
 			// Must compute A.
 			A = new Ed25519EncodedGroupElement(rawEncodedA).decode();
@@ -107,7 +123,7 @@ public class Ed25519DsaSigner implements DsaSigner {
 
 		// Compare calculated R to given R.
 		final byte[] encodedCalculatedR = calculatedR.encode().getRaw();
-		final int result = ArrayUtils.isEqual(encodedCalculatedR, rawEncodedR);
+		final int result = ArrayUtils.isEqualConstantTime(encodedCalculatedR, rawEncodedR);
 		return 1 == result;
 	}
 

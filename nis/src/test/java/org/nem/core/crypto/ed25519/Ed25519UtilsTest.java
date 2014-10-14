@@ -17,7 +17,7 @@ public class Ed25519UtilsTest {
 		final PrivateKey privateKey = new PrivateKey(new BigInteger(Utils.generateRandomBytes(32)));
 
 		// Act:
-		final byte[] a = Ed25519Utils.prepareForScalarMultiply(privateKey.getRaw()).getRaw();
+		final byte[] a = Ed25519Utils.prepareForScalarMultiply(privateKey).getRaw();
 
 		// Assert:
 		Assert.assertThat(a[31] & 0x40, IsEqual.equalTo(0x40));

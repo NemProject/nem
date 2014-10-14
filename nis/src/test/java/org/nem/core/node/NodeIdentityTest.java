@@ -300,7 +300,7 @@ public class NodeIdentityTest {
 	//region toString
 
 	private final PublicKey PUBLIC_KEY_FOR_TO_STRING_TESTS =
-			PublicKey.fromHexString("02d3da82b0a291ba2cb1469c7e3bd65c255b797586acb774a66fff53f02ef509e9");
+			PublicKey.fromHexString("509079d0252d8e24aef0402403618515717970345b1192aa8c3522c6292aa648");
 
 	@Test
 	public void toStringReturnsAppropriateRepresentationWhenNameIsPresent() {
@@ -309,7 +309,7 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = new NodeIdentity(keyPair, "bob");
 
 		// Assert:
-		Assert.assertThat(identity.toString(), IsEqual.equalTo("bob <TDXJDTROHFWTJQDGFVFJBFMFXSDAPTBVJEQRVJEH>"));
+		Assert.assertThat(identity.toString(), IsEqual.equalTo("bob <TAXYZDGH33FMGBDAY3LYBHVVDSNPTYKVRMQSJ7RY>"));
 	}
 
 	@Test
@@ -319,7 +319,7 @@ public class NodeIdentityTest {
 		final NodeIdentity identity = new NodeIdentity(keyPair);
 
 		// Assert:
-		Assert.assertThat(identity.toString(), IsEqual.equalTo("<TDXJDTROHFWTJQDGFVFJBFMFXSDAPTBVJEQRVJEH>"));
+		Assert.assertThat(identity.toString(), IsEqual.equalTo("<TAXYZDGH33FMGBDAY3LYBHVVDSNPTYKVRMQSJ7RY>"));
 	}
 
 	//endregion

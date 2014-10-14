@@ -10,6 +10,7 @@ import org.nem.core.crypto.*;
 public class SecP256K1Utils {
 
 	// TODO 20141013 J-B: simple tests?
+	// TODO 20141014 BR -> J: done.
 
 	/**
 	 * Gets the EC private key parameters.

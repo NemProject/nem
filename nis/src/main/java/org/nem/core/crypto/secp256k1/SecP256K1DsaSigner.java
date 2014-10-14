@@ -34,7 +34,7 @@ public class SecP256K1DsaSigner implements DsaSigner {
 				this.keyPair.getPrivateKey().getRaw(),
 				SecP256K1Curve.secp256k1().getParams());
 		signer.init(true, privateKeyParameters);
-		final byte[] hash = Hashes.sha3(data);
+		final byte[] hash = Hashes.sha3_256(data);
 		final BigInteger[] components = signer.generateSignature(hash);
 		final Signature signature = new Signature(components[0], components[1]);
 		return this.makeSignatureCanonical(signature);
@@ -50,7 +50,7 @@ public class SecP256K1DsaSigner implements DsaSigner {
 		final ECPoint point = SecP256K1Curve.secp256k1().getParams().getCurve().decodePoint(this.keyPair.getPublicKey().getRaw());
 		final ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(point, SecP256K1Curve.secp256k1().getParams());
 		signer.init(false, publicKeyParameters);
-		final byte[] hash = Hashes.sha3(data);
+		final byte[] hash = Hashes.sha3_256(data);
 		return signer.verifySignature(hash, signature.getR(), signature.getS());
 	}
 

@@ -61,7 +61,7 @@ public class Ed25519EncodedFieldElement {
 	 * @return 1 if it is non-zero, 0 otherwise.
 	 */
 	public boolean isNonZero() {
-		return 0 == ArrayUtils.isEqual(this.values, this.ZERO);
+		return 0 == ArrayUtils.isEqualConstantTime(this.values, this.ZERO);
 	}
 
 	/**
@@ -995,7 +995,7 @@ public class Ed25519EncodedFieldElement {
 		}
 
 		final Ed25519EncodedFieldElement encoded = (Ed25519EncodedFieldElement)obj;
-		return 1 == ArrayUtils.isEqual(this.values, encoded.values);
+		return 1 == ArrayUtils.isEqualConstantTime(this.values, encoded.values);
 	}
 
 	@Override

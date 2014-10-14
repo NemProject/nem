@@ -21,6 +21,8 @@ public class PublicKey implements SerializableEntity {
 	 * TODO 20141010 J-B: i need to look closer at how it's being used
 	 * TODO 20141012 BR -> J: I would leave here for now although we will not use it right now.
 	 * TODO 20141013 J-B: isn't the signer the only one using this? if so, we can cache the group elements in the signer?
+	 * TODO 20141014 BR -> J: DsaSigner is using it during verify(). But the signer is not cached but rather created every time when needed.
+	 * TODO                   The caching is done via AccountAnalyzer/AccountCache --> Account --> KeyPair --> PublicKey.
 	 */
 	private final Ed25519GroupElement A;
 

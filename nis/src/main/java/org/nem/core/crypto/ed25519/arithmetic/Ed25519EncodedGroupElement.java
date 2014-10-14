@@ -62,7 +62,7 @@ public class Ed25519EncodedGroupElement {
 		final Ed25519FieldElement vxSquare;
 		Ed25519FieldElement checkForZero;
 		y = this.getAffineY();
-		ySquare = y.square();
+		ySquare = y.squareAndOptionalDouble(false);
 
 		// u = y^2 - 1
 		u = ySquare.subtract(Ed25519Field.ONE);
@@ -73,7 +73,7 @@ public class Ed25519EncodedGroupElement {
 		// x = sqrt(u / v)
 		x = Ed25519FieldElement.sqrt(u, v);
 
-		vxSquare = x.square().multiply(v);
+		vxSquare = x.squareAndOptionalDouble(false).multiply(v);
 		checkForZero = vxSquare.subtract(u);
 		if (checkForZero.isNonZero()) {
 			checkForZero = vxSquare.add(u);
@@ -81,6 +81,7 @@ public class Ed25519EncodedGroupElement {
 				// TODO 20141011: does indicate a bug in our code or can we get here with bad input?
 				// TODO 20141013 BR -> J: yes, it means the given affine point (x,y) is not on the curve since β^2 != +-(u / v).
 				// TODO 20141013 J-BR: can we add a test that triggers this exception?
+				// TODO 20141014 BR -> J: done.
 				throw new IllegalArgumentException("not a valid Ed25519EncodedGroupElement.");
 			}
 
@@ -119,7 +120,7 @@ public class Ed25519EncodedGroupElement {
 		}
 
 		final Ed25519EncodedGroupElement encoded = (Ed25519EncodedGroupElement)obj;
-		return 1 == ArrayUtils.isEqual(this.values, encoded.values);
+		return 1 == ArrayUtils.isEqualConstantTime(this.values, encoded.values);
 	}
 
 	@Override

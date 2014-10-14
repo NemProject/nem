@@ -66,6 +66,16 @@ public class Ed25519EncodedGroupElementTest {
 		}
 	}
 
+	@Test (expected = IllegalArgumentException.class)
+	public void GetAffineXThrowsIfEncodedGroupElementIsInvalid() {
+		// Arrange:
+		final Ed25519GroupElement g = Ed25519GroupElement.p2(Ed25519Field.ONE, Ed25519Field.D, Ed25519Field.ONE);
+		final Ed25519EncodedGroupElement encoded = g.encode();
+
+		// Assert:
+		encoded.getAffineX();
+	}
+
 	@Test
 	public void getAffineYReturnsExpectedResult() {
 		for (int i = 0; i < 1000; i++) {

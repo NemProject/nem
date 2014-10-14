@@ -62,18 +62,13 @@ public class Ed25519FieldElement {
 		// TODO 2014 J-B: can we loop here? or would that be bad?
 		// TODO 20141013 BR -> J: I don't think it would raise security issues, probably just a bit slower.
 		// TODO 20141013 J-BR: i think the loop is cleaner, but i'll leave it up to you
+		// TODO 20141014 BR -> J: done (verify() is about 5-10% slower now).
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
-		h[0] = this.values[0] + gValues[0];
-		h[1] = this.values[1] + gValues[1];
-		h[2] = this.values[2] + gValues[2];
-		h[3] = this.values[3] + gValues[3];
-		h[4] = this.values[4] + gValues[4];
-		h[5] = this.values[5] + gValues[5];
-		h[6] = this.values[6] + gValues[6];
-		h[7] = this.values[7] + gValues[7];
-		h[8] = this.values[8] + gValues[8];
-		h[9] = this.values[9] + gValues[9];
+		for (int i=0; i<10; i++) {
+			h[i] = this.values[i] + gValues[i];
+		}
+
 		return new Ed25519FieldElement(h);
 	}
 
@@ -94,16 +89,10 @@ public class Ed25519FieldElement {
 	public Ed25519FieldElement subtract(final Ed25519FieldElement g) {
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
-		h[0] = this.values[0] - gValues[0];
-		h[1] = this.values[1] - gValues[1];
-		h[2] = this.values[2] - gValues[2];
-		h[3] = this.values[3] - gValues[3];
-		h[4] = this.values[4] - gValues[4];
-		h[5] = this.values[5] - gValues[5];
-		h[6] = this.values[6] - gValues[6];
-		h[7] = this.values[7] - gValues[7];
-		h[8] = this.values[8] - gValues[8];
-		h[9] = this.values[9] - gValues[9];
+		for (int i=0; i<10; i++) {
+			h[i] = this.values[i] - gValues[i];
+		}
+
 		return new Ed25519FieldElement(h);
 	}
 
@@ -121,16 +110,10 @@ public class Ed25519FieldElement {
 	 */
 	public Ed25519FieldElement negate() {
 		final int[] h = new int[10];
-		h[0] = -this.values[0];
-		h[1] = -this.values[1];
-		h[2] = -this.values[2];
-		h[3] = -this.values[3];
-		h[4] = -this.values[4];
-		h[5] = -this.values[5];
-		h[6] = -this.values[6];
-		h[7] = -this.values[7];
-		h[8] = -this.values[8];
-		h[9] = -this.values[9];
+		for (int i=0; i<10; i++) {
+			h[i] = -this.values[i];
+		}
+
 		return new Ed25519FieldElement(h);
 	}
 
@@ -424,178 +407,9 @@ public class Ed25519FieldElement {
 	}
 
 	/**
-	 * Squares this field element and returns the result.
-	 * <b>h = this * this</b>
-	 * <pre>
-	 * Preconditions:
-	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
-	 * Postconditions:
-	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
-	 * </pre>
-	 * See multiply for discussion of implementation strategy.
-	 *
-	 * @return The square of this field element.
-	 */
-	public Ed25519FieldElement square() {
-		final int f0 = this.values[0];
-		final int f1 = this.values[1];
-		final int f2 = this.values[2];
-		final int f3 = this.values[3];
-		final int f4 = this.values[4];
-		final int f5 = this.values[5];
-		final int f6 = this.values[6];
-		final int f7 = this.values[7];
-		final int f8 = this.values[8];
-		final int f9 = this.values[9];
-		final int f0_2 = 2 * f0;
-		final int f1_2 = 2 * f1;
-		final int f2_2 = 2 * f2;
-		final int f3_2 = 2 * f3;
-		final int f4_2 = 2 * f4;
-		final int f5_2 = 2 * f5;
-		final int f6_2 = 2 * f6;
-		final int f7_2 = 2 * f7;
-		final int f5_38 = 38 * f5; /* 1.959375*2^30 */
-		final int f6_19 = 19 * f6; /* 1.959375*2^30 */
-		final int f7_38 = 38 * f7; /* 1.959375*2^30 */
-		final int f8_19 = 19 * f8; /* 1.959375*2^30 */
-		final int f9_38 = 38 * f9; /* 1.959375*2^30 */
-		final long f0f0 = f0 * (long)f0;
-		final long f0f1_2 = f0_2 * (long)f1;
-		final long f0f2_2 = f0_2 * (long)f2;
-		final long f0f3_2 = f0_2 * (long)f3;
-		final long f0f4_2 = f0_2 * (long)f4;
-		final long f0f5_2 = f0_2 * (long)f5;
-		final long f0f6_2 = f0_2 * (long)f6;
-		final long f0f7_2 = f0_2 * (long)f7;
-		final long f0f8_2 = f0_2 * (long)f8;
-		final long f0f9_2 = f0_2 * (long)f9;
-		final long f1f1_2 = f1_2 * (long)f1;
-		final long f1f2_2 = f1_2 * (long)f2;
-		final long f1f3_4 = f1_2 * (long)f3_2;
-		final long f1f4_2 = f1_2 * (long)f4;
-		final long f1f5_4 = f1_2 * (long)f5_2;
-		final long f1f6_2 = f1_2 * (long)f6;
-		final long f1f7_4 = f1_2 * (long)f7_2;
-		final long f1f8_2 = f1_2 * (long)f8;
-		final long f1f9_76 = f1_2 * (long)f9_38;
-		final long f2f2 = f2 * (long)f2;
-		final long f2f3_2 = f2_2 * (long)f3;
-		final long f2f4_2 = f2_2 * (long)f4;
-		final long f2f5_2 = f2_2 * (long)f5;
-		final long f2f6_2 = f2_2 * (long)f6;
-		final long f2f7_2 = f2_2 * (long)f7;
-		final long f2f8_38 = f2_2 * (long)f8_19;
-		final long f2f9_38 = f2 * (long)f9_38;
-		final long f3f3_2 = f3_2 * (long)f3;
-		final long f3f4_2 = f3_2 * (long)f4;
-		final long f3f5_4 = f3_2 * (long)f5_2;
-		final long f3f6_2 = f3_2 * (long)f6;
-		final long f3f7_76 = f3_2 * (long)f7_38;
-		final long f3f8_38 = f3_2 * (long)f8_19;
-		final long f3f9_76 = f3_2 * (long)f9_38;
-		final long f4f4 = f4 * (long)f4;
-		final long f4f5_2 = f4_2 * (long)f5;
-		final long f4f6_38 = f4_2 * (long)f6_19;
-		final long f4f7_38 = f4 * (long)f7_38;
-		final long f4f8_38 = f4_2 * (long)f8_19;
-		final long f4f9_38 = f4 * (long)f9_38;
-		final long f5f5_38 = f5 * (long)f5_38;
-		final long f5f6_38 = f5_2 * (long)f6_19;
-		final long f5f7_76 = f5_2 * (long)f7_38;
-		final long f5f8_38 = f5_2 * (long)f8_19;
-		final long f5f9_76 = f5_2 * (long)f9_38;
-		final long f6f6_19 = f6 * (long)f6_19;
-		final long f6f7_38 = f6 * (long)f7_38;
-		final long f6f8_38 = f6_2 * (long)f8_19;
-		final long f6f9_38 = f6 * (long)f9_38;
-		final long f7f7_38 = f7 * (long)f7_38;
-		final long f7f8_38 = f7_2 * (long)f8_19;
-		final long f7f9_76 = f7_2 * (long)f9_38;
-		final long f8f8_19 = f8 * (long)f8_19;
-		final long f8f9_38 = f8 * (long)f9_38;
-		final long f9f9_38 = f9 * (long)f9_38;
-
-		/**
-		 * Same procedure as in multiply, but this time we have a higher symmetry leading to less summands.
-		 * e.g. f1f9_76 really stands for f1 * 2^26 * f9 * 2^230 + f9 * 2^230 + f1 * 2^26 congruent 2 * 2 * 19 * f1 * f9  2^0 modulo p.
-		 */
-		long h0 = f0f0 + f1f9_76 + f2f8_38 + f3f7_76 + f4f6_38 + f5f5_38;
-		long h1 = f0f1_2 + f2f9_38 + f3f8_38 + f4f7_38 + f5f6_38;
-		long h2 = f0f2_2 + f1f1_2 + f3f9_76 + f4f8_38 + f5f7_76 + f6f6_19;
-		long h3 = f0f3_2 + f1f2_2 + f4f9_38 + f5f8_38 + f6f7_38;
-		long h4 = f0f4_2 + f1f3_4 + f2f2 + f5f9_76 + f6f8_38 + f7f7_38;
-		long h5 = f0f5_2 + f1f4_2 + f2f3_2 + f6f9_38 + f7f8_38;
-		long h6 = f0f6_2 + f1f5_4 + f2f4_2 + f3f3_2 + f7f9_76 + f8f8_19;
-		long h7 = f0f7_2 + f1f6_2 + f2f5_2 + f3f4_2 + f8f9_38;
-		long h8 = f0f8_2 + f1f7_4 + f2f6_2 + f3f5_4 + f4f4 + f9f9_38;
-		long h9 = f0f9_2 + f1f8_2 + f2f7_2 + f3f6_2 + f4f5_2;
-		long carry0;
-		final long carry1;
-		final long carry2;
-		final long carry3;
-		long carry4;
-		final long carry5;
-		final long carry6;
-		final long carry7;
-		final long carry8;
-		final long carry9;
-
-		carry0 = (h0 + (long)(1 << 25)) >> 26;
-		h1 += carry0;
-		h0 -= carry0 << 26;
-		carry4 = (h4 + (long)(1 << 25)) >> 26;
-		h5 += carry4;
-		h4 -= carry4 << 26;
-		carry1 = (h1 + (long)(1 << 24)) >> 25;
-		h2 += carry1;
-		h1 -= carry1 << 25;
-		carry5 = (h5 + (long)(1 << 24)) >> 25;
-		h6 += carry5;
-		h5 -= carry5 << 25;
-		carry2 = (h2 + (long)(1 << 25)) >> 26;
-		h3 += carry2;
-		h2 -= carry2 << 26;
-		carry6 = (h6 + (long)(1 << 25)) >> 26;
-		h7 += carry6;
-		h6 -= carry6 << 26;
-		carry3 = (h3 + (long)(1 << 24)) >> 25;
-		h4 += carry3;
-		h3 -= carry3 << 25;
-		carry7 = (h7 + (long)(1 << 24)) >> 25;
-		h8 += carry7;
-		h7 -= carry7 << 25;
-		carry4 = (h4 + (long)(1 << 25)) >> 26;
-		h5 += carry4;
-		h4 -= carry4 << 26;
-		carry8 = (h8 + (long)(1 << 25)) >> 26;
-		h9 += carry8;
-		h8 -= carry8 << 26;
-		carry9 = (h9 + (long)(1 << 24)) >> 25;
-		h0 += carry9 * 19;
-		h9 -= carry9 << 25;
-		carry0 = (h0 + (long)(1 << 25)) >> 26;
-		h1 += carry0;
-		h0 -= carry0 << 26;
-
-		final int[] h = new int[10];
-		h[0] = (int)h0;
-		h[1] = (int)h1;
-		h[2] = (int)h2;
-		h[3] = (int)h3;
-		h[4] = (int)h4;
-		h[5] = (int)h5;
-		h[6] = (int)h6;
-		h[7] = (int)h7;
-		h[8] = (int)h8;
-		h[9] = (int)h9;
-
-		return new Ed25519FieldElement(h);
-	}
-
-	/**
-	 * Squares this field element, multiplies by two and returns the result.
-	 * <b>h = 2 * this * this</b>
+	 * Squares this field element, optionally multiplies by two and returns the result.
+	 * <b>h = 2 * this * this</b> if dbl is true or
+	 * <b>h = this * this</b> if dbl is false.
 	 * <pre>
 	 * Preconditions:
 	 *     |this| bounded by 1.65*2^26,1.65*2^25,1.65*2^26,1.65*2^25,etc.
@@ -606,7 +420,7 @@ public class Ed25519FieldElement {
 	 *
 	 * @return The square of this field element times 2.
 	 */
-	public Ed25519FieldElement squareAndDouble() {
+	public Ed25519FieldElement squareAndOptionalDouble(final boolean dbl) {
 		final int f0 = this.values[0];
 		final int f1 = this.values[1];
 		final int f2 = this.values[2];
@@ -709,16 +523,19 @@ public class Ed25519FieldElement {
 		// TODO 20141011: this is the only difference from square; can we refactor?
 		// TODO 20141013 BR -> J: sure. Just not sure about how to name the method. squareAndOptionalDouble(final boolean dbl)?
 		// TODO 20141013 J-BR: that name is fine
-		h0 += h0;
-		h1 += h1;
-		h2 += h2;
-		h3 += h3;
-		h4 += h4;
-		h5 += h5;
-		h6 += h6;
-		h7 += h7;
-		h8 += h8;
-		h9 += h9;
+		// TODO 20141014 BR -> J: done.
+		if (dbl) {
+			h0 += h0;
+			h1 += h1;
+			h2 += h2;
+			h3 += h3;
+			h4 += h4;
+			h5 += h5;
+			h6 += h6;
+			h7 += h7;
+			h8 += h8;
+			h9 += h9;
+		}
 
 		carry0 = (h0 + (long)(1 << 25)) >> 26;
 		h1 += carry0;
@@ -790,22 +607,24 @@ public class Ed25519FieldElement {
 		// comments describe how exponent is created
 
 		// 2 == 2 * 1
-		f0 = this.square();
+		f0 = this.squareAndOptionalDouble(false);
 
 		// 9 == 9
 		// TODO 20141013 J-B: can we rename to something like pow2to9
-		f1 = this.pow29();
+		// TODO 20141014 BR -> J: done.
+		f1 = this.pow2to9();
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
 
 		// 2^252 - 2^2
 		// TODO 20141013 J-B: can we rename to something like pow2to252sub4
-		f1 = this.pow22524();
+		// TODO 20141014 BR -> J: done.
+		f1 = this.pow2to252sub4();
 
 		// 2^255 - 2^5
 		for (int i = 1; i < 4; ++i) {
-			f1 = f1.square();
+			f1 = f1.squareAndOptionalDouble(false);
 		}
 
 		// 2^255 - 21
@@ -817,17 +636,17 @@ public class Ed25519FieldElement {
 	 *
 	 * @return This field element to the power of (2^9).
 	 */
-	private Ed25519FieldElement pow29() {
+	private Ed25519FieldElement pow2to9() {
 		Ed25519FieldElement f;
 
 		// 2 == 2 * 1
-		f = this.square();
+		f = this.squareAndOptionalDouble(false);
 
 		// 4 == 2 * 2
-		f = f.square();
+		f = f.squareAndOptionalDouble(false);
 
 		// 8 == 2 * 4
-		f = f.square();
+		f = f.squareAndOptionalDouble(false);
 
 		// 9 == 1 + 8
 		return this.multiply(f);
@@ -839,106 +658,106 @@ public class Ed25519FieldElement {
 	 *
 	 * @return This field element to the power of (2^252 - 4).
 	 */
-	private Ed25519FieldElement pow22524() {
+	private Ed25519FieldElement pow2to252sub4() {
 		Ed25519FieldElement f0, f1, f2;
 
 		// 2 == 2 * 1
-		f0 = this.square();
+		f0 = this.squareAndOptionalDouble(false);
 
 		// 9
-		f1 = this.pow29();
+		f1 = this.pow2to9();
 
 		// 11 == 9 + 2
 		f0 = f0.multiply(f1);
 
 		// 22 == 2 * 11
-		f0 = f0.square();
+		f0 = f0.squareAndOptionalDouble(false);
 
 		// 31 == 22 + 9
 		f0 = f1.multiply(f0);
 
 		// 2^6 - 2^1
-		f1 = f0.square();
+		f1 = f0.squareAndOptionalDouble(false);
 
 		// 2^10 - 2^5
 		for (int i = 1; i < 5; ++i) {
-			f1 = f1.square();
+			f1 = f1.squareAndOptionalDouble(false);
 		}
 
 		// 2^10 - 2^0
 		f0 = f1.multiply(f0);
 
 		// 2^11 - 2^1
-		f1 = f0.square();
+		f1 = f0.squareAndOptionalDouble(false);
 
 		// 2^20 - 2^10
 		for (int i = 1; i < 10; ++i) {
-			f1 = f1.square();
+			f1 = f1.squareAndOptionalDouble(false);
 		}
 
 		// 2^20 - 2^0
 		f1 = f1.multiply(f0);
 
 		// 2^21 - 2^1
-		f2 = f1.square();
+		f2 = f1.squareAndOptionalDouble(false);
 
 		// 2^40 - 2^20
 		for (int i = 1; i < 20; ++i) {
-			f2 = f2.square();
+			f2 = f2.squareAndOptionalDouble(false);
 		}
 
 		// 2^40 - 2^0
 		f1 = f2.multiply(f1);
 
 		// 2^41 - 2^1
-		f1 = f1.square();
+		f1 = f1.squareAndOptionalDouble(false);
 
 		// 2^50 - 2^10
 		for (int i = 1; i < 10; ++i) {
-			f1 = f1.square();
+			f1 = f1.squareAndOptionalDouble(false);
 		}
 
 		// 2^50 - 2^0
 		f0 = f1.multiply(f0);
 
 		// 2^51 - 2^1
-		f1 = f0.square();
+		f1 = f0.squareAndOptionalDouble(false);
 
 		// 2^100 - 2^50
 		for (int i = 1; i < 50; ++i) {
-			f1 = f1.square();
+			f1 = f1.squareAndOptionalDouble(false);
 		}
 
 		// 2^100 - 2^0
 		f1 = f1.multiply(f0);
 
 		// 2^101 - 2^1
-		f2 = f1.square();
+		f2 = f1.squareAndOptionalDouble(false);
 
 		// 2^200 - 2^100
 		for (int i = 1; i < 100; ++i) {
-			f2 = f2.square();
+			f2 = f2.squareAndOptionalDouble(false);
 		}
 
 		// 2^200 - 2^0
 		f1 = f2.multiply(f1);
 
 		// 2^201 - 2^1
-		f1 = f1.square();
+		f1 = f1.squareAndOptionalDouble(false);
 
 		// 2^250 - 2^50
 		for (int i = 1; i < 50; ++i) {
-			f1 = f1.square();
+			f1 = f1.squareAndOptionalDouble(false);
 		}
 
 		// 2^250 - 2^0
 		f0 = f1.multiply(f0);
 
 		// 2^251 - 2^1
-		f0 = f0.square();
+		f0 = f0.squareAndOptionalDouble(false);
 
 		// 2^252 - 2^2
-		return f0.square();
+		return f0.squareAndOptionalDouble(false);
 	}
 
 	/**
@@ -955,13 +774,13 @@ public class Ed25519FieldElement {
 		final Ed25519FieldElement v3;
 
 		// v3 = v^3
-		v3 = v.square().multiply(v);
+		v3 = v.squareAndOptionalDouble(false).multiply(v);
 
 		// x = (v3^2) * v * u = u * v^7
-		x = v3.square().multiply(v).multiply(u);
+		x = v3.squareAndOptionalDouble(false).multiply(v).multiply(u);
 
 		//  x = (u * v^7)^((q - 5) / 8)
-		x = x.pow22524().multiply(x); // 2^252 - 3
+		x = x.pow2to252sub4().multiply(x); // 2^252 - 3
 
 		// x = u * v^3 * (u * v^7)^((q - 5) / 8)
 		x = v3.multiply(u).multiply(x);

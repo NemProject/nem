@@ -432,11 +432,11 @@ public class Ed25519GroupElement implements Serializable {
 				final Ed25519FieldElement ASquare;
 				final Ed25519FieldElement YSquarePlusXSquare;
 				final Ed25519FieldElement YSquareMinusXSquare;
-				XSquare = this.X.square();
-				YSquare = this.Y.square();
-				B = this.Z.squareAndDouble();
+				XSquare = this.X.squareAndOptionalDouble(false);
+				YSquare = this.Y.squareAndOptionalDouble(false);
+				B = this.Z.squareAndOptionalDouble(true);
 				A = this.X.add(this.Y);
-				ASquare = A.square();
+				ASquare = A.squareAndOptionalDouble(false);
 				YSquarePlusXSquare = YSquare.add(XSquare);
 				YSquareMinusXSquare = YSquare.subtract(XSquare);
 				return p1xp1(ASquare.subtract(YSquarePlusXSquare), YSquarePlusXSquare, YSquareMinusXSquare, B.subtract(YSquareMinusXSquare));
@@ -758,20 +758,20 @@ public class Ed25519GroupElement implements Serializable {
 	 */
 	private Ed25519GroupElement select(final int pos, final int b) {
 		// Is r_i negative?
-		final int bNegative = ByteUtils.isNegative(b);
+		final int bNegative = ByteUtils.isNegativeConstantTime(b);
 		// |r_i|
 		final int bAbs = b - (((-bNegative) & b) << 1);
 
 		// 16^i |r_i| B
 		final Ed25519GroupElement t = Ed25519Group.ZERO_PRECOMPUTED
-				.cmov(this.precomputedForSingle[pos][0], ByteUtils.isEqual(bAbs, 1))
-				.cmov(this.precomputedForSingle[pos][1], ByteUtils.isEqual(bAbs, 2))
-				.cmov(this.precomputedForSingle[pos][2], ByteUtils.isEqual(bAbs, 3))
-				.cmov(this.precomputedForSingle[pos][3], ByteUtils.isEqual(bAbs, 4))
-				.cmov(this.precomputedForSingle[pos][4], ByteUtils.isEqual(bAbs, 5))
-				.cmov(this.precomputedForSingle[pos][5], ByteUtils.isEqual(bAbs, 6))
-				.cmov(this.precomputedForSingle[pos][6], ByteUtils.isEqual(bAbs, 7))
-				.cmov(this.precomputedForSingle[pos][7], ByteUtils.isEqual(bAbs, 8));
+				.cmov(this.precomputedForSingle[pos][0], ByteUtils.isEqualConstantTime(bAbs, 1))
+				.cmov(this.precomputedForSingle[pos][1], ByteUtils.isEqualConstantTime(bAbs, 2))
+				.cmov(this.precomputedForSingle[pos][2], ByteUtils.isEqualConstantTime(bAbs, 3))
+				.cmov(this.precomputedForSingle[pos][3], ByteUtils.isEqualConstantTime(bAbs, 4))
+				.cmov(this.precomputedForSingle[pos][4], ByteUtils.isEqualConstantTime(bAbs, 5))
+				.cmov(this.precomputedForSingle[pos][5], ByteUtils.isEqualConstantTime(bAbs, 6))
+				.cmov(this.precomputedForSingle[pos][6], ByteUtils.isEqualConstantTime(bAbs, 7))
+				.cmov(this.precomputedForSingle[pos][7], ByteUtils.isEqualConstantTime(bAbs, 8));
 		// -16^i |r_i| B
 		final Ed25519GroupElement tMinus = precomputed(t.Y, t.X, t.Z.negate());
 		// 16^i r_i B
@@ -920,8 +920,8 @@ public class Ed25519GroupElement implements Serializable {
 				final Ed25519FieldElement inverse = this.Z.invert();
 				final Ed25519FieldElement x = this.X.multiply(inverse);
 				final Ed25519FieldElement y = this.Y.multiply(inverse);
-				final Ed25519FieldElement xSquare = x.square();
-				final Ed25519FieldElement ySquare = y.square();
+				final Ed25519FieldElement xSquare = x.squareAndOptionalDouble(false);
+				final Ed25519FieldElement ySquare = y.squareAndOptionalDouble(false);
 				final Ed25519FieldElement dXSquareYSquare = Ed25519Field.D.multiply(xSquare).multiply(ySquare);
 				return Ed25519Field.ONE.add(dXSquareYSquare).add(xSquare).equals(ySquare);
 

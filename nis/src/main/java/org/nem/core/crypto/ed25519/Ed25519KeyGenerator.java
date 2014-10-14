@@ -29,7 +29,7 @@ public class Ed25519KeyGenerator implements KeyGenerator {
 
 	@Override
 	public PublicKey derivePublicKey(final PrivateKey privateKey) {
-		final Ed25519EncodedFieldElement a = Ed25519Utils.prepareForScalarMultiply(privateKey.getRaw());
+		final Ed25519EncodedFieldElement a = Ed25519Utils.prepareForScalarMultiply(privateKey);
 
 		// a * base point is the public key.
 		final Ed25519GroupElement pubKey = Ed25519Group.BASE_POINT.scalarMultiply(a);
