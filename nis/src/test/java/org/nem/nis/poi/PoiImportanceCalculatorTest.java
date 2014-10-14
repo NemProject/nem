@@ -311,7 +311,8 @@ public class PoiImportanceCalculatorTest {
 	public void spamLinksDoNotHaveABigImpactOnImportance() {
 		// Arrange:
 		// - all accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = setupAccountStatesForRings();
+		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final StandardContext context = new StandardContext();
 
 		// Construct basic ring connections
 		final Matrix outlinkMatrix = setupBasicRingStructure();
@@ -322,24 +323,19 @@ public class PoiImportanceCalculatorTest {
 			outlinkMatrix.incrementAt(random.nextInt(6), random.nextInt(6), 20);
 		}
 
-		final BlockHeight height1 = new BlockHeight(2);
-		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
-		addOutlinksFromGraph(accountStates, height1, outlinkMatrix);
-		DEFAULT_IMPORTANCE_SCORER = new PageRankScorer();
+		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
 
 		// Act:
-		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
-		builder.setClusteringStrategy(new SingleClusterScan());
-		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
+		context.builder.setClusteringStrategy(new SingleClusterScan());
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = calculateImportances(builder.create(), height1, accountStates);
+		final ColumnVector normalImportances = calculateImportances(context.builder.create(), context.height1, accountStates);
 		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = calculateImportances(builder2.create(), height2, accountStates);
+		final ColumnVector ncdAwareImportances = calculateImportances(context.builder2.create(), context.height2, accountStates);
 		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
@@ -435,7 +431,8 @@ public class PoiImportanceCalculatorTest {
 	public void linkFromRingTwoToRingOneTransfersImportanceToLeftBlock() {
 		// Arrange:
 		// - all accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = setupAccountStatesForRings();
+		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final StandardContext context = new StandardContext();
 
 		// Construct basic ring connections
 		final Matrix outlinkMatrix = setupBasicRingStructure();
@@ -445,33 +442,28 @@ public class PoiImportanceCalculatorTest {
 		outlinkMatrix.setAt(4, 2, 1);
 		outlinkMatrix.setAt(11, 7, 1);
 
-		final BlockHeight height1 = new BlockHeight(2);
-		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
-		addOutlinksFromGraph(accountStates, height1, outlinkMatrix);
-		DEFAULT_IMPORTANCE_SCORER = new PageRankScorer();
+		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
 
 		// Act:
-		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
-		builder.setClusteringStrategy(new SingleClusterScan());
-		builder.setTeleportationProbability(1.00);
-		builder.setInterLevelTeleportationProbability(0.0);
-		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
-		builder2.setTeleportationProbability(0.86);
-		builder2.setInterLevelTeleportationProbability(0.1);
+		context.builder.setTeleportationProbability(1.00);
+		context.builder.setInterLevelTeleportationProbability(0.0);
+		context.builder2.setTeleportationProbability(0.86);
+		context.builder2.setInterLevelTeleportationProbability(0.1);
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = calculateImportances(builder.create(), height1, accountStates);
+		final ColumnVector normalImportances = calculateImportances(context.builder.create(), context.height1, accountStates);
 		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = calculateImportances(builder2.create(), height2, accountStates);
+		final ColumnVector ncdAwareImportances = calculateImportances(context.builder2.create(), context.height2, accountStates);
 		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
 		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
 
+		// Assert:
 		// There should have been some importance transferred from the right ring to the left one.
 		Assert.assertThat(ratio1 > 1, IsEqual.equalTo(true));
 		Assert.assertThat(ratio2 > 1 , IsEqual.equalTo(true));
@@ -479,10 +471,10 @@ public class PoiImportanceCalculatorTest {
 
 	// endregion
 
-	private List<PoiAccountState> setupAccountStatesForRings() {
+	private List<PoiAccountState> setupAccountStates(final int numAccounts) {
 		// All accounts start with 2000 NEM
 		final List<PoiAccountState> accountStates = new ArrayList<>();
-		for (int i=0; i<12; i++) {
+		for (int i=0; i<numAccounts; i++) {
 			accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 		}
 
@@ -510,6 +502,81 @@ public class PoiImportanceCalculatorTest {
 
 		return sum;
 	}
+
+	//region users-merchant-exchange
+
+	/**
+	 * 10 users transfer NEM to a merchant. The merchant transfers NEM to a exchange.
+	 * From the exchange, the NEM flow back to the users.
+	 * The importances for the merchant and the exchange are independent of the ammount of nem that flows.
+	 * This is due to the normalization of the outlink matrix and imo a weak point because the amount should matter.
+	 * This can be countered to a certain degree by setting the minOutlinkWeight to a reasonable value.
+	 * For our standard values, there is not much difference between normal and ncd aware page rank.
+	 *
+	 * <pre>
+	 *                  --------------------------
+	 *                /                U          |
+	 *               |    |------------0o-----    |
+	 *               |    |  ----------1o-   |    |
+	 *               |    | /          2   \ |    |
+	 *               |    oo         / .o   \|    |
+	 *               ----10o-------/   . ----11o---
+	 *                   M o           .   / E
+	 *                      \          . o
+	 *                       ----------9
+	 * </pre>
+	 */
+	@Test
+	public void merchantAndExchangeGetALotMoreImportance() {
+		// Arrange:
+		// - all accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final StandardContext context = new StandardContext();
+
+		// Setup transfers from users, merchant and exchange.
+		final Matrix outlinkMatrix = new DenseMatrix(12, 12);
+		for (int i = 0; i < 10; ++i) {
+			outlinkMatrix.setAt(10, i, 100);
+			outlinkMatrix.setAt(i, 11, 1);
+		}
+		outlinkMatrix.setAt(11, 10, 1);
+
+		// Act:
+		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
+
+		// Normal page rank
+		LOGGER.info("normal page rank:");
+		final ColumnVector normalImportances = calculateImportances(context.builder.create(), context.height1, accountStates);
+
+		// NCD aware page rank
+		LOGGER.info("NCD aware page rank:");
+		final ColumnVector ncdAwareImportances = calculateImportances(context.builder2.create(), context.height2, accountStates);
+
+		// Assert:
+		// Merchant and exchange should have higher importance than users.
+		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(10), IsEqual.equalTo(true));
+		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(11), IsEqual.equalTo(true));
+		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(10), IsEqual.equalTo(true));
+		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(11), IsEqual.equalTo(true));
+	}
+
+	private class StandardContext {
+		final BlockHeight height1 = new BlockHeight(2);
+		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
+
+		public StandardContext() {
+			DEFAULT_IMPORTANCE_SCORER = new PageRankScorer();
+			builder.setClusteringStrategy(new SingleClusterScan());
+			builder.setTeleportationProbability(0.85);
+			builder.setInterLevelTeleportationProbability(0.0);
+			builder2.setTeleportationProbability(0.75);
+			builder2.setInterLevelTeleportationProbability(0.1);
+		}
+	}
+
+	//endregion
 
 	/**
 	 * a --o b   c
