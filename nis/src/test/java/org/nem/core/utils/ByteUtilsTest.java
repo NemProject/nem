@@ -110,6 +110,7 @@ public class ByteUtilsTest {
 
 	// TODO 20141014 J-B: any reason isEqualConstantTime / isNegativeConstantTime don't return boolean?
 	// > i guess it's because you're using them in bitwise operations, if so that's fine
+	// TODO 20141015 BR -> J: in our case it is easier if it returns an int.
 
 	@Test
 	public void isEqualReturnsOneIfBytesAreEqual() {
