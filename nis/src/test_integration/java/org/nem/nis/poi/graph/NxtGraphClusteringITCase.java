@@ -211,6 +211,65 @@ public class NxtGraphClusteringITCase {
 
 	//endregion
 
+	//region min harvesting balance
+
+	/**
+	 * Using L2 distance as a proxy for importance sensitivity to min harvesting balance.
+	 * TODO 20141014 J-J: recalculate differences using pearson r
+	 *
+	 * min-balance - distance from stakes
+	 * 1:      0.013472
+	 * 100:    0.013472
+	 * 1000:   0.013472
+	 * 10000:  0.012213 <-- seems reasonable to bump up to 10000 with minimal changes
+	 * 100000: 0.008058
+	 */
+	@Test
+	public void minHarvestingBalanceVariance() {
+		// Arrange:
+		final int endHeight = 225000;
+		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
+		final Set<Long> minHarvesterBalances = Sets.newSet(1L, 100L, 500L, 1000L, 10000L, 100000L);
+		final Map<Long, ColumnVector> minBalanceToImportanceMap = new HashMap<>();
+
+		// calculate importances
+		for (final Long minHarvesterBalance : minHarvesterBalances) {
+			final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
+			optionsBuilder.setMinHarvesterBalance(Amount.fromNem(minHarvesterBalance));
+
+			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight);
+			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
+			minBalanceToImportanceMap.put(minHarvesterBalance, importances);
+		}
+
+		// calculate balances
+		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight));
+		balances.normalize();
+
+		for (final Map.Entry<Long, ColumnVector> entry : minBalanceToImportanceMap.entrySet()) {
+			final double distance = balances.l2Distance(entry.getValue());
+			LOGGER.info(String.format("distance between stakes and %d: %f", entry.getKey(), distance));
+		}
+	}
+
+	private static ColumnVector getBalances(
+			final BlockHeight blockHeight,
+			final Collection<PoiAccountState> accountStates) {
+		final List<Amount> balances = accountStates.stream()
+				.map(a -> a.getWeightedBalances().getVested(blockHeight))
+				.collect(Collectors.toList());
+
+		final ColumnVector balancesVector = new ColumnVector(balances.size());
+		for (int i = 0; i < balances.size(); ++i) {
+			balancesVector.setAt(i, balances.get(i).getNumNem());
+		}
+
+		LOGGER.info(String.format("balances: %s", balancesVector));
+		return balancesVector;
+	}
+
+	//endregion
+
 	//region poiComparisonTest
 
 	@Test
@@ -259,9 +318,16 @@ public class NxtGraphClusteringITCase {
 	}
 
 	private static Collection<PoiAccountState> loadEligibleHarvestingAccountStates(final long startHeight, final long endHeight) {
+		return loadEligibleHarvestingAccountStates(startHeight, endHeight, DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
+	}
+
+	private static Collection<PoiAccountState> loadEligibleHarvestingAccountStates(
+			final long startHeight,
+			final long endHeight,
+			final Amount minHarvesterBalance) {
 		final Collection<NxtTransaction> transactionData = loadTransactionData(startHeight, endHeight);
 		final Map<Address, PoiAccountState> accountStateMap = createAccountStatesFromTransactionData(transactionData);
-		return selectHarvestingEligibleAccounts(accountStateMap, new BlockHeight(endHeight));
+		return selectHarvestingEligibleAccounts(accountStateMap, new BlockHeight(endHeight), minHarvesterBalance);
 	}
 
 	private static Map<Address, PoiAccountState> createAccountStatesFromTransactionData(final Collection<NxtTransaction> transactions) {
@@ -276,7 +342,7 @@ public class NxtGraphClusteringITCase {
 
 		// 2. Iterate through transactions, creating new accounts as needed.
 		for (final NxtTransaction trans : transactions) {
-			final Amount amount = Amount.fromMicroNem(trans.getAmount() / 100000000); // NXT stores NXT * 10^8 (ignore micro nem)
+			final Amount amount = Amount.fromNem(trans.getAmount() / 100000000); // NXT stores NXT * 10^8 (ignore micro nem)
 			final Address sender = Address.fromEncoded(Long.toString(trans.getSenderId()));
 			final Address recipient = Address.fromEncoded(Long.toString(trans.getRecipientId()));
 			final BlockHeight blockHeight = new BlockHeight(trans.getHeight() + 1); // NXT blocks start at 0 but NEM blocks start at 1
@@ -324,8 +390,9 @@ public class NxtGraphClusteringITCase {
 
 	private static Collection<PoiAccountState> selectHarvestingEligibleAccounts(
 			final Map<Address, PoiAccountState> accountStateMap,
-			final BlockHeight height) {
-		final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
+			final BlockHeight height,
+			final Amount minHarvesterBalance) {
+		final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(minHarvesterBalance);
 		return accountStateMap.values().stream()
 				.filter(accountState -> canHarvestPredicate.canHarvest(accountState, height))
 				.collect(Collectors.toList());
