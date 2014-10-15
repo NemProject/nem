@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.utils.FormatUtils;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountImportance;
@@ -283,9 +284,12 @@ public class PoiContext {
 					this.options.getMuClusteringValue(),
 					this.options.getEpsilonClusteringValue());
 			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
+			final int numClusterMembers = this.clusteringResult.getClusters().stream().mapToInt(c -> c.size()).sum();
+			final int numClusters = this.clusteringResult.getClusters().size();
 			LOGGER.info(String.format(
-					"clustering completed: { clusters: %d, hubs: %d, outliers: %d }",
-					this.clusteringResult.getClusters().size(),
+					"clustering completed: { clusters: %d (average size: %s), hubs: %d, outliers: %d }",
+					numClusters,
+					numClusters > 0? FormatUtils.format((double)numClusterMembers / (double)numClusters, 2) : 0,
 					this.clusteringResult.getHubs().size(),
 					this.clusteringResult.getOutliers().size()));
 

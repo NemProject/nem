@@ -155,6 +155,9 @@ public class WeightedBalances {
 			return Amount.ZERO;
 		}
 		final int index = this.findElement(height);
+		if (index < 0) {
+			return Amount.fromMicroNem(0);
+		}
 		return this.balances.get(index).getVestedBalance();
 	}
 

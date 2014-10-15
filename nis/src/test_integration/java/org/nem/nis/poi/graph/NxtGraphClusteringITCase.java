@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
 
 public class NxtGraphClusteringITCase {
 	private static final Logger LOGGER = Logger.getLogger(NxtGraphClusteringITCase.class.getName());
-	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
+	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
+	private static final PoiOptions DEFAULT_POI_OPTIONS = DEFAULT_POI_OPTIONS_BUILDER.create();
 
 	@Test
 	public void canQueryNxtTransactionTable() {
@@ -71,7 +72,7 @@ public class NxtGraphClusteringITCase {
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 
 		// 0. Load account states.
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight);
+		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		// 1. calc importances
 		final ColumnVector importances = getAccountImportances(
@@ -162,7 +163,7 @@ public class NxtGraphClusteringITCase {
 									final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 
 									// 0. Load account states.
-									final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight);
+									final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 									// 1. calc importances
 									final ColumnVector importances = getAccountImportances(
@@ -216,6 +217,7 @@ public class NxtGraphClusteringITCase {
 	/**
 	 * Using L2 distance as a proxy for importance sensitivity to min harvesting balance.
 	 * TODO 20141014 J-J: recalculate differences using pearson r
+	 * TODO 20141015 BR -> J: nice test. I agree to raise the min harvest balance to the suggested value.
 	 *
 	 * min-balance - distance from stakes
 	 * 1:      0.013472
@@ -237,13 +239,13 @@ public class NxtGraphClusteringITCase {
 			final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 			optionsBuilder.setMinHarvesterBalance(Amount.fromNem(minHarvesterBalance));
 
-			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight);
+			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
 			minBalanceToImportanceMap.put(minHarvesterBalance, importances);
 		}
 
 		// calculate balances
-		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight));
+		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER));
 		balances.normalize();
 
 		for (final Map.Entry<Long, ColumnVector> entry : minBalanceToImportanceMap.entrySet()) {
@@ -272,12 +274,13 @@ public class NxtGraphClusteringITCase {
 
 	//region poiComparisonTest
 
+	// TODO 20141015 BR: this test used to pass but now it fails. What changed?
 	@Test
 	public void poiComparisonTest() {
 		// Arrange:
-		final int endHeight = 5000;//225000;
+		final int endHeight = 300000;//225000;
 
-		// a) This is the warm up phase. I dunno why it is needed but the first time java needs a lot longer for the calculation
+		// a) This is the warm up phase.
 		getAccountImportances(endHeight, new OutlierScan(), "WARM UP");
 
 		// Act:
@@ -304,7 +307,7 @@ public class NxtGraphClusteringITCase {
 			final GraphClusteringStrategy clusteringStrategy,
 			final String name) {
 		// 0. Load transactions.
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight);
+		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		LOGGER.info(String.format("*** Poi calculation: %s **", name));
 		final long start = System.currentTimeMillis();
@@ -317,8 +320,117 @@ public class NxtGraphClusteringITCase {
 		return importanceVector;
 	}
 
-	private static Collection<PoiAccountState> loadEligibleHarvestingAccountStates(final long startHeight, final long endHeight) {
-		return loadEligibleHarvestingAccountStates(startHeight, endHeight, DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
+	//endregion
+
+	//region influence of epsilon
+
+	/**
+	 * Analyzes the influence of the value of epsilon on the number of clusters, the average cluster size and the number of hubs.
+	 * The minimum harvester balance is set to 10000.
+	 * (unfortunately cluster information is only internally available, so it is only logged. You have to look for the entries yourself).
+	 *
+	 * epsilon = 0.75
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     1    |    3.00   |          1.00           |  0
+	 *   50000   |     6    |    3.00   |          1.20           |  0
+	 *  100000   |     8    |    3.12   |          0.80           |  5
+	 *  150000   |     9    |    3.11   |          0.60           |  5
+	 *  200000   |    13    |    3.15   |          0.65           |  5
+	 *
+	 * epsilon = 0.65 (standard value)
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     2    |    3.00   |          3.00           |  0
+	 *   50000   |    14    |    3.29   |          2.80           |  3
+	 *  100000   |    16    |    3.19   |          1.60           |  8
+	 *  150000   |    24    |    3.33   |          1.60           |  5
+	 *  200000   |    33    |    3.33   |          1.65           |  8
+	 *
+	 * epsilon = 0.55
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     6    |    3.67   |          6.00           |  1
+	 *   50000   |    26    |    3.73   |          5.20           |  9
+	 *  100000   |    29    |    3.45   |          2.90           | 10
+	 *  150000   |    44    |    3.70   |          2.93           | 13
+	 *  200000   |    53    |    2.65   |          2.65           | 19
+	 *
+	 * epsilon = 0.45
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |    10    |    4.70   |         10.00           |  5
+	 *   50000   |    37    |    4.03   |          7.40           | 17
+	 *  100000   |    47    |    3.96   |          4.70           | 24
+	 *  150000   |    64    |    4.25   |          4.26           | 39
+	 *  200000   |    77    |    3.86   |          3.85           | 47
+	 *
+	 * epsilon = 0.35
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     8    |    8.88   |          8.00           |  5
+	 *   50000   |    38    |    6.03   |          7.60           | 18
+	 *  100000   |    44    |    6.98   |          4.40           | 30
+	 *  150000   |    63    |    6.52   |          4.26           | 29
+	 *  200000   |    81    |    5.91   |          4.05           | 48
+	 *
+	 * epsilon = 0.30
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     6    |   13.67   |          6.00           |  3
+	 *   50000   |    22    |   11.45   |          4.40           |  6
+	 *  100000   |    33    |   11.18   |          3.30           | 54
+	 *  150000   |    48    |    9.77   |          3.20           | 16
+	 *  200000   |    58    |    9.91   |          2.90           | 27
+	 *
+	 * epsilon = 0.25
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     4    |   21.00   |          4.00           |  0
+	 *   50000   |    16    |   17.44   |          3.20           |  4
+	 *  100000   |    22    |   18.86   |          2.20           | 38
+	 *  150000   |    28    |   18.61   |          1.87           | 12
+	 *  200000   |    38    |   17.63   |          1.90           |  9
+	 *
+	 * epsilon = 0.20
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     3    |   34.67   |          3.00           |  0
+	 *   50000   |    12    |   28.83   |          2.40           |  1
+	 *  100000   |    17    |   27.71   |          1.70           |  0
+	 *  150000   |    20    |   31.15   |          1.33           |  5
+	 *  200000   |    28    |   26.64   |          1.40           |  5
+	 *
+	 * epsilon = 0.15
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     3    |   37.33   |          3.00           |  0
+	 *   50000   |    10    |   39.00   |          2.00           |  0
+	 *  100000   |    13    |   40.77   |          1.30           |  0
+	 *  150000   |    14    |   49.29   |          0.93           |  0
+	 *  200000   |    20    |   39.60   |          1.00           |  0
+	 *
+	 * epsilon = 0.05
+	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
+	 *   10000   |     2    |   56.00   |          2.00           |  0
+	 *   50000   |     8    |   55.62   |          1.60           |  0
+	 *  100000   |     2    |  485.50   |          0.20           |  0
+	 *  150000   |     7    |  175.14   |          0.47           |  0
+	 *  200000   |    10    |  110.60   |          0.50           |  0
+	 *
+	 */
+	@Test
+	public void epsilonInfluenceOnNumberOfClustersAndClusterSize() {
+		// Arrange:
+		final int endHeight = 200000;
+		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
+		final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
+		optionsBuilder.setMinHarvesterBalance(Amount.fromNem(10000));
+		optionsBuilder.setEpsilonClusteringValue(0.20);
+
+		// Act:
+		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, optionsBuilder);
+		getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
+	}
+
+	// endregion
+
+	private static Collection<PoiAccountState> loadEligibleHarvestingAccountStates(
+			final long startHeight,
+			final long endHeight,
+			final PoiOptionsBuilder optionsBuilder) {
+		return loadEligibleHarvestingAccountStates(startHeight, endHeight, optionsBuilder.create().getMinHarvesterBalance());
 	}
 
 	private static Collection<PoiAccountState> loadEligibleHarvestingAccountStates(
@@ -402,6 +514,7 @@ public class NxtGraphClusteringITCase {
 		Assert.assertThat(lhs.size(), IsEqual.equalTo(rhs.size()));
 		final ColumnVector ratios = new ColumnVector(lhs.size());
 		double diff = 0;
+		double maxRatio = 1.0;
 		for (int i = 0; i < rhs.size(); ++i) {
 			diff += Math.abs(rhs.getAt(i) - lhs.getAt(i));
 			if (lhs.getAt(i) > 0.0) {
@@ -411,12 +524,14 @@ public class NxtGraphClusteringITCase {
 			} else {
 				ratios.setAt(i, 1.0);
 			}
+			maxRatio = ratios.getAt(i) > maxRatio? ratios.getAt(i) : maxRatio;
 			if (ratios.getAt(i) > 1.001 || ratios.getAt(i) < 0.999) {
 				LOGGER.info("Account " + i + " importance ratio is " + ratios.getAt(i));
 			}
 		}
 
 		LOGGER.info(String.format("diff: %f; ratios: %s", diff, ratios));
+		LOGGER.info(String.format("maximal ratio is: %f", maxRatio));
 		LOGGER.finest(lhs.toString());
 		LOGGER.finest(rhs.toString());
 		return diff;
@@ -455,7 +570,7 @@ public class NxtGraphClusteringITCase {
 	}
 
 	private SparseMatrix createNetOutlinkMatrix(final long startHeight, final long endHeight) {
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight);
+		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), DEFAULT_POI_OPTIONS);
 		return poiContext.getOutlinkMatrix();
 	}

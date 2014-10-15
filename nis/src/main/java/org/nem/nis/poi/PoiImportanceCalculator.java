@@ -50,7 +50,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		final PowerIterator iterator = new PoiPowerIterator(
 				context,
 				this.options,
-				this.scorer,
 				accountStates.size(),
 				this.options.isClusteringEnabled());
 
@@ -78,19 +77,17 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		private final PoiContext context;
 		private final PoiOptions options;
 		// TODO 20141014 J-B: you don't need to pass scorer here
-		private final ImportanceScorer scorer;
+		// TODO 20141015 BR -> J: actually it was already there, I didn't add it ^^
 		private final boolean useClustering;
 
 		public PoiPowerIterator(
 				final PoiContext context,
 				final PoiOptions options,
-				final ImportanceScorer scorer,
 				final int numAccounts,
 				final boolean useClustering) {
 			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.options = options;
-			this.scorer = scorer;
 			this.useClustering = useClustering;
 		}
 
@@ -150,6 +147,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		// TODO 20141014 J-B: i would move this somewhere so that we can keep the deleted test
+		// TODO 20151015 BR -> J: tell me where to move it, it is only used in this class.
 		/**
 		 * Calculates the weighted teleporation sum of all dangling accounts.
 		 *
