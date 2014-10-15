@@ -310,7 +310,7 @@ public class PoiImportanceCalculatorTest {
 	@Test
 	public void spamLinksDoNotHaveABigImpactOnImportance() {
 		// Arrange:
-		// - all accounts start with 2000 NEM
+		// - all (12) accounts start with 2000 NEM
 		final List<PoiAccountState> accountStates = setupAccountStates(12);
 		final StandardContext context = new StandardContext();
 
@@ -318,6 +318,7 @@ public class PoiImportanceCalculatorTest {
 		final Matrix outlinkMatrix = setupBasicRingStructure();
 
 		// Add random transactions to the left ring
+		// TODO 20141014 J-B: should we attempt to filter out self loops (probably doesn't matter)
 		final SecureRandom random = new SecureRandom();
 		for (int i = 0; i < 100; ++i) {
 			outlinkMatrix.incrementAt(random.nextInt(6), random.nextInt(6), 20);
@@ -326,6 +327,7 @@ public class PoiImportanceCalculatorTest {
 		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
 
 		// Act:
+		// TODO 20141014 J-B: are you intentionally using SingleClusterScan?
 		context.builder.setClusteringStrategy(new SingleClusterScan());
 
 		// Normal page rank
@@ -482,7 +484,7 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	private Matrix setupBasicRingStructure() {
-		// Construct basic ring connections
+		// construct basic ring connections
 		final Matrix outlinkMatrix = new DenseMatrix(12, 12);
 		outlinkMatrix.setAt(0, 5, 100);
 		outlinkMatrix.setAt(6, 11, 100);
@@ -508,7 +510,7 @@ public class PoiImportanceCalculatorTest {
 	/**
 	 * 10 users transfer NEM to a merchant. The merchant transfers NEM to a exchange.
 	 * From the exchange, the NEM flow back to the users.
-	 * The importances for the merchant and the exchange are independent of the ammount of nem that flows.
+	 * The importances for the merchant and the exchange are independent of the amount of nem that flows.
 	 * This is due to the normalization of the outlink matrix and imo a weak point because the amount should matter.
 	 * This can be countered to a certain degree by setting the minOutlinkWeight to a reasonable value.
 	 * For our standard values, there is not much difference between normal and ncd aware page rank.
@@ -567,6 +569,7 @@ public class PoiImportanceCalculatorTest {
 		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
 
 		public StandardContext() {
+			// TODO 20141014 J-B: i don't really like how you're changing the constant
 			DEFAULT_IMPORTANCE_SCORER = new PageRankScorer();
 			builder.setClusteringStrategy(new SingleClusterScan());
 			builder.setTeleportationProbability(0.85);

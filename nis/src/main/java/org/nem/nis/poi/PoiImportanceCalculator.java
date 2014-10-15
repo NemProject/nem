@@ -77,6 +77,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static class PoiPowerIterator extends PowerIterator {
 		private final PoiContext context;
 		private final PoiOptions options;
+		// TODO 20141014 J-B: you don't need to pass scorer here
 		private final ImportanceScorer scorer;
 		private final boolean useClustering;
 
@@ -148,6 +149,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 					.multiply(this.options.getInterLevelTeleportationProbability());
 		}
 
+		// TODO 20141014 J-B: i would move this somewhere so that we can keep the deleted test
 		/**
 		 * Calculates the weighted teleporation sum of all dangling accounts.
 		 *
