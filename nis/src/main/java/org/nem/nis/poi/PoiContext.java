@@ -112,6 +112,8 @@ public class PoiContext {
 
 	//endregion
 
+	// TODO 20141016 J-B: we should test
+
 	//region clustering result
 
 	/**

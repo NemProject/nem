@@ -85,6 +85,8 @@ public class ClusteringResult {
 		return this.clusters.size() + this.hubs.size() + this.outliers.size();
 	}
 
+	// TODO 20141016 J-B: i guess we should test these
+
 	/**
 	 * Gets a value indicating whether or not the given id is a regular cluster id.
 	 *

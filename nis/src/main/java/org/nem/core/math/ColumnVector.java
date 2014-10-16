@@ -391,7 +391,7 @@ public class ColumnVector {
 
 	@Override
 	public String toString() {
-		final DecimalFormat format = FormatUtils.getDecimalFormat(5);
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < this.size; ++i) {
