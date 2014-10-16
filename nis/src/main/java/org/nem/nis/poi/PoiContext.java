@@ -90,7 +90,7 @@ public class PoiContext {
 
 	//endregion
 
-	//region matricies
+	//region matrices
 
 	/**
 	 * Gets the out-link matrix.
@@ -111,6 +111,17 @@ public class PoiContext {
 	}
 
 	//endregion
+
+	//region clustering result
+
+	/**
+	 * Gets the clustering result.
+	 *
+	 * @return The clustering result.
+	 */
+	public ClusteringResult getClusteringResult() {
+		return this.accountProcessor.clusteringResult;
+	}
 
 	//endregion
 

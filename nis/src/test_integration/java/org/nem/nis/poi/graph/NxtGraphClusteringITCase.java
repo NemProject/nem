@@ -647,12 +647,23 @@ public class NxtGraphClusteringITCase {
 		final long startHeight = 0;
 		final long stopHeight = 10000;
 
-		final SparseMatrix outlinkMatrix = this.createNetOutlinkMatrix(startHeight, stopHeight);
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setEpsilonClusteringValue(0.40);
+		builder.setMinOutlinkWeight(Amount.fromNem(1000));
+		builder.setMinHarvesterBalance(Amount.fromNem(10000));
+		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, stopHeight, builder);
+		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(stopHeight), builder.create());
+		final SparseMatrix outlinkMatrix = poiContext.getOutlinkMatrix();
+		final ClusteringResult result = poiContext.getClusteringResult();
+		System.out.println("Clusters:");
+		result.getClusters().stream().forEach(cluster -> System.out.println(cluster.toString()));
+		System.out.println("Hubs:");
+		result.getHubs().stream().forEach(hub -> System.out.println(hub.toString()));
 		final PoiGraphParameters params = PoiGraphParameters.getDefaultParams();
 		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
-		final PoiGraphViewer viewer = new PoiGraphViewer(outlinkMatrix, params);
-		viewer.saveGraph();
-		//viewer.showGraph();
+		final PoiGraphViewer viewer = new PoiGraphViewer(outlinkMatrix, params, result);
+		//viewer.saveGraph();
+		viewer.showGraph();
 	}
 
 	@Ignore
@@ -661,7 +672,8 @@ public class NxtGraphClusteringITCase {
 		final int startHeight = 100000;
 		final int stopHeight = 200000;//300000;
 
-		final SparseMatrix outlinkMatrix = this.createNetOutlinkMatrix(startHeight, stopHeight);
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		final SparseMatrix outlinkMatrix = this.createNetOutlinkMatrix(startHeight, stopHeight, builder);
 		final ClusteringResult result = calculateClusteringResult(new FastScanClusteringStrategy(), outlinkMatrix);
 		LOGGER.info(String.format("The clusterer found %d regular clusters, %d hubs, and %d outliers",
 				result.getClusters().size(),
@@ -669,9 +681,9 @@ public class NxtGraphClusteringITCase {
 				result.getOutliers().size()));
 	}
 
-	private SparseMatrix createNetOutlinkMatrix(final long startHeight, final long endHeight) {
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
-		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), DEFAULT_POI_OPTIONS);
+	private SparseMatrix createNetOutlinkMatrix(final long startHeight, final long endHeight, final PoiOptionsBuilder builder) {
+		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight, builder);
+		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), builder.create());
 		return poiContext.getOutlinkMatrix();
 	}
 

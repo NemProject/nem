@@ -86,6 +86,38 @@ public class ClusteringResult {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the given id is a regular cluster id.
+	 *
+	 * @param id The id
+	 * @return true if the id is a regular cluster id, false otherwise.
+	 */
+	public boolean isRegularCluster(final ClusterId id) {
+		for (Cluster cluster : this.clusters) {
+			if (cluster.getId().equals(id)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Gets a value indicating whether or not the given id is hub id.
+	 *
+	 * @param id The id
+	 * @return true if the id is a hub id, false otherwise.
+	 */
+	public boolean isHub(final ClusterId id) {
+		for (Cluster hub : this.hubs) {
+			if (hub.getId().equals(id)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Gets the id of the cluster for the given node id.
 	 *
 	 * @param nodeId The node id.
