@@ -7,7 +7,7 @@ import org.mockito.internal.util.collections.Sets;
 import org.nem.core.math.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
-import org.nem.core.utils.ExceptionUtils;
+import org.nem.core.utils.*;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountLink;
@@ -15,7 +15,9 @@ import org.nem.nis.test.NisUtils;
 
 import java.io.*;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -225,75 +227,97 @@ public class NxtGraphClusteringITCase {
 	 * 10^2 | 0.9990 | 1.0000 | 1.0000 |        |        |        |
 	 * 10^3 | 0.9990 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^4 | 0.9992 | 0.9992 | 0.9992 | 0.9992 | 1.0000 |        |
-	 * 10^5 | 0.9983 | 0.9983 | 0.9983 | 0.9983 | 0.9989 | 1.0000 |
+	 * 10^5 | 0.9984 | 0.9984 | 0.9984 | 0.9984 | 0.9990 | 1.0000 |
 	 */
 	@Test
 	public void minHarvestingBalanceVariance() {
-		// Arrange:
-		final int endHeight = 225000;
-		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-		final Map<Long, ColumnVector> minBalanceToImportanceMap = new HashMap<>();
-
-		// calculate importances
-		for (final Long minHarvesterBalance : Arrays.asList(1L, 100L, 1000L, 10000L, 100000L)) {
-			final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
-			optionsBuilder.setMinHarvesterBalance(Amount.fromNem(minHarvesterBalance));
-
-			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
-			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
-			minBalanceToImportanceMap.put(minHarvesterBalance, importances);
-		}
-
-		// calculate balances
-		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER));
-		balances.normalize();
-		minBalanceToImportanceMap.put(0L, balances);
-
-		for (final Map.Entry<Long, ColumnVector> entry1 : minBalanceToImportanceMap.entrySet()) {
-			for (final Map.Entry<Long, ColumnVector> entry2 : minBalanceToImportanceMap.entrySet()) {
-				final double correlation = entry1.getValue().correlation(entry2.getValue());
-				LOGGER.info(String.format("correlation between %d and %d: %f", entry1.getKey(), entry2.getKey(), correlation));
-			}
-		}
+		// Act:
+		runSensitivityTest(
+				Arrays.asList(1L, 100L, 1000L, 10000L, 100000L),
+				v -> {
+					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
+					optionsBuilder.setMinHarvesterBalance(Amount.fromNem(v));
+					return optionsBuilder;
+				});
 	}
+
 	/**
 	 * Using correlation as a proxy for importance sensitivity to min outlink balance.
 	 *
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |
 	 * STK  | 1.0000 |        |        |        |        |
 	 * 10^0 | 0.9994 | 1.0000 |        |        |        |
-	 * 10^1 | 0.9995 | 0.9999 | 1.0000 |        |        |
-	 * 10^2 | 0.9995 | 0.9999 | 0.9999 | 1.0000 |        |
-	 * 10^3 | 0.9996 | 0.9998 | 0.9999 | 0.9999 | 1.0000 |
+	 * 10^1 | 0.9995 | 1.0000 | 1.0000 |        |        |
+	 * 10^2 | 0.9996 | 0.9999 | 1.0000 | 1.0000 |        |
+	 * 10^3 | 0.9996 | 0.9999 | 0.9999 | 1.0000 | 1.0000 |
 	 */
 	@Test
 	public void minOutlinkWeightBalanceVariance() {
+		// Act:
+		runSensitivityTest(
+				Arrays.asList(1L, 10L, 100L, 1000L),
+				v -> {
+					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
+					optionsBuilder.setMinOutlinkWeight(Amount.fromNem(v));
+					return optionsBuilder;
+				});
+	}
+
+	private static void runSensitivityTest(final Collection<Long> values, final Function<Long, PoiOptionsBuilder> createOptionsBuilder) {
 		// Arrange:
 		final int endHeight = 225000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-		final Map<Long, ColumnVector> minBalanceToImportanceMap = new HashMap<>();
+		final Map<Long, ColumnVector> parameterToImportanceMap = new HashMap<>();
 
 		// calculate importances
-		for (final Long minOutlinkWeight : Arrays.asList(1L, 10L, 100L, 1000L)) {
-			final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
-			optionsBuilder.setMinOutlinkWeight(Amount.fromNem(minOutlinkWeight));
+		for (final Long value : values) {
+			final PoiOptionsBuilder optionsBuilder = createOptionsBuilder.apply(value);
 
 			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
-			minBalanceToImportanceMap.put(minOutlinkWeight, importances);
+			parameterToImportanceMap.put(value, importances);
 		}
 
 		// calculate balances
 		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER));
 		balances.normalize();
-		minBalanceToImportanceMap.put(0L, balances);
+		parameterToImportanceMap.put(0L, balances);
 
-		for (final Map.Entry<Long, ColumnVector> entry1 : minBalanceToImportanceMap.entrySet()) {
-			for (final Map.Entry<Long, ColumnVector> entry2 : minBalanceToImportanceMap.entrySet()) {
-				final double correlation = entry1.getValue().correlation(entry2.getValue());
-				LOGGER.info(String.format("correlation between %d and %d: %f", entry1.getKey(), entry2.getKey(), correlation));
+		final List<Long> keys = parameterToImportanceMap.keySet().stream().sorted().collect(Collectors.toList());
+		final List<String> keyNames = keys.stream()
+				.map(NxtGraphClusteringITCase::getFriendlyLabel)
+				.collect(Collectors.toList());
+
+		final StringBuilder builder = new StringBuilder();
+		builder.append(System.lineSeparator());
+		builder.append("*      |");
+		for (final String keyName : keyNames) {
+			builder.append(String.format("  %s  |", keyName));
+		}
+
+		final DecimalFormat decimalFormat = FormatUtils.getDecimalFormat(4);
+		for (int i = 0; i < keyNames.size(); ++i) {
+			builder.append(System.lineSeparator());
+			builder.append(String.format("* %s |", keyNames.get(i)));
+
+			final ColumnVector vector1 = parameterToImportanceMap.get(keys.get(i));
+			for (int j = 0; j < keyNames.size(); ++j) {
+				if (j > i) {
+					builder.append("        |");
+					continue;
+				}
+
+				final ColumnVector vector2 = parameterToImportanceMap.get(keys.get(j));
+				final double correlation = vector1.correlation(vector2);
+				builder.append(String.format(" %s |", decimalFormat.format(correlation)));
 			}
 		}
+
+		LOGGER.info(builder.toString());
+	}
+
+	private static String getFriendlyLabel(final long key) {
+		return 0 == key ? "STK " : "10^" + (long)Math.log10(key);
 	}
 
 	private static ColumnVector getBalances(
