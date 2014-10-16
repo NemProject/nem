@@ -337,7 +337,7 @@ public class Ed25519FieldElement {
 		carry5 = (h5 + (long)(1 << 24)) >> 25;
 		h6 += carry5;
 		h5 -= carry5 << 25;
-        /* |h1| <= 2^24; from now on fits into int32 */
+		/* |h1| <= 2^24; from now on fits into int32 */
         /* |h5| <= 2^24; from now on fits into int32 */
         /* |h2| <= 1.41*2^60 */
         /* |h6| <= 1.41*2^60 */
