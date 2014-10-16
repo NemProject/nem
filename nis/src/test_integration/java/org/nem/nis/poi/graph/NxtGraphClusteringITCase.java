@@ -344,6 +344,7 @@ public class NxtGraphClusteringITCase {
 	//region poiComparisonTest
 
 	// TODO 20141015 BR: this test used to pass but now it fails. What changed?
+    // TODO 20141016 M: something seems to have broken somewhere I think
 	@Test
 	public void poiComparisonTest() {
 		// Arrange:
