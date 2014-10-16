@@ -2,7 +2,7 @@ package org.nem.core.math;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 
 import java.util.*;
 
@@ -374,6 +374,56 @@ public class ColumnVectorTest {
 
 		// Assert:
 		Assert.assertEquals(13.96424, magnitude, 0.0000001);
+	}
+
+	//endregion
+
+	//region correlation
+
+	@Test
+	public void correlationCannotBeCalculatedForDifferentSizedVectors() {
+		// Arrange:
+		final ColumnVector largerVector = new ColumnVector(8);
+		final ColumnVector smallerVector = new ColumnVector(7);
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> largerVector.correlation(smallerVector), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> smallerVector.correlation(largerVector), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void correlationCanBeCalculatedForPerfectlyCorrelatedVectors() {
+		// Arrange:
+		final ColumnVector lhs = new ColumnVector(1, 2, 3, 4, 5);
+		final ColumnVector rhs = new ColumnVector(5, 10, 15, 20, 25);
+
+		// Assert:
+		Assert.assertThat(lhs.correlation(lhs), IsEqual.equalTo(1.0));
+		Assert.assertThat(lhs.correlation(rhs), IsEqual.equalTo(1.0));
+		Assert.assertThat(rhs.correlation(lhs), IsEqual.equalTo(1.0));
+		Assert.assertThat(rhs.correlation(rhs), IsEqual.equalTo(1.0));
+	}
+
+	@Test
+	public void correlationCanBeCalculatedForPerfectlyAntiCorrelatedVectors() {
+		// Arrange:
+		final ColumnVector lhs = new ColumnVector(5, 4, 3, 2, 1);
+		final ColumnVector rhs = new ColumnVector(5, 10, 15, 20, 25);
+
+		// Assert:
+		Assert.assertThat(lhs.correlation(rhs), IsEqual.equalTo(-1.0));
+		Assert.assertThat(rhs.correlation(lhs), IsEqual.equalTo(-1.0));
+	}
+
+	@Test
+	public void correlationCanBeCalculatedForPartiallyCorrelatedVectors() {
+		// Arrange:
+		final ColumnVector lhs = new ColumnVector(10.00, 200.0, 7.000, 150.0, 2.000);
+		final ColumnVector rhs = new ColumnVector(0.001, 0.450, 0.007, 0.200, 0.300);
+
+		// Assert:
+		Assert.assertThat(lhs.correlation(rhs), IsRoundedEqual.equalTo(0.6877, 4));
+		Assert.assertThat(rhs.correlation(lhs), IsRoundedEqual.equalTo(0.6877, 4));
 	}
 
 	//endregion

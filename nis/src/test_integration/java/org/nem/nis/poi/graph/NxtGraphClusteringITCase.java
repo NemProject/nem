@@ -215,27 +215,27 @@ public class NxtGraphClusteringITCase {
 	//region min harvesting balance
 
 	/**
-	 * Using L2 distance as a proxy for importance sensitivity to min harvesting balance.
+	 * Using correlation as a proxy for importance sensitivity to min harvesting balance.
 	 * TODO 20141014 J-J: recalculate differences using pearson r
 	 * TODO 20141015 BR -> J: nice test. I agree to raise the min harvest balance to the suggested value.
 	 *
-	 * min-balance - distance from stakes
-	 * 1:      0.013472
-	 * 100:    0.013472
-	 * 1000:   0.013472
-	 * 10000:  0.012213 <-- seems reasonable to bump up to 10000 with minimal changes
-	 * 100000: 0.008058
+	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
+	 * STK  | 1.0000 |        |        |        |        |        |
+	 * 10^0 | 0.9990 | 1.0000 |        |        |        |        |
+	 * 10^2 | 0.9990 | 1.0000 | 1.0000 |        |        |        |
+	 * 10^3 | 0.9990 | 1.0000 | 1.0000 | 1.0000 |        |        |
+	 * 10^4 | 0.9992 | 0.9992 | 0.9992 | 0.9992 | 1.0000 |        |
+	 * 10^5 | 0.9983 | 0.9983 | 0.9983 | 0.9983 | 0.9989 | 1.0000 |
 	 */
 	@Test
 	public void minHarvestingBalanceVariance() {
 		// Arrange:
 		final int endHeight = 225000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-		final Set<Long> minHarvesterBalances = Sets.newSet(1L, 100L, 500L, 1000L, 10000L, 100000L);
 		final Map<Long, ColumnVector> minBalanceToImportanceMap = new HashMap<>();
 
 		// calculate importances
-		for (final Long minHarvesterBalance : minHarvesterBalances) {
+		for (final Long minHarvesterBalance : Arrays.asList(1L, 100L, 1000L, 10000L, 100000L)) {
 			final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 			optionsBuilder.setMinHarvesterBalance(Amount.fromNem(minHarvesterBalance));
 
@@ -247,10 +247,52 @@ public class NxtGraphClusteringITCase {
 		// calculate balances
 		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER));
 		balances.normalize();
+		minBalanceToImportanceMap.put(0L, balances);
 
-		for (final Map.Entry<Long, ColumnVector> entry : minBalanceToImportanceMap.entrySet()) {
-			final double distance = balances.l2Distance(entry.getValue());
-			LOGGER.info(String.format("distance between stakes and %d: %f", entry.getKey(), distance));
+		for (final Map.Entry<Long, ColumnVector> entry1 : minBalanceToImportanceMap.entrySet()) {
+			for (final Map.Entry<Long, ColumnVector> entry2 : minBalanceToImportanceMap.entrySet()) {
+				final double correlation = entry1.getValue().correlation(entry2.getValue());
+				LOGGER.info(String.format("correlation between %d and %d: %f", entry1.getKey(), entry2.getKey(), correlation));
+			}
+		}
+	}
+	/**
+	 * Using correlation as a proxy for importance sensitivity to min outlink balance.
+	 *
+	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |
+	 * STK  | 1.0000 |        |        |        |        |
+	 * 10^0 | 0.9994 | 1.0000 |        |        |        |
+	 * 10^1 | 0.9995 | 0.9999 | 1.0000 |        |        |
+	 * 10^2 | 0.9995 | 0.9999 | 0.9999 | 1.0000 |        |
+	 * 10^3 | 0.9996 | 0.9998 | 0.9999 | 0.9999 | 1.0000 |
+	 */
+	@Test
+	public void minOutlinkWeightBalanceVariance() {
+		// Arrange:
+		final int endHeight = 225000;
+		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
+		final Map<Long, ColumnVector> minBalanceToImportanceMap = new HashMap<>();
+
+		// calculate importances
+		for (final Long minOutlinkWeight : Arrays.asList(1L, 10L, 100L, 1000L)) {
+			final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
+			optionsBuilder.setMinOutlinkWeight(Amount.fromNem(minOutlinkWeight));
+
+			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
+			minBalanceToImportanceMap.put(minOutlinkWeight, importances);
+		}
+
+		// calculate balances
+		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER));
+		balances.normalize();
+		minBalanceToImportanceMap.put(0L, balances);
+
+		for (final Map.Entry<Long, ColumnVector> entry1 : minBalanceToImportanceMap.entrySet()) {
+			for (final Map.Entry<Long, ColumnVector> entry2 : minBalanceToImportanceMap.entrySet()) {
+				final double correlation = entry1.getValue().correlation(entry2.getValue());
+				LOGGER.info(String.format("correlation between %d and %d: %f", entry1.getKey(), entry2.getKey(), correlation));
+			}
 		}
 	}
 
