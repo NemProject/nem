@@ -80,8 +80,6 @@ public class Ed25519DsaSigner implements DsaSigner {
 			return false;
 		}
 
-		// TODO 20141014: can you add a test for this?
-		// TODO 20141014 BR -> J: done.
 		if (1 == ArrayUtils.isEqualConstantTime(this.getKeyPair().getPublicKey().getRaw(), new byte[32])) {
 			return false;
 		}
