@@ -6,11 +6,14 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
+import org.nem.core.utils.Base32Encoder;
 
 import java.math.BigInteger;
 import java.util.function.*;
 
 public class AddressTest {
+
+	//region construction
 
 	@Test
 	public void addressCanBeCreatedAroundEncodedAddress() {
@@ -32,6 +35,19 @@ public class AddressTest {
 		Assert.assertThat(address.getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
 	}
+
+	@Test
+	public void addressCanBeCreatedAroundPublicKeyAndCustomVersion() {
+		// Act:
+		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		final Address address = Address.fromPublicKey((byte)0x88, publicKey);
+
+		// Assert:
+		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
+		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+	}
+
+	//endregion
 
 	@Test
 	public void sameAddressIsGeneratedForSameInputs() {

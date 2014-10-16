@@ -115,6 +115,27 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 	}
 
 	@Test
+	public void verifyReturnsFalseIfPublicKeyIsZeroArray() {
+		// Arrange:
+		final KeyPair kp = new KeyPair();
+		final DsaSigner dsaSigner = this.getDsaSigner(kp);
+		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
+		final Signature signature = dsaSigner.sign(input);
+		final Ed25519DsaSigner dsaSignerWithZeroArrayPublicKey = Mockito.mock(Ed25519DsaSigner.class);
+		Mockito.when(dsaSignerWithZeroArrayPublicKey.getKeyPair()).thenReturn(new KeyPair(kp.getPrivateKey(), new PublicKey(new byte[32])));
+		Mockito.when(dsaSignerWithZeroArrayPublicKey.verify(input, signature)).thenCallRealMethod();
+		Mockito.when(dsaSignerWithZeroArrayPublicKey.isCanonicalSignature(signature)).thenReturn(true);
+
+		// Act:
+		final boolean result = dsaSignerWithZeroArrayPublicKey.verify(input, signature);
+
+		// Assert (getKeyPair() would be called more than once if it got beyond the second check):
+		Assert.assertThat(result, IsEqual.equalTo(false));
+		Mockito.verify(dsaSignerWithZeroArrayPublicKey, Mockito.times(1)).isCanonicalSignature(signature);
+		Mockito.verify(dsaSignerWithZeroArrayPublicKey, Mockito.times(1)).getKeyPair();
+	}
+
+	@Test
 	public void verifyHasExpectedSpeed() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();

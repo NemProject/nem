@@ -59,9 +59,6 @@ public class Ed25519FieldElement {
 	 * @return The field element this + val.
 	 */
 	public Ed25519FieldElement add(final Ed25519FieldElement g) {
-		// TODO 20141013 J-BR: i think the loop is cleaner, but i'll leave it up to you
-		// TODO 20141014 BR -> J: done (verify() is about 5-10% slower now).
-		// TODO 20141014 J-BR: i ran with and without the loops and didn't see any difference, we can revert if you're seeing that big of a difference
 		final int[] gValues = g.values;
 		final int[] h = new int[10];
 		for (int i = 0; i < 10; i++) {
@@ -340,8 +337,8 @@ public class Ed25519FieldElement {
 		carry5 = (h5 + (long)(1 << 24)) >> 25;
 		h6 += carry5;
 		h5 -= carry5 << 25;
-        /* |h1| <= 2^24; from now on fits into int32 */
-        /* |h5| <= 2^24; from now on fits into int32 */
+		/* |h1| <= 2^24; from now on fits into int32 */
+		/* |h5| <= 2^24; from now on fits into int32 */
         /* |h2| <= 1.41*2^60 */
         /* |h6| <= 1.41*2^60 */
 
@@ -438,8 +435,6 @@ public class Ed25519FieldElement {
 	public Ed25519FieldElement squareAndDouble() {
 		return this.squareAndOptionalDouble(true);
 	}
-
-	// TODO 20141014 J-BR: i hope you're ok with this change ... i don't think squareAndOptionalDouble should be public
 
 	/**
 	 * Squares this field element, optionally multiplies by two and returns the result.
