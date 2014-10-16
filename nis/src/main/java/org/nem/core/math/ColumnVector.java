@@ -313,7 +313,7 @@ public class ColumnVector {
 
 	//endregion
 
-	//region magnitude / distance
+	//region magnitude / distance / correlation
 
 	/**
 	 * Gets the magnitude of this vector.
@@ -358,6 +358,31 @@ public class ColumnVector {
 		}
 
 		return distance;
+	}
+
+	/**
+	 * Calculates the correlation (pearson r) between the specified vector and this vector.
+	 *
+	 * @param vector The specified vector.
+	 * @return The correlation.
+	 */
+	public double correlation(final ColumnVector vector) {
+		if (this.size != vector.size) {
+			throw new IllegalArgumentException("cannot determine the correlation between vectors with different sizes");
+		}
+
+		final ColumnVector meanAdjustedX = this.meanAdjust();
+		final ColumnVector meanAdjustedY = vector.meanAdjust();
+
+	 	final double squaredDeviationX = meanAdjustedX.multiplyElementWise(meanAdjustedX).sum();
+		final double squaredDeviationY = meanAdjustedY.multiplyElementWise(meanAdjustedY).sum();
+		final double deviationProduct = meanAdjustedX.multiplyElementWise(meanAdjustedY).sum();
+		return deviationProduct / Math.sqrt(squaredDeviationX * squaredDeviationY);
+	}
+
+	private ColumnVector meanAdjust() {
+		final double mean = this.sum() / this.size;
+		return this.add(-mean);
 	}
 
 	//endregion
