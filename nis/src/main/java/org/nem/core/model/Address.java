@@ -23,7 +23,18 @@ public class Address {
 	 * @return An address object.
 	 */
 	public static Address fromPublicKey(final PublicKey publicKey) {
-		return new Address(NetworkInfo.getDefault().getVersion(), publicKey);
+		return fromPublicKey(NetworkInfo.getDefault().getVersion(), publicKey);
+	}
+
+	/**
+	 * Creates an address object from a version and public key.
+	 *
+	 * @param version The address version.
+	 * @param publicKey The address public key.
+	 * @return An address object.
+	 */
+	public static Address fromPublicKey(final byte version, final PublicKey publicKey) {
+		return new Address(version, publicKey);
 	}
 
 	/**
@@ -36,22 +47,11 @@ public class Address {
 		return new Address(encoded.toUpperCase());
 	}
 
-	/**
-	 * Creates an address object from an encoded address.
-	 *
-	 * @param encoded The encoded address.
-	 */
 	private Address(final String encoded) {
 		this.encoded = encoded;
 		this.publicKey = null;
 	}
 
-	/**
-	 * Creates an address object from a version and public key.
-	 *
-	 * @param version The address version.
-	 * @param publicKey The address public key.
-	 */
 	private Address(final byte version, final PublicKey publicKey) {
 		this.encoded = generateEncoded(version, publicKey.getRaw());
 		this.publicKey = publicKey;
