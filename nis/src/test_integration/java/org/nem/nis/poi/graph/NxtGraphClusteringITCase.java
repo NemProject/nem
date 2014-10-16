@@ -220,6 +220,9 @@ public class NxtGraphClusteringITCase {
 	 * Using correlation as a proxy for importance sensitivity to min harvesting balance.
 	 * TODO 20141014 J-J: recalculate differences using pearson r
 	 * TODO 20141015 BR -> J: nice test. I agree to raise the min harvest balance to the suggested value.
+     * TODO 20141016 M -> BR, J: If possible we should try to keep the min balance low so that more people can
+     * ->participate in harvesting NEM. None of these correlations are really so different, so I wouldn't go over 1000.
+     * ->Also, I get different numbers when I run the test (it could because I am using a newer NXT DB with more blocks).
 	 *
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
 	 * STK  | 1.0000 |        |        |        |        |        |
