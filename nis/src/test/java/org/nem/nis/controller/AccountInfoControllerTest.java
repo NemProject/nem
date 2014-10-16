@@ -2,61 +2,76 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.Utils;
+import org.nem.core.model.primitive.*;
+import org.nem.core.test.*;
+import org.nem.core.time.*;
 import org.nem.nis.controller.requests.AccountIdBuilder;
-import org.nem.nis.harvesting.UnlockedAccounts;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.service.*;
+
+import java.util.*;
 
 public class AccountInfoControllerTest {
 
 	//region accountGet
 
 	@Test
-	public void accountGetDelegatesToAccountInfoFactory() {
+	public void accountGetDelegatesToAccountInfoFactoryForAccountInfo() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountIdBuilder builder = new AccountIdBuilder();
-		builder.setAddress(address.getEncoded());
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
-		final AccountRemoteStatus accountRemoteStatus = AccountRemoteStatus.ACTIVATING;
-
 		final TestContext context = new TestContext();
-		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
-		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfo);
-		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(accountRemoteStatus);
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
+		Mockito.when(context.accountInfoFactory.createInfo(context.address)).thenReturn(accountInfo);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(builder);
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(context.getBuilder());
 
 		// Assert:
-		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(address);
-		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).getRemoteStatus(address, BlockHeight.ONE);
 		Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
+		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(context.address);
 	}
 
 	@Test
-	public void accountGetDelegatesToUnlockedAccounts() {
+	public void accountGetDelegatesToAccountInfoFactoryForRemoteStatus() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountIdBuilder builder = new AccountIdBuilder();
-		builder.setAddress(address.getEncoded());
-
 		final TestContext context = new TestContext();
-		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1L);
-		Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(Mockito.mock(AccountInfo.class));
-		Mockito.when(context.accountInfoFactory.getRemoteStatus(address, BlockHeight.ONE)).thenReturn(AccountRemoteStatus.DEACTIVATING);
-		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(true);
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = context.controller.accountGet(builder);
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(context.getBuilder());
 
 		// Assert:
-		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(address);
-		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		context.assertRemoteStatus(metaDataPair.getMetaData(), AccountRemoteStatus.ACTIVATING, 1);
+	}
+
+	@Test
+	public void accountGetDelegatesToUnlockedAccountsForOverriddenRemoteStatus() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVE, 1);
+		context.filteredTransactions.add(createImportanceTransfer(context.address));
+
+		// Act:
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(context.getBuilder());
+
+		// Assert:
+		context.assertRemoteStatus(metaDataPair.getMetaData(), AccountRemoteStatus.DEACTIVATING, 1);
+	}
+
+	@Test
+	public void accountGetDelegatesToUnlockedAccountsForAccountStatus() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setUnlocked(false);
+
+		// Act:
+		final AccountMetaDataPair metaDataPair = context.controller.accountGet(context.getBuilder());
+
+		// Assert:
+		context.assertUnlocked(metaDataPair.getMetaData(), AccountStatus.LOCKED);
 	}
 
 	//endregion
@@ -64,43 +79,174 @@ public class AccountInfoControllerTest {
 	//region accountStatus
 
 	@Test
-	public void accountStatusDelegatesToUnlockedAccounts() {
+	public void accountStatusDelegatesToUnlockedAccountsForUnlockedAccountStatus() {
 		assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
+	}
+
+	@Test
+	public void accountStatusDelegatesToUnlockedAccountsForLockedAccountStatus() {
 		assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
 	}
 
-	private static void assertAccountStatusDelegatesToUnlockedAccounts(final boolean returned, final AccountStatus expectedStatus) {
+	private static void assertAccountStatusDelegatesToUnlockedAccounts(
+			final boolean isAccountUnlockedResult,
+			final AccountStatus expectedStatus) {
 		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountIdBuilder builder = new AccountIdBuilder();
-		builder.setAddress(address.getEncoded());
-
 		final TestContext context = new TestContext();
-		Mockito.when(context.unlockedAccounts.isAccountUnlocked(address)).thenReturn(returned);
-		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(17L);
+		context.setUnlocked(isAccountUnlockedResult);
 
 		// Act:
-		final AccountMetaData accountMetaData = context.controller.accountStatus(builder);
+		final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
 
 		// Assert:
-		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(address);
-		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
-		Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(expectedStatus));
+		context.assertUnlocked(accountMetaData, expectedStatus);
+	}
+
+	@Test
+	public void accountStatusDelegatesToAccountInfoFactoryForRemoteStatus() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 17);
+
+		// Act:
+		final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
+
+		// Assert:
+		context.assertRemoteStatus(accountMetaData, AccountRemoteStatus.ACTIVATING, 17);
+	}
+
+	@Test
+	public void accountStatusOverridesInactiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
+		// Assert:
+		assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+				AccountRemoteStatus.INACTIVE,
+				AccountRemoteStatus.ACTIVATING);
+	}
+
+	@Test
+	public void accountStatusOverridesActiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
+		// Assert:
+		assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+				AccountRemoteStatus.ACTIVE,
+				AccountRemoteStatus.DEACTIVATING);
+	}
+
+	private static void assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+			final AccountRemoteStatus remoteStatus,
+			final AccountRemoteStatus expectedRemoteStatus) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(remoteStatus, 17);
+		context.filteredTransactions.add(createImportanceTransfer(context.address));
+
+		// Act:
+		final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
+
+		// Assert:
+		context.assertRemoteStatus(accountMetaData, expectedRemoteStatus, 17);
+	}
+
+	@Test
+	public void accountStatusDoesNotOverrideRemoteStatusIfOtherUnconfirmedTransferIsPending() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVE, 17);
+		context.filteredTransactions.add(createTransfer(context.address));
+		context.filteredTransactions.add(createImportanceTransfer(Utils.generateRandomAddress()));
+
+		// Act:
+		final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
+
+		// Assert:
+		context.assertRemoteStatus(accountMetaData, AccountRemoteStatus.ACTIVE, 17);
+	}
+
+	@Test
+	public void accountStatusFailsIfUnconfirmedImportanceTransferIsPendingWithUnexpectedRemoteStatus() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 17);
+		context.filteredTransactions.add(createImportanceTransfer(context.address));
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> context.controller.accountStatus(context.getBuilder()),
+				IllegalStateException.class);
 	}
 
 	//endregion
 
+	private static Transaction createTransfer(final Address address) {
+		return new TransferTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(Amount.fromNem(100)),
+				new Account(address),
+				Amount.fromNem(1),
+				null);
+	}
+
+	private static Transaction createImportanceTransfer(final Address address) {
+		return new ImportanceTransferTransaction(
+				TimeInstant.ZERO,
+				new Account(address),
+				ImportanceTransferTransaction.Mode.Activate,
+				Utils.generateRandomAccount());
+	}
+
 	private static class TestContext {
+		private final Address address = Utils.generateRandomAddressWithPublicKey();
+
 		private final AccountInfoController controller;
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
+		private final List<Transaction> filteredTransactions = new ArrayList<>();
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 
 		public TestContext() {
+			final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
+			final UnconfirmedTransactions filteredUnconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
+			Mockito.when(unconfirmedTransactions.getTransactionsForAccount(Mockito.any()))
+					.thenReturn(filteredUnconfirmedTransactions);
+			Mockito.when(filteredUnconfirmedTransactions.getAll()).thenReturn(this.filteredTransactions);
+
 			this.controller = new AccountInfoController(
 					this.unlockedAccounts,
+					unconfirmedTransactions,
 					this.blockChainLastBlockLayer,
 					this.accountInfoFactory);
+		}
+
+		private AccountIdBuilder getBuilder() {
+			final AccountIdBuilder builder = new AccountIdBuilder();
+			builder.setAddress(this.address.getEncoded());
+			return builder;
+		}
+
+		private void setRemoteStatus(final AccountRemoteStatus remoteStatus, final long blockHeight) {
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(blockHeight);
+			Mockito.when(this.accountInfoFactory.getRemoteStatus(this.address, new BlockHeight(blockHeight)))
+					.thenReturn(remoteStatus);
+		}
+
+		private void setUnlocked(final boolean isAccountUnlockedResult) {
+			Mockito.when(this.unlockedAccounts.isAccountUnlocked(this.address)).thenReturn(isAccountUnlockedResult);
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(17L);
+		}
+
+		private void assertRemoteStatus(
+				final AccountMetaData accountMetaData,
+				final AccountRemoteStatus remoteStatus,
+				final long blockHeight) {
+			Assert.assertThat(accountMetaData.getRemoteStatus(), IsEqual.equalTo(remoteStatus));
+			Mockito.verify(this.accountInfoFactory, Mockito.times(1)).getRemoteStatus(this.address, new BlockHeight(blockHeight));
+			Mockito.verify(this.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
+		}
+
+		private void assertUnlocked(
+				final AccountMetaData accountMetaData,
+				final AccountStatus status) {
+			Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(status));
+			Mockito.verify(this.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(this.address);
 		}
 	}
 }
