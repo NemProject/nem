@@ -25,6 +25,8 @@ public class NxtGraphClusteringITCase {
 	private static final Logger LOGGER = Logger.getLogger(NxtGraphClusteringITCase.class.getName());
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
 	private static final PoiOptions DEFAULT_POI_OPTIONS = DEFAULT_POI_OPTIONS_BUILDER.create();
+	private static ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
+	private static ImportanceScorer PAGE_RANK_SCORER = new NxtGraphClusteringITCase.PageRankScorer();
 
 	@Test
 	public void canQueryNxtTransactionTable() {
@@ -171,7 +173,8 @@ public class NxtGraphClusteringITCase {
 									final ColumnVector importances = getAccountImportances(
 											new BlockHeight(endHeight),
 											eligibleAccountStates,
-											optionsBuilder);
+											optionsBuilder,
+											new PoiScorer());
 
 									final List<Long> stakes = eligibleAccountStates.stream()
 											.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(
@@ -217,6 +220,17 @@ public class NxtGraphClusteringITCase {
 	//region min harvesting balance
 
 	/**
+	 * TODO 20141016 BR -> J: here are the values when using PageRankScorer (see comment below):
+	 *
+	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
+	 * STK  | 1.0000 |        |        |        |        |        |
+	 * 10^0 | 0.0257 | 1.0000 |        |        |        |        |
+	 * 10^2 | 0.0257 | 1.0000 | 1.0000 |        |        |        |
+	 * 10^3 | 0.0257 | 1.0000 | 1.0000 | 1.0000 |        |        |
+	 * 10^4 | 0.1050 | 0.2965 | 0.2965 | 0.2965 | 1.0000 |        |
+	 * 10^5 | 0.2436 | 0.1980 | 0.1980 | 0.1980 | 0.6061 | 1.0000 |
+	 */
+	/**
 	 * Using correlation as a proxy for importance sensitivity to min harvesting balance.
 	 * TODO 20141014 J-J: recalculate differences using pearson r
 	 * TODO 20141015 BR -> J: nice test. I agree to raise the min harvest balance to the suggested value.
@@ -233,7 +247,7 @@ public class NxtGraphClusteringITCase {
 	public void minHarvestingBalanceVariance() {
 		// Act:
 		runSensitivityTest(
-				Arrays.asList(1L, 100L, 1000L, 10000L, 100000L),
+				Arrays.asList(1L, 100L, 1000L, 10000L, 100000L, 100000L),
 				v -> {
 					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 					optionsBuilder.setMinHarvesterBalance(Amount.fromNem(v));
@@ -241,6 +255,21 @@ public class NxtGraphClusteringITCase {
 				});
 	}
 
+	/**
+	 * TODO-CR 20141016 BR -> J: you are probably wondering why the correlation is so high. Well that is because POI is still dominated by POS.
+	 * TODO                      If you want to know the influence of min outlink balance on the page rank part of POI you need to use the PageRankScorer.
+	 * TODO                      Doing so results in the following values:
+	 *
+	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
+	 * STK  | 1.0000 |        |        |        |        |        |        |        |
+	 * 10^0 | 0.0220 | 1.0000 |        |        |        |        |        |        |
+	 * 10^1 | 0.0150 | 0.9734 | 1.0000 |        |        |        |        |        |
+	 * 10^2 | 0.0197 | 0.8848 | 0.9206 | 1.0000 |        |        |        |        |
+	 * 10^3 | 0.0269 | 0.7070 | 0.7492 | 0.8589 | 1.0000 |        |        |        |
+	 * 10^4 | 0.0648 | 0.1986 | 0.2619 | 0.3457 | 0.5153 | 1.0000 |        |        |
+	 * 10^5 | 0.1427 | 0.0946 | 0.1278 | 0.1700 | 0.2545 | 0.4657 | 1.0000 |        |
+	 * 10^6 | 0.2629 | 0.0321 | 0.0329 | 0.0446 | 0.0711 | 0.1606 | 0.4626 | 1.0000 |
+	 */
 	/**
 	 * Using correlation as a proxy for importance sensitivity to min outlink balance.
 	 *
@@ -255,7 +284,7 @@ public class NxtGraphClusteringITCase {
 	public void minOutlinkWeightBalanceVariance() {
 		// Act:
 		runSensitivityTest(
-				Arrays.asList(1L, 10L, 100L, 1000L),
+				Arrays.asList(1L, 10L, 100L, 1000L, 10000L, 100000L, 1000000L),
 				v -> {
 					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 					optionsBuilder.setMinOutlinkWeight(Amount.fromNem(v));
@@ -274,7 +303,8 @@ public class NxtGraphClusteringITCase {
 			final PoiOptionsBuilder optionsBuilder = createOptionsBuilder.apply(value);
 
 			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
-			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
+			// TODO BR: I changed the scorer!
+			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, PAGE_RANK_SCORER);
 			parameterToImportanceMap.put(value, importances);
 		}
 
@@ -487,7 +517,7 @@ public class NxtGraphClusteringITCase {
 
 		// Act:
 		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, optionsBuilder);
-		getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder);
+		getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	// endregion
@@ -675,14 +705,15 @@ public class NxtGraphClusteringITCase {
 			final GraphClusteringStrategy clusteringStrategy) {
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
-		return getAccountImportances(blockHeight, acctStates, poiOptionsBuilder);
+		return getAccountImportances(blockHeight, acctStates, poiOptionsBuilder, DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> acctStates,
-			final PoiOptionsBuilder poiOptionsBuilder) {
-		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(new PoiScorer(), poiOptionsBuilder.create());
+			final PoiOptionsBuilder poiOptionsBuilder,
+			final ImportanceScorer scorer) {
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(scorer, poiOptionsBuilder.create());
 		importanceCalculator.recalculate(blockHeight, acctStates);
 		final List<Double> importances = acctStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
@@ -725,6 +756,15 @@ public class NxtGraphClusteringITCase {
 		TeleportationProbabilities(final double teleporationProb, final double interLevelTeleporationProb) {
 			this.teleporationProb = teleporationProb;
 			this.interLevelTeleporationProb = interLevelTeleporationProb;
+		}
+	}
+
+	private static class PageRankScorer implements ImportanceScorer {
+
+		@Override
+		public ColumnVector calculateFinalScore(final ColumnVector importanceVector, final ColumnVector outlinkVector, final ColumnVector vestedBalanceVector) {
+			importanceVector.normalize();
+			return importanceVector;
 		}
 	}
 }
