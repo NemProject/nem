@@ -132,6 +132,7 @@ public class SparseMatrix extends Matrix {
 						rowValues[jCopy] = v;
 					}
 				});
+
 				if (copied[0]) {
 					// Same index again since the array shrank.
 					size = this.maxIndices[i];
@@ -213,6 +214,7 @@ public class SparseMatrix extends Matrix {
 			System.arraycopy(this.values[row], colIndex + 1, this.values[row], colIndex, lastIndex - colIndex);
 			copied = true;
 		}
+
 		if (lastIndex >= 0) {
 			// Keep the arrays clean, it doesn't cost much time.
 			this.cols[row][lastIndex] = 0;

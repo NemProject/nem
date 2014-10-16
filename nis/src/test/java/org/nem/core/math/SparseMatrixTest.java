@@ -197,13 +197,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.setAt(0, 4, 5.0);
 
 		// Assert:
-		int col = -1;
-		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
-		while (iterator.hasNext()) {
-			final MatrixElement entry = iterator.next();
-			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
-			col = entry.getColumn();
-		}
+		assertSorted(sparseMatrix.getNonZeroElementRowIterator(0));
 	}
 
 	@Test
@@ -216,13 +210,7 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.setAt(0, 4, 0.0);
 
 		// Assert:
-		int col = -1;
-		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
-		while (iterator.hasNext()) {
-			final MatrixElement entry = iterator.next();
-			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
-			col = entry.getColumn();
-		}
+		assertSorted(sparseMatrix.getNonZeroElementRowIterator(0));
 	}
 
 	@Test
@@ -234,9 +222,11 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.removeLessThan(0);
 
 		// Assert:
-		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(3));
+		assertSorted(sparseMatrix.getNonZeroElementRowIterator(0));
+	}
+
+	private static void assertSorted(final MatrixNonZeroElementRowIterator iterator) {
 		int col = -1;
-		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
 		while (iterator.hasNext()) {
 			final MatrixElement entry = iterator.next();
 			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
