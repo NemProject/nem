@@ -127,7 +127,7 @@ public class SparseMatrix extends Matrix {
 				copied[0] = false;
 				func.visit(i, rowCols[j], rowValues[j], v -> {
 					if (0.0 == v) {
-						copied[0] = remove(iCopy, jCopy);
+						copied[0] = this.remove(iCopy, jCopy);
 					} else {
 						rowValues[jCopy] = v;
 					}
