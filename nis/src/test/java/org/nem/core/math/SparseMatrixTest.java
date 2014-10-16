@@ -114,6 +114,18 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 	}
 
 	@Test
+	public void removeLessThanShrinksNumberOfEntries() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[] { 2, -3, -5, 11, -1, 8 });
+
+		// Act:
+		sparseMatrix.removeLessThan(0);
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getNumEntries(), IsEqual.equalTo(3));
+	}
+
+	@Test
 	public void rowCanBeReallocatedIfHigherColumnElementDoesNotFit() {
 		// Arrange:
 		final SparseMatrix sparseMatrix = new SparseMatrix(3, 2, 1);
@@ -185,6 +197,44 @@ public class SparseMatrixTest extends MatrixTest<SparseMatrix> {
 		sparseMatrix.setAt(0, 4, 5.0);
 
 		// Assert:
+		int col = -1;
+		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
+		while (iterator.hasNext()) {
+			final MatrixElement entry = iterator.next();
+			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
+			col = entry.getColumn();
+		}
+	}
+
+	@Test
+	public void removeKeepsColumnsSorted() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[] { 2, 3, 5, 11, 1, 8 });
+
+		// Act:
+		sparseMatrix.setAt(0, 1, 0.0);
+		sparseMatrix.setAt(0, 4, 0.0);
+
+		// Assert:
+		int col = -1;
+		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
+		while (iterator.hasNext()) {
+			final MatrixElement entry = iterator.next();
+			Assert.assertThat(entry.getColumn() > col, IsEqual.equalTo(true));
+			col = entry.getColumn();
+		}
+	}
+
+	@Test
+	public void removeLessThanKeepsColumnsSorted() {
+		// Arrange:
+		final SparseMatrix sparseMatrix = this.createMatrix(1, 6, new double[] { 2, -3, -5, 11, -1, 8 });
+
+		// Act:
+		sparseMatrix.removeLessThan(0);
+
+		// Assert:
+		Assert.assertThat(sparseMatrix.getNonZeroColumnCount(0), IsEqual.equalTo(3));
 		int col = -1;
 		final MatrixNonZeroElementRowIterator iterator = sparseMatrix.getNonZeroElementRowIterator(0);
 		while (iterator.hasNext()) {

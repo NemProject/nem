@@ -116,13 +116,27 @@ public class SparseMatrix extends Matrix {
 
 	@Override
 	protected final void forEach(final ElementVisitorFunction func) {
+		final boolean[] copied = new boolean[1];
 		for (int i = 0; i < this.numRows; ++i) {
+			final int iCopy = i;
 			final double[] rowValues = this.values[i];
 			final int[] rowCols = this.cols[i];
-			final int size = this.maxIndices[i];
+			int size = this.maxIndices[i];
 			for (int j = 0; j < size; ++j) {
 				final int jCopy = j;
-				func.visit(i, rowCols[j], rowValues[j], v -> rowValues[jCopy] = v);
+				copied[0] = false;
+				func.visit(i, rowCols[j], rowValues[j], v -> {
+					if (0.0 == v) {
+						copied[0] = remove(iCopy, jCopy);
+					} else {
+						rowValues[jCopy] = v;
+					}
+				});
+				if (copied[0]) {
+					// Same index again since the array shrank.
+					size = this.maxIndices[i];
+					--j;
+				}
 			}
 		}
 	}
@@ -189,15 +203,24 @@ public class SparseMatrix extends Matrix {
 	 * @param row The row.
 	 * @param colIndex The column index.
 	 */
-	private void remove(final int row, final int colIndex) {
+	private boolean remove(final int row, final int colIndex) {
 		// Shrink arrays
+		boolean copied = false;
 		final int lastIndex = this.maxIndices[row] - 1;
-		if (lastIndex > 0) {
-			this.cols[row][colIndex] = this.cols[row][lastIndex];
-			this.values[row][colIndex] = this.values[row][lastIndex];
+		if (lastIndex > 0 && lastIndex != colIndex) {
+			// We have to copy since the values within one row are ordered.
+			System.arraycopy(this.cols[row], colIndex + 1, this.cols[row], colIndex, lastIndex - colIndex);
+			System.arraycopy(this.values[row], colIndex + 1, this.values[row], colIndex, lastIndex - colIndex);
+			copied = true;
+		}
+		if (lastIndex >= 0) {
+			// Keep the arrays clean, it doesn't cost much time.
+			this.cols[row][lastIndex] = 0;
+			this.values[row][lastIndex] = 0.0;
 		}
 
 		--this.maxIndices[row];
+		return copied;
 	}
 
 	/**
