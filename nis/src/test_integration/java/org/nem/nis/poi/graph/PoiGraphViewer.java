@@ -154,8 +154,8 @@ public class PoiGraphViewer {
 	/**
 	 * Set the clustering result.
 	 */
-	public void setClusteringResult(final ClusteringResult clusteringResult) {
-		this.clusteringResult = clusteringResult;
+	public ClusteringResult getClusteringResult() {
+		return this.clusteringResult;
 	}
 
 	private Color getClusterColor(final ClusterId clusterId) {
@@ -182,7 +182,9 @@ public class PoiGraphViewer {
 	private void buildGraph(final Matrix adjacencyMatrix, final PoiGraphParameters params) {
 		final EdgeType edgeType = (EDGE_TYPE_UNDIRECTED == params.getAsInteger("edgeType", EDGE_TYPE_UNDIRECTED)) ? EdgeType.UNDIRECTED : EdgeType.DIRECTED;
 		for (int i = 0; i < adjacencyMatrix.getColumnCount(); i++) {
-			this.graph.addVertex((Integer)i);
+			if (!this.clusteringResult.isOutlier(clusteringResult.getIdForNode(new NodeId(i)))) {
+				this.graph.addVertex((Integer)i);
+			}
 		}
 
 		adjacencyMatrix.forEach(new ReadOnlyElementVisitorFunction() {
@@ -190,7 +192,10 @@ public class PoiGraphViewer {
 
 			@Override
 			public void visit(final int row, final int col, final double value) {
-				PoiGraphViewer.this.getGraph().addEdge(this.edgeCount++, col, row, edgeType);
+				if (!getClusteringResult().isOutlier(clusteringResult.getIdForNode(new NodeId(row))) &&
+					!getClusteringResult().isOutlier(clusteringResult.getIdForNode(new NodeId(col)))) {
+					PoiGraphViewer.this.getGraph().addEdge(this.edgeCount++, col, row, edgeType);
+				}
 			}
 		});
 	}

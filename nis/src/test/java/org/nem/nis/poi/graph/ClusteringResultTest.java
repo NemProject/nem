@@ -66,6 +66,102 @@ public class ClusteringResultTest {
 
 	//endregion
 
+	// region isRegularCluster/isHub/isOutlier
+
+	@Test
+	public void isRegularClusterReturnsTrueWhenClusterIdIsARegularCluster() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+		final Collection<Cluster> hubs = Arrays.asList();
+		final Collection<Cluster> outliers = Arrays.asList();
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.isRegularCluster(new ClusterId(7)), IsEqual.equalTo(true));
+		Assert.assertThat(result.isRegularCluster(new ClusterId(8)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isRegularClusterReturnsFalseWhenClusterIdIsNotARegularCluster() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+		final Collection<Cluster> hubs = Arrays.asList();
+		final Collection<Cluster> outliers = Arrays.asList();
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.isRegularCluster(new ClusterId(5)), IsEqual.equalTo(false));
+		Assert.assertThat(result.isRegularCluster(new ClusterId(3)), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	@Test
+	public void isHubReturnsTrueWhenClusterIdIsAHub() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList();
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+		final Collection<Cluster> outliers = Arrays.asList();
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.isHub(new ClusterId(7)), IsEqual.equalTo(true));
+		Assert.assertThat(result.isHub(new ClusterId(8)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isHubReturnsTrueWhenClusterIdIsNotAHub() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList();
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+		final Collection<Cluster> outliers = Arrays.asList();
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.isHub(new ClusterId(5)), IsEqual.equalTo(false));
+		Assert.assertThat(result.isHub(new ClusterId(3)), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isOutlierReturnsTrueWhenClusterIdIsAnOutlier() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList();
+		final Collection<Cluster> hubs = Arrays.asList();
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.isOutlier(new ClusterId(7)), IsEqual.equalTo(true));
+		Assert.assertThat(result.isOutlier(new ClusterId(8)), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isOutlierReturnsTrueWhenClusterIdIsNotAnOutlier() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList();
+		final Collection<Cluster> hubs = Arrays.asList();
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(7)), new Cluster(new ClusterId(8)));
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.isOutlier(new ClusterId(5)), IsEqual.equalTo(false));
+		Assert.assertThat(result.isOutlier(new ClusterId(3)), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
 	//region getIdForNode
 
 	@Test

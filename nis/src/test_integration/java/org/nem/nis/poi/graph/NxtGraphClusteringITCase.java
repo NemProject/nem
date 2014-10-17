@@ -513,7 +513,7 @@ public class NxtGraphClusteringITCase {
 	@Test
 	public void epsilonInfluenceOnNumberOfClustersAndClusterSize() {
 		// Arrange:
-		final int endHeight = 200000;
+		final int endHeight = 10000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 		final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 		optionsBuilder.setMinHarvesterBalance(Amount.fromNem(10000));
@@ -645,7 +645,7 @@ public class NxtGraphClusteringITCase {
 	@Test
 	public void nxtGraphViewTest() throws SQLException, IOException {
 		final long startHeight = 0;
-		final long stopHeight = 10000;
+		final long stopHeight = 200000;
 
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setEpsilonClusteringValue(0.40);

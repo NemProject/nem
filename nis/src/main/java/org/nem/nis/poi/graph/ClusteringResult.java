@@ -120,6 +120,22 @@ public class ClusteringResult {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the given id is hub id.
+	 *
+	 * @param id The id
+	 * @return true if the id is a hub id, false otherwise.
+	 */
+	public boolean isOutlier(final ClusterId id) {
+		for (Cluster outlier : this.outliers) {
+			if (outlier.getId().equals(id)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Gets the id of the cluster for the given node id.
 	 *
 	 * @param nodeId The node id.

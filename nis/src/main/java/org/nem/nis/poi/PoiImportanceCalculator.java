@@ -109,6 +109,12 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
+			// TODO-CR 20141017 BR -> J,M: adding the interlevel teleportation probability leads to violation of the probability conservation.
+			// TODO                        Thus the l1-norm of the importance is changed in each step. We are normalizing after each step but
+			// TODO                        it still could result in some strange effects. The reason for the dangle sum is that there is some probability
+			// TODO                        missing due to some columns of the outlink matrix being zero. This is exactly compensated when using the
+			// TODO                        teleportation probability in the dangle sum. the dangle sum has nothing to do with the ILP matrix or
+			// TODO                        the interlevel teleportation probability. I would suggest to use only the teleportation probability.
 			final double totalTeleportationProbability = this.options.getTeleportationProbability() + this.options.getInterLevelTeleportationProbability();
 			final double dangleSum = calculateDangleSum(
 					this.context.getDangleIndexes(),
