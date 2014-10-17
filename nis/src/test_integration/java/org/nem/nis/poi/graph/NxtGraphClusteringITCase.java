@@ -167,7 +167,7 @@ public class NxtGraphClusteringITCase {
 									final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 
 									// 0. Load account states.
-									final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+									final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, optionsBuilder);
 
 									// 1. calc importances
 									final ColumnVector importances = getAccountImportances(
