@@ -121,8 +121,8 @@ public class NxtGraphClusteringITCase {
 		// compute Cartesian product of considered parameters
 		final Set<Long> minHarvesterBalances = Sets.newSet(1l, 100l, 500l, 1000l, 10000l, 100000l);
 		final Set<Long> minOutlinkWeights = Sets.newSet(0l, 1l, 100l, 1000l, 10000l);
-		final Set<Double> negativeOutlinkWeights = Sets.newSet(0., 20., 40., 60., 80., 100.);
-		final Set<Double> outlierWeights = Sets.newSet(0.85, 0.9, 0.95, 1.0);
+		final Set<Double> negativeOutlinkWeights = Sets.newSet(0., 0.2, 0.4, 0.6, 0.8, 1.0);
+		final Set<Double> outlierWeights = Sets.newSet(0.8, 0.85, 0.9, 0.95, 1.0);
 		final Set<Integer> mus = Sets.newSet(1, 2, 3, 4, 5);
 		final Set<Double> epsilons = Sets.newSet(0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95);
 		final Set<TeleportationProbabilities> teleporationProbabilities = Sets.newSet(
