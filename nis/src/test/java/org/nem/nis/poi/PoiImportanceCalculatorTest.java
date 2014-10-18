@@ -547,7 +547,7 @@ public class PoiImportanceCalculatorTest {
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = context.calculateRing1Importances(accountStates);
+		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
 
 		// Assert:
 		// Merchant and exchange should have higher importance than users.

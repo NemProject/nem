@@ -14,19 +14,19 @@ public class NonFutureEntityValidatorTest {
 	@Test
 	public void transactionWithTimeStampLessThanFutureThresholdIsValid() {
 		// Assert:
-		this.assertTransactionValidationResult(11, 70, ValidationResult.SUCCESS);
+		this.assertTransactionValidationResult(11, 20, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void transactionWithTimeStampEqualToFutureThresholdIsValid() {
 		// Assert:
-		this.assertTransactionValidationResult(11, 71, ValidationResult.SUCCESS);
+		this.assertTransactionValidationResult(11, 21, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void transactionWithTimeStampGreaterThanFutureThresholdIsNotValid() {
 		// Assert:
-		this.assertTransactionValidationResult(11, 72, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
+		this.assertTransactionValidationResult(11, 22, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
 	}
 
 	private void assertTransactionValidationResult(
@@ -51,19 +51,19 @@ public class NonFutureEntityValidatorTest {
 	@Test
 	public void blockWithTimeStampLessThanFutureThresholdIsValid() {
 		// Assert:
-		this.assertBlockValidationResult(11, 70, ValidationResult.SUCCESS);
+		this.assertBlockValidationResult(11, 20, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void blockWithTimeStampEqualToFutureThresholdIsValid() {
 		// Assert:
-		this.assertBlockValidationResult(11, 71, ValidationResult.SUCCESS);
+		this.assertBlockValidationResult(11, 21, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void blockWithTimeStampGreaterThanFutureThresholdIsNotValid() {
 		// Assert:
-		this.assertBlockValidationResult(11, 72, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
+		this.assertBlockValidationResult(11, 22, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
 	}
 
 	private void assertBlockValidationResult(

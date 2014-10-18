@@ -138,12 +138,12 @@ public class BlockScorerTest {
 	private static final Map<Integer, Integer> HEIGHT_TO_GROUPED_HEIGHT_MAP = new HashMap<Integer, Integer>() {
 		{
 			this.put(1, 1);
-			this.put(30, 1);
-			this.put(31, 1);
-			this.put(32, 31);
-			this.put(33, 31);
-			this.put(90, 62);
-			this.put(111, 93);
+			this.put(358, 1);
+			this.put(359, 1);
+			this.put(360, 359);
+			this.put(361, 359);
+			this.put(1074, 718);
+			this.put(1095, 1077);
 		}
 	};
 
@@ -171,8 +171,8 @@ public class BlockScorerTest {
 	public void calculateForgerBalanceDerivesBalanceFromImportance() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Block block = NisUtils.createRandomBlockWithHeight(100);
-		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(93), 0.75); // this is the grouped height
+		final Block block = NisUtils.createRandomBlockWithHeight(1000);
+		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(718), 0.75); // this is the grouped height
 
 		// Act:
 		final long balance = context.scorer.calculateForgerBalance(block);

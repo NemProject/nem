@@ -152,7 +152,6 @@ public class AccountInfoControllerTest {
 		final TestContext context = new TestContext();
 		context.setRemoteStatus(AccountRemoteStatus.ACTIVE, 17);
 		context.filteredTransactions.add(createTransfer(context.address));
-		context.filteredTransactions.add(createImportanceTransfer(Utils.generateRandomAddress()));
 
 		// Act:
 		final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
