@@ -228,22 +228,18 @@ public class PoiContextTest {
 
 	@Test
 	public void clusteringResultIsInitializedCorrectly() {
-		// Arrange:
-		// (0, 1, 8), (0, 2, 4), (1, 0, 2), (1, 2, 6), (3, 0, 3), (3, 2, 5)
-		// ==> (0, 1, 6), (0, 2, 4), (1, 2, 6), (3, 2, 5)
-		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setMinOutlinkWeight(Amount.fromNem(4)); // TODO <--
-		// make node 3 an outlier
-		poiOptionsBuilder.setEpsilonClusteringValue(0.75);
-		final PoiOptions options = poiOptionsBuilder.create();
-
 		// Act:
-		final PoiContext context = createTestPoiContextWithAccountLinks(options);
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers();
 
-		// Assert: (one cluster { 0, 1, 2 }, no hubs, one outlier { 3 }):
-		final List<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)));
-		final List<Cluster> hubs = Arrays.asList();
-		final List<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(3)));
+		// Assert: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
+		final List<Cluster> clusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 4)),
+				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 8)));
+		final List<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(3)));
+		final List<Cluster> outliers = Arrays.asList(
+				new Cluster(new NodeId(2)),
+				new Cluster(new NodeId(7)),
+				new Cluster(new NodeId(9)));
 
 		Assert.assertThat(context.getClusteringResult().getClusters(), IsEqual.equalTo(clusters));
 		Assert.assertThat(context.getClusteringResult().getHubs(), IsEqual.equalTo(hubs));
@@ -496,7 +492,7 @@ public class PoiContextTest {
 	 *                 o   o
 	 *                8----o6
 	 * </pre>
-	 * Expected: clusters {0,1,4} and {5,6,8}, one hub {3}, three outlier {2,7,9}
+	 * Expected: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
 	 */
 	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndThreeOutliers() {
 		// Arrange: create 10 accounts

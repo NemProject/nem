@@ -11,7 +11,7 @@ import org.nem.core.utils.*;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountLink;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -26,7 +26,7 @@ public class NxtGraphClusteringITCase {
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
 	private static final PoiOptions DEFAULT_POI_OPTIONS = DEFAULT_POI_OPTIONS_BUILDER.create();
 	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
-	private static final ImportanceScorer PAGE_RANK_SCORER = new NxtGraphClusteringITCase.PageRankScorer();
+	private static final ImportanceScorer PAGE_RANK_SCORER = new PageRankScorer();
 
 	@Test
 	public void canQueryNxtTransactionTable() {
@@ -77,7 +77,7 @@ public class NxtGraphClusteringITCase {
 				endBlockHeight);
 	}
 
-//	@Ignore
+	@Ignore
 	@Test
 	public void canWriteImportancesToFileForManyDifferentParameters() throws IOException {
 		// compute Cartesian product of considered parameters
@@ -96,7 +96,7 @@ public class NxtGraphClusteringITCase {
 				new TeleportationProbabilities(0.55, 0.2));
 
 		// load account states from the database
-		final int endHeight = 150000;//225000;
+		final int endHeight = 150000;//225000; // TODO 20141018 J: add a constant
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
@@ -294,38 +294,6 @@ public class NxtGraphClusteringITCase {
 				v -> {
 					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 					optionsBuilder.setNegativeOutlinkWeight(v/100.0);//hack to get double :/
-					return optionsBuilder;
-				},
-				scorer);
-		harness.renderNegOutlinkStatesAsList();
-	}
-	
-	/**
-	 * Using correlation as a proxy for importance sensitivity to outlierWeight.
-	 * 
-	 * Results for blockheight up to 150,000:
-	 * 0.0 | 0.3779 |   3849 |
-	 * 0.2 | 0.6384 |   3849 |
-	 * 0.4 | 0.8110 |   3849 |
-	 * 0.6 | 0.9054 |   3849 |
-	 * 0.7 | 0.9331 |   3849 |
-	 * 0.8 | 0.9523 |   3849 |
-	 * 0.9 | 0.9654 |   3849 |
-	 * 1.0 | 0.9742 |   3849 |
-	 */
-	@Test
-	public void outlierWeightBalanceImportanceVariance() {
-		// Act:
-		runOutlierWeightBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
-	}
-
-	private static void runOutlierWeightBalanceVariance(final ImportanceScorer scorer) {
-		final SensitivityTestHarness harness = new SensitivityTestHarness();
-		harness.mapValuesToImportanceVectors(
-				Arrays.asList(0l, 20l, 40l, 60l, 70l, 80l, 90l, 100l),
-				v -> {
-					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
-					optionsBuilder.setOutlierWeight(v/100.0);//hack to get double :/
 					return optionsBuilder;
 				},
 				scorer);
@@ -962,15 +930,6 @@ public class NxtGraphClusteringITCase {
 		TeleportationProbabilities(final double teleporationProb, final double interLevelTeleporationProb) {
 			this.teleporationProb = teleporationProb;
 			this.interLevelTeleporationProb = interLevelTeleporationProb;
-		}
-	}
-
-	private static class PageRankScorer implements ImportanceScorer {
-
-		@Override
-		public ColumnVector calculateFinalScore(final ColumnVector importanceVector, final ColumnVector outlinkVector, final ColumnVector vestedBalanceVector, final ColumnVector graphWeightVector) {
-			importanceVector.normalize();
-			return importanceVector;
 		}
 	}
 }

@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class PoiImportanceCalculatorTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorTest.class.getName());
 	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();
-	private static ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
+	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
 
 	@Test
 	public void fastScanClusteringResultsInSameImportancesAsScan() {
@@ -313,6 +313,7 @@ public class PoiImportanceCalculatorTest {
 		// - all (12) accounts start with 2000 NEM
 		final List<PoiAccountState> accountStates = setupAccountStates(12);
 		final StandardContext context = new StandardContext();
+		context.builder1.setClusteringStrategy(new SingleClusterScan());
 
 		// Construct basic ring connections
 		final Matrix outlinkMatrix = setupBasicRingStructure();
@@ -326,16 +327,14 @@ public class PoiImportanceCalculatorTest {
 		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
 
 		// Act:
-		context.builder.setClusteringStrategy(new SingleClusterScan());
-
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = calculateImportances(context.builder.create(), context.height1, accountStates);
+		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
 		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = calculateImportances(context.builder2.create(), context.height2, accountStates);
+		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
 		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
@@ -433,6 +432,10 @@ public class PoiImportanceCalculatorTest {
 		// - all accounts start with 2000 NEM
 		final List<PoiAccountState> accountStates = setupAccountStates(12);
 		final StandardContext context = new StandardContext();
+		context.builder1.setTeleportationProbability(1.00);
+		context.builder1.setInterLevelTeleportationProbability(0.0);
+		context.builder2.setTeleportationProbability(0.86);
+		context.builder2.setInterLevelTeleportationProbability(0.1);
 
 		// Construct basic ring connections
 		final Matrix outlinkMatrix = setupBasicRingStructure();
@@ -445,19 +448,15 @@ public class PoiImportanceCalculatorTest {
 		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
 
 		// Act:
-		context.builder.setTeleportationProbability(1.00);
-		context.builder.setInterLevelTeleportationProbability(0.0);
-		context.builder2.setTeleportationProbability(0.86);
-		context.builder2.setInterLevelTeleportationProbability(0.1);
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = calculateImportances(context.builder.create(), context.height1, accountStates);
+		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
 		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = calculateImportances(context.builder2.create(), context.height2, accountStates);
+		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
 		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
@@ -546,11 +545,11 @@ public class PoiImportanceCalculatorTest {
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = calculateImportances(context.builder.create(), context.height1, accountStates);
+		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = calculateImportances(context.builder2.create(), context.height2, accountStates);
+		final ColumnVector ncdAwareImportances = context.calculateRing1Importances(accountStates);
 
 		// Assert:
 		// Merchant and exchange should have higher importance than users.
@@ -563,18 +562,24 @@ public class PoiImportanceCalculatorTest {
 	private class StandardContext {
 		final BlockHeight height1 = new BlockHeight(2);
 		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
-		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		final PoiOptionsBuilder builder1 = new PoiOptionsBuilder();
 		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
 
 		public StandardContext() {
-			// TODO 20141014 J-B: i don't really like how you're changing the constant
-			// TODO 20141015 BR -> J: I knew this comment was coming ^^. Can you either fix it or tell me how you would like it to be?
-			DEFAULT_IMPORTANCE_SCORER = new PageRankScorer();
-			builder.setClusteringStrategy(new SingleClusterScan());
-			builder.setTeleportationProbability(0.85);
-			builder.setInterLevelTeleportationProbability(0.0);
+			builder1.setClusteringStrategy(new SingleClusterScan());
+			builder1.setTeleportationProbability(0.85);
+			builder1.setInterLevelTeleportationProbability(0.0);
 			builder2.setTeleportationProbability(0.75);
 			builder2.setInterLevelTeleportationProbability(0.1);
+		}
+
+		// TODO 20141018 J-B: not sure if i named these correctly; if not you might want to rename
+		public ColumnVector calculateRing1Importances(final Collection<PoiAccountState> accountStates) {
+			return calculateImportances(this.builder1.create(), this.height1, accountStates, new PageRankScorer());
+		}
+
+		public ColumnVector calculateRing2Importances(final Collection<PoiAccountState> accountStates) {
+			return calculateImportances(this.builder2.create(), this.height2, accountStates, new PageRankScorer());
 		}
 	}
 
@@ -668,8 +673,16 @@ public class PoiImportanceCalculatorTest {
 			final PoiOptions options,
 			final BlockHeight importanceBlockHeight,
 			final Collection<PoiAccountState> accountStates) {
+		return calculateImportances(options, importanceBlockHeight, accountStates, DEFAULT_IMPORTANCE_SCORER);
+	}
+
+	private static ColumnVector calculateImportances(
+			final PoiOptions options,
+			final BlockHeight importanceBlockHeight,
+			final Collection<PoiAccountState> accountStates,
+			final ImportanceScorer scorer) {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
-				DEFAULT_IMPORTANCE_SCORER,
+				scorer,
 				options);
 		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		return getImportances(importanceBlockHeight, accountStates);
@@ -718,15 +731,6 @@ public class PoiImportanceCalculatorTest {
 
 		LOGGER.info(String.format("importances: %s", importancesVector));
 		return importancesVector;
-	}
-
-	private class PageRankScorer implements ImportanceScorer {
-
-		@Override
-		public ColumnVector calculateFinalScore(final ColumnVector importanceVector, final ColumnVector outlinkVector, final ColumnVector vestedBalanceVector, final ColumnVector graphWeightVector) {
-			importanceVector.normalize();
-			return importanceVector;
-		}
 	}
 
 	//endregion

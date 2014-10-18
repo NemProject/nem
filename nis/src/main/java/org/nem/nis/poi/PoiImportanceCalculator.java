@@ -107,7 +107,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
-			final double dangleSum = calculateDangleSum(
+			final double dangleSum = PoiUtils.calculateDangleSum(
 					this.context.getDangleIndexes(),
 					this.options.getTeleportationProbability(),
 					prevIterImportances);
@@ -132,29 +132,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			return interLevelMatrix.getA()
 					.multiply(interLevelMatrix.getR().multiply(prevIterImportances))
 					.multiply(this.options.getInterLevelTeleportationProbability());
-		}
-
-		// TODO 20141014 J-B: i would move this somewhere so that we can keep the deleted test
-		// TODO 20151015 BR -> J: tell me where to move it, it is only used in this class.
-		/**
-		 * Calculates the weighted teleporation sum of all dangling accounts.
-		 *
-		 * @param dangleIndexes The indexes of dangling accounts.
-		 * @param teleportationProbability The teleportation probability.
-		 * @param importanceVector The importance (weights).
-		 * @return The weighted teleporation sum of all dangling accounts.
-		 */
-		private double calculateDangleSum(
-				final List<Integer> dangleIndexes,
-				final double teleportationProbability,
-				final ColumnVector importanceVector) {
-
-			double dangleSum = 0;
-			for (final int i : dangleIndexes) {
-				dangleSum += importanceVector.getAt(i);
-			}
-
-			return dangleSum * teleportationProbability / importanceVector.size();
 		}
 	}
 }

@@ -85,16 +85,38 @@ public class ClusteringResult {
 		return this.clusters.size() + this.hubs.size() + this.outliers.size();
 	}
 
-	// TODO 20141016 J-B: i guess we should test these
-
 	/**
 	 * Gets a value indicating whether or not the given id is a regular cluster id.
 	 *
-	 * @param id The id
+	 * @param id The id.
 	 * @return true if the id is a regular cluster id, false otherwise.
 	 */
 	public boolean isRegularCluster(final ClusterId id) {
-		for (Cluster cluster : this.clusters) {
+		return contains(this.clusters, id);
+	}
+
+	/**
+	 * Gets a value indicating whether or not the given id is hub id.
+	 *
+	 * @param id The id.
+	 * @return true if the id is a hub id, false otherwise.
+	 */
+	public boolean isHub(final ClusterId id) {
+		return contains(this.hubs, id);
+	}
+
+	/**
+	 * Gets a value indicating whether or not the given id is hub id.
+	 *
+	 * @param id The id.
+	 * @return true if the id is a hub id, false otherwise.
+	 */
+	public boolean isOutlier(final ClusterId id) {
+		return contains(this.outliers, id);
+	}
+
+	private static boolean contains(final Collection<Cluster> clusters, final ClusterId id) {
+		for (final Cluster cluster : clusters) {
 			if (cluster.getId().equals(id)) {
 				return true;
 			}
@@ -104,35 +126,14 @@ public class ClusteringResult {
 	}
 
 	/**
-	 * Gets a value indicating whether or not the given id is hub id.
+	 * Gets the average cluster size.
 	 *
-	 * @param id The id
-	 * @return true if the id is a hub id, false otherwise.
+	 * @return The average cluster size.
 	 */
-	public boolean isHub(final ClusterId id) {
-		for (Cluster hub : this.hubs) {
-			if (hub.getId().equals(id)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Gets a value indicating whether or not the given id is hub id.
-	 *
-	 * @param id The id
-	 * @return true if the id is a hub id, false otherwise.
-	 */
-	public boolean isOutlier(final ClusterId id) {
-		for (Cluster outlier : this.outliers) {
-			if (outlier.getId().equals(id)) {
-				return true;
-			}
-		}
-
-		return false;
+	public double getAverageClusterSize() {
+		final double numClusterMembers = this.clusters.stream().mapToInt(c -> c.size()).sum();
+		final int numClusters = this.clusters.size();
+		return 0 == numClusters ? 0.0 : numClusterMembers / numClusters;
 	}
 
 	/**

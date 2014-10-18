@@ -121,8 +121,6 @@ public class PoiContext {
 
 	//endregion
 
-	// TODO 20141016 J-B: we should test
-
 	//region clustering result
 
 	/**
@@ -319,13 +317,10 @@ public class PoiContext {
 					this.options.getMuClusteringValue(),
 					this.options.getEpsilonClusteringValue());
 			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
-			// TODO: move to clustering result
-			final int numClusterMembers = this.clusteringResult.getClusters().stream().mapToInt(c -> c.size()).sum();
-			final int numClusters = this.clusteringResult.getClusters().size();
 			LOGGER.info(String.format(
 					"clustering completed: { clusters: %d (average size: %s), hubs: %d, outliers: %d }",
-					numClusters,
-					numClusters > 0? FormatUtils.format((double)numClusterMembers / (double)numClusters, 2) : 0,
+					this.clusteringResult.getClusters().size(),
+					FormatUtils.format(this.clusteringResult.getAverageClusterSize(), 2),
 					this.clusteringResult.getHubs().size(),
 					this.clusteringResult.getOutliers().size()));
 
