@@ -272,6 +272,14 @@ public class NxtGraphClusteringITCase {
 	 * 0.6 | 0.9521 |   4970 |
 	 * 0.8 | 0.9495 |   4970 |
 	 * 1.0 | 0.9463 |   4970 |
+	 * 
+	 * results for blockheight up to 150000:
+	 * 0.0 | 0.9743 |   3849 |
+	 * 0.2 | 0.9742 |   3849 |
+	 * 0.4 | 0.9742 |   3849 |
+	 * 0.6 | 0.9740 |   3849 |
+	 * 0.8 | 0.9738 |   3849 |
+	 * 1.0 | 0.9736 |   3849 |
 	 */
 	@Test
 	public void negOutlinkWeightBalanceImportanceVariance() {
@@ -364,7 +372,7 @@ public class NxtGraphClusteringITCase {
 	}
 
 	private static class SensitivityTestHarness {
-		private final int endHeight = 225000;
+		private final int endHeight = 150000;//225000;
 		private final BlockHeight endBlockHeight = new BlockHeight(this.endHeight);
 		private final Map<Long, ColumnVector> parameterToImportanceMap = new HashMap<>();
 		private final Map<Double, ColumnVector> doubleParameterToImportanceMap = new HashMap<>();
