@@ -400,7 +400,7 @@ public class NxtGraphClusteringITCase {
 				final PoiOptionsBuilder optionsBuilder = createOptionsBuilder.apply(value);
 				final PoiOptions options = optionsBuilder.create();
 
-				final Collection<PoiAccountState> eligibleAccountStates = copyAndFilter(options.getMinHarvesterBalance());
+				final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(options.getMinHarvesterBalance());
 				final ColumnVector importances = getAccountImportances(this.endBlockHeight, eligibleAccountStates, optionsBuilder, scorer);
 				this.parameterToImportanceMap.put(value, importances);
 			}
@@ -431,7 +431,7 @@ public class NxtGraphClusteringITCase {
 				builder.append(System.lineSeparator());
 				builder.append(String.format("* %s |", keyNames.get(i)));
 
-				final Collection<PoiAccountState> eligibleAccountStates = copyAndFilter(Amount.fromNem(keys.get(i)));
+				final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(Amount.fromNem(keys.get(i)));
 				final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
 				final ColumnVector importances = this.parameterToImportanceMap.get(keys.get(i));
 				final double correlation = balances.correlation(importances);
@@ -455,7 +455,7 @@ public class NxtGraphClusteringITCase {
 				builder.append(System.lineSeparator());
 				builder.append(String.format("* %s |", keyNames.get(i)));
 
-				final Collection<PoiAccountState> eligibleAccountStates = copyAndFilter(DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
+				final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
 				final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
 				final ColumnVector importances = this.parameterToImportanceMap.get(keys.get(i));
 				final double correlation = balances.correlation(importances);
@@ -467,7 +467,7 @@ public class NxtGraphClusteringITCase {
 		}
 
 		private void renderAsTable(final Amount minHarvesterBalance) {
-			final Collection<PoiAccountState> eligibleAccountStates = copyAndFilter(minHarvesterBalance);
+			final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(minHarvesterBalance);
 			final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
 			this.parameterToImportanceMap.put(0L, balances);
 

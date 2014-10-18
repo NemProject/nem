@@ -311,12 +311,12 @@ public class PoiImportanceCalculatorTest {
 	public void spamLinksDoNotHaveABigImpactOnImportance() {
 		// Arrange:
 		// - all (12) accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final List<PoiAccountState> accountStates = this.setupAccountStates(12);
 		final StandardContext context = new StandardContext();
 		context.builder1.setClusteringStrategy(new SingleClusterScan());
 
 		// Construct basic ring connections
-		final Matrix outlinkMatrix = setupBasicRingStructure();
+		final Matrix outlinkMatrix = this.setupBasicRingStructure();
 
 		// Add random transactions to the left ring
 		final SecureRandom random = new SecureRandom();
@@ -330,12 +330,12 @@ public class PoiImportanceCalculatorTest {
 		// Normal page rank
 		LOGGER.info("normal page rank:");
 		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
-		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
+		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
 		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
-		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
+		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
 		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
@@ -429,7 +429,7 @@ public class PoiImportanceCalculatorTest {
 	public void linkFromRingTwoToRingOneTransfersImportanceToLeftBlock() {
 		// Arrange:
 		// - all accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final List<PoiAccountState> accountStates = this.setupAccountStates(12);
 		final StandardContext context = new StandardContext();
 		context.builder1.setTeleportationProbability(1.00);
 		context.builder1.setInterLevelTeleportationProbability(0.0);
@@ -437,7 +437,7 @@ public class PoiImportanceCalculatorTest {
 		context.builder2.setInterLevelTeleportationProbability(0.1);
 
 		// Construct basic ring connections
-		final Matrix outlinkMatrix = setupBasicRingStructure();
+		final Matrix outlinkMatrix = this.setupBasicRingStructure();
 
 		// Link blocks
 		outlinkMatrix.setAt(3, 6, 100);
@@ -451,12 +451,12 @@ public class PoiImportanceCalculatorTest {
 		// Normal page rank
 		LOGGER.info("normal page rank:");
 		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
-		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
+		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
 
 		// NCD aware page rank
 		LOGGER.info("NCD aware page rank:");
 		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
-		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
+		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
 		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
@@ -527,7 +527,7 @@ public class PoiImportanceCalculatorTest {
 	public void merchantAndExchangeGetALotMoreImportance() {
 		// Arrange:
 		// - all accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final List<PoiAccountState> accountStates = this.setupAccountStates(12);
 		final StandardContext context = new StandardContext();
 
 		// Setup transfers from users, merchant and exchange.
@@ -564,11 +564,11 @@ public class PoiImportanceCalculatorTest {
 		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
 
 		public StandardContext() {
-			builder1.setClusteringStrategy(new SingleClusterScan());
-			builder1.setTeleportationProbability(0.85);
-			builder1.setInterLevelTeleportationProbability(0.0);
-			builder2.setTeleportationProbability(0.75);
-			builder2.setInterLevelTeleportationProbability(0.1);
+			this.builder1.setClusteringStrategy(new SingleClusterScan());
+			this.builder1.setTeleportationProbability(0.85);
+			this.builder1.setInterLevelTeleportationProbability(0.0);
+			this.builder2.setTeleportationProbability(0.75);
+			this.builder2.setInterLevelTeleportationProbability(0.1);
 		}
 
 		// TODO 20141018 J-B: not sure if i named these correctly; if not you might want to rename

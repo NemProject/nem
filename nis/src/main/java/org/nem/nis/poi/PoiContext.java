@@ -247,10 +247,10 @@ public class PoiContext {
 			// V(1) - V(outlier) * (1 - weight) ==> V(outlier) * (-1 + weight) + V(1)
 			this.graphWeightVector.setAll(1);
 			final ColumnVector weightedVector = this.graphWeightVector.addElementWise(this.outlierVector
-					.multiply(-1 + options.getOutlierWeight()));
+					.multiply(-1 + this.options.getOutlierWeight()));
 
 			for (int index = 0; index < weightedVector.size(); ++index) {
-				graphWeightVector.setAt(index, weightedVector.getAt(index));
+				this.graphWeightVector.setAt(index, weightedVector.getAt(index));
 			}
 		}
 
