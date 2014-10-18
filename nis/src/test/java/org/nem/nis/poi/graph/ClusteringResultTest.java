@@ -68,6 +68,8 @@ public class ClusteringResultTest {
 
 	// region isRegularCluster/isHub/isOutlier
 
+	// TODO 20141018 - review tests!
+
 	@Test
 	public void isRegularClusterReturnsTrueWhenClusterIdIsARegularCluster() {
 		// Arrange:
@@ -97,8 +99,6 @@ public class ClusteringResultTest {
 		Assert.assertThat(result.isRegularCluster(new ClusterId(5)), IsEqual.equalTo(false));
 		Assert.assertThat(result.isRegularCluster(new ClusterId(3)), IsEqual.equalTo(false));
 	}
-
-	//endregion
 
 	@Test
 	public void isHubReturnsTrueWhenClusterIdIsAHub() {

@@ -77,8 +77,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static class PoiPowerIterator extends PowerIterator {
 		private final PoiContext context;
 		private final PoiOptions options;
-		// TODO 20141014 J-B: you don't need to pass scorer here
-		// TODO 20141015 BR -> J: actually it was already there, I didn't add it ^^
 		private final boolean useClustering;
 
 		public PoiPowerIterator(
@@ -109,13 +107,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
-			// TODO-CR 20141017 BR -> J,M: adding the interlevel teleportation probability leads to violation of the probability conservation.
-			// TODO                        Thus the l1-norm of the importance is changed in each step. We are normalizing after each step but
-			// TODO                        it still could result in some strange effects. The reason for the dangle sum is that there is some probability
-			// TODO                        missing due to some columns of the outlink matrix being zero. This is exactly compensated when using the
-			// TODO                        teleportation probability in the dangle sum. the dangle sum has nothing to do with the ILP matrix or
-			// TODO                        the interlevel teleportation probability. I would suggest to use only the teleportation probability.
-			// TODO-CR 20141018 M -> J, BR: I changed this back to just teleportation probability
 			final double dangleSum = calculateDangleSum(
 					this.context.getDangleIndexes(),
 					this.options.getTeleportationProbability(),

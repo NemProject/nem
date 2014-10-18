@@ -50,6 +50,7 @@ public class FormatUtils {
 
 	/**
 	 * Formats a double value with a given number of decimal places.
+	 * TODO 20141018 J-B: should add a test for this.
 	 *
 	 * @param value The value to format.
 	 * @param decimalPlaces The desired number of decimal places.

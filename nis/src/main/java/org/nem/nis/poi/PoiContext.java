@@ -319,6 +319,7 @@ public class PoiContext {
 					this.options.getMuClusteringValue(),
 					this.options.getEpsilonClusteringValue());
 			this.clusteringResult = this.options.getClusteringStrategy().cluster(this.neighborhood);
+			// TODO: move to clustering result
 			final int numClusterMembers = this.clusteringResult.getClusters().stream().mapToInt(c -> c.size()).sum();
 			final int numClusters = this.clusteringResult.getClusters().size();
 			LOGGER.info(String.format(

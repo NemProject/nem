@@ -228,22 +228,23 @@ public class PoiContextTest {
 
 	@Test
 	public void clusteringResultIsInitializedCorrectly() {
-		// Act:
+		// Arrange:
 		// (0, 1, 8), (0, 2, 4), (1, 0, 2), (1, 2, 6), (3, 0, 3), (3, 2, 5)
 		// ==> (0, 1, 6), (0, 2, 4), (1, 2, 6), (3, 2, 5)
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setMinOutlinkWeight(Amount.fromNem(4));
+		poiOptionsBuilder.setMinOutlinkWeight(Amount.fromNem(4)); // TODO <--
 		// make node 3 an outlier
 		poiOptionsBuilder.setEpsilonClusteringValue(0.75);
 		final PoiOptions options = poiOptionsBuilder.create();
 
-		// Act (expected: one cluster { 0, 1, 2 }, no hubs, one outlier { 3 }):
+		// Act:
 		final PoiContext context = createTestPoiContextWithAccountLinks(options);
+
+		// Assert: (one cluster { 0, 1, 2 }, no hubs, one outlier { 3 }):
 		final List<Cluster> clusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2)));
 		final List<Cluster> hubs = Arrays.asList();
 		final List<Cluster> outliers = Arrays.asList(new Cluster(new ClusterId(3), NisUtils.toNodeIdList(3)));
 
-		// Assert:
 		Assert.assertThat(context.getClusteringResult().getClusters(), IsEqual.equalTo(clusters));
 		Assert.assertThat(context.getClusteringResult().getHubs(), IsEqual.equalTo(hubs));
 		Assert.assertThat(context.getClusteringResult().getOutliers(), IsEqual.equalTo(outliers));

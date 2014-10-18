@@ -318,8 +318,6 @@ public class PoiImportanceCalculatorTest {
 		final Matrix outlinkMatrix = setupBasicRingStructure();
 
 		// Add random transactions to the left ring
-		// TODO 20141014 J-B: should we attempt to filter out self loops (probably doesn't matter)
-		// TODO 20141015 BR -> J: doesn't matter as it gets filtered out during PoiContext initialization.
 		final SecureRandom random = new SecureRandom();
 		for (int i = 0; i < 100; ++i) {
 			outlinkMatrix.incrementAt(random.nextInt(6), random.nextInt(6), 20);
@@ -328,9 +326,6 @@ public class PoiImportanceCalculatorTest {
 		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
 
 		// Act:
-		// TODO 20141014 J-B: are you intentionally using SingleClusterScan?
-		// TODO 20141015 BR -> J: yes, SingleClusterScan emulates normal page rank since the ncd-aware part behaves like
-		// TODO                   adding the inter level teleportation probability to the inverse teleportation probability.
 		context.builder.setClusteringStrategy(new SingleClusterScan());
 
 		// Normal page rank
