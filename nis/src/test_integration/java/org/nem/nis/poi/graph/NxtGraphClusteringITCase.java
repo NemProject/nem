@@ -133,6 +133,11 @@ public class NxtGraphClusteringITCase {
 				new TeleportationProbabilities(0.65, 0.2),
 				new TeleportationProbabilities(0.55, 0.2));
 
+		// load account states from the database
+		final int endHeight = 225000;
+		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
+		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+
 		// how I learned to stop worrying and love the loop
 		for (final long minHarvesterBalance : minHarvesterBalances) {
 			for (final long minOutlinkWeight : minOutlinkWeights) {
@@ -162,12 +167,8 @@ public class NxtGraphClusteringITCase {
 											teleporationPair.teleporationProb,
 											teleporationPair.interLevelTeleporationProb);
 
-									// Arrange
-									final int endHeight = 225000;
-									final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-
 									// 0. Load account states.
-									final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, optionsBuilder);
+									final Collection<PoiAccountState> eligibleAccountStates = copy(dbAccountStates);
 
 									// 1. calc importances
 									final ColumnVector importances = getAccountImportances(
