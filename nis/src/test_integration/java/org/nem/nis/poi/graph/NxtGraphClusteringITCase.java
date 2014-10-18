@@ -242,6 +242,8 @@ public class NxtGraphClusteringITCase {
 	 * 10^3 | 0.9456 |   4970 |
 	 * 10^4 | 0.9452 |   2483 |
 	 * 10^5 | 0.9504 |    797 |
+	 * 
+	 * 
 	 */
 	@Test
 	public void minHarvestingBalanceImportanceVariance() {
@@ -260,6 +262,34 @@ public class NxtGraphClusteringITCase {
 				},
 				scorer);
 		harness.renderAsList();
+	}
+	
+	/**
+	 * Using correlation as a proxy for importance sensitivity to negOutlinkWeight.
+	 * 0.0 | 0.9566 |   4970 |
+	 * 0.2 | 0.9557 |   4970 |
+	 * 0.4 | 0.9541 |   4970 |
+	 * 0.6 | 0.9521 |   4970 |
+	 * 0.8 | 0.9495 |   4970 |
+	 * 1.0 | 0.9463 |   4970 |
+	 */
+	@Test
+	public void negOutlinkWeightBalanceImportanceVariance() {
+		// Act:
+		runNegOutlinkWeightBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
+	}
+
+	private static void runNegOutlinkWeightBalanceVariance(final ImportanceScorer scorer) {
+		final SensitivityTestHarness harness = new SensitivityTestHarness();
+		harness.mapValuesToImportanceVectors(
+				Arrays.asList(0l, 20l, 40l, 60l, 80l, 100l),
+				v -> {
+					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
+					optionsBuilder.setNegativeOutlinkWeight(v/100.0);//hack to get double :/
+					return optionsBuilder;
+				},
+				scorer);
+		harness.renderNegOutlinkStatesAsList();
 	}
 
 	/**
@@ -337,6 +367,7 @@ public class NxtGraphClusteringITCase {
 		private final int endHeight = 225000;
 		private final BlockHeight endBlockHeight = new BlockHeight(this.endHeight);
 		private final Map<Long, ColumnVector> parameterToImportanceMap = new HashMap<>();
+		private final Map<Double, ColumnVector> doubleParameterToImportanceMap = new HashMap<>();
 		private final Collection<PoiAccountState> dbAccountStates;
 
 		public SensitivityTestHarness() {
@@ -358,6 +389,7 @@ public class NxtGraphClusteringITCase {
 				this.parameterToImportanceMap.put(value, importances);
 			}
 		}
+		
 
 		private Collection<PoiAccountState> copyAndFilter(final Amount minHarvesterBalance) {
 			return this.dbAccountStates.stream()
@@ -394,6 +426,31 @@ public class NxtGraphClusteringITCase {
 
 			LOGGER.info(builder.toString());
 		}
+		
+		private void renderNegOutlinkStatesAsList() {
+			final List<Long> keys = this.parameterToImportanceMap.keySet().stream().sorted().collect(Collectors.toList());
+			final List<String> keyNames = keys.stream()
+					.map(NxtGraphClusteringITCase::getReducedDecimalLabel)
+					.collect(Collectors.toList());
+
+			final StringBuilder builder = new StringBuilder();
+			final DecimalFormat decimalFormat = FormatUtils.getDecimalFormat(4);
+			
+			for (int i = 0; i < keyNames.size(); ++i) {
+				builder.append(System.lineSeparator());
+				builder.append(String.format("* %s |", keyNames.get(i)));
+
+				final Collection<PoiAccountState> eligibleAccountStates = copyAndFilter(DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
+				final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
+				final ColumnVector importances = this.parameterToImportanceMap.get(keys.get(i));
+				final double correlation = balances.correlation(importances);
+				builder.append(String.format(" %s |", decimalFormat.format(correlation)));
+				builder.append(String.format(" %6d |", balances.size()));
+			}
+
+			LOGGER.info(builder.toString());
+		}
+		
 
 		private void renderAsTable(final Amount minHarvesterBalance) {
 			final Collection<PoiAccountState> eligibleAccountStates = copyAndFilter(minHarvesterBalance);
@@ -440,6 +497,10 @@ public class NxtGraphClusteringITCase {
 
 	private static String getFriendlyLabel(final long key) {
 		return 0 == key ? "STK " : "10^" + (long)Math.log10(key);
+	}
+	
+	private static String getReducedDecimalLabel(final long key) {
+		return "" + key / 100.0;
 	}
 
 	private static ColumnVector getBalances(
