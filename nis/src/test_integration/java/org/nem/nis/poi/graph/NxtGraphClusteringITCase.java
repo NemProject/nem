@@ -77,7 +77,7 @@ public class NxtGraphClusteringITCase {
 				endBlockHeight);
 	}
 
-	@Ignore
+//	@Ignore
 	@Test
 	public void canWriteImportancesToFileForManyDifferentParameters() throws IOException {
 		// compute Cartesian product of considered parameters
@@ -96,7 +96,7 @@ public class NxtGraphClusteringITCase {
 				new TeleportationProbabilities(0.55, 0.2));
 
 		// load account states from the database
-		final int endHeight = 225000;
+		final int endHeight = 150000;//225000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
@@ -154,8 +154,8 @@ public class NxtGraphClusteringITCase {
 				new PoiScorer());
 
 		final List<Long> stakes = eligibleAccountStates.stream()
-				.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(
-						endBlockHeight)).getNumMicroNem())
+				.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight)/*.add(acct.getWeightedBalances().getUnvested(
+						endBlockHeight))*/.getNumMicroNem())
 				.collect(Collectors.toList());
 
 		final List<String> addresses = eligibleAccountStates.stream()
