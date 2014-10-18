@@ -217,26 +217,32 @@ public class NxtGraphClusteringITCase {
 
 	//endregion
 
-	//region min harvesting balance
+	//region sensitivity tests
 
 	/**
 	 * TODO 20141016 BR -> J: here are the values when using PageRankScorer (see comment below):
 	 *
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
 	 * STK  | 1.0000 |        |        |        |        |        |
-	 * 10^0 | 0.0257 | 1.0000 |        |        |        |        |
-	 * 10^2 | 0.0257 | 1.0000 | 1.0000 |        |        |        |
-	 * 10^3 | 0.0257 | 1.0000 | 1.0000 | 1.0000 |        |        |
-	 * 10^4 | 0.1050 | 0.2965 | 0.2965 | 0.2965 | 1.0000 |        |
-	 * 10^5 | 0.2436 | 0.1980 | 0.1980 | 0.1980 | 0.6061 | 1.0000 |
+	 * 10^0 | 0.0250 | 1.0000 |        |        |        |        |
+	 * 10^2 | 0.0250 | 1.0000 | 1.0000 |        |        |        |
+	 * 10^3 | 0.0250 | 1.0000 | 1.0000 | 1.0000 |        |        |
+	 * 10^4 | 0.1193 | 0.2411 | 0.2411 | 0.2411 | 1.0000 |        |
+	 * 10^5 | 0.2375 | 0.1791 | 0.1791 | 0.1791 | 0.6107 | 1.0000 |
 	 */
+	@Test
+	public void minHarvestingBalancePageRankVariance() {
+		// Act:
+		minHarvestingBalanceVariance(PAGE_RANK_SCORER);
+	}
+
 	/**
 	 * Using correlation as a proxy for importance sensitivity to min harvesting balance.
 	 * TODO 20141014 J-J: recalculate differences using pearson r
 	 * TODO 20141015 BR -> J: nice test. I agree to raise the min harvest balance to the suggested value.
-     * TODO 20141016 M -> BR, J: If possible we should try to keep the min balance low so that more people can
-     * ->participate in harvesting NEM. None of these correlations are really so different, so I wouldn't go over 1000.
-     * ->Also, I get different numbers when I run the test (it could because I am using a newer NXT DB with more blocks).
+	 * TODO 20141016 M -> BR, J: If possible we should try to keep the min balance low so that more people can
+	 * ->participate in harvesting NEM. None of these correlations are really so different, so I wouldn't go over 1000.
+	 * ->Also, I get different numbers when I run the test (it could because I am using a newer NXT DB with more blocks).
 	 *
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
 	 * STK  | 1.0000 |        |        |        |        |        |
@@ -247,55 +253,73 @@ public class NxtGraphClusteringITCase {
 	 * 10^5 | 0.9984 | 0.9984 | 0.9984 | 0.9984 | 0.9990 | 1.0000 |
 	 */
 	@Test
-	public void minHarvestingBalanceVariance() {
+	public void minHarvestingBalanceImportanceVariance() {
 		// Act:
+		minHarvestingBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
+	}
+
+	private static void minHarvestingBalanceVariance(final ImportanceScorer scorer) {
 		runSensitivityTest(
 				Arrays.asList(1L, 100L, 1000L, 10000L, 100000L, 100000L),
 				v -> {
 					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 					optionsBuilder.setMinHarvesterBalance(Amount.fromNem(v));
 					return optionsBuilder;
-				});
+				},
+				scorer);
 	}
 
 	/**
-	 * TODO-CR 20141016 BR -> J: you are probably wondering why the correlation is so high. Well that is because POI is still dominated by POS.
-	 * TODO                      If you want to know the influence of min outlink balance on the page rank part of POI you need to use the PageRankScorer.
-	 * TODO                      Doing so results in the following values:
-	 *
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
-	 * 10^0 | 0.0220 | 1.0000 |        |        |        |        |        |        |
-	 * 10^1 | 0.0150 | 0.9734 | 1.0000 |        |        |        |        |        |
-	 * 10^2 | 0.0197 | 0.8848 | 0.9206 | 1.0000 |        |        |        |        |
-	 * 10^3 | 0.0269 | 0.7070 | 0.7492 | 0.8589 | 1.0000 |        |        |        |
-	 * 10^4 | 0.0648 | 0.1986 | 0.2619 | 0.3457 | 0.5153 | 1.0000 |        |        |
-	 * 10^5 | 0.1427 | 0.0946 | 0.1278 | 0.1700 | 0.2545 | 0.4657 | 1.0000 |        |
-	 * 10^6 | 0.2629 | 0.0321 | 0.0329 | 0.0446 | 0.0711 | 0.1606 | 0.4626 | 1.0000 |
+	 * 10^0 | 0.0230 | 1.0000 |        |        |        |        |        |        |
+	 * 10^1 | 0.0141 | 0.9713 | 1.0000 |        |        |        |        |        |
+	 * 10^2 | 0.0082 | 0.9110 | 0.9500 | 1.0000 |        |        |        |        |
+	 * 10^3 | 0.0085 | 0.7620 | 0.7971 | 0.8535 | 1.0000 |        |        |        |
+	 * 10^4 | 0.0228 | 0.2798 | 0.3292 | 0.3869 | 0.4881 | 1.0000 |        |        |
+	 * 10^5 | 0.0141 | 0.0223 | 0.0338 | 0.0611 | 0.0886 | 0.2691 | 1.0000 |        |
+	 * 10^6 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 1.0000 |
 	 */
+	@Test
+	public void minOutlinkWeightPageRankVariance() {
+		// Act:
+		runMinOutlinkWeightVariance(PAGE_RANK_SCORER);
+	}
+
 	/**
 	 * Using correlation as a proxy for importance sensitivity to min outlink balance.
 	 *
-	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |
-	 * STK  | 1.0000 |        |        |        |        |
-	 * 10^0 | 0.9994 | 1.0000 |        |        |        |
-	 * 10^1 | 0.9995 | 1.0000 | 1.0000 |        |        |
-	 * 10^2 | 0.9996 | 0.9999 | 1.0000 | 1.0000 |        |
-	 * 10^3 | 0.9996 | 0.9999 | 0.9999 | 1.0000 | 1.0000 |
+	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
+	 * STK  | 1.0000 |        |        |        |        |        |        |        |
+	 * 10^0 | 0.9994 | 1.0000 |        |        |        |        |        |        |
+	 * 10^1 | 0.9995 | 1.0000 | 1.0000 |        |        |        |        |        |
+	 * 10^2 | 0.9996 | 0.9999 | 1.0000 | 1.0000 |        |        |        |        |
+	 * 10^3 | 0.9996 | 0.9999 | 0.9999 | 1.0000 | 1.0000 |        |        |        |
+	 * 10^4 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 |        |        |
+	 * 10^5 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |        |
+	 * 10^6 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
 	 */
 	@Test
-	public void minOutlinkWeightBalanceVariance() {
+	public void minOutlinkWeightImportanceVariance() {
 		// Act:
+		runMinOutlinkWeightVariance(DEFAULT_IMPORTANCE_SCORER);
+	}
+
+	private static void runMinOutlinkWeightVariance(final ImportanceScorer scorer) {
 		runSensitivityTest(
 				Arrays.asList(1L, 10L, 100L, 1000L, 10000L, 100000L, 1000000L),
 				v -> {
 					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
 					optionsBuilder.setMinOutlinkWeight(Amount.fromNem(v));
 					return optionsBuilder;
-				});
+				},
+				scorer);
 	}
 
-	private static void runSensitivityTest(final Collection<Long> values, final Function<Long, PoiOptionsBuilder> createOptionsBuilder) {
+	private static void runSensitivityTest(
+			final Collection<Long> values,
+			final Function<Long, PoiOptionsBuilder> createOptionsBuilder,
+			final ImportanceScorer scorer) {
 		// Arrange:
 		final int endHeight = 225000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
@@ -310,7 +334,7 @@ public class NxtGraphClusteringITCase {
 			final PoiOptionsBuilder optionsBuilder = createOptionsBuilder.apply(value);
 
 			final Collection<PoiAccountState> eligibleAccountStates = copy(dbAccountStates);
-			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, DEFAULT_IMPORTANCE_SCORER);
+			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, scorer);
 			parameterToImportanceMap.put(value, importances);
 		}
 
