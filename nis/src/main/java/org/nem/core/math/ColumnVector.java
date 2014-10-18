@@ -374,7 +374,7 @@ public class ColumnVector {
 		final ColumnVector meanAdjustedX = this.meanAdjust();
 		final ColumnVector meanAdjustedY = vector.meanAdjust();
 
-	 	final double squaredDeviationX = meanAdjustedX.multiplyElementWise(meanAdjustedX).sum();
+		final double squaredDeviationX = meanAdjustedX.multiplyElementWise(meanAdjustedX).sum();
 		final double squaredDeviationY = meanAdjustedY.multiplyElementWise(meanAdjustedY).sum();
 		final double deviationProduct = meanAdjustedX.multiplyElementWise(meanAdjustedY).sum();
 		return deviationProduct / Math.sqrt(squaredDeviationX * squaredDeviationY);

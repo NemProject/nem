@@ -74,7 +74,7 @@ public class PoiContext {
 	public ColumnVector getOutlierVector() {
 		return this.accountProcessor.outlierVector;
 	}
-	
+
 	/**
 	 * Gets the graph weight vector.
 	 *
@@ -242,13 +242,13 @@ public class PoiContext {
 			this.poiStartVector.setAll(1.0);
 			this.poiStartVector.normalize();
 		}
-		
+
 		private void createGraphWeightVector() {
 			// V(1) - V(outlier) * (1 - weight) ==> V(outlier) * (-1 + weight) + V(1)
 			this.graphWeightVector.setAll(1);
 			final ColumnVector weightedVector = this.graphWeightVector.addElementWise(this.outlierVector
 					.multiply(-1 + options.getOutlierWeight()));
-			
+
 			for (int index = 0; index < weightedVector.size(); ++index) {
 				graphWeightVector.setAt(index, weightedVector.getAt(index));
 			}
@@ -327,7 +327,7 @@ public class PoiContext {
 			for (final Cluster cluster : this.clusteringResult.getOutliers()) {
 				this.outlierVector.setAt(cluster.getId().getRaw(), 1.0);
 			}
-			
+
 			// now use the outlierVector to create the graph weight vector
 			this.createGraphWeightVector();
 		}

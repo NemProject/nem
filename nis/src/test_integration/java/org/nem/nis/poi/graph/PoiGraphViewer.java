@@ -125,11 +125,7 @@ public class PoiGraphViewer {
 		this.viewer.setPickedEdgeState(pickedEdgeState);
 
 		// Transformer maps the vertex number to a vertex property
-		Transformer<Integer,Paint> vertexColor = new Transformer<Integer,Paint>() {
-			public Paint transform(Integer i) {
-				return getClusterColor(clusteringResult.getIdForNode(new NodeId(i)));
-			}
-		};
+		Transformer<Integer, Paint> vertexColor = i -> getClusterColor(clusteringResult.getIdForNode(new NodeId(i)));
 		this.viewer.getRenderContext().setEdgeDrawPaintTransformer(
 				new PickableEdgePaintTransformer<Number>(this.viewer.getPickedEdgeState(), Color.black, Color.red));
 		this.viewer.getRenderContext().setVertexFillPaintTransformer(vertexColor);
@@ -193,7 +189,7 @@ public class PoiGraphViewer {
 			@Override
 			public void visit(final int row, final int col, final double value) {
 				if (!getClusteringResult().isOutlier(clusteringResult.getIdForNode(new NodeId(row))) &&
-					!getClusteringResult().isOutlier(clusteringResult.getIdForNode(new NodeId(col)))) {
+						!getClusteringResult().isOutlier(clusteringResult.getIdForNode(new NodeId(col)))) {
 					PoiGraphViewer.this.getGraph().addEdge(this.edgeCount++, col, row, edgeType);
 				}
 			}

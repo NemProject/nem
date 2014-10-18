@@ -192,6 +192,7 @@ public class NxtGraphClusteringITCase {
 	/**
 	 * TODO 20141016 BR -> J: here are the values when using PageRankScorer (see comment below):
 	 *
+	 * <pre>
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
 	 * STK  | 1.0000 |        |        |        |        |        |
 	 * 10^0 | 0.0250 | 1.0000 |        |        |        |        |
@@ -199,13 +200,14 @@ public class NxtGraphClusteringITCase {
 	 * 10^3 | 0.0250 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^4 | 0.1193 | 0.2411 | 0.2411 | 0.2411 | 1.0000 |        |
 	 * 10^5 | 0.2375 | 0.1791 | 0.1791 | 0.1791 | 0.6107 | 1.0000 |
-	 * 
+	 *
 	 * TODO 20141018 M->BR,J: These are the results on my machine:
 	 * 10^0 | 0.0709 |  50139 |
 	 * 10^2 | 0.0194 |   8178 |
 	 * 10^3 | 0.0258 |   4970 |
 	 * 10^4 | 0.0601 |   2483 |
 	 * 10^5 | 0.0712 |    797 |
+	 * </pre>
 	 */
 	@Test
 	public void minHarvestingBalancePageRankVariance() {
@@ -221,6 +223,7 @@ public class NxtGraphClusteringITCase {
 	 * ->participate in harvesting NEM. None of these correlations are really so different, so I wouldn't go over 1000.
 	 * ->Also, I get different numbers when I run the test (it could because I am using a newer NXT DB with more blocks).
 	 *
+	 * <pre>
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
 	 * STK  | 1.0000 |        |        |        |        |        |
 	 * 10^0 | 0.9990 | 1.0000 |        |        |        |        |
@@ -228,8 +231,8 @@ public class NxtGraphClusteringITCase {
 	 * 10^3 | 0.9990 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^4 | 0.9992 | 0.9992 | 0.9992 | 0.9992 | 1.0000 |        |
 	 * 10^5 | 0.9984 | 0.9984 | 0.9984 | 0.9984 | 0.9990 | 1.0000 |
-	 * 
-	 * TODO 20141018 M-J: These are the results printed out on my machine: 
+	 *
+	 * TODO 20141018 M-J: These are the results printed out on my machine:
 	 * 10^0 | 0.9581 |  50139 |
 	 * 10^2 | 0.9559 |   8178 |
 	 * 10^3 | 0.9557 |   4970 |
@@ -242,8 +245,7 @@ public class NxtGraphClusteringITCase {
 	 * 10^3 | 0.9456 |   4970 |
 	 * 10^4 | 0.9452 |   2483 |
 	 * 10^5 | 0.9504 |    797 |
-	 * 
-	 * 
+	 * </pre>
 	 */
 	@Test
 	public void minHarvestingBalanceImportanceVariance() {
@@ -263,16 +265,17 @@ public class NxtGraphClusteringITCase {
 				scorer);
 		harness.renderAsList();
 	}
-	
+
 	/**
 	 * Using correlation as a proxy for importance sensitivity to negOutlinkWeight.
+	 * <pre>
 	 * 0.0 | 0.9566 |   4970 |
 	 * 0.2 | 0.9557 |   4970 |
 	 * 0.4 | 0.9541 |   4970 |
 	 * 0.6 | 0.9521 |   4970 |
 	 * 0.8 | 0.9495 |   4970 |
 	 * 1.0 | 0.9463 |   4970 |
-	 * 
+	 *
 	 * results for blockheight up to 150000:
 	 * 0.0 | 0.9743 |   3849 |
 	 * 0.2 | 0.9742 |   3849 |
@@ -280,6 +283,7 @@ public class NxtGraphClusteringITCase {
 	 * 0.6 | 0.9740 |   3849 |
 	 * 0.8 | 0.9738 |   3849 |
 	 * 1.0 | 0.9736 |   3849 |
+	 * </pre>
 	 */
 	@Test
 	public void negOutlinkWeightBalanceImportanceVariance() {
@@ -293,7 +297,7 @@ public class NxtGraphClusteringITCase {
 				Arrays.asList(0l, 20l, 40l, 60l, 80l, 100l),
 				v -> {
 					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
-					optionsBuilder.setNegativeOutlinkWeight(v/100.0);//hack to get double :/
+					optionsBuilder.setNegativeOutlinkWeight(v / 100.0);//hack to get double :/
 					return optionsBuilder;
 				},
 				scorer);
@@ -301,6 +305,7 @@ public class NxtGraphClusteringITCase {
 	}
 
 	/**
+	 * <pre>
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
 	 * 10^0 | 0.0230 | 1.0000 |        |        |        |        |        |        |
@@ -310,7 +315,7 @@ public class NxtGraphClusteringITCase {
 	 * 10^4 | 0.0228 | 0.2798 | 0.3292 | 0.3869 | 0.4881 | 1.0000 |        |        |
 	 * 10^5 | 0.0141 | 0.0223 | 0.0338 | 0.0611 | 0.0886 | 0.2691 | 1.0000 |        |
 	 * 10^6 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 1.0000 |
-	 * 
+	 *
 	 * TODO M: These are the results when I run this:
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
@@ -321,6 +326,7 @@ public class NxtGraphClusteringITCase {
 	 * 10^4 | 0.0419 | 0.3125 | 0.4007 | 0.5446 | 0.7383 | 1.0000 |        |        |
 	 * 10^5 | 0.0503 | 0.2173 | 0.2850 | 0.4043 | 0.5668 | 0.8268 | 1.0000 |        |
 	 * 10^6 | 0.0511 | 0.1817 | 0.2414 | 0.3551 | 0.5066 | 0.7426 | 0.9283 | 1.0000 |
+	 * </pre>
 	 */
 	@Test
 	public void minOutlinkWeightPageRankVariance() {
@@ -331,6 +337,7 @@ public class NxtGraphClusteringITCase {
 	/**
 	 * Using correlation as a proxy for importance sensitivity to min outlink balance.
 	 *
+	 * <pre>
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
 	 * 10^0 | 0.9994 | 1.0000 |        |        |        |        |        |        |
@@ -340,7 +347,7 @@ public class NxtGraphClusteringITCase {
 	 * 10^4 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^5 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |        |
 	 * 10^6 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-	 * 
+	 *
 	 * TODO M: These are the results when I run this:
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
@@ -351,6 +358,7 @@ public class NxtGraphClusteringITCase {
 	 * 10^4 | 0.9563 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^5 | 0.9563 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |        |
 	 * 10^6 | 0.9563 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+	 * </pre>
 	 */
 	@Test
 	public void minOutlinkWeightImportanceVariance() {
@@ -397,7 +405,6 @@ public class NxtGraphClusteringITCase {
 				this.parameterToImportanceMap.put(value, importances);
 			}
 		}
-		
 
 		private Collection<PoiAccountState> copyAndFilter(final Amount minHarvesterBalance) {
 			return this.dbAccountStates.stream()
@@ -419,7 +426,7 @@ public class NxtGraphClusteringITCase {
 
 			final StringBuilder builder = new StringBuilder();
 			final DecimalFormat decimalFormat = FormatUtils.getDecimalFormat(4);
-			
+
 			for (int i = 0; i < keyNames.size(); ++i) {
 				builder.append(System.lineSeparator());
 				builder.append(String.format("* %s |", keyNames.get(i)));
@@ -434,7 +441,7 @@ public class NxtGraphClusteringITCase {
 
 			LOGGER.info(builder.toString());
 		}
-		
+
 		private void renderNegOutlinkStatesAsList() {
 			final List<Long> keys = this.parameterToImportanceMap.keySet().stream().sorted().collect(Collectors.toList());
 			final List<String> keyNames = keys.stream()
@@ -443,7 +450,7 @@ public class NxtGraphClusteringITCase {
 
 			final StringBuilder builder = new StringBuilder();
 			final DecimalFormat decimalFormat = FormatUtils.getDecimalFormat(4);
-			
+
 			for (int i = 0; i < keyNames.size(); ++i) {
 				builder.append(System.lineSeparator());
 				builder.append(String.format("* %s |", keyNames.get(i)));
@@ -458,7 +465,6 @@ public class NxtGraphClusteringITCase {
 
 			LOGGER.info(builder.toString());
 		}
-		
 
 		private void renderAsTable(final Amount minHarvesterBalance) {
 			final Collection<PoiAccountState> eligibleAccountStates = copyAndFilter(minHarvesterBalance);
@@ -506,7 +512,7 @@ public class NxtGraphClusteringITCase {
 	private static String getFriendlyLabel(final long key) {
 		return 0 == key ? "STK " : "10^" + (long)Math.log10(key);
 	}
-	
+
 	private static String getReducedDecimalLabel(final long key) {
 		return "" + key / 100.0;
 	}
@@ -517,7 +523,7 @@ public class NxtGraphClusteringITCase {
 		final List<Amount> balances = accountStates.stream()
 				.map(a -> a.getWeightedBalances().getVested(blockHeight))
 				.collect(Collectors.toList());
-		
+
 		final ColumnVector balancesVector = new ColumnVector(balances.size());
 		for (int i = 0; i < balances.size(); ++i) {
 			balancesVector.setAt(i, balances.get(i).getNumNem());
@@ -532,7 +538,7 @@ public class NxtGraphClusteringITCase {
 	//region poiComparisonTest
 
 	// TODO 20141015 BR: this test used to pass but now it fails. What changed?
-    // TODO 20141016 M: something seems to have broken somewhere I think
+	// TODO 20141016 M: something seems to have broken somewhere I think
 	@Test
 	public void poiComparisonTest() {
 		// Arrange:
@@ -587,6 +593,7 @@ public class NxtGraphClusteringITCase {
 	 * The minimum harvester balance is set to 10000.
 	 * (unfortunately cluster information is only internally available, so it is only logged. You have to look for the entries yourself).
 	 *
+	 * <pre>
 	 * epsilon = 0.75
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     1    |    3.00   |          1.00           |  0
@@ -666,7 +673,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |     2    |  485.50   |          0.20           |  0
 	 *  150000   |     7    |  175.14   |          0.47           |  0
 	 *  200000   |    10    |  110.60   |          0.50           |  0
-	 *
+	 * </pre>
 	 */
 	@Test
 	public void epsilonInfluenceOnNumberOfClustersAndClusterSize() {
@@ -782,7 +789,8 @@ public class NxtGraphClusteringITCase {
 			} else {
 				ratios.setAt(i, 1.0);
 			}
-			maxRatio = ratios.getAt(i) > maxRatio? ratios.getAt(i) : maxRatio;
+
+			maxRatio = ratios.getAt(i) > maxRatio ? ratios.getAt(i) : maxRatio;
 			if (ratios.getAt(i) > 1.001 || ratios.getAt(i) < 0.999) {
 				LOGGER.info("Account " + i + " importance ratio is " + ratios.getAt(i));
 			}

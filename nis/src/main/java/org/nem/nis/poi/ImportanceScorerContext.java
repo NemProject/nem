@@ -34,4 +34,4 @@ public interface ImportanceScorerContext {
 	 * @return The graph weight vector.
 	 */
 	public ColumnVector getGraphWeightVector();
- }
+}
