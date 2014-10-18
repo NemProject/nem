@@ -10,7 +10,7 @@ public class SecP256K1KeyAnalyzerTest extends KeyAnalyzerTest {
 	@Test
 	public void compressedKeyMustHaveCorrectFirstByte() {
 		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		final PublicKey publicKey = this.getCryptoEngine().createKeyGenerator().generateKeyPair().getPublicKey();
 		final KeyAnalyzer analyzer = this.getKeyAnalyzer();
 
 		// Assert:
@@ -29,13 +29,7 @@ public class SecP256K1KeyAnalyzerTest extends KeyAnalyzerTest {
 	}
 
 	@Override
-	protected KeyAnalyzer getKeyAnalyzer() {
-		return new SecP256K1KeyAnalyzer();
-	}
-
-	@Override
-	@Before
-	public void initCryptoEngine() {
-		CryptoEngines.setDefaultEngine(CryptoEngines.secp256k1Engine());
+	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+		return CryptoEngines.secp256k1Engine();
 	}
 }

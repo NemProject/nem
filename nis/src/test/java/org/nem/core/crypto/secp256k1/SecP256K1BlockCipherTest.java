@@ -11,8 +11,7 @@ public class SecP256K1BlockCipherTest extends BlockCipherTest {
 	}
 
 	@Override
-	@Before
-	public void initCryptoEngine() {
-		CryptoEngines.setDefaultEngine(CryptoEngines.secp256k1Engine());
+	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+		return CryptoEngines.secp256k1Engine();
 	}
 }

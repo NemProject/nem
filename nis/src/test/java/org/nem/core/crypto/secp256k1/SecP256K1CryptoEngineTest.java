@@ -6,7 +6,6 @@ public class SecP256K1CryptoEngineTest extends CryptoEngineTest {
 
 	@Override
 	protected CryptoEngines.CryptoEngine getCryptoEngine() {
-		CryptoEngines.setDefaultEngine(CryptoEngines.secp256k1Engine());
-		return CryptoEngines.getDefaultEngine();
+		return CryptoEngines.secp256k1Engine();
 	}
 }

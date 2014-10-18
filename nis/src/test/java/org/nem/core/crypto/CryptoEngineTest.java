@@ -17,7 +17,8 @@ public abstract class CryptoEngineTest {
 	@Test
 	public void canCreateDsaSigner() {
 		// Act:
-		final DsaSigner signer = this.getCryptoEngine().createDsaSigner(new KeyPair());
+		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final DsaSigner signer = engine.createDsaSigner(KeyPair.random(engine));
 
 		// Assert:
 		Assert.assertThat(signer, IsInstanceOf.instanceOf(DsaSigner.class));
@@ -44,7 +45,8 @@ public abstract class CryptoEngineTest {
 	@Test
 	public void canCreateBlockCipher() {
 		// Act:
-		final BlockCipher blockCipher = this.getCryptoEngine().createBlockCipher(new KeyPair(), new KeyPair());
+		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final BlockCipher blockCipher = engine.createBlockCipher(KeyPair.random(engine), KeyPair.random(engine));
 
 		// Assert:
 		Assert.assertThat(blockCipher, IsInstanceOf.instanceOf(BlockCipher.class));
