@@ -65,59 +65,21 @@ public class NxtGraphClusteringITCase {
 	@Ignore
 	@Test
 	public void canWriteImportancesToFile() throws IOException {
-		final String options = String.format(
-				"_%smin_%dmu_%fepsilon",
-				DEFAULT_POI_OPTIONS.getMinHarvesterBalance(),
-				DEFAULT_POI_OPTIONS.getMuClusteringValue(),
-				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
-
-		// Arrange
+		// Arrange:
 		final int endHeight = 225000;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
+		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
-		// 0. Load account states.
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
-
-		// 1. calc importances
-		final ColumnVector importances = getAccountImportances(
-				new BlockHeight(endHeight),
-				eligibleAccountStates,
-				new FastScanClusteringStrategy());
-
-		final List<Long> stakes = eligibleAccountStates.stream()
-				.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(endBlockHeight)).getNumMicroNem())
-				.collect(Collectors.toList());
-
-		final List<String> addresses = eligibleAccountStates.stream()
-				.map(acct -> acct.getAddress().getEncoded())
-				.collect(Collectors.toList());
-
-		final List<Integer> outlinkCounts = eligibleAccountStates.stream()
-				.map(acct -> acct.getImportanceInfo().getOutlinksSize(endBlockHeight))
-				.collect(Collectors.toList());
-
-		final List<Long> outlinkSums = eligibleAccountStates.stream()
-				.map(acct -> {
-					final ArrayList<Long> amts = new ArrayList<>();
-					acct.getImportanceInfo()
-							.getOutlinksIterator(endBlockHeight)
-							.forEachRemaining(i -> amts.add(i.getAmount().getNumMicroNem()));
-					return amts.stream().mapToLong(i -> i).sum();
-				})
-				.collect(Collectors.toList());
-
-		String output = "'address', 'stake', 'importance', 'outlinkCount', 'outlinkSum'\n";
-		for (int i = 0; i < importances.size(); ++i) {
-			output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," + outlinkSums.get(i) + "\n";
-		}
-
-		FileUtils.writeStringToFile(new File("kaiseki/importances" + options + ".csv"), output);
+		// Act:
+		outputImportancesCsv(
+				DEFAULT_POI_OPTIONS_BUILDER,
+				copy(dbAccountStates),
+				endBlockHeight);
 	}
 
 	@Ignore
 	@Test
 	public void canWriteImportancesToFileForManyDifferentParameters() throws IOException {
-
 		// compute Cartesian product of considered parameters
 		final Set<Long> minHarvesterBalances = Sets.newSet(1l, 100l, 500l, 1000l, 10000l, 100000l);
 		final Set<Long> minOutlinkWeights = Sets.newSet(0l, 1l, 100l, 1000l, 10000l);
@@ -155,58 +117,10 @@ public class NxtGraphClusteringITCase {
 											epsilon,
 											teleporationPair.teleporationProb,
 											teleporationPair.interLevelTeleporationProb);
-
-									final String options = String.format(
-											"_%sminBalance_%sminOutlink_%snegOutlink_%soutlierWeight_%smu_%sepsilon_%stelPro_%sinterLevelProb",
-											minHarvesterBalance,
-											minOutlinkWeight,
-											negativeOutlinkWeight,
-											outlierWeight,
-											mu,
-											epsilon,
-											teleporationPair.teleporationProb,
-											teleporationPair.interLevelTeleporationProb);
-
-									// 0. Load account states.
-									final Collection<PoiAccountState> eligibleAccountStates = copy(dbAccountStates);
-
-									// 1. calc importances
-									final ColumnVector importances = getAccountImportances(
-											new BlockHeight(endHeight),
-											eligibleAccountStates,
+									outputImportancesCsv(
 											optionsBuilder,
-											new PoiScorer());
-
-									final List<Long> stakes = eligibleAccountStates.stream()
-											.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(
-													endBlockHeight)).getNumMicroNem())
-											.collect(Collectors.toList());
-
-									final List<String> addresses = eligibleAccountStates.stream()
-											.map(acct -> acct.getAddress().getEncoded())
-											.collect(Collectors.toList());
-
-									final List<Integer> outlinkCounts = eligibleAccountStates.stream()
-											.map(acct -> acct.getImportanceInfo().getOutlinksSize(endBlockHeight))
-											.collect(Collectors.toList());
-
-									final List<Long> outlinkSums = eligibleAccountStates.stream()
-											.map(acct -> {
-												final ArrayList<Long> amounts = new ArrayList<>();
-												acct.getImportanceInfo()
-														.getOutlinksIterator(endBlockHeight)
-														.forEachRemaining(i -> amounts.add(i.getAmount().getNumMicroNem()));
-												return amounts.stream().mapToLong(i -> i).sum();
-											})
-											.collect(Collectors.toList());
-
-									String output = "'address', 'stake', 'importance', 'outlinkCount', 'outlinkSum'\n";
-									for (int i = 0; i < importances.size(); ++i) {
-										output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," +
-												outlinkSums.get(i) + "\n";
-									}
-
-									FileUtils.writeStringToFile(new File("kaiseki/importances" + options + ".csv"), output);
+											copy(dbAccountStates),
+											endBlockHeight);
 								}
 							}
 						}
@@ -214,6 +128,61 @@ public class NxtGraphClusteringITCase {
 				}
 			}
 		}
+	}
+
+	private static void outputImportancesCsv(
+			final PoiOptionsBuilder optionsBuilder,
+			final Collection<PoiAccountState> eligibleAccountStates,
+			final BlockHeight endBlockHeight) throws IOException {
+		final PoiOptions options = optionsBuilder.create();
+		final String optionsDescription = String.format(
+				"_%sminBalance_%sminOutlink_%snegOutlink_%soutlierWeight_%smu_%sepsilon_%stelPro_%sinterLevelProb",
+				options.getMinHarvesterBalance(),
+				options.getMinOutlinkWeight(),
+				options.getNegativeOutlinkWeight(),
+				options.getOutlierWeight(),
+				options.getMuClusteringValue(),
+				options.getEpsilonClusteringValue(),
+				options.getTeleportationProbability(),
+				options.getInterLevelTeleportationProbability());
+
+		// 1. calc importances
+		final ColumnVector importances = getAccountImportances(
+				endBlockHeight,
+				eligibleAccountStates,
+				optionsBuilder,
+				new PoiScorer());
+
+		final List<Long> stakes = eligibleAccountStates.stream()
+				.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight).add(acct.getWeightedBalances().getUnvested(
+						endBlockHeight)).getNumMicroNem())
+				.collect(Collectors.toList());
+
+		final List<String> addresses = eligibleAccountStates.stream()
+				.map(acct -> acct.getAddress().getEncoded())
+				.collect(Collectors.toList());
+
+		final List<Integer> outlinkCounts = eligibleAccountStates.stream()
+				.map(acct -> acct.getImportanceInfo().getOutlinksSize(endBlockHeight))
+				.collect(Collectors.toList());
+
+		final List<Long> outlinkSums = eligibleAccountStates.stream()
+				.map(acct -> {
+					final ArrayList<Long> amounts = new ArrayList<>();
+					acct.getImportanceInfo()
+							.getOutlinksIterator(endBlockHeight)
+							.forEachRemaining(i -> amounts.add(i.getAmount().getNumMicroNem()));
+					return amounts.stream().mapToLong(i -> i).sum();
+				})
+				.collect(Collectors.toList());
+
+		String output = "'address', 'stake', 'importance', 'outlinkCount', 'outlinkSum'\n";
+		for (int i = 0; i < importances.size(); ++i) {
+			output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," +
+					outlinkSums.get(i) + "\n";
+		}
+
+		FileUtils.writeStringToFile(new File(String.format("kaiseki/importances%s.csv", optionsDescription)), output);
 	}
 
 	//endregion
