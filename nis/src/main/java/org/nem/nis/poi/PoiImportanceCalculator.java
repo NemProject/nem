@@ -115,10 +115,10 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			// TODO                        missing due to some columns of the outlink matrix being zero. This is exactly compensated when using the
 			// TODO                        teleportation probability in the dangle sum. the dangle sum has nothing to do with the ILP matrix or
 			// TODO                        the interlevel teleportation probability. I would suggest to use only the teleportation probability.
-			final double totalTeleportationProbability = this.options.getTeleportationProbability() + this.options.getInterLevelTeleportationProbability();
+			// TODO-CR 20141018 M -> J, BR: I changed this back to just teleportation probability
 			final double dangleSum = calculateDangleSum(
 					this.context.getDangleIndexes(),
-					totalTeleportationProbability,
+					this.options.getTeleportationProbability(),
 					prevIterImportances);
 
 			// V(dangle-sum + inverseTeleportation / N)
