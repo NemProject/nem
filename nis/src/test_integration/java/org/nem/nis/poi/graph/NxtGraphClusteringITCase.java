@@ -27,6 +27,13 @@ public class NxtGraphClusteringITCase {
 	private static final PoiOptions DEFAULT_POI_OPTIONS = DEFAULT_POI_OPTIONS_BUILDER.create();
 	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
 	private static final ImportanceScorer PAGE_RANK_SCORER = new PageRankScorer();
+	private static final int DEFAULT_END_HEIGHT = 150000;
+	private static final BalanceComparisonType BALANCE_COMPARISON_TYPE = BalanceComparisonType.VestedOnly;
+
+	private enum BalanceComparisonType {
+		VestedOnly,
+		VestedAndUnvested
+	}
 
 	@Test
 	public void canQueryNxtTransactionTable() {
@@ -66,7 +73,7 @@ public class NxtGraphClusteringITCase {
 	@Test
 	public void canWriteImportancesToFile() throws IOException {
 		// Arrange:
-		final int endHeight = 225000;
+		final int endHeight = DEFAULT_END_HEIGHT;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
@@ -96,7 +103,7 @@ public class NxtGraphClusteringITCase {
 				new TeleportationProbabilities(0.55, 0.2));
 
 		// load account states from the database
-		final int endHeight = 150000;//225000; // TODO 20141018 J: add a constant
+		final int endHeight = DEFAULT_END_HEIGHT;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
@@ -154,8 +161,7 @@ public class NxtGraphClusteringITCase {
 				new PoiScorer());
 
 		final List<Long> stakes = eligibleAccountStates.stream()
-				.map(acct -> acct.getWeightedBalances().getVested(endBlockHeight)/*.add(acct.getWeightedBalances().getUnvested(
-						endBlockHeight))*/.getNumMicroNem())
+				.map(state -> mapPoiAccountStateToBalance(state, endBlockHeight).getNumMicroNem())
 				.collect(Collectors.toList());
 
 		final List<String> addresses = eligibleAccountStates.stream()
@@ -294,14 +300,16 @@ public class NxtGraphClusteringITCase {
 	private static void runNegOutlinkWeightBalanceVariance(final ImportanceScorer scorer) {
 		final SensitivityTestHarness harness = new SensitivityTestHarness();
 		harness.mapValuesToImportanceVectors(
-				Arrays.asList(0l, 20l, 40l, 60l, 80l, 100l),
+				Arrays.asList(0L, 20L, 40L, 60L, 80L, 100L),
 				v -> {
 					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
-					optionsBuilder.setNegativeOutlinkWeight(v / 100.0);//hack to get double :/
+					optionsBuilder.setNegativeOutlinkWeight(v / 100.0);
 					return optionsBuilder;
 				},
 				scorer);
-		harness.renderNegOutlinkStatesAsList();
+		harness.renderAsTable(
+				DEFAULT_POI_OPTIONS.getMinHarvesterBalance(),
+				k -> FormatUtils.format(k / 100.0, 2));
 	}
 
 	/**
@@ -380,7 +388,7 @@ public class NxtGraphClusteringITCase {
 	}
 
 	private static class SensitivityTestHarness {
-		private final int endHeight = 150000;//225000;
+		private final int endHeight = DEFAULT_END_HEIGHT;
 		private final BlockHeight endBlockHeight = new BlockHeight(this.endHeight);
 		private final Map<Long, ColumnVector> parameterToImportanceMap = new HashMap<>();
 		private final Map<Double, ColumnVector> doubleParameterToImportanceMap = new HashMap<>();
@@ -410,10 +418,8 @@ public class NxtGraphClusteringITCase {
 			return this.dbAccountStates.stream()
 					.map(PoiAccountState::copy)
 					.filter(accountState -> {
-						final Amount vested = accountState.getWeightedBalances().getVested(this.endBlockHeight);
-						final Amount unvested = accountState.getWeightedBalances().getUnvested(this.endBlockHeight);
-						final Amount total = vested.add(unvested);
-						return total.compareTo(minHarvesterBalance) >= 0;
+						final Amount balance = mapPoiAccountStateToBalance(accountState, this.endBlockHeight);
+						return balance.compareTo(minHarvesterBalance) >= 0;
 					})
 					.collect(Collectors.toList());
 		}
@@ -442,38 +448,18 @@ public class NxtGraphClusteringITCase {
 			LOGGER.info(builder.toString());
 		}
 
-		private void renderNegOutlinkStatesAsList() {
-			final List<Long> keys = this.parameterToImportanceMap.keySet().stream().sorted().collect(Collectors.toList());
-			final List<String> keyNames = keys.stream()
-					.map(NxtGraphClusteringITCase::getReducedDecimalLabel)
-					.collect(Collectors.toList());
-
-			final StringBuilder builder = new StringBuilder();
-			final DecimalFormat decimalFormat = FormatUtils.getDecimalFormat(4);
-
-			for (int i = 0; i < keyNames.size(); ++i) {
-				builder.append(System.lineSeparator());
-				builder.append(String.format("* %s |", keyNames.get(i)));
-
-				final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
-				final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
-				final ColumnVector importances = this.parameterToImportanceMap.get(keys.get(i));
-				final double correlation = balances.correlation(importances);
-				builder.append(String.format(" %s |", decimalFormat.format(correlation)));
-				builder.append(String.format(" %6d |", balances.size()));
-			}
-
-			LOGGER.info(builder.toString());
+		private void renderAsTable(final Amount minHarvesterBalance) {
+			this.renderAsTable(minHarvesterBalance, NxtGraphClusteringITCase::getFriendlyLabel);
 		}
 
-		private void renderAsTable(final Amount minHarvesterBalance) {
+		private void renderAsTable(final Amount minHarvesterBalance, final Function<Long, String> keyToKeyName) {
 			final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(minHarvesterBalance);
 			final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
 			this.parameterToImportanceMap.put(0L, balances);
 
 			final List<Long> keys = this.parameterToImportanceMap.keySet().stream().sorted().collect(Collectors.toList());
 			final List<String> keyNames = keys.stream()
-					.map(NxtGraphClusteringITCase::getFriendlyLabel)
+					.map(keyToKeyName::apply)
 					.collect(Collectors.toList());
 
 			final StringBuilder builder = new StringBuilder();
@@ -513,15 +499,11 @@ public class NxtGraphClusteringITCase {
 		return 0 == key ? "STK " : "10^" + (long)Math.log10(key);
 	}
 
-	private static String getReducedDecimalLabel(final long key) {
-		return "" + key / 100.0;
-	}
-
 	private static ColumnVector getBalances(
 			final BlockHeight blockHeight,
 			final Collection<PoiAccountState> accountStates) {
 		final List<Amount> balances = accountStates.stream()
-				.map(a -> a.getWeightedBalances().getVested(blockHeight))
+				.map(state -> mapPoiAccountStateToBalance(state, blockHeight))
 				.collect(Collectors.toList());
 
 		final ColumnVector balancesVector = new ColumnVector(balances.size());
@@ -533,6 +515,13 @@ public class NxtGraphClusteringITCase {
 		return balancesVector;
 	}
 
+	private static Amount mapPoiAccountStateToBalance(final PoiAccountState accountState, final BlockHeight blockHeight) {
+		final Amount vested = accountState.getWeightedBalances().getVested(blockHeight);
+		final Amount unvested = accountState.getWeightedBalances().getUnvested(blockHeight);
+		final Amount total = vested.add(unvested);
+		return BALANCE_COMPARISON_TYPE == BalanceComparisonType.VestedAndUnvested ? total : vested;
+	}
+
 	//endregion
 
 	//region poiComparisonTest
@@ -542,7 +531,7 @@ public class NxtGraphClusteringITCase {
 	@Test
 	public void poiComparisonTest() {
 		// Arrange:
-		final int endHeight = 300000;//225000;
+		final int endHeight = DEFAULT_END_HEIGHT;
 
 		// a) This is the warm up phase.
 		getAccountImportances(endHeight, new OutlierScan(), "WARM UP");
@@ -730,8 +719,7 @@ public class NxtGraphClusteringITCase {
 
 			final PoiAccountState senderAccountState = accountStateMap.get(sender);
 			final PoiAccountState recipientAccountState = accountStateMap.get(recipient);
-			final long balance = senderAccountState.getWeightedBalances().getVested(blockHeight).getNumMicroNem() +
-					senderAccountState.getWeightedBalances().getUnvested(blockHeight).getNumMicroNem();
+			final long balance = mapPoiAccountStateToBalance(senderAccountState, blockHeight).getNumMicroNem();
 
 			// We need to add some balance sometimes because the transactions don't account for fees earned from forged blocks
 			final long remainingBalance = balance - amount.getNumMicroNem();
