@@ -9,6 +9,7 @@ import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.*;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class PoiImportanceCalculatorTest {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorTest.class.getName());
 	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();
+	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
 
 	@Test
 	public void fastScanClusteringResultsInSameImportancesAsScan() {
@@ -285,6 +287,304 @@ public class PoiImportanceCalculatorTest {
 		}
 	}
 
+	// region spam scenario
+
+	/**
+	 * Given 2 6-rings, the right one got only few edges, the left one got many edges.
+	 * Try to find parameters so that the left ring has (ideally) not more importance than the right ring.
+	 * (because the transaction within a ring should not matter to the overall importance of a ring.)
+	 *
+	 * Outcome: Independent of the used algorithm it seems it doesn't matter at all if there are additional transactions.
+	 *          This is probably due to the normalization of the columns of the outlink matrix.
+	 *
+	 * <pre>
+	 *           1------o2                 7------o8
+	 *         o \     /  \              o          \
+	 *       /             o           /             o
+	 *     0--  many txs  --3         6               9
+	 *      o              /          o              /
+	 *       \  /       \ O            \            O
+	 *        5o---------4             11o--------10
+	 * </pre>
+	 */
+	@Test
+	public void spamLinksDoNotHaveABigImpactOnImportance() {
+		// Arrange:
+		// - all (12) accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final StandardContext context = new StandardContext();
+		context.builder1.setClusteringStrategy(new SingleClusterScan());
+
+		// Construct basic ring connections
+		final Matrix outlinkMatrix = setupBasicRingStructure();
+
+		// Add random transactions to the left ring
+		final SecureRandom random = new SecureRandom();
+		for (int i = 0; i < 100; ++i) {
+			outlinkMatrix.incrementAt(random.nextInt(6), random.nextInt(6), 20);
+		}
+
+		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
+
+		// Act:
+		// Normal page rank
+		LOGGER.info("normal page rank:");
+		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
+		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
+
+		// NCD aware page rank
+		LOGGER.info("NCD aware page rank:");
+		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
+		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
+
+		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
+		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+
+		// Ideally the ratio should be within a small range.
+		Assert.assertThat(ratio1 > 0.95 && ratio1 < 1.05, IsEqual.equalTo(true));
+		Assert.assertThat(ratio2 > 0.95 && ratio2 < 1.05, IsEqual.equalTo(true));
+	}
+
+	// endregion
+
+	// region transfer of importance between clusters
+
+	/**
+	 * Given 2 6-rings with a link between them, analyze the difference between normal page rank matrix and ILP-matrix.
+	 * (TP = teleportation probability, ILTP = inter level teleportation probability, PR = normal page rank)
+	 *
+	 * a) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
+	 *    The ratio for the normal page rank is 2.1398
+	 * TP   | ILTP | ratio ring 1 : ring 2
+	 * 0.85 | 0.0  |       2.1398
+	 * 0.75 | 0.1  |       2.0999
+	 * 0.65 | 0.2  |       2.0586
+	 * 0.55 | 0.3  |       2.0166
+	 * 0.45 | 0.4  |       1.9741
+	 * 0.35 | 0.5  |       1.9327
+	 * 0.25 | 0.6  |       1.8929
+	 * 0.15 | 0.7  |       1.8562
+	 * 0.05 | 0.8  |       1.8245
+	 *
+	 * Outcome:
+	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer less importance from one cluster to another than normal page rank.
+	 * The difference is not that huge though.
+	 *
+	 * b) Connection between ring 1 and ring 2 is a factor 100 weaker than the connections within the ring.
+	 *    The ratio for the normal page rank is 1.01841
+	 * TP   | ILTP | ratio ring 1 : ring 2
+	 * 0.85 | 0.0  |       1.0184
+	 * 0.75 | 0.1  |       1.1267
+	 * 0.65 | 0.2  |       1.2331
+	 * 0.55 | 0.3  |       1.3360
+	 * 0.45 | 0.4  |       1.4346
+	 * 0.35 | 0.5  |       1.5280
+	 * 0.25 | 0.6  |       1.6153
+	 * 0.15 | 0.7  |       1.6970
+	 * 0.05 | 0.8  |       1.7737
+	 *
+	 * Outcome:
+	 * With our standard parameters (0.75/0.1) the ncd aware algorithm tends to transfer more importance from one cluster to another than normal page rank.
+	 * The difference is not that huge though.
+	 *
+	 * c) Connection between ring 1 and ring 2 is as strong as the connections within the ring.
+	 *    ILTP is set to 0.1 for ncd aware page rank and 0.0 for normal page rank. TP is varied.
+	 *                  PR                  ncd aware
+	 * TP   | ratio ring 1 : ring 2 | ratio ring 1 : ring 2
+	 * 1.00 |     7.281 * 10^75     |        ---
+	 * 0.99 |        21.854         |        ---
+	 * 0.98 |        11.289         |        ---
+	 * 0.95 |        4.9520 <------ | ----   ---
+	 * 0.90 |        2.8410         |    |   3106.8314
+	 * 0.89 |        2.6494         |    |   21.029
+	 * 0.88 |        2.4897         |    |   10.9181
+	 * 0.87 |        2.3555         |    |   7.5296
+	 * 0.86 |        2.2399         |    |   5.8320
+	 * 0.85 |        2.1398         |    --- 4.8137
+	 * 0.80 |        1.7916         |        2.7770
+	 * 0.75 |        1.5839         |        2.0999
+	 * 0.70 |        1.4467         |        1.7632
+	 * 0.65 |        1.3498         |        1.5631
+	 * 0.55 |
+	 * 0.45 |
+	 * 0.35 |
+	 * 0.25 |
+	 * 0.15 |
+	 * 0.05 |
+	 *
+	 * Outcome:
+	 * Only the sum TP + ILTP plays a role. As it goes near one, more and more importance gets transferred from ring 2 to ring 1.
+	 *
+	 * <pre>
+	 *             ring 1                   ring 2
+	 *           1------o2                 7------o8
+	 *         o         |\              o |        \
+	 *       /           | o           /   |         o
+	 *     0             |   3o-------6    |          9
+	 *      o            |  /          o   |         /
+	 *       \           oo             \ o         O
+	 *        5o---------4              11o-------10
+	 * </pre>
+	 */
+	@Test
+	public void linkFromRingTwoToRingOneTransfersImportanceToLeftBlock() {
+		// Arrange:
+		// - all accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final StandardContext context = new StandardContext();
+		context.builder1.setTeleportationProbability(1.00);
+		context.builder1.setInterLevelTeleportationProbability(0.0);
+		context.builder2.setTeleportationProbability(0.86);
+		context.builder2.setInterLevelTeleportationProbability(0.1);
+
+		// Construct basic ring connections
+		final Matrix outlinkMatrix = setupBasicRingStructure();
+
+		// Link blocks
+		outlinkMatrix.setAt(3, 6, 100);
+		outlinkMatrix.setAt(4, 2, 1);
+		outlinkMatrix.setAt(11, 7, 1);
+
+		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
+
+		// Act:
+
+		// Normal page rank
+		LOGGER.info("normal page rank:");
+		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
+		final double ratio1 = ringImportanceSum(normalImportances, 1) / ringImportanceSum(normalImportances, 2);
+
+		// NCD aware page rank
+		LOGGER.info("NCD aware page rank:");
+		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
+		final double ratio2 = ringImportanceSum(ncdAwareImportances, 1) / ringImportanceSum(ncdAwareImportances, 2);
+
+		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
+		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
+
+		// Assert:
+		// There should have been some importance transferred from the right ring to the left one.
+		Assert.assertThat(ratio1 > 1, IsEqual.equalTo(true));
+		Assert.assertThat(ratio2 > 1 , IsEqual.equalTo(true));
+	}
+
+	// endregion
+
+	private List<PoiAccountState> setupAccountStates(final int numAccounts) {
+		// All accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = new ArrayList<>();
+		for (int i=0; i<numAccounts; i++) {
+			accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
+		}
+
+		return accountStates;
+	}
+
+	private Matrix setupBasicRingStructure() {
+		// construct basic ring connections
+		final Matrix outlinkMatrix = new DenseMatrix(12, 12);
+		outlinkMatrix.setAt(0, 5, 100);
+		outlinkMatrix.setAt(6, 11, 100);
+		for (int i = 0; i < 5; ++i) {
+			outlinkMatrix.setAt(i + 1, i, 100);
+			outlinkMatrix.setAt(i + 7, i + 6, 100);
+		}
+
+		return outlinkMatrix;
+	}
+
+	private double ringImportanceSum(final ColumnVector importances, final int ring) {
+		double sum = 0.0;
+		for (int i=0; i<6; i++) {
+			sum += importances.getAt(i + 6 * (ring - 1));
+		}
+
+		return sum;
+	}
+
+	//region users-merchant-exchange
+
+	/**
+	 * 10 users transfer NEM to a merchant. The merchant transfers NEM to a exchange.
+	 * From the exchange, the NEM flow back to the users.
+	 * The importances for the merchant and the exchange are independent of the amount of nem that flows.
+	 * This is due to the normalization of the outlink matrix and imo a weak point because the amount should matter.
+	 * This can be countered to a certain degree by setting the minOutlinkWeight to a reasonable value.
+	 * For our standard values, there is not much difference between normal and ncd aware page rank.
+	 *
+	 * <pre>
+	 *                  --------------------------
+	 *                /                U          |
+	 *               |    |------------0o-----    |
+	 *               |    |  ----------1o-   |    |
+	 *               |    | /          2   \ |    |
+	 *               |    oo         / .o   \|    |
+	 *               ----10o-------/   . ----11o---
+	 *                   M o           .   / E
+	 *                      \          . o
+	 *                       ----------9
+	 * </pre>
+	 */
+	@Test
+	public void merchantAndExchangeGetALotMoreImportance() {
+		// Arrange:
+		// - all accounts start with 2000 NEM
+		final List<PoiAccountState> accountStates = setupAccountStates(12);
+		final StandardContext context = new StandardContext();
+
+		// Setup transfers from users, merchant and exchange.
+		final Matrix outlinkMatrix = new DenseMatrix(12, 12);
+		for (int i = 0; i < 10; ++i) {
+			outlinkMatrix.setAt(10, i, 100);
+			outlinkMatrix.setAt(i, 11, 1);
+		}
+		outlinkMatrix.setAt(11, 10, 1);
+
+		// Act:
+		addOutlinksFromGraph(accountStates, context.height1, outlinkMatrix);
+
+		// Normal page rank
+		LOGGER.info("normal page rank:");
+		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
+
+		// NCD aware page rank
+		LOGGER.info("NCD aware page rank:");
+		final ColumnVector ncdAwareImportances = context.calculateRing1Importances(accountStates);
+
+		// Assert:
+		// Merchant and exchange should have higher importance than users.
+		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(10), IsEqual.equalTo(true));
+		Assert.assertThat(normalImportances.getAt(0) < normalImportances.getAt(11), IsEqual.equalTo(true));
+		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(10), IsEqual.equalTo(true));
+		Assert.assertThat(ncdAwareImportances.getAt(0) < ncdAwareImportances.getAt(11), IsEqual.equalTo(true));
+	}
+
+	private class StandardContext {
+		final BlockHeight height1 = new BlockHeight(2);
+		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
+		final PoiOptionsBuilder builder1 = new PoiOptionsBuilder();
+		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
+
+		public StandardContext() {
+			builder1.setClusteringStrategy(new SingleClusterScan());
+			builder1.setTeleportationProbability(0.85);
+			builder1.setInterLevelTeleportationProbability(0.0);
+			builder2.setTeleportationProbability(0.75);
+			builder2.setInterLevelTeleportationProbability(0.1);
+		}
+
+		// TODO 20141018 J-B: not sure if i named these correctly; if not you might want to rename
+		public ColumnVector calculateRing1Importances(final Collection<PoiAccountState> accountStates) {
+			return calculateImportances(this.builder1.create(), this.height1, accountStates, new PageRankScorer());
+		}
+
+		public ColumnVector calculateRing2Importances(final Collection<PoiAccountState> accountStates) {
+			return calculateImportances(this.builder2.create(), this.height2, accountStates, new PageRankScorer());
+		}
+	}
+
+	//endregion
+
 	/**
 	 * a --o b   c
 	 */
@@ -373,8 +673,16 @@ public class PoiImportanceCalculatorTest {
 			final PoiOptions options,
 			final BlockHeight importanceBlockHeight,
 			final Collection<PoiAccountState> accountStates) {
+		return calculateImportances(options, importanceBlockHeight, accountStates, DEFAULT_IMPORTANCE_SCORER);
+	}
+
+	private static ColumnVector calculateImportances(
+			final PoiOptions options,
+			final BlockHeight importanceBlockHeight,
+			final Collection<PoiAccountState> accountStates,
+			final ImportanceScorer scorer) {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
-				new PoiScorer(),
+				scorer,
 				options);
 		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		return getImportances(importanceBlockHeight, accountStates);

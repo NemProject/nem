@@ -49,10 +49,10 @@ public class GraphClustererImplITCase {
 
 		final PoiGraphParameters params = PoiGraphParameters.getDefaultParams();
 		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
-		final PoiGraphViewer viewer = new PoiGraphViewer(outlinkMatrix, params);
+		final PoiGraphViewer viewer = new PoiGraphViewer(outlinkMatrix, params, null);
 		//		viewer.saveGraph();
 		final Cluster cluster1 = new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5));
-		viewer.setCluster(cluster1);
+		//viewer.setCluster(cluster1);
 		viewer.showGraph();
 		//		Cluster cluster1 = new Cluster(195, Arrays.asList(195, 132, 134, 136, 75, 77, 205, 18, 148, 88, 153, 27, 96, 97, 35, 100, 165, 37, 39, 46, 112, 179, 116, 118, 59, 126));
 		//		Cluster cluster2 = new Cluster(65, Arrays.asList(65, 3, 21, 120, 121));

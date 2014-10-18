@@ -16,3 +16,4 @@ nis-*.log*
 *.iml
 poiAnalysisData
 .ipynb_checkpoints
+/kaiseki/*.csv

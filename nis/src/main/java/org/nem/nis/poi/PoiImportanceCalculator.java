@@ -2,9 +2,9 @@ package org.nem.nis.poi;
 
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.graph.InterLevelProximityMatrix;
+import org.nem.nis.poi.graph.*;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -22,19 +22,19 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static final int DEFAULT_MAX_ITERATIONS = 3000;
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
-	private final PoiScorer poiScorer;
+	private final ImportanceScorer scorer;
 	private final PoiOptions options;
 
 	/**
 	 * Creates a new generator with custom options.
 	 *
-	 * @param poiScorer The poi scorer to use.
+	 * @param scorer The poi scorer to use.
 	 * @param options The poi options.
 	 */
 	public PoiImportanceCalculator(
-			final PoiScorer poiScorer,
+			final ImportanceScorer scorer,
 			final PoiOptions options) {
-		this.poiScorer = poiScorer;
+		this.scorer = scorer;
 		this.options = options;
 	}
 
@@ -50,7 +50,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		final PowerIterator iterator = new PoiPowerIterator(
 				context,
 				this.options,
-				this.poiScorer,
 				accountStates.size(),
 				this.options.isClusteringEnabled());
 
@@ -67,29 +66,28 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		// (3) merge all sub-scores
-		final ColumnVector importanceVector = this.poiScorer.calculateFinalScore(
-				iterator.getResult(),
-				context.getOutlinkScoreVector(),
-				context.getVestedBalanceVector());
+		final ImportanceScorerContextBuilder builder = new ImportanceScorerContextBuilder();
+		builder.setImportanceVector(iterator.getResult());
+		builder.setOutlinkVector(context.getOutlinkScoreVector());
+		builder.setVestedBalanceVector(context.getVestedBalanceVector());
+		builder.setGraphWeightVector(context.getGraphWeightVector());
+		final ColumnVector importanceVector = this.scorer.calculateFinalScore(builder.create());
 		context.updateImportances(iterator.getResult(), importanceVector);
 	}
 
 	private static class PoiPowerIterator extends PowerIterator {
 		private final PoiContext context;
 		private final PoiOptions options;
-		private final PoiScorer scorer;
 		private final boolean useClustering;
 
 		public PoiPowerIterator(
 				final PoiContext context,
 				final PoiOptions options,
-				final PoiScorer scorer,
 				final int numAccounts,
 				final boolean useClustering) {
 			super(context.getPoiStartVector(), DEFAULT_MAX_ITERATIONS, DEFAULT_POWER_ITERATION_TOL / numAccounts);
 			this.context = context;
 			this.options = options;
-			this.scorer = scorer;
 			this.useClustering = useClustering;
 		}
 
@@ -101,20 +99,16 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			ColumnVector resultVector = importancesVector.addElementWise(poiAdjustmentVector);
 			if (this.useClustering) {
 				final ColumnVector interLevelVector = this.createInterLeverVector(prevIterImportances);
-				final ColumnVector outlierVector = this.createOutlierVector();
-				resultVector = resultVector
-						.addElementWise(interLevelVector)
-						.multiplyElementWise(outlierVector);
+				resultVector = resultVector.addElementWise(interLevelVector);
 			}
 
 			return resultVector;
 		}
 
 		private ColumnVector createAdjustmentVector(final ColumnVector prevIterImportances) {
-			final double totalTeleportationProbability = this.options.getTeleportationProbability() + this.options.getInterLevelTeleportationProbability();
-			final double dangleSum = this.scorer.calculateDangleSum(
+			final double dangleSum = PoiUtils.calculateDangleSum(
 					this.context.getDangleIndexes(),
-					totalTeleportationProbability,
+					this.options.getTeleportationProbability(),
 					prevIterImportances);
 
 			// V(dangle-sum + inverseTeleportation / N)
@@ -129,15 +123,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			return this.context.getOutlinkMatrix()
 					.multiply(prevIterImportances)
 					.multiply(this.options.getTeleportationProbability());
-		}
-
-		private ColumnVector createOutlierVector() {
-			// V(1) - V(outlier) * (1 - weight) ==> V(outlier) * (-1 + weight) + V(1)
-			final ColumnVector onesVector = new ColumnVector(this.context.getOutlierVector().size());
-			onesVector.setAll(1);
-			return this.context.getOutlierVector()
-					.multiply(-1 + this.options.getOutlierWeight())
-					.addElementWise(onesVector);
 		}
 
 		private ColumnVector createInterLeverVector(final ColumnVector prevIterImportances) {

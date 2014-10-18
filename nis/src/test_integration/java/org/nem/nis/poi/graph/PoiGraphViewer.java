@@ -9,8 +9,12 @@ import edu.uci.ics.jung.visualization.decorators.*;
 import edu.uci.ics.jung.visualization.picking.*;
 import edu.uci.ics.jung.visualization.renderers.DefaultVertexLabelRenderer;
 import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
+import org.apache.commons.collections15.Transformer;
+import org.nem.core.crypto.Hashes;
 import org.nem.core.math.Matrix;
 import org.nem.core.math.Matrix.ReadOnlyElementVisitorFunction;
+import org.nem.core.model.primitive.*;
+import org.nem.core.utils.ByteUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -60,9 +64,9 @@ public class PoiGraphViewer {
 	private final PoiGraphParameters params;
 
 	/**
-	 * The cluster to be shown.
+	 * The clustering result.
 	 */
-	private Cluster cluster = null;
+	private ClusteringResult clusteringResult = null;
 
 	/**
 	 * Creates a new poi graph viewer.
@@ -70,7 +74,10 @@ public class PoiGraphViewer {
 	 * @param adjacencyMatrix The matrix containing all vertex/edge information.
 	 * @param params A map containing additional information about the graph.
 	 */
-	public PoiGraphViewer(final Matrix adjacencyMatrix, final PoiGraphParameters params) {
+	public PoiGraphViewer(
+			final Matrix adjacencyMatrix,
+			final PoiGraphParameters params,
+			final ClusteringResult clusteringResult) {
 		if (null == adjacencyMatrix || null == params) {
 			throw new IllegalArgumentException("Adjacency matrix and parameters cannot be null.");
 		}
@@ -78,6 +85,7 @@ public class PoiGraphViewer {
 		this.graph = new SparseGraph<Integer, Number>();
 		this.adjacencyMatrix = adjacencyMatrix;
 		this.params = params;
+		this.clusteringResult = clusteringResult;
 
 		switch (params.getAsInteger("layout", KAMADA_KAWAI_LAYOUT)) {
 			case CIRCLE_LAYOUT:
@@ -116,10 +124,17 @@ public class PoiGraphViewer {
 		this.viewer.setPickedVertexState(pickedVertexState);
 		this.viewer.setPickedEdgeState(pickedEdgeState);
 
+		// Transformer maps the vertex number to a vertex property
+		Transformer<Integer,Paint> vertexColor = new Transformer<Integer,Paint>() {
+			public Paint transform(Integer i) {
+				return getClusterColor(clusteringResult.getIdForNode(new NodeId(i)));
+			}
+		};
 		this.viewer.getRenderContext().setEdgeDrawPaintTransformer(
 				new PickableEdgePaintTransformer<Number>(this.viewer.getPickedEdgeState(), Color.black, Color.red));
-		this.viewer.getRenderContext().setVertexFillPaintTransformer(
-				new PickableVertexPaintTransformer<Integer>(this.viewer.getPickedVertexState(), Color.green, Color.yellow));
+		this.viewer.getRenderContext().setVertexFillPaintTransformer(vertexColor);
+		//this.viewer.getRenderContext().setVertexFillPaintTransformer(
+		//		new PickableVertexPaintTransformer<Integer>(this.viewer.getPickedVertexState(), Color.green, Color.yellow));
 
 		this.viewer.getRenderContext().setVertexLabelTransformer(new ToStringLabeller<Integer>());
 		this.viewer.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
@@ -137,10 +152,25 @@ public class PoiGraphViewer {
 	}
 
 	/**
-	 * Set the cluster.
+	 * Set the clustering result.
 	 */
-	public void setCluster(final Cluster cluster) {
-		this.cluster = cluster;
+	public ClusteringResult getClusteringResult() {
+		return this.clusteringResult;
+	}
+
+	private Color getClusterColor(final ClusterId clusterId) {
+		if (null == clusterId) {
+			return Color.black;
+		}
+		if (this.clusteringResult.isRegularCluster(clusterId)) {
+			final byte[] hash = Hashes.sha3_256(ByteUtils.intToBytes(clusterId.getRaw()));
+			return new Color(hash[0] & 0xff, hash[1] & 0xff, hash[2] & 0xff);
+		}
+		if (this.clusteringResult.isHub(clusterId)) {
+			return Color.red;
+		}
+
+		return Color.gray;
 	}
 
 	/**
@@ -152,7 +182,9 @@ public class PoiGraphViewer {
 	private void buildGraph(final Matrix adjacencyMatrix, final PoiGraphParameters params) {
 		final EdgeType edgeType = (EDGE_TYPE_UNDIRECTED == params.getAsInteger("edgeType", EDGE_TYPE_UNDIRECTED)) ? EdgeType.UNDIRECTED : EdgeType.DIRECTED;
 		for (int i = 0; i < adjacencyMatrix.getColumnCount(); i++) {
-			this.graph.addVertex((Integer)i);
+			if (!this.clusteringResult.isOutlier(clusteringResult.getIdForNode(new NodeId(i)))) {
+				this.graph.addVertex((Integer)i);
+			}
 		}
 
 		adjacencyMatrix.forEach(new ReadOnlyElementVisitorFunction() {
@@ -160,7 +192,10 @@ public class PoiGraphViewer {
 
 			@Override
 			public void visit(final int row, final int col, final double value) {
-				PoiGraphViewer.this.getGraph().addEdge(this.edgeCount++, col, row, edgeType);
+				if (!getClusteringResult().isOutlier(clusteringResult.getIdForNode(new NodeId(row))) &&
+					!getClusteringResult().isOutlier(clusteringResult.getIdForNode(new NodeId(col)))) {
+					PoiGraphViewer.this.getGraph().addEdge(this.edgeCount++, col, row, edgeType);
+				}
 			}
 		});
 	}

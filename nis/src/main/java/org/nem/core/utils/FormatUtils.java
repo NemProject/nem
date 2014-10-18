@@ -47,4 +47,16 @@ public class FormatUtils {
 		format.setGroupingUsed(false);
 		return format;
 	}
+
+	/**
+	 * Formats a double value with a given number of decimal places.
+	 *
+	 * @param value The value to format.
+	 * @param decimalPlaces The desired number of decimal places.
+	 * @return The formatted string.
+	 */
+	public static String format(final double value, final int decimalPlaces) {
+		final DecimalFormat formatter = getDecimalFormat(decimalPlaces);
+		return formatter.format(value);
+	}
 }

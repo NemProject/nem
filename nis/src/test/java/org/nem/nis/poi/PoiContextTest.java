@@ -5,8 +5,9 @@ import org.junit.*;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.poi.graph.InterLevelProximityMatrix;
+import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -222,6 +223,28 @@ public class PoiContextTest {
 	}
 
 	//endregion
+
+	//region clustering result
+
+	@Test
+	public void clusteringResultIsInitializedCorrectly() {
+		// Act:
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers();
+
+		// Assert: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
+		final List<Cluster> clusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 4)),
+				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 8)));
+		final List<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(3)));
+		final List<Cluster> outliers = Arrays.asList(
+				new Cluster(new NodeId(2)),
+				new Cluster(new NodeId(7)),
+				new Cluster(new NodeId(9)));
+
+		Assert.assertThat(context.getClusteringResult().getClusters(), IsEqual.equalTo(clusters));
+		Assert.assertThat(context.getClusteringResult().getHubs(), IsEqual.equalTo(hubs));
+		Assert.assertThat(context.getClusteringResult().getOutliers(), IsEqual.equalTo(outliers));
+	}
 
 	//endregion
 
@@ -469,7 +492,7 @@ public class PoiContextTest {
 	 *                 o   o
 	 *                8----o6
 	 * </pre>
-	 * Expected: clusters {0,1,4} and {5,6,8}, one hub {3}, three outlier {2,7,9}
+	 * Expected: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
 	 */
 	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndThreeOutliers() {
 		// Arrange: create 10 accounts

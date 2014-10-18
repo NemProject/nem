@@ -66,6 +66,119 @@ public class ClusteringResultTest {
 
 	//endregion
 
+	//region isRegularCluster/isHub/isOutlier
+
+	@Test
+	public void isRegularClusterIsOnlyPredicateThatReturnsTrueForRegularClusterId() {
+		// Act:
+		final ClusteringResult result = createClusteringResultForPredicateTests();
+
+		// Assert:
+		for (final int i : Arrays.asList(1, 7)) {
+			final ClusterId id = new ClusterId(i);
+			Assert.assertThat(result.isRegularCluster(id), IsEqual.equalTo(true));
+			Assert.assertThat(result.isHub(id), IsEqual.equalTo(false));
+			Assert.assertThat(result.isOutlier(id), IsEqual.equalTo(false));
+		}
+	}
+
+	@Test
+	public void isHubIsOnlyPredicateThatReturnsTrueForHubClusterId() {
+		// Act:
+		final ClusteringResult result = createClusteringResultForPredicateTests();
+
+		// Assert:
+		for (final int i : Arrays.asList(3, 4, 6)) {
+			final ClusterId id = new ClusterId(i);
+			Assert.assertThat(result.isRegularCluster(id), IsEqual.equalTo(false));
+			Assert.assertThat(result.isHub(id), IsEqual.equalTo(true));
+			Assert.assertThat(result.isOutlier(id), IsEqual.equalTo(false));
+		}
+	}
+
+	@Test
+	public void isOutlierIsOnlyPredicateThatReturnsTrueForOutlierClusterId() {
+		// Act:
+		final ClusteringResult result = createClusteringResultForPredicateTests();
+
+		// Assert:
+		for (final int i : Arrays.asList(2, 5)) {
+			final ClusterId id = new ClusterId(i);
+			Assert.assertThat(result.isRegularCluster(id), IsEqual.equalTo(false));
+			Assert.assertThat(result.isHub(id), IsEqual.equalTo(false));
+			Assert.assertThat(result.isOutlier(id), IsEqual.equalTo(true));
+		}
+	}
+
+	@Test
+	public void allPredicatesReturnFalseForUnknownClusterId() {
+		// Act:
+		final ClusteringResult result = createClusteringResultForPredicateTests();
+
+		// Assert:
+		for (final int i : Arrays.asList(0, 8, 11)) {
+			final ClusterId id = new ClusterId(i);
+			Assert.assertThat(result.isRegularCluster(id), IsEqual.equalTo(false));
+			Assert.assertThat(result.isHub(id), IsEqual.equalTo(false));
+			Assert.assertThat(result.isOutlier(id), IsEqual.equalTo(false));
+		}
+	}
+
+	private static ClusteringResult createClusteringResultForPredicateTests() {
+		// Arrange:
+		final Collection<Cluster> clusters = mapToClusters(1, 7);
+		final Collection<Cluster> hubs = mapToClusters(3, 4, 6);
+		final Collection<Cluster> outliers = mapToClusters(2, 5);
+		return new ClusteringResult(clusters, hubs, outliers);
+	}
+
+	private static Collection<Cluster> mapToClusters(final int... ids) {
+		final Collection<Cluster> clusters = new ArrayList<>();
+		for (final int id : ids) {
+			clusters.add(new Cluster(new ClusterId(id)));
+		}
+
+		return clusters;
+	}
+
+	//endregion
+
+	//region getAverageClusterSize
+
+	@Test
+	public void getAverageClusterSizeReturnsAverageClusterSizeWhenThereAreClusters() {
+		// Arrange:
+		final Collection<Cluster> clusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4)),
+				new Cluster(new ClusterId(17), NisUtils.toNodeIdList(17, 18)),
+				new Cluster(new ClusterId(20), NisUtils.toNodeIdList(20, 21)),
+				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 7, 8, 9)));
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert: 14 / 4
+		Assert.assertThat(result.getAverageClusterSize(), IsEqual.equalTo(3.5));
+	}
+
+	@Test
+	public void getAverageClusterSizeReturnsZeroWhenThereAreNoClusters() {
+		// Arrange:
+		final Collection<Cluster> clusters = new ArrayList<>();
+		final Collection<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(11)));
+		final Collection<Cluster> outliers = Arrays.asList(new Cluster(new NodeId(10)));
+
+		// Act:
+		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
+
+		// Assert:
+		Assert.assertThat(result.getAverageClusterSize(), IsEqual.equalTo(0.0));
+	}
+
+	//endregion
+
 	//region getIdForNode
 
 	@Test

@@ -4,22 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 
-import java.util.Arrays;
-
 public class PoiScorerTest {
-
-	@Test
-	public void dangleSumIsCalculatedCorrectly() {
-		// Act:
-		final PoiScorer scorer = new PoiScorer();
-		final double dangleSum = scorer.calculateDangleSum(
-				Arrays.asList(1, 3),
-				0.4,
-				new ColumnVector(0.1, 0.8, 0.2, 0.5, 0.6, 0.3));
-
-		// Assert: sum(0.8, 0.5) * 0.4 / 6
-		Assert.assertThat(dangleSum, IsEqual.equalTo(1.3 * 0.4 / 6));
-	}
 
 	@Test
 	public void finalScoreIsCalculatedCorrectly() {
@@ -28,11 +13,13 @@ public class PoiScorerTest {
 		final double importanceWeight = 0.1337;
 
 		// Act:
-		final PoiScorer scorer = new PoiScorer();
-		final ColumnVector finalScoresVector = scorer.calculateFinalScore(
-				new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30),  // importance
-				new ColumnVector(4.00, 1.00, 7.00, 9.00, 2.00, 5.00),  // outlink
-				new ColumnVector(80.0, 5.00, 140., 45.0, 40.0, 25.0)); // vested-balance
+		final ImportanceScorer scorer = new PoiScorer();
+		final ImportanceScorerContextBuilder builder = new ImportanceScorerContextBuilder();
+		builder.setImportanceVector(new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30));
+		builder.setOutlinkVector(new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30));
+		builder.setVestedBalanceVector(new ColumnVector(4.00, 1.00, 7.00, 9.00, 2.00, 5.00));
+		builder.setGraphWeightVector(new ColumnVector(1.0, 1.0, 1.0, 1.0, 1.0, 1.0));
+		final ColumnVector finalScoresVector = scorer.calculateFinalScore(builder.create());
 
 		// Assert:
 		// weighted-outlinks: l1norm(outlink * outlinkWeight + vested-balance)

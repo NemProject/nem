@@ -86,6 +86,57 @@ public class ClusteringResult {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the given id is a regular cluster id.
+	 *
+	 * @param id The id.
+	 * @return true if the id is a regular cluster id, false otherwise.
+	 */
+	public boolean isRegularCluster(final ClusterId id) {
+		return contains(this.clusters, id);
+	}
+
+	/**
+	 * Gets a value indicating whether or not the given id is hub id.
+	 *
+	 * @param id The id.
+	 * @return true if the id is a hub id, false otherwise.
+	 */
+	public boolean isHub(final ClusterId id) {
+		return contains(this.hubs, id);
+	}
+
+	/**
+	 * Gets a value indicating whether or not the given id is hub id.
+	 *
+	 * @param id The id.
+	 * @return true if the id is a hub id, false otherwise.
+	 */
+	public boolean isOutlier(final ClusterId id) {
+		return contains(this.outliers, id);
+	}
+
+	private static boolean contains(final Collection<Cluster> clusters, final ClusterId id) {
+		for (final Cluster cluster : clusters) {
+			if (cluster.getId().equals(id)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Gets the average cluster size.
+	 *
+	 * @return The average cluster size.
+	 */
+	public double getAverageClusterSize() {
+		final double numClusterMembers = this.clusters.stream().mapToInt(c -> c.size()).sum();
+		final int numClusters = this.clusters.size();
+		return 0 == numClusters ? 0.0 : numClusterMembers / numClusters;
+	}
+
+	/**
 	 * Gets the id of the cluster for the given node id.
 	 *
 	 * @param nodeId The node id.
