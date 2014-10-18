@@ -221,6 +221,13 @@ public class NxtGraphClusteringITCase {
 	 * 10^3 | 0.9990 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^4 | 0.9992 | 0.9992 | 0.9992 | 0.9992 | 1.0000 |        |
 	 * 10^5 | 0.9984 | 0.9984 | 0.9984 | 0.9984 | 0.9990 | 1.0000 |
+	 * 
+	 * TODO 20141016 M-J: These are the results printed out on my machine: 
+	 * 10^0 | 0.9581 |  50139 |
+	 * 10^2 | 0.9559 |   8178 |
+	 * 10^3 | 0.9557 |   4970 |
+	 * 10^4 | 0.9553 |   2483 |
+	 * 10^5 | 0.9606 |    797 |
 	 */
 	@Test
 	public void minHarvestingBalanceImportanceVariance() {
