@@ -301,18 +301,21 @@ public class NxtGraphClusteringITCase {
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
 		final Map<Long, ColumnVector> parameterToImportanceMap = new HashMap<>();
 
+		// load account states
+		// TODO BR: I changed the scorer!
+		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+
 		// calculate importances
 		for (final Long value : values) {
 			final PoiOptionsBuilder optionsBuilder = createOptionsBuilder.apply(value);
 
-			final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
-			// TODO BR: I changed the scorer!
-			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, PAGE_RANK_SCORER);
+			final Collection<PoiAccountState> eligibleAccountStates = copy(dbAccountStates);
+			final ColumnVector importances = getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, DEFAULT_IMPORTANCE_SCORER);
 			parameterToImportanceMap.put(value, importances);
 		}
 
 		// calculate balances
-		final ColumnVector balances = getBalances(endBlockHeight, loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER));
+		final ColumnVector balances = getBalances(endBlockHeight, copy(dbAccountStates));
 		balances.normalize();
 		parameterToImportanceMap.put(0L, balances);
 
@@ -347,6 +350,10 @@ public class NxtGraphClusteringITCase {
 		}
 
 		LOGGER.info(builder.toString());
+	}
+
+	private static Collection<PoiAccountState> copy(final Collection<PoiAccountState> accountStates) {
+		return accountStates.stream().map(PoiAccountState::copy).collect(Collectors.toList());
 	}
 
 	private static String getFriendlyLabel(final long key) {
