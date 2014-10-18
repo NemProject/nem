@@ -299,6 +299,37 @@ public class NxtGraphClusteringITCase {
 				scorer);
 		harness.renderNegOutlinkStatesAsList();
 	}
+	
+	/**
+	 * Using correlation as a proxy for importance sensitivity to outlierWeight.
+	 * Results for blockheight up to 150,000:
+	 * 0.0 | 0.8240 |   3849 |
+	 * 0.2 | 0.8508 |   3849 |
+	 * 0.4 | 0.8907 |   3849 |
+	 * 0.6 | 0.9492 |   3849 |
+	 * 0.7 | 0.9722 |   3849 |
+	 * 0.8 | 0.9734 |   3849 |
+	 * 0.9 | 0.9739 |   3849 |
+	 * 1.0 | 0.9742 |   3849 |
+	 */
+	@Test
+	public void outlierWeightBalanceImportanceVariance() {
+		// Act:
+		runOutlierWeightBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
+	}
+
+	private static void runOutlierWeightBalanceVariance(final ImportanceScorer scorer) {
+		final SensitivityTestHarness harness = new SensitivityTestHarness();
+		harness.mapValuesToImportanceVectors(
+				Arrays.asList(0l, 20l, 40l, 60l, 70l, 80l, 90l, 100l),
+				v -> {
+					final PoiOptionsBuilder optionsBuilder = new PoiOptionsBuilder();
+					optionsBuilder.setOutlierWeight(v/100.0);//hack to get double :/
+					return optionsBuilder;
+				},
+				scorer);
+		harness.renderNegOutlinkStatesAsList();
+	}
 
 	/**
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
