@@ -1,7 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.math.ColumnVector;
-import org.nem.nis.poi.graph.ImportanceScorer;
+import org.nem.nis.poi.*;
 
 /**
  * Importance scorer implementation that only uses page rank.
@@ -9,11 +9,8 @@ import org.nem.nis.poi.graph.ImportanceScorer;
 public class PageRankScorer implements ImportanceScorer {
 
 	@Override
-	public ColumnVector calculateFinalScore(
-			final ColumnVector importanceVector,
-			final ColumnVector outlinkVector,
-			final ColumnVector vestedBalanceVector,
-			final ColumnVector graphWeightVector) {
+	public ColumnVector calculateFinalScore(final ImportanceScorerContext context) {
+		final ColumnVector importanceVector = context.getImportanceVector();
 		importanceVector.normalize();
 		return importanceVector;
 	}

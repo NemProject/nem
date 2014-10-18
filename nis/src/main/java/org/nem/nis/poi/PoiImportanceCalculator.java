@@ -66,11 +66,12 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		}
 
 		// (3) merge all sub-scores
-		final ColumnVector importanceVector = this.scorer.calculateFinalScore(
-				iterator.getResult(),
-				context.getOutlinkScoreVector(),
-				context.getVestedBalanceVector(),
-				context.getGraphWeightVector());
+		final ImportanceScorerContextBuilder builder = new ImportanceScorerContextBuilder();
+		builder.setImportanceVector(iterator.getResult());
+		builder.setOutlinkVector(context.getOutlinkScoreVector());
+		builder.setVestedBalanceVector(context.getVestedBalanceVector());
+		builder.setGraphWeightVector(context.getGraphWeightVector());
+		final ColumnVector importanceVector = this.scorer.calculateFinalScore(builder.create());
 		context.updateImportances(iterator.getResult(), importanceVector);
 	}
 
@@ -98,9 +99,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			ColumnVector resultVector = importancesVector.addElementWise(poiAdjustmentVector);
 			if (this.useClustering) {
 				final ColumnVector interLevelVector = this.createInterLeverVector(prevIterImportances);
-				resultVector = resultVector
-						.addElementWise(interLevelVector);
-//						.multiplyElementWise(outlierVector);//TODO should not be in the power iteration
+				resultVector = resultVector.addElementWise(interLevelVector);
 			}
 
 			return resultVector;

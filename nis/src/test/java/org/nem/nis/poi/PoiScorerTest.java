@@ -13,12 +13,13 @@ public class PoiScorerTest {
 		final double importanceWeight = 0.1337;
 
 		// Act:
-		final PoiScorer scorer = new PoiScorer();
-		final ColumnVector finalScoresVector = scorer.calculateFinalScore(
-				new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30),  // importance
-				new ColumnVector(4.00, 1.00, 7.00, 9.00, 2.00, 5.00),  // outlink
-				new ColumnVector(80.0, 5.00, 140., 45.0, 40.0, 25.0),  // vested-balance
-				new ColumnVector(1.0, 1.0, 1.0, 1.0, 1.0, 1.0)); // graph weight vector
+		final ImportanceScorer scorer = new PoiScorer();
+		final ImportanceScorerContextBuilder builder = new ImportanceScorerContextBuilder();
+		builder.setImportanceVector(new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30));
+		builder.setOutlinkVector(new ColumnVector(1.00, 0.80, 0.20, 0.50, 0.60, 0.30));
+		builder.setVestedBalanceVector(new ColumnVector(4.00, 1.00, 7.00, 9.00, 2.00, 5.00));
+		builder.setGraphWeightVector(new ColumnVector(1.0, 1.0, 1.0, 1.0, 1.0, 1.0));
+		final ColumnVector finalScoresVector = scorer.calculateFinalScore(builder.create());
 
 		// Assert:
 		// weighted-outlinks: l1norm(outlink * outlinkWeight + vested-balance)
