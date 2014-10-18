@@ -12,8 +12,9 @@ public class PoiScorer implements ImportanceScorer {
 	public ColumnVector calculateFinalScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outlinkVector,
-			final ColumnVector vestedBalanceVector) {
-		final ColumnVector finalScoreVector = this.calculateScore(importanceVector, outlinkVector, vestedBalanceVector);
+			final ColumnVector vestedBalanceVector,
+			final ColumnVector graphWeightVector) {
+		final ColumnVector finalScoreVector = this.calculateScore(importanceVector, outlinkVector, vestedBalanceVector, graphWeightVector);
 		finalScoreVector.normalize();
 		return finalScoreVector;
 	}
@@ -21,7 +22,8 @@ public class PoiScorer implements ImportanceScorer {
 	private ColumnVector calculateScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outlinkVector,
-			final ColumnVector vestedBalanceVector) {
+			final ColumnVector vestedBalanceVector,
+			final ColumnVector graphWeightVector) {
 		final double outlinkWeight = 1.25;
 		final double importanceWeight = 0.1337;
 
@@ -33,7 +35,7 @@ public class PoiScorer implements ImportanceScorer {
 		// WI: importanceWeight * PR
 		final ColumnVector weightedImportances = importanceVector.multiply(importanceWeight);
 
-		// WO + WI
-		return weightedOutlinks.addElementWise(weightedImportances);
+		// (WO + WI) * graphWeightVector
+		return weightedOutlinks.addElementWise(weightedImportances).multiplyElementWise(graphWeightVector);
 	}
 }

@@ -302,14 +302,15 @@ public class NxtGraphClusteringITCase {
 	
 	/**
 	 * Using correlation as a proxy for importance sensitivity to outlierWeight.
+	 * 
 	 * Results for blockheight up to 150,000:
-	 * 0.0 | 0.8240 |   3849 |
-	 * 0.2 | 0.8508 |   3849 |
-	 * 0.4 | 0.8907 |   3849 |
-	 * 0.6 | 0.9492 |   3849 |
-	 * 0.7 | 0.9722 |   3849 |
-	 * 0.8 | 0.9734 |   3849 |
-	 * 0.9 | 0.9739 |   3849 |
+	 * 0.0 | 0.3779 |   3849 |
+	 * 0.2 | 0.6384 |   3849 |
+	 * 0.4 | 0.8110 |   3849 |
+	 * 0.6 | 0.9054 |   3849 |
+	 * 0.7 | 0.9331 |   3849 |
+	 * 0.8 | 0.9523 |   3849 |
+	 * 0.9 | 0.9654 |   3849 |
 	 * 1.0 | 0.9742 |   3849 |
 	 */
 	@Test
@@ -967,7 +968,7 @@ public class NxtGraphClusteringITCase {
 	private static class PageRankScorer implements ImportanceScorer {
 
 		@Override
-		public ColumnVector calculateFinalScore(final ColumnVector importanceVector, final ColumnVector outlinkVector, final ColumnVector vestedBalanceVector) {
+		public ColumnVector calculateFinalScore(final ColumnVector importanceVector, final ColumnVector outlinkVector, final ColumnVector vestedBalanceVector, final ColumnVector graphWeightVector) {
 			importanceVector.normalize();
 			return importanceVector;
 		}

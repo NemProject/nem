@@ -69,7 +69,8 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 		final ColumnVector importanceVector = this.scorer.calculateFinalScore(
 				iterator.getResult(),
 				context.getOutlinkScoreVector(),
-				context.getVestedBalanceVector());
+				context.getVestedBalanceVector(),
+				context.getGraphWeightVector());
 		context.updateImportances(iterator.getResult(), importanceVector);
 	}
 
@@ -99,10 +100,9 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			ColumnVector resultVector = importancesVector.addElementWise(poiAdjustmentVector);
 			if (this.useClustering) {
 				final ColumnVector interLevelVector = this.createInterLeverVector(prevIterImportances);
-				final ColumnVector outlierVector = this.createOutlierVector();
 				resultVector = resultVector
-						.addElementWise(interLevelVector)
-						.multiplyElementWise(outlierVector);
+						.addElementWise(interLevelVector);
+//						.multiplyElementWise(outlierVector);//TODO should not be in the power iteration
 			}
 
 			return resultVector;
@@ -133,15 +133,6 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			return this.context.getOutlinkMatrix()
 					.multiply(prevIterImportances)
 					.multiply(this.options.getTeleportationProbability());
-		}
-
-		private ColumnVector createOutlierVector() {
-			// V(1) - V(outlier) * (1 - weight) ==> V(outlier) * (-1 + weight) + V(1)
-			final ColumnVector onesVector = new ColumnVector(this.context.getOutlierVector().size());
-			onesVector.setAll(1);
-			return this.context.getOutlierVector()
-					.multiply(-1 + this.options.getOutlierWeight())
-					.addElementWise(onesVector);
 		}
 
 		private ColumnVector createInterLeverVector(final ColumnVector prevIterImportances) {

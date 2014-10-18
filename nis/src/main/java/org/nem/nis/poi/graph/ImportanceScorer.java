@@ -13,10 +13,12 @@ public interface ImportanceScorer {
 	 * @param importanceVector The importances sub-scores.
 	 * @param outlinkVector The out-link sub-scores.
 	 * @param vestedBalanceVector The coin-day sub-scores.
+	 * @param graphWeightVector Weight vector for graph-theoretic metrics (outliers, hubs, etc).
 	 * @return The weighted teleporation sum of all dangling accounts.
 	 */
 	public ColumnVector calculateFinalScore(
 			final ColumnVector importanceVector,
 			final ColumnVector outlinkVector,
-			final ColumnVector vestedBalanceVector);
+			final ColumnVector vestedBalanceVector,
+			final ColumnVector graphWeightVector);
 }

@@ -74,6 +74,15 @@ public class PoiContext {
 	public ColumnVector getOutlierVector() {
 		return this.accountProcessor.outlierVector;
 	}
+	
+	/**
+	 * Gets the graph weight vector.
+	 *
+	 * @return The graph weight vector.
+	 */
+	public ColumnVector getGraphWeightVector() {
+		return this.accountProcessor.graphWeightVector;
+	}
 
 	//endregion
 
@@ -148,6 +157,7 @@ public class PoiContext {
 		private final ColumnVector poiStartVector;
 		private final ColumnVector outlinkScoreVector;
 		private final ColumnVector outlierVector;
+		private final ColumnVector graphWeightVector;
 		private SparseMatrix outlinkMatrix;
 		private InterLevelProximityMatrix interLevelMatrix;
 		private ClusteringResult clusteringResult;
@@ -189,6 +199,7 @@ public class PoiContext {
 			this.poiStartVector = new ColumnVector(i);
 			this.outlinkScoreVector = new ColumnVector(i);
 			this.outlierVector = new ColumnVector(i);
+			this.graphWeightVector = new ColumnVector(i);
 		}
 
 		public void process() {
@@ -232,6 +243,17 @@ public class PoiContext {
 		private void createStartVector() {
 			this.poiStartVector.setAll(1.0);
 			this.poiStartVector.normalize();
+		}
+		
+		private void createGraphWeightVector() {
+			// V(1) - V(outlier) * (1 - weight) ==> V(outlier) * (-1 + weight) + V(1)
+			this.graphWeightVector.setAll(1);
+			final ColumnVector weightedVector = this.graphWeightVector.addElementWise(this.outlierVector
+					.multiply(-1 + options.getOutlierWeight()));
+			
+			for (int index = 0; index < weightedVector.size(); ++index) {
+				graphWeightVector.setAt(index, weightedVector.getAt(index));
+			}
 		}
 
 		private void createOutlinkMatrix() {
@@ -309,6 +331,9 @@ public class PoiContext {
 			for (final Cluster cluster : this.clusteringResult.getOutliers()) {
 				this.outlierVector.setAt(cluster.getId().getRaw(), 1.0);
 			}
+			
+			// now use the outlierVector to create the graph weight vector
+			this.createGraphWeightVector();
 		}
 
 		private void buildInterLevelProximityMatrix() {
