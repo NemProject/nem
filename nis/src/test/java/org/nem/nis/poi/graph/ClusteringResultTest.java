@@ -173,7 +173,7 @@ public class ClusteringResultTest {
 		// Act:
 		final ClusteringResult result = new ClusteringResult(clusters, hubs, outliers);
 
-		// Assert: 12 / 3
+		// Assert:
 		Assert.assertThat(result.getAverageClusterSize(), IsEqual.equalTo(0.0));
 	}
 

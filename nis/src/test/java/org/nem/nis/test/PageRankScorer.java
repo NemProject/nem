@@ -9,7 +9,11 @@ import org.nem.nis.poi.graph.ImportanceScorer;
 public class PageRankScorer implements ImportanceScorer {
 
 	@Override
-	public ColumnVector calculateFinalScore(final ColumnVector importanceVector, final ColumnVector outlinkVector, final ColumnVector vestedBalanceVector) {
+	public ColumnVector calculateFinalScore(
+			final ColumnVector importanceVector,
+			final ColumnVector outlinkVector,
+			final ColumnVector vestedBalanceVector,
+			final ColumnVector graphWeightVector) {
 		importanceVector.normalize();
 		return importanceVector;
 	}
