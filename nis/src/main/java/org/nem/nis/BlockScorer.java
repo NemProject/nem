@@ -37,7 +37,7 @@ public class BlockScorer {
 	 * In other words, POI importances will only be calculated at blocks that
 	 * are a multiple of this grouping number.
 	 */
-	private static final int POI_GROUPING = 31;
+	private static final int POI_GROUPING = 359;
 
 	public final PoiFacade poiFacade;
 

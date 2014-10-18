@@ -559,7 +559,7 @@ public class PoiImportanceCalculatorTest {
 
 	private class StandardContext {
 		final BlockHeight height1 = new BlockHeight(2);
-		final BlockHeight height2 = new BlockHeight(2 + 31); // POI_GROUPING
+		final BlockHeight height2 = new BlockHeight(2 + 359); // POI_GROUPING
 		final PoiOptionsBuilder builder1 = new PoiOptionsBuilder();
 		final PoiOptionsBuilder builder2 = new PoiOptionsBuilder();
 
