@@ -110,7 +110,7 @@ public class PoiContextTest {
 	@Test
 	public void outlierVectorIsSetCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers();
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(DEFAULT_OPTIONS);
 
 		// Assert:
 		// (1) values corresponding to outliers are 1
@@ -118,6 +118,21 @@ public class PoiContextTest {
 		Assert.assertThat(
 				context.getOutlierVector(),
 				IsEqual.equalTo(new ColumnVector(0, 0, 1, 0, 0, 0, 0, 1, 0, 1)));
+	}
+
+	@Test
+	public void graphWeightVectorIsSetCorrectly() {
+		// Act:
+		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
+		builder.setOutlierWeight(0.75);
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(builder.create());
+
+		// Assert:
+		// (1) values corresponding to outliers are 0.75
+		// (2) values corresponding to non-outliers are 1
+		Assert.assertThat(
+				context.getGraphWeightVector(),
+				IsEqual.equalTo(new ColumnVector(1, 1, 0.75, 1, 1, 1, 1, 0.75, 1, 0.75)));
 	}
 
 	//endregion
@@ -229,7 +244,7 @@ public class PoiContextTest {
 	@Test
 	public void clusteringResultIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers();
+		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(DEFAULT_OPTIONS);
 
 		// Assert: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
 		final List<Cluster> clusters = Arrays.asList(
@@ -494,7 +509,7 @@ public class PoiContextTest {
 	 * </pre>
 	 * Expected: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
 	 */
-	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndThreeOutliers() {
+	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(final PoiOptions poiOptions) {
 		// Arrange: create 10 accounts
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = new ArrayList<>();
@@ -519,7 +534,7 @@ public class PoiContextTest {
 		addAccountLink(height, accountStates.get(9), accountStates.get(2), 1);
 
 		// Act:
-		return createPoiContext(accountStates, height);
+		return new PoiContext(accountStates, height, poiOptions);
 	}
 
 	//endregion

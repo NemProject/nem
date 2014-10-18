@@ -214,8 +214,8 @@ public class PoiContext {
 			this.outlinkMatrix = new SparseMatrix(i, i, numOutlinks < i ? 1 : numOutlinks / i);
 			this.createOutlinkMatrix();
 
-			// (2) create the start vector
-			this.createStartVector();
+			// (2) initialize the start vector
+			this.initializeStartVector();
 		}
 
 		public void updateImportances(
@@ -238,20 +238,9 @@ public class PoiContext {
 			}
 		}
 
-		private void createStartVector() {
+		private void initializeStartVector() {
 			this.poiStartVector.setAll(1.0);
 			this.poiStartVector.normalize();
-		}
-
-		private void createGraphWeightVector() {
-			// V(1) - V(outlier) * (1 - weight) ==> V(outlier) * (-1 + weight) + V(1)
-			this.graphWeightVector.setAll(1);
-			final ColumnVector weightedVector = this.graphWeightVector.addElementWise(this.outlierVector
-					.multiply(-1 + this.options.getOutlierWeight()));
-
-			for (int index = 0; index < weightedVector.size(); ++index) {
-				this.graphWeightVector.setAt(index, weightedVector.getAt(index));
-			}
 		}
 
 		private void createOutlinkMatrix() {
@@ -324,12 +313,12 @@ public class PoiContext {
 					this.clusteringResult.getHubs().size(),
 					this.clusteringResult.getOutliers().size()));
 
+			this.graphWeightVector.setAll(1.0);
 			for (final Cluster cluster : this.clusteringResult.getOutliers()) {
-				this.outlierVector.setAt(cluster.getId().getRaw(), 1.0);
+				final int outlierId = cluster.getId().getRaw();
+				this.outlierVector.setAt(outlierId, 1.0);
+				this.graphWeightVector.setAt(outlierId, this.options.getOutlierWeight());
 			}
-
-			// now use the outlierVector to create the graph weight vector
-			this.createGraphWeightVector();
 		}
 
 		private void buildInterLevelProximityMatrix() {
