@@ -7,7 +7,7 @@ import org.nem.core.time.*;
  * BlockValidator and TransactionValidator implementation that ensures entities are not too far in the future.
  */
 public class NonFutureEntityValidator implements BlockValidator, TransactionValidator {
-	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 60;
+	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
 	private final TimeProvider timeProvider;
 
 	/**
