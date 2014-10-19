@@ -540,7 +540,7 @@ public class NxtGraphClusteringITCase {
 		// Assert:
 		assertDifference("FastScan vs SingleClusterScan", fastScanImportances, singleClusterScanImportances);
 		assertDifference("FastScan vs OutlierScan", fastScanImportances, outlierScanImportances);
-		assertDifference("SingleClusterScan vs OutlierScan", singleClusterScanImportances, outlierScanImportances);
+		assertDifference("SingleClusterScan vs OutlierScan", singleClusterScanImportances, outlierScanImportances); //TODO: I am not convinced these should be so different. At any rate, this assert is making the test fail.
 	}
 
 	private static void assertDifference(final String message, final ColumnVector lhs, final ColumnVector rhs) {
