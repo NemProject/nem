@@ -32,7 +32,7 @@ public class SignerTest {
 	public void ctorDelegatesToEngineCreateDsaSigner() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
-		final CryptoEngines.CryptoEngine engine = Mockito.mock(CryptoEngines.CryptoEngine.class);
+		final CryptoEngine engine = Mockito.mock(CryptoEngine.class);
 
 		// Act:
 		new Signer(keyPair, engine);

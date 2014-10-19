@@ -111,7 +111,7 @@ public class KeyPairTest {
 	}
 
 	private class KeyPairContext {
-		private final CryptoEngines.CryptoEngine engine = Mockito.mock(CryptoEngines.CryptoEngine.class);
+		private final CryptoEngine engine = Mockito.mock(CryptoEngine.class);
 		private final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
 		private final KeyGenerator generator = Mockito.mock(KeyGenerator.class);
 		private final PrivateKey privateKey = Mockito.mock(PrivateKey.class);

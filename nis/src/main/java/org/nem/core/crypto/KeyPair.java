@@ -34,7 +34,7 @@ public class KeyPair {
 	 * @param privateKey The private key.
 	 * @param engine The crypto engine.
 	 */
-	public KeyPair(final PrivateKey privateKey, final CryptoEngines.CryptoEngine engine) {
+	public KeyPair(final PrivateKey privateKey, final CryptoEngine engine) {
 		this(privateKey, engine.createKeyGenerator().derivePublicKey(privateKey), engine);
 	}
 
@@ -55,11 +55,11 @@ public class KeyPair {
 	 * @param publicKey The public key.
 	 * @param engine The crypto engine.
 	 */
-	public KeyPair(final PublicKey publicKey, final CryptoEngines.CryptoEngine engine) {
+	public KeyPair(final PublicKey publicKey, final CryptoEngine engine) {
 		this(null, publicKey, engine);
 	}
 
-	public KeyPair(final PrivateKey privateKey, final PublicKey publicKey, final CryptoEngines.CryptoEngine engine) {
+	public KeyPair(final PrivateKey privateKey, final PublicKey publicKey, final CryptoEngine engine) {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 
@@ -81,7 +81,7 @@ public class KeyPair {
 	 * @param engine The crypto engine.
 	 * @return The key pair.
 	 */
-	public static KeyPair random(final CryptoEngines.CryptoEngine engine) {
+	public static KeyPair random(final CryptoEngine engine) {
 		final KeyPair pair = engine.createKeyGenerator().generateKeyPair();
 		return new KeyPair(pair.getPrivateKey(), pair.getPublicKey(), engine);
 	}

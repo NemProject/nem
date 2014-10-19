@@ -12,7 +12,7 @@ public abstract class DsaSignerTest {
 	@Test
 	public void signedDataCanBeVerified() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
@@ -27,7 +27,7 @@ public abstract class DsaSignerTest {
 	@Test
 	public void dataSignedWithKeyPairCannotBeVerifiedWithDifferentKeyPair() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp1 = KeyPair.random(engine);
 		final KeyPair kp2 = KeyPair.random(engine);
 		final DsaSigner dsaSigner1 = this.getDsaSigner(kp1);
@@ -48,7 +48,7 @@ public abstract class DsaSignerTest {
 	@Test
 	public void signaturesReturnedBySignAreDeterministic() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
@@ -64,7 +64,7 @@ public abstract class DsaSignerTest {
 	@Test(expected = CryptoException.class)
 	public void cannotSignPayloadWithoutPrivateKey() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = new KeyPair(KeyPair.random(engine).getPublicKey(), engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
@@ -76,7 +76,7 @@ public abstract class DsaSignerTest {
 	@Test
 	public void isCanonicalReturnsTrueForCanonicalSignature() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -91,7 +91,7 @@ public abstract class DsaSignerTest {
 	@Test
 	public void verifyCallsIsCanonicalSignature() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final DsaSigner dsaSigner = Mockito.spy(this.getDsaSigner(kp));
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -108,5 +108,5 @@ public abstract class DsaSignerTest {
 		return this.getCryptoEngine().createDsaSigner(keyPair);
 	}
 
-	protected abstract CryptoEngines.CryptoEngine getCryptoEngine();
+	protected abstract CryptoEngine getCryptoEngine();
 }

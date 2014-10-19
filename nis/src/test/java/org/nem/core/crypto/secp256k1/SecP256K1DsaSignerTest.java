@@ -13,7 +13,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void signerProducesCorrectSignatureUsing256bitSha3() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair keyPair = new KeyPair(new PrivateKey(BigInteger.valueOf(1L)), engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 
@@ -28,7 +28,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void verifyReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair keyPair = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 		final byte[] input = Utils.generateRandomBytes();
@@ -45,7 +45,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void isCanonicalReturnsFalseForNonCanonicalSignature() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -62,7 +62,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void makeCanonicalMakesNonCanonicalSignatureCanonical() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -81,7 +81,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void replacingRWithGroupOrderMinusRInSignatureRuinsSignature() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
@@ -101,7 +101,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	@Test
 	public void verifyHasExpectedSpeed() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair keyPair = KeyPair.random(engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
@@ -128,7 +128,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	}
 
 	@Override
-	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+	protected CryptoEngine getCryptoEngine() {
 		return CryptoEngines.secp256k1Engine();
 	}
 }

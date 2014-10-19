@@ -21,7 +21,7 @@ public class Signer implements DsaSigner {
 	 * @param keyPair The KeyPair that should be used for signing and verification.
 	 * @param engine The crypto engine.
 	 */
-	public Signer(final KeyPair keyPair, final CryptoEngines.CryptoEngine engine) {
+	public Signer(final KeyPair keyPair, final CryptoEngine engine) {
 		this(engine.createDsaSigner(keyPair));
 	}
 

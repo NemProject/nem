@@ -5,7 +5,7 @@ import org.nem.core.crypto.*;
 public class SecP256K1CryptoEngineTest extends CryptoEngineTest {
 
 	@Override
-	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+	protected CryptoEngine getCryptoEngine() {
 		return CryptoEngines.secp256k1Engine();
 	}
 }

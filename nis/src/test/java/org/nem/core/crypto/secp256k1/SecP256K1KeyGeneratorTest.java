@@ -79,7 +79,7 @@ public class SecP256K1KeyGeneratorTest extends KeyGeneratorTest {
 	}
 
 	@Override
-	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+	protected CryptoEngine getCryptoEngine() {
 		return CryptoEngines.secp256k1Engine();
 	}
 }

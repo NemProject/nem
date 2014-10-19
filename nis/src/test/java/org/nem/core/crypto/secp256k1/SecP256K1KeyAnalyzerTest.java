@@ -29,7 +29,7 @@ public class SecP256K1KeyAnalyzerTest extends KeyAnalyzerTest {
 	}
 
 	@Override
-	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+	protected CryptoEngine getCryptoEngine() {
 		return CryptoEngines.secp256k1Engine();
 	}
 }

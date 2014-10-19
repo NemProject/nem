@@ -48,5 +48,5 @@ public abstract class KeyGeneratorTest {
 		return this.getCryptoEngine().createKeyGenerator();
 	}
 
-	protected abstract CryptoEngines.CryptoEngine getCryptoEngine();
+	protected abstract CryptoEngine getCryptoEngine();
 }

@@ -9,7 +9,7 @@ public class Ed25519BlockCipherTest extends BlockCipherTest {
 	@Test
 	public void decryptReturnsNullIfInputIsTooSmallInLength() {
 		// Arrange:
-		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final CryptoEngine engine = this.getCryptoEngine();
 		final KeyPair kp = KeyPair.random(engine);
 		final BlockCipher blockCipher = this.getBlockCipher(kp, kp);
 
@@ -26,7 +26,7 @@ public class Ed25519BlockCipherTest extends BlockCipherTest {
 	}
 
 	@Override
-	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+	protected CryptoEngine getCryptoEngine() {
 		return CryptoEngines.ed25519Engine();
 	}
 }

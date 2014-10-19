@@ -23,7 +23,7 @@ public class Cipher implements BlockCipher {
 	 * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
 	 * @param engine The crypto engine.
 	 */
-	public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair, final CryptoEngines.CryptoEngine engine) {
+	public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair, final CryptoEngine engine) {
 		this(engine.createBlockCipher(senderKeyPair, recipientKeyPair));
 	}
 

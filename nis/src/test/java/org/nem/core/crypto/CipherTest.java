@@ -31,7 +31,7 @@ public class CipherTest {
 		// Arrange:
 		final KeyPair keyPair1 = new KeyPair();
 		final KeyPair keyPair2 = new KeyPair();
-		final CryptoEngines.CryptoEngine engine = Mockito.mock(CryptoEngines.CryptoEngine.class);
+		final CryptoEngine engine = Mockito.mock(CryptoEngine.class);
 
 		// Act:
 		new Cipher(keyPair1, keyPair2, engine);
@@ -66,6 +66,6 @@ public class CipherTest {
 		cipher.decrypt(encryptedData);
 
 		// Assert:
-		Mockito.verify(blockCipher, Mockito.only()).decrypt(encryptedData);
+		Mockito.verify(blockCipher, Mockito.times(1)).decrypt(encryptedData);
 	}
 }

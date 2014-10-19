@@ -66,7 +66,7 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 	}*/
 
 	@Override
-	protected CryptoEngines.CryptoEngine getCryptoEngine() {
+	protected CryptoEngine getCryptoEngine() {
 		return CryptoEngines.ed25519Engine();
 	}
 }

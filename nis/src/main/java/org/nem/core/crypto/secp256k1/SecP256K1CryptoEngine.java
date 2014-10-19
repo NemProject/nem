@@ -5,7 +5,7 @@ import org.nem.core.crypto.*;
 /**
  * Class that wraps the SECP256K1 specific implementation.
  */
-public class SecP256K1CryptoEngine implements CryptoEngines.CryptoEngine {
+public class SecP256K1CryptoEngine implements CryptoEngine {
 
 	@Override
 	public Curve getCurve() {

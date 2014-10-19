@@ -30,5 +30,5 @@ public abstract class KeyAnalyzerTest {
 		return this.getCryptoEngine().createKeyAnalyzer();
 	}
 
-	protected abstract CryptoEngines.CryptoEngine getCryptoEngine();
+	protected abstract CryptoEngine getCryptoEngine();
 }
