@@ -44,8 +44,9 @@ public abstract class KeyGeneratorTest {
 		Assert.assertThat(kp2.getPublicKey(), IsNot.not(IsEqual.equalTo(kp1.getPublicKey())));
 	}
 
-	protected abstract KeyGenerator getKeyGenerator();
+	protected KeyGenerator getKeyGenerator() {
+		return this.getCryptoEngine().createKeyGenerator();
+	}
 
-	@Before
-	public abstract void initCryptoEngine();
+	protected abstract CryptoEngine getCryptoEngine();
 }

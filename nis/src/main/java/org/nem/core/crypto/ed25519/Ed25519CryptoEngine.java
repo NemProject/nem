@@ -5,7 +5,7 @@ import org.nem.core.crypto.*;
 /**
  * Class that wraps the Ed25519 specific implementation.
  */
-public class Ed25519CryptoEngine implements CryptoEngines.CryptoEngine {
+public class Ed25519CryptoEngine implements CryptoEngine {
 
 	@Override
 	public org.nem.core.crypto.Curve getCurve() {

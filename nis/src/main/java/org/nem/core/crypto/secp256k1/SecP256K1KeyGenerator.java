@@ -27,7 +27,7 @@ public class SecP256K1KeyGenerator implements KeyGenerator {
 		final PrivateKey privateKey = new PrivateKey(privateKeyParams.getD());
 		final ECPoint point = publicKeyParams.getQ();
 		final PublicKey publicKey = new PublicKey(point.getEncoded(true));
-		return new KeyPair(privateKey, publicKey);
+		return new KeyPair(privateKey, publicKey, CryptoEngines.secp256k1Engine());
 	}
 
 	@Override

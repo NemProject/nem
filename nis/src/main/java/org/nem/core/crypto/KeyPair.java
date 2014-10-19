@@ -7,9 +7,10 @@ public class KeyPair {
 
 	/**
 	 * Creates a random key pair.
+	 * TODO 20141018: change constructors to factory functions.
 	 */
 	public KeyPair() {
-		final KeyGenerator generator = CryptoEngines.getDefaultEngine().createKeyGenerator();
+		final KeyGenerator generator = CryptoEngines.defaultEngine().createKeyGenerator();
 		final KeyPair pair = generator.generateKeyPair();
 		this.privateKey = pair.getPrivateKey();
 		this.publicKey = pair.getPublicKey();
@@ -22,7 +23,18 @@ public class KeyPair {
 	 * @param privateKey The private key.
 	 */
 	public KeyPair(final PrivateKey privateKey) {
-		this(privateKey, CryptoEngines.getDefaultEngine().createKeyGenerator().derivePublicKey(privateKey));
+		this(privateKey, CryptoEngines.defaultEngine());
+	}
+
+	/**
+	 * Creates a key pair around a private key.
+	 * The public key is calculated from the private key.
+	 *
+	 * @param privateKey The private key.
+	 * @param engine The crypto engine.
+	 */
+	public KeyPair(final PrivateKey privateKey, final CryptoEngine engine) {
+		this(privateKey, engine.createKeyGenerator().derivePublicKey(privateKey), engine);
 	}
 
 	/**
@@ -32,16 +44,45 @@ public class KeyPair {
 	 * @param publicKey The public key.
 	 */
 	public KeyPair(final PublicKey publicKey) {
-		this(null, publicKey);
+		this(publicKey, CryptoEngines.defaultEngine());
 	}
 
-	public KeyPair(final PrivateKey privateKey, final PublicKey publicKey) {
+	/**
+	 * Creates a key pair around a public key.
+	 * The private key is empty.
+	 *
+	 * @param publicKey The public key.
+	 * @param engine The crypto engine.
+	 */
+	public KeyPair(final PublicKey publicKey, final CryptoEngine engine) {
+		this(null, publicKey, engine);
+	}
+
+	public KeyPair(final PrivateKey privateKey, final PublicKey publicKey, final CryptoEngine engine) {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 
-		if (!publicKey.isCompressed()) {
+		if (!engine.createKeyAnalyzer().isKeyCompressed(this.publicKey)) {
 			throw new IllegalArgumentException("publicKey must be in compressed form");
 		}
+	}
+
+	/**
+	 * Creates a random key pair.
+	 */
+	public static KeyPair random() {
+		return random(CryptoEngines.defaultEngine());
+	}
+
+	/**
+	 * Creates a random key pair that is compatible with the specified engine.
+	 *
+	 * @param engine The crypto engine.
+	 * @return The key pair.
+	 */
+	public static KeyPair random(final CryptoEngine engine) {
+		final KeyPair pair = engine.createKeyGenerator().generateKeyPair();
+		return new KeyPair(pair.getPrivateKey(), pair.getPublicKey(), engine);
 	}
 
 	/**

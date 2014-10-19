@@ -9,7 +9,7 @@ public abstract class KeyAnalyzerTest {
 	public void isKeyCompressedReturnsTrueForCompressedPublicKey() {
 		// Arrange:
 		final KeyAnalyzer analyzer = this.getKeyAnalyzer();
-		final KeyPair keyPair = new KeyPair();
+		final KeyPair keyPair = this.getCryptoEngine().createKeyGenerator().generateKeyPair();
 
 		// Act + Assert:
 		Assert.assertThat(analyzer.isKeyCompressed(keyPair.getPublicKey()), IsEqual.equalTo(true));
@@ -19,15 +19,16 @@ public abstract class KeyAnalyzerTest {
 	public void isKeyCompressedReturnsFalseIfKeyHasWrongLength() {
 		// Arrange:
 		final KeyAnalyzer analyzer = this.getKeyAnalyzer();
-		final KeyPair keyPair = new KeyPair();
+		final KeyPair keyPair = this.getCryptoEngine().createKeyGenerator().generateKeyPair();
 		final PublicKey key = new PublicKey(new byte[keyPair.getPublicKey().getRaw().length + 1]);
 
 		// Act + Assert:
 		Assert.assertThat(analyzer.isKeyCompressed(key), IsEqual.equalTo(false));
 	}
 
-	protected abstract KeyAnalyzer getKeyAnalyzer();
+	protected KeyAnalyzer getKeyAnalyzer() {
+		return this.getCryptoEngine().createKeyAnalyzer();
+	}
 
-	@Before
-	public abstract void initCryptoEngine();
+	protected abstract CryptoEngine getCryptoEngine();
 }

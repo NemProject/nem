@@ -3,7 +3,7 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -72,10 +72,5 @@ public class BlockFactoryTest {
 		Assert.assertThat(block, IsInstanceOf.instanceOf(Block.class));
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getSignature(), IsNull.nullValue());
-	}
-
-	@Before
-	public void initCryptoEngine() {
-		CryptoEngines.setDefaultEngine(CryptoEngines.ed25519Engine());
 	}
 }
