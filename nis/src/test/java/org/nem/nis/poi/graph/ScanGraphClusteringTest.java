@@ -569,7 +569,7 @@ public abstract class ScanGraphClusteringTest {
 	 * </pre>
 	 */
 	@Test
-	public void forthGraphIsClusteredAsExpected() {
+	public void fourthGraphIsClusteredAsExpected() {
 		// Arrange:
 		final DenseMatrix outlinkMatrix = new DenseMatrix(8, 8);
 		outlinkMatrix.setAt(1, 0, 1);

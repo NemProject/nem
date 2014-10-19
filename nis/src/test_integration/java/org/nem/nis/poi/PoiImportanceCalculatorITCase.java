@@ -128,8 +128,8 @@ public class PoiImportanceCalculatorITCase {
 		final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accountStates);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		final double user1Importance = importances.getAt(1) + importances.getAt(2);
-		final double user2Importance = importances.getAt(3) + importances.getAt(4);
+		final double user1Importance = importances.getAt(0) + importances.getAt(1);
+		final double user2Importance = importances.getAt(2) + importances.getAt(3);
 		final double ratio = user1Importance / user2Importance;
 		System.out.print("Self loop vs. normal loop: User 1 importance is " + format.format(user1Importance));
 		System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
@@ -424,13 +424,13 @@ public class PoiImportanceCalculatorITCase {
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
 		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
 		// Warm up phase
-		getAccountImportances(new BlockHeight(10000), accounts);
+		getAccountImportances(new BlockHeight(9999), accounts);
 
 		// Act: calculate importances
 		System.out.println("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < 5; i++) {
-			final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accounts);
+			final ColumnVector importances = getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 		final long stop = System.currentTimeMillis();
 		System.out.println("Finished poi calculation.");

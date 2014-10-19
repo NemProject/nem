@@ -7,15 +7,15 @@ import org.nem.nis.poi.graph.*;
  * A builder for creating poi options.
  */
 public class PoiOptionsBuilder {
-	private Amount minHarvesterBalance = Amount.fromNem(1000);
-	private Amount minOutlinkWeight = Amount.ZERO;
-	private double negativeOutlinkWeight = 0.2;
-	private double outlierWeight = 1.0;
+	private Amount minHarvesterBalance = Amount.fromNem(10000);
+	private Amount minOutlinkWeight = Amount.fromNem(1000);
+	private double negativeOutlinkWeight = 0.4;
+	private double outlierWeight = 0.9;
 	private double teleportationProbability = .75; // For NCDawareRank
 	private double interLevelTeleportationProbability = .1; // For NCDawareRank
 	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
 	private int mu = 3;
-	private double epsilon = 0.65;
+	private double epsilon = 0.4;
 
 	//region weights
 
