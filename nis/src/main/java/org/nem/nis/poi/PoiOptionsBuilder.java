@@ -11,8 +11,8 @@ public class PoiOptionsBuilder {
 	private Amount minOutlinkWeight = Amount.fromNem(1000);
 	private double negativeOutlinkWeight = 0.4;
 	private double outlierWeight = 0.9;
-	private double teleportationProbability = .6; // For NCDawareRank
-	private double interLevelTeleportationProbability = .25; // For NCDawareRank
+	private double teleportationProbability = .75; // For NCDawareRank
+	private double interLevelTeleportationProbability = .1; // For NCDawareRank
 	private GraphClusteringStrategy clusteringStrategy = new FastScanClusteringStrategy();
 	private int mu = 3;
 	private double epsilon = 0.4;
