@@ -64,7 +64,8 @@ public abstract class DsaSignerTest {
 	@Test(expected = CryptoException.class)
 	public void cannotSignPayloadWithoutPrivateKey() {
 		// Arrange:
-		final KeyPair kp = new KeyPair(Utils.generateRandomPublicKey());
+		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
+		final KeyPair kp = new KeyPair(KeyPair.random(engine).getPublicKey(), engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(kp);
 		final byte[] input = Utils.generateRandomBytes();
 

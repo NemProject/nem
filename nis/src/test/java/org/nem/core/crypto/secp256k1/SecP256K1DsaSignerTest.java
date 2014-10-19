@@ -14,7 +14,7 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 	public void signerProducesCorrectSignatureUsing256bitSha3() {
 		// Arrange:
 		final CryptoEngines.CryptoEngine engine = this.getCryptoEngine();
-		final KeyPair keyPair = new KeyPair(new PrivateKey(BigInteger.valueOf(1L)));
+		final KeyPair keyPair = new KeyPair(new PrivateKey(BigInteger.valueOf(1L)), engine);
 		final DsaSigner dsaSigner = this.getDsaSigner(keyPair);
 
 		// Act:

@@ -88,15 +88,6 @@ public class PublicKey implements SerializableEntity {
 		return this.value;
 	}
 
-	/**
-	 * Determines if the public key is in compressed form.
-	 *
-	 * @return true if the public key is in compressed form.
-	 */
-	public boolean isCompressed() {
-		return CryptoEngines.getDefaultEngine().createKeyAnalyzer().isKeyCompressed(this);
-	}
-
 	@Override
 	public void serialize(final Serializer serializer) {
 		serializer.writeBytes("value", this.value);

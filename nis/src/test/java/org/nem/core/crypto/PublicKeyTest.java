@@ -119,25 +119,6 @@ public class PublicKeyTest {
 
 	//endregion
 
-	//region delegation
-
-	@Test
-	public void isCompressedDelegatesToKeyAnalyzer() {
-		final CryptoEngines.CryptoEngine engine = Mockito.mock(CryptoEngines.CryptoEngine.class);
-		CryptoEngines.setDefaultEngine(engine);
-		final KeyAnalyzer analyzer = Mockito.mock(KeyAnalyzer.class);
-		Mockito.when(engine.createKeyAnalyzer()).thenReturn(analyzer);
-		final PublicKey key = PublicKey.fromHexString("227F");
-
-		// Act:
-		key.isCompressed();
-
-		// Assert:
-		Mockito.verify(analyzer, Mockito.times(1)).isKeyCompressed(key);
-	}
-
-	//endregion
-
 	private static Ed25519GroupElement getA(final boolean precompute) {
 		final Ed25519GroupElement A = Ed25519GroupElement.p3(
 				Ed25519Field.ZERO,
