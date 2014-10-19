@@ -159,9 +159,4 @@ public class NemesisBlockTest {
 	}
 
 	//endregion
-
-	@Before
-	public void initCryptoEngine() {
-		CryptoEngines.setDefaultEngine(CryptoEngines.ed25519Engine());
-	}
 }

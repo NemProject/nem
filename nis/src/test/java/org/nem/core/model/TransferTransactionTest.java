@@ -154,7 +154,6 @@ public class TransferTransactionTest {
 	@Test
 	public void feeIsWaivedForNemesisAccount() {
 		// Arrange:
-		CryptoEngines.setDefaultEngine(CryptoEngines.ed25519Engine());
 		final Account nemesisAccount = new Account(NemesisBlock.ADDRESS);
 
 		// Assert:

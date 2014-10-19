@@ -11,7 +11,7 @@ public class KeyPair {
 	 * TODO 20141018: change constructors to factory functions.
 	 */
 	public KeyPair() {
-		final KeyGenerator generator = CryptoEngines.getDefaultEngine().createKeyGenerator();
+		final KeyGenerator generator = CryptoEngines.defaultEngine().createKeyGenerator();
 		final KeyPair pair = generator.generateKeyPair();
 		this.privateKey = pair.getPrivateKey();
 		this.publicKey = pair.getPublicKey();
@@ -24,7 +24,7 @@ public class KeyPair {
 	 * @param privateKey The private key.
 	 */
 	public KeyPair(final PrivateKey privateKey) {
-		this(privateKey, CryptoEngines.getDefaultEngine());
+		this(privateKey, CryptoEngines.defaultEngine());
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class KeyPair {
 	 * @param publicKey The public key.
 	 */
 	public KeyPair(final PublicKey publicKey) {
-		this(publicKey, CryptoEngines.getDefaultEngine());
+		this(publicKey, CryptoEngines.defaultEngine());
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class KeyPair {
 	 * Creates a random key pair.
 	 */
 	public static KeyPair random() {
-		return random(CryptoEngines.getDefaultEngine());
+		return random(CryptoEngines.defaultEngine());
 	}
 
 	/**

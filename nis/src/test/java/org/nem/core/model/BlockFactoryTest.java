@@ -73,9 +73,4 @@ public class BlockFactoryTest {
 		Assert.assertThat(block.getType(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getSignature(), IsNull.nullValue());
 	}
-
-	@Before
-	public void initCryptoEngine() {
-		CryptoEngines.setDefaultEngine(CryptoEngines.ed25519Engine());
-	}
 }

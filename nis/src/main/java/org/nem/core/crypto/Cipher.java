@@ -13,7 +13,7 @@ public class Cipher implements BlockCipher {
 	 * @param recipientKeyPair The recipient KeyPair. The recipient's private key is required for decryption.
 	 */
 	public Cipher(final KeyPair senderKeyPair, final KeyPair recipientKeyPair) {
-		this(senderKeyPair, recipientKeyPair, CryptoEngines.getDefaultEngine());
+		this(senderKeyPair, recipientKeyPair, CryptoEngines.defaultEngine());
 	}
 
 	/**

@@ -11,21 +11,12 @@ public class CryptoEngines {
 
 	private static final CryptoEngine secp256k1Engine;
 	private static final CryptoEngine ed25519Engine;
-	private static CryptoEngine defaultEngine = initDefaultEngine();
+	private static final CryptoEngine defaultEngine;
 
 	static {
 		secp256k1Engine = new SecP256K1CryptoEngine();
 		ed25519Engine = new Ed25519CryptoEngine();
-	}
-
-	/**
-	 * Initializes the default crypto engine (needed for unit tests).
-	 *
-	 * @return The default crypto engine.
-	 */
-	public static CryptoEngine initDefaultEngine() {
 		defaultEngine = ed25519Engine;
-		return defaultEngine;
 	}
 
 	/**
@@ -33,28 +24,8 @@ public class CryptoEngines {
 	 *
 	 * @return The default crypto engine.
 	 */
-	public static CryptoEngine getDefaultEngine() {
-		if (null == defaultEngine) {
-			initDefaultEngine();
-		}
-
+	public static CryptoEngine defaultEngine() {
 		return defaultEngine;
-	}
-
-	/**
-	 * Sets the default crypto engine (needed for unit tests).
-	 *
-	 * @param engine The crypto engine.
-	 */
-	public static void setDefaultEngine(final CryptoEngine engine) {
-		// TODO 20141012: this fixes the majority of the affected tests, but a few still fail
-		// > because they use the default engine to check the validity of the nemesis address
-		// the NemesisBlock depends on the "real" default engine,
-		// so make sure it is initialized before changing the default engine
-		//noinspection ResultOfMethodCallIgnored
-		NemesisBlock.GENERATION_HASH.equals(Hash.ZERO);
-
-		defaultEngine = engine;
 	}
 
 	/**

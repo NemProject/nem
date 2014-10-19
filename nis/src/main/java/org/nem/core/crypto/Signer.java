@@ -12,7 +12,7 @@ public class Signer implements DsaSigner {
 	 * @param keyPair The KeyPair that should be used for signing and verification.
 	 */
 	public Signer(final KeyPair keyPair) {
-		this(keyPair, CryptoEngines.getDefaultEngine());
+		this(keyPair, CryptoEngines.defaultEngine());
 	}
 
 	/**

@@ -32,9 +32,4 @@ public class SecP256K1UtilsTest {
 		// Assert:
 		Assert.assertThat(parameters.getQ().getEncoded(), IsEqual.equalTo(keyPair.getPublicKey().getRaw()));
 	}
-
-	@Before
-	public void initCryptoEngine() {
-		CryptoEngines.setDefaultEngine(CryptoEngines.secp256k1Engine());
-	}
 }
