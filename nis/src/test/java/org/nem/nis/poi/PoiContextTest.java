@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 
 public class PoiContextTest {
 	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();
-	private static final Amount MIN_HARVESTING_BALANCE = DEFAULT_OPTIONS.getMinHarvesterBalance();
+	private static final long MIN_HARVESTING_BALANCE = DEFAULT_OPTIONS.getMinHarvesterBalance().getNumMicroNem();
+	private static final long MIN_OUTLINK_WEIGHT = DEFAULT_OPTIONS.getMinOutlinkWeight().getNumMicroNem();
 
 	//region construction (failures)
 
@@ -61,7 +62,7 @@ public class PoiContextTest {
 		// (2) vested balances are not normalized
 		Assert.assertThat(
 				context.getVestedBalanceVector(),
-				IsEqual.equalTo(new ColumnVector(2999999999L, 5000000000L, 1000000000L, 1000000000L)));
+				IsEqual.equalTo(new ColumnVector(29999999999L, 50000000000L, 10000000000L, 10000000000L)));
 	}
 
 	@Test
@@ -346,8 +347,9 @@ public class PoiContextTest {
 			final BlockHeight height,
 			final PoiAccountState sender,
 			final PoiAccountState recipient,
-			final int amount) {
-		final AccountLink link = new AccountLink(height, Amount.fromNem(amount), recipient.getAddress());
+			final int weight) {
+		final Amount amount = Amount.fromMicroNem(weight * MIN_OUTLINK_WEIGHT);
+		final AccountLink link = new AccountLink(height, amount, recipient.getAddress());
 		sender.getImportanceInfo().addOutlink(link);
 	}
 
@@ -371,14 +373,13 @@ public class PoiContextTest {
 	}
 
 	private static List<PoiAccountState> createDefaultTestAccountStates(final BlockHeight height) {
-		final long multiplier = MIN_HARVESTING_BALANCE.getNumMicroNem();
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(3 * multiplier - 1, null),
-				new TestAccountInfo(multiplier - 1, new int[] { 1 }), // 1 (insufficient balance)
-				new TestAccountInfo(5 * multiplier, new int[] { 1, 2 }), // 3
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, new int[] { 1, 1, 4, 3, 1 }), // 10
-				new TestAccountInfo(multiplier - 1, new int[] { 7 })); // 7 (insufficient vested balance)
+				new TestAccountInfo(3 * MIN_HARVESTING_BALANCE - 1, null),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, new int[] { 1 }), // 1 (insufficient balance)
+				new TestAccountInfo(5 * MIN_HARVESTING_BALANCE, new int[] { 1, 2 }), // 3
+				new TestAccountInfo(MIN_HARVESTING_BALANCE, null),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE, new int[] { 1, 1, 4, 3, 1 }), // 10
+				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, new int[] { 7 })); // 7 (insufficient vested balance)
 
 		// outlinks
 		// - 0: none
@@ -391,6 +392,10 @@ public class PoiContextTest {
 	private static class TestAccountInfo {
 		public final long vestedBalance;
 		public final int[] amounts;
+
+		public TestAccountInfo(final long vestedBalance) {
+			this(vestedBalance, null);
+		}
 
 		public TestAccountInfo(final long vestedBalance, final int[] amounts) {
 			this.vestedBalance = vestedBalance;
@@ -418,13 +423,12 @@ public class PoiContextTest {
 
 	private static PoiContext createTestPoiContextWithAccountLinks(final PoiOptions poiOptions) {
 		// Arrange: create 4 accounts
-		final long multiplier = MIN_HARVESTING_BALANCE.getNumMicroNem(); // 1000 is min harvesting balance
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier, null),
-				new TestAccountInfo(multiplier - 1, null)); // non-foraging account
+				new TestAccountInfo(MIN_HARVESTING_BALANCE),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE),
+				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, null)); // non-foraging account
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
@@ -467,10 +471,9 @@ public class PoiContextTest {
 	 */
 	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndOneOutlier() {
 		// Arrange: create 8 accounts
-		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = new ArrayList<>();
 		for (int i = 0; i < 8; ++i) {
-			accountInfos.add(new TestAccountInfo(multiplier, null));
+			accountInfos.add(new TestAccountInfo(MIN_HARVESTING_BALANCE));
 		}
 
 		final BlockHeight height = new BlockHeight(21);
@@ -511,10 +514,9 @@ public class PoiContextTest {
 	 */
 	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(final PoiOptions poiOptions) {
 		// Arrange: create 10 accounts
-		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = new ArrayList<>();
 		for (int i = 0; i < 10; ++i) {
-			accountInfos.add(new TestAccountInfo(multiplier, null));
+			accountInfos.add(new TestAccountInfo(MIN_HARVESTING_BALANCE));
 		}
 
 		final BlockHeight height = new BlockHeight(21);

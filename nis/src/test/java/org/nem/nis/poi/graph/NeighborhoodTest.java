@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class NeighborhoodTest {
+	private static final double DEFAULT_EPSILON = 0.65;
 
 	//region getCommunity
 
@@ -26,7 +27,7 @@ public class NeighborhoodTest {
 	@Test
 	public void getCommunityTreatsNodesWithSimilarityScoreGreaterThanEpsilonAsSimilar() {
 		// Act:
-		final Community community = getCommunity(2, 4, 0.651);
+		final Community community = getCommunity(2, 4, DEFAULT_EPSILON + 0.0001);
 
 		// Assert:
 		assertCommunity(community, new NodeId(2), NisUtils.toNodeIdList(2, 4), NisUtils.toNodeIdList());
@@ -35,7 +36,7 @@ public class NeighborhoodTest {
 	@Test
 	public void getCommunityTreatsNodesWithSimilarityScoreEqualToEpsilonAsDissimilar() {
 		// Act:
-		final Community community = getCommunity(2, 4, 0.65);
+		final Community community = getCommunity(2, 4, DEFAULT_EPSILON);
 
 		// Assert:
 		assertCommunity(community, new NodeId(2), NisUtils.toNodeIdList(2), NisUtils.toNodeIdList(4));
@@ -44,7 +45,7 @@ public class NeighborhoodTest {
 	@Test
 	public void getCommunityTreatsNodesWithSimilarityScoreLessThanEpsilonAsDissimilar() {
 		// Act:
-		final Community community = getCommunity(2, 4, 0.649);
+		final Community community = getCommunity(2, 4, DEFAULT_EPSILON - 0.0001);
 
 		// Assert:
 		assertCommunity(community, new NodeId(2), NisUtils.toNodeIdList(2), NisUtils.toNodeIdList(4));
@@ -58,7 +59,7 @@ public class NeighborhoodTest {
 		final SimilarityStrategy strategy = Mockito.mock(SimilarityStrategy.class);
 		Mockito.when(strategy.calculateSimilarity(new NodeId(pivotId), new NodeId(neighborId))).thenReturn(similarity);
 
-		final Neighborhood neighborhood = createNeighborhood(repository, strategy);
+		final Neighborhood neighborhood = new Neighborhood(repository, strategy, 3, DEFAULT_EPSILON);
 
 		// Act:
 		return neighborhood.getCommunity(new NodeId(pivotId));

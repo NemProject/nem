@@ -1,6 +1,7 @@
 package org.nem.nis.test;
 
 import org.nem.core.math.*;
+import org.nem.nis.poi.PoiOptionsBuilder;
 
 /**
  * Static factory class that exposes functions for creating well-known outlink matrices.
@@ -148,6 +149,7 @@ public class OutlinkMatrixFactory {
 		}
 
 		matrix.removeNegatives();
+		matrix.multiply(new PoiOptionsBuilder().create().getMinOutlinkWeight().getNumNem());
 		return matrix;
 	}
 
