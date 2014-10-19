@@ -197,7 +197,6 @@ public class NxtGraphClusteringITCase {
 
 	/**
 	 * TODO 20141016 BR -> J: here are the values when using PageRankScorer (see comment below):
-	 *
 	 * <pre>
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
 	 * STK  | 1.0000 |        |        |        |        |        |
@@ -206,7 +205,7 @@ public class NxtGraphClusteringITCase {
 	 * 10^3 | 0.0250 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^4 | 0.1193 | 0.2411 | 0.2411 | 0.2411 | 1.0000 |        |
 	 * 10^5 | 0.2375 | 0.1791 | 0.1791 | 0.1791 | 0.6107 | 1.0000 |
-	 *
+	 * <br/>
 	 * TODO 20141018 M->BR,J: These are the results on my machine:
 	 * 10^0 | 0.0709 |  50139 |
 	 * 10^2 | 0.0194 |   8178 |
@@ -228,7 +227,6 @@ public class NxtGraphClusteringITCase {
 	 * TODO 20141016 M -> BR, J: If possible we should try to keep the min balance low so that more people can
 	 * ->participate in harvesting NEM. None of these correlations are really so different, so I wouldn't go over 1000.
 	 * ->Also, I get different numbers when I run the test (it could because I am using a newer NXT DB with more blocks).
-	 *
 	 * <pre>
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
 	 * STK  | 1.0000 |        |        |        |        |        |
@@ -237,7 +235,7 @@ public class NxtGraphClusteringITCase {
 	 * 10^3 | 0.9990 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^4 | 0.9992 | 0.9992 | 0.9992 | 0.9992 | 1.0000 |        |
 	 * 10^5 | 0.9984 | 0.9984 | 0.9984 | 0.9984 | 0.9990 | 1.0000 |
-	 *
+	 * <br/>
 	 * TODO 20141018 M-J: These are the results printed out on my machine:
 	 * 10^0 | 0.9581 |  50139 |
 	 * 10^2 | 0.9559 |   8178 |
@@ -281,7 +279,7 @@ public class NxtGraphClusteringITCase {
 	 * 0.6 | 0.9521 |   4970 |
 	 * 0.8 | 0.9495 |   4970 |
 	 * 1.0 | 0.9463 |   4970 |
-	 *
+	 * <br/>
 	 * results for blockheight up to 150000:
 	 * 0.0 | 0.9743 |   3849 |
 	 * 0.2 | 0.9742 |   3849 |
@@ -323,7 +321,6 @@ public class NxtGraphClusteringITCase {
 	 * 10^4 | 0.0228 | 0.2798 | 0.3292 | 0.3869 | 0.4881 | 1.0000 |        |        |
 	 * 10^5 | 0.0141 | 0.0223 | 0.0338 | 0.0611 | 0.0886 | 0.2691 | 1.0000 |        |
 	 * 10^6 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 1.0000 |
-	 *
 	 * TODO M: These are the results when I run this:
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
@@ -344,7 +341,6 @@ public class NxtGraphClusteringITCase {
 
 	/**
 	 * Using correlation as a proxy for importance sensitivity to min outlink balance.
-	 *
 	 * <pre>
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
@@ -355,7 +351,6 @@ public class NxtGraphClusteringITCase {
 	 * 10^4 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 |        |        |
 	 * 10^5 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |        |
 	 * 10^6 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-	 *
 	 * TODO M: These are the results when I run this:
 	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
 	 * STK  | 1.0000 |        |        |        |        |        |        |        |
@@ -581,7 +576,6 @@ public class NxtGraphClusteringITCase {
 	 * Analyzes the influence of the value of epsilon on the number of clusters, the average cluster size and the number of hubs.
 	 * The minimum harvester balance is set to 10000.
 	 * (unfortunately cluster information is only internally available, so it is only logged. You have to look for the entries yourself).
-	 *
 	 * <pre>
 	 * epsilon = 0.75
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
@@ -590,7 +584,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |     8    |    3.12   |          0.80           |  5
 	 *  150000   |     9    |    3.11   |          0.60           |  5
 	 *  200000   |    13    |    3.15   |          0.65           |  5
-	 *
+	 * <br/>
 	 * epsilon = 0.65 (standard value)
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     2    |    3.00   |          3.00           |  0
@@ -598,7 +592,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    16    |    3.19   |          1.60           |  8
 	 *  150000   |    24    |    3.33   |          1.60           |  5
 	 *  200000   |    33    |    3.33   |          1.65           |  8
-	 *
+	 * <br/>
 	 * epsilon = 0.55
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     6    |    3.67   |          6.00           |  1
@@ -606,7 +600,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    29    |    3.45   |          2.90           | 10
 	 *  150000   |    44    |    3.70   |          2.93           | 13
 	 *  200000   |    53    |    2.65   |          2.65           | 19
-	 *
+	 * <br/>
 	 * epsilon = 0.45
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |    10    |    4.70   |         10.00           |  5
@@ -614,7 +608,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    47    |    3.96   |          4.70           | 24
 	 *  150000   |    64    |    4.25   |          4.26           | 39
 	 *  200000   |    77    |    3.86   |          3.85           | 47
-	 *
+	 * <br/>
 	 * epsilon = 0.35
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     8    |    8.88   |          8.00           |  5
@@ -622,7 +616,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    44    |    6.98   |          4.40           | 30
 	 *  150000   |    63    |    6.52   |          4.26           | 29
 	 *  200000   |    81    |    5.91   |          4.05           | 48
-	 *
+	 * <br/>
 	 * epsilon = 0.30
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     6    |   13.67   |          6.00           |  3
@@ -630,7 +624,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    33    |   11.18   |          3.30           | 54
 	 *  150000   |    48    |    9.77   |          3.20           | 16
 	 *  200000   |    58    |    9.91   |          2.90           | 27
-	 *
+	 * <br/>
 	 * epsilon = 0.25
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     4    |   21.00   |          4.00           |  0
@@ -638,7 +632,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    22    |   18.86   |          2.20           | 38
 	 *  150000   |    28    |   18.61   |          1.87           | 12
 	 *  200000   |    38    |   17.63   |          1.90           |  9
-	 *
+	 * <br/>
 	 * epsilon = 0.20
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     3    |   34.67   |          3.00           |  0
@@ -646,7 +640,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    17    |   27.71   |          1.70           |  0
 	 *  150000   |    20    |   31.15   |          1.33           |  5
 	 *  200000   |    28    |   26.64   |          1.40           |  5
-	 *
+	 * <br/>
 	 * epsilon = 0.15
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     3    |   37.33   |          3.00           |  0
@@ -654,7 +648,7 @@ public class NxtGraphClusteringITCase {
 	 *  100000   |    13    |   40.77   |          1.30           |  0
 	 *  150000   |    14    |   49.29   |          0.93           |  0
 	 *  200000   |    20    |   39.60   |          1.00           |  0
-	 *
+	 * <br/>
 	 * epsilon = 0.05
 	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
 	 *   10000   |     2    |   56.00   |          2.00           |  0

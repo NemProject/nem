@@ -411,7 +411,7 @@ public class PoiImportanceCalculatorTest {
 	 * 0.25 |
 	 * 0.15 |
 	 * 0.05 |
-	 *<br/>
+	 * <br/>
 	 * Outcome:
 	 * Only the sum TP + ILTP plays a role. As it goes near one, more and more importance gets transferred from ring 2 to ring 1.
 	 * <pre>

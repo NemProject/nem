@@ -3,7 +3,7 @@ package org.nem.core.model;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.MockAccountLookup;

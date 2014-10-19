@@ -3,7 +3,6 @@ package org.nem.core.crypto;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 
 public class KeyPairTest {
 

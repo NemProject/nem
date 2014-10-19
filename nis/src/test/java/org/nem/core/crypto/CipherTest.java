@@ -2,7 +2,6 @@ package org.nem.core.crypto;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.crypto.ed25519.Ed25519CryptoEngine;
 import org.nem.core.test.Utils;
 
 public class CipherTest {

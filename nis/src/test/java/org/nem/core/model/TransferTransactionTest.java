@@ -3,7 +3,6 @@ package org.nem.core.model;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.crypto.CryptoEngines;
 import org.nem.core.messages.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;

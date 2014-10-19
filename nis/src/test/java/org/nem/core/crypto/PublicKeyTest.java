@@ -2,7 +2,6 @@ package org.nem.core.crypto;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.crypto.ed25519.arithmetic.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
