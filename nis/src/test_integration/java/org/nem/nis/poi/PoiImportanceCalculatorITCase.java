@@ -128,8 +128,8 @@ public class PoiImportanceCalculatorITCase {
 		final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accountStates);
 
 		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-		final double user1Importance = importances.getAt(1) + importances.getAt(2);
-		final double user2Importance = importances.getAt(3) + importances.getAt(4);
+		final double user1Importance = importances.getAt(0) + importances.getAt(1);
+		final double user2Importance = importances.getAt(2) + importances.getAt(3);
 		final double ratio = user1Importance / user2Importance;
 		System.out.print("Self loop vs. normal loop: User 1 importance is " + format.format(user1Importance));
 		System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
