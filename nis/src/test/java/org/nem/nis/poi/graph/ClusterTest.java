@@ -165,7 +165,7 @@ public class ClusterTest {
 		{
 			this.put("default", new Cluster(new ClusterId(1337), NisUtils.toNodeIdList(1338, 1339, 1440)));
 			this.put("diff-cluster-id", new Cluster(new ClusterId(1336), NisUtils.toNodeIdList(1338, 1339, 1440)));
-			this.put("diff-member-ids", new Cluster(new ClusterId(1337), NisUtils.toNodeIdList(1338, 1339, 1442)));
+			this.put("diff-member-ids", new Cluster(new ClusterId(1337), NisUtils.toNodeIdList(1336, 1339, 1442)));
 			this.put("diff-less-member-ids", new Cluster(new ClusterId(1337), NisUtils.toNodeIdList(1338, 1339)));
 			this.put("diff-more-member-ids", new Cluster(new ClusterId(1337), NisUtils.toNodeIdList(1338, 1339, 1440, 1441)));
 		}
@@ -178,7 +178,7 @@ public class ClusterTest {
 
 		// Assert:
 		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("default"), IsEqual.equalTo(cluster));
-		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-cluster-id"), IsNot.not(IsEqual.equalTo(cluster)));
+		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-cluster-id"), IsEqual.equalTo(cluster));
 		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-member-ids"), IsNot.not(IsEqual.equalTo(cluster)));
 		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-less-member-ids"), IsNot.not(IsEqual.equalTo(cluster)));
 		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-more-member-ids"), IsNot.not(IsEqual.equalTo(cluster)));
@@ -194,10 +194,10 @@ public class ClusterTest {
 
 		// Assert:
 		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-cluster-id").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-cluster-id").hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-member-ids").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-less-member-ids").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-more-member-ids").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-less-member-ids").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_CLUSTER_MAP.get("diff-more-member-ids").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 	}
 
 	// endregion

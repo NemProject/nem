@@ -284,6 +284,69 @@ public class InterLevelProximityMatrixTest {
 		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
 	}
 
+	@Test
+	public void matricesAreCalculatedCorrectlyForGraphWithThreeClustersTwoHubsAndThreeOutliers() {
+		// Act:
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+
+		// Assert:
+		assertInterLevelMatrixForGraphWithThreeClustersTwoHubsAndThreeOutliers(interLevel);
+	}
+
+	/**
+	 * Asserts that the inter-level matrix is correct for the well known graph GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS.
+	 *
+	 * @param interLevel The inter-level matrix to check.
+	 */
+	public static void assertInterLevelMatrixForGraphWithThreeClustersTwoHubsAndThreeOutliers(final InterLevelProximityMatrix interLevel) {
+		final SparseMatrix a = new SparseMatrix(20, 8, 4);
+		final SparseMatrix r = new SparseMatrix(8, 20, 4);
+
+		// cluster 1
+		for (final int i : Arrays.asList(0, 1, 4, 10, 14)) {
+			a.setAt(i, 0, 1);
+			r.setAt(0, i, 1.0 / 5.0); // N(i): 1; |A(0)|: 5
+		}
+
+		// cluster 2
+		for (final int i : Arrays.asList(2, 3, 7, 9, 15)) {
+			a.setAt(i, 1, 1);
+			r.setAt(1, i, 1.0 / 5.0); // N(i): 1; |A(1)|: 5
+		}
+
+		// cluster 3
+		for (final int i : Arrays.asList(5, 6, 8, 11, 12)) {
+			a.setAt(i, 2, 1);
+			r.setAt(2, i, 1.0 / 5.0); // N(i): 1; |A(2)|: 5
+		}
+
+		// hubs
+		a.setAt(16, 3, 1);
+		a.setAt(18, 4, 1);
+
+		for (final int i : Arrays.asList(0, 1, 2)) {
+			r.setAt(i, 16, 1.0 / 25.0); // N(16): 5; |A(i)|: 5
+			r.setAt(i, 18, 1.0 / 25.0);
+		}
+
+		r.setAt(3, 16, 1.0 / 5.0); // N(16): 5; |A(3)|: 1
+		r.setAt(4, 18, 1.0 / 5.0); // N(18): 5; |A(4)|: 1
+		r.setAt(6, 16, 1.0 / 5.0); // N(16): 5; |A(6)|: 1
+		r.setAt(7, 18, 1.0 / 5.0); // N(18): 5; |A(7)|: 1
+
+		// outliers
+		a.setAt(13, 5, 1);
+		a.setAt(17, 6, 1);
+		a.setAt(19, 7, 1);
+
+		r.setAt(5, 13, 1.0); // N(13): 1; |A(5)|: 1
+		r.setAt(6, 17, 1.0); // N(17): 1; |A(6)|: 1
+		r.setAt(7, 19, 1.0); // N(19): 1; |A(7)|: 1
+
+		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
+		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+	}
+
 	/**
 	 * <pre>
 	 *      0

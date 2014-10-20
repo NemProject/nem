@@ -143,6 +143,35 @@ public class OutlinkMatrixFactory {
 				break;
 			}
 
+			case GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS: {
+				matrix = new DenseMatrix(20, 20);
+				matrix.setAt(1, 0, 1);
+				matrix.setAt(4, 0, 1);
+				matrix.setAt(4, 1, 1);
+				matrix.setAt(2, 3, 1);
+				matrix.setAt(7, 3, 1);
+				matrix.setAt(9, 3, 1);
+				matrix.setAt(15, 3, 1);
+				matrix.setAt(10, 4, 1);
+				matrix.setAt(14, 4, 1);
+				matrix.setAt(6, 5, 1);
+				matrix.setAt(8, 5, 1);
+				matrix.setAt(11, 5, 1);
+				matrix.setAt(12, 5, 1);
+				matrix.setAt(6, 8, 1);
+				matrix.setAt(2, 9, 1);
+				matrix.setAt(3, 16, 1);
+				matrix.setAt(4, 16, 1);
+				matrix.setAt(5, 16, 1);
+				matrix.setAt(17, 16, 1);
+				matrix.setAt(3, 18, 1);
+				matrix.setAt(4, 18, 1);
+				matrix.setAt(5, 18, 1);
+				matrix.setAt(19, 18, 1);
+				matrix = makeAntiSymmetric(matrix);
+				break;
+			}
+
 			default: {
 				throw new IllegalArgumentException("unknown graph");
 			}

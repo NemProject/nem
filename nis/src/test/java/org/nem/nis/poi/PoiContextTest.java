@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -82,7 +82,7 @@ public class PoiContextTest {
 	public void outlinkScoreVectorIsInitializedCorrectlyWhenThereAreBidirectionalFlows() {
 		// Act:
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setNegativeOutlinkWeight(0.4);
+		poiOptionsBuilder.setNegativeOutlinkWeight(0.6);
 		final PoiContext context = createTestPoiContextWithAccountLinks(poiOptionsBuilder.create());
 
 		// Assert:
@@ -92,7 +92,7 @@ public class PoiContextTest {
 		// (4) net outflows are used instead of total outflows
 		Assert.assertThat(
 				context.getOutlinkScoreVector().roundTo(5),
-				IsEqual.equalTo(new ColumnVector(9e06, 0, 0.4 * -15e06, 8e06)));
+				IsEqual.equalTo(new ColumnVector(9 * MIN_OUTLINK_WEIGHT, 0, 0.6 * -15 * MIN_OUTLINK_WEIGHT, 8 * MIN_OUTLINK_WEIGHT)));
 	}
 
 	@Test
@@ -111,14 +111,18 @@ public class PoiContextTest {
 	@Test
 	public void outlierVectorIsSetCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(DEFAULT_OPTIONS);
+		final PoiContext context = createTestPoiContextWithRealGraph(DEFAULT_OPTIONS);
 
 		// Assert:
 		// (1) values corresponding to outliers are 1
 		// (2) values corresponding to non-outliers are 0
+		final ColumnVector expectedOutlierVector = new ColumnVector(20);
+		expectedOutlierVector.setAt(13, 1);
+		expectedOutlierVector.setAt(17, 1);
+		expectedOutlierVector.setAt(19, 1);
 		Assert.assertThat(
 				context.getOutlierVector(),
-				IsEqual.equalTo(new ColumnVector(0, 0, 1, 0, 0, 0, 0, 1, 0, 1)));
+				IsEqual.equalTo(expectedOutlierVector));
 	}
 
 	@Test
@@ -126,14 +130,19 @@ public class PoiContextTest {
 		// Act:
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setOutlierWeight(0.75);
-		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(builder.create());
+		final PoiContext context = createTestPoiContextWithRealGraph(builder.create());
 
 		// Assert:
 		// (1) values corresponding to outliers are 0.75
 		// (2) values corresponding to non-outliers are 1
+		final ColumnVector expectedGraphWeightVector = new ColumnVector(20);
+		expectedGraphWeightVector.setAll(1);
+		expectedGraphWeightVector.setAt(13, 0.75);
+		expectedGraphWeightVector.setAt(17, 0.75);
+		expectedGraphWeightVector.setAt(19, 0.75);
 		Assert.assertThat(
 				context.getGraphWeightVector(),
-				IsEqual.equalTo(new ColumnVector(1, 1, 0.75, 1, 1, 1, 1, 0.75, 1, 0.75)));
+				IsEqual.equalTo(expectedGraphWeightVector));
 	}
 
 	//endregion
@@ -185,7 +194,7 @@ public class PoiContextTest {
 		// (0, 1, 8), (0, 2, 4), (1, 0, 2), (1, 2, 6), (3, 0, 3), (3, 2, 5)
 		// ==> (0, 1, 6), (0, 2, 4), (1, 2, 6), (3, 2, 5)
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
-		poiOptionsBuilder.setMinOutlinkWeight(Amount.fromNem(4));
+		poiOptionsBuilder.setMinOutlinkWeight(Amount.fromMicroNem(4 * MIN_OUTLINK_WEIGHT));
 		final PoiOptions options = poiOptionsBuilder.create();
 		final PoiContext context = createTestPoiContextWithAccountLinks(options);
 
@@ -207,35 +216,11 @@ public class PoiContextTest {
 	@Test
 	public void interLevelProximityMatrixIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndOneOutlier();
+		final PoiContext context = createTestPoiContextWithRealGraph(DEFAULT_OPTIONS);
 
 		// Assert:
 		final InterLevelProximityMatrix interLevel = context.getInterLevelMatrix();
-		final SparseMatrix a = new SparseMatrix(8, 4, 4);
-		a.setAt(0, 0, 1.0);
-		a.setAt(1, 0, 1.0);
-		a.setAt(2, 0, 1.0);
-		a.setAt(3, 2, 1.0);
-		a.setAt(4, 1, 1.0);
-		a.setAt(5, 1, 1.0);
-		a.setAt(6, 1, 1.0);
-		a.setAt(7, 3, 1.0);
-
-		final SparseMatrix r = new SparseMatrix(4, 8, 8);
-		r.setAt(0, 0, 1.0 / 3.0); // N(0): 1; |A(0)|: 3
-		r.setAt(0, 1, 1.0 / 3.0); // N(1): 1; |A(0)|: 3
-		r.setAt(0, 2, 1.0 / 9.0); // N(2): 3; |A(0)|: 3
-		r.setAt(1, 3, 1.0 / 6.0); // N(3): 2; |A(1)|: 3
-		r.setAt(1, 4, 1.0 / 3.0); // N(4): 1; |A(1)|: 3
-		r.setAt(1, 5, 1.0 / 3.0); // N(5): 1; |A(1)|: 3
-		r.setAt(1, 6, 1.0 / 3.0); // N(6): 1; |A(1)|: 3
-		r.setAt(2, 2, 1.0 / 3.0); // N(2): 3; |A(2)|: 1
-		r.setAt(2, 3, 1.0 / 2.0); // N(3): 2; |A(2)|: 1
-		r.setAt(3, 2, 1.0 / 3.0); // N(2): 3; |A(3)|: 1
-		r.setAt(3, 7, 1.0 / 1.0); // N(7): 1; |A(3)|: 1
-
-		Assert.assertThat(interLevel.getA(), IsEqual.equalTo(a));
-		Assert.assertThat(interLevel.getR(), IsEqual.equalTo(r));
+		InterLevelProximityMatrixTest.assertInterLevelMatrixForGraphWithThreeClustersTwoHubsAndThreeOutliers(interLevel);
 	}
 
 	//endregion
@@ -245,21 +230,14 @@ public class PoiContextTest {
 	@Test
 	public void clusteringResultIsInitializedCorrectly() {
 		// Act:
-		final PoiContext context = createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(DEFAULT_OPTIONS);
+		final PoiContext context = createTestPoiContextWithRealGraph(DEFAULT_OPTIONS);
+		final ClusteringResult result = context.getClusteringResult();
 
-		// Assert: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
-		final List<Cluster> clusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 4)),
-				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 8)));
-		final List<Cluster> hubs = Arrays.asList(new Cluster(new NodeId(3)));
-		final List<Cluster> outliers = Arrays.asList(
-				new Cluster(new NodeId(2)),
-				new Cluster(new NodeId(7)),
-				new Cluster(new NodeId(9)));
-
-		Assert.assertThat(context.getClusteringResult().getClusters(), IsEqual.equalTo(clusters));
-		Assert.assertThat(context.getClusteringResult().getHubs(), IsEqual.equalTo(hubs));
-		Assert.assertThat(context.getClusteringResult().getOutliers(), IsEqual.equalTo(outliers));
+		// Assert:
+		final ClusteringResult expectedResult = IdealizedClusterFactory.create(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
+		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
+		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
 	}
 
 	//endregion
@@ -451,28 +429,14 @@ public class PoiContextTest {
 		return new PoiContext(accountStates, height, poiOptions);
 	}
 
-	/**
-	 * <pre>
-	 * Graph:         0
-	 *               / \
-	 *              o   o
-	 *             1----o2----o7
-	 *                   |
-	 *                   o
-	 *                   3
-	 *                   |
-	 *                   o
-	 *                   4
-	 *                  / \
-	 *                 o   o
-	 *                5----o6
-	 * </pre>
-	 * Expected: clusters {0,1,2} and {4,5,6}, one hub {3}, one outlier {7}
-	 */
-	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndOneOutlier() {
-		// Arrange: create 8 accounts
+
+	private static PoiContext createTestPoiContextWithRealGraph(final PoiOptions poiOptions) {
+		// Arrange:
+		final Matrix matrix = OutlinkMatrixFactory.create(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+
+		// create accounts
 		final List<TestAccountInfo> accountInfos = new ArrayList<>();
-		for (int i = 0; i < 8; ++i) {
+		for (int i = 0; i < matrix.getRowCount(); ++i) {
 			accountInfos.add(new TestAccountInfo(MIN_HARVESTING_BALANCE));
 		}
 
@@ -480,60 +444,13 @@ public class PoiContextTest {
 		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// set up account links
-		addAccountLink(height, accountStates.get(0), accountStates.get(1), 1);
-		addAccountLink(height, accountStates.get(0), accountStates.get(2), 1);
-		addAccountLink(height, accountStates.get(1), accountStates.get(2), 1);
-		addAccountLink(height, accountStates.get(2), accountStates.get(7), 1);
-		addAccountLink(height, accountStates.get(2), accountStates.get(3), 1);
-		addAccountLink(height, accountStates.get(3), accountStates.get(4), 1);
-		addAccountLink(height, accountStates.get(4), accountStates.get(5), 1);
-		addAccountLink(height, accountStates.get(4), accountStates.get(6), 1);
-		addAccountLink(height, accountStates.get(5), accountStates.get(6), 1);
-
-		// Act:
-		return createPoiContext(accountStates, height);
-	}
-
-	/**
-	 * <pre>
-	 * Graph:         0
-	 *               / \
-	 *              o   o
-	 *             1----o4----o7
-	 *                   |
-	 *                   o
-	 *              9o---3
-	 *              |    |
-	 *              o    o
-	 *              2    5
-	 *                  / \
-	 *                 o   o
-	 *                8----o6
-	 * </pre>
-	 * Expected: clusters {0, 1, 4} and {5, 6, 8}, one hub {3}, three outlier {2, 7, 9}
-	 */
-	private static PoiContext createTestPoiContextWithTwoClustersOneHubAndThreeOutliers(final PoiOptions poiOptions) {
-		// Arrange: create 10 accounts
-		final List<TestAccountInfo> accountInfos = new ArrayList<>();
-		for (int i = 0; i < 10; ++i) {
-			accountInfos.add(new TestAccountInfo(MIN_HARVESTING_BALANCE));
+		for (int i = 0; i < matrix.getRowCount(); ++i) {
+			final MatrixNonZeroElementRowIterator iterator = matrix.getNonZeroElementRowIterator(i);
+			while (iterator.hasNext()) {
+				final MatrixElement element = iterator.next();
+				addAccountLink(height, accountStates.get(element.getColumn()), accountStates.get(element.getRow()), 1);
+			}
 		}
-
-		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
-
-		// set up account links
-		addAccountLink(height, accountStates.get(0), accountStates.get(1), 1);
-		addAccountLink(height, accountStates.get(0), accountStates.get(4), 1);
-		addAccountLink(height, accountStates.get(1), accountStates.get(4), 1);
-		addAccountLink(height, accountStates.get(4), accountStates.get(7), 1);
-		addAccountLink(height, accountStates.get(4), accountStates.get(3), 1);
-		addAccountLink(height, accountStates.get(3), accountStates.get(5), 1);
-		addAccountLink(height, accountStates.get(3), accountStates.get(9), 1);
-		addAccountLink(height, accountStates.get(5), accountStates.get(8), 1);
-		addAccountLink(height, accountStates.get(5), accountStates.get(6), 1);
-		addAccountLink(height, accountStates.get(8), accountStates.get(6), 1);
-		addAccountLink(height, accountStates.get(9), accountStates.get(2), 1);
 
 		// Act:
 		return new PoiContext(accountStates, height, poiOptions);
