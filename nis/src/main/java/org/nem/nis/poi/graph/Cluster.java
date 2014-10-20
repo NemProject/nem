@@ -3,6 +3,7 @@ package org.nem.nis.poi.graph;
 import org.nem.core.model.primitive.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A cluster represents a set of nodes that share certain similarity (i.e. are closely connected).
@@ -94,7 +95,7 @@ public class Cluster {
 
 	@Override
 	public int hashCode() {
-		return this.id.getRaw();
+		return this.memberIds.stream().collect(Collectors.summingInt(NodeId::getRaw));
 	}
 
 	@Override
@@ -105,7 +106,7 @@ public class Cluster {
 
 		// The id is not relevant for a cluster
 		final Cluster rhs = (Cluster)obj;
-		return this.id.equals(rhs.id) && this.memberIds.equals(rhs.memberIds);
+		return this.memberIds.equals(rhs.memberIds);
 	}
 
 	//endregion
