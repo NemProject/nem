@@ -125,7 +125,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 				UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
 				"UPDATING LOCAL NODE ENDPOINT");
 		this.addSimpleTask(
-				this.runnableToFutureSupplier(() -> network.checkChainSynchronization()),
+				() -> network.checkChainSynchronization(),
 				CHECK_CHAIN_SYNC_INTERVAL,
 				"CHECKING CHAIN SYNCHRONIZATION");
 	}

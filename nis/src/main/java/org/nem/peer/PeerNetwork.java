@@ -4,6 +4,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
+import org.nem.nis.service.ChainServices;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
@@ -146,8 +147,10 @@ public class PeerNetwork {
 	/**
 	 * Checks if the local chain is synchronized with the rest of the network and updates the network's state.
 	 */
-	public void checkChainSynchronization() {
-		this.state.setChainSynchronized(this.servicesFactory.getChainServices().isChainSynchronized(this.getLocalNode()));
+	public CompletableFuture<Void> checkChainSynchronization() {
+		final ChainServices chainServices = this.servicesFactory.getChainServices();
+		return chainServices.isChainSynchronized(this.getNodes().getActiveNodes())
+				.thenAccept(this.state::setChainSynchronized);
 	}
 
 	/**

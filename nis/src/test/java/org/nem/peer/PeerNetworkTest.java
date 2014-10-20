@@ -217,9 +217,11 @@ public class PeerNetworkTest {
 		final TestContext context = new TestContext();
 		final ChainServices services = Mockito.mock(ChainServices.class);
 		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
+		Mockito.when(context.state.getNodes()).thenReturn(new NodeCollection());
+		Mockito.when(services.isChainSynchronized(Mockito.any())).thenReturn(CompletableFuture.completedFuture(true));
 
 		// Act:
-		context.network.checkChainSynchronization();
+		context.network.checkChainSynchronization().join();
 
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.times(1)).getChainServices();
@@ -231,13 +233,16 @@ public class PeerNetworkTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final ChainServices services = Mockito.mock(ChainServices.class);
-		final Node node = PeerUtils.createNodeWithName("r");
-		Mockito.when(services.isChainSynchronized(node)).thenReturn(true);
 		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
-		Mockito.when(context.state.getLocalNode()).thenReturn(node);
+
+		final NodeCollection nodes = new NodeCollection();
+		nodes.update(PeerUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
+		nodes.update(PeerUtils.createNodeWithName("b"), NodeStatus.INACTIVE);
+		Mockito.when(context.state.getNodes()).thenReturn(nodes);
+		Mockito.when(services.isChainSynchronized(context.state.getNodes().getActiveNodes())).thenReturn(CompletableFuture.completedFuture(true));
 
 		// Act:
-		context.network.checkChainSynchronization();
+		context.network.checkChainSynchronization().join();
 
 		// Assert:
 		Mockito.verify(context.state, Mockito.times(1)).setChainSynchronized(true);

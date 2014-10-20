@@ -22,30 +22,36 @@ public class ChainServicesTest {
 	public void isChainSynchronizedReturnsTrueIfLocalChainHasEqualChainScore() {
 		// Arrange:
 		final TestContext context = new TestContext(30);
-		final Node node = context.createNode("test");
+
+		// Act:
+		final boolean isSynchronized = context.services.isChainSynchronized(context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(context.services.isChainSynchronized(node), IsEqual.equalTo(true));
+		Assert.assertThat(isSynchronized, IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void isChainSynchronizedReturnsTrueIfLocalChainHasBetterChainScore() {
 		// Arrange:
 		final TestContext context = new TestContext(31);
-		final Node node = context.createNode("test");
+
+		// Act:
+		final boolean isSynchronized = context.services.isChainSynchronized(context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(context.services.isChainSynchronized(node), IsEqual.equalTo(true));
+		Assert.assertThat(isSynchronized, IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void isChainSynchronizedReturnsFalseIfLocalChainHasWorseChainScore() {
 		// Arrange:
 		final TestContext context = new TestContext(29);
-		final Node node = context.createNode("test");
+
+		// Act:
+		final boolean isSynchronized = context.services.isChainSynchronized(context.nodes.asCollection()).join();
 
 		// Assert:
-		Assert.assertThat(context.services.isChainSynchronized(node), IsEqual.equalTo(false));
+		Assert.assertThat(isSynchronized, IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -54,15 +60,6 @@ public class ChainServicesTest {
 
 	@Test
 	public void getMaxChainHeightAsyncReturnsMaxHeightOnSuccess() {
-		// Assert:
-		assertGetMaxChainHeightAsyncReturnsMaxHeightOnSuccess((context, nodes) -> {
-			final Node node = context.createNode("test");
-			return context.services.getMaxChainHeightAsync(node);
-		});
-	}
-
-	@Test
-	public void getMaxChainHeightAsyncNodeCollectionOverloadReturnsMaxHeightOnSuccess() {
 		// Assert:
 		assertGetMaxChainHeightAsyncReturnsMaxHeightOnSuccess((context, nodes) -> context.services.getMaxChainHeightAsync(nodes));
 	}
@@ -88,15 +85,6 @@ public class ChainServicesTest {
 	@Test
 	public void getMaxChainHeightAsyncIgnoresFailedNodes() {
 		// Assert:
-		assertGetMaxChainHeightAsyncIgnoresFailedNodes((context, nodes) -> {
-			final Node node = context.createNode("test");
-			return context.services.getMaxChainHeightAsync(node);
-		});
-	}
-
-	@Test
-	public void getMaxChainHeightAsyncNodeCollectionOverloadIgnoresFailedNodes() {
-		// Assert:
 		assertGetMaxChainHeightAsyncIgnoresFailedNodes((context, nodes) -> context.services.getMaxChainHeightAsync(nodes));
 	}
 
@@ -120,15 +108,6 @@ public class ChainServicesTest {
 
 	@Test
 	public void getMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail() {
-		// Assert:
-		assertGetMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail((context, nodes) -> {
-			final Node node = context.createNode("test");
-			return context.services.getMaxChainHeightAsync(node);
-		});
-	}
-
-	@Test
-	public void getMaxChainHeightAsyncNodeCollectionOverloadReturnsBlockHeightOneIfAllNodesFail() {
 		// Assert:
 		assertGetMaxChainHeightAsyncReturnsBlockHeightOneIfAllNodesFail((context, nodes) -> context.services.getMaxChainHeightAsync(nodes));
 	}
@@ -159,10 +138,9 @@ public class ChainServicesTest {
 	public void isChainSynchronizedDelegatesToBlockChainLastBlockChainLayer() {
 		// Arrange:
 		final TestContext context = new TestContext(29);
-		final Node node = context.createNode("test");
 
 		// Act:
-		context.services.isChainSynchronized(node);
+		context.services.isChainSynchronized(context.nodes.asCollection()).join();
 
 		// Assert:
 		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
@@ -172,13 +150,11 @@ public class ChainServicesTest {
 	public void getMaxChainHeightAsyncDelegatesToConnectorPool() {
 		// Arrange:
 		final TestContext context = new TestContext(29);
-		final Node node = context.createNode("test");
 
 		// Act:
-		context.services.getMaxChainHeightAsync(node);
+		context.services.getMaxChainHeightAsync(context.nodes.asCollection()).join();
 
 		// Assert:
-		Mockito.verify(context.connectorPool, Mockito.times(1)).getPeerConnector(null);
 		Mockito.verify(context.connectorPool, Mockito.times(3)).getSyncConnector(null);
 	}
 

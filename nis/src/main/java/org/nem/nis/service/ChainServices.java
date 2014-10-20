@@ -28,25 +28,17 @@ public class ChainServices {
 	}
 
 	/**
-	 * Gets a value indicating whether or not the local chain is synchronized with the given node's active peers.
+	 * Gets a value indicating whether or not the local chain is synchronized with respect to the specified nodes.
 	 *
-	 * @param node The node.
+	 * @param nodes The nodes.
 	 * @return true if the local chain is synchronized, false otherwise.
 	 */
-	public boolean isChainSynchronized(final Node node) {
-		final BlockHeight maxHeight = this.getMaxChainHeightAsync(node).join();
-		return new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()).compareTo(maxHeight) >= 0;
-	}
-
-	/**
-	 * Gets the maximum block chain height for the active neighbor peers of the specified NIS nodes.
-	 *
-	 * @param node The node.
-	 * @return The maximum block chain height.
-	 */
-	public CompletableFuture<BlockHeight> getMaxChainHeightAsync(final Node node) {
-		return this.connectorPool.getPeerConnector(null).getKnownPeers(node)
-				.thenCompose(nodes -> this.getMaxChainHeightAsync(nodes.asCollection()));
+	public CompletableFuture<Boolean> isChainSynchronized(final Collection<Node> nodes) {
+		return this.getMaxChainHeightAsync(nodes)
+				.thenApply(maxHeight -> {
+					final BlockHeight localBlockHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
+					return localBlockHeight.compareTo(maxHeight) >= 0;
+				});
 	}
 
 	/**
