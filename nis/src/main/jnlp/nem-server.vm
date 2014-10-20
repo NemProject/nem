@@ -6,7 +6,8 @@
     <homepage href="http://www.ournem.com"/>
     <description>NEM Server</description>
     <icon href="images/nis_64x64.ico"/>
-    <icon href="images/nis_32x32.ico"/>
+    <icon href="images/nis_32x32.png"/>
+    <icon kind="splash" href="images/splash_screen.png"/>
   </information>
   <security>
       <all-permissions/>
@@ -15,7 +16,8 @@
   <resources>
     <java version="1.8+" java-vm-args="-esa -Xnoclassgc"/>
     $dependencies
+<!-- Progress Bar add download="progress" -->
 </resources>
-  <application-desc main-class="$mainClass">
+  <application-desc main-class="$mainClass" progress-class="org.nem.client.download.SplashProgressBar">
   </application-desc>
 </jnlp> 
