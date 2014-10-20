@@ -149,5 +149,38 @@ public enum GraphType {
 	 * Hubs: {3}, {7}
 	 * Outliers: {8}, {9}
 	 */
-	GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS
+	GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS,
+
+	// TODO 20141019: most of the above graphs are no longer correct after changing the poi parameters
+	// > fixing them leads to graphs like the following; not sure if that's the best use of time:
+
+	/**
+	 * 	/**
+	 * <pre>
+	 * Graph:         0    14
+	 *               / \   o
+	 *              o   o /
+	 *             1----o4----o10
+	 *
+	 *                2    15
+	 *               o o   o
+	 *               |  \ /
+	 *              9o---3---o7    16---o3,4,5o---18
+	 *                              |             |
+	 *                              o             o
+	 *             12o---5---o11   17             19
+	 *                  / \
+	 *                 o   o         13
+	 *                8----o6
+	 * <br/>
+	 * sim(16, 3) = (|{16,3}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
+	 * sim(16, 4) = (|{16,4}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
+	 * sim(16, 5) = (|{16,5}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
+	 * </pre>
+	 * Expected:
+	 * Clusters {0, 1, 4, 10, 14}, {2, 3, 7, 9, 15}, {5, 6, 8, 11, 12}
+	 * Hubs: {16}, {18}
+	 * Outliers: {13}, {17}, {19}
+	 */
+	GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS
 }

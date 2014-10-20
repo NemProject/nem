@@ -71,6 +71,17 @@ public class IdealizedClusterFactory {
 				outliers.add(new Cluster(new NodeId(9)));
 				break;
 
+			case GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS:
+				clusters.add(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 4, 10, 14)));
+				clusters.add(new Cluster(new ClusterId(2), NisUtils.toNodeIdList(2, 3, 7, 9, 15)));
+				clusters.add(new Cluster(new ClusterId(5), NisUtils.toNodeIdList(5, 6, 8, 11 ,12)));
+				hubs.add(new Cluster(new NodeId(16)));
+				hubs.add(new Cluster(new NodeId(18)));
+				outliers.add(new Cluster(new NodeId(13)));
+				outliers.add(new Cluster(new NodeId(17)));
+				outliers.add(new Cluster(new NodeId(19)));
+				break;
+
 			default: {
 				throw new IllegalArgumentException("unknown graph");
 			}
