@@ -19,6 +19,14 @@ public class PoiImportanceCalculatorTest {
 	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();
 	private static final ImportanceScorer DEFAULT_IMPORTANCE_SCORER = new PoiScorer();
 
+	/**
+	 * This is currently used as a multipler for amounts in many tests.
+	 * Both the initial balance and outlink amounts are multiplied by this constant.
+	 * This ensures that the ratios crafted when the tests were written are unchanged.
+	 * While it might look weird to multiply an initial balance by this constant, it is correct.
+	 */
+	private static final long MIN_OUTLINK_WEIGHT = DEFAULT_OPTIONS.getMinOutlinkWeight().getNumMicroNem();
+
 	@Test
 	public void fastScanClusteringResultsInSameImportancesAsScan() {
 		// Act:
@@ -70,9 +78,9 @@ public class PoiImportanceCalculatorTest {
 			}
 		}
 
-		// Assert: max index and next max index are 4 and 5
-		Assert.assertThat(maxIndex + nextMaxIndex, IsEqual.equalTo(9));
-		Assert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(1));
+		// Assert: max index and next max index are 2 and 4
+		Assert.assertThat(maxIndex + nextMaxIndex, IsEqual.equalTo(6));
+		Assert.assertThat(Math.abs(maxIndex - nextMaxIndex), IsEqual.equalTo(2));
 	}
 
 	private static double calculateDistanceBetweenFastScanAndOtherImportances(final GraphClusteringStrategy clusteringStrategy) {
@@ -89,7 +97,7 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy) {
-		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
+		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
@@ -266,14 +274,10 @@ public class PoiImportanceCalculatorTest {
 		builder.setTeleportationProbability(0.8);
 		builder.setInterLevelTeleportationProbability(0.1);
 		final ColumnVector importances = calculateImportances(builder.create(), height, accountStates);
-		final ColumnVector balances = getBalances(height, accountStates);
 
 		// Assert:
 		// - all balances should be within a small range
-		for (int i = 0; i < balances.size(); ++i) {
-			final double balance = balances.getAt(i);
-			Assert.assertThat(balance >= 2000 && balance < 2005, IsEqual.equalTo(true));
-		}
+		assertBalancesInRange(height, accountStates, 2000, 2005);
 
 		// - all importances should be within a small range
 		for (int i = 0; i < importances.size(); ++i) {
@@ -619,16 +623,20 @@ public class PoiImportanceCalculatorTest {
 			final PoiAccountState recipientAccountState,
 			final BlockHeight blockHeight,
 			final Amount amount) {
-		senderAccountState.getWeightedBalances().addSend(blockHeight, amount);
+		final Amount adjustedAmount = Amount.fromMicroNem(amount.getNumNem() * MIN_OUTLINK_WEIGHT);
+		senderAccountState.getWeightedBalances().addSend(blockHeight, adjustedAmount);
 		senderAccountState.getImportanceInfo().addOutlink(
-				new AccountLink(blockHeight, amount, recipientAccountState.getAddress()));
+				new AccountLink(blockHeight, adjustedAmount, recipientAccountState.getAddress()));
 
-		recipientAccountState.getWeightedBalances().addReceive(blockHeight, amount);
+		recipientAccountState.getWeightedBalances().addReceive(blockHeight, adjustedAmount);
 	}
 
 	private static PoiAccountState createAccountStateWithBalance(final Amount balance) {
+		// multiply the balance by MIN_OUTLINK_WEIGHT so that the ratio between balances
+		// and outlink amounts stays the same
+		final Amount adjustedBalance = Amount.fromMicroNem(balance.getNumNem() * MIN_OUTLINK_WEIGHT);
 		final PoiAccountState accountState = new PoiAccountState(Utils.generateRandomAddress());
-		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
+		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, adjustedBalance);
 		return accountState;
 	}
 
@@ -710,8 +718,27 @@ public class PoiImportanceCalculatorTest {
 		final ColumnVector balances = getBalances(blockHeight, accountStates);
 
 		// Assert:
+		final double adjustedAmount = Amount.fromMicroNem((long)(amount * MIN_OUTLINK_WEIGHT)).getNumNem();
 		for (int i = 0; i < balances.size(); ++i) {
-			Assert.assertThat(balances.getAt(i), IsEqual.equalTo(amount));
+			Assert.assertThat(balances.getAt(i), IsEqual.equalTo(adjustedAmount));
+		}
+	}
+
+	private static void assertBalancesInRange(
+			final BlockHeight blockHeight,
+			final Collection<PoiAccountState> accountStates,
+			final double lowAmount,
+			final double highAmount) {
+		// Act:
+		final ColumnVector balances = getBalances(blockHeight, accountStates);
+
+		// Assert:
+		final double adjustedLowAmount = Amount.fromMicroNem((long)(lowAmount * MIN_OUTLINK_WEIGHT)).getNumNem();
+		final double adjustedHighAmount = Amount.fromMicroNem((long)(highAmount * MIN_OUTLINK_WEIGHT)).getNumNem();
+
+		for (int i = 0; i < balances.size(); ++i) {
+			final double balance = balances.getAt(i);
+			Assert.assertThat(balance >= adjustedLowAmount && balance < adjustedHighAmount, IsEqual.equalTo(true));
 		}
 	}
 
