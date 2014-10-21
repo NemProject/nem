@@ -7,7 +7,9 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 public class ArrayUtilsTest {
+
 	//region duplicate
+
 	@Test
 	public void duplicateIsNotReference() {
 		// Arrange:
@@ -21,30 +23,32 @@ public class ArrayUtilsTest {
 	}
 
 	@Test
-	public void duplicateIsEqual() {
-		// Arrange:
-		final byte[] src1 = new byte[] { 1, 2, 3, 4 };
-		final byte[] src2 = new byte[] { };
+	public void duplicateCanDuplicateEmptyArray() {
+		// Assert:
+		assertCanDuplicate(new byte[] { });
+	}
 
+	@Test
+	public void duplicateCanDuplicateNonEmptyArray() {
+		// Assert:
+		assertCanDuplicate(new byte[] { 1, 2, 3, 4 });
+	}
+
+	private static void assertCanDuplicate(final byte[] bytes) {
 		// Act:
-		final byte[] result1 = ArrayUtils.duplicate(src1);
-		final byte[] result2 = ArrayUtils.duplicate(src2);
+		final byte[] result = ArrayUtils.duplicate(bytes);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(src1));
-		Assert.assertThat(result2, IsEqual.equalTo(src2));
+		Assert.assertThat(result, IsEqual.equalTo(bytes));
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void duplicateThrowsExceptionOnNull() {
-		// Arrange:
-		final byte[] src = null;
-
 		// Act:
-		ArrayUtils.duplicate(src);
+		ArrayUtils.duplicate(null);
 	}
 
-	//endregion duplicate
+	//endregion
 
 	//region concat
 
@@ -264,9 +268,6 @@ public class ArrayUtilsTest {
 
 	@Test
 	public void isEqualsReturnsOneForEqualByteArrays() {
-		// TODO 20141010 J-b: i'm not sure if we need to loop in this test
-		// TODO 20141011 BR -> J: you only want to test a specfic setup?
-
 		// Arrange:
 		final SecureRandom random = new SecureRandom();
 		final byte[] bytes1 = new byte[32];
@@ -275,8 +276,11 @@ public class ArrayUtilsTest {
 			random.nextBytes(bytes1);
 			System.arraycopy(bytes1, 0, bytes2, 0, 32);
 
+			// Act:
+			final int result = ArrayUtils.isEqualConstantTime(bytes1, bytes2);
+
 			// Assert:
-			Assert.assertThat(ArrayUtils.isEqualConstantTime(bytes1, bytes2), IsEqual.equalTo(1));
+			Assert.assertThat(createMessage(bytes1, bytes2), result, IsEqual.equalTo(1));
 		}
 	}
 
@@ -291,9 +295,20 @@ public class ArrayUtilsTest {
 			System.arraycopy(bytes1, 0, bytes2, 0, 32);
 			bytes2[i] = (byte)(bytes2[i] ^ 0xff);
 
+			// Act:
+			final int result = ArrayUtils.isEqualConstantTime(bytes1, bytes2);
+
 			// Assert:
-			Assert.assertThat(ArrayUtils.isEqualConstantTime(bytes1, bytes2), IsEqual.equalTo(0));
+			Assert.assertThat(createMessage(bytes1, bytes2), result, IsEqual.equalTo(0));
 		}
+	}
+
+	private static String createMessage(final byte[] bytes1, final byte[] bytes2) {
+		return String.format(
+				"bytes1: %s%sbytes2: %s",
+				ByteUtils.toString(bytes1),
+				System.lineSeparator(),
+				ByteUtils.toString(bytes2));
 	}
 
 	//endregion

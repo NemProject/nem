@@ -6,11 +6,12 @@ import java.math.BigInteger;
  * Static class that contains a handful of array helper functions.
  */
 public class ArrayUtils {
+
 	/**
 	 * Creates duplicate of given array
 	 *
-	 * @param src - array to duplicate
-	 * @return copy of an array
+	 * @param src The array to duplicate.
+	 * @return A copy of the array.
 	 */
 	public static byte[] duplicate(final byte[] src) {
 		final byte[] result = new byte[src.length];
@@ -99,48 +100,6 @@ public class ArrayUtils {
 		}
 
 		return new BigInteger(bigEndianBytes);
-	}
-
-	/**
-	 * Utility method to find the maximum value in an array.
-	 *
-	 * @param vector - non-empty array of doubles
-	 * @return double in <code>vector</code> that has the largest value.
-	 */
-	public static double max(final double[] vector) {
-		if (vector == null || vector.length < 1) {
-			throw new IllegalArgumentException("input vector is empty");
-		}
-		double max = Double.MIN_VALUE;
-
-		for (final double val : vector) {
-			if (max < val) {
-				max = val;
-			}
-		}
-
-		return max;
-	}
-
-	/**
-	 * Utility method to find the maximum value in an array.
-	 *
-	 * @param vector - non-empty array of longs
-	 * @return double in <code>vector</code> that has the largest value.
-	 */
-	public static long max(final long[] vector) {
-		if (vector == null || vector.length < 1) {
-			throw new IllegalArgumentException("input vector is empty");
-		}
-		long max = Long.MIN_VALUE;
-
-		for (final long val : vector) {
-			if (max < val) {
-				max = val;
-			}
-		}
-
-		return max;
 	}
 
 	/**
