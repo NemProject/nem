@@ -38,18 +38,6 @@ public class Hashes {
 		return hash("SHA3-512", inputs);
 	}
 
-	// TODO 20141010 J-B: should we just replace sha3 with this?
-	// > i would also prefer to hide the message digest in this class
-	// > (like the other overloads)
-	// TODO 20141011 BR -> J: We need both sha3-256 (for secp256k1) and sha3-512 (for ed25519).
-	// TODO 20141011          Aside from that, sure we can hide the message digest. You want to do this?
-	// TODO 20141011 J-BR: yea, i think i would prefer to have all the hash functions look the same
-	// TODO 20141012 BR -> J: sorry to ask again. So I should code it like sha3_256(...) and sha3_512(...) ?
-	// TODO 20141011 J-BR yep:
-	// sha3_256(final byte[]... inputs)
-	// sha3_512(final byte[]... inputs)
-	// TODO 20141014 BR -> J: done.
-
 	/**
 	 * Performs a RIPEMD160 hash of the concatenated inputs.
 	 *

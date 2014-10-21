@@ -5,64 +5,37 @@ import org.junit.*;
 import org.nem.core.test.Utils;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 public class HashesTest {
-
-	// TODO 20141010 J-J refactor some of these tests
+	private static final HashTester Sha3_256_Tester = new HashTester(Hashes::sha3_256, 32);
+	private static final HashTester Sha3_512_Tester = new HashTester(Hashes::sha3_512, 64);
+	private static final HashTester Ripemd160_Tester = new HashTester(Hashes::ripemd160, 20);
 
 	//region sha3_256
 
 	@Test
-	public void sha3_256HashHas32ByteLength() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash = Hashes.sha3_256(input);
-
+	public void sha3_256HashHasExpectedByteLength() {
 		// Assert:
-		Assert.assertThat(hash.length, IsEqual.equalTo(32));
+		Sha3_256_Tester.assertHashHasExpectedLength();
 	}
 
 	@Test
 	public void sha3_256GeneratesSameHashForSameInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_256(input);
-		final byte[] hash2 = Hashes.sha3_256(input);
-
 		// Assert:
-		Assert.assertThat(hash1.length, IsEqual.equalTo(32));
-		Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		Sha3_256_Tester.assertHashIsSameForSameInputs();
 	}
 
 	@Test
 	public void sha3_256GeneratesSameHashForSameMergedInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_256(input);
-		final byte[] hash2 = Hashes.sha3_256(this.split(input));
-
 		// Assert:
-		Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		Sha3_256_Tester.assertHashIsSameForSplitInputs();
 	}
 
 	@Test
 	public void sha3_256GeneratesDifferentHashForDifferentInputs() {
-		// Arrange:
-		final byte[] input1 = Utils.generateRandomBytes();
-		final byte[] input2 = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_256(input1);
-		final byte[] hash2 = Hashes.sha3_256(input2);
-
 		// Assert:
-		Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+		Sha3_256_Tester.assertHashIsDifferentForDifferentInputs();
 	}
 
 	//endregion
@@ -70,56 +43,27 @@ public class HashesTest {
 	//region sha3_512
 
 	@Test
-	public void sha3_512HashHas64ByteLength() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash = Hashes.sha3_512(input);
-
+	public void sha3_512HashHasExpectedByteLength() {
 		// Assert:
-		Assert.assertThat(hash.length, IsEqual.equalTo(64));
+		Sha3_512_Tester.assertHashHasExpectedLength();
 	}
 
 	@Test
 	public void sha3_512GeneratesSameHashForSameInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_512(input);
-		final byte[] hash2 = Hashes.sha3_512(input);
-
 		// Assert:
-		Assert.assertThat(hash1.length, IsEqual.equalTo(64));
-		Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		Sha3_512_Tester.assertHashIsSameForSameInputs();
 	}
 
 	@Test
 	public void sha3_512GeneratesSameHashForSameMergedInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_512(input);
-		final byte[] hash2 = Hashes.sha3_512(this.split(input));
-
 		// Assert:
-		Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		Sha3_512_Tester.assertHashIsSameForSplitInputs();
 	}
 
 	@Test
 	public void sha3_512GeneratesDifferentHashForDifferentInputs() {
-		// Arrange:
-		final byte[] input1 = Utils.generateRandomBytes();
-		final byte[] input2 = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_512(input1);
-		final byte[] hash2 = Hashes.sha3_512(input2);
-
 		// Assert:
-		Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+		Sha3_512_Tester.assertHashIsDifferentForDifferentInputs();
 	}
 
 	//endregion
@@ -127,55 +71,27 @@ public class HashesTest {
 	//region ripemd160
 
 	@Test
-	public void ripemd160HashHas20ByteLength() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash = Hashes.ripemd160(input);
-
+	public void ripemd160HashHasExpectedByteLength() {
 		// Assert:
-		Assert.assertThat(hash.length, IsEqual.equalTo(20));
+		Ripemd160_Tester.assertHashHasExpectedLength();
 	}
 
 	@Test
 	public void ripemd160GeneratesSameHashForSameInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.ripemd160(input);
-		final byte[] hash2 = Hashes.ripemd160(input);
-
 		// Assert:
-		Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		Ripemd160_Tester.assertHashIsSameForSameInputs();
 	}
 
 	@Test
 	public void ripemd160GeneratesSameHashForSameMergedInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.ripemd160(input);
-		final byte[] hash2 = Hashes.ripemd160(this.split(input));
-
 		// Assert:
-		Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		Ripemd160_Tester.assertHashIsSameForSplitInputs();
 	}
 
 	@Test
 	public void ripemd160GeneratesDifferentHashForDifferentInputs() {
-		// Arrange:
-		final byte[] input1 = Utils.generateRandomBytes();
-		final byte[] input2 = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.ripemd160(input1);
-		final byte[] hash2 = Hashes.ripemd160(input2);
-
 		// Assert:
-		Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+		Ripemd160_Tester.assertHashIsDifferentForDifferentInputs();
 	}
 
 	//endregion
@@ -184,38 +100,32 @@ public class HashesTest {
 
 	@Test
 	public void sha3_256AndRipemd160GenerateDifferentHashForSameInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_256(input);
-		final byte[] hash2 = Hashes.ripemd160(input);
-
 		// Assert:
-		Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+		assertHashesAreDifferent(Hashes::sha3_256, Hashes::ripemd160);
 	}
 
 	@Test
 	public void sha3_256AndSha3_512GenerateDifferentHashForSameInputs() {
-		// Arrange:
-		final byte[] input = Utils.generateRandomBytes();
-
-		// Act:
-		final byte[] hash1 = Hashes.sha3_256(input);
-		final byte[] hash2 = Hashes.sha3_512(input);
-
 		// Assert:
-		Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+		assertHashesAreDifferent(Hashes::sha3_256, Hashes::sha3_512);
 	}
 
 	@Test
 	public void sha3_512AndRipemd160GenerateDifferentHashForSameInputs() {
+		// Assert:
+		assertHashesAreDifferent(Hashes::sha3_512, Hashes::ripemd160);
+	}
+
+	private static void assertHashesAreDifferent(
+			final Function<byte[], byte[]> hashFunction1,
+			final Function<byte[], byte[]> hashFunction2) {
+
 		// Arrange:
 		final byte[] input = Utils.generateRandomBytes();
 
 		// Act:
-		final byte[] hash1 = Hashes.sha3_512(input);
-		final byte[] hash2 = Hashes.ripemd160(input);
+		final byte[] hash1 = hashFunction1.apply(input);
+		final byte[] hash2 = hashFunction2.apply(input);
 
 		// Assert:
 		Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
@@ -223,11 +133,71 @@ public class HashesTest {
 
 	//endregion
 
-	private byte[][] split(final byte[] input) {
-		return new byte[][] {
-				Arrays.copyOfRange(input, 0, 17),
-				Arrays.copyOfRange(input, 17, 100),
-				Arrays.copyOfRange(input, 100, input.length)
-		};
+	private static class HashTester {
+		private final Function<byte[], byte[]> hashFunction;
+		private final Function<byte[][], byte[]> hashMultipleFunction;
+		private final int expectedHashLength;
+
+		public HashTester(final Function<byte[][], byte[]> hashMultipleFunction, final int expectedHashLength) {
+			this.hashMultipleFunction = hashMultipleFunction;
+			this.hashFunction = input -> hashMultipleFunction.apply(new byte[][] { input });
+			this.expectedHashLength = expectedHashLength;
+		}
+
+		public void assertHashHasExpectedLength() {
+			// Arrange:
+			final byte[] input = Utils.generateRandomBytes();
+
+			// Act:
+			final byte[] hash = this.hashFunction.apply(input);
+
+			// Assert:
+			Assert.assertThat(hash.length, IsEqual.equalTo(this.expectedHashLength));
+		}
+
+		public void assertHashIsSameForSameInputs() {
+			// Arrange:
+			final byte[] input = Utils.generateRandomBytes();
+
+			// Act:
+			final byte[] hash1 = this.hashFunction.apply(input);
+			final byte[] hash2 = this.hashFunction.apply(input);
+
+			// Assert:
+			Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		}
+
+		public void assertHashIsSameForSplitInputs() {
+			// Arrange:
+			final byte[] input = Utils.generateRandomBytes();
+
+			// Act:
+			final byte[] hash1 = this.hashFunction.apply(input);
+			final byte[] hash2 = this.hashMultipleFunction.apply(split(input));
+
+			// Assert:
+			Assert.assertThat(hash2, IsEqual.equalTo(hash1));
+		}
+
+		public void assertHashIsDifferentForDifferentInputs() {
+			// Arrange:
+			final byte[] input1 = Utils.generateRandomBytes();
+			final byte[] input2 = Utils.generateRandomBytes();
+
+			// Act:
+			final byte[] hash1 = this.hashFunction.apply(input1);
+			final byte[] hash2 = this.hashFunction.apply(input2);
+
+			// Assert:
+			Assert.assertThat(hash2, IsNot.not(IsEqual.equalTo(hash1)));
+		}
+
+		private static byte[][] split(final byte[] input) {
+			return new byte[][] {
+					Arrays.copyOfRange(input, 0, 17),
+					Arrays.copyOfRange(input, 17, 100),
+					Arrays.copyOfRange(input, 100, input.length)
+			};
+		}
 	}
 }
