@@ -66,13 +66,7 @@ public class BasicNodeSelector implements NodeSelector {
 		final List<Node> partnerNodes = new ArrayList<>();
 
 		int numSelectedNodes;
-		double remainingTrust = 0.0;
-		for (int i = 0; i < nodes.length; ++i) {
-			if (this.isCandidate(nodes[i])) {
-				remainingTrust += this.trustVector.getAt(i);
-			}
-		}
-
+		double remainingTrust = 1.0;
 		do {
 			numSelectedNodes = partnerNodes.size();
 
@@ -81,7 +75,12 @@ public class BasicNodeSelector implements NodeSelector {
 			for (int i = 0; i < nodes.length; ++i) {
 				// skip nodes with zero trust and those that have already been used
 				final double trust = this.trustVector.getAt(i);
-				if (0 == trust || usedNodes[i] || !this.isCandidate(nodes[i])) {
+				if (0 == trust || usedNodes[i]) {
+					continue;
+				}
+
+				if (!this.isCandidate(nodes[i])) {
+					sum += trust;
 					continue;
 				}
 
