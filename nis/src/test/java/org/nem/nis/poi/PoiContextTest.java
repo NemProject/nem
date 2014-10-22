@@ -429,7 +429,6 @@ public class PoiContextTest {
 		return new PoiContext(accountStates, height, poiOptions);
 	}
 
-
 	private static PoiContext createTestPoiContextWithRealGraph(final PoiOptions poiOptions) {
 		// Arrange:
 		final Matrix matrix = OutlinkMatrixFactory.create(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);

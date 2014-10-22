@@ -81,14 +81,12 @@ public enum GraphTypeEpsilon040 {
 	GRAPH_TWO_CLUSTERS_ONE_HUB_THREE_OUTLIERS,
 
 	/**
-	 * 	/**
 	 * <pre>
-	 * Graph:         0    14
-	 *               / \   o
-	 *              o   o /
-	 *             1----o4----o10
-	 *                  o
-	 *
+	 * Graph:                               0    14
+	 *                                     / \   o
+	 *                                    o   o /
+	 *                                   1----o4----o10
+	 *                                        o
 	 *                2    15
 	 *               o o   o
 	 *               |  \ /

@@ -3,7 +3,7 @@ package org.nem.nis.poi.graph;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.math.*;
+import org.nem.core.math.Matrix;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.poi.*;

@@ -408,6 +408,7 @@ public class InterLevelProximityMatrixTest {
 	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphType graphType) {
 		return createInterLevelMatrix(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType));
 	}
+
 	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphTypeEpsilon040 graphType) {
 		return createInterLevelMatrix(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType));
 	}
