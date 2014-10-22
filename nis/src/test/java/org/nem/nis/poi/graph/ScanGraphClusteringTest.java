@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.poi.PoiOptionsBuilder;
+import org.nem.nis.poi.*;
 import org.nem.nis.test.*;
 
 import java.util.*;
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public abstract class ScanGraphClusteringTest {
 	private static final Logger LOGGER = Logger.getLogger(ScanGraphClusteringTest.class.getName());
-	private static final double DEFAULT_LINK_WEIGHT =  new PoiOptionsBuilder().create().getMinOutlinkWeight().getNumNem();
+	private static final PoiOptions DEFAULT_OPTIONS = new PoiOptionsBuilder().create();
 
 	/**
 	 * Creates the GraphClusteringStrategy being tested.
@@ -22,6 +22,8 @@ public abstract class ScanGraphClusteringTest {
 	 * @return The GraphClusteringStrategy being tested
 	 */
 	protected abstract GraphClusteringStrategy createClusteringStrategy();
+
+	//region unit tests with node similarity explicitly specified
 
 	/**
 	 * <pre>
@@ -362,437 +364,183 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
-	/**
-	 * <pre>
-	 * First Graph: 0 --- 1
-	 *              | \   |
-	 *              |   \ |
-	 *              3 --- 2
-	 * <br/>
-	 * Similarities:
-	 *        sim(0,1) = (1+1+1)/sqrt(4*3) = sqrt(3/4)
-	 *                 = sim(1,0)
-	 *                 = sim(0,3) = sim(3,0)
-	 *                 = sim(2,3) = sim(3,2)
-	 *                 = sim(1,2) = sim(2,1) > EPSILON
-	 *        sim(0,2) = (2+1+1)/sqrt(4*4) = 1
-	 *                 = sim(2,0) > EPSILON
-	 *        sim(1,3) = (2+0+0)/sqrt(3*3) = 2/3
-	 *                 = sim(3,1) < EPSILON
-	 * <br/>
-	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
-	 *        com(0) = (0, {1,2,3}, {})
-	 *        com(1) = (1, {0,2}, {})
-	 *        com(2) = (2, {0,1,3}, {})
-	 *        com(3) = (3, {0,2}, {})
-	 * <br/>
-	 * Expected: cluster {0, 1, 2, 3}, no hubs, no outliers
-	 * <br/>
-	 * First Graph: 0 --- 1 (essentially the same graph but we start scanning from a different node)
-	 * (isomorphic) |   / |
-	 *              | /   |
-	 *              3 --- 2
-	 * <br/>
-	 * Similarities:
-	 *        sim(0,1) = (1+1+1)/sqrt(3*4) = sqrt(3/4)
-	 *                 = sim(1,0)
-	 *                 = sim(0,3) = sim(3,0)
-	 *                 = sim(2,3) = sim(3,2)
-	 *                 = sim(1,2) = sim(2,1) > EPSILON
-	 *        sim(0,2) = (2+0+0)/sqrt(3*3) = 2/3
-	 *                 = sim(2,0) < EPSILON
-	 *        sim(1,3) = (2+1+1)/sqrt(4*4) = 1
-	 *                 = sim(3,1) > EPSILON
-	 * <br/>
-	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
-	 *        com(0) = (0, {1,3}, {})
-	 *        com(1) = (1, {0,2,3}, {})
-	 *        com(2) = (2, {1,3}, {})
-	 *        com(3) = (3, {0,1,2}, {})
-	 * <br/>
-	 * Expected: cluster {0, 1, 2, 3}, no hubs, no outliers
-	 * </pre>
-	 */
+	//endregion
+
+	//region tests with real similarity calculations
+
+	//region epsilon any
+
 	@Test
-	public void firstGraphIsClusteredAsExpected() {
-		// Arrange:
-		// Using dense matrix for easier debugging
-		final DenseMatrix outlinkMatrix = new DenseMatrix(4, 4);
-		outlinkMatrix.setAt(1, 0, 1);
-		outlinkMatrix.setAt(2, 0, 1);
-		outlinkMatrix.setAt(3, 0, 1);
-		outlinkMatrix.setAt(0, 1, 1);
-		outlinkMatrix.setAt(2, 1, 1);
-		outlinkMatrix.setAt(0, 2, 1);
-		outlinkMatrix.setAt(1, 2, 1);
-		outlinkMatrix.setAt(3, 2, 1);
-		outlinkMatrix.setAt(0, 3, 1);
-		outlinkMatrix.setAt(2, 3, 1);
-
-		// Act:
-		ClusteringResult result = this.calculateClusteringResult(
-				this.createClusteringStrategy(),
-				outlinkMatrix.multiply(DEFAULT_LINK_WEIGHT));
-		this.logClusteringResult(result);
-
+	public void graphSingleNodeIsClusteredAsExpected() {
 		// Assert:
-		List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
-
-		final DenseMatrix outlinkMatrix2 = new DenseMatrix(4, 4);
-		outlinkMatrix2.setAt(1, 0, 1);
-		outlinkMatrix2.setAt(3, 0, 1);
-		outlinkMatrix2.setAt(0, 1, 1);
-		outlinkMatrix2.setAt(2, 1, 1);
-		outlinkMatrix2.setAt(3, 1, 1);
-		outlinkMatrix2.setAt(1, 2, 1);
-		outlinkMatrix2.setAt(3, 2, 1);
-		outlinkMatrix2.setAt(0, 3, 1);
-		outlinkMatrix2.setAt(1, 3, 1);
-		outlinkMatrix2.setAt(2, 3, 1);
-
-		// Act:
-		result = this.calculateClusteringResult(
-				this.createClusteringStrategy(),
-				outlinkMatrix2.multiply(DEFAULT_LINK_WEIGHT));
-		this.logClusteringResult(result);
-
-		// Assert:
-		expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
-	}
-
-	/**
-	 * <pre>
-	 *                                                9  8
-	 *                   6 7 8 9                       \ |
-	 *                   \_\/_/                      6---1---2--3
-	 *                 /  \|/ \                        / \   | /|\
-	 * Second graph:  0----1   5   is equivalent to   7  \   |/ | \
-	 *                |\    \ / \                         \  5  /  \
-	 *                | \    2  /                          \ | /   |
-	 *                |  \  /  \                            \|/    |
-	 *                4----3--/ 8                            0-----4
-	 * <br/>
-	 * Similarities:
-	 *        sim(0,1) = (|{0,1}|)/sqrt(5*7) = 2/sqrt(35) ~ 0.3381
-	 *                 = sim(1,0) < EPSILON
-	 *        sim(0,3) = (|{0,3,4,5}|)/sqrt(5*5) = 4/5
-	 *                 = sim(3,0) > EPSILON
-	 *        sim(0,4) = (|{0,4,3}|)/sqrt(5*3) = 3/sqrt(15) ~ 0.7746
-	 *                 = sim(4,0) > EPSILON
-	 *        sim(0,5) = (|{0,3,5}|)/sqrt(4*5) = 3/sqrt(20) ~ 0.6708
-	 *                 = sim(5,0) < EPSILON
-	 *        sim(1,2) = (|{1,2}|)/sqrt(7*4) = 2/sqrt(28) ~ 0.3780
-	 *                 = sim(2,1) < EPSILON
-	 *        sim(2,3) = (|{2,3,5}|)/sqrt(4*5) = 3/sqrt(20) ~ 0.6708
-	 *                 = sim(3,2) < EPSILON
-	 *        sim(2,5) = (|{2,3,5}|)/sqrt(4*4) = 3/4
-	 *                 = sim(5,2) > EPSILON
-	 *        sim(3,4) = (|{0,3,4}|)/sqrt(5*3) = 3/sqrt(15) ~ 0.7746
-	 *                 = sim(4,3) > EPSILON
-	 *        sim(3,5) = (|{0,2,3,5}|)/sqrt(5*4) = 4/sqrt(20) ~ 0.8944
-	 *                 = sim(5,3) > EPSILON
-	 * <br/>
-	 * Communities in form (node id, similar neighbors, dissimilar neighbors):
-	 *         com(0) = (0, {3,4}, {1,5})
-	 *         com(1) = (1, {}, {0,2})
-	 *         com(2) = (2, {5}, {1,3})
-	 *         com(3) = (3, {0,4,5}, {2})
-	 *         com(4) = (4, {0,3}, {})
-	 *         com(5) = (5, {2,3}, {0})
-	 * <br/>
-	 * Expected:
-	 * - clusters: {0,2,3,4,5}, {1,6,7,8,9}
-	 * - hubs: none
-	 * - outliers: none
-	 * </pre>
-	 */
-	@Test
-	public void secondGraphIsClusteredAsExpected() {
-		// Arrange:
-		// Using dense matrix for easier debugging
-		final DenseMatrix outlinkMatrix = new DenseMatrix(10, 10);
-		setBidirectionalLink(outlinkMatrix, 0, 1);
-		setBidirectionalLink(outlinkMatrix, 0, 3);
-		setBidirectionalLink(outlinkMatrix, 0, 4);
-		setBidirectionalLink(outlinkMatrix, 0, 5);
-		setBidirectionalLink(outlinkMatrix, 1, 2);
-		setBidirectionalLink(outlinkMatrix, 1, 6);
-		setBidirectionalLink(outlinkMatrix, 1, 7);
-		setBidirectionalLink(outlinkMatrix, 1, 8);
-		setBidirectionalLink(outlinkMatrix, 1, 9);
-		setBidirectionalLink(outlinkMatrix, 2, 3);
-		setBidirectionalLink(outlinkMatrix, 2, 5);
-		setBidirectionalLink(outlinkMatrix, 3, 4);
-		setBidirectionalLink(outlinkMatrix, 3, 5);
-
-		// Act:
-		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		this.logClusteringResult(result);
-
-		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 2, 3, 4, 5)),
-				new Cluster(new ClusterId(1), NisUtils.toNodeIdList(1, 6, 7, 8, 9)));
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
-		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_SINGLE_NODE);
 	}
 
 	@Test
-	public void thirdGraphIsClusteredAsExpected() {
+	public void graphTwoUnconnectedNodesIsClusteredAsExpected() {
 		// Assert:
-		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER);
-	}
-
-	/**
-	 * <pre>
-	 * Graph:        0---11--15
-	 *              / \  |  /
-	 *             /   \ | /
-	 *             1-----2----7----16
-	 *             |   / | \
-	 *              10 --|--14
-	 *                   |
-	 *                   3----17
-	 *                   |
-	 *               13--|--12
-	 *              /  \ | / \
-	 *              9----4----8
-	 *               \  / \  /
-	 *                5-----6
-	 * <br/>
-	 * Expected:
-	 * - clusters: {0, 1, 2, 10, 11, 14, 15}, {4, 5, 6, 8, 9, 12, 13}
-	 * - hubs {3}
-	 * - outliers {7}, {16}, {17}
-	 * </pre>
-	 */
-	@Test
-	public void fourthGraphIsClusteredAsExpected() {
-		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(18, 18);
-
-		// cluster 1
-		setBidirectionalLink(outlinkMatrix, 0, 1);
-		setBidirectionalLink(outlinkMatrix, 0, 2);
-		setBidirectionalLink(outlinkMatrix, 0, 11);
-		setBidirectionalLink(outlinkMatrix, 1, 2);
-		setBidirectionalLink(outlinkMatrix, 1, 10);
-		setBidirectionalLink(outlinkMatrix, 2, 11);
-		setBidirectionalLink(outlinkMatrix, 2, 10);
-		setBidirectionalLink(outlinkMatrix, 2, 14);
-		setBidirectionalLink(outlinkMatrix, 2, 15);
-		setBidirectionalLink(outlinkMatrix, 10, 14);
-		setBidirectionalLink(outlinkMatrix, 11, 15);
-
-		// cluster 2
-		setBidirectionalLink(outlinkMatrix, 4, 5);
-		setBidirectionalLink(outlinkMatrix, 4, 6);
-		setBidirectionalLink(outlinkMatrix, 4, 8);
-		setBidirectionalLink(outlinkMatrix, 4, 9);
-		setBidirectionalLink(outlinkMatrix, 4, 12);
-		setBidirectionalLink(outlinkMatrix, 4, 13);
-		setBidirectionalLink(outlinkMatrix, 5, 6);
-		setBidirectionalLink(outlinkMatrix, 5, 9);
-		setBidirectionalLink(outlinkMatrix, 6, 8);
-		setBidirectionalLink(outlinkMatrix, 8, 12);
-		setBidirectionalLink(outlinkMatrix, 9, 13);
-		setBidirectionalLink(outlinkMatrix, 12, 13);
-
-		// connections
-		setBidirectionalLink(outlinkMatrix, 2, 7);
-		setBidirectionalLink(outlinkMatrix, 2, 3);
-		setBidirectionalLink(outlinkMatrix, 3, 4);
-		setBidirectionalLink(outlinkMatrix, 3, 17);
-		setBidirectionalLink(outlinkMatrix, 7, 16);
-
-		// Act:
-		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
-		this.logClusteringResult(result);
-
-		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 10, 11, 14, 15)),
-				new Cluster(new ClusterId(4), NisUtils.toNodeIdList(4, 5, 6, 8, 9, 12, 13)));
-		final List<Cluster> expectedHubs = Arrays.asList(new Cluster(new NodeId(3)));
-		final List<Cluster> expectedOutliers = Arrays.asList(
-				new Cluster(new NodeId(7)),
-				new Cluster(new NodeId(16)),
-				new Cluster(new NodeId(17)));
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
-	}
-
-	/**
-	 * <pre>
-	 * Graph:      0----o1
-	 *             o     |
-	 *             |     o
-	 *             3o----2
-	 * <br/>
-	 *                4
-	 *                |
-	 *                o
-	 *                5----o6
-	 * <br/>
-	 * Expected: clusters {0,1,2} and {4,5,6}
-	 * </pre>
-	 */
-	@Test
-	public void fifthGraphIsClusteredAsExpected() {
-		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(7, 7);
-		outlinkMatrix.setAt(1, 0, 1);
-		outlinkMatrix.setAt(2, 1, 1);
-		outlinkMatrix.setAt(3, 2, 1);
-		outlinkMatrix.setAt(0, 3, 1);
-
-		outlinkMatrix.setAt(5, 4, 1);
-		outlinkMatrix.setAt(6, 5, 1);
-
-		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-
-		// Act:
-		final ClusteringResult result = this.calculateClusteringResult(
-				this.createClusteringStrategy(),
-				outlinkMatrix.multiply(DEFAULT_LINK_WEIGHT));
-		this.logClusteringResult(result);
-
-		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(
-				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)),
-				new Cluster(new ClusterId(5), NisUtils.toNodeIdList(4, 5, 6)));
-		final List<Cluster> expectedHubs = Arrays.asList();
-		final List<Cluster> expectedOutliers = Arrays.asList();
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
-	}
-
-	/**
-	 * <pre>
-	 * Graph:      0
-	 *            /|\
-	 *           / | \
-	 *          o  o  o
-	 *         1   2   3
-	 * <br/>
-	 * Expected: clusters: {0,1,2,3}
-	 *           hubs    : none
-	 *           outliers: none
-	 * </pre>
-	 */
-	@Test
-	public void sixthGraphIsClusteredAsExpected() {
-		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(4, 4);
-		outlinkMatrix.setAt(1, 0, 1);
-		outlinkMatrix.setAt(2, 0, 1);
-		outlinkMatrix.setAt(3, 0, 1);
-
-		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-
-		// Act:
-		final ClusteringResult result = this.calculateClusteringResult(
-				this.createClusteringStrategy(),
-				outlinkMatrix.multiply(DEFAULT_LINK_WEIGHT));
-		this.logClusteringResult(result);
-
-		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
-		final List<Cluster> expectedHubs = Arrays.asList();
-		final List<Cluster> expectedOutliers = Arrays.asList();
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
-	}
-
-	/**
-	 * <pre>
-	 * Graph:      0--o1--o2--o3--o4--o5
-	 * </pre>
-	 * Expected: clusters: {0,1,2,3,4,5}
-	 * hubs    : none
-	 * outliers: none
-	 */
-	@Test
-	public void seventhGraphIsClusteredAsExpected() {
-		// Arrange:
-		final DenseMatrix outlinkMatrix = new DenseMatrix(6, 6);
-		outlinkMatrix.setAt(1, 0, 1);
-		outlinkMatrix.setAt(2, 1, 1);
-		outlinkMatrix.setAt(3, 2, 1);
-		outlinkMatrix.setAt(4, 3, 1);
-		outlinkMatrix.setAt(5, 4, 1);
-
-		outlinkMatrix.removeNegatives(); //shouldn't make a difference either way
-
-		// Act:
-		final ClusteringResult result = this.calculateClusteringResult(
-				this.createClusteringStrategy(),
-				outlinkMatrix.multiply(DEFAULT_LINK_WEIGHT));
-		this.logClusteringResult(result);
-
-		// Assert:
-		final List<Cluster> expectedClusters = Arrays.asList(new Cluster(new ClusterId(1), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
-		final List<Cluster> expectedHubs = Arrays.asList();
-		final List<Cluster> expectedOutliers = Arrays.asList();
-
-		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
-		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedHubs));
-		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_TWO_UNCONNECTED_NODES);
 	}
 
 	@Test
-	public void eighthGraphIsClusteredAsExpected() {
+	public void graphTwoConnectedNodesIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_TWO_CONNECTED_NODES);
+	}
+
+	@Test
+	public void graphLineStructureIsClusteredAsExpected() {
 		// Assert:
 		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_LINE_STRUCTURE);
 	}
 
 	@Test
-	public void ninthGraphIsClusteredAsExpected() {
+	public void graphLine6StructureIsClusteredAsExpected() {
 		// Assert:
-		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_LINE6_STRUCTURE);
 	}
 
-	private static void setBidirectionalLink(final Matrix matrix, final int id1, final int id2) {
-		matrix.setAt(id1, id2, new PoiOptionsBuilder().create().getMinOutlinkWeight().getNumNem());
+	@Test
+	public void graphRingStructureIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_RING_STRUCTURE);
 	}
+
+	@Test
+	public void graphBoxTwoDiagonalsIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_BOX_TWO_DIAGONALS);
+	}
+
+	@Test
+	public void graphBoxMajorDiagonalsIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_BOX_MAJOR_DIAGONAL);
+	}
+
+	@Test
+	public void graphBoxMinorDiagonalsIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_BOX_MINOR_DIAGONAL);
+	}
+
+	@Test
+	public void graphTreeStructureIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_TREE_STRUCTURE);
+	}
+
+	@Test
+	public void graphDisconnectedBoxAndLIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphType.GRAPH_DISCONNECTED_BOX_AND_L);
+	}
+
+	//endregion
+
+	//region epsilon default (0.40)
+
+	@Test
+	public void graphTwoClustersNoHubsNoOutliersIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon040.GRAPH_TWO_CLUSTERS_NO_HUBS_NO_OUTLIERS);
+	}
+
+	@Test
+	public void graphTwoClustersOneHubThreeOutliersIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon040.GRAPH_TWO_CLUSTERS_ONE_HUB_THREE_OUTLIERS);
+	}
+
+	@Test
+	public void graphThreeClustersTwoHubsThreeOutliersIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+	}
+
+	//endregion
+
+	//region epsilon custom (0.65)
+
+	@Test
+	public void graphCustomEpsilonOneClusterNoHubOneOutlierIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon065.GRAPH_ONE_CLUSTER_NO_HUB_ONE_OUTLIER);
+	}
+
+	@Test
+	public void graphCustomEpsilonTwoClustersNoHubNoOutlierIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER);
+	}
+
+	@Test
+	public void graphCustomEpsilonTwoClustersNoHubOneOutlierIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER);
+	}
+
+	@Test
+	public void graphCustomEpsilonTwoClustersOneHubNoOutlierIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER);
+	}
+
+	@Test
+	public void graphCustomEpsilonTwoClustersTwoHubsTwoOutliersIsClusteredAsExpected() {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
+	}
+
+	//endregion
+
+	//endregion
 
 	private void assertGraphIsClusteredCorrectly(final GraphType graphType) {
-		// Arrange:
-		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(
+				OutlinkMatrixFactory.create(graphType),
+				IdealizedClusterFactory.create(graphType),
+				DEFAULT_OPTIONS.getEpsilonClusteringValue());
+	}
 
+	private void assertGraphIsClusteredCorrectly(final GraphTypeEpsilon040 graphType) {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(
+				OutlinkMatrixFactory.create(graphType),
+				IdealizedClusterFactory.create(graphType),
+				DEFAULT_OPTIONS.getEpsilonClusteringValue());
+	}
+
+	private void assertGraphIsClusteredCorrectly(final GraphTypeEpsilon065 graphType) {
+		// Assert:
+		this.assertGraphIsClusteredCorrectly(
+				OutlinkMatrixFactory.create(graphType),
+				IdealizedClusterFactory.create(graphType),
+				0.65);
+	}
+
+	private void assertGraphIsClusteredCorrectly(
+			final Matrix outlinkMatrix,
+			final ClusteringResult expectedResult,
+			final double epsilon) {
 		// Act:
-		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix);
+		final ClusteringResult result = this.calculateClusteringResult(this.createClusteringStrategy(), outlinkMatrix, epsilon);
 		this.logClusteringResult(result);
 
 		// Assert:
-		final ClusteringResult expectedResult = IdealizedClusterFactory.create(graphType);
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
 		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
 	}
 
-	private ClusteringResult calculateClusteringResult(final GraphClusteringStrategy graphClusteringStrategy, final Matrix outlinkMatrix) {
+	private ClusteringResult calculateClusteringResult(
+			final GraphClusteringStrategy graphClusteringStrategy,
+			final Matrix outlinkMatrix,
+			final double epsilon) {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final SimilarityStrategy strategy = new DefaultSimilarityStrategy(nodeNeighborMap);
-		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, strategy);
+		final Neighborhood neighborhood = new Neighborhood(nodeNeighborMap, strategy, DEFAULT_OPTIONS.getMuClusteringValue(), epsilon);
 		return graphClusteringStrategy.cluster(neighborhood);
 	}
 
