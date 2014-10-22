@@ -176,6 +176,28 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
 	}
 
+	@Test
+	public void selectNodesSelectsNodesCorrectlyWhenCumulativeCandidateTrustIsLessThanOne() {
+		// Arrange:
+		final Random random = Mockito.mock(Random.class);
+		Mockito.when(random.nextDouble()).thenReturn(0.10, 0.40, 0.10, 0.40);
+		// Node 0 and 3 do not qualify as candidate therefore only 0.5 trust is available.
+		final TestContext context = new TestContext(
+				10,
+				new ColumnVector(0.25, 0.25, 0.25, 0.25),
+				new ColumnVector(0.00001, 0.2, 0.2, 0.00001),
+				new ColumnVector(10, 10, 10, 10),
+				random);
+
+		// Act:
+		final List<Node> nodes = context.selector.selectNodes();
+
+		// Assert:
+		Assert.assertThat(
+				nodes,
+				IsEqual.equalTo(Arrays.asList(context.nodes[1], context.nodes[2])));
+	}
+
 	//endregion
 
 	private static class TestContext {
