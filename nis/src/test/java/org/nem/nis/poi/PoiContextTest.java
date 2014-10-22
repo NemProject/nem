@@ -234,7 +234,7 @@ public class PoiContextTest {
 		final ClusteringResult result = context.getClusteringResult();
 
 		// Assert:
-		final ClusteringResult expectedResult = IdealizedClusterFactory.create(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		final ClusteringResult expectedResult = IdealizedClusterFactory.create(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedResult.getClusters()));
 		Assert.assertThat(result.getHubs(), IsEquivalent.equivalentTo(expectedResult.getHubs()));
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedResult.getOutliers()));
@@ -429,10 +429,9 @@ public class PoiContextTest {
 		return new PoiContext(accountStates, height, poiOptions);
 	}
 
-
 	private static PoiContext createTestPoiContextWithRealGraph(final PoiOptions poiOptions) {
 		// Arrange:
-		final Matrix matrix = OutlinkMatrixFactory.create(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		final Matrix matrix = OutlinkMatrixFactory.create(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
 		// create accounts
 		final List<TestAccountInfo> accountInfos = new ArrayList<>();

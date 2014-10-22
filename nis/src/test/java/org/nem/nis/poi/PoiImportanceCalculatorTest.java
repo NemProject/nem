@@ -97,7 +97,7 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy) {
-		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
@@ -640,7 +640,7 @@ public class PoiImportanceCalculatorTest {
 		return accountState;
 	}
 
-	private static Collection<PoiAccountState> createAccountStatesFromGraph(final GraphType graphType) {
+	private static Collection<PoiAccountState> createAccountStatesFromGraph(final GraphTypeEpsilon040 graphType) {
 		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
 		return createAccountStatesFromGraph(outlinkMatrix);
 	}

@@ -1,7 +1,8 @@
 package org.nem.nis.test;
 
 /**
- * An enum of well-known graph types.
+ * An enum of well-known graph types where the epsilon value doesn't matter
+ * because the graphs are either fully connected or unconnected.
  * <br/>
  * Graph interpretation: i----oj means i has directed edge to j
  */
@@ -49,6 +50,16 @@ public enum GraphType {
 
 	/**
 	 * <pre>
+	 * Graph:         0--o1--o2--o3--o4--o5
+	 * </pre>
+	 * Clusters: {0,1,2,3,4,5}
+	 * Hubs: none
+	 * Outliers: none
+	 */
+	GRAPH_LINE6_STRUCTURE,
+
+	/**
+	 * <pre>
 	 * Graph:         0----o1----o2
 	 *                o           |
 	 *                |           o
@@ -73,114 +84,97 @@ public enum GraphType {
 	 * Hubs: none
 	 * Outliers: none
 	 */
-	GRAPH_ONE_CLUSTERS_NO_HUB_NO_OUTLIER,
+	GRAPH_BOX_TWO_DIAGONALS,
 
 	/**
 	 * <pre>
-	 * Graph:         0---o1---o4
-	 *                o\  o|
-	 *                | \/ |
-	 *                | /\ |
-	 *                |/  oo
-	 *                3o---2
+	 * First Graph: 0 --- 1
+	 *              | \   |
+	 *              |   \ |
+	 *              3 --- 2
+	 * <br/>
+	 * Similarities:
+	 *        sim(0,1) = (1+1+1)/sqrt(4*3) = sqrt(3/4)
+	 *                 = sim(1,0)
+	 *                 = sim(0,3) = sim(3,0)
+	 *                 = sim(2,3) = sim(3,2)
+	 *                 = sim(1,2) = sim(2,1) > EPSILON
+	 *        sim(0,2) = (2+1+1)/sqrt(4*4) = 1
+	 *                 = sim(2,0) > EPSILON
+	 *        sim(1,3) = (2+0+0)/sqrt(3*3) = 2/3
+	 *                 = sim(3,1) < EPSILON
+	 * <br/>
+	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
+	 *        com(0) = (0, {1,2,3}, {})
+	 *        com(1) = (1, {0,2}, {})
+	 *        com(2) = (2, {0,1,3}, {})
+	 *        com(3) = (3, {0,2}, {})
 	 * </pre>
 	 * Clusters: {0,1,2,3}
 	 * Hubs: none
-	 * Outliers: {4}
-	 */
-	GRAPH_ONE_CLUSTERS_NO_HUB_ONE_OUTLIER,
-
-	/**
-	 * <pre>
-	 * Graph:         0           4
-	 *               / o         o \
-	 *              o   \       /   o
-	 *             1----o2----o3o----5
-	 * </pre>
-	 * Clusters: {0,1,2}, {3,4,5}
-	 * Hubs: none
 	 * Outliers: none
 	 */
-	GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER,
+	GRAPH_BOX_MAJOR_DIAGONAL,
 
 	/**
 	 * <pre>
-	 * Graph:         0
-	 *               / o
-	 *              o   \
-	 *             1----o2----o6
-	 *                   |
-	 *                   o
-	 *                   3
-	 *                  / o
-	 *                 o   \
-	 *                4----o5
-	 * </pre>
-	 * Clusters: {0,1,2}, {3,4,5}
-	 * Hubs: none
-	 * Outliers: {6}
-	 */
-	GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER,
-
-	/**
-	 * <pre>
-	 * Graph:         0                 5
-	 *               / o               o \
-	 *              o   \             /   o
-	 *             1----o2----o3----o4o----6
-	 * </pre>
-	 * Clusters: {0,1,2}, {4,5,6}
-	 * Hubs: {3}
-	 * Outliers: none
-	 */
-	GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER,
-
-	/**
-	 * <pre>
-	 * Graph:         0-------o7-------o5-----o8
-	 *               / o               o \
-	 *              o   \             /   o
-	 *      10o----1----o2----o3----o4o----6
-	 *                         |
-	 *                         o
-	 *                         9
-	 * </pre>
-	 * Clusters: {0,1,2,10}, {4,5,6}
-	 * Hubs: {3}, {7}
-	 * Outliers: {8}, {9}
-	 */
-	GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS,
-
-	// TODO 20141019: most of the above graphs are no longer correct after changing the poi parameters
-	// > fixing them leads to graphs like the following; not sure if that's the best use of time:
-
-	/**
-	 * 	/**
-	 * <pre>
-	 * Graph:         0    14
-	 *               / \   o
-	 *              o   o /
-	 *             1----o4----o10
-	 *
-	 *                2    15
-	 *               o o   o
-	 *               |  \ /
-	 *              9o---3---o7    16---o3,4,5o---18
-	 *                              |             |
-	 *                              o             o
-	 *             12o---5---o11   17             19
-	 *                  / \
-	 *                 o   o         13
-	 *                8----o6
+	 * First Graph: 0 --- 1 (essentially the same graph as GRAPH_BOX_MAJOR_DIAGONAL
+	 * (isomorphic) |   / | but we start scanning from a different node)
+	 *              | /   |
+	 *              3 --- 2
 	 * <br/>
-	 * sim(16, 3) = (|{16,3}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
-	 * sim(16, 4) = (|{16,4}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
-	 * sim(16, 5) = (|{16,5}|)/sqrt(5*6) = 2/sqrt(30) = 0.37
+	 * Similarities:
+	 *        sim(0,1) = (1+1+1)/sqrt(3*4) = sqrt(3/4)
+	 *                 = sim(1,0)
+	 *                 = sim(0,3) = sim(3,0)
+	 *                 = sim(2,3) = sim(3,2)
+	 *                 = sim(1,2) = sim(2,1) > EPSILON
+	 *        sim(0,2) = (2+0+0)/sqrt(3*3) = 2/3
+	 *                 = sim(2,0) < EPSILON
+	 *        sim(1,3) = (2+1+1)/sqrt(4*4) = 1
+	 *                 = sim(3,1) > EPSILON
+	 * <br/>
+	 * Communities in form (node id, epsilon neighbors, non-epsilon neighbors):
+	 *        com(0) = (0, {1,3}, {})
+	 *        com(1) = (1, {0,2,3}, {})
+	 *        com(2) = (2, {1,3}, {})
+	 *        com(3) = (3, {0,1,2}, {})
 	 * </pre>
-	 * Expected:
-	 * Clusters {0, 1, 4, 10, 14}, {2, 3, 7, 9, 15}, {5, 6, 8, 11, 12}
-	 * Hubs: {16}, {18}
-	 * Outliers: {13}, {17}, {19}
+	 * Clusters: {0,1,2,3}
+	 * Hubs: none
+	 * Outliers: none
 	 */
-	GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS
+	GRAPH_BOX_MINOR_DIAGONAL,
+
+	/**
+	 * <pre>
+	 * Graph:      0
+	 *            /|\
+	 *           / | \
+	 *          o  o  o
+	 *         1   2   3
+	 * </pre>
+	 * Clusters: {0,1,2,3}
+	 * Hubs: none
+	 * Outliers: none
+	 */
+	GRAPH_TREE_STRUCTURE,
+
+	/**
+	 * <pre>
+	 * Graph:      0----o1
+	 *             o     |
+	 *             |     o
+	 *             3o----2
+	 * <br/>
+	 *                4
+	 *                |
+	 *                o
+	 *                5----o6
+	 * </pre>
+	 * Clusters: {0,1,2,3}, {4,5,6}
+	 * Hubs: none
+	 * Outliers: none
+	 */
+	GRAPH_DISCONNECTED_BOX_AND_L
 }
