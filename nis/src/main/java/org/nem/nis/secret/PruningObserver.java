@@ -9,6 +9,9 @@ import org.nem.nis.poi.*;
  */
 public class PruningObserver implements BlockTransactionObserver {
 	// TODO 20141022 J-*: not sure if this is reasonable or not
+	// TODO 20141023 BR -> J: pruning once every 30 days means keeping outlinks/weighted balances for maximal 60 days.
+	// TODO                   Since pruning is not expensive I would do it once a day, keep the last 30 days when pruning outlinks
+	// TODO                   and probably not more than 2 days when pruning weighted balances (could in theory even be less).
 	private static final long PRUNE_BLOCK_MULTIPLER = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY; // prune once every 30 days
 	private final PoiFacade poiFacade;
 
