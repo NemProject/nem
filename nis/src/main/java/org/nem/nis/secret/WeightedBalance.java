@@ -17,7 +17,7 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	// TODO: i don't think there's any downside with using balance as an id instead (if we even need it)
 	private final Amount amount;
 
-	//region createUnvested / createVested
+	//region create*
 
 	/**
 	 * Creates a weighted balance that is fully unvested.
@@ -39,6 +39,19 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 */
 	public static WeightedBalance createVested(final BlockHeight height, final Amount amount) {
 		return new WeightedBalance(amount, height, amount, 0, amount.getNumMicroNem());
+	}
+
+	/**
+	 * Creates a weighed balance that is partially vested and unvested.
+	 *
+	 * @param height The block height.
+	 * @param vested The vested amount.
+	 * @param unvested The unvested amount.
+	 * @return The new weighted balance.
+	 */
+	public static WeightedBalance create(final BlockHeight height, final Amount vested, final Amount unvested) {
+		final Amount balance = vested.add(unvested);
+		return new WeightedBalance(balance, height, balance, unvested.getNumMicroNem(), vested.getNumMicroNem());
 	}
 
 	private WeightedBalance(

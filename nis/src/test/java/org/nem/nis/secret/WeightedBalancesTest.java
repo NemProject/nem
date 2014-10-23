@@ -232,6 +232,68 @@ public class WeightedBalancesTest {
 
 	//endregion
 
+	//region prune
+
+	@Test
+	public void pruneRemovesAllOlderBalancesAndPreservesCorrectBalancesAtPruneHeight() {
+		// Arrange:
+		final long[] heights = new long[] { 1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4 };
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(heights[0]), Amount.fromNem(10_000));
+		weightedBalances.addSend(new BlockHeight(heights[1]), Amount.fromNem(23));
+		weightedBalances.addSend(new BlockHeight(heights[2]), Amount.fromNem(23));
+		weightedBalances.addSend(new BlockHeight(heights[3]), Amount.fromNem(23));
+		weightedBalances.addSend(new BlockHeight(heights[4]), Amount.fromNem(23));
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(9));
+
+		final WeightedBalance referenceBalance =
+				WeightedBalance.createUnvested(new BlockHeight(heights[0]), Amount.fromNem(10_000))
+						.next()
+						.createSend(new BlockHeight(heights[1]), Amount.fromNem(23))
+						.next()
+						.createSend(new BlockHeight(heights[2]), Amount.fromNem(23));
+
+		// Act:
+		weightedBalances.prune(new BlockHeight(heights[2]));
+
+		// Assert:
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(5));
+		assertVested(weightedBalances, heights[2], referenceBalance.getVestedBalance());
+		assertUnvested(weightedBalances, heights[2], referenceBalance.getUnvestedBalance());
+	}
+
+	@Test
+	public void pruneRemovesAllOlderBalancesAndPreservesCorrectBalancesAfterPruneHeight() {
+		// Arrange:
+		final long[] heights = new long[] { 1, 1 + 1440, 1 + 1440 * 2, 1 + 1440 * 3, 1 + 1440 * 4 };
+		final WeightedBalances weightedBalances = new WeightedBalances();
+		weightedBalances.addReceive(new BlockHeight(heights[0]), Amount.fromNem(10_000));
+		weightedBalances.addSend(new BlockHeight(heights[1]), Amount.fromNem(23));
+		weightedBalances.addSend(new BlockHeight(heights[2]), Amount.fromNem(23));
+		weightedBalances.addSend(new BlockHeight(heights[3]), Amount.fromNem(23));
+		weightedBalances.addSend(new BlockHeight(heights[4]), Amount.fromNem(23));
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(9));
+
+		final WeightedBalance referenceBalance =
+				WeightedBalance.createUnvested(new BlockHeight(heights[0]), Amount.fromNem(10_000))
+						.next()
+						.createSend(new BlockHeight(heights[1]), Amount.fromNem(23))
+						.next()
+						.createSend(new BlockHeight(heights[2]), Amount.fromNem(23))
+						.next()
+						.createSend(new BlockHeight(heights[3]), Amount.fromNem(23));
+
+		// Act:
+		weightedBalances.prune(new BlockHeight(heights[2]));
+
+		// Assert:
+		Assert.assertThat(weightedBalances.size(), IsEqual.equalTo(5));
+		assertVested(weightedBalances, heights[3], referenceBalance.getVestedBalance());
+		assertUnvested(weightedBalances, heights[3], referenceBalance.getUnvestedBalance());
+	}
+
+	//endregion
+
 	private static void assertUnvested(final WeightedBalances weightedBalances, final long height, final Amount amount) {
 		Assert.assertThat(weightedBalances.getUnvested(new BlockHeight(height)), IsEqual.equalTo(amount));
 	}
