@@ -60,10 +60,9 @@ public class NetworkInfoTest {
 
 		// Act:
 		final NetworkInfo networkInfo = NetworkInfo.fromAddress(address);
-		final NetworkInfo expectedNetworkInfo = NetworkInfo.getTestNetworkInfo();
 
 		// Assert:
-		assertIsSameNetworkInfo(networkInfo, expectedNetworkInfo);
+		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfo.getTestNetworkInfo()));
 	}
 
 	@Test
@@ -73,15 +72,8 @@ public class NetworkInfoTest {
 
 		// Act:
 		final NetworkInfo networkInfo = NetworkInfo.fromAddress(address);
-		final NetworkInfo expectedNetworkInfo = NetworkInfo.getMainNetworkInfo();
 
 		// Assert:
-		assertIsSameNetworkInfo(networkInfo, expectedNetworkInfo);
-	}
-
-	private void assertIsSameNetworkInfo(final NetworkInfo networkInfo1, final NetworkInfo networkInfo2) {
-		Assert.assertThat(networkInfo1.getVersion(), IsEqual.equalTo(networkInfo2.getVersion()));
-		Assert.assertThat(networkInfo1.getAddressStartChar(), IsEqual.equalTo(networkInfo2.getAddressStartChar()));
-		Assert.assertThat(networkInfo1.getNemesisAccountId(), IsEqual.equalTo(networkInfo2.getNemesisAccountId()));
+		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfo.getMainNetworkInfo()));
 	}
 }

@@ -1,18 +1,14 @@
 package org.nem.core.model;
 
 import org.nem.core.utils.Base32Encoder;
+
 /**
  * Represents information about a current network.
  */
 public class NetworkInfo {
-	private static final byte MAIN_NET_VERSION = (byte)0x68;
-	private static final byte TEST_NET_VERSION = (byte)0x98;
-	private static final char MAIN_NET_START_CHAR = 'N';
-	private static final char TEST_NET_START_CHAR = 'T';
-	private static final String MAIN_NET_NEMESIS_ACCOUNT_ID = "Not-a-real-address";
-	private static final String TEST_NET_NEMESIS_ACCOUNT_ID = "TANEMWISEEPBJ2BU5OZO6AUCSEHSZZBPTY5VNXRM";
-	private static final NetworkInfo mainNetworkInfo = createMainNetworkInfo();
-	private static final NetworkInfo testNetworkInfo = createTestNetworkInfo();
+	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
+	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();
+	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO };
 
 	private byte version;
 	private char addressStartChar;
@@ -51,7 +47,7 @@ public class NetworkInfo {
 	 * @return Information about the MAIN network.
 	 */
 	public static NetworkInfo getMainNetworkInfo() {
-		return mainNetworkInfo;
+		return MAIN_NETWORK_INFO;
 	}
 
 	/**
@@ -60,7 +56,7 @@ public class NetworkInfo {
 	 * @return Information about the TEST network.
 	 */
 	public static NetworkInfo getTestNetworkInfo() {
-		return testNetworkInfo;
+		return TEST_NETWORK_INFO;
 	}
 
 	/**
@@ -70,21 +66,18 @@ public class NetworkInfo {
 	 * @return The network info.
 	 */
 	public static NetworkInfo fromAddress(final Address address) {
-		final byte[] encodedBytes;
-		try {
-			encodedBytes = Base32Encoder.getBytes(address.getEncoded());
-		} catch (final IllegalArgumentException e) {
-			throw new IllegalArgumentException("Invalid address.", e);
+		final byte version = getVersionFromAddress(address);
+		for (final NetworkInfo info : KNOWN_NETWORKS) {
+			if (version == info.getVersion()) {
+				return info;
+			}
 		}
 
-		switch (encodedBytes[0]) {
-			case MAIN_NET_VERSION:
-				return createMainNetworkInfo();
-			case TEST_NET_VERSION:
-				return createTestNetworkInfo();
-			default:
-				throw new IllegalArgumentException("Invalid address");
-		}
+		throw new IllegalArgumentException(String.format("Invalid address '%s' is not part of any known network", address));
+	}
+
+	private static byte getVersionFromAddress(final Address address) {
+		return Base32Encoder.getBytes(address.getEncoded())[0];
 	}
 
 	/**
@@ -98,17 +91,17 @@ public class NetworkInfo {
 
 	private static NetworkInfo createMainNetworkInfo() {
 		final NetworkInfo info = new NetworkInfo();
-		info.version = MAIN_NET_VERSION;
-		info.addressStartChar = MAIN_NET_START_CHAR;
-		info.nemesisAccountId = MAIN_NET_NEMESIS_ACCOUNT_ID;
+		info.version = 0x68;
+		info.addressStartChar = 'N';
+		info.nemesisAccountId = "Not-a-real-address";
 		return info;
 	}
 
 	private static NetworkInfo createTestNetworkInfo() {
 		final NetworkInfo info = new NetworkInfo();
-		info.version = TEST_NET_VERSION;
-		info.addressStartChar = TEST_NET_START_CHAR;
-		info.nemesisAccountId = TEST_NET_NEMESIS_ACCOUNT_ID;
+		info.version = (byte)0x98;
+		info.addressStartChar = 'T';
+		info.nemesisAccountId = "TANEMWISEEPBJ2BU5OZO6AUCSEHSZZBPTY5VNXRM";
 		return info;
 	}
 }
