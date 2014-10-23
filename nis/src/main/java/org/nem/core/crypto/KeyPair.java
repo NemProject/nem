@@ -58,23 +58,6 @@ public class KeyPair {
 		this(null, publicKey, engine);
 	}
 
-	/**
-	 * Creates a key pair around a private and public key.
-	 *
-	 * @param publicKey The public key.
-	 * @param privateKey The private key.
-	 */
-	public KeyPair(final PrivateKey privateKey, final PublicKey publicKey) {
-		this(privateKey, publicKey, CryptoEngines.defaultEngine());
-	}
-
-	/**
-	 * Creates a key pair around a private and public key for a given crypto engine.
-	 *
-	 * @param publicKey The public key.
-	 * @param privateKey The private key.
-	 * @param engine The crypto engine.
-	 */
 	public KeyPair(final PrivateKey privateKey, final PublicKey publicKey, final CryptoEngine engine) {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
