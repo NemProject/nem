@@ -47,6 +47,20 @@ public class KeyPairTest {
 		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
 	}
 
+	@Test
+	public void ctorCanCreateKeyPairAroundPrivateAndPublicKey() {
+		// Arrange:
+		final KeyPair kp1 = new KeyPair();
+
+		// Act:
+		final KeyPair kp2 = new KeyPair(kp1.getPrivateKey(), kp1.getPublicKey());
+
+		// Assert:
+		Assert.assertThat(kp2.hasPrivateKey(), IsEqual.equalTo(true));
+		Assert.assertThat(kp2.getPrivateKey(), IsEqual.equalTo(kp1.getPrivateKey()));
+		Assert.assertThat(kp2.getPublicKey(), IsEqual.equalTo(kp1.getPublicKey()));
+	}
+
 	//endregion
 
 	@Test

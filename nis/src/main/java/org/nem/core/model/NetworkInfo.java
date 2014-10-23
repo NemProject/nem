@@ -1,9 +1,16 @@
 package org.nem.core.model;
 
+import org.nem.core.utils.Base32Encoder;
 /**
  * Represents information about a current network.
  */
 public class NetworkInfo {
+	private static final byte MAIN_NET_VERSION = (byte)0x68;
+	private static final byte TEST_NET_VERSION = (byte)0x98;
+	private static final char MAIN_NET_START_CHAR = 'N';
+	private static final char TEST_NET_START_CHAR = 'T';
+	private static final String MAIN_NET_NEMESIS_ACCOUNT_ID = "Not-a-real-address";
+	private static final String TEST_NET_NEMESIS_ACCOUNT_ID = "TANEMWISEEPBJ2BU5OZO6AUCSEHSZZBPTY5VNXRM";
 	private static final NetworkInfo mainNetworkInfo = createMainNetworkInfo();
 	private static final NetworkInfo testNetworkInfo = createTestNetworkInfo();
 
@@ -57,6 +64,30 @@ public class NetworkInfo {
 	}
 
 	/**
+	 * Gets the network info from an address.
+	 *
+	 * @param address The address.
+	 * @return The network info.
+	 */
+	public static NetworkInfo fromAddress(final Address address) {
+		final byte[] encodedBytes;
+		try {
+			encodedBytes = Base32Encoder.getBytes(address.getEncoded());
+		} catch (final IllegalArgumentException e) {
+			throw new IllegalArgumentException("Invalid address.", e);
+		}
+
+		switch (encodedBytes[0]) {
+			case MAIN_NET_VERSION:
+				return createMainNetworkInfo();
+			case TEST_NET_VERSION:
+				return createTestNetworkInfo();
+			default:
+				throw new IllegalArgumentException("Invalid address");
+		}
+	}
+
+	/**
 	 * Gets information about the DEFAULT network.
 	 *
 	 * @return Information about the DEFAULT network.
@@ -67,17 +98,17 @@ public class NetworkInfo {
 
 	private static NetworkInfo createMainNetworkInfo() {
 		final NetworkInfo info = new NetworkInfo();
-		info.version = 0x68;
-		info.addressStartChar = 'N';
-		info.nemesisAccountId = "Not-a-real-address";
+		info.version = MAIN_NET_VERSION;
+		info.addressStartChar = MAIN_NET_START_CHAR;
+		info.nemesisAccountId = MAIN_NET_NEMESIS_ACCOUNT_ID;
 		return info;
 	}
 
 	private static NetworkInfo createTestNetworkInfo() {
 		final NetworkInfo info = new NetworkInfo();
-		info.version = (byte)0x98;
-		info.addressStartChar = 'T';
-		info.nemesisAccountId = "TANEMWISEEPBJ2BU5OZO6AUCSEHSZZBPTY5VNXRM";
+		info.version = TEST_NET_VERSION;
+		info.addressStartChar = TEST_NET_START_CHAR;
+		info.nemesisAccountId = TEST_NET_NEMESIS_ACCOUNT_ID;
 		return info;
 	}
 }
