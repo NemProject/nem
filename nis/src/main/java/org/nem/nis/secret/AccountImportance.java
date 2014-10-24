@@ -75,7 +75,7 @@ public class AccountImportance implements SerializableEntity {
 	}
 
 	/**
-	 * Gets an iterator that returns all out-links at or before the (inclusive) given height.
+	 * Gets an iterator that returns all outlinks at or before the (inclusive) given height.
 	 *
 	 * @param blockHeight The block height.
 	 * @return The matching links.
@@ -85,13 +85,22 @@ public class AccountImportance implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the number of out-links at or before the (inclusive) given height.
+	 * Gets the number of outlinks at or before the (inclusive) given height.
 	 *
 	 * @param blockHeight The block height.
 	 * @return The number of matching links.
 	 */
 	public int getOutlinksSize(final BlockHeight blockHeight) {
 		return this.historicalOutlinks.outlinksSize(blockHeight);
+	}
+
+	/**
+	 * Removes all historical outlinks that are older than the specified height.
+	 *
+	 * @param minHeight The minimum height of outlinks to keep.
+	 */
+	public void prune(final BlockHeight minHeight) {
+		this.historicalOutlinks.prune(minHeight);
 	}
 
 	/**

@@ -180,6 +180,7 @@ public class WeightedBalances {
 		return this.balances.size();
 	}
 
+	// TODO 20141018 J-G: should test and comment
 	public void convertToFullyVested() {
 		if (this.balances.size() > 1) {
 			throw new IllegalArgumentException("invalid call to convertToFullyVested " + this.balances.size());
@@ -229,5 +230,19 @@ public class WeightedBalances {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Removes all weighted balances that have a height less than minHeight.
+	 *
+	 * @param minHeight The minimum height of balances to keep.
+	 */
+	public void prune(final BlockHeight minHeight) {
+		final Amount vested = this.getVested(minHeight);
+		final Amount unvested = this.getUnvested(minHeight);
+
+		final WeightedBalance consolidatedBalance = WeightedBalance.create(minHeight, vested, unvested);
+		this.balances.removeIf(balance -> balance.getBlockHeight().compareTo(minHeight) <= 0);
+		this.balances.add(0, consolidatedBalance);
 	}
 }
