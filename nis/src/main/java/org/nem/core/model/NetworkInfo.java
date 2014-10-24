@@ -42,6 +42,21 @@ public class NetworkInfo {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the specified address is compatible with the network.
+	 *
+	 * @param address The address.
+	 * @return true if the address is compatible with the network.
+	 */
+	public boolean isCompatible(final Address address) {
+		try {
+			return this.version == getVersionFromAddress(address);
+		}
+		catch (final IllegalArgumentException e) {
+			return false;
+		}
+	}
+
+	/**
 	 * Gets information about the MAIN network.
 	 *
 	 * @return Information about the MAIN network.
