@@ -424,6 +424,9 @@ public class PoiImportanceCalculatorITCase {
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
 		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
+        // TODO: 20141024 M-J: Do you think we can speed up Java warm-up? http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
+        // -> perhaps we can call some of the poi code in a low priority thread on startup so that things are warmed up?
+
 		// Warm up phase
 		getAccountImportances(new BlockHeight(9999), accounts);
 
