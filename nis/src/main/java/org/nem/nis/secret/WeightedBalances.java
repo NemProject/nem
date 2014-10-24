@@ -159,6 +159,7 @@ public class WeightedBalances {
 			// TODO 20141018 J-B: seems like an edge case we should test
 			return Amount.fromMicroNem(0);
 		}
+
 		return this.balances.get(index).getVestedBalance();
 	}
 
@@ -173,6 +174,11 @@ public class WeightedBalances {
 			return Amount.ZERO;
 		}
 		final int index = this.findElement(height);
+		if (index < 0) {
+			// TODO 20141018 J-B: seems like an edge case we should test
+			return Amount.fromMicroNem(0);
+		}
+
 		return this.balances.get(index).getUnvestedBalance();
 	}
 
