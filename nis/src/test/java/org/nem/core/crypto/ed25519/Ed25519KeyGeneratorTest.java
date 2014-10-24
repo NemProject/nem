@@ -42,16 +42,23 @@ public class Ed25519KeyGeneratorTest extends KeyGeneratorTest {
 	/*@Test
 	public void mineKeys() {
 		// Arrange:
-		initCryptoEngine();
 		final KeyGenerator generator = getKeyGenerator();
-		List<String> list = Arrays.asList( "ALICE", "TBOBB", "GIMRE", "THIES", "JAGUA", "MAKOT", "SANSAN", "JUSAN", "GOGOGO", "NIJUI", "HACHI", "RIGEL" );
+		List<String> list = new LinkedList(
+			Arrays.asList(
+					"TALICE2", "TALICE3", "TALICE4", "TALICE5",
+					"TALICE6", "TALICE7", "TALICE8", "TALICE9")
+		);
 		int i = 0;
 		while (true) {
 			final KeyPair keyPair = generator.generateKeyPair();
 			final String address = Address.fromPublicKey(keyPair.getPublicKey()).getEncoded();
-			for (String wantedAddress : list) {
-				if (address.indexOf(wantedAddress) >= 0) {
+			Iterator<String> iterator = list.listIterator();
+			while (iterator.hasNext()) {
+				final String wantedAddress = iterator.next();
+				if (address.startsWith(wantedAddress)) {
 					System.out.println(keyPair.getPrivateKey().toString() + " : " + keyPair.getPublicKey().toString() + " : " + address);
+					iterator.remove();
+					break;
 				}
 			}
 			i++;
