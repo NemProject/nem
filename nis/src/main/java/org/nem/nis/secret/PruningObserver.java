@@ -8,11 +8,9 @@ import org.nem.nis.poi.*;
  * A block transaction observer that automatically prunes account-related data once every ~30 days.
  */
 public class PruningObserver implements BlockTransactionObserver {
-	// TODO 20141022 J-*: not sure if this is reasonable or not
-	// TODO 20141023 BR -> J: pruning once every 30 days means keeping outlinks/weighted balances for maximal 60 days.
-	// TODO                   Since pruning is not expensive I would do it once a day, keep the last 30 days when pruning outlinks
-	// TODO                   and probably not more than 2 days when pruning weighted balances (could in theory even be less).
-	private static final long PRUNE_BLOCK_MULTIPLER = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY; // prune once every 30 days
+	// keep 2 days of weighted balance history and 30 days of outlink history
+	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = 2 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long OUTLINK_BLOCK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private final PoiFacade poiFacade;
 
 	/**
@@ -30,16 +28,20 @@ public class PruningObserver implements BlockTransactionObserver {
 			return;
 		}
 
-		final BlockHeight pruneHeight = new BlockHeight(context.getHeight().getRaw() - PRUNE_BLOCK_MULTIPLER);
+		final BlockHeight weightedBalancePruneHeight = getPruneHeight(context.getHeight(), WEIGHTED_BALANCE_BLOCK_HISTORY);
+		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), OUTLINK_BLOCK_HISTORY);
 		for (final PoiAccountState accountState : this.poiFacade) {
-			accountState.getWeightedBalances().prune(pruneHeight);
-			accountState.getImportanceInfo().prune(pruneHeight);
+			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
+			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}
+	}
+
+	private static BlockHeight getPruneHeight(final BlockHeight height, final long numHistoryBlocks) {
+		return new BlockHeight(Math.max(1, height.getRaw() - numHistoryBlocks));
 	}
 
 	private static boolean shouldPrune(final Notification notification, final BlockNotificationContext context) {
 		return NotificationTrigger.Execute == context.getTrigger() &&
-				NotificationType.HarvestReward == notification.getType() &&
-				0 == (context.getHeight().getRaw() - 1) % PRUNE_BLOCK_MULTIPLER;
+				NotificationType.HarvestReward == notification.getType();
 	}
 }

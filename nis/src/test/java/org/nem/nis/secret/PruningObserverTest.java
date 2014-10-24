@@ -25,13 +25,6 @@ public class PruningObserverTest {
 		assertNoAccountsArePruned(432001, NotificationTrigger.Execute, NotificationType.BalanceCredit);
 	}
 
-	@Test
-	public void noAccountsArePrunedWhenNonPruneMultiplerBlockIsHarvested() {
-		// Assert:
-		assertNoAccountsArePruned(432000, NotificationTrigger.Execute, NotificationType.HarvestReward);
-		assertNoAccountsArePruned(432002, NotificationTrigger.Execute, NotificationType.HarvestReward);
-	}
-
 	private static void assertNoAccountsArePruned(
 			final long notificationHeight,
 			final NotificationTrigger notificationTrigger,
@@ -55,18 +48,41 @@ public class PruningObserverTest {
 	//region pruning trigger
 
 	@Test
-	public void allAccountsArePrunedWhenPruneMultiplerBlockIsHarvestedAtMinimumPruningBlockHeight() {
+	public void allAccountsArePrunedAtInitialBlockHeight() {
 		// Assert:
-		assertAllAccountsArePruned(43201, 1);
+		assertAllAccountsArePruned(1, 1, 1);
 	}
 
 	@Test
-	public void allAccountsArePrunedWhenPruneMultiplerBlockIsHarvestedAtOtherPruningBlockHeight() {
+	public void allAccountsArePrunedWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 		// Assert:
-		assertAllAccountsArePruned(432001, 388801);
+		assertAllAccountsArePruned(2879, 1, 1);
+		assertAllAccountsArePruned(2880, 1, 1);
+		assertAllAccountsArePruned(2881, 1, 1);
+		assertAllAccountsArePruned(2882, 2, 1);
+		assertAllAccountsArePruned(2883, 3, 1);
 	}
 
-	private static void assertAllAccountsArePruned(final long notificationHeight, final long expectedPruningHeight) {
+	@Test
+	public void allAccountsArePrunedWhenBlockHeightIsNearOutlinkBlockHistory() {
+		// Assert:
+		assertAllAccountsArePruned(43199, 40319, 1);
+		assertAllAccountsArePruned(43200, 40320, 1);
+		assertAllAccountsArePruned(43201, 40321, 1);
+		assertAllAccountsArePruned(43202, 40322, 2);
+		assertAllAccountsArePruned(43203, 40323, 3);
+	}
+
+	@Test
+	public void allAccountsArePrunedWhenBlockHeightIsMuchGreaterThanHistories() {
+		// Assert:
+		assertAllAccountsArePruned(432001, 429121, 388801);
+	}
+
+	private static void assertAllAccountsArePruned(
+			final long notificationHeight,
+			final long expectedWeightedBalancePruningHeight,
+			final long expectedOutlinkPruningHeight) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -78,7 +94,8 @@ public class PruningObserverTest {
 		context.observer.notify(notification, notificationContext);
 
 		// Assert:
-		context.assertPruning(new BlockHeight(expectedPruningHeight));
+		context.assertWeightedBalancePruning(new BlockHeight(expectedWeightedBalancePruningHeight));
+		context.assertOutlinkPruning(new BlockHeight(expectedOutlinkPruningHeight));
 	}
 
 	//endregion
@@ -108,15 +125,20 @@ public class PruningObserverTest {
 
 		private void assertNoPruning() {
 			for (final PoiAccountState accountState : this.accountStates) {
-				Mockito.verify(accountState.getImportanceInfo(), Mockito.never()).prune(Mockito.any());
 				Mockito.verify(accountState.getWeightedBalances(), Mockito.never()).prune(Mockito.any());
+				Mockito.verify(accountState.getImportanceInfo(), Mockito.never()).prune(Mockito.any());
 			}
 		}
 
-		private void assertPruning(final BlockHeight height) {
+		private void assertWeightedBalancePruning(final BlockHeight height) {
+			for (final PoiAccountState accountState : this.accountStates) {
+				Mockito.verify(accountState.getWeightedBalances(), Mockito.only()).prune(height);
+			}
+		}
+
+		private void assertOutlinkPruning(final BlockHeight height) {
 			for (final PoiAccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.only()).prune(height);
-				Mockito.verify(accountState.getWeightedBalances(), Mockito.only()).prune(height);
 			}
 		}
 	}
