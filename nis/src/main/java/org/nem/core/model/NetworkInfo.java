@@ -50,8 +50,7 @@ public class NetworkInfo {
 	public boolean isCompatible(final Address address) {
 		try {
 			return this.version == getVersionFromAddress(address);
-		}
-		catch (final IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			return false;
 		}
 	}
