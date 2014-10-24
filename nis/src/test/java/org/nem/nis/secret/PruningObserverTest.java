@@ -106,7 +106,7 @@ public class PruningObserverTest {
 
 	private static class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final List<PoiAccountState> accountStates =  new ArrayList<>();
+		private final List<PoiAccountState> accountStates = new ArrayList<>();
 		private final BlockTransactionObserver observer = new PruningObserver(this.poiFacade);
 
 		private TestContext() {

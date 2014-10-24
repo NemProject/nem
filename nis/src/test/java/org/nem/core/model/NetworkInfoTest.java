@@ -35,7 +35,7 @@ public class NetworkInfoTest {
 				IsSame.sameInstance(NetworkInfo.getTestNetworkInfo()));
 	}
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void fromAddressThrowsIfEncodedAddressContainsInvalidCharacters() {
 		// Arrange:
 		final Address address = Address.fromEncoded("TAAAAAAAAAA1BBBBBBBBBCCCCCCCCCCDDDDDDDDD");
@@ -44,7 +44,7 @@ public class NetworkInfoTest {
 		NetworkInfo.fromAddress(address);
 	}
 
-	@Test (expected = IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void fromAddressThrowsIfEncodedAddressHasUnknownNetworkVersion() {
 		// Arrange:
 		final Address address = Address.fromEncoded("YAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDD");
