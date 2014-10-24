@@ -34,4 +34,46 @@ public class NetworkInfoTest {
 				NetworkInfo.getDefault(),
 				IsSame.sameInstance(NetworkInfo.getTestNetworkInfo()));
 	}
+
+	@Test (expected = IllegalArgumentException.class)
+	public void fromAddressThrowsIfEncodedAddressContainsInvalidCharacters() {
+		// Arrange:
+		final Address address = Address.fromEncoded("TAAAAAAAAAA1BBBBBBBBBCCCCCCCCCCDDDDDDDDD");
+
+		// Assert:
+		NetworkInfo.fromAddress(address);
+	}
+
+	@Test (expected = IllegalArgumentException.class)
+	public void fromAddressThrowsIfEncodedAddressHasUnknownNetworkVersion() {
+		// Arrange:
+		final Address address = Address.fromEncoded("YAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDD");
+
+		// Assert:
+		NetworkInfo.fromAddress(address);
+	}
+
+	@Test
+	public void fromAddressReturnsTestNetworkInfoWhenGivenAValidTestNetAddress() {
+		// Arrange:
+		final Address address = Address.fromEncoded("TAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDD");
+
+		// Act:
+		final NetworkInfo networkInfo = NetworkInfo.fromAddress(address);
+
+		// Assert:
+		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfo.getTestNetworkInfo()));
+	}
+
+	@Test
+	public void fromAddressReturnsMainNetworkInfoWhenGivenAValidMainNetAddress() {
+		// Arrange:
+		final Address address = Address.fromEncoded("NAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDD");
+
+		// Act:
+		final NetworkInfo networkInfo = NetworkInfo.fromAddress(address);
+
+		// Assert:
+		Assert.assertThat(networkInfo, IsSame.sameInstance(NetworkInfo.getMainNetworkInfo()));
+	}
 }

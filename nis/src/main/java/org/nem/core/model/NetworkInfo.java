@@ -1,11 +1,14 @@
 package org.nem.core.model;
 
+import org.nem.core.utils.Base32Encoder;
+
 /**
  * Represents information about a current network.
  */
 public class NetworkInfo {
-	private static final NetworkInfo mainNetworkInfo = createMainNetworkInfo();
-	private static final NetworkInfo testNetworkInfo = createTestNetworkInfo();
+	private static final NetworkInfo MAIN_NETWORK_INFO = createMainNetworkInfo();
+	private static final NetworkInfo TEST_NETWORK_INFO = createTestNetworkInfo();
+	private static final NetworkInfo[] KNOWN_NETWORKS = new NetworkInfo[] { MAIN_NETWORK_INFO, TEST_NETWORK_INFO };
 
 	private byte version;
 	private char addressStartChar;
@@ -44,7 +47,7 @@ public class NetworkInfo {
 	 * @return Information about the MAIN network.
 	 */
 	public static NetworkInfo getMainNetworkInfo() {
-		return mainNetworkInfo;
+		return MAIN_NETWORK_INFO;
 	}
 
 	/**
@@ -53,7 +56,28 @@ public class NetworkInfo {
 	 * @return Information about the TEST network.
 	 */
 	public static NetworkInfo getTestNetworkInfo() {
-		return testNetworkInfo;
+		return TEST_NETWORK_INFO;
+	}
+
+	/**
+	 * Gets the network info from an address.
+	 *
+	 * @param address The address.
+	 * @return The network info.
+	 */
+	public static NetworkInfo fromAddress(final Address address) {
+		final byte version = getVersionFromAddress(address);
+		for (final NetworkInfo info : KNOWN_NETWORKS) {
+			if (version == info.getVersion()) {
+				return info;
+			}
+		}
+
+		throw new IllegalArgumentException(String.format("Invalid address '%s' is not part of any known network", address));
+	}
+
+	private static byte getVersionFromAddress(final Address address) {
+		return Base32Encoder.getBytes(address.getEncoded())[0];
 	}
 
 	/**
