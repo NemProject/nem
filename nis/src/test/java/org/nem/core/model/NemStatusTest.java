@@ -12,8 +12,9 @@ public class NemStatusTest {
 		Assert.assertThat(NemStatus.fromValue(1), IsEqual.equalTo(NemStatus.STOPPED));
 		Assert.assertThat(NemStatus.fromValue(2), IsEqual.equalTo(NemStatus.STARTING));
 		Assert.assertThat(NemStatus.fromValue(3), IsEqual.equalTo(NemStatus.RUNNING));
-		Assert.assertThat(NemStatus.fromValue(4), IsEqual.equalTo(NemStatus.BOOTED));
-		Assert.assertThat(NemStatus.fromValue(5), IsEqual.equalTo(NemStatus.SYNCHRONIZED));
+		Assert.assertThat(NemStatus.fromValue(4), IsEqual.equalTo(NemStatus.BOOTING));
+		Assert.assertThat(NemStatus.fromValue(5), IsEqual.equalTo(NemStatus.BOOTED));
+		Assert.assertThat(NemStatus.fromValue(6), IsEqual.equalTo(NemStatus.SYNCHRONIZED));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
