@@ -4,6 +4,7 @@ import org.nem.nis.audit.AuditCollection;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import javax.servlet.http.*;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -11,7 +12,7 @@ import java.util.logging.Logger;
  */
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
-	private static final String HEARTBEAT_PATH = "/heartbeat";
+	private static final List<String> IGNORED_API_PATHS = Arrays.asList("/heartbeat", "/status");
 
 	private final AuditCollection auditCollection;
 
@@ -65,7 +66,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		private boolean shouldIgnore() {
-			return this.path.equalsIgnoreCase(HEARTBEAT_PATH);
+			return IGNORED_API_PATHS.stream().anyMatch(this.path::equalsIgnoreCase);
 		}
 	}
 }
