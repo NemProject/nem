@@ -92,9 +92,14 @@ public class PushService {
 			final Consumer<T> logAdditionalInfo,
 			final NodeApiId broadcastId,
 			final NodeIdentity identity) {
-		LOGGER.info(String.format("   received: %s from %s", entity.getType(), identity));
-		LOGGER.info("   signer: " + entity.getSigner().getKeyPair().getPublicKey());
-		LOGGER.info("   verify: " + Boolean.toString(entity.verify()));
+		final String message = String.format("   received: %s from %s%s   signer: %s%sverify: %s",
+				entity.getType(),
+				identity,
+				System.lineSeparator(),
+				entity.getSigner().getKeyPair().getPublicKey(),
+				System.lineSeparator(),
+				entity.verify());
+		LOGGER.info(message);
 		logAdditionalInfo.accept(entity);
 
 		final PeerNetwork network = this.host.getNetwork();
