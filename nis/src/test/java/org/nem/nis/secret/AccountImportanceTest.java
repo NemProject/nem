@@ -187,15 +187,19 @@ public class AccountImportanceTest {
 	}
 
 	@Test
-	public void importanceSetAtHeightCannotBeUpdated() {
+	public void importanceSetAtHeightCanBeUpdated() {
 		// Arrange:
 		final AccountImportance ai = new AccountImportance();
 		ai.setImportance(new BlockHeight(5), 17);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> ai.setImportance(new BlockHeight(5), 11),
-				IllegalArgumentException.class);
+		ai.setImportance(new BlockHeight(5), 11);
+		final double importance = ai.getImportance(new BlockHeight(5));
+
+		// Assert:
+		Assert.assertThat(ai.isSet(), IsEqual.equalTo(true));
+		Assert.assertThat(importance, IsEqual.equalTo(11.0));
+		Assert.assertThat(ai.getHeight(), IsEqual.equalTo(new BlockHeight(5)));
 	}
 
 	@Test
