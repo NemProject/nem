@@ -109,5 +109,17 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 		return new Amount(deserializer.readLong(label));
 	}
 
+	/**
+	 * Reads an optional amount object.
+	 *
+	 * @param deserializer The deserializer to use.
+	 * @param label The optional label.
+	 * @return The read object.
+	 */
+	public static Amount readFromOptional(final Deserializer deserializer, final String label) {
+		final Long value = deserializer.readOptionalLong(label);
+		return null == value ? null : new Amount(value);
+	}
+
 	//endregion
 }
