@@ -25,14 +25,19 @@ public enum NemStatus {
 	RUNNING(3),
 
 	/**
+	 * Local node is booting (implies RUNNING).
+	 */
+	BOOTING(4),
+
+	/**
 	 * Local node is booted (implies RUNNING).
 	 */
-	BOOTED(4),
+	BOOTED(5),
 
 	/**
 	 * NIS local node is synchronized (implies RUNNING and BOOTED)
 	 */
-	SYNCHRONIZED(5);
+	SYNCHRONIZED(6);
 
 	private final int value;
 

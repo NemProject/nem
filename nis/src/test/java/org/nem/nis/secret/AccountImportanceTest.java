@@ -63,7 +63,7 @@ public class AccountImportanceTest {
 
 	//endregion
 
-	//region out-links
+	//region outlinks
 
 	@Test
 	public void canAddOutlinks() {
@@ -125,6 +125,27 @@ public class AccountImportanceTest {
 		final List<AccountLink> links = this.toList(ai.getOutlinksIterator(new BlockHeight(8)));
 		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
 		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(8)), IsEqual.equalTo(2));
+	}
+
+	@Test
+	public void canPruneOutlinks() {
+		// Arrange:
+		final AccountImportance ai = new AccountImportance();
+		ai.addOutlink(NisUtils.createLink(7, 27, "BBB"));
+		ai.addOutlink(NisUtils.createLink(8, 35, "CCC"));
+		ai.addOutlink(NisUtils.createLink(9, 18, "AAA"));
+		ai.addOutlink(NisUtils.createLink(10, 22, "ZZZ"));
+
+		// Act:
+		ai.prune(new BlockHeight(9));
+
+		// Assert:
+		final List<AccountLink> expectedLinks = Arrays.asList(
+				NisUtils.createLink(9, 18, "AAA"),
+				NisUtils.createLink(10, 22, "ZZZ"));
+		final List<AccountLink> links = this.toList(ai.getOutlinksIterator(new BlockHeight(10)));
+		Assert.assertThat(links, IsEquivalent.equivalentTo(expectedLinks));
+		Assert.assertThat(ai.getOutlinksSize(new BlockHeight(10)), IsEqual.equalTo(2));
 	}
 
 	//endregion

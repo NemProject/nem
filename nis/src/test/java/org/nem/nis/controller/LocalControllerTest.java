@@ -12,18 +12,31 @@ import org.nem.peer.PeerNetwork;
 public class LocalControllerTest {
 
 	@Test
-	public void statusReturnsStatusRunningWhenNetworkIsNotBooted() {
+	public void statusReturnsStatusRunningWhenNetworkIsNotBootedAndNotBooting() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.host.isNetworkBooted()).thenReturn(false);
+		Mockito.when(context.host.isNetworkBooting()).thenReturn(false);
 
 		// Act:
 		final NemRequestResult result = context.controller.status();
 
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_STATUS));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(NemStatus.RUNNING.getValue()));
-		Assert.assertThat(result.getMessage(), IsEqual.equalTo("status"));
+		assertStatus(result, NemStatus.RUNNING);
+	}
+
+	@Test
+	public void statusReturnsStatusBootingWhenNetworkIsNotBootedButBooting() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.host.isNetworkBooted()).thenReturn(false);
+		Mockito.when(context.host.isNetworkBooting()).thenReturn(true);
+
+		// Act:
+		final NemRequestResult result = context.controller.status();
+
+		// Assert:
+		assertStatus(result, NemStatus.BOOTING);
 	}
 
 	@Test
@@ -37,9 +50,7 @@ public class LocalControllerTest {
 		final NemRequestResult result = context.controller.status();
 
 		// Assert:
-		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_STATUS));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(NemStatus.BOOTED.getValue()));
-		Assert.assertThat(result.getMessage(), IsEqual.equalTo("status"));
+		assertStatus(result, NemStatus.BOOTED);
 	}
 
 	@Test
@@ -53,8 +64,13 @@ public class LocalControllerTest {
 		final NemRequestResult result = context.controller.status();
 
 		// Assert:
+		assertStatus(result, NemStatus.SYNCHRONIZED);
+	}
+
+	private static void assertStatus(final NemRequestResult result, final NemStatus expectedStatus) {
+		// Assert:
 		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_STATUS));
-		Assert.assertThat(result.getCode(), IsEqual.equalTo(NemStatus.SYNCHRONIZED.getValue()));
+		Assert.assertThat(result.getCode(), IsEqual.equalTo(expectedStatus.getValue()));
 		Assert.assertThat(result.getMessage(), IsEqual.equalTo("status"));
 	}
 

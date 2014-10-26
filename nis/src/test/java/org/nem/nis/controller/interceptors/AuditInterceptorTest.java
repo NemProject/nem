@@ -31,6 +31,12 @@ public class AuditInterceptorTest {
 	}
 
 	@Test
+	public void preHandleIgnoresStatusRequests() throws Exception {
+		// Assert:
+		assertPreHandleIgnoresPath("/status");
+	}
+
+	@Test
 	public void preHandleIgnoresCaseInsensitiveHeartbeatRequests() throws Exception {
 		// Assert:
 		assertPreHandleIgnoresPath("/HeartBeat");
@@ -68,6 +74,12 @@ public class AuditInterceptorTest {
 	public void afterCompletionIgnoresHeartbeatRequests() throws Exception {
 		// Assert:
 		assertAfterCompletionIgnoresPath("/heartbeat");
+	}
+
+	@Test
+	public void afterCompletionIgnoresStatusRequests() throws Exception {
+		// Assert:
+		assertAfterCompletionIgnoresPath("/status");
 	}
 
 	@Test

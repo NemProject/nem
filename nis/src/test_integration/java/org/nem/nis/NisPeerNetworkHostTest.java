@@ -62,6 +62,8 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
+	//region isNetworkBooted
+
 	@Test
 	public void isNetworkBootedReturnsFalseIfNetworkIsNotBooted() {
 		// Arrange:
@@ -72,7 +74,7 @@ public class NisPeerNetworkHostTest {
 	}
 
 	@Test
-	public void isNetworkBootedReturnsTrueIfNetworkIsNotBooted() {
+	public void isNetworkBootedReturnsTrueIfNetworkIsBooted() {
 		// Arrange:
 		final NisPeerNetworkHost host = createNetwork();
 
@@ -82,6 +84,48 @@ public class NisPeerNetworkHostTest {
 		// Assert:
 		Assert.assertThat(host.isNetworkBooted(), IsEqual.equalTo(true));
 	}
+
+	//endregion
+
+	//region isNetworkBooting
+
+	@Test
+	public void isNetworkBootingReturnsFalseIfNetworkIsNotBooted() {
+		// Arrange:
+		final NisPeerNetworkHost host = createNetwork();
+
+		// Assert:
+		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void isNetworkBootingReturnsTrueIfNetworkIsBooting() {
+		// Arrange:
+		final NisPeerNetworkHost host = createNetwork();
+
+		// Act:
+		final CompletableFuture<?> future = host.boot(createLocalNode());
+
+		// Assert:
+		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(true));
+
+		// Cleanup:
+		future.join();
+	}
+
+	@Test
+	public void isNetworkBootingReturnsFalseIfNetworkIsBooted() {
+		// Arrange:
+		final NisPeerNetworkHost host = createNetwork();
+
+		// Act:
+		host.boot(createLocalNode()).join();
+
+		// Assert:
+		Assert.assertThat(host.isNetworkBooting(), IsEqual.equalTo(false));
+	}
+
+	//endregion
 
 	@Test(expected = IllegalStateException.class)
 	public void networkCannotBeBootedMoreThanOnce() {

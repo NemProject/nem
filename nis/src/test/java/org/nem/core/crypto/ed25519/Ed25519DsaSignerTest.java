@@ -129,8 +129,11 @@ public class Ed25519DsaSignerTest extends DsaSignerTest {
 		final byte[] input = org.nem.core.test.Utils.generateRandomBytes();
 		final Signature signature = dsaSigner.sign(input);
 		final Ed25519DsaSigner dsaSignerWithZeroArrayPublicKey = Mockito.mock(Ed25519DsaSigner.class);
+		final KeyPair keyPairWithZeroArrayPublicKey = Mockito.mock(KeyPair.class);
 		Mockito.when(dsaSignerWithZeroArrayPublicKey.getKeyPair())
-				.thenReturn(new KeyPair(kp.getPrivateKey(), new PublicKey(new byte[32]), engine));
+				.thenReturn(keyPairWithZeroArrayPublicKey);
+		Mockito.when(keyPairWithZeroArrayPublicKey.getPublicKey())
+				.thenReturn(new PublicKey(new byte[32]));
 		Mockito.when(dsaSignerWithZeroArrayPublicKey.verify(input, signature)).thenCallRealMethod();
 		Mockito.when(dsaSignerWithZeroArrayPublicKey.isCanonicalSignature(signature)).thenReturn(true);
 

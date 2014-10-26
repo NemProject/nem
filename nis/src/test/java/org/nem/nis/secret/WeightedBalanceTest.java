@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.*;
 
 public class WeightedBalanceTest {
 
-	//region createUnvested / createVested
+	//region create*
 
 	@Test
 	public void fullyUnvestedBalanceCanBeCreated() {
@@ -26,6 +26,16 @@ public class WeightedBalanceTest {
 		// Assert:
 		assertWeightedBalance(weightedBalance, 120, Amount.fromNem(1_000_000), Amount.ZERO);
 		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
+	}
+
+	@Test
+	public void partiallyVestedAndUnvestedBalanceCanBeCreated() {
+		// Arrange:
+		final WeightedBalance weightedBalance = WeightedBalance.create(new BlockHeight(120), Amount.fromNem(1_000_000), Amount.fromNem(2_000_000));
+
+		// Assert:
+		assertWeightedBalance(weightedBalance, 120, Amount.fromNem(1_000_000), Amount.fromNem(2_000_000));
+		Assert.assertThat(weightedBalance.getAmount(), IsEqual.equalTo(Amount.fromNem(3_000_000)));
 	}
 
 	//endregion ctor

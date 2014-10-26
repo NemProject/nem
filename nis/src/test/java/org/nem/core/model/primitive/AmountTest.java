@@ -1,10 +1,12 @@
 package org.nem.core.model.primitive;
 
 import net.minidev.json.JSONObject;
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
+
+import java.util.function.BiFunction;
 
 public class AmountTest {
 
@@ -143,6 +145,17 @@ public class AmountTest {
 
 	@Test
 	public void canRoundtripAmount() {
+		// Assert:
+		assertCanRoundtripAmount(Amount::readFrom);
+	}
+
+	@Test
+	public void canRoundtripAmountUsingReadFromOptional() {
+		// Assert:
+		assertCanRoundtripAmount(Amount::readFromOptional);
+	}
+
+	private static void assertCanRoundtripAmount(final BiFunction<Deserializer, String, Amount> readFrom) {
 		// Arrange:
 		final JsonSerializer serializer = new JsonSerializer();
 		final Amount originalAmount = new Amount(0x7712411223456L);
@@ -151,10 +164,23 @@ public class AmountTest {
 		Amount.writeTo(serializer, "Amount", originalAmount);
 
 		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
-		final Amount amount = Amount.readFrom(deserializer, "Amount");
+		final Amount amount = readFrom.apply(deserializer, "Amount");
 
 		// Assert:
 		Assert.assertThat(amount, IsEqual.equalTo(originalAmount));
+	}
+
+	@Test
+	public void canReadNullUsingReadFromOptional() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		final JsonDeserializer deserializer = Utils.createDeserializer(serializer.getObject());
+		final Amount amount = Amount.readFromOptional(deserializer, "Amount");
+
+		// Assert:
+		Assert.assertThat(amount, IsNull.nullValue());
 	}
 
 	//endregion

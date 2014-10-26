@@ -27,7 +27,6 @@ public class ImportanceTransferTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 	}
 
-	// TODO 20141005 J-G: (minor pedantic comment) - can you keep blanklines around //region //endregion :)
 	//endregion
 
 	//region first link

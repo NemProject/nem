@@ -94,8 +94,8 @@ public class TransferTransaction extends Transaction {
 	}
 
 	private long getMinimumTransferFee() {
-		final double microNemAmount = this.amount.getNumNem();
-		return Math.max(1, (long)Math.ceil(microNemAmount / 25000 + Math.log(microNemAmount) / 5));
+		final double nemAmount = this.amount.getNumNem();
+		return Math.max(1, (long)Math.ceil(nemAmount / 25000 + Math.log(nemAmount) / 5));
 	}
 
 	private long getMinimumMessageFee() {

@@ -111,7 +111,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithOneClusterAndNoHubAndNoOutlier() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_ONE_CLUSTERS_NO_HUB_NO_OUTLIER);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_BOX_TWO_DIAGONALS);
 
 		// Assert:
 		final SparseMatrix a = new SparseMatrix(4, 1, 4);
@@ -133,7 +133,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithOneClusterAndNoHubAndOneOutlier() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_ONE_CLUSTERS_NO_HUB_ONE_OUTLIER);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphTypeEpsilon065.GRAPH_ONE_CLUSTER_NO_HUB_ONE_OUTLIER);
 
 		// Assert:
 		final SparseMatrix a = new SparseMatrix(5, 2, 4);
@@ -158,7 +158,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoClustersAndNoHubAndNoOutlier() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_NO_HUB_NO_OUTLIER);
 
 		// Assert:
 		final SparseMatrix a = new SparseMatrix(6, 2, 4);
@@ -185,7 +185,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoClustersAndNoHubAndOneOutlier() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_NO_HUB_ONE_OUTLIER);
 
 		// Assert:
 		final SparseMatrix a = new SparseMatrix(7, 3, 4);
@@ -215,7 +215,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoClustersAndOneHubAndNoOutlier() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_ONE_HUB_NO_OUTLIER);
 
 		// Assert:
 		final SparseMatrix a = new SparseMatrix(7, 3, 4);
@@ -245,7 +245,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithTwoClustersAndTwoHubsAndTwoOutliers() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphTypeEpsilon065.GRAPH_TWO_CLUSTERS_TWO_HUBS_TWO_OUTLIERS);
 
 		// Assert:
 		final SparseMatrix a = new SparseMatrix(11, 6, 4);
@@ -287,7 +287,7 @@ public class InterLevelProximityMatrixTest {
 	@Test
 	public void matricesAreCalculatedCorrectlyForGraphWithThreeClustersTwoHubsAndThreeOutliers() {
 		// Act:
-		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphType.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		final InterLevelProximityMatrix interLevel = createInterLevelMatrix(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
 		// Assert:
 		assertInterLevelMatrixForGraphWithThreeClustersTwoHubsAndThreeOutliers(interLevel);
@@ -406,8 +406,18 @@ public class InterLevelProximityMatrixTest {
 	//region test infrastructure
 
 	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphType graphType) {
-		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
-		final ClusteringResult clusteringResult = IdealizedClusterFactory.create(graphType);
+		return createInterLevelMatrix(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType));
+	}
+
+	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphTypeEpsilon040 graphType) {
+		return createInterLevelMatrix(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType));
+	}
+
+	private static InterLevelProximityMatrix createInterLevelMatrix(final GraphTypeEpsilon065 graphType) {
+		return createInterLevelMatrix(OutlinkMatrixFactory.create(graphType), IdealizedClusterFactory.create(graphType));
+	}
+
+	private static InterLevelProximityMatrix createInterLevelMatrix(final Matrix outlinkMatrix, final ClusteringResult clusteringResult) {
 		final NodeNeighborMap nodeNeighborMap = new NodeNeighborMap(outlinkMatrix);
 		final Neighborhood neighborhood = NisUtils.createNeighborhood(nodeNeighborMap, new DefaultSimilarityStrategy(nodeNeighborMap));
 		return new InterLevelProximityMatrix(clusteringResult, neighborhood, outlinkMatrix);

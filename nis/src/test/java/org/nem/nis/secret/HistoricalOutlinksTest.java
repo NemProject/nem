@@ -6,7 +6,8 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
-import java.util.Iterator;
+import java.util.*;
+import java.util.stream.*;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 
@@ -149,6 +150,31 @@ public class HistoricalOutlinksTest {
 	}
 	//endregion
 
+	//region prune
+
+	@Test
+	public void pruneRemovesAllOlderOutlinks() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final HistoricalOutlinks historicalOutlinks = new HistoricalOutlinks();
+		historicalOutlinks.add(new BlockHeight(1234), address, Amount.fromNem(123));
+		historicalOutlinks.add(new BlockHeight(1235), address, Amount.fromNem(234));
+		historicalOutlinks.add(new BlockHeight(1236), address, Amount.fromNem(345));
+		historicalOutlinks.add(new BlockHeight(1237), address, Amount.fromNem(456));
+
+		// Act:
+		historicalOutlinks.prune(new BlockHeight(1236));
+
+		// Assert:
+		final Iterator<AccountLink> it = historicalOutlinks.outlinksIterator(new BlockHeight(1238));
+		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
+				.map(link -> link.getAmount().getNumNem())
+				.collect(Collectors.toList());
+		Assert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(345L, 456L)));
+	}
+
+	//endregion
+
 	//region copy
 
 	@Test
@@ -164,11 +190,11 @@ public class HistoricalOutlinksTest {
 		final HistoricalOutlinks copy = historicalOutlinks.copy();
 
 		// Assert:
-		final Iterator<AccountLink> it = copy.outlinksIterator(new BlockHeight(1235));
-		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(123)));
-		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(234)));
-		Assert.assertThat(it.next().getAmount(), equalTo(Amount.fromNem(345)));
-		Assert.assertFalse(it.hasNext());
+		final Iterator<AccountLink> it = copy.outlinksIterator(new BlockHeight(1238));
+		final List<Long> amounts = StreamSupport.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.IMMUTABLE), false)
+				.map(link -> link.getAmount().getNumNem())
+				.collect(Collectors.toList());
+		Assert.assertThat(amounts, IsEqual.equalTo(Arrays.asList(123L, 234L, 345L)));
 	}
 
 	@Test

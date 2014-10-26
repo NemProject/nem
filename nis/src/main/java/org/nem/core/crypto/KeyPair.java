@@ -58,7 +58,7 @@ public class KeyPair {
 		this(null, publicKey, engine);
 	}
 
-	public KeyPair(final PrivateKey privateKey, final PublicKey publicKey, final CryptoEngine engine) {
+	private KeyPair(final PrivateKey privateKey, final PublicKey publicKey, final CryptoEngine engine) {
 		this.privateKey = privateKey;
 		this.publicKey = publicKey;
 

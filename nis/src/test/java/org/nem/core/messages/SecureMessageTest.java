@@ -27,6 +27,22 @@ public class SecureMessageTest {
 	}
 
 	@Test
+	public void canCreateMessageAroundEmptyDecodedPayload() {
+		// Act:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final byte[] input = new byte[] { };
+		final SecureMessage message = SecureMessage.fromDecodedPayload(sender, recipient, input);
+
+		// Assert:
+		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));
+		Assert.assertThat(message.canDecode(), IsEqual.equalTo(true));
+		Assert.assertThat(message.getDecodedPayload(), IsEqual.equalTo(input));
+		Assert.assertThat(message.getEncodedPayload(), IsNot.not(IsEqual.equalTo(input)));
+		Assert.assertThat(message.getEncodedPayload().length, IsEqual.equalTo(64));
+	}
+
+	@Test
 	public void canCreateMessageAroundEncodedPayload() {
 		// Act:
 		final Account sender = Utils.generateRandomAccount();

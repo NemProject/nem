@@ -348,10 +348,10 @@ public class Ed25519FieldElement {
 		carry6 = (h6 + (long)(1 << 25)) >> 26;
 		h7 += carry6;
 		h6 -= carry6 << 26;
-        /* |h2| <= 2^25; from now on fits into int32 unchanged */
-        /* |h6| <= 2^25; from now on fits into int32 unchanged */
-        /* |h3| <= 1.71*2^59 */
-        /* |h7| <= 1.71*2^59 */
+		/* |h2| <= 2^25; from now on fits into int32 unchanged */
+		/* |h6| <= 2^25; from now on fits into int32 unchanged */
+		/* |h3| <= 1.71*2^59 */
+		/* |h7| <= 1.71*2^59 */
 
 		carry3 = (h3 + (long)(1 << 24)) >> 25;
 		h4 += carry3;
@@ -359,10 +359,10 @@ public class Ed25519FieldElement {
 		carry7 = (h7 + (long)(1 << 24)) >> 25;
 		h8 += carry7;
 		h7 -= carry7 << 25;
-        /* |h3| <= 2^24; from now on fits into int32 unchanged */
-        /* |h7| <= 2^24; from now on fits into int32 unchanged */
-        /* |h4| <= 1.72*2^34 */
-        /* |h8| <= 1.41*2^60 */
+		/* |h3| <= 2^24; from now on fits into int32 unchanged */
+		/* |h7| <= 2^24; from now on fits into int32 unchanged */
+		/* |h4| <= 1.72*2^34 */
+		/* |h8| <= 1.41*2^60 */
 
 		carry4 = (h4 + (long)(1 << 25)) >> 26;
 		h5 += carry4;
@@ -370,22 +370,22 @@ public class Ed25519FieldElement {
 		carry8 = (h8 + (long)(1 << 25)) >> 26;
 		h9 += carry8;
 		h8 -= carry8 << 26;
-        /* |h4| <= 2^25; from now on fits into int32 unchanged */
-        /* |h8| <= 2^25; from now on fits into int32 unchanged */
-        /* |h5| <= 1.01*2^24 */
-        /* |h9| <= 1.71*2^59 */
+		/* |h4| <= 2^25; from now on fits into int32 unchanged */
+		/* |h8| <= 2^25; from now on fits into int32 unchanged */
+		/* |h5| <= 1.01*2^24 */
+		/* |h9| <= 1.71*2^59 */
 
 		carry9 = (h9 + (long)(1 << 24)) >> 25;
 		h0 += carry9 * 19;
 		h9 -= carry9 << 25;
-        /* |h9| <= 2^24; from now on fits into int32 unchanged */
-        /* |h0| <= 1.1*2^39 */
+		/* |h9| <= 2^24; from now on fits into int32 unchanged */
+		/* |h0| <= 1.1*2^39 */
 
 		carry0 = (h0 + (long)(1 << 25)) >> 26;
 		h1 += carry0;
 		h0 -= carry0 << 26;
-        /* |h0| <= 2^25; from now on fits into int32 unchanged */
-        /* |h1| <= 1.01*2^24 */
+		/* |h0| <= 2^25; from now on fits into int32 unchanged */
+		/* |h1| <= 1.01*2^24 */
 
 		final int[] h = new int[10];
 		h[0] = (int)h0;

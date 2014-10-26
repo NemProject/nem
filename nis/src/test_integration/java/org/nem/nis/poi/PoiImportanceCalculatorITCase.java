@@ -147,6 +147,7 @@ public class PoiImportanceCalculatorITCase {
 		// Arrange 1 vs many:
 		// Splitting of one account into many small accounts should have no influence on the importance distribution.
 		// TODO-CR 20140916 BR: test fails because weight on page rank was increased from 5% to 13.37%.
+        // TODO: 20141024 M-M: see if there are any effects of clustering here
 		final List<PoiAccountState> accounts = new ArrayList<>();
 		for (int i = 2; i < 10; i++) {
 			accounts.clear();
@@ -423,6 +424,9 @@ public class PoiImportanceCalculatorITCase {
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
 		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
+        // TODO: 20141024 M-J: Do you think we can speed up Java warm-up? http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
+        // -> perhaps we can call some of the poi code in a low priority thread on startup so that things are warmed up?
+
 		// Warm up phase
 		getAccountImportances(new BlockHeight(9999), accounts);
 

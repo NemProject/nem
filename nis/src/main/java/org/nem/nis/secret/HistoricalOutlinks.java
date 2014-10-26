@@ -94,14 +94,20 @@ public class HistoricalOutlinks {
 	}
 
 	/**
+	 * Removes all historical outlinks that are older than the specified height.
+	 *
+	 * @param minHeight The minimum height of outlinks to keep.
+	 */
+	public void prune(final BlockHeight minHeight) {
+		this.outlinks.removeIf(outlink -> outlink.getHeight().compareTo(minHeight) < 0);
+	}
+
+	/**
 	 * Creates a new copy of these out-links.
 	 */
 	public HistoricalOutlinks copy() {
 		final HistoricalOutlinks copy = new HistoricalOutlinks();
-		// looks ugly, but obfuscation does not like forEach :/
-		for (final HistoricalOutlink temp : this.outlinks.stream().map(hl -> hl.copy()).collect(Collectors.toList())) {
-			copy.outlinks.add(temp);
-		}
+		copy.outlinks.addAll(this.outlinks.stream().map(hl -> hl.copy()).collect(Collectors.toList()));
 		return copy;
 	}
 }
