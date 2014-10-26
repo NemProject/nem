@@ -257,7 +257,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void addNewFailsIfTimeStampIsTooFarInThePast() {
+	public void addNewSucceedsIfTimeStampIsTooFarInThePast() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.timeProvider.getCurrentTime()).thenReturn(new TimeInstant(1000));
@@ -268,8 +268,8 @@ public class UnconfirmedTransactionsTest {
 		final ValidationResult result = context.transactions.addNew(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(0));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
 	}
 
 	@Test

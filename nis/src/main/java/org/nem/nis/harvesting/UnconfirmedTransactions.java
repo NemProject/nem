@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.*;
+import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
  */
 public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
-	private static final int TRANSACTION_MAX_ALLOWED_TIME_DEVIATION = 30;
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
@@ -93,12 +93,8 @@ public class UnconfirmedTransactions {
 	public ValidationResult addNew(final Transaction transaction) {
 		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
 		final TimeInstant entityTime = transaction.getTimeStamp();
-		if (entityTime.compareTo(currentTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION)) > 0) {
+		if (entityTime.compareTo(currentTime.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
 			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
-		}
-
-		if (entityTime.addSeconds(TRANSACTION_MAX_ALLOWED_TIME_DEVIATION).compareTo(currentTime) < 0) {
-			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_PAST;
 		}
 
 		return this.add(transaction, AddOptions.RejectNeutral, true);

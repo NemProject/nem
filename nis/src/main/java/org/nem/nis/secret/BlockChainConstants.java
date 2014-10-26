@@ -20,4 +20,10 @@ public class BlockChainConstants {
 	 * Number of blocks send and compared during synchronization
 	 */
 	public static final int BLOCKS_LIMIT = ESTIMATED_BLOCKS_PER_DAY;
+
+	/**
+	 * The maximum number of seconds in the future that an entity's timestamp can be
+	 * without the entity being rejected.
+	 */
+	public static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
 }

@@ -2,12 +2,12 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.core.time.*;
+import org.nem.nis.secret.BlockChainConstants;
 
 /**
  * BlockValidator and TransactionValidator implementation that ensures entities are not too far in the future.
  */
 public class NonFutureEntityValidator implements BlockValidator, TransactionValidator {
-	private static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
 	private final TimeProvider timeProvider;
 
 	/**
@@ -31,7 +31,7 @@ public class NonFutureEntityValidator implements BlockValidator, TransactionVali
 
 	private ValidationResult validateTimeStamp(final TimeInstant timeInstant) {
 		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-		return timeInstant.compareTo(currentTime.addSeconds(MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0
+		return timeInstant.compareTo(currentTime.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0
 				? ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE
 				: ValidationResult.SUCCESS;
 	}
