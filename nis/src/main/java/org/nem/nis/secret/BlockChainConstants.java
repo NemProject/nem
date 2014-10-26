@@ -14,7 +14,7 @@ public class BlockChainConstants {
 	/**
 	 * Number of blocks that network is allowed to rewrite during fork
 	 */
-	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 2);
+	public static final int REWRITE_LIMIT = ESTIMATED_BLOCKS_PER_DAY - 60;//(ESTIMATED_BLOCKS_PER_DAY / 2);
 
 	/**
 	 * Number of blocks send and compared during synchronization
