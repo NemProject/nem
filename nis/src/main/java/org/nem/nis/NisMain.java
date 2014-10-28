@@ -11,13 +11,12 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.*;
-import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.util.Iterator;
 import java.util.logging.Logger;
+
+// TODO: we should really test this class ;)
 
 public class NisMain {
 	private static final Logger LOGGER = Logger.getLogger(NisMain.class.getName());
@@ -33,153 +32,30 @@ public class NisMain {
 	private final AccountDao accountDao;
 	private final BlockDao blockDao;
 	private final AccountAnalyzer accountAnalyzer;
-	private final BlockChain blockChain;
 	private final NisPeerNetworkHost networkHost;
-	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final NisConfiguration nisConfiguration;
+	private final BlockAnalyzer blockAnalyzer;
 
 	@Autowired(required = true)
 	public NisMain(
 			final AccountDao accountDao,
 			final BlockDao blockDao,
 			final AccountAnalyzer accountAnalyzer,
-			final BlockChain blockChain,
 			final NisPeerNetworkHost networkHost,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final NisConfiguration nisConfiguration) {
+			final NisConfiguration nisConfiguration,
+			final BlockAnalyzer blockAnalyzer) {
 		this.accountDao = accountDao;
 		this.blockDao = blockDao;
 		this.accountAnalyzer = accountAnalyzer;
-		this.blockChain = blockChain;
 		this.networkHost = networkHost;
-		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.nisConfiguration = nisConfiguration;
+		this.blockAnalyzer = blockAnalyzer;
 	}
 
 	private void analyzeBlocks() {
-		Long curBlockId;
-		LOGGER.info("starting analysis...");
-
-		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
-		if (dbBlock == null) {
-			LOGGER.severe("couldn't find nemesis block, did you remove OLD database?");
+		if (!this.blockAnalyzer.analyze(this.accountAnalyzer)) {
 			System.exit(-1);
 		}
-		LOGGER.info(String.format("first block generation hash: %s", dbBlock.getGenerationHash()));
-		if (!dbBlock.getGenerationHash().equals(NemesisBlock.GENERATION_HASH)) {
-			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
-			System.exit(-1);
-		}
-
-		Block parentBlock = null;
-		final BlockIterator iterator = new BlockIterator(this.blockDao);
-
-		// TODO: we should really test this procedure ;)
-
-		// This is tricky:
-		// we pass AA to observer and AutoCachedAA to toModel
-		// it creates accounts for us inside AA but without height, so inside observer we'll set height
-		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
-		final AccountCache accountCache = this.accountAnalyzer.getAccountCache();
-		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache);
-		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(this.accountAnalyzer);
-		do {
-			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
-
-			if ((block.getHeight().getRaw() % 5000) == 0) {
-				LOGGER.warning(String.format("%d", block.getHeight().getRaw()));
-			}
-
-			if (null != parentBlock) {
-				this.blockChain.updateScore(parentBlock, block);
-			}
-
-			executor.execute(block, observer);
-
-			// fully vest all transactions coming out of the nemesis block
-			if (null == parentBlock) {
-				for (final Account account : accountCache) {
-					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
-						continue;
-					}
-
-					final PoiAccountState accountState = poiFacade.findStateByAddress(account.getAddress());
-					accountState.getWeightedBalances().convertToFullyVested();
-				}
-			}
-
-			parentBlock = block;
-
-			curBlockId = dbBlock.getNextBlockId();
-
-			// This is proper exit from this loop
-			if (null == curBlockId) {
-				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
-				break;
-			}
-
-			dbBlock = iterator.findById(curBlockId);
-
-			if (dbBlock == null && this.blockChainLastBlockLayer.getLastDbBlock() == null) {
-				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
-				System.exit(-1);
-			}
-		} while (dbBlock != null);
-
-		this.initializePoi(parentBlock.getHeight());
-	}
-
-	private static class BlockIterator {
-		private final BlockDao blockDao;
-		private long curHeight;
-		private Iterator<org.nem.nis.dbmodel.Block> iterator;
-
-		public BlockIterator(final BlockDao blockDao) {
-			this.curHeight = 1; // the nemesis block height
-			this.blockDao = blockDao;
-		}
-
-		public org.nem.nis.dbmodel.Block findById(final long id) {
-			// ugly loop, this is equivalent to
-			// dbBlock = this.blockDao.findById(curBlockId);
-			org.nem.nis.dbmodel.Block dbBlock = null;
-			do {
-				if (null == this.iterator || !this.iterator.hasNext()) {
-					this.iterator = this.blockDao.getBlocksAfter(this.curHeight, 2345).iterator();
-				}
-
-				// in most cases this won't make any loops
-				while (this.iterator.hasNext()) {
-					dbBlock = this.iterator.next();
-					if (dbBlock.getId().equals(id)) {
-						break;
-					}
-
-					if (dbBlock.getHeight().compareTo(this.curHeight + 1) > 0) {
-						dbBlock = null;
-					}
-				}
-
-				if (dbBlock == null) {
-					break;
-				}
-
-				this.curHeight = dbBlock.getHeight();
-			}
-			while (!dbBlock.getId().equals(id));
-
-			return dbBlock;
-		}
-	}
-
-	private void initializePoi(final BlockHeight height) {
-		LOGGER.info("Analyzed blocks: " + height);
-		LOGGER.info("Known accounts: " + this.accountAnalyzer.getAccountCache().size());
-		LOGGER.info(String.format("Initializing PoI for (%d) accounts", this.accountAnalyzer.getAccountCache().size()));
-		final BlockScorer blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
-		final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
-		this.accountAnalyzer.getPoiFacade().recalculateImportances(blockHeight);
-		LOGGER.info("PoI initialized");
 	}
 
 	@PostConstruct
