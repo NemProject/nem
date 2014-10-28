@@ -56,7 +56,6 @@ public class DebugControllerTest {
 		blockDaoParent.setDifficulty(difficulty);
 
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
-		scorer.forceImportanceCalculation();
 		final BigInteger hit = scorer.calculateHit(blockDaoBlock);
 		final BigInteger target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
 

@@ -96,7 +96,6 @@ public class DebugController {
 		// because we want the returned importances to be relative to the requested height
 		// (note that the recalculation is done on a copy of the AccountAnalyzer so it will not impact the real block-chain)
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
-		scorer.forceImportanceCalculation();
 
 		final BigInteger hit = scorer.calculateHit(block);
 		final BigInteger target = null == parent ? BigInteger.ZERO : scorer.calculateTarget(parent, block);
