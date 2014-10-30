@@ -447,7 +447,7 @@ public class BlockChain implements BlockSynchronizer {
 
 			// BR: Do not accept a chain with the same score.
 			//     In case we got here via pushBlock the following can happen:
-			//     2 different blocks with the height and score are pushed in the network.
+			//     2 different blocks with the same height and score are pushed in the network.
 			//     This leads to switching between the 2 blocks indefinitely resulting in tons of pushes.
 			if (this.peerScore.compareTo(this.ourScore) <= 0) {
 				return ValidationResult.NEUTRAL;

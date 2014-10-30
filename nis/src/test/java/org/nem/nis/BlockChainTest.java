@@ -16,7 +16,7 @@ import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
-import org.nem.nis.validators.TransactionValidatorFactory;
+import org.nem.nis.validators.*;
 
 import java.lang.reflect.*;
 import java.math.BigInteger;
@@ -144,12 +144,14 @@ public class BlockChainTest {
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
+		final BatchTransactionHashValidatorFactory batchTransactionHashValidatorFactory = NisUtils.createBatchTransactionHashValidatorFactory();
 		final BlockChainServices services =
 				new BlockChainServices(
 						mockBlockDao,
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
-						transactionValidatorFactory);
+						transactionValidatorFactory,
+						batchTransactionHashValidatorFactory);
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,
