@@ -27,17 +27,20 @@ public class BlockChainServices {
 	private final BlockTransactionObserverFactory observerFactory;
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final TransactionValidatorFactory transactionValidatorFactory;
+	private final BatchTransactionHashValidatorFactory batchTransactionHashValidatorFactory;
 
 	@Autowired(required = true)
 	public BlockChainServices(
 			final BlockDao blockDao,
 			final BlockTransactionObserverFactory observerFactory,
 			final BlockValidatorFactory blockValidatorFactory,
-			final TransactionValidatorFactory transactionValidatorFactory) {
+			final TransactionValidatorFactory transactionValidatorFactory,
+			final BatchTransactionHashValidatorFactory batchTransactionHashValidatorFactory) {
 		this.blockDao = blockDao;
 		this.observerFactory = observerFactory;
 		this.blockValidatorFactory = blockValidatorFactory;
 		this.transactionValidatorFactory = transactionValidatorFactory;
+		this.batchTransactionHashValidatorFactory = batchTransactionHashValidatorFactory;
 	}
 
 	/**
@@ -62,7 +65,8 @@ public class BlockChainServices {
 				scorer,
 				BlockChainConstants.BLOCKS_LIMIT,
 				this.blockValidatorFactory.create(poiFacade),
-				this.transactionValidatorFactory.create(poiFacade));
+				this.transactionValidatorFactory.create(poiFacade),
+				this.batchTransactionHashValidatorFactory.create());
 		return validator.isValid(parentBlock, peerChain);
 	}
 

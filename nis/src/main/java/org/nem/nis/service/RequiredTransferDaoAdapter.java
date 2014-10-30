@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,11 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 			throw createMissingResourceException(txHash.toString());
 		}
 		return transfer;
+	}
+
+	@Override
+	public boolean duplicateHashExists(Collection<Hash> hashes, BlockHeight maxBlockHeight) {
+		return this.transferDao.duplicateHashExists(hashes, maxBlockHeight);
 	}
 
 	//TODO: we should probably delegate in getTransactionsForAccount too and add tests for delegation

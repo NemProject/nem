@@ -1,6 +1,10 @@
 package org.nem.nis.dao;
 
+import org.nem.core.crypto.Hash;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.ImportanceTransfer;
+
+import java.util.Collection;
 
 // TODO 20140909 J-G: not sure if this buys us anything, but we could have a generic TransferDao interface that we could use for all transaction types
 // G-J: It'll probably will be better to keep DAOs separated, but it might be good idea to generalize actual implementation.
@@ -40,4 +44,14 @@ public interface ImportanceTransferDao {
 	 * @return Transfer having given hash or null.
 	 */
 	ImportanceTransfer findByHash(byte[] txHash, long maxBlockHeight);
+
+	/**
+	 * Get a value indicating whether or not any of the given hashes exist in the db.
+	 * The search is only up to a given block height.
+	 *
+	 * @param hashes A collections of hashes.
+	 * @param maxBlockHeight The maximum block height.
+	 * @return True if any of the given hashes already exist in the db, false otherwise.
+	 */
+	public boolean duplicateHashExists(Collection<Hash> hashes, BlockHeight maxBlockHeight);
 }

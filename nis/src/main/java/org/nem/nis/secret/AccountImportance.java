@@ -110,15 +110,6 @@ public class AccountImportance implements SerializableEntity {
 	 * @param importance The importance.
 	 */
 	public void setImportance(final BlockHeight blockHeight, final double importance) {
-		// don't allow importance to be reset at the same height
-		// TODO 20141007 J-G: do you remember why we have this check?
-		// TODO 20141026 BR -> J,G: this caused the unresolvable fork in our network.
-		// TODO                     either we need to add a copyAndResetImportanceHeights() method in PoiFacade instead of simple copy()
-		// TODO                     or we comment this out. I did the latter for now.
-		/*if (null != this.importanceHeight && 0 == this.importanceHeight.compareTo(blockHeight)) {
-			throw new IllegalArgumentException("importance already set at given height");
-		}*/
-
 		this.importanceHeight = blockHeight;
 		this.importance = importance;
 	}

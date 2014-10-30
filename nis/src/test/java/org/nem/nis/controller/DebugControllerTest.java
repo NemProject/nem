@@ -56,7 +56,6 @@ public class DebugControllerTest {
 		blockDaoParent.setDifficulty(difficulty);
 
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
-		scorer.forceImportanceCalculation();
 		final BigInteger hit = scorer.calculateHit(blockDaoBlock);
 		final BigInteger target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
 
@@ -83,7 +82,7 @@ public class DebugControllerTest {
 		Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
 		Mockito.when(context.blockDao.findByHeight(new BlockHeight(9))).thenReturn(dbParent);
 
-		Mockito.when(context.blockChain.copyAccountAnalyzer()).thenReturn(accountAnalyzer);
+		// TODO Mockito.when(context.blockChain.copyAccountAnalyzer()).thenReturn(accountAnalyzer);
 
 		// Act:
 		final BlockDebugInfo blockDebugInfo = context.controller.blockDebugInfo("10");
@@ -163,8 +162,9 @@ public class DebugControllerTest {
 	}
 
 	private static class TestContext {
-		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
+		private final BlockAnalyzer blockAnalyzer = Mockito.mock(BlockAnalyzer.class);
+		private final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final DebugController controller;
@@ -176,7 +176,7 @@ public class DebugControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new DebugController(this.host, this.blockChain, this.blockDao);
+			this.controller = new DebugController(this.host, this.blockDao, this.blockAnalyzer, this.importanceCalculator);
 		}
 	}
 }

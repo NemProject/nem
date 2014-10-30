@@ -180,6 +180,25 @@ public class NisUtils {
 	}
 
 	/**
+	 * Creates a (mostly real) batch transaction hash validator factory.
+	 *
+	 * @return The factory.
+	 */
+	public static BatchTransactionHashValidatorFactory createBatchTransactionHashValidatorFactory() {
+		return createBatchTransactionHashValidatorFactory(Mockito.mock(TransferDao.class));
+	}
+
+	/**
+	 * Creates a (mostly real) batch transaction hash validator factory.
+	 *
+	 * @param transferDao The transfer dao.
+	 * @return The factory.
+	 */
+	public static BatchTransactionHashValidatorFactory createBatchTransactionHashValidatorFactory(final TransferDao transferDao) {
+		return new BatchTransactionHashValidatorFactory(transferDao, Mockito.mock(ImportanceTransferDao.class));
+	}
+
+	/**
 	 * Creates a (real) block validator factory.
 	 *
 	 * @return The factory.
