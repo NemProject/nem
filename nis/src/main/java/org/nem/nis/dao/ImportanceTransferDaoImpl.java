@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import com.sun.deploy.util.StringUtils;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class ImportanceTransferDaoImpl implements ImportanceTransferDao {

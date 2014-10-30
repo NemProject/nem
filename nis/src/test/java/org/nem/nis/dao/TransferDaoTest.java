@@ -500,6 +500,7 @@ public class TransferDaoTest {
 	}
 
 	// TODO 20141029 BR -> J: you want the same tests for importance transfer dao
+	// TODO 20141029 J -> BR: yes ... i think we need some refactoring of the transfer daos
 	@Test
 	public void duplicateHashExistsReturnsFalseIfNoneOfTheHashesExistInDatabase() {
 		// Arrange:

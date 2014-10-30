@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+// TODO 20141030: this class needs tests
+
 /**
  * Loads and analyzes blocks from the database.
  */
@@ -122,7 +124,6 @@ public class BlockAnalyzer {
 		return true;
 	}
 
-
 	private static class BlockIterator {
 		private final BlockDao blockDao;
 		private long curHeight;
@@ -187,6 +188,8 @@ public class BlockAnalyzer {
 		// load the nemesis block
 		return NemesisBlock.fromResource(new DeserializationContext(accountAnalyzer.getAccountCache().asAutoCache()));
 	}
+
+	// TODO 20141030: figure out if this should be integrated here or stay in main
 
 	//private void logNemesisInformation() {
 	//	LOGGER.info("nemesis block hash:" + this.nemesisBlockHash);

@@ -22,6 +22,7 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final TransactionValidator transactionValidator;
+	// TODO 20141030 J-G think about this a bit more
 	private final BatchTransactionHashValidator batchTransactionHashValidator;
 
 	/**

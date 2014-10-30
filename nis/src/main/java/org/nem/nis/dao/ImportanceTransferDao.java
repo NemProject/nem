@@ -46,7 +46,7 @@ public interface ImportanceTransferDao {
 	ImportanceTransfer findByHash(byte[] txHash, long maxBlockHeight);
 
 	/**
-	 * Get a value indicating whether or not any of the given hashes exist in the db.
+	 * Gets a value indicating whether or not any of the given hashes exist in the db.
 	 * The search is only up to a given block height.
 	 *
 	 * @param hashes A collections of hashes.
