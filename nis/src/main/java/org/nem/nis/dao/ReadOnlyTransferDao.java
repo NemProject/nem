@@ -54,7 +54,7 @@ public interface ReadOnlyTransferDao {
 	 * @param maxBlockHeight The maximum block height.
 	 * @return True if any of the given hashes already exist in the db, false otherwise.
 	 */
-	public boolean duplicateHashExists(Collection<Hash> hashes, BlockHeight maxBlockHeight);
+	public boolean anyHashExists(Collection<Hash> hashes, BlockHeight maxBlockHeight);
 
 	/**
 	 * Retrieves limit Transfers from db for given account.

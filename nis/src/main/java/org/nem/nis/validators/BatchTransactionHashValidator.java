@@ -33,8 +33,8 @@ public class BatchTransactionHashValidator {
 		final Collection<Hash> hashes = new ArrayList<>();
 		transactions.stream().forEach(t -> hashes.add(HashUtils.calculateHash(t)));
 		final BlockHeight blockHeight = context.getConfirmedBlockHeight();
-		final boolean isInTransferDao = this.transferDao.duplicateHashExists(hashes, blockHeight);
-		final boolean isInImportanceTransferDao = this.importanceTransferDao.duplicateHashExists(hashes, blockHeight);
+		final boolean isInTransferDao = this.transferDao.anyHashExists(hashes, blockHeight);
+		final boolean isInImportanceTransferDao = this.importanceTransferDao.anyHashExists(hashes, blockHeight);
 		long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("BatchTransactionHashValidator.validate() at height %d needed %dms.",
 				blockHeight.getRaw(),

@@ -48,8 +48,8 @@ public class RequiredTransferDaoAdapter implements RequiredTransferDao {
 	}
 
 	@Override
-	public boolean duplicateHashExists(Collection<Hash> hashes, BlockHeight maxBlockHeight) {
-		return this.transferDao.duplicateHashExists(hashes, maxBlockHeight);
+	public boolean anyHashExists(Collection<Hash> hashes, BlockHeight maxBlockHeight) {
+		return this.transferDao.anyHashExists(hashes, maxBlockHeight);
 	}
 
 	//TODO: we should probably delegate in getTransactionsForAccount too and add tests for delegation
