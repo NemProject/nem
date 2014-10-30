@@ -5,10 +5,11 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
+import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
@@ -257,6 +258,59 @@ public class PushServiceTest {
 		Assert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
+	@Test
+	public void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = createMockTransaction();
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		context.service.pushTransaction(transaction, null);
+		final ValidationResult result = context.service.pushTransaction(transaction, null);
+
+		// Assert:
+		// if the transaction in the second pushTransaction call would have gone past the cache check,
+		// then there would 2 calls to getTape().
+		Mockito.verify(transaction, Mockito.times(1)).getType();
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void pushTransactionPrunesTransactionHashCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = createMockTransaction();
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp 5 seconds later than first one --> first transaction not pruned.
+		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp 11 seconds later than second one --> first and second transaction pruned.
+		context.service.pushTransaction(transaction, null);
+
+		// Assert:
+		Mockito.verify(transaction, Mockito.times(2)).getType();
+	}
+
+	private Transaction createMockTransaction() {
+		final Transaction transaction = Mockito.mock(Transaction.class);
+		final MockTransaction mockTransaction = new MockTransaction(Utils.generateRandomAccount(), 12);
+		mockTransaction.sign();
+		final Account account = Utils.generateRandomAccount();
+		Mockito.when(transaction.verify()).thenReturn(true);
+		Mockito.when(transaction.getType()).thenReturn(TransactionTypes.TRANSFER);
+		Mockito.when(transaction.getSigner()).thenReturn(account);
+		Mockito.when(transaction.asNonVerifiable()).thenReturn(mockTransaction);
+		Mockito.when(transaction.getTimeStamp()).thenReturn(new TimeInstant(1122448));
+		Mockito.when(transaction.getDeadline()).thenReturn(new TimeInstant(1122448).addHours(2));
+		Mockito.when(transaction.getFee()).thenReturn(new Amount(5));
+		return transaction;
+	}
+
 	//endregion
 
 	private static class TestContext {
@@ -266,6 +320,7 @@ public class PushServiceTest {
 		private final PeerNetwork network;
 		private final UnconfirmedTransactions unconfirmedTransactions;
 		private final BlockChain blockChain;
+		private final TimeProvider timeProvider;
 		private final PushService service;
 
 		public TestContext() {
@@ -288,6 +343,14 @@ public class PushServiceTest {
 
 			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
+			this.timeProvider = Mockito.mock(TimeProvider.class);
+			Mockito.when(this.timeProvider.getCurrentTime())
+					.thenReturn(
+							new TimeInstant(1122448),
+							new TimeInstant(1122448),
+							new TimeInstant(1122448 + 5),
+							new TimeInstant(1122448 + 16),
+							new TimeInstant(1122448 + 16));
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
@@ -296,7 +359,8 @@ public class PushServiceTest {
 					this.unconfirmedTransactions,
 					validator,
 					this.blockChain,
-					host);
+					host,
+					this.timeProvider);
 		}
 
 		public void assertNoUpdateExperience() {
