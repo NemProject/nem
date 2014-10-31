@@ -502,7 +502,7 @@ public class TransferDaoTest {
 	// TODO 20141029 BR -> J: you want the same tests for importance transfer dao
 	// TODO 20141029 J -> BR: yes ... i think we need some refactoring of the transfer daos
 	@Test
-	public void duplicateHashExistsReturnsFalseIfNoneOfTheHashesExistInDatabase() {
+	public void anyHashExistsReturnsFalseIfNoneOfTheHashesExistInDatabase() {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(3);
 		Collection<Hash> hashes = new ArrayList<>();
@@ -512,14 +512,14 @@ public class TransferDaoTest {
 		}
 
 		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.duplicateHashExists(hashes, new BlockHeight(3));
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
 
 		// Assert:
 		Assert.assertThat(exists, IsEqual.equalTo(false));
 	}
 
 	@Test
-	public void duplicateHashExistsReturnsTrueIfAtLeastOneOfTheHashesExistInDatabase() {
+	public void anyHashExistsReturnsTrueIfAtLeastOneOfTheHashesExistInDatabase() {
 		// Arrange:
 		List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
 		Collection<Hash> hashes = new ArrayList<>();
@@ -529,14 +529,14 @@ public class TransferDaoTest {
 		hashes.add(transactionHashes.get(3));
 
 		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.duplicateHashExists(hashes, new BlockHeight(3));
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
 
 		// Assert:
 		Assert.assertThat(exists, IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void duplicateHashExistsReturnsFalseIfNoneOfTheHashesIsContainedInABlockUpToMaxBlockHeight() {
+	public void anyHashExistsReturnsFalseIfNoneOfTheHashesIsContainedInABlockUpToMaxBlockHeight() {
 		// Arrange:
 		List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
 		Collection<Hash> hashes = new ArrayList<>();
@@ -545,20 +545,20 @@ public class TransferDaoTest {
 		hashes.add(transactionHashes.get(8));
 
 		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.duplicateHashExists(hashes, new BlockHeight(2));
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(2));
 
 		// Assert:
 		Assert.assertThat(exists, IsEqual.equalTo(false));
 	}
 
 	@Test
-	public void duplicateHashExistsReturnsFalseIfHashCollectionIsEmpty() {
+	public void anyHashExistsReturnsFalseIfHashCollectionIsEmpty() {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(3);
 		Collection<Hash> hashes = new ArrayList<>();
 
 		// Act: second parameter is maximum block height
-		final boolean exists = this.transferDao.duplicateHashExists(hashes, new BlockHeight(3));
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
 
 		// Assert:
 		Assert.assertThat(exists, IsEqual.equalTo(false));
@@ -566,7 +566,7 @@ public class TransferDaoTest {
 
 	// TODO: Move to integration test?
 	@Test
-	public void duplicateHashExistsIsFastEnough() {
+	public void anyHashExistsIsFastEnough() {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(10000);
 		Collection<Hash> hashes = new ArrayList<>();
@@ -576,9 +576,9 @@ public class TransferDaoTest {
 
 		// Act: second parameter is maximum block height
 		long start = System.currentTimeMillis();
-		final boolean exists = this.transferDao.duplicateHashExists(hashes, new BlockHeight(3));
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
 		long stop = System.currentTimeMillis();
-		LOGGER.info(String.format("duplicateHashExists need %dms.", stop - start));
+		LOGGER.info(String.format("anyHashExists need %dms.", stop - start));
 
 		// Assert:
 		Assert.assertThat(exists, IsEqual.equalTo(false));

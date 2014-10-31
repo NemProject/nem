@@ -8,6 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.*;
@@ -22,14 +23,14 @@ public class ChainController {
 	private static final Logger LOGGER = Logger.getLogger(ChainController.class.getName());
 
 	private final AccountLookup accountLookup;
-	private final RequiredBlockDao blockDao;
+	private final ReadOnlyBlockDao blockDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockChain blockChain;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
 	public ChainController(
-			final RequiredBlockDao blockDao,
+			final ReadOnlyBlockDao blockDao,
 			final AccountLookup accountLookup,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockChain blockChain,
@@ -66,6 +67,7 @@ public class ChainController {
 	@AuthenticatedApi
 	public AuthenticatedResponse<SerializableList<Block>> blocksAfter(
 			@RequestBody final AuthenticatedBlockHeightRequest request) {
+		// TODO 20141030 J-B: i guess this is one of the functions to optimize
 		// TODO: add tests for this action
 		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(request.getEntity());
 		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);

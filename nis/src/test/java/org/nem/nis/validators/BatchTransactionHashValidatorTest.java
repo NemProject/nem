@@ -71,12 +71,12 @@ public class BatchTransactionHashValidatorTest {
 		}
 
 		private void setTransferDaoForHashes() {
-			Mockito.when(this.transferDao.duplicateHashExists(this.hashes, this.confirmedBlockHeight))
+			Mockito.when(this.transferDao.anyHashExists(this.hashes, this.confirmedBlockHeight))
 					.thenReturn(true);
 		}
 
 		private void setImportanceTransferDaoForHashes() {
-			Mockito.when(this.importanceTransferDao.duplicateHashExists(this.hashes, this.confirmedBlockHeight))
+			Mockito.when(this.importanceTransferDao.anyHashExists(this.hashes, this.confirmedBlockHeight))
 					.thenReturn(true);
 		}
 

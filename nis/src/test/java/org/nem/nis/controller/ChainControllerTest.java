@@ -12,6 +12,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.*;
 import org.nem.nis.test.NisUtils;
@@ -184,7 +185,7 @@ public class ChainControllerTest {
 	//endregion
 
 	private static class TestContext {
-		private final RequiredBlockDao blockDao = Mockito.mock(RequiredBlockDao.class);
+		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final AccountLookup accountLookup = new MockAccountLookup();
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);

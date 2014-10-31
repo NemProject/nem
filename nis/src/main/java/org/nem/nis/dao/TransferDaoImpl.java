@@ -4,7 +4,6 @@ import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.utils.ByteUtils;
 import org.nem.nis.dbmodel.Transfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -14,91 +13,56 @@ import java.util.*;
 
 @Repository
 public class TransferDaoImpl implements TransferDao {
-
-	private final SessionFactory sessionFactory;
+	private final SimpleTransferDaoImpl<Transfer> impl;
 
 	@Autowired(required = true)
 	public TransferDaoImpl(final SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
+		this.impl = new SimpleTransferDaoImpl<>("Transfer", sessionFactory, Transfer::getTransferHash);
 	}
 
 	private Session getCurrentSession() {
-		return this.sessionFactory.getCurrentSession();
+		return this.impl.getCurrentSession();
 	}
 
-	@Override
-	@Transactional
-	public void save(final Transfer transaction) {
-		this.getCurrentSession().saveOrUpdate(transaction);
-	}
+	//region SimpleTransferDao
 
 	@Override
 	@Transactional(readOnly = true)
 	public Long count() {
-		return (Long)this.getCurrentSession().createQuery("select count (*) from Transfer").uniqueResult();
+		return this.impl.count();
 	}
 
-	/**
-	 * First try to find block using "shortId",
-	 * than find proper block in software.
-	 */
 	@Override
 	@Transactional(readOnly = true)
 	public Transfer findByHash(final byte[] txHash) {
-		final long txId = ByteUtils.bytesToLong(txHash);
-		final Query query = this.getCurrentSession()
-				.createQuery("from Transfer a where a.shortId = :id")
-				.setParameter("id", txId);
-
-		return this.getByHashQuery(txHash, query);
+		return this.impl.findByHash(txHash);
 	}
 
-	/**
-	 * First try to find block using "shortId",
-	 * then find proper block in software.
-	 * TODO 20140927 J-G: consider refactoring since the only difference from the previous is the Query
-	 */
 	@Override
 	@Transactional(readOnly = true)
 	public Transfer findByHash(final byte[] txHash, final long maxBlockHeight) {
-		final long txId = ByteUtils.bytesToLong(txHash);
-		final Query query = this.getCurrentSession()
-				.createQuery("from Transfer t where t.shortId = :id and t.block.height <= :height")
-				.setParameter("id", txId)
-				.setParameter("height", maxBlockHeight);
-		return this.getByHashQuery(txHash, query);
-	}
-
-	private Transfer getByHashQuery(final byte[] txHash, final Query query) {
-		final List<?> userList = query.list();
-		for (final Object transferObject : userList) {
-			final Transfer transfer = (Transfer)transferObject;
-			if (Arrays.equals(txHash, transfer.getTransferHash().getRaw())) {
-				return transfer;
-			}
-		}
-		return null;
+		return this.impl.findByHash(txHash, maxBlockHeight);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public boolean duplicateHashExists(Collection<Hash> hashes, BlockHeight maxBlockHeight) {
-		if (hashes.size() == 0) {
-			return false;
-		}
-		final StringBuilder builder = new StringBuilder();
-		builder.append("Select count(*) from Transfer t where t.transferHash in (");
-		hashes.stream().forEach(h -> builder.append(String.format("'%s',", h.toString())));
-		builder.setLength(builder.length() - 1);
-		builder.append(")");
-		builder.append(" and t.block.height <= :height");
-		final Query query = this.getCurrentSession()
-				.createQuery(builder.toString())
-				.setParameter("height", maxBlockHeight.getRaw());
-
-		final Long count = (Long)query.uniqueResult();
-		return 0 != count;
+	public boolean anyHashExists(final Collection<Hash> hashes, final BlockHeight maxBlockHeight) {
+		return this.impl.anyHashExists(hashes, maxBlockHeight);
 	}
+
+	@Override
+	@Transactional
+	public void save(final Transfer entity) {
+		this.impl.save(entity);
+	}
+
+	@Override
+	@Transactional
+	public void saveMulti(final List<Transfer> transfers) {
+		this.impl.saveMulti(transfers);
+	}
+
+	//endregion
 
 	// NOTE: this query will also ask for accounts of senders and recipients!
 	@Override
@@ -189,35 +153,6 @@ public class TransferDaoImpl implements TransferDao {
 				.setMaxResults(limit);
 
 		return listAndCast(query);
-	}
-
-	@Override
-	public void saveMulti(final List<Transfer> transfers) {
-		final Session sess = this.sessionFactory.openSession();
-		org.hibernate.Transaction tx = null;
-		try {
-			tx = sess.beginTransaction();
-			int i = 0;
-			for (final Transfer t : transfers) {
-				sess.saveOrUpdate(t);
-
-				i++;
-				if (i == 20) {
-					sess.flush();
-					sess.clear();
-					i = 0;
-				}
-			}
-
-			tx.commit();
-		} catch (final RuntimeException e) {
-			if (tx != null) {
-				tx.rollback();
-			}
-			e.printStackTrace();
-		} finally {
-			sess.close();
-		}
 	}
 
 	@SuppressWarnings("unchecked")
