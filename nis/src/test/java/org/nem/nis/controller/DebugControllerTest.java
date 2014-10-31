@@ -82,7 +82,16 @@ public class DebugControllerTest {
 		Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
 		Mockito.when(context.blockDao.findByHeight(new BlockHeight(9))).thenReturn(dbParent);
 
-		// TODO Mockito.when(context.blockChain.copyAccountAnalyzer()).thenReturn(accountAnalyzer);
+		// Arrange: simulate block loading by (1) copying all of the information in the AccountAnalyzer
+		// to the AccountAnalyzer copy and (2) then calculate importances (based on the copy)
+		Mockito.when(context.blockAnalyzer.analyze(Mockito.any(), Mockito.eq(10L))).then(invocationOnMock -> {
+			final AccountAnalyzer accountAnalyzerCopy = (AccountAnalyzer)invocationOnMock.getArguments()[0];
+			accountAnalyzer.shallowCopyTo(accountAnalyzerCopy);
+
+			final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
+			accountAnalyzerCopy.getPoiFacade().recalculateImportances(blockHeight);
+			return null;
+		});
 
 		// Act:
 		final BlockDebugInfo blockDebugInfo = context.controller.blockDebugInfo("10");
@@ -96,6 +105,7 @@ public class DebugControllerTest {
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
 		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(60));
 
+		Mockito.verify(context.blockAnalyzer, Mockito.only()).analyze(Mockito.any(), Mockito.eq(10L));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(10));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(9));
 		Mockito.verify(context.blockDao, Mockito.times(2)).findByHeight(Mockito.any());
