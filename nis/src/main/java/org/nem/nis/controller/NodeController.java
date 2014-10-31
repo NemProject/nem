@@ -10,6 +10,7 @@ import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
+import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +25,16 @@ import java.util.*;
 public class NodeController {
 	private final NisPeerNetworkHost host;
 	private final ChainServices chainServices;
+	private final NodeSelector selector;
 
 	@Autowired(required = true)
-	NodeController(final NisPeerNetworkHost host, final ChainServices chainServices) {
+	NodeController(
+			final NisPeerNetworkHost host,
+			final ChainServices chainServices,
+			final NodeSelectorFactory selectorFactory) {
 		this.host = host;
 		this.chainServices = chainServices;
+		this.selector = selectorFactory.createNodeSelector();
 	}
 
 	//region getInfo / getExtendedInfo
@@ -91,17 +97,28 @@ public class NodeController {
 	 *
 	 * @return A list of the active nodes currently known by the running node.
 	 */
-	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
+	@RequestMapping(value = "/node/peer-list/reachable", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Node> getActivePeerList() {
+	public SerializableList<Node> getReachablePeerList() {
 		return new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
 	}
 
 	/**
-	 * Gets a list of the active nodes currently known by the running node.
+	 * Gets a dynamic list of the active nodes to which the running node broadcasts information.
+	 *
+	 * @return A list of broadcast partners.
+	 */
+	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Node> getActivePeerList() {
+		return new SerializableList<>(this.selector.selectNodes());
+	}
+
+	/**
+	 * Gets a dynamic list of the active nodes to which the running node broadcasts information.
 	 *
 	 * @param challenge The challenge.
-	 * @return A list of the active nodes currently known by the running node.
+	 * @return A list of broadcast partners.
 	 */
 	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.POST)
 	@P2PApi
@@ -195,7 +212,7 @@ public class NodeController {
 	@RequestMapping(value = "/node/active-peers/max-chain-height", method = RequestMethod.GET)
 	@PublicApi
 	public BlockHeight activePeersMaxChainHeight() {
-		return this.chainServices.getMaxChainHeightAsync(this.getActivePeerList().asCollection()).join();
+		return this.chainServices.getMaxChainHeightAsync(this.getReachablePeerList().asCollection()).join();
 	}
 
 	//endregion
