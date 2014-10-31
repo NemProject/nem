@@ -526,14 +526,16 @@ public class PoiImportanceCalculatorITCase {
 		ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
 		LOGGER.info("Heap: " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
 		LOGGER.info("NonHeap: " + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage());
-		List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
-		for (MemoryPoolMXBean bean: beans) {
+		final List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
+		for (MemoryPoolMXBean bean : beans) {
 			LOGGER.info(bean.getName() + " : " + bean.getUsage());
 		}
 
-		for (GarbageCollectorMXBean bean: ManagementFactory.getGarbageCollectorMXBeans()) {
+		for (GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
 			LOGGER.info(bean.getName() + " : " + bean.getCollectionCount() + " : " + bean.getCollectionTime());
 		}
+
+
 	}
 
 	private List<PoiAccountState> createUserAccounts(
