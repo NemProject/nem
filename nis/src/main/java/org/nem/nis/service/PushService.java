@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 @Service
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
+	private static final int CACHE_SECONDS = 10;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final TransactionValidator validator;
@@ -55,7 +56,6 @@ public class PushService {
 			return ValidationResult.NEUTRAL;
 		}
 
-		this.transactionHashCache.add(hash);
 		final ValidationResult result = this.pushEntity(
 				entity,
 				transaction -> this.checkTransaction(transaction),
@@ -147,8 +147,7 @@ public class PushService {
 		return status;
 	}
 
-	// TODO
-	private class TransactionHashCache {
+	private static class TransactionHashCache {
 		private final HashMap<Hash, TimeInstant> cache;
 		private final TimeProvider timeProvider;
 
@@ -159,22 +158,23 @@ public class PushService {
 
 		private boolean isKnown(final Hash hash) {
 			this.prune();
-			return this.cache.containsKey(hash);
+			if (this.cache.containsKey(hash)) {
+				return true;
+			}
+
+			this.cache.putIfAbsent(hash, this.timeProvider.getCurrentTime());
+			return false;
 		}
 
 		private void prune() {
 			final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-			Iterator<Map.Entry<Hash, TimeInstant>> iterator = this.cache.entrySet().iterator();
+			final Iterator<Map.Entry<Hash, TimeInstant>> iterator = this.cache.entrySet().iterator();
 			while (iterator.hasNext()) {
-				Map.Entry<Hash, TimeInstant> entry = iterator.next();
-				if (entry.getValue().addSeconds(10).compareTo(currentTime) <= 0) {
+				final Map.Entry<Hash, TimeInstant> entry = iterator.next();
+				if (entry.getValue().addSeconds(CACHE_SECONDS).compareTo(currentTime) <= 0) {
 					iterator.remove();
 				}
 			}
-		}
-
-		private void add(final Hash hash) {
-			this.cache.putIfAbsent(hash, this.timeProvider.getCurrentTime());
 		}
 	}
 }

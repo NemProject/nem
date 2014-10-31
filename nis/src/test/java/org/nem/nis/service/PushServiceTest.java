@@ -259,56 +259,75 @@ public class PushServiceTest {
 	}
 
 	@Test
-	public void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCache() {
+	public void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithSuccessfulValidation() {
+		pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(ValidationResult.SUCCESS);
+	}
+
+	// TODO 20141031 J-B: is this desired?
+	@Test
+	public void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithFailedValidation() {
+		// Assert:
+		pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(ValidationResult.FAILURE_CHAIN_INVALID);
+	}
+
+	private static void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(final ValidationResult validateResult) {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(validateResult);
+
+		final TestContext context = new TestContext(validator);
 		final Transaction transaction = createMockTransaction();
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
+		// initial push (cached validation result should NOT be used)
 		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp 5 seconds later than first one --> first transaction not pruned
+		// (cached validation result should be used)
 		final ValidationResult result = context.service.pushTransaction(transaction, null);
 
 		// Assert:
-		// if the transaction in the second pushTransaction call would have gone past the cache check,
-		// then there would 2 calls to getTape().
-		Mockito.verify(transaction, Mockito.times(1)).getType();
+		// transaction validation should have only occured once
+		Mockito.verify(validator, Mockito.times(1)).validate(Mockito.any());
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 	}
 
 	@Test
 	public void pushTransactionPrunesTransactionHashCache() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+
+		final TestContext context = new TestContext(validator);
 		final Transaction transaction = createMockTransaction();
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
+		// initial push (cached validation result should NOT be used)
 		context.service.pushTransaction(transaction, null);
 
 		// time provider supplies time stamp 5 seconds later than first one --> first transaction not pruned.
+		// (cached validation result should be used)
 		context.service.pushTransaction(transaction, null);
 
 		// time provider supplies time stamp 11 seconds later than second one --> first and second transaction pruned.
+		// (cached validation result should NOT be used)
+		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp same as third one --> third transaction not pruned.
+		// (cached validation result should be used)
 		context.service.pushTransaction(transaction, null);
 
 		// Assert:
-		Mockito.verify(transaction, Mockito.times(2)).getType();
+		// transaction validation should have only occured twice
+		Mockito.verify(validator, Mockito.times(2)).validate(Mockito.any());
 	}
 
-	private Transaction createMockTransaction() {
-		final Transaction transaction = Mockito.mock(Transaction.class);
-		final MockTransaction mockTransaction = new MockTransaction(Utils.generateRandomAccount(), 12);
+	private static Transaction createMockTransaction() {
+		final MockTransaction mockTransaction = new MockTransaction(12, new TimeInstant(1122448));
 		mockTransaction.sign();
-		final Account account = Utils.generateRandomAccount();
-		Mockito.when(transaction.verify()).thenReturn(true);
-		Mockito.when(transaction.getType()).thenReturn(TransactionTypes.TRANSFER);
-		Mockito.when(transaction.getSigner()).thenReturn(account);
-		Mockito.when(transaction.asNonVerifiable()).thenReturn(mockTransaction);
-		Mockito.when(transaction.getTimeStamp()).thenReturn(new TimeInstant(1122448));
-		Mockito.when(transaction.getDeadline()).thenReturn(new TimeInstant(1122448).addHours(2));
-		Mockito.when(transaction.getFee()).thenReturn(new Amount(5));
-		return transaction;
+		return mockTransaction;
 	}
 
 	//endregion
