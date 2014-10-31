@@ -128,7 +128,7 @@ public class NodeControllerTest {
 	}
 
 	@Test
-	public void getActivePeerListReturnsSelectedNodes() {
+	public void getActivePeerListReturnsPartnerNodes() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -137,7 +137,7 @@ public class NodeControllerTest {
 	}
 
 	@Test
-	public void getActivePeerListAuthenticatedReturnsSelectedNodes() {
+	public void getActivePeerListAuthenticatedReturnsPartnerNodes() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Node localNode = context.network.getLocalNode();
@@ -159,7 +159,7 @@ public class NodeControllerTest {
 		final List<Node> selectedNodes = Arrays.asList(
 				PeerUtils.createNodeWithHost("10.0.0.4"),
 				PeerUtils.createNodeWithHost("10.0.0.7"));
-		Mockito.when(context.selector.selectNodes()).thenReturn(selectedNodes);
+		Mockito.when(context.network.getPartnerNodes()).thenReturn(selectedNodes);
 
 		// Act:
 		final T response = action.apply(context);
@@ -310,7 +310,6 @@ public class NodeControllerTest {
 		private final NisPeerNetworkHost host;
 		private final NodeController controller;
 		private final ChainServices services;
-		private final NodeSelector selector;
 		private final Node localNode;
 
 		private TestContext() {
@@ -326,11 +325,7 @@ public class NodeControllerTest {
 			Mockito.when(this.services.getMaxChainHeightAsync(Mockito.anyCollectionOf(Node.class)))
 					.thenReturn(CompletableFuture.completedFuture(new BlockHeight(123)));
 
-			final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
-			this.selector = Mockito.mock(NodeSelector.class);
-			Mockito.when(selectorFactory.createNodeSelector()).thenReturn(this.selector);
-
-			this.controller = new NodeController(this.host, this.services, selectorFactory);
+			this.controller = new NodeController(this.host, this.services);
 		}
 	}
 }

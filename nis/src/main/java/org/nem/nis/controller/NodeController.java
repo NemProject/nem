@@ -25,16 +25,13 @@ import java.util.*;
 public class NodeController {
 	private final NisPeerNetworkHost host;
 	private final ChainServices chainServices;
-	private final NodeSelector selector;
 
 	@Autowired(required = true)
 	NodeController(
 			final NisPeerNetworkHost host,
-			final ChainServices chainServices,
-			final NodeSelectorFactory selectorFactory) {
+			final ChainServices chainServices) {
 		this.host = host;
 		this.chainServices = chainServices;
-		this.selector = selectorFactory.createNodeSelector();
 	}
 
 	//region getInfo / getExtendedInfo
@@ -111,7 +108,7 @@ public class NodeController {
 	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<Node> getActivePeerList() {
-		return new SerializableList<>(this.selector.selectNodes());
+		return new SerializableList<>(this.host.getNetwork().getPartnerNodes());
 	}
 
 	/**

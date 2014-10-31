@@ -50,7 +50,7 @@ public class NodeRefresher {
 	 * @param refreshNodes The nodes with which to directly communicate.
 	 * @return The future.
 	 */
-	public CompletableFuture<Void> refresh(final List<Node> refreshNodes) {
+	public CompletableFuture<Void> refresh(final Collection<Node> refreshNodes) {
 		// all refresh nodes are directly communicated with;
 		// ensure that only direct communication is trusted for these nodes
 		this.connectedNodes.addAll(refreshNodes);
