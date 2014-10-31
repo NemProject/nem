@@ -15,6 +15,11 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import java.lang.management.GarbageCollectorMXBean;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryUsage;
+
 /**
  * If someone can manipulate their importance so that they can often or at-will
  * be chosen to forage, then things like double-spend attacks become possible.
@@ -420,7 +425,7 @@ public class PoiImportanceCalculatorITCase {
 		System.out.println("Setting up accounts.");
 		final int numAccounts = 50000;
 		final List<PoiAccountState> accounts = new ArrayList<>();
-		accounts.addAll(this.createUserAccounts(1, numAccounts, 10000 * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
+		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000l * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
 		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
@@ -483,6 +488,51 @@ public class PoiImportanceCalculatorITCase {
 			}
 
 			prevTimeDiff = currTimeDiff;
+		}
+	}
+
+	@Test
+	public void poiCalculationHasModerateMemoryUsage() {
+		LOGGER.info("Testing performance of the poi calculation");
+
+		// Arrange:
+		System.out.println("Setting up accounts.");
+		final int numAccounts = 50000;
+		final List<PoiAccountState> accounts = new ArrayList<>();
+		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000l * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
+
+		// TODO 20140929 BR: Why is everything so damn slow in the first round?
+		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
+		// TODO: 20141024 M-J: Do you think we can speed up Java warm-up? http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
+		// -> perhaps we can call some of the poi code in a low priority thread on startup so that things are warmed up?
+
+		// Warm up phase
+		getAccountImportances(new BlockHeight(9999), accounts);
+
+		// Act: calculate importances
+		System.out.println("Starting poi calculation.");
+		final long start = System.currentTimeMillis();
+		for (int i = 0; i < 5; i++) {
+			final ColumnVector importances = getAccountImportances(new BlockHeight(10000 + i), accounts);
+		}
+		final long stop = System.currentTimeMillis();
+		LOGGER.info("Finished poi calculation.");
+
+		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed " + (stop - start) / 5 + "ms.");
+
+		// Assert
+		//Assert.assertTrue(stop - start < 1000);
+
+		ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+		LOGGER.info("Heap: " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
+		LOGGER.info("NonHeap: " + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage());
+		List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
+		for (MemoryPoolMXBean bean: beans) {
+			LOGGER.info(bean.getName() + " : " + bean.getUsage());
+		}
+
+		for (GarbageCollectorMXBean bean: ManagementFactory.getGarbageCollectorMXBeans()) {
+			LOGGER.info(bean.getName() + " : " + bean.getCollectionCount() + " : " + bean.getCollectionTime());
 		}
 	}
 
