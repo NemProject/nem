@@ -136,7 +136,7 @@ public class AccountIoAdapterTest {
 			this.blockDao.save(dbBlock);
 		}
 
-		return new AccountIoAdapter(new RequiredTransferDaoAdapter(this.transferDao), new RequiredBlockDaoAdapter(this.blockDao), accountCache);
+		return new AccountIoAdapter(this.transferDao, this.blockDao, accountCache);
 	}
 
 	private void assertResultGetAccountTransfers(final SerializableList<TransactionMetaDataPair> result) {
