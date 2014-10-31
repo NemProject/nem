@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  *
  * @param <TTransfer> The transfer type.
  */
-public class SimpleTransferDaoImpl<TTransfer> implements SimpleTransferDao<TTransfer> {
+public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferDao<TTransfer>, SimpleTransferDao<TTransfer> {
 	private static final Logger LOGGER = Logger.getLogger(SimpleTransferDao.class.getName());
 
 	private final String tableName;

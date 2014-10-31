@@ -12,7 +12,7 @@ import java.util.*;
 
 @Repository
 public class ImportanceTransferDaoImpl implements ImportanceTransferDao {
-	private final SimpleTransferDao<ImportanceTransfer> impl;
+	private final SimpleTransferDaoImpl<ImportanceTransfer> impl;
 
 	@Autowired(required = true)
 	public ImportanceTransferDaoImpl(final SessionFactory sessionFactory) {

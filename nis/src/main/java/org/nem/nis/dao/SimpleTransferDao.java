@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @param <TTransfer> The transfer type.
  */
-public interface SimpleTransferDao<TTransfer> extends SimpleReadOnlyTransferDao<TTransfer> {
+public interface SimpleTransferDao<TTransfer> {
 
 	/**
 	 * Saves or updates entity in the database.
@@ -21,5 +21,5 @@ public interface SimpleTransferDao<TTransfer> extends SimpleReadOnlyTransferDao<
 	 *
 	 * @param transfers list of transfers to be saved.
 	 */
-	public void saveMulti(List<TTransfer> transfers);
+	void saveMulti(List<TTransfer> transfers);
 }
