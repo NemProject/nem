@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
