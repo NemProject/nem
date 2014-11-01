@@ -209,7 +209,11 @@ public class ChainControllerTest {
 			final Function<T, SerializableList<Block>> getBlocks) {
 		// Arrange:
 		final org.nem.nis.dbmodel.Block dbBlock1 = NisUtils.createDbBlockWithTimeStampAtHeight(443, 11);
+		dbBlock1.setId(11L);
+		dbBlock1.setNextBlockId(12L);
 		final org.nem.nis.dbmodel.Block dbBlock2 = NisUtils.createDbBlockWithTimeStampAtHeight(543, 12);
+		dbBlock2.setId(12L);
+		dbBlock2.setNextBlockId(13L);
 		Mockito.when(context.blockDao.getBlocksAfter(10, BlockChainConstants.BLOCKS_LIMIT))
 				.thenReturn(Arrays.asList(dbBlock1, dbBlock2));
 
