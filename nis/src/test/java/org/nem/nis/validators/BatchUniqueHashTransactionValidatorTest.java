@@ -43,6 +43,18 @@ public class BatchUniqueHashTransactionValidatorTest {
 	//endregion
 
 	@Test
+	public void validateReturnsSuccessIfCalledWithEmptyList() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final ValidationResult result = context.validator.validate(Arrays.asList());
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
 	public void validateReturnsSuccessIfNoneOfTheHashesExistInAnyDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -64,7 +76,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		private final BatchUniqueHashTransactionValidator validator = new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
 
 		public TestContext() {
-			for (int i = 0; i < 4; ++i) {
+			for (int i = 0; i < 5; ++i) {
 				final Transaction transaction = new MockTransaction(Utils.generateRandomAccount(), 7 + i);
 				this.transactions.add(transaction);
 				this.hashes.add(HashUtils.calculateHash(transaction));
@@ -84,7 +96,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		private ValidationResult validateAtHeight(final long height) {
 			final List<TransactionsContextPair> groupedTransactions = new ArrayList<>();
 			groupedTransactions.add(this.createPair(0, 1, height));
-			groupedTransactions.add(this.createPair(2, 3, height + 1));
+			groupedTransactions.add(this.createPair(2, 4, height + 1));
 			return this.validator.validate(groupedTransactions);
 		}
 

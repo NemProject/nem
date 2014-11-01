@@ -70,7 +70,7 @@ public class ValidationResultTest {
 	//region aggregate
 
 	@Test
-	public void aggregateReturnsSuccessWhenPassedEmptyIterator() {
+	public void canAggregateZeroResults() {
 		// Act:
 		final Collection<ValidationResult> results = Arrays.asList();
 
@@ -79,12 +79,24 @@ public class ValidationResultTest {
 	}
 
 	@Test
-	public void aggregateReturnsSingleResultWhenPassedIteratorWithSingleResult() {
+	public void canAggregateOneResult() {
 		// Act:
 		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.FAILURE_CHAIN_INVALID);
 
 		// Assert:
 		assertAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID, false);
+	}
+
+	@Test
+	public void canAggregateMultipleResults() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.SUCCESS,
+				ValidationResult.SUCCESS);
+
+		// Assert:
+		assertAggregationResult(results, ValidationResult.SUCCESS, false);
 	}
 
 	@Test

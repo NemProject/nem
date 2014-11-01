@@ -177,6 +177,8 @@ public class AggregateTransactionValidatorBuilderTest {
 
 	//endregion
 
+	//region mapping
+
 	//region SingleTransactionValidator mapping
 
 	@Test
@@ -200,57 +202,41 @@ public class AggregateTransactionValidatorBuilderTest {
 	@Test
 	public void batchValidationDelegatesToSingleTransactionValidator() {
 		// Arrange:
-		final List<Transaction> transactions1 = Arrays.asList(Mockito.mock(Transaction.class), Mockito.mock(Transaction.class));
-		final ValidationContext validationContext1 = Mockito.mock(ValidationContext.class);
-		final List<Transaction> transactions2 = Arrays.asList(Mockito.mock(Transaction.class));
-		final ValidationContext validationContext2 = Mockito.mock(ValidationContext.class);
-
-		final List<TransactionsContextPair> groupedTransactions = Arrays.asList(
-				new TransactionsContextPair(transactions1, validationContext1),
-				new TransactionsContextPair(transactions2, validationContext2));
-
+		final BatchTransactionValidatorContext batchContext = new BatchTransactionValidatorContext();
 		final SingleTransactionValidator validator = createValidator(ValidationResult.SUCCESS);
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
 
 		// Act:
 		builder.add(validator);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(groupedTransactions);
+		final ValidationResult result = aggregate.validate(batchContext.groupedTransactions);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Mockito.verify(validator, Mockito.times(3)).validate(Mockito.any(), Mockito.any());
-		Mockito.verify(validator, Mockito.times(1)).validate(transactions1.get(0), validationContext1);
-		Mockito.verify(validator, Mockito.times(1)).validate(transactions1.get(1), validationContext1);
-		Mockito.verify(validator, Mockito.times(1)).validate(transactions2.get(0), validationContext2);
+		Mockito.verify(validator, Mockito.times(1)).validate(batchContext.transactions1.get(0), batchContext.validationContext1);
+		Mockito.verify(validator, Mockito.times(1)).validate(batchContext.transactions1.get(1), batchContext.validationContext1);
+		Mockito.verify(validator, Mockito.times(1)).validate(batchContext.transactions2.get(0), batchContext.validationContext2);
 	}
 
 	@Test
 	public void batchValidationDelegatesToSingleTransactionValidatorButStopsOnFirstFailure() {
 		// Arrange:
-		final List<Transaction> transactions1 = Arrays.asList(Mockito.mock(Transaction.class), Mockito.mock(Transaction.class));
-		final ValidationContext validationContext1 = Mockito.mock(ValidationContext.class);
-		final List<Transaction> transactions2 = Arrays.asList(Mockito.mock(Transaction.class));
-		final ValidationContext validationContext2 = Mockito.mock(ValidationContext.class);
-
-		final List<TransactionsContextPair> groupedTransactions = Arrays.asList(
-				new TransactionsContextPair(transactions1, validationContext1),
-				new TransactionsContextPair(transactions2, validationContext2));
-
+		final BatchTransactionValidatorContext batchContext = new BatchTransactionValidatorContext();
 		final SingleTransactionValidator validator = createValidator(ValidationResult.FAILURE_CHAIN_INVALID);
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
 
 		// Act:
 		builder.add(validator);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(groupedTransactions);
+		final ValidationResult result = aggregate.validate(batchContext.groupedTransactions);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
 		Mockito.verify(validator, Mockito.times(1)).validate(Mockito.any(), Mockito.any());
-		Mockito.verify(validator, Mockito.times(1)).validate(transactions1.get(0), validationContext1);
-		Mockito.verify(validator, Mockito.never()).validate(transactions1.get(1), validationContext1);
-		Mockito.verify(validator, Mockito.never()).validate(transactions2.get(0), validationContext2);
+		Mockito.verify(validator, Mockito.times(1)).validate(batchContext.transactions1.get(0), batchContext.validationContext1);
+		Mockito.verify(validator, Mockito.never()).validate(batchContext.transactions1.get(1), batchContext.validationContext1);
+		Mockito.verify(validator, Mockito.never()).validate(batchContext.transactions2.get(0), batchContext.validationContext2);
 	}
 
 	//endregion
@@ -289,26 +275,30 @@ public class AggregateTransactionValidatorBuilderTest {
 	@Test
 	public void batchValidationDelegatesToBatchTransactionValidator() {
 		// Arrange:
-		final List<Transaction> transactions1 = Arrays.asList(Mockito.mock(Transaction.class), Mockito.mock(Transaction.class));
-		final ValidationContext validationContext1 = Mockito.mock(ValidationContext.class);
-		final List<Transaction> transactions2 = Arrays.asList(Mockito.mock(Transaction.class));
-		final ValidationContext validationContext2 = Mockito.mock(ValidationContext.class);
-
-		final List<TransactionsContextPair> groupedTransactions = Arrays.asList(
-				new TransactionsContextPair(transactions1, validationContext1),
-				new TransactionsContextPair(transactions2, validationContext2));
-
+		final BatchTransactionValidatorContext batchContext = new BatchTransactionValidatorContext();
 		final BatchTransactionValidator validator = createValidator(ValidationResult.SUCCESS);
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
 
 		// Act:
 		builder.add(validator);
 		final TransactionValidator aggregate = builder.build();
-		final ValidationResult result = aggregate.validate(groupedTransactions);
+		final ValidationResult result = aggregate.validate(batchContext.groupedTransactions);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Mockito.verify(validator, Mockito.only()).validate(groupedTransactions);
+		Mockito.verify(validator, Mockito.only()).validate(batchContext.groupedTransactions);
+	}
+
+	//endregion
+
+	private static class BatchTransactionValidatorContext {
+		final List<Transaction> transactions1 = Arrays.asList(Mockito.mock(Transaction.class), Mockito.mock(Transaction.class));
+		final ValidationContext validationContext1 = Mockito.mock(ValidationContext.class);
+		final List<Transaction> transactions2 = Arrays.asList(Mockito.mock(Transaction.class));
+		final ValidationContext validationContext2 = Mockito.mock(ValidationContext.class);
+		final List<TransactionsContextPair> groupedTransactions = Arrays.asList(
+				new TransactionsContextPair(this.transactions1, this.validationContext1),
+				new TransactionsContextPair(this.transactions2, this.validationContext2));
 	}
 
 	//endregion

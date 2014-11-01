@@ -138,7 +138,7 @@ public enum ValidationResult {
 	}
 
 	/**
-	 * Aggregates an iterator of validation results.
+	 * Aggregates an iterator of validation results. This implementation short-circuits on the first failure.
 	 *
 	 * @param resultIterator The results to aggregate.
 	 * @return The aggregated result.

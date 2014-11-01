@@ -3,8 +3,6 @@ package org.nem.nis.validators;
 import org.nem.core.model.*;
 
 import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.*;
 
 /**
  * Builder for building an aggregate AggregateValidatorBuilder.
@@ -21,13 +19,14 @@ public class AggregateTransactionValidatorBuilder {
 		this.validators.add(new TransactionValidator() {
 			@Override
 			public ValidationResult validate(final List<TransactionsContextPair> groupedTransactions) {
-				final Iterator<ValidationResult> resultIterator =
-						groupedTransactions.stream()
-								.map(pair -> ValidationResult.aggregate(
-										pair.getTransactions().stream()
-												.map(transaction -> validator.validate(transaction, pair.getContext()))
-												.iterator()))
-								.iterator();
+				final Iterator<ValidationResult> resultIterator = groupedTransactions.stream()
+						.map(pair -> {
+							final Iterator<ValidationResult> pairResultIterator = pair.getTransactions().stream()
+									.map(transaction -> this.validate(transaction, pair.getContext()))
+									.iterator();
+							return ValidationResult.aggregate(pairResultIterator);
+						})
+						.iterator();
 
 				return ValidationResult.aggregate(resultIterator);
 			}

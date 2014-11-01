@@ -37,10 +37,10 @@ public class BatchUniqueHashTransactionValidator implements BatchTransactionVali
 		}
 
 		final BlockHeight blockHeight = groupedTransactions.get(0).getContext().getConfirmedBlockHeight();
-		final List<Hash> hashes = new ArrayList<>();
-		for (final TransactionsContextPair pair : groupedTransactions) {
-			hashes.addAll(pair.getTransactions().stream().map(HashUtils::calculateHash).collect(Collectors.toList()));
-		}
+		final List<Hash> hashes = groupedTransactions.stream()
+				.flatMap(pair -> pair.getTransactions().stream())
+				.map(HashUtils::calculateHash)
+				.collect(Collectors.toList());
 
 		final long start = System.currentTimeMillis();
 		final ValidationResult result = this.validate(hashes, blockHeight);
