@@ -146,8 +146,6 @@ public class BlockChainValidatorIntegrationTest {
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.poiFacade);
 		public final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		public final TransactionValidator transactionValidator = NisUtils.createTransactionValidatorFactory(this.transferDao).create(this.poiFacade);
-		public final BatchTransactionHashValidator batchTransactionHashValidator =
-				NisUtils.createBatchTransactionHashValidatorFactory(this.transferDao).create();
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -163,8 +161,7 @@ public class BlockChainValidatorIntegrationTest {
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,
-					this.transactionValidator,
-					this.batchTransactionHashValidator);
+					this.transactionValidator);
 		}
 	}
 
