@@ -6,29 +6,10 @@ import org.nem.core.crypto.*;
 
 import java.util.Properties;
 
-// TODO 20141005 J-J,G - these tests are probably dumb :)
-// > it might be better to have a can read default config and can read custom config
-
 public class NisConfigurationTest {
 
-	//region nis.bootKey
-
 	@Test
-	public void canReadConfigurationWithAutoBootKey() {
-		// Arrange:
-		final PrivateKey originalPrivateKey = new KeyPair().getPrivateKey();
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getAutoBootKey(), IsEqual.equalTo(originalPrivateKey));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutAutoBootKey() {
+	public void canReadDefaultConfiguration() {
 		// Arrange:
 		final Properties properties = this.getCommonProperties();
 
@@ -37,23 +18,41 @@ public class NisConfigurationTest {
 
 		// Assert:
 		Assert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
+		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
+		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(5));
+		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
+		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(false));
+		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(true));
+		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
+		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 	}
 
-	//endregion
-
-	//region nis.bootName
-
 	@Test
-	public void canReadConfigurationWithAutoBootName() {
+	public void canReadCustomConfiguration() {
 		// Arrange:
+		final PrivateKey originalPrivateKey = new KeyPair().getPrivateKey();
 		final Properties properties = this.getCommonProperties();
+		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
 		properties.setProperty("nis.bootName", "my name");
+		properties.setProperty("nis.nodeLimit", "8");
+		properties.setProperty("nis.timeSyncNodeLimit", "12");
+		properties.setProperty("nis.bootWithoutAck", "true");
+		properties.setProperty("nis.useBinaryTransport", "false");
+		properties.setProperty("nis.useNetworkTime", "false");
+		properties.setProperty("nis.unlockedLimit", "123");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Assert:
+		Assert.assertThat(config.getAutoBootKey(), IsEqual.equalTo(originalPrivateKey));
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("my name"));
+		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(8));
+		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(12));
+		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(true));
+		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(false));
+		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
+		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
 	}
 
 	@Test
@@ -68,189 +67,6 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
 	}
-
-	@Test
-	public void canReadConfigurationWithoutAutoBootName() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
-	}
-
-	//endregion
-
-	//region nis.nodeLimit
-
-	@Test
-	public void canReadConfigurationWithNodeLimit() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.nodeLimit", "12");
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(12));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutNodeLimit() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(20));
-	}
-	//endregion
-
-	//region nis.nodeLimit
-
-	@Test
-	public void canReadConfigurationWithTimeSyncNodeLimit() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.timeSyncNodeLimit", "12");
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(12));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutTimeSyncNodeLimit() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
-	}
-	//endregion
-
-	//region nis.unlockedLimit
-	@Test
-	public void canReadConfigurationWithUnlockedLimit() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.unlockedLimit", "123");
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutUnlockedLimit() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(2));
-	}
-	//endregion
-
-	//region nis.bootWithoutAck
-	@Test
-	public void canReadConfigurationWithBootWithoutAck() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.bootWithoutAck", "true");
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutBootWithoutAck() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(false));
-	}
-
-	//endregion
-
-	//region nis.useBinaryTransport
-
-	@Test
-	public void canReadConfigurationWithUseBinaryTransport() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.useBinaryTransport", "true");
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutUseBinaryTransport() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(false));
-	}
-
-	//endregion
-
-	//region nis.useNetworkTime
-
-	@Test
-	public void canReadConfigurationWithUseNetworkTime() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.useNetworkTime", "true");
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutUseNetworkTime() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
-	}
-
-	//endregion
 
 	private Properties getCommonProperties() {
 		final Properties properties = new Properties();

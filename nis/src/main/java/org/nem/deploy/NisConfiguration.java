@@ -37,12 +37,12 @@ public class NisConfiguration extends CommonConfiguration {
 		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
 		final String autoBootName = getOptionalString(properties, "nis.bootName", null);
 		this.bootName = null == autoBootName ? null : autoBootName.trim();
-		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 20);
+		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 5);
 		this.timeSyncNodeLimit = getOptionalInteger(properties, "nis.timeSyncNodeLimit", 20);
 		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
-		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", false);
-		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", false);
-		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 2);
+		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", true);
+		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", true);
+		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
 	}
 
 	/**
