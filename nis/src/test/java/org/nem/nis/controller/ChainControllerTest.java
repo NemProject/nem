@@ -95,7 +95,7 @@ public class ChainControllerTest {
 		// Assert:
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(chain, IsEqual.equalTo(originalHashes));
-		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(new BlockHeight(44), defaultLimit);
+		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(height, defaultLimit);
 	}
 
 	//endregion
@@ -117,7 +117,7 @@ public class ChainControllerTest {
 				NisUtils.createDbBlockWithTimeStamp(10),
 				NisUtils.createDbBlockWithTimeStamp(11),
 				NisUtils.createDbBlockWithTimeStamp(12));
-		Mockito.when(context.blockDao.getBlocksAfter(44L, defaultLimit)).thenReturn(dbBlocks);
+		Mockito.when(context.blockDao.getBlocksAfter(height, defaultLimit)).thenReturn(dbBlocks);
 
 		// Act:
 		final AuthenticatedResponse<SerializableList<Block>> response = context.controller.blocksAfter(request);
@@ -127,7 +127,7 @@ public class ChainControllerTest {
 		// Assert:
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(timeStamps, IsEqual.equalTo(Arrays.asList(10, 11, 12)));
-		Mockito.verify(context.blockDao, Mockito.times(1)).getBlocksAfter(44, defaultLimit);
+		Mockito.verify(context.blockDao, Mockito.times(1)).getBlocksAfter(height, defaultLimit);
 	}
 
 	//endregion

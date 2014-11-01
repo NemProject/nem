@@ -48,7 +48,7 @@ public interface ReadOnlyBlockDao {
 	 * This should be used, not to pull whole block from the db.
 	 *
 	 * @param height height of a first block.
-	 * @param limit maximal number of elements to return.
+	 * @param limit maximum number of hashes to return.
 	 * @return The hash chain.
 	 */
 	public HashChain getHashesFrom(final BlockHeight height, int limit);
@@ -66,9 +66,9 @@ public interface ReadOnlyBlockDao {
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.
 	 *
-	 * @param blockHeight The height of the block before the first desired block.
-	 * @param blocksCount The maximum number of blocks.
+	 * @param height The height of the block before the first desired block.
+	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<Block> getBlocksAfter(long blockHeight, int blocksCount);
+	public Collection<Block> getBlocksAfter(final BlockHeight height, int limit);
 }

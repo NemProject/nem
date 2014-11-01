@@ -140,7 +140,7 @@ public class BlockAnalyzer {
 			org.nem.nis.dbmodel.Block dbBlock = null;
 			do {
 				if (null == this.iterator || !this.iterator.hasNext()) {
-					this.iterator = this.blockDao.getBlocksAfter(this.curHeight, 2345).iterator();
+					this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 2345).iterator();
 				}
 
 				// in most cases this won't make any loops

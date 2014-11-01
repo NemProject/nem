@@ -69,7 +69,7 @@ public class ChainController {
 	@AuthenticatedApi
 	public AuthenticatedResponse<SerializableList<Block>> blocksAfter(@RequestBody final AuthenticatedBlockHeightRequest request) {
 		final Collection<Block> blocks =
-				this.blockDao.getBlocksAfter(request.getEntity().getRaw(), BlockChainConstants.BLOCKS_LIMIT).stream()
+				this.blockDao.getBlocksAfter(request.getEntity(), BlockChainConstants.BLOCKS_LIMIT).stream()
 				.map(dbBlock -> BlockMapper.toModel(dbBlock, this.accountLookup))
 				.collect(Collectors.toList());
 

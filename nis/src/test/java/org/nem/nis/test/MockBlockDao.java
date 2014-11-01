@@ -151,7 +151,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public List<Block> getBlocksAfter(final long blockHeight, final int blocksCount) {
+	public List<Block> getBlocksAfter(final BlockHeight height, int limit) {
 		return null;
 	}
 
