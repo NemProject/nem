@@ -84,6 +84,7 @@ public class NisConfigurationTest {
 	//endregion
 
 	//region nis.nodeLimit
+
 	@Test
 	public void canReadConfigurationWithNodeLimit() {
 		// Arrange:
@@ -107,6 +108,34 @@ public class NisConfigurationTest {
 
 		// Assert:
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(20));
+	}
+	//endregion
+
+	//region nis.nodeLimit
+
+	@Test
+	public void canReadConfigurationWithTimeSyncNodeLimit() {
+		// Arrange:
+		final Properties properties = this.getCommonProperties();
+		properties.setProperty("nis.timeSyncNodeLimit", "12");
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(12));
+	}
+
+	@Test
+	public void canReadConfigurationWithoutTimeSyncNodeLimit() {
+		// Arrange:
+		final Properties properties = this.getCommonProperties();
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
 	}
 	//endregion
 

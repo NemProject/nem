@@ -195,7 +195,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				config.getTrustProvider(),
 				networkState);
 		final ImportanceAwareNodeSelectorFactory importanceAwareSelectorFactory = new ImportanceAwareNodeSelectorFactory(
-				this.nisConfiguration.getNodeLimit(),
+				this.nisConfiguration.getTimeSyncNodeLimit(),
 				config.getTrustProvider(),
 				networkState,
 				this.accountAnalyzer.getPoiFacade());
