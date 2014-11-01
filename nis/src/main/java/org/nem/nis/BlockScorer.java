@@ -46,14 +46,6 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Forces a recalculation of the importances the next time calculateForgerBalance() is called.
-	 */
-	public void forceImportanceCalculation() {
-		// TODO: fix me1
-		//		this.poiFacade();
-	}
-
-	/**
 	 * Calculates the hit score for block.
 	 *
 	 * @param block The block.

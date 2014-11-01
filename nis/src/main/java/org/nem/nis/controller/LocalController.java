@@ -9,8 +9,8 @@ import org.nem.core.time.*;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.secret.BlockChainConstants;
-import org.nem.nis.service.RequiredBlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +22,11 @@ public class LocalController {
 	private final static Logger LOGGER = Logger.getLogger(LocalController.class.getName());
 
 	private final long SHUTDOWN_DELAY = 200;
-	private final RequiredBlockDao blockDao;
+	private final ReadOnlyBlockDao blockDao;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
-	public LocalController(final RequiredBlockDao blockDao, final NisPeerNetworkHost host) {
+	public LocalController(final ReadOnlyBlockDao blockDao, final NisPeerNetworkHost host) {
 		this.blockDao = blockDao;
 		this.host = host;
 	}

@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.AccountCache;
-import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.TransferMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,14 @@ import java.util.*;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
-	private final RequiredTransferDao transferDao;
-	private final RequiredBlockDao blockDao;
+	private final ReadOnlyTransferDao transferDao;
+	private final ReadOnlyBlockDao blockDao;
 	private final AccountCache accountCache;
 
 	@Autowired(required = true)
 	public AccountIoAdapter(
-			final RequiredTransferDao transferDao,
-			final RequiredBlockDao blockDao,
+			final ReadOnlyTransferDao transferDao,
+			final ReadOnlyBlockDao blockDao,
 			final AccountCache accountCache) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;

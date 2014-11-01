@@ -56,7 +56,6 @@ public class DebugControllerTest {
 		blockDaoParent.setDifficulty(difficulty);
 
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
-		scorer.forceImportanceCalculation();
 		final BigInteger hit = scorer.calculateHit(blockDaoBlock);
 		final BigInteger target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
 
@@ -83,7 +82,16 @@ public class DebugControllerTest {
 		Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
 		Mockito.when(context.blockDao.findByHeight(new BlockHeight(9))).thenReturn(dbParent);
 
-		Mockito.when(context.blockChain.copyAccountAnalyzer()).thenReturn(accountAnalyzer);
+		// Arrange: simulate block loading by (1) copying all of the information in the AccountAnalyzer
+		// to the AccountAnalyzer copy and (2) then calculate importances (based on the copy)
+		Mockito.when(context.blockAnalyzer.analyze(Mockito.any(), Mockito.eq(10L))).then(invocationOnMock -> {
+			final AccountAnalyzer accountAnalyzerCopy = (AccountAnalyzer)invocationOnMock.getArguments()[0];
+			accountAnalyzer.shallowCopyTo(accountAnalyzerCopy);
+
+			final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
+			accountAnalyzerCopy.getPoiFacade().recalculateImportances(blockHeight);
+			return null;
+		});
 
 		// Act:
 		final BlockDebugInfo blockDebugInfo = context.controller.blockDebugInfo("10");
@@ -97,6 +105,7 @@ public class DebugControllerTest {
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
 		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(60));
 
+		Mockito.verify(context.blockAnalyzer, Mockito.only()).analyze(Mockito.any(), Mockito.eq(10L));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(10));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(9));
 		Mockito.verify(context.blockDao, Mockito.times(2)).findByHeight(Mockito.any());
@@ -163,8 +172,9 @@ public class DebugControllerTest {
 	}
 
 	private static class TestContext {
-		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
+		private final BlockAnalyzer blockAnalyzer = Mockito.mock(BlockAnalyzer.class);
+		private final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final DebugController controller;
@@ -176,7 +186,7 @@ public class DebugControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.controller = new DebugController(this.host, this.blockChain, this.blockDao);
+			this.controller = new DebugController(this.host, this.blockDao, this.blockAnalyzer, this.importanceCalculator);
 		}
 	}
 }

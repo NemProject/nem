@@ -22,6 +22,8 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final TransactionValidator transactionValidator;
+	// TODO 20141030 J-G think about this a bit more
+	private final BatchTransactionHashValidator batchTransactionHashValidator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -37,12 +39,14 @@ public class BlockChainValidator {
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final BlockValidator blockValidator,
-			final TransactionValidator transactionValidator) {
+			final TransactionValidator transactionValidator,
+			final BatchTransactionHashValidator batchTransactionHashValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
+		this.batchTransactionHashValidator = batchTransactionHashValidator;
 	}
 
 	/**
@@ -58,6 +62,10 @@ public class BlockChainValidator {
 		}
 
 		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
+		if (duplicateHashExists(blocks, confirmedBlockHeight)) {
+			return false;
+		}
+
 		final Set<Hash> chainHashes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
@@ -99,6 +107,18 @@ public class BlockChainValidator {
 		}
 
 		return true;
+	}
+
+	private boolean duplicateHashExists(final Collection<Block> blocks, final BlockHeight confirmedBlockHeight) {
+		Collection<Transaction> transactions = new ArrayList<>();
+		for (final Block block : blocks) {
+			for (final Transaction transaction : block.getTransactions()) {
+				transactions.add(transaction);
+			}
+		}
+
+		final ValidationContext validationContext = new ValidationContext(BlockHeight.MAX, confirmedBlockHeight);
+		return ValidationResult.SUCCESS != this.batchTransactionHashValidator.validate(transactions, validationContext);
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {

@@ -135,7 +135,8 @@ public class NisAppConfig {
 				this.blockDao,
 				this.blockTransactionObserverFactory(),
 				this.blockValidatorFactory(),
-				this.transactionValidatorFactory());
+				this.transactionValidatorFactory(),
+				this.batchTransactionHashValidatorFactory());
 	}
 
 	@Bean
@@ -151,6 +152,11 @@ public class NisAppConfig {
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
 		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider(), this.poiOptions());
+	}
+
+	@Bean
+	public BatchTransactionHashValidatorFactory batchTransactionHashValidatorFactory() {
+		return new BatchTransactionHashValidatorFactory(this.transferDao, this.importanceTransferDao);
 	}
 
 	@Bean
@@ -183,10 +189,12 @@ public class NisAppConfig {
 
 	@Bean
 	public PoiFacade poiFacade() {
-		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
-				new PoiScorer(),
-				this.poiOptions());
-		return new PoiFacade(importanceCalculator);
+		return new PoiFacade(this.importanceCalculator());
+	}
+
+	@Bean
+	public ImportanceCalculator importanceCalculator() {
+		return new PoiImportanceCalculator(new PoiScorer(), this.poiOptions());
 	}
 
 	@Bean
@@ -230,10 +238,14 @@ public class NisAppConfig {
 				this.accountDao,
 				this.blockDao,
 				this.accountAnalyzer(),
-				this.blockChain(),
 				this.nisPeerNetworkHost(),
-				this.blockChainLastBlockLayer,
-				this.nisConfiguration());
+				this.nisConfiguration(),
+				this.blockAnalyzer());
+	}
+
+	@Bean
+	public BlockAnalyzer blockAnalyzer() {
+		return new BlockAnalyzer(this.blockDao, this.blockChain(), this.blockChainLastBlockLayer);
 	}
 
 	@Bean

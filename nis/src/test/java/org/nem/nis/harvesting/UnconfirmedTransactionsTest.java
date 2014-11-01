@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	//region size
 
@@ -504,6 +506,66 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+
+		// Assert:
+		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
+	}
+
+	//endregion
+
+	//region getTransactions
+
+	@Test
+	public void getMostImportantTransactionsReturnsAllTransactionsIfLessThanMaximumTransactionsAreAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		addMockTransactions(context.transactions, 6, 9);
+
+		// Act:
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final List<Integer> customFieldValues = getCustomFieldValues(transactions);
+
+		// Assert:
+		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
+	}
+
+	@Test
+	public void getMostImportantTransactionsReturnsMaximumTransactionsIfMoreThanMaximumTransactionsAreAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		addMockTransactions(context.transactions, 6, 90);
+
+		// Act:
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+
+		// Assert:
+		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
+	}
+
+	@Test
+	public void getMostImportantTransactionsReturnsMaximumTransactionsIfMaximumTransactionsAreAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		addMockTransactions(context.transactions, 6, 6 + MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1);
+
+		// Act:
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+
+		// Assert:
+		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
+	}
+
+	@Test
+	public void getMostImportantTransactionsReturnsTransactionsInSortedOrder() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<MockTransaction> originalTransactions = createMockTransactions(6, 9);
+		originalTransactions.get(2).setFee(Amount.fromNem(11));
+		originalTransactions.forEach(context.transactions::addExisting);
+
+		// Act:
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final List<Integer> customFieldValues = getCustomFieldValues(transactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));

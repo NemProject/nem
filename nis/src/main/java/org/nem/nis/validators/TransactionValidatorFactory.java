@@ -44,7 +44,6 @@ public class TransactionValidatorFactory {
 		builder.add(new NonFutureEntityValidator(this.timeProvider));
 		builder.add(new TransferTransactionValidator());
 		builder.add(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
-		builder.add(new UniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
 		return builder.build();
 	}
 }

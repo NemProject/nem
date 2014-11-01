@@ -27,13 +27,24 @@ public class NisUtils {
 	 * @return The db block.
 	 */
 	public static org.nem.nis.dbmodel.Block createDbBlockWithTimeStamp(final int timeStamp) {
+		return createDbBlockWithTimeStampAtHeight(timeStamp, 10);
+	}
+
+	/**
+	 * Creates a DB Block that can be mapped to a model Block.
+	 *
+	 * @param timeStamp The block timestamp.
+	 * @param height The block height.
+	 * @return The db block.
+	 */
+	public static org.nem.nis.dbmodel.Block createDbBlockWithTimeStampAtHeight(final int timeStamp, final long height) {
 		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
 		account.setPublicKey(Utils.generateRandomPublicKey());
 
 		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block();
 		block.setForger(account);
 		block.setTimeStamp(timeStamp);
-		block.setHeight(10L);
+		block.setHeight(height);
 		block.setForgerProof(Utils.generateRandomBytes(64));
 		block.setBlockTransfers(new ArrayList<>());
 		block.setBlockImportanceTransfers(new ArrayList<>());
@@ -177,6 +188,25 @@ public class NisUtils {
 				Mockito.mock(ImportanceTransferDao.class),
 				new SystemTimeProvider(),
 				DEFAULT_POI_OPTIONS);
+	}
+
+	/**
+	 * Creates a (mostly real) batch transaction hash validator factory.
+	 *
+	 * @return The factory.
+	 */
+	public static BatchTransactionHashValidatorFactory createBatchTransactionHashValidatorFactory() {
+		return createBatchTransactionHashValidatorFactory(Mockito.mock(TransferDao.class));
+	}
+
+	/**
+	 * Creates a (mostly real) batch transaction hash validator factory.
+	 *
+	 * @param transferDao The transfer dao.
+	 * @return The factory.
+	 */
+	public static BatchTransactionHashValidatorFactory createBatchTransactionHashValidatorFactory(final TransferDao transferDao) {
+		return new BatchTransactionHashValidatorFactory(transferDao, Mockito.mock(ImportanceTransferDao.class));
 	}
 
 	/**

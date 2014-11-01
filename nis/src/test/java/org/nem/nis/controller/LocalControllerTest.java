@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.nis.NisPeerNetworkHost;
-import org.nem.nis.service.RequiredBlockDao;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.peer.PeerNetwork;
 
 public class LocalControllerTest {
@@ -75,7 +75,7 @@ public class LocalControllerTest {
 	}
 
 	private class TestContext {
-		private final RequiredBlockDao blockDao = Mockito.mock(RequiredBlockDao.class);
+		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 		private final PeerNetwork network = Mockito.mock(PeerNetwork.class);
 		private final LocalController controller;

@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.hamcrest.core.IsNull;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
@@ -16,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.*;
 
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -24,6 +25,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransferDaoTest {
+	private static final Logger LOGGER = Logger.getLogger(TransferDaoTest.class.getName());
 	@Autowired
 	TransferDao transferDao;
 
@@ -454,7 +456,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsTransferIfMaxBlockHeightIsGreaterOrEqualToTransferBlockHeight() {
 		// Arrange:
-		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase();
+		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase(1);
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer1_1 = this.transferDao.findByHash(hashes.get(0).getRaw(), 1);
@@ -474,7 +476,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsNullIfMaxBlockHeightIsLessThanTransferBlockHeight() {
 		// Arrange:
-		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase();
+		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase(1);
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer1 = this.transferDao.findByHash(hashes.get(1).getRaw(), 1);
@@ -488,7 +490,7 @@ public class TransferDaoTest {
 	@Test
 	public void findByHashReturnsNullIfHashDoesNotExistInDatabase() {
 		// Arrange:
-		this.saveThreeBlocksWithTransactionsInDatabase();
+		this.saveThreeBlocksWithTransactionsInDatabase(1);
 
 		// Act: second parameter is maximum block height
 		final Transfer transfer = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);
@@ -497,7 +499,93 @@ public class TransferDaoTest {
 		Assert.assertThat(transfer, IsNull.nullValue());
 	}
 
-	private List<Hash> saveThreeBlocksWithTransactionsInDatabase() {
+	// TODO 20141029 BR -> J: you want the same tests for importance transfer dao
+	// TODO 20141029 J -> BR: yes ... i think we need some refactoring of the transfer daos
+	@Test
+	public void anyHashExistsReturnsFalseIfNoneOfTheHashesExistInDatabase() {
+		// Arrange:
+		this.saveThreeBlocksWithTransactionsInDatabase(3);
+		Collection<Hash> hashes = new ArrayList<>();
+		for (int i=0; i<5; i++) {
+			// TODO 20141029 BR -> all: why does Utils.generateRandomHash() create a 64 byte hash?
+			hashes.add(new Hash(Utils.generateRandomBytes(32)));
+		}
+
+		// Act: second parameter is maximum block height
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
+
+		// Assert:
+		Assert.assertThat(exists, IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void anyHashExistsReturnsTrueIfAtLeastOneOfTheHashesExistInDatabase() {
+		// Arrange:
+		List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
+		Collection<Hash> hashes = new ArrayList<>();
+		for (int i=0; i<5; i++) {
+			hashes.add(new Hash(Utils.generateRandomBytes(32)));
+		}
+		hashes.add(transactionHashes.get(3));
+
+		// Act: second parameter is maximum block height
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
+
+		// Assert:
+		Assert.assertThat(exists, IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void anyHashExistsReturnsFalseIfNoneOfTheHashesIsContainedInABlockUpToMaxBlockHeight() {
+		// Arrange:
+		List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
+		Collection<Hash> hashes = new ArrayList<>();
+		hashes.add(transactionHashes.get(6));
+		hashes.add(transactionHashes.get(7));
+		hashes.add(transactionHashes.get(8));
+
+		// Act: second parameter is maximum block height
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(2));
+
+		// Assert:
+		Assert.assertThat(exists, IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void anyHashExistsReturnsFalseIfHashCollectionIsEmpty() {
+		// Arrange:
+		this.saveThreeBlocksWithTransactionsInDatabase(3);
+		Collection<Hash> hashes = new ArrayList<>();
+
+		// Act: second parameter is maximum block height
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
+
+		// Assert:
+		Assert.assertThat(exists, IsEqual.equalTo(false));
+	}
+
+	// TODO: Move to integration test?
+	@Test
+	public void anyHashExistsIsFastEnough() {
+		// Arrange:
+		this.saveThreeBlocksWithTransactionsInDatabase(10000);
+		Collection<Hash> hashes = new ArrayList<>();
+		for (int i=0; i<10000; i++) {
+			hashes.add(new Hash(Utils.generateRandomBytes(32)));
+		}
+
+		// Act: second parameter is maximum block height
+		long start = System.currentTimeMillis();
+		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
+		long stop = System.currentTimeMillis();
+		LOGGER.info(String.format("anyHashExists need %dms.", stop - start));
+
+		// Assert:
+		Assert.assertThat(exists, IsEqual.equalTo(false));
+		Assert.assertThat(stop - start < 1000, IsEqual.equalTo(true));
+	}
+
+	private List<Hash> saveThreeBlocksWithTransactionsInDatabase(final int transactionsPerBlock) {
 		final List<Hash> hashes = new ArrayList<>();
 		final Account sender = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
@@ -508,12 +596,14 @@ public class TransferDaoTest {
 			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(i * 123), new BlockHeight(i));
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
-			final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-			final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
-			hashes.add(dbTransfer.getTransferHash());
+			for (int j=0; j<transactionsPerBlock; j++) {
+				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
+				final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
+				hashes.add(dbTransfer.getTransferHash());
+				dummyBlock.addTransaction(transferTransaction);
+			}
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
-			dummyBlock.addTransaction(transferTransaction);
 			dummyBlock.sign();
 			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
 			this.blockDao.save(dbBlock);
