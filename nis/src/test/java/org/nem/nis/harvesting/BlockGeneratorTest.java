@@ -12,6 +12,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
 
@@ -136,7 +137,8 @@ public class BlockGeneratorTest {
 		transactions.forEach(VerifiableEntity::sign);
 		final UnconfirmedTransactions filteredTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		Mockito.when(context.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
-		Mockito.when(filteredTransactions.getAll()).thenReturn(transactions);
+		Mockito.when(filteredTransactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK))
+				.thenReturn(transactions);
 
 		final Account remoteAccount = Utils.generateRandomAccount();
 		final Account ownerAccount = Utils.generateRandomAccount();
@@ -338,7 +340,8 @@ public class BlockGeneratorTest {
 
 			final UnconfirmedTransactions filteredTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			Mockito.when(this.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
-			Mockito.when(filteredTransactions.getAll()).thenReturn(new ArrayList<>());
+			Mockito.when(filteredTransactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK))
+					.thenReturn(new ArrayList<>());
 
 			Mockito.when(this.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(new BlockDifficulty(13));
 			Mockito.when(this.scorer.getDifficultyScorer()).thenReturn(this.difficultyScorer);

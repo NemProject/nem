@@ -26,4 +26,9 @@ public class BlockChainConstants {
 	 * without the entity being rejected.
 	 */
 	public static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
+
+	/**
+	 * The maximum number of transactions in a block.
+	 */
+	public static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 60;
 }
