@@ -185,7 +185,7 @@ public class ChainControllerTest {
 
 	//endregion
 
-	// region blocksAfter
+	//region blocksAfter
 
 	@Test
 	public void blocksAfterAuthenticatedReturnsMappedBlocksFromDatabase() {
@@ -227,7 +227,7 @@ public class ChainControllerTest {
 		return result;
 	}
 
-	// endregion
+	//endregion
 
 	private static class TestContext {
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
