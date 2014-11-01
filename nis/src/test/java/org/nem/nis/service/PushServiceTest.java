@@ -23,8 +23,7 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionVerifyFailureIncrementsFailedExperience() {
 		// Arrange:
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 		final TestContext context = new TestContext(validator);
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
@@ -42,8 +41,7 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionValidFailureIncrementsFailedExperience() {
 		// Arrange:
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 		final TestContext context = new TestContext(validator);
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
@@ -272,8 +270,7 @@ public class PushServiceTest {
 
 	private static void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(final ValidationResult validateResult) {
 		// Arrange:
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(validateResult);
+		final SingleTransactionValidator validator = createValidatorWithResult(validateResult);
 
 		final TestContext context = new TestContext(validator);
 		final Transaction transaction = createMockTransaction();
@@ -296,8 +293,7 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionPrunesTransactionHashCache() {
 		// Arrange:
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.SUCCESS);;
 
 		final TestContext context = new TestContext(validator);
 		final Transaction transaction = createMockTransaction();
@@ -332,6 +328,12 @@ public class PushServiceTest {
 
 	//endregion
 
+	private static TransactionValidator createValidatorWithResult(final ValidationResult result) {
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any(Transaction.class))).thenReturn(result);
+		return validator;
+	}
+
 	private static class TestContext {
 		private final NodeIdentity remoteNodeIdentity;
 		private final Node remoteNode;
@@ -346,7 +348,7 @@ public class PushServiceTest {
 			this(new UniversalTransactionValidator());
 		}
 
-		public TestContext(final TransactionValidator validator) {
+		public TestContext(final SingleTransactionValidator validator) {
 			this.remoteNodeIdentity = new NodeIdentity(new KeyPair());
 			this.remoteNode = new Node(this.remoteNodeIdentity, NodeEndpoint.fromHost("10.0.0.1"));
 

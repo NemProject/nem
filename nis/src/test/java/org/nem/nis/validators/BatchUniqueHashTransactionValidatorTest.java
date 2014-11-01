@@ -12,7 +12,7 @@ import org.nem.nis.dao.*;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class BatchTransactionHashValidatorTest {
+public class BatchUniqueHashTransactionValidatorTest {
 
 	//region some transaction hash already exists in transfer dao
 
@@ -61,7 +61,7 @@ public class BatchTransactionHashValidatorTest {
 
 		private final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		private final ImportanceTransferDao importanceTransferDao = Mockito.mock(ImportanceTransferDao.class);
-		private final BatchTransactionHashValidator validator = new BatchTransactionHashValidator(this.transferDao, this.importanceTransferDao);
+		private final BatchUniqueHashTransactionValidator validator = new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
 
 		public TestContext() {
 			this.transactions.add(new MockTransaction(Utils.generateRandomAccount(), 7));
@@ -82,7 +82,9 @@ public class BatchTransactionHashValidatorTest {
 
 		private ValidationResult validateAtHeight(final long height) {
 			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight);
-			return this.validator.validate(this.transactions, validationContext);
+			final List<TransactionsContextPair> groupedTransactions = new ArrayList<>();
+			groupedTransactions.add(new TransactionsContextPair(this.transactions, validationContext));
+			return this.validator.validate(groupedTransactions);
 		}
 	}
 }

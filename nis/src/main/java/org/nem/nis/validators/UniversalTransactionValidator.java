@@ -6,7 +6,7 @@ import org.nem.core.time.TimeInstant;
 /**
  * A TransactionValidator implementation that applies to all transactions.
  */
-public class UniversalTransactionValidator implements TransactionValidator {
+public class UniversalTransactionValidator implements SingleTransactionValidator {
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {

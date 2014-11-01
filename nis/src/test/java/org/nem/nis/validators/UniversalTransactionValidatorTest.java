@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.MockTransaction;
 
 public class UniversalTransactionValidatorTest {
-	private static final TransactionValidator VALIDATOR = new UniversalTransactionValidator();
+	private static final SingleTransactionValidator VALIDATOR = new UniversalTransactionValidator();
 
 	@Test
 	public void transactionWithDeadlineInRangeIsValid() {

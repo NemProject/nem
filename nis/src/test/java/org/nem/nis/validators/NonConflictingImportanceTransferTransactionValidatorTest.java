@@ -19,7 +19,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final Transaction transaction = createImportanceTransferTransaction(signer, remote);
-		final TransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(ArrayList::new);
+		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(ArrayList::new);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction);
@@ -35,7 +35,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final Account remote = Utils.generateRandomAccount();
 		final Transaction transaction = createImportanceTransferTransaction(signer, remote);
 		final List<Transaction> transactions = Arrays.asList(new MockTransaction(signer, 1));
-		final TransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
+		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction);
@@ -54,7 +54,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final Account remote = Utils.generateRandomAccount();
 		final Transaction transaction = createImportanceTransferTransaction(signer, remote);
 		final List<Transaction> transactions = Arrays.asList(transaction);
-		final TransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
+		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction);
@@ -91,7 +91,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 				createImportanceTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()),
 				createConflictingTransaction.apply(signer, remote),
 				createImportanceTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()));
-		final TransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
+		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction);
@@ -109,7 +109,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final List<Transaction> transactions = Arrays.asList(new MockTransaction(signer, 1));
-		final TransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
+		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
 		final ValidationResult result = validator.validate(new MockTransaction(signer, 2));

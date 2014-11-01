@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 public class TransferTransactionValidatorTest {
-	private static final TransactionValidator VALIDATOR = new TransferTransactionValidator();
+	private static final SingleTransactionValidator VALIDATOR = new TransferTransactionValidator();
 
 	//region predicate precedence
 

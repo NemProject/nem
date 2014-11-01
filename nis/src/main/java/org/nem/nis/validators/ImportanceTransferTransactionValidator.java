@@ -8,7 +8,7 @@ import org.nem.nis.secret.BlockChainConstants;
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
-public class ImportanceTransferTransactionValidator implements TransactionValidator {
+public class ImportanceTransferTransactionValidator implements SingleTransactionValidator {
 	private final PoiFacade poiFacade;
 	private final Amount minHarvesterBalance;
 
