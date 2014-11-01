@@ -4,7 +4,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.peer.connect.PeerConnector;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -33,7 +33,7 @@ public class NodeBroadcaster {
 	 * @return The future.
 	 */
 	public CompletableFuture<Void> broadcast(
-			final List<Node> partnerNodes,
+			final Collection<Node> partnerNodes,
 			final NodeApiId broadcastId,
 			final SerializableEntity entity) {
 
