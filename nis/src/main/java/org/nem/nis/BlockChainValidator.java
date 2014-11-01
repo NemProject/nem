@@ -90,11 +90,6 @@ public class BlockChainValidator {
 					return false;
 				}
 
-				if (transaction.getSigner().equals(block.getSigner())) {
-					LOGGER.info("received block with self-signed TX");
-					return false;
-				}
-
 				final Hash hash = HashUtils.calculateHash(transaction);
 				if (chainHashes.contains(hash)) {
 					LOGGER.info("received block with duplicate TX");

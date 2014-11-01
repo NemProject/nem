@@ -98,6 +98,24 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
+	@Test
+	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createSignedTransactionWithGivenSender(middleBlock.getSigner()));
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
 	//region helper functions
 
 	//region transactions / blocks
@@ -121,6 +139,13 @@ public class BlockChainValidatorIntegrationTest {
 	private static Transaction createInvalidSignedTransaction() {
 		final Transaction transaction = new MockTransaction();
 		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() - 1));
+		transaction.sign();
+		return transaction;
+	}
+
+	private static Transaction createSignedTransactionWithGivenSender(final Account account) {
+		final Transaction transaction = new MockTransaction(account);
+		transaction.setDeadline(new TimeInstant(16));
 		transaction.sign();
 		return transaction;
 	}
@@ -152,6 +177,8 @@ public class BlockChainValidatorIntegrationTest {
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
 
 			Mockito.when(this.poiFacade.findStateByAddress(Mockito.any()))
+					.then(invocation -> new PoiAccountState((Address)invocation.getArguments()[0]));
+			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
 					.then(invocation -> new PoiAccountState((Address)invocation.getArguments()[0]));
 		}
 

@@ -218,24 +218,6 @@ public class BlockChainValidatorTest {
 	}
 
 	@Test
-	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
-		// Arrange:
-		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createSignedTransactionWithGivenSender(middleBlock.getSigner()));
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
-
-		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-	}
-
-	@Test
 	public void chainIsInvalidIfOneBlockContainsTheSameTransactionTwice() {
 		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
@@ -432,13 +414,6 @@ public class BlockChainValidatorTest {
 		final TimeInstant timeInstant = new TimeInstant(15);
 		final MockTransaction transaction = new MockTransaction(customField, timeInstant);
 		transaction.setDeadline(timeInstant.addSeconds(1));
-		transaction.sign();
-		return transaction;
-	}
-
-	private static Transaction createSignedTransactionWithGivenSender(final Account account) {
-		final Transaction transaction = new MockTransaction(account);
-		transaction.setDeadline(new TimeInstant(16));
 		transaction.sign();
 		return transaction;
 	}
