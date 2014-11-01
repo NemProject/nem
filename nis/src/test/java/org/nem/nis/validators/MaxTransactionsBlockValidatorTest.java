@@ -8,32 +8,41 @@ import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 
 public class MaxTransactionsBlockValidatorTest {
-	private static final BlockValidator VALIDATOR = new MaxTransactionsBlockValidator();
-	private static final Block BLOCK = NisUtils.createRandomBlock();
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	@Test
-	public void validateReturnsSuccessWhenBlockHasLessThanOrEqualToMaximumTransactions() {
-		// Arrange:
-		this.addTransactions(BLOCK, BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-
+	public void validateReturnsSuccessWhenBlockHasLessThanMaximumTransactions() {
 		// Assert:
-		Assert.assertThat(VALIDATOR.validate(BLOCK), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(
+				validateBlockWithTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK),
+				IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void validateReturnsSuccessWhenBlockHasExactlyMaximumTransactions() {
+		// Assert:
+		Assert.assertThat(
+				validateBlockWithTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK),
+				IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
 	public void validateReturnsFailureWhenBlockHasMoreThanMaximumTransactions() {
-		// Arrange:
-		this.addTransactions(BLOCK, BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK + 1);
-
 		// Assert:
-		Assert.assertThat(VALIDATOR.validate(BLOCK), IsEqual.equalTo(ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS));
+		Assert.assertThat(
+				validateBlockWithTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK + 1),
+				IsEqual.equalTo(ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS));
 	}
 
-	private Block addTransactions(final Block block, final int numTransactions) {
+	private static ValidationResult validateBlockWithTransactions(final int numTransactions) {
+		// Arrange:
+		final BlockValidator validator = new MaxTransactionsBlockValidator();
+		final Block block = NisUtils.createRandomBlock();
 		for (int i=0; i<numTransactions; i++) {
 			block.addTransaction(new MockTransaction());
 		}
 
-		return block;
+		// Act:
+		return validator.validate(block);
 	}
 }
