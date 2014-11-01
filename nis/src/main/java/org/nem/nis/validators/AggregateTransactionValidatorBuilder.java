@@ -18,17 +18,25 @@ public class AggregateTransactionValidatorBuilder {
 	 * @param validator The validator to add.
 	 */
 	public void add(final SingleTransactionValidator validator) {
-		//this.validators.add(new TransactionValidator() {groupedTransactions -> {
-		//	final Iterator<ValidationResult> resultIterator =
-		//			groupedTransactions.stream()
-		//					.map(pair -> ValidationResult.aggregate(
-		//							pair.getTransactions().stream()
-		//									.map(transaction -> validator.validate(transaction, pair.getContext()))
-		//									.iterator()))
-		//					.iterator();
-		//
-		//	return ValidationResult.aggregate(resultIterator);
-		//});
+		this.validators.add(new TransactionValidator() {
+			@Override
+			public ValidationResult validate(final List<TransactionsContextPair> groupedTransactions) {
+				final Iterator<ValidationResult> resultIterator =
+						groupedTransactions.stream()
+								.map(pair -> ValidationResult.aggregate(
+										pair.getTransactions().stream()
+												.map(transaction -> validator.validate(transaction, pair.getContext()))
+												.iterator()))
+								.iterator();
+
+				return ValidationResult.aggregate(resultIterator);
+			}
+
+			@Override
+			public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
+				return validator.validate(transaction, context);
+			}
+		});
 	}
 
 	/**
@@ -40,12 +48,12 @@ public class AggregateTransactionValidatorBuilder {
 		this.validators.add(new TransactionValidator() {
 			@Override
 			public ValidationResult validate(final List<TransactionsContextPair> groupedTransactions) {
-				return null;
+				return validator.validate(groupedTransactions);
 			}
 
 			@Override
 			public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-				return null;
+				return this.validate(Arrays.asList(new TransactionsContextPair(transaction, context)));
 			}
 		});
 	}
