@@ -20,7 +20,7 @@ import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.function.Function;
 
 public class ChainControllerTest {
@@ -199,23 +199,55 @@ public class ChainControllerTest {
 		final AuthenticatedResponse<?> response = runBlocksAfterTest(
 				context,
 				c -> c.controller.blocksAfter(request),
+				r -> r.getEntity(localNode.getIdentity(), challenge),
+				getValidBlockList());
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+	}
+
+	@Test (expected = RuntimeException.class)
+	public void blocksAfterAuthenticatedThrowsIfDatabaseReturnsCorruptBlockList() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(new BlockHeight(10), challenge);
+
+		// Assert:
+		final AuthenticatedResponse<?> response = runBlocksAfterTestWithCorruptBlockList(
+				context,
+				c -> c.controller.blocksAfter(request),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	private static <T> T runBlocksAfterTest(
+	private static <T> T runBlocksAfterTestWithCorruptBlockList(
 			final TestContext context,
 			final Function<TestContext, T> action,
 			final Function<T, SerializableList<Block>> getBlocks) {
 		// Arrange:
+		final List<org.nem.nis.dbmodel.Block> blockList = getValidBlockList();
+		blockList.get(1).setId(11L);
+		blockList.get(1).setNextBlockId(12L);
+		return runBlocksAfterTest(context, action, getBlocks, blockList);
+	}
+
+	private static List<org.nem.nis.dbmodel.Block> getValidBlockList() {
 		final org.nem.nis.dbmodel.Block dbBlock1 = NisUtils.createDbBlockWithTimeStampAtHeight(443, 11);
 		dbBlock1.setId(11L);
 		dbBlock1.setNextBlockId(12L);
 		final org.nem.nis.dbmodel.Block dbBlock2 = NisUtils.createDbBlockWithTimeStampAtHeight(543, 12);
 		dbBlock2.setId(12L);
 		dbBlock2.setNextBlockId(13L);
-		Mockito.when(context.blockDao.getBlocksAfter(10, BlockChainConstants.BLOCKS_LIMIT))
-				.thenReturn(Arrays.asList(dbBlock1, dbBlock2));
+		return Arrays.asList(dbBlock1, dbBlock2);
+	}
+
+	private static <T> T runBlocksAfterTest(
+			final TestContext context,
+			final Function<TestContext, T> action,
+			final Function<T, SerializableList<Block>> getBlocks,
+			final List<org.nem.nis.dbmodel.Block> blockList) {
+		// Arrange:
+		Mockito.when(context.blockDao.getBlocksAfter(10, BlockChainConstants.BLOCKS_LIMIT)).thenReturn(blockList);
 
 		// Act:
 		final T result = action.apply(context);

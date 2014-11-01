@@ -71,6 +71,7 @@ public class ChainController {
 		// TODO: add tests for this action
 		// TODO 20141030 BR: added one test
 		// TODO 20141031 J-B: can we add a test for when things aren't fine?
+		// TODO 20141101 BR -> J: added a test with corrupt block list.
 		final long start = System.currentTimeMillis();
 		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
 		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(request.getEntity().getRaw(), BlockChainConstants.BLOCKS_LIMIT);

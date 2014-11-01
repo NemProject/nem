@@ -65,6 +65,7 @@ public class PushService {
 				identity);
 
 		if (result.isFailure()) {
+			this.transactionHashCache.remove(hash);
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 
@@ -164,6 +165,10 @@ public class PushService {
 
 			this.cache.putIfAbsent(hash, this.timeProvider.getCurrentTime());
 			return false;
+		}
+
+		private void remove(final Hash hash) {
+			this.cache.remove(hash);
 		}
 
 		private void prune() {
