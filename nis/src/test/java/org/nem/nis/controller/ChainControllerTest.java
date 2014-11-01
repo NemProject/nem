@@ -7,7 +7,7 @@ import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.core.serialization.AccountLookup;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
@@ -20,7 +20,9 @@ import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
 
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ChainControllerTest {
 
@@ -70,6 +72,8 @@ public class ChainControllerTest {
 
 	//endregion
 
+	//region hashesFrom
+
 	@Test
 	public void hashesFromReturnsHashesFromHeight() {
 		// Arrange:
@@ -93,6 +97,40 @@ public class ChainControllerTest {
 		Assert.assertThat(chain, IsEqual.equalTo(originalHashes));
 		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(new BlockHeight(44), defaultLimit);
 	}
+
+	//endregion
+
+	//region blocksAfter
+
+	@Test
+	public void blocksAfterReturnsBlocksFromHeight() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+
+		final BlockHeight height = new BlockHeight(44);
+		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(height, challenge);
+
+		final int defaultLimit = BlockChainConstants.BLOCKS_LIMIT;
+		final List<org.nem.nis.dbmodel.Block> dbBlocks = Arrays.asList(
+				NisUtils.createDbBlockWithTimeStamp(10),
+				NisUtils.createDbBlockWithTimeStamp(11),
+				NisUtils.createDbBlockWithTimeStamp(12));
+		Mockito.when(context.blockDao.getBlocksAfter(44L, defaultLimit)).thenReturn(dbBlocks);
+
+		// Act:
+		final AuthenticatedResponse<SerializableList<Block>> response = context.controller.blocksAfter(request);
+		final SerializableList<Block> blocks = response.getEntity(localNode.getIdentity(), challenge);
+		final List<Integer> timeStamps = blocks.asCollection().stream().map(b -> b.getTimeStamp().getRawTime()).collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+		Assert.assertThat(timeStamps, IsEqual.equalTo(Arrays.asList(10, 11, 12)));
+		Mockito.verify(context.blockDao, Mockito.times(1)).getBlocksAfter(44, defaultLimit);
+	}
+
+	//endregion
 
 	//region chainScore
 
@@ -139,7 +177,7 @@ public class ChainControllerTest {
 
 	//endregion
 
-	//region chainScore
+	//region chainHeight
 
 	@Test
 	public void chainHeightReturnsHeight() {

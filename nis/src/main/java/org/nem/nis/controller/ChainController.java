@@ -16,7 +16,9 @@ import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @RestController
 public class ChainController {
@@ -65,25 +67,15 @@ public class ChainController {
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	@P2PApi
 	@AuthenticatedApi
-	public AuthenticatedResponse<SerializableList<Block>> blocksAfter(
-			@RequestBody final AuthenticatedBlockHeightRequest request) {
-		// TODO 20141030 J-B: i guess this is one of the functions to optimize
-		// TODO: add tests for this action
-		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(request.getEntity());
-		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
-		for (int i = 0; i < BlockChainConstants.BLOCKS_LIMIT; ++i) {
-			final Long curBlockId = dbBlock.getNextBlockId();
-			if (null == curBlockId) {
-				break;
-			}
-
-			dbBlock = this.blockDao.findById(curBlockId);
-			blockList.add(BlockMapper.toModel(dbBlock, this.accountLookup));
-		}
+	public AuthenticatedResponse<SerializableList<Block>> blocksAfter(@RequestBody final AuthenticatedBlockHeightRequest request) {
+		final Collection<Block> blocks =
+				this.blockDao.getBlocksAfter(request.getEntity().getRaw(), BlockChainConstants.BLOCKS_LIMIT).stream()
+				.map(dbBlock -> BlockMapper.toModel(dbBlock, this.accountLookup))
+				.collect(Collectors.toList());
 
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(
-				blockList,
+				new SerializableList<>(blocks),
 				localNode.getIdentity(),
 				request.getChallenge());
 	}
