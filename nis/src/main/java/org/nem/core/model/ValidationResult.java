@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.*;
+
 /**
  * Possible validation results.
  */
@@ -133,5 +135,25 @@ public enum ValidationResult {
 	 */
 	public int getValue() {
 		return this.value;
+	}
+
+	/**
+	 * Aggregates an iterator of validation results.
+	 *
+	 * @param resultIterator The results to aggregate.
+	 * @return The aggregated result.
+	 */
+	public static ValidationResult aggregate(final Iterator<ValidationResult> resultIterator) {
+		boolean isNeutral = false;
+		while (resultIterator.hasNext()) {
+			final ValidationResult result = resultIterator.next();
+			if (ValidationResult.NEUTRAL == result) {
+				isNeutral = true;
+			} else if (ValidationResult.SUCCESS != result) {
+				return result;
+			}
+		}
+
+		return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
 	}
 }
