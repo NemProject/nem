@@ -135,10 +135,7 @@ public class BlockGeneratorTest {
 				new MockTransaction(11, new TimeInstant(2)),
 				new MockTransaction(5, new TimeInstant(3)));
 		transactions.forEach(VerifiableEntity::sign);
-		final UnconfirmedTransactions filteredTransactions = Mockito.mock(UnconfirmedTransactions.class);
-		Mockito.when(context.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
-		Mockito.when(filteredTransactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK))
-				.thenReturn(transactions);
+		context.setBlockTransactions(transactions);
 
 		final Account remoteAccount = Utils.generateRandomAccount();
 		final Account ownerAccount = Utils.generateRandomAccount();
@@ -338,10 +335,7 @@ public class BlockGeneratorTest {
 					.thenReturn(new PoiAccountState(signer.getAddress()));
 			Mockito.when(this.accountLookup.findByAddress(Mockito.any())).thenReturn(signer);
 
-			final UnconfirmedTransactions filteredTransactions = Mockito.mock(UnconfirmedTransactions.class);
-			Mockito.when(this.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
-			Mockito.when(filteredTransactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK))
-					.thenReturn(new ArrayList<>());
+			this.setBlockTransactions(new ArrayList<>());
 
 			Mockito.when(this.difficultyScorer.calculateDifficulty(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(new BlockDifficulty(13));
 			Mockito.when(this.scorer.getDifficultyScorer()).thenReturn(this.difficultyScorer);
@@ -361,6 +355,13 @@ public class BlockGeneratorTest {
 
 		private GeneratedBlock generateNextBlock(final Block lastBlock, final Account harvesterSigner, final TimeInstant timeInstant) {
 			return this.generator.generateNextBlock(lastBlock, harvesterSigner, timeInstant);
+		}
+
+		private void setBlockTransactions(final List<Transaction> transactions) {
+			final UnconfirmedTransactions filteredTransactions = Mockito.mock(UnconfirmedTransactions.class);
+			Mockito.when(this.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
+			Mockito.when(filteredTransactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK))
+					.thenReturn(transactions);
 		}
 	}
 }

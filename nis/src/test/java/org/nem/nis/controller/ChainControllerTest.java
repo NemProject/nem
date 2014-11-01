@@ -204,7 +204,7 @@ public class ChainControllerTest {
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
 
-	@Test (expected = RuntimeException.class)
+	@Test
 	public void blocksAfterAuthenticatedThrowsIfDatabaseReturnsCorruptBlockList() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -212,23 +212,21 @@ public class ChainControllerTest {
 		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
 		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(new BlockHeight(10), challenge);
 
-		// Assert:
-		final AuthenticatedResponse<?> response = runBlocksAfterTestWithCorruptBlockList(
-				context,
-				c -> c.controller.blocksAfter(request),
-				r -> r.getEntity(localNode.getIdentity(), challenge));
-		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
-	}
-
-	private static <T> T runBlocksAfterTestWithCorruptBlockList(
-			final TestContext context,
-			final Function<TestContext, T> action,
-			final Function<T, SerializableList<Block>> getBlocks) {
-		// Arrange:
+		// Arrange: set the id and next block id of the second block incorrectly
 		final List<org.nem.nis.dbmodel.Block> blockList = getValidBlockList();
 		blockList.get(1).setId(11L);
 		blockList.get(1).setNextBlockId(12L);
-		return runBlocksAfterTest(context, action, getBlocks, blockList);
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> {
+					runBlocksAfterTest(
+							context,
+							c -> c.controller.blocksAfter(request),
+							r -> r.getEntity(localNode.getIdentity(), challenge),
+							blockList);
+				},
+				RuntimeException.class);
 	}
 
 	private static List<org.nem.nis.dbmodel.Block> getValidBlockList() {

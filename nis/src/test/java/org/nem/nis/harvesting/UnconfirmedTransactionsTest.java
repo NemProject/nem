@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	//region size
 
@@ -521,7 +522,7 @@ public class UnconfirmedTransactionsTest {
 		addMockTransactions(context.transactions, 6, 9);
 
 		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 		final List<Integer> customFieldValues = getCustomFieldValues(transactions);
 
 		// Assert:
@@ -535,28 +536,27 @@ public class UnconfirmedTransactionsTest {
 		addMockTransactions(context.transactions, 6, 90);
 
 		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 
 		// Assert:
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
+		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
 	}
 
 	@Test
 	public void getMostImportantTransactionsReturnsMaximumTransactionsIfMaximumTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		addMockTransactions(context.transactions, 6, 65);
+		addMockTransactions(context.transactions, 6, 6 + MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1);
 
 		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 
 		// Assert:
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
+		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
 	}
 
 	@Test
 	public void getMostImportantTransactionsReturnsTransactionsInSortedOrder() {
-
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<MockTransaction> originalTransactions = createMockTransactions(6, 9);
@@ -564,7 +564,7 @@ public class UnconfirmedTransactionsTest {
 		originalTransactions.forEach(context.transactions::addExisting);
 
 		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 		final List<Integer> customFieldValues = getCustomFieldValues(transactions);
 
 		// Assert:

@@ -259,25 +259,23 @@ public class PushServiceTest {
 	}
 
 	@Test
-	public void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithSuccessfulValidation() {
-		pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(
+	public void pushTransactionCachesTransactionIfValidationSucceeds() {
+		assertPushServiceTransactionCaching(
 				ValidationResult.SUCCESS,
 				ValidationResult.NEUTRAL,
 				1);
 	}
 
-	// TODO 20141031 J-B: is this desired?
-	// TODO 20141101 BR -> J: probably better to punish a node each time it sends an invalid transaction.
 	@Test
 	public void pushTransactionDoesNotCacheTransactionIfValidationFails() {
 		// Assert:
-		pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(
+		assertPushServiceTransactionCaching(
 				ValidationResult.FAILURE_CHAIN_INVALID,
 				ValidationResult.FAILURE_CHAIN_INVALID,
 				2);
 	}
 
-	private static void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(
+	private static void assertPushServiceTransactionCaching(
 			final ValidationResult transactionValidationResult,
 			final ValidationResult expectedValidationResult,
 			final int expectedNumberOfInvocations) {
@@ -298,7 +296,7 @@ public class PushServiceTest {
 		final ValidationResult result = context.service.pushTransaction(transaction, null);
 
 		// Assert:
-		// transaction validation should have only occurred once
+		// transaction validation should have only the expected number of times
 		Mockito.verify(validator, Mockito.times(expectedNumberOfInvocations)).validate(Mockito.any());
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
