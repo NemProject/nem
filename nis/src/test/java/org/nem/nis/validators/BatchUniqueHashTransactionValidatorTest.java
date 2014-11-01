@@ -64,10 +64,11 @@ public class BatchUniqueHashTransactionValidatorTest {
 		private final BatchUniqueHashTransactionValidator validator = new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
 
 		public TestContext() {
-			this.transactions.add(new MockTransaction(Utils.generateRandomAccount(), 7));
-			this.transactions.add(new MockTransaction(Utils.generateRandomAccount(), 8));
-			this.hashes.add(HashUtils.calculateHash(this.transactions.get(0)));
-			this.hashes.add(HashUtils.calculateHash(this.transactions.get(1)));
+			for (int i = 0; i < 4; ++i) {
+				final Transaction transaction = new MockTransaction(Utils.generateRandomAccount(), 7 + i);
+				this.transactions.add(transaction);
+				this.hashes.add(HashUtils.calculateHash(transaction));
+			}
 		}
 
 		private void setTransferDaoForHashes() {
@@ -81,10 +82,20 @@ public class BatchUniqueHashTransactionValidatorTest {
 		}
 
 		private ValidationResult validateAtHeight(final long height) {
-			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight);
 			final List<TransactionsContextPair> groupedTransactions = new ArrayList<>();
-			groupedTransactions.add(new TransactionsContextPair(this.transactions, validationContext));
+			groupedTransactions.add(this.createPair(0, 1, height));
+			groupedTransactions.add(this.createPair(2, 3, height + 1));
 			return this.validator.validate(groupedTransactions);
+		}
+
+		private TransactionsContextPair createPair(final int start, final int end, final long height) {
+			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight);
+			final List<Transaction> transactions = new ArrayList<>();
+			for (int i = start; i <= end; ++i) {
+				transactions.add(this.transactions.get(i));
+			}
+
+			return new TransactionsContextPair(transactions, validationContext);
 		}
 	}
 }
