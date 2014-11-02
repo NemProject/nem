@@ -146,7 +146,8 @@ public class BlockChain implements BlockSynchronizer {
 	public synchronized NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			return this.synchronizeNodeInternal(connectorPool, node);
-		} catch (InactivePeerException | FatalPeerException ex) {
+		} catch (final InactivePeerException | FatalPeerException ex) {
+			LOGGER.info(String.format("failed to synchronize with %s: %s", node, ex));
 			return NodeInteractionResult.FAILURE;
 		}
 	}
@@ -160,7 +161,7 @@ public class BlockChain implements BlockSynchronizer {
 		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
 
 		if (result.getCode().isEvil()) {
-			throw new FatalPeerException("remote node is evil");
+			throw new FatalPeerException(String.format("remote node is evil: %s", result.getCode()));
 		}
 
 		return result;

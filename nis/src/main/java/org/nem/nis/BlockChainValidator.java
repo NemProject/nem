@@ -72,8 +72,9 @@ public class BlockChainValidator {
 				return false;
 			}
 
-			if (!this.blockValidator.validate(block).isSuccess()) {
-				LOGGER.info("received block that failed validation");
+			final ValidationResult blockValidationResult = this.blockValidator.validate(block);
+			if (!blockValidationResult.isSuccess()) {
+				LOGGER.info(String.format("received block that failed validation: %s", blockValidationResult));
 				return false;
 			}
 
@@ -86,13 +87,13 @@ public class BlockChainValidator {
 			groupedTransactions.add(new TransactionsContextPair(block.getTransactions(), context));
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
-					LOGGER.info("received block with unverifiable TX");
+					LOGGER.info("received block with unverifiable transaction");
 					return false;
 				}
 
 				final Hash hash = HashUtils.calculateHash(transaction);
 				if (chainHashes.contains(hash)) {
-					LOGGER.info("received block with duplicate TX");
+					LOGGER.info("received block with duplicate transaction");
 					return false;
 				}
 
@@ -105,7 +106,13 @@ public class BlockChainValidator {
 			this.executor.accept(block);
 		}
 
-		return this.transactionValidator.validate(groupedTransactions).isSuccess();
+		final ValidationResult transactionValidationResult = this.transactionValidator.validate(groupedTransactions);
+		if (!transactionValidationResult.isSuccess()) {
+			LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
+			return false;
+		}
+
+		return true;
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
