@@ -708,7 +708,7 @@ public class BlockDaoTest {
 
 		// Assert:
 		org.nem.nis.dbmodel.Block previousBlock = null;
-		for (org.nem.nis.dbmodel.Block block : blocks) {
+		for (final org.nem.nis.dbmodel.Block block : blocks) {
 			if (null != previousBlock) {
 				Assert.assertThat(previousBlock.getHeight(), IsEqual.equalTo(block.getHeight() - 1));
 			}
@@ -727,7 +727,7 @@ public class BlockDaoTest {
 
 		// Assert:
 		org.nem.nis.dbmodel.Block previousBlock = null;
-		for (org.nem.nis.dbmodel.Block block : blocks) {
+		for (final org.nem.nis.dbmodel.Block block : blocks) {
 			if (null != previousBlock) {
 				Assert.assertThat(previousBlock.getNextBlockId(), IsEqual.equalTo(block.getId()));
 			}

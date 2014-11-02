@@ -71,7 +71,7 @@ public class ChainController {
 		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
 		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(request.getEntity(), BlockChainConstants.BLOCKS_LIMIT);
 		org.nem.nis.dbmodel.Block previousDbBlock = null;
-		for (org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
+		for (final org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
 			if (null != previousDbBlock && !previousDbBlock.getNextBlockId().equals(dbBlock.getId())) {
 				throw new RuntimeException("Corrupt block list returned from db.");
