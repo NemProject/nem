@@ -178,7 +178,7 @@ public class BlockDaoImpl implements BlockDao {
 		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.setFetchMode("forger", FetchMode.JOIN)
 				.add(Restrictions.gt("height", blockHeight))
-				.add(Restrictions.le("height", blockHeight + (long)limit))
+				.add(Restrictions.le("height", blockHeight + limit))
 				.addOrder(Order.asc("height"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return listAndCast(criteria);

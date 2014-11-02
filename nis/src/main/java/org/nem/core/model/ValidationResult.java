@@ -83,7 +83,7 @@ public enum ValidationResult {
 	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14),
 
 	/**
-	 * Validation failed because there are too many transaction in the block
+	 * Validation failed because there are too many transactions in the block.
 	 */
 	FAILURE_TOO_MANY_TRANSACTIONS(15);
 

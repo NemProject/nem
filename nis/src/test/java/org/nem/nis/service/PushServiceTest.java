@@ -293,7 +293,7 @@ public class PushServiceTest {
 		final ValidationResult result = context.service.pushTransaction(transaction, null);
 
 		// Assert:
-		// transaction validation should have only the expected number of times
+		// transaction validation should have only occurred the expected number of times
 		Mockito.verify(validator, Mockito.times(expectedNumberOfInvocations)).validate(Mockito.any());
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
