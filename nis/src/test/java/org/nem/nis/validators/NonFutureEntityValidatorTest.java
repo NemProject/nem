@@ -35,7 +35,7 @@ public class NonFutureEntityValidatorTest {
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction(7, new TimeInstant(entityTime));
-		final TransactionValidator validator = createValidator(currentTime);
+		final SingleTransactionValidator validator = createValidator(currentTime);
 
 		// Act:
 		final ValidationResult result = validator.validate(transaction);

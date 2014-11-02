@@ -71,6 +71,8 @@ public class ChainControllerTest {
 
 	//endregion
 
+	//region hashesFrom
+
 	@Test
 	public void hashesFromReturnsHashesFromHeight() {
 		// Arrange:
@@ -92,8 +94,10 @@ public class ChainControllerTest {
 		// Assert:
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(chain, IsEqual.equalTo(originalHashes));
-		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(new BlockHeight(44), defaultLimit);
+		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(height, defaultLimit);
 	}
+
+	//endregion
 
 	//region chainScore
 
@@ -140,7 +144,7 @@ public class ChainControllerTest {
 
 	//endregion
 
-	//region chainScore
+	//region chainHeight
 
 	@Test
 	public void chainHeightReturnsHeight() {
@@ -245,7 +249,7 @@ public class ChainControllerTest {
 			final Function<T, SerializableList<Block>> getBlocks,
 			final List<org.nem.nis.dbmodel.Block> blockList) {
 		// Arrange:
-		Mockito.when(context.blockDao.getBlocksAfter(10, BlockChainConstants.BLOCKS_LIMIT)).thenReturn(blockList);
+		Mockito.when(context.blockDao.getBlocksAfter(new BlockHeight(10), BlockChainConstants.BLOCKS_LIMIT)).thenReturn(blockList);
 
 		// Act:
 		final T result = action.apply(context);
@@ -257,7 +261,7 @@ public class ChainControllerTest {
 		Assert.assertThat(blocks.get(1).getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 		Assert.assertThat(blocks.get(1).getTimeStamp(), IsEqual.equalTo(new TimeInstant(543)));
 		Mockito.verify(context.blockDao, Mockito.times(1))
-				.getBlocksAfter(10, BlockChainConstants.BLOCKS_LIMIT);
+				.getBlocksAfter(new BlockHeight(10), BlockChainConstants.BLOCKS_LIMIT);
 		return result;
 	}
 

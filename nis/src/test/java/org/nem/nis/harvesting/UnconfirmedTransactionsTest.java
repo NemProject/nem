@@ -957,7 +957,7 @@ public class UnconfirmedTransactionsTest {
 
 	private static class TestContext {
 		private final TimeProvider timeProvider = Utils.createMockTimeProvider(25);
-		private final TransactionValidator validator;
+		private final SingleTransactionValidator validator;
 		private final UnconfirmedTransactions transactions;
 
 		private TestContext() {
@@ -969,7 +969,7 @@ public class UnconfirmedTransactionsTest {
 			Mockito.when(this.validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
 		}
 
-		private TestContext(final TransactionValidator validator) {
+		private TestContext(final SingleTransactionValidator validator) {
 			this.validator = validator;
 			this.transactions = new UnconfirmedTransactions(this.timeProvider, this.validator);
 		}

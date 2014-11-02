@@ -505,8 +505,8 @@ public class TransferDaoTest {
 	public void anyHashExistsReturnsFalseIfNoneOfTheHashesExistInDatabase() {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(3);
-		Collection<Hash> hashes = new ArrayList<>();
-		for (int i=0; i<5; i++) {
+		final Collection<Hash> hashes = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
 			// TODO 20141029 BR -> all: why does Utils.generateRandomHash() create a 64 byte hash?
 			hashes.add(new Hash(Utils.generateRandomBytes(32)));
 		}
@@ -521,9 +521,9 @@ public class TransferDaoTest {
 	@Test
 	public void anyHashExistsReturnsTrueIfAtLeastOneOfTheHashesExistInDatabase() {
 		// Arrange:
-		List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
-		Collection<Hash> hashes = new ArrayList<>();
-		for (int i=0; i<5; i++) {
+		final List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
+		final Collection<Hash> hashes = new ArrayList<>();
+		for (int i = 0; i < 5; i++) {
 			hashes.add(new Hash(Utils.generateRandomBytes(32)));
 		}
 		hashes.add(transactionHashes.get(3));
@@ -538,8 +538,8 @@ public class TransferDaoTest {
 	@Test
 	public void anyHashExistsReturnsFalseIfNoneOfTheHashesIsContainedInABlockUpToMaxBlockHeight() {
 		// Arrange:
-		List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
-		Collection<Hash> hashes = new ArrayList<>();
+		final List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
+		final Collection<Hash> hashes = new ArrayList<>();
 		hashes.add(transactionHashes.get(6));
 		hashes.add(transactionHashes.get(7));
 		hashes.add(transactionHashes.get(8));
@@ -555,7 +555,7 @@ public class TransferDaoTest {
 	public void anyHashExistsReturnsFalseIfHashCollectionIsEmpty() {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(3);
-		Collection<Hash> hashes = new ArrayList<>();
+		final Collection<Hash> hashes = new ArrayList<>();
 
 		// Act: second parameter is maximum block height
 		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
@@ -569,15 +569,15 @@ public class TransferDaoTest {
 	public void anyHashExistsIsFastEnough() {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(10000);
-		Collection<Hash> hashes = new ArrayList<>();
-		for (int i=0; i<10000; i++) {
+		final Collection<Hash> hashes = new ArrayList<>();
+		for (int i = 0; i < 10000; i++) {
 			hashes.add(new Hash(Utils.generateRandomBytes(32)));
 		}
 
 		// Act: second parameter is maximum block height
-		long start = System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
 		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
-		long stop = System.currentTimeMillis();
+		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("anyHashExists need %dms.", stop - start));
 
 		// Assert:
@@ -596,7 +596,7 @@ public class TransferDaoTest {
 			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(i * 123), new BlockHeight(i));
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
-			for (int j=0; j<transactionsPerBlock; j++) {
+			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
 				final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
 				hashes.add(dbTransfer.getTransferHash());

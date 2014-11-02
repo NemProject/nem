@@ -10,13 +10,11 @@ import org.nem.core.model.Address;
 import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.ExceptionAssert;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.*;
 import org.nem.peer.Config;
 import org.nem.peer.node.ImpersonatingPeerException;
 
 import java.io.InputStream;
-import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.logging.Logger;
@@ -94,7 +92,7 @@ public class HttpConnectorTest {
 
 		final StringBuilder builder = new StringBuilder();
 		builder.append(String.format("%s nodes", nodes.size()));
-		for (final Map.Entry <NodeStatus, Integer> pair : nodeStatusCounts.entrySet()) {
+		for (final Map.Entry<NodeStatus, Integer> pair : nodeStatusCounts.entrySet()) {
 			builder.append(System.lineSeparator());
 			builder.append(String.format("%s nodes -> %s", pair.getValue(), pair.getKey()));
 		}

@@ -12,7 +12,7 @@ import org.nem.nis.dao.*;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class BatchTransactionHashValidatorTest {
+public class BatchUniqueHashTransactionValidatorTest {
 
 	//region some transaction hash already exists in transfer dao
 
@@ -43,6 +43,18 @@ public class BatchTransactionHashValidatorTest {
 	//endregion
 
 	@Test
+	public void validateReturnsSuccessIfCalledWithEmptyList() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final ValidationResult result = context.validator.validate(Arrays.asList());
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
 	public void validateReturnsSuccessIfNoneOfTheHashesExistInAnyDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -61,13 +73,14 @@ public class BatchTransactionHashValidatorTest {
 
 		private final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		private final ImportanceTransferDao importanceTransferDao = Mockito.mock(ImportanceTransferDao.class);
-		private final BatchTransactionHashValidator validator = new BatchTransactionHashValidator(this.transferDao, this.importanceTransferDao);
+		private final BatchUniqueHashTransactionValidator validator = new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
 
 		public TestContext() {
-			this.transactions.add(new MockTransaction(Utils.generateRandomAccount(), 7));
-			this.transactions.add(new MockTransaction(Utils.generateRandomAccount(), 8));
-			this.hashes.add(HashUtils.calculateHash(this.transactions.get(0)));
-			this.hashes.add(HashUtils.calculateHash(this.transactions.get(1)));
+			for (int i = 0; i < 5; ++i) {
+				final Transaction transaction = new MockTransaction(Utils.generateRandomAccount(), 7 + i);
+				this.transactions.add(transaction);
+				this.hashes.add(HashUtils.calculateHash(transaction));
+			}
 		}
 
 		private void setTransferDaoForHashes() {
@@ -81,8 +94,20 @@ public class BatchTransactionHashValidatorTest {
 		}
 
 		private ValidationResult validateAtHeight(final long height) {
+			final List<TransactionsContextPair> groupedTransactions = new ArrayList<>();
+			groupedTransactions.add(this.createPair(0, 1, height));
+			groupedTransactions.add(this.createPair(2, 4, height + 1));
+			return this.validator.validate(groupedTransactions);
+		}
+
+		private TransactionsContextPair createPair(final int start, final int end, final long height) {
 			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight);
-			return this.validator.validate(this.transactions, validationContext);
+			final List<Transaction> transactions = new ArrayList<>();
+			for (int i = start; i <= end; ++i) {
+				transactions.add(this.transactions.get(i));
+			}
+
+			return new TransactionsContextPair(transactions, validationContext);
 		}
 	}
 }

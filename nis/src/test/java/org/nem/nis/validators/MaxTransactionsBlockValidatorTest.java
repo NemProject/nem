@@ -38,7 +38,7 @@ public class MaxTransactionsBlockValidatorTest {
 		// Arrange:
 		final BlockValidator validator = new MaxTransactionsBlockValidator();
 		final Block block = NisUtils.createRandomBlock();
-		for (int i=0; i<numTransactions; i++) {
+		for (int i = 0; i < numTransactions; i++) {
 			block.addTransaction(new MockTransaction());
 		}
 

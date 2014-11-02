@@ -9,7 +9,7 @@ import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**

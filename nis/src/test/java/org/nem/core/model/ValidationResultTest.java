@@ -66,4 +66,87 @@ public class ValidationResultTest {
 	}
 
 	//endregion
+
+	//region aggregate
+
+	@Test
+	public void canAggregateZeroResults() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList();
+
+		// Assert:
+		assertAggregationResult(results, ValidationResult.SUCCESS, false);
+	}
+
+	@Test
+	public void canAggregateOneResult() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(ValidationResult.FAILURE_CHAIN_INVALID);
+
+		// Assert:
+		assertAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID, false);
+	}
+
+	@Test
+	public void canAggregateMultipleResults() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.SUCCESS,
+				ValidationResult.SUCCESS);
+
+		// Assert:
+		assertAggregationResult(results, ValidationResult.SUCCESS, false);
+	}
+
+	@Test
+	public void aggregateReturnsFailureWhenPassedIteratorWithAtLeastOneFailureResult() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				ValidationResult.SUCCESS);
+
+		// Assert:
+		assertAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID, true);
+	}
+
+	@Test
+	public void aggregateReturnsNeutralWhenPassedIteratorWithAtLeastOneNeutralResultAndNoFailureResults() {
+		// Act:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.NEUTRAL,
+				ValidationResult.SUCCESS);
+
+		// Assert:
+		assertAggregationResult(results, ValidationResult.NEUTRAL, false);
+	}
+
+	@Test
+	public void aggregateGivesHigherPrecedenceToFailureResultThanNeutralResult() {
+		// Arrange:
+		final Collection<ValidationResult> results = Arrays.asList(
+				ValidationResult.SUCCESS,
+				ValidationResult.NEUTRAL,
+				ValidationResult.FAILURE_CHAIN_INVALID);
+
+		// Assert:
+		assertAggregationResult(results, ValidationResult.FAILURE_CHAIN_INVALID, false);
+	}
+
+	private static void assertAggregationResult(
+			final Collection<ValidationResult> results,
+			final ValidationResult expectedResult,
+			final boolean isShortCircuited) {
+		// Act:
+		final Iterator<ValidationResult> resultIterator = results.iterator();
+		final ValidationResult result = ValidationResult.aggregate(resultIterator);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+		Assert.assertThat(resultIterator.hasNext(), IsEqual.equalTo(isShortCircuited));
+	}
+
+	//endregion
 }

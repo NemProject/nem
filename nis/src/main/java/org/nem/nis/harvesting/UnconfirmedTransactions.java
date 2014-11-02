@@ -44,7 +44,7 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TimeProvider timeProvider,
-			final TransactionValidator validator) {
+			final SingleTransactionValidator validator) {
 		this.timeProvider = timeProvider;
 
 		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();

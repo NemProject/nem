@@ -1,13 +1,11 @@
 package org.nem.nis;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
-import org.nem.nis.dao.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
@@ -37,7 +35,6 @@ public class BlockAnalyzer {
 		this.blockChain = blockChain;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
-
 
 	public boolean analyze(final AccountAnalyzer accountAnalyzer) {
 		return this.analyze(accountAnalyzer, null);
@@ -117,7 +114,6 @@ public class BlockAnalyzer {
 			if (null != maxHeight && dbBlock != null && dbBlock.getHeight() > maxHeight) {
 				break;
 			}
-
 		} while (dbBlock != null);
 
 		this.initializePoi(accountAnalyzer, parentBlock.getHeight());
@@ -140,7 +136,7 @@ public class BlockAnalyzer {
 			org.nem.nis.dbmodel.Block dbBlock = null;
 			do {
 				if (null == this.iterator || !this.iterator.hasNext()) {
-					this.iterator = this.blockDao.getBlocksAfter(this.curHeight, 2345).iterator();
+					this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 2345).iterator();
 				}
 
 				// in most cases this won't make any loops

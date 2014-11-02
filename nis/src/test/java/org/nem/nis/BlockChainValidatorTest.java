@@ -209,32 +209,12 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(createValidSignedTransaction(12));
 		middleBlock.sign();
 
-		Mockito.when(transactionValidator.validate(Mockito.any(), Mockito.any()))
-				.thenReturn(ValidationResult.SUCCESS);
-		Mockito.when(transactionValidator.validate(Mockito.eq(middleBlock.getTransactions().get(1)), Mockito.any()))
+		Mockito.when(((BatchTransactionValidator)transactionValidator).validate(Mockito.any()))
 				.thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-		Mockito.verify(transactionValidator, Mockito.times(2)).validate(Mockito.any(), Mockito.any());
-	}
-
-	@Test
-	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
-		// Arrange:
-		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createSignedTransactionWithGivenSender(middleBlock.getSigner()));
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
-
-		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Mockito.verify(((BatchTransactionValidator)transactionValidator), Mockito.only()).validate(Mockito.any());
 	}
 
 	@Test
@@ -325,17 +305,17 @@ public class BlockChainValidatorTest {
 
 	//endregion
 
-	//region validation context
+	//region transaction validate arguments
 
 	@Test
 	public void validationContextConfirmedBlockHeightIsConstant() {
 		// Act:
-		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(11);
+		final List<TransactionsContextPair> pairsCaptor = captureValidatorArguments(11);
 
 		// Assert:
-		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
+		for (final TransactionsContextPair pair : pairsCaptor) {
 			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getConfirmedBlockHeight(),
+					pair.getContext().getConfirmedBlockHeight(),
 					IsEqual.equalTo(new BlockHeight(11)));
 		}
 	}
@@ -343,20 +323,38 @@ public class BlockChainValidatorTest {
 	@Test
 	public void validationContextCurrentBlockHeightIsIncrementingPerBlock() {
 		// Act:
-		final ArgumentCaptor<ValidationContext> contextCaptor = captureValidationContext(11);
+		final List<TransactionsContextPair> pairsCaptor = captureValidatorArguments(11);
 
 		// Assert:
-		for (int i = 0; i < contextCaptor.getAllValues().size(); ++i) {
+		for (int i = 0; i < pairsCaptor.size(); ++i) {
 			Assert.assertThat(
-					contextCaptor.getAllValues().get(i).getBlockHeight(),
-					IsEqual.equalTo(new BlockHeight(12 + i / 2)));
+					pairsCaptor.get(i).getContext().getBlockHeight(),
+					IsEqual.equalTo(new BlockHeight(12 + i)));
 		}
 	}
 
-	private static ArgumentCaptor<ValidationContext> captureValidationContext(final long parentBlockHeight) {
+	@Test
+	public void transactionsAreGroupedByBlockBeforeValidation() {
+		// Act:
+		final List<TransactionsContextPair> pairsCaptor = captureValidatorArguments(11);
+
+		// Assert:
+		int expectedId = 0;
+		for (final TransactionsContextPair pair : pairsCaptor) {
+			Assert.assertThat(expectedId % 2, IsEqual.equalTo(0)); // two transactions per block
+			for (final Transaction transaction : pair.getTransactions()) {
+				Assert.assertThat(
+						((MockTransaction)transaction).getCustomField(),
+						IsEqual.equalTo(++expectedId));
+			}
+		}
+	}
+
+	private static List<TransactionsContextPair> captureValidatorArguments(final long parentBlockHeight) {
 		// Arrange:
 		final TransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(((BatchTransactionValidator)transactionValidator).validate(Mockito.any()))
+				.thenReturn(ValidationResult.SUCCESS);
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 		factory.transactionValidator = transactionValidator;
 
@@ -366,13 +364,14 @@ public class BlockChainValidatorTest {
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 		Block previousBlock = null;
+		int id = 0;
 		for (final Block block : blocks) {
 			if (null != previousBlock) {
 				block.setPrevious(previousBlock);
 			}
 
-			block.addTransaction(createValidSignedTransaction());
-			block.addTransaction(createValidSignedTransaction());
+			block.addTransaction(createValidSignedTransaction(++id));
+			block.addTransaction(createValidSignedTransaction(++id));
 			block.sign();
 
 			previousBlock = block;
@@ -384,9 +383,14 @@ public class BlockChainValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 
-		final ArgumentCaptor<ValidationContext> contextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
-		Mockito.verify(transactionValidator, Mockito.times(6)).validate(Mockito.any(), contextCaptor.capture());
-		return contextCaptor;
+		final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
+		Mockito.verify(transactionValidator, Mockito.only()).validate(pairsCaptor.capture());
+		return pairsCaptor.getValue();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
+		return ArgumentCaptor.forClass((Class)List.class);
 	}
 
 	//endregion
@@ -411,13 +415,6 @@ public class BlockChainValidatorTest {
 		final TimeInstant timeInstant = new TimeInstant(15);
 		final MockTransaction transaction = new MockTransaction(customField, timeInstant);
 		transaction.setDeadline(timeInstant.addSeconds(1));
-		transaction.sign();
-		return transaction;
-	}
-
-	private static Transaction createSignedTransactionWithGivenSender(final Account account) {
-		final Transaction transaction = new MockTransaction(account);
-		transaction.setDeadline(new TimeInstant(16));
 		transaction.sign();
 		return transaction;
 	}
@@ -448,7 +445,6 @@ public class BlockChainValidatorTest {
 		public int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		public TransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
-		public BatchTransactionHashValidator batchTransactionHashValidator = Mockito.mock(BatchTransactionHashValidator.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -456,8 +452,8 @@ public class BlockChainValidatorTest {
 
 			Mockito.when(this.blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 
-			Mockito.when(this.transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
-			Mockito.when(this.batchTransactionHashValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+			Mockito.when(((BatchTransactionValidator)this.transactionValidator).validate(Mockito.any()))
+					.thenReturn(ValidationResult.SUCCESS);
 		}
 
 		public BlockChainValidator create() {
@@ -466,8 +462,7 @@ public class BlockChainValidatorTest {
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,
-					this.transactionValidator,
-					this.batchTransactionHashValidator);
+					this.transactionValidator);
 		}
 	}
 

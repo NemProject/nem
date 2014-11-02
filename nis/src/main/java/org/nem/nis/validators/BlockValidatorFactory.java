@@ -29,6 +29,7 @@ public class BlockValidatorFactory {
 		builder.add(new NonFutureEntityValidator(this.timeProvider));
 		builder.add(new EligibleSignerBlockValidator(poiFacade));
 		builder.add(new MaxTransactionsBlockValidator());
+		builder.add(new NoSelfSignedTransactionsBlockValidator(poiFacade));
 		return builder.build();
 	}
 }

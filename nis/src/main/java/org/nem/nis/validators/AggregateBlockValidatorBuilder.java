@@ -37,17 +37,10 @@ public class AggregateBlockValidatorBuilder {
 
 		@Override
 		public ValidationResult validate(final Block block) {
-			boolean isNeutral = false;
-			for (final BlockValidator validator : this.validators) {
-				final ValidationResult result = validator.validate(block);
-				if (ValidationResult.NEUTRAL == result) {
-					isNeutral = true;
-				} else if (ValidationResult.SUCCESS != result) {
-					return result;
-				}
-			}
-
-			return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
+			final Iterator<ValidationResult> resultIterator = this.validators.stream()
+					.map(validator -> validator.validate(block))
+					.iterator();
+			return ValidationResult.aggregate(resultIterator);
 		}
 	}
 }

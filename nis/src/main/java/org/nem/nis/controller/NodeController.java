@@ -10,7 +10,6 @@ import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.nis.service.ChainServices;
 import org.nem.peer.*;
 import org.nem.peer.node.*;
-import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -209,7 +208,7 @@ public class NodeController {
 	@RequestMapping(value = "/node/active-peers/max-chain-height", method = RequestMethod.GET)
 	@PublicApi
 	public BlockHeight activePeersMaxChainHeight() {
-		return this.chainServices.getMaxChainHeightAsync(this.getReachablePeerList().asCollection()).join();
+		return this.chainServices.getMaxChainHeightAsync(this.getActivePeerList().asCollection()).join();
 	}
 
 	//endregion

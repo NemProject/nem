@@ -1,5 +1,7 @@
 package org.nem.core.model;
 
+import java.util.Iterator;
+
 /**
  * Possible validation results.
  */
@@ -81,9 +83,14 @@ public enum ValidationResult {
 	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14),
 
 	/**
-	 * Validation failed because there are too many transaction in the block
+	 * Validation failed because there are too many transactions in a block.
 	 */
-	FAILURE_TOO_MANY_TRANSACTIONS(15);
+	FAILURE_TOO_MANY_TRANSACTIONS(15),
+
+	/**
+	 * Validation failed because a block contained a self-signed transaction.
+	 */
+	FAILURE_SELF_SIGNED_TRANSACTION(16);
 
 	private final int value;
 
@@ -138,5 +145,25 @@ public enum ValidationResult {
 	 */
 	public int getValue() {
 		return this.value;
+	}
+
+	/**
+	 * Aggregates an iterator of validation results. This implementation short-circuits on the first failure.
+	 *
+	 * @param resultIterator The results to aggregate.
+	 * @return The aggregated result.
+	 */
+	public static ValidationResult aggregate(final Iterator<ValidationResult> resultIterator) {
+		boolean isNeutral = false;
+		while (resultIterator.hasNext()) {
+			final ValidationResult result = resultIterator.next();
+			if (ValidationResult.NEUTRAL == result) {
+				isNeutral = true;
+			} else if (ValidationResult.SUCCESS != result) {
+				return result;
+			}
+		}
+
+		return isNeutral ? ValidationResult.NEUTRAL : ValidationResult.SUCCESS;
 	}
 }

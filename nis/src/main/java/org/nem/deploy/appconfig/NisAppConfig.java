@@ -135,8 +135,7 @@ public class NisAppConfig {
 				this.blockDao,
 				this.blockTransactionObserverFactory(),
 				this.blockValidatorFactory(),
-				this.transactionValidatorFactory(),
-				this.batchTransactionHashValidatorFactory());
+				this.transactionValidatorFactory());
 	}
 
 	@Bean
@@ -152,11 +151,6 @@ public class NisAppConfig {
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
 		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider(), this.poiOptions());
-	}
-
-	@Bean
-	public BatchTransactionHashValidatorFactory batchTransactionHashValidatorFactory() {
-		return new BatchTransactionHashValidatorFactory(this.transferDao, this.importanceTransferDao);
 	}
 
 	@Bean

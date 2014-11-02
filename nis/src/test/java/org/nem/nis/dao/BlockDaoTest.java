@@ -665,7 +665,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(3, 5);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
 
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(5));
@@ -678,7 +678,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 15);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
 
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(7));
@@ -691,7 +691,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 6);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 		// Assert:
 		Assert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
@@ -704,11 +704,11 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 6);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 		// Assert:
 		org.nem.nis.dbmodel.Block previousBlock = null;
-		for (org.nem.nis.dbmodel.Block block : blocks) {
+		for (final org.nem.nis.dbmodel.Block block : blocks) {
 			if (null != previousBlock) {
 				Assert.assertThat(previousBlock.getHeight(), IsEqual.equalTo(block.getHeight() - 1));
 			}
@@ -723,11 +723,11 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 6);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 		// Assert:
 		org.nem.nis.dbmodel.Block previousBlock = null;
-		for (org.nem.nis.dbmodel.Block block : blocks) {
+		for (final org.nem.nis.dbmodel.Block block : blocks) {
 			if (null != previousBlock) {
 				Assert.assertThat(previousBlock.getNextBlockId(), IsEqual.equalTo(block.getId()));
 			}
@@ -795,7 +795,12 @@ public class BlockDaoTest {
 
 		org.nem.nis.dbmodel.Block lastBlock = null;
 		for (int i = 1; i < numBlocks; i++) {
-			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(i * 123), new BlockHeight(i));
+			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
+					sender,
+					Hash.ZERO,
+					Hash.ZERO,
+					new TimeInstant(i * 123),
+					new BlockHeight(i));
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
 			dummyBlock.sign();

@@ -179,7 +179,7 @@ public class PoiGraphViewer {
 		final EdgeType edgeType = (EDGE_TYPE_UNDIRECTED == params.getAsInteger("edgeType", EDGE_TYPE_UNDIRECTED)) ? EdgeType.UNDIRECTED : EdgeType.DIRECTED;
 		for (int i = 0; i < adjacencyMatrix.getColumnCount(); i++) {
 			if (!this.clusteringResult.isOutlier(this.clusteringResult.getIdForNode(new NodeId(i)))) {
-				this.graph.addVertex((Integer)i);
+				this.graph.addVertex(i);
 			}
 		}
 
