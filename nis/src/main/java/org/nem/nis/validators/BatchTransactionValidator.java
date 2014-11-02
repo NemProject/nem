@@ -1,8 +1,8 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.*;
+import org.nem.core.model.ValidationResult;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * Interface for validating batches of transactions.

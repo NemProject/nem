@@ -10,7 +10,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.poi.PoiAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;

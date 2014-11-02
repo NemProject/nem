@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.ByteUtils;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 

@@ -73,7 +73,7 @@ public class ChainController {
 		org.nem.nis.dbmodel.Block previousDbBlock = null;
 		for (org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
-			if (null != previousDbBlock && !previousDbBlock.getNextBlockId().equals(dbBlock.getId()))  {
+			if (null != previousDbBlock && !previousDbBlock.getNextBlockId().equals(dbBlock.getId())) {
 				throw new RuntimeException("Corrupt block list returned from db.");
 			}
 

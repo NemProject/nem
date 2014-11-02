@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.hibernate.*;
+import org.hibernate.SessionFactory;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.ImportanceTransfer;

@@ -301,7 +301,7 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionPrunesTransactionHashCache() {
 		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.SUCCESS);;
+		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.SUCCESS);
 
 		final TestContext context = new TestContext(validator);
 		final Transaction transaction = createMockTransaction();

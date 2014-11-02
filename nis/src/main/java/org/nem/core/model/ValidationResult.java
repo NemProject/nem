@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * Possible validation results.

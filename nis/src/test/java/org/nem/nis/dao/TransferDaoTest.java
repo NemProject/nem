@@ -506,7 +506,7 @@ public class TransferDaoTest {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(3);
 		Collection<Hash> hashes = new ArrayList<>();
-		for (int i=0; i<5; i++) {
+		for (int i = 0; i < 5; i++) {
 			// TODO 20141029 BR -> all: why does Utils.generateRandomHash() create a 64 byte hash?
 			hashes.add(new Hash(Utils.generateRandomBytes(32)));
 		}
@@ -523,7 +523,7 @@ public class TransferDaoTest {
 		// Arrange:
 		List<Hash> transactionHashes = this.saveThreeBlocksWithTransactionsInDatabase(3);
 		Collection<Hash> hashes = new ArrayList<>();
-		for (int i=0; i<5; i++) {
+		for (int i = 0; i < 5; i++) {
 			hashes.add(new Hash(Utils.generateRandomBytes(32)));
 		}
 		hashes.add(transactionHashes.get(3));
@@ -570,7 +570,7 @@ public class TransferDaoTest {
 		// Arrange:
 		this.saveThreeBlocksWithTransactionsInDatabase(10000);
 		Collection<Hash> hashes = new ArrayList<>();
-		for (int i=0; i<10000; i++) {
+		for (int i = 0; i < 10000; i++) {
 			hashes.add(new Hash(Utils.generateRandomBytes(32)));
 		}
 
@@ -596,7 +596,7 @@ public class TransferDaoTest {
 			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(i * 123), new BlockHeight(i));
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
-			for (int j=0; j<transactionsPerBlock; j++) {
+			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
 				final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
 				hashes.add(dbTransfer.getTransferHash());

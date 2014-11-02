@@ -8,7 +8,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.MissingResourceException;
 

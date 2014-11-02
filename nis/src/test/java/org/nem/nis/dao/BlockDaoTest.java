@@ -795,7 +795,12 @@ public class BlockDaoTest {
 
 		org.nem.nis.dbmodel.Block lastBlock = null;
 		for (int i = 1; i < numBlocks; i++) {
-			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(i * 123), new BlockHeight(i));
+			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
+					sender,
+					Hash.ZERO,
+					Hash.ZERO,
+					new TimeInstant(i * 123),
+					new BlockHeight(i));
 			final Account recipient = Utils.generateRandomAccount();
 			this.addMapping(mockAccountDao, recipient);
 			dummyBlock.sign();

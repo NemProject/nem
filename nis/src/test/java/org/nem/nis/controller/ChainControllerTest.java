@@ -22,7 +22,6 @@ import org.nem.peer.test.PeerUtils;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class ChainControllerTest {
 
