@@ -17,10 +17,6 @@ public class ComparisonContext {
 	public ComparisonContext(final int maxNumBlocksToAnalyze, final int maxNumBlocksToRewrite) {
 		this.maxNumBlocksToAnalyze = maxNumBlocksToAnalyze;
 		this.maxNumBlocksToRewrite = maxNumBlocksToRewrite;
-
-		if (maxNumBlocksToAnalyze <= maxNumBlocksToRewrite) {
-			throw new IllegalArgumentException("maxNumBlocksToAnalyze must be greater than maxNumBlocksToRewrite");
-		}
 	}
 
 	/**

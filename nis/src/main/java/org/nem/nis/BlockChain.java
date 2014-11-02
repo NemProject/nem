@@ -153,7 +153,7 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
-		final ComparisonContext context = new ComparisonContext(BlockChainConstants.BLOCKS_LIMIT, BlockChainConstants.REWRITE_LIMIT);
+		final ComparisonContext context = new DefaultComparisonContext(localLookup.getLastBlock().getHeight());
 		final BlockChainComparer comparer = new BlockChainComparer(context);
 
 		final BlockLookup remoteLookup = new RemoteBlockLookupAdapter(connector, node);

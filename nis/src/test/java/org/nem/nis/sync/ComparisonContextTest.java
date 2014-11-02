@@ -6,7 +6,7 @@ import org.junit.*;
 public class ComparisonContextTest {
 
 	@Test
-	public void comparisonContextExposesAllConstructorParameters() {
+	public void comparisonContextCanBeCreatedWithMaxBlocksToAnalyzeGreaterThanMaxBlocksToRewrite() {
 		// Act:
 		final ComparisonContext context = new ComparisonContext(124, 33);
 
@@ -15,15 +15,13 @@ public class ComparisonContextTest {
 		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(33));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void maxBlocksToAnalyzeCannotBeLessThanMaxBlocksToRewrite() {
+	@Test
+	public void comparisonContextCanBeCreatedWithMaxBlocksToAnalyzeLessThanMaxBlocksToRewrite() {
 		// Act:
-		new ComparisonContext(123, 124);
-	}
+		final ComparisonContext context = new ComparisonContext(33, 124);
 
-	@Test(expected = IllegalArgumentException.class)
-	public void maxBlocksToAnalyzeCannotBeEqualToMaxBlocksToRewrite() {
-		// Act:
-		new ComparisonContext(124, 124);
+		// Assert:
+		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(33));
+		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(124));
 	}
 }

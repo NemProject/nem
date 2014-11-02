@@ -3,7 +3,6 @@ package org.nem.nis.sync;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockMarkerConstants;
 
 /**
  * Helper class for comparing two block chains.
@@ -116,19 +115,11 @@ public class BlockChainComparer {
 					this.localLastBlock.getHeight().getRaw() - this.context.getMaxNumBlocksToRewrite()));
 			final HashChain remoteHashes = this.remoteLookup.getHashesFrom(startingBlockHeight);
 
-			// TODO 20141102 J-*: lowering the rewrite limit causes this check to fail
 			// since the starting block height is (lastLocalBlockHeight - rewriteLimit), in order for this node
 			// to sync properly with the network, the remote must be allowed to return at least rewriteLimit + 1 hashes
 			// (as an optimization, getMaxNumBlocksToAnalyze is used to allow faster syncing)
-
-			// TODO: I'm not sure if localLastBlock or (localLastBlock + getMaxNumBlocksToAnalyze) should be used
-			// if we're past it WE are good ones, so we could reject "older versions" (so we could use localLastBlock)
-			// otoh localLastBlock + getMaxNumBlocksToAnalyze might be safer choice...
-			final long testHeight = this.localLastBlock.getHeight().getRaw() + this.context.getMaxNumBlocksToAnalyze();
-			if (testHeight > BlockMarkerConstants.BETA_HARD_FORK) {
-				if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze()) {
-					return ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES;
-				}
+			if (remoteHashes.size() > this.context.getMaxNumBlocksToAnalyze()) {
+				return ComparisonResult.Code.REMOTE_RETURNED_TOO_MANY_HASHES;
 			}
 
 			final HashChain localHashes = this.localLookup.getHashesFrom(startingBlockHeight);
