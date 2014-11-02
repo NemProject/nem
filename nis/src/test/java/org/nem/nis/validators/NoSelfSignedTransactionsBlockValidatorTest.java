@@ -35,7 +35,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION));
 	}
 
 	@Test

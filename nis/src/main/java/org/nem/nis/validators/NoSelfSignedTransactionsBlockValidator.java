@@ -28,7 +28,7 @@ public class NoSelfSignedTransactionsBlockValidator implements BlockValidator {
 		});
 
 		return isSelfSigned
-				? ValidationResult.FAILURE_ENTITY_UNUSABLE
+				? ValidationResult.FAILURE_SELF_SIGNED_TRANSACTION
 				: ValidationResult.SUCCESS;
 	}
 }

@@ -83,9 +83,14 @@ public enum ValidationResult {
 	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14),
 
 	/**
-	 * Validation failed because there are too many transactions in the block.
+	 * Validation failed because there are too many transactions in a block.
 	 */
-	FAILURE_TOO_MANY_TRANSACTIONS(15);
+	FAILURE_TOO_MANY_TRANSACTIONS(15),
+
+	/**
+	 * Validation failed because a block contained a self-signed transaction.
+	 */
+	FAILURE_SELF_SIGNED_TRANSACTION(16);
 
 	private final int value;
 
