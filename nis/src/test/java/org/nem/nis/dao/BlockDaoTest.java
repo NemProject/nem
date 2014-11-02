@@ -665,7 +665,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(3, 5);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
 
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(5));
@@ -678,7 +678,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 15);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
 
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(7));
@@ -691,7 +691,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 6);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 		// Assert:
 		Assert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
@@ -704,7 +704,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 6);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 		// Assert:
 		org.nem.nis.dbmodel.Block previousBlock = null;
@@ -723,7 +723,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabase(10);
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(2, 6);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
 
 		// Assert:
 		org.nem.nis.dbmodel.Block previousBlock = null;

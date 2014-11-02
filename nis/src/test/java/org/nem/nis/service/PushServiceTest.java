@@ -278,9 +278,7 @@ public class PushServiceTest {
 			final ValidationResult expectedValidationResult,
 			final int expectedNumberOfInvocations) {
 		// Arrange:
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(transactionValidationResult);
-		final SingleTransactionValidator validator = createValidatorWithResult(validateResult);
+		final SingleTransactionValidator validator = createValidatorWithResult(transactionValidationResult);
 
 		final TestContext context = new TestContext(validator);
 		final Transaction transaction = createMockTransaction();
