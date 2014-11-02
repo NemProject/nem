@@ -60,6 +60,7 @@ public class NodeEndpointTest {
 		apiIdToPathMap.put(NodeApiId.REST_NODE_EXTENDED_INFO, "node/extended-info");
 		apiIdToPathMap.put(NodeApiId.REST_NODE_INFO, "node/info");
 		apiIdToPathMap.put(NodeApiId.REST_NODE_PEER_LIST, "node/peer-list/all");
+		apiIdToPathMap.put(NodeApiId.REST_NODE_PEER_LIST_REACHABLE, "node/peer-list/reachable");
 		apiIdToPathMap.put(NodeApiId.REST_NODE_PEER_LIST_ACTIVE, "node/peer-list/active");
 		apiIdToPathMap.put(NodeApiId.REST_NODE_PING, "node/ping");
 		apiIdToPathMap.put(NodeApiId.REST_PUSH_BLOCK, "push/block");

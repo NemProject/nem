@@ -11,6 +11,7 @@ import java.util.Properties;
  */
 public class NisConfiguration extends CommonConfiguration {
 	private final int nodeLimit;
+	private final int timeSyncNodeLimit;
 	private final PrivateKey bootKey;
 	private final boolean bootWithoutAck;
 	private final boolean useBinaryTransport;
@@ -36,20 +37,30 @@ public class NisConfiguration extends CommonConfiguration {
 		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
 		final String autoBootName = getOptionalString(properties, "nis.bootName", null);
 		this.bootName = null == autoBootName ? null : autoBootName.trim();
-		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 20);
+		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 5);
+		this.timeSyncNodeLimit = getOptionalInteger(properties, "nis.timeSyncNodeLimit", 20);
 		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
-		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", false);
-		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", false);
-		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 2);
+		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", true);
+		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", true);
+		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
 	}
 
 	/**
 	 * Gets the number of regular nodes that this node should communicate with during broadcasts.
 	 *
-	 * @return The number of regular nodes that this node should communicate with during broadcasts
+	 * @return The number of regular nodes that this node should communicate with during broadcasts.
 	 */
 	public int getNodeLimit() {
 		return this.nodeLimit;
+	}
+
+	/**
+	 * Gets the number of regular nodes that this node should communicate with during time synchronization.
+	 *
+	 * @return The number of regular nodes that this node should communicate with during time synchronization.
+	 */
+	public int getTimeSyncNodeLimit() {
+		return this.timeSyncNodeLimit;
 	}
 
 	/**

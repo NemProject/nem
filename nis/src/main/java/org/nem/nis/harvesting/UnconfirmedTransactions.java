@@ -198,6 +198,18 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
+	 * Gets all transactions up to a given limit of transactions.
+	 *
+	 * @return The list of unconfirmed transactions.
+	 */
+	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
+		return this.transactions.values().stream()
+				.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
+				.limit(maxTransactions)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
 	 * @param time The specified time.
@@ -266,7 +278,7 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions getTransactionsForNewBlock(final Address harvesterAddress, final TimeInstant blockTime) {
 		// in order for a transaction to be eligible for inclusion in a block, it must
-		// (1) occur at or after the block time
+		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
 		// (3) pass validation against the *confirmed* balance
 

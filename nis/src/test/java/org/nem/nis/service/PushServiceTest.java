@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
@@ -257,19 +257,29 @@ public class PushServiceTest {
 	}
 
 	@Test
-	public void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithSuccessfulValidation() {
-		pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(ValidationResult.SUCCESS);
+	public void pushTransactionCachesTransactionIfValidationSucceeds() {
+		assertPushServiceTransactionCaching(
+				ValidationResult.SUCCESS,
+				ValidationResult.NEUTRAL,
+				1);
 	}
 
-	// TODO 20141031 J-B: is this desired?
 	@Test
-	public void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithFailedValidation() {
+	public void pushTransactionDoesNotCacheTransactionIfValidationFails() {
 		// Assert:
-		pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(ValidationResult.FAILURE_CHAIN_INVALID);
+		assertPushServiceTransactionCaching(
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				2);
 	}
 
-	private static void pushTransactionReturnsValidationResultNeutralIfTransactionIsInCacheWithValidateResult(final ValidationResult validateResult) {
+	private static void assertPushServiceTransactionCaching(
+			final ValidationResult transactionValidationResult,
+			final ValidationResult expectedValidationResult,
+			final int expectedNumberOfInvocations) {
 		// Arrange:
+		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any())).thenReturn(transactionValidationResult);
 		final SingleTransactionValidator validator = createValidatorWithResult(validateResult);
 
 		final TestContext context = new TestContext(validator);
@@ -285,9 +295,9 @@ public class PushServiceTest {
 		final ValidationResult result = context.service.pushTransaction(transaction, null);
 
 		// Assert:
-		// transaction validation should have only occured once
-		Mockito.verify(validator, Mockito.times(1)).validate(Mockito.any());
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		// transaction validation should have only the expected number of times
+		Mockito.verify(validator, Mockito.times(expectedNumberOfInvocations)).validate(Mockito.any());
+		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	@Test
@@ -316,7 +326,7 @@ public class PushServiceTest {
 		context.service.pushTransaction(transaction, null);
 
 		// Assert:
-		// transaction validation should have only occured twice
+		// transaction validation should have only occurred twice
 		Mockito.verify(validator, Mockito.times(2)).validate(Mockito.any());
 	}
 

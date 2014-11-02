@@ -13,9 +13,10 @@ import org.nem.core.test.*;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.ExtendedNodeExperiencePair;
 import org.nem.nis.service.ChainServices;
-import org.nem.peer.PeerNetwork;
+import org.nem.peer.*;
 import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
+import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -90,7 +91,7 @@ public class NodeControllerTest {
 
 	//endregion
 
-	//region getPeerList / getActivePeerList
+	//region getPeerList / getReachablePeerList / getActivePeerList
 
 	@Test
 	public void getPeerListReturnsNetworkNodes() {
@@ -105,7 +106,29 @@ public class NodeControllerTest {
 	}
 
 	@Test
-	public void getActivePeerListReturnsActiveNetworkNodes() {
+	public void getReachablePeerListReturnsActiveNetworkNodes() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Arrange:
+		final NodeCollection nodeCollection = context.network.getNodes();
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.2"), NodeStatus.INACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.4"), NodeStatus.ACTIVE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.3"), NodeStatus.FAILURE);
+		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.7"), NodeStatus.ACTIVE);
+
+		// Act:
+		final SerializableList<Node> nodes = context.controller.getReachablePeerList();
+
+		// Assert:
+		final List<Node> expectedNodes = Arrays.asList(
+				PeerUtils.createNodeWithHost("10.0.0.4"),
+				PeerUtils.createNodeWithHost("10.0.0.7"));
+		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
+	}
+
+	@Test
+	public void getActivePeerListReturnsPartnerNodes() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -114,7 +137,7 @@ public class NodeControllerTest {
 	}
 
 	@Test
-	public void getActivePeerListAuthenticatedReturnsActiveNetworkNodes() {
+	public void getActivePeerListAuthenticatedReturnsPartnerNodes() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Node localNode = context.network.getLocalNode();
@@ -133,21 +156,17 @@ public class NodeControllerTest {
 			final Function<TestContext, T> action,
 			final Function<T, SerializableList<Node>> getActivePeerList) {
 		// Arrange:
-		final NodeCollection nodeCollection = context.network.getNodes();
-		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.2"), NodeStatus.INACTIVE);
-		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.4"), NodeStatus.ACTIVE);
-		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.3"), NodeStatus.FAILURE);
-		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.7"), NodeStatus.ACTIVE);
+		final List<Node> selectedNodes = Arrays.asList(
+				PeerUtils.createNodeWithHost("10.0.0.4"),
+				PeerUtils.createNodeWithHost("10.0.0.7"));
+		Mockito.when(context.network.getPartnerNodes()).thenReturn(selectedNodes);
 
 		// Act:
 		final T response = action.apply(context);
 		final SerializableList<Node> nodes = getActivePeerList.apply(response);
 
 		// Assert:
-		final List<Node> expectedNodes = Arrays.asList(
-				PeerUtils.createNodeWithHost("10.0.0.4"),
-				PeerUtils.createNodeWithHost("10.0.0.7"));
-		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(expectedNodes));
+		Assert.assertThat(nodes.asCollection(), IsEquivalent.equivalentTo(selectedNodes));
 		return response;
 	}
 

@@ -80,7 +80,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because conflicting importance transfer is present
 	 */
-	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14);
+	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14),
+
+	/**
+	 * Validation failed because there are too many transaction in the block
+	 */
+	FAILURE_TOO_MANY_TRANSACTIONS(15);
 
 	private final int value;
 
