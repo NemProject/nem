@@ -276,16 +276,14 @@ public class NodeControllerTest {
 	public void activePeersMaxChainHeightDelegatesToChainServices() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final NodeCollection nodeCollection = context.network.getNodes();
-		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.2"), NodeStatus.INACTIVE);
-		nodeCollection.update(PeerUtils.createNodeWithHost("10.0.0.4"), NodeStatus.ACTIVE);
+		final List<Node> selectedNodes = Arrays.asList(PeerUtils.createNodeWithHost("10.0.0.4"));
+		Mockito.when(context.network.getPartnerNodes()).thenReturn(selectedNodes);
 
 		// Act:
 		final BlockHeight height = context.controller.activePeersMaxChainHeight();
 
 		// Assert:
-		Mockito.verify(context.services, Mockito.times(1))
-				.getMaxChainHeightAsync(Arrays.asList(PeerUtils.createNodeWithHost("10.0.0.4")));
+		Mockito.verify(context.services, Mockito.only()).getMaxChainHeightAsync(selectedNodes);
 		Assert.assertThat(height, IsEqual.equalTo(new BlockHeight(123)));
 	}
 
