@@ -10,8 +10,10 @@ public class MaxTransactionsBlockValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		return block.getTransactions().size() <= BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK
-				? ValidationResult.SUCCESS
-				: ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS;
+		// TODO 20141102 J-*: there are some blocks with > 60 transactions so we need to add a block marker constant
+		return ValidationResult.SUCCESS;
+		//return block.getTransactions().size() <= BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK
+		//		? ValidationResult.SUCCESS
+		//		: ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS;
 	}
 }

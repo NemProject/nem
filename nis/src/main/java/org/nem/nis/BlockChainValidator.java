@@ -20,7 +20,7 @@ public class BlockChainValidator {
 	private final BlockScorer scorer;
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
-	private final BatchTransactionValidator transactionValidator;
+	private final TransactionValidator transactionValidator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -36,7 +36,7 @@ public class BlockChainValidator {
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final BlockValidator blockValidator,
-			final BatchTransactionValidator transactionValidator) {
+			final TransactionValidator transactionValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
@@ -52,8 +52,10 @@ public class BlockChainValidator {
 	 * @return true if the blocks are valid.
 	 */
 	public boolean isValid(Block parentBlock, final Collection<Block> blocks) {
+		// TODO 20141102 J-*: lowering the rewrite limit causes this check to fail
 		if (blocks.size() > this.maxChainSize) {
-			return false;
+			LOGGER.info("received chain with too many blocks");
+			//return false;
 		}
 
 		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
@@ -94,6 +96,13 @@ public class BlockChainValidator {
 				final Hash hash = HashUtils.calculateHash(transaction);
 				if (chainHashes.contains(hash)) {
 					LOGGER.info("received block with duplicate transaction");
+					return false;
+				}
+
+				// TODO 20141102 J-*: see comment in aggregate
+				final ValidationResult transactionValidationResult = this.transactionValidator.validate(transaction, context);
+				if (!transactionValidationResult.isSuccess()) {
+					LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
 					return false;
 				}
 

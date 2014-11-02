@@ -195,7 +195,7 @@ public class BlockChainValidatorTest {
 	@Test
 	public void allTransactionsInChainMustBeValid() {
 		// Arrange:
-		final BatchTransactionValidator transactionValidator = Mockito.mock(BatchTransactionValidator.class);
+		final TransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 		factory.transactionValidator = transactionValidator;
 		final BlockChainValidator validator = factory.create();
@@ -209,12 +209,12 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(createValidSignedTransaction(12));
 		middleBlock.sign();
 
-		Mockito.when(transactionValidator.validate(Mockito.any()))
+		Mockito.when(((BatchTransactionValidator)transactionValidator).validate(Mockito.any()))
 				.thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-		Mockito.verify(transactionValidator, Mockito.only()).validate(Mockito.any());
+		Mockito.verify(((BatchTransactionValidator)transactionValidator), Mockito.only()).validate(Mockito.any());
 	}
 
 	@Test
@@ -352,8 +352,9 @@ public class BlockChainValidatorTest {
 
 	private static List<TransactionsContextPair> captureValidatorArguments(final long parentBlockHeight) {
 		// Arrange:
-		final BatchTransactionValidator transactionValidator = Mockito.mock(BatchTransactionValidator.class);
-		Mockito.when(transactionValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		final TransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
+		Mockito.when(((BatchTransactionValidator)transactionValidator).validate(Mockito.any()))
+				.thenReturn(ValidationResult.SUCCESS);
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 		factory.transactionValidator = transactionValidator;
 
@@ -443,7 +444,7 @@ public class BlockChainValidatorTest {
 		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		public int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
-		public BatchTransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
+		public TransactionValidator transactionValidator = Mockito.mock(TransactionValidator.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -451,7 +452,8 @@ public class BlockChainValidatorTest {
 
 			Mockito.when(this.blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 
-			Mockito.when(this.transactionValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+			Mockito.when(((BatchTransactionValidator)this.transactionValidator).validate(Mockito.any()))
+					.thenReturn(ValidationResult.SUCCESS);
 		}
 
 		public BlockChainValidator create() {

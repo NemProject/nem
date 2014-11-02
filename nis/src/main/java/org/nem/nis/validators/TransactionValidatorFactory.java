@@ -47,4 +47,21 @@ public class TransactionValidatorFactory {
 		builder.add(new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
 		return builder.build();
 	}
+
+	/**
+	 * Creates a transaction validator.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @return The validator.
+	 */
+	public TransactionValidator createSplit(final PoiFacade poiFacade) {
+		// TODO 20141102 J-*: see comment in aggregate
+		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
+		builder.add(new UniversalTransactionValidator());
+		builder.add(new NonFutureEntityValidator(this.timeProvider));
+		builder.add(new TransferTransactionValidator());
+		builder.add(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
+		builder.add(new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
+		return builder.buildBatchOptimized();
+	}
 }
