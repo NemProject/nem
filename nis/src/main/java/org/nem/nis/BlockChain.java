@@ -246,6 +246,14 @@ public class BlockChain implements BlockSynchronizer {
 					(this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
+
+			// undo above might remove some accounts from account analyzer,
+			// because receivedBlock has still references to those accounts, AND if competitive
+			// block has transaction addressed to that account, it won't be seen later,
+			// (see canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards test for details)
+			// we remap once more to fix accounts references (and possibly add them to AA)
+			final org.nem.nis.dbmodel.Block dbBlock2 = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
+			receivedBlock = BlockMapper.toModel(dbBlock2, context.accountAnalyzer.getAccountCache().asAutoCache());
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
