@@ -24,7 +24,7 @@ public class UnconfirmedTransactions {
 	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 	private final TimeProvider timeProvider;
-	private final TransactionValidator validator;
+	private final SingleTransactionValidator validator;
 
 	private enum AddOptions {
 		AllowNeutral,
@@ -47,7 +47,7 @@ public class UnconfirmedTransactions {
 			final SingleTransactionValidator validator) {
 		this.timeProvider = timeProvider;
 
-		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
+		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(validator);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		this.validator = builder.build();
@@ -57,7 +57,7 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final ValidationOptions options,
 			final TimeProvider timeProvider,
-			final TransactionValidator validator) {
+			final SingleTransactionValidator validator) {
 		this.timeProvider = timeProvider;
 		this.validator = validator;
 		for (final Transaction transaction : transactions) {

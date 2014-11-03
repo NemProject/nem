@@ -9,7 +9,7 @@ import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.PushService;
-import org.nem.nis.validators.TransactionValidator;
+import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ public class TransactionController {
 	private final AccountLookup accountLookup;
 	private final PushService pushService;
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final TransactionValidator validator;
+	private final SingleTransactionValidator validator;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
@@ -30,7 +30,7 @@ public class TransactionController {
 			final AccountLookup accountLookup,
 			final PushService pushService,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final TransactionValidator validator,
+			final SingleTransactionValidator validator,
 			final NisPeerNetworkHost host) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;

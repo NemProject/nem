@@ -965,7 +965,7 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final ValidationResult result) {
-			this(Mockito.mock(TransactionValidator.class));
+			this(Mockito.mock(SingleTransactionValidator.class));
 			Mockito.when(this.validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
 		}
 

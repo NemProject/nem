@@ -33,35 +33,44 @@ public class TransactionValidatorFactory {
 	}
 
 	/**
-	 * Creates a transaction validator.
+	 * Creates a transaction validator that contains both single and batch validators.
 	 *
 	 * @param poiFacade The poi facade.
 	 * @return The validator.
 	 */
-	public TransactionValidator create(final PoiFacade poiFacade) {
-		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
-		builder.add(new UniversalTransactionValidator());
-		builder.add(new NonFutureEntityValidator(this.timeProvider));
-		builder.add(new TransferTransactionValidator());
-		builder.add(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
+	public SingleTransactionValidator create(final PoiFacade poiFacade) {
+		final AggregateSingleTransactionValidatorBuilder builder = this.createSingleBuilder(poiFacade);
 		builder.add(new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
 		return builder.build();
 	}
 
 	/**
-	 * Creates a transaction validator.
+	 * Creates a transaction validator that only contains single validators.
 	 *
 	 * @param poiFacade The poi facade.
 	 * @return The validator.
 	 */
-	public TransactionValidator createSplit(final PoiFacade poiFacade) {
-		// TODO 20141102 J-*: see comment in aggregate
-		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
+	public SingleTransactionValidator createSingle(final PoiFacade poiFacade) {
+		return this.createSingleBuilder(poiFacade).build();
+	}
+
+	/**
+	 * Creates a transaction validator that only contains batch validators.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @return The validator.
+	 */
+	public BatchTransactionValidator createBatch(final PoiFacade poiFacade) {
+		return new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
+	}
+
+	private AggregateSingleTransactionValidatorBuilder createSingleBuilder(final PoiFacade poiFacade) {
+		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(new UniversalTransactionValidator());
 		builder.add(new NonFutureEntityValidator(this.timeProvider));
 		builder.add(new TransferTransactionValidator());
 		builder.add(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
 		builder.add(new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
-		return builder.buildBatchOptimized();
+		return builder;
 	}
 }

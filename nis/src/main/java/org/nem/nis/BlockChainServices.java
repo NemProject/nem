@@ -62,7 +62,7 @@ public class BlockChainServices {
 				scorer,
 				BlockChainConstants.BLOCKS_LIMIT,
 				this.blockValidatorFactory.create(poiFacade),
-				this.transactionValidatorFactory.createSplit(poiFacade));
+				this.transactionValidatorFactory.createSingle(poiFacade));
 		return validator.isValid(parentBlock, peerChain);
 	}
 

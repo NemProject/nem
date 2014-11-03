@@ -154,7 +154,7 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public TransactionValidator transactionValidator() {
+	public SingleTransactionValidator transactionValidator() {
 		return this.transactionValidatorFactory().create(this.poiFacade());
 	}
 

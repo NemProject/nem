@@ -20,7 +20,7 @@ public class BlockChainValidator {
 	private final BlockScorer scorer;
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
-	private final TransactionValidator transactionValidator;
+	private final SingleTransactionValidator transactionValidator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -36,7 +36,7 @@ public class BlockChainValidator {
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final BlockValidator blockValidator,
-			final TransactionValidator transactionValidator) {
+			final SingleTransactionValidator transactionValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
@@ -115,11 +115,11 @@ public class BlockChainValidator {
 			this.executor.accept(block);
 		}
 
-		final ValidationResult transactionValidationResult = this.transactionValidator.validate(groupedTransactions);
-		if (!transactionValidationResult.isSuccess()) {
-			LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
-			return false;
-		}
+		//final ValidationResult transactionValidationResult = this.transactionValidator.validate(groupedTransactions);
+		//if (!transactionValidationResult.isSuccess()) {
+		//	LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
+		//	return false;
+		//}
 
 		return true;
 	}
