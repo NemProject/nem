@@ -181,6 +181,82 @@ public class BlockChainTest {
 		Assert.assertTrue(siblingResult == ValidationResult.NEUTRAL);
 	}
 
+	@Test
+	public void canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards() throws NoSuchFieldException, IllegalAccessException {
+		// Arrange:
+		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
+				accountStates.stream()
+						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
+
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), poiFacade);
+		final List<Account> accounts = this.prepareSigners(accountAnalyzer);
+		for (final Account account : accounts) {
+			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+		}
+
+		final Account signer = accounts.get(0);
+
+		final Block parentBlock = createBlock(signer, accountAnalyzer.getAccountCache());
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
+		final List<Block> blocks = new LinkedList<>();
+		blocks.add(parentBlock);
+		final Block block = this.createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
+
+		final AccountDao accountDao = mock(AccountDao.class);
+		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
+				this.retrieveAccount(1, parentBlock.getSigner())
+		);
+		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
+		final org.nem.nis.dbmodel.Block parent = BlockMapper.toDbModel(parentBlock, accountDaoLookup);
+		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, accountDaoLookup);
+
+		final MockBlockDao mockBlockDao = new MockBlockDao(parent, null, MockBlockDao.MockBlockDaoMode.MultipleBlocks);
+		mockBlockDao.save(parent);
+		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
+		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
+		final BlockChainServices services =
+				new BlockChainServices(
+						mockBlockDao,
+						new BlockTransactionObserverFactory(),
+						NisUtils.createBlockValidatorFactory(),
+						transactionValidatorFactory);
+		final BlockChain blockChain = new BlockChain(
+				accountAnalyzer,
+				accountDao,
+				blockChainLastBlockLayer,
+				mockBlockDao,
+				services,
+				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+
+		// Act:
+		final ValidationResult result = blockChain.processBlock(block);
+		mockBlockDao.save(dbBlock);
+		mockBlockDao.addBlock(dbBlock);
+		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
+		TransferTransaction transaction;
+
+		// Assert:
+		// TODO: clean up all the accounts and check amount of nems
+		// TODO: add all sorts of different checks
+		Assert.assertTrue(result == ValidationResult.SUCCESS);
+		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
+		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
+		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
+		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(290)));
+
+		// siblings with same score must be rejected
+		// Act:
+		final Block sibling = this.createBlockSiblingWithBetterScore(block, parentBlock, accounts);
+		final ValidationResult siblingResult = blockChain.processBlock(sibling);
+		final Block savedBlock2 = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
+
+		// Assert:
+		transaction = (TransferTransaction)savedBlock2.getTransactions().get(0);
+		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertTrue(accountAnalyzer.getAccountCache().isKnownAddress(transaction.getRecipient().getAddress()));
+		Assert.assertTrue(siblingResult == ValidationResult.SUCCESS);
+	}
+
 	private org.nem.nis.dbmodel.Account retrieveAccount(final long i, final Account signer) {
 		final org.nem.nis.dbmodel.Account ret = new org.nem.nis.dbmodel.Account(signer.getAddress().getEncoded(), signer.getKeyPair().getPublicKey());
 		ret.setId(i);
@@ -217,7 +293,8 @@ public class BlockChainTest {
 		final TransferTransaction transaction = new TransferTransaction(
 				timeInstant,
 				accounts.get(i),
-				accounts.get(i + 1),
+				Utils.generateRandomAccount(),
+				//accounts.get(i + 1),
 				Amount.fromNem(amount),
 				null);
 		transaction.setDeadline(timeInstant.addHours(2));
@@ -249,7 +326,7 @@ public class BlockChainTest {
 				.divide(BlockScorer.TWO_TO_THE_POWER_OF_64)
 				.divide(BigInteger.valueOf(800000000L)) // this is value of calculateForgerBalance() for current forager
 				.intValue();
-		seconds += 1;
+		seconds += 2;
 
 		final TimeInstant blockTime = new TimeInstant(lastBlock.getTimeStamp().getRawTime() + seconds);
 		block = new Block(forger, lastBlock, blockTime);
@@ -270,8 +347,18 @@ public class BlockChainTest {
 		final Account signer = accounts.get(accounts.indexOf(block.getSigner()));
 		final Block sibling = new Block(signer, parentBlock, block.getTimeStamp());
 		sibling.setDifficulty(block.getDifficulty());
-		final TransferTransaction transaction1 = this.createSignedTransactionWithAmount(accounts, 1, 123, block.getTimeStamp().addMinutes(-2));
-		sibling.addTransaction(transaction1);
+		final TransferTransaction transaction = this.createSignedTransactionWithAmount(accounts, 1, 123, block.getTimeStamp().addMinutes(-2));
+		sibling.addTransaction(transaction);
+		sibling.sign();
+
+		return sibling;
+	}
+
+	private Block createBlockSiblingWithBetterScore(final Block block, final Block parentBlock, final List<Account> accounts) {
+		final Account signer = accounts.get(accounts.indexOf(block.getSigner()));
+		final Block sibling = new Block(signer, parentBlock, block.getTimeStamp().addSeconds(-1));
+		sibling.setDifficulty(block.getDifficulty());
+		sibling.addTransaction(block.getTransactions().get(0));
 		sibling.sign();
 
 		return sibling;
