@@ -484,7 +484,6 @@ public class BlockChainValidatorTest {
 
 	//endregion
 
-
 	//endregion
 
 	//region helper functions

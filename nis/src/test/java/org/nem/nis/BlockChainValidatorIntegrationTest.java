@@ -7,7 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.poi.*;
