@@ -58,8 +58,9 @@ public class BlockChainServices {
 
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
 		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache());
+		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(accountAnalyzer);
 		final BlockChainValidator validator = new BlockChainValidator(
-				block -> executor.execute(block, this.observerFactory.createExecuteCommitObserver(accountAnalyzer)),
+				block -> executor.execute(block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(poiFacade),
