@@ -5,12 +5,14 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.dao.TransferDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.poi.*;
+import org.nem.nis.secret.*;
+import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 
@@ -116,6 +118,49 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
+	@Test
+	public void chainIsValidIfAccountSpendsAmountReceivedInEarlierBlockInLaterBlock() {
+		// Arrange:
+		class TestContext {
+			final AccountCache accountCache = new AccountCache();
+			final PoiFacade poiFacade = new PoiFacade(NisUtils.createImportanceCalculator());
+
+			private BlockChainValidator createValidator() {
+				final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(this.accountCache, this.poiFacade);
+				final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+				final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
+
+				final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer);
+				factory.executor = block -> executor.execute(block, observer);
+				return factory.create();
+			}
+
+			private Account createSeedAccount() {
+				final Amount seedAmount = Amount.fromNem(1000);
+				final Account account = Utils.generateRandomAccount(seedAmount);
+				this.poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances().addFullyVested(BlockHeight.ONE, seedAmount);
+				return account;
+			}
+		}
+
+		final TestContext context = new TestContext();
+		final Account account1 = context.createSeedAccount();
+		final Account account2 = context.createSeedAccount();
+		final BlockChainValidator validator = context.createValidator();
+
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		blocks.get(0).addTransaction(createTransfer(account1, account2, Amount.fromNem(500)));
+		blocks.get(1).addTransaction(createTransfer(account2, account1, Amount.fromNem(1250)));
+		blocks.get(2).addTransaction(createTransfer(account1, account2, Amount.fromNem(1700)));
+		resignBlocks(blocks);
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
 	//region helper functions
 
 	//region transactions / blocks
@@ -143,6 +188,14 @@ public class BlockChainValidatorIntegrationTest {
 		return transaction;
 	}
 
+	private static Transaction createTransfer(final Account sender, final Account recipient, final Amount amount) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Transaction transaction = new TransferTransaction(currentTime.addSeconds(1), sender, recipient, amount, null);
+		transaction.setDeadline(currentTime.addHours(1));
+		transaction.sign();
+		return transaction;
+	}
+
 	private static Transaction createSignedTransactionWithGivenSender(final Account account) {
 		final Transaction transaction = new MockTransaction(account);
 		transaction.setDeadline(new TimeInstant(16));
@@ -159,6 +212,18 @@ public class BlockChainValidatorIntegrationTest {
 		final Block block = new Block(Utils.generateRandomAccount(), parentBlock, currentTime.addMinutes(2));
 		block.sign();
 		return block;
+	}
+
+	private static void resignBlocks(final List<Block> blocks) {
+		Block previousBlock = null;
+		for (final Block block : blocks) {
+			if (null != previousBlock) {
+				block.setPrevious(previousBlock);
+			}
+
+			block.sign();
+			previousBlock = block;
+		}
 	}
 
 	//endregion
