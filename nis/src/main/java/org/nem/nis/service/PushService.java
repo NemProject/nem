@@ -1,15 +1,18 @@
 package org.nem.nis.service;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
+import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.validators.TransactionValidator;
+import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
 import java.util.function.*;
 import java.util.logging.Logger;
 
@@ -19,22 +22,26 @@ import java.util.logging.Logger;
 @Service
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
+	private static final int CACHE_SECONDS = 10;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final TransactionValidator validator;
+	private final SingleTransactionValidator validator;
 	private final BlockChain blockChain;
 	private final NisPeerNetworkHost host;
+	private final TransactionHashCache transactionHashCache;
 
 	@Autowired(required = true)
 	public PushService(
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final TransactionValidator validator,
+			final SingleTransactionValidator validator,
 			final BlockChain blockChain,
-			final NisPeerNetworkHost host) {
+			final NisPeerNetworkHost host,
+			final TimeProvider timeProvider) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.blockChain = blockChain;
 		this.host = host;
+		this.transactionHashCache = new TransactionHashCache(timeProvider);
 	}
 
 	/**
@@ -44,6 +51,11 @@ public class PushService {
 	 * @param identity The identity of the pushing node.
 	 */
 	public ValidationResult pushTransaction(final Transaction entity, final NodeIdentity identity) {
+		final Hash hash = HashUtils.calculateHash(entity);
+		if (this.transactionHashCache.isKnown(hash)) {
+			return ValidationResult.NEUTRAL;
+		}
+
 		final ValidationResult result = this.pushEntity(
 				entity,
 				transaction -> this.checkTransaction(transaction),
@@ -53,6 +65,7 @@ public class PushService {
 				identity);
 
 		if (result.isFailure()) {
+			this.transactionHashCache.remove(hash);
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 
@@ -133,5 +146,40 @@ public class PushService {
 		}
 
 		return status;
+	}
+
+	private static class TransactionHashCache {
+		private final HashMap<Hash, TimeInstant> cache;
+		private final TimeProvider timeProvider;
+
+		private TransactionHashCache(final TimeProvider timeProvider) {
+			this.timeProvider = timeProvider;
+			this.cache = new HashMap<>();
+		}
+
+		private boolean isKnown(final Hash hash) {
+			this.prune();
+			if (this.cache.containsKey(hash)) {
+				return true;
+			}
+
+			this.cache.putIfAbsent(hash, this.timeProvider.getCurrentTime());
+			return false;
+		}
+
+		private void remove(final Hash hash) {
+			this.cache.remove(hash);
+		}
+
+		private void prune() {
+			final TimeInstant currentTime = this.timeProvider.getCurrentTime();
+			final Iterator<Map.Entry<Hash, TimeInstant>> iterator = this.cache.entrySet().iterator();
+			while (iterator.hasNext()) {
+				final Map.Entry<Hash, TimeInstant> entry = iterator.next();
+				if (entry.getValue().addSeconds(CACHE_SECONDS).compareTo(currentTime) <= 0) {
+					iterator.remove();
+				}
+			}
+		}
 	}
 }

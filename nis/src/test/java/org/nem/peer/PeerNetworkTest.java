@@ -14,7 +14,7 @@ import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkTest {
@@ -61,6 +61,23 @@ public class PeerNetworkTest {
 		// Assert:
 		Mockito.verify(context.state, Mockito.times(1)).getNodes();
 		Assert.assertThat(networkNodes, IsSame.sameInstance(nodes));
+	}
+
+	@Test
+	public void getPartnerNodesDelegatesToSelector() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<Node> nodes = Arrays.asList(
+				PeerUtils.createNodeWithHost("10.0.0.4"),
+				PeerUtils.createNodeWithHost("10.0.0.7"));
+		Mockito.when(context.selector.selectNodes()).thenReturn(nodes);
+
+		// Act:
+		final Collection<Node> selectedNodes = context.network.getPartnerNodes();
+
+		// Assert:
+		Mockito.verify(context.selector, Mockito.only()).selectNodes();
+		Assert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
 	}
 
 	@Test
@@ -274,13 +291,13 @@ public class PeerNetworkTest {
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
 		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(PeerNetworkServicesFactory.class);
 		private final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
+		private final NodeSelector selector = Mockito.mock(NodeSelector.class);
 		private final NodeSelectorFactory importanceAwareSelectorFactory = Mockito.mock(NodeSelectorFactory.class);
 		private final PeerNetwork network;
 
 		public TestContext() {
-			final NodeSelector selector = Mockito.mock(NodeSelector.class);
-			Mockito.when(selector.selectNodes()).thenReturn(new ArrayList<>());
-			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(selector);
+			Mockito.when(this.selector.selectNodes()).thenReturn(new ArrayList<>());
+			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(this.selector);
 
 			this.network = new PeerNetwork(this.state, this.servicesFactory, this.selectorFactory, this.importanceAwareSelectorFactory);
 		}

@@ -3,9 +3,9 @@ package org.nem.nis.validators;
 import org.nem.core.model.*;
 
 /**
- * Interface for validating a transaction.
+ * Interface for validating a single transaction.
  */
-public interface TransactionValidator {
+public interface SingleTransactionValidator {
 
 	/**
 	 * Checks the validity of the specified transaction.

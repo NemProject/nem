@@ -7,18 +7,20 @@ import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.core.serialization.AccountLookup;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.secret.BlockChainConstants;
-import org.nem.nis.service.*;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 import org.nem.peer.test.PeerUtils;
 
+import java.util.*;
 import java.util.function.Function;
 
 public class ChainControllerTest {
@@ -69,6 +71,8 @@ public class ChainControllerTest {
 
 	//endregion
 
+	//region hashesFrom
+
 	@Test
 	public void hashesFromReturnsHashesFromHeight() {
 		// Arrange:
@@ -90,8 +94,10 @@ public class ChainControllerTest {
 		// Assert:
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(chain, IsEqual.equalTo(originalHashes));
-		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(new BlockHeight(44), defaultLimit);
+		Mockito.verify(context.blockDao, Mockito.times(1)).getHashesFrom(height, defaultLimit);
 	}
+
+	//endregion
 
 	//region chainScore
 
@@ -138,7 +144,7 @@ public class ChainControllerTest {
 
 	//endregion
 
-	//region chainScore
+	//region chainHeight
 
 	@Test
 	public void chainHeightReturnsHeight() {
@@ -183,8 +189,86 @@ public class ChainControllerTest {
 
 	//endregion
 
+	//region blocksAfter
+
+	@Test
+	public void blocksAfterAuthenticatedReturnsMappedBlocksFromDatabase() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(new BlockHeight(10), challenge);
+
+		// Assert:
+		final AuthenticatedResponse<?> response = runBlocksAfterTest(
+				context,
+				c -> c.controller.blocksAfter(request),
+				r -> r.getEntity(localNode.getIdentity(), challenge),
+				getValidBlockList());
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+	}
+
+	@Test
+	public void blocksAfterAuthenticatedThrowsIfDatabaseReturnsCorruptBlockList() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+		final AuthenticatedBlockHeightRequest request = new AuthenticatedBlockHeightRequest(new BlockHeight(10), challenge);
+
+		// Arrange: set the id and next block id of the second block incorrectly
+		final List<org.nem.nis.dbmodel.Block> blockList = getValidBlockList();
+		blockList.get(1).setId(11L);
+		blockList.get(1).setNextBlockId(12L);
+
+		// Assert:
+		ExceptionAssert.assertThrows(
+				v -> {
+					runBlocksAfterTest(
+							context,
+							c -> c.controller.blocksAfter(request),
+							r -> r.getEntity(localNode.getIdentity(), challenge),
+							blockList);
+				},
+				RuntimeException.class);
+	}
+
+	private static List<org.nem.nis.dbmodel.Block> getValidBlockList() {
+		final org.nem.nis.dbmodel.Block dbBlock1 = NisUtils.createDbBlockWithTimeStampAtHeight(443, 11);
+		dbBlock1.setId(11L);
+		dbBlock1.setNextBlockId(12L);
+		final org.nem.nis.dbmodel.Block dbBlock2 = NisUtils.createDbBlockWithTimeStampAtHeight(543, 12);
+		dbBlock2.setId(12L);
+		dbBlock2.setNextBlockId(13L);
+		return Arrays.asList(dbBlock1, dbBlock2);
+	}
+
+	private static <T> T runBlocksAfterTest(
+			final TestContext context,
+			final Function<TestContext, T> action,
+			final Function<T, SerializableList<Block>> getBlocks,
+			final List<org.nem.nis.dbmodel.Block> blockList) {
+		// Arrange:
+		Mockito.when(context.blockDao.getBlocksAfter(new BlockHeight(10), BlockChainConstants.BLOCKS_LIMIT)).thenReturn(blockList);
+
+		// Act:
+		final T result = action.apply(context);
+		final SerializableList<Block> blocks = getBlocks.apply(result);
+
+		// Assert:
+		Assert.assertThat(blocks.get(0).getHeight(), IsEqual.equalTo(new BlockHeight(11)));
+		Assert.assertThat(blocks.get(0).getTimeStamp(), IsEqual.equalTo(new TimeInstant(443)));
+		Assert.assertThat(blocks.get(1).getHeight(), IsEqual.equalTo(new BlockHeight(12)));
+		Assert.assertThat(blocks.get(1).getTimeStamp(), IsEqual.equalTo(new TimeInstant(543)));
+		Mockito.verify(context.blockDao, Mockito.times(1))
+				.getBlocksAfter(new BlockHeight(10), BlockChainConstants.BLOCKS_LIMIT);
+		return result;
+	}
+
+	//endregion
+
 	private static class TestContext {
-		private final RequiredBlockDao blockDao = Mockito.mock(RequiredBlockDao.class);
+		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final AccountLookup accountLookup = new MockAccountLookup();
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final BlockChain blockChain = Mockito.mock(BlockChain.class);

@@ -24,7 +24,7 @@ public class UnconfirmedTransactions {
 	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 	private final TimeProvider timeProvider;
-	private final TransactionValidator validator;
+	private final SingleTransactionValidator validator;
 
 	private enum AddOptions {
 		AllowNeutral,
@@ -44,10 +44,10 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TimeProvider timeProvider,
-			final TransactionValidator validator) {
+			final SingleTransactionValidator validator) {
 		this.timeProvider = timeProvider;
 
-		final AggregateTransactionValidatorBuilder builder = new AggregateTransactionValidatorBuilder();
+		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(validator);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		this.validator = builder.build();
@@ -57,7 +57,7 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final ValidationOptions options,
 			final TimeProvider timeProvider,
-			final TransactionValidator validator) {
+			final SingleTransactionValidator validator) {
 		this.timeProvider = timeProvider;
 		this.validator = validator;
 		for (final Transaction transaction : transactions) {
@@ -198,6 +198,18 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
+	 * Gets all transactions up to a given limit of transactions.
+	 *
+	 * @return The list of unconfirmed transactions.
+	 */
+	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
+		return this.transactions.values().stream()
+				.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
+				.limit(maxTransactions)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
 	 * @param time The specified time.
@@ -266,7 +278,7 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions getTransactionsForNewBlock(final Address harvesterAddress, final TimeInstant blockTime) {
 		// in order for a transaction to be eligible for inclusion in a block, it must
-		// (1) occur at or after the block time
+		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
 		// (3) pass validation against the *confirmed* balance
 

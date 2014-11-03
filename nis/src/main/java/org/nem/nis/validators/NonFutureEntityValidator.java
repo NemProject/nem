@@ -7,7 +7,7 @@ import org.nem.nis.secret.BlockChainConstants;
 /**
  * BlockValidator and TransactionValidator implementation that ensures entities are not too far in the future.
  */
-public class NonFutureEntityValidator implements BlockValidator, TransactionValidator {
+public class NonFutureEntityValidator implements BlockValidator, SingleTransactionValidator {
 	private final TimeProvider timeProvider;
 
 	/**

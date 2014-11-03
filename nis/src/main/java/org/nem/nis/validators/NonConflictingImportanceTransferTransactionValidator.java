@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  * does not conflict with any known transactions.
  * This is used by UnconfirmedTransactions and is not a default validator.
  */
-public class NonConflictingImportanceTransferTransactionValidator implements TransactionValidator {
+public class NonConflictingImportanceTransferTransactionValidator implements SingleTransactionValidator {
 	private final Supplier<Collection<Transaction>> transactionsSupplier;
 
 	/**

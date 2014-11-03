@@ -12,6 +12,7 @@ import org.nem.nis.controller.annotations.PublicApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.poi.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,24 +27,28 @@ public class DebugController {
 	private static final Logger LOGGER = Logger.getLogger(DebugController.class.getName());
 
 	private final NisPeerNetworkHost host;
-	private final BlockChain blockChain;
 	private final BlockDao blockDao;
+	private final BlockAnalyzer blockAnalyzer;
+	private final ImportanceCalculator importanceCalculator;
 
 	/**
 	 * Creates a new debug controller.
 	 *
 	 * @param host The host.
-	 * @param blockChain The block chain.
 	 * @param blockDao The block dao.
+	 * @param blockAnalyzer The block analyzer.
+	 * @param importanceCalculator The importance calculator.
 	 */
 	@Autowired(required = true)
 	public DebugController(
 			final NisPeerNetworkHost host,
-			final BlockChain blockChain,
-			final BlockDao blockDao) {
+			final BlockDao blockDao,
+			final BlockAnalyzer blockAnalyzer,
+			final ImportanceCalculator importanceCalculator) {
 		this.host = host;
-		this.blockChain = blockChain;
 		this.blockDao = blockDao;
+		this.blockAnalyzer = blockAnalyzer;
+		this.importanceCalculator = importanceCalculator;
 	}
 
 	/**
@@ -83,20 +88,21 @@ public class DebugController {
 	@PublicApi
 	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
 		final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
-		final AccountAnalyzer accountAnalyzer = this.blockChain.copyAccountAnalyzer();
+		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(
+				new AccountCache(),
+				new PoiFacade(this.importanceCalculator));
+		this.blockAnalyzer.analyze(accountAnalyzer, blockHeight.getRaw());
 		final AccountLookup accountLookup = accountAnalyzer.getAccountCache();
+
+		// this API can be called for any block in the chain, so we need to force an importance recalculation
+		// because we want the returned importances to be relative to the requested height
+		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
 
 		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
 		final Block block = BlockMapper.toModel(dbBlock, accountLookup);
 
 		final org.nem.nis.dbmodel.Block dbParent = 1 == blockHeight.getRaw() ? null : this.blockDao.findByHeight(blockHeight.prev());
 		final Block parent = null == dbParent ? null : BlockMapper.toModel(dbParent, accountLookup);
-
-		// this API can be called for any block in the chain, so we need to force an importance recalculation
-		// because we want the returned importances to be relative to the requested height
-		// (note that the recalculation is done on a copy of the AccountAnalyzer so it will not impact the real block-chain)
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
-		scorer.forceImportanceCalculation();
 
 		final BigInteger hit = scorer.calculateHit(block);
 		final BigInteger target = null == parent ? BigInteger.ZERO : scorer.calculateTarget(parent, block);

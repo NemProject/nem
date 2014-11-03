@@ -26,7 +26,9 @@ public class NodeController {
 	private final ChainServices chainServices;
 
 	@Autowired(required = true)
-	NodeController(final NisPeerNetworkHost host, final ChainServices chainServices) {
+	NodeController(
+			final NisPeerNetworkHost host,
+			final ChainServices chainServices) {
 		this.host = host;
 		this.chainServices = chainServices;
 	}
@@ -91,17 +93,28 @@ public class NodeController {
 	 *
 	 * @return A list of the active nodes currently known by the running node.
 	 */
-	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
+	@RequestMapping(value = "/node/peer-list/reachable", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Node> getActivePeerList() {
+	public SerializableList<Node> getReachablePeerList() {
 		return new SerializableList<>(this.host.getNetwork().getNodes().getActiveNodes());
 	}
 
 	/**
-	 * Gets a list of the active nodes currently known by the running node.
+	 * Gets a dynamic list of the active nodes to which the running node broadcasts information.
+	 *
+	 * @return A list of broadcast partners.
+	 */
+	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.GET)
+	@ClientApi
+	public SerializableList<Node> getActivePeerList() {
+		return new SerializableList<>(this.host.getNetwork().getPartnerNodes());
+	}
+
+	/**
+	 * Gets a dynamic list of the active nodes to which the running node broadcasts information.
 	 *
 	 * @param challenge The challenge.
-	 * @return A list of the active nodes currently known by the running node.
+	 * @return A list of broadcast partners.
 	 */
 	@RequestMapping(value = "/node/peer-list/active", method = RequestMethod.POST)
 	@P2PApi

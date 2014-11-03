@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.test.*;
+import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
@@ -22,8 +23,7 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionVerifyFailureIncrementsFailedExperience() {
 		// Arrange:
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 		final TestContext context = new TestContext(validator);
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
@@ -41,8 +41,7 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionValidFailureIncrementsFailedExperience() {
 		// Arrange:
-		final TransactionValidator validator = Mockito.mock(TransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 		final TestContext context = new TestContext(validator);
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
@@ -257,7 +256,91 @@ public class PushServiceTest {
 		Assert.assertThat(((MockTransaction)secureEntity.getEntity()).getCustomField(), IsEqual.equalTo(12));
 	}
 
+	@Test
+	public void pushTransactionCachesTransactionIfValidationSucceeds() {
+		assertPushServiceTransactionCaching(
+				ValidationResult.SUCCESS,
+				ValidationResult.NEUTRAL,
+				1);
+	}
+
+	@Test
+	public void pushTransactionDoesNotCacheTransactionIfValidationFails() {
+		// Assert:
+		assertPushServiceTransactionCaching(
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				2);
+	}
+
+	private static void assertPushServiceTransactionCaching(
+			final ValidationResult transactionValidationResult,
+			final ValidationResult expectedValidationResult,
+			final int expectedNumberOfInvocations) {
+		// Arrange:
+		final SingleTransactionValidator validator = createValidatorWithResult(transactionValidationResult);
+
+		final TestContext context = new TestContext(validator);
+		final Transaction transaction = createMockTransaction();
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		// initial push (cached validation result should NOT be used)
+		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp 5 seconds later than first one --> first transaction not pruned
+		// (cached validation result should be used)
+		final ValidationResult result = context.service.pushTransaction(transaction, null);
+
+		// Assert:
+		// transaction validation should have only occurred the expected number of times
+		Mockito.verify(validator, Mockito.times(expectedNumberOfInvocations)).validate(Mockito.any());
+		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+	}
+
+	@Test
+	public void pushTransactionPrunesTransactionHashCache() {
+		// Arrange:
+		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.SUCCESS);
+
+		final TestContext context = new TestContext(validator);
+		final Transaction transaction = createMockTransaction();
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		// initial push (cached validation result should NOT be used)
+		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp 5 seconds later than first one --> first transaction not pruned.
+		// (cached validation result should be used)
+		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp 11 seconds later than second one --> first and second transaction pruned.
+		// (cached validation result should NOT be used)
+		context.service.pushTransaction(transaction, null);
+
+		// time provider supplies time stamp same as third one --> third transaction not pruned.
+		// (cached validation result should be used)
+		context.service.pushTransaction(transaction, null);
+
+		// Assert:
+		// transaction validation should have only occurred twice
+		Mockito.verify(validator, Mockito.times(2)).validate(Mockito.any());
+	}
+
+	private static Transaction createMockTransaction() {
+		final MockTransaction mockTransaction = new MockTransaction(12, new TimeInstant(1122448));
+		mockTransaction.sign();
+		return mockTransaction;
+	}
+
 	//endregion
+
+	private static SingleTransactionValidator createValidatorWithResult(final ValidationResult result) {
+		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any(Transaction.class))).thenReturn(result);
+		return validator;
+	}
 
 	private static class TestContext {
 		private final NodeIdentity remoteNodeIdentity;
@@ -266,13 +349,14 @@ public class PushServiceTest {
 		private final PeerNetwork network;
 		private final UnconfirmedTransactions unconfirmedTransactions;
 		private final BlockChain blockChain;
+		private final TimeProvider timeProvider;
 		private final PushService service;
 
 		public TestContext() {
 			this(new UniversalTransactionValidator());
 		}
 
-		public TestContext(final TransactionValidator validator) {
+		public TestContext(final SingleTransactionValidator validator) {
 			this.remoteNodeIdentity = new NodeIdentity(new KeyPair());
 			this.remoteNode = new Node(this.remoteNodeIdentity, NodeEndpoint.fromHost("10.0.0.1"));
 
@@ -288,6 +372,14 @@ public class PushServiceTest {
 
 			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
+			this.timeProvider = Mockito.mock(TimeProvider.class);
+			Mockito.when(this.timeProvider.getCurrentTime())
+					.thenReturn(
+							new TimeInstant(1122448),
+							new TimeInstant(1122448),
+							new TimeInstant(1122448 + 5),
+							new TimeInstant(1122448 + 16),
+							new TimeInstant(1122448 + 16));
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
@@ -296,7 +388,8 @@ public class PushServiceTest {
 					this.unconfirmedTransactions,
 					validator,
 					this.blockChain,
-					host);
+					host,
+					this.timeProvider);
 		}
 
 		public void assertNoUpdateExperience() {

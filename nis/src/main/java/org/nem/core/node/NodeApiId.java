@@ -66,6 +66,11 @@ public enum NodeApiId {
 	REST_NODE_PEER_LIST,
 
 	/**
+	 * The node/peer-list/reachable API.
+	 */
+	REST_NODE_PEER_LIST_REACHABLE,
+
+	/**
 	 * The node/peer-list/active API.
 	 */
 	REST_NODE_PEER_LIST_ACTIVE,

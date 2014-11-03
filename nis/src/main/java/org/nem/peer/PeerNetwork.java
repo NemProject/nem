@@ -9,7 +9,7 @@ import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -68,6 +68,15 @@ public class PeerNetwork {
 	 */
 	public NodeCollection getNodes() {
 		return this.state.getNodes();
+	}
+
+	/**
+	 * Gets a dynamic list of the active nodes to which the running node broadcasts information.
+	 *
+	 * @return A list of broadcast partners
+	 */
+	public Collection<Node> getPartnerNodes() {
+		return this.selector.selectNodes();
 	}
 
 	/**
@@ -165,10 +174,6 @@ public class PeerNetwork {
 	 */
 	public CompletableFuture<Boolean> updateLocalNodeEndpoint() {
 		return this.servicesFactory.createLocalNodeEndpointUpdater().update(this.selector);
-	}
-
-	private List<Node> getPartnerNodes() {
-		return this.selector.selectNodes();
 	}
 
 	//endregion

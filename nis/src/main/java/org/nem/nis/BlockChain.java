@@ -146,13 +146,14 @@ public class BlockChain implements BlockSynchronizer {
 	public synchronized NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			return this.synchronizeNodeInternal(connectorPool, node);
-		} catch (InactivePeerException | FatalPeerException ex) {
+		} catch (final InactivePeerException | FatalPeerException ex) {
+			LOGGER.info(String.format("failed to synchronize with %s: %s", node, ex));
 			return NodeInteractionResult.FAILURE;
 		}
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
-		final ComparisonContext context = new ComparisonContext(BlockChainConstants.BLOCKS_LIMIT, BlockChainConstants.REWRITE_LIMIT);
+		final ComparisonContext context = new DefaultComparisonContext(localLookup.getLastBlock().getHeight());
 		final BlockChainComparer comparer = new BlockChainComparer(context);
 
 		final BlockLookup remoteLookup = new RemoteBlockLookupAdapter(connector, node);
@@ -160,7 +161,7 @@ public class BlockChain implements BlockSynchronizer {
 		final ComparisonResult result = comparer.compare(localLookup, remoteLookup);
 
 		if (result.getCode().isEvil()) {
-			throw new FatalPeerException("remote node is evil");
+			throw new FatalPeerException(String.format("remote node is evil: %s", result.getCode()));
 		}
 
 		return result;
@@ -447,7 +448,7 @@ public class BlockChain implements BlockSynchronizer {
 
 			// BR: Do not accept a chain with the same score.
 			//     In case we got here via pushBlock the following can happen:
-			//     2 different blocks with the height and score are pushed in the network.
+			//     2 different blocks with the same height and score are pushed in the network.
 			//     This leads to switching between the 2 blocks indefinitely resulting in tons of pushes.
 			if (this.peerScore.compareTo(this.ourScore) <= 0) {
 				return ValidationResult.NEUTRAL;

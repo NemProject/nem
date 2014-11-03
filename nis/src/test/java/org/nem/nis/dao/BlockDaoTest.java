@@ -1,5 +1,6 @@
 package org.nem.nis.dao;
 
+import org.hamcrest.core.IsEqual;
 import org.hibernate.LazyInitializationException;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -656,6 +657,84 @@ public class BlockDaoTest {
 			i = i + 1;
 		}
 	}
+
+	@Test
+	public void getBlocksAfterReturnsCorrectNumberOfBlocksIfEnoughBlocksAreAvailable() {
+		// Arrange:
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		this.createBlocksInDatabase(10);
+
+		// Act:
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(3), 5);
+
+		// Assert:
+		Assert.assertThat(blocks.size(), IsEqual.equalTo(5));
+	}
+
+	@Test
+	public void getBlocksAfterReturnsAllBlocksAfterGivenHeightIfNotEnoughBlocksAreAvailable() {
+		// Arrange:
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		this.createBlocksInDatabase(10);
+
+		// Act:
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 15);
+
+		// Assert:
+		Assert.assertThat(blocks.size(), IsEqual.equalTo(7));
+	}
+
+	@Test
+	public void getBlocksAfterReturnsBlocksAfterGivenHeight() {
+		// Arrange:
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		this.createBlocksInDatabase(10);
+
+		// Act:
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
+
+		// Assert:
+		Assert.assertThat(blocks.stream().findFirst().get().getHeight(), IsEqual.equalTo(3L));
+	}
+
+	@Test
+	public void getBlocksAfterReturnsBlocksInAscendingOrderOfHeights() {
+		// Arrange:
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		this.createBlocksInDatabase(10);
+
+		// Act:
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
+
+		// Assert:
+		org.nem.nis.dbmodel.Block previousBlock = null;
+		for (final org.nem.nis.dbmodel.Block block : blocks) {
+			if (null != previousBlock) {
+				Assert.assertThat(previousBlock.getHeight(), IsEqual.equalTo(block.getHeight() - 1));
+			}
+			previousBlock = block;
+		}
+	}
+
+	@Test
+	public void getBlocksAfterReturnsBlocksWithMatchingNextBlockIds() {
+		// Arrange:
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		this.createBlocksInDatabase(10);
+
+		// Act:
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
+
+		// Assert:
+		org.nem.nis.dbmodel.Block previousBlock = null;
+		for (final org.nem.nis.dbmodel.Block block : blocks) {
+			if (null != previousBlock) {
+				Assert.assertThat(previousBlock.getNextBlockId(), IsEqual.equalTo(block.getId()));
+			}
+			previousBlock = block;
+		}
+	}
+
 	//endregion
 
 	//region helpers
@@ -706,5 +785,41 @@ public class BlockDaoTest {
 		importanceTransferTransaction.sign();
 		return importanceTransferTransaction;
 	}
+
+	private List<Hash> createBlocksInDatabase(final int numBlocks) {
+		final List<Hash> hashes = new ArrayList<>();
+		final Account sender = Utils.generateRandomAccount();
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+		this.addMapping(mockAccountDao, sender);
+
+		org.nem.nis.dbmodel.Block lastBlock = null;
+		for (int i = 1; i < numBlocks; i++) {
+			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
+					sender,
+					Hash.ZERO,
+					Hash.ZERO,
+					new TimeInstant(i * 123),
+					new BlockHeight(i));
+			final Account recipient = Utils.generateRandomAccount();
+			this.addMapping(mockAccountDao, recipient);
+			dummyBlock.sign();
+			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			this.blockDao.save(dbBlock);
+			if (null != lastBlock) {
+				lastBlock.setNextBlockId(dbBlock.getId());
+				this.blockDao.updateLastBlockId(lastBlock);
+			}
+			lastBlock = dbBlock;
+		}
+
+		return hashes;
+	}
+
+	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
+		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getKeyPair().getPublicKey());
+		mockAccountDao.addMapping(account, dbSender);
+	}
+
 	//endregion
 }

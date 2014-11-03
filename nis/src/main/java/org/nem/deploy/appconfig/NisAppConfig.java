@@ -154,7 +154,7 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public TransactionValidator transactionValidator() {
+	public SingleTransactionValidator transactionValidator() {
 		return this.transactionValidatorFactory().create(this.poiFacade());
 	}
 
@@ -183,10 +183,12 @@ public class NisAppConfig {
 
 	@Bean
 	public PoiFacade poiFacade() {
-		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
-				new PoiScorer(),
-				this.poiOptions());
-		return new PoiFacade(importanceCalculator);
+		return new PoiFacade(this.importanceCalculator());
+	}
+
+	@Bean
+	public ImportanceCalculator importanceCalculator() {
+		return new PoiImportanceCalculator(new PoiScorer(), this.poiOptions());
 	}
 
 	@Bean
@@ -230,10 +232,14 @@ public class NisAppConfig {
 				this.accountDao,
 				this.blockDao,
 				this.accountAnalyzer(),
-				this.blockChain(),
 				this.nisPeerNetworkHost(),
-				this.blockChainLastBlockLayer,
-				this.nisConfiguration());
+				this.nisConfiguration(),
+				this.blockAnalyzer());
+	}
+
+	@Bean
+	public BlockAnalyzer blockAnalyzer() {
+		return new BlockAnalyzer(this.blockDao, this.blockChain(), this.blockChainLastBlockLayer);
 	}
 
 	@Bean
