@@ -7,7 +7,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
-import org.nem.nis.sync.BlockLookup;
+import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,8 @@ public class BlockChainServices {
 				scorer,
 				BlockChainConstants.BLOCKS_LIMIT,
 				this.blockValidatorFactory.create(poiFacade),
-				this.transactionValidatorFactory.createSingle(poiFacade));
+				this.transactionValidatorFactory.createSingle(poiFacade),
+				this.transactionValidatorFactory.createBatch(poiFacade));
 		return validator.isValid(parentBlock, peerChain);
 	}
 

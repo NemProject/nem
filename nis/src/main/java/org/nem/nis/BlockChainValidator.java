@@ -21,6 +21,7 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final SingleTransactionValidator transactionValidator;
+	private final BatchTransactionValidator batchTransactionValidator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -30,18 +31,21 @@ public class BlockChainValidator {
 	 * @param maxChainSize The maximum chain size.
 	 * @param blockValidator The validator to use for validating blocks.
 	 * @param transactionValidator The validator to use for validating transactions.
+	 * @param batchTransactionValidator The validator to use for validating transactions in batches.
 	 */
 	public BlockChainValidator(
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final BlockValidator blockValidator,
-			final SingleTransactionValidator transactionValidator) {
+			final SingleTransactionValidator transactionValidator,
+			final BatchTransactionValidator batchTransactionValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
+		this.batchTransactionValidator = batchTransactionValidator;
 	}
 
 	/**
@@ -99,7 +103,6 @@ public class BlockChainValidator {
 					return false;
 				}
 
-				// TODO 20141102 J-*: see comment in aggregate
 				final ValidationResult transactionValidationResult = this.transactionValidator.validate(transaction, context);
 				if (!transactionValidationResult.isSuccess()) {
 					LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
@@ -115,11 +118,11 @@ public class BlockChainValidator {
 			this.executor.accept(block);
 		}
 
-		//final ValidationResult transactionValidationResult = this.transactionValidator.validate(groupedTransactions);
-		//if (!transactionValidationResult.isSuccess()) {
-		//	LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
-		//	return false;
-		//}
+		final ValidationResult transactionValidationResult = this.batchTransactionValidator.validate(groupedTransactions);
+		if (!transactionValidationResult.isSuccess()) {
+			LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
+			return false;
+		}
 
 		return true;
 	}

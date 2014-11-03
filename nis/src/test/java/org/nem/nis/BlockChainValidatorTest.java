@@ -445,15 +445,15 @@ public class BlockChainValidatorTest {
 		public int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		public SingleTransactionValidator transactionValidator = Mockito.mock(SingleTransactionValidator.class);
+		public BatchTransactionValidator batchTransactionValidator = Mockito.mock(BatchTransactionValidator.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
 
 			Mockito.when(this.blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
-
-			//Mockito.when(((BatchTransactionValidator)this.transactionValidator).validate(Mockito.any()))
-			//		.thenReturn(ValidationResult.SUCCESS);
+			Mockito.when(this.transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+			Mockito.when(this.batchTransactionValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		}
 
 		public BlockChainValidator create() {
@@ -462,7 +462,8 @@ public class BlockChainValidatorTest {
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,
-					this.transactionValidator);
+					this.transactionValidator,
+					this.batchTransactionValidator);
 		}
 	}
 
