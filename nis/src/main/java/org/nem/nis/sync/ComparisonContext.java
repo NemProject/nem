@@ -4,7 +4,6 @@ package org.nem.nis.sync;
  * Provides contextual information that informs block chain comparisons.
  */
 public class ComparisonContext {
-
 	private final int maxNumBlocksToAnalyze;
 	private final int maxNumBlocksToRewrite;
 

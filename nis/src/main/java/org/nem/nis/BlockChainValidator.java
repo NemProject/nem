@@ -56,10 +56,9 @@ public class BlockChainValidator {
 	 * @return true if the blocks are valid.
 	 */
 	public boolean isValid(Block parentBlock, final Collection<Block> blocks) {
-		// TODO 20141102 J-*: lowering the rewrite limit causes this check to fail
 		if (blocks.size() > this.maxChainSize) {
 			LOGGER.info("received chain with too many blocks");
-			//return false;
+			return false;
 		}
 
 		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();

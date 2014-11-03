@@ -56,11 +56,12 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
+		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
 		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache());
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, this.observerFactory.createExecuteCommitObserver(accountAnalyzer)),
 				scorer,
-				BlockChainConstants.BLOCKS_LIMIT,
+				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(poiFacade),
 				this.transactionValidatorFactory.createSingle(poiFacade),
 				this.transactionValidatorFactory.createBatch(poiFacade));

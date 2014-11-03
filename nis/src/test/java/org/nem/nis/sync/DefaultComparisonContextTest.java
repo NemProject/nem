@@ -15,8 +15,8 @@ public class DefaultComparisonContextTest {
 		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(EFFECTIVE_FORK_HEIGHT - 1));
 
 		// Assert:
-		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.BLOCKS_LIMIT));
-		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY / 2));
+		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY));
+		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.REWRITE_LIMIT));
 	}
 
 	@Test
@@ -25,8 +25,8 @@ public class DefaultComparisonContextTest {
 		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(EFFECTIVE_FORK_HEIGHT));
 
 		// Assert:
-		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.BLOCKS_LIMIT));
-		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY / 2));
+		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY));
+		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.REWRITE_LIMIT));
 	}
 
 	@Test

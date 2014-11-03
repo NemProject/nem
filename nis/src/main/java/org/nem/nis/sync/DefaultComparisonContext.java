@@ -8,7 +8,7 @@ import org.nem.nis.secret.BlockChainConstants;
  * A default comparison context that is populated with block chain constants.
  */
 public class DefaultComparisonContext extends ComparisonContext {
-	private static final int OLD_REWRITE_LIMIT = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY / 2;
+	private static final int OLD_ANALYZE_LIMIT = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
 	 * Creates a default comparison context.
@@ -16,13 +16,13 @@ public class DefaultComparisonContext extends ComparisonContext {
 	 * @param height The local block height.
 	 */
 	public DefaultComparisonContext(final BlockHeight height) {
-		super(BlockChainConstants.BLOCKS_LIMIT, getRewriteLimitAtHeight(height));
+		super(getAnalyzeLimitAtHeight(height), BlockChainConstants.REWRITE_LIMIT);
 	}
 
-	private static int getRewriteLimitAtHeight(final BlockHeight height) {
+	private static int getAnalyzeLimitAtHeight(final BlockHeight height) {
 		final long testHeight = height.getRaw() + BlockChainConstants.BLOCKS_LIMIT;
 		return testHeight > BlockMarkerConstants.BETA_HARD_FORK
-				? BlockChainConstants.REWRITE_LIMIT
-				: OLD_REWRITE_LIMIT;
+				? BlockChainConstants.BLOCKS_LIMIT
+				: OLD_ANALYZE_LIMIT;
 	}
 }
