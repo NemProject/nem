@@ -10,7 +10,6 @@ import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.peer.node.*;

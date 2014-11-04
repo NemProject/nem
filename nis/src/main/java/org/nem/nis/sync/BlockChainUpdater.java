@@ -11,14 +11,11 @@ import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.visitors.PartialWeightedScoreVisitor;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 // TODO 20140920 J-* this class needs tests!!!
 

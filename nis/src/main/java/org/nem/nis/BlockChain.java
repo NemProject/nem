@@ -1,24 +1,15 @@
 package org.nem.nis;
 
 import org.nem.core.connect.*;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.nis.dao.*;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.sync.*;
-import org.nem.nis.visitors.PartialWeightedScoreVisitor;
+import org.nem.nis.sync.BlockChainUpdater;
 import org.nem.peer.*;
-import org.nem.peer.connect.*;
+import org.nem.peer.connect.SyncConnectorPool;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());

@@ -6,11 +6,10 @@ import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.*;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.BlockChainConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

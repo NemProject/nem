@@ -3,8 +3,7 @@ package org.nem.nis.sync;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.BlockChainConstants;
+import org.nem.nis.*;
 
 public class DefaultComparisonContextTest {
 	private final long EFFECTIVE_FORK_HEIGHT = BlockMarkerConstants.BETA_HARD_FORK - BlockChainConstants.BLOCKS_LIMIT;

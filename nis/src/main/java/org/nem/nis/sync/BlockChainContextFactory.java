@@ -2,10 +2,9 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;
-import org.nem.nis.*;
+import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
 import java.util.Collection;
