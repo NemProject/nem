@@ -15,6 +15,7 @@ import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
@@ -130,7 +131,7 @@ public class ChainControllerTest {
 			final Function<TestContext, T> action,
 			final Function<T, BlockChainScore> getChainScore) {
 		// Arrange:
-		Mockito.when(context.blockChain.getScore()).thenReturn(new BlockChainScore(21));
+		Mockito.when(context.blockChainScoreManager.getScore()).thenReturn(new BlockChainScore(21));
 
 		// Act:
 		final T result = action.apply(context);
@@ -138,7 +139,7 @@ public class ChainControllerTest {
 
 		// Assert:
 		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(21)));
-		Mockito.verify(context.blockChain, Mockito.times(1)).getScore();
+		Mockito.verify(context.blockChainScoreManager, Mockito.times(1)).getScore();
 		return result;
 	}
 
@@ -271,7 +272,7 @@ public class ChainControllerTest {
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final AccountLookup accountLookup = new MockAccountLookup();
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
+		private final BlockChainScoreManager blockChainScoreManager = Mockito.mock(BlockChainScoreManager.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final ChainController controller;
@@ -287,7 +288,7 @@ public class ChainControllerTest {
 					this.blockDao,
 					this.accountLookup,
 					this.blockChainLastBlockLayer,
-					this.blockChain,
+					this.blockChainScoreManager,
 					this.host);
 		}
 	}
