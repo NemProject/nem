@@ -1,13 +1,13 @@
-package org.nem.nis;
+package org.nem.nis.sync;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
-import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 

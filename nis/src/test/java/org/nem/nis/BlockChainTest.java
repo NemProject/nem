@@ -15,6 +15,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.sync.BlockChainServices;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.TransactionValidatorFactory;
 

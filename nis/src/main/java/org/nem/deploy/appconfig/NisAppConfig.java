@@ -13,6 +13,7 @@ import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
+import org.nem.nis.sync.BlockChainServices;
 import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
