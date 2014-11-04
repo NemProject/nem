@@ -1,17 +1,17 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
-import java.util.Collection;
-
+/**
+ * Creates a block chain synchronization context. The primary point of this class is to
+ * hold onto a copy of the account analyzer so that all account-related modifications during
+ * a sync only modify the copy.
+ */
 public class BlockChainSyncContext {
 	private final AccountAnalyzer accountAnalyzer;
-	private final AccountAnalyzer originalAnalyzer;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
@@ -19,13 +19,11 @@ public class BlockChainSyncContext {
 
 	public BlockChainSyncContext(
 			final AccountAnalyzer accountAnalyzer,
-			final AccountAnalyzer originalAnalyzer,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final BlockChainScore ourScore) {
-		this.accountAnalyzer = accountAnalyzer;
-		this.originalAnalyzer = originalAnalyzer;
+		this.accountAnalyzer = accountAnalyzer.copy();
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
@@ -52,28 +50,11 @@ public class BlockChainSyncContext {
 		return this.services.undoAndGetScore(this.accountAnalyzer, this.createLocalBlockLookup(), commonBlockHeight);
 	}
 
-	public UpdateChainResult updateOurChain(
-			final UnconfirmedTransactions unconfirmedTransactions,
-			final org.nem.nis.dbmodel.Block dbParentBlock,
-			final Collection<Block> peerChain,
-			final BlockChainScore ourScore,
-			final boolean hasOwnChain) {
-
-		final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
-				this.accountAnalyzer,
-				this.originalAnalyzer,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.services,
-				unconfirmedTransactions,
-				dbParentBlock,
-				peerChain,
-				ourScore,
-				hasOwnChain);
-
-		return updateContext.update();
-	}
-
+	/**
+	 * Creates a local block lookup adapter.
+	 *
+	 * @return The local block lookup adapter.
+	 */
 	public BlockLookup createLocalBlockLookup() {
 		return new LocalBlockLookupAdapter(
 				this.blockDao,

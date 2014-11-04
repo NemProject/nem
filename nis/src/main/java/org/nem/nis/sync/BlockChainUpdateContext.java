@@ -14,6 +14,9 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Somewhat messy class that actually updates the local chain as appropriate.
+ */
 public class BlockChainUpdateContext {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdateContext.class.getName());
 

@@ -142,6 +142,16 @@ public class NisAppConfig {
 				this.accountDao,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
+				this.blockChainContextFactory(),
+				this.unconfirmedTransactions());
+	}
+
+	@Bean
+	public BlockChainContextFactory blockChainContextFactory() {
+		return new BlockChainContextFactory(
+				this.accountAnalyzer(),
+				this.blockChainLastBlockLayer,
+				this.blockDao,
 				this.blockChainServices(),
 				this.unconfirmedTransactions());
 	}

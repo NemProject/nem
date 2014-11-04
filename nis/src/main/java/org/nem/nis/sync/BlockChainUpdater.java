@@ -32,23 +32,22 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final AccountAnalyzer accountAnalyzer;
-	private final BlockChainServices services;
+	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private BlockChainScore score;
 
-	@Autowired(required = true)
 	public BlockChainUpdater(
 			final AccountAnalyzer accountAnalyzer,
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
-			final BlockChainServices services,
+			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
-		this.services = services;
+		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.score = BlockChainScore.ZERO;
 	}
@@ -214,13 +213,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	//endregion
 
 	private BlockChainSyncContext createSyncContext() {
-		return new BlockChainSyncContext(
-				this.accountAnalyzer.copy(),
-				this.accountAnalyzer,
-				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.services,
-				this.score);
+		return this.blockChainContextFactory.createSyncContext(this.score);
 	}
 
 	private ValidationResult updateOurChain(
@@ -230,12 +223,13 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain,
 			final boolean shouldPunishLowerPeerScore) {
-		final UpdateChainResult updateResult = context.updateOurChain(
-				this.unconfirmedTransactions,
+		final BlockChainUpdateContext updateContext = this.blockChainContextFactory.createUpdateContext(
+				context,
 				dbParentBlock,
 				peerChain,
 				ourScore,
 				hasOwnChain);
+		final UpdateChainResult updateResult = updateContext.update();
 
 		if (shouldPunishLowerPeerScore && updateResult.peerScore.compareTo(updateResult.ourScore) <= 0) {
 			// if we got here, the peer lied about his score, so penalize him

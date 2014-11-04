@@ -151,14 +151,23 @@ public class BlockChainTest {
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
+		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
+				new SystemTimeProvider(),
+				transactionValidatorFactory.create(poiFacade));
+		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
+				accountAnalyzer,
+				blockChainLastBlockLayer,
+				mockBlockDao,
+				services,
+				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
 						accountAnalyzer,
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,
-						services,
-						new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+						contextFactory,
+						unconfirmedTransactions);
 		final BlockChain blockChain = new BlockChain(blockChainLastBlockLayer, updater);
 
 		// Act:
@@ -223,14 +232,23 @@ public class BlockChainTest {
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
+		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
+				new SystemTimeProvider(),
+				transactionValidatorFactory.create(poiFacade));
+		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
+				accountAnalyzer,
+				blockChainLastBlockLayer,
+				mockBlockDao,
+				services,
+				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
 						accountAnalyzer,
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,
-						services,
-						new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+						contextFactory,
+						unconfirmedTransactions);
 		final BlockChain blockChain = new BlockChain(blockChainLastBlockLayer, updater);
 
 		// Act:
