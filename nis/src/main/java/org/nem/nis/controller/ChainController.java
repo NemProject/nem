@@ -10,7 +10,7 @@ import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;

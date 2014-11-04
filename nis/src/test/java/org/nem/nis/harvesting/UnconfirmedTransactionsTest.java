@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.poi.PoiFacade;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 

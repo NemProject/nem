@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.*;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.validators.*;
 
 import java.util.*;

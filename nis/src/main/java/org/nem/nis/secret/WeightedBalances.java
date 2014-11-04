@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.primitive.*;
+import org.nem.nis.BlockChainConstants;
 
 import java.util.*;
 import java.util.stream.Collectors;

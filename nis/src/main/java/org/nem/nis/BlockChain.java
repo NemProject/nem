@@ -9,7 +9,6 @@ import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
 import org.nem.nis.visitors.PartialWeightedScoreVisitor;

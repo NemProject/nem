@@ -3,7 +3,7 @@ package org.nem.nis.validators;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.

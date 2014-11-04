@@ -13,7 +13,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;

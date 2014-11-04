@@ -7,7 +7,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
