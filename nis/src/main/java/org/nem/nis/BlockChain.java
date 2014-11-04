@@ -61,15 +61,6 @@ public class BlockChain implements BlockSynchronizer {
 	}
 
 	/**
-	 * Creates a copy of the current account analyzer.
-	 *
-	 * @return A copy of the account analyzer.
-	 */
-	public AccountAnalyzer copyAccountAnalyzer() {
-		return this.accountAnalyzer.copy();
-	}
-
-	/**
 	 * Updates the score of this chain by adding the score derived from the specified block and parent block.
 	 *
 	 * @param parentBlock The parent block.
@@ -234,8 +225,7 @@ public class BlockChain implements BlockSynchronizer {
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
-		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
-		receivedBlock = BlockMapper.toModel(dbBlock, context.accountAnalyzer.getAccountCache().asAutoCache());
+		receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer);
 		// EVIL hack end
 
 		BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -252,14 +242,18 @@ public class BlockChain implements BlockSynchronizer {
 			// block has transaction addressed to that account, it won't be seen later,
 			// (see canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards test for details)
 			// we remap once more to fix accounts references (and possibly add them to AA)
-			final org.nem.nis.dbmodel.Block dbBlock2 = BlockMapper.toDbModel(receivedBlock, new AccountDaoLookupAdapter(this.accountDao));
-			receivedBlock = BlockMapper.toModel(dbBlock2, context.accountAnalyzer.getAccountCache().asAutoCache());
+			receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer);
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
+	}
+
+	private Block remapBlock(final Block block, final AccountAnalyzer accountAnalyzer) {
+		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		return BlockMapper.toModel(dbBlock, accountAnalyzer.getAccountCache().asAutoCache());
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
