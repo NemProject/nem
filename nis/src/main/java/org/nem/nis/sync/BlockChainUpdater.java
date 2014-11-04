@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  * Facade for updating a block chain.
  */
 public class BlockChainUpdater implements BlockChainScoreManager {
-	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdater.class.getName());
 
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
@@ -80,7 +80,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
-		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.getAccountCache().asAutoCache());
+		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer().getAccountCache().asAutoCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
@@ -166,7 +166,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
-		receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer);
+		receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer());
 		// EVIL hack end
 
 		BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -183,7 +183,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			// block has transaction addressed to that account, it won't be seen later,
 			// (see canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards test for details)
 			// we remap once more to fix accounts references (and possibly add them to AA)
-			receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer);
+			receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer());
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
@@ -248,237 +248,4 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		return updateResult.validationResult;
 	}
-
-	//region UpdateChainResult
-
-	private static class UpdateChainResult {
-		public ValidationResult validationResult;
-		public BlockChainScore ourScore;
-		public BlockChainScore peerScore;
-	}
-
-	//endregion
-
-	//region BlockChainSyncContext
-
-	private static class BlockChainSyncContext {
-		private final AccountAnalyzer accountAnalyzer;
-		private final AccountAnalyzer originalAnalyzer;
-		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-		private final BlockDao blockDao;
-		private final BlockChainServices services;
-		private final BlockChainScore ourScore;
-
-		private BlockChainSyncContext(
-				final AccountAnalyzer accountAnalyzer,
-				final AccountAnalyzer originalAnalyzer,
-				final BlockChainLastBlockLayer blockChainLastBlockLayer,
-				final BlockDao blockDao,
-				final BlockChainServices services,
-				final BlockChainScore ourScore) {
-			this.accountAnalyzer = accountAnalyzer;
-			this.originalAnalyzer = originalAnalyzer;
-			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-			this.blockDao = blockDao;
-			this.services = services;
-			this.ourScore = ourScore;
-		}
-
-		/**
-		 * Reverses transactions between commonBlockHeight and current lastBlock.
-		 * Additionally calculates score.
-		 *
-		 * @param commonBlockHeight height up to which TXes should be reversed.
-		 * @return score for iterated blocks.
-		 */
-		public BlockChainScore undoTxesAndGetScore(final BlockHeight commonBlockHeight) {
-			return this.services.undoAndGetScore(this.accountAnalyzer, this.createLocalBlockLookup(), commonBlockHeight);
-		}
-
-		public UpdateChainResult updateOurChain(
-				final UnconfirmedTransactions unconfirmedTransactions,
-				final org.nem.nis.dbmodel.Block dbParentBlock,
-				final Collection<Block> peerChain,
-				final BlockChainScore ourScore,
-				final boolean hasOwnChain) {
-
-			final BlockChainUpdateContext updateContext = new BlockChainUpdateContext(
-					this.accountAnalyzer,
-					this.originalAnalyzer,
-					this.blockChainLastBlockLayer,
-					this.blockDao,
-					this.services,
-					unconfirmedTransactions,
-					dbParentBlock,
-					peerChain,
-					ourScore,
-					hasOwnChain);
-
-			final UpdateChainResult result = new UpdateChainResult();
-			result.validationResult = updateContext.update();
-			result.ourScore = updateContext.ourScore;
-			result.peerScore = updateContext.peerScore;
-			return result;
-		}
-
-		private BlockLookup createLocalBlockLookup() {
-			return new LocalBlockLookupAdapter(
-					this.blockDao,
-					this.accountAnalyzer.getAccountCache(),
-					this.blockChainLastBlockLayer.getLastDbBlock(),
-					this.ourScore,
-					BlockChainConstants.BLOCKS_LIMIT);
-		}
-	}
-
-	//endregion
-
-	//region BlockChainUpdateContext
-
-	private static class BlockChainUpdateContext {
-
-		private final AccountAnalyzer accountAnalyzer;
-		private final AccountAnalyzer originalAnalyzer;
-		private final BlockScorer blockScorer;
-		private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-		private final BlockDao blockDao;
-		private final BlockChainServices services;
-		private final UnconfirmedTransactions unconfirmedTransactions;
-		private final Block parentBlock;
-		private final Collection<Block> peerChain;
-		private final BlockChainScore ourScore;
-		private BlockChainScore peerScore;
-		private final boolean hasOwnChain;
-
-		public BlockChainUpdateContext(
-				final AccountAnalyzer accountAnalyzer,
-				final AccountAnalyzer originalAnalyzer,
-				final BlockChainLastBlockLayer blockChainLastBlockLayer,
-				final BlockDao blockDao,
-				final BlockChainServices services,
-				final UnconfirmedTransactions unconfirmedTransactions,
-				final org.nem.nis.dbmodel.Block dbParentBlock,
-				final Collection<Block> peerChain,
-				final BlockChainScore ourScore,
-				final boolean hasOwnChain) {
-
-			this.accountAnalyzer = accountAnalyzer;
-			this.originalAnalyzer = originalAnalyzer;
-			this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
-			this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-			this.blockDao = blockDao;
-			this.services = services;
-			this.unconfirmedTransactions = unconfirmedTransactions;
-
-			// do not trust peer, take first block from our db and convert it
-			this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer.getAccountCache());
-
-			this.peerChain = peerChain;
-			this.ourScore = ourScore;
-			this.peerScore = BlockChainScore.ZERO;
-			this.hasOwnChain = hasOwnChain;
-		}
-
-		public ValidationResult update() {
-			if (!this.validatePeerChain()) {
-				return ValidationResult.FAILURE_CHAIN_INVALID;
-			}
-
-			this.peerScore = this.getPeerChainScore();
-
-			logScore(this.ourScore, this.peerScore);
-			if (BlockChainScore.ZERO.equals(this.peerScore)) {
-				return ValidationResult.FAILURE_CHAIN_INVALID;
-			}
-
-			// BR: Do not accept a chain with the same score.
-			//     In case we got here via pushBlock the following can happen:
-			//     2 different blocks with the same height and score are pushed in the network.
-			//     This leads to switching between the 2 blocks indefinitely resulting in tons of pushes.
-			if (this.peerScore.compareTo(this.ourScore) <= 0) {
-				return ValidationResult.NEUTRAL;
-			}
-
-			this.updateOurChain();
-			return ValidationResult.SUCCESS;
-		}
-
-		private static void logScore(final BlockChainScore ourScore, final BlockChainScore peerScore) {
-			if (BlockChainScore.ZERO.equals(ourScore)) {
-				LOGGER.info(String.format("new block's score: %s", peerScore));
-			} else {
-				LOGGER.info(String.format("our score: %s, peer's score: %s", ourScore, peerScore));
-			}
-		}
-
-		/**
-		 * Validates blocks in peerChain.
-		 *
-		 * @return score or -1 if chain is invalid
-		 */
-		private boolean validatePeerChain() {
-			return this.services.isPeerChainValid(this.accountAnalyzer, this.parentBlock, this.peerChain);
-		}
-
-		private BlockChainScore getPeerChainScore() {
-			final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(this.blockScorer);
-			BlockIterator.all(this.parentBlock, this.peerChain, scoreVisitor);
-			return scoreVisitor.getScore();
-		}
-
-		/*
-		 * 1. replace current accountAnalyzer with contemporaryAccountAnalyzer
-		 * 2. add unconfirmed transactions from "our" chain
-		 *    (except those transactions, that are included in peer's chain)
-		 *
-		 * 3. drop "our" blocks from the db
-		 *
-		 * 4. update db with "peer's" chain
-		 */
-		private void updateOurChain() {
-			this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
-
-			if (this.hasOwnChain) {
-				// mind that we're using "new" (replaced) accountAnalyzer
-				final Set<Hash> transactionHashes = this.peerChain.stream()
-						.flatMap(bl -> bl.getTransactions().stream())
-						.map(bl -> HashUtils.calculateHash(bl))
-						.collect(Collectors.toSet());
-				this.addRevertedTransactionsAsUnconfirmed(
-						transactionHashes,
-						this.parentBlock.getHeight().getRaw(),
-						this.originalAnalyzer);
-			}
-
-			this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
-
-			this.peerChain.stream()
-					.filter(block -> this.blockChainLastBlockLayer.addBlockToDb(block))
-					.forEach(block -> this.unconfirmedTransactions.removeAll(block));
-		}
-
-		private void addRevertedTransactionsAsUnconfirmed(
-				final Set<Hash> transactionHashes,
-				final long wantedHeight,
-				final AccountAnalyzer accountAnalyzer) {
-			long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
-
-			while (currentHeight != wantedHeight) {
-				final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
-
-				// if the transaction is in db, we should add it to unconfirmed transactions without a db check
-				// (otherwise, since it is not removed from the database, the database hash check would fail).
-				// at this point, only "state" (in accountAnalyzer and so on) is reverted.
-				// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
-				// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
-				block.getBlockTransfers().stream()
-						.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
-						.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
-						.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
-				currentHeight--;
-			}
-		}
-	}
-
-	//endregion
 }
