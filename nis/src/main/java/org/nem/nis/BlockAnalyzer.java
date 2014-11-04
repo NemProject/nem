@@ -9,6 +9,7 @@ import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
+import org.nem.nis.sync.BlockChainScoreManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
@@ -23,16 +24,16 @@ public class BlockAnalyzer {
 	private static final Logger LOGGER = Logger.getLogger(BlockAnalyzer.class.getName());
 
 	private final BlockDao blockDao;
-	private final BlockChain blockChain;
+	private final BlockChainScoreManager blockChainScoreManager;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	@Autowired(required = true)
 	public BlockAnalyzer(
 			final BlockDao blockDao,
-			final BlockChain blockChain,
+			final BlockChainScoreManager blockChainScoreManager,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer) {
 		this.blockDao = blockDao;
-		this.blockChain = blockChain;
+		this.blockChainScoreManager = blockChainScoreManager;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 
@@ -77,7 +78,7 @@ public class BlockAnalyzer {
 			}
 
 			if (null != parentBlock) {
-				this.blockChain.updateScore(parentBlock, block);
+				this.blockChainScoreManager.updateScore(parentBlock, block);
 			}
 
 			executor.execute(block, observer);

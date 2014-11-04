@@ -12,6 +12,7 @@ import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class ChainController {
 	private final AccountLookup accountLookup;
 	private final ReadOnlyBlockDao blockDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
-	private final BlockChain blockChain;
+	private final BlockChainScoreManager blockChainScoreManager;
 	private final NisPeerNetworkHost host;
 
 	@Autowired(required = true)
@@ -34,12 +35,12 @@ public class ChainController {
 			final ReadOnlyBlockDao blockDao,
 			final AccountLookup accountLookup,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
-			final BlockChain blockChain,
+			final BlockChainScoreManager blockChainScoreManager,
 			final NisPeerNetworkHost host) {
 		this.blockDao = blockDao;
 		this.accountLookup = accountLookup;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
-		this.blockChain = blockChain;
+		this.blockChainScoreManager = blockChainScoreManager;
 		this.host = host;
 	}
 
@@ -109,7 +110,7 @@ public class ChainController {
 	@RequestMapping(value = "/chain/score", method = RequestMethod.GET)
 	@PublicApi
 	public BlockChainScore chainScore() {
-		return this.blockChain.getScore();
+		return this.blockChainScoreManager.getScore();
 	}
 
 	@RequestMapping(value = "/chain/score", method = RequestMethod.POST)

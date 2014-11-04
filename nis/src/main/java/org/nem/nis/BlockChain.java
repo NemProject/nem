@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class BlockChain implements BlockSynchronizer {
+public class BlockChain implements BlockSynchronizer, BlockChainScoreManager {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
 	// TODO 20140920 J-G: started some of the refactoring by pulling stuff out into BlockChainServices (i wouldn't dump everything there), but it think it is a good facade that hides a lot of the helpers from this class
@@ -50,25 +50,20 @@ public class BlockChain implements BlockSynchronizer {
 		this.score = BlockChainScore.ZERO;
 	}
 
-	/**
-	 * Returns the overall score for the chain.
-	 *
-	 * @return the score.
-	 */
+	//region BlockChainScoreManager
+
+	@Override
 	public BlockChainScore getScore() {
 		return this.score;
 	}
 
-	/**
-	 * Updates the score of this chain by adding the score derived from the specified block and parent block.
-	 *
-	 * @param parentBlock The parent block.
-	 * @param block The block.
-	 */
+	@Override
 	public void updateScore(final Block parentBlock, final Block block) {
 		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 		this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 	}
+
+	//endregion
 
 	/**
 	 * Checks if given block follows last block in the chain.
@@ -78,11 +73,9 @@ public class BlockChain implements BlockSynchronizer {
 	 */
 	private boolean isLastBlockParent(final Block block) {
 		final boolean result;
-		synchronized (this.blockChainLastBlockLayer) {
-			result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
-			LOGGER.info("isLastBlockParent result: " + result);
-			LOGGER.info("last block height: " + this.blockChainLastBlockLayer.getLastDbBlock().getHeight());
-		}
+		result = this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash().equals(block.getPreviousBlockHash());
+		LOGGER.info("isLastBlockParent result: " + result);
+		LOGGER.info("last block height: " + this.blockChainLastBlockLayer.getLastDbBlock().getHeight());
 		return result;
 	}
 
@@ -94,10 +87,8 @@ public class BlockChain implements BlockSynchronizer {
 	 */
 	private boolean isLastBlockSibling(final Block block) {
 		final boolean result;
-		synchronized (this.blockChainLastBlockLayer) {
-			// it's better to base it on hash of previous block instead of height
-			result = this.blockChainLastBlockLayer.getLastDbBlock().getPrevBlockHash().equals(block.getPreviousBlockHash());
-		}
+		// it's better to base it on hash of previous block instead of height
+		result = this.blockChainLastBlockLayer.getLastDbBlock().getPrevBlockHash().equals(block.getPreviousBlockHash());
 		return result;
 	}
 
@@ -163,13 +154,18 @@ public class BlockChain implements BlockSynchronizer {
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer.getAccountCache().asAutoCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
-		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
-				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
-			final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-			unconfirmedTransactions.forEach(tr -> this.unconfirmedTransactions.addNew(tr));
-		}
-		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
-			return NodeInteractionResult.fromComparisonResultCode(result.getCode());
+		switch (result.getCode()) {
+			case REMOTE_IS_SYNCED:
+			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
+				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
+				unconfirmedTransactions.forEach(tr -> this.unconfirmedTransactions.addNew(tr));
+				break;
+
+			case REMOTE_IS_NOT_SYNCED:
+				break;
+
+			default:
+				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
@@ -203,15 +199,13 @@ public class BlockChain implements BlockSynchronizer {
 		final org.nem.nis.dbmodel.Block dbParent;
 
 		// receivedBlock already seen
-		synchronized (this.blockChainLastBlockLayer) {
-			if (this.blockDao.findByHash(blockHash) != null) {
-				// This will happen frequently and is ok
-				return ValidationResult.NEUTRAL;
-			}
-
-			// check if we know previous receivedBlock
-			dbParent = this.blockDao.findByHash(parentHash);
+		if (this.blockDao.findByHash(blockHash) != null) {
+			// This will happen frequently and is ok
+			return ValidationResult.NEUTRAL;
 		}
+
+		// check if we know previous receivedBlock
+		dbParent = this.blockDao.findByHash(parentHash);
 
 		// if we don't have parent, we can't do anything with this receivedBlock
 		if (dbParent == null) {
@@ -492,27 +486,25 @@ public class BlockChain implements BlockSynchronizer {
 		 * 4. update db with "peer's" chain
 		 */
 		private void updateOurChain() {
-			synchronized (this.blockChainLastBlockLayer) {
-				this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
+			this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
 
-				if (this.hasOwnChain) {
-					// mind that we're using "new" (replaced) accountAnalyzer
-					final Set<Hash> transactionHashes = this.peerChain.stream()
-							.flatMap(bl -> bl.getTransactions().stream())
-							.map(bl -> HashUtils.calculateHash(bl))
-							.collect(Collectors.toSet());
-					this.addRevertedTransactionsAsUnconfirmed(
-							transactionHashes,
-							this.parentBlock.getHeight().getRaw(),
-							this.originalAnalyzer);
-				}
-
-				this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
-
-				this.peerChain.stream()
-						.filter(block -> this.blockChainLastBlockLayer.addBlockToDb(block))
-						.forEach(block -> this.unconfirmedTransactions.removeAll(block));
+			if (this.hasOwnChain) {
+				// mind that we're using "new" (replaced) accountAnalyzer
+				final Set<Hash> transactionHashes = this.peerChain.stream()
+						.flatMap(bl -> bl.getTransactions().stream())
+						.map(bl -> HashUtils.calculateHash(bl))
+						.collect(Collectors.toSet());
+				this.addRevertedTransactionsAsUnconfirmed(
+						transactionHashes,
+						this.parentBlock.getHeight().getRaw(),
+						this.originalAnalyzer);
 			}
+
+			this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
+
+			this.peerChain.stream()
+					.filter(block -> this.blockChainLastBlockLayer.addBlockToDb(block))
+					.forEach(block -> this.unconfirmedTransactions.removeAll(block));
 		}
 
 		private void addRevertedTransactionsAsUnconfirmed(
