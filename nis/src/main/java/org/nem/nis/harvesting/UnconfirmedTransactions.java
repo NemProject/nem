@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.validators.*;
@@ -25,6 +25,7 @@ public class UnconfirmedTransactions {
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 	private final TimeProvider timeProvider;
 	private final SingleTransactionValidator validator;
+	private final BatchTransactionValidator batchValidator;
 
 	private enum AddOptions {
 		AllowNeutral,
@@ -44,22 +45,26 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TimeProvider timeProvider,
-			final SingleTransactionValidator validator) {
+			final SingleTransactionValidator validator,
+			final BatchTransactionValidator batchValidator) {
 		this.timeProvider = timeProvider;
 
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(validator);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		this.validator = builder.build();
+		this.batchValidator = batchValidator;
 	}
 
 	private UnconfirmedTransactions(
 			final List<Transaction> transactions,
 			final ValidationOptions options,
 			final TimeProvider timeProvider,
-			final SingleTransactionValidator validator) {
+			final SingleTransactionValidator validator,
+			final BatchTransactionValidator batchValidator) {
 		this.timeProvider = timeProvider;
 		this.validator = validator;
+		this.batchValidator = batchValidator;
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, AddOptions.AllowNeutral, options == ValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -82,6 +87,30 @@ public class UnconfirmedTransactions {
 	 */
 	public Amount getUnconfirmedBalance(final Account account) {
 		return this.unconfirmedBalances.get(account);
+	}
+
+	/**
+	 * Adds new unconfirmed transactions.
+	 *
+	 * @param transactions The collection of transactions.
+	 * @return SUCCESS if at least one transaction was added, NEUTRAL or FAILURE otherwise.
+	 */
+	public ValidationResult batchAddNew(final Collection<Transaction> transactions, final BlockHeight height) {
+		final ValidationContext context = new ValidationContext(height, height);
+		final ValidationResult transactionValidationResult =
+				this.batchValidator.validate(Arrays.asList(new TransactionsContextPair(transactions, context)));
+		if (!transactionValidationResult.isSuccess()) {
+			return transactionValidationResult;
+		}
+
+		boolean success = false;
+		for(Transaction transaction : transactions) {
+			if (ValidationResult.SUCCESS == this.addNew(transaction)) {
+				success = true;
+			}
+		}
+
+		return true == success? ValidationResult.SUCCESS : ValidationResult.NEUTRAL;
 	}
 
 	/**
@@ -252,7 +281,8 @@ public class UnconfirmedTransactions {
 						.collect(Collectors.toList()),
 				ValidationOptions.ValidateAgainstUnconfirmedBalance,
 				this.timeProvider,
-				this.validator);
+				this.validator,
+				this.batchValidator);
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
@@ -294,7 +324,8 @@ public class UnconfirmedTransactions {
 						.collect(Collectors.toList()),
 				ValidationOptions.ValidateAgainstConfirmedBalance,
 				this.timeProvider,
-				this.validator);
+				this.validator,
+				this.batchValidator);
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {

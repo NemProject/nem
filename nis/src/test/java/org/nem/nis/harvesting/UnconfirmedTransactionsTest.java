@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.poi.PoiFacade;
@@ -71,7 +71,53 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	//region add[New/Existing]
+	//region add[Batch/New/Existing]
+	// TODO 20141104 BR: addNew has no test yet.
+
+	@Test
+	public void batchAddNewReturnsSuccessIfAtLeastOneTransactionCanBeSuccessfullyAdded() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(10));
+		final ValidationResult result = context.transactions.batchAddNew(Arrays.asList(transaction, transaction), BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void batchAddNewReturnsNeutralIfNoTransactionCanBeSuccessfullyAdded() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(40));
+		final ValidationResult result = context.transactions.batchAddNew(Arrays.asList(transaction, transaction), BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void batchAddNewReturnsFailureIfBatchValidationFails() {
+		// Arrange:
+		final TestContext context = new TestContext(ValidationResult.SUCCESS, ValidationResult.FAILURE_HASH_EXISTS);
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(15));
+		final ValidationResult result = context.transactions.batchAddNew(Arrays.asList(transaction), BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(result.isFailure(), IsEqual.equalTo(true));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(0));
+	}
 
 	@Test
 	public void addSucceedsIfTransactionWithSameHashHasNotAlreadyBeenAdded() {
@@ -907,7 +953,10 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator() {
-		final TestContext context = new TestContext(NisUtils.createTransactionValidatorFactory().create(Mockito.mock(PoiFacade.class)));
+		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
+		final TestContext context = new TestContext(
+				factory.create(Mockito.mock(PoiFacade.class)),
+				factory.createBatch(Mockito.mock(PoiFacade.class)));
 		return context.transactions;
 	}
 
@@ -958,20 +1007,35 @@ public class UnconfirmedTransactionsTest {
 	private static class TestContext {
 		private final TimeProvider timeProvider = Utils.createMockTimeProvider(25);
 		private final SingleTransactionValidator validator;
+		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 
 		private TestContext() {
-			this(ValidationResult.SUCCESS);
+			this(ValidationResult.SUCCESS, ValidationResult.SUCCESS);
 		}
 
-		private TestContext(final ValidationResult result) {
-			this(Mockito.mock(SingleTransactionValidator.class));
-			Mockito.when(this.validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
+		private TestContext(final ValidationResult singleValidationResult) {
+			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
+			Mockito.when(this.validator.validate(Mockito.any(), Mockito.any())).thenReturn(singleValidationResult);
+			Mockito.when(this.batchValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		}
+
+		private TestContext(final ValidationResult singleValidationResult, final ValidationResult batchValidationResult) {
+			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
+			Mockito.when(this.validator.validate(Mockito.any(), Mockito.any())).thenReturn(singleValidationResult);
+			Mockito.when(this.batchValidator.validate(Mockito.any())).thenReturn(batchValidationResult);
 		}
 
 		private TestContext(final SingleTransactionValidator validator) {
 			this.validator = validator;
-			this.transactions = new UnconfirmedTransactions(this.timeProvider, this.validator);
+			this.batchValidator = Mockito.mock(BatchTransactionValidator.class);
+			this.transactions = new UnconfirmedTransactions(this.timeProvider, this.validator, this.batchValidator);
+		}
+
+		private TestContext(final SingleTransactionValidator validator, final BatchTransactionValidator batchValidator) {
+			this.validator = validator;
+			this.batchValidator = batchValidator;
+			this.transactions = new UnconfirmedTransactions(this.timeProvider, this.validator, this.batchValidator);
 		}
 	}
 }

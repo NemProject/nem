@@ -176,7 +176,7 @@ public class BlockChain implements BlockSynchronizer {
 		if (ComparisonResult.Code.REMOTE_IS_SYNCED == result.getCode() ||
 				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE == result.getCode()) {
 			final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-			unconfirmedTransactions.forEach(tr -> this.unconfirmedTransactions.addNew(tr));
+			this.unconfirmedTransactions.batchAddNew(unconfirmedTransactions, new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight()));
 		}
 		if (ComparisonResult.Code.REMOTE_IS_NOT_SYNCED != result.getCode()) {
 			return NodeInteractionResult.fromComparisonResultCode(result.getCode());

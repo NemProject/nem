@@ -156,7 +156,10 @@ public class BlockChainTest {
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+				new UnconfirmedTransactions(
+						new SystemTimeProvider(),
+						transactionValidatorFactory.create(poiFacade),
+						transactionValidatorFactory.createBatch(poiFacade)));
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
@@ -226,7 +229,10 @@ public class BlockChainTest {
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+				new UnconfirmedTransactions(
+						new SystemTimeProvider(),
+						transactionValidatorFactory.create(poiFacade),
+						transactionValidatorFactory.createBatch(poiFacade)));
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
