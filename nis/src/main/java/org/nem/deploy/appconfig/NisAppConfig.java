@@ -225,8 +225,8 @@ public class NisAppConfig {
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
 				this.timeProvider(),
-				this.transactionValidator(),
-				this.batchTransactionValidator());
+				this.transactionValidatorFactory(),
+				this.poiFacade());
 	}
 
 	@Bean

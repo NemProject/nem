@@ -159,8 +159,8 @@ public class BlockChainTest {
 				services,
 				new UnconfirmedTransactions(
 						new SystemTimeProvider(),
-						transactionValidatorFactory.create(poiFacade),
-						transactionValidatorFactory.createBatch(poiFacade)));
+						transactionValidatorFactory,
+						poiFacade));
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
@@ -232,8 +232,8 @@ public class BlockChainTest {
 				services,
 				new UnconfirmedTransactions(
 						new SystemTimeProvider(),
-						transactionValidatorFactory.create(poiFacade),
-						transactionValidatorFactory.createBatch(poiFacade)));
+						transactionValidatorFactory,
+						poiFacade));
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
