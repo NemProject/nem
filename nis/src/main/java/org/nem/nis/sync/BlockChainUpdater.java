@@ -84,6 +84,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
 				unconfirmedTransactions.forEach(tr -> this.unconfirmedTransactions.addNew(tr));
+				// TODO 20141105 BR -> J: if we are synced or have equal score there is no need to continue (will result in an exception thrown if we do).
 				break;
 
 			case REMOTE_IS_NOT_SYNCED:
