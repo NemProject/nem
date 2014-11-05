@@ -70,10 +70,6 @@ public class BlockChainLastBlockLayer {
 		// as there is cascade in Block
 		// mind that there is NO cascade in transaction (near block field)
 		this.blockDao.save(dbBlock);
-
-		this.lastBlock.setNextBlockId(dbBlock.getId());
-		this.blockDao.updateLastBlockId(this.lastBlock);
-
 		this.lastBlock = dbBlock;
 
 		return true;

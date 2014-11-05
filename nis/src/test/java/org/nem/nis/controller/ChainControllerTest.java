@@ -219,7 +219,6 @@ public class ChainControllerTest {
 		// Arrange: set the id and next block id of the second block incorrectly
 		final List<org.nem.nis.dbmodel.Block> blockList = getValidBlockList();
 		blockList.get(1).setId(11L);
-		blockList.get(1).setNextBlockId(12L);
 
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -236,10 +235,8 @@ public class ChainControllerTest {
 	private static List<org.nem.nis.dbmodel.Block> getValidBlockList() {
 		final org.nem.nis.dbmodel.Block dbBlock1 = NisUtils.createDbBlockWithTimeStampAtHeight(443, 11);
 		dbBlock1.setId(11L);
-		dbBlock1.setNextBlockId(12L);
 		final org.nem.nis.dbmodel.Block dbBlock2 = NisUtils.createDbBlockWithTimeStampAtHeight(543, 12);
 		dbBlock2.setId(12L);
-		dbBlock2.setNextBlockId(13L);
 		return Arrays.asList(dbBlock1, dbBlock2);
 	}
 

@@ -2,9 +2,12 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
@@ -45,7 +48,7 @@ public class BlockAnalyzer {
 		final Block nemesisBlock = this.loadNemesisBlock(accountAnalyzer);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
-		Long curBlockId;
+		Long curBlockHeight;
 		LOGGER.info("starting analysis...");
 
 		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(nemesisBlockHash);
@@ -97,20 +100,14 @@ public class BlockAnalyzer {
 
 			parentBlock = block;
 
-			curBlockId = dbBlock.getNextBlockId();
+			curBlockHeight = dbBlock.getHeight() + 1;
 
-			// This is proper exit from this loop
-			if (null == curBlockId) {
+			final org.nem.nis.dbmodel.Block currentBlock = iterator.findByHeight(curBlockHeight);
+			if (currentBlock == null) {
+				// This is proper exit from this loop
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
-				break;
 			}
-
-			dbBlock = iterator.findById(curBlockId);
-
-			if (dbBlock == null && this.blockChainLastBlockLayer.getLastDbBlock() == null) {
-				LOGGER.severe("inconsistent db state, you're probably using developer's build, drop the db and rerun");
-				return false;
-			}
+			dbBlock = currentBlock;
 
 			if (null != maxHeight && dbBlock != null && dbBlock.getHeight() > maxHeight) {
 				break;
@@ -125,41 +122,40 @@ public class BlockAnalyzer {
 		private final BlockDao blockDao;
 		private long curHeight;
 		private Iterator<org.nem.nis.dbmodel.Block> iterator;
+		private boolean finished;
 
 		public BlockIterator(final BlockDao blockDao) {
 			this.curHeight = 1; // the nemesis block height
 			this.blockDao = blockDao;
+			this.finished = false;
 		}
 
-		public org.nem.nis.dbmodel.Block findById(final long id) {
-			// ugly loop, this is equivalent to
-			// dbBlock = this.blockDao.findById(curBlockId);
-			org.nem.nis.dbmodel.Block dbBlock = null;
-			do {
-				if (null == this.iterator || !this.iterator.hasNext()) {
-					this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 2345).iterator();
-				}
-
-				// in most cases this won't make any loops
-				while (this.iterator.hasNext()) {
-					dbBlock = this.iterator.next();
-					if (dbBlock.getId().equals(id)) {
-						break;
-					}
-
-					if (dbBlock.getHeight().compareTo(this.curHeight + 1) > 0) {
-						dbBlock = null;
-					}
-				}
-
-				if (dbBlock == null) {
-					break;
-				}
-
-				this.curHeight = dbBlock.getHeight();
+		public org.nem.nis.dbmodel.Block findByHeight(final long height) {
+			if (this.finished) {
+				return null;
 			}
-			while (!dbBlock.getId().equals(id));
 
+			if (null == this.iterator || !this.iterator.hasNext()) {
+				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 2345).iterator();
+				if (! this.iterator.hasNext()) {
+					this.finished = true;
+					return null;
+				}
+			}
+
+			if (height != this.curHeight + 1) {
+				LOGGER.severe("invalid call");
+				return null;
+			}
+
+			// in most cases this won't make any loops
+			final org.nem.nis.dbmodel.Block dbBlock = this.iterator.next();
+			if (! dbBlock.getHeight().equals(height)) {
+				LOGGER.severe("inconsistent db state, there's missing block you're probably using developer's build, drop the db and rerun");
+				return null;
+			}
+
+			this.curHeight = dbBlock.getHeight();
 			return dbBlock;
 		}
 	}

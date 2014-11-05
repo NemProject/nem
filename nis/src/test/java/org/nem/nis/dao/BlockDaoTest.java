@@ -715,26 +715,6 @@ public class BlockDaoTest {
 			previousBlock = block;
 		}
 	}
-
-	@Test
-	public void getBlocksAfterReturnsBlocksWithMatchingNextBlockIds() {
-		// Arrange:
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
-		this.createBlocksInDatabase(10);
-
-		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(2), 6);
-
-		// Assert:
-		org.nem.nis.dbmodel.Block previousBlock = null;
-		for (final org.nem.nis.dbmodel.Block block : blocks) {
-			if (null != previousBlock) {
-				Assert.assertThat(previousBlock.getNextBlockId(), IsEqual.equalTo(block.getId()));
-			}
-			previousBlock = block;
-		}
-	}
-
 	//endregion
 
 	//region helpers
@@ -793,7 +773,6 @@ public class BlockDaoTest {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		this.addMapping(mockAccountDao, sender);
 
-		org.nem.nis.dbmodel.Block lastBlock = null;
 		for (int i = 1; i < numBlocks; i++) {
 			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
 					sender,
@@ -806,11 +785,6 @@ public class BlockDaoTest {
 			dummyBlock.sign();
 			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
 			this.blockDao.save(dbBlock);
-			if (null != lastBlock) {
-				lastBlock.setNextBlockId(dbBlock.getId());
-				this.blockDao.updateLastBlockId(lastBlock);
-			}
-			lastBlock = dbBlock;
 		}
 
 		return hashes;

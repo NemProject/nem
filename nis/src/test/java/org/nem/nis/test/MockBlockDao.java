@@ -97,11 +97,6 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public void updateLastBlockId(final Block block) {
-
-	}
-
-	@Override
 	public Long count() {
 		return null;
 	}

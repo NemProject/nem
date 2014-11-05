@@ -168,7 +168,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
-		if (dbParent.getNextBlockId() != null) {
+		if (this.blockDao.findByHeight(new BlockHeight(dbParent.getHeight() + 1)) != null) {
 			LOGGER.info("processBlock -> chain inconsistent: calling undoTxesAndGetScore() (" +
 					(this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
