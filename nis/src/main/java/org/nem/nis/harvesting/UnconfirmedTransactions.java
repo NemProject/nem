@@ -49,6 +49,13 @@ public class UnconfirmedTransactions {
 			final BatchTransactionValidator batchValidator) {
 		this.timeProvider = timeProvider;
 
+		// TODO 20141104 J-B: the single transaction validator actually includes the transaction check ...
+		// > I think it might be more sensible to just pass in a TransactionValidatorFactory, since this
+		// > class will probably need three variants (single, batch, default)
+		// > addExisting -> single
+		// > addNew -> default
+		// > addNewBatch -> batch, single
+
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(validator);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
@@ -94,6 +101,9 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param transactions The collection of transactions.
 	 * @return SUCCESS if at least one transaction was added, NEUTRAL or FAILURE otherwise.
+	 *
+	 * TODO 20141104 J-B: you're never actually returning FAILURE, not sure if that's intentional
+	 * > if you want to short circuit on failure, you can use ValidationResult.aggregate
 	 */
 	public ValidationResult batchAddNew(final Collection<Transaction> transactions, final BlockHeight height) {
 		final ValidationContext context = new ValidationContext(height, height);
@@ -103,6 +113,7 @@ public class UnconfirmedTransactions {
 			return transactionValidationResult;
 		}
 
+		// TODO 20141104 J-B: addNew is still doing the db check validation because it is using the default validator (see comment above)
 		boolean success = false;
 		for(Transaction transaction : transactions) {
 			if (ValidationResult.SUCCESS == this.addNew(transaction)) {

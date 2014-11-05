@@ -73,6 +73,8 @@ public class UnconfirmedTransactionsTest {
 
 	//region add[Batch/New/Existing]
 	// TODO 20141104 BR: addNew has no test yet.
+	// TODO 20141104 J-B: i'm not sure what you mean? there are addNew tests
+	// > (granted, since addNew was a specialization of addExisting, most of the tests are for addExisting)
 
 	@Test
 	public void batchAddNewReturnsSuccessIfAtLeastOneTransactionCanBeSuccessfullyAdded() {
@@ -91,6 +93,7 @@ public class UnconfirmedTransactionsTest {
 
 	@Test
 	public void batchAddNewReturnsNeutralIfNoTransactionCanBeSuccessfullyAdded() {
+		// TODO 20141104 J-B: why not failure?
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
@@ -107,6 +110,8 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void batchAddNewReturnsFailureIfBatchValidationFails() {
 		// Arrange:
+		// TODO 20141104 J-B: probably fine for now, but if we change the implementation we should consider a helper function on the context
+		// > like setBatchValidationResult / setSingleValidationResult
 		final TestContext context = new TestContext(ValidationResult.SUCCESS, ValidationResult.FAILURE_HASH_EXISTS);
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
 

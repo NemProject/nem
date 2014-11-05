@@ -150,6 +150,7 @@ public class BlockChainTest {
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
+		// TODO 20141104 J-B: can't wait to refactor these tests ;)
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,
