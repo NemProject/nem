@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
-	private static final List<String> IGNORED_API_PATHS = Arrays.asList("/heartbeat", "/status");
+	private static final List<String> IGNORED_API_PATHS = Arrays.asList("/heartbeat", "/status", "/chain/height");
 
 	private final AuditCollection auditCollection;
 
