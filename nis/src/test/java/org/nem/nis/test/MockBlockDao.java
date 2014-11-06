@@ -158,7 +158,8 @@ public class MockBlockDao implements BlockDao {
 	@Override
 	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
 		return this.blocks.stream()
-				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0)
 				.map(bl -> new BlockDifficulty(bl.getDifficulty()))
 				.collect(Collectors.toList());
 	}
@@ -166,14 +167,21 @@ public class MockBlockDao implements BlockDao {
 	@Override
 	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
 		return this.blocks.stream()
-				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) > 0)
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
+				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0)
 				.map(bl -> new TimeInstant(bl.getTimeStamp()))
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	public void deleteBlocksAfterHeight(final BlockHeight height) {
-
+		Iterator<Block> iterator = this.blocks.iterator();
+		while (iterator.hasNext()) {
+			Block block = iterator.next();
+			if (block.getHeight().compareTo(height.getRaw()) > 0) {
+				iterator.remove();
+			}
+		}
 	}
 
 	/**
