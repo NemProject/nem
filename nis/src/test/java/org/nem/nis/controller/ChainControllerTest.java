@@ -210,6 +210,8 @@ public class ChainControllerTest {
 
 	@Test
 	public void blocksAfterAuthenticatedThrowsIfDatabaseReturnsCorruptBlockList() {
+		// TODO 20141011 J-G: you broke this test ;)
+
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Node localNode = context.network.getLocalNode();

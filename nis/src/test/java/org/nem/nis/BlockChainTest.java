@@ -115,6 +115,8 @@ public class BlockChainTest {
 
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithSameScoreGetsRejectedAfterwards() throws NoSuchFieldException, IllegalAccessException {
+		// TODO 20141011 J-G: you broke this test ;)
+
 		// Arrange:
 		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
 				accountStates.stream()
