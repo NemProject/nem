@@ -9,6 +9,9 @@ import org.nem.core.utils.FormatUtils;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.NisUtils;
 
+import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -493,18 +496,15 @@ public class PoiImportanceCalculatorITCase {
 
 	@Test
 	public void poiCalculationHasModerateMemoryUsage() {
-		LOGGER.info("Testing performance of the poi calculation");
+		LOGGER.info("Testing memory usage of the poi calculation");
 
 		// Arrange:
+        UtilUnsafe sizeFetcher = new UtilUnsafe();
+
 		System.out.println("Setting up accounts.");
 		final int numAccounts = 50000;
 		final List<PoiAccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000l * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
-
-		// TODO 20140929 BR: Why is everything so damn slow in the first round?
-		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
-		// TODO: 20141024 M-J: Do you think we can speed up Java warm-up? http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
-		// -> perhaps we can call some of the poi code in a low priority thread on startup so that things are warmed up?
 
 		// Warm up phase
 		getAccountImportances(new BlockHeight(9999), accounts);
@@ -512,31 +512,41 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		System.out.println("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
+        long startHeapSize = Runtime.getRuntime().totalMemory();
 		for (int i = 0; i < 5; i++) {
 			final ColumnVector importances = getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
-		final long stop = System.currentTimeMillis();
+        long endHeapSize = Runtime.getRuntime().totalMemory();
+
+        final long stop = System.currentTimeMillis();
 		LOGGER.info("Finished poi calculation.");
 
 		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed " + (stop - start) / 5 + "ms.");
 
-		// Assert
-		//Assert.assertTrue(stop - start < 1000);
-
-		ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
+        // Assert
 		LOGGER.info("Heap: " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
 		LOGGER.info("NonHeap: " + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage());
 		final List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
 		for (MemoryPoolMXBean bean : beans) {
-			LOGGER.info(bean.getName() + " : " + bean.getUsage());
+            System.out.println(bean.getName() + " : " + bean.getUsage());
+            if ("PS Eden Space".equals(bean.getName())) {
+                Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
+            } else if ("PS Survivor Space".equals(bean.getName())) {
+                Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
+            }
+            else if ("PS Old Gen".equals(bean.getName())) {
+                Assert.assertTrue(bean.getUsage().getUsed() < 256000000); // ~256 Mb
+            }
 		}
+
+        // Not so meaningful because the GC will affect this a lot
+        long heapSizeDiff = endHeapSize - startHeapSize;
+        Assert.assertTrue(heapSizeDiff < 256000000); // ~256 Mb
 
 		for (GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
 			LOGGER.info(bean.getName() + " : " + bean.getCollectionCount() + " : " + bean.getCollectionTime());
 		}
-
-
-	}
+    }
 
 	private List<PoiAccountState> createUserAccounts(
 			final long blockHeight,
@@ -622,4 +632,52 @@ public class PoiImportanceCalculatorITCase {
 
 		return importancesVector;
 	}
+
+
+    class UtilUnsafe {
+        private final int NR_BITS = Integer.valueOf(System.getProperty("sun.arch.data.model"));
+        private final int BYTE = 8;
+        private final int WORD = NR_BITS/BYTE;
+        private final int MIN_SIZE = 16;
+
+        int sizeOf(Class src){
+            //
+            // Get the instance fields of src class
+            //
+            List<Field> instanceFields = new LinkedList<Field>();
+            do{
+                if(src == Object.class) return MIN_SIZE;
+                for (Field f : src.getDeclaredFields()) {
+                    if((f.getModifiers() & Modifier.STATIC) == 0){
+                        instanceFields.add(f);
+                    }
+                }
+                src = src.getSuperclass();
+            }while(instanceFields.isEmpty());
+            //
+            // Get the field with the maximum offset
+            //
+            long maxOffset = 0;
+            for (Field f : instanceFields) {
+                long offset = this.UNSAFE.objectFieldOffset(f);
+                if(offset > maxOffset) maxOffset = offset;
+            }
+            return  (((int)maxOffset/WORD) + 1)*WORD;
+        }
+
+        public final sun.misc.Unsafe UNSAFE;
+
+        UtilUnsafe() {
+            Object theUnsafe = null;
+            Exception exception = null;
+            try {
+                Class<?> uc = Class.forName("sun.misc.Unsafe");
+                Field f = uc.getDeclaredField("theUnsafe");
+                f.setAccessible(true);
+                theUnsafe = f.get(uc);
+            } catch (Exception e) { exception = e; }
+            UNSAFE = (sun.misc.Unsafe) theUnsafe;
+            if (UNSAFE == null) throw new Error("Could not obtain access to sun.misc.Unsafe", exception);
+        }
+    }
 }
