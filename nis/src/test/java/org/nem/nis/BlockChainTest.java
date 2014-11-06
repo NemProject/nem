@@ -116,6 +116,7 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithSameScoreGetsRejectedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// TODO 20141011 J-G: you broke this test ;)
+		// TODO 20141106 G-J: yes I didn't know yesterday how to fix it :]
 
 		// Arrange:
 		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
@@ -188,6 +189,9 @@ public class BlockChainTest {
 
 		// siblings with same score must be rejected
 		// Act:
+		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, accountDaoLookup);
+		mockBlockDao.addBlock(dbBlock);
+
 		final Block sibling = this.createBlockSiblingWithSameScore(block, parentBlock, accounts);
 		final ValidationResult siblingResult = blockChain.processBlock(sibling);
 

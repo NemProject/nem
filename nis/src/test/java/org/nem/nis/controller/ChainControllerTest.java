@@ -210,8 +210,6 @@ public class ChainControllerTest {
 
 	@Test
 	public void blocksAfterAuthenticatedThrowsIfDatabaseReturnsCorruptBlockList() {
-		// TODO 20141011 J-G: you broke this test ;)
-
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Node localNode = context.network.getLocalNode();
@@ -220,7 +218,7 @@ public class ChainControllerTest {
 
 		// Arrange: set the id and next block id of the second block incorrectly
 		final List<org.nem.nis.dbmodel.Block> blockList = getValidBlockList();
-		blockList.get(1).setId(11L);
+		blockList.get(1).setHeight(11L);
 
 		// Assert:
 		ExceptionAssert.assertThrows(

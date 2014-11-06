@@ -104,9 +104,7 @@ public class BlockAnalyzer {
 
 			final org.nem.nis.dbmodel.Block currentBlock = iterator.findByHeight(curBlockHeight);
 			if (currentBlock == null) {
-				// This is proper exit from this loop
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
-				// TODO 20141105 J-G did you remove the break on purpose (if you did you should remove the comment)?
 			}
 			dbBlock = currentBlock;
 
@@ -145,16 +143,14 @@ public class BlockAnalyzer {
 			}
 
 			if (height != this.curHeight + 1) {
-				LOGGER.severe("invalid call");
+				throw new IllegalStateException("invalid call");
 				// TODO 20141105 J-G consider throwing an IllegalStatException?
-				return null;
+				// 20141106 G-J: in both cases I did, I just wasn't sure if it'll be handled properly
 			}
 
 			final org.nem.nis.dbmodel.Block dbBlock = this.iterator.next();
 			if (! dbBlock.getHeight().equals(height)) {
-				LOGGER.severe("inconsistent db state, there's missing block you're probably using developer's build, drop the db and rerun");
-				// TODO 20141105 J-G consider throwing an IllegalStatException
-				return null;
+				throw new IllegalStateException("inconsistent db state, there's missing block you're probably using developer's build, drop the db and rerun");
 			}
 
 			this.curHeight = dbBlock.getHeight();
