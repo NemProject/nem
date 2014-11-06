@@ -84,7 +84,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
 				unconfirmedTransactions.forEach(tr -> this.unconfirmedTransactions.addNew(tr));
-				break;
+				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 
 			case REMOTE_IS_NOT_SYNCED:
 				break;
