@@ -222,11 +222,6 @@ public class TransferDaoImpl implements TransferDao {
 			return blockIndexComparison;
 		}
 
-		final int hashComparison = lhsTransfer.getTransferHash().toString().compareTo(rhsTransfer.getTransferHash().toString());
-		if (0 != hashComparison) {
-			return hashComparison;
-		}
-
 		return 0;
 	}
 }
