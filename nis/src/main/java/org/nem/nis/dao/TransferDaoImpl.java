@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class TransferDaoImpl implements TransferDao {
@@ -127,7 +128,7 @@ public class TransferDaoImpl implements TransferDao {
 		if (TransferType.ALL == transferType) {
 			final Collection<Object[]> objects = this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, TransferType.INCOMING, tx);
 			objects.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, TransferType.OUTGOING, tx));
-			return objects;
+			return sortAndLimit(objects, limit);
 		} else {
 			return this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, transferType, tx);
 		}
@@ -168,7 +169,7 @@ public class TransferDaoImpl implements TransferDao {
 		if (TransferType.ALL == transferType) {
 			final Collection<Object[]> objects = this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.INCOMING);
 			objects.addAll(this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.OUTGOING));
-			return objects;
+			return sortAndLimit(objects, limit);
 		} else {
 			return this.getLatestTransactionsForAccountWithTransferType(address, limit, transferType);
 		}
@@ -191,5 +192,41 @@ public class TransferDaoImpl implements TransferDao {
 	@SuppressWarnings("unchecked")
 	private static <T> List<T> listAndCast(final Query q) {
 		return q.list();
+	}
+
+	private Collection<Object[]> sortAndLimit(final Collection<Object[]> objects, final int limit) {
+		return objects.stream()
+				.sorted((o1, o2) -> comparePair(o1, o2))
+				.limit(limit)
+				.collect(Collectors.toList());
+	}
+
+	private int comparePair(final Object[] lhs, final Object[] rhs) {
+		final Transfer lhsTransfer = (Transfer)lhs[0];
+		final Long lhsHeight = (long)lhs[1];
+		final Transfer rhsTransfer = (Transfer)rhs[0];
+		final Long rhsHeight = (long)rhs[1];
+
+		final int heightComparison = -lhsHeight.compareTo(rhsHeight);
+		if (0 != heightComparison) {
+			return heightComparison;
+		}
+
+		final int timeStampComparison = -lhsTransfer.getTimeStamp().compareTo(rhsTransfer.getTimeStamp());
+		if (0 != timeStampComparison) {
+			return timeStampComparison;
+		}
+
+		final int blockIndexComparison = lhsTransfer.getBlkIndex().compareTo(rhsTransfer.getBlkIndex());
+		if (0 != blockIndexComparison) {
+			return blockIndexComparison;
+		}
+
+		final int hashComparison = lhsTransfer.getTransferHash().toString().compareTo(rhsTransfer.getTransferHash().toString());
+		if (0 != hashComparison) {
+			return hashComparison;
+		}
+
+		return 0;
 	}
 }
