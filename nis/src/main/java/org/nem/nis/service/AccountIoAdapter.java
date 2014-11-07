@@ -78,12 +78,43 @@ public class AccountIoAdapter implements AccountIo {
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
+				.sorted((o1, o2) -> comparePair(o1, o2))
 				.map(tr -> new TransactionMetaDataPair(
 						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
 						new TransactionMetaData(new BlockHeight((long)tr[1]))
 				))
+				.limit(25)
 				.forEach(obj -> transactionList.add(obj));
 		return transactionList;
+	}
+
+	private int comparePair(final Object[] lhs, final Object[] rhs) {
+		final Transfer lhsTransfer = (Transfer)lhs[0];
+		final Long lhsHeight = (long)lhs[1];
+		final Transfer rhsTransfer = (Transfer)rhs[0];
+		final Long rhsHeight = (long)rhs[1];
+
+		final int heightComparison = -lhsHeight.compareTo(rhsHeight);
+		if (0 != heightComparison) {
+			return heightComparison;
+		}
+
+		final int timeStampComparison = -lhsTransfer.getTimeStamp().compareTo(rhsTransfer.getTimeStamp());
+		if (0 != timeStampComparison) {
+			return timeStampComparison;
+		}
+
+		final int blockIndexComparison = lhsTransfer.getBlkIndex().compareTo(rhsTransfer.getBlkIndex());
+		if (0 != blockIndexComparison) {
+			return blockIndexComparison;
+		}
+
+		final int hashComparison = lhsTransfer.getTransferHash().toString().compareTo(rhsTransfer.getTransferHash().toString());
+		if (0 != hashComparison) {
+			return hashComparison;
+		}
+
+		return 0;
 	}
 
 	@Override
