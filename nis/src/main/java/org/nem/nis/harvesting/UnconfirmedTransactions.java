@@ -25,14 +25,8 @@ public class UnconfirmedTransactions {
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 	private final TimeProvider timeProvider;
 	private final TransactionValidatorFactory validatorFactory;
+	private final SingleTransactionValidator singleValidator;
 	private final PoiFacade poiFacade;
-
-	// TODO 20141106 as a result of the validators split, i'm not sure if we still need this
-	// > since the dbcheck validator is the only one that returns NEUTRAL
-	private enum AddOptions {
-		AllowNeutral,
-		RejectNeutral
-	}
 
 	private enum BalanceValidationOptions {
 		ValidateAgainstConfirmedBalance,
@@ -53,6 +47,7 @@ public class UnconfirmedTransactions {
 		this.timeProvider = timeProvider;
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
+		this.singleValidator = createSingleValidator();
 	}
 
 	private UnconfirmedTransactions(
@@ -64,8 +59,9 @@ public class UnconfirmedTransactions {
 		this.timeProvider = timeProvider;
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
+		this.singleValidator = createSingleValidator();
 		for (final Transaction transaction : transactions) {
-			this.add(transaction, AddOptions.AllowNeutral, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
+			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
 	}
 
@@ -109,6 +105,10 @@ public class UnconfirmedTransactions {
 	 * > if you want to short circuit on failure, you can use ValidationResult.aggregate
 	 * TODO 20141105 BR -> J: if the batch validation fails it is returning failure, see test class.
 	 * TODO 20141106 J-B: sorry, i meant in the case of add failing (see comment in test)
+	 * TODO 20141107: BR -> J: I am unsure which way to go. If batch validation fails we have to return FAILURE, else the batch validation doesn't make sense.
+	 * TODO                    For the rest we use single validation anyway so we can pick those transactions which are valid.
+	 * TODO                    Do you want to fail fast because the remote could supply tons of new invalid transactions as an attack vector?
+	 * TODO                    Probably pretty expensive for the attacker too bc he needs to upload all those transactions. Gimre, what's your opinion?
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		final ValidationResult transactionValidationResult = validateBatch(transactions);
@@ -118,7 +118,7 @@ public class UnconfirmedTransactions {
 
 		boolean success = false;
 		for(Transaction transaction : transactions) {
-			if (ValidationResult.SUCCESS == this.add(transaction, AddOptions.RejectNeutral, true)) {
+			if (ValidationResult.SUCCESS == this.add(transaction, true)) {
 				success = true;
 			}
 		}
@@ -135,7 +135,7 @@ public class UnconfirmedTransactions {
 	public ValidationResult addNew(final Transaction transaction) {
 		final ValidationResult transactionValidationResult = validateBatch(Arrays.asList(transaction));
 		return transactionValidationResult.isSuccess()
-				? this.add(transaction, AddOptions.RejectNeutral, true)
+				? this.add(transaction, true)
 				: transactionValidationResult;
 	}
 
@@ -146,17 +146,17 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addExisting(final Transaction transaction) {
-		return this.add(transaction, AddOptions.AllowNeutral, true);
+		return this.add(transaction, true);
 	}
 
-	private ValidationResult add(final Transaction transaction, final AddOptions options, final boolean execute) {
+	private ValidationResult add(final Transaction transaction, final boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, true)) {
 			return ValidationResult.NEUTRAL;
 		}
 
 		try {
-			return this.addInternal(transaction, transactionHash, options, execute);
+			return this.addInternal(transaction, transactionHash, execute);
 		} finally {
 			this.pendingTransactions.remove(transactionHash);
 		}
@@ -165,10 +165,9 @@ public class UnconfirmedTransactions {
 	private ValidationResult addInternal(
 			final Transaction transaction,
 			final Hash transactionHash,
-			final AddOptions options,
 			final boolean execute) {
 		final ValidationResult validationResult = this.validateSingle(transaction);
-		if (!isSuccess(validationResult, options)) {
+		if (!validationResult.isSuccess()) {
 			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
 			return validationResult;
 		}
@@ -181,23 +180,17 @@ public class UnconfirmedTransactions {
 		return ValidationResult.SUCCESS;
 	}
 
-	private static boolean isSuccess(final ValidationResult result, final AddOptions options) {
-		return (AddOptions.AllowNeutral == options && ValidationResult.NEUTRAL == result) || result.isSuccess();
-	}
-
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
 		final TransactionsContextPair pair = new TransactionsContextPair(transactions, new ValidationContext());
 		return this.validatorFactory.createBatch(this.poiFacade).validate(Arrays.asList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {
-		return this.createSingleValidator().validate(
+		return this.singleValidator.validate(
 				transaction,
 				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
 	}
 
-	// TODO 20141106 J-B: any reason you're creating the validators lazily instead of in the constructor?
-	// > they are stateless so afaikt, this is only causing N validators of each type to be created instead of 1
 	private SingleTransactionValidator createSingleValidator() {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.poiFacade));

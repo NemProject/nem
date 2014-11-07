@@ -74,10 +74,8 @@ public class UnconfirmedTransactionsTest {
 
 	//region add[Batch/New/Existing]
 
-	// TODO 20141106 J-B: can you rename the batchAddNew test names as well to addNewBatch
-
 	@Test
-	public void batchAddNewReturnsSuccessIfAtLeastOneTransactionCanBeSuccessfullyAdded() {
+	public void addNewBatchReturnsSuccessIfAtLeastOneTransactionCanBeSuccessfullyAdded() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
@@ -92,13 +90,14 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void batchAddNewReturnsNeutralIfNoTransactionCanBeSuccessfullyAdded() {
+	public void addNewBatchReturnsNeutralIfNoTransactionCanBeSuccessfullyAdded() {
 		// TODO 20141104 J-B: why not failure?
 		// TODO 20141105 BR -> J: which FAILURE should be returned? In a batch there could be many different failures.
 		// TODO                   You don't want to stop if one transaction fails once the batch validation succeeded or do you?
 		// TODO 20141106 J-B: 'You don't want to stop if one transaction fails' - right now it just feels inconsistent since
 		// > we stop if one transaction in the batch fails batch validation but not if one fails regular validation
 		// > however, this is moot since we aren't actually checking the result :)
+		// TODO 20141107 BR -> J: Not moot, just a question if an attack vector is possible, see comments in UnconfirmedTransactions class.
 
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -115,14 +114,8 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void batchAddNewReturnsFailureIfBatchValidationFails() {
+	public void addNewBatchReturnsFailureIfBatchValidationFails() {
 		// Arrange:
-		// TODO 20141104 J-B: probably fine for now, but if we change the implementation we should consider a helper function on the context
-		// > like setBatchValidationResult / setSingleValidationResult
-		// TODO 20141105 BR -> J: I can do that but I don't see the merit. Is having a few different constructors bad? (maybe I misunderstood you)
-		// TODO 20141106 J-B: 'Is having a few different constructors bad' - no, but imo what you did makes the code more readable because
-		// > i don't have to guess which constructor parameter is a single or batch result (it's obvious from the function name)
-		// > fyi, i'm fine with the single parameter constructor bc it's less ambiguous what the result is for (single validation)
 		final TestContext context = new TestContext();
 		context.setSingleValidationResult(ValidationResult.SUCCESS);
 		context.setBatchValidationResult(ValidationResult.FAILURE_HASH_EXISTS);
@@ -189,20 +182,24 @@ public class UnconfirmedTransactionsTest {
 
 	// TODO 20141106 - we should have a tests that (1) addNew fails if batchValidation fails
 	// > and addExisting does not fail if batchValidation fails
+	// TODO 20141107 BR: done.
 
 	@Test
-	public void addExistingSucceedsIfValidationReturnsNeutral() {
+	public void addExistingSucceedsWhileAddNewFailsIfBatchValidationFails() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.setSingleValidationResult(ValidationResult.NEUTRAL);
+		context.setSingleValidationResult(ValidationResult.SUCCESS);
+		context.setBatchValidationResult(ValidationResult.FAILURE_HASH_EXISTS);
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = context.transactions.addExisting(transaction);
+		final ValidationResult result1 = context.transactions.addNew(transaction);
+		final ValidationResult result2 = context.transactions.addExisting(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.FAILURE_HASH_EXISTS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
 	}
 
@@ -281,7 +278,7 @@ public class UnconfirmedTransactionsTest {
 	// TODO 20141105 should update the delegation test for batchValidation too (and add one for addNew)
 
 	@Test
-	public void addDelegatesToTransactionValidatorForValidation() {
+	public void addExistingDelegatesToSingleTransactionValidatorForValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
@@ -292,6 +289,48 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Mockito.verify(context.singleValidator, Mockito.times(1)).validate(Mockito.eq(transaction), Mockito.any());
+	}
+
+	@Test
+	public void addNewDelegatesToSingleTransactionValidatorForValidation() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		context.transactions.addNew(transaction);
+
+		// Assert:
+		Mockito.verify(context.singleValidator, Mockito.times(1)).validate(Mockito.eq(transaction), Mockito.any());
+	}
+
+	@Test
+	public void addNewDelegatesToBatchTransactionValidatorForValidation() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		context.transactions.addNew(transaction);
+
+		// Assert:
+		Mockito.verify(context.batchValidator, Mockito.times(1)).validate(Mockito.any());
+	}
+
+	@Test
+	public void addNewBatchDelegatesToBatchTransactionValidatorForValidation() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		context.transactions.addNewBatch(Arrays.asList(transaction));
+
+		// Assert:
+		Mockito.verify(context.batchValidator, Mockito.times(1)).validate(Mockito.any());
 	}
 
 	//endregion
@@ -314,6 +353,7 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
 	}
 
+	// TODO 20141107 BR -> G: Why should this test pass? (It does because of the way it is set up)
 	@Test
 	public void addExistingSucceedsIfTimeStampIsTooFarInTheFuture() {
 		// Arrange:
@@ -964,6 +1004,9 @@ public class UnconfirmedTransactionsTest {
 	// TODO 20140926 J-G how would he stop the whole network; when re-validating against confirmed balance only one would be chosen?
 
 	// TODO 20141106 J-G,B: while we're here can you answer my question ;)?
+	// TODO 20141107 BR -> J: the term ValidateAgainstConfirmedBalance is misleading, it means that the transaction is not executed during add().
+	// TODO                   There is no check against a confirmed balance.
+	// TODO                   So the above is valid and a harvester would create a block that doesn't pass processBlock().
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:
@@ -1035,9 +1078,6 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static class TestContext {
-		// TODO 20141106: the first two don't need to be members (they can be local in the function)
-		private final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
@@ -1050,18 +1090,20 @@ public class UnconfirmedTransactionsTest {
 
 		private TestContext(final SingleTransactionValidator singleValidator) {
 			this(singleValidator, Mockito.mock(BatchTransactionValidator.class));
-			Mockito.when(this.batchValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+			this.setBatchValidationResult(ValidationResult.SUCCESS);
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
+			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
+			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+			Mockito.when(validatorFactory.createBatch(Mockito.any())).thenReturn(this.batchValidator);
+			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					TIME_PROVIDER,
-					this.validatorFactory,
-					this.poiFacade);
-			Mockito.when(this.validatorFactory.createBatch(Mockito.any())).thenReturn(this.batchValidator);
-			Mockito.when(this.validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
+					validatorFactory,
+					poiFacade);
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {
