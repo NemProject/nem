@@ -106,12 +106,10 @@ public class BlockAnalyzer {
 			if (currentBlock == null) {
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 			}
+
 			dbBlock = currentBlock;
 
-			if (null != maxHeight && dbBlock != null && dbBlock.getHeight() > maxHeight) {
-				break;
-			}
-		} while (dbBlock != null);
+		} while (null != maxHeight && dbBlock != null && dbBlock.getHeight() > maxHeight);
 
 		this.initializePoi(accountAnalyzer, parentBlock.getHeight());
 		return true;
@@ -143,9 +141,7 @@ public class BlockAnalyzer {
 			}
 
 			if (height != this.curHeight + 1) {
-				throw new IllegalStateException("invalid call");
-				// TODO 20141105 J-G consider throwing an IllegalStatException?
-				// 20141106 G-J: in both cases I did, I just wasn't sure if it'll be handled properly
+				throw new IllegalStateException("iterator was called for non-consecutive block");
 			}
 
 			final org.nem.nis.dbmodel.Block dbBlock = this.iterator.next();
