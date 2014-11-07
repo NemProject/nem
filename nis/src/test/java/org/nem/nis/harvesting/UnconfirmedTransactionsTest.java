@@ -1,8 +1,8 @@
 package org.nem.nis.harvesting;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
@@ -98,6 +98,7 @@ public class UnconfirmedTransactionsTest {
 		// > we stop if one transaction in the batch fails batch validation but not if one fails regular validation
 		// > however, this is moot since we aren't actually checking the result :)
 		// TODO 20141107 BR -> J: Not moot, just a question if an attack vector is possible, see comments in UnconfirmedTransactions class.
+		// TODO 20141107 J-B: well, moot now because BlockChain is not checking the result ;)
 
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -180,12 +181,8 @@ public class UnconfirmedTransactionsTest {
 
 	//region validation
 
-	// TODO 20141106 - we should have a tests that (1) addNew fails if batchValidation fails
-	// > and addExisting does not fail if batchValidation fails
-	// TODO 20141107 BR: done.
-
 	@Test
-	public void addExistingSucceedsWhileAddNewFailsIfBatchValidationFails() {
+	public void addExistingSucceedsIfBatchValidationFails() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.setSingleValidationResult(ValidationResult.SUCCESS);
@@ -194,13 +191,28 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result1 = context.transactions.addNew(transaction);
-		final ValidationResult result2 = context.transactions.addExisting(transaction);
+		final ValidationResult result = context.transactions.addExisting(transaction);
 
 		// Assert:
-		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.FAILURE_HASH_EXISTS));
-		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void addNewFailsIfBatchValidationFails() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setSingleValidationResult(ValidationResult.SUCCESS);
+		context.setBatchValidationResult(ValidationResult.FAILURE_HASH_EXISTS);
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+
+		// Act:
+		final MockTransaction transaction = new MockTransaction(sender, 7);
+		final ValidationResult result = context.transactions.addNew(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_HASH_EXISTS));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -275,10 +287,8 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
 	}
 
-	// TODO 20141105 should update the delegation test for batchValidation too (and add one for addNew)
-
 	@Test
-	public void addExistingDelegatesToSingleTransactionValidatorForValidation() {
+	public void addExistingDelegatesToSingleTransactionValidatorButNotBatchTransactionValidatorForValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
@@ -288,11 +298,12 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.addExisting(transaction);
 
 		// Assert:
-		Mockito.verify(context.singleValidator, Mockito.times(1)).validate(Mockito.eq(transaction), Mockito.any());
+		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
+		Mockito.verify(context.batchValidator, Mockito.never()).validate(Mockito.any());
 	}
 
 	@Test
-	public void addNewDelegatesToSingleTransactionValidatorForValidation() {
+	public void addNewDelegatesToSingleTransactionValidatorAndBatchTransactionValidatorForValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
@@ -302,25 +313,12 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.addNew(transaction);
 
 		// Assert:
-		Mockito.verify(context.singleValidator, Mockito.times(1)).validate(Mockito.eq(transaction), Mockito.any());
+		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
+		assertBatchValidation(context.batchValidator, transaction);
 	}
 
 	@Test
-	public void addNewDelegatesToBatchTransactionValidatorForValidation() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
-
-		// Act:
-		final MockTransaction transaction = new MockTransaction(sender, 7);
-		context.transactions.addNew(transaction);
-
-		// Assert:
-		Mockito.verify(context.batchValidator, Mockito.times(1)).validate(Mockito.any());
-	}
-
-	@Test
-	public void addNewBatchDelegatesToBatchTransactionValidatorForValidation() {
+	public void addNewBatchDelegatesToSingleTransactionValidatorAndBatchTransactionValidatorForValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
@@ -330,7 +328,21 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.addNewBatch(Arrays.asList(transaction));
 
 		// Assert:
-		Mockito.verify(context.batchValidator, Mockito.times(1)).validate(Mockito.any());
+		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
+		assertBatchValidation(context.batchValidator, transaction);
+	}
+
+	private static void assertBatchValidation(final BatchTransactionValidator validator, final Transaction transaction) {
+		final ArgumentCaptor<List<TransactionsContextPair>> pairsCaptor = createPairsCaptor();
+		Mockito.verify(validator, Mockito.only()).validate(pairsCaptor.capture());
+
+		final TransactionsContextPair pair = pairsCaptor.getValue().get(0);
+		Assert.assertThat(pair.getTransactions(), IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+	}
+
+	@SuppressWarnings("unchecked")
+	private static ArgumentCaptor<List<TransactionsContextPair>> createPairsCaptor() {
+		return ArgumentCaptor.forClass((Class)List.class);
 	}
 
 	//endregion
@@ -1098,8 +1110,8 @@ public class UnconfirmedTransactionsTest {
 			this.batchValidator = batchValidator;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-			Mockito.when(validatorFactory.createBatch(Mockito.any())).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
+			Mockito.when(validatorFactory.createBatch(poiFacade)).thenReturn(this.batchValidator);
+			Mockito.when(validatorFactory.createSingle(poiFacade)).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					TIME_PROVIDER,
 					validatorFactory,

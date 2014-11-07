@@ -93,10 +93,10 @@ public class TransferDaoImpl implements TransferDao {
 	@Override
 	@Transactional
 	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account address, final Hash hash, final TransferType transferType, final int limit) {
-		final String addressString = this.buildAddressQuery(transferType);
 		if (hash == null) {
 			return this.getLatestTransactionsForAccount(address, limit, transferType);
 		} else {
+			final String addressString = this.buildAddressQuery(transferType);
 			final Object[] tx = this.getTransactionDescriptorUsingHash(address, hash, limit, addressString);
 			return this.getTransactionsForAccountUpToTransaction(address, limit, transferType, tx);
 		}
@@ -166,6 +166,7 @@ public class TransferDaoImpl implements TransferDao {
 			final Account address,
 			final int limit,
 			final TransferType transferType) {
+		// TODO 20141107 J-B: was something wrong with what buildAddressQuery was doing when transfer type was ALL?
 		if (TransferType.ALL == transferType) {
 			final Collection<Object[]> objects = this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.INCOMING);
 			objects.addAll(this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.OUTGOING));
