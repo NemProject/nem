@@ -12,6 +12,8 @@ import java.util.logging.Logger;
  */
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
+	// TODO 20141106 J-*: i was wondering if we should read this list from the config.properties file so it is easy to turn things off
+	// > unless there is a better way to configure Java logging files
 	private static final List<String> IGNORED_API_PATHS = Arrays.asList("/heartbeat", "/status", "/chain/height");
 
 	private final AuditCollection auditCollection;

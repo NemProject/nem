@@ -27,6 +27,8 @@ public class UnconfirmedTransactions {
 	private final TransactionValidatorFactory validatorFactory;
 	private final PoiFacade poiFacade;
 
+	// TODO 20141106 as a result of the validators split, i'm not sure if we still need this
+	// > since the dbcheck validator is the only one that returns NEUTRAL
 	private enum AddOptions {
 		AllowNeutral,
 		RejectNeutral
@@ -42,21 +44,13 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param timeProvider The time provider to use.
 	 * @param validatorFactory The transaction validator factory to use.
+	 * @param poiFacade The poi facade to use.
 	 */
 	public UnconfirmedTransactions(
 			final TimeProvider timeProvider,
 			final TransactionValidatorFactory validatorFactory,
 			final PoiFacade poiFacade) {
 		this.timeProvider = timeProvider;
-
-		// TODO 20141104 J-B: the single transaction validator actually includes the transaction check ...
-		// > I think it might be more sensible to just pass in a TransactionValidatorFactory, since this
-		// > class will probably need three variants (single, batch, default)
-		// > addExisting -> single
-		// > addNew -> default
-		// > addNewBatch -> batch, single
-		// TODO 20141105 BR -> J: adNew and addNewBatch are doing batch check, addExisting simply calls add which doesn't.
-
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
 	}
@@ -70,11 +64,20 @@ public class UnconfirmedTransactions {
 		this.timeProvider = timeProvider;
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		// TODO 20141105 BR: Usually should be ok NOT to check against db here but Parana had lots of old transactions in hist list.
-		// TODO				 Better do the check?
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, AddOptions.AllowNeutral, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
+	}
+
+	private UnconfirmedTransactions filter(
+			final List<Transaction> transactions,
+			final BalanceValidationOptions options) {
+		return new UnconfirmedTransactions(
+				transactions,
+				options,
+				this.timeProvider,
+				this.validatorFactory,
+				this.poiFacade);
 	}
 
 	/**
@@ -105,6 +108,7 @@ public class UnconfirmedTransactions {
 	 * TODO 20141104 J-B: you're never actually returning FAILURE, not sure if that's intentional
 	 * > if you want to short circuit on failure, you can use ValidationResult.aggregate
 	 * TODO 20141105 BR -> J: if the batch validation fails it is returning failure, see test class.
+	 * TODO 20141106 J-B: sorry, i meant in the case of add failing (see comment in test)
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		final ValidationResult transactionValidationResult = validateBatch(transactions);
@@ -112,8 +116,6 @@ public class UnconfirmedTransactions {
 			return transactionValidationResult;
 		}
 
-		// TODO 20141104 J-B: addNew is still doing the db check validation because it is using the default validator (see comment above)
-		// TODO 20141105 BR -> J: changed it so that add() will never do a db check.
 		boolean success = false;
 		for(Transaction transaction : transactions) {
 			if (ValidationResult.SUCCESS == this.add(transaction, AddOptions.RejectNeutral, true)) {
@@ -121,7 +123,7 @@ public class UnconfirmedTransactions {
 			}
 		}
 
-		return true == success? ValidationResult.SUCCESS : ValidationResult.NEUTRAL;
+		return success ? ValidationResult.SUCCESS : ValidationResult.NEUTRAL;
 	}
 
 	/**
@@ -131,9 +133,10 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
-		// TODO 20141105 BR -> J: removed check for tx living too far in the future as we already checking that in the single validator.
 		final ValidationResult transactionValidationResult = validateBatch(Arrays.asList(transaction));
-		return transactionValidationResult.isSuccess()? this.add(transaction, AddOptions.RejectNeutral, true) : transactionValidationResult;
+		return transactionValidationResult.isSuccess()
+				? this.add(transaction, AddOptions.RejectNeutral, true)
+				: transactionValidationResult;
 	}
 
 	/**
@@ -193,6 +196,8 @@ public class UnconfirmedTransactions {
 				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
 	}
 
+	// TODO 20141106 J-B: any reason you're creating the validators lazily instead of in the constructor?
+	// > they are stateless so afaikt, this is only causing N validators of each type to be created instead of 1
 	private SingleTransactionValidator createSingleValidator() {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.poiFacade));
@@ -294,14 +299,11 @@ public class UnconfirmedTransactions {
 	 * @return The filtered list of transactions.
 	 */
 	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-		return new UnconfirmedTransactions(
+		return this.filter(
 				this.getAll().stream()
 						.filter(tx -> matchAddress(tx, address))
 						.collect(Collectors.toList()),
-				BalanceValidationOptions.ValidateAgainstUnconfirmedBalance,
-				this.timeProvider,
-				this.validatorFactory,
-				this.poiFacade);
+				BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
@@ -337,14 +339,11 @@ public class UnconfirmedTransactions {
 		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
 		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
 		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
-		return new UnconfirmedTransactions(
+		return this.filter(
 				this.getTransactionsBefore(blockTime).stream()
 						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
 						.collect(Collectors.toList()),
-				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
-				this.timeProvider,
-				this.validatorFactory,
-				this.poiFacade);
+				BalanceValidationOptions.ValidateAgainstConfirmedBalance);
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
