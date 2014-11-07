@@ -224,7 +224,6 @@ public class NisAppConfig {
 	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
-				this.timeProvider(),
 				this.transactionValidatorFactory(),
 				this.poiFacade());
 	}

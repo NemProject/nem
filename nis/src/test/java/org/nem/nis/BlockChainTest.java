@@ -158,7 +158,6 @@ public class BlockChainTest {
 				mockBlockDao,
 				services,
 				new UnconfirmedTransactions(
-						new SystemTimeProvider(),
 						transactionValidatorFactory,
 						poiFacade));
 
@@ -231,7 +230,6 @@ public class BlockChainTest {
 				mockBlockDao,
 				services,
 				new UnconfirmedTransactions(
-						new SystemTimeProvider(),
 						transactionValidatorFactory,
 						poiFacade));
 

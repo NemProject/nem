@@ -23,7 +23,6 @@ public class UnconfirmedTransactions {
 	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
 	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
-	private final TimeProvider timeProvider;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
 	private final PoiFacade poiFacade;
@@ -36,15 +35,12 @@ public class UnconfirmedTransactions {
 	/**
 	 * Creates a new unconfirmed transactions collection.
 	 *
-	 * @param timeProvider The time provider to use.
 	 * @param validatorFactory The transaction validator factory to use.
 	 * @param poiFacade The poi facade to use.
 	 */
 	public UnconfirmedTransactions(
-			final TimeProvider timeProvider,
 			final TransactionValidatorFactory validatorFactory,
 			final PoiFacade poiFacade) {
-		this.timeProvider = timeProvider;
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
 		this.singleValidator = createSingleValidator();
@@ -53,10 +49,8 @@ public class UnconfirmedTransactions {
 	private UnconfirmedTransactions(
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
-			final TimeProvider timeProvider,
 			final TransactionValidatorFactory validatorFactory,
 			final PoiFacade poiFacade) {
-		this.timeProvider = timeProvider;
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
 		this.singleValidator = createSingleValidator();
@@ -71,7 +65,6 @@ public class UnconfirmedTransactions {
 		return new UnconfirmedTransactions(
 				transactions,
 				options,
-				this.timeProvider,
 				this.validatorFactory,
 				this.poiFacade);
 	}
