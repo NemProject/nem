@@ -150,13 +150,17 @@ public class BlockChainTest {
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
+		// TODO 20141104 J-B: can't wait to refactor these tests ;)
 		final BlockChain blockChain = new BlockChain(
 				accountAnalyzer,
 				accountDao,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+				new UnconfirmedTransactions(
+						new SystemTimeProvider(),
+						transactionValidatorFactory,
+						poiFacade));
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
@@ -226,7 +230,10 @@ public class BlockChainTest {
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+				new UnconfirmedTransactions(
+						new SystemTimeProvider(),
+						transactionValidatorFactory,
+						poiFacade));
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
