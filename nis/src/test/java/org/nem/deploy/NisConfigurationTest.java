@@ -25,6 +25,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(true));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
+		Assert.assertThat(
+				config.getNonAuditedApiPaths(),
+				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height" }));
 	}
 
 	@Test
@@ -40,6 +43,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.useBinaryTransport", "false");
 		properties.setProperty("nis.useNetworkTime", "false");
 		properties.setProperty("nis.unlockedLimit", "123");
+		properties.setProperty("nis.nonAuditedApiPaths", "/status|/whatever");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -53,6 +57,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(false));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
+		Assert.assertThat(
+				config.getNonAuditedApiPaths(),
+				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
 	}
 
 	@Test
