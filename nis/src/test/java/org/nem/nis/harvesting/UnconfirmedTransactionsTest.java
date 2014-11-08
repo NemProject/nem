@@ -933,6 +933,10 @@ public class UnconfirmedTransactionsTest {
 	// TODO 20141107 BR -> J: the term ValidateAgainstConfirmedBalance is misleading, it means that the transaction is not executed during add().
 	// TODO                   There is no check against a confirmed balance.
 	// TODO                   So the above is valid and a harvester would create a block that doesn't pass processBlock().
+	// TODO 20141107 J-G: BR - when execute is true, i guess by "hang the network" you mean flood the network with bogus transactions?
+	// > BR - the confirmed balance check was moved into the single validator ...
+	// > look at these tests (1) transactionIsExcludedFromNextBlockIfConfirmedBalanceIsInsufficient
+	// > (2) getTransactionsForNewBlockExcludesConflictingTransactions (which would fail without it)
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:
@@ -943,11 +947,13 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(7));
-		transactions.addExisting(t1);
+		final ValidationResult result1 = transactions.addExisting(t1);
 		final Transaction t2 = createTransferTransaction(currentTime.addSeconds(-1), sender, recipient, Amount.fromNem(7));
-		transactions.addExisting(t2);
+		final ValidationResult result2 = transactions.addExisting(t2);
 
 		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
