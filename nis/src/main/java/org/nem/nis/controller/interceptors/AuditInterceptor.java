@@ -12,19 +12,20 @@ import java.util.logging.Logger;
  */
 public class AuditInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
-	// TODO 20141106 J-*: i was wondering if we should read this list from the config.properties file so it is easy to turn things off
-	// > unless there is a better way to configure Java logging files
-	// TODO 20141107 BR: I agree standalone users would be happy
-	private static final List<String> IGNORED_API_PATHS = Arrays.asList("/heartbeat", "/status", "/chain/height");
 
+	private final List<String> ignoredApiPaths;
 	private final AuditCollection auditCollection;
 
 	/**
 	 * Creates a new audit interceptor.
 	 *
+	 * @param ignoredApiPaths The api paths to ignore.
 	 * @param auditCollection The audit collection.
 	 */
-	public AuditInterceptor(final AuditCollection auditCollection) {
+	public AuditInterceptor(
+			final List<String> ignoredApiPaths,
+			final AuditCollection auditCollection) {
+		this.ignoredApiPaths = ignoredApiPaths;
 		this.auditCollection = auditCollection;
 	}
 
@@ -59,7 +60,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 		LOGGER.info(String.format("exiting %s [%s]", entry.path, entry.host));
 	}
 
-	private static class AuditEntry {
+	private class AuditEntry {
 		private final String host;
 		private final String path;
 
@@ -69,7 +70,7 @@ public class AuditInterceptor extends HandlerInterceptorAdapter {
 		}
 
 		private boolean shouldIgnore() {
-			return IGNORED_API_PATHS.stream().anyMatch(this.path::equalsIgnoreCase);
+			return AuditInterceptor.this.ignoredApiPaths.stream().anyMatch(this.path::equalsIgnoreCase);
 		}
 	}
 }
