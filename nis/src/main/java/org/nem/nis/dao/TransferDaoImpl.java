@@ -167,6 +167,11 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		// TODO 20141107 J-B: was something wrong with what buildAddressQuery was doing when transfer type was ALL?
+		// TODO 20141108 BR -> J: I noticed that the /transaction/all request that NCC makes for th GUI was terrible slow (needed up to 3 seconds).
+		// TODO                   The reason was the SQL query that hibernate created which was far from being optimal. I would have preferred a SQL query
+		// TODO                   using UNION keyword. But hibernate doesn't support unions even if I explicitly give hibernate a query string using UNION.
+		// TODO                   So I ended up doing two queries and building the union/doing sorting "manually". It is still more than ten times
+		// TODO                   faster then the original query hibernate creates.
 		if (TransferType.ALL == transferType) {
 			final Collection<Object[]> objects = this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.INCOMING);
 			objects.addAll(this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.OUTGOING));

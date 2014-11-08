@@ -1,12 +1,12 @@
 package org.nem.nis.harvesting;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
@@ -98,6 +98,8 @@ public class UnconfirmedTransactionsTest {
 		// > however, this is moot since we aren't actually checking the result :)
 		// TODO 20141107 BR -> J: Not moot, just a question if an attack vector is possible, see comments in UnconfirmedTransactions class.
 		// TODO 20141107 J-B: well, moot now because BlockChain is not checking the result ;)
+		// TODO 20141108 BR -> J: even if we don't check the result, failing on the first invalid transaction is faster than checking
+		// // TODO                10k invalid transactions that an attacker sends. That's why I was asking about the attack scenario.
 
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -937,6 +939,12 @@ public class UnconfirmedTransactionsTest {
 	// > BR - the confirmed balance check was moved into the single validator ...
 	// > look at these tests (1) transactionIsExcludedFromNextBlockIfConfirmedBalanceIsInsufficient
 	// > (2) getTransactionsForNewBlockExcludesConflictingTransactions (which would fail without it)
+	// TODO 20141108 BR -> J: you are right, the conflicting transactions would be excluded when generating a block.
+	// TODO                   But I finally remember why we have this check:
+	// TODO                   A user (I think it was VicVegas) complained that if the GUI shows a balance of 1k NEM he can initiate many
+	// TODO                   transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
+	// TODO                   can spend more than he has. Furthermore, a new block included one of the transactions leaving the
+	// TODO                   the other transaction still being displayed as unconfirmed in the GUI forever (until deadline was exceeded).
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:
