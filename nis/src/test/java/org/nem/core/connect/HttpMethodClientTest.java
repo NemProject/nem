@@ -50,9 +50,15 @@ public class HttpMethodClientTest {
 	}
 
 	@Test(expected = InactivePeerException.class)
-	public void getThrowsInactivePeerExceptionOnTimeout() {
+	public void getThrowsInactivePeerExceptionOnConnectionTimeout() {
 		// Assert:
-		this.getTestRunner.sendThrowsInactivePeerExceptionOnTimeout();
+		this.getTestRunner.sendThrowsInactivePeerExceptionOnConnectionTimeout();
+	}
+
+	@Test(expected = InactivePeerException.class)
+	public void getThrowsInactivePeerExceptionOnSocketTimeout() {
+		// Assert:
+		this.getTestRunner.sendThrowsInactivePeerExceptionOnSocketTimeout();
 	}
 
 	@Test(expected = CancellationException.class)
@@ -102,9 +108,15 @@ public class HttpMethodClientTest {
 	}
 
 	@Test(expected = InactivePeerException.class)
-	public void postThrowsInactivePeerExceptionOnTimeout() {
+	public void postThrowsInactivePeerExceptionOnConnectionTimeout() {
 		// Assert:
-		this.postTestRunner.sendThrowsInactivePeerExceptionOnTimeout();
+		this.postTestRunner.sendThrowsInactivePeerExceptionOnConnectionTimeout();
+	}
+
+	@Test(expected = InactivePeerException.class)
+	public void postThrowsInactivePeerExceptionOnSocketTimeout() {
+		// Assert:
+		this.postTestRunner.sendThrowsInactivePeerExceptionOnSocketTimeout();
 	}
 
 	@Test(expected = CancellationException.class)
@@ -199,7 +211,15 @@ public class HttpMethodClientTest {
 			Assert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
 		}
 
-		public void sendThrowsInactivePeerExceptionOnTimeout() {
+		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
+			// Arrange:
+			final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(1, GOOD_TIMEOUT, GOOD_TIMEOUT);
+
+			// Act:
+			this.strategy.send(client, this.stringToUrl("http://10.0.0.1:9999"), DEFAULT_STRATEGY).get();
+		}
+
+		public void sendThrowsInactivePeerExceptionOnSocketTimeout() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = createClient(1);
 

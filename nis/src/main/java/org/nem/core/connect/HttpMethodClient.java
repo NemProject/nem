@@ -196,7 +196,7 @@ public class HttpMethodClient<T> {
 
 		@Override
 		public void failed(final Exception e) {
-			final Exception wrappedException = SocketTimeoutException.class == e.getClass()
+			final Exception wrappedException = SocketTimeoutException.class == e.getClass() || ConnectException.class == e.getClass()
 					? new InactivePeerException(e)
 					: new FatalPeerException(e);
 			this.future.completeExceptionally(wrappedException);
