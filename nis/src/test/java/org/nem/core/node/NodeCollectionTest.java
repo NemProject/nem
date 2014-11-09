@@ -562,7 +562,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 
 		// Assert:
 		assertMultipleNodesCollection(nodes);
@@ -574,8 +574,8 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
-		nodes.pruneInactiveNodes(); // removed: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // removed: { I1, F1, F2 }
 
 		// Assert:
 		assertMultipleNodesCollectionAfterPruning(nodes);
@@ -587,9 +587,9 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
-		nodes.pruneInactiveNodes(); // removed: { I1, F2 }
+		nodes.prune(); // removed: { I1, F2 }
 
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
@@ -606,9 +606,9 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.BUSY);
-		nodes.pruneInactiveNodes(); // removed: { I1, F2 }
+		nodes.prune(); // removed: { I1, F2 }
 
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
@@ -625,9 +625,9 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
-		nodes.pruneInactiveNodes(); // removed: { I1, F1 F2 }
+		nodes.prune(); // removed: { I1, F1 F2 }
 
 		// Assert:
 		assertMultipleNodesCollectionAfterPruning(nodes);
@@ -639,9 +639,9 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
-		nodes.pruneInactiveNodes(); // removed: { I1, F1, F2 }
+		nodes.prune(); // removed: { I1, F1, F2 }
 
 		// Assert:
 		assertMultipleNodesCollectionAfterPruning(nodes);
@@ -653,10 +653,10 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
 		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
-		nodes.pruneInactiveNodes(); // removed: { I1, F2 }
+		nodes.prune(); // removed: { I1, F2 }
 
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
@@ -673,10 +673,10 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.BUSY);
 		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
-		nodes.pruneInactiveNodes(); // removed: { F1, F2 }
+		nodes.prune(); // removed: { F1, F2 }
 
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
@@ -693,13 +693,13 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.pruneInactiveNodes(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { I1, F1, F2 }
 		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.ACTIVE);
 		nodes.update(PeerUtils.createNodeWithName("F2"), NodeStatus.BUSY);
-		nodes.pruneInactiveNodes(); // candidate: { F1 }
+		nodes.prune(); // candidate: { F1 }
 		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.INACTIVE);
 		nodes.update(PeerUtils.createNodeWithName("F2"), NodeStatus.FAILURE);
-		nodes.pruneInactiveNodes(); // candidate: { I1, F2 }, pruned: { F1 }
+		nodes.prune(); // candidate: { I1, F2 }, pruned: { F1 }
 
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(7));

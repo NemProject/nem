@@ -198,10 +198,8 @@ public class NodeCollection implements SerializableEntity {
 	/**
 	 * Takes a snapshot of all inactive nodes and drops the inactive nodes
 	 * that have stayed inactive since the last time this function was called.
-	 *
-	 * TODO: rename to prune
 	 */
-	public void pruneInactiveNodes() {
+	public void prune() {
 		this.pruneCandidates.stream()
 				.filter(node -> this.isNodeBlacklisted(node))
 				.forEach(node -> this.update(node, NodeStatus.UNKNOWN));

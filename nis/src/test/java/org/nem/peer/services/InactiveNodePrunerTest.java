@@ -19,7 +19,7 @@ public class InactiveNodePrunerTest {
 		pruner.prune(nodes);
 
 		// Assert:
-		Mockito.verify(nodes, Mockito.times(1)).pruneInactiveNodes();
+		Mockito.verify(nodes, Mockito.times(1)).prune();
 	}
 
 	@Test
