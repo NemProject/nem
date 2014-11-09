@@ -70,7 +70,7 @@ public class AsyncTimerTest {
 		// Arrange:
 		final CountableFuture cf = new CountableFuture();
 		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { TimeUnit, 2 * TimeUnit, TimeUnit, 2 * TimeUnit });
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, strategy, null)) {
+		try (final AsyncTimer timer = createTimer(cf.getFutureSupplier(), TimeUnit, strategy, null)) {
 			// Arrange: (should fire at 1, 2, 4, 5)
 			Thread.sleep(6 * TimeUnit);
 
@@ -110,7 +110,7 @@ public class AsyncTimerTest {
 		final CountableFuture cf = new CountableFuture();
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
 		final AbstractDelayStrategy strategy = new UniformDelayStrategy(2 * TimeUnit, 1);
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeUnit, strategy, visitor)) {
+		try (final AsyncTimer timer = createTimer(cf.getFutureSupplier(), TimeUnit, strategy, visitor)) {
 			// Arrange:
 			Thread.sleep(3 * TimeHalfUnit);
 
@@ -172,6 +172,49 @@ public class AsyncTimerTest {
 			}
 		}
 	}
+
+	//region getFirstFireFuture
+
+	@Test
+	public void firstFireFutureIsSetAfterFirstSuccessfulCompletion() throws InterruptedException {
+		// Arrange:
+		final CountableFuture cf = new CountableFuture();
+
+		// Assert:
+		assertFirstFireFutureIsSet(cf);
+	}
+
+	@Test
+	public void firstFireFutureIsSetAfterFirstExceptionalCompletion() throws InterruptedException {
+		// Arrange:
+		final CountableFuture cf = new CountableFuture(() -> () -> {
+			throw new RuntimeException("this shouldn't stop the timer");
+		});
+
+		// Assert:
+		assertFirstFireFutureIsSet(cf);
+	}
+
+	private static void assertFirstFireFutureIsSet(final CountableFuture cf) throws InterruptedException {
+		try (final AsyncTimer timer = createTimer(cf, TimeUnit, 2 * TimeUnit)) {
+			// Assert: initially unset
+			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(false));
+
+			// Arrange: (should fire at 1)
+			Thread.sleep(2 * TimeUnit);
+
+			// Assert: the future should be set after the initial fire
+			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
+
+			// Arrange: (should fire at 3)
+			Thread.sleep(2 * TimeUnit);
+
+			// Assert: the future should be set after subsequent fires
+			Assert.assertThat(timer.getFirstFireFuture().isDone(), IsEqual.equalTo(true));
+		}
+	}
+
+	//endregion
 
 	//region visitor
 
@@ -236,7 +279,7 @@ public class AsyncTimerTest {
 		final AsyncTimerVisitor visitor = Mockito.mock(AsyncTimerVisitor.class);
 
 		final MockDelayStrategy strategy = new MockDelayStrategy(new int[] { 2 * TimeUnit, 3 * TimeHalfUnit, TimeUnit });
-		try (final AsyncTimer timer = new AsyncTimer(cf.getFutureSupplier(), TimeHalfUnit, strategy, visitor)) {
+		try (final AsyncTimer ignored = createTimer(cf.getFutureSupplier(), TimeHalfUnit, strategy, visitor)) {
 			// Arrange: (should fire at 0.5, 2.5, 4.0, 5.0)
 			Thread.sleep(6 * TimeUnit);
 
@@ -281,7 +324,27 @@ public class AsyncTimerTest {
 			final int initialDelay,
 			final int delay,
 			final AsyncTimerVisitor visitor) {
-		return new AsyncTimer(cf.getFutureSupplier(), initialDelay, new UniformDelayStrategy(delay), visitor);
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
+				.setRecurringFutureSupplier(cf.getFutureSupplier())
+				.setInitialDelay(initialDelay)
+				.setDelayStrategy(new UniformDelayStrategy(delay))
+				.setVisitor(visitor)
+				.create();
+		return new AsyncTimer(options);
+	}
+
+	private static AsyncTimer createTimer(
+			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
+			final int initialDelay,
+			final AbstractDelayStrategy delay,
+			final AsyncTimerVisitor visitor) {
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
+				.setRecurringFutureSupplier(recurringFutureSupplier)
+				.setInitialDelay(initialDelay)
+				.setDelayStrategy(delay)
+				.setVisitor(visitor)
+				.create();
+		return new AsyncTimer(options);
 	}
 
 	private static AsyncTimer createTimerAfter(
@@ -289,7 +352,13 @@ public class AsyncTimerTest {
 			final CountableFuture cf,
 			final int delay,
 			final AsyncTimerVisitor visitor) {
-		return AsyncTimer.After(triggerTimer, cf.getFutureSupplier(), new UniformDelayStrategy(delay), visitor);
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
+				.setRecurringFutureSupplier(cf.getFutureSupplier())
+				.setTrigger(triggerTimer.getFirstFireFuture())
+				.setDelayStrategy(new UniformDelayStrategy(delay))
+				.setVisitor(visitor)
+				.create();
+		return new AsyncTimer(options);
 	}
 
 	private static class CountableFuture {
