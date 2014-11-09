@@ -152,14 +152,14 @@ public class BlockChainTest {
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
-				new SystemTimeProvider(),
-				transactionValidatorFactory.create(poiFacade));
+				transactionValidatorFactory,
+				poiFacade);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
 						accountAnalyzer,
@@ -236,14 +236,14 @@ public class BlockChainTest {
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
-				new SystemTimeProvider(),
-				transactionValidatorFactory.create(poiFacade));
+				transactionValidatorFactory,
+				poiFacade);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(new SystemTimeProvider(), transactionValidatorFactory.create(poiFacade)));
+				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
 						accountAnalyzer,
