@@ -177,6 +177,11 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public BatchTransactionValidator batchTransactionValidator() {
+		return this.transactionValidatorFactory().createBatch(this.poiFacade());
+	}
+
+	@Bean
 	public Harvester harvester() {
 		final PoiFacade poiFacade = this.poiFacade();
 		final BlockGenerator generator = new BlockGenerator(
@@ -236,7 +241,9 @@ public class NisAppConfig {
 
 	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
-		return new UnconfirmedTransactions(this.timeProvider(), this.transactionValidator());
+		return new UnconfirmedTransactions(
+				this.transactionValidatorFactory(),
+				this.poiFacade());
 	}
 
 	@Bean
