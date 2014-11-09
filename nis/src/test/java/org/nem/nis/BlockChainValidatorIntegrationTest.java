@@ -97,6 +97,35 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	@Test
+	public void chainWithInvalidImportanceTransferIsInvalid() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(12345));
+		final Account account2 = Utils.generateRandomAccount();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		final Transaction transaction1 = new TransferTransaction(new TimeInstant(100), account1, account2, new Amount(7), null);
+		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
+		transaction1.sign();
+		middleBlock.addTransaction(transaction1);
+		final Transaction transaction2 = new ImportanceTransferTransaction(new TimeInstant(150), account1,
+		                                                                   ImportanceTransferTransaction.Mode.Activate, account2);
+		transaction2.setDeadline(transaction2.getTimeStamp().addHours(1));
+		transaction2.sign();
+		middleBlock.addTransaction(transaction2);
+		middleBlock.sign();
+
+		// Assert:
+		final boolean result = validator.isValid(parentBlock, blocks);
+		Assert.assertThat(result, IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void chainIsInvalidIfTransactionAlreadyExistInDb() {
 		// Arrange:
 		final long confirmedBlockHeight = 10;
