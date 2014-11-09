@@ -49,11 +49,11 @@ public class BlockChainValidatorIntegrationTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createInvalidSignedTransaction());
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
+		final Block block = blocks.get(1);
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(createInvalidSignedTransaction());
+		block.addTransaction(createValidSignedTransaction());
+		block.sign();
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
@@ -67,11 +67,11 @@ public class BlockChainValidatorIntegrationTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createSignedFutureTransaction());
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
+		final Block block = blocks.get(1);
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(createSignedFutureTransaction());
+		block.addTransaction(createValidSignedTransaction());
+		block.sign();
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
@@ -85,11 +85,11 @@ public class BlockChainValidatorIntegrationTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
+		final Block block = blocks.get(1);
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(createValidSignedTransaction());
+		block.sign();
 
 		// Assert:
 		final boolean result = validator.isValid(parentBlock, blocks);
@@ -110,17 +110,17 @@ public class BlockChainValidatorIntegrationTest {
 		final Account account2 = Utils.generateRandomAccount();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
+		final Block block = blocks.get(1);
 		final Transaction transaction1 = new TransferTransaction(new TimeInstant(100), account1, account2, new Amount(7), null);
 		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
 		transaction1.sign();
-		middleBlock.addTransaction(transaction1);
+		block.addTransaction(transaction1);
 		final Transaction transaction2 = new ImportanceTransferTransaction(new TimeInstant(150), account1,
 		                                                                   ImportanceTransferTransaction.Mode.Activate, account2);
 		transaction2.setDeadline(transaction2.getTimeStamp().addHours(1));
 		transaction2.sign();
-		middleBlock.addTransaction(transaction2);
-		middleBlock.sign();
+		block.addTransaction(transaction2);
+		block.sign();
 
 		// Assert:
 		final boolean result = validator.isValid(parentBlock, blocks);
@@ -140,9 +140,9 @@ public class BlockChainValidatorIntegrationTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(transaction);
-		middleBlock.sign();
+		final Block block = blocks.get(1);
+		block.addTransaction(transaction);
+		block.sign();
 
 		// Assert:
 		final boolean valid = validator.isValid(parentBlock, blocks);
@@ -157,11 +157,11 @@ public class BlockChainValidatorIntegrationTest {
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.addTransaction(createSignedTransactionWithGivenSender(middleBlock.getSigner()));
-		middleBlock.addTransaction(createValidSignedTransaction());
-		middleBlock.sign();
+		final Block block = blocks.get(1);
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(createSignedTransactionWithGivenSender(block.getSigner()));
+		block.addTransaction(createValidSignedTransaction());
+		block.sign();
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
