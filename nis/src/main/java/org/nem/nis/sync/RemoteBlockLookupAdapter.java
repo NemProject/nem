@@ -12,8 +12,6 @@ import java.util.logging.Logger;
  * A BlockLookup implementation that looks up blocks from a remote node.
  */
 public class RemoteBlockLookupAdapter implements BlockLookup {
-	private static final Logger LOGGER = Logger.getLogger(RemoteBlockLookupAdapter.class.getName());
-
 	private final SyncConnector connector;
 	private final Node remoteNode;
 
