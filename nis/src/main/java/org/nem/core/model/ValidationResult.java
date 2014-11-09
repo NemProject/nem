@@ -90,7 +90,9 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a block contained a self-signed transaction.
 	 */
-	FAILURE_SELF_SIGNED_TRANSACTION(16);
+	FAILURE_SELF_SIGNED_TRANSACTION(16),
+
+	FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY(17);
 
 	private final int value;
 

@@ -59,6 +59,10 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 				}
 
+				if (transaction.getRemote().getBalance().compareTo(Amount.ZERO) != 0) {
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY;
+				}
+
 				// if a remote is already activated, it needs to be deactivated first
 				return !isRemoteActivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_UNUSABLE;
 

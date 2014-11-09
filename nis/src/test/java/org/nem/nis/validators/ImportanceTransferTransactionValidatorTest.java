@@ -59,6 +59,24 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//endregion
 
+
+	//region recipient balance
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		((ImportanceTransferTransaction)transaction).getRemote().incrementBalance(Amount.fromNem(1));
+
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY));
+	}
+	//endregion
+
+
 	//region one day after opposite link
 
 	@Test
