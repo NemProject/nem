@@ -13,19 +13,19 @@ import java.util.stream.Collectors;
 public class NodeCollectionAssert {
 
 	/**
-	 * Asserts that nodes have matching active and inactive names.
+	 * Asserts that nodes have matching active and busy names.
 	 *
 	 * @param nodes The nodes.
 	 * @param expectedActiveNames The expected active names.
-	 * @param expectedInactiveNames The expected inactive names.
+	 * @param expectedBusyNames The expected busy names.
 	 */
 	public static void areNamesEquivalent(
 			final NodeCollection nodes,
 			final String[] expectedActiveNames,
-			final String[] expectedInactiveNames) {
+			final String[] expectedBusyNames) {
 		// Assert:
 		Assert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
-		Assert.assertThat(getNames(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveNames));
+		Assert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
 	}
 
 	private static List<String> getNames(final Collection<Node> nodes) {

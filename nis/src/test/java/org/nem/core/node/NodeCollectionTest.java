@@ -21,7 +21,7 @@ public class NodeCollectionTest {
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(0));
+		Assert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(0));
 		for (final NodeStatus status : NodeStatus.values()) {
 			Assert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(0));
@@ -69,7 +69,7 @@ public class NodeCollectionTest {
 		final boolean isActiveOrBusy = NodeStatus.ACTIVE == expectedStatus || NodeStatus.BUSY == expectedStatus;
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(1));
 		Assert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(NodeStatus.ACTIVE == expectedStatus ? 1 : 0));
-		Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(NodeStatus.BUSY == expectedStatus ? 1 : 0));
+		Assert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(NodeStatus.BUSY == expectedStatus ? 1 : 0));
 		Assert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(isActiveOrBusy ? 1 : 0));
 		for (final NodeStatus status : NodeStatus.values()) {
 			Assert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(status == expectedStatus ? 1 : 0));
@@ -87,7 +87,7 @@ public class NodeCollectionTest {
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getActiveNodes().size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getInactiveNodes().size(), IsEqual.equalTo(0));
+		Assert.assertThat(nodes.getBusyNodes().size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getAllNodes().size(), IsEqual.equalTo(0));
 		for (final NodeStatus status : NodeStatus.values()) {
 			Assert.assertThat(nodes.getNodes(status).size(), IsEqual.equalTo(0));
@@ -125,7 +125,7 @@ public class NodeCollectionTest {
 
 		// Assert:
 		final Collection<Node> expectedNodes = Arrays.asList(node);
-		Assert.assertThat(nodes.getInactiveNodes(), IsEquivalent.equivalentTo(expectedNodes));
+		Assert.assertThat(nodes.getBusyNodes(), IsEquivalent.equivalentTo(expectedNodes));
 		Assert.assertThat(nodes.getAllNodes(), IsEquivalent.equivalentTo(expectedNodes));
 		Assert.assertThat(nodes.getNodes(NodeStatus.BUSY), IsEquivalent.equivalentTo(expectedNodes));
 	}
@@ -542,7 +542,7 @@ public class NodeCollectionTest {
 	public void getInactiveNodesIsConcurrencySafe() {
 		// Arrange: partially iterate the set
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
-		final Iterator<Node> it = nodes.getInactiveNodes().iterator();
+		final Iterator<Node> it = nodes.getBusyNodes().iterator();
 		it.next();
 
 		// Act: update the set and resume the iteration

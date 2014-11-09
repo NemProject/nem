@@ -60,23 +60,22 @@ public class NodeCollection implements SerializableEntity {
 
 	/**
 	 * Gets all busy nodes.
-	 * TODO 20131109: rename this function
 	 *
 	 * @return A collection of busy nodes.
 	 */
-	public Collection<Node> getInactiveNodes() {
+	public Collection<Node> getBusyNodes() {
 		return this.statusNodesMap.get(NodeStatus.BUSY);
 	}
 
 	/**
-	 * Gets a collection of all nodes (both active and inactive).
+	 * Gets a collection of all non-blacklisted nodes.
 	 *
-	 * @return A collection of all nodes.
+	 * @return A collection of all non-blacklisted nodes.
 	 */
 	public Collection<Node> getAllNodes() {
 		final List<Node> allNodes = new ArrayList<>();
 		allNodes.addAll(this.getActiveNodes());
-		allNodes.addAll(this.getInactiveNodes());
+		allNodes.addAll(this.getBusyNodes());
 		return allNodes;
 	}
 

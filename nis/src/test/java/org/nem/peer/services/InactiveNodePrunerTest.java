@@ -28,7 +28,7 @@ public class InactiveNodePrunerTest {
 		// Arrange:
 		final InactiveNodePruner pruner = new InactiveNodePruner();
 		final NodeCollection nodes = Mockito.mock(NodeCollection.class);
-		Mockito.when(nodes.getInactiveNodes()).thenReturn(createNodeListWithSize(17), createNodeListWithSize(9));
+		Mockito.when(nodes.getBusyNodes()).thenReturn(createNodeListWithSize(17), createNodeListWithSize(9));
 
 		// Act:
 		final int result = pruner.prune(nodes);
