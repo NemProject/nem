@@ -13,6 +13,7 @@ import org.nem.peer.test.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 public class NodeRefresherTest {
 	private static final int DEFAULT_SLEEP = 300;
@@ -51,7 +52,7 @@ public class NodeRefresherTest {
 	}
 
 	@Test
-	public void refreshGetInfoTransientFailureMovesNodesToInactive() {
+	public void refreshGetInfoTransientFailureMovesNodesToBusy() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.setBusyGetInfoForNode("b");
@@ -66,23 +67,20 @@ public class NodeRefresherTest {
 
 	@Test
 	public void refreshGetInfoInactiveFailureRemovesNodesFromBothLists() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.setInactiveGetInfoForNode("b");
-
-		// Act:
-		context.refresher.refresh(context.refreshNodes).join();
-
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { });
-		Mockito.verify(context.connector, Mockito.never()).getKnownPeers(context.refreshNodes.get(1));
+		assertGetInfoFailureRemovesNodesFromBothLists((context, name) -> context.setInactiveGetInfoForNode(name));
 	}
 
 	@Test
 	public void refreshGetInfoFatalFailureRemovesNodesFromBothLists() {
+		// Assert:
+		assertGetInfoFailureRemovesNodesFromBothLists((context, name) -> context.setFatalGetInfoForNode(name));
+	}
+
+	private static void assertGetInfoFailureRemovesNodesFromBothLists(final BiConsumer<TestContext, String> setError) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.setFatalGetInfoForNode("b");
+		setError.accept(context, "b");
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -191,7 +189,7 @@ public class NodeRefresherTest {
 	//region getKnownPeers transitions / short-circuiting
 
 	@Test
-	public void refreshGetKnownPeersInfoTransientFailureMovesNodesToInactive() {
+	public void refreshGetKnownPeersInfoTransientFailureMovesNodesToBusy() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getKnownPeers(context.refreshNodes.get(1)))
@@ -229,7 +227,6 @@ public class NodeRefresherTest {
 
 		// Assert:
 		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "c" }, new String[] { });
-
 	}
 
 	//endregion
@@ -344,24 +341,30 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		Mockito.verify(context.connector, Mockito.times(2)).getKnownPeers(Mockito.any());
-		Mockito.verify(context.connector, Mockito.times(6)).getInfo(Mockito.any());
+		Mockito.verify(context.connector, Mockito.times(2)).getKnownPeers(Mockito.any()); // a c
+		Mockito.verify(context.connector, Mockito.times(6)).getInfo(Mockito.any()); // a b c d e f
 	}
 
 	@Test
 	public void refreshGetInfoIsBypassedForBlacklistedNodes() {
-		// Arrange:
+		// Arrange: blacklist a and c
 		final TestContext context = new TestContext();
 		context.nodes.update(PeerUtils.createNodeWithName("a"), NodeStatus.FAILURE);
 		context.nodes.update(PeerUtils.createNodeWithName("c"), NodeStatus.INACTIVE);
+		context.nodes.update(PeerUtils.createNodeWithName("d"), NodeStatus.FAILURE);
+		context.nodes.update(PeerUtils.createNodeWithName("f"), NodeStatus.INACTIVE);
+
+		// Arrange: set up a node peers list that indicates peer d-f are active
+		// but the local node can only communicate with e
+		context.setKnownPeers(PeerUtils.createNodesWithNames("d", "e", "f"));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
-		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "b" }, new String[] { });
-		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(Mockito.any());
-		Mockito.verify(context.connector, Mockito.times(1)).getInfo(Mockito.any());
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "b", "e" }, new String[] { });
+		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(Mockito.any()); // b
+		Mockito.verify(context.connector, Mockito.times(2)).getInfo(Mockito.any()); // b, e
 	}
 
 	//endregion

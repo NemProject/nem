@@ -10,7 +10,7 @@ public enum NodeStatus {
 	ACTIVE,
 
 	/**
-	 * The node is active and the last request failed due to a busy signal.
+	 * The node is active but the last request failed due to a busy signal.
 	 */
 	BUSY,
 
