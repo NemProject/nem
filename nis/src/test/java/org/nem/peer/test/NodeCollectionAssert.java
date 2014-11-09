@@ -50,23 +50,6 @@ public class NodeCollectionAssert {
 		Assert.assertThat(getPorts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePorts));
 	}
 
-	/**
-	 * Asserts that nodes have matching ports.
-	 *
-	 * @param nodes The nodes.
-	 * @param expectedPorts The expected ports.
-	 */
-	public static void arePortsEquivalent(
-			final Node[] nodes,
-			final Integer[] expectedPorts) {
-		// Arrange:
-		final List<Node> nodesList = new ArrayList<>();
-		Collections.addAll(nodesList, nodes);
-
-		// Assert:
-		Assert.assertThat(getPorts(nodesList), IsEquivalent.equivalentTo(expectedPorts));
-	}
-
 	private static List<Integer> getPorts(final Collection<Node> nodes) {
 		return nodes.stream().map(node -> node.getEndpoint().getBaseUrl().getPort()).collect(Collectors.toList());
 	}

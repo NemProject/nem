@@ -46,9 +46,20 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("D")), IsEqual.equalTo(NodeStatus.ACTIVE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("F")), IsEqual.equalTo(NodeStatus.ACTIVE));
+		for (final String id : Arrays.asList("A", "D", "F")) {
+			Assert.assertThat(nodes.getNodeStatus(createNode(id)), IsEqual.equalTo(NodeStatus.ACTIVE));
+		}
+	}
+
+	@Test
+	public void getNodeStatusReturnsCorrectStatusForBusyNodes() {
+		// Act:
+		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+		// Assert:
+		for (final String id : Arrays.asList("B", "C")) {
+			Assert.assertThat(nodes.getNodeStatus(createNode(id)), IsEqual.equalTo(NodeStatus.BUSY));
+		}
 	}
 
 	@Test
@@ -57,8 +68,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("G")), IsEqual.equalTo(NodeStatus.INACTIVE));
 	}
 
 	@Test
@@ -68,7 +78,15 @@ public class NodeCollectionTest {
 
 		// Assert:
 		Assert.assertThat(nodes.getNodeStatus(createNode("E")), IsEqual.equalTo(NodeStatus.FAILURE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("G")), IsEqual.equalTo(NodeStatus.FAILURE));
+	}
+
+	@Test
+	public void getNodeStatusReturnsCorrectStatusForNodesWithoutAnyInteraction() {
+		// Act:
+		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(createNode("H")), IsEqual.equalTo(NodeStatus.UNKNOWN));
 	}
 
 	//endregion
@@ -94,32 +112,51 @@ public class NodeCollectionTest {
 	@Test
 	public void updateCanAddNewActiveNode() {
 		// Arrange:
+		final Node node = createNode("A");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
-		nodes.update(createNode("A"), NodeStatus.ACTIVE);
+		nodes.update(node, NodeStatus.ACTIVE);
 
 		// Assert:
 		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { "A" }, new String[] { });
 		NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[] { (int)'A' }, new Integer[] { });
+		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.ACTIVE));
 	}
 
 	@Test
-	public void updateCanAddNewInactiveNode() {
+	public void updateCanAddNewBusyNode() {
 		// Arrange:
+		final Node node = createNode("A");
+		final NodeCollection nodes = new NodeCollection();
+
+		// Act:
+		nodes.update(createNode("A"), NodeStatus.BUSY);
+
+		// Assert:
+		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { }, new String[] { "A" });
+		NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[] { }, new Integer[] { (int)'A' });
+		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.BUSY));
+	}
+
+	@Test
+	public void updateDoesNotAddNewInactiveNode() {
+		// Arrange:
+		final Node node = createNode("A");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
 		nodes.update(createNode("A"), NodeStatus.INACTIVE);
 
 		// Assert:
-		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { }, new String[] { "A" });
-		NodeCollectionAssert.arePortsEquivalent(nodes, new Integer[] { }, new Integer[] { (int)'A' });
+		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { }, new String[] { });
+		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.INACTIVE));
 	}
 
 	@Test
 	public void updateDoesNotAddNewFailureNode() {
 		// Arrange:
+		final Node node = createNode("A");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
@@ -127,6 +164,7 @@ public class NodeCollectionTest {
 
 		// Assert:
 		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { }, new String[] { });
+		Assert.assertThat(nodes.getNodeStatus(node), IsEqual.equalTo(NodeStatus.FAILURE));
 	}
 
 	@Test
@@ -150,7 +188,7 @@ public class NodeCollectionTest {
 		nodes.update(createNode("A"), NodeStatus.ACTIVE);
 
 		// Act:
-		nodes.update(createNode("B", 'A'), NodeStatus.INACTIVE);
+		nodes.update(createNode("B", 'A'), NodeStatus.BUSY);
 
 		// Assert:
 		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { }, new String[] { "B" });
@@ -161,7 +199,7 @@ public class NodeCollectionTest {
 	public void updateCanUpdateInactiveNodeAsActiveNode() {
 		// Arrange:
 		final NodeCollection nodes = new NodeCollection();
-		nodes.update(createNode("A"), NodeStatus.INACTIVE);
+		nodes.update(createNode("A"), NodeStatus.BUSY);
 
 		// Act:
 		nodes.update(createNode("B", 'A'), NodeStatus.ACTIVE);
@@ -175,10 +213,10 @@ public class NodeCollectionTest {
 	public void updateCanUpdateInactiveNode() {
 		// Arrange:
 		final NodeCollection nodes = new NodeCollection();
-		nodes.update(createNode("A"), NodeStatus.INACTIVE);
+		nodes.update(createNode("A"), NodeStatus.BUSY);
 
 		// Act:
-		nodes.update(createNode("B", 'A'), NodeStatus.INACTIVE);
+		nodes.update(createNode("B", 'A'), NodeStatus.BUSY);
 
 		// Assert:
 		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { }, new String[] { "B" });
@@ -191,7 +229,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.update(createNode("Z", 'D'), NodeStatus.INACTIVE);
+		nodes.update(createNode("Z", 'D'), NodeStatus.BUSY);
 
 		// Assert:
 		NodeCollectionAssert.arePlatformsEquivalent(nodes, new String[] { "A", "F" }, new String[] { "B", "C", "Z" });
@@ -250,7 +288,7 @@ public class NodeCollectionTest {
 		it.next();
 
 		// Act: update the set and resume the iteration
-		nodes.update(createNode("Z"), NodeStatus.INACTIVE);
+		nodes.update(createNode("Z"), NodeStatus.BUSY);
 		it.next();
 
 		// Assert: no ConcurrentModificationException is thrown
@@ -287,7 +325,7 @@ public class NodeCollectionTest {
 	}
 
 	@Test
-	public void findNodeByEndpointReturnsInactiveNodeMatchingEndpoint() {
+	public void findNodeByEndpointReturnsBusyNodeMatchingEndpoint() {
 		// Arrange:
 		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
 
@@ -323,7 +361,7 @@ public class NodeCollectionTest {
 	}
 
 	@Test
-	public void findNodeByIdentityReturnsInactiveNodeMatchingEndpoint() {
+	public void findNodeByIdentityReturnsBusyNodeMatchingEndpoint() {
 		// Arrange:
 		final NodeCollection nodes = createNodeCollectionForFindNodeByEndpointTests();
 
@@ -352,9 +390,9 @@ public class NodeCollectionTest {
 		nodes.update(createNode("A", "37.128.23.2", 7890), NodeStatus.ACTIVE);
 		nodes.update(createNode("A", "37.123.25.5", 7890), NodeStatus.ACTIVE);
 		nodes.update(createNode("A", "37.121.27.7", 7890), NodeStatus.ACTIVE);
-		nodes.update(createNode("A", "38.188.83.2", 7890), NodeStatus.INACTIVE);
-		nodes.update(createNode("A", "38.183.85.5", 7890), NodeStatus.INACTIVE);
-		nodes.update(createNode("A", "38.181.87.7", 7890), NodeStatus.INACTIVE);
+		nodes.update(createNode("A", "38.188.83.2", 7890), NodeStatus.BUSY);
+		nodes.update(createNode("A", "38.183.85.5", 7890), NodeStatus.BUSY);
+		nodes.update(createNode("A", "38.181.87.7", 7890), NodeStatus.BUSY);
 		return nodes;
 	}
 
@@ -372,7 +410,7 @@ public class NodeCollectionTest {
 
 		// Assert:
 		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.BUSY));
 		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
 	}
 
@@ -415,12 +453,12 @@ public class NodeCollectionTest {
 		// Act:
 		nodes.pruneInactiveNodes(); // inactive: { B }
 		nodes.update(createNode("B"), NodeStatus.ACTIVE);
-		nodes.update(createNode("B"), NodeStatus.INACTIVE);
+		nodes.update(createNode("B"), NodeStatus.BUSY);
 		nodes.pruneInactiveNodes(); // inactive: { B }
 
 		// Assert:
 		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.ACTIVE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.BUSY));
 		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
 	}
 
@@ -432,24 +470,24 @@ public class NodeCollectionTest {
 		// Act:
 		nodes.pruneInactiveNodes(); // inactive: { B }
 		nodes.update(createNode("B"), NodeStatus.ACTIVE);
-		nodes.update(createNode("A"), NodeStatus.INACTIVE);
+		nodes.update(createNode("A"), NodeStatus.BUSY);
 		nodes.pruneInactiveNodes(); // inactive: { A }
-		nodes.update(createNode("B"), NodeStatus.INACTIVE);
-		nodes.update(createNode("D"), NodeStatus.INACTIVE);
+		nodes.update(createNode("B"), NodeStatus.BUSY);
+		nodes.update(createNode("D"), NodeStatus.BUSY);
 		nodes.pruneInactiveNodes(); // inactive: { B, D }, pruned: { A }
 
 		// Assert:
 		Assert.assertThat(nodes.getNodeStatus(createNode("A")), IsEqual.equalTo(NodeStatus.FAILURE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("B")), IsEqual.equalTo(NodeStatus.BUSY));
 		Assert.assertThat(nodes.getNodeStatus(createNode("C")), IsEqual.equalTo(NodeStatus.FAILURE));
-		Assert.assertThat(nodes.getNodeStatus(createNode("D")), IsEqual.equalTo(NodeStatus.INACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(createNode("D")), IsEqual.equalTo(NodeStatus.BUSY));
 	}
 
 	private static NodeCollection createNodeCollectionForPruneInactiveNodesTests() {
 		// Arrange:
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(createNode("A"), NodeStatus.ACTIVE);
-		nodes.update(createNode("B"), NodeStatus.INACTIVE);
+		nodes.update(createNode("B"), NodeStatus.BUSY);
 		nodes.update(createNode("C"), NodeStatus.FAILURE);
 		return nodes;
 	}
@@ -495,6 +533,7 @@ public class NodeCollectionTest {
 	}
 
 	//endregion
+
 	private static Node createNode(final String platform) {
 		// Arrange:
 		return createNode(platform, platform.charAt(0));
@@ -517,11 +556,12 @@ public class NodeCollectionTest {
 		// Arrange:
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(createNode("A"), NodeStatus.ACTIVE);
-		nodes.update(createNode("B"), NodeStatus.INACTIVE);
-		nodes.update(createNode("C"), NodeStatus.INACTIVE);
+		nodes.update(createNode("B"), NodeStatus.BUSY);
+		nodes.update(createNode("C"), NodeStatus.BUSY);
 		nodes.update(createNode("D"), NodeStatus.ACTIVE);
 		nodes.update(createNode("E"), NodeStatus.FAILURE);
 		nodes.update(createNode("F"), NodeStatus.ACTIVE);
+		nodes.update(createNode("G"), NodeStatus.INACTIVE);
 		return nodes;
 	}
 
@@ -535,7 +575,7 @@ public class NodeCollectionTest {
 		}
 
 		for (final String nodeName : inactiveNodeNames) {
-			nodes.update(createNode(nodeName), NodeStatus.INACTIVE);
+			nodes.update(createNode(nodeName), NodeStatus.BUSY);
 		}
 
 		return nodes;
