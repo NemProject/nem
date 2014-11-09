@@ -171,6 +171,8 @@ public class NodeControllerTest {
 
 	//endregion
 
+	//region getExperiences
+
 	@Test
 	public void getExperiencesReturnsExtendedLocalNodeExperiences() {
 		// Arrange:
@@ -199,32 +201,59 @@ public class NodeControllerTest {
 		Assert.assertThat(pairs, IsEquivalent.equivalentTo(expectedPairs));
 	}
 
+	//endregion
+
+	//region ping
+
 	@Test
-	public void pingActivatesSourceNode() {
+	public void pingActivatesSourceNodeIfSourceNodeStatusIsUnknown() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final NodeExperiencesPair pair = new NodeExperiencesPair(PeerUtils.createNodeWithName("alice"), new ArrayList<>());
+
 		final NodeCollection nodes = context.network.getNodes();
-
-		final Node sourceNode = PeerUtils.createNodeWithName("alice");
-		final NodeExperiencesPair pair = new NodeExperiencesPair(sourceNode, new ArrayList<>());
-
-		// Arrange: sanity
-		Assert.assertThat(nodes.getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.FAILURE));
+		nodes.update(pair.getNode(), NodeStatus.UNKNOWN);
 
 		// Act:
 		context.controller.ping(pair);
 
 		// Assert:
-		Assert.assertThat(nodes.getNodeStatus(sourceNode), IsEqual.equalTo(NodeStatus.ACTIVE));
+		Assert.assertThat(nodes.getNodeStatus(pair.getNode()), IsEqual.equalTo(NodeStatus.ACTIVE));
 	}
 
 	@Test
-	public void pingSetsSourceNodeExperiences() {
+	public void pingDoesNotChangeSourceNodeStatusIfSourceNodeStatusIsKnown() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final NodeExperiencesPair pair = new NodeExperiencesPair(
-				PeerUtils.createNodeWithName("alice"),
-				new ArrayList<>());
+		final NodeExperiencesPair pair = new NodeExperiencesPair(PeerUtils.createNodeWithName("alice"), new ArrayList<>());
+
+		final NodeCollection nodes = context.network.getNodes();
+		nodes.update(pair.getNode(), NodeStatus.INACTIVE);
+
+		// Act:
+		context.controller.ping(pair);
+
+		// Assert:
+		Assert.assertThat(nodes.getNodeStatus(pair.getNode()), IsEqual.equalTo(NodeStatus.INACTIVE));
+	}
+
+	@Test
+	public void pingSetsSourceNodeExperiencesIfSourceNodeStatusIsKnown() {
+		// Assert:
+		assertPingSetsSourceNodeExperiencesForSourceNodeWithStatus(NodeStatus.ACTIVE);
+	}
+
+	@Test
+	public void pingSetsSourceNodeExperiencesIfSourceNodeStatusIsUnknown() {
+		// Assert:
+		assertPingSetsSourceNodeExperiencesForSourceNodeWithStatus(NodeStatus.UNKNOWN);
+	}
+
+	private static void assertPingSetsSourceNodeExperiencesForSourceNodeWithStatus(final NodeStatus status) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final NodeExperiencesPair pair = new NodeExperiencesPair(PeerUtils.createNodeWithName("alice"), new ArrayList<>());
+		context.network.getNodes().update(pair.getNode(), status);
 
 		// Act:
 		context.controller.ping(pair);
@@ -232,6 +261,8 @@ public class NodeControllerTest {
 		// Assert:
 		Mockito.verify(context.network, Mockito.times(1)).setRemoteNodeExperiences(pair);
 	}
+
+	//endregion
 
 	@Test
 	public void canYouSeeMeReturnsTheRemoteAddress() {

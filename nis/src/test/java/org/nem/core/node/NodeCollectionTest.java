@@ -434,6 +434,20 @@ public class NodeCollectionTest {
 	}
 
 	@Test
+	public void updateRemovesNodeIfStatusChangesToUnknown() {
+		// Arrange:
+		final Node node = PeerUtils.createNodeWithName("X");
+		final NodeCollection nodes = new NodeCollection();
+		nodes.update(node, NodeStatus.ACTIVE);
+
+		// Act:
+		nodes.update(node, NodeStatus.UNKNOWN);
+
+		// Assert:
+		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
+	}
+
+	@Test
 	public void updateCanUpdateNodeEndpointWithoutStatusChange() {
 		// Assert:
 		updateCanUpdateNodeEndpoint(NodeStatus.ACTIVE, NodeStatus.ACTIVE);
