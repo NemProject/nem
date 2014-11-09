@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dao.TransferDao;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
@@ -92,7 +92,8 @@ public class BlockChainValidatorIntegrationTest {
 		middleBlock.sign();
 
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+		final boolean result = validator.isValid(parentBlock, blocks);
+		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -100,10 +101,8 @@ public class BlockChainValidatorIntegrationTest {
 		// Arrange:
 		final long confirmedBlockHeight = 10;
 		final Transaction transaction = createValidSignedTransaction();
-		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		Mockito.when(factory.transferDao.findByHash(transactionHash.getRaw(), confirmedBlockHeight))
-				.thenReturn(Mockito.mock(Transfer.class));
+		Mockito.when(factory.transferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(true);
 		final BlockChainValidator validator = factory.create();
 
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), confirmedBlockHeight);
@@ -115,7 +114,8 @@ public class BlockChainValidatorIntegrationTest {
 		middleBlock.sign();
 
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		final boolean valid = validator.isValid(parentBlock, blocks);
+		Assert.assertThat(valid, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -184,7 +184,7 @@ public class BlockChainValidatorIntegrationTest {
 	//region transactions / blocks
 
 	private static MockTransaction createValidSignedTransaction() {
-		final TimeInstant timeInstant = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(15);
+		final TimeInstant timeInstant = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
 		final MockTransaction transaction = new MockTransaction(12, timeInstant);
 		transaction.setDeadline(timeInstant.addSeconds(1));
 		transaction.sign();
@@ -253,14 +253,17 @@ public class BlockChainValidatorIntegrationTest {
 		public final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.poiFacade);
 		public final TransferDao transferDao = Mockito.mock(TransferDao.class);
+		public final ImportanceTransferDao importanceTransferDao = Mockito.mock(ImportanceTransferDao.class);
 		public final SingleTransactionValidator transactionValidator;
 		public final BatchTransactionValidator batchTransactionValidator;
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory(this.transferDao);
 			this.transactionValidator = transactionValidatorFactory.createSingle(this.poiFacade);
-			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.poiFacade);
+			this.batchTransactionValidator = new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
 
+			Mockito.when(this.transferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(false);
+			Mockito.when(this.importanceTransferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
 
