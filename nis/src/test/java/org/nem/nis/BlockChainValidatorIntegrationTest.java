@@ -78,6 +78,24 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	@Test
+	public void chainWithValidTransactionsIsValid() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block middleBlock = blocks.get(1);
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.addTransaction(createValidSignedTransaction());
+		middleBlock.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
+	@Test
 	public void chainIsInvalidIfTransactionAlreadyExistInDb() {
 		// Arrange:
 		final long confirmedBlockHeight = 10;
