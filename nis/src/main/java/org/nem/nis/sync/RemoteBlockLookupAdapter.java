@@ -30,13 +30,11 @@ public class RemoteBlockLookupAdapter implements BlockLookup {
 
 	@Override
 	public BlockChainScore getChainScore() {
-		LOGGER.info("remote.getChainScore");
 		return this.connector.getChainScore(this.remoteNode);
 	}
 
 	@Override
 	public Block getLastBlock() {
-		LOGGER.info("remote.getLastBlock");
 		return this.connector.getLastBlock(this.remoteNode);
 	}
 
