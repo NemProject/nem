@@ -1,16 +1,16 @@
 package org.nem.core.connect;
 
 /**
- * An exception that is thrown when a connection cannot be established with a peer.
+ * An exception that is thrown when peer communication fails because a peer is busy.
  */
-public class InactivePeerException extends RuntimeException {
+public class BusyPeerException extends RuntimeException {
 
 	/**
 	 * Creates a new exception.
 	 *
 	 * @param message The exception message.
 	 */
-	public InactivePeerException(final String message) {
+	public BusyPeerException(final String message) {
 		super(message);
 	}
 
@@ -19,7 +19,7 @@ public class InactivePeerException extends RuntimeException {
 	 *
 	 * @param cause The exception message.
 	 */
-	public InactivePeerException(final Throwable cause) {
+	public BusyPeerException(final Throwable cause) {
 		super(cause);
 	}
 
@@ -29,7 +29,7 @@ public class InactivePeerException extends RuntimeException {
 	 * @param message The exception message.
 	 * @param cause The original exception.
 	 */
-	public InactivePeerException(final String message, final Throwable cause) {
+	public BusyPeerException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 }

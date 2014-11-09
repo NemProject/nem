@@ -55,8 +55,8 @@ public class HttpMethodClientTest {
 		this.getTestRunner.sendThrowsInactivePeerExceptionOnConnectionTimeout();
 	}
 
-	@Test(expected = InactivePeerException.class)
-	public void getThrowsInactivePeerExceptionOnSocketTimeout() {
+	@Test(expected = BusyPeerException.class)
+	public void getThrowsBusyPeerExceptionOnSocketTimeout() {
 		// Assert:
 		this.getTestRunner.sendThrowsInactivePeerExceptionOnSocketTimeout();
 	}
@@ -113,8 +113,8 @@ public class HttpMethodClientTest {
 		this.postTestRunner.sendThrowsInactivePeerExceptionOnConnectionTimeout();
 	}
 
-	@Test(expected = InactivePeerException.class)
-	public void postThrowsInactivePeerExceptionOnSocketTimeout() {
+	@Test(expected = BusyPeerException.class)
+	public void postThrowsBusyPeerExceptionOnSocketTimeout() {
 		// Assert:
 		this.postTestRunner.sendThrowsInactivePeerExceptionOnSocketTimeout();
 	}
