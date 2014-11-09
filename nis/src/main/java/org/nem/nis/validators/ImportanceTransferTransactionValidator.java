@@ -59,7 +59,8 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 				}
 
-				if (transaction.getRemote().getBalance().compareTo(Amount.ZERO) != 0) {
+				// TODO 20141109 J-G: i guess you did this so that someone doesn't automatically set their real account as the remote?
+				if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY;
 				}
 

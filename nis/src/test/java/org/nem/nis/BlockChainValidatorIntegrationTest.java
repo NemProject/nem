@@ -96,6 +96,8 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
+	// TODO 20141109 J-G: so, i know this test is failing ;), but consider being more descriptive in the test name
+	// > or a comment in the test code as to why the ImportanceTransfer is invalid
 	@Test
 	public void chainWithInvalidImportanceTransferIsInvalid() {
 		// Arrange:

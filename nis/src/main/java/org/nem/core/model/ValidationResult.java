@@ -92,6 +92,10 @@ public enum ValidationResult {
 	 */
 	FAILURE_SELF_SIGNED_TRANSACTION(16),
 
+	// TODO 20141109 J-G: please comment status codes; how about FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE
+	// TODO 20141109 J-G: while you're here, can you add status codes for the other importance transfer failure results too?
+
+
 	FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY(17);
 
 	private final int value;
