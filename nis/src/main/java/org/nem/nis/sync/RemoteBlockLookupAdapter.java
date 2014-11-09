@@ -12,8 +12,6 @@ import java.util.logging.Logger;
  * A BlockLookup implementation that looks up blocks from a remote node.
  */
 public class RemoteBlockLookupAdapter implements BlockLookup {
-	private static final Logger LOGGER = Logger.getLogger(RemoteBlockLookupAdapter.class.getName());
-
 	private final SyncConnector connector;
 	private final Node remoteNode;
 
@@ -30,13 +28,11 @@ public class RemoteBlockLookupAdapter implements BlockLookup {
 
 	@Override
 	public BlockChainScore getChainScore() {
-		LOGGER.info("remote.getChainScore");
 		return this.connector.getChainScore(this.remoteNode);
 	}
 
 	@Override
 	public Block getLastBlock() {
-		LOGGER.info("remote.getLastBlock");
 		return this.connector.getLastBlock(this.remoteNode);
 	}
 

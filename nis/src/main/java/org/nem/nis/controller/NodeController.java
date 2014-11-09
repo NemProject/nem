@@ -166,7 +166,11 @@ public class NodeController {
 	@P2PApi
 	public void ping(@RequestBody final NodeExperiencesPair nodeExperiencesPair) {
 		final PeerNetwork network = this.host.getNetwork();
-		network.getNodes().update(nodeExperiencesPair.getNode(), NodeStatus.ACTIVE);
+		final Node node = nodeExperiencesPair.getNode();
+		if (NodeStatus.UNKNOWN == network.getNodes().getNodeStatus(node)) {
+			network.getNodes().update(node, NodeStatus.ACTIVE);
+		}
+
 		network.setRemoteNodeExperiences(nodeExperiencesPair);
 	}
 

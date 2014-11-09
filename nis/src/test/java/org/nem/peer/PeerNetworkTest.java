@@ -285,6 +285,22 @@ public class PeerNetworkTest {
 		Mockito.verify(synchronizer, Mockito.times(1)).synchronizeTime();
 	}
 
+	@Test
+	public void bootDelegatesToFactory() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
+		Mockito.when(updater.updateAny(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
+		Mockito.when(context.servicesFactory.createLocalNodeEndpointUpdater()).thenReturn(updater);
+
+		// Act:
+		context.network.boot().join();
+
+		// Assert:
+		Mockito.verify(context.servicesFactory, Mockito.only()).createLocalNodeEndpointUpdater();
+		Mockito.verify(updater, Mockito.only()).updateAny(Mockito.any());
+	}
+
 	//endregion
 
 	private static class TestContext {

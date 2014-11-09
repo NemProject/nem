@@ -131,15 +131,11 @@ public class PeerNetworkState {
 	}
 
 	private static Node[] toNodeArray(final NodeCollection nodes, final Node localNode) {
-		final int numNodes = nodes.getActiveNodes().size() + nodes.getInactiveNodes().size() + 1;
+		final int numNodes = nodes.getAllNodes().size() + 1;
 		final Node[] nodeArray = new Node[numNodes];
 
 		int index = 0;
-		for (final Node node : nodes.getActiveNodes()) {
-			nodeArray[index++] = node;
-		}
-
-		for (final Node node : nodes.getInactiveNodes()) {
+		for (final Node node : nodes.getAllNodes()) {
 			nodeArray[index++] = node;
 		}
 

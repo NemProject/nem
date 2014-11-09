@@ -72,9 +72,9 @@ public class PeerNetworkStateTest {
 
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(PeerUtils.createNodeWithName("a1"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("i1"), NodeStatus.INACTIVE);
+		nodes.update(PeerUtils.createNodeWithName("b1"), NodeStatus.BUSY);
 		nodes.update(PeerUtils.createNodeWithName("f"), NodeStatus.FAILURE);
-		nodes.update(PeerUtils.createNodeWithName("i2"), NodeStatus.INACTIVE);
+		nodes.update(PeerUtils.createNodeWithName("b2"), NodeStatus.BUSY);
 		nodes.update(PeerUtils.createNodeWithName("a2"), NodeStatus.ACTIVE);
 		nodes.update(PeerUtils.createNodeWithName("a3"), NodeStatus.ACTIVE);
 
@@ -88,8 +88,8 @@ public class PeerNetworkStateTest {
 				PeerUtils.createNodeWithName("a1"),
 				PeerUtils.createNodeWithName("a2"),
 				PeerUtils.createNodeWithName("a3"),
-				PeerUtils.createNodeWithName("i1"),
-				PeerUtils.createNodeWithName("i2"),
+				PeerUtils.createNodeWithName("b2"),
+				PeerUtils.createNodeWithName("b1"),
 				PeerUtils.createNodeWithName("l"),
 		};
 		Assert.assertThat(context.getNodes(), IsEqual.equalTo(expectedNodes));

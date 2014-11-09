@@ -20,54 +20,13 @@ public class AsyncTimer implements Closeable {
 	/**
 	 * Creates a new async timer.
 	 *
-	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
-	 * @param initialDelay The time (in milliseconds) to delay the first execution.
-	 * @param delay The delay strategy.
-	 * @param visitor The visitor.
+	 * @param options The async timer options.
 	 */
-	public AsyncTimer(
-			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final int initialDelay,
-			final AbstractDelayStrategy delay,
-			final AsyncTimerVisitor visitor) {
-
-		this.recurringFutureSupplier = recurringFutureSupplier;
-		this.delay = delay;
-		this.visitor = getVisitorOrDefault(visitor);
-		this.future = this.chain(initialDelay);
-	}
-
-	private AsyncTimer(
-			final CompletableFuture<?> trigger,
-			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final AbstractDelayStrategy delay,
-			final AsyncTimerVisitor visitor) {
-
-		this.recurringFutureSupplier = recurringFutureSupplier;
-		this.delay = delay;
-		this.visitor = getVisitorOrDefault(visitor);
-		this.future = trigger.thenCompose(v -> this.getNextChainLink());
-	}
-
-	private static AsyncTimerVisitor getVisitorOrDefault(final AsyncTimerVisitor visitor) {
-		return null == visitor ? new DefaultAsyncTimerVisitor() : visitor;
-	}
-
-	/**
-	 * Creates a new AsyncTimer that will start executing when the specified trigger is triggered.
-	 *
-	 * @param triggerTimer The timer that will trigger the first execution when it has completed a single recurrence.
-	 * @param recurringFutureSupplier Supplier that provides a future that should be executed on an interval.
-	 * @param delay The delay strategy.
-	 * @param visitor The visitor.
-	 */
-	public static AsyncTimer After(
-			final AsyncTimer triggerTimer,
-			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final AbstractDelayStrategy delay,
-			final AsyncTimerVisitor visitor) {
-
-		return new AsyncTimer(triggerTimer.firstRecurrenceFuture, recurringFutureSupplier, delay, visitor);
+	public AsyncTimer(final AsyncTimerOptions options) {
+		this.recurringFutureSupplier = options.getRecurringFutureSupplier();
+		this.delay = options.getDelayStrategy();
+		this.visitor = options.getVisitor();
+		this.future = options.getInitialTrigger().thenCompose(v -> this.getNextChainLink());
 	}
 
 	/**
@@ -77,6 +36,15 @@ public class AsyncTimer implements Closeable {
 	 */
 	public boolean isStopped() {
 		return this.future.isDone();
+	}
+
+	/**
+	 * Gets a future that is triggered after the recurring future is completed at least once.
+	 *
+	 * @return The future.
+	 */
+	public CompletableFuture<?> getFirstFireFuture() {
+		return this.firstRecurrenceFuture;
 	}
 
 	private CompletableFuture<?> chain(final int delay) {
@@ -108,27 +76,5 @@ public class AsyncTimer implements Closeable {
 					this.firstRecurrenceFuture.complete(null);
 					return this.chain(this.delay.next());
 				});
-	}
-
-	private static class DefaultAsyncTimerVisitor implements AsyncTimerVisitor {
-		@Override
-		public void notifyOperationStart() {
-		}
-
-		@Override
-		public void notifyOperationComplete() {
-		}
-
-		@Override
-		public void notifyOperationCompleteExceptionally(final Throwable e) {
-		}
-
-		@Override
-		public void notifyDelay(final int delay) {
-		}
-
-		@Override
-		public void notifyStop() {
-		}
 	}
 }

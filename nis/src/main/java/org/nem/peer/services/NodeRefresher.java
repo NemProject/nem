@@ -73,6 +73,11 @@ public class NodeRefresher {
 			return CompletableFuture.completedFuture(null);
 		}
 
+		if (this.nodes.isNodeBlacklisted(node)) {
+			LOGGER.info(String.format("skipping refresh of blacklisted node: %s", node));
+			return CompletableFuture.completedFuture(null);
+		}
+
 		CompletableFuture<NodeStatus> future = this.connector.getInfo(node)
 				.thenApply(n -> {
 					// if the node returned inconsistent information, drop it for this round
@@ -116,7 +121,13 @@ public class NodeRefresher {
 
 	private NodeStatus getNodeStatusFromException(Throwable ex) {
 		ex = CompletionException.class == ex.getClass() ? ex.getCause() : ex;
-		return InactivePeerException.class == ex.getClass() ? NodeStatus.INACTIVE : NodeStatus.FAILURE;
+		if (InactivePeerException.class == ex.getClass()) {
+			return NodeStatus.INACTIVE;
+		} else if (BusyPeerException.class == ex.getClass()) {
+			return NodeStatus.BUSY;
+		} else {
+			return NodeStatus.FAILURE;
+		}
 	}
 
 	private void update(final Node node, final NodeStatus status) {

@@ -5,11 +5,11 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.nis.service.ChainServices;
-import org.nem.peer.services.PeerNetworkServicesFactory;
+import org.nem.peer.services.*;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -174,6 +174,14 @@ public class PeerNetwork {
 	 */
 	public CompletableFuture<Boolean> updateLocalNodeEndpoint() {
 		return this.servicesFactory.createLocalNodeEndpointUpdater().update(this.selector);
+	}
+
+	/**
+	 * Updates the endpoint of the local node as seen by other nodes.
+	 */
+	public CompletableFuture<Boolean> boot() {
+		// it is safe to use partner nodes before a refresh cycle
+		return this.servicesFactory.createLocalNodeEndpointUpdater().updateAny(this.getPartnerNodes());
 	}
 
 	//endregion

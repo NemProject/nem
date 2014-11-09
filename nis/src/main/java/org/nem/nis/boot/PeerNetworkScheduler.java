@@ -85,80 +85,106 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain, final Harvester harvester) {
 		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
-		this.timers.add(new AsyncTimer(
-				this.runnableToFutureSupplier(() -> {
-					final Block block = harvester.harvestBlock();
-					if (null == block || !blockChain.processBlock(block).isSuccess()) {
-						return;
-					}
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
+				.setRecurringFutureSupplier(
+						this.runnableToFutureSupplier(() -> {
+							final Block block = harvester.harvestBlock();
+							if (null == block || !blockChain.processBlock(block).isSuccess()) {
+								return;
+							}
 
-					final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
-							block,
-							network.getLocalNode().getIdentity());
-					network.broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
-				}),
-				FORAGING_INITIAL_DELAY,
-				new UniformDelayStrategy(FORAGING_INTERVAL),
-				timerVisitor));
+							final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
+									block,
+									network.getLocalNode().getIdentity());
+							network.broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
+						}))
+				.setInitialDelay(FORAGING_INITIAL_DELAY)
+				.setDelayStrategy(new UniformDelayStrategy(FORAGING_INTERVAL))
+				.setVisitor(timerVisitor)
+				.create();
+		this.timers.add(new AsyncTimer(options));
 	}
 
 	private void addNetworkTasks(final PeerNetwork network, final boolean useNetworkTime) {
-		this.addRefreshTask(network);
-		if (useNetworkTime) {
-			this.addTimeSynchronizationTask(network);
+		final NetworkTaskInitializer initializer = new NetworkTaskInitializer(this);
+		initializer.initialize(network, useNetworkTime);
+	}
+
+	private static class NetworkTaskInitializer {
+		private final PeerNetworkScheduler scheduler;
+		private AsyncTimer refreshTimer;
+
+		public NetworkTaskInitializer(final PeerNetworkScheduler scheduler) {
+			this.scheduler = scheduler;
 		}
 
-		this.addSimpleTask(
-				() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
-				BROADCAST_INTERVAL,
-				"BROADCAST");
-		this.addSimpleTask(
-				this.runnableToFutureSupplier(() -> network.synchronize()),
-				SYNC_INTERVAL,
-				"SYNC");
-		this.addSimpleTask(
-				this.runnableToFutureSupplier(() -> network.pruneInactiveNodes()),
-				PRUNE_INACTIVE_NODES_DELAY,
-				"PRUNING INACTIVE NODES");
-		this.addSimpleTask(
-				this.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
-				UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
-				"UPDATING LOCAL NODE ENDPOINT");
-		this.addSimpleTask(
-				() -> network.checkChainSynchronization(),
-				CHECK_CHAIN_SYNC_INTERVAL,
-				"CHECKING CHAIN SYNCHRONIZATION");
-	}
+		private void initialize(final PeerNetwork network, final boolean useNetworkTime) {
+			this.refreshTimer = this.addRefreshTask(network);
 
-	private void addRefreshTask(final PeerNetwork network) {
-		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("REFRESH");
-		this.timers.add(new AsyncTimer(
-				() -> network.refresh(),
-				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
-				getRefreshDelayStrategy(),
-				timerVisitor));
-	}
+			if (useNetworkTime) {
+				this.addSimpleTask(
+						() -> network.synchronizeTime(this.scheduler.timeProvider),
+						getTimeSynchronizationDelayStrategy(),
+						"TIME SYNCHRONIZATION");
+			}
 
-	private void addTimeSynchronizationTask(final PeerNetwork network) {
-		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("TIME SYNCHRONIZATION");
-		this.timers.add(new AsyncTimer(
-				() -> network.synchronizeTime(this.timeProvider),
-				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
-				getTimeSynchronizationDelayStrategy(),
-				timerVisitor));
-	}
+			this.addSimpleTask(
+					() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
+					BROADCAST_INTERVAL,
+					"BROADCAST");
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(() -> network.synchronize()),
+					SYNC_INTERVAL,
+					"SYNC");
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(() -> network.pruneInactiveNodes()),
+					PRUNE_INACTIVE_NODES_DELAY,
+					"PRUNING INACTIVE NODES");
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
+					UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
+					"UPDATING LOCAL NODE ENDPOINT");
+			this.addSimpleTask(
+					() -> network.checkChainSynchronization(),
+					CHECK_CHAIN_SYNC_INTERVAL,
+					"CHECKING CHAIN SYNCHRONIZATION");
+		}
 
-	private void addSimpleTask(
-			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final int delay,
-			final String name) {
-		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor(name);
+		private AsyncTimer addRefreshTask(final PeerNetwork network) {
+			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder()
+					.setRecurringFutureSupplier(() -> network.refresh())
+					.setInitialDelay(REFRESH_INITIAL_DELAY)
+					.setDelayStrategy(getRefreshDelayStrategy());
+			return this.addTask("REFRESH", builder);
+		}
 
-		this.timers.add(new AsyncTimer(
-				recurringFutureSupplier,
-				REFRESH_INITIAL_DELAY,
-				new UniformDelayStrategy(delay),
-				timerVisitor));
+		private void addSimpleTask(
+				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
+				final int delay,
+				final String name) {
+			this.addSimpleTask(recurringFutureSupplier, new UniformDelayStrategy(delay), name);
+		}
+
+		private void addSimpleTask(
+				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
+				final AbstractDelayStrategy delay,
+				final String name) {
+			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder()
+					.setRecurringFutureSupplier(recurringFutureSupplier)
+					.setTrigger(this.refreshTimer.getFirstFireFuture())
+					.setInitialDelay(REFRESH_INITIAL_DELAY * this.scheduler.timerVisitors.size()) // stagger the timer start times
+					.setDelayStrategy(delay);
+			this.addTask(name, builder);
+		}
+
+		private AsyncTimer addTask(final String name, final AsyncTimerOptionsBuilder builder) {
+			final AsyncTimerVisitor timerVisitor = this.scheduler.createNamedVisitor(name);
+			builder.setVisitor(timerVisitor);
+
+			final AsyncTimer timer = new AsyncTimer(builder.create());
+			this.scheduler.timers.add(timer);
+			return timer;
+		}
 	}
 
 	private static AbstractDelayStrategy getRefreshDelayStrategy() {
