@@ -146,7 +146,7 @@ public class BlockChain implements BlockSynchronizer {
 	public synchronized NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			return this.synchronizeNodeInternal(connectorPool, node);
-		} catch (final InactivePeerException | FatalPeerException ex) {
+		} catch (final FatalPeerException ex) {
 			LOGGER.info(String.format("failed to synchronize with %s: %s", node, ex));
 			return NodeInteractionResult.FAILURE;
 		}
