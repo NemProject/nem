@@ -18,6 +18,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final String bootName;
 	private final boolean useNetworkTime;
 	private final int unlockedLimit;
+	private final String[] nonAuditedApiPaths;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -43,6 +44,8 @@ public class NisConfiguration extends CommonConfiguration {
 		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", true);
 		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", true);
 		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
+		final String nonAuditedApiPaths = getOptionalString(properties, "nis.nonAuditedApiPaths", "/heartbeat|/status|/chain/height");
+		this.nonAuditedApiPaths = nonAuditedApiPaths.split("\\|");
 	}
 
 	/**
@@ -102,7 +105,8 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets a value indicating whether or not this node should use the network time for time stamps in blocks, transactions, ...
+	 * Gets a value indicating whether or not this node should use the network time for time stamps in NIS entities
+	 * (e.g. blocks, transactions, ...).
 	 *
 	 * @return true if this node should use the network time.
 	 */
@@ -118,4 +122,11 @@ public class NisConfiguration extends CommonConfiguration {
 	public int getUnlockedLimit() {
 		return this.unlockedLimit;
 	}
+
+	/**
+	 * Gets the NIS APIs that shouldn't be audited.
+	 *
+	 * @return The NIS APIs that shouldn't be audited.
+	 */
+	public String[] getNonAuditedApiPaths() { return this.nonAuditedApiPaths; }
 }

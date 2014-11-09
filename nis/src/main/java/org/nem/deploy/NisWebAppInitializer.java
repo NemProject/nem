@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * Class supplying Spring MVC configuration.
@@ -23,6 +24,9 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 
 	@Autowired
 	private NisPeerNetworkHost host;
+
+	@Autowired
+	private NisConfiguration nisConfiguration;
 
 	@Override
 	protected void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
@@ -42,7 +46,13 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 	@Override
 	protected void addInterceptors(final InterceptorRegistry registry) {
 		registry.addInterceptor(new LocalHostInterceptor());
-		registry.addInterceptor(new AuditInterceptor(this.host.getIncomingAudits()));
+		registry.addInterceptor(this.createAuditInterceptor());
 		super.addInterceptors(registry);
+	}
+
+	private HandlerInterceptorAdapter createAuditInterceptor() {
+		return new AuditInterceptor(
+				Arrays.asList(this.nisConfiguration.getNonAuditedApiPaths()),
+				this.host.getIncomingAudits());
 	}
 }
