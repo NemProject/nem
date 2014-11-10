@@ -94,7 +94,7 @@ public enum ValidationResult {
 
 	// TODO 20141109 J-G: please comment status codes; how about FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE
 	// TODO 20141109 J-G: while you're here, can you add status codes for the other importance transfer failure results too?
-
+	// TODO 20141110 G-J: not sure if this branch should be merged-in, more elaborate explanation in another file
 
 	FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY(17);
 

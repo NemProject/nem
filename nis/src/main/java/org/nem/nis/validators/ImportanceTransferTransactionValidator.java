@@ -60,6 +60,12 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				}
 
 				// TODO 20141109 J-G: i guess you did this so that someone doesn't automatically set their real account as the remote?
+				// TODO 20141110 G-J: my idea was as follows (we've talked a bit about it on Sun) remote account should be used
+				// ONLY for remote harvesting, so we should probably block any incoming or outgoing transfers, additionally we
+				// shouldn't allow setting an account that already have some balance on it.
+				// but right now I'm not sure if it's a good idea or not, and I was thinking about dropping this whole branch.
+				// 1. from user perspective it's not that important, as "remote private key" is not easily accessible.
+				// 2. adding such checks will also add additional work, as we would have to add some unconfirmed transactions purging
 				if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY;
 				}
