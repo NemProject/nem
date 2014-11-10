@@ -30,5 +30,5 @@ public class BlockChainConstants {
 	/**
 	 * The maximum number of transactions in a block.
 	 */
-	public static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 60;
+	public static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
 }
