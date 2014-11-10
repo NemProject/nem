@@ -85,7 +85,7 @@ public class AsyncTimerOptionsBuilder {
 			if (initialDelay > 0) {
 				if (null == trigger) {
 					trigger = this.delay(initialDelay);
-				} else  {
+				} else {
 					trigger = trigger.thenCompose(v -> this.delay(initialDelay));
 				}
 			}

@@ -18,7 +18,7 @@ public interface AsyncTimerOptions {
 	/**
 	 * Gets the initial trigger.
 	 *
- 	 * @return The initial trigger.
+	 * @return The initial trigger.
 	 */
 	public CompletableFuture<?> getInitialTrigger();
 

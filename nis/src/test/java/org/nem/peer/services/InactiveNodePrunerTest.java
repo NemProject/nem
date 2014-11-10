@@ -3,7 +3,7 @@ package org.nem.peer.services;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.node.*;
+import org.nem.core.node.NodeCollection;
 
 public class InactiveNodePrunerTest {
 

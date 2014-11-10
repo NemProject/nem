@@ -128,5 +128,7 @@ public class NisConfiguration extends CommonConfiguration {
 	 *
 	 * @return The NIS APIs that shouldn't be audited.
 	 */
-	public String[] getNonAuditedApiPaths() { return this.nonAuditedApiPaths; }
+	public String[] getNonAuditedApiPaths() {
+		return this.nonAuditedApiPaths;
+	}
 }

@@ -2,12 +2,9 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
@@ -108,7 +105,6 @@ public class BlockAnalyzer {
 			}
 
 			dbBlock = currentBlock;
-
 		} while (null != maxHeight && dbBlock != null && dbBlock.getHeight() > maxHeight);
 
 		this.initializePoi(accountAnalyzer, parentBlock.getHeight());
@@ -134,7 +130,7 @@ public class BlockAnalyzer {
 
 			if (null == this.iterator || !this.iterator.hasNext()) {
 				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 2345).iterator();
-				if (! this.iterator.hasNext()) {
+				if (!this.iterator.hasNext()) {
 					this.finished = true;
 					return null;
 				}
@@ -145,7 +141,7 @@ public class BlockAnalyzer {
 			}
 
 			final org.nem.nis.dbmodel.Block dbBlock = this.iterator.next();
-			if (! dbBlock.getHeight().equals(height)) {
+			if (!dbBlock.getHeight().equals(height)) {
 				throw new IllegalStateException("inconsistent db state, there's missing block you're probably using developer's build, drop the db and rerun");
 			}
 

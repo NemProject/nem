@@ -5,11 +5,11 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 import org.nem.nis.service.ChainServices;
-import org.nem.peer.services.*;
+import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 /**

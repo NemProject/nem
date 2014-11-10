@@ -1,6 +1,6 @@
 package org.nem.nis;
 
-import org.nem.core.connect.*;
+import org.nem.core.connect.FatalPeerException;
 import org.nem.core.model.*;
 import org.nem.core.node.Node;
 import org.nem.nis.service.BlockChainLastBlockLayer;

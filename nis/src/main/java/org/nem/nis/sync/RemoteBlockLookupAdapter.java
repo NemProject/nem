@@ -6,8 +6,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.peer.connect.SyncConnector;
 
-import java.util.logging.Logger;
-
 /**
  * A BlockLookup implementation that looks up blocks from a remote node.
  */

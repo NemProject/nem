@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 
@@ -93,7 +93,6 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param transactions The collection of transactions.
 	 * @return SUCCESS if at least one transaction was added, NEUTRAL or FAILURE otherwise.
-	 *
 	 * TODO 20141104 J-B: you're never actually returning FAILURE, not sure if that's intentional
 	 * > if you want to short circuit on failure, you can use ValidationResult.aggregate
 	 * TODO 20141105 BR -> J: if the batch validation fails it is returning failure, see test class.
@@ -110,7 +109,7 @@ public class UnconfirmedTransactions {
 		}
 
 		boolean success = false;
-		for(Transaction transaction : transactions) {
+		for (Transaction transaction : transactions) {
 			if (ValidationResult.SUCCESS == this.add(transaction, true)) {
 				success = true;
 			}

@@ -10,7 +10,6 @@ import org.nem.nis.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.dbmodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
