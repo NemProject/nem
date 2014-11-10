@@ -16,7 +16,7 @@ public class BlockMarkerConstants {
 	/**
 	 * Beta hard fork due to changing number of transactions inside the block
 	 * <br/>
-	 * Targeting Wed 12 Nov, 5 UTC.
+	 * Targeting Thursday 13 Nov, 6am UTC.
 	 */
-	public static long BETA_TX_COUNT_FORK = 33489;
+	public static long BETA_TX_COUNT_FORK = 35000;
 }

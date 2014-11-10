@@ -6,6 +6,7 @@ import org.nem.nis.*;
 /**
  * A block validator that ensures a block does not have more than the maximum number of transactions.
  */
+// TODO 2141110 BR -> all: remember to adjust this before launch!!!
 public class MaxTransactionsBlockValidator implements BlockValidator {
 
 	@Override
