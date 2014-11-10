@@ -14,6 +14,11 @@ public class MaxTransactionsBlockValidator implements BlockValidator {
 			return ValidationResult.SUCCESS;
 		}
 
+		if (block.getHeight().getRaw() > BlockMarkerConstants.BETA_TX_COUNT_FORK) {
+			return block.getTransactions().size() <= BlockChainConstants.NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK
+			       ? ValidationResult.SUCCESS
+			       : ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS;
+		}
 		return block.getTransactions().size() <= BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS;
