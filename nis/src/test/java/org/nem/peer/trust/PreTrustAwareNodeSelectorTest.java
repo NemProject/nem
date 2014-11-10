@@ -18,7 +18,7 @@ public class PreTrustAwareNodeSelectorTest {
 	public void selectNodeDelegatesToWrappedSelector() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Node node = PeerUtils.createNodeWithName("a");
+		final Node node = NodeUtils.createNodeWithName("a");
 		Mockito.when(context.innerSelector.selectNode()).thenReturn(node);
 
 		// Act:
@@ -119,7 +119,7 @@ public class PreTrustAwareNodeSelectorTest {
 		private final NodeSelector innerSelector = Mockito.mock(NodeSelector.class);
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 
-		private final Node localNode = PeerUtils.createNodeWithName("l");
+		private final Node localNode = NodeUtils.createNodeWithName("l");
 		private final NodeCollection nodes = new NodeCollection();
 		private final NodeSelector selector;
 
@@ -140,7 +140,7 @@ public class PreTrustAwareNodeSelectorTest {
 		}
 
 		public void setNodeStatus(final String name, final NodeStatus status) {
-			this.nodes.update(PeerUtils.createNodeWithName(name), status);
+			this.nodes.update(NodeUtils.createNodeWithName(name), status);
 		}
 
 		public void setTestNodeStatuses() {

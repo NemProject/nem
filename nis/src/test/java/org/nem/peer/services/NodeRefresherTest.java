@@ -94,7 +94,7 @@ public class NodeRefresherTest {
 	public void refreshGetInfoChangeIdentityRemovesNodesFromBothLists() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Node changedNode = PeerUtils.createNodeWithName("p");
+		final Node changedNode = NodeUtils.createNodeWithName("p");
 		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
 				.thenReturn(CompletableFuture.completedFuture(changedNode));
 
@@ -132,7 +132,7 @@ public class NodeRefresherTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
-				.thenReturn(CompletableFuture.completedFuture(PeerUtils.createNodeWithHost("10.0.0.125", "b")));
+				.thenReturn(CompletableFuture.completedFuture(NodeUtils.createNodeWithHost("10.0.0.125", "b")));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -264,22 +264,22 @@ public class NodeRefresherTest {
 
 		// Arrange: set up 4 active nodes (3 pre-trusted)
 		final TestContext context = new TestContext();
-		context.refreshNodes.add(PeerUtils.createNodeWithName("d"));
+		context.refreshNodes.add(NodeUtils.createNodeWithName("d"));
 		context.setBusyGetInfoForNode("c", DEFAULT_SLEEP);
 
 		// Arrange: when the mock connector sees nodes w-x, it will trigger an identity change to a good node
 		final List<Node> evilNodes = Arrays.asList(
-				PeerUtils.createNodeWithHost("10.0.0.100", "w"),
-				PeerUtils.createNodeWithHost("10.0.0.101", "x"),
-				PeerUtils.createNodeWithHost("10.0.0.102", "y"),
-				PeerUtils.createNodeWithHost("10.0.0.103", "z"));
+				NodeUtils.createNodeWithHost("10.0.0.100", "w"),
+				NodeUtils.createNodeWithHost("10.0.0.101", "x"),
+				NodeUtils.createNodeWithHost("10.0.0.102", "y"),
+				NodeUtils.createNodeWithHost("10.0.0.103", "z"));
 		context.setKnownPeers(evilNodes);
 		for (final Node evilNode : evilNodes) {
 			final StringBuilder newNameBuilder = new StringBuilder();
 			newNameBuilder.appendCodePoint(evilNode.getIdentity().getName().codePointAt(0) - 'w' + 'b');
 			Mockito.when(context.connector.getInfo(evilNode))
 					.thenReturn(CompletableFuture.completedFuture(
-							PeerUtils.createNodeWithName(newNameBuilder.toString())));
+							NodeUtils.createNodeWithName(newNameBuilder.toString())));
 		}
 
 		// Act:
@@ -304,7 +304,7 @@ public class NodeRefresherTest {
 	public void refreshResultForDirectNodeIgnoresChildNodeGetInfoResults() {
 		// Arrange: set up 4 active nodes (3 pre-trusted)
 		final TestContext context = new TestContext();
-		context.refreshNodes.add(PeerUtils.createNodeWithName("d"));
+		context.refreshNodes.add(NodeUtils.createNodeWithName("d"));
 		context.setBusyGetInfoForNode("c", DEFAULT_SLEEP);
 		context.setFatalGetInfoForNode("y");
 		context.setBusyGetInfoForNode("z");
@@ -349,10 +349,10 @@ public class NodeRefresherTest {
 	public void refreshGetInfoIsBypassedForBlacklistedNodes() {
 		// Arrange: blacklist a and c
 		final TestContext context = new TestContext();
-		context.nodes.update(PeerUtils.createNodeWithName("a"), NodeStatus.FAILURE);
-		context.nodes.update(PeerUtils.createNodeWithName("c"), NodeStatus.INACTIVE);
-		context.nodes.update(PeerUtils.createNodeWithName("d"), NodeStatus.FAILURE);
-		context.nodes.update(PeerUtils.createNodeWithName("f"), NodeStatus.INACTIVE);
+		context.nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.FAILURE);
+		context.nodes.update(NodeUtils.createNodeWithName("c"), NodeStatus.INACTIVE);
+		context.nodes.update(NodeUtils.createNodeWithName("d"), NodeStatus.FAILURE);
+		context.nodes.update(NodeUtils.createNodeWithName("f"), NodeStatus.INACTIVE);
 
 		// Arrange: set up a node peers list that indicates peer d-f are active
 		// but the local node can only communicate with e
@@ -430,7 +430,7 @@ public class NodeRefresherTest {
 
 	private static class TestContext {
 		private final List<Node> refreshNodes = PeerUtils.createNodesWithNames("a", "b", "c");
-		private final Node localNode = PeerUtils.createNodeWithName("l");
+		private final Node localNode = NodeUtils.createNodeWithName("l");
 		private final NodeCollection nodes = new NodeCollection();
 		private final PeerConnector connector = mockPeerConnector();
 		private final NodeRefresher refresher;
@@ -448,7 +448,7 @@ public class NodeRefresherTest {
 		}
 
 		public void setBusyGetInfoForNode(final String name, final int sleep) {
-			final Node node = PeerUtils.createNodeWithName(name);
+			final Node node = NodeUtils.createNodeWithName(name);
 			Mockito.when(this.connector.getInfo(node))
 					.thenReturn(CompletableFuture.supplyAsync(() -> {
 						ExceptionUtils.propagateVoid(() -> Thread.sleep(sleep));
@@ -457,13 +457,13 @@ public class NodeRefresherTest {
 		}
 
 		public void setInactiveGetInfoForNode(final String name) {
-			final Node node = PeerUtils.createNodeWithName(name);
+			final Node node = NodeUtils.createNodeWithName(name);
 			Mockito.when(this.connector.getInfo(node))
 					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new InactivePeerException("inactive"); }));
 		}
 
 		public void setFatalGetInfoForNode(final String name) {
-			final Node node = PeerUtils.createNodeWithName(name);
+			final Node node = NodeUtils.createNodeWithName(name);
 			Mockito.when(this.connector.getInfo(node))
 					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new FatalPeerException("fatal"); }));
 		}

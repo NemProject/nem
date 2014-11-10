@@ -71,12 +71,12 @@ public class PeerNetworkStateTest {
 		Mockito.when(config.getTrustParameters()).thenReturn(params);
 
 		final NodeCollection nodes = new NodeCollection();
-		nodes.update(PeerUtils.createNodeWithName("a1"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("b1"), NodeStatus.BUSY);
-		nodes.update(PeerUtils.createNodeWithName("f"), NodeStatus.FAILURE);
-		nodes.update(PeerUtils.createNodeWithName("b2"), NodeStatus.BUSY);
-		nodes.update(PeerUtils.createNodeWithName("a2"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("a3"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("a1"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("b1"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("f"), NodeStatus.FAILURE);
+		nodes.update(NodeUtils.createNodeWithName("b2"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("a2"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("a3"), NodeStatus.ACTIVE);
 
 		// Act:
 		final NodeExperiences experiences = new NodeExperiences();
@@ -85,12 +85,12 @@ public class PeerNetworkStateTest {
 
 		// Assert:
 		final Node[] expectedNodes = new Node[] {
-				PeerUtils.createNodeWithName("a1"),
-				PeerUtils.createNodeWithName("a2"),
-				PeerUtils.createNodeWithName("a3"),
-				PeerUtils.createNodeWithName("b2"),
-				PeerUtils.createNodeWithName("b1"),
-				PeerUtils.createNodeWithName("l"),
+				NodeUtils.createNodeWithName("a1"),
+				NodeUtils.createNodeWithName("a2"),
+				NodeUtils.createNodeWithName("a3"),
+				NodeUtils.createNodeWithName("b2"),
+				NodeUtils.createNodeWithName("b1"),
+				NodeUtils.createNodeWithName("l"),
 		};
 		Assert.assertThat(context.getNodes(), IsEqual.equalTo(expectedNodes));
 		Assert.assertThat(context.getLocalNode(), IsSame.sameInstance(state.getLocalNode()));
@@ -202,9 +202,9 @@ public class PeerNetworkStateTest {
 		final Config config = createTestConfig();
 		final NodeExperiences nodeExperiences = new NodeExperiences();
 		final NodeCollection nodes = new NodeCollection();
-		nodes.update(PeerUtils.createNodeWithName("p"), NodeStatus.INACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("p"), NodeStatus.INACTIVE);
 		final PeerNetworkState state = new PeerNetworkState(config, nodeExperiences, nodes);
-		final Node remoteNode = PeerUtils.createNodeWithName(name);
+		final Node remoteNode = NodeUtils.createNodeWithName(name);
 
 		// Act:
 		state.updateExperience(remoteNode, result);
@@ -236,8 +236,8 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), experiences, new NodeCollection());
 
 		final Node localNode = state.getLocalNode();
-		final Node otherNode1 = PeerUtils.createNodeWithPort(91);
-		final Node otherNode2 = PeerUtils.createNodeWithPort(97);
+		final Node otherNode1 = NodeUtils.createNodeWithPort(91);
+		final Node otherNode2 = NodeUtils.createNodeWithPort(97);
 
 		experiences.getNodeExperience(localNode, otherNode1).successfulCalls().set(14);
 		experiences.getNodeExperience(localNode, otherNode2).successfulCalls().set(7);
@@ -267,8 +267,8 @@ public class PeerNetworkStateTest {
 		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), experiences, new NodeCollection());
 
 		final List<NodeExperiencePair> pairs = new ArrayList<>();
-		pairs.add(new NodeExperiencePair(PeerUtils.createNodeWithPort(81), PeerUtils.createNodeExperience(14)));
-		pairs.add(new NodeExperiencePair(PeerUtils.createNodeWithPort(83), PeerUtils.createNodeExperience(44)));
+		pairs.add(new NodeExperiencePair(NodeUtils.createNodeWithPort(81), PeerUtils.createNodeExperience(14)));
+		pairs.add(new NodeExperiencePair(NodeUtils.createNodeWithPort(83), PeerUtils.createNodeExperience(44)));
 
 		// Act:
 		state.setRemoteNodeExperiences(new NodeExperiencesPair(state.getLocalNode(), pairs));
@@ -280,9 +280,9 @@ public class PeerNetworkStateTest {
 		final NodeExperiences experiences = new NodeExperiences();
 		final PeerNetworkState state = new PeerNetworkState(createTestConfig(), experiences, new NodeCollection());
 
-		final Node remoteNode = PeerUtils.createNodeWithPort(1);
-		final Node otherNode1 = PeerUtils.createNodeWithPort(81);
-		final Node otherNode2 = PeerUtils.createNodeWithPort(83);
+		final Node remoteNode = NodeUtils.createNodeWithPort(1);
+		final Node otherNode1 = NodeUtils.createNodeWithPort(81);
+		final Node otherNode2 = NodeUtils.createNodeWithPort(83);
 
 		final List<NodeExperiencePair> pairs = Arrays.asList(
 				new NodeExperiencePair(otherNode1, PeerUtils.createNodeExperience(14)),
@@ -347,7 +347,7 @@ public class PeerNetworkStateTest {
 
 	private static Config createTestConfig() {
 		final Config config = Mockito.mock(Config.class);
-		Mockito.when(config.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+		Mockito.when(config.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 		Mockito.when(config.getPreTrustedNodes()).
 				thenReturn(new PreTrustedNodes(new HashSet<>(PeerUtils.createNodesWithNames("a", "b", "c"))));
 		return config;

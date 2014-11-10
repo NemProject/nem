@@ -4,7 +4,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.test.IsEquivalent;
-import org.nem.peer.test.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,7 +62,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
-		nodes.update(PeerUtils.createNodeWithName("X"), expectedStatus);
+		nodes.update(NodeUtils.createNodeWithName("X"), expectedStatus);
 
 		// Assert:
 		final boolean isActiveOrBusy = NodeStatus.ACTIVE == expectedStatus || NodeStatus.BUSY == expectedStatus;
@@ -82,7 +81,7 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
-		nodes.update(PeerUtils.createNodeWithName("X"), NodeStatus.UNKNOWN);
+		nodes.update(NodeUtils.createNodeWithName("X"), NodeStatus.UNKNOWN);
 
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(0));
@@ -101,7 +100,7 @@ public class NodeCollectionTest {
 	@Test
 	public void activeNodeCanBeAddedToCollectionAndExposedBySubCollections() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("X");
+		final Node node = NodeUtils.createNodeWithName("X");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
@@ -117,7 +116,7 @@ public class NodeCollectionTest {
 	@Test
 	public void busyNodeCanBeAddedToCollectionAndExposedBySubCollections() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("X");
+		final Node node = NodeUtils.createNodeWithName("X");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
@@ -144,7 +143,7 @@ public class NodeCollectionTest {
 
 	private static void assertNodeWithStatusCanBeAddedToCollectionAndExposedByCollections(final NodeStatus status) {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("X");
+		final Node node = NodeUtils.createNodeWithName("X");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
@@ -184,7 +183,7 @@ public class NodeCollectionTest {
 
 	private static void assertGetNodeStatusReturnsCorrectStatusForNodeWithStatus(final NodeStatus status) {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("X");
+		final Node node = NodeUtils.createNodeWithName("X");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Act:
@@ -197,7 +196,7 @@ public class NodeCollectionTest {
 	@Test
 	public void getNodeStatusReturnsCorrectStatusForOtherNode() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("X");
+		final Node node = NodeUtils.createNodeWithName("X");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Assert:
@@ -222,7 +221,7 @@ public class NodeCollectionTest {
 
 	private static void assertFindNodeByEndpointReturnsNodeWithStatusMatchingEndpoint(final NodeStatus status) {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithHost("10.0.0.1", "X");
+		final Node node = NodeUtils.createNodeWithHost("10.0.0.1", "X");
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node, status);
 
@@ -247,7 +246,7 @@ public class NodeCollectionTest {
 
 	private static void assertFindNodeByEndpointDoesNotReturnNodeWithStatusMatchingEndpoint(final NodeStatus status) {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithHost("10.0.0.1", "X");
+		final Node node = NodeUtils.createNodeWithHost("10.0.0.1", "X");
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node, status);
 
@@ -288,7 +287,7 @@ public class NodeCollectionTest {
 
 	private static void assertFindNodeByIdentityReturnsNodeWithStatusMatchingIdentity(final NodeStatus status) {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithHost("10.0.0.1", "X");
+		final Node node = NodeUtils.createNodeWithHost("10.0.0.1", "X");
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node, status);
 
@@ -313,7 +312,7 @@ public class NodeCollectionTest {
 
 	private static void assertFindNodeByIdentityDoesNotReturnNodeWithStatusMatchingIdentity(final NodeStatus status) {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithHost("10.0.0.1", "X");
+		final Node node = NodeUtils.createNodeWithHost("10.0.0.1", "X");
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node, status);
 
@@ -366,7 +365,7 @@ public class NodeCollectionTest {
 
 	private static void assertNodeWithStatusIsBlacklisted(final NodeStatus status, final boolean isBlacklisted) {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithHost("10.0.0.1", "X");
+		final Node node = NodeUtils.createNodeWithHost("10.0.0.1", "X");
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node, status);
 
@@ -377,7 +376,7 @@ public class NodeCollectionTest {
 	@Test
 	public void unknownNodeIsNotBlacklisted() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithHost("10.0.0.1", "X");
+		final Node node = NodeUtils.createNodeWithHost("10.0.0.1", "X");
 		final NodeCollection nodes = new NodeCollection();
 
 		// Assert:
@@ -436,7 +435,7 @@ public class NodeCollectionTest {
 	@Test
 	public void updateRemovesNodeIfStatusChangesToUnknown() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("X");
+		final Node node = NodeUtils.createNodeWithName("X");
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node, NodeStatus.ACTIVE);
 
@@ -461,8 +460,8 @@ public class NodeCollectionTest {
 
 	private static void updateCanUpdateNodeEndpoint(final NodeStatus originalStatus, final NodeStatus endingStatus) {
 		// Arrange:
-		final Node node1 = PeerUtils.createNodeWithHost("10.0.0.1", "X");
-		final Node node2 = PeerUtils.createNodeWithHost("10.0.0.2", "X");
+		final Node node1 = NodeUtils.createNodeWithHost("10.0.0.1", "X");
+		final Node node2 = NodeUtils.createNodeWithHost("10.0.0.2", "X");
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node1, originalStatus);
 
@@ -519,7 +518,7 @@ public class NodeCollectionTest {
 	@Test
 	public void updateOnlyUpdatesMatchingNode() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("A2");
+		final Node node = NodeUtils.createNodeWithName("A2");
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
@@ -546,7 +545,7 @@ public class NodeCollectionTest {
 		it.next();
 
 		// Act: update the set and resume the iteration
-		nodes.update(PeerUtils.createNodeWithName("Z"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("Z"), NodeStatus.ACTIVE);
 		it.next();
 
 		// Assert: no ConcurrentModificationException is thrown
@@ -560,7 +559,7 @@ public class NodeCollectionTest {
 		it.next();
 
 		// Act: update the set and resume the iteration
-		nodes.update(PeerUtils.createNodeWithName("Z"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("Z"), NodeStatus.BUSY);
 		it.next();
 
 		// Assert: no ConcurrentModificationException is thrown
@@ -602,7 +601,7 @@ public class NodeCollectionTest {
 
 		// Act:
 		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
 		nodes.prune(); // removed: { I1, F2 }
 
 		// Assert:
@@ -621,7 +620,7 @@ public class NodeCollectionTest {
 
 		// Act:
 		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.BUSY);
 		nodes.prune(); // removed: { I1, F2 }
 
 		// Assert:
@@ -640,7 +639,7 @@ public class NodeCollectionTest {
 
 		// Act:
 		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
 		nodes.prune(); // removed: { I1, F1 F2 }
 
 		// Assert:
@@ -654,7 +653,7 @@ public class NodeCollectionTest {
 
 		// Act:
 		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
+		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
 		nodes.prune(); // removed: { I1, F1, F2 }
 
 		// Assert:
@@ -668,8 +667,8 @@ public class NodeCollectionTest {
 
 		// Act:
 		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
 		nodes.prune(); // removed: { I1, F2 }
 
 		// Assert:
@@ -688,8 +687,8 @@ public class NodeCollectionTest {
 
 		// Act:
 		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.BUSY);
-		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
+		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
 		nodes.prune(); // removed: { F1, F2 }
 
 		// Assert:
@@ -708,11 +707,11 @@ public class NodeCollectionTest {
 
 		// Act:
 		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("F2"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F2"), NodeStatus.BUSY);
 		nodes.prune(); // candidate: { F1 }
-		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.INACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("F2"), NodeStatus.FAILURE);
+		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.INACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F2"), NodeStatus.FAILURE);
 		nodes.prune(); // candidate: { I1, F2 }, pruned: { F1 }
 
 		// Assert:
@@ -736,7 +735,7 @@ public class NodeCollectionTest {
 			this.put("diff-status", createNodeCollection(new String[] { "A", "F", "Y" }, new String[] { "B", "P" }));
 
 			final NodeCollection other = createNodeCollection(new String[] { "A", "F", "P" }, new String[] { "B", "Y" });
-			other.update(PeerUtils.createNodeWithName("X"), NodeStatus.INACTIVE);
+			other.update(NodeUtils.createNodeWithName("X"), NodeStatus.INACTIVE);
 			this.put("diff-other", other);
 		}
 	};
@@ -776,11 +775,11 @@ public class NodeCollectionTest {
 		// Arrange:
 		final NodeCollection nodes = new NodeCollection();
 		for (final String nodeName : activeNodeNames) {
-			nodes.update(PeerUtils.createNodeWithName(nodeName), NodeStatus.ACTIVE);
+			nodes.update(NodeUtils.createNodeWithName(nodeName), NodeStatus.ACTIVE);
 		}
 
 		for (final String nodeName : inactiveNodeNames) {
-			nodes.update(PeerUtils.createNodeWithName(nodeName), NodeStatus.BUSY);
+			nodes.update(NodeUtils.createNodeWithName(nodeName), NodeStatus.BUSY);
 		}
 
 		return nodes;
@@ -791,15 +790,15 @@ public class NodeCollectionTest {
 	private static NodeCollection createNodeCollectionWithMultipleNodes() {
 		// Arrange:
 		final NodeCollection nodes = new NodeCollection();
-		nodes.update(PeerUtils.createNodeWithName("A1"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("B1"), NodeStatus.BUSY);
-		nodes.update(PeerUtils.createNodeWithName("B2"), NodeStatus.BUSY);
-		nodes.update(PeerUtils.createNodeWithName("A2"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("F1"), NodeStatus.FAILURE);
-		nodes.update(PeerUtils.createNodeWithName("A3"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("I1"), NodeStatus.INACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("F2"), NodeStatus.FAILURE);
-		nodes.update(PeerUtils.createNodeWithName("U1"), NodeStatus.UNKNOWN);
+		nodes.update(NodeUtils.createNodeWithName("A1"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("B1"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("B2"), NodeStatus.BUSY);
+		nodes.update(NodeUtils.createNodeWithName("A2"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.FAILURE);
+		nodes.update(NodeUtils.createNodeWithName("A3"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.INACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("F2"), NodeStatus.FAILURE);
+		nodes.update(NodeUtils.createNodeWithName("U1"), NodeStatus.UNKNOWN);
 		return nodes;
 	}
 

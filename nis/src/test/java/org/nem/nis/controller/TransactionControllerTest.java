@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
@@ -14,7 +14,6 @@ import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.PushService;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-import org.nem.peer.test.PeerUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -76,7 +75,7 @@ public class TransactionControllerTest {
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
-			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+			Mockito.when(this.network.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);

@@ -3,7 +3,7 @@ package org.nem.peer.trust.score;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.*;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.peer.test.*;
 
 public class ScoresTest {
@@ -196,7 +196,7 @@ public class ScoresTest {
 
 			this.nodes = new Node[numNodes];
 			for (int i = 0; i < numNodes; ++i) {
-				this.nodes[i] = PeerUtils.createNodeWithName(String.format("bob #%d", i));
+				this.nodes[i] = NodeUtils.createNodeWithName(String.format("bob #%d", i));
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 package org.nem.peer.trust.simulation;
 
 import org.nem.core.node.*;
-import org.nem.peer.test.PeerUtils;
 
 import java.io.*;
 import java.util.*;
@@ -117,7 +116,7 @@ public class Config {
 					isLeech,
 					isCollusive);
 
-			this.node = PeerUtils.createNodeWithHost(address);
+			this.node = NodeUtils.createNodeWithHost(address);
 		}
 
 		public Entry(final String line) {
@@ -140,7 +139,7 @@ public class Config {
 					isLeech,
 					isCollusive);
 
-			this.node = PeerUtils.createNodeWithHost(nodeAttributes[0]);
+			this.node = NodeUtils.createNodeWithHost(nodeAttributes[0]);
 		}
 
 		public boolean isPreTrusted() {

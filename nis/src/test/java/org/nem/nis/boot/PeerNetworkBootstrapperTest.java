@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.async.SleepFuture;
+import org.nem.core.node.NodeUtils;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.peer.*;
 import org.nem.peer.services.*;
@@ -146,7 +147,7 @@ public class PeerNetworkBootstrapperTest {
 		public TestContext(final boolean requirePeerAck) {
 			final NodeSelector selector = Mockito.mock(NodeSelector.class);
 			Mockito.when(selector.selectNodes()).thenReturn(PeerUtils.createNodesWithNames("a", "b", "c"));
-			Mockito.when(selector.selectNode()).thenReturn(PeerUtils.createNodeWithName("d"));
+			Mockito.when(selector.selectNode()).thenReturn(NodeUtils.createNodeWithName("d"));
 			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(selector);
 
 			Mockito.when(this.updater.updateAny(Mockito.any())).thenReturn(CompletableFuture.completedFuture(true));

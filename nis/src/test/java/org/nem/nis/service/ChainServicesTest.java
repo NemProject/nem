@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.peer.connect.*;
-import org.nem.peer.test.WeakNodeIdentity;
+import org.nem.core.node.WeakNodeIdentity;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;

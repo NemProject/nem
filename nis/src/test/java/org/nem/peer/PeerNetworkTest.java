@@ -10,7 +10,6 @@ import org.nem.core.time.synchronization.TimeSynchronizer;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.services.*;
-import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;
 
@@ -37,7 +36,7 @@ public class PeerNetworkTest {
 	public void getLocalNodeDelegatesToState() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Node localNode = PeerUtils.createNodeWithName("l");
+		final Node localNode = NodeUtils.createNodeWithName("l");
 		Mockito.when(context.network.getLocalNode()).thenReturn(localNode);
 
 		// Act:
@@ -68,8 +67,8 @@ public class PeerNetworkTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<Node> nodes = Arrays.asList(
-				PeerUtils.createNodeWithHost("10.0.0.4"),
-				PeerUtils.createNodeWithHost("10.0.0.7"));
+				NodeUtils.createNodeWithHost("10.0.0.4"),
+				NodeUtils.createNodeWithHost("10.0.0.7"));
 		Mockito.when(context.selector.selectNodes()).thenReturn(nodes);
 
 		// Act:
@@ -84,7 +83,7 @@ public class PeerNetworkTest {
 	public void getLocalNodeAndExperiencesDelegatesToState() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final NodeExperiencesPair pair = new NodeExperiencesPair(PeerUtils.createNodeWithName("r"), new ArrayList<>());
+		final NodeExperiencesPair pair = new NodeExperiencesPair(NodeUtils.createNodeWithName("r"), new ArrayList<>());
 		Mockito.when(context.network.getLocalNodeAndExperiences()).thenReturn(pair);
 
 		// Act:
@@ -99,7 +98,7 @@ public class PeerNetworkTest {
 	public void updateExperienceDelegatesToState() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Node node = PeerUtils.createNodeWithName("r");
+		final Node node = NodeUtils.createNodeWithName("r");
 
 		// Act:
 		context.network.updateExperience(node, NodeInteractionResult.SUCCESS);
@@ -112,7 +111,7 @@ public class PeerNetworkTest {
 	public void setRemoteNodeExperiencesDelegatesToState() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final NodeExperiencesPair pair = new NodeExperiencesPair(PeerUtils.createNodeWithName("r"), new ArrayList<>());
+		final NodeExperiencesPair pair = new NodeExperiencesPair(NodeUtils.createNodeWithName("r"), new ArrayList<>());
 
 		// Act:
 		context.network.setRemoteNodeExperiences(pair);
@@ -253,8 +252,8 @@ public class PeerNetworkTest {
 		Mockito.when(context.servicesFactory.getChainServices()).thenReturn(services);
 
 		final NodeCollection nodes = new NodeCollection();
-		nodes.update(PeerUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
-		nodes.update(PeerUtils.createNodeWithName("b"), NodeStatus.INACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("b"), NodeStatus.INACTIVE);
 		Mockito.when(context.state.getNodes()).thenReturn(nodes);
 		Mockito.when(services.isChainSynchronized(context.state.getNodes().getActiveNodes())).thenReturn(CompletableFuture.completedFuture(true));
 

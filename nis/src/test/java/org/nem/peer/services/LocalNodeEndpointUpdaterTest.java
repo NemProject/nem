@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import org.nem.core.connect.*;
 import org.nem.core.node.*;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 
 import java.util.*;
@@ -180,13 +179,13 @@ public class LocalNodeEndpointUpdaterTest {
 	//endregion
 
 	private static class TestContext {
-		private final Node localNode = PeerUtils.createNodeWithName("l");
+		private final Node localNode = NodeUtils.createNodeWithName("l");
 		private final NodeSelector selector = Mockito.mock(NodeSelector.class);
 		private final PeerConnector connector = Mockito.mock(PeerConnector.class);
 		private final LocalNodeEndpointUpdater updater = new LocalNodeEndpointUpdater(this.localNode, this.connector);
 
 		public void makeSelectorReturnRemoteNode() {
-			Mockito.when(this.selector.selectNode()).thenReturn(PeerUtils.createNodeWithName("p"));
+			Mockito.when(this.selector.selectNode()).thenReturn(NodeUtils.createNodeWithName("p"));
 		}
 
 		public boolean runUpdateAnyWithThreeNodes(
@@ -194,9 +193,9 @@ public class LocalNodeEndpointUpdaterTest {
 				final CompletableFuture<NodeEndpoint> node2Future,
 				final CompletableFuture<NodeEndpoint> node3Future) {
 			final List<Node> nodes = Arrays.asList(
-					PeerUtils.createNodeWithName("a"),
-					PeerUtils.createNodeWithName("b"),
-					PeerUtils.createNodeWithName("c"));
+					NodeUtils.createNodeWithName("a"),
+					NodeUtils.createNodeWithName("b"),
+					NodeUtils.createNodeWithName("c"));
 			Mockito.when(this.connector.getLocalNodeInfo(Mockito.eq(nodes.get(0)), Mockito.any()))
 					.thenReturn(node1Future);
 			Mockito.when(this.connector.getLocalNodeInfo(Mockito.eq(nodes.get(1)), Mockito.any()))

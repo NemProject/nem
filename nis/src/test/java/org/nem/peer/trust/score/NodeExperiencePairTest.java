@@ -4,7 +4,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
-import org.nem.peer.test.PeerUtils;
 
 public class NodeExperiencePairTest {
 
@@ -13,7 +12,7 @@ public class NodeExperiencePairTest {
 	@Test
 	public void pairCanBeCreated() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("bob");
+		final Node node = NodeUtils.createNodeWithName("bob");
 		final NodeExperience experience = new NodeExperience();
 
 		// Act:
@@ -93,6 +92,6 @@ public class NodeExperiencePairTest {
 			final String host,
 			final int numSuccess,
 			final int numFailures) {
-		return new NodeExperiencePair(PeerUtils.createNodeWithHost(host), new NodeExperience(numSuccess, numFailures));
+		return new NodeExperiencePair(NodeUtils.createNodeWithHost(host), new NodeExperience(numSuccess, numFailures));
 	}
 }

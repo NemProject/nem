@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
 
@@ -20,12 +20,12 @@ public class TestTrustContext {
 	 * Creates a new test trust context.
 	 */
 	public TestTrustContext() {
-		this.localNode = PeerUtils.createNodeWithName("local");
+		this.localNode = NodeUtils.createNodeWithName("local");
 		this.nodes = new Node[] {
-				PeerUtils.createNodeWithName("bob"),
-				PeerUtils.createNodeWithName("alice"),
-				PeerUtils.createNodeWithName("trudy"),
-				PeerUtils.createNodeWithName("peggy"),
+				NodeUtils.createNodeWithName("bob"),
+				NodeUtils.createNodeWithName("alice"),
+				NodeUtils.createNodeWithName("trudy"),
+				NodeUtils.createNodeWithName("peggy"),
 				this.localNode
 		};
 
