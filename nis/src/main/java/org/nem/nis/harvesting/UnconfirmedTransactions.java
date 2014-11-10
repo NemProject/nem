@@ -43,7 +43,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = createSingleValidator();
+		this.singleValidator = this.createSingleValidator();
 	}
 
 	private UnconfirmedTransactions(
@@ -53,7 +53,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = createSingleValidator();
+		this.singleValidator = this.createSingleValidator();
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -103,13 +103,13 @@ public class UnconfirmedTransactions {
 	 * TODO                    Probably pretty expensive for the attacker too bc he needs to upload all those transactions. Gimre, what's your opinion?
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
-		final ValidationResult transactionValidationResult = validateBatch(transactions);
+		final ValidationResult transactionValidationResult = this.validateBatch(transactions);
 		if (!transactionValidationResult.isSuccess()) {
 			return transactionValidationResult;
 		}
 
 		boolean success = false;
-		for (Transaction transaction : transactions) {
+		for (final Transaction transaction : transactions) {
 			if (ValidationResult.SUCCESS == this.add(transaction, true)) {
 				success = true;
 			}
@@ -125,7 +125,7 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
-		final ValidationResult transactionValidationResult = validateBatch(Arrays.asList(transaction));
+		final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
 		return transactionValidationResult.isSuccess()
 				? this.add(transaction, true)
 				: transactionValidationResult;

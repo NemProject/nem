@@ -128,7 +128,7 @@ public class TransferDaoImpl implements TransferDao {
 		if (TransferType.ALL == transferType) {
 			final Collection<Object[]> objects = this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, TransferType.INCOMING, tx);
 			objects.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, TransferType.OUTGOING, tx));
-			return sortAndLimit(objects, limit);
+			return this.sortAndLimit(objects, limit);
 		} else {
 			return this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, transferType, tx);
 		}
@@ -175,7 +175,7 @@ public class TransferDaoImpl implements TransferDao {
 		if (TransferType.ALL == transferType) {
 			final Collection<Object[]> objects = this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.INCOMING);
 			objects.addAll(this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.OUTGOING));
-			return sortAndLimit(objects, limit);
+			return this.sortAndLimit(objects, limit);
 		} else {
 			return this.getLatestTransactionsForAccountWithTransferType(address, limit, transferType);
 		}
@@ -202,7 +202,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	private Collection<Object[]> sortAndLimit(final Collection<Object[]> objects, final int limit) {
 		return objects.stream()
-				.sorted((o1, o2) -> comparePair(o1, o2))
+				.sorted((o1, o2) -> this.comparePair(o1, o2))
 				.limit(limit)
 				.collect(Collectors.toList());
 	}
