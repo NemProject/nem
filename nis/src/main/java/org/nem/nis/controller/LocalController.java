@@ -6,14 +6,14 @@ import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.*;
-import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.secret.BlockChainConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 // TODO: add tests for this controller
@@ -62,15 +62,9 @@ public class LocalController {
 	@ClientApi
 	public SerializableList<ExplorerBlockView> localBlocksAfter(@RequestBody final BlockHeight height) {
 		// TODO: add tests for this action
-		org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
 		final SerializableList<ExplorerBlockView> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
-		for (int i = 0; i < BlockChainConstants.BLOCKS_LIMIT; ++i) {
-			final Long curBlockId = dbBlock.getNextBlockId();
-			if (null == curBlockId) {
-				break;
-			}
-
-			dbBlock = this.blockDao.findById(curBlockId);
+		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(height, BlockChainConstants.BLOCKS_LIMIT);
+		for (final org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
 			final long timeStamp = UnixTime.fromTimeInstant(new TimeInstant(dbBlock.getTimeStamp())).getMillis();
 			final ExplorerBlockView explorerBlockView = new ExplorerBlockView(
 					dbBlock.getHeight(),

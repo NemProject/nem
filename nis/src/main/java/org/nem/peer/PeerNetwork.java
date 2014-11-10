@@ -176,5 +176,13 @@ public class PeerNetwork {
 		return this.servicesFactory.createLocalNodeEndpointUpdater().update(this.selector);
 	}
 
+	/**
+	 * Updates the endpoint of the local node as seen by other nodes.
+	 */
+	public CompletableFuture<Boolean> boot() {
+		// it is safe to use partner nodes before a refresh cycle
+		return this.servicesFactory.createLocalNodeEndpointUpdater().updateAny(this.getPartnerNodes());
+	}
+
 	//endregion
 }

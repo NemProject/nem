@@ -3,7 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.model.ImportanceTransferTransaction;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.utils.CircularStack;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 
 /**
  * A collection of remote states associated with an account.

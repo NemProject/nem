@@ -18,9 +18,9 @@ public class InactiveNodePruner {
 	 */
 	public int prune(final NodeCollection nodes) {
 		LOGGER.fine("pruning inactive nodes");
-		final int numInitialInactiveNodes = nodes.getInactiveNodes().size();
-		nodes.pruneInactiveNodes();
-		final int numNodesPruned = numInitialInactiveNodes - nodes.getInactiveNodes().size();
+		final int numInitialNodes = nodes.size();
+		nodes.prune();
+		final int numNodesPruned = numInitialNodes - nodes.size();
 		LOGGER.info(String.format("%d inactive node(s) were pruned", numNodesPruned));
 		return numNodesPruned;
 	}

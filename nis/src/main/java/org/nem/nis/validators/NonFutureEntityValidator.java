@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.core.time.*;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.BlockChainConstants;
 
 /**
  * BlockValidator and TransactionValidator implementation that ensures entities are not too far in the future.

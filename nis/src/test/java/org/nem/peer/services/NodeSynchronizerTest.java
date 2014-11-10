@@ -3,10 +3,9 @@ package org.nem.peer.services;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
-import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 
 public class NodeSynchronizerTest {
@@ -83,7 +82,7 @@ public class NodeSynchronizerTest {
 				this.state);
 
 		public Node makeSelectorReturnRemoteNode() {
-			final Node remoteNode = PeerUtils.createNodeWithName("p");
+			final Node remoteNode = NodeUtils.createNodeWithName("p");
 			Mockito.when(this.selector.selectNode()).thenReturn(remoteNode);
 			return remoteNode;
 		}

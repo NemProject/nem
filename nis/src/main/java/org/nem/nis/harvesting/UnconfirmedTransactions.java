@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.time.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 
@@ -43,7 +43,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = createSingleValidator();
+		this.singleValidator = this.createSingleValidator();
 	}
 
 	private UnconfirmedTransactions(
@@ -53,7 +53,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = createSingleValidator();
+		this.singleValidator = this.createSingleValidator();
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -93,7 +93,6 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param transactions The collection of transactions.
 	 * @return SUCCESS if at least one transaction was added, NEUTRAL or FAILURE otherwise.
-	 *
 	 * TODO 20141104 J-B: you're never actually returning FAILURE, not sure if that's intentional
 	 * > if you want to short circuit on failure, you can use ValidationResult.aggregate
 	 * TODO 20141105 BR -> J: if the batch validation fails it is returning failure, see test class.
@@ -102,15 +101,23 @@ public class UnconfirmedTransactions {
 	 * TODO                    For the rest we use single validation anyway so we can pick those transactions which are valid.
 	 * TODO                    Do you want to fail fast because the remote could supply tons of new invalid transactions as an attack vector?
 	 * TODO                    Probably pretty expensive for the attacker too bc he needs to upload all those transactions. Gimre, what's your opinion?
+	 * TODO 20141110: G-BR, J: I think failing fast could lead to problems, this is scenario I've came up with (assuming fail FAST):
+	 *   1. I have 100 N, I send TX a: 80N to some nodes and TX b: 80N to other nodes
+	 *   2. those nodes, shouldn't exchange TXes with each other (due to fail fast)
+	 *   3. but after some time, one of those TXes will be included in some block anyway
+	 *   4. but probably that 'conflicting' TX won't be purged... [1]
+	 *   5. so half of the nodes or more, won't be able to sync until it'll expire
+	 *       (by sync I mean nodes won't pull any unconfirmed TXes from those 'infected' nodes)
+	 *    [1] maybe that is something that will need to be changed/fixed
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
-		final ValidationResult transactionValidationResult = validateBatch(transactions);
+		final ValidationResult transactionValidationResult = this.validateBatch(transactions);
 		if (!transactionValidationResult.isSuccess()) {
 			return transactionValidationResult;
 		}
 
 		boolean success = false;
-		for(Transaction transaction : transactions) {
+		for (final Transaction transaction : transactions) {
 			if (ValidationResult.SUCCESS == this.add(transaction, true)) {
 				success = true;
 			}
@@ -126,7 +133,7 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
-		final ValidationResult transactionValidationResult = validateBatch(Arrays.asList(transaction));
+		final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
 		return transactionValidationResult.isSuccess()
 				? this.add(transaction, true)
 				: transactionValidationResult;

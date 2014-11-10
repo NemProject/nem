@@ -1,6 +1,6 @@
 package org.nem.peer.test;
 
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.peer.trust.ScoreProvider;
 import org.nem.peer.trust.score.*;
 
@@ -64,9 +64,9 @@ public class ScoreProviderTestContext {
 			final double localTrust2,
 			final double localTrustSum2) {
 		// Arrange:
-		final Node node1 = PeerUtils.createNodeWithName("a");
-		final Node node2 = PeerUtils.createNodeWithName("b");
-		final Node node3 = PeerUtils.createNodeWithName("c");
+		final Node node1 = NodeUtils.createNodeWithName("a");
+		final Node node2 = NodeUtils.createNodeWithName("b");
+		final Node node3 = NodeUtils.createNodeWithName("c");
 
 		this.trustScores.getScore(node1, node3).score().set(localTrust1);
 		this.trustScores.getScoreWeight(node1).set(localTrustSum1);

@@ -2,8 +2,7 @@ package org.nem.peer.trust.score;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.node.Node;
-import org.nem.peer.test.PeerUtils;
+import org.nem.core.node.*;
 
 public class TrustScoresTest {
 
@@ -12,7 +11,7 @@ public class TrustScoresTest {
 	@Test
 	public void previouslyUnknownWeightCanBeRetrieved() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("bob");
+		final Node node = NodeUtils.createNodeWithName("bob");
 		final TrustScores scores = new TrustScores();
 
 		// Act:
@@ -25,7 +24,7 @@ public class TrustScoresTest {
 	@Test
 	public void sameWeightIsReturnedForSameNode() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithName("bob");
+		final Node node = NodeUtils.createNodeWithName("bob");
 		final TrustScores scores = new TrustScores();
 
 		// Act:

@@ -2,7 +2,6 @@ package org.nem.nis;
 
 import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.secret.BlockChainConstants;
 
 import java.math.BigInteger;
 import java.util.List;

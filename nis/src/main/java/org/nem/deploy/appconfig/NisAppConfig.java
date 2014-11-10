@@ -13,6 +13,7 @@ import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
+import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,12 +122,8 @@ public class NisAppConfig {
 	@Bean
 	public BlockChain blockChain() {
 		return new BlockChain(
-				this.accountAnalyzer(),
-				this.accountDao,
 				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.blockChainServices(),
-				this.unconfirmedTransactions());
+				this.blockChainUpdater());
 	}
 
 	@Bean
@@ -136,6 +133,27 @@ public class NisAppConfig {
 				this.blockTransactionObserverFactory(),
 				this.blockValidatorFactory(),
 				this.transactionValidatorFactory());
+	}
+
+	@Bean
+	public BlockChainUpdater blockChainUpdater() {
+		return new BlockChainUpdater(
+				this.accountAnalyzer(),
+				this.accountDao,
+				this.blockChainLastBlockLayer,
+				this.blockDao,
+				this.blockChainContextFactory(),
+				this.unconfirmedTransactions());
+	}
+
+	@Bean
+	public BlockChainContextFactory blockChainContextFactory() {
+		return new BlockChainContextFactory(
+				this.accountAnalyzer(),
+				this.blockChainLastBlockLayer,
+				this.blockDao,
+				this.blockChainServices(),
+				this.unconfirmedTransactions());
 	}
 
 	@Bean
@@ -246,7 +264,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockAnalyzer blockAnalyzer() {
-		return new BlockAnalyzer(this.blockDao, this.blockChain(), this.blockChainLastBlockLayer);
+		return new BlockAnalyzer(this.blockDao, this.blockChainUpdater(), this.blockChainLastBlockLayer);
 	}
 
 	@Bean

@@ -4,8 +4,10 @@ import org.nem.core.node.Node;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.trust.NodeSelector;
 
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Helper class used to implement local node endpoint updating logic.
@@ -31,7 +33,7 @@ public class LocalNodeEndpointUpdater {
 	 * Updates the local node endpoint.
 	 *
 	 * @param selector The node selector.
-	 * @return The future.
+	 * @return The future (true if the node was updated; false otherwise).
 	 */
 	public CompletableFuture<Boolean> update(final NodeSelector selector) {
 		LOGGER.info("updating local node endpoint");
@@ -41,7 +43,11 @@ public class LocalNodeEndpointUpdater {
 			return CompletableFuture.completedFuture(false);
 		}
 
-		return this.connector.getLocalNodeInfo(partnerNode, this.localNode.getEndpoint())
+		return this.update(partnerNode);
+	}
+
+	private CompletableFuture<Boolean> update(final Node node) {
+		return this.connector.getLocalNodeInfo(node, this.localNode.getEndpoint())
 				.handle((endpoint, e) -> {
 					if (null == endpoint) {
 						return false;
@@ -57,5 +63,23 @@ public class LocalNodeEndpointUpdater {
 					this.localNode.setEndpoint(endpoint);
 					return true;
 				});
+	}
+
+	/**
+	 * Updates the local node endpoint by using any of the specified nodes.
+	 *
+	 * @param nodes The candidate nodes.
+	 * @return The future (true if the node was updated by at least one node; false otherwise).
+	 */
+	public CompletableFuture<Boolean> updateAny(final Collection<Node> nodes) {
+		final CompletableFuture<Boolean> aggregateFuture = new CompletableFuture<>();
+		final List<CompletableFuture<?>> futures = nodes.stream()
+				.map(node -> this.update(node).thenAccept(b -> { if (b) { aggregateFuture.complete(true); } }))
+				.collect(Collectors.toList());
+
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+				.thenAccept(b -> aggregateFuture.complete(false));
+
+		return aggregateFuture;
 	}
 }

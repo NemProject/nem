@@ -1,8 +1,7 @@
 package org.nem.nis.sync;
 
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.nis.*;
 
 /**
  * A default comparison context that is populated with block chain constants.

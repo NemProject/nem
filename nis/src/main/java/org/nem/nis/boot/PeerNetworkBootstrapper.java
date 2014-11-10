@@ -61,8 +61,7 @@ public class PeerNetworkBootstrapper {
 			throw new IllegalStateException("network boot was already attempted");
 		}
 
-		return this.network.refresh()
-				.thenCompose(v -> this.network.updateLocalNodeEndpoint())
+		return this.network.boot()
 				.handle((result, e) -> {
 					if (null != e || (!result && this.requirePeerAck)) {
 						this.canBoot.set(true);

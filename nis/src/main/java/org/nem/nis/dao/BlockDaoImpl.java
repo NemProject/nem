@@ -36,25 +36,6 @@ public class BlockDaoImpl implements BlockDao {
 		this.getCurrentSession().saveOrUpdate(block);
 	}
 
-	/*
-	 * I was trying to do that, by marking Block with:
-	 * "@DynamicUpdate" and "@SelectBeforeUpdate", and indeed,
-	 * only nextBlockId was updated, but apart from that also all associated
-	 * transfers and block_transfers table. That is unacceptable of course.
-	 *
-	 * If anyone will figure how to do that we could get rid of this.
-	 */
-	@Override
-	@Transactional
-	public void updateLastBlockId(final Block block) {
-		final Query updateId = this.getCurrentSession().createQuery("UPDATE Block " +
-				"set nextBlockId = :nextBlockId " +
-				"where id = :blockId");
-		updateId.setParameter("nextBlockId", block.getNextBlockId());
-		updateId.setParameter("blockId", block.getId());
-		updateId.executeUpdate();
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public Long count() {

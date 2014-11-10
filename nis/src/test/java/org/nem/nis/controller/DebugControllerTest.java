@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.node.NodeUtils;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -16,7 +17,6 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
-import org.nem.peer.test.PeerUtils;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -181,7 +181,7 @@ public class DebugControllerTest {
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
-			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+			Mockito.when(this.network.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);

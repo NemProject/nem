@@ -6,12 +6,14 @@ import org.mockito.Mockito;
 import org.nem.core.connect.*;
 import org.nem.core.node.*;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.NodeSelector;
 
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class LocalNodeEndpointUpdaterTest {
+
+	//region update
 
 	@Test
 	public void updateDelegatesToNodeSelectorForNodeSelection() {
@@ -22,7 +24,7 @@ public class LocalNodeEndpointUpdaterTest {
 		context.updater.update(context.selector).join();
 
 		// Assert:
-		Mockito.verify(context.selector, Mockito.times(1)).selectNode();
+		Mockito.verify(context.selector, Mockito.only()).selectNode();
 	}
 
 	@Test
@@ -113,14 +115,96 @@ public class LocalNodeEndpointUpdaterTest {
 		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.101"));
 	}
 
+	//endregion
+
+	//region updateAny
+
+	@Test
+	public void updateAnyUpdatesEndpointWithOneSuccessfulResult() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final boolean result = context.runUpdateAnyWithThreeNodes(
+				CompletableFuture.completedFuture(NodeEndpoint.fromHost("127.0.0.10")),
+				CompletableFuture.completedFuture(NodeEndpoint.fromHost("127.0.0.20")),
+				CompletableFuture.completedFuture(NodeEndpoint.fromHost("127.0.0.30")));
+
+		// Assert:
+		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
+		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.30"));
+	}
+
+	@Test
+	public void updateAnySucceedsWhenAtLeastOneNodeIsAbleToUpdateLocalEndpoint() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final boolean result = context.runUpdateAnyWithThreeNodes(
+				createExceptionalFuture(),
+				CompletableFuture.completedFuture(NodeEndpoint.fromHost("127.0.0.20")),
+				createExceptionalFuture());
+
+		// Assert:
+		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
+		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.20"));
+	}
+
+	@Test
+	public void updateAnyFailsWhenNoNodesAreAbleToUpdateLocalEndpoint() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final boolean result = context.runUpdateAnyWithThreeNodes(
+				createExceptionalFuture(),
+				createExceptionalFuture(),
+				createExceptionalFuture());
+
+		// Assert:
+		Mockito.verify(context.connector, Mockito.times(3)).getLocalNodeInfo(Mockito.any(), Mockito.any());
+		Assert.assertThat(result, IsEqual.equalTo(false));
+		Assert.assertThat(context.localNode.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo("127.0.0.1"));
+	}
+
+	private static CompletableFuture<NodeEndpoint> createExceptionalFuture() {
+		return CompletableFuture.supplyAsync(() -> {
+			throw new FatalPeerException("badness");
+		});
+	}
+
+	//endregion
+
 	private static class TestContext {
-		private final Node localNode = PeerUtils.createNodeWithName("l");
+		private final Node localNode = NodeUtils.createNodeWithName("l");
 		private final NodeSelector selector = Mockito.mock(NodeSelector.class);
 		private final PeerConnector connector = Mockito.mock(PeerConnector.class);
 		private final LocalNodeEndpointUpdater updater = new LocalNodeEndpointUpdater(this.localNode, this.connector);
 
 		public void makeSelectorReturnRemoteNode() {
-			Mockito.when(this.selector.selectNode()).thenReturn(PeerUtils.createNodeWithName("p"));
+			Mockito.when(this.selector.selectNode()).thenReturn(NodeUtils.createNodeWithName("p"));
+		}
+
+		public boolean runUpdateAnyWithThreeNodes(
+				final CompletableFuture<NodeEndpoint> node1Future,
+				final CompletableFuture<NodeEndpoint> node2Future,
+				final CompletableFuture<NodeEndpoint> node3Future) {
+			final List<Node> nodes = Arrays.asList(
+					NodeUtils.createNodeWithName("a"),
+					NodeUtils.createNodeWithName("b"),
+					NodeUtils.createNodeWithName("c"));
+			Mockito.when(this.connector.getLocalNodeInfo(Mockito.eq(nodes.get(0)), Mockito.any()))
+					.thenReturn(node1Future);
+			Mockito.when(this.connector.getLocalNodeInfo(Mockito.eq(nodes.get(1)), Mockito.any()))
+					.thenReturn(node2Future);
+			Mockito.when(this.connector.getLocalNodeInfo(Mockito.eq(nodes.get(2)), Mockito.any()))
+					.thenReturn(node3Future);
+
+			// Act:
+			return this.updater.updateAny(nodes).join();
 		}
 	}
 }

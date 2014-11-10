@@ -6,19 +6,18 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-import org.nem.peer.test.PeerUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -130,7 +129,7 @@ public class ChainControllerTest {
 			final Function<TestContext, T> action,
 			final Function<T, BlockChainScore> getChainScore) {
 		// Arrange:
-		Mockito.when(context.blockChain.getScore()).thenReturn(new BlockChainScore(21));
+		Mockito.when(context.blockChainScoreManager.getScore()).thenReturn(new BlockChainScore(21));
 
 		// Act:
 		final T result = action.apply(context);
@@ -138,7 +137,7 @@ public class ChainControllerTest {
 
 		// Assert:
 		Assert.assertThat(score, IsEqual.equalTo(new BlockChainScore(21)));
-		Mockito.verify(context.blockChain, Mockito.times(1)).getScore();
+		Mockito.verify(context.blockChainScoreManager, Mockito.times(1)).getScore();
 		return result;
 	}
 
@@ -218,8 +217,7 @@ public class ChainControllerTest {
 
 		// Arrange: set the id and next block id of the second block incorrectly
 		final List<org.nem.nis.dbmodel.Block> blockList = getValidBlockList();
-		blockList.get(1).setId(11L);
-		blockList.get(1).setNextBlockId(12L);
+		blockList.get(1).setHeight(11L);
 
 		// Assert:
 		ExceptionAssert.assertThrows(
@@ -236,10 +234,8 @@ public class ChainControllerTest {
 	private static List<org.nem.nis.dbmodel.Block> getValidBlockList() {
 		final org.nem.nis.dbmodel.Block dbBlock1 = NisUtils.createDbBlockWithTimeStampAtHeight(443, 11);
 		dbBlock1.setId(11L);
-		dbBlock1.setNextBlockId(12L);
 		final org.nem.nis.dbmodel.Block dbBlock2 = NisUtils.createDbBlockWithTimeStampAtHeight(543, 12);
 		dbBlock2.setId(12L);
-		dbBlock2.setNextBlockId(13L);
 		return Arrays.asList(dbBlock1, dbBlock2);
 	}
 
@@ -271,14 +267,14 @@ public class ChainControllerTest {
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final AccountLookup accountLookup = new MockAccountLookup();
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		private final BlockChain blockChain = Mockito.mock(BlockChain.class);
+		private final BlockChainScoreManager blockChainScoreManager = Mockito.mock(BlockChainScoreManager.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final ChainController controller;
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
-			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+			Mockito.when(this.network.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
@@ -287,7 +283,7 @@ public class ChainControllerTest {
 					this.blockDao,
 					this.accountLookup,
 					this.blockChainLastBlockLayer,
-					this.blockChain,
+					this.blockChainScoreManager,
 					this.host);
 		}
 	}
