@@ -105,7 +105,11 @@ public class BlockAnalyzer {
 			}
 
 			dbBlock = currentBlock;
-		} while (null != maxHeight && dbBlock != null && dbBlock.getHeight() > maxHeight);
+
+			if (null != maxHeight && dbBlock != null && dbBlock.getHeight() > maxHeight) {
+				break;
+			}
+		} while (dbBlock != null);
 
 		this.initializePoi(accountAnalyzer, parentBlock.getHeight());
 		return true;
