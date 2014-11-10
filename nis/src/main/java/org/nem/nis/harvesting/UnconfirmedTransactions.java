@@ -101,6 +101,14 @@ public class UnconfirmedTransactions {
 	 * TODO                    For the rest we use single validation anyway so we can pick those transactions which are valid.
 	 * TODO                    Do you want to fail fast because the remote could supply tons of new invalid transactions as an attack vector?
 	 * TODO                    Probably pretty expensive for the attacker too bc he needs to upload all those transactions. Gimre, what's your opinion?
+	 * TODO 20141110: G-BR, J: I think failing fast could lead to problems, this is scenario I've came up with (assuming fail FAST):
+	 *   1. I have 100 N, I send TX a: 80N to some nodes and TX b: 80N to other nodes
+	 *   2. those nodes, shouldn't exchange TXes with each other (due to fail fast)
+	 *   3. but after some time, one of those TXes will be included in some block anyway
+	 *   4. but probably that 'conflicting' TX won't be purged... [1]
+	 *   5. so half of the nodes or more, won't be able to sync until it'll expire
+	 *       (by sync I mean nodes won't pull any unconfirmed TXes from those 'infected' nodes)
+	 *    [1] maybe that is something that will need to be changed/fixed
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		final ValidationResult transactionValidationResult = this.validateBatch(transactions);

@@ -11,6 +11,8 @@ public class ImportanceTransferMapper {
 	/**
 	 * Converts a ImportanceTransferTransaction model to a ImportanceTransfer db-model.
 	 * TODO 20141010 J-G: do we need both blockIndex and orderIndex?
+	 * TODO 20131110 G-J: just to let you know, I remember about this, I'll try to address this in some future build,
+	 * TODO  but I'm not sure if that will be doable.
 	 *
 	 * @param importanceTransferTransaction The transfer transaction model.
 	 * @param blockIndex The index of the transfer within the owning block.
