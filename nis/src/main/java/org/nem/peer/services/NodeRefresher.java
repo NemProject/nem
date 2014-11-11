@@ -4,7 +4,7 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.connect.*;
 import org.nem.core.node.*;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.node.NodeVersionCheck;
+import org.nem.peer.node.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -104,19 +104,35 @@ public class NodeRefresher {
 
 						return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 					})
-					.thenApply(v -> NodeStatus.ACTIVE);
+					.thenApply(v -> NodeStatus.ACTIVE)
+					.exceptionally(e -> {
+						final NodeStatus status = this.getNodeStatusFromException(e);
+						if (NodeStatus.FAILURE == status) {
+							LOGGER.severe(String.format("Fatal DIRECT error encountered while communicating with <%s>: %s", node, e));
+						} else if (NodeStatus.ACTIVE != status) {
+							LOGGER.info(String.format("Error DIRECT (%s) encountered while communicating with <%s>: %s", status, node, e));
+						}
+
+						return status;
+					});
+		} else {
+			future = future
+					.exceptionally(e -> {
+						final NodeStatus status = this.getUntrustedNodeStatusFromException(e);
+						if (NodeStatus.FAILURE == status) {
+							LOGGER.severe(String.format("Fatal INDIRECT error encountered while communicating with <%s>: %s", node, e));
+						} else if (NodeStatus.ACTIVE != status) {
+							LOGGER.info(String.format("Error INDIRECT (%s) encountered while communicating with <%s>: %s", status, node, e));
+						}
+
+						return status;
+					});
 		}
 
 		return future
-				.exceptionally(e -> {
-					final NodeStatus status = this.getNodeStatusFromException(e);
-					if (NodeStatus.FAILURE == status) {
-						LOGGER.severe(String.format("Fatal error encountered while communicating with <%s>: %s", node, e));
-					}
-
-					return status;
-				})
-				.thenAccept(ns -> this.update(node, ns));
+				.thenAccept(ns -> {
+					this.update(node, ns);
+				});
 	}
 
 	private NodeStatus getNodeStatusFromException(Throwable ex) {
@@ -128,6 +144,15 @@ public class NodeRefresher {
 		} else {
 			return NodeStatus.FAILURE;
 		}
+	}
+
+	private NodeStatus getUntrustedNodeStatusFromException(Throwable ex) {
+		ex = CompletionException.class == ex.getClass() ? ex.getCause() : ex;
+		if (ImpersonatingPeerException.class == ex.getClass()) {
+			return NodeStatus.ACTIVE;
+		}
+
+		return this.getNodeStatusFromException(ex);
 	}
 
 	private void update(final Node node, final NodeStatus status) {
