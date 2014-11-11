@@ -2,7 +2,7 @@ package org.nem.core.test;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 
@@ -103,5 +103,25 @@ public class NotificationUtils {
 		Assert.assertThat(n.getLessor(), IsEqual.equalTo(expectedLessor));
 		Assert.assertThat(n.getLessee(), IsEqual.equalTo(expectedLessee));
 		Assert.assertThat(n.getMode(), IsEqual.equalTo(expectedMode));
+	}
+
+	/**
+	 * Asserts that the specified notification is a cosignatory modification notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedMultisig The expected multisig account.
+	 * @param expectedCosignatory The expected cosignatory.
+	 * @param expectedModificationType The expected type of modification.
+	 */
+	public static void assertCosignatoryModificationNotification(
+			final Notification notification,
+			final Account expectedMultisig,
+			final Account expectedCosignatory,
+			final int expectedModificationType) {
+		final CosignatoryModificationNotification n = (CosignatoryModificationNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
+		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
+		Assert.assertThat(n.getCosignatoryAccount(), IsEqual.equalTo(expectedCosignatory));
+		Assert.assertThat(n.getModificationType(), IsEqual.equalTo(expectedModificationType));
 	}
 }

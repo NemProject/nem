@@ -34,5 +34,10 @@ public enum NotificationType {
 	 * The notification represents a block harvest reward (this is different from BalanceCredit
 	 * because harvest fees can be forwarded whereas regular credits cannot).
 	 */
-	HarvestReward
+	HarvestReward,
+
+	/**
+	 * The notification represents add of cosigner account to given account.
+	 */
+	CosignatoryModification
 }

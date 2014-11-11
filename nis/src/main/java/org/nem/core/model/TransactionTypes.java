@@ -8,6 +8,7 @@ public class TransactionTypes {
 	private static final int ASSET_TYPE = 0x0200;
 	private static final int SNAPSHOT_TYPE = 0x0400;
 	private static final int IMPORTANCE_TYPE = 0x0800;
+	private static final int MULTISIG_TYPE = 0x1000;
 
 	/**
 	 * A transfer transaction.
@@ -38,4 +39,15 @@ public class TransactionTypes {
 	 * A snapshot transaction.
 	 */
 	public static final int SNAPSHOT = SNAPSHOT_TYPE | 0x01;
+
+	/**
+	 * Announce account as multi-sig.
+	 */
+	public static final int MULTISIG_MODIFY_SIGNER = MULTISIG_TYPE | 0x02;
+
+	/**
+	 * Multisig signature
+	 */
+	public static final int MULTISIG_SIGNATURE = MULTISIG_TYPE | 0x03;
+
 }
