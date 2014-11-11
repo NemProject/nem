@@ -6,6 +6,9 @@ import org.nem.peer.trust.score.NodeExperience;
 
 import java.util.*;
 
+/**
+ * Static class containing helper functions for creating objects used in peer tests.
+ */
 public class PeerUtils {
 
 	/**

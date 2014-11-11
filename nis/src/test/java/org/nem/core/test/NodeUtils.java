@@ -2,7 +2,11 @@ package org.nem.core.test;
 
 import org.nem.core.node.*;
 
+/**
+ * Static class containing helper functions for creating node objects.
+ */
 public class NodeUtils {
+
 	/**
 	 * Creates a node with the specified name.
 	 *
