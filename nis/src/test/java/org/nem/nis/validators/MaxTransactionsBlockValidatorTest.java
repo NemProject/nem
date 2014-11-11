@@ -8,10 +8,10 @@ import org.nem.nis.*;
 import org.nem.nis.test.NisUtils;
 
 public class MaxTransactionsBlockValidatorTest {
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 	private static final long BETA_HARD_FORK = BlockMarkerConstants.BETA_HARD_FORK;
-	private static final int NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 60;
 	private static final long BETA_TX_HARD_FORK = BlockMarkerConstants.BETA_TX_COUNT_FORK;
+	private static final int NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
 
 	// region first hard fork
 
@@ -101,7 +101,7 @@ public class MaxTransactionsBlockValidatorTest {
 
 	// endregion
 
-	private void assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
+	private static void assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
 			final int maxAllowedTransactions,
 			final long forkHeight,
 			final ValidationResult result) {

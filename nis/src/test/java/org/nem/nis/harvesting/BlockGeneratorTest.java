@@ -144,7 +144,7 @@ public class BlockGeneratorTest {
 
 		// Act:
 		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
+				NisUtils.createRandomBlockWithHeight(BlockMarkerConstants.BETA_TX_COUNT_FORK + 1),
 				remoteAccount,
 				new TimeInstant(11)).getBlock();
 

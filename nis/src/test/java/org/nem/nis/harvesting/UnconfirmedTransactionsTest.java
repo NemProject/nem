@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	//region size
 
@@ -575,7 +575,7 @@ public class UnconfirmedTransactionsTest {
 	public void getMostImportantTransactionsReturnsMaximumTransactionsIfMoreThanMaximumTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		addMockTransactions(context.transactions, 6, 150);
+		addMockTransactions(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 
 		// Act:
 		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
