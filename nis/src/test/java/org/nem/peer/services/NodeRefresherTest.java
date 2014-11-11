@@ -235,6 +235,34 @@ public class NodeRefresherTest {
 	//region precedence / potential attacks
 
 	@Test
+	public void refreshDoesNotUpdateIndirectNodesThatCannotBeCommunicatedWith() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setBusyGetInfoForNode("a", DEFAULT_SLEEP);
+		context.setBusyGetInfoForNode("b", DEFAULT_SLEEP);
+		context.setFatalGetInfoForNode("d");
+		context.setBusyGetInfoForNode("f");
+		context.setRuntimeExceptionGetInfoForNode("g");
+		context.nodes.update(NodeUtils.createNodeWithName("d"), NodeStatus.ACTIVE);
+		context.nodes.update(NodeUtils.createNodeWithName("f"), NodeStatus.ACTIVE);
+		context.nodes.update(NodeUtils.createNodeWithName("g"), NodeStatus.ACTIVE);
+
+		// Arrange: set up a node peers list that indicates peers b, d-g are active
+		// but the local node can only communicate with e, other nodes throw exceptions
+		// since nodes d, f, g are already active, they stay active
+		context.setKnownPeers(PeerUtils.createNodesWithNames("b", "d", "e", "f", "g"));
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+
+		// Assert:
+		NodeCollectionAssert.areNamesEquivalent(
+				context.nodes,
+				new String[] { "c", "d", "e", "f", "g" },
+				new String[] { "a", "b" });
+	}
+
+	@Test
 	public void refreshGivesPrecedenceToFirstHandExperience() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -254,7 +282,7 @@ public class NodeRefresherTest {
 		NodeCollectionAssert.areNamesEquivalent(
 				context.nodes,
 				new String[] { "a", "c", "e" },
-				new String[] { "b", "f" });
+				new String[] { "b" });
 	}
 
 	@Test
@@ -319,11 +347,11 @@ public class NodeRefresherTest {
 		// Assert:
 		// - all peers (a, b, d) that were directly communicated with successfully are active
 		// - the peer that was directly communicated with unsuccessfully (c) is inactive
-		// - the unseen inactive peer (z) is inactive
+		// - the unseen inactive peer (z) is not added because the information cannot be trusted
 		NodeCollectionAssert.areNamesEquivalent(
 				context.nodes,
 				new String[] { "a", "b", "d" },
-				new String[] { "c", "z" });
+				new String[] { "c" });
 	}
 
 	@Test
@@ -467,6 +495,12 @@ public class NodeRefresherTest {
 			final Node node = NodeUtils.createNodeWithName(name);
 			Mockito.when(this.connector.getInfo(node))
 					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new FatalPeerException("fatal"); }));
+		}
+
+		public void setRuntimeExceptionGetInfoForNode(final String name) {
+			final Node node = NodeUtils.createNodeWithName(name);
+			Mockito.when(this.connector.getInfo(node))
+					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime exception"); }));
 		}
 
 		public void setKnownPeers(final List<Node> nodes) {
