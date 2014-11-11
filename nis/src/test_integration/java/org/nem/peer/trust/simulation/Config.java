@@ -1,6 +1,7 @@
 package org.nem.peer.trust.simulation;
 
 import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 
 import java.io.*;
 import java.util.*;

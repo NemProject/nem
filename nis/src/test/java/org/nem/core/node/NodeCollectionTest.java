@@ -3,7 +3,7 @@ package org.nem.core.node;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.test.IsEquivalent;
+import org.nem.core.test.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

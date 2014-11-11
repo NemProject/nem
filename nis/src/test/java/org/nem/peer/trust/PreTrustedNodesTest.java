@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
-import org.nem.core.test.IsEquivalent;
+import org.nem.core.test.*;
 
 import java.util.*;
 

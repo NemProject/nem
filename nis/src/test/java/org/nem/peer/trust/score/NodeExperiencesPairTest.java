@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 
 import java.util.*;
 

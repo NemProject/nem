@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;

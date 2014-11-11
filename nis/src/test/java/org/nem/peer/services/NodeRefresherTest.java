@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.connect.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableList;
+import org.nem.core.test.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.node.NodeVersionCheck;

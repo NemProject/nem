@@ -4,7 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.async.SleepFuture;
-import org.nem.core.node.NodeUtils;
+import org.nem.core.test.NodeUtils;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.peer.*;
 import org.nem.peer.services.*;

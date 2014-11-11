@@ -4,7 +4,7 @@ import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.node.*;
-import org.nem.core.test.MockSerializableEntity;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.TimeSynchronizer;
 import org.nem.nis.service.ChainServices;

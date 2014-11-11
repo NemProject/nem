@@ -7,7 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;

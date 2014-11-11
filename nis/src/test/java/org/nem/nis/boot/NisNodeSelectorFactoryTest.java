@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;

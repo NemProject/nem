@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.math.*;
 import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 import org.nem.peer.test.*;
 
 public class ScoresTest {

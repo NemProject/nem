@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.connect.*;
 import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 import org.nem.peer.connect.PeerConnector;
 import org.nem.peer.trust.NodeSelector;
 

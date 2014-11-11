@@ -1,4 +1,6 @@
-package org.nem.core.node;
+package org.nem.core.test;
+
+import org.nem.core.node.*;
 
 public class NodeUtils {
 	/**
