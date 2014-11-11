@@ -54,7 +54,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE));
 	}
 
 	//endregion
@@ -119,7 +119,8 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert:
 		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
 				ImportanceTransferTransaction.Mode.Deactivate,
-				ImportanceTransferTransaction.Mode.Activate);
+				ImportanceTransferTransaction.Mode.Activate,
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	@Test
@@ -127,12 +128,14 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert:
 		assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
 				ImportanceTransferTransaction.Mode.Activate,
-				ImportanceTransferTransaction.Mode.Deactivate);
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
 	private static void assertTransferIsNotValidLessThanOneDayAfterOppositeLink(
 			final ImportanceTransferTransaction.Mode initialLink,
-			final ImportanceTransferTransaction.Mode newLink) {
+			final ImportanceTransferTransaction.Mode newLink,
+			final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Transaction transaction = context.createTransaction(newLink);
@@ -142,7 +145,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(1440)));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	//endregion
@@ -152,16 +155,22 @@ public class ImportanceTransferTransactionValidatorTest {
 	@Test
 	public void activateImportanceTransferIsNotValidAfterActivateLink() {
 		// Assert:
-		assertTransferIsNotValidAfterSameLink(ImportanceTransferTransaction.Mode.Activate);
+		assertTransferIsNotValidAfterSameLink(
+				ImportanceTransferTransaction.Mode.Activate,
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
 	@Test
 	public void deactivateImportanceTransferIsNotValidAfterDeactivateLink() {
 		// Assert:
-		assertTransferIsNotValidAfterSameLink(ImportanceTransferTransaction.Mode.Deactivate);
+		assertTransferIsNotValidAfterSameLink(
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
 	}
 
-	private static void assertTransferIsNotValidAfterSameLink(final ImportanceTransferTransaction.Mode mode) {
+	private static void assertTransferIsNotValidAfterSameLink(
+			final ImportanceTransferTransaction.Mode mode,
+			final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Transaction transaction = context.createTransaction(mode);
@@ -171,7 +180,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(2882)));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	//endregion

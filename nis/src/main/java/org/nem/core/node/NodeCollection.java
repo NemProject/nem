@@ -9,20 +9,28 @@ import java.util.concurrent.ConcurrentHashMap;
  * Represents a collection of nodes.
  */
 public class NodeCollection implements SerializableEntity {
-
 	private static final ObjectDeserializer<Node> NODE_DESERIALIZER = obj -> new Node(obj);
+	private static final Collection<NodeStatus> NODE_STATUSES = Arrays.asList(
+			NodeStatus.ACTIVE,
+			NodeStatus.BUSY,
+			NodeStatus.INACTIVE,
+			NodeStatus.FAILURE);
+	private static final Collection<NodeStatus> BLACKLIST_NODE_STATUSES = Arrays.asList(NodeStatus.INACTIVE, NodeStatus.FAILURE);
 
-	final Set<Node> activeNodes;
-	final Set<Node> inactiveNodes;
-	Set<Node> inactiveNodesSnapshot;
+	private final Map<NodeStatus, Set<Node>> statusNodesMap = new HashMap<NodeStatus, Set<Node>>() {
+		{
+			for (final NodeStatus value : NODE_STATUSES) {
+				this.put(value, createSet());
+			}
+		}
+	};
+
+	private final Set<Node> pruneCandidates = createSet();
 
 	/**
 	 * Creates a node collection.
 	 */
 	public NodeCollection() {
-		this.activeNodes = createSet();
-		this.inactiveNodes = createSet();
-		this.inactiveNodesSnapshot = createSet();
 	}
 
 	/**
@@ -31,10 +39,10 @@ public class NodeCollection implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NodeCollection(final Deserializer deserializer) {
-		this.activeNodes = createSet();
-		this.activeNodes.addAll(deserializer.readObjectArray("active", NODE_DESERIALIZER));
-		this.inactiveNodes = createSet();
-		this.inactiveNodes.addAll(deserializer.readObjectArray("inactive", NODE_DESERIALIZER));
+		for (final NodeStatus value : NODE_STATUSES) {
+			final String key = value.toString().toLowerCase();
+			this.statusNodesMap.get(value).addAll(deserializer.readObjectArray(key, NODE_DESERIALIZER));
+		}
 	}
 
 	private static Set<Node> createSet() {
@@ -42,33 +50,59 @@ public class NodeCollection implements SerializableEntity {
 	}
 
 	/**
-	 * Gets a collection of active nodes.
+	 * Gets all active nodes.
 	 *
 	 * @return A collection of active nodes.
 	 */
 	public Collection<Node> getActiveNodes() {
-		return this.activeNodes;
+		return this.statusNodesMap.get(NodeStatus.ACTIVE);
 	}
 
 	/**
-	 * Gets a collection of inactive nodes.
+	 * Gets all busy nodes.
 	 *
-	 * @return A collection of inactive nodes.
+	 * @return A collection of busy nodes.
 	 */
-	public Collection<Node> getInactiveNodes() {
-		return this.inactiveNodes;
+	public Collection<Node> getBusyNodes() {
+		return this.statusNodesMap.get(NodeStatus.BUSY);
 	}
 
 	/**
-	 * Gets a collection of all nodes (both active and inactive).
+	 * Gets a collection of all non-blacklisted nodes.
 	 *
-	 * @return A collection of all nodes.
+	 * @return A collection of all non-blacklisted nodes.
 	 */
 	public Collection<Node> getAllNodes() {
 		final List<Node> allNodes = new ArrayList<>();
 		allNodes.addAll(this.getActiveNodes());
-		allNodes.addAll(this.getInactiveNodes());
+		allNodes.addAll(this.getBusyNodes());
 		return allNodes;
+	}
+
+	/**
+	 * Gets a collection of nodes that have the specified status.
+	 *
+	 * @param status The status.
+	 * @return All nodes with the specified status.
+	 */
+	public Collection<Node> getNodes(final NodeStatus status) {
+		final Collection<Node> nodes = this.statusNodesMap.getOrDefault(status, null);
+		if (null == nodes) {
+			return new ArrayList<>();
+		}
+
+		return nodes;
+	}
+
+	/**
+	 * Gets the total number of nodes in the collection.
+	 *
+	 * @return The total number of nodes
+	 */
+	public int size() {
+		return this.statusNodesMap.entrySet().stream()
+				.map(entry -> entry.getValue().size())
+				.reduce(0, Integer::sum);
 	}
 
 	/**
@@ -104,21 +138,35 @@ public class NodeCollection implements SerializableEntity {
 	}
 
 	/**
+	 * Gets a value indicating whether or not the node is currently blacklisted.
+	 *
+	 * @param node The node.
+	 * @return True if the node is blacklisted.
+	 */
+	public boolean isNodeBlacklisted(final Node node) {
+		for (final NodeStatus status : BLACKLIST_NODE_STATUSES) {
+			if (this.statusNodesMap.get(status).contains(node)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Gets the status of the specified node.
 	 *
 	 * @param node The node.
 	 * @return The node's status.
 	 */
 	public NodeStatus getNodeStatus(final Node node) {
-		if (this.activeNodes.contains(node)) {
-			return NodeStatus.ACTIVE;
+		for (final Map.Entry<NodeStatus, Set<Node>> entry : this.statusNodesMap.entrySet()) {
+			if (entry.getValue().contains(node)) {
+				return entry.getKey();
+			}
 		}
 
-		if (this.inactiveNodes.contains(node)) {
-			return NodeStatus.INACTIVE;
-		}
-
-		return NodeStatus.FAILURE;
+		return NodeStatus.UNKNOWN;
 	}
 
 	/**
@@ -133,50 +181,46 @@ public class NodeCollection implements SerializableEntity {
 			throw new NullPointerException("node cannot be null");
 		}
 
-		this.activeNodes.remove(node);
-		this.inactiveNodes.remove(node);
-
-		final Set<Node> nodes;
-		switch (status) {
-			case ACTIVE:
-				nodes = this.activeNodes;
-				this.inactiveNodesSnapshot.remove(node);
-				break;
-
-			case INACTIVE:
-				nodes = this.inactiveNodes;
-				break;
-
-			case FAILURE:
-			default:
-				return;
+		for (final Map.Entry<NodeStatus, Set<Node>> entry : this.statusNodesMap.entrySet()) {
+			entry.getValue().remove(node);
 		}
 
-		nodes.add(node);
+		final Set<Node> nodes = this.statusNodesMap.getOrDefault(status, null);
+		if (null != nodes) {
+			this.statusNodesMap.get(status).add(node);
+		}
+
+		if (!this.isNodeBlacklisted(node)) {
+			this.pruneCandidates.remove(node);
+		}
 	}
 
 	/**
 	 * Takes a snapshot of all inactive nodes and drops the inactive nodes
 	 * that have stayed inactive since the last time this function was called.
 	 */
-	public void pruneInactiveNodes() {
-		this.getInactiveNodes().stream()
-				.filter(obj -> this.inactiveNodesSnapshot.contains(obj))
-				.forEach(node -> this.update(node, NodeStatus.FAILURE));
+	public void prune() {
+		this.pruneCandidates.stream()
+				.filter(node -> this.isNodeBlacklisted(node))
+				.forEach(node -> this.update(node, NodeStatus.UNKNOWN));
 
-		this.inactiveNodesSnapshot = createSet();
-		this.inactiveNodesSnapshot.addAll(this.getInactiveNodes());
+		this.pruneCandidates.clear();
+		for (final NodeStatus status : BLACKLIST_NODE_STATUSES) {
+			this.pruneCandidates.addAll(this.statusNodesMap.get(status));
+		}
 	}
 
 	@Override
 	public void serialize(final Serializer serializer) {
-		serializer.writeObjectArray("active", new ArrayList<>(this.activeNodes));
-		serializer.writeObjectArray("inactive", new ArrayList<>(this.inactiveNodes));
+		for (final NodeStatus value : NODE_STATUSES) {
+			final String key = value.toString().toLowerCase();
+			serializer.writeObjectArray(key, this.statusNodesMap.get(value));
+		}
 	}
 
 	@Override
 	public int hashCode() {
-		return this.activeNodes.hashCode() ^ this.inactiveNodes.hashCode();
+		return this.statusNodesMap.hashCode();
 	}
 
 	@Override
@@ -186,6 +230,6 @@ public class NodeCollection implements SerializableEntity {
 		}
 
 		final NodeCollection rhs = (NodeCollection)obj;
-		return this.activeNodes.equals(rhs.activeNodes) && this.inactiveNodes.equals(rhs.inactiveNodes);
+		return this.statusNodesMap.equals(rhs.statusNodesMap);
 	}
 }

@@ -4,7 +4,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
-import org.nem.peer.test.WeakNodeIdentity;
 
 import java.util.*;
 

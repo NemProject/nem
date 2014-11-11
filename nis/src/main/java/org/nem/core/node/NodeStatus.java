@@ -5,17 +5,27 @@ package org.nem.core.node;
  */
 public enum NodeStatus {
 	/**
-	 * The node is connected.
+	 * The node is active and the last request succeeded.
 	 */
 	ACTIVE,
 
 	/**
-	 * The node is not connected.
+	 * The node is active but the last request failed due to a busy signal.
+	 */
+	BUSY,
+
+	/**
+	 * The node is offline.
 	 */
 	INACTIVE,
 
 	/**
-	 * The node is not a NEM node.
+	 * The node is active but the last request failed due to a server error.
 	 */
-	FAILURE
+	FAILURE,
+
+	/**
+	 * The node is in an unknown state.
+	 */
+	UNKNOWN
 }

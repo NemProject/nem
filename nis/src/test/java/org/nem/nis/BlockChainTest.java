@@ -15,6 +15,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.sync.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.TransactionValidatorFactory;
 
@@ -150,16 +151,24 @@ public class BlockChainTest {
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
-		// TODO 20141104 J-B: can't wait to refactor these tests ;)
-		final BlockChain blockChain = new BlockChain(
+		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
+				transactionValidatorFactory,
+				poiFacade);
+		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
-				accountDao,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(
-						transactionValidatorFactory,
-						poiFacade));
+				unconfirmedTransactions);
+		final BlockChainUpdater updater =
+				new BlockChainUpdater(
+						accountAnalyzer,
+						accountDao,
+						blockChainLastBlockLayer,
+						mockBlockDao,
+						contextFactory,
+						unconfirmedTransactions);
+		final BlockChain blockChain = new BlockChain(blockChainLastBlockLayer, updater);
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
@@ -177,6 +186,9 @@ public class BlockChainTest {
 
 		// siblings with same score must be rejected
 		// Act:
+		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, accountDaoLookup);
+		mockBlockDao.addBlock(dbBlock);
+
 		final Block sibling = this.createBlockSiblingWithSameScore(block, parentBlock, accounts);
 		final ValidationResult siblingResult = blockChain.processBlock(sibling);
 
@@ -223,15 +235,24 @@ public class BlockChainTest {
 						new BlockTransactionObserverFactory(),
 						NisUtils.createBlockValidatorFactory(),
 						transactionValidatorFactory);
-		final BlockChain blockChain = new BlockChain(
+		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
+				transactionValidatorFactory,
+				poiFacade);
+		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
-				accountDao,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
-				new UnconfirmedTransactions(
-						transactionValidatorFactory,
-						poiFacade));
+				unconfirmedTransactions);
+		final BlockChainUpdater updater =
+				new BlockChainUpdater(
+						accountAnalyzer,
+						accountDao,
+						blockChainLastBlockLayer,
+						mockBlockDao,
+						contextFactory,
+						unconfirmedTransactions);
+		final BlockChain blockChain = new BlockChain(blockChainLastBlockLayer, updater);
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);

@@ -1,55 +1,15 @@
 package org.nem.peer.test;
 
-import org.nem.core.node.*;
+import org.nem.core.node.Node;
+import org.nem.core.test.NodeUtils;
 import org.nem.peer.trust.score.NodeExperience;
 
 import java.util.*;
 
+/**
+ * Static class containing helper functions for creating objects used in peer tests.
+ */
 public class PeerUtils {
-
-	/**
-	 * Creates a node with the specified name.
-	 *
-	 * @param name The name.
-	 * @return The new node.
-	 */
-	public static Node createNodeWithName(final String name) {
-		return createNodeWithHost("127.0.0.1", name);
-	}
-
-	/**
-	 * Creates a node with the specified port.
-	 * Note: this is around for legacy tests that are using port as a hallmark.
-	 *
-	 * @param port The port.
-	 * @return The new node.
-	 */
-	public static Node createNodeWithPort(final int port) {
-		return new Node(
-				new WeakNodeIdentity(String.format("%d", port)),
-				new NodeEndpoint("http", "127.0.0.1", port));
-	}
-
-	/**
-	 * Creates a node with the specified host name.
-	 *
-	 * @param host The host.
-	 * @return The new node.
-	 */
-	public static Node createNodeWithHost(final String host) {
-		return createNodeWithHost(host, host);
-	}
-
-	/**
-	 * Creates a node with the specified host name.
-	 *
-	 * @param host The host.
-	 * @param name The name.
-	 * @return The new node.
-	 */
-	public static Node createNodeWithHost(final String host, final String name) {
-		return new Node(new WeakNodeIdentity(name), NodeEndpoint.fromHost(host));
-	}
 
 	/**
 	 * Creates a node array of the specified size.
@@ -60,7 +20,7 @@ public class PeerUtils {
 	public static Node[] createNodeArray(final int size) {
 		final Node[] nodes = new Node[size];
 		for (int i = 0; i < size; ++i) {
-			nodes[i] = createNodeWithPort(i);
+			nodes[i] = NodeUtils.createNodeWithPort(i);
 		}
 
 		return nodes;
@@ -87,7 +47,7 @@ public class PeerUtils {
 	public static List<Node> createNodesWithNames(final String... names) {
 		final List<Node> nodes = new ArrayList<>();
 		for (final String name : names) {
-			nodes.add(PeerUtils.createNodeWithName(name));
+			nodes.add(NodeUtils.createNodeWithName(name));
 		}
 
 		return nodes;

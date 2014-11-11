@@ -8,8 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dao.TransferDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
@@ -92,8 +91,8 @@ public class BlockChainValidatorIntegrationTest {
 		block.sign();
 
 		// Assert:
-		final boolean result = validator.isValid(parentBlock, blocks);
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		final boolean isValid = validator.isValid(parentBlock, blocks);
+		Assert.assertThat(isValid, IsEqual.equalTo(true));
 	}
 
 	// TODO 20141109 J-G: so, i know this test is failing ;), but consider being more descriptive in the test name
@@ -148,8 +147,8 @@ public class BlockChainValidatorIntegrationTest {
 		block.sign();
 
 		// Assert:
-		final boolean valid = validator.isValid(parentBlock, blocks);
-		Assert.assertThat(valid, IsEqual.equalTo(false));
+		final boolean isValid = validator.isValid(parentBlock, blocks);
+		Assert.assertThat(isValid, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -287,17 +286,15 @@ public class BlockChainValidatorIntegrationTest {
 		public final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.poiFacade);
 		public final TransferDao transferDao = Mockito.mock(TransferDao.class);
-		public final ImportanceTransferDao importanceTransferDao = Mockito.mock(ImportanceTransferDao.class);
 		public final SingleTransactionValidator transactionValidator;
 		public final BatchTransactionValidator batchTransactionValidator;
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory(this.transferDao);
 			this.transactionValidator = transactionValidatorFactory.createSingle(this.poiFacade);
-			this.batchTransactionValidator = new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
+			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.poiFacade);
 
 			Mockito.when(this.transferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(false);
-			Mockito.when(this.importanceTransferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
 

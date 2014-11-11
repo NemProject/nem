@@ -50,8 +50,6 @@ public class Block {
 
 	private Long difficulty;
 
-	private Long nextBlockId;
-
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
@@ -207,14 +205,6 @@ public class Block {
 
 	public void setDifficulty(final Long difficulty) {
 		this.difficulty = difficulty;
-	}
-
-	public Long getNextBlockId() {
-		return this.nextBlockId;
-	}
-
-	public void setNextBlockId(final Long nextBlockId) {
-		this.nextBlockId = nextBlockId;
 	}
 
 	public List<Transfer> getBlockTransfers() {

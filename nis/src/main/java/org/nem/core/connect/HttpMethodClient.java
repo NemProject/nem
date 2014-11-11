@@ -34,7 +34,7 @@ public class HttpMethodClient<T> {
 	 * Creates a new HTTP method client with default timeouts.
 	 */
 	public HttpMethodClient() {
-		this(5000, 60000, 60000);
+		this(5000, 5000, 60000);
 	}
 
 	/**
@@ -196,10 +196,17 @@ public class HttpMethodClient<T> {
 
 		@Override
 		public void failed(final Exception e) {
-			final Exception wrappedException = SocketTimeoutException.class == e.getClass()
-					? new InactivePeerException(e)
-					: new FatalPeerException(e);
-			this.future.completeExceptionally(wrappedException);
+			this.future.completeExceptionally(wrapException(e));
+		}
+
+		private static Exception wrapException(final Exception e) {
+			if (SocketTimeoutException.class == e.getClass()) {
+				return new BusyPeerException(e);
+			} else if (ConnectException.class == e.getClass()) {
+				return new InactivePeerException(e);
+			} else {
+				return new FatalPeerException(e);
+			}
 		}
 
 		@Override

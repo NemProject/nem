@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.nis.audit.AuditCollection;
 
 import javax.servlet.http.*;
+import java.util.Arrays;
 
 public class AuditInterceptorTest {
 
@@ -25,19 +26,13 @@ public class AuditInterceptorTest {
 	}
 
 	@Test
-	public void preHandleIgnoresHeartbeatRequests() throws Exception {
+	public void preHandleIgnoresIgnoredApiPathRequests() throws Exception {
 		// Assert:
 		assertPreHandleIgnoresPath("/heartbeat");
 	}
 
 	@Test
-	public void preHandleIgnoresStatusRequests() throws Exception {
-		// Assert:
-		assertPreHandleIgnoresPath("/status");
-	}
-
-	@Test
-	public void preHandleIgnoresCaseInsensitiveHeartbeatRequests() throws Exception {
+	public void preHandleIgnoresCaseInsensitiveIgnoredApiPathRequests() throws Exception {
 		// Assert:
 		assertPreHandleIgnoresPath("/HeartBeat");
 	}
@@ -71,19 +66,13 @@ public class AuditInterceptorTest {
 	}
 
 	@Test
-	public void afterCompletionIgnoresHeartbeatRequests() throws Exception {
+	public void afterCompletionIgnoresIgnoredApiPathRequests() throws Exception {
 		// Assert:
 		assertAfterCompletionIgnoresPath("/heartbeat");
 	}
 
 	@Test
-	public void afterCompletionIgnoresStatusRequests() throws Exception {
-		// Assert:
-		assertAfterCompletionIgnoresPath("/status");
-	}
-
-	@Test
-	public void afterCompletionIgnoresCaseInsensitiveHeartbeatRequests() throws Exception {
+	public void afterCompletionIgnoresCaseInsensitiveIgnoredApiPathRequests() throws Exception {
 		// Assert:
 		assertPreHandleIgnoresPath("/HeartBeat");
 	}
@@ -111,7 +100,9 @@ public class AuditInterceptorTest {
 
 	private static class TestContext {
 		private final AuditCollection collection = Mockito.mock(AuditCollection.class);
-		private final AuditInterceptor interceptor = new AuditInterceptor(this.collection);
+		private final AuditInterceptor interceptor = new AuditInterceptor(
+				Arrays.asList("/heartbeat"),
+				this.collection);
 		private final HttpServletRequest request;
 		private final HttpServletResponse response;
 

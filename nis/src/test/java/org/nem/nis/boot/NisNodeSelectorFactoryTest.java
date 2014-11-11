@@ -5,8 +5,8 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.NodeCollection;
+import org.nem.core.test.NodeUtils;
 import org.nem.peer.*;
-import org.nem.peer.test.PeerUtils;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
@@ -34,8 +34,8 @@ public class NisNodeSelectorFactoryTest {
 
 		final Config config = Mockito.mock(Config.class);
 		Mockito.when(config.getTrustProvider()).thenReturn(trustProvider);
-		Mockito.when(config.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
-		Mockito.when(config.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+		Mockito.when(config.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
+		Mockito.when(config.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));
 		return config;
 	}

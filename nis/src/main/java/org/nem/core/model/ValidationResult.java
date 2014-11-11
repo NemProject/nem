@@ -96,7 +96,23 @@ public enum ValidationResult {
 	// TODO 20141109 J-G: while you're here, can you add status codes for the other importance transfer failure results too?
 	// TODO 20141110 G-J: not sure if this branch should be merged-in, more elaborate explanation in another file
 
-	FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY(17);
+	FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY(17),
+	
+	/**
+	 * Validation failed because previous importance transfer is in progress.
+	 */
+	FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS(18),
+
+	/**
+	 * Validation failed because importance transfer activation was attempted while previous one is active.
+	 */
+	FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED(19),
+
+	/**
+	 * Validation failed because importance transfer deactivation was attempted but is not active.
+	 */
+	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20);
+
 
 	private final int value;
 

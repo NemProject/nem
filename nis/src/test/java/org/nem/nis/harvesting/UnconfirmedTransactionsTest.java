@@ -7,8 +7,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.poi.PoiFacade;
-import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 
@@ -575,7 +575,7 @@ public class UnconfirmedTransactionsTest {
 	public void getMostImportantTransactionsReturnsMaximumTransactionsIfMoreThanMaximumTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		addMockTransactions(context.transactions, 6, 90);
+		addMockTransactions(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 
 		// Act:
 		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
@@ -945,6 +945,7 @@ public class UnconfirmedTransactionsTest {
 	// TODO                   transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
 	// TODO                   can spend more than he has. Furthermore, a new block included one of the transactions leaving the
 	// TODO                   the other transaction still being displayed as unconfirmed in the GUI forever (until deadline was exceeded).
+	// TODO 20141110 G -> J: does this require any more comments?
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:
@@ -986,7 +987,7 @@ public class UnconfirmedTransactionsTest {
 
 		for (int i = startCustomField; i <= endCustomField; ++i) {
 			final MockTransaction transaction = new MockTransaction(
-					Utils.generateRandomAccount(Amount.fromNem(100)),
+					Utils.generateRandomAccount(Amount.fromNem(1000)),
 					i,
 					new TimeInstant(i));
 			transaction.setFee(Amount.fromNem(i));

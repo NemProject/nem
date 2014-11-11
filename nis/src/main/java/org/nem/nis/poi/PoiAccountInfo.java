@@ -2,6 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.secret.*;
 
 import java.util.*;

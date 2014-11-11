@@ -3,7 +3,7 @@ package org.nem.nis.controller.viewmodels;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.node.Node;
-import org.nem.peer.test.PeerUtils;
+import org.nem.core.test.NodeUtils;
 import org.nem.peer.trust.score.NodeExperience;
 
 public class ExtendedNodeExperiencePairTest {
@@ -13,7 +13,7 @@ public class ExtendedNodeExperiencePairTest {
 	@Test
 	public void pairCanBeCreated() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithPort(81);
+		final Node node = NodeUtils.createNodeWithPort(81);
 		final NodeExperience experience = new NodeExperience();
 
 		// Act:
@@ -28,7 +28,7 @@ public class ExtendedNodeExperiencePairTest {
 	@Test
 	public void pairCanBeRoundTripped() {
 		// Arrange:
-		final Node node = PeerUtils.createNodeWithPort(81);
+		final Node node = NodeUtils.createNodeWithPort(81);
 		final NodeExperience experience = new NodeExperience();
 		experience.successfulCalls().set(17);
 		final ExtendedNodeExperiencePair originalPair = new ExtendedNodeExperiencePair(node, experience, 89);
@@ -108,7 +108,7 @@ public class ExtendedNodeExperiencePairTest {
 			final int numFailures,
 			final int numSyncAttempts) {
 		return new ExtendedNodeExperiencePair(
-				PeerUtils.createNodeWithHost(host, name),
+				NodeUtils.createNodeWithHost(host, name),
 				new NodeExperience(numSuccess, numFailures),
 				numSyncAttempts);
 	}
