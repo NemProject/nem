@@ -62,11 +62,18 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// TODO 20141110 G-J: my idea was as follows (we've talked a bit about it on Sun) remote account should be used
 				// ONLY for remote harvesting, so we should probably block any incoming or outgoing transfers, additionally we
 				// shouldn't allow setting an account that already have some balance on it.
-				// but right now I'm not sure if it's a good idea or not, and I was thinking about dropping this whole branch.
-				// 1. from user perspective it's not that important, as "remote private key" is not easily accessible.
-				// 2. adding such checks will also add additional work, as we would have to add some unconfirmed transactions purging
+				//
+				// I finally have possible attack vector:
+				//   let's say I own account X which is harvesting and has big importance
+				//   user EVIL has small importance and announces remote harvesting, where he gives
+				//       X as his remote account
+				//   this basically cuts off X
+				//
+				// second attack vector, user X announces account Y as his remote
+				// EVIL also announces Y as his remote... (this is not handled yet)
+				// again this cuts off X from harvesting
 				if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY;
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
 				}
 
 				// if a remote is already activated, it needs to be deactivated first

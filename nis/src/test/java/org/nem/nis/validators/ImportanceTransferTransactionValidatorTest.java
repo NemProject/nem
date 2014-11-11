@@ -72,7 +72,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_NOT_EMPTY));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE));
 	}
 	//endregion
 
