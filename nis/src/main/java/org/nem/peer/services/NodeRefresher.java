@@ -125,7 +125,7 @@ public class NodeRefresher {
 							LOGGER.info(String.format("Error INDIRECT (%s) encountered while communicating with <%s>: %s", status, node, e));
 						}
 
-						return NodeStatus.ACTIVE == status ? NodeStatus.ACTIVE : NodeStatus.UNKNOWN;
+						return NodeStatus.UNKNOWN;
 					});
 		}
 
