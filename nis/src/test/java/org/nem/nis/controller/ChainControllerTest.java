@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
-import org.nem.core.node.*;
+import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;

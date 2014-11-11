@@ -2,7 +2,7 @@ package org.nem.peer.trust.score;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.node.*;
+import org.nem.core.node.Node;
 import org.nem.core.test.NodeUtils;
 
 public class TrustScoresTest {

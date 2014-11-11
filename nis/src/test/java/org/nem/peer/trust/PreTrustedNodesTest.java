@@ -3,7 +3,7 @@ package org.nem.peer.trust;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.math.ColumnVector;
-import org.nem.core.node.*;
+import org.nem.core.node.Node;
 import org.nem.core.test.*;
 
 import java.util.*;

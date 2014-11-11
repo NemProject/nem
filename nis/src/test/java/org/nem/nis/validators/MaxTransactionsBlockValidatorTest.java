@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.MockTransaction;
-import org.nem.nis.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.NisUtils;
 
 public class MaxTransactionsBlockValidatorTest {
@@ -109,7 +109,6 @@ public class MaxTransactionsBlockValidatorTest {
 		Assert.assertThat(
 				validateBlockWithTransactions(maxAllowedTransactions, forkHeight),
 				IsEqual.equalTo(result));
-
 	}
 
 	private static ValidationResult validateBlockWithTransactions(final int numTransactions, final long height) {

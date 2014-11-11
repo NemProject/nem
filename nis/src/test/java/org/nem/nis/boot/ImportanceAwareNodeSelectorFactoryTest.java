@@ -4,7 +4,7 @@ import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
-import org.nem.core.node.*;
+import org.nem.core.node.NodeCollection;
 import org.nem.core.test.NodeUtils;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.peer.*;

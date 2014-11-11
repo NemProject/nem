@@ -150,7 +150,7 @@ public class TransferDaoImpl implements TransferDao {
 				.createQuery("select t, t.block.height from Transfer t " +
 						"WHERE " +
 						this.buildAddressQuery(transferType) +
-                        // TODO: it might have more sense to use orderId instead of blkIndex here
+						// TODO: it might have more sense to use orderId instead of blkIndex here
 						" AND ((t.block.height < :height)" +
 						" OR (t.block.height = :height AND t.timeStamp < :timeStamp)" +
 						" OR (t.block.height = :height AND t.timeStamp = :timeStamp AND t.blkIndex > :blockIndex))" +
@@ -190,7 +190,7 @@ public class TransferDaoImpl implements TransferDao {
 				.createQuery("select t, t.block.height from Transfer t " +
 						"WHERE " +
 						this.buildAddressQuery(transferType) +
-                        // TODO: it might have more sense to use orderId instead of blkIndex here
+						// TODO: it might have more sense to use orderId instead of blkIndex here
 						" ORDER BY t.block.height DESC, t.timeStamp DESC, t.blkIndex ASC, t.transferHash ASC")
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);

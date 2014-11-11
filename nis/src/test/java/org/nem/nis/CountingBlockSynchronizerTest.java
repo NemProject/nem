@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.node.*;
+import org.nem.core.node.Node;
 import org.nem.core.test.NodeUtils;
 import org.nem.peer.*;
 import org.nem.peer.connect.SyncConnectorPool;
