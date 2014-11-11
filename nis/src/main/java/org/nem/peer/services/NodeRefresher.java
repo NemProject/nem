@@ -125,13 +125,15 @@ public class NodeRefresher {
 							LOGGER.info(String.format("Error INDIRECT (%s) encountered while communicating with <%s>: %s", status, node, e));
 						}
 
-						return status;
+						return NodeStatus.ACTIVE == status ? NodeStatus.ACTIVE : NodeStatus.UNKNOWN;
 					});
 		}
 
 		return future
 				.thenAccept(ns -> {
-					this.update(node, ns);
+					if (NodeStatus.UNKNOWN != ns) {
+						this.update(node, ns);
+					}
 				});
 	}
 
@@ -149,7 +151,7 @@ public class NodeRefresher {
 	private NodeStatus getUntrustedNodeStatusFromException(Throwable ex) {
 		ex = CompletionException.class == ex.getClass() ? ex.getCause() : ex;
 		if (ImpersonatingPeerException.class == ex.getClass()) {
-			return NodeStatus.ACTIVE;
+			return NodeStatus.UNKNOWN;
 		}
 
 		return this.getNodeStatusFromException(ex);
