@@ -43,7 +43,7 @@ public class TransactionTypes {
 	/**
 	 * Announce account as multi-sig.
 	 */
-	public static final int MULTISIG_MODIFY_SIGNER = MULTISIG_TYPE | 0x02;
+	public static final int MULTISIG_SIGNER_MODIFY = MULTISIG_TYPE | 0x02;
 
 	/**
 	 * Multisig signature

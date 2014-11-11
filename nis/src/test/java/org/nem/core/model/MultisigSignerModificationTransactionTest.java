@@ -107,6 +107,7 @@ public class MultisigSignerModificationTransactionTest {
 		// Act:
 		final MultisigSignerModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNER_MODIFY));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getCosignatory(), IsEqual.equalTo(cosignatory));

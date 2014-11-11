@@ -87,7 +87,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	 * @param cosignatoryAccount The cosignatory account.
 	 */
 	public MultisigSignerModificationTransaction(final TimeInstant timeStamp, final Account sender, final ModificationType modificationType, final Account cosignatoryAccount) {
-		super(TransactionTypes.MULTISIG_MODIFY_SIGNER, 1, timeStamp, sender);
+		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, 1, timeStamp, sender);
 		this.modificationType = modificationType;
 		this.cosignatoryAccount = cosignatoryAccount;
 
@@ -107,7 +107,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	 * @param deserializer The deserializer.
 	 */
 	public MultisigSignerModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
-		super(TransactionTypes.IMPORTANCE_TRANSFER, options, deserializer);
+		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, options, deserializer);
 		this.modificationType = ModificationType.fromValueOrDefault(deserializer.readInt("modificationType"));
 		this.cosignatoryAccount = Account.readFrom(deserializer, "cosignatoryAccount", AddressEncoding.PUBLIC_KEY);
 
