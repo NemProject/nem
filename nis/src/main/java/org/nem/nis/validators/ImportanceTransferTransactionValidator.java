@@ -46,11 +46,10 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	}
 
-	// TODO 20140920 J-G: should we have more specific results?
 	private ValidationResult validate(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
 		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
-			return ValidationResult.FAILURE_ENTITY_UNUSABLE;
+			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
 
 		switch (transaction.getMode()) {
@@ -60,12 +59,12 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				}
 
 				// if a remote is already activated, it needs to be deactivated first
-				return !isRemoteActivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_UNUSABLE;
+				return !isRemoteActivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
 
 			case Deactivate:
 			default:
 				// if a remote is already deactivated, it needs to be activated first
-				return !isRemoteDeactivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_ENTITY_UNUSABLE;
+				return !isRemoteDeactivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE;
 		}
 	}
 }
