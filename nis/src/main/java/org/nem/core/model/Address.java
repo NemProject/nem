@@ -47,6 +47,21 @@ public class Address {
 		return new Address(encoded.toUpperCase());
 	}
 
+	/**
+	 * Creates an Address from a database account object.
+	 *
+	 * @param dbAccount The database account.
+	 * @return An address object.
+	 */
+	public static Address fromDbAccount(final org.nem.nis.dbmodel.Account dbAccount) {
+		return new Address(dbAccount.getPublicKey(), dbAccount.getPrintableKey());
+	}
+
+	private Address (final PublicKey publicKey, final String encoded) {
+		this.encoded = encoded;
+		this.publicKey = publicKey;
+	}
+
 	private Address(final String encoded) {
 		this.encoded = encoded;
 		this.publicKey = null;

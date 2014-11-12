@@ -44,6 +44,6 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static boolean shouldPrune(final Notification notification, final BlockNotificationContext context) {
 		return NotificationTrigger.Execute == context.getTrigger() &&
 				NotificationType.HarvestReward == notification.getType() &&
-				0 == (context.getHeight().getRaw() % 60);
+				0 == (context.getHeight().getRaw() % 360);
 	}
 }
