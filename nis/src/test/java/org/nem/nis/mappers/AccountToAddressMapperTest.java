@@ -7,6 +7,7 @@ import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
 
 public class AccountToAddressMapperTest {
+
 	@Test
 	public void addressCanBeCreatedAroundDbAccount() {
 		// Arrange:

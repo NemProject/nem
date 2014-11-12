@@ -48,25 +48,23 @@ public class Address {
 	}
 
 	/**
-	 * Creates address from both public key and an encoded address string.
-	 * For use by db mapper.
+	 * Creates an Address from both public key and an encoded address string.
+	 * This is protected because consistency is not checked.
 	 *
-	 * @param publicKey Accounts public key.
+	 * @param publicKey The public key.
 	 * @param encoded The encoded address string.
 	 */
-	public Address(final PublicKey publicKey, final String encoded) {
-		this.encoded = encoded;
+	protected Address(final PublicKey publicKey, final String encoded) {
 		this.publicKey = publicKey;
+		this.encoded = encoded;
 	}
 
 	private Address(final String encoded) {
-		this.encoded = encoded;
-		this.publicKey = null;
+		this(null, encoded);
 	}
 
 	private Address(final byte version, final PublicKey publicKey) {
-		this.encoded = generateEncoded(version, publicKey.getRaw());
-		this.publicKey = publicKey;
+		this(publicKey, generateEncoded(version, publicKey.getRaw()));
 	}
 
 	private static String generateEncoded(final byte version, final byte[] publicKey) {
