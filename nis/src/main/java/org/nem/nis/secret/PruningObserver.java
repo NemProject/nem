@@ -12,6 +12,7 @@ public class PruningObserver implements BlockTransactionObserver {
 	// keep 2 days of weighted balance history and 30 days of outlink history
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = 2 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long PRUNE_INTERVAL = 360;
 	private final PoiFacade poiFacade;
 
 	/**
@@ -44,6 +45,6 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static boolean shouldPrune(final Notification notification, final BlockNotificationContext context) {
 		return NotificationTrigger.Execute == context.getTrigger() &&
 				NotificationType.HarvestReward == notification.getType() &&
-				0 == (context.getHeight().getRaw() % 360);
+				1 == (context.getHeight().getRaw() % PRUNE_INTERVAL);
 	}
 }
