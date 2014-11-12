@@ -7,7 +7,6 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.Base32Encoder;
-import org.nem.nis.mappers.AccountToAddressMapper;
 
 import java.math.BigInteger;
 import java.util.function.*;
@@ -45,21 +44,6 @@ public class AddressTest {
 
 		// Assert:
 		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
-		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
-	}
-
-	@Test
-	public void addressCanBeCreatedAroundDbAccount() {
-		// Arrange:
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
-		final String encoded = Address.fromPublicKey(publicKey).getEncoded();
-		final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account(encoded, publicKey);
-
-		// Act:
-		final Address address = AccountToAddressMapper.toAddress(dbAccount);
-
-		// Assert:
-		Assert.assertThat(address.getEncoded(), IsEqual.equalTo(encoded));
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 
