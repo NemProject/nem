@@ -46,7 +46,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", true);
 
 		final String ipDetectionMode = getOptionalString(properties, "nis.ipDetectionMode", null);
-		this.ipDetectionMode =  null == ipDetectionMode
+		this.ipDetectionMode = null == ipDetectionMode
 				? IpDetectionMode.AutoRequired
 				: IpDetectionMode.valueOf(ipDetectionMode);
 
