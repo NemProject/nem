@@ -18,7 +18,7 @@ public class PeerNetworkSchedulerTest {
 	@Test
 	public void initiallyNoTasksAreStarted() {
 		// Act:
-		try (final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(Mockito.mock(TimeProvider.class))) {
+		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Assert:
 			Assert.assertThat(scheduler.getVisitors().size(), IsEqual.equalTo(0));
 		}
@@ -27,12 +27,10 @@ public class PeerNetworkSchedulerTest {
 	@Test
 	public void addTasksAddsAllNisTasks() {
 		// Arrange:
-		try (final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(Mockito.mock(TimeProvider.class))) {
+		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), Mockito.mock(Harvester.class), true);
-			final List<String> taskNames = scheduler.getVisitors().stream()
-					.map(NemAsyncTimerVisitor::getTimerName)
-					.collect(Collectors.toList());
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), true, true);
+			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
 			final List<String> expectedTaskNames = Arrays.asList(
@@ -41,7 +39,7 @@ public class PeerNetworkSchedulerTest {
 					"PRUNING INACTIVE NODES",
 					"REFRESH",
 					"SYNC",
-					"UPDATING LOCAL NODE ENDPOINT",
+					"AUTO IP DETECTION",
 					"TIME SYNCHRONIZATION",
 					"CHECKING CHAIN SYNCHRONIZATION");
 			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
@@ -51,15 +49,59 @@ public class PeerNetworkSchedulerTest {
 	@Test
 	public void timeSynchronizationTaskCanBeExcluded() {
 		// Arrange:
-		try (final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(Mockito.mock(TimeProvider.class))) {
+		try (final PeerNetworkScheduler scheduler = createScheduler()) {
 			// Act:
-			scheduler.addTasks(Mockito.mock(PeerNetwork.class), Mockito.mock(BlockChain.class), Mockito.mock(Harvester.class), false);
-			final List<String> taskNames = scheduler.getVisitors().stream()
-					.map(NemAsyncTimerVisitor::getTimerName)
-					.collect(Collectors.toList());
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), false, true);
+			final List<String> taskNames = getTaskNames(scheduler);
 
 			// Assert:
 			Assert.assertThat(!taskNames.contains("TIME SYNCHRONIZATION"), IsEqual.equalTo(true));
 		}
+	}
+
+	@Test
+	public void autoIpDetectionTaskCanBeExcluded() {
+		// Arrange:
+		try (final PeerNetworkScheduler scheduler = createScheduler()) {
+			// Act:
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), true, false);
+			final List<String> taskNames = getTaskNames(scheduler);
+
+			// Assert:
+			Assert.assertThat(!taskNames.contains("AUTO IP DETECTION"), IsEqual.equalTo(true));
+		}
+	}
+
+	@Test
+	public void allOptionalTasksCanBeExcluded() {
+		// Arrange:
+		try (final PeerNetworkScheduler scheduler = createScheduler()) {
+			// Act:
+			scheduler.addTasks(Mockito.mock(PeerNetwork.class), false, false);
+			final List<String> taskNames = getTaskNames(scheduler);
+
+			// Assert:
+			final List<String> expectedTaskNames = Arrays.asList(
+					"BROADCAST",
+					"FORAGING",
+					"PRUNING INACTIVE NODES",
+					"REFRESH",
+					"SYNC",
+					"CHECKING CHAIN SYNCHRONIZATION");
+			Assert.assertThat(taskNames, IsEquivalent.equivalentTo(expectedTaskNames));
+		}
+	}
+
+	private static List<String> getTaskNames(final PeerNetworkScheduler scheduler) {
+		return scheduler.getVisitors().stream()
+				.map(NemAsyncTimerVisitor::getTimerName)
+				.collect(Collectors.toList());
+	}
+
+	private static PeerNetworkScheduler createScheduler() {
+		return new PeerNetworkScheduler(
+				Mockito.mock(TimeProvider.class),
+				Mockito.mock(BlockChain.class),
+				Mockito.mock(Harvester.class));
 	}
 }
