@@ -54,10 +54,10 @@ public class ImportanceTransferMapper {
 	 * @return The ImportanceTransferTransaction model.
 	 */
 	public static ImportanceTransferTransaction toModel(final ImportanceTransfer dbImportanceTransfer, final AccountLookup accountLookup) {
-		final Address senderAccount = Address.fromDbAccount(dbImportanceTransfer.getSender());
+		final Address senderAccount = AccountToAddressMapper.toAddress(dbImportanceTransfer.getSender());
 		final Account sender = accountLookup.findByAddress(senderAccount);
 
-		final Address remoteAddress = Address.fromDbAccount(dbImportanceTransfer.getRemote());
+		final Address remoteAddress = AccountToAddressMapper.toAddress(dbImportanceTransfer.getRemote());
 		final Account remote = accountLookup.findByAddress(remoteAddress);
 
 		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(

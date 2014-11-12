@@ -7,6 +7,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.Base32Encoder;
+import org.nem.nis.mappers.AccountToAddressMapper;
 
 import java.math.BigInteger;
 import java.util.function.*;
@@ -55,7 +56,7 @@ public class AddressTest {
 		final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account(encoded, publicKey);
 
 		// Act:
-		final Address address = Address.fromDbAccount(dbAccount);
+		final Address address = AccountToAddressMapper.toAddress(dbAccount);
 
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsEqual.equalTo(encoded));

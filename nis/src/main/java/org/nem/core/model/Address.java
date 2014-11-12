@@ -48,16 +48,13 @@ public class Address {
 	}
 
 	/**
-	 * Creates an Address from a database account object.
+	 * Creates address from both public key and an encoded address string.
+	 * For use by db mapper.
 	 *
-	 * @param dbAccount The database account.
-	 * @return An address object.
+	 * @param publicKey Accounts public key.
+	 * @param encoded The encoded address string.
 	 */
-	public static Address fromDbAccount(final org.nem.nis.dbmodel.Account dbAccount) {
-		return new Address(dbAccount.getPublicKey(), dbAccount.getPrintableKey());
-	}
-
-	private Address (final PublicKey publicKey, final String encoded) {
+	public Address(final PublicKey publicKey, final String encoded) {
 		this.encoded = encoded;
 		this.publicKey = publicKey;
 	}
