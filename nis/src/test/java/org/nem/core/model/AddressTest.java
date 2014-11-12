@@ -47,6 +47,21 @@ public class AddressTest {
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 
+	@Test
+	public void addressCanBeCreatedAroundDbAccount() {
+		// Arrange:
+		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		final String encoded = Address.fromPublicKey(publicKey).getEncoded();
+		final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account(encoded, publicKey);
+
+		// Act:
+		final Address address = Address.fromDbAccount(dbAccount);
+
+		// Assert:
+		Assert.assertThat(address.getEncoded(), IsEqual.equalTo(encoded));
+		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+	}
+
 	//endregion
 
 	@Test
