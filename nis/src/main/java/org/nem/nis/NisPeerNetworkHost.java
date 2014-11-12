@@ -27,10 +27,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class NisPeerNetworkHost implements AutoCloseable {
 	private final AccountAnalyzer accountAnalyzer;
+	private final CountingBlockSynchronizer synchronizer;
 	private final PeerNetworkScheduler scheduler;
 	private final ChainServices chainServices;
 	private final NisConfiguration nisConfiguration;
-	private final CountingBlockSynchronizer synchronizer;
 	private final HttpConnectorPool httpConnectorPool;
 	private final AuditCollection incomingAudits;
 	private final AuditCollection outgoingAudits;
@@ -40,23 +40,21 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	@Autowired(required = true)
 	public NisPeerNetworkHost(
 			final AccountAnalyzer accountAnalyzer,
-			final BlockChain blockChain,
-			final Harvester harvester,
+			final CountingBlockSynchronizer synchronizer,
+			final PeerNetworkScheduler scheduler,
 			final ChainServices chainServices,
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
 			final AuditCollection incomingAudits,
 			final AuditCollection outgoingAudits) {
 		this.accountAnalyzer = accountAnalyzer;
+		this.synchronizer = synchronizer;
+		this.scheduler = scheduler;
 		this.chainServices = chainServices;
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
 		this.incomingAudits = incomingAudits;
 		this.outgoingAudits = outgoingAudits;
-
-		// TODO 2014112 J-J: consider injecting the following
-		this.synchronizer = new CountingBlockSynchronizer(blockChain);
-		this.scheduler = new PeerNetworkScheduler(CommonStarter.TIME_PROVIDER, blockChain, harvester);
 	}
 
 	/**

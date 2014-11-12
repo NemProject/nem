@@ -7,6 +7,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
@@ -277,10 +278,13 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
+		final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(this.timeProvider(), this.blockChain(), this.harvester());
+		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(this.blockChain());
+
 		return new NisPeerNetworkHost(
 				this.accountAnalyzer(),
-				this.blockChain(),
-				this.harvester(),
+				synchronizer,
+				scheduler,
 				this.chainServices(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),
