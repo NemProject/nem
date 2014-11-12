@@ -10,6 +10,7 @@ import org.nem.nis.poi.*;
 import java.util.*;
 
 public class PruningObserverTest {
+	private static final long PRUNE_INTERVAL = 360;
 
 	//region no-op
 
@@ -23,6 +24,16 @@ public class PruningObserverTest {
 	public void noAccountsArePrunedWhenNotificationTypeIsNotHarvestReward() {
 		// Assert:
 		assertNoAccountsArePruned(432001, NotificationTrigger.Execute, NotificationType.BalanceCredit);
+	}
+
+	@Test
+	public void noAccountsArePrunedIfBlockHeightModuloThreeHundredSixtyIsNotOne() {
+		// Assert:
+		for (int i=1; i<1000; i++) {
+			if (1 != (i % PRUNE_INTERVAL)) {
+				assertNoAccountsArePruned(i, NotificationTrigger.Execute, NotificationType.HarvestReward);
+			}
+		}
 	}
 
 	private static void assertNoAccountsArePruned(
@@ -54,23 +65,15 @@ public class PruningObserverTest {
 	}
 
 	@Test
-	public void allAccountsArePrunedWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
+	public void allAccountsArePrunedWhenBlockHeightIsAtWeightedBalanceBlockHistoryPlusOne() {
 		// Assert:
-		assertAllAccountsArePruned(2879, 1, 1);
-		assertAllAccountsArePruned(2880, 1, 1);
 		assertAllAccountsArePruned(2881, 1, 1);
-		assertAllAccountsArePruned(2882, 2, 1);
-		assertAllAccountsArePruned(2883, 3, 1);
 	}
 
 	@Test
-	public void allAccountsArePrunedWhenBlockHeightIsNearOutlinkBlockHistory() {
+	public void allAccountsArePrunedWhenBlockHeightAtOutlinkBlockHistoryPlusOne() {
 		// Assert:
-		assertAllAccountsArePruned(43199, 40319, 1);
-		assertAllAccountsArePruned(43200, 40320, 1);
 		assertAllAccountsArePruned(43201, 40321, 1);
-		assertAllAccountsArePruned(43202, 40322, 2);
-		assertAllAccountsArePruned(43203, 40323, 3);
 	}
 
 	@Test

@@ -65,7 +65,7 @@ public class TransferMapper {
 	 * @return The TransferTransaction model.
 	 */
 	public static TransferTransaction toModel(final Transfer dbTransfer, final AccountLookup accountLookup) {
-		final Address senderAccount = Address.fromPublicKey(dbTransfer.getSender().getPublicKey());
+		final Address senderAccount = Address.fromDbAccount(dbTransfer.getSender());
 		final Account sender = accountLookup.findByAddress(senderAccount);
 
 		final Address recipientAccount = Address.fromEncoded(dbTransfer.getRecipient().getPrintableKey());
