@@ -24,6 +24,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(false));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(true));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
+		Assert.assertThat(config.useAutoIpDetection(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
@@ -42,6 +43,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.bootWithoutAck", "true");
 		properties.setProperty("nis.useBinaryTransport", "false");
 		properties.setProperty("nis.useNetworkTime", "false");
+		properties.setProperty("nis.useAutoIpDetection", "false");
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.nonAuditedApiPaths", "/status|/whatever");
 
@@ -56,6 +58,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(true));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(false));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
+		Assert.assertThat(config.useAutoIpDetection(), IsEqual.equalTo(false));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),

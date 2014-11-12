@@ -17,6 +17,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final boolean useBinaryTransport;
 	private final String bootName;
 	private final boolean useNetworkTime;
+	private final boolean useAutoIpDetection;
 	private final int unlockedLimit;
 	private final String[] nonAuditedApiPaths;
 
@@ -43,6 +44,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
 		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", true);
 		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", true);
+		this.useAutoIpDetection = getOptionalBoolean(properties, "nis.useAutoIpDetection", true);
 		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
 		final String nonAuditedApiPaths = getOptionalString(properties, "nis.nonAuditedApiPaths", "/heartbeat|/status|/chain/height");
 		this.nonAuditedApiPaths = nonAuditedApiPaths.split("\\|");
@@ -112,6 +114,15 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public boolean useNetworkTime() {
 		return this.useNetworkTime;
+	}
+
+	/**
+	 * Gets a value indicating whether or not auto-IP detection should be used.
+	 *
+	 * @return true if auto-IP detection should be used.
+	 */
+	public boolean useAutoIpDetection() {
+		return this.useAutoIpDetection;
 	}
 
 	/**
