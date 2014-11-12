@@ -97,7 +97,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdateAnyWithThreeNodes(
+		final boolean result = context.runUpdateAny(
 				createEndpointFuture("127.0.0.10"),
 				createEndpointFuture("127.0.0.20"),
 				createEndpointFuture("127.0.0.30"));
@@ -114,7 +114,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdateAnyWithThreeNodes(
+		final boolean result = context.runUpdateAny(
 				createExceptionalFuture(),
 				createEndpointFuture("127.0.0.20"),
 				createExceptionalFuture());
@@ -131,7 +131,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdateAnyWithThreeNodes(
+		final boolean result = context.runUpdateAny(
 				createExceptionalFuture(),
 				createExceptionalFuture(),
 				createExceptionalFuture());
@@ -152,7 +152,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdatePluralityWithThreeNodes(
+		final boolean result = context.runUpdatePlurality(
 				createEndpointFuture("127.0.0.10"),
 				createEndpointFuture("127.0.0.20"),
 				createEndpointFuture("127.0.0.30"));
@@ -210,7 +210,7 @@ public class LocalNodeEndpointUpdaterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final boolean result = context.runUpdatePluralityWithThreeNodes(
+		final boolean result = context.runUpdatePlurality(
 				createExceptionalFuture(),
 				createExceptionalFuture(),
 				createExceptionalFuture());
@@ -239,22 +239,12 @@ public class LocalNodeEndpointUpdaterTest {
 		private final PeerConnector connector = Mockito.mock(PeerConnector.class);
 		private final LocalNodeEndpointUpdater updater = new LocalNodeEndpointUpdater(this.localNode, this.connector);
 
-		public boolean runUpdateAnyWithThreeNodes(
-				final CompletableFuture<NodeEndpoint> node1Future,
-				final CompletableFuture<NodeEndpoint> node2Future,
-				final CompletableFuture<NodeEndpoint> node3Future) {
-			final List<Node> nodes = this.createNodes(Arrays.asList(node1Future, node2Future, node3Future));
+		@SafeVarargs
+		public final boolean runUpdateAny(final CompletableFuture<NodeEndpoint>... futures) {
+			final List<Node> nodes = this.createNodes(Arrays.asList(futures));
 
 			// Act:
 			return this.updater.updateAny(nodes).join();
-		}
-
-		public boolean runUpdatePluralityWithThreeNodes(
-				final CompletableFuture<NodeEndpoint> node1Future,
-				final CompletableFuture<NodeEndpoint> node2Future,
-				final CompletableFuture<NodeEndpoint> node3Future) {
-			// Act:
-			return this.runUpdatePlurality(node1Future, node2Future, node3Future);
 		}
 
 		@SafeVarargs
