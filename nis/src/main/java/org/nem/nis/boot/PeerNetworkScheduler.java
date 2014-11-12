@@ -34,7 +34,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private static final int PRUNE_INACTIVE_NODES_DELAY = ONE_HOUR;
 
-	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
+	private static final int AUTO_IP_DETECTION_DELAY = 5 * ONE_MINUTE;
 
 	private static final int TIME_SYNC_INITIAL_INTERVAL = ONE_MINUTE;
 	private static final int TIME_SYNC_INITIAL_INTERVAL_ROUNDS = 15;
@@ -44,6 +44,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int CHECK_CHAIN_SYNC_INTERVAL = 30 * ONE_SECOND;
 
 	private final TimeProvider timeProvider;
+	private final BlockChain blockChain;
+	private final Harvester harvester;
 	private final List<NemAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final List<AsyncTimer> timers = new ArrayList<>();
 	private final Executor executor = Executors.newCachedThreadPool();
@@ -52,9 +54,16 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * Creates a new scheduler.
 	 *
 	 * @param timeProvider The time provider.
+	 * @param blockChain The block chain.
+	 * @param harvester The harvester.
 	 */
-	public PeerNetworkScheduler(final TimeProvider timeProvider) {
+	public PeerNetworkScheduler(
+			final TimeProvider timeProvider,
+			final BlockChain blockChain,
+			final Harvester harvester) {
 		this.timeProvider = timeProvider;
+		this.blockChain = blockChain;
+		this.harvester = harvester;
 	}
 
 	/**
@@ -70,26 +79,33 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * Adds all NIS tasks.
 	 *
 	 * @param network The network.
-	 * @param blockChain The block chain.
-	 * @param harvester The harvester.
 	 * @param useNetworkTime true if network time should be used.
+	 * @param enableAutoIpDetection true if auto IP detection should be enabled.
 	 */
 	public void addTasks(
 			final PeerNetwork network,
-			final BlockChain blockChain,
-			final Harvester harvester,
-			final boolean useNetworkTime) {
-		this.addForagingTask(network, blockChain, harvester);
-		this.addNetworkTasks(network, useNetworkTime);
+			final boolean useNetworkTime,
+			final boolean enableAutoIpDetection) {
+		this.addForagingTask(network);
+
+		final NetworkTaskInitializer initializer = new NetworkTaskInitializer(this, network);
+		initializer.addDefaultTasks();
+		if (useNetworkTime) {
+			initializer.addTimeSynchronizationTask();
+		}
+
+		if (enableAutoIpDetection) {
+			initializer.addAutoIpDetectionTask();
+		}
 	}
 
-	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain, final Harvester harvester) {
+	private void addForagingTask(final PeerNetwork network) {
 		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
 				.setRecurringFutureSupplier(
 						this.runnableToFutureSupplier(() -> {
-							final Block block = harvester.harvestBlock();
-							if (null == block || !blockChain.processBlock(block).isSuccess()) {
+							final Block block = this.harvester.harvestBlock();
+							if (null == block || !this.blockChain.processBlock(block).isSuccess()) {
 								return;
 							}
 
@@ -105,29 +121,18 @@ public class PeerNetworkScheduler implements AutoCloseable {
 		this.timers.add(new AsyncTimer(options));
 	}
 
-	private void addNetworkTasks(final PeerNetwork network, final boolean useNetworkTime) {
-		final NetworkTaskInitializer initializer = new NetworkTaskInitializer(this);
-		initializer.initialize(network, useNetworkTime);
-	}
-
 	private static class NetworkTaskInitializer {
 		private final PeerNetworkScheduler scheduler;
-		private AsyncTimer refreshTimer;
+		private final PeerNetwork network;
+		private final AsyncTimer refreshTimer;
 
-		public NetworkTaskInitializer(final PeerNetworkScheduler scheduler) {
+		public NetworkTaskInitializer(final PeerNetworkScheduler scheduler, final PeerNetwork network) {
 			this.scheduler = scheduler;
+			this.network = network;
+			this.refreshTimer = this.addRefreshTask(network);
 		}
 
-		private void initialize(final PeerNetwork network, final boolean useNetworkTime) {
-			this.refreshTimer = this.addRefreshTask(network);
-
-			if (useNetworkTime) {
-				this.addSimpleTask(
-						() -> network.synchronizeTime(this.scheduler.timeProvider),
-						getTimeSynchronizationDelayStrategy(),
-						"TIME SYNCHRONIZATION");
-			}
-
+		public void addDefaultTasks() {
 			this.addSimpleTask(
 					() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
 					BROADCAST_INTERVAL,
@@ -141,13 +146,23 @@ public class PeerNetworkScheduler implements AutoCloseable {
 					PRUNE_INACTIVE_NODES_DELAY,
 					"PRUNING INACTIVE NODES");
 			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
-					UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
-					"UPDATING LOCAL NODE ENDPOINT");
-			this.addSimpleTask(
 					() -> network.checkChainSynchronization(),
 					CHECK_CHAIN_SYNC_INTERVAL,
 					"CHECKING CHAIN SYNCHRONIZATION");
+		}
+
+		public void addTimeSynchronizationTask() {
+			this.addSimpleTask(
+					() -> network.synchronizeTime(this.scheduler.timeProvider),
+					getTimeSynchronizationDelayStrategy(),
+					"TIME SYNCHRONIZATION");
+		}
+
+		public void addAutoIpDetectionTask() {
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
+					AUTO_IP_DETECTION_DELAY,
+					"AUTO IP DETECTION");
 		}
 
 		private AsyncTimer addRefreshTask(final PeerNetwork network) {

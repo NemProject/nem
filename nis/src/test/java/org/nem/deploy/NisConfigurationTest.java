@@ -21,9 +21,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(5));
 		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(20));
-		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(false));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(true));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
+		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.AutoRequired));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
@@ -39,9 +39,9 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.bootName", "my name");
 		properties.setProperty("nis.nodeLimit", "8");
 		properties.setProperty("nis.timeSyncNodeLimit", "12");
-		properties.setProperty("nis.bootWithoutAck", "true");
 		properties.setProperty("nis.useBinaryTransport", "false");
 		properties.setProperty("nis.useNetworkTime", "false");
+		properties.setProperty("nis.ipDetectionMode", "Disabled");
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.nonAuditedApiPaths", "/status|/whatever");
 
@@ -53,9 +53,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("my name"));
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(8));
 		Assert.assertThat(config.getTimeSyncNodeLimit(), IsEqual.equalTo(12));
-		Assert.assertThat(config.bootWithoutAck(), IsEqual.equalTo(true));
 		Assert.assertThat(config.useBinaryTransport(), IsEqual.equalTo(false));
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
+		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.Disabled));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),

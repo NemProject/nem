@@ -216,15 +216,15 @@ public class PeerNetworkTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
-		Mockito.when(updater.update(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
+		Mockito.when(updater.updatePlurality(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
 		Mockito.when(context.servicesFactory.createLocalNodeEndpointUpdater()).thenReturn(updater);
 
 		// Act:
 		context.network.updateLocalNodeEndpoint().join();
 
 		// Assert:
-		Mockito.verify(context.servicesFactory, Mockito.times(1)).createLocalNodeEndpointUpdater();
-		Mockito.verify(updater, Mockito.times(1)).update(Mockito.any());
+		Mockito.verify(context.servicesFactory, Mockito.only()).createLocalNodeEndpointUpdater();
+		Mockito.verify(updater, Mockito.only()).updatePlurality(Mockito.any());
 	}
 
 	@Test
