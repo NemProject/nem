@@ -204,6 +204,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.createNetworkServicesFactory(networkState),
 				selectorFactory,
 				importanceAwareSelectorFactory,
-				!this.nisConfiguration.bootWithoutAck());
+				this.nisConfiguration.getIpDetectionMode());
 	}
 }

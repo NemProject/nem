@@ -13,11 +13,10 @@ public class NisConfiguration extends CommonConfiguration {
 	private final int nodeLimit;
 	private final int timeSyncNodeLimit;
 	private final PrivateKey bootKey;
-	private final boolean bootWithoutAck;
 	private final boolean useBinaryTransport;
 	private final String bootName;
 	private final boolean useNetworkTime;
-	private final boolean useAutoIpDetection;
+	private final IpDetectionMode ipDetectionMode;
 	private final int unlockedLimit;
 	private final String[] nonAuditedApiPaths;
 
@@ -37,14 +36,20 @@ public class NisConfiguration extends CommonConfiguration {
 		super(properties);
 		final String autoBootKey = getOptionalString(properties, "nis.bootKey", null);
 		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
+
 		final String autoBootName = getOptionalString(properties, "nis.bootName", null);
 		this.bootName = null == autoBootName ? null : autoBootName.trim();
+
 		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 5);
 		this.timeSyncNodeLimit = getOptionalInteger(properties, "nis.timeSyncNodeLimit", 20);
-		this.bootWithoutAck = getOptionalBoolean(properties, "nis.bootWithoutAck", false);
 		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", true);
 		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", true);
-		this.useAutoIpDetection = getOptionalBoolean(properties, "nis.useAutoIpDetection", true);
+
+		final String ipDetectionMode = getOptionalString(properties, "nis.ipDetectionMode", null);
+		this.ipDetectionMode =  null == ipDetectionMode
+				? IpDetectionMode.AutoRequired
+				: IpDetectionMode.valueOf(ipDetectionMode);
+
 		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
 		final String nonAuditedApiPaths = getOptionalString(properties, "nis.nonAuditedApiPaths", "/heartbeat|/status|/chain/height");
 		this.nonAuditedApiPaths = nonAuditedApiPaths.split("\\|");
@@ -88,16 +93,6 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets a value indicating whether or not this node should be allowed to boot if it
-	 * cannot receive acknowledgement from a remote peer during the boot sequence.
-	 *
-	 * @return true if remote peer acknowledgement is optional.
-	 */
-	public boolean bootWithoutAck() {
-		return this.bootWithoutAck;
-	}
-
-	/**
 	 * Gets a value indicating whether or not this node should send binary payloads.
 	 *
 	 * @return true if this node should send binary payloads.
@@ -117,12 +112,12 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets a value indicating whether or not auto-IP detection should be used.
+	 * Gets the IP detection mode.
 	 *
-	 * @return true if auto-IP detection should be used.
+	 * @return The IP detection mode.
 	 */
-	public boolean useAutoIpDetection() {
-		return this.useAutoIpDetection;
+	public IpDetectionMode getIpDetectionMode() {
+		return this.ipDetectionMode;
 	}
 
 	/**
