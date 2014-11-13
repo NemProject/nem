@@ -37,6 +37,17 @@ public class MultisigSignerModificationTransaction extends Transaction {
 		 *  3. Now I remove A, B and C, and withdraw funds from an account and go to Bahamas...
 		 *
 		 *  I'm not sure how removal of account should be done...
+		 *
+		 * TODO 20131113 G-J,B: my idea (may be flawed), was as follows:
+		 * 22:57 <@gimre> 1. making "add cosignatory" transaction (i.e. add X as cosigner of M), changes account M to multisig
+		 * 22:58 <@gimre> and than you simply add next accounts
+		 * 22:58 <@gimre> and than transfer from M to anywhere
+		 * 22:59 <@gimre> requires signatures from all cosignatories
+		 * 22:59 <@gimre> also, there would probably have to be "wait" time, before cosignatory becomes valid...
+		 * 23:00 <@gimre> (similar to that with activation of remote harvesting account)
+		 * 23:02 <@BloodyRookie> is it really needed to change a multisig account once it is created? (like adding new cosigners)
+		 * 23:03 <@gimre> BloodyRookie: most likely not, but what I wanted was to have "add cosigner" as a separate transactions,
+		 * as that most likely will be easier to handle
 		 */
 		// Del(2)
 
