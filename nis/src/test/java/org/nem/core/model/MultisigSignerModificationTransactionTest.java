@@ -58,7 +58,7 @@ public class MultisigSignerModificationTransactionTest {
 	}
 
 	@Test
-	public void deserializationFailsWhenAddressIsMissing() {
+	public void deserializationFailsWhenCosignatoryIsMissing() {
 		// Assert:
 		this.assertDeserializationFailure(jsonObject -> jsonObject.put("cosignatoryAccount", null));
 	}
@@ -148,8 +148,7 @@ public class MultisigSignerModificationTransactionTest {
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final MultisigSignerModificationTransaction.ModificationType modificationType = MODIFICATION_ADD;
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(90));
+		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
 		transaction.setFee(Amount.fromNem(10));
@@ -174,8 +173,7 @@ public class MultisigSignerModificationTransactionTest {
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
 		final MultisigSignerModificationTransaction.ModificationType modificationType = MODIFICATION_ADD;
-		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(90));
+		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
 		transaction.setFee(Amount.fromNem(10));

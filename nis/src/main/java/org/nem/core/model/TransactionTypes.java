@@ -41,13 +41,13 @@ public class TransactionTypes {
 	public static final int SNAPSHOT = SNAPSHOT_TYPE | 0x01;
 
 	/**
-	 * Announce account as multi-sig.
+	 * A multisig change transaction (e.g. announce an account as multi-sig).
 	 */
-	public static final int MULTISIG_SIGNER_MODIFY = MULTISIG_TYPE | 0x02;
+	public static final int MULTISIG_SIGNER_MODIFY = MULTISIG_TYPE | 0x01;
 
 	/**
-	 * Multisig signature
+	 * A multisig signature transaction.
 	 */
-	public static final int MULTISIG_SIGNATURE = MULTISIG_TYPE | 0x03;
+	public static final int MULTISIG_SIGNATURE = MULTISIG_TYPE | 0x02;
 
 }

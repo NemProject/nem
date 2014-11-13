@@ -15,7 +15,7 @@ public class CosignatoryModificationNotification extends Notification {
 	 *
 	 * @param multisigAccount The multisig account.
 	 * @param cosignatoryAccount The cosigner account.
-	 * @param modificationType The modificationType of signer modification transaction.
+	 * @param modificationType The type of modification.
 	 */
 	public CosignatoryModificationNotification(final Account multisigAccount, final Account cosignatoryAccount, final int modificationType) {
 		super(NotificationType.CosignatoryModification);
@@ -43,9 +43,9 @@ public class CosignatoryModificationNotification extends Notification {
 	}
 
 	/**
-	 * Gets the modificationType of signer modification transaction.
+	 * Gets the type of signer modification transaction.
 	 *
-	 * @return The modificationType of signer modification transaction.
+	 * @return The type of signer modification transaction.
 	 */
 	public int getModificationType() {
 		return this.modificationType;

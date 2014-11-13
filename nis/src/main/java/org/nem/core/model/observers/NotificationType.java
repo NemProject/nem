@@ -37,7 +37,7 @@ public enum NotificationType {
 	HarvestReward,
 
 	/**
-	 * The notification represents add of cosigner account to given account.
+	 * The notification represents a cosigner change.
 	 */
 	CosignatoryModification
 }

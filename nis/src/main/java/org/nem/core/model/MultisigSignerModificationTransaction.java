@@ -13,8 +13,9 @@ import org.nem.core.time.TimeInstant;
 public class MultisigSignerModificationTransaction extends Transaction {
 
 	//region ModificationType
+
 	/**
-	 * Static class containing types of modification of MultisigModifySignerTransaction.
+	 * Enum containing types of multisig modifications.
 	 */
 	public static enum ModificationType {
 		/**
@@ -29,6 +30,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 
 		/**
 		 * For now we WON'T allow removal...
+		 * TODO 20141112 J-G: do you have a concern in mind or are just dropping it for expediency?
 		 */
 		// Del(2)
 
@@ -86,7 +88,11 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	 * @param modificationType The type of signer modification transaction.
 	 * @param cosignatoryAccount The cosignatory account.
 	 */
-	public MultisigSignerModificationTransaction(final TimeInstant timeStamp, final Account sender, final ModificationType modificationType, final Account cosignatoryAccount) {
+	public MultisigSignerModificationTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final ModificationType modificationType,
+			final Account cosignatoryAccount) {
 		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, 1, timeStamp, sender);
 		this.modificationType = modificationType;
 		this.cosignatoryAccount = cosignatoryAccount;
