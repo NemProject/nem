@@ -20,7 +20,6 @@ public class NodeEndpointTest {
 		// Assert:
 		final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
 		Assert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
-		assertApiUrlsAreCorrect(expectedUrl, endpoint);
 	}
 
 	@Test
@@ -31,7 +30,6 @@ public class NodeEndpointTest {
 		// Assert:
 		final URL expectedUrl = new URL("http", "10.8.8.2", 7890, "/");
 		Assert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
-		assertApiUrlsAreCorrect(expectedUrl, endpoint);
 	}
 
 	@Test
@@ -45,36 +43,6 @@ public class NodeEndpointTest {
 		// Assert:
 		final URL expectedUrl = new URL("ftp", "10.8.8.2", 12, "/");
 		Assert.assertThat(endpoint.getBaseUrl(), IsEqual.equalTo(expectedUrl));
-		assertApiUrlsAreCorrect(expectedUrl, endpoint);
-	}
-
-	private static void assertApiUrlsAreCorrect(final URL url, final NodeEndpoint endpoint) throws Exception {
-		final Map<NodeApiId, String> apiIdToPathMap = new HashMap<>();
-		apiIdToPathMap.put(NodeApiId.REST_BLOCK_AT, "block/at");
-		apiIdToPathMap.put(NodeApiId.REST_CHAIN_BLOCKS_AFTER, "chain/blocks-after");
-		apiIdToPathMap.put(NodeApiId.REST_CHAIN_HASHES_FROM, "chain/hashes-from");
-		apiIdToPathMap.put(NodeApiId.REST_CHAIN_LAST_BLOCK, "chain/last-block");
-		apiIdToPathMap.put(NodeApiId.REST_CHAIN_SCORE, "chain/score");
-		apiIdToPathMap.put(NodeApiId.REST_CHAIN_HEIGHT, "chain/height");
-		apiIdToPathMap.put(NodeApiId.REST_NODE_CAN_YOU_SEE_ME, "node/cysm");
-		apiIdToPathMap.put(NodeApiId.REST_NODE_EXTENDED_INFO, "node/extended-info");
-		apiIdToPathMap.put(NodeApiId.REST_NODE_INFO, "node/info");
-		apiIdToPathMap.put(NodeApiId.REST_NODE_PEER_LIST, "node/peer-list/all");
-		apiIdToPathMap.put(NodeApiId.REST_NODE_PEER_LIST_REACHABLE, "node/peer-list/reachable");
-		apiIdToPathMap.put(NodeApiId.REST_NODE_PEER_LIST_ACTIVE, "node/peer-list/active");
-		apiIdToPathMap.put(NodeApiId.REST_NODE_PING, "node/ping");
-		apiIdToPathMap.put(NodeApiId.REST_PUSH_BLOCK, "push/block");
-		apiIdToPathMap.put(NodeApiId.REST_PUSH_TRANSACTION, "push/transaction");
-		apiIdToPathMap.put(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED, "transactions/unconfirmed");
-		apiIdToPathMap.put(NodeApiId.REST_TIME_SYNC_NETWORK_TIME, "time-sync/network-time");
-
-		for (final NodeApiId apiId : NodeApiId.values()) {
-			if (!apiIdToPathMap.containsKey(apiId)) {
-				Assert.fail(String.format("path for '%s' is not being tested", apiId));
-			}
-
-			Assert.assertThat(endpoint.getApiUrl(apiId), IsEqual.equalTo(new URL(url, apiIdToPathMap.get(apiId))));
-		}
 	}
 
 	//region invalid parameters

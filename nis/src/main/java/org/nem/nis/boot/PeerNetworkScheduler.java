@@ -2,7 +2,7 @@ package org.nem.nis.boot;
 
 import org.nem.core.async.*;
 import org.nem.core.model.Block;
-import org.nem.core.node.NodeApiId;
+import org.nem.core.node.NisPeerId;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.BlockChain;
 import org.nem.nis.harvesting.Harvester;
@@ -112,7 +112,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 							final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
 									block,
 									network.getLocalNode().getIdentity());
-							network.broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
+							network.broadcast(NisPeerId.REST_PUSH_BLOCK, secureBlock);
 						}))
 				.setInitialDelay(FORAGING_INITIAL_DELAY)
 				.setDelayStrategy(new UniformDelayStrategy(FORAGING_INTERVAL))
@@ -134,7 +134,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 		public void addDefaultTasks() {
 			this.addSimpleTask(
-					() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
+					() -> network.broadcast(NisPeerId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
 					BROADCAST_INTERVAL,
 					"BROADCAST");
 			this.addSimpleTask(

@@ -77,7 +77,7 @@ public class PushServiceTest {
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
 		Mockito.verify(context.network, Mockito.times(1))
-				.broadcast(Mockito.eq(NodeApiId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
+				.broadcast(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
@@ -186,7 +186,7 @@ public class PushServiceTest {
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
 		Mockito.verify(context.network, Mockito.times(1))
-				.broadcast(Mockito.eq(NodeApiId.REST_PUSH_BLOCK), broadcastEntityArgument.capture());
+				.broadcast(Mockito.eq(NisPeerId.REST_PUSH_BLOCK), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
@@ -249,7 +249,7 @@ public class PushServiceTest {
 
 		final ArgumentCaptor<SerializableEntity> broadcastEntityArgument = ArgumentCaptor.forClass(SerializableEntity.class);
 		Mockito.verify(context.network, Mockito.times(1))
-				.broadcast(Mockito.eq(NodeApiId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
+				.broadcast(Mockito.eq(NisPeerId.REST_PUSH_TRANSACTION), broadcastEntityArgument.capture());
 
 		final SecureSerializableEntity<?> secureEntity = (SecureSerializableEntity<?>)(broadcastEntityArgument.getValue());
 		Assert.assertThat(secureEntity.getIdentity(), IsEqual.equalTo(context.localNodeIdentity));
