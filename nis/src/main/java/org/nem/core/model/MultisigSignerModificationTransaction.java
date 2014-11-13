@@ -31,6 +31,12 @@ public class MultisigSignerModificationTransaction extends Transaction {
 		/**
 		 * For now we WON'T allow removal...
 		 * TODO 20141112 J-G: do you have a concern in mind or are just dropping it for expediency?
+		 * TODO 20131113 G-J,B: actually it's not about implementation part, but about real life part.
+		 *  1. Let's say I create multisig acct for some company and add 3 addresses mine X, and A, B, C
+		 *  2. Company adds fund to the account
+		 *  3. Now I remove A, B and C, and withdraw funds from an account and go to Bahamas...
+		 *
+		 *  I'm not sure how removal of account should be done...
 		 */
 		// Del(2)
 
