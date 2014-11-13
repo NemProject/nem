@@ -73,7 +73,7 @@ public class PeerNetwork {
 	/**
 	 * Gets a dynamic list of the active nodes to which the running node broadcasts information.
 	 *
-	 * @return A list of broadcast partners
+	 * @return A list of broadcast partners.
 	 */
 	public Collection<Node> getPartnerNodes() {
 		return this.selector.selectNodes();
@@ -173,7 +173,7 @@ public class PeerNetwork {
 	 * Updates the endpoint of the local node as seen by other nodes.
 	 */
 	public CompletableFuture<Boolean> updateLocalNodeEndpoint() {
-		return this.servicesFactory.createLocalNodeEndpointUpdater().update(this.selector);
+		return this.servicesFactory.createLocalNodeEndpointUpdater().updatePlurality(this.getPartnerNodes());
 	}
 
 	/**

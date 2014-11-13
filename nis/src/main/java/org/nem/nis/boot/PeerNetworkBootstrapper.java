@@ -1,5 +1,6 @@
 package org.nem.nis.boot;
 
+import org.nem.deploy.IpDetectionMode;
 import org.nem.peer.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 
@@ -10,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Helper class for booting a PeerNetwork.
  */
 public class PeerNetworkBootstrapper {
-	private final boolean requirePeerAck;
+	private final IpDetectionMode ipDetectionMode;
 	private final PeerNetwork network;
 	private final AtomicBoolean canBoot = new AtomicBoolean(true);
 	private boolean isBooted;
@@ -21,15 +22,15 @@ public class PeerNetworkBootstrapper {
 	 * @param state The network state.
 	 * @param servicesFactory The network services factory.
 	 * @param selectorFactory The node selector factory.
-	 * @param requirePeerAck true if the boot should fail if a peer acknowledgement is not received.
+	 * @param ipDetectionMode The desired IP detection mode.
 	 */
 	public PeerNetworkBootstrapper(
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
 			final NodeSelectorFactory selectorFactory,
 			final NodeSelectorFactory importanceAwareSelectorFactory,
-			final boolean requirePeerAck) {
-		this.requirePeerAck = requirePeerAck;
+			final IpDetectionMode ipDetectionMode) {
+		this.ipDetectionMode = ipDetectionMode;
 		this.network = new PeerNetwork(state, servicesFactory, selectorFactory, importanceAwareSelectorFactory);
 	}
 
@@ -61,9 +62,13 @@ public class PeerNetworkBootstrapper {
 			throw new IllegalStateException("network boot was already attempted");
 		}
 
-		return this.network.boot()
+		final CompletableFuture<Boolean> future = IpDetectionMode.Disabled == this.ipDetectionMode
+				? CompletableFuture.completedFuture(true)
+				: this.network.boot();
+
+		return future
 				.handle((result, e) -> {
-					if (null != e || (!result && this.requirePeerAck)) {
+					if (null != e || (!result && IpDetectionMode.AutoRequired == this.ipDetectionMode)) {
 						this.canBoot.set(true);
 						throw new IllegalStateException("network boot failed", e);
 					}

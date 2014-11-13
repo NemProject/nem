@@ -47,14 +47,24 @@ public class Address {
 		return new Address(encoded.toUpperCase());
 	}
 
-	private Address(final String encoded) {
+	/**
+	 * Creates an Address from both public key and an encoded address string.
+	 * This is protected because consistency is not checked.
+	 *
+	 * @param publicKey The public key.
+	 * @param encoded The encoded address string.
+	 */
+	protected Address(final PublicKey publicKey, final String encoded) {
+		this.publicKey = publicKey;
 		this.encoded = encoded;
-		this.publicKey = null;
+	}
+
+	private Address(final String encoded) {
+		this(null, encoded);
 	}
 
 	private Address(final byte version, final PublicKey publicKey) {
-		this.encoded = generateEncoded(version, publicKey.getRaw());
-		this.publicKey = publicKey;
+		this(publicKey, generateEncoded(version, publicKey.getRaw()));
 	}
 
 	private static String generateEncoded(final byte version, final byte[] publicKey) {

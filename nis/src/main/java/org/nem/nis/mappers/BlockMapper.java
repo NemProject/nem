@@ -90,9 +90,9 @@ public class BlockMapper {
 			return NemesisBlock.fromResource(new DeserializationContext(accountLookup));
 		}
 
-		final Address foragerAddress = Address.fromPublicKey(dbBlock.getForger().getPublicKey());
+		final Address foragerAddress = AccountToAddressMapper.toAddress(dbBlock.getForger());
 		final Account forager = accountLookup.findByAddress(foragerAddress);
-		final Address lessorAddress = dbBlock.getLessor() != null ? Address.fromPublicKey(dbBlock.getLessor().getPublicKey()) : null;
+		final Address lessorAddress = dbBlock.getLessor() != null ? AccountToAddressMapper.toAddress(dbBlock.getLessor()) : null;
 		final Account lessor = lessorAddress != null ? accountLookup.findByAddress(lessorAddress) : null;
 
 		final Block block = new org.nem.core.model.Block(
