@@ -29,7 +29,7 @@ public class PruningObserverTest {
 	@Test
 	public void noAccountsArePrunedIfBlockHeightModuloThreeHundredSixtyIsNotOne() {
 		// Assert:
-		for (int i=1; i<1000; i++) {
+		for (int i = 1; i < 1000; ++i) {
 			if (1 != (i % PRUNE_INTERVAL)) {
 				assertNoAccountsArePruned(i, NotificationTrigger.Execute, NotificationType.HarvestReward);
 			}

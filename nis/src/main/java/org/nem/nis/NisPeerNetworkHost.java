@@ -7,7 +7,6 @@ import org.nem.core.node.*;
 import org.nem.deploy.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
-import org.nem.nis.harvesting.Harvester;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
