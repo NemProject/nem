@@ -919,33 +919,6 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
-	// TODO 20140923 J-G: so, what benefits do we get checking by checking the unconfirmed balances?
-	// TODO 20140924 G-J well, not sure if that's gonna answer your question
-	// let's assume S has 10, and he makes two distinct TXes with amount of 7
-	// because we execute first TX unconfirmed balance is changed, and second one won't be added
-	// to unconfirmed TXes at all.
-	//
-	// If it WOULD be added, there's a chance, someone could hang whole network (I think we had such
-	// bug somewhere in the beginning)
-	// Let's say both TXes have been added, now harvester would fail to generate a block (as long as deadline haven't passed)
-	// If attacker would send those two TXes to whole network, he'd basically stop whole harvesting
-	// TODO 20140926 J-G how would he stop the whole network; when re-validating against confirmed balance only one would be chosen?
-
-	// TODO 20141106 J-G,B: while we're here can you answer my question ;)?
-	// TODO 20141107 BR -> J: the term ValidateAgainstConfirmedBalance is misleading, it means that the transaction is not executed during add().
-	// TODO                   There is no check against a confirmed balance.
-	// TODO                   So the above is valid and a harvester would create a block that doesn't pass processBlock().
-	// TODO 20141107 J-G: BR - when execute is true, i guess by "hang the network" you mean flood the network with bogus transactions?
-	// > BR - the confirmed balance check was moved into the single validator ...
-	// > look at these tests (1) transactionIsExcludedFromNextBlockIfConfirmedBalanceIsInsufficient
-	// > (2) getTransactionsForNewBlockExcludesConflictingTransactions (which would fail without it)
-	// TODO 20141108 BR -> J: you are right, the conflicting transactions would be excluded when generating a block.
-	// TODO                   But I finally remember why we have this check:
-	// TODO                   A user (I think it was VicVegas) complained that if the GUI shows a balance of 1k NEM he can initiate many
-	// TODO                   transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
-	// TODO                   can spend more than he has. Furthermore, a new block included one of the transactions leaving the
-	// TODO                   the other transaction still being displayed as unconfirmed in the GUI forever (until deadline was exceeded).
-	// TODO 20141110 G -> J: does this require any more comments?
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:

@@ -28,7 +28,25 @@ public class UnconfirmedTransactions {
 	private final PoiFacade poiFacade;
 
 	private enum BalanceValidationOptions {
+		/**
+		 * The confirmed balance check occurs as part of the single transaction validator.
+		 * This is used to exclude conflicting transactions when generating a block.
+		 * This is accomplished by bypassing the execution of the UnconfirmedBalancesObserver
+		 * (so that all balance validations are against the current account balances).
+		 */
 		ValidateAgainstConfirmedBalance,
+
+		/**
+		 * The unconfirmed balance check occurs as part of the execution of the UnconfirmedBalancesObserver.
+		 * This is the default setting and is used when adding new transactions and
+		 * when getting the unconfirmed transactions for an account.
+		 * <br/>
+		 * This improves the user experience:
+		 * A user complained that if the GUI shows a balance of 1k NEM he can initiate many
+		 * transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
+		 * can spend more than he has. Furthermore, a new block included one of the transactions leaving the
+		 * the other transaction still being displayed as unconfirmed in the GUI forever (until deadline was exceeded).
+		 */
 		ValidateAgainstUnconfirmedBalance,
 	}
 
