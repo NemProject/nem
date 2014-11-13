@@ -38,8 +38,10 @@ public class NisUtils {
 	 * @return The db block.
 	 */
 	public static org.nem.nis.dbmodel.Block createDbBlockWithTimeStampAtHeight(final int timeStamp, final long height) {
+		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
-		account.setPublicKey(Utils.generateRandomPublicKey());
+		account.setPrintableKey(address.getEncoded());
+		account.setPublicKey(address.getPublicKey());
 
 		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block();
 		block.setForger(account);
