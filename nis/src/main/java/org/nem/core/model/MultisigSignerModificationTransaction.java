@@ -48,6 +48,10 @@ public class MultisigSignerModificationTransaction extends Transaction {
 		 * 23:02 <@BloodyRookie> is it really needed to change a multisig account once it is created? (like adding new cosigners)
 		 * 23:03 <@gimre> BloodyRookie: most likely not, but what I wanted was to have "add cosigner" as a separate transactions,
 		 * as that most likely will be easier to handle
+		 * 'is it really needed to change a multisig account once it is created' - RH had a scenario ... there is an account for a company
+		 * where each member of the board has a private key ... when the board changes, the people in charge of the funds need to change
+		 * concretely, for the NEM post-launch account, if someone leaves NEM their key should be revoked (and probably replaced with someone else)
+		 * removal addition could require full consensus
 		 */
 		// Del(2)
 
