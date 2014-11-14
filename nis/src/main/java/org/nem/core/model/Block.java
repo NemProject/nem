@@ -244,7 +244,7 @@ public class Block extends VerifiableEntity {
 
 		final Block rhs = (Block)obj;
 		return this.getHeight().equals(rhs.getHeight()) &&
-				this.getSignature().equals(rhs.getSignature()) &&
+				Objects.equals(this.getSignature(), rhs.getSignature()) &&
 				HashUtils.calculateHash(this).equals(HashUtils.calculateHash(rhs));
 	}
 

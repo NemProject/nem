@@ -375,6 +375,9 @@ public class BlockTest {
 			final Block diffHashBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(6), new BlockHeight(3));
 			diffHeightBlock.sign();
 			this.put("diff-hash", diffHashBlock);
+
+			final Block nullSignatureBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(3));
+			this.put("null-signature", nullSignatureBlock);
 		}
 	};
 
@@ -389,6 +392,7 @@ public class BlockTest {
 		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature"), IsNot.not(IsEqual.equalTo(block)));
 		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height"), IsNot.not(IsEqual.equalTo(block)));
 		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash"), IsNot.not(IsEqual.equalTo(block)));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature"), IsNot.not(IsEqual.equalTo(block)));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(block)));
 		Assert.assertThat(DEFAULT_ACCOUNT, IsNot.not(IsEqual.equalTo((Object)block)));
 	}
@@ -405,6 +409,7 @@ public class BlockTest {
 		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature").hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion
