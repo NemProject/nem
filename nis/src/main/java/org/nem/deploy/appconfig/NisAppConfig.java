@@ -227,7 +227,7 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockChainLastBlockLayer,
 				this.canHarvestPredicate(),
-				this.nisConfiguration());
+				this.nisConfiguration().getUnlockedLimit());
 	}
 
 	@Bean
