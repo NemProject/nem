@@ -32,15 +32,7 @@ public class BlockChainComparer {
 		return impl.compare();
 	}
 
-	private static boolean areBlocksEqual(final Block lhs, final Block rhs) {
-		// TODO: move to Block.equals
-		return lhs.getHeight().equals(rhs.getHeight())
-				&& HashUtils.calculateHash(lhs).equals(HashUtils.calculateHash(rhs))
-				&& lhs.getSignature().equals(rhs.getSignature());
-	}
-
 	private static class Impl {
-
 		private final ComparisonContext context;
 		private final BlockLookup localLookup;
 		private final BlockLookup remoteLookup;
@@ -155,7 +147,7 @@ public class BlockChainComparer {
 				return ComparisonResult.Code.REMOTE_HAS_NON_VERIFIABLE_BLOCK;
 			}
 
-			if (areBlocksEqual(this.localLastBlock, this.remoteLastBlock)) {
+			if (this.localLastBlock.equals(this.remoteLastBlock)) {
 				return ComparisonResult.Code.REMOTE_IS_SYNCED;
 			}
 
