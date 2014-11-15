@@ -59,7 +59,6 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//endregion
 
-
 	//region recipient balance
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
@@ -259,10 +258,10 @@ public class ImportanceTransferTransactionValidatorTest {
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
-	// note that this will actually fail in validateOwner not validateRemote
 	@Test
 	public void cannotDeactivateIfRemoteIsDeactivatedAfterOneDay()
 	{
+		// note that this will actually fail in validateOwner not validateRemote
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Deactivate,
@@ -274,14 +273,16 @@ public class ImportanceTransferTransactionValidatorTest {
 			final ImportanceTransferTransaction.Mode previous,
 			final ImportanceTransferTransaction.Mode mode,
 			final BlockHeight blockHeight,
-			final ValidationResult expectedValidationResult
-	)
+			final ValidationResult expectedValidationResult)
 	{
 		// Arrange:
 		final TestContext context = new TestContext();
+
+		// - use a dummy transaction to set the state of the remote account
 		final ImportanceTransferTransaction dummy = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
 		context.setLesseeRemoteState(dummy, BlockHeight.ONE, previous);
 
+		// - create another transaction around the dummy remote account set up previously
 		final Transaction transaction = context.createTransactionWithRemote(dummy.getRemote(), mode);
 
 		// Act:
@@ -352,8 +353,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		}
 
 		public ImportanceTransferTransaction createTransactionWithRemote(final Account remote, final ImportanceTransferTransaction.Mode mode) {
-			final Account signer = Utils.generateRandomAccount();
-			signer.incrementBalance(Amount.fromNem(2001));
+			final Account signer = Utils.generateRandomAccount(Amount.fromNem(2001));
 			this.addRemoteLinks(signer);
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,

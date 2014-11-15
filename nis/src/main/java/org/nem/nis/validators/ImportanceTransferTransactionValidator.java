@@ -31,11 +31,16 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 			return ValidationResult.SUCCESS;
 		}
 
-		final ValidationResult result = this.validateRemote(context.getBlockHeight(), (ImportanceTransferTransaction)transaction);
-		if (result != ValidationResult.SUCCESS) {
+		return this.validate((ImportanceTransferTransaction)transaction, context);
+	}
+
+	private ValidationResult validate(final ImportanceTransferTransaction transaction, final ValidationContext context) {
+		final ValidationResult result = this.validateRemote(context.getBlockHeight(), transaction);
+		if (!result.isSuccess()) {
 			return result;
 		}
-		return this.validateOwner(context.getBlockHeight(), (ImportanceTransferTransaction)transaction, context.getDebitPredicate());
+
+		return this.validateOwner(context.getBlockHeight(), transaction, context.getDebitPredicate());
 	}
 
 	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
@@ -62,8 +67,6 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 				}
 
-				// TODO 20141109 J-G: i guess you did this so that someone doesn't automatically set their real account as the remote?
-				// TODO 20141110 G-J: my idea was as follows (we've talked a bit about it on Sun) remote account should be used
 				// ONLY for remote harvesting, so we should probably block any incoming or outgoing transfers, additionally we
 				// shouldn't allow setting an account that already have some balance on it.
 				//
