@@ -18,15 +18,34 @@ public class PushControllerTest {
 	@Test
 	public void pushTransactionDelegatesToPushService() {
 		// Arrange:
-		final PushService pushService = Mockito.mock(PushService.class);
-		final PushController controller = new PushController(pushService);
-
 		final Transaction transaction = new TransferTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				Amount.fromNem(11),
 				null);
+
+		// Assert:
+		assertPushTransactionDelegatesToPushService(transaction);
+	}
+
+	@Test
+	public void pushTransactionDelegatesToPushServiceForNonTransferTransactions() {
+		// Arrange:
+		final Transaction transaction = new ImportanceTransferTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				ImportanceTransferTransaction.Mode.Activate,
+				Utils.generateRandomAccount());
+
+		// Assert:
+		assertPushTransactionDelegatesToPushService(transaction);
+	}
+
+	private static void assertPushTransactionDelegatesToPushService(final Transaction transaction) {
+		// Arrange:
+		final PushService pushService = Mockito.mock(PushService.class);
+		final PushController controller = new PushController(pushService);
 		transaction.sign();
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());

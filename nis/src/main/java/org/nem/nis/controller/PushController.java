@@ -19,8 +19,6 @@ import java.util.logging.Logger;
  * part of p2p API, so I think it should be kept separated.
  * (I think it might pay off in future, if we'd like to add restrictions to client APIs)
  */
-
-// TODO: add tests
 @RestController
 public class PushController {
 	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
@@ -43,9 +41,20 @@ public class PushController {
 		LOGGER.info("[start] /push/transaction");
 		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
 		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
-		LOGGER.info(
-				"[end] /push/transaction recipient:" + ((TransferTransaction)secureEntity.getEntity()).getRecipient().getAddress().getEncoded() + " signer:" +
-						secureEntity.getEntity().getSigner());
+
+		final Transaction transaction = secureEntity.getEntity();
+		LOGGER.info(String.format("[end] /push/transaction type: %d, signer %s; recipient: %s",
+				transaction.getType(),
+				secureEntity.getEntity().getSigner(),
+				getRecipientOrDefault(transaction)));
+	}
+
+	private static Account getRecipientOrDefault(final Transaction transaction) {
+		if (transaction instanceof TransferTransaction) {
+			return ((TransferTransaction)transaction).getRecipient();
+		}
+
+		return null;
 	}
 
 	/**
@@ -59,6 +68,8 @@ public class PushController {
 		LOGGER.info("[start] /push/block");
 		final SecureSerializableEntity<Block> secureEntity = new SecureSerializableEntity<>(deserializer, BlockFactory.VERIFIABLE);
 		this.pushService.pushBlock(secureEntity.getEntity(), secureEntity.getIdentity());
-		LOGGER.info("[end] /push/block height:" + secureEntity.getEntity().getHeight() + " signer:" + secureEntity.getEntity().getSigner());
+		LOGGER.info(String.format("[end] /push/block height: %s; signer: %s",
+				secureEntity.getEntity().getHeight(),
+				secureEntity.getEntity().getSigner()));
 	}
 }
