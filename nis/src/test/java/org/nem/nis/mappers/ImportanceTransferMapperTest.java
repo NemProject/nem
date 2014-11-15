@@ -129,8 +129,7 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
-			// TODO 20140923 should the db method be called getMode too?
-			Assert.assertThat(dbModel.getDirection(), IsEqual.equalTo(this.model.getMode().value()));
+			Assert.assertThat(dbModel.getMode(), IsEqual.equalTo(this.model.getMode().value()));
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
