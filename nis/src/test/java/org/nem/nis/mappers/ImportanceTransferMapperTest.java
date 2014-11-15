@@ -2,7 +2,6 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
@@ -10,8 +9,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.ImportanceTransfer;
 import org.nem.nis.test.MockAccountDao;
-
-import java.util.List;
 
 public class ImportanceTransferMapperTest {
 
@@ -109,20 +106,7 @@ public class ImportanceTransferMapperTest {
 
 		@SuppressWarnings("unchecked")
 		public ImportanceTransfer toDbModel(final int blockIndex) {
-			// TODO 20141010 J-G guess we should validate orderIndex like blockIndex
 			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, 0, new AccountDaoLookupAdapter(this.accountDao));
-
-			// TODO 20140923 J-G i'm not following what you're doing here
-			// TODO 20140924 G-J: this was made to make .getBlock and .getBlkIndex inside asserts
-			// work, but I guess that doesn't make much sense, and it probably would be better to simply
-			// remove those asserts
-			// hackery
-			final org.nem.nis.dbmodel.Block b = Mockito.mock(org.nem.nis.dbmodel.Block.class);
-			final List<ImportanceTransfer> l = (List<ImportanceTransfer>)Mockito.mock(List.class);
-			Mockito.when(l.indexOf(ret)).thenReturn(blockIndex);
-			Mockito.when(b.getBlockImportanceTransfers()).thenReturn(l);
-			ret.setBlock(b);
-
 			return ret;
 		}
 
@@ -149,8 +133,6 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(dbModel.getDirection(), IsEqual.equalTo(this.model.getMode().value()));
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
-			// TODO 20140923 why is the block not null here (but null for transfer)?
-			Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
