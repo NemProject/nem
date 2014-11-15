@@ -210,7 +210,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotActivateIfRemoteIsDeactivedWithinOneDay()
+	public void cannotActivateIfRemoteIsDeactivatedWithinOneDay()
 	{
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
@@ -250,7 +250,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsDeactivedWithinOneDay()
+	public void cannotDeactivateIfRemoteIsDeactivatedWithinOneDay()
 	{
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
@@ -261,7 +261,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	// note that this will actually fail in validateOwner not validateRemote
 	@Test
-	public void cannotDeactivateIfRemoteIsDeactivedAfterOneDay()
+	public void cannotDeactivateIfRemoteIsDeactivatedAfterOneDay()
 	{
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
