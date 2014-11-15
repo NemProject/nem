@@ -206,6 +206,19 @@ public class WeightedBalanceTest {
 		assertWeightedBalance(result, 1, Amount.ZERO, Amount.ZERO);
 	}
 
+	@Test
+	public void createSendAddsVestedToUnvestedAndSetsVestedToZeroIfCalculatedNewVestedAmountIsNegative() {
+		// Arrange:
+		WeightedBalance original = WeightedBalance.create(BlockHeight.ONE, Amount.fromMicroNem(2549716), Amount.fromMicroNem(450284));
+
+		// Act:
+		// ratio = 0.15009466666666665, sendUv = 450283.99999999995 --> 450283, vested hitting negative value of -1
+		final WeightedBalance result = original.createSend(BlockHeight.ONE, Amount.fromMicroNem(3_000_000));
+
+		// Assert:
+		assertWeightedBalance(result, 1, Amount.ZERO, Amount.ZERO);
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotSendIfAmountIsLargerThanBalance() {
 		// Arrange:

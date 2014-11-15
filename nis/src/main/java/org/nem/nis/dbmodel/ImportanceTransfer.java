@@ -37,7 +37,7 @@ public class ImportanceTransfer {
 	@JoinColumn(name = "remoteId")
 	private Account remote;
 
-	private Integer direction;
+	private Integer mode;
 
 	private Integer blkIndex; // index inside block
 	private Integer orderId; // index inside list
@@ -61,7 +61,7 @@ public class ImportanceTransfer {
 			final Account sender,
 			final byte[] senderProof,
 			final Account remote,
-			final Integer direction,
+			final Integer mode,
 			final Integer orderId,
 			final Integer blkIndex,
 			final Long referencedTransaction
@@ -76,7 +76,7 @@ public class ImportanceTransfer {
 		this.sender = sender;
 		this.senderProof = senderProof;
 		this.remote = remote;
-		this.direction = direction;
+		this.mode = mode;
 		this.orderId = orderId;
 		this.blkIndex = blkIndex;
 		this.referencedTransaction = referencedTransaction;
@@ -170,12 +170,12 @@ public class ImportanceTransfer {
 		this.remote = remote;
 	}
 
-	public Integer getDirection() {
-		return this.direction;
+	public Integer getMode() {
+		return this.mode;
 	}
 
-	public void setDirection(final Integer direction) {
-		this.direction = direction;
+	public void setMode(final Integer mode) {
+		this.mode = mode;
 	}
 
 	public Integer getBlkIndex() {
