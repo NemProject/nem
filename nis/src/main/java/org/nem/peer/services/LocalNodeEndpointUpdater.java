@@ -1,8 +1,7 @@
 package org.nem.peer.services;
 
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.peer.connect.PeerConnector;
-import org.nem.peer.trust.NodeSelector;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -32,37 +31,57 @@ public class LocalNodeEndpointUpdater {
 	/**
 	 * Updates the local node endpoint.
 	 *
-	 * @param selector The node selector.
+	 * @param node The remote node.
 	 * @return The future (true if the node was updated; false otherwise).
 	 */
-	public CompletableFuture<Boolean> update(final NodeSelector selector) {
-		LOGGER.info("updating local node endpoint");
-		final Node partnerNode = selector.selectNode();
-		if (null == partnerNode) {
-			LOGGER.warning("no suitable peers found to update local node");
-			return CompletableFuture.completedFuture(false);
-		}
-
-		return this.update(partnerNode);
+	public CompletableFuture<Boolean> update(final Node node) {
+		return this.getLocalEndpoint(node).thenApply(endpoint -> this.setLocalEndpoint(endpoint));
 	}
 
-	private CompletableFuture<Boolean> update(final Node node) {
-		return this.connector.getLocalNodeInfo(node, this.localNode.getEndpoint())
-				.handle((endpoint, e) -> {
-					if (null == endpoint) {
-						return false;
-					}
+	/**
+	 * Updates the local node endpoint by using the endpoint returned by the plurality the specified nodes.
+	 *
+	 * @param nodes The candidate nodes.
+	 * @return The future (true if the node was updated; false otherwise).
+	 */
+	public CompletableFuture<Boolean> updatePlurality(final Collection<Node> nodes) {
+		final NodeEndpoint[] endpoints = new NodeEndpoint[nodes.size()];
+		final List<CompletableFuture<?>> futures = new ArrayList<>(nodes.size());
+		final Iterator<Node> iterator = nodes.iterator();
+		int i = 0;
+		while (iterator.hasNext()) {
+			final int j = i++;
+			final Node node = iterator.next();
+			final CompletableFuture<?> future = this.getLocalEndpoint(node)
+					.thenAccept(endpoint -> endpoints[j] = endpoint);
 
-					if (this.localNode.getEndpoint().equals(endpoint)) {
-						return true;
-					}
+			futures.add(future);
+		}
 
-					LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>",
-							this.localNode.getEndpoint(),
-							endpoint));
-					this.localNode.setEndpoint(endpoint);
-					return true;
-				});
+		final CompletableFuture<Boolean> aggregateFuture = new CompletableFuture<>();
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+				.thenAccept(v -> aggregateFuture.complete(this.setLocalEndpoint(findBestEndpoint(endpoints))));
+		return aggregateFuture;
+	}
+
+	private static NodeEndpoint findBestEndpoint(final NodeEndpoint[] endpoints) {
+		final Map<NodeEndpoint, Integer> endpointCounts = new HashMap<>();
+		for (final NodeEndpoint endpoint : endpoints) {
+			if (null != endpoint) {
+				endpointCounts.put(endpoint, endpointCounts.getOrDefault(endpoint, 0) + 1);
+			}
+		}
+
+		NodeEndpoint bestEndpoint = null;
+		int maxCount = 0;
+		for (final Map.Entry<NodeEndpoint, Integer> entry : endpointCounts.entrySet()) {
+			if (entry.getValue() > maxCount) {
+				maxCount = entry.getValue();
+				bestEndpoint = entry.getKey();
+			}
+		}
+
+		return bestEndpoint;
 	}
 
 	/**
@@ -74,12 +93,37 @@ public class LocalNodeEndpointUpdater {
 	public CompletableFuture<Boolean> updateAny(final Collection<Node> nodes) {
 		final CompletableFuture<Boolean> aggregateFuture = new CompletableFuture<>();
 		final List<CompletableFuture<?>> futures = nodes.stream()
-				.map(node -> this.update(node).thenAccept(b -> { if (b) { aggregateFuture.complete(true); } }))
+				.map(node -> this.getLocalEndpoint(node).thenAccept(endpoint -> {
+					if (!aggregateFuture.isDone() && this.setLocalEndpoint(endpoint)) {
+						aggregateFuture.complete(true);
+					}
+				}))
 				.collect(Collectors.toList());
 
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
 				.thenAccept(b -> aggregateFuture.complete(false));
 
 		return aggregateFuture;
+	}
+
+	private CompletableFuture<NodeEndpoint> getLocalEndpoint(final Node node) {
+		return this.connector.getLocalNodeInfo(node, this.localNode.getEndpoint())
+				.handle((endpoint, e) -> endpoint);
+	}
+
+	private Boolean setLocalEndpoint(final NodeEndpoint endpoint) {
+		if (null == endpoint) {
+			return false;
+		}
+
+		if (this.localNode.getEndpoint().equals(endpoint)) {
+			return true;
+		}
+
+		LOGGER.info(String.format("updating local node endpoint from <%s> to <%s>",
+				this.localNode.getEndpoint(),
+				endpoint));
+		this.localNode.setEndpoint(endpoint);
+		return true;
 	}
 }

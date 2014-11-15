@@ -3,8 +3,10 @@ package org.nem.nis.boot;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.mockito.verification.VerificationMode;
 import org.nem.core.async.SleepFuture;
 import org.nem.core.test.*;
+import org.nem.deploy.IpDetectionMode;
 import org.nem.peer.*;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
@@ -13,9 +15,8 @@ import org.nem.peer.trust.NodeSelector;
 import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkBootstrapperTest {
-
-	private static final boolean REQUIRE_ACK = true;
-	private static final boolean DO_NOT_REQUIRE_ACK = false;
+	private static final IpDetectionMode REQUIRE_ACK = IpDetectionMode.AutoRequired;
+	private static final IpDetectionMode DO_NOT_REQUIRE_ACK = IpDetectionMode.AutoOptional;
 
 	@Test
 	public void constructorDoesNotBootNetwork() {
@@ -25,6 +26,7 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.never());
 	}
 
 	@Test
@@ -39,6 +41,7 @@ public class PeerNetworkBootstrapperTest {
 		Assert.assertThat(network, IsNull.notNullValue());
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
@@ -54,6 +57,7 @@ public class PeerNetworkBootstrapperTest {
 		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
@@ -70,6 +74,7 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
@@ -86,6 +91,7 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
@@ -100,6 +106,21 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.only());
+	}
+
+	@Test
+	public void networkBootBypassesAutoIpDetectionWhenIpDetectionModeIsDisabled() {
+		// Arrange:
+		final TestContext context = new TestContext(IpDetectionMode.Disabled);
+
+		// Act:
+		context.bootstrapper.boot().join();
+
+		// Assert:
+		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
+		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.never());
 	}
 
 	@Test
@@ -112,6 +133,9 @@ public class PeerNetworkBootstrapperTest {
 		ExceptionAssert.assertThrows(
 				v -> context.bootstrapper.boot().join(),
 				IllegalStateException.class);
+
+		//Assert:
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
@@ -133,6 +157,7 @@ public class PeerNetworkBootstrapperTest {
 		Assert.assertThat(network, IsNull.notNullValue());
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.times(2));
 	}
 
 	private static class TestContext {
@@ -143,7 +168,7 @@ public class PeerNetworkBootstrapperTest {
 		private final PeerNetworkBootstrapper bootstrapper;
 		private final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
 
-		public TestContext(final boolean requirePeerAck) {
+		public TestContext(final IpDetectionMode ipDetectionMode) {
 			final NodeSelector selector = Mockito.mock(NodeSelector.class);
 			Mockito.when(selector.selectNodes()).thenReturn(PeerUtils.createNodesWithNames("a", "b", "c"));
 			Mockito.when(selector.selectNode()).thenReturn(NodeUtils.createNodeWithName("d"));
@@ -157,12 +182,16 @@ public class PeerNetworkBootstrapperTest {
 					this.servicesFactory,
 					this.selectorFactory,
 					this.importanceAwareSelectorFactory,
-					requirePeerAck);
+					ipDetectionMode);
 		}
 
 		public void setUpdaterResult(final CompletableFuture<Boolean> future) {
 			Mockito.when(this.updater.updateAny(Mockito.any()))
 					.thenReturn(future);
+		}
+
+		private void verifyBootCalls(final VerificationMode mode) {
+			Mockito.verify(this.updater, mode).updateAny(Mockito.any());
 		}
 	}
 }

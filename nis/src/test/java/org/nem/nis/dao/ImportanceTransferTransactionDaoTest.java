@@ -155,7 +155,7 @@ public class ImportanceTransferTransactionDaoTest {
 		public void assertTransaction(final ImportanceTransfer entity) {
 			Assert.assertThat(entity.getSender().getPublicKey(), equalTo(this.sender.getKeyPair().getPublicKey()));
 			Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(this.recipient.getKeyPair().getPublicKey()));
-			Assert.assertThat(entity.getDirection(), equalTo(this.transaction.getMode().value()));
+			Assert.assertThat(entity.getMode(), equalTo(this.transaction.getMode().value()));
 			Assert.assertThat(entity.getSenderProof(), equalTo(this.transaction.getSignature().getBytes()));
 		}
 	}

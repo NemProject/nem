@@ -235,6 +235,72 @@ public class NodeRefresherTest {
 	//region precedence / potential attacks
 
 	@Test
+	public void refreshDoesNotUpdateIndirectNodesWithNonActiveStatusWhenNodesAreActive() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setBusyGetInfoForNode("a", DEFAULT_SLEEP);
+		context.setBusyGetInfoForNode("b", DEFAULT_SLEEP);
+		context.setFatalGetInfoForNode("d");
+		context.setBusyGetInfoForNode("f");
+		context.setRuntimeExceptionGetInfoForNode("g");
+		context.nodes.update(NodeUtils.createNodeWithName("d"), NodeStatus.ACTIVE);
+		context.nodes.update(NodeUtils.createNodeWithName("f"), NodeStatus.ACTIVE);
+		context.nodes.update(NodeUtils.createNodeWithName("g"), NodeStatus.ACTIVE);
+
+		// Arrange: set up a node peers list that indicates peers b, d-g are active
+		// but the local node can only communicate with e, other nodes throw exceptions
+		// since nodes d, f, g are already active, they stay active
+		context.setKnownPeers(PeerUtils.createNodesWithNames("b", "d", "e", "f", "g"));
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+
+		// Assert:
+		// - all good peers (c, d, f, g) that were directly communicated with are active even though
+		//   some are reported as being in a bad state by other peers (d, f, g)
+		// - indirect peers (e) that were communicated with successfully are active
+		// - busy peers communicated with directly are busy (a, b)
+		NodeCollectionAssert.areNamesEquivalent(
+				context.nodes,
+				new String[] { "c", "d", "e", "f", "g" },
+				new String[] { "a", "b" });
+		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
+	}
+
+	@Test
+	public void refreshDoesNotUpdateIndirectNodesWithNonActiveStatusWhenNodesAreNotActive() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setBusyGetInfoForNode("a", DEFAULT_SLEEP);
+		context.setBusyGetInfoForNode("b", DEFAULT_SLEEP);
+		context.setFatalGetInfoForNode("d");
+		context.setBusyGetInfoForNode("f");
+		context.setRuntimeExceptionGetInfoForNode("g");
+		context.nodes.update(NodeUtils.createNodeWithName("d"), NodeStatus.BUSY);
+		context.nodes.update(NodeUtils.createNodeWithName("f"), NodeStatus.FAILURE);
+		context.nodes.update(NodeUtils.createNodeWithName("g"), NodeStatus.INACTIVE);
+
+		// Arrange: set up a node peers list that indicates peers b, d-g are active
+		// but the local node can only communicate with e, other nodes throw exceptions
+		// since nodes d, f, g are already in the node collection, they keep their original statuses
+		context.setKnownPeers(PeerUtils.createNodesWithNames("b", "d", "e", "f", "g"));
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+
+		// Assert:
+		// - all peers (a, b, c, d, f, g) that were directly communicated preserve their original statuses
+		// - indirect peers (e) that were communicated with successfully are active
+		NodeCollectionAssert.areNamesEquivalent(
+				context.nodes,
+				new String[] { "c", "e" },
+				new String[] { "a", "b", "d" },
+				new String[] { "g" },
+				new String[] { "f" });
+		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(7));
+	}
+
+	@Test
 	public void refreshGivesPrecedenceToFirstHandExperience() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -251,10 +317,14 @@ public class NodeRefresherTest {
 		context.refresher.refresh(context.refreshNodes).join();
 
 		// Assert:
+		// - all good peers (a, c) that were directly communicated with are active
+		// - all good peers (e) that were indirectly communicated with are active
+		// - all busy peers (b) that were directly communicated with are busy
 		NodeCollectionAssert.areNamesEquivalent(
 				context.nodes,
 				new String[] { "a", "c", "e" },
-				new String[] { "b", "f" });
+				new String[] { "b" });
+		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 	}
 
 	@Test
@@ -294,6 +364,7 @@ public class NodeRefresherTest {
 				context.nodes,
 				new String[] { "a", "b", "d" },
 				new String[] { "c" });
+		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 
 		// Assert: the endpoints of good nodes were not changed
 		for (final Node node : context.nodes.getAllNodes()) {
@@ -319,11 +390,12 @@ public class NodeRefresherTest {
 		// Assert:
 		// - all peers (a, b, d) that were directly communicated with successfully are active
 		// - the peer that was directly communicated with unsuccessfully (c) is inactive
-		// - the unseen inactive peer (z) is inactive
+		// - the unseen inactive peer (z) is not added because the information cannot be trusted
 		NodeCollectionAssert.areNamesEquivalent(
 				context.nodes,
 				new String[] { "a", "b", "d" },
-				new String[] { "c", "z" });
+				new String[] { "c" });
+		Assert.assertThat(context.nodes.size(), IsEqual.equalTo(4));
 	}
 
 	@Test
@@ -467,6 +539,12 @@ public class NodeRefresherTest {
 			final Node node = NodeUtils.createNodeWithName(name);
 			Mockito.when(this.connector.getInfo(node))
 					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new FatalPeerException("fatal"); }));
+		}
+
+		public void setRuntimeExceptionGetInfoForNode(final String name) {
+			final Node node = NodeUtils.createNodeWithName(name);
+			Mockito.when(this.connector.getInfo(node))
+					.thenReturn(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime exception"); }));
 		}
 
 		public void setKnownPeers(final List<Node> nodes) {

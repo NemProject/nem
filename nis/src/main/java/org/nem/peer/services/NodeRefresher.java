@@ -104,22 +104,31 @@ public class NodeRefresher {
 
 						return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 					})
-					.thenApply(v -> NodeStatus.ACTIVE);
+					.thenApply(v -> NodeStatus.ACTIVE)
+					.exceptionally(e -> getAndLogStatus(node, "DIRECT", e));
+		} else {
+			future = future
+					.exceptionally(e -> {
+						getAndLogStatus(node, "INDIRECT", e);
+						return NodeStatus.UNKNOWN;
+					});
 		}
 
 		return future
-				.exceptionally(e -> {
-					final NodeStatus status = this.getNodeStatusFromException(e);
-					if (NodeStatus.FAILURE == status) {
-						LOGGER.severe(String.format("Fatal error encountered while communicating with <%s>: %s", node, e));
+				.thenAccept(ns -> {
+					if (NodeStatus.UNKNOWN != ns) {
+						this.update(node, ns);
 					}
-
-					return status;
-				})
-				.thenAccept(ns -> this.update(node, ns));
+				});
 	}
 
-	private NodeStatus getNodeStatusFromException(Throwable ex) {
+	private static NodeStatus getAndLogStatus(final Node node, final String qualifier, final Throwable e) {
+		final NodeStatus status = getNodeStatusFromException(e);
+		logException(node, status, qualifier, e);
+		return status;
+	}
+
+	private static NodeStatus getNodeStatusFromException(Throwable ex) {
 		ex = CompletionException.class == ex.getClass() ? ex.getCause() : ex;
 		if (InactivePeerException.class == ex.getClass()) {
 			return NodeStatus.INACTIVE;
@@ -127,6 +136,14 @@ public class NodeRefresher {
 			return NodeStatus.BUSY;
 		} else {
 			return NodeStatus.FAILURE;
+		}
+	}
+
+	private static void logException(final Node node, final NodeStatus status, final String qualifier, final Throwable e) {
+		if (NodeStatus.FAILURE == status) {
+			LOGGER.severe(String.format("%s fatal error encountered while communicating with <%s>: %s", qualifier, node, e));
+		} else if (NodeStatus.ACTIVE != status) {
+			LOGGER.info(String.format("%s warning (%s) encountered while communicating with <%s>: %s", qualifier, status, node, e));
 		}
 	}
 

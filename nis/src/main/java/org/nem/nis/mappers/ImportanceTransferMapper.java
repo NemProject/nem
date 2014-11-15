@@ -54,16 +54,16 @@ public class ImportanceTransferMapper {
 	 * @return The ImportanceTransferTransaction model.
 	 */
 	public static ImportanceTransferTransaction toModel(final ImportanceTransfer dbImportanceTransfer, final AccountLookup accountLookup) {
-		final Address senderAccount = Address.fromPublicKey(dbImportanceTransfer.getSender().getPublicKey());
+		final Address senderAccount = AccountToAddressMapper.toAddress(dbImportanceTransfer.getSender());
 		final Account sender = accountLookup.findByAddress(senderAccount);
 
-		final Address remoteAddress = Address.fromPublicKey(dbImportanceTransfer.getRemote().getPublicKey());
+		final Address remoteAddress = AccountToAddressMapper.toAddress(dbImportanceTransfer.getRemote());
 		final Account remote = accountLookup.findByAddress(remoteAddress);
 
 		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(
 				new TimeInstant(dbImportanceTransfer.getTimeStamp()),
 				sender,
-				ImportanceTransferTransaction.Mode.fromValueOrDefault(dbImportanceTransfer.getDirection()),
+				ImportanceTransferTransaction.Mode.fromValueOrDefault(dbImportanceTransfer.getMode()),
 				remote);
 
 		transfer.setFee(new Amount(dbImportanceTransfer.getFee()));

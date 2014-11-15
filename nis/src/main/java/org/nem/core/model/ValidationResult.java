@@ -112,7 +112,6 @@ public enum ValidationResult {
 	 */
 	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20);
 
-
 	private final int value;
 
 	private ValidationResult(final int value) {

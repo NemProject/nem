@@ -10,6 +10,7 @@ import org.nem.nis.poi.*;
 import java.util.*;
 
 public class PruningObserverTest {
+	private static final long PRUNE_INTERVAL = 360;
 
 	//region no-op
 
@@ -23,6 +24,16 @@ public class PruningObserverTest {
 	public void noAccountsArePrunedWhenNotificationTypeIsNotHarvestReward() {
 		// Assert:
 		assertNoAccountsArePruned(432001, NotificationTrigger.Execute, NotificationType.BalanceCredit);
+	}
+
+	@Test
+	public void noAccountsArePrunedIfBlockHeightModuloThreeHundredSixtyIsNotOne() {
+		// Assert:
+		for (int i = 1; i < 1000; ++i) {
+			if (1 != (i % PRUNE_INTERVAL)) {
+				assertNoAccountsArePruned(i, NotificationTrigger.Execute, NotificationType.HarvestReward);
+			}
+		}
 	}
 
 	private static void assertNoAccountsArePruned(
@@ -56,21 +67,31 @@ public class PruningObserverTest {
 	@Test
 	public void allAccountsArePrunedWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 		// Assert:
-		assertAllAccountsArePruned(2879, 1, 1);
-		assertAllAccountsArePruned(2880, 1, 1);
+		assertAllAccountsArePruned(2880, 0, 0);
 		assertAllAccountsArePruned(2881, 1, 1);
-		assertAllAccountsArePruned(2882, 2, 1);
-		assertAllAccountsArePruned(2883, 3, 1);
+
+		assertAllAccountsArePruned(3240, 0, 0);
+		assertAllAccountsArePruned(3241, 361, 1);
+		assertAllAccountsArePruned(3242, 0, 0);
+
+		assertAllAccountsArePruned(3600, 0, 0);
+		assertAllAccountsArePruned(3601, 721, 1);
+		assertAllAccountsArePruned(3602, 0, 0);
 	}
 
 	@Test
 	public void allAccountsArePrunedWhenBlockHeightIsNearOutlinkBlockHistory() {
 		// Assert:
-		assertAllAccountsArePruned(43199, 40319, 1);
-		assertAllAccountsArePruned(43200, 40320, 1);
+		assertAllAccountsArePruned(43200, 0, 0);
 		assertAllAccountsArePruned(43201, 40321, 1);
-		assertAllAccountsArePruned(43202, 40322, 2);
-		assertAllAccountsArePruned(43203, 40323, 3);
+
+		assertAllAccountsArePruned(43560, 0, 0);
+		assertAllAccountsArePruned(43561, 40681, 361);
+		assertAllAccountsArePruned(43562, 0, 0);
+
+		assertAllAccountsArePruned(43920, 0, 0);
+		assertAllAccountsArePruned(43921, 41041, 721);
+		assertAllAccountsArePruned(43922, 0, 0);
 	}
 
 	@Test
@@ -94,8 +115,17 @@ public class PruningObserverTest {
 		context.observer.notify(notification, notificationContext);
 
 		// Assert:
-		context.assertWeightedBalancePruning(new BlockHeight(expectedWeightedBalancePruningHeight));
-		context.assertOutlinkPruning(new BlockHeight(expectedOutlinkPruningHeight));
+		if (0 != expectedWeightedBalancePruningHeight) {
+			context.assertWeightedBalancePruning(new BlockHeight(expectedWeightedBalancePruningHeight));
+		} else {
+			context.assertNoWeightedBalancePruning();
+		}
+
+		if (0 != expectedOutlinkPruningHeight) {
+			context.assertOutlinkPruning(new BlockHeight(expectedOutlinkPruningHeight));
+		} else {
+			context.assertNoOutlinkPruning();
+		}
 	}
 
 	//endregion
@@ -124,8 +154,18 @@ public class PruningObserverTest {
 		}
 
 		private void assertNoPruning() {
+			this.assertNoWeightedBalancePruning();
+			this.assertNoOutlinkPruning();
+		}
+
+		private void assertNoWeightedBalancePruning() {
 			for (final PoiAccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getWeightedBalances(), Mockito.never()).prune(Mockito.any());
+			}
+		}
+
+		private void assertNoOutlinkPruning() {
+			for (final PoiAccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.never()).prune(Mockito.any());
 			}
 		}
