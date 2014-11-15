@@ -31,7 +31,11 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 			return ValidationResult.SUCCESS;
 		}
 
-		return this.validate(context.getBlockHeight(), (ImportanceTransferTransaction)transaction, context.getDebitPredicate());
+		final ValidationResult result = this.validateRemote(context.getBlockHeight(), (ImportanceTransferTransaction)transaction);
+		if (result != ValidationResult.SUCCESS) {
+			return result;
+		}
+		return this.validateOwner(context.getBlockHeight(), (ImportanceTransferTransaction)transaction, context.getDebitPredicate());
 	}
 
 	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
@@ -46,7 +50,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	}
 
-	private ValidationResult validate(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
+	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
 		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
@@ -84,5 +88,33 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// if a remote is already deactivated, it needs to be activated first
 				return !isRemoteDeactivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE;
 		}
+	}
+
+	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
+		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
+			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
+		}
+
+		if (! remoteLinks.isRemoteHarvester()) {
+			return ValidationResult.SUCCESS;
+		}
+
+		final Address owner = remoteLinks.getCurrent().getLinkedAddress();
+		if (owner == transaction.getSigner().getAddress()) {
+			// pass it, as rest will be checked in validateOwner
+			return ValidationResult.SUCCESS;
+		}
+
+		final RemoteStatus remoteStatus = remoteLinks.getRemoteStatus(height);
+
+		switch (remoteStatus) {
+			case REMOTE_ACTIVATING:
+			case REMOTE_ACTIVE:
+			case REMOTE_DEACTIVATING:
+				return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
+		}
+
+		return ValidationResult.SUCCESS;
 	}
 }
