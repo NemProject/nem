@@ -63,7 +63,6 @@ public class ImportanceTransferMapperTest {
 	}
 
 	private class TestContext {
-
 		private final ImportanceTransferTransaction model;
 		private final org.nem.nis.dbmodel.Account dbSender;
 		private final org.nem.nis.dbmodel.Account dbRemote;
@@ -104,10 +103,8 @@ public class ImportanceTransferMapperTest {
 			return this.model;
 		}
 
-		@SuppressWarnings("unchecked")
 		public ImportanceTransfer toDbModel(final int blockIndex) {
-			final ImportanceTransfer ret = ImportanceTransferMapper.toDbModel(this.model, blockIndex, 0, new AccountDaoLookupAdapter(this.accountDao));
-			return ret;
+			return ImportanceTransferMapper.toDbModel(this.model, blockIndex, 0, new AccountDaoLookupAdapter(this.accountDao));
 		}
 
 		public ImportanceTransferTransaction toModel(final ImportanceTransfer dbTransfer) {
@@ -132,6 +129,7 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(dbModel.getMode(), IsEqual.equalTo(this.model.getMode().value()));
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
