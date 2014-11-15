@@ -4,10 +4,9 @@ import net.minidev.json.*;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.node.*;
-import org.nem.deploy.NisConfiguration;
+import org.nem.deploy.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
-import org.nem.nis.harvesting.Harvester;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
@@ -27,37 +26,34 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class NisPeerNetworkHost implements AutoCloseable {
 	private final AccountAnalyzer accountAnalyzer;
-	private final BlockChain blockChain;
-	private final Harvester harvester;
+	private final CountingBlockSynchronizer synchronizer;
+	private final PeerNetworkScheduler scheduler;
 	private final ChainServices chainServices;
 	private final NisConfiguration nisConfiguration;
-	private final CountingBlockSynchronizer synchronizer;
 	private final HttpConnectorPool httpConnectorPool;
 	private final AuditCollection incomingAudits;
 	private final AuditCollection outgoingAudits;
 	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
-	private final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(CommonStarter.TIME_PROVIDER);
 	private PeerNetwork network;
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(
 			final AccountAnalyzer accountAnalyzer,
-			final BlockChain blockChain,
-			final Harvester harvester,
+			final CountingBlockSynchronizer synchronizer,
+			final PeerNetworkScheduler scheduler,
 			final ChainServices chainServices,
 			final NisConfiguration nisConfiguration,
 			final HttpConnectorPool httpConnectorPool,
 			final AuditCollection incomingAudits,
 			final AuditCollection outgoingAudits) {
 		this.accountAnalyzer = accountAnalyzer;
-		this.blockChain = blockChain;
-		this.harvester = harvester;
+		this.synchronizer = synchronizer;
+		this.scheduler = scheduler;
 		this.chainServices = chainServices;
 		this.nisConfiguration = nisConfiguration;
 		this.httpConnectorPool = httpConnectorPool;
 		this.incomingAudits = incomingAudits;
 		this.outgoingAudits = outgoingAudits;
-		this.synchronizer = new CountingBlockSynchronizer(this.blockChain);
 	}
 
 	/**
@@ -76,9 +72,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			this.network = network;
 			this.scheduler.addTasks(
 					this.network,
-					this.blockChain,
-					this.harvester,
-					this.nisConfiguration.useNetworkTime());
+					this.nisConfiguration.useNetworkTime(),
+					IpDetectionMode.Disabled != this.nisConfiguration.getIpDetectionMode());
 		});
 	}
 
@@ -204,6 +199,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.createNetworkServicesFactory(networkState),
 				selectorFactory,
 				importanceAwareSelectorFactory,
-				!this.nisConfiguration.bootWithoutAck());
+				this.nisConfiguration.getIpDetectionMode());
 	}
 }

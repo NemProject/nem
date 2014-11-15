@@ -11,6 +11,8 @@ public class ImportanceTransferMapper {
 	/**
 	 * Converts a ImportanceTransferTransaction model to a ImportanceTransfer db-model.
 	 * TODO 20141010 J-G: do we need both blockIndex and orderIndex?
+	 * TODO 20131110 G-J: just to let you know, I remember about this, I'll try to address this in some future build,
+	 * TODO  but I'm not sure if that will be doable.
 	 *
 	 * @param importanceTransferTransaction The transfer transaction model.
 	 * @param blockIndex The index of the transfer within the owning block.
@@ -52,10 +54,10 @@ public class ImportanceTransferMapper {
 	 * @return The ImportanceTransferTransaction model.
 	 */
 	public static ImportanceTransferTransaction toModel(final ImportanceTransfer dbImportanceTransfer, final AccountLookup accountLookup) {
-		final Address senderAccount = Address.fromPublicKey(dbImportanceTransfer.getSender().getPublicKey());
+		final Address senderAccount = AccountToAddressMapper.toAddress(dbImportanceTransfer.getSender());
 		final Account sender = accountLookup.findByAddress(senderAccount);
 
-		final Address remoteAddress = Address.fromPublicKey(dbImportanceTransfer.getRemote().getPublicKey());
+		final Address remoteAddress = AccountToAddressMapper.toAddress(dbImportanceTransfer.getRemote());
 		final Account remote = accountLookup.findByAddress(remoteAddress);
 
 		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(

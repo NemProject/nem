@@ -1,17 +1,15 @@
-package org.nem.nis;
+package org.nem.nis.sync;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
-import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.*;
 
@@ -21,14 +19,12 @@ import java.util.*;
  * Facade that hides the details of wiring up a number of BlockChain dependencies.
  * This class is intended to hide BlockExecutor and BlockChainValidator from the BlockChain COMPLETELY.
  */
-@Service
 public class BlockChainServices {
 	private final BlockDao blockDao;
 	private final BlockTransactionObserverFactory observerFactory;
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final TransactionValidatorFactory transactionValidatorFactory;
 
-	@Autowired(required = true)
 	public BlockChainServices(
 			final BlockDao blockDao,
 			final BlockTransactionObserverFactory observerFactory,

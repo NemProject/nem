@@ -1,4 +1,6 @@
-package org.nem.nis.secret;
+package org.nem.nis;
+
+import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Common place to have BlockChain-related constants accessible
@@ -30,5 +32,20 @@ public class BlockChainConstants {
 	/**
 	 * The maximum number of transactions in a block.
 	 */
-	public static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 60;
+	public static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
+
+	/**
+	 * The maximum number of transactions in a block at the specified height.
+	 *
+	 * @param height The height.
+	 */
+	public static int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK(final BlockHeight height) {
+		if (height.getRaw() > BlockMarkerConstants.BETA_TX_COUNT_FORK) {
+			return MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+		} else if (height.getRaw() > BlockMarkerConstants.BETA_HARD_FORK) {
+			return 60;
+		} else {
+			return Integer.MAX_VALUE;
+		}
+	}
 }

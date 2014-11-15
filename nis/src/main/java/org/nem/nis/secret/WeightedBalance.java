@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.primitive.*;
+import org.nem.nis.BlockChainConstants;
 
 /**
  * Calculates vested and unvested balances at a specified block height.
@@ -82,8 +83,14 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 		final double ratio = (double)this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);
 		final long sendUv = (long)(ratio * amount.getNumMicroNem());
 		// TODO: this probably can hit negative, which probably won't do us anything good
-		final long unvested = this.unvestedBalance - sendUv;
-		final long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
+		// TODO 20141114 BR : sooooooo true!
+		long unvested = this.unvestedBalance - sendUv;
+		long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
+		if (0 > vested) {
+			// must be a rounding error: too much vested is send.
+			unvested += vested;
+			vested = 0;
+		}
 		return new WeightedBalance(amount, blockHeight, balance, unvested, vested);
 	}
 

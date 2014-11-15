@@ -4,10 +4,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockScorer;
+import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
@@ -96,7 +95,7 @@ public class BlockGenerator {
 
 		final Collection<Transaction> transactions = this.unconfirmedTransactions
 				.getTransactionsForNewBlock(ownerAccount.getAddress(), blockTime)
-				.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+				.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK(harvestedBlockHeight));
 		final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock.getHeight());
 
 		// it's the remote harvester that generates a block NOT owner, we won't have owner's key here!

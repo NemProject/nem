@@ -1,4 +1,4 @@
-package org.nem.peer.test;
+package org.nem.core.test;
 
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.node.NodeIdentity;

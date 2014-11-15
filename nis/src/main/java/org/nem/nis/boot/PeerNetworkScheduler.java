@@ -34,7 +34,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 	private static final int PRUNE_INACTIVE_NODES_DELAY = ONE_HOUR;
 
-	private static final int UPDATE_LOCAL_NODE_ENDPOINT_DELAY = 5 * ONE_MINUTE;
+	private static final int AUTO_IP_DETECTION_DELAY = 5 * ONE_MINUTE;
 
 	private static final int TIME_SYNC_INITIAL_INTERVAL = ONE_MINUTE;
 	private static final int TIME_SYNC_INITIAL_INTERVAL_ROUNDS = 15;
@@ -44,6 +44,8 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int CHECK_CHAIN_SYNC_INTERVAL = 30 * ONE_SECOND;
 
 	private final TimeProvider timeProvider;
+	private final BlockChain blockChain;
+	private final Harvester harvester;
 	private final List<NemAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final List<AsyncTimer> timers = new ArrayList<>();
 	private final Executor executor = Executors.newCachedThreadPool();
@@ -52,9 +54,16 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * Creates a new scheduler.
 	 *
 	 * @param timeProvider The time provider.
+	 * @param blockChain The block chain.
+	 * @param harvester The harvester.
 	 */
-	public PeerNetworkScheduler(final TimeProvider timeProvider) {
+	public PeerNetworkScheduler(
+			final TimeProvider timeProvider,
+			final BlockChain blockChain,
+			final Harvester harvester) {
 		this.timeProvider = timeProvider;
+		this.blockChain = blockChain;
+		this.harvester = harvester;
 	}
 
 	/**
@@ -70,95 +79,127 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * Adds all NIS tasks.
 	 *
 	 * @param network The network.
-	 * @param blockChain The block chain.
-	 * @param harvester The harvester.
 	 * @param useNetworkTime true if network time should be used.
+	 * @param enableAutoIpDetection true if auto IP detection should be enabled.
 	 */
 	public void addTasks(
 			final PeerNetwork network,
-			final BlockChain blockChain,
-			final Harvester harvester,
-			final boolean useNetworkTime) {
-		this.addForagingTask(network, blockChain, harvester);
-		this.addNetworkTasks(network, useNetworkTime);
-	}
+			final boolean useNetworkTime,
+			final boolean enableAutoIpDetection) {
+		this.addForagingTask(network);
 
-	private void addForagingTask(final PeerNetwork network, final BlockChain blockChain, final Harvester harvester) {
-		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
-		this.timers.add(new AsyncTimer(
-				this.runnableToFutureSupplier(() -> {
-					final Block block = harvester.harvestBlock();
-					if (null == block || !blockChain.processBlock(block).isSuccess()) {
-						return;
-					}
-
-					final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
-							block,
-							network.getLocalNode().getIdentity());
-					network.broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
-				}),
-				FORAGING_INITIAL_DELAY,
-				new UniformDelayStrategy(FORAGING_INTERVAL),
-				timerVisitor));
-	}
-
-	private void addNetworkTasks(final PeerNetwork network, final boolean useNetworkTime) {
-		this.addRefreshTask(network);
+		final NetworkTaskInitializer initializer = new NetworkTaskInitializer(this, network);
+		initializer.addDefaultTasks();
 		if (useNetworkTime) {
-			this.addTimeSynchronizationTask(network);
+			initializer.addTimeSynchronizationTask();
 		}
 
-		this.addSimpleTask(
-				() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
-				BROADCAST_INTERVAL,
-				"BROADCAST");
-		this.addSimpleTask(
-				this.runnableToFutureSupplier(() -> network.synchronize()),
-				SYNC_INTERVAL,
-				"SYNC");
-		this.addSimpleTask(
-				this.runnableToFutureSupplier(() -> network.pruneInactiveNodes()),
-				PRUNE_INACTIVE_NODES_DELAY,
-				"PRUNING INACTIVE NODES");
-		this.addSimpleTask(
-				this.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
-				UPDATE_LOCAL_NODE_ENDPOINT_DELAY,
-				"UPDATING LOCAL NODE ENDPOINT");
-		this.addSimpleTask(
-				() -> network.checkChainSynchronization(),
-				CHECK_CHAIN_SYNC_INTERVAL,
-				"CHECKING CHAIN SYNCHRONIZATION");
+		if (enableAutoIpDetection) {
+			initializer.addAutoIpDetectionTask();
+		}
 	}
 
-	private void addRefreshTask(final PeerNetwork network) {
-		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("REFRESH");
-		this.timers.add(new AsyncTimer(
-				() -> network.refresh(),
-				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
-				getRefreshDelayStrategy(),
-				timerVisitor));
+	private void addForagingTask(final PeerNetwork network) {
+		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
+		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
+				.setRecurringFutureSupplier(
+						this.runnableToFutureSupplier(() -> {
+							final Block block = this.harvester.harvestBlock();
+							if (null == block || !this.blockChain.processBlock(block).isSuccess()) {
+								return;
+							}
+
+							final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
+									block,
+									network.getLocalNode().getIdentity());
+							network.broadcast(NodeApiId.REST_PUSH_BLOCK, secureBlock);
+						}))
+				.setInitialDelay(FORAGING_INITIAL_DELAY)
+				.setDelayStrategy(new UniformDelayStrategy(FORAGING_INTERVAL))
+				.setVisitor(timerVisitor)
+				.create();
+		this.timers.add(new AsyncTimer(options));
 	}
 
-	private void addTimeSynchronizationTask(final PeerNetwork network) {
-		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("TIME SYNCHRONIZATION");
-		this.timers.add(new AsyncTimer(
-				() -> network.synchronizeTime(this.timeProvider),
-				REFRESH_INITIAL_DELAY * this.timerVisitors.size(), // stagger the timer start times
-				getTimeSynchronizationDelayStrategy(),
-				timerVisitor));
-	}
+	private static class NetworkTaskInitializer {
+		private final PeerNetworkScheduler scheduler;
+		private final PeerNetwork network;
+		private final AsyncTimer refreshTimer;
 
-	private void addSimpleTask(
-			final Supplier<CompletableFuture<?>> recurringFutureSupplier,
-			final int delay,
-			final String name) {
-		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor(name);
+		public NetworkTaskInitializer(final PeerNetworkScheduler scheduler, final PeerNetwork network) {
+			this.scheduler = scheduler;
+			this.network = network;
+			this.refreshTimer = this.addRefreshTask(network);
+		}
 
-		this.timers.add(new AsyncTimer(
-				recurringFutureSupplier,
-				REFRESH_INITIAL_DELAY,
-				new UniformDelayStrategy(delay),
-				timerVisitor));
+		public void addDefaultTasks() {
+			this.addSimpleTask(
+					() -> network.broadcast(NodeApiId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
+					BROADCAST_INTERVAL,
+					"BROADCAST");
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(() -> network.synchronize()),
+					SYNC_INTERVAL,
+					"SYNC");
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(() -> network.pruneInactiveNodes()),
+					PRUNE_INACTIVE_NODES_DELAY,
+					"PRUNING INACTIVE NODES");
+			this.addSimpleTask(
+					() -> network.checkChainSynchronization(),
+					CHECK_CHAIN_SYNC_INTERVAL,
+					"CHECKING CHAIN SYNCHRONIZATION");
+		}
+
+		public void addTimeSynchronizationTask() {
+			this.addSimpleTask(
+					() -> network.synchronizeTime(this.scheduler.timeProvider),
+					getTimeSynchronizationDelayStrategy(),
+					"TIME SYNCHRONIZATION");
+		}
+
+		public void addAutoIpDetectionTask() {
+			this.addSimpleTask(
+					this.scheduler.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
+					AUTO_IP_DETECTION_DELAY,
+					"AUTO IP DETECTION");
+		}
+
+		private AsyncTimer addRefreshTask(final PeerNetwork network) {
+			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder()
+					.setRecurringFutureSupplier(() -> network.refresh())
+					.setInitialDelay(REFRESH_INITIAL_DELAY)
+					.setDelayStrategy(getRefreshDelayStrategy());
+			return this.addTask("REFRESH", builder);
+		}
+
+		private void addSimpleTask(
+				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
+				final int delay,
+				final String name) {
+			this.addSimpleTask(recurringFutureSupplier, new UniformDelayStrategy(delay), name);
+		}
+
+		private void addSimpleTask(
+				final Supplier<CompletableFuture<?>> recurringFutureSupplier,
+				final AbstractDelayStrategy delay,
+				final String name) {
+			final AsyncTimerOptionsBuilder builder = new AsyncTimerOptionsBuilder()
+					.setRecurringFutureSupplier(recurringFutureSupplier)
+					.setTrigger(this.refreshTimer.getFirstFireFuture())
+					.setInitialDelay(REFRESH_INITIAL_DELAY * this.scheduler.timerVisitors.size()) // stagger the timer start times
+					.setDelayStrategy(delay);
+			this.addTask(name, builder);
+		}
+
+		private AsyncTimer addTask(final String name, final AsyncTimerOptionsBuilder builder) {
+			final AsyncTimerVisitor timerVisitor = this.scheduler.createNamedVisitor(name);
+			builder.setVisitor(timerVisitor);
+
+			final AsyncTimer timer = new AsyncTimer(builder.create());
+			this.scheduler.timers.add(timer);
+			return timer;
+		}
 	}
 
 	private static AbstractDelayStrategy getRefreshDelayStrategy() {

@@ -19,13 +19,6 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	public void save(Block block);
 
 	/**
-	 * Updates lastBlockId of this block using id of given block.
-	 *
-	 * @param block Block whose id will be used.
-	 */
-	public void updateLastBlockId(Block block);
-
-	/**
 	 * Retrieves list of at most limit difficulties for blocks starting at given height.
 	 *
 	 * @param height height of a first block.

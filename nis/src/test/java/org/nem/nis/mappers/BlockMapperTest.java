@@ -399,7 +399,6 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
 			Assert.assertThat(dbModel.getTotalAmount(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(Amount.fromNem(expectedFee).getNumMicroNem()));
-			Assert.assertThat(dbModel.getNextBlockId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(79_876_543_211_237L));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.blockGenerationHash));
 			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(this.dbLessor));

@@ -3,8 +3,10 @@ package org.nem.nis.boot;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.test.ExceptionAssert;
-import org.nem.core.utils.ExceptionUtils;
+import org.mockito.verification.VerificationMode;
+import org.nem.core.async.SleepFuture;
+import org.nem.core.test.*;
+import org.nem.deploy.IpDetectionMode;
 import org.nem.peer.*;
 import org.nem.peer.services.*;
 import org.nem.peer.test.PeerUtils;
@@ -13,9 +15,8 @@ import org.nem.peer.trust.NodeSelector;
 import java.util.concurrent.CompletableFuture;
 
 public class PeerNetworkBootstrapperTest {
-
-	private static final boolean REQUIRE_ACK = true;
-	private static final boolean DO_NOT_REQUIRE_ACK = false;
+	private static final IpDetectionMode REQUIRE_ACK = IpDetectionMode.AutoRequired;
+	private static final IpDetectionMode DO_NOT_REQUIRE_ACK = IpDetectionMode.AutoOptional;
 
 	@Test
 	public void constructorDoesNotBootNetwork() {
@@ -25,6 +26,7 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.never());
 	}
 
 	@Test
@@ -39,17 +41,14 @@ public class PeerNetworkBootstrapperTest {
 		Assert.assertThat(network, IsNull.notNullValue());
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
 	public void networkBootIsAsync() {
 		// Arrange:
 		final TestContext context = new TestContext(REQUIRE_ACK);
-		Mockito.when(context.refresher.refresh(Mockito.any()))
-				.thenReturn(CompletableFuture.supplyAsync(() -> {
-					ExceptionUtils.propagateVoid(() -> Thread.sleep(300));
-					return null;
-				}));
+		context.setUpdaterResult(SleepFuture.create(300));
 
 		// Act:
 		final CompletableFuture<?> future = context.bootstrapper.boot();
@@ -58,31 +57,14 @@ public class PeerNetworkBootstrapperTest {
 		Assert.assertThat(future.isDone(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void networkBootFailsOnRefreshException() {
-		// Arrange:
-		final TestContext context = new TestContext(DO_NOT_REQUIRE_ACK);
-		Mockito.when(context.refresher.refresh(Mockito.any()))
-				.thenReturn(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime"); }));
-
-		// Act:
-		ExceptionAssert.assertThrowsCompletionException(
-				v -> context.bootstrapper.boot().join(),
-				IllegalStateException.class);
-
-		// Assert:
-		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
-		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
 	public void networkBootFailsOnUpdateLocalNodeEndpointException() {
 		// Arrange:
 		final TestContext context = new TestContext(DO_NOT_REQUIRE_ACK);
-		Mockito.when(context.updater.update(Mockito.any()))
-				.thenReturn(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime"); }));
+		context.setUpdaterResult(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime"); }));
 
 		// Act:
 		ExceptionAssert.assertThrowsCompletionException(
@@ -92,14 +74,14 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
 	public void networkBootFailsOnUpdateLocalNodeEndpointFailureWhenAckIsRequired() {
 		// Arrange:
 		final TestContext context = new TestContext(REQUIRE_ACK);
-		Mockito.when(context.updater.update(Mockito.any()))
-				.thenReturn(CompletableFuture.completedFuture(false));
+		context.setUpdaterResult(CompletableFuture.completedFuture(false));
 
 		// Act:
 		ExceptionAssert.assertThrowsCompletionException(
@@ -109,14 +91,14 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(true));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(false));
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
 	public void networkBootSucceedsOnUpdateLocalNodeEndpointFailureWhenAckIsNotRequired() {
 		// Arrange:
 		final TestContext context = new TestContext(DO_NOT_REQUIRE_ACK);
-		Mockito.when(context.updater.update(Mockito.any()))
-				.thenReturn(CompletableFuture.completedFuture(false));
+		context.setUpdaterResult(CompletableFuture.completedFuture(false));
 
 		// Act:
 		context.bootstrapper.boot().join();
@@ -124,6 +106,21 @@ public class PeerNetworkBootstrapperTest {
 		// Assert:
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.only());
+	}
+
+	@Test
+	public void networkBootBypassesAutoIpDetectionWhenIpDetectionModeIsDisabled() {
+		// Arrange:
+		final TestContext context = new TestContext(IpDetectionMode.Disabled);
+
+		// Act:
+		context.bootstrapper.boot().join();
+
+		// Assert:
+		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
+		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.never());
 	}
 
 	@Test
@@ -136,6 +133,9 @@ public class PeerNetworkBootstrapperTest {
 		ExceptionAssert.assertThrows(
 				v -> context.bootstrapper.boot().join(),
 				IllegalStateException.class);
+
+		//Assert:
+		context.verifyBootCalls(Mockito.only());
 	}
 
 	@Test
@@ -144,21 +144,20 @@ public class PeerNetworkBootstrapperTest {
 		final TestContext context = new TestContext(DO_NOT_REQUIRE_ACK);
 
 		// Act: first boot should fail
-		Mockito.when(context.updater.update(Mockito.any()))
-				.thenReturn(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime"); }));
+		context.setUpdaterResult(CompletableFuture.supplyAsync(() -> { throw new RuntimeException("runtime"); }));
 		ExceptionAssert.assertThrowsCompletionException(
 				v -> context.bootstrapper.boot().join(),
 				IllegalStateException.class);
 
 		// Act: second boot should succeed
-		Mockito.when(context.updater.update(Mockito.any()))
-				.thenReturn(CompletableFuture.completedFuture(true));
+		context.setUpdaterResult(CompletableFuture.completedFuture(true));
 		final PeerNetwork network = context.bootstrapper.boot().join();
 
 		// Assert:
 		Assert.assertThat(network, IsNull.notNullValue());
 		Assert.assertThat(context.bootstrapper.canBoot(), IsEqual.equalTo(false));
 		Assert.assertThat(context.bootstrapper.isBooted(), IsEqual.equalTo(true));
+		context.verifyBootCalls(Mockito.times(2));
 	}
 
 	private static class TestContext {
@@ -166,20 +165,16 @@ public class PeerNetworkBootstrapperTest {
 		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(PeerNetworkServicesFactory.class);
 		private final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
 		private final NodeSelectorFactory importanceAwareSelectorFactory = Mockito.mock(NodeSelectorFactory.class);
-		private final NodeRefresher refresher = Mockito.mock(NodeRefresher.class);
 		private final PeerNetworkBootstrapper bootstrapper;
 		private final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
 
-		public TestContext(final boolean requirePeerAck) {
+		public TestContext(final IpDetectionMode ipDetectionMode) {
 			final NodeSelector selector = Mockito.mock(NodeSelector.class);
 			Mockito.when(selector.selectNodes()).thenReturn(PeerUtils.createNodesWithNames("a", "b", "c"));
-			Mockito.when(selector.selectNode()).thenReturn(PeerUtils.createNodeWithName("d"));
+			Mockito.when(selector.selectNode()).thenReturn(NodeUtils.createNodeWithName("d"));
 			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(selector);
 
-			Mockito.when(this.refresher.refresh(Mockito.any())).thenReturn(CompletableFuture.completedFuture(null));
-			Mockito.when(this.servicesFactory.createNodeRefresher()).thenReturn(this.refresher);
-
-			Mockito.when(this.updater.update(Mockito.any())).thenReturn(CompletableFuture.completedFuture(true));
+			Mockito.when(this.updater.updateAny(Mockito.any())).thenReturn(CompletableFuture.completedFuture(true));
 			Mockito.when(this.servicesFactory.createLocalNodeEndpointUpdater()).thenReturn(this.updater);
 
 			this.bootstrapper = new PeerNetworkBootstrapper(
@@ -187,7 +182,16 @@ public class PeerNetworkBootstrapperTest {
 					this.servicesFactory,
 					this.selectorFactory,
 					this.importanceAwareSelectorFactory,
-					requirePeerAck);
+					ipDetectionMode);
+		}
+
+		public void setUpdaterResult(final CompletableFuture<Boolean> future) {
+			Mockito.when(this.updater.updateAny(Mockito.any()))
+					.thenReturn(future);
+		}
+
+		private void verifyBootCalls(final VerificationMode mode) {
+			Mockito.verify(this.updater, mode).updateAny(Mockito.any());
 		}
 	}
 }

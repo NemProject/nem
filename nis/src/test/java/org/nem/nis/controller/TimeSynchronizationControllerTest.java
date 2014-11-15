@@ -5,13 +5,12 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.NetworkTimeStamp;
 import org.nem.core.node.Node;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
-import org.nem.peer.test.PeerUtils;
 
 import java.util.function.Function;
 
@@ -120,7 +119,7 @@ public class TimeSynchronizationControllerTest {
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
-			Mockito.when(this.network.getLocalNode()).thenReturn(PeerUtils.createNodeWithName("l"));
+			Mockito.when(this.network.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 			this.timeProvider = Mockito.mock(SystemTimeProvider.class);

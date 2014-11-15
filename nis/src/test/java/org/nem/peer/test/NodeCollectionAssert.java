@@ -13,94 +13,46 @@ import java.util.stream.Collectors;
 public class NodeCollectionAssert {
 
 	/**
-	 * Asserts that nodes have matching active and inactive names.
+	 * Asserts that nodes have matching active and busy names.
 	 *
 	 * @param nodes The nodes.
 	 * @param expectedActiveNames The expected active names.
-	 * @param expectedInactiveNames The expected inactive names.
+	 * @param expectedBusyNames The expected busy names.
 	 */
 	public static void areNamesEquivalent(
 			final NodeCollection nodes,
 			final String[] expectedActiveNames,
-			final String[] expectedInactiveNames) {
+			final String[] expectedBusyNames) {
 		// Assert:
 		Assert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
-		Assert.assertThat(getNames(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactiveNames));
+		Assert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
+	}
+
+	/**
+	 * Asserts that nodes have matching active, busy, inactive, and failure names.
+	 *
+	 * @param nodes The nodes.
+	 * @param expectedActiveNames The expected active names.
+	 * @param expectedBusyNames The expected busy names.
+	 * @param expectedInactiveNames The expected inactive names.
+	 * @param expectedFailureNames The expected failure names.
+	 */
+	public static void areNamesEquivalent(
+			final NodeCollection nodes,
+			final String[] expectedActiveNames,
+			final String[] expectedBusyNames,
+			final String[] expectedInactiveNames,
+			final String[] expectedFailureNames) {
+		// Assert:
+		Assert.assertThat(getNames(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActiveNames));
+		Assert.assertThat(getNames(nodes.getBusyNodes()), IsEquivalent.equivalentTo(expectedBusyNames));
+		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(expectedInactiveNames));
+		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(expectedFailureNames));
 	}
 
 	private static List<String> getNames(final Collection<Node> nodes) {
 		return nodes.stream()
 				.map(node -> node.getIdentity().getName())
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * Asserts that nodes have matching active and inactive ports.
-	 *
-	 * @param nodes The nodes.
-	 * @param expectedActivePorts The expected active ports.
-	 * @param expectedInactivePorts The expected inactive ports.
-	 */
-	public static void arePortsEquivalent(
-			final NodeCollection nodes,
-			final Integer[] expectedActivePorts,
-			final Integer[] expectedInactivePorts) {
-		// Assert:
-		Assert.assertThat(getPorts(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActivePorts));
-		Assert.assertThat(getPorts(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePorts));
-	}
-
-	/**
-	 * Asserts that nodes have matching ports.
-	 *
-	 * @param nodes The nodes.
-	 * @param expectedPorts The expected ports.
-	 */
-	public static void arePortsEquivalent(
-			final Node[] nodes,
-			final Integer[] expectedPorts) {
-		// Arrange:
-		final List<Node> nodesList = new ArrayList<>();
-		Collections.addAll(nodesList, nodes);
-
-		// Assert:
-		Assert.assertThat(getPorts(nodesList), IsEquivalent.equivalentTo(expectedPorts));
-	}
-
-	private static List<Integer> getPorts(final Collection<Node> nodes) {
-		return nodes.stream().map(node -> node.getEndpoint().getBaseUrl().getPort()).collect(Collectors.toList());
-	}
-
-	/**
-	 * Asserts that nodes have matching active and inactive platforms.
-	 *
-	 * @param nodes The nodes.
-	 * @param expectedActivePlatforms The expected active platforms.
-	 * @param expectedInactivePlatforms The expected inactive platforms.
-	 */
-	public static void arePlatformsEquivalent(
-			final NodeCollection nodes,
-			final String[] expectedActivePlatforms,
-			final String[] expectedInactivePlatforms) {
-		// Assert:
-		Assert.assertThat(getPlatforms(nodes.getActiveNodes()), IsEquivalent.equivalentTo(expectedActivePlatforms));
-		Assert.assertThat(getPlatforms(nodes.getInactiveNodes()), IsEquivalent.equivalentTo(expectedInactivePlatforms));
-	}
-
-	/**
-	 * Asserts that nodes have matching active and inactive platforms.
-	 *
-	 * @param nodes The nodes.
-	 * @param expectedPlatforms The expected platforms (both active and inactive).
-	 */
-	public static void arePlatformsEquivalent(
-			final NodeCollection nodes,
-			final String[] expectedPlatforms) {
-		// Assert:
-		Assert.assertThat(getPlatforms(nodes.getAllNodes()), IsEquivalent.equivalentTo(expectedPlatforms));
-	}
-
-	private static List<String> getPlatforms(final Collection<Node> nodes) {
-		return nodes.stream().map(n -> n.getMetaData().getPlatform()).collect(Collectors.toList());
 	}
 }

@@ -7,12 +7,14 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
+import org.nem.nis.sync.*;
 import org.nem.nis.validators.*;
 import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,12 +123,8 @@ public class NisAppConfig {
 	@Bean
 	public BlockChain blockChain() {
 		return new BlockChain(
-				this.accountAnalyzer(),
-				this.accountDao,
 				this.blockChainLastBlockLayer,
-				this.blockDao,
-				this.blockChainServices(),
-				this.unconfirmedTransactions());
+				this.blockChainUpdater());
 	}
 
 	@Bean
@@ -136,6 +134,27 @@ public class NisAppConfig {
 				this.blockTransactionObserverFactory(),
 				this.blockValidatorFactory(),
 				this.transactionValidatorFactory());
+	}
+
+	@Bean
+	public BlockChainUpdater blockChainUpdater() {
+		return new BlockChainUpdater(
+				this.accountAnalyzer(),
+				this.accountDao,
+				this.blockChainLastBlockLayer,
+				this.blockDao,
+				this.blockChainContextFactory(),
+				this.unconfirmedTransactions());
+	}
+
+	@Bean
+	public BlockChainContextFactory blockChainContextFactory() {
+		return new BlockChainContextFactory(
+				this.accountAnalyzer(),
+				this.blockChainLastBlockLayer,
+				this.blockDao,
+				this.blockChainServices(),
+				this.unconfirmedTransactions());
 	}
 
 	@Bean
@@ -156,6 +175,11 @@ public class NisAppConfig {
 	@Bean
 	public SingleTransactionValidator transactionValidator() {
 		return this.transactionValidatorFactory().create(this.poiFacade());
+	}
+
+	@Bean
+	public BatchTransactionValidator batchTransactionValidator() {
+		return this.transactionValidatorFactory().createBatch(this.poiFacade());
 	}
 
 	@Bean
@@ -218,7 +242,9 @@ public class NisAppConfig {
 
 	@Bean
 	public UnconfirmedTransactions unconfirmedTransactions() {
-		return new UnconfirmedTransactions(this.timeProvider(), this.transactionValidator());
+		return new UnconfirmedTransactions(
+				this.transactionValidatorFactory(),
+				this.poiFacade());
 	}
 
 	@Bean
@@ -239,7 +265,7 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockAnalyzer blockAnalyzer() {
-		return new BlockAnalyzer(this.blockDao, this.blockChain(), this.blockChainLastBlockLayer);
+		return new BlockAnalyzer(this.blockDao, this.blockChainUpdater(), this.blockChainLastBlockLayer);
 	}
 
 	@Bean
@@ -252,10 +278,13 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
+		final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(this.timeProvider(), this.blockChain(), this.harvester());
+		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(this.blockChain());
+
 		return new NisPeerNetworkHost(
 				this.accountAnalyzer(),
-				this.blockChain(),
-				this.harvester(),
+				synchronizer,
+				scheduler,
 				this.chainServices(),
 				this.nisConfiguration(),
 				this.httpConnectorPool(),

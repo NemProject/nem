@@ -1,7 +1,7 @@
 package org.nem.core.connect;
 
 /**
- * A exception that is thrown when attempting to communicate with an inactive peer.
+ * An exception that is thrown when a connection cannot be established with a peer.
  */
 public class InactivePeerException extends RuntimeException {
 

@@ -12,7 +12,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
-import org.nem.nis.secret.BlockChainConstants;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.BlockValidator;
 
@@ -145,7 +144,7 @@ public class BlockGeneratorTest {
 
 		// Act:
 		final Block block = context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
+				NisUtils.createRandomBlockWithHeight(BlockMarkerConstants.BETA_TX_COUNT_FORK + 1),
 				remoteAccount,
 				new TimeInstant(11)).getBlock();
 

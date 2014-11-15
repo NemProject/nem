@@ -97,11 +97,6 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public void updateLastBlockId(final Block block) {
-
-	}
-
-	@Override
 	public Long count() {
 		return null;
 	}
@@ -175,9 +170,9 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public void deleteBlocksAfterHeight(final BlockHeight height) {
-		Iterator<Block> iterator = this.blocks.iterator();
+		final Iterator<Block> iterator = this.blocks.iterator();
 		while (iterator.hasNext()) {
-			Block block = iterator.next();
+			final Block block = iterator.next();
 			if (block.getHeight().compareTo(height.getRaw()) > 0) {
 				iterator.remove();
 			}

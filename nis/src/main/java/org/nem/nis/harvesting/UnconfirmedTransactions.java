@@ -4,8 +4,8 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.time.*;
-import org.nem.nis.secret.BlockChainConstants;
+import org.nem.core.time.TimeInstant;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -23,15 +23,11 @@ public class UnconfirmedTransactions {
 	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
 	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
-	private final TimeProvider timeProvider;
-	private final SingleTransactionValidator validator;
+	private final TransactionValidatorFactory validatorFactory;
+	private final SingleTransactionValidator singleValidator;
+	private final PoiFacade poiFacade;
 
-	private enum AddOptions {
-		AllowNeutral,
-		RejectNeutral
-	}
-
-	private enum ValidationOptions {
+	private enum BalanceValidationOptions {
 		ValidateAgainstConfirmedBalance,
 		ValidateAgainstUnconfirmedBalance,
 	}
@@ -39,30 +35,38 @@ public class UnconfirmedTransactions {
 	/**
 	 * Creates a new unconfirmed transactions collection.
 	 *
-	 * @param timeProvider The time provider to use.
-	 * @param validator The transaction validator to use.
+	 * @param validatorFactory The transaction validator factory to use.
+	 * @param poiFacade The poi facade to use.
 	 */
 	public UnconfirmedTransactions(
-			final TimeProvider timeProvider,
-			final SingleTransactionValidator validator) {
-		this.timeProvider = timeProvider;
-
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(validator);
-		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
-		this.validator = builder.build();
+			final TransactionValidatorFactory validatorFactory,
+			final PoiFacade poiFacade) {
+		this.validatorFactory = validatorFactory;
+		this.poiFacade = poiFacade;
+		this.singleValidator = this.createSingleValidator();
 	}
 
 	private UnconfirmedTransactions(
 			final List<Transaction> transactions,
-			final ValidationOptions options,
-			final TimeProvider timeProvider,
-			final SingleTransactionValidator validator) {
-		this.timeProvider = timeProvider;
-		this.validator = validator;
+			final BalanceValidationOptions options,
+			final TransactionValidatorFactory validatorFactory,
+			final PoiFacade poiFacade) {
+		this.validatorFactory = validatorFactory;
+		this.poiFacade = poiFacade;
+		this.singleValidator = this.createSingleValidator();
 		for (final Transaction transaction : transactions) {
-			this.add(transaction, AddOptions.AllowNeutral, options == ValidationOptions.ValidateAgainstUnconfirmedBalance);
+			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
+	}
+
+	private UnconfirmedTransactions filter(
+			final List<Transaction> transactions,
+			final BalanceValidationOptions options) {
+		return new UnconfirmedTransactions(
+				transactions,
+				options,
+				this.validatorFactory,
+				this.poiFacade);
 	}
 
 	/**
@@ -85,19 +89,54 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
+	 * Adds new unconfirmed transactions.
+	 *
+	 * @param transactions The collection of transactions.
+	 * @return SUCCESS if at least one transaction was added, NEUTRAL or FAILURE otherwise.
+	 * TODO 20141104 J-B: you're never actually returning FAILURE, not sure if that's intentional
+	 * > if you want to short circuit on failure, you can use ValidationResult.aggregate
+	 * TODO 20141105 BR -> J: if the batch validation fails it is returning failure, see test class.
+	 * TODO 20141106 J-B: sorry, i meant in the case of add failing (see comment in test)
+	 * TODO 20141107: BR -> J: I am unsure which way to go. If batch validation fails we have to return FAILURE, else the batch validation doesn't make sense.
+	 * TODO                    For the rest we use single validation anyway so we can pick those transactions which are valid.
+	 * TODO                    Do you want to fail fast because the remote could supply tons of new invalid transactions as an attack vector?
+	 * TODO                    Probably pretty expensive for the attacker too bc he needs to upload all those transactions. Gimre, what's your opinion?
+	 * TODO 20141110: G-BR, J: I think failing fast could lead to problems, this is scenario I've came up with (assuming fail FAST):
+	 * 1. I have 100 N, I send TX a: 80N to some nodes and TX b: 80N to other nodes
+	 * 2. those nodes, shouldn't exchange TXes with each other (due to fail fast)
+	 * 3. but after some time, one of those TXes will be included in some block anyway
+	 * 4. but probably that 'conflicting' TX won't be purged... [1]
+	 * 5. so half of the nodes or more, won't be able to sync until it'll expire
+	 * (by sync I mean nodes won't pull any unconfirmed TXes from those 'infected' nodes)
+	 * [1] maybe that is something that will need to be changed/fixed
+	 */
+	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
+		final ValidationResult transactionValidationResult = this.validateBatch(transactions);
+		if (!transactionValidationResult.isSuccess()) {
+			return transactionValidationResult;
+		}
+
+		boolean success = false;
+		for (final Transaction transaction : transactions) {
+			if (ValidationResult.SUCCESS == this.add(transaction, true)) {
+				success = true;
+			}
+		}
+
+		return success ? ValidationResult.SUCCESS : ValidationResult.NEUTRAL;
+	}
+
+	/**
 	 * Adds a new unconfirmed transaction.
 	 *
 	 * @param transaction The transaction.
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
-		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-		final TimeInstant entityTime = transaction.getTimeStamp();
-		if (entityTime.compareTo(currentTime.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0) {
-			return ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE;
-		}
-
-		return this.add(transaction, AddOptions.RejectNeutral, true);
+		final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
+		return transactionValidationResult.isSuccess()
+				? this.add(transaction, true)
+				: transactionValidationResult;
 	}
 
 	/**
@@ -107,17 +146,17 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addExisting(final Transaction transaction) {
-		return this.add(transaction, AddOptions.AllowNeutral, true);
+		return this.add(transaction, true);
 	}
 
-	private ValidationResult add(final Transaction transaction, final AddOptions options, final boolean execute) {
+	private ValidationResult add(final Transaction transaction, final boolean execute) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, true)) {
 			return ValidationResult.NEUTRAL;
 		}
 
 		try {
-			return this.addInternal(transaction, transactionHash, options, execute);
+			return this.addInternal(transaction, transactionHash, execute);
 		} finally {
 			this.pendingTransactions.remove(transactionHash);
 		}
@@ -126,10 +165,9 @@ public class UnconfirmedTransactions {
 	private ValidationResult addInternal(
 			final Transaction transaction,
 			final Hash transactionHash,
-			final AddOptions options,
 			final boolean execute) {
-		final ValidationResult validationResult = this.validate(transaction);
-		if (!isSuccess(validationResult, options)) {
+		final ValidationResult validationResult = this.validateSingle(transaction);
+		if (!validationResult.isSuccess()) {
 			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
 			return validationResult;
 		}
@@ -142,14 +180,22 @@ public class UnconfirmedTransactions {
 		return ValidationResult.SUCCESS;
 	}
 
-	private static boolean isSuccess(final ValidationResult result, final AddOptions options) {
-		return (AddOptions.AllowNeutral == options && ValidationResult.NEUTRAL == result) || result.isSuccess();
+	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
+		final TransactionsContextPair pair = new TransactionsContextPair(transactions, new ValidationContext());
+		return this.validatorFactory.createBatch(this.poiFacade).validate(Arrays.asList(pair));
 	}
 
-	private ValidationResult validate(final Transaction transaction) {
-		return this.validator.validate(
+	private ValidationResult validateSingle(final Transaction transaction) {
+		return this.singleValidator.validate(
 				transaction,
 				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
+	}
+
+	private SingleTransactionValidator createSingleValidator() {
+		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
+		builder.add(this.validatorFactory.createSingle(this.poiFacade));
+		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
+		return builder.build();
 	}
 
 	/**
@@ -246,13 +292,11 @@ public class UnconfirmedTransactions {
 	 * @return The filtered list of transactions.
 	 */
 	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-		return new UnconfirmedTransactions(
+		return this.filter(
 				this.getAll().stream()
 						.filter(tx -> matchAddress(tx, address))
 						.collect(Collectors.toList()),
-				ValidationOptions.ValidateAgainstUnconfirmedBalance,
-				this.timeProvider,
-				this.validator);
+				BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
@@ -288,13 +332,11 @@ public class UnconfirmedTransactions {
 		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
 		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
 		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
-		return new UnconfirmedTransactions(
+		return this.filter(
 				this.getTransactionsBefore(blockTime).stream()
 						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
 						.collect(Collectors.toList()),
-				ValidationOptions.ValidateAgainstConfirmedBalance,
-				this.timeProvider,
-				this.validator);
+				BalanceValidationOptions.ValidateAgainstConfirmedBalance);
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {

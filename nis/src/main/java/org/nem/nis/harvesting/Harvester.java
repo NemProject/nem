@@ -45,23 +45,21 @@ public class Harvester {
 		}
 
 		final TimeInstant blockTime = this.timeProvider.getCurrentTime();
-		synchronized (this.blockChainLastBlockLayer) {
-			final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
-			final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
+		final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+		final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 
-			GeneratedBlock bestGeneratedBlock = null;
-			for (final Account harvester : this.unlockedAccounts) {
-				final GeneratedBlock generatedBlock = this.generator.generateNextBlock(
-						lastBlock,
-						harvester,
-						blockTime);
+		GeneratedBlock bestGeneratedBlock = null;
+		for (final Account harvester : this.unlockedAccounts) {
+			final GeneratedBlock generatedBlock = this.generator.generateNextBlock(
+					lastBlock,
+					harvester,
+					blockTime);
 
-				if (null != generatedBlock && (null == bestGeneratedBlock || generatedBlock.getScore() > bestGeneratedBlock.getScore())) {
-					bestGeneratedBlock = generatedBlock;
-				}
+			if (null != generatedBlock && (null == bestGeneratedBlock || generatedBlock.getScore() > bestGeneratedBlock.getScore())) {
+				bestGeneratedBlock = generatedBlock;
 			}
-
-			return null == bestGeneratedBlock ? null : bestGeneratedBlock.getBlock();
 		}
+
+		return null == bestGeneratedBlock ? null : bestGeneratedBlock.getBlock();
 	}
 }
