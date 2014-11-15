@@ -129,6 +129,40 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
+	// TODO: re-using NonConflictingImportanceTransferTransactionValidator in BlockChainValidator should help
+	@Test
+	public void chainWithConflictingImportanceTransfersIsInvalid() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final Account account1 = Utils.generateRandomAccount();
+		account1.incrementBalance(Amount.fromNem(12345));
+		final Account account2 = Utils.generateRandomAccount();
+		account2.incrementBalance(Amount.fromNem(12345));
+		final Account accountX = Utils.generateRandomAccount();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+		final Transaction transaction1 = new ImportanceTransferTransaction(new TimeInstant(150), account1,
+		                                                                   ImportanceTransferTransaction.Mode.Activate, accountX);
+		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
+		transaction1.sign();
+		block.addTransaction(transaction1);
+
+		final Transaction transaction2 = new ImportanceTransferTransaction(new TimeInstant(150), account2,
+		                                                                   ImportanceTransferTransaction.Mode.Activate, accountX);
+		transaction2.setDeadline(transaction2.getTimeStamp().addHours(1));
+		transaction2.sign();
+		block.addTransaction(transaction2);
+		block.sign();
+
+		// Assert:
+		final boolean result = validator.isValid(parentBlock, blocks);
+		Assert.assertThat(result, IsEqual.equalTo(false));
+	}
+
 	@Test
 	public void chainIsInvalidIfTransactionAlreadyExistInDb() {
 		// Arrange:
