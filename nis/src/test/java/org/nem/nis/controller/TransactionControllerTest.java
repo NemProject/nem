@@ -2,8 +2,10 @@ package org.nem.nis.controller;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
+import org.mockito.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
@@ -12,6 +14,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.PushService;
+import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 
@@ -19,6 +22,79 @@ import java.util.*;
 import java.util.function.Function;
 
 public class TransactionControllerTest {
+
+	//region transactionPrepare / transactionAnnounce
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void transactionPrepareFailsIfTransactionDataFailsValidation() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+
+		final Transaction transaction = createTransaction();
+		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> context.controller.transactionPrepare(deserializer),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void transactionPrepareSucceedsIfTransactionDataPassesValidation() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+
+		final Transaction transaction = createTransaction();
+		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));
+
+		// Act:
+		final RequestPrepare requestPrepare = context.controller.transactionPrepare(deserializer);
+
+		// Assert:
+		Assert.assertThat(requestPrepare.getData(), IsEqual.equalTo(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
+	}
+
+	@Test
+	public void transactionAnnounceSignsAndPushesTransactionIfTransactionPassesValidation() {
+		// Assert:
+		assertTransactionAnnounceSignsAndPushesTransaction(ValidationResult.SUCCESS);
+	}
+
+	@Test
+ 	public void transactionAnnounceSignsAndPushesTransactionIfTransactionFailsValidation() {
+		// Assert:
+		assertTransactionAnnounceSignsAndPushesTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
+	}
+
+	private static void assertTransactionAnnounceSignsAndPushesTransaction(final ValidationResult validationResult) {
+		final TestContext context = new TestContext();
+		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any()))
+				.thenReturn(validationResult);
+
+		final Transaction transaction = createTransaction();
+		final Signature signature = new Signature(Utils.generateRandomBytes(64));
+		final RequestAnnounce requestAnnounce = new RequestAnnounce(
+				BinarySerializer.serializeToBytes(transaction.asNonVerifiable()),
+				signature.getBytes());
+
+		// Act:
+		final NemRequestResult result = context.controller.transactionAnnounce(requestAnnounce);
+
+		// Assert:
+		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
+		Assert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
+
+		final ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
+		Mockito.verify(context.pushService, Mockito.only()).pushTransaction(transactionCaptor.capture(), Mockito.eq(null));
+		Assert.assertThat(transactionCaptor.getValue().getSignature(), IsEqual.equalTo(signature));
+	}
+
+	//endregion
+
 	//region unconfirmed
 
 	@Test
@@ -56,12 +132,15 @@ public class TransactionControllerTest {
 
 	//endregion
 
-	private static List<Transaction> createTransactionList() {
+	private static Transaction createTransaction() {
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final TransferTransaction transaction = new TransferTransaction(new TimeInstant(321), sender, recipient, Amount.fromNem(100), null);
+		return new TransferTransaction(new TimeInstant(321), sender, recipient, Amount.fromNem(100), null);
+	}
+
+	private static List<Transaction> createTransactionList() {
 		final List<Transaction> transactions = new ArrayList<>();
-		transactions.add(transaction);
+		transactions.add(createTransaction());
 		return transactions;
 	}
 
@@ -69,6 +148,7 @@ public class TransactionControllerTest {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final PushService pushService = Mockito.mock(PushService.class);
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
+		private final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
@@ -84,7 +164,7 @@ public class TransactionControllerTest {
 					this.accountLookup,
 					this.pushService,
 					this.unconfirmedTransactions,
-					null,
+					this.validator,
 					this.host);
 		}
 	}

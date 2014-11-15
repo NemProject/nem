@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
-// TODO: add tests
 @RestController
 public class TransactionController {
 	private final AccountLookup accountLookup;
@@ -46,7 +46,7 @@ public class TransactionController {
 		final Transaction transfer = deserializeTransaction(deserializer);
 
 		final ValidationResult validationResult = this.validator.validate(transfer);
-		if (ValidationResult.SUCCESS != validationResult) {
+		if (!validationResult.isSuccess()) {
 			throw new IllegalArgumentException(validationResult.toString());
 		}
 
@@ -56,7 +56,7 @@ public class TransactionController {
 
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
-	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) throws Exception {
+	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce)  {
 		final Transaction transfer = this.deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
@@ -72,8 +72,7 @@ public class TransactionController {
 	@RequestMapping(value = "/transactions/unconfirmed", method = RequestMethod.POST)
 	@P2PApi
 	@AuthenticatedApi
-	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(
-			@RequestBody final NodeChallenge challenge) {
+	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(@RequestBody final NodeChallenge challenge) {
 		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions());
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), challenge);
@@ -83,10 +82,12 @@ public class TransactionController {
 		return this.unconfirmedTransactions.getAll();
 	}
 
-	private Transaction deserializeTransaction(final byte[] bytes) throws Exception {
-		try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
-			return deserializeTransaction(dataDeserializer);
-		}
+	private Transaction deserializeTransaction(final byte[] bytes) {
+		return ExceptionUtils.propagate(() -> {
+			try (final BinaryDeserializer dataDeserializer = getDeserializer(bytes, this.accountLookup)) {
+				return deserializeTransaction(dataDeserializer);
+			}
+		});
 	}
 
 	private static Transaction deserializeTransaction(final Deserializer deserializer) {
