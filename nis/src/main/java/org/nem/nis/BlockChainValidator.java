@@ -89,8 +89,7 @@ public class BlockChainValidator {
 			}
 
 			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight);
-			final TransactionsContextPair transactionsContextPair = new TransactionsContextPair(block.getTransactions(), context);
-			groupedTransactions.add(transactionsContextPair);
+			groupedTransactions.add(new TransactionsContextPair(block.getTransactions(), context));
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
 					LOGGER.info("received block with unverifiable transaction");
