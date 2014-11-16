@@ -189,7 +189,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//region remote is already occupied
 	@Test
-	 public void cannotActivateIfRemoteIsActiveWithinOneDay()
+	public void cannotActivateIfRemoteIsActiveWithinOneDay()
 	{
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
@@ -267,6 +267,61 @@ public class ImportanceTransferTransactionValidatorTest {
 				ImportanceTransferTransaction.Mode.Deactivate,
 				new BlockHeight(1441),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
+	}
+
+	@Test
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterWithinOneDay()
+	{
+		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
+				new BlockHeight(1440),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS
+		);
+	}
+	//endregion
+
+	//region transitive remote harvesting
+
+	// two following tests, are testing following scenario
+	// 1) A importance transfer to X
+	// 2) send some nems to X
+	// 3) X importance transfer to Y
+	//
+	// I'm not sure if we handle such situation properly (obviously importance transfer should not be transitive)
+	@Test
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAfterOneDay()
+	{
+		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
+				new BlockHeight(1441),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED
+		);
+	}
+
+	private static void assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
+			final BlockHeight height,
+			final ValidationResult validationResult)
+	{
+		final TestContext context = new TestContext();
+
+		// - use a dummy transaction to set the state of the remote account
+		final ImportanceTransferTransaction dummy = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		context.setLesseeRemoteState(dummy, BlockHeight.ONE, ImportanceTransferTransaction.Mode.Activate);
+
+		// - create another transaction around the dummy remote account set up previously
+		final Account furtherRemote = Utils.generateRandomAccount();
+		final Account remote = dummy.getRemote();
+		final Transaction transaction = new ImportanceTransferTransaction(
+				TimeInstant.ZERO,
+				remote,
+				ImportanceTransferTransaction.Mode.Activate,
+				furtherRemote);
+		context.addRemoteLinks(furtherRemote);
+		remote.incrementBalance(Amount.fromNem(2001));
+
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(height));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
 	private static void assertRemoteIsOccupiedTest(
