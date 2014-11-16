@@ -329,6 +329,54 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
+    /**
+     * TODO M-M: update graph below!
+     * <pre>
+     *  4 - 0  - 2
+     *  |   | \/ |
+     *  |   | /\ |
+     *  |   1 -  3
+     *  |    \  /
+     *  \---- 5
+     * </pre>
+     */
+    @Test
+    public void complexGraphIsMergedAsExpected() {
+        //TODO: M-M: update this description!
+        // Arrange: { 0, 1, 2, 3 } form clusters;
+        // 4 is an outlier connected to the cluster
+        // 5 is an outlier connected to (4) and the cluster (twice)
+        final TestContext context = new TestContext(this.createClusteringStrategy(), 6);
+        context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4));
+        context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3, 5));
+        context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3));
+        context.setNeighborIds(3, Arrays.asList(0, 1, 2, 3, 5));
+        context.setNeighborIds(4, Arrays.asList(5, 0, 4));
+        context.setNeighborIds(5, Arrays.asList(4, 1, 3, 5));
+        context.setNeighborIds(6, Arrays.asList(5, 6));
+        context.setNeighborIds(7, Arrays.asList(6, 7));
+        context.setNeighborIds(8, Arrays.asList(7, 8, 9, 10));
+        context.makeAllSimilar();
+        context.setSimilarity(4, 0, 0);
+        context.setSimilarity(4, 5, 1);
+        context.setSimilarity(5, 1, 0);
+        context.setSimilarity(5, 3, 0);
+
+        // Act:
+        final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
+
+        // Assert:
+        final List<Cluster> expectedClusters = Arrays.asList(
+                new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3)));
+        final List<Cluster> expectedOutliers = Arrays.asList(
+                new Cluster(new NodeId(4)),
+                new Cluster(new NodeId(5)));
+
+        Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
+        Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
+        Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
+    }
+
 	/**
 	 * <pre>
 	 *    0  - 1
