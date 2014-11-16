@@ -11,13 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.logging.Logger;
 
-// TODO: add tests for this controller
 @RestController
 public class BlockExplorerController {
-	private final static Logger LOGGER = Logger.getLogger(BlockExplorerController.class.getName());
-
 	private final ReadOnlyBlockDao blockDao;
 
 	@Autowired(required = true)
@@ -29,7 +25,6 @@ public class BlockExplorerController {
 	@ClientApi
 	@TrustedApi
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
-		// TODO: add tests for this action
 		final BlockExplorerMapper mapper = new BlockExplorerMapper();
 		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
 		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(height, BlockChainConstants.BLOCKS_LIMIT);
