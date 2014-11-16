@@ -97,6 +97,7 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 
 			final Cluster cluster;
 			ClusterId clusterId = new ClusterId(community.getPivotId());
+            System.out.println("processing cluster: " + clusterId);
 
 			// Find out if some of the similar neighbors already have an id.
 			// This would mean the new cluster overlaps with at least one existing cluster.
@@ -111,7 +112,8 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 				cluster = this.mergeClusters(clusterIds);
 				clusterId = cluster.getId();
 			} else {
-				cluster = new Cluster(clusterId);
+                System.out.println("creating new cluster around: " + clusterId);
+                cluster = new Cluster(clusterId);
 				this.addCluster(cluster);
 			}
 
@@ -137,6 +139,7 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 
 			// TODO 20141002: we should add a test where clusterIds.size() >= 2!
             System.out.println("clusterIds.size(): " + clusterIds.size());
+            System.out.println("clusterIds: " + clusterIds);
             for (int ndx = 1; ndx < clusterIds.size(); ++ndx) {
 				final Cluster clusterToMerge = this.findCluster(clusterIds.get(ndx));
 				cluster.merge(clusterToMerge);

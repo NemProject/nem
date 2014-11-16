@@ -346,8 +346,8 @@ public abstract class ScanGraphClusteringTest {
         // Arrange: { 0, 1, 2, 3 } form clusters;
         // 4 is an outlier connected to the cluster
         // 5 is an outlier connected to (4) and the cluster (twice)
-        final TestContext context = new TestContext(this.createClusteringStrategy(), 6);
-        context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4));
+        final TestContext context = new TestContext(this.createClusteringStrategy(), 11);
+        context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4, 9));
         context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3, 5));
         context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3));
         context.setNeighborIds(3, Arrays.asList(0, 1, 2, 3, 5));
@@ -356,8 +356,14 @@ public abstract class ScanGraphClusteringTest {
         context.setNeighborIds(6, Arrays.asList(5, 6));
         context.setNeighborIds(7, Arrays.asList(6, 7));
         context.setNeighborIds(8, Arrays.asList(7, 8, 9, 10));
+        context.setNeighborIds(9, Arrays.asList(0, 7, 8, 9, 10, 2));
+
         context.makeAllSimilar();
-        context.setSimilarity(4, 0, 0);
+
+        context.setSimilarity(1, 0, 0);
+        context.setSimilarity(2, 0, 0);
+        context.setSimilarity(3, 0, 0);
+        context.setSimilarity(4, 0, 1);
         context.setSimilarity(4, 5, 1);
         context.setSimilarity(5, 1, 0);
         context.setSimilarity(5, 3, 0);
