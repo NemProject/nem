@@ -4,8 +4,6 @@ import org.nem.core.model.*;
 
 import java.util.*;
 
-// TODO 20141116 J-J: obviously we need tests :)
-
 /**
  * Builder for building an aggregate BatchTransactionValidator.
  */
