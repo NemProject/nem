@@ -22,11 +22,11 @@ public class NodeBroadcasterTest {
 		final SerializableEntity entity = new MockSerializableEntity();
 
 		// Act:
-		context.broadcaster.broadcast(context.broadcastNodes, NodeApiId.REST_PUSH_TRANSACTION, entity).join();
+		context.broadcaster.broadcast(context.broadcastNodes, NisPeerId.REST_PUSH_TRANSACTION, entity).join();
 
 		// Assert:
 		for (final Node node : context.broadcastNodes) {
-			Mockito.verify(context.connector, Mockito.times(1)).announce(node, NodeApiId.REST_PUSH_TRANSACTION, entity);
+			Mockito.verify(context.connector, Mockito.times(1)).announce(node, NisPeerId.REST_PUSH_TRANSACTION, entity);
 		}
 	}
 
@@ -43,7 +43,7 @@ public class NodeBroadcasterTest {
 		// Act:
 		final CompletableFuture future = context.broadcaster.broadcast(
 				context.broadcastNodes,
-				NodeApiId.REST_PUSH_TRANSACTION,
+				NisPeerId.REST_PUSH_TRANSACTION,
 				new MockSerializableEntity());
 
 		// Assert:

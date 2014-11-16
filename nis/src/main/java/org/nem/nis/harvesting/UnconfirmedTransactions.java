@@ -28,7 +28,25 @@ public class UnconfirmedTransactions {
 	private final PoiFacade poiFacade;
 
 	private enum BalanceValidationOptions {
+		/**
+		 * The confirmed balance check occurs as part of the single transaction validator.
+		 * This is used to exclude conflicting transactions when generating a block.
+		 * This is accomplished by bypassing the execution of the UnconfirmedBalancesObserver
+		 * (so that all balance validations are against the current account balances).
+		 */
 		ValidateAgainstConfirmedBalance,
+
+		/**
+		 * The unconfirmed balance check occurs as part of the execution of the UnconfirmedBalancesObserver.
+		 * This is the default setting and is used when adding new transactions and
+		 * when getting the unconfirmed transactions for an account.
+		 * <br/>
+		 * This improves the user experience:
+		 * A user complained that if the GUI shows a balance of 1k NEM he can initiate many
+		 * transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
+		 * can spend more than he has. Furthermore, a new block included one of the transactions leaving the
+		 * the other transaction still being displayed as unconfirmed in the GUI forever (until deadline was exceeded).
+		 */
 		ValidateAgainstUnconfirmedBalance,
 	}
 
@@ -92,23 +110,7 @@ public class UnconfirmedTransactions {
 	 * Adds new unconfirmed transactions.
 	 *
 	 * @param transactions The collection of transactions.
-	 * @return SUCCESS if at least one transaction was added, NEUTRAL or FAILURE otherwise.
-	 * TODO 20141104 J-B: you're never actually returning FAILURE, not sure if that's intentional
-	 * > if you want to short circuit on failure, you can use ValidationResult.aggregate
-	 * TODO 20141105 BR -> J: if the batch validation fails it is returning failure, see test class.
-	 * TODO 20141106 J-B: sorry, i meant in the case of add failing (see comment in test)
-	 * TODO 20141107: BR -> J: I am unsure which way to go. If batch validation fails we have to return FAILURE, else the batch validation doesn't make sense.
-	 * TODO                    For the rest we use single validation anyway so we can pick those transactions which are valid.
-	 * TODO                    Do you want to fail fast because the remote could supply tons of new invalid transactions as an attack vector?
-	 * TODO                    Probably pretty expensive for the attacker too bc he needs to upload all those transactions. Gimre, what's your opinion?
-	 * TODO 20141110: G-BR, J: I think failing fast could lead to problems, this is scenario I've came up with (assuming fail FAST):
-	 * 1. I have 100 N, I send TX a: 80N to some nodes and TX b: 80N to other nodes
-	 * 2. those nodes, shouldn't exchange TXes with each other (due to fail fast)
-	 * 3. but after some time, one of those TXes will be included in some block anyway
-	 * 4. but probably that 'conflicting' TX won't be purged... [1]
-	 * 5. so half of the nodes or more, won't be able to sync until it'll expire
-	 * (by sync I mean nodes won't pull any unconfirmed TXes from those 'infected' nodes)
-	 * [1] maybe that is something that will need to be changed/fixed
+	 * @return SUCCESS if all transactions were added successfully, NEUTRAL or FAILURE otherwise.
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		final ValidationResult transactionValidationResult = this.validateBatch(transactions);
@@ -116,14 +118,7 @@ public class UnconfirmedTransactions {
 			return transactionValidationResult;
 		}
 
-		boolean success = false;
-		for (final Transaction transaction : transactions) {
-			if (ValidationResult.SUCCESS == this.add(transaction, true)) {
-				success = true;
-			}
-		}
-
-		return success ? ValidationResult.SUCCESS : ValidationResult.NEUTRAL;
+		return ValidationResult.aggregate(transactions.stream().map(transaction -> this.add(transaction, true)).iterator());
 	}
 
 	/**
