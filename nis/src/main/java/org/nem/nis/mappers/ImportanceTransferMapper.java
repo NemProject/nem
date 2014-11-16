@@ -63,7 +63,7 @@ public class ImportanceTransferMapper {
 		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(
 				new TimeInstant(dbImportanceTransfer.getTimeStamp()),
 				sender,
-				ImportanceTransferTransaction.Mode.fromValueOrDefault(dbImportanceTransfer.getDirection()),
+				ImportanceTransferTransaction.Mode.fromValueOrDefault(dbImportanceTransfer.getMode()),
 				remote);
 
 		transfer.setFee(new Amount(dbImportanceTransfer.getFee()));
