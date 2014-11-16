@@ -5,9 +5,6 @@ import org.nem.core.model.*;
 import java.util.*;
 import java.util.stream.*;
 
-// TODO: having two separate validators is definitely nicer and easier to test, but it might
-// TODO: have more sense to join them into one
-
 // TODO 2014116 J-G: i don't think you're covering this scenario (or else i'm not sure how it is being covered):
 // > block N sets up R as a remote account
 // > block N + 1 bob makes a transfer to R
@@ -15,6 +12,7 @@ import java.util.stream.*;
 // TODO 20141116 G-J: yes it doesn't, if we need to cover it it should be covered by
 // some (transfer) transaction validator... (check if recipient has associated "owner")
 // but I'm not sure if we actually need to cover such scenario.
+
 /**
  * A block transaction validator, that verifies that inside a block, there are no transfers to accounts
  * that are used as remote harvesting accounts.

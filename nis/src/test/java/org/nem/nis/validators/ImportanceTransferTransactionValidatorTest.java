@@ -269,17 +269,17 @@ public class ImportanceTransferTransactionValidatorTest {
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
 	}
 
+	//endregion
+
+	//region transitive remote harvesting
+
 	@Test
 	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterWithinOneDay()
 	{
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
 				new BlockHeight(1440),
-				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS
-		);
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
-	//endregion
-
-	//region transitive remote harvesting
 
 	// two following tests, are testing following scenario
 	// 1) A importance transfer to X
@@ -292,8 +292,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	{
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
 				new BlockHeight(1441),
-				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED
-		);
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
 	private static void assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
@@ -346,6 +345,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
+
 	//endregion
 
 	//region other type
