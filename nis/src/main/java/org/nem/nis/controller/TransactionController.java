@@ -56,7 +56,7 @@ public class TransactionController {
 
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
-	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce)  {
+	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) {
 		final Transaction transfer = this.deserializeTransaction(requestAnnounce.getData());
 		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
 		final ValidationResult result = this.pushService.pushTransaction(transfer, null);

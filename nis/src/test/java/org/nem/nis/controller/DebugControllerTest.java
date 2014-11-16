@@ -30,7 +30,7 @@ public class DebugControllerTest {
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v-> context.controller.blockDebugInfo("10"),
+				v -> context.controller.blockDebugInfo("10"),
 				UnsupportedOperationException.class);
 	}
 

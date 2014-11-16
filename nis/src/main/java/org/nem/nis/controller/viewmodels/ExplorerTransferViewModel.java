@@ -4,11 +4,10 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
-import org.nem.core.time.*;
+import org.nem.core.time.UnixTime;
 
 /**
  * A transfer view model that is used by NIS services like the block explorer.
- *
  * TODO 20141115 J-G: is there a reason this only works for transfers?
  */
 public class ExplorerTransferViewModel implements SerializableEntity {

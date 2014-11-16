@@ -1,10 +1,10 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockExplorerMapper;
 import org.springframework.beans.factory.annotation.Autowired;

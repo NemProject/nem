@@ -1,11 +1,11 @@
 package org.nem.nis.controller.viewmodels;
 
-import net.minidev.json.*;
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 import org.nem.core.time.UnixTime;

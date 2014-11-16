@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.test.NisUtils;
 
 import java.util.Arrays;
@@ -35,7 +35,6 @@ public class BlockExplorerControllerTest {
 		Assert.assertThat(getHeight(blocks.get(0)), IsEqual.equalTo(15L));
 		Assert.assertThat(getHeight(blocks.get(1)), IsEqual.equalTo(16L));
 		Assert.assertThat(getHeight(blocks.get(2)), IsEqual.equalTo(18L));
-
 	}
 
 	private static long getHeight(final ExplorerBlockViewModel viewModel) {

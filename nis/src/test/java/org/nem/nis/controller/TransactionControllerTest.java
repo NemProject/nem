@@ -65,7 +65,7 @@ public class TransactionControllerTest {
 	}
 
 	@Test
- 	public void transactionAnnounceSignsAndPushesTransactionIfTransactionFailsValidation() {
+	public void transactionAnnounceSignsAndPushesTransactionIfTransactionFailsValidation() {
 		// Assert:
 		assertTransactionAnnounceSignsAndPushesTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
 	}
