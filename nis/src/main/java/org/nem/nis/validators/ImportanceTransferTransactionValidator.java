@@ -70,14 +70,15 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// ONLY for remote harvesting, so we should probably block any incoming or outgoing transfers, additionally we
 				// shouldn't allow setting an account that already have some balance on it.
 				//
-				// I finally have possible attack vector:
+				// I finally have possible attack vector
+				// (handled by check below, and partially by BlockImportanceTransferBalanceValidator):
 				//   let's say I own account X which is harvesting and has big importance
 				//   user EVIL has small importance and announces remote harvesting, where he gives
 				//       X as his remote account
 				//   this basically cuts off X
 				//
 				// second attack vector, user X announces account Y as his remote
-				// EVIL also announces Y as his remote... (this is not handled yet)
+				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
 				if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
 					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
