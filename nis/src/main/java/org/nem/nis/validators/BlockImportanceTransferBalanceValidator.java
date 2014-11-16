@@ -12,14 +12,14 @@ import java.util.stream.*;
  * A batch transaction validator, that verifies that inside block, there are no transfers to accounts,
  * that are used as remote harvesting accounts.
  */
-public class BatchImportanceTransferBalanceValidator implements BatchTransactionValidator {
+public class BlockImportanceTransferBalanceValidator implements BlockValidator {
 	@Override
-	public ValidationResult validate(final List<TransactionsContextPair> groupedTransactions) {
-		if (groupedTransactions.isEmpty()) {
+	public ValidationResult validate(final Block block) {
+		if (block.getTransactions().isEmpty()) {
 			return ValidationResult.SUCCESS;
 		}
 
-		final Set<Address> importanceTransfers = groupedTransactions.get(0).getTransactions().stream()
+		final Set<Address> importanceTransfers = block.getTransactions().stream()
 				.filter(t -> t.getType() == TransactionTypes.IMPORTANCE_TRANSFER)
 				.map(t -> ((ImportanceTransferTransaction)t).getRemote().getAddress())
 				.collect(Collectors.toSet());
@@ -28,7 +28,7 @@ public class BatchImportanceTransferBalanceValidator implements BatchTransaction
 		}
 
 		// note: it might be transfer with amount of 0, but I guess we don't have to care about it
-		final boolean hasTransfer = groupedTransactions.get(0).getTransactions().stream()
+		final boolean hasTransfer = block.getTransactions().stream()
 				.filter(t -> t.getType() == TransactionTypes.TRANSFER)
 				.anyMatch(
 						t -> importanceTransfers.contains(((TransferTransaction)t).getRecipient().getAddress())

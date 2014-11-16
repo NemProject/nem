@@ -21,7 +21,6 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final SingleTransactionValidator transactionValidator;
-	private final BatchTransactionValidator batchTransactionsPostValidator;
 	private final BatchTransactionValidator batchTransactionValidator;
 
 	/**
@@ -33,7 +32,6 @@ public class BlockChainValidator {
 	 * @param blockValidator The validator to use for validating blocks.
 	 * @param transactionValidator The validator to use for validating transactions.
 	 * @param batchTransactionValidator The validator to use for validating transactions in batches.
-	 * @param batchTransactionsPostValidator The validator used to post validate transactions in block.
 	 */
 	public BlockChainValidator(
 			final Consumer<Block> executor,
@@ -41,15 +39,13 @@ public class BlockChainValidator {
 			final int maxChainSize,
 			final BlockValidator blockValidator,
 			final SingleTransactionValidator transactionValidator,
-			final BatchTransactionValidator batchTransactionValidator,
-			final BatchTransactionValidator batchTransactionsPostValidator) {
+			final BatchTransactionValidator batchTransactionValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
 		this.batchTransactionValidator = batchTransactionValidator;
-		this.batchTransactionsPostValidator = batchTransactionsPostValidator;
 	}
 
 	/**
@@ -114,11 +110,6 @@ public class BlockChainValidator {
 				}
 
 				chainHashes.add(hash);
-			}
-			final ValidationResult transactionsPostValidationResult = this.batchTransactionsPostValidator.validate(Arrays.asList(transactionsContextPair));
-			if (!transactionsPostValidationResult.isSuccess()) {
-				LOGGER.info(String.format("received transaction that failed validation: %s", transactionsPostValidationResult));
-				return false;
 			}
 
 			parentBlock = block;
