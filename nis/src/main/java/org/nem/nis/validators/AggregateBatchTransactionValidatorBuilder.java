@@ -4,8 +4,6 @@ import org.nem.core.model.*;
 
 import java.util.*;
 
-// TODO 20141116 J-J: obviously we need tests :)
-
 /**
  * Builder for building an aggregate BatchTransactionValidator.
  */
@@ -27,22 +25,21 @@ public class AggregateBatchTransactionValidatorBuilder {
 	 * @return the aggregate validator.
 	 */
 	public BatchTransactionValidator build() {
-		return new AggregateBlockValidator(this.validators);
+		return new AggregateBatchTransactionValidator(this.validators);
 	}
 
-	private static class AggregateBlockValidator implements BatchTransactionValidator {
+	private static class AggregateBatchTransactionValidator implements BatchTransactionValidator {
 		private final List<BatchTransactionValidator> validators;
 
-		public AggregateBlockValidator(final List<BatchTransactionValidator> validators) {
+		public AggregateBatchTransactionValidator(final List<BatchTransactionValidator> validators) {
 			this.validators = validators;
 		}
 
 		@Override
 		public ValidationResult validate(final List<TransactionsContextPair> groupedTransactions) {
-			final Iterator<ValidationResult> resultIterator = this.validators.stream()
+			return ValidationResult.aggregate(this.validators.stream()
 					.map(validator -> validator.validate(groupedTransactions))
-					.iterator();
-			return ValidationResult.aggregate(resultIterator);
+					.iterator());
 		}
 	}
 }

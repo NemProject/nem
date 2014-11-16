@@ -95,13 +95,9 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(isValid, IsEqual.equalTo(true));
 	}
 
-	// TODO 20141109 J-G: so, i know this test is failing ;), but consider being more descriptive in the test name
-	// > or a comment in the test code as to why the ImportanceTransfer is invalid
-	// TODO 20141110 G-J: you're right. This is related to comment in other file. This test fails,
-	// as there is currently no validator that would check that within the block there is a transfer
-	// made to an account, to which also importance transfer is made
+
 	@Test
-	public void chainWithInvalidImportanceTransferIsInvalid() {
+	public void chainWithImportanceTransferToNonZeroBalanceAccountIsInvalid() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
