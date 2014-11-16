@@ -61,8 +61,7 @@ public class BlockChainServices {
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(poiFacade),
 				this.transactionValidatorFactory.createSingle(poiFacade),
-				this.transactionValidatorFactory.createBatch(poiFacade),
-				this.transactionValidatorFactory.createBatchPost());
+				this.transactionValidatorFactory.createBatch(poiFacade));
 		return validator.isValid(parentBlock, peerChain);
 	}
 

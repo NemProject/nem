@@ -61,11 +61,10 @@ public class TransactionValidatorFactory {
 	 * @return The validator.
 	 */
 	public BatchTransactionValidator createBatch(final PoiFacade poiFacade) {
-		return new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
-	}
-
-	public BatchTransactionValidator createBatchPost() {
-		return new BatchImportanceTransferValidator();
+		final AggregateBatchTransactionValidatorBuilder builder = new AggregateBatchTransactionValidatorBuilder();
+		builder.add(new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
+		builder.add(new BatchImportanceTransferValidator());
+		return builder.build();
 	}
 
 	private AggregateSingleTransactionValidatorBuilder createSingleBuilder(final PoiFacade poiFacade) {

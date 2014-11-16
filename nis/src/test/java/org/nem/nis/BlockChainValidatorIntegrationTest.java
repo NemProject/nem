@@ -321,13 +321,11 @@ public class BlockChainValidatorIntegrationTest {
 		public final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		public final SingleTransactionValidator transactionValidator;
 		public final BatchTransactionValidator batchTransactionValidator;
-		public final BatchTransactionValidator batchTransactionsPostValidator;
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory(this.transferDao);
 			this.transactionValidator = transactionValidatorFactory.createSingle(this.poiFacade);
 			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.poiFacade);
-			this.batchTransactionsPostValidator = transactionValidatorFactory.createBatchPost();
 
 			Mockito.when(this.transferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -346,8 +344,7 @@ public class BlockChainValidatorIntegrationTest {
 					this.maxChainSize,
 					this.blockValidator,
 					this.transactionValidator,
-					this.batchTransactionValidator,
-					this.batchTransactionsPostValidator);
+					this.batchTransactionValidator);
 		}
 	}
 
