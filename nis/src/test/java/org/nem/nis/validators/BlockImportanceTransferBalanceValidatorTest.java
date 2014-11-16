@@ -3,11 +3,12 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.NisUtils;
 
-public class BlockImportanceTransferValidatorTest {
+public class BlockImportanceTransferBalanceValidatorTest {
 	//region valid blocks
 	@Test
 	public void blockWithoutTransactionsValidates() {
@@ -25,8 +26,8 @@ public class BlockImportanceTransferValidatorTest {
 	public void blockWithoutImportanceTransfersValidates() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addTransaction();
-		context.addTransaction();
+		context.addTransferTransaction();
+		context.addTransferTransaction();
 
 		// Act:
 		final ValidationResult result = context.validator.validate(context.block);
@@ -54,9 +55,9 @@ public class BlockImportanceTransferValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addImportanceTransaction(Utils.generateRandomAccount());
-		context.addTransaction();
+		context.addTransferTransaction();
 		context.addImportanceTransaction(Utils.generateRandomAccount());
-		context.addTransaction();
+		context.addTransferTransaction();
 
 		// Act:
 		final ValidationResult result = context.validator.validate(context.block);
@@ -68,11 +69,11 @@ public class BlockImportanceTransferValidatorTest {
 
 	//region invalid blocks
 	@Test
-	public void blockWithConflictingImportanceTransferSenderDoesNotValidate() {
+	public void blockWithTransferAndConflictingImportanceTransferDoesNotValidate() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addImportanceTransaction(context.common, Utils.generateRandomAccount());
-		context.addImportanceTransaction(context.common, Utils.generateRandomAccount());
+		context.addImportanceTransaction(Utils.generateRandomAccount(), context.common);
+		context.addTransferTransaction(context.common, Amount.fromNem(10));
 
 		// Act:
 		final ValidationResult result = context.validator.validate(context.block);
@@ -82,28 +83,11 @@ public class BlockImportanceTransferValidatorTest {
 	}
 
 	@Test
-	public void blockWithConflictingImportanceTransferRecipientDoesNotValidate() {
+	public void blockWithZeroBalanceTransferAndConflictingImportanceTransferDoesNotValidate() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addImportanceTransaction(Utils.generateRandomAccount(), context.common);
-		context.addImportanceTransaction(Utils.generateRandomAccount(), context.common);
-
-		// Act:
-		final ValidationResult result = context.validator.validate(context.block);
-
-		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
-	}
-
-
-	@Test
-	public void blockWithTransfersAndConflictingImportanceTransferRecipientDoesNotValidate() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addImportanceTransaction(Utils.generateRandomAccount(), context.common);
-		context.addTransaction();
-		context.addImportanceTransaction(Utils.generateRandomAccount(), context.common);
-		context.addTransaction();
+		context.addTransferTransaction(context.common, Amount.fromNem(0));
 
 		// Act:
 		final ValidationResult result = context.validator.validate(context.block);
@@ -116,15 +100,17 @@ public class BlockImportanceTransferValidatorTest {
 	private static class TestContext {
 		private final Account harvester = Utils.generateRandomAccount();
 		private final Block block = NisUtils.createRandomBlockWithHeight(this.harvester, 12);
-		private final BlockValidator validator = new BlockImportanceTransferValidator();
+		private final BlockValidator validator = new BlockImportanceTransferBalanceValidator();
 		private final Account common = Utils.generateRandomAccount();
 
-		private void addTransaction() {
-			this.addTransaction(Utils.generateRandomAccount());
+		private void addTransferTransaction() {
+			this.addTransferTransaction(Utils.generateRandomAccount(), Amount.fromNem(10));
 		}
 
-		private void addTransaction(final Account account) {
-			this.block.addTransaction(new MockTransaction(account));
+		private void addTransferTransaction(final Account recipient, final Amount amount) {
+			final Transaction t = new TransferTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), recipient, amount, null);
+			t.setFee(t.getFee());
+			this.block.addTransaction(t);
 		}
 
 		private void addImportanceTransaction(final Account recipient) {
