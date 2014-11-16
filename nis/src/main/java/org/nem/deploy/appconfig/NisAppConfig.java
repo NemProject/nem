@@ -311,4 +311,9 @@ public class NisAppConfig {
 	public ChainServices chainServices() {
 		return new ChainServices(this.blockChainLastBlockLayer, this.httpConnectorPool());
 	}
+
+	@Bean
+	public CommonStarter commonStarter() {
+		return CommonStarter.INSTANCE;
+	}
 }
