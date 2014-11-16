@@ -68,6 +68,16 @@ public class BlockImportanceTransferValidatorTest {
 	}
 
 	// TODO 20141116 J-G: i guess this is ok?
+	// TODO 20141116 G-J such block actually won't be validated, but for a different reason:
+	// sender is required to have minHarvesterBalance (commonAccount)
+	// but at the same time recipient is required to have zero balance (again commonAccount)
+	//
+	// but leave it here, for a while as this case is interesting anyway, as someone could following:
+	// 1) A importance transfer to X
+	// 2) send some nems to X
+	// 3) X importance transfer to Y
+	//
+	// I'm not sure if we handle such situation properly (obviously importance transfer should not be transitive)
 	@Test
 	public void blockWithConflictingImportanceTransferSenderAndRecipientValidates() {
 		// Arrange:
