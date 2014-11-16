@@ -2,8 +2,8 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 // TODO 2014116 J-G: i don't think you're covering this scenario (or else i'm not sure how it is being covered):
 // > block N sets up R as a remote account

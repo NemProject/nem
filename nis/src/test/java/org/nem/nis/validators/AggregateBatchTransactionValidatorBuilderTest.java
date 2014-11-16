@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
-import org.nem.core.model.*;
+import org.nem.core.model.ValidationResult;
 
 import java.util.*;
 

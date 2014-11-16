@@ -96,7 +96,7 @@ public enum ValidationResult {
 	 * Validation failed because remote harvesting account has non-zero balance.
 	 */
 	FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE(17),
-	
+
 	/**
 	 * Validation failed because previous importance transfer change is in progress.
 	 */

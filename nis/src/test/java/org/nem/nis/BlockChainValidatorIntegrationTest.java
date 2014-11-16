@@ -95,7 +95,6 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(isValid, IsEqual.equalTo(true));
 	}
 
-
 	@Test
 	public void chainWithImportanceTransferToNonZeroBalanceAccountIsInvalid() {
 		// Arrange:
@@ -113,8 +112,11 @@ public class BlockChainValidatorIntegrationTest {
 		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
 		transaction1.sign();
 		block.addTransaction(transaction1);
-		final Transaction transaction2 = new ImportanceTransferTransaction(new TimeInstant(150), account1,
-		                                                                   ImportanceTransferTransaction.Mode.Activate, account2);
+		final Transaction transaction2 = new ImportanceTransferTransaction(
+				new TimeInstant(150),
+				account1,
+				ImportanceTransferTransaction.Mode.Activate,
+				account2);
 		transaction2.setDeadline(transaction2.getTimeStamp().addHours(1));
 		transaction2.sign();
 		block.addTransaction(transaction2);
@@ -140,14 +142,20 @@ public class BlockChainValidatorIntegrationTest {
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
-		final Transaction transaction1 = new ImportanceTransferTransaction(new TimeInstant(150), account1,
-		                                                                   ImportanceTransferTransaction.Mode.Activate, accountX);
+		final Transaction transaction1 = new ImportanceTransferTransaction(
+				new TimeInstant(150),
+				account1,
+				ImportanceTransferTransaction.Mode.Activate,
+				accountX);
 		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
 		transaction1.sign();
 		block.addTransaction(transaction1);
 
-		final Transaction transaction2 = new ImportanceTransferTransaction(new TimeInstant(150), account2,
-		                                                                   ImportanceTransferTransaction.Mode.Activate, accountX);
+		final Transaction transaction2 = new ImportanceTransferTransaction(
+				new TimeInstant(150),
+				account2,
+				ImportanceTransferTransaction.Mode.Activate,
+				accountX);
 		transaction2.setDeadline(transaction2.getTimeStamp().addHours(1));
 		transaction2.sign();
 		block.addTransaction(transaction2);

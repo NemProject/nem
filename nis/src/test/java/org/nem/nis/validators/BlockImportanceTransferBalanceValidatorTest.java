@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.NisUtils;
 
@@ -121,6 +121,7 @@ public class BlockImportanceTransferBalanceValidatorTest {
 		private void addImportanceTransaction(final Account recipient) {
 			this.addImportanceTransaction(Utils.generateRandomAccount(), recipient);
 		}
+
 		private void addImportanceTransaction(final Account sender, final Account recipient) {
 			this.block.addTransaction(
 					new ImportanceTransferTransaction(

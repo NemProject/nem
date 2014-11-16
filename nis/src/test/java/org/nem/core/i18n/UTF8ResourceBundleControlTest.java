@@ -3,7 +3,7 @@ package org.nem.core.i18n;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 
-import java.util.*;
+import java.util.ResourceBundle;
 
 public class UTF8ResourceBundleControlTest {
 	private final ResourceBundle BUNDLE = ResourceBundle.getBundle("test", new UTF8ResourceBundleControl());

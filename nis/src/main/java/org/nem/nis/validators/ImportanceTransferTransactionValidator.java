@@ -100,7 +100,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
 
-		if (! remoteLinks.isRemoteHarvester()) {
+		if (!remoteLinks.isRemoteHarvester()) {
 			return ValidationResult.SUCCESS;
 		}
 

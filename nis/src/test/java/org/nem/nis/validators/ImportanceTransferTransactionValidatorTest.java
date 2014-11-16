@@ -75,7 +75,6 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 	//endregion
 
-
 	//region one day after opposite link
 
 	@Test
@@ -189,8 +188,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//region remote is already occupied
 	@Test
-	public void cannotActivateIfRemoteIsActiveWithinOneDay()
-	{
+	public void cannotActivateIfRemoteIsActiveWithinOneDay() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Activate,
@@ -199,8 +197,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotActivateIfRemoteIsActiveAfterOneDay()
-	{
+	public void cannotActivateIfRemoteIsActiveAfterOneDay() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Activate,
@@ -209,8 +206,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotActivateIfRemoteIsDeactivatedWithinOneDay()
-	{
+	public void cannotActivateIfRemoteIsDeactivatedWithinOneDay() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Activate,
@@ -219,8 +215,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void canActivateIfRemoteIsDeactivatedAfterOneDay()
-	{
+	public void canActivateIfRemoteIsDeactivatedAfterOneDay() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Activate,
@@ -229,8 +224,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsActiveWithinOneDay()
-	{
+	public void cannotDeactivateIfRemoteIsActiveWithinOneDay() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Deactivate,
@@ -239,8 +233,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsActiveAfterOneDay()
-	{
+	public void cannotDeactivateIfRemoteIsActiveAfterOneDay() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Deactivate,
@@ -249,8 +242,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsDeactivatedWithinOneDay()
-	{
+	public void cannotDeactivateIfRemoteIsDeactivatedWithinOneDay() {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Deactivate,
@@ -259,8 +251,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void cannotDeactivateIfRemoteIsDeactivatedAfterOneDay()
-	{
+	public void cannotDeactivateIfRemoteIsDeactivatedAfterOneDay() {
 		// note that this will actually fail in validateOwner not validateRemote
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
@@ -274,8 +265,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	//region transitive remote harvesting
 
 	@Test
-	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterWithinOneDay()
-	{
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterWithinOneDay() {
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
 				new BlockHeight(1440),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
@@ -288,8 +278,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	//
 	// I'm not sure if we handle such situation properly (obviously importance transfer should not be transitive)
 	@Test
-	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAfterOneDay()
-	{
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAfterOneDay() {
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
 				new BlockHeight(1441),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
@@ -297,8 +286,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	private static void assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
 			final BlockHeight height,
-			final ValidationResult validationResult)
-	{
+			final ValidationResult validationResult) {
 		final TestContext context = new TestContext();
 
 		// - use a dummy transaction to set the state of the remote account
@@ -327,8 +315,7 @@ public class ImportanceTransferTransactionValidatorTest {
 			final ImportanceTransferTransaction.Mode previous,
 			final ImportanceTransferTransaction.Mode mode,
 			final BlockHeight blockHeight,
-			final ValidationResult expectedValidationResult)
-	{
+			final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
