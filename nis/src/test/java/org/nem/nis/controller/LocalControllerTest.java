@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
 
@@ -14,13 +15,13 @@ public class LocalControllerTest {
 	//region shutdown
 
 	@Test
-	public void shutdownDelegatesToCommonStarter() throws InterruptedException {
+	public void shutdownDelegatesToCommonStarter() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
 		context.controller.shutdown();
-		Thread.sleep(500);
+		ExceptionUtils.propagateVoid(() -> Thread.sleep(500));
 
 		// Assert:
 		Mockito.verify(context.starter, Mockito.only()).stopServer();

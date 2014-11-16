@@ -15,6 +15,23 @@ import java.util.Arrays;
 public class BlockExplorerControllerTest {
 
 	@Test
+	public void localBlocksAfterDelegatesToBlockDao() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(14);
+		final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
+		Mockito.when(blockDao.getBlocksAfter(height, BlockChainConstants.BLOCKS_LIMIT))
+				.thenReturn(Arrays.asList());
+		final BlockExplorerController controller = new BlockExplorerController(blockDao);
+
+		// Act:
+		final SerializableList<ExplorerBlockViewModel> blocks = controller.localBlocksAfter(height);
+
+		// Assert:
+		Mockito.verify(blockDao, Mockito.only()).getBlocksAfter(height, BlockChainConstants.BLOCKS_LIMIT);
+		Assert.assertThat(blocks.size(), IsEqual.equalTo(0));
+	}
+
+	@Test
 	public void localBlocksAfterReturnsAppropriateBlocks() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(14);

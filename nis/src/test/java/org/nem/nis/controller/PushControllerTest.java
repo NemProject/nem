@@ -30,7 +30,7 @@ public class PushControllerTest {
 	}
 
 	@Test
-	public void pushTransactionDelegatesToPushServiceForNonTransferTransactions() {
+	public void pushTransactionDelegatesToPushServiceForImportanceTransferTransactions() {
 		// Arrange:
 		final Transaction transaction = new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
