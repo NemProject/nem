@@ -30,6 +30,8 @@ public class BlockValidatorFactory {
 		builder.add(new EligibleSignerBlockValidator(poiFacade));
 		builder.add(new MaxTransactionsBlockValidator());
 		builder.add(new NoSelfSignedTransactionsBlockValidator(poiFacade));
+		builder.add(new BlockImportanceTransferValidator());
+		builder.add(new BlockImportanceTransferBalanceValidator());
 		return builder.build();
 	}
 }

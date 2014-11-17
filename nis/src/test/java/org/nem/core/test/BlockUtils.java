@@ -46,20 +46,6 @@ public class BlockUtils {
 	}
 
 	/**
-	 * Creates a transaction with the specified fee.
-	 *
-	 * @param fee The fee.
-	 * @return The transaction.
-	 */
-	public static MockTransaction createTransactionWithFee(final Amount fee) {
-		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final MockTransaction transaction = new MockTransaction(sender, 7);
-		transaction.setFee(fee);
-		return transaction;
-	}
-
-	/**
 	 * Creates a block with the specified harvester account.
 	 *
 	 * @param harvester The harvester.

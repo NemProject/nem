@@ -31,7 +31,16 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 			return ValidationResult.SUCCESS;
 		}
 
-		return this.validate(context.getBlockHeight(), (ImportanceTransferTransaction)transaction, context.getDebitPredicate());
+		return this.validate((ImportanceTransferTransaction)transaction, context);
+	}
+
+	private ValidationResult validate(final ImportanceTransferTransaction transaction, final ValidationContext context) {
+		final ValidationResult result = this.validateRemote(context.getBlockHeight(), transaction);
+		if (!result.isSuccess()) {
+			return result;
+		}
+
+		return this.validateOwner(context.getBlockHeight(), transaction, context.getDebitPredicate());
 	}
 
 	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
@@ -46,7 +55,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	}
 
-	private ValidationResult validate(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
+	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
 		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
@@ -58,6 +67,23 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 				}
 
+				// ONLY for remote harvesting, so we should probably block any incoming or outgoing transfers, additionally we
+				// shouldn't allow setting an account that already have some balance on it.
+				//
+				// I finally have possible attack vector
+				// (handled by check below, and partially by BlockImportanceTransferBalanceValidator):
+				//   let's say I own account X which is harvesting and has big importance
+				//   user EVIL has small importance and announces remote harvesting, where he gives
+				//       X as his remote account
+				//   this basically cuts off X
+				//
+				// second attack vector, user X announces account Y as his remote
+				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
+				// again this cuts off X from harvesting
+				if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
+				}
+
 				// if a remote is already activated, it needs to be deactivated first
 				return !isRemoteActivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
 
@@ -66,5 +92,33 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// if a remote is already deactivated, it needs to be activated first
 				return !isRemoteDeactivated(remoteLinks) ? ValidationResult.SUCCESS : ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE;
 		}
+	}
+
+	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
+		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
+			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
+		}
+
+		if (!remoteLinks.isRemoteHarvester()) {
+			return ValidationResult.SUCCESS;
+		}
+
+		final Address owner = remoteLinks.getCurrent().getLinkedAddress();
+		if (owner == transaction.getSigner().getAddress()) {
+			// pass it, as rest will be checked in validateOwner
+			return ValidationResult.SUCCESS;
+		}
+
+		final RemoteStatus remoteStatus = remoteLinks.getRemoteStatus(height);
+
+		switch (remoteStatus) {
+			case REMOTE_ACTIVATING:
+			case REMOTE_ACTIVE:
+			case REMOTE_DEACTIVATING:
+				return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED;
+		}
+
+		return ValidationResult.SUCCESS;
 	}
 }

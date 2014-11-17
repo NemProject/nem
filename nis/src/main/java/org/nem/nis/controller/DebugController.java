@@ -3,20 +3,18 @@ package org.nem.nis.controller;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.*;
+import org.nem.core.model.primitive.Amount;
+import org.nem.core.serialization.SerializableList;
 import org.nem.core.utils.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.controller.annotations.PublicApi;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.poi.*;
+import org.nem.nis.poi.ImportanceCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigInteger;
 import java.util.logging.Logger;
 
 /**
@@ -53,6 +51,7 @@ public class DebugController {
 
 	/**
 	 * Debug entry point that can force the node to shut down.
+	 * TODO 20141115 J-*: we should probably remove this before release
 	 *
 	 * @param signature The signature.
 	 * @return The result of the operation.
@@ -87,7 +86,8 @@ public class DebugController {
 	@RequestMapping(value = "/debug/block-info/get", method = RequestMethod.GET)
 	@PublicApi
 	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
-		final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
+		throw new UnsupportedOperationException("Currently not supported");
+		/*final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(
 				new AccountCache(),
 				new PoiFacade(this.importanceCalculator));
@@ -120,7 +120,7 @@ public class DebugController {
 			blockDebugInfo.addTransactionDebugInfo(mapToDebugInfo(transaction));
 		}
 
-		return blockDebugInfo;
+		return blockDebugInfo;*/
 	}
 
 	/**

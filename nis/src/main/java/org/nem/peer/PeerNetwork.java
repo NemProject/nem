@@ -142,7 +142,7 @@ public class PeerNetwork {
 	 * @param entity The entity.
 	 * @return The future.
 	 */
-	public CompletableFuture<Void> broadcast(final NodeApiId broadcastId, final SerializableEntity entity) {
+	public CompletableFuture<Void> broadcast(final NisPeerId broadcastId, final SerializableEntity entity) {
 		return this.servicesFactory.createNodeBroadcaster().broadcast(this.getPartnerNodes(), broadcastId, entity);
 	}
 

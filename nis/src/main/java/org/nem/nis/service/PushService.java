@@ -61,7 +61,7 @@ public class PushService {
 				transaction -> this.checkTransaction(transaction),
 				transaction -> this.unconfirmedTransactions.addNew(transaction),
 				transaction -> {},
-				NodeApiId.REST_PUSH_TRANSACTION,
+				NisPeerId.REST_PUSH_TRANSACTION,
 				identity);
 
 		if (result.isFailure()) {
@@ -90,7 +90,7 @@ public class PushService {
 				obj -> this.blockChain.checkPushedBlock(obj),
 				obj -> this.blockChain.processBlock(obj),
 				block -> LOGGER.info("   block height: " + entity.getHeight()),
-				NodeApiId.REST_PUSH_BLOCK,
+				NisPeerId.REST_PUSH_BLOCK,
 				identity);
 
 		if (result.isFailure()) {
@@ -103,7 +103,7 @@ public class PushService {
 			final Function<T, ValidationResult> isValid,
 			final Function<T, ValidationResult> isAccepted,
 			final Consumer<T> logAdditionalInfo,
-			final NodeApiId broadcastId,
+			final NisPeerId broadcastId,
 			final NodeIdentity identity) {
 		final String message = String.format("   received: %s from %s%s   signer: %s%sverify: %s",
 				entity.getType(),

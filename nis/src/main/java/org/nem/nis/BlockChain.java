@@ -14,8 +14,6 @@ import java.util.logging.Logger;
 public class BlockChain implements BlockSynchronizer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	// TODO 20140920 J-G: started some of the refactoring by pulling stuff out into BlockChainServices (i wouldn't dump everything there), but it think it is a good facade that hides a lot of the helpers from this class
-
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockChainUpdater updater;
 

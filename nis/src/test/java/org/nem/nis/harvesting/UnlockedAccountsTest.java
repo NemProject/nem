@@ -7,7 +7,6 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.*;
-import org.nem.deploy.NisConfiguration;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
@@ -15,6 +14,7 @@ import java.util.*;
 import java.util.stream.*;
 
 public class UnlockedAccountsTest {
+	private static final int MAX_UNLOCKED_ACCOUNTS = 3;
 
 	// region addUnlockedAccount
 
@@ -119,13 +119,7 @@ public class UnlockedAccountsTest {
 	public void canIterateOverAllUnlockedAccounts() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Account> accounts = new ArrayList<>();
-		for (int i = 0; i < 3; ++i) {
-			final Account account = Utils.generateRandomAccount();
-			context.setKnownAddress(account, true);
-			context.setCanForageAtHeight(account, 17, true);
-			accounts.add(account);
-		}
+		final List<Account> accounts = context.createServerLimitPlusOneAccounts();
 
 		// Act: unlock three accounts and then lock the second one
 		context.unlockedAccounts.addUnlockedAccount(accounts.get(0));
@@ -143,55 +137,62 @@ public class UnlockedAccountsTest {
 	//endregion
 
 	//region unlockedLimit
+
 	@Test
-	public void cannotUnlockMoreThanLimitAccounts() {
+	public void canUnlockExactlyMaxUnlockedAccounts() {
+		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Account> accounts = new ArrayList<>();
-		for (int i = 0; i < 4; ++i) {
-			final Account account = Utils.generateRandomAccount();
-			context.setKnownAddress(account, true);
-			context.setCanForageAtHeight(account, 17, true);
-			accounts.add(account);
+		final List<Account> accounts = context.createServerLimitPlusOneAccounts();
+
+		// Assert: MAX_UNLOCKED_ACCOUNTS accounts can be unlocked
+		for (int i = 0; i < MAX_UNLOCKED_ACCOUNTS; ++i) {
+			Assert.assertThat(context.unlockedAccounts.addUnlockedAccount(accounts.get(i)), IsEqual.equalTo(UnlockResult.SUCCESS));
 		}
 
-		// TODO 20141005 J-G comment is wrong :)
-		// > while i am usually against combining Act and Assert
-		// > there might be some benefit to validating the result of every addUnlockedAccount
-		// Act: unlock three accounts and then lock the second one
-		context.unlockedAccounts.addUnlockedAccount(accounts.get(0));
-		context.unlockedAccounts.addUnlockedAccount(accounts.get(1));
-		context.unlockedAccounts.addUnlockedAccount(accounts.get(2));
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(MAX_UNLOCKED_ACCOUNTS));
+	}
+
+	@Test
+	public void cannotUnlockMoreThanMaxUnlockedAccounts() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<Account> accounts = context.createServerLimitPlusOneAccounts();
+
+		// - unlock MAX_UNLOCKED_ACCOUNTS accounts
+		for (int i = 0; i < MAX_UNLOCKED_ACCOUNTS; ++i) {
+			context.unlockedAccounts.addUnlockedAccount(accounts.get(i));
+		}
+
+		// Act: unlock account MAX_UNLOCKED_ACCOUNTS + 1
 		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(accounts.get(3));
 
-		// Assert:
-		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(3));
+		// Assert: the account was not unlocked
+		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(MAX_UNLOCKED_ACCOUNTS));
+		Assert.assertThat(context.unlockedAccounts.isAccountUnlocked(accounts.get(3)), IsEqual.equalTo(false));
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_SERVER_LIMIT));
 	}
 
 	@Test
 	public void canUnlockIfBelowServerLimit() {
+		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Account> accounts = new ArrayList<>();
-		for (int i = 0; i < 4; ++i) {
-			final Account account = Utils.generateRandomAccount();
-			context.setKnownAddress(account, true);
-			context.setCanForageAtHeight(account, 17, true);
-			accounts.add(account);
+		final List<Account> accounts = context.createServerLimitPlusOneAccounts();
+
+		// - unlock MAX_UNLOCKED_ACCOUNTS accounts
+		for (int i = 0; i < MAX_UNLOCKED_ACCOUNTS; ++i) {
+			context.unlockedAccounts.addUnlockedAccount(accounts.get(i));
 		}
 
-		// Act: unlock three accounts and then lock the second one
-		context.unlockedAccounts.addUnlockedAccount(accounts.get(0));
-		context.unlockedAccounts.addUnlockedAccount(accounts.get(1));
-		context.unlockedAccounts.addUnlockedAccount(accounts.get(2));
-
-		// this should fail
+		// unlock account MAX_UNLOCKED_ACCOUNTS + 1 (fails)
 		context.unlockedAccounts.addUnlockedAccount(accounts.get(3));
+
+		// Act: lock the second account and unlock MAX_UNLOCKED_ACCOUNTS + 1 account
 		context.unlockedAccounts.removeUnlockedAccount(accounts.get(2));
-		// this should succeed
 		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(accounts.get(3));
 
-		// Assert:
+		// Assert: the account was unlocked
 		Assert.assertThat(context.unlockedAccounts.size(), IsEqual.equalTo(3));
+		Assert.assertThat(context.unlockedAccounts.isAccountUnlocked(accounts.get(3)), IsEqual.equalTo(true));
 		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.SUCCESS));
 	}
 
@@ -202,18 +203,12 @@ public class UnlockedAccountsTest {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final CanHarvestPredicate canHarvestPredicate = Mockito.mock(CanHarvestPredicate.class);
-		private final NisConfiguration nisConfiguration = Mockito.mock(NisConfiguration.class);
 		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(
 				this.accountLookup,
 				this.poiFacade,
 				this.lastBlockLayer,
 				this.canHarvestPredicate,
-				this.nisConfiguration);
-
-		public TestContext() {
-			// TODO 20141005 J-G can you use a class constant for 3 e.g. TEST_SERVER_LIMIT ... i think it will make the tests a little clearer
-			Mockito.when(this.nisConfiguration.getUnlockedLimit()).thenReturn(3);
-		}
+				MAX_UNLOCKED_ACCOUNTS);
 
 		private void setKnownAddress(final Account account, final boolean isKnown) {
 			Mockito.when(this.accountLookup.isKnownAddress(account.getAddress())).thenReturn(isKnown);
@@ -227,6 +222,18 @@ public class UnlockedAccountsTest {
 			Mockito.when(this.poiFacade.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
 
 			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, new BlockHeight(lastBlockHeight))).thenReturn(canForage);
+		}
+
+		private List<Account> createServerLimitPlusOneAccounts() {
+			final List<Account> accounts = new ArrayList<>();
+			for (int i = 0; i < MAX_UNLOCKED_ACCOUNTS + 1; ++i) {
+				final Account account = Utils.generateRandomAccount();
+				this.setKnownAddress(account, true);
+				this.setCanForageAtHeight(account, 17, true);
+				accounts.add(account);
+			}
+
+			return accounts;
 		}
 
 		private void assertIsKnownAddressDelegation(final Account account) {

@@ -77,18 +77,22 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 * @param amount The unvested balance.
 	 */
 
-	// TODO: rename to send
 	public WeightedBalance createSend(final BlockHeight blockHeight, final Amount amount) {
 		final Amount balance = this.balance.subtract(amount);
 		final double ratio = (double)this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);
 		final long sendUv = (long)(ratio * amount.getNumMicroNem());
 		// TODO: this probably can hit negative, which probably won't do us anything good
-		final long unvested = this.unvestedBalance - sendUv;
-		final long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
+		// TODO 20141114 BR : sooooooo true!
+		long unvested = this.unvestedBalance - sendUv;
+		long vested = this.vestedBalance - (amount.getNumMicroNem() - sendUv);
+		if (0 > vested) {
+			// must be a rounding error: too much vested is send.
+			unvested += vested;
+			vested = 0;
+		}
 		return new WeightedBalance(amount, blockHeight, balance, unvested, vested);
 	}
 
-	// TODO: rename to receive
 	public WeightedBalance createReceive(final BlockHeight blockHeight, final Amount amount) {
 		final Amount balance = this.balance.add(amount);
 		final long unvested = this.unvestedBalance + amount.getNumMicroNem();

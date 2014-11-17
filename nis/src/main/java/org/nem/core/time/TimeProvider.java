@@ -1,5 +1,6 @@
 package org.nem.core.time;
 
+// TODO 20141112 J-B: i think i would prefer to move these dependencies into this (core.time) package
 import org.nem.core.model.primitive.*;
 import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 
@@ -21,11 +22,6 @@ public interface TimeProvider {
 	 * @return The current time.
 	 */
 	public TimeInstant getCurrentTime();
-
-	// TODO 20140909 J-B i'm not sure i like this, but i need to give it a little more thought
-	// i guess the reason for networktimestamp is for more fine-grained ms resolution?
-	// TODO 20140910 BR -> J: yes, the time synchronization should operate on ms basis. Most adjustments will be much smaller than 1 second.
-	// TODO 20140910          It also let's us detect a slow shift in time easier.
 
 	/**
 	 * Gets the network time in ms.

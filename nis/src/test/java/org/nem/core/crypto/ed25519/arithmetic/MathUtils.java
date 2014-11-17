@@ -519,7 +519,9 @@ public class MathUtils {
 		return new Signature(R.encode().getRaw(), toByteArray(S));
 	}
 
-	// Start TODO BR: Remove when finished!
+	/**
+	 * Simple test for verifying that the MathUtils code works as expected.
+	 */
 	@Test
 	public void mathUtilsWorkAsExpected() {
 		final Ed25519GroupElement neutral = Ed25519GroupElement.p3(
@@ -575,5 +577,4 @@ public class MathUtils {
 			Assert.assertThat(Ed25519Group.ZERO_P3, IsEqual.equalTo(h));
 		}
 	}
-	// End TODO BR: Remove when finished!
 }

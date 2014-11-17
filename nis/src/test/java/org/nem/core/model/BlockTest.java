@@ -2,12 +2,13 @@ package org.nem.core.model;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class BlockTest {
@@ -349,6 +350,66 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(103L)));
+	}
+
+	//endregion
+
+	//region equals / hashCode
+
+	private static final Account DEFAULT_ACCOUNT = Utils.generateRandomAccount();
+
+	private static final Map<String, Block> DESC_TO_BLOCK_MAP = new HashMap<String, Block>() {
+		{
+			final Block defaultBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(3));
+			defaultBlock.sign();
+			this.put("default", defaultBlock);
+
+			final Block diffSignatureBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(3));
+			diffSignatureBlock.setSignature(new Signature(BigInteger.ONE, BigInteger.ONE));
+			this.put("diff-signature", diffSignatureBlock);
+
+			final Block diffHeightBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(4));
+			diffHeightBlock.sign();
+			this.put("diff-height", diffHeightBlock);
+
+			final Block diffHashBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(6), new BlockHeight(3));
+			diffHeightBlock.sign();
+			this.put("diff-hash", diffHashBlock);
+
+			final Block nullSignatureBlock = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(3));
+			this.put("null-signature", nullSignatureBlock);
+		}
+	};
+
+	@Test
+	public void equalsOnlyReturnsTrueForEquivalentObjects() {
+		// Arrange:
+		final Block block = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(3));
+		block.sign();
+
+		// Assert:
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("default"), IsEqual.equalTo(block));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature"), IsNot.not(IsEqual.equalTo(block)));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height"), IsNot.not(IsEqual.equalTo(block)));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash"), IsNot.not(IsEqual.equalTo(block)));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature"), IsNot.not(IsEqual.equalTo(block)));
+		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(block)));
+		Assert.assertThat(DEFAULT_ACCOUNT, IsNot.not(IsEqual.equalTo((Object)block)));
+	}
+
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final Block block = new Block(DEFAULT_ACCOUNT, Hash.ZERO, Hash.ZERO, new TimeInstant(7), new BlockHeight(3));
+		block.sign();
+		final int hashCode = block.hashCode();
+
+		// Assert:
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("default").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-signature").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-height").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("diff-hash").hashCode(), IsEqual.equalTo(hashCode));
+		Assert.assertThat(DESC_TO_BLOCK_MAP.get("null-signature").hashCode(), IsEqual.equalTo(hashCode));
 	}
 
 	//endregion
