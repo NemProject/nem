@@ -48,6 +48,6 @@ public interface PeerConnector {
 	 */
 	public CompletableFuture announce(
 			final Node node,
-			final NodeApiId announceId,
+			final NisPeerId announceId,
 			final SerializableEntity entity);
 }

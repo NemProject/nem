@@ -4,7 +4,6 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.deploy.NisConfiguration;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +18,21 @@ public class UnlockedAccounts implements Iterable<Account> {
 	private final PoiFacade poiFacade;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final CanHarvestPredicate canHarvestPredicate;
-	private final NisConfiguration nisConfiguration;
+	private final int maxUnlockedAccounts;
 	private final ConcurrentHashSet<Account> unlocked;
 
-	// TODO 20141005 J-G: do we expect the configuration to be "live" (in that changes take effect without restarting NIS)?
-	// > if not, i would prefer to just pass in the limit as an int
 	@Autowired(required = true)
 	public UnlockedAccounts(
 			final AccountLookup accountLookup,
 			final PoiFacade poiFacade,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final CanHarvestPredicate canHarvestPredicate,
-			final NisConfiguration nisConfiguration) {
+			final int maxUnlockedAccounts) {
 		this.accountLookup = accountLookup;
 		this.poiFacade = poiFacade;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.canHarvestPredicate = canHarvestPredicate;
-		this.nisConfiguration = nisConfiguration;
+		this.maxUnlockedAccounts = maxUnlockedAccounts;
 		this.unlocked = new ConcurrentHashSet<>();
 	}
 
@@ -45,7 +42,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	 * @param account The account.
 	 */
 	public UnlockResult addUnlockedAccount(final Account account) {
-		if (this.unlocked.size() == this.nisConfiguration.getUnlockedLimit()) {
+		if (this.unlocked.size() == this.maxUnlockedAccounts) {
 			return UnlockResult.FAILURE_SERVER_LIMIT;
 		}
 

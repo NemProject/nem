@@ -53,7 +53,8 @@ public class BlockChainContextFactory {
 	 * @param dbParentBlock The parent block (from the database).
 	 * @param peerChain The peer chain.
 	 * @param localScore The local chain score.
-	 * @param hasOwnChain TODO 20141103 description ???.
+	 * @param hasOwnChain true if the peer chain is inconsistent with the local chain
+	 * (i.e. if the peer chain is accepted, parts of the local chain will need to be rolled back).
 	 */
 	public BlockChainUpdateContext createUpdateContext(
 			final BlockChainSyncContext syncContext,

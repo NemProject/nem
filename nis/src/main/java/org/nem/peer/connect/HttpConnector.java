@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 import org.nem.peer.node.*;
 
@@ -35,13 +36,13 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 
 	@Override
 	public CompletableFuture<Node> getInfo(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_INFO);
+		final URL url = getUrl(node, NisPeerId.REST_NODE_INFO);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new Node(obj));
 	}
 
 	@Override
 	public CompletableFuture<SerializableList<Node>> getKnownPeers(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_PEER_LIST_ACTIVE);
+		final URL url = getUrl(node, NisPeerId.REST_NODE_PEER_LIST_ACTIVE);
 		return this.postAuthenticated(url, node.getIdentity(), d -> new SerializableList<>(d, obj -> new Node(obj)));
 	}
 
@@ -49,16 +50,16 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	public CompletableFuture<NodeEndpoint> getLocalNodeInfo(
 			final Node node,
 			final NodeEndpoint localEndpoint) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_NODE_CAN_YOU_SEE_ME);
+		final URL url = getUrl(node, NisPeerId.REST_NODE_CAN_YOU_SEE_ME);
 		return this.post(url, localEndpoint).thenApply(obj -> new NodeEndpoint(obj));
 	}
 
 	@Override
 	public CompletableFuture announce(
 			final Node node,
-			final NodeApiId announceId,
+			final NisPeerId announceId,
 			final SerializableEntity entity) {
-		final URL url = node.getEndpoint().getApiUrl(announceId);
+		final URL url = getUrl(node, announceId);
 		return this.postVoidAsync(url, entity);
 	}
 
@@ -68,19 +69,19 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 
 	@Override
 	public Block getLastBlock(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_LAST_BLOCK);
+		final URL url = getUrl(node, NisPeerId.REST_CHAIN_LAST_BLOCK);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj)).join();
 	}
 
 	@Override
 	public Block getBlockAt(final Node node, final BlockHeight height) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_BLOCK_AT);
+		final URL url = getUrl(node, NisPeerId.REST_BLOCK_AT);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> BlockFactory.VERIFIABLE.deserialize(obj), height).join();
 	}
 
 	@Override
 	public Collection<Block> getChainAfter(final Node node, final BlockHeight height) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_BLOCKS_AFTER);
+		final URL url = getUrl(node, NisPeerId.REST_CHAIN_BLOCKS_AFTER);
 		return this.postAuthenticated(
 				url,
 				node.getIdentity(),
@@ -90,19 +91,19 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 
 	@Override
 	public HashChain getHashesFrom(final Node node, final BlockHeight height) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_HASHES_FROM);
+		final URL url = getUrl(node, NisPeerId.REST_CHAIN_HASHES_FROM);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new HashChain(obj), height).join();
 	}
 
 	@Override
 	public BlockChainScore getChainScore(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_SCORE);
+		final URL url = getUrl(node, NisPeerId.REST_CHAIN_SCORE);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new BlockChainScore(obj)).join();
 	}
 
 	@Override
 	public Collection<Transaction> getUnconfirmedTransactions(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TRANSACTIONS_UNCONFIRMED);
+		final URL url = getUrl(node, NisPeerId.REST_TRANSACTIONS_UNCONFIRMED);
 		return this.postAuthenticated(
 				url,
 				node.getIdentity(),
@@ -111,7 +112,7 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 
 	@Override
 	public CompletableFuture<BlockHeight> getChainHeightAsync(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_CHAIN_HEIGHT);
+		final URL url = getUrl(node, NisPeerId.REST_CHAIN_HEIGHT);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new BlockHeight(obj));
 	}
 
@@ -120,11 +121,15 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	// region TimeSynchronizationConnector
 
 	public CompletableFuture<CommunicationTimeStamps> getCommunicationTimeStamps(final Node node) {
-		final URL url = node.getEndpoint().getApiUrl(NodeApiId.REST_TIME_SYNC_NETWORK_TIME);
+		final URL url = getUrl(node, NisPeerId.REST_TIME_SYNC_NETWORK_TIME);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new CommunicationTimeStamps(obj));
 	}
 
 	//endregion
+
+	private static URL getUrl(final Node node, final NisPeerId id) {
+		return ExceptionUtils.propagate(() -> new URL(node.getEndpoint().getBaseUrl(), id.toString()));
+	}
 
 	private CompletableFuture<Deserializer> post(final URL url, final SerializableEntity entity) {
 		return this.communicator.post(url, entity);

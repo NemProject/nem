@@ -14,7 +14,6 @@ public class ComparisonResult {
 
 	/**
 	 * Possible comparison end states.
-	 * TODO: this is probably too fine-grained and can be generalized.
 	 */
 	public enum Code {
 		/**

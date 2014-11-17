@@ -14,7 +14,6 @@ import java.util.*;
  * The forger proof is the signature.
  */
 public class Block extends VerifiableEntity {
-
 	private final static int BLOCK_VERSION = 1;
 
 	private final BlockHeight height;
@@ -230,6 +229,23 @@ public class Block extends VerifiableEntity {
 		BlockHeight.writeTo(serializer, "height", this.height);
 
 		serializer.writeObjectArray("transactions", this.transactions);
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.valueOf(this.height.getRaw()).intValue();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof Block)) {
+			return false;
+		}
+
+		final Block rhs = (Block)obj;
+		return this.getHeight().equals(rhs.getHeight()) &&
+				Objects.equals(this.getSignature(), rhs.getSignature()) &&
+				HashUtils.calculateHash(this).equals(HashUtils.calculateHash(rhs));
 	}
 
 	@Override

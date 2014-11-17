@@ -93,19 +93,24 @@ public enum ValidationResult {
 	FAILURE_SELF_SIGNED_TRANSACTION(16),
 
 	/**
-	 * Validation failed because previous importance transfer is in progress.
+	 * Validation failed because remote harvesting account has non-zero balance.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS(17),
+	FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE(17),
 
 	/**
-	 * Validation failed because importance transfer activation was attempted while previous one is active.
+	 * Validation failed because previous importance transfer change is in progress.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED(18),
+	FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS(18),
 
 	/**
-	 * Validation failed because importance transfer deactivation was attempted but is not active.
+	 * Validation failed because importance transfer activation was attempted while already activated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(19);
+	FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED(19),
+
+	/**
+	 * Validation failed because importance transfer deactivation was attempted while already deactivated.
+	 */
+	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20);
 
 	private final int value;
 

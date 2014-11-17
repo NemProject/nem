@@ -227,7 +227,7 @@ public class NisAppConfig {
 				this.poiFacade(),
 				this.blockChainLastBlockLayer,
 				this.canHarvestPredicate(),
-				this.nisConfiguration());
+				this.nisConfiguration().getUnlockedLimit());
 	}
 
 	@Bean
@@ -310,5 +310,10 @@ public class NisAppConfig {
 	@Bean
 	public ChainServices chainServices() {
 		return new ChainServices(this.blockChainLastBlockLayer, this.httpConnectorPool());
+	}
+
+	@Bean
+	public CommonStarter commonStarter() {
+		return CommonStarter.INSTANCE;
 	}
 }

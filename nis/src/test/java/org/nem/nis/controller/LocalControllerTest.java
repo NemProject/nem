@@ -3,13 +3,51 @@ package org.nem.nis.controller;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
+import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
-import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.peer.PeerNetwork;
 
 public class LocalControllerTest {
+
+	//region shutdown
+
+	@Test
+	public void shutdownDelegatesToCommonStarter() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.controller.shutdown();
+		ExceptionUtils.propagateVoid(() -> Thread.sleep(500));
+
+		// Assert:
+		Mockito.verify(context.starter, Mockito.only()).stopServer();
+	}
+
+	//endregion
+
+	//region heartbeat
+
+	@Test
+	public void heartbeatReturnsCorrectResult() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final NemRequestResult result = context.controller.heartbeat();
+
+		// Assert:
+		Assert.assertThat(result.getCode(), IsEqual.equalTo(NemRequestResult.CODE_SUCCESS));
+		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_HEARTBEAT));
+		Assert.assertThat(result.getMessage(), IsEqual.equalTo("ok"));
+	}
+
+	//endregion
+
+	//region status
 
 	@Test
 	public void statusReturnsStatusRunningWhenNetworkIsNotBootedAndNotBooting() {
@@ -74,14 +112,16 @@ public class LocalControllerTest {
 		Assert.assertThat(result.getMessage(), IsEqual.equalTo("status"));
 	}
 
+	//endregion
+
 	private class TestContext {
-		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
 		private final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 		private final PeerNetwork network = Mockito.mock(PeerNetwork.class);
+		private final CommonStarter starter = Mockito.mock(CommonStarter.class);
 		private final LocalController controller;
 
 		private TestContext() {
-			this.controller = new LocalController(this.blockDao, this.host);
+			this.controller = new LocalController(this.host, this.starter);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 		}
 	}

@@ -59,6 +59,22 @@ public class ImportanceTransferTransactionValidatorTest {
 
 	//endregion
 
+	//region recipient balance
+	@Test
+	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		((ImportanceTransferTransaction)transaction).getRemote().incrementBalance(Amount.fromNem(1));
+
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE));
+	}
+	//endregion
+
 	//region one day after opposite link
 
 	@Test
@@ -82,8 +98,9 @@ public class ImportanceTransferTransactionValidatorTest {
 			final ImportanceTransferTransaction.Mode newLink) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction(newLink);
-		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, initialLink);
+		final ImportanceTransferTransaction transaction = context.createTransaction(newLink);
+		context.setLessorRemoteState(transaction, BlockHeight.ONE, initialLink);
+		context.setLesseeRemoteState(transaction, BlockHeight.ONE, initialLink);
 
 		// Act:
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(1441)));
@@ -120,8 +137,9 @@ public class ImportanceTransferTransactionValidatorTest {
 			final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction(newLink);
-		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, initialLink);
+		final ImportanceTransferTransaction transaction = context.createTransaction(newLink);
+		context.setLessorRemoteState(transaction, BlockHeight.ONE, initialLink);
+		context.setLesseeRemoteState(transaction, BlockHeight.ONE, initialLink);
 
 		// Act:
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(1440)));
@@ -155,11 +173,161 @@ public class ImportanceTransferTransactionValidatorTest {
 			final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction(mode);
-		context.setRemoteState(transaction.getSigner(), BlockHeight.ONE, mode);
+		final ImportanceTransferTransaction transaction = context.createTransaction(mode);
+		context.setLessorRemoteState(transaction, BlockHeight.ONE, mode);
+		context.setLesseeRemoteState(transaction, BlockHeight.ONE, mode);
 
 		// Act:
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(2882)));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
+	}
+
+	//endregion
+
+	//region remote is already occupied
+	@Test
+	public void cannotActivateIfRemoteIsActiveWithinOneDay() {
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferTransaction.Mode.Activate,
+				new BlockHeight(1440),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
+	}
+
+	@Test
+	public void cannotActivateIfRemoteIsActiveAfterOneDay() {
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferTransaction.Mode.Activate,
+				new BlockHeight(1441),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
+	}
+
+	@Test
+	public void cannotActivateIfRemoteIsDeactivatedWithinOneDay() {
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ImportanceTransferTransaction.Mode.Activate,
+				new BlockHeight(1440),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
+	}
+
+	@Test
+	public void canActivateIfRemoteIsDeactivatedAfterOneDay() {
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ImportanceTransferTransaction.Mode.Activate,
+				new BlockHeight(1441),
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void cannotDeactivateIfRemoteIsActiveWithinOneDay() {
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferTransaction.Mode.Deactivate,
+				new BlockHeight(1440),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
+	}
+
+	@Test
+	public void cannotDeactivateIfRemoteIsActiveAfterOneDay() {
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Activate,
+				ImportanceTransferTransaction.Mode.Deactivate,
+				new BlockHeight(1441),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
+	}
+
+	@Test
+	public void cannotDeactivateIfRemoteIsDeactivatedWithinOneDay() {
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ImportanceTransferTransaction.Mode.Deactivate,
+				new BlockHeight(1440),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
+	}
+
+	@Test
+	public void cannotDeactivateIfRemoteIsDeactivatedAfterOneDay() {
+		// note that this will actually fail in validateOwner not validateRemote
+		assertRemoteIsOccupiedTest(
+				ImportanceTransferTransaction.Mode.Deactivate,
+				ImportanceTransferTransaction.Mode.Deactivate,
+				new BlockHeight(1441),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
+	}
+
+	//endregion
+
+	//region transitive remote harvesting
+
+	@Test
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterWithinOneDay() {
+		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
+				new BlockHeight(1440),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
+	}
+
+	// two following tests, are testing following scenario
+	// 1) A importance transfer to X
+	// 2) send some nems to X
+	// 3) X importance transfer to Y
+	//
+	// I'm not sure if we handle such situation properly (obviously importance transfer should not be transitive)
+	@Test
+	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAfterOneDay() {
+		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
+				new BlockHeight(1441),
+				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
+	}
+
+	private static void assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
+			final BlockHeight height,
+			final ValidationResult validationResult) {
+		final TestContext context = new TestContext();
+
+		// - use a dummy transaction to set the state of the remote account
+		final ImportanceTransferTransaction dummy = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		context.setLesseeRemoteState(dummy, BlockHeight.ONE, ImportanceTransferTransaction.Mode.Activate);
+
+		// - create another transaction around the dummy remote account set up previously
+		final Account furtherRemote = Utils.generateRandomAccount();
+		final Account remote = dummy.getRemote();
+		final Transaction transaction = new ImportanceTransferTransaction(
+				TimeInstant.ZERO,
+				remote,
+				ImportanceTransferTransaction.Mode.Activate,
+				furtherRemote);
+		context.addRemoteLinks(furtherRemote);
+		remote.incrementBalance(Amount.fromNem(2001));
+
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(height));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(validationResult));
+	}
+
+	private static void assertRemoteIsOccupiedTest(
+			final ImportanceTransferTransaction.Mode previous,
+			final ImportanceTransferTransaction.Mode mode,
+			final BlockHeight blockHeight,
+			final ValidationResult expectedValidationResult) {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// - use a dummy transaction to set the state of the remote account
+		final ImportanceTransferTransaction dummy = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		context.setLesseeRemoteState(dummy, BlockHeight.ONE, previous);
+
+		// - create another transaction around the dummy remote account set up previously
+		final Transaction transaction = context.createTransactionWithRemote(dummy.getRemote(), mode);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
@@ -192,15 +360,17 @@ public class ImportanceTransferTransactionValidatorTest {
 				this.poiFacade,
 				Amount.fromNem(2000));
 
-		private Transaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
+		private ImportanceTransferTransaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
 			final Account signer = Utils.generateRandomAccount();
+			final Account remote = Utils.generateRandomAccount();
 			signer.incrementBalance(Amount.fromNem(2001));
 			this.addRemoteLinks(signer);
+			this.addRemoteLinks(remote);
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,
 					signer,
 					mode,
-					Utils.generateRandomAccount());
+					remote);
 		}
 
 		private void addRemoteLinks(final Account account) {
@@ -210,9 +380,28 @@ public class ImportanceTransferTransactionValidatorTest {
 					.thenReturn(state);
 		}
 
-		private void setRemoteState(final Account account, final BlockHeight height, final ImportanceTransferTransaction.Mode mode) {
-			final RemoteLink link = new RemoteLink(account.getAddress(), height, mode.value(), RemoteLink.Owner.HarvestingRemotely);
-			this.poiFacade.findStateByAddress(account.getAddress()).getRemoteLinks().addLink(link);
+		private void setLessorRemoteState(final ImportanceTransferTransaction account, final BlockHeight height, final ImportanceTransferTransaction.Mode mode) {
+			final Address sender = account.getSigner().getAddress();
+			final Address remote = account.getRemote().getAddress();
+			final RemoteLink link = new RemoteLink(remote, height, mode.value(), RemoteLink.Owner.HarvestingRemotely);
+			this.poiFacade.findStateByAddress(sender).getRemoteLinks().addLink(link);
+		}
+
+		private void setLesseeRemoteState(final ImportanceTransferTransaction account, final BlockHeight height, final ImportanceTransferTransaction.Mode mode) {
+			final Address sender = account.getSigner().getAddress();
+			final Address remote = account.getRemote().getAddress();
+			final RemoteLink link = new RemoteLink(sender, height, mode.value(), RemoteLink.Owner.RemoteHarvester);
+			this.poiFacade.findStateByAddress(remote).getRemoteLinks().addLink(link);
+		}
+
+		public ImportanceTransferTransaction createTransactionWithRemote(final Account remote, final ImportanceTransferTransaction.Mode mode) {
+			final Account signer = Utils.generateRandomAccount(Amount.fromNem(2001));
+			this.addRemoteLinks(signer);
+			return new ImportanceTransferTransaction(
+					TimeInstant.ZERO,
+					signer,
+					mode,
+					remote);
 		}
 	}
 }

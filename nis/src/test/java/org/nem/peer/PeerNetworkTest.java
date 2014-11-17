@@ -174,7 +174,7 @@ public class PeerNetworkTest {
 		Mockito.when(context.servicesFactory.createNodeBroadcaster()).thenReturn(broadcaster);
 
 		// Act:
-		context.network.broadcast(NodeApiId.REST_PUSH_BLOCK, new MockSerializableEntity()).join();
+		context.network.broadcast(NisPeerId.REST_PUSH_BLOCK, new MockSerializableEntity()).join();
 
 		// Assert:
 		Mockito.verify(context.servicesFactory, Mockito.times(1)).createNodeBroadcaster();

@@ -51,6 +51,7 @@ public class DebugController {
 
 	/**
 	 * Debug entry point that can force the node to shut down.
+	 * TODO 20141115 J-*: we should probably remove this before release
 	 *
 	 * @param signature The signature.
 	 * @return The result of the operation.
@@ -85,7 +86,7 @@ public class DebugController {
 	@RequestMapping(value = "/debug/block-info/get", method = RequestMethod.GET)
 	@PublicApi
 	public BlockDebugInfo blockDebugInfo(@RequestParam(value = "height") final String height) {
-		throw new RuntimeException("Currently not supported");
+		throw new UnsupportedOperationException("Currently not supported");
 		/*final BlockHeight blockHeight = new BlockHeight(Long.parseLong(height));
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(
 				new AccountCache(),

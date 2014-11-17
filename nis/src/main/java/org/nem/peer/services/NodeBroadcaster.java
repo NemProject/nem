@@ -34,7 +34,7 @@ public class NodeBroadcaster {
 	 */
 	public CompletableFuture<Void> broadcast(
 			final Collection<Node> partnerNodes,
-			final NodeApiId broadcastId,
+			final NisPeerId broadcastId,
 			final SerializableEntity entity) {
 
 		final List<CompletableFuture> futures = partnerNodes.stream()

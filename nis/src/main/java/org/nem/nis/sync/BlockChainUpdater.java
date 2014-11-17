@@ -99,8 +99,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		//region revert TXes inside contemporaryAccountAnalyzer
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		if (!result.areChainsConsistent()) {
-			LOGGER.info("synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (" +
-					(this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
+			LOGGER.info(String.format(
+					"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
+					this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 		}
 		//endregion
@@ -109,6 +110,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
 		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
+		//endregion
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
@@ -169,8 +171,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
 		if (this.blockDao.findByHeight(new BlockHeight(dbParent.getHeight() + 1)) != null) {
-			LOGGER.info("processBlock -> chain inconsistent: calling undoTxesAndGetScore() (" +
-					(this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()) + " blocks).");
+			LOGGER.info(String.format(
+					"processBlock -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
+					this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 
@@ -194,17 +197,10 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
-		// TODO 20140927 J-G not sure if we still need this here since the previous block is also set by the block chain validator
-		fixGenerationHash(block, parent);
-
 		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
 		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
 		final Account lessor = this.accountAnalyzer.getAccountCache().findByAddress(state.getAddress());
 		block.setLessor(lessor);
-	}
-
-	private static void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
-		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
 	//endregion

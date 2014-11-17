@@ -74,45 +74,35 @@ public class UnconfirmedTransactionsTest {
 	//region add[Batch/New/Existing]
 
 	@Test
-	public void addNewBatchReturnsSuccessIfAtLeastOneTransactionCanBeSuccessfullyAdded() {
+	public void addNewBatchReturnsSuccessIfAllTransactionsCanBeSuccessfullyAdded() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
 
 		// Act:
-		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(10));
-		final ValidationResult result = context.transactions.addNewBatch(Arrays.asList(transaction, transaction));
+		final ValidationResult result = context.transactions.addNewBatch(createMockTransactionsAsBatch(1, 2));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(2));
 	}
 
 	@Test
-	public void addNewBatchReturnsNeutralIfNoTransactionCanBeSuccessfullyAdded() {
-		// TODO 20141104 J-B: why not failure?
-		// TODO 20141105 BR -> J: which FAILURE should be returned? In a batch there could be many different failures.
-		// TODO                   You don't want to stop if one transaction fails once the batch validation succeeded or do you?
-		// TODO 20141106 J-B: 'You don't want to stop if one transaction fails' - right now it just feels inconsistent since
-		// > we stop if one transaction in the batch fails batch validation but not if one fails regular validation
-		// > however, this is moot since we aren't actually checking the result :)
-		// TODO 20141107 BR -> J: Not moot, just a question if an attack vector is possible, see comments in UnconfirmedTransactions class.
-		// TODO 20141107 J-B: well, moot now because BlockChain is not checking the result ;)
-		// TODO 20141108 BR -> J: even if we don't check the result, failing on the first invalid transaction is faster than checking
-		// // TODO                10k invalid transactions that an attacker sends. That's why I was asking about the attack scenario.
-
+	public void addNewBatchShortCircuitsAndReturnsFailureIfAnyTransactionFailsSingleValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.setSingleValidationResult(ValidationResult.FAILURE_FUTURE_DEADLINE);
-		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
+		Mockito.when(context.singleValidator.validate(Mockito.any(), Mockito.any())).thenReturn(
+				ValidationResult.SUCCESS,
+				ValidationResult.FAILURE_FUTURE_DEADLINE,
+				ValidationResult.SUCCESS,
+				ValidationResult.FAILURE_ENTITY_UNUSABLE);
 
 		// Act:
-		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(40));
-		final ValidationResult result = context.transactions.addNewBatch(Arrays.asList(transaction, transaction));
+		final ValidationResult result = context.transactions.addNewBatch(createMockTransactionsAsBatch(1, 4));
 
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(0));
+		// Assert: only first transaction was added and validation stopped after the first failure
+		Mockito.verify(context.singleValidator, Mockito.times(2)).validate(Mockito.any(), Mockito.any());
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -919,33 +909,6 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
-	// TODO 20140923 J-G: so, what benefits do we get checking by checking the unconfirmed balances?
-	// TODO 20140924 G-J well, not sure if that's gonna answer your question
-	// let's assume S has 10, and he makes two distinct TXes with amount of 7
-	// because we execute first TX unconfirmed balance is changed, and second one won't be added
-	// to unconfirmed TXes at all.
-	//
-	// If it WOULD be added, there's a chance, someone could hang whole network (I think we had such
-	// bug somewhere in the beginning)
-	// Let's say both TXes have been added, now harvester would fail to generate a block (as long as deadline haven't passed)
-	// If attacker would send those two TXes to whole network, he'd basically stop whole harvesting
-	// TODO 20140926 J-G how would he stop the whole network; when re-validating against confirmed balance only one would be chosen?
-
-	// TODO 20141106 J-G,B: while we're here can you answer my question ;)?
-	// TODO 20141107 BR -> J: the term ValidateAgainstConfirmedBalance is misleading, it means that the transaction is not executed during add().
-	// TODO                   There is no check against a confirmed balance.
-	// TODO                   So the above is valid and a harvester would create a block that doesn't pass processBlock().
-	// TODO 20141107 J-G: BR - when execute is true, i guess by "hang the network" you mean flood the network with bogus transactions?
-	// > BR - the confirmed balance check was moved into the single validator ...
-	// > look at these tests (1) transactionIsExcludedFromNextBlockIfConfirmedBalanceIsInsufficient
-	// > (2) getTransactionsForNewBlockExcludesConflictingTransactions (which would fail without it)
-	// TODO 20141108 BR -> J: you are right, the conflicting transactions would be excluded when generating a block.
-	// TODO                   But I finally remember why we have this check:
-	// TODO                   A user (I think it was VicVegas) complained that if the GUI shows a balance of 1k NEM he can initiate many
-	// TODO                   transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
-	// TODO                   can spend more than he has. Furthermore, a new block included one of the transactions leaving the
-	// TODO                   the other transaction still being displayed as unconfirmed in the GUI forever (until deadline was exceeded).
-	// TODO 20141110 G -> J: does this require any more comments?
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
 		// Arrange:
@@ -995,6 +958,10 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		return transactions;
+	}
+
+	private static Collection<Transaction> createMockTransactionsAsBatch(final int startCustomField, final int endCustomField) {
+		return createMockTransactions(startCustomField, endCustomField).stream().collect(Collectors.toList());
 	}
 
 	private static List<MockTransaction> addMockTransactions(
