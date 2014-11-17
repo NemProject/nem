@@ -342,10 +342,7 @@ public abstract class ScanGraphClusteringTest {
      */
     @Test
     public void complexGraphIsMergedAsExpected() {
-        //TODO: M-M: update this description!
-        // Arrange: { 0, 1, 2, 3 } form clusters;
-        // 4 is an outlier connected to the cluster
-        // 5 is an outlier connected to (4) and the cluster (twice)
+        // Arrange: { 0, 1, 2, 3 } form a single cluster (this requires a merge of two clusters in the FastScanClusteringStrategy)
         final TestContext context = new TestContext(this.createClusteringStrategy(), 9);
         
         context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4, 8));
