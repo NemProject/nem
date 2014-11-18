@@ -10,6 +10,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.controller.requests.AccountIdBuilder;
 import org.nem.nis.harvesting.*;
+import org.nem.nis.poi.*;
 import org.nem.nis.service.*;
 
 import java.util.*;
@@ -200,6 +201,7 @@ public class AccountInfoControllerTest {
 		private final List<Transaction> filteredTransactions = new ArrayList<>();
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 
 		public TestContext() {
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
@@ -212,7 +214,8 @@ public class AccountInfoControllerTest {
 					this.unlockedAccounts,
 					unconfirmedTransactions,
 					this.blockChainLastBlockLayer,
-					this.accountInfoFactory);
+					this.accountInfoFactory,
+					this.poiFacade);
 		}
 
 		private AccountIdBuilder getBuilder() {
@@ -221,15 +224,44 @@ public class AccountInfoControllerTest {
 			return builder;
 		}
 
-		private void setRemoteStatus(final AccountRemoteStatus remoteStatus, final long blockHeight) {
+		private void setRemoteStatus(final AccountRemoteStatus accountRemoteStatus, final long blockHeight) {
 			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(blockHeight);
-			Mockito.when(this.accountInfoFactory.getRemoteStatus(this.address, new BlockHeight(blockHeight)))
-					.thenReturn(remoteStatus);
+
+			final RemoteLinks remoteLinks = Mockito.mock(RemoteLinks.class);
+			Mockito.when(remoteLinks.getRemoteStatus(new BlockHeight(blockHeight)))
+					.thenReturn(getRemoteStatus(accountRemoteStatus));
+
+			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			Mockito.when(accountState.getRemoteLinks()).thenReturn(remoteLinks);
+
+			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(accountState);
+		}
+
+		private static RemoteStatus getRemoteStatus(final AccountRemoteStatus accountRemoteStatus) {
+			switch (accountRemoteStatus) {
+				case INACTIVE:
+					return RemoteStatus.OWNER_INACTIVE;
+
+				case ACTIVATING:
+					return RemoteStatus.OWNER_ACTIVATING;
+
+				case ACTIVE:
+					return RemoteStatus.OWNER_ACTIVE;
+
+				case DEACTIVATING:
+					return RemoteStatus.OWNER_DEACTIVATING;
+
+				default:
+					return RemoteStatus.REMOTE_ACTIVE;
+			}
 		}
 
 		private void setUnlocked(final boolean isAccountUnlockedResult) {
 			Mockito.when(this.unlockedAccounts.isAccountUnlocked(this.address)).thenReturn(isAccountUnlockedResult);
 			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(17L);
+
+			// set the remote status to avoid NullPointerException
+			this.setRemoteStatus(AccountRemoteStatus.INACTIVE, 17L);
 		}
 
 		private void assertRemoteStatus(
@@ -237,8 +269,10 @@ public class AccountInfoControllerTest {
 				final AccountRemoteStatus remoteStatus,
 				final long blockHeight) {
 			Assert.assertThat(accountMetaData.getRemoteStatus(), IsEqual.equalTo(remoteStatus));
-			Mockito.verify(this.accountInfoFactory, Mockito.times(1)).getRemoteStatus(this.address, new BlockHeight(blockHeight));
-			Mockito.verify(this.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
+			Mockito.verify(this.poiFacade, Mockito.only()).findStateByAddress(this.address);
+			final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(this.address).getRemoteLinks();
+			Mockito.verify(remoteLinks, Mockito.only()).getRemoteStatus(new BlockHeight(blockHeight));
+			Mockito.verify(this.blockChainLastBlockLayer, Mockito.only()).getLastBlockHeight();
 		}
 
 		private void assertUnlocked(

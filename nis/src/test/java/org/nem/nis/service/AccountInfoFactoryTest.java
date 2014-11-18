@@ -61,85 +61,6 @@ public class AccountInfoFactoryTest {
 		assertAccountInfo(info, context.address, 0.0);
 	}
 
-	//region getRemoteStatus
-	@Test
-	public void statusReturnsInactiveIfThereAreNoLinks() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		final AccountRemoteStatus remoteStatus = context.factory.getRemoteStatus(context.address, BlockHeight.ONE);
-
-		// Assert:
-		Assert.assertThat(remoteStatus, IsEqual.equalTo(AccountRemoteStatus.INACTIVE));
-	}
-
-	@Test
-	public void statusReturnsRemoteIfActivateAndWithin() {
-		assertQueryRemote(ImportanceTransferTransaction.Mode.Activate, new BlockHeight(2));
-	}
-
-	@Test
-	public void statusReturnsRemoteIfActivateAndNotWithin() {
-		assertQueryRemote(ImportanceTransferTransaction.Mode.Activate, new BlockHeight(2000));
-	}
-
-	@Test
-	public void statusReturnsRemoteIfDeactivateAndWithin() {
-		assertQueryRemote(ImportanceTransferTransaction.Mode.Deactivate, new BlockHeight(2));
-	}
-
-	@Test
-	public void statusReturnsRemoteIfDeactivateAndNotWithin() {
-		assertQueryRemote(ImportanceTransferTransaction.Mode.Deactivate, new BlockHeight(2000));
-	}
-
-	private static void assertQueryRemote(final ImportanceTransferTransaction.Mode mode, final BlockHeight height) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.createRemoteHarvesterLink(mode.value());
-
-		// Act:
-		final AccountRemoteStatus remoteStatus = context.factory.getRemoteStatus(context.address, height);
-
-		// Assert:
-		Assert.assertThat(remoteStatus, IsEqual.equalTo(AccountRemoteStatus.REMOTE));
-	}
-
-	@Test
-	public void statusReturnsActivatingIfActivateAndWithin() {
-		assertQueryLessor(AccountRemoteStatus.ACTIVATING, ImportanceTransferTransaction.Mode.Activate, new BlockHeight(2));
-	}
-
-	@Test
-	public void statusReturnsActiveIfActivateAndNotWithin() {
-		assertQueryLessor(AccountRemoteStatus.ACTIVE, ImportanceTransferTransaction.Mode.Activate, new BlockHeight(1441));
-	}
-
-	@Test
-	public void statusReturnsDeactivatingIfDeactivateAndWithin() {
-		assertQueryLessor(AccountRemoteStatus.DEACTIVATING, ImportanceTransferTransaction.Mode.Deactivate, new BlockHeight(2));
-	}
-
-	@Test
-	public void statusReturnsInactiveIfDeactivateAndNotWithin() {
-		assertQueryLessor(AccountRemoteStatus.INACTIVE, ImportanceTransferTransaction.Mode.Deactivate, new BlockHeight(1441));
-	}
-
-	private static void assertQueryLessor(final AccountRemoteStatus expectedState, final ImportanceTransferTransaction.Mode mode, final BlockHeight height) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.createHarvestingLink(mode.value());
-
-		// Act:
-		final AccountRemoteStatus remoteStatus = context.factory.getRemoteStatus(context.address, height);
-
-		// Assert:
-		Assert.assertThat(remoteStatus, IsEqual.equalTo(expectedState));
-	}
-
-	//endregion
-
 	private static Account createAccount(final Address address) {
 		// Arrange:
 		final Account account = new Account(address);
@@ -172,14 +93,6 @@ public class AccountInfoFactoryTest {
 		private TestContext() {
 			Mockito.when(this.accountLookup.findByAddress(this.address)).thenReturn(this.account);
 			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(this.accountState);
-		}
-
-		public void createRemoteHarvesterLink(final int mode) {
-			this.accountState.getRemoteLinks().addLink(new RemoteLink(this.address, BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
-		}
-
-		public void createHarvestingLink(final int mode) {
-			this.accountState.getRemoteLinks().addLink(new RemoteLink(this.address, BlockHeight.ONE, mode, RemoteLink.Owner.HarvestingRemotely));
 		}
 	}
 }

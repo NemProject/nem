@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.serialization.*;
+import org.nem.nis.poi.RemoteStatus;
 
 /**
  * Possible remote account states.
@@ -38,15 +39,44 @@ public enum AccountRemoteStatus {
 		this.status = status;
 	}
 
+	/**
+	 * Creates a new AccountRemoteStatus given a string representation.
+	 *
+	 * @param status The string representation.
+	 * @return The account remote status.
+	 */
 	public static AccountRemoteStatus fromString(final String status) {
-		if (status != null) {
-			for (final AccountRemoteStatus accountStatus : values()) {
-				if (accountStatus.status.equals(status)) {
-					return accountStatus;
-				}
+		for (final AccountRemoteStatus accountStatus : values()) {
+			if (accountStatus.status.equals(status)) {
+				return accountStatus;
 			}
 		}
-		throw new IllegalArgumentException("Invalid account status: " + status);
+
+		throw new IllegalArgumentException(String.format("Invalid account status: %s", status));
+	}
+
+	/**
+	 * Creates a new AccountRemoteStatus given a RemoteStatus.
+	 *
+	 * @param status The remote status.
+	 * @return The account remote status.
+	 */
+	public static AccountRemoteStatus fromRemoteStatus(final RemoteStatus status) {
+		switch (status) {
+			case NOT_SET:
+				return AccountRemoteStatus.INACTIVE;
+			case OWNER_INACTIVE:
+				return AccountRemoteStatus.INACTIVE;
+			case OWNER_ACTIVATING:
+				return AccountRemoteStatus.ACTIVATING;
+			case OWNER_ACTIVE:
+				return AccountRemoteStatus.ACTIVE;
+			case OWNER_DEACTIVATING:
+				return AccountRemoteStatus.DEACTIVATING;
+
+			default:
+				return AccountRemoteStatus.REMOTE;
+		}
 	}
 
 	//region inline serialization
