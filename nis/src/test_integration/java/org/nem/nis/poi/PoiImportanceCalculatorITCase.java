@@ -9,15 +9,12 @@ import org.nem.core.utils.FormatUtils;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.NisUtils;
 
+import java.lang.management.*;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryPoolMXBean;
 
 /**
  * If someone can manipulate their importance so that they can often or at-will
@@ -506,42 +503,41 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		System.out.println("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
-        long startHeapSize = Runtime.getRuntime().totalMemory();
+		long startHeapSize = Runtime.getRuntime().totalMemory();
 		for (int i = 0; i < 5; i++) {
 			getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 
-        long endHeapSize = Runtime.getRuntime().totalMemory();
+		long endHeapSize = Runtime.getRuntime().totalMemory();
 
-        final long stop = System.currentTimeMillis();
+		final long stop = System.currentTimeMillis();
 		LOGGER.info("Finished poi calculation.");
 
 		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed " + (stop - start) / 5 + "ms.");
 
-        // Assert
+		// Assert
 		LOGGER.info("Heap: " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
 		LOGGER.info("NonHeap: " + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage());
 		final List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
 		for (MemoryPoolMXBean bean : beans) {
-            System.out.println(bean.getName() + " : " + bean.getUsage());
-            if ("PS Eden Space".equals(bean.getName())) {
-                Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
-            } else if ("PS Survivor Space".equals(bean.getName())) {
-                Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
-            }
-            else if ("PS Old Gen".equals(bean.getName())) {
-                Assert.assertTrue(bean.getUsage().getUsed() < 256000000); // ~256 Mb
-            }
+			System.out.println(bean.getName() + " : " + bean.getUsage());
+			if ("PS Eden Space".equals(bean.getName())) {
+				Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
+			} else if ("PS Survivor Space".equals(bean.getName())) {
+				Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
+			} else if ("PS Old Gen".equals(bean.getName())) {
+				Assert.assertTrue(bean.getUsage().getUsed() < 256000000); // ~256 Mb
+			}
 		}
 
-        // Not so meaningful because the GC will affect this a lot
-        long heapSizeDiff = endHeapSize - startHeapSize;
-        Assert.assertTrue(heapSizeDiff < 256000000); // ~256 Mb
+		// Not so meaningful because the GC will affect this a lot
+		long heapSizeDiff = endHeapSize - startHeapSize;
+		Assert.assertTrue(heapSizeDiff < 256000000); // ~256 Mb
 
 		for (GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
 			LOGGER.info(bean.getName() + " : " + bean.getCollectionCount() + " : " + bean.getCollectionTime());
 		}
-    }
+	}
 
 	private List<PoiAccountState> createUserAccounts(
 			final long blockHeight,
