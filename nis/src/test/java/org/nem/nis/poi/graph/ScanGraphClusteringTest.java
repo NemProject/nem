@@ -329,7 +329,7 @@ public abstract class ScanGraphClusteringTest {
 		Assert.assertThat(result.getOutliers(), IsEqual.equalTo(expectedOutliers));
 	}
 
-    /**
+	/**
 	 * This test is designed to require a cluster merge when clustering with FastScanClusteringStrategy.
      * <pre>
      *  4 - 0  - 2--|
@@ -364,7 +364,6 @@ public abstract class ScanGraphClusteringTest {
         // Assert:
         final List<Cluster> expectedClusters = Arrays.asList(
                 new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
-        final List<Cluster> expectedOutliers = Arrays.asList();
 
         Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
         Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));

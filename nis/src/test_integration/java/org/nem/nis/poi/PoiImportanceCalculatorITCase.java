@@ -9,9 +9,6 @@ import org.nem.core.utils.FormatUtils;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.NisUtils;
 
-import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -21,7 +18,6 @@ import java.util.stream.Collectors;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
-import java.lang.management.MemoryUsage;
 
 /**
  * If someone can manipulate their importance so that they can often or at-will
@@ -428,7 +424,7 @@ public class PoiImportanceCalculatorITCase {
 		System.out.println("Setting up accounts.");
 		final int numAccounts = 50000;
 		final List<PoiAccountState> accounts = new ArrayList<>();
-		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000l * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
+		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000L * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
 		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
@@ -512,8 +508,9 @@ public class PoiImportanceCalculatorITCase {
 		final long start = System.currentTimeMillis();
         long startHeapSize = Runtime.getRuntime().totalMemory();
 		for (int i = 0; i < 5; i++) {
-			final ColumnVector importances = getAccountImportances(new BlockHeight(10000 + i), accounts);
+			getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
+
         long endHeapSize = Runtime.getRuntime().totalMemory();
 
         final long stop = System.currentTimeMillis();
