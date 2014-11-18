@@ -7,9 +7,11 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.*;
 
 public class ImportanceTransferTransactionValidatorTest {
+	private static BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_IT_VALIDATION_FORK);
 
 	//region signer balance
 
@@ -21,7 +23,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		transaction.getSigner().decrementBalance(Amount.fromNem(1));
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
@@ -38,7 +40,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -51,7 +53,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE));
@@ -62,16 +64,26 @@ public class ImportanceTransferTransactionValidatorTest {
 	//region recipient balance
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
+		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(TEST_HEIGHT.getRaw(), ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE);
+	}
+
+	@Test
+	public void activateImportanceTransferIsVaalidWhenRecipientHasBalanceBeforeForkBlock() {
+		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(TEST_HEIGHT.getRaw() - 1, ValidationResult.SUCCESS);
+	}
+
+	private static void assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(final long height, final ValidationResult validationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
 		((ImportanceTransferTransaction)transaction).getRemote().incrementBalance(Amount.fromNem(1));
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+		final BlockHeight testedHeight = new BlockHeight(height);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(testedHeight));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE));
+		Assert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 	//endregion
 
@@ -99,11 +111,12 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final ImportanceTransferTransaction transaction = context.createTransaction(newLink);
-		context.setLessorRemoteState(transaction, BlockHeight.ONE, initialLink);
-		context.setLesseeRemoteState(transaction, BlockHeight.ONE, initialLink);
+		context.setLessorRemoteState(transaction, TEST_HEIGHT, initialLink);
+		context.setLesseeRemoteState(transaction, TEST_HEIGHT, initialLink);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(1441)));
+		final BlockHeight testedHeight = new BlockHeight(1440 + TEST_HEIGHT.getRaw());
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(testedHeight));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -138,11 +151,12 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final ImportanceTransferTransaction transaction = context.createTransaction(newLink);
-		context.setLessorRemoteState(transaction, BlockHeight.ONE, initialLink);
-		context.setLesseeRemoteState(transaction, BlockHeight.ONE, initialLink);
+		context.setLessorRemoteState(transaction, TEST_HEIGHT, initialLink);
+		context.setLesseeRemoteState(transaction, TEST_HEIGHT, initialLink);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(1440)));
+		final BlockHeight testedHeight = new BlockHeight(1439 + TEST_HEIGHT.getRaw());
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(testedHeight));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
@@ -174,11 +188,12 @@ public class ImportanceTransferTransactionValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final ImportanceTransferTransaction transaction = context.createTransaction(mode);
-		context.setLessorRemoteState(transaction, BlockHeight.ONE, mode);
-		context.setLesseeRemoteState(transaction, BlockHeight.ONE, mode);
+		context.setLessorRemoteState(transaction, TEST_HEIGHT, mode);
+		context.setLesseeRemoteState(transaction, TEST_HEIGHT, mode);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(new BlockHeight(2882)));
+		final BlockHeight testedHeight = new BlockHeight(2882 + TEST_HEIGHT.getRaw());
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(testedHeight));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
@@ -192,7 +207,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Activate,
-				new BlockHeight(1440),
+				new BlockHeight(1439),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -201,7 +216,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Activate,
-				new BlockHeight(1441),
+				new BlockHeight(1440),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
@@ -210,7 +225,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Activate,
-				new BlockHeight(1440),
+				new BlockHeight(1439),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -219,7 +234,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Activate,
-				new BlockHeight(1441),
+				new BlockHeight(1440),
 				ValidationResult.SUCCESS);
 	}
 
@@ -228,7 +243,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Deactivate,
-				new BlockHeight(1440),
+				new BlockHeight(1439),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -237,7 +252,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Activate,
 				ImportanceTransferTransaction.Mode.Deactivate,
-				new BlockHeight(1441),
+				new BlockHeight(1440),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
@@ -246,7 +261,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Deactivate,
-				new BlockHeight(1440),
+				new BlockHeight(1439),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -256,7 +271,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		assertRemoteIsOccupiedTest(
 				ImportanceTransferTransaction.Mode.Deactivate,
 				ImportanceTransferTransaction.Mode.Deactivate,
-				new BlockHeight(1441),
+				new BlockHeight(1440),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE);
 	}
 
@@ -267,7 +282,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	@Test
 	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterWithinOneDay() {
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
-				new BlockHeight(1440),
+				new BlockHeight(1439),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS);
 	}
 
@@ -280,7 +295,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	@Test
 	public void remoteHarvesterCannotActivateHisOwnRemoteHarvesterAfterOneDay() {
 		assertRemoteHarvesterCannotActivateHisOwnRemoteHarvester(
-				new BlockHeight(1441),
+				new BlockHeight(1440),
 				ValidationResult.FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED);
 	}
 
@@ -291,7 +306,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		// - use a dummy transaction to set the state of the remote account
 		final ImportanceTransferTransaction dummy = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
-		context.setLesseeRemoteState(dummy, BlockHeight.ONE, ImportanceTransferTransaction.Mode.Activate);
+		context.setLesseeRemoteState(dummy, TEST_HEIGHT, ImportanceTransferTransaction.Mode.Activate);
 
 		// - create another transaction around the dummy remote account set up previously
 		final Account furtherRemote = Utils.generateRandomAccount();
@@ -305,7 +320,8 @@ public class ImportanceTransferTransactionValidatorTest {
 		remote.incrementBalance(Amount.fromNem(2001));
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(height));
+		final BlockHeight testedHeight = new BlockHeight(height.getRaw() + TEST_HEIGHT.getRaw());
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(testedHeight));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -321,13 +337,14 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		// - use a dummy transaction to set the state of the remote account
 		final ImportanceTransferTransaction dummy = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
-		context.setLesseeRemoteState(dummy, BlockHeight.ONE, previous);
+		context.setLesseeRemoteState(dummy, TEST_HEIGHT, previous);
 
 		// - create another transaction around the dummy remote account set up previously
 		final Transaction transaction = context.createTransactionWithRemote(dummy.getRemote(), mode);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight));
+		final BlockHeight testedHeight = new BlockHeight(blockHeight.getRaw() + TEST_HEIGHT.getRaw());
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(testedHeight));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));

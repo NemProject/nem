@@ -35,7 +35,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validate(final ImportanceTransferTransaction transaction, final ValidationContext context) {
-		if (context.getBlockHeight().getRaw() > BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
+		if (context.getBlockHeight().getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
 			final ValidationResult result = this.validateRemote(context.getBlockHeight(), transaction);
 			if (!result.isSuccess()) {
 				return result;
@@ -82,7 +82,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				if (height.getRaw() > BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
+				if (height.getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
 					if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
 					}

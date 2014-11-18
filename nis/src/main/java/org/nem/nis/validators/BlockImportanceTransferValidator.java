@@ -13,10 +13,10 @@ public class BlockImportanceTransferValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		if (block.getHeight().getRaw() <= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
+		if (block.getHeight().getRaw() < BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
 			return ValidationResult.SUCCESS;
 		}
-		
+
 		final List<Transaction> importanceTransfers = block.getTransactions().stream()
 				.filter(t -> t.getType() == TransactionTypes.IMPORTANCE_TRANSFER)
 				.collect(Collectors.toList());

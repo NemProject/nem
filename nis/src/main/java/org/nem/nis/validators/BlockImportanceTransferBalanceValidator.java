@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class BlockImportanceTransferBalanceValidator implements BlockValidator {
 	@Override
 	public ValidationResult validate(final Block block) {
-		if (block.getHeight().getRaw() <= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
+		if (block.getHeight().getRaw() < BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
 			return ValidationResult.SUCCESS;
 		}
 
