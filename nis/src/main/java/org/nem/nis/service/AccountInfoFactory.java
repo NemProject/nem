@@ -48,27 +48,4 @@ public class AccountInfoFactory {
 				account.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
 	}
-
-	// TODO 20141014 J-G - can't this move to the caller (is it called more than once)?
-	// > you can also add a function to the enum to do the mapping (RemoteStatus.toAccountRemoteStatus())
-	// TODO 20141014 J-G - the tests you added are good, but i'd move them to RemoteStatus
-	public AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
-		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
-		switch (remoteStatus) {
-			case NOT_SET:
-				return AccountRemoteStatus.INACTIVE;
-			case OWNER_INACTIVE:
-				return AccountRemoteStatus.INACTIVE;
-			case OWNER_ACTIVATING:
-				return AccountRemoteStatus.ACTIVATING;
-			case OWNER_ACTIVE:
-				return AccountRemoteStatus.ACTIVE;
-			case OWNER_DEACTIVATING:
-				return AccountRemoteStatus.DEACTIVATING;
-
-			default:
-				return AccountRemoteStatus.REMOTE;
-		}
-	}
 }

@@ -7,6 +7,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.poi.*;
+import org.nem.nis.remote.*;
 
 public class RemoteObserverTest {
 
