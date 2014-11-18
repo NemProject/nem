@@ -78,7 +78,7 @@ public class AccountInfoController {
 	private AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
-		return AccountRemoteStatus.fromRemoteStatus(remoteStatus);
+		return remoteStatus.toAccountRemoteStatus();
 	}
 
 	private boolean hasPendingImportanceTransfer(final Address address) {

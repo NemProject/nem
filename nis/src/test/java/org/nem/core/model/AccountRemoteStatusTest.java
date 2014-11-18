@@ -39,30 +39,6 @@ public class AccountRemoteStatusTest {
 
 	//endregion
 
-	//region fromString
-
-	@Test
-	public void accountRemoteStatusCanBeCreatedFromRemoteStatus() {
-		// Assert:
-		Assert.assertThat(RemoteStatus.values().length, IsEqual.equalTo(9));
-		assertMapping(RemoteStatus.NOT_SET, AccountRemoteStatus.INACTIVE);
-		assertMapping(RemoteStatus.OWNER_INACTIVE, AccountRemoteStatus.INACTIVE);
-		assertMapping(RemoteStatus.OWNER_ACTIVATING, AccountRemoteStatus.ACTIVATING);
-		assertMapping(RemoteStatus.OWNER_ACTIVE, AccountRemoteStatus.ACTIVE);
-		assertMapping(RemoteStatus.OWNER_DEACTIVATING, AccountRemoteStatus.DEACTIVATING);
-		assertMapping(RemoteStatus.REMOTE_INACTIVE, AccountRemoteStatus.REMOTE);
-		assertMapping(RemoteStatus.REMOTE_ACTIVATING, AccountRemoteStatus.REMOTE);
-		assertMapping(RemoteStatus.REMOTE_ACTIVE, AccountRemoteStatus.REMOTE);
-		assertMapping(RemoteStatus.REMOTE_DEACTIVATING, AccountRemoteStatus.REMOTE);
-	}
-
-	private static void assertMapping(final RemoteStatus remoteStatus, final AccountRemoteStatus accountRemoteStatus) {
-		// Assert:
-		Assert.assertThat(AccountRemoteStatus.fromRemoteStatus(remoteStatus), IsEqual.equalTo(accountRemoteStatus));
-	}
-
-	//endregion
-
 	//region inline serialization
 
 	@Test
