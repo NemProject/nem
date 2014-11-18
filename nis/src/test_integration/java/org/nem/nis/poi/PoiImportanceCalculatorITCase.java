@@ -503,12 +503,12 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		System.out.println("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
-		long startHeapSize = Runtime.getRuntime().totalMemory();
+		final long startHeapSize = Runtime.getRuntime().totalMemory();
 		for (int i = 0; i < 5; i++) {
 			getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 
-		long endHeapSize = Runtime.getRuntime().totalMemory();
+		final long endHeapSize = Runtime.getRuntime().totalMemory();
 
 		final long stop = System.currentTimeMillis();
 		LOGGER.info("Finished poi calculation.");
@@ -519,7 +519,7 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("Heap: " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
 		LOGGER.info("NonHeap: " + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage());
 		final List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
-		for (MemoryPoolMXBean bean : beans) {
+		for (final MemoryPoolMXBean bean : beans) {
 			System.out.println(bean.getName() + " : " + bean.getUsage());
 			if ("PS Eden Space".equals(bean.getName())) {
 				Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
@@ -531,10 +531,10 @@ public class PoiImportanceCalculatorITCase {
 		}
 
 		// Not so meaningful because the GC will affect this a lot
-		long heapSizeDiff = endHeapSize - startHeapSize;
+		final long heapSizeDiff = endHeapSize - startHeapSize;
 		Assert.assertTrue(heapSizeDiff < 256000000); // ~256 Mb
 
-		for (GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
+		for (final GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
 			LOGGER.info(bean.getName() + " : " + bean.getCollectionCount() + " : " + bean.getCollectionTime());
 		}
 	}
