@@ -9,6 +9,7 @@ import org.nem.core.utils.FormatUtils;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.NisUtils;
 
+import java.lang.management.*;
 import java.security.SecureRandom;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -420,7 +421,7 @@ public class PoiImportanceCalculatorITCase {
 		System.out.println("Setting up accounts.");
 		final int numAccounts = 50000;
 		final List<PoiAccountState> accounts = new ArrayList<>();
-		accounts.addAll(this.createUserAccounts(1, numAccounts, 10000 * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
+		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000L * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
 
 		// TODO 20140929 BR: Why is everything so damn slow in the first round?
 		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
@@ -483,6 +484,58 @@ public class PoiImportanceCalculatorITCase {
 			}
 
 			prevTimeDiff = currTimeDiff;
+		}
+	}
+
+	@Test
+	public void poiCalculationHasModerateMemoryUsage() {
+		LOGGER.info("Testing memory usage of the poi calculation");
+
+		// Arrange:
+		System.out.println("Setting up accounts.");
+		final int numAccounts = 50000;
+		final List<PoiAccountState> accounts = new ArrayList<>();
+		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000l * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
+
+		// Warm up phase
+		getAccountImportances(new BlockHeight(9999), accounts);
+
+		// Act: calculate importances
+		System.out.println("Starting poi calculation.");
+		final long start = System.currentTimeMillis();
+		final long startHeapSize = Runtime.getRuntime().totalMemory();
+		for (int i = 0; i < 5; i++) {
+			getAccountImportances(new BlockHeight(10000 + i), accounts);
+		}
+
+		final long endHeapSize = Runtime.getRuntime().totalMemory();
+
+		final long stop = System.currentTimeMillis();
+		LOGGER.info("Finished poi calculation.");
+
+		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed " + (stop - start) / 5 + "ms.");
+
+		// Assert
+		LOGGER.info("Heap: " + ManagementFactory.getMemoryMXBean().getHeapMemoryUsage());
+		LOGGER.info("NonHeap: " + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage());
+		final List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
+		for (final MemoryPoolMXBean bean : beans) {
+			System.out.println(bean.getName() + " : " + bean.getUsage());
+			if ("PS Eden Space".equals(bean.getName())) {
+				Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
+			} else if ("PS Survivor Space".equals(bean.getName())) {
+				Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
+			} else if ("PS Old Gen".equals(bean.getName())) {
+				Assert.assertTrue(bean.getUsage().getUsed() < 256000000); // ~256 Mb
+			}
+		}
+
+		// Not so meaningful because the GC will affect this a lot
+		final long heapSizeDiff = endHeapSize - startHeapSize;
+		Assert.assertTrue(heapSizeDiff < 256000000); // ~256 Mb
+
+		for (final GarbageCollectorMXBean bean : ManagementFactory.getGarbageCollectorMXBeans()) {
+			LOGGER.info(bean.getName() + " : " + bean.getCollectionCount() + " : " + bean.getCollectionTime());
 		}
 	}
 
