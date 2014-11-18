@@ -11,7 +11,7 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.*;
 
 public class ImportanceTransferTransactionValidatorTest {
-	private static BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_IT_VALIDATION_FORK);
+	private static final BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_IT_VALIDATION_FORK);
 
 	//region signer balance
 

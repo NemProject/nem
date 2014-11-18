@@ -208,7 +208,7 @@ public class TransferDaoImpl implements TransferDao {
 				.collect(Collectors.toList());
 		Object[] curObject = null;
 		final Collection<Object[]> result = new ArrayList<>();
-		for (Object[] object : list) {
+		for (final Object[] object : list) {
 			if (null == curObject || !((Transfer)curObject[0]).getId().equals(((Transfer)object[0]).getId())) {
 				result.add(object);
 				if (limit == result.size()) {

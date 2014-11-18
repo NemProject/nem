@@ -9,7 +9,7 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.NisUtils;
 
 public class BlockImportanceTransferValidatorTest {
-	private static long TEST_HEIGHT = BlockMarkerConstants.BETA_IT_VALIDATION_FORK;
+	private static final long TEST_HEIGHT = BlockMarkerConstants.BETA_IT_VALIDATION_FORK;
 
 	//region valid blocks
 
