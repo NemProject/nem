@@ -3,11 +3,14 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.NisUtils;
 
 public class BlockImportanceTransferValidatorTest {
+	private static long TEST_HEIGHT = BlockMarkerConstants.BETA_IT_VALIDATION_FORK;
 
 	//region valid blocks
 
@@ -136,7 +139,7 @@ public class BlockImportanceTransferValidatorTest {
 
 	private static class TestContext {
 		private final Account harvester = Utils.generateRandomAccount();
-		private final Block block = NisUtils.createRandomBlockWithHeight(this.harvester, 12);
+		private final Block block = NisUtils.createRandomBlockWithHeight(this.harvester, TEST_HEIGHT);
 		private final BlockValidator validator = new BlockImportanceTransferValidator();
 		private final Account commonAccount = Utils.generateRandomAccount();
 
