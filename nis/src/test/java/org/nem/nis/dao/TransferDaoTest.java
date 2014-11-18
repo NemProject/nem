@@ -349,7 +349,7 @@ public class TransferDaoTest {
 			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(blockTs), new BlockHeight(height));
 
 			for (final int txTimestamp : txTimestamps[i]) {
-				final Account recipient = useSenderAsRecipient? sender : Utils.generateRandomAccount();
+				final Account recipient = useSenderAsRecipient ? sender : Utils.generateRandomAccount();
 				this.addMapping(mockAccountDao, recipient);
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, txTimestamp);
 

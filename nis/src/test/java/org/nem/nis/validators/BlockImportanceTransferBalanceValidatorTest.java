@@ -3,7 +3,7 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;

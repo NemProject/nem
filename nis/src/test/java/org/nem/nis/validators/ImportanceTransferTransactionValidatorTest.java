@@ -64,7 +64,9 @@ public class ImportanceTransferTransactionValidatorTest {
 	//region recipient balance
 	@Test
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
-		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(TEST_HEIGHT.getRaw(), ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE);
+		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(
+				TEST_HEIGHT.getRaw(),
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE);
 	}
 
 	@Test
