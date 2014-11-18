@@ -203,10 +203,22 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	private Collection<Object[]> sortAndLimit(final Collection<Object[]> objects, final int limit) {
-		return objects.stream()
-				.sorted((o1, o2) -> this.comparePair(o1, o2))
-				.limit(limit)
+		final List<Object[]> list = objects.stream()
+				.sorted(this::comparePair)
 				.collect(Collectors.toList());
+		Object[] curObject = null;
+		final Collection<Object[]> result = new ArrayList<>();
+		for (final Object[] object : list) {
+			if (null == curObject || !((Transfer)curObject[0]).getId().equals(((Transfer)object[0]).getId())) {
+				result.add(object);
+				if (limit == result.size()) {
+					break;
+				}
+			}
+			curObject = object;
+		}
+
+		return result;
 	}
 
 	private int comparePair(final Object[] lhs, final Object[] rhs) {
