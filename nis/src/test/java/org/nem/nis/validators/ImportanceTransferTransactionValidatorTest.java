@@ -68,7 +68,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	}
 
 	@Test
-	public void activateImportanceTransferIsVaalidWhenRecipientHasBalanceBeforeForkBlock() {
+	public void activateImportanceTransferIsValidWhenRecipientHasBalanceBeforeForkBlock() {
 		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(TEST_HEIGHT.getRaw() - 1, ValidationResult.SUCCESS);
 	}
 
