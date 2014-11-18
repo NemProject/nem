@@ -1,4 +1,4 @@
-package org.nem.nis.poi;
+package org.nem.nis.remote;
 
 // TODO 20141014 J-G: comments
 

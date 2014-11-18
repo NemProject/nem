@@ -6,6 +6,7 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.remote.RemoteLink;
 
 import java.util.*;
 import java.util.stream.*;

@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChainConstants;
+import org.nem.nis.remote.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.remote.*;
 import org.nem.nis.secret.*;
 
 public class PoiAccountStateTest {

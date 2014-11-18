@@ -1,4 +1,4 @@
-package org.nem.nis.poi;
+package org.nem.nis.remote;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;

@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.*;
+import org.nem.nis.remote.RemoteLink;
 
 public class ImportanceTransferTransactionValidatorTest {
 
