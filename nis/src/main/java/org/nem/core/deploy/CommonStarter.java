@@ -36,12 +36,12 @@ public class CommonStarter implements ServletContextListener {
 	/**
 	 * The publicly available system time provider.
 	 */
-	public static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
+	public static final TimeProvider TIME_PROVIDER;
 
 	/**
 	 * The meta data (name, version,...) for this application.
 	 */
-	public static final ApplicationMetaData META_DATA = MetaDataFactory.loadApplicationMetaData(CommonStarter.class, TIME_PROVIDER);
+	public static final ApplicationMetaData META_DATA;
 
 	/**
 	 * The common starter.
@@ -73,6 +73,10 @@ public class CommonStarter implements ServletContextListener {
 		if (null == fileLockHandle) {
 			LOGGER.warning(String.format("Could not acquire exclusive lock to lock file"));
 		}
+
+		// make sure to initialize these after bootstrapping logging as some of them write to the log
+		TIME_PROVIDER = new SystemTimeProvider();
+		META_DATA = MetaDataFactory.loadApplicationMetaData(CommonStarter.class, TIME_PROVIDER);
 	}
 
 	private static Closeable tryAcquireLock(final File lockFile) {
