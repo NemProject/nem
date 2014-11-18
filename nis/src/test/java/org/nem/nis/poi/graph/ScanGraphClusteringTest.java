@@ -330,6 +330,47 @@ public abstract class ScanGraphClusteringTest {
 	}
 
 	/**
+	 * This test is designed to require a cluster merge when clustering with FastScanClusteringStrategy.
+	 * <pre>
+	 *  4 - 0  - 2--|
+	 *      | \/ |  |
+	 *      | /\ |  |
+	 *      1 -  3  |
+	 *       \  /   |
+	 *         5-----
+	 * </pre>
+	 */
+	@Test
+	public void complexGraphIsMergedAsExpected() {
+		// Arrange: { 0, 1, 2, 3, 4, 5 } form a single cluster (this requires a merge of two clusters in the FastScanClusteringStrategy)
+		final TestContext context = new TestContext(this.createClusteringStrategy(), 6);
+
+		context.setNeighborIds(0, Arrays.asList(0, 1, 2, 3, 4, 5));
+		context.setNeighborIds(1, Arrays.asList(0, 1, 2, 3));
+		context.setNeighborIds(2, Arrays.asList(0, 1, 2, 3)); // 5 is not present here on purpose, to force a cluster merge
+		context.setNeighborIds(3, Arrays.asList(1, 2, 3));
+		context.setNeighborIds(4, Arrays.asList(0, 4));
+		context.setNeighborIds(5, Arrays.asList(0, 5, 2));
+
+		context.makeAllSimilar();
+
+		context.setSimilarity(1, 0, 0);
+		context.setSimilarity(2, 0, 0);
+		context.setSimilarity(3, 0, 0);
+
+		// Act:
+		final ClusteringResult result = context.clusteringStrategy.cluster(context.neighborhood);
+
+		// Assert:
+		final List<Cluster> expectedClusters = Arrays.asList(
+				new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5)));
+
+		Assert.assertThat(result.getClusters(), IsEquivalent.equivalentTo(expectedClusters));
+		Assert.assertThat(result.getHubs().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(result.getOutliers().isEmpty(), IsEqual.equalTo(true));
+	}
+
+	/**
 	 * <pre>
 	 *    0  - 1
 	 *    | \/ |

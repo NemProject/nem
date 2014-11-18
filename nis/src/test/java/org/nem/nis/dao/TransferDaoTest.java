@@ -331,7 +331,12 @@ public class TransferDaoTest {
 		Assert.assertThat(allTimeStamps2, equalTo(outgoingTimestamps.subList(25, 50)));
 	}
 
-	private void createTestBlocks(final long[] heights, final int[] blockTimestamp, final int[][] txTimestamps, final Account sender) {
+	private void createTestBlocks(
+			final long[] heights,
+			final int[] blockTimestamp,
+			final int[][] txTimestamps,
+			final Account sender,
+			final boolean useSenderAsRecipient) {
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 
@@ -344,7 +349,7 @@ public class TransferDaoTest {
 			final Block dummyBlock = new Block(sender, Hash.ZERO, Hash.ZERO, new TimeInstant(blockTs), new BlockHeight(height));
 
 			for (final int txTimestamp : txTimestamps[i]) {
-				final Account recipient = Utils.generateRandomAccount();
+				final Account recipient = useSenderAsRecipient ? sender : Utils.generateRandomAccount();
 				this.addMapping(mockAccountDao, recipient);
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, txTimestamp);
 
@@ -369,7 +374,7 @@ public class TransferDaoTest {
 		final long heights[] = { 3, 4, 1, 2 };
 		final int blockTimestamp[] = { 1801, 1901, 1401, 1501 };
 		final int txTimestamps[][] = { { 1800, 1600 }, { 1900, 1700, 1700 }, { 1200, 1400 }, { 1300, 1500 } };
-		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender);
+		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
 
 		// Act
 		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
@@ -381,6 +386,22 @@ public class TransferDaoTest {
 		Assert.assertThat(entities1.size(), equalTo(9));
 		Assert.assertThat(resultHeights, equalTo(expectedHeights));
 		Assert.assertThat(resultTimestamps, equalTo(expectedTimestamps));
+	}
+
+	@Test
+	public void getTransactionsForAccountUsingHashFiltersDuplicatesIfTransferTypeIsAll() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final long heights[] = { 3 };
+		final int blockTimestamp[] = { 1801 };
+		final int txTimestamps[][] = { { 1800 } };
+		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, true);
+
+		// Act (transaction is pulled 2 times from db, one should get filtered):
+		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
+
+		// Assert:
+		Assert.assertThat(entities1.size(), equalTo(1));
 	}
 
 	@Test

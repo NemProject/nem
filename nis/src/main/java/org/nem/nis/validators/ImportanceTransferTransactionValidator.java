@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.BlockChainConstants;
+import org.nem.nis.*;
 import org.nem.nis.poi.*;
 
 /**
@@ -35,9 +35,11 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validate(final ImportanceTransferTransaction transaction, final ValidationContext context) {
-		final ValidationResult result = this.validateRemote(context.getBlockHeight(), transaction);
-		if (!result.isSuccess()) {
-			return result;
+		if (context.getBlockHeight().getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
+			final ValidationResult result = this.validateRemote(context.getBlockHeight(), transaction);
+			if (!result.isSuccess()) {
+				return result;
+			}
 		}
 
 		return this.validateOwner(context.getBlockHeight(), transaction, context.getDebitPredicate());
@@ -80,8 +82,10 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
+				if (height.getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
+					if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
+						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
+					}
 				}
 
 				// if a remote is already activated, it needs to be deactivated first

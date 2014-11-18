@@ -19,4 +19,9 @@ public class BlockMarkerConstants {
 	 * Targeting Friday 13 Nov, 8am UTC.
 	 */
 	public static long BETA_TX_COUNT_FORK = 36500;
+
+	/**
+	 * Beta hard fork due to adding additional importance transfer validation.
+	 */
+	public static long BETA_IT_VALIDATION_FORK = 44974;
 }

@@ -18,7 +18,6 @@ public class AggregateSingleTransactionValidatorBuilderTest {
 	//region delegation
 
 	//region canAggregateOneValidator
-
 	@Test
 	public void canAggregateOneValidatorAndCallAsSingleValidator() {
 		// Assert:
