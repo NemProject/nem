@@ -197,8 +197,10 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
-		// Do not remove!
-		this.fixGenerationHash(block, parent);
+		// blocks that are received via /push/block do not have their generation hashes set
+		// (generation hashes are not serialized), so we need to recalculate it for
+		// each block that we receive
+		fixGenerationHash(block, parent);
 
 		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
 		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
