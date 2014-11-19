@@ -197,10 +197,17 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
+		// Do not remove!
+		this.fixGenerationHash(block, parent);
+
 		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
 		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
 		final Account lessor = this.accountAnalyzer.getAccountCache().findByAddress(state.getAddress());
 		block.setLessor(lessor);
+	}
+
+	private static void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
+		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
 	//endregion
