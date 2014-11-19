@@ -7,6 +7,10 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.ImportanceTransfer;
 
+/**
+ * Static class that contains functions for converting to and from
+ * db-model ImportanceTransfer and model ImportanceTransferTransaction.
+ */
 public class ImportanceTransferMapper {
 	/**
 	 * Converts a ImportanceTransferTransaction model to a ImportanceTransfer db-model.

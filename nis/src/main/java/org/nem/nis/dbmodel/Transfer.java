@@ -26,7 +26,7 @@ public class Transfer {
 	private byte[] transferHash;
 
 	private Integer version;
-	private Integer type;
+	private Integer type; // candidate for removal
 	private Long fee;
 	private Integer timeStamp;
 	private Integer deadline;

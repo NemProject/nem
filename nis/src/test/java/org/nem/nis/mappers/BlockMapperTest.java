@@ -165,12 +165,62 @@ public class BlockMapperTest {
 	}
 
 	@Test
+	public void blockModelWithMultisigSignerModificationTransactionCanBeMappedToDbModel() {
+		// Arrange:
+		final int NUM_TRANSACTIONS = 2;
+		final TestContext context = new TestContext();
+		context.addMultisigSignerModificationTransactions();
+
+		// Act:
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+
+		// Assert:
+		context.assertDbModel(dbModel, NUM_TRANSACTIONS*1000L);
+		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
+		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
+			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final Transaction transaction = context.getModel().getTransactions().get(i);
+			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+		}
+	}
+
+	@Test
+	public void blockModelWithMultisigSignerModificationTransactionCanBeRoundTripped() {
+		// Arrange:
+		final int NUM_TRANSACTIONS = 2;
+		final TestContext context = new TestContext();
+		context.addMultisigSignerModificationTransactions();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+
+		// Act:
+		final Block model = context.toModel(dbModel);
+
+		// Assert:
+		context.assertModel(model);
+
+		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
+			final Transaction originalTransaction = context.getModel().getTransactions().get(i);
+			final Hash originalTransactionHash = HashUtils.calculateHash(originalTransaction);
+
+			final Transaction transaction = model.getTransactions().get(i);
+			final Hash transactionHash = HashUtils.calculateHash(transaction);
+
+			Assert.assertThat(transactionHash, IsEqual.equalTo(originalTransactionHash));
+		}
+	}
+
+	@Test
 	public void blockModelWithTransactionsCanBeMappedToDbModel() {
 		// Arrange:
 		final int NUM_TRANSACTIONS_A = 2;
-		final int NUM_TRANSACTIONS_B = 3;
+		final int NUM_TRANSACTIONS_B = 2;
+		final int NUM_TRANSACTIONS_C = 3;
 		final TestContext context = new TestContext();
 		// order matters, as foraging will create block in that order
+		context.addMultisigSignerModificationTransactions();
 		context.addImportanceTransferTransactions();
 		context.addTransactions();
 
@@ -178,16 +228,22 @@ public class BlockMapperTest {
 		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B);
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
+		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A*1000L + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C);
+		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
+		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
+		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
 		for (int i = 0; i < NUM_TRANSACTIONS_A; ++i) {
-			final ImportanceTransfer dbTransfer = dbModel.getBlockImportanceTransfers().get(i);
+			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
-		for (int i = NUM_TRANSACTIONS_A; i < NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B; ++i) {
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(i - NUM_TRANSACTIONS_A);
+		for (int i = 2; i < 2 + NUM_TRANSACTIONS_B; ++i) {
+			final ImportanceTransfer dbTransfer = dbModel.getBlockImportanceTransfers().get(i - 2);
+			final Transaction transaction = context.getModel().getTransactions().get(i);
+			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+		}
+		for (int i = 4; i < 4 + NUM_TRANSACTIONS_C; ++i) {
+			final Transfer dbTransfer = dbModel.getBlockTransfers().get(i - 4);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -197,19 +253,26 @@ public class BlockMapperTest {
 	public void blockModelWithSortedTransactionsCanBeRoundTripped() {
 		// TODO 20141010 J-G: do we also need a test that the transactions are saved sorted or do the dao tests cover that?
 		// > actually, it looks like the previous test (blockModelWithTransactionsCanBeMappedToDbModel) is validating that, right?
+		// TODO 20141119 G-J: not exactly sure what you mean, but I believe the answer is yes ;)
 		// Arrange:
 		final int NUM_TRANSACTIONS_A = 2;
-		final int NUM_TRANSACTIONS_B = 3;
+		final int NUM_TRANSACTIONS_B = 2;
+		final int NUM_TRANSACTIONS_C = 3;
 		final TestContext context = new TestContext();
 
 		// order matters, let's assume fees were such that block have been created in such order
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		final MultisigSignerModificationTransaction.ModificationType modificationType = MultisigSignerModificationTransaction.ModificationType.Add;
+
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
-		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(150), context.account1, mode, context.account2));
-		context.model.addTransaction(new TransferTransaction(new TimeInstant(200), context.account2, context.account3, new Amount(11), null));
-		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(250), context.account3, mode, context.account2));
-		context.model.addTransaction(new TransferTransaction(new TimeInstant(300), context.account3, context.account1, new Amount(4), null));
+		context.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(200), context.account1, modificationType, context.account2));
+		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(300), context.account1, mode, context.account2));
+		context.model.addTransaction(new TransferTransaction(new TimeInstant(400), context.account2, context.account3, new Amount(11), null));
+		context.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(500), context.account1, modificationType, context.account3));
+		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(600), context.account3, mode, context.account2));
+		context.model.addTransaction(new TransferTransaction(new TimeInstant(700), context.account3, context.account1, new Amount(4), null));
 		for (final Transaction transaction : context.model.getTransactions()) {
+			transaction.setFee(Amount.fromNem(1000L));
 			transaction.sign();
 		}
 
@@ -220,23 +283,29 @@ public class BlockMapperTest {
 		final Block model = context.toModel(dbModel);
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B);
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
+		context.assertDbModel(dbModel, 1000L * (NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C));
+		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
+		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
+		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
 		for (int i = 0; i < NUM_TRANSACTIONS_A; ++i) {
-			final ImportanceTransfer dbTransfer = dbModel.getBlockImportanceTransfers().get(i);
-			final Transaction transaction = context.getModel().getTransactions().get(2 * i + 1);
+			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final Transaction transaction = context.getModel().getTransactions().get(3 * i + 1);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 		for (int i = 0; i < NUM_TRANSACTIONS_B; ++i) {
+			final ImportanceTransfer dbTransfer = dbModel.getBlockImportanceTransfers().get(i);
+			final Transaction transaction = context.getModel().getTransactions().get(3 * i + 2);
+			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+		}
+		for (int i = 0; i < NUM_TRANSACTIONS_C; ++i) {
 			final Transfer dbTransfer = dbModel.getBlockTransfers().get(i);
-			final Transaction transaction = context.getModel().getTransactions().get(2 * i);
+			final Transaction transaction = context.getModel().getTransactions().get(3 * i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 
 		// assert model
 		Assert.assertThat(model.getSignature(), IsEqual.equalTo(context.model.getSignature()));
-		for (int i = 0; i < NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B; ++i) {
+		for (int i = 0; i < NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C; ++i) {
 			final Transaction expected = context.getModel().getTransactions().get(i);
 			final Transaction actual = model.getTransactions().get(i);
 			Assert.assertThat(HashUtils.calculateHash(expected), IsEqual.equalTo(HashUtils.calculateHash(actual)));
@@ -374,6 +443,20 @@ public class BlockMapperTest {
 					new TimeInstant(150), this.account1, ImportanceTransferTransaction.Mode.Activate, this.account2));
 			this.model.addTransaction(new ImportanceTransferTransaction(
 					new TimeInstant(250), this.account3, ImportanceTransferTransaction.Mode.Activate, this.account2));
+
+			for (final Transaction transaction : this.model.getTransactions()) {
+				transaction.sign();
+			}
+
+			this.signModel();
+		}
+
+
+		public void addMultisigSignerModificationTransactions() {
+			this.model.addTransaction(new MultisigSignerModificationTransaction(
+					new TimeInstant(150), this.account1, MultisigSignerModificationTransaction.ModificationType.Add, this.account2));
+			this.model.addTransaction(new MultisigSignerModificationTransaction(
+					new TimeInstant(250), this.account1, MultisigSignerModificationTransaction.ModificationType.Add, this.account3));
 
 			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();

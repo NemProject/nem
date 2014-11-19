@@ -6,14 +6,14 @@ import org.nem.core.crypto.Hash;
 import javax.persistence.*;
 
 /**
- * Importance transfer db entity
+ * Multisig Signer Modification db entity
  * <p>
  * Holds information about Transactions having type TransactionTypes.IMPORTANCE_TYPE
  * <p>
  */
 @Entity
-@Table(name = "importancetransfers")
-public class ImportanceTransfer {
+@Table(name = "multisigsignermodifications")
+public class MultisigSignerModification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -34,10 +34,10 @@ public class ImportanceTransfer {
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-	@JoinColumn(name = "remoteId")
-	private Account remote;
+	@JoinColumn(name = "cosignatoryId")
+	private Account cosignatory;
 
-	private Integer mode;
+	private Integer modificationType;
 
 	private Integer blkIndex; // index inside block
 	private Integer orderId; // index inside list
@@ -48,23 +48,20 @@ public class ImportanceTransfer {
 	@JoinColumn(name = "blockId")
 	private Block block;
 
-	public ImportanceTransfer() {
-	}
-
-	public ImportanceTransfer(
+	public MultisigSignerModification(
 			final Hash hash,
-			final Integer version,
-			final Integer type,
-			final Long fee,
-			final Integer timeStamp,
-			final Integer deadline,
+			final int version,
+			final int type,
+			final long fee,
+			final int timeStamp,
+			final int deadline,
 			final Account sender,
 			final byte[] senderProof,
-			final Account remote,
-			final Integer mode,
-			final Integer orderId,
-			final Integer blkIndex,
-			final Long referencedTransaction
+			final Account cosignatory,
+			final int modificationType,
+			final int orderIndex,
+			final int blockIndex,
+			final long referencedTransaction
 	) {
 		this.shortId = hash.getShortId();
 		this.transferHash = hash.getRaw();
@@ -75,10 +72,10 @@ public class ImportanceTransfer {
 		this.deadline = deadline;
 		this.sender = sender;
 		this.senderProof = senderProof;
-		this.remote = remote;
-		this.mode = mode;
-		this.orderId = orderId;
-		this.blkIndex = blkIndex;
+		this.cosignatory = cosignatory;
+		this.modificationType = modificationType;
+		this.orderId = orderIndex;
+		this.blkIndex = blockIndex;
 		this.referencedTransaction = referencedTransaction;
 	}
 
@@ -162,20 +159,20 @@ public class ImportanceTransfer {
 		this.senderProof = senderProof;
 	}
 
-	public Account getRemote() {
-		return this.remote;
+	public Account getCosignatory() {
+		return this.cosignatory;
 	}
 
-	public void setRemote(final Account remote) {
-		this.remote = remote;
+	public void setCosignatory(final Account cosignatory) {
+		this.cosignatory = cosignatory;
 	}
 
-	public Integer getMode() {
-		return this.mode;
+	public Integer getModificationType() {
+		return this.modificationType;
 	}
 
-	public void setMode(final Integer mode) {
-		this.mode = mode;
+	public void setModificationType(final Integer modificationType) {
+		this.modificationType = modificationType;
 	}
 
 	public Integer getBlkIndex() {

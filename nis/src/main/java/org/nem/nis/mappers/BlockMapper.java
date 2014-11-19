@@ -7,6 +7,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -44,10 +45,13 @@ public class BlockMapper {
 				lessor);
 
 		int i = 0;
+		int multisigSignerModificationsIndex = 0;
 		int importanceTransferIndex = 0;
 		int transferIndex = 0;
 		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
-		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(block.getTransactions().size());
+		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<MultisigSignerModification> multisigSignerModificationsTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+
 		for (final Transaction transaction : block.getTransactions()) {
 			switch (transaction.getType()) {
 				case TransactionTypes.TRANSFER: {
@@ -70,11 +74,24 @@ public class BlockMapper {
 					importanceTransferTransactions.add(dbTransfer);
 				}
 				break;
+				case TransactionTypes.MULTISIG_SIGNER_MODIFY: {
+					final MultisigSignerModification dbTransfer = MultisigSignerModificationMapper.toDbModel(
+							(MultisigSignerModificationTransaction)transaction,
+					        i++,
+					        multisigSignerModificationsIndex++,
+					        accountDao);
+					dbTransfer.setBlock(dbBlock);
+					multisigSignerModificationsTransactions.add(dbTransfer);
+				}
+				break;
+				default:
+					throw new RuntimeException("trying to map block with unknown transaction type");
 			}
 		}
 
 		dbBlock.setBlockTransfers(transferTransactions);
 		dbBlock.setBlockImportanceTransfers(importanceTransferTransactions);
+		dbBlock.setBlockMultisigSignerModifications(multisigSignerModificationsTransactions);
 		return dbBlock;
 	}
 
@@ -107,17 +124,25 @@ public class BlockMapper {
 		block.setLessor(lessor);
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
-		final int count = dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
+		final int count =
+				dbBlock.getBlockMultisigSignerModifications().size() +
+				dbBlock.getBlockImportanceTransfers().size() +
+				dbBlock.getBlockTransfers().size();
 		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
 
+		for (final MultisigSignerModification dbTransfer : dbBlock.getBlockMultisigSignerModifications()) {
+			final MultisigSignerModificationTransaction transaction = MultisigSignerModificationMapper.toModel(dbTransfer, accountLookup);
+			transactions.set(dbTransfer.getBlkIndex(), transaction);
+		}
+
 		for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
-			final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
-			transactions.set(dbTransfer.getBlkIndex(), importanceTransferTransaction);
+			final ImportanceTransferTransaction transaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
+			transactions.set(dbTransfer.getBlkIndex(), transaction);
 		}
 
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
-			final TransferTransaction transfer = TransferMapper.toModel(dbTransfer, accountLookup);
-			transactions.set(dbTransfer.getBlkIndex(), transfer);
+			final TransferTransaction transaction = TransferMapper.toModel(dbTransfer, accountLookup);
+			transactions.set(dbTransfer.getBlkIndex(), transaction);
 		}
 
 		block.addTransactions(transactions);
