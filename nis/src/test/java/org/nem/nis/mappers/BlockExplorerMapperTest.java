@@ -75,7 +75,7 @@ public class BlockExplorerMapperTest {
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
-		transfer.setTransferHash(hash.getRaw());
+		transfer.setTransferHash(hash);
 
 		transfer.setRecipient(new Account(recipientAddress.getEncoded(), null));
 		transfer.setAmount(888888000000L);
@@ -99,7 +99,7 @@ public class BlockExplorerMapperTest {
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
-		transfer.setTransferHash(hash.getRaw());
+		transfer.setTransferHash(hash);
 
 		transfer.setRecipient(new Account(recipientAddress.getEncoded(), null));
 		transfer.setAmount(888888000000L);
