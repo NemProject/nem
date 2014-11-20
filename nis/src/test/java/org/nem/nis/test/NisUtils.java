@@ -50,6 +50,7 @@ public class NisUtils {
 		block.setForgerProof(Utils.generateRandomBytes(64));
 		block.setBlockTransfers(new ArrayList<>());
 		block.setBlockImportanceTransfers(new ArrayList<>());
+		block.setBlockMultisigSignerModifications(new ArrayList<>());
 		return block;
 	}
 
