@@ -1,6 +1,7 @@
-package org.nem.core.model;
+package org.nem.core.model.ncc;
 
 import org.nem.core.crypto.PrivateKey;
+import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
 /**

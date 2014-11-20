@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.NemRequestResult;
+import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
