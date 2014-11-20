@@ -1,6 +1,6 @@
 package org.nem.nis.controller;
 
-import org.nem.core.crypto.Signature;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.Node;
@@ -39,7 +39,16 @@ public class TransactionController {
 		this.host = host;
 	}
 
+	/**
+	 * A request for NIS to serialize unsigned transaction data into binary for signing by the client.
+	 * <br/>
+	 * This is insecure if an attacker modifies the binary payload in-between NIS and the client.
+	 *
+	 * @param deserializer The deserializer that is expected to contain transaction data.
+	 * @return The binary form of the transaction data.
+	 */
 	@RequestMapping(value = "/transaction/prepare", method = RequestMethod.POST)
+	@TrustedApi
 	@ClientApi
 	@Deprecated
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
@@ -54,12 +63,41 @@ public class TransactionController {
 		return new RequestPrepare(transferData);
 	}
 
+	/**
+	 * A request for NIS to sign unsigned transaction data and announce it given a private key.
+	 * <br/>
+	 * This is insecure if an attacker modifies the binary payload in-between NIS and the client
+	 * (not to mention it exposes the private key).
+	 *
+	 * @param request The request, which contains the transaction data and a private key.
+	 * @return The result of the operation.
+	 */
+	@RequestMapping(value = "/transaction/prepare-announce", method = RequestMethod.POST)
+	@TrustedApi
+	@ClientApi
+	public NemRequestResult transactionPrepareAnnounce(@RequestBody final RequestPrepareAnnounce request) {
+		final Account account = new Account(new KeyPair(request.getPrivateKey()));
+		final Transaction transfer = request.getTransaction();
+		transfer.signBy(account);
+		return this.push(transfer);
+	}
+
+	/**
+	 * A request for NIS to announce signed transaction data.
+	 *
+	 * @param request The request, which contains the transaction data and a signature.
+	 * @return The result of the operation.
+	 */
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
-	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce requestAnnounce) {
-		final Transaction transfer = this.deserializeTransaction(requestAnnounce.getData());
-		transfer.setSignature(new Signature(requestAnnounce.getSignature()));
-		final ValidationResult result = this.pushService.pushTransaction(transfer, null);
+	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce request) {
+		final Transaction transfer = this.deserializeTransaction(request.getData());
+		transfer.setSignature(new Signature(request.getSignature()));
+		return this.push(transfer);
+	}
+
+	private NemRequestResult push(final Transaction transaction) {
+		final ValidationResult result = this.pushService.pushTransaction(transaction, null);
 		return new NemRequestResult(result);
 	}
 

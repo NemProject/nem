@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.crypto.Signature;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.model.primitive.Amount;
@@ -23,7 +23,7 @@ import java.util.function.Function;
 
 public class TransactionControllerTest {
 
-	//region transactionPrepare / transactionAnnounce
+	//region transactionPrepare
 
 	@Test
 	@SuppressWarnings("deprecation")
@@ -57,6 +57,52 @@ public class TransactionControllerTest {
 		// Assert:
 		Assert.assertThat(requestPrepare.getData(), IsEqual.equalTo(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
 	}
+
+	//endregion
+
+	//region transactionPrepareAnnounce
+
+	@Test
+	public void transactionPrepareAnnounceSignsAndPushesTransactionIfTransactionPassesValidation() {
+		// Assert:
+		assertTransactionPrepareAnnounceSignsAndPushesTransaction(ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionPrepareAnnounceSignsAndPushesTransactionIfTransactionFailsValidation() {
+		// Assert:
+		assertTransactionPrepareAnnounceSignsAndPushesTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
+	}
+
+	private static void assertTransactionPrepareAnnounceSignsAndPushesTransaction(final ValidationResult validationResult) {
+		final TestContext context = new TestContext();
+		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any()))
+				.thenReturn(validationResult);
+
+		final Account account = Utils.generateRandomAccount();
+		final Transaction transaction = createTransactionWithSender(account);
+		final RequestPrepareAnnounce request = new RequestPrepareAnnounce(
+				transaction,
+				account.getKeyPair().getPrivateKey());
+
+		// Act:
+		final NemRequestResult result = context.controller.transactionPrepareAnnounce(request);
+
+		// Assert:
+		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
+		Assert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
+
+		final ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
+		Mockito.verify(context.pushService, Mockito.only()).pushTransaction(transactionCaptor.capture(), Mockito.eq(null));
+
+		final Transaction pushedTransaction = transactionCaptor.getValue();
+		Assert.assertThat(pushedTransaction.getSignature(), IsNull.notNullValue());
+		Assert.assertThat(pushedTransaction.verify(), IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	//region transactionAnnounce
 
 	@Test
 	public void transactionAnnounceSignsAndPushesTransactionIfTransactionPassesValidation() {
@@ -133,7 +179,10 @@ public class TransactionControllerTest {
 	//endregion
 
 	private static Transaction createTransaction() {
-		final Account sender = Utils.generateRandomAccount();
+		return createTransactionWithSender(Utils.generateRandomAccount());
+	}
+
+	private static Transaction createTransactionWithSender(final Account sender) {
 		final Account recipient = Utils.generateRandomAccount();
 		return new TransferTransaction(new TimeInstant(321), sender, recipient, Amount.fromNem(100), null);
 	}
