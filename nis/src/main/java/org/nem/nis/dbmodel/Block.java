@@ -66,7 +66,7 @@ public class Block {
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<MultisigSignerModification> blockMultisigSignerModification;
+	private List<MultisigSignerModification> blockMultisigSignerModifications;
 
 	public Block() {
 	}
@@ -231,12 +231,12 @@ public class Block {
 
 	public List<MultisigSignerModification> getBlockMultisigSignerModifications()
 	{
-		return this.blockMultisigSignerModification;
+		return this.blockMultisigSignerModifications;
 	}
 
 	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModification)
 	{
-		this.blockMultisigSignerModification = blockMultisigSignerModification;
+		this.blockMultisigSignerModifications = blockMultisigSignerModification;
 	}
 }
 

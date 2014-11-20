@@ -15,9 +15,14 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.persistence.Entity;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -684,6 +689,20 @@ public class BlockDaoTest {
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(7));
 	}
 
+
+	@Test
+	public void getBlocksAfterReturnsBlocksWithTransactions() throws Exception {
+		// Arrange:
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		this.createBlocksInDatabaseWithTransactions();
+
+		// Act:
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(1), 10);
+
+		// Assert:
+		Assert.assertThat(blocks.size(), IsEqual.equalTo(1));
+	}
+
 	@Test
 	public void getBlocksAfterReturnsBlocksAfterGivenHeight() {
 		// Arrange:
@@ -788,6 +807,54 @@ public class BlockDaoTest {
 		}
 
 		return hashes;
+	}
+
+	private void createBlocksInDatabaseWithTransactions() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+		final List<Hash> hashes = new ArrayList<>();
+		final Account sender = Utils.generateRandomAccount();
+		final MockAccountDao mockAccountDao = new MockAccountDao();
+		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+		this.addMapping(mockAccountDao, sender);
+
+		final int numBlocks = 2;
+		for (int i = 1; i < numBlocks; i++) {
+			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
+					sender,
+					Hash.ZERO,
+					Hash.ZERO,
+					new TimeInstant(i * 123),
+					new BlockHeight(i));
+
+			final Account recipient = Utils.generateRandomAccount();
+			this.addMapping(mockAccountDao, recipient);
+			dummyBlock.sign();
+			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+
+			final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
+			scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
+			// I wanted to make a generic test, that would create a dbBlock
+			// with all possible transaction types, but idk how to do that
+			/*
+			for (final BeanDefinition beanDefinition : scanner.findCandidateComponents("org.nem.nis.dbmodel")) {
+				final Class clazz = Class.forName(beanDefinition.getBeanClassName());
+				final Type genericType = clazz.getGenericSuperclass();
+				if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
+					continue;
+				}
+
+				// create db-model transfer object
+				final Object obj = clazz.newInstance();
+				final List transaction = new ArrayList();
+				transaction.add(obj);
+
+				// call dbBlock.setBlock*
+				final Method method = dbBlock.getClass().getMethod("setBlock" + clazz.getSimpleName() + "s", List.class);
+				method.invoke(dbBlock, transaction);
+			}
+			*/
+
+			this.blockDao.save(dbBlock);
+		}
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
