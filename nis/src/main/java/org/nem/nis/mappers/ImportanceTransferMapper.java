@@ -32,22 +32,12 @@ public class ImportanceTransferMapper {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(importanceTransferTransaction.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(importanceTransferTransaction.getRemote().getAddress());
 
-		final Hash txHash = HashUtils.calculateHash(importanceTransferTransaction);
-		return new ImportanceTransfer(
-				txHash,
-				importanceTransferTransaction.getVersion(),
-				importanceTransferTransaction.getType(),
-				importanceTransferTransaction.getFee().getNumMicroNem(),
-				importanceTransferTransaction.getTimeStamp().getRawTime(),
-				importanceTransferTransaction.getDeadline().getRawTime(),
-				sender,
-				// proof
-				importanceTransferTransaction.getSignature().getBytes(),
-				remote,
-				importanceTransferTransaction.getMode().value(),
-				orderIndex,
-				blockIndex, // index
-				0L);
+		final ImportanceTransfer transfer = new ImportanceTransfer();
+		AbstractTransferMapper.toDbModel(importanceTransferTransaction, sender, blockIndex, orderIndex, transfer);
+
+		transfer.setRemote(remote);
+		transfer.setMode(importanceTransferTransaction.getMode().value());
+		return transfer;
 	}
 
 	/**

@@ -3,10 +3,11 @@ package org.nem.nis.mappers;
 import org.nem.core.crypto.*;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 
 /**
  * Static class that contains functions for converting to and from
@@ -31,22 +32,11 @@ public class TransferMapper {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
 
-		final Hash txHash = HashUtils.calculateHash(transfer);
-		final Transfer dbTransfer = new Transfer(
-				txHash,
-				transfer.getVersion(),
-				transfer.getType(),
-				transfer.getFee().getNumMicroNem(),
-				transfer.getTimeStamp().getRawTime(),
-				transfer.getDeadline().getRawTime(),
-				sender,
-				// proof
-				transfer.getSignature().getBytes(),
-				recipient,
-				orderIndex, // order
-				blockIndex, // index
-				transfer.getAmount().getNumMicroNem(),
-				0L); // referenced tx
+		final Transfer dbTransfer = new Transfer();
+		AbstractTransferMapper.toDbModel(transfer, sender, blockIndex, orderIndex, dbTransfer);
+
+		dbTransfer.setRecipient(recipient);
+		dbTransfer.setAmount(transfer.getAmount().getNumMicroNem());
 
 		final Message message = transfer.getMessage();
 		if (null != message) {

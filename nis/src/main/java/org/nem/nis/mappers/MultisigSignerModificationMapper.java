@@ -33,22 +33,12 @@ public class MultisigSignerModificationMapper {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(multisigSignerModification.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(multisigSignerModification.getCosignatory().getAddress());
 
-		final Hash txHash = HashUtils.calculateHash(multisigSignerModification);
-		return new MultisigSignerModification(
-				txHash,
-				multisigSignerModification.getVersion(),
-				multisigSignerModification.getType(),
-				multisigSignerModification.getFee().getNumMicroNem(),
-				multisigSignerModification.getTimeStamp().getRawTime(),
-				multisigSignerModification.getDeadline().getRawTime(),
-				sender,
-				// proof
-				multisigSignerModification.getSignature().getBytes(),
-				remote,
-				multisigSignerModification.getModificationType().value(),
-				orderIndex,
-				blockIndex, // index
-				0L);
+		final MultisigSignerModification transfer = new MultisigSignerModification();
+		AbstractTransferMapper.toDbModel(multisigSignerModification, sender, blockIndex, orderIndex, transfer);
+
+		transfer.setCosignatory(remote);
+		transfer.setModificationType(multisigSignerModification.getModificationType().value());
+		return transfer;
 	}
 
 	/**
