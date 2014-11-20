@@ -99,7 +99,7 @@ public class BlockChainValidatorIntegrationTest {
 	public void chainWithImportanceTransferToNonZeroBalanceAccountIsInvalid() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_IT_VALIDATION_FORK + 11);
 		parentBlock.sign();
 
 		final Account account1 = Utils.generateRandomAccount();
@@ -131,7 +131,7 @@ public class BlockChainValidatorIntegrationTest {
 	public void chainWithConflictingImportanceTransfersIsInvalid() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_IT_VALIDATION_FORK + 11);
 		parentBlock.sign();
 
 		final Account account1 = Utils.generateRandomAccount();
