@@ -15,7 +15,6 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.MockAccountDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.test.context.ContextConfiguration;
@@ -111,9 +110,11 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote);
+		final MultisigSignerModificationTransaction multisigSignerModificationTransaction = this.prepareMultisigSignerModificationTransaction(signer, remote);
 		final ImportanceTransferTransaction importanceTransfer = this.prepareImportanceTransferTransaction(signer, remote, true);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(signer, remote, 10);
 		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
+		emptyBlock.addTransaction(multisigSignerModificationTransaction);
 		emptyBlock.addTransaction(importanceTransfer);
 		emptyBlock.addTransaction(transferTransaction);
 		emptyBlock.sign();
@@ -127,8 +128,10 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockMultisigSignerModifications().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getBlockMultisigSignerModifications().get(0).getId(), notNullValue());
 	}
 
 	// TODO 20141005 - since i imagine these tests will apply to all transaction types, it might make sense
@@ -697,7 +700,7 @@ public class BlockDaoTest {
 		this.createBlocksInDatabaseWithTransactions();
 
 		// Act:
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(new BlockHeight(1), 10);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksAfter(BlockHeight.ONE, 10);
 
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(1));
@@ -785,6 +788,21 @@ public class BlockDaoTest {
 		return importanceTransferTransaction;
 	}
 
+	private MultisigSignerModificationTransaction prepareMultisigSignerModificationTransaction(
+			final Account sender,
+			final Account cosignatory
+	) {
+		// Arrange:
+		final MultisigSignerModificationTransaction transaction = new MultisigSignerModificationTransaction(
+				new TimeInstant(0),
+				sender,
+				MultisigSignerModificationTransaction.ModificationType.Add,
+				cosignatory
+		);
+		transaction.sign();
+		return transaction;
+	}
+
 	private List<Hash> createBlocksInDatabase(final int numBlocks) {
 		final List<Hash> hashes = new ArrayList<>();
 		final Account sender = Utils.generateRandomAccount();
@@ -816,8 +834,8 @@ public class BlockDaoTest {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		this.addMapping(mockAccountDao, sender);
 
-		final int numBlocks = 2;
-		for (int i = 1; i < numBlocks; i++) {
+		final int numBlocks = 3;
+		for (int i = 2; i < numBlocks; i++) {
 			final org.nem.core.model.Block dummyBlock = new org.nem.core.model.Block(
 					sender,
 					Hash.ZERO,

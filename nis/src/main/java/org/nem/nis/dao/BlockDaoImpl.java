@@ -46,7 +46,8 @@ public class BlockDaoImpl implements BlockDao {
 	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
 		return criteria
 				.setFetchMode("blockTransfers", fetchMode)
-				.setFetchMode("blockImportanceTransfers", fetchMode);
+				.setFetchMode("blockImportanceTransfers", fetchMode)
+				.setFetchMode("blockMultisigSignerModification", fetchMode);
 	}
 
 	private static Criteria setTransfersToJoin(final Criteria criteria) {
@@ -174,39 +175,28 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		final Query getTxes = this.getCurrentSession()
-				.createQuery("select tx.id from Block b join b.blockTransfers tx where b.height > :height")
-				.setParameter("height", blockHeight.getRaw());
-		final List<Long> txToDelete = listAndCast(getTxes);
-
-		// TODO 20140909 J-G: likewise, i would probably refactor the query construction and delete if !empty
-		// (the differences are the join field name and the transfer table name)
-		// G-J: I need to rewrite this method, as it's probably wrong anyway, but I'll do it later
-		// TODO 20140914 J-G: that's why tests are good :)
-
-		final Query getImportanceTxes = this.getCurrentSession()
-				.createQuery("select tx.id from Block b join b.blockImportanceTransfers tx where b.height > :height")
-				.setParameter("height", blockHeight.getRaw());
-		final List<Long> importanceTxToDelete = listAndCast(getImportanceTxes);
-
-		if (!importanceTxToDelete.isEmpty()) {
-			final Query dropTxes = this.getCurrentSession()
-					.createQuery("delete from ImportanceTransfer t where t.id in (:ids)")
-					.setParameterList("ids", importanceTxToDelete);
-			dropTxes.executeUpdate();
-		}
-
-		if (!txToDelete.isEmpty()) {
-			final Query dropTxes = this.getCurrentSession()
-					.createQuery("delete from Transfer t where t.id in (:ids)")
-					.setParameterList("ids", txToDelete);
-			dropTxes.executeUpdate();
-		}
+		dropTransfers(blockHeight, "Transfer", "blockTransfers");
+		dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers");
+		dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications");
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
+	}
+
+	private void dropTransfers(final BlockHeight blockHeight, final String tableName, final String transfersName) {
+		final Query getTransactionIdsQuery = this.getCurrentSession()
+				.createQuery("select tx.id from Block b join b." + transfersName + " tx where b.height > :height")
+				.setParameter("height", blockHeight.getRaw());
+		final List<Long> transactionsToDElete = listAndCast(getTransactionIdsQuery);
+
+		if (!transactionsToDElete.isEmpty()) {
+			final Query dropTxes = this.getCurrentSession()
+			                           .createQuery("delete from " + tableName + " t where t.id in (:ids)")
+			                           .setParameterList("ids", transactionsToDElete);
+			dropTxes.executeUpdate();
+		}
 	}
 
 	private <T> T executeSingleQuery(final Criteria criteria) {
