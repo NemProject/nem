@@ -521,8 +521,6 @@ public class NxtGraphClusteringITCase {
 
 	//region poiComparisonTest
 
-	// TODO 20141015 BR: this test used to pass but now it fails. What changed?
-	// TODO 20141016 M: something seems to have broken somewhere I think
 	@Test
 	public void poiComparisonTest() {
 		// Arrange:
@@ -542,7 +540,7 @@ public class NxtGraphClusteringITCase {
 		assertDifference("FastScan vs OutlierScan", fastScanImportances, outlierScanImportances);
 		assertDifference("SingleClusterScan vs OutlierScan",
 				singleClusterScanImportances,
-				outlierScanImportances); //TODO: I am not convinced these should be so different. At any rate, this assert is making the test fail.
+				outlierScanImportances); //TODO-M: I am not convinced that we should expect these two to be so different. At any rate, this assert is making the test fail.
 	}
 
 	private static void assertDifference(final String message, final ColumnVector lhs, final ColumnVector rhs) {

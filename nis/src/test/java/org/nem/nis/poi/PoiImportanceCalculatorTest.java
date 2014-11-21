@@ -333,12 +333,12 @@ public class PoiImportanceCalculatorTest {
 		// Act:
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
+		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
 		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
 
-		// NCD aware page rank
-		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
+		// NCD aware rank
+		LOGGER.info("NCD aware rank:");
+		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
@@ -454,12 +454,12 @@ public class PoiImportanceCalculatorTest {
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
+		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
 		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
 
-		// NCD aware page rank
-		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
+		// NCD aware rank
+		LOGGER.info("NCD aware rank:");
+		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
@@ -547,11 +547,11 @@ public class PoiImportanceCalculatorTest {
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
+		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
 
-		// NCD aware page rank
-		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
+		// NCD aware rank
+		LOGGER.info("NCD aware rank:");
+		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 
 		// Assert:
 		// Merchant and exchange should have higher importance than users.
@@ -575,12 +575,11 @@ public class PoiImportanceCalculatorTest {
 			this.builder2.setInterLevelTeleportationProbability(0.1);
 		}
 
-		// TODO 20141018 J-B: not sure if i named these correctly; if not you might want to rename
-		public ColumnVector calculateRing1Importances(final Collection<PoiAccountState> accountStates) {
+		public ColumnVector calculatePageRankImportances(final Collection<PoiAccountState> accountStates) {
 			return calculateImportances(this.builder1.create(), this.height1, accountStates, new PageRankScorer());
 		}
 
-		public ColumnVector calculateRing2Importances(final Collection<PoiAccountState> accountStates) {
+		public ColumnVector calculateNCDAwareRankImportances(final Collection<PoiAccountState> accountStates) {
 			return calculateImportances(this.builder2.create(), this.height2, accountStates, new PageRankScorer());
 		}
 	}
