@@ -5,12 +5,17 @@ import org.mockito.Mockito;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.*;
 import org.nem.nis.poi.*;
 
 import java.util.*;
 
 public class PruningObserverTest {
+	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = 2 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long OUTLINK_BLOCK_HISTORY_OLD = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long PRUNE_INTERVAL = 360;
+	private static final long BETA_OUTLINK_PRUNING_FORK = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK;
 
 	//region no-op
 
@@ -81,23 +86,47 @@ public class PruningObserverTest {
 
 	@Test
 	public void allAccountsArePrunedWhenBlockHeightIsNearOutlinkBlockHistory() {
+		// TODO: Replace with new constant when launching.
 		// Assert:
-		assertAllAccountsArePruned(43200, 0, 0);
-		assertAllAccountsArePruned(43201, 40321, 1);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD, 0, 0);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 1, OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1);
 
-		assertAllAccountsArePruned(43560, 0, 0);
-		assertAllAccountsArePruned(43561, 40681, 361);
-		assertAllAccountsArePruned(43562, 0, 0);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 360, 0, 0);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 361, OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY + 361, 361);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 362, 0, 0);
 
-		assertAllAccountsArePruned(43920, 0, 0);
-		assertAllAccountsArePruned(43921, 41041, 721);
-		assertAllAccountsArePruned(43922, 0, 0);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 720, 0, 0);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 721, OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY + 721, 721);
+		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 722, 0, 0);
 	}
 
 	@Test
 	public void allAccountsArePrunedWhenBlockHeightIsMuchGreaterThanHistories() {
 		// Assert:
-		assertAllAccountsArePruned(432001, 429121, 388801);
+		assertAllAccountsArePruned(
+				10 * OUTLINK_BLOCK_HISTORY + 1,
+				10 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1,
+				10 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1);
+	}
+
+	@Test
+	public void outlinkPruningUsesOutlinkBlockHistoryOldBeforeBetaOutlinkPruningFork() {
+		// Assert:
+		final long notificationHeight = (BETA_OUTLINK_PRUNING_FORK / 360) * 360 + 1;
+		assertAllAccountsArePruned(
+				notificationHeight,
+				notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
+				notificationHeight - OUTLINK_BLOCK_HISTORY_OLD);
+	}
+
+	@Test
+	public void outlinkPruningUsesOutlinkBlockHistoryAfterBetaOutlinkPruningFork() {
+		// Assert:
+		final long notificationHeight = (BETA_OUTLINK_PRUNING_FORK / 360 + 1) * 360 + 1;
+		assertAllAccountsArePruned(
+				notificationHeight,
+				notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
+				notificationHeight - OUTLINK_BLOCK_HISTORY);
 	}
 
 	private static void assertAllAccountsArePruned(

@@ -2,7 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockChainConstants;
+import org.nem.nis.*;
 import org.nem.nis.secret.*;
 
 import java.util.*;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
  * Account information used by poi.
  */
 public class PoiAccountInfo {
+	private static final long OUTLINK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private final int index;
 	private final PoiAccountState accountState;
 	private final BlockHeight height;
@@ -38,6 +39,9 @@ public class PoiAccountInfo {
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
+			if (OUTLINK_HISTORY < heightDifference && BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK <= height.getRaw()) {
+				continue;
+			}
 			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 			final double weight = heightDifference < 0
 					? 0.0
