@@ -113,15 +113,17 @@ public class BlockDaoTest {
 		final MultisigSignerModificationTransaction multisigSignerModificationTransaction = this.prepareMultisigSignerModificationTransaction(signer, remote);
 		final ImportanceTransferTransaction importanceTransfer = this.prepareImportanceTransferTransaction(signer, remote, true);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(signer, remote, 10);
-		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
-		emptyBlock.addTransaction(multisigSignerModificationTransaction);
-		emptyBlock.addTransaction(importanceTransfer);
-		emptyBlock.addTransaction(transferTransaction);
-		emptyBlock.sign();
-		final Block entity = BlockMapper.toDbModel(emptyBlock, accountDaoLookup);
+		final org.nem.core.model.Block block = this.createTestEmptyBlock(signer, 133, 0);
+		block.addTransaction(multisigSignerModificationTransaction);
+		block.addTransaction(importanceTransfer);
+		block.addTransaction(transferTransaction);
+		block.sign();
+
+		final Block dbBlock = BlockMapper.toDbModel(block, accountDaoLookup);
+		this.blockDao.save(dbBlock);
 
 		// Act:
-		this.blockDao.save(entity);
+		final Block entity = this.blockDao.findByHeight(block.getHeight());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());

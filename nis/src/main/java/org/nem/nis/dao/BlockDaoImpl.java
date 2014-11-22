@@ -47,7 +47,7 @@ public class BlockDaoImpl implements BlockDao {
 		return criteria
 				.setFetchMode("blockTransfers", fetchMode)
 				.setFetchMode("blockImportanceTransfers", fetchMode)
-				.setFetchMode("blockMultisigSignerModification", fetchMode);
+				.setFetchMode("blockMultisigSignerModifications", fetchMode);
 	}
 
 	private static Criteria setTransfersToJoin(final Criteria criteria) {
