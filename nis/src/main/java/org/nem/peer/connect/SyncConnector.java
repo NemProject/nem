@@ -4,6 +4,7 @@ import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
+import org.nem.nis.controller.requests.ChainRequest;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -51,6 +52,16 @@ public interface SyncConnector {
 	 * @return All blocks in the chain after the specified height.
 	 */
 	public Collection<Block> getChainAfter(final Node node, final BlockHeight height);
+
+	/**
+	 * Requests information about all blocks in the chain after the specified height
+	 * from the specified node.
+	 *
+	 * @param node The remote node.
+	 * @param chainRequest The chain request.
+	 * @return All blocks in the chain as specified in the chain request.
+	 */
+	public Collection<Block> getChainAfter(final Node node, final ChainRequest chainRequest);
 
 	/**
 	 * Requests information about the cumulative score of the remote chain

@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.nis.*;
+import org.nem.nis.controller.requests.ChainRequest;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
@@ -107,7 +108,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		//endregion
 
 		//region verify peer's chain
-		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
+		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight));
 		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
 		//endregion

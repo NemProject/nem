@@ -7,6 +7,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.nis.controller.requests.ChainRequest;
 import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 import org.nem.peer.node.*;
 
@@ -90,6 +91,16 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	}
 
 	@Override
+	public Collection<Block> getChainAfter(final Node node, final ChainRequest chainRequest) {
+		final URL url = getUrl(node, NisPeerId.REST_CHAIN_BLOCKS_AFTER);
+		return this.postAuthenticated(
+				url,
+				node.getIdentity(),
+				d -> new SerializableList<>(d, BlockFactory.VERIFIABLE),
+				chainRequest).join().asCollection();
+	}
+
+	@Override
 	public HashChain getHashesFrom(final Node node, final BlockHeight height) {
 		final URL url = getUrl(node, NisPeerId.REST_CHAIN_HASHES_FROM);
 		return this.postAuthenticated(url, node.getIdentity(), obj -> new HashChain(obj), height).join();
@@ -152,6 +163,16 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 			final NodeIdentity remoteNodeIdentity,
 			final ObjectDeserializer<TOut> entityDeserializer,
 			final BlockHeight entity) {
+		final NodeChallenge challenge = this.challengeFactory.next();
+		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(entity, challenge);
+		return unwrapAuthenticatedResponse(this.post(url, request), challenge, remoteNodeIdentity, entityDeserializer);
+	}
+
+	private <TOut extends SerializableEntity> CompletableFuture<TOut> postAuthenticated(
+			final URL url,
+			final NodeIdentity remoteNodeIdentity,
+			final ObjectDeserializer<TOut> entityDeserializer,
+			final ChainRequest entity) {
 		final NodeChallenge challenge = this.challengeFactory.next();
 		final AuthenticatedRequest<?> request = new AuthenticatedRequest<>(entity, challenge);
 		return unwrapAuthenticatedResponse(this.post(url, request), challenge, remoteNodeIdentity, entityDeserializer);
