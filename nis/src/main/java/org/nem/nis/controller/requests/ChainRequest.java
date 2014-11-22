@@ -85,6 +85,15 @@ public class ChainRequest implements SerializableEntity {
 		return this.maxTransactions;
 	}
 
+	/**
+	 * Gets the number of blocks which should be used in the database query.
+	 *
+	 * @return The number of blocks.
+	 */
+	public int getNumBlocks() {
+		return Math.min(BlockChainConstants.BLOCKS_LIMIT, this.minBlocks + 100);
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);

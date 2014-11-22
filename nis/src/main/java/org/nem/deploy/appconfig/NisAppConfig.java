@@ -144,7 +144,8 @@ public class NisAppConfig {
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.blockChainContextFactory(),
-				this.unconfirmedTransactions());
+				this.unconfirmedTransactions(),
+				this.nisConfiguration());
 	}
 
 	@Bean
