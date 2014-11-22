@@ -19,12 +19,12 @@ public class BlockChainConstants {
 	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 4);
 
 	/**
-	 * Maximum number of blocks send and compared during synchronization
+	 * Maximum number of blocks send and compare during synchronization
 	 */
 	public static final int BLOCKS_LIMIT = REWRITE_LIMIT + 40;
 
 	/**
-	 * Maximum number of transactions during synchronization
+	 * Maximum number of transactions to send during synchronization
 	 */
 	public static final int TRANSACTIONS_LIMIT = 10000;
 
