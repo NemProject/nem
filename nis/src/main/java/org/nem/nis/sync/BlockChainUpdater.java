@@ -108,7 +108,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		//endregion
 
 		//region verify peer's chain
-		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight));
+		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().longValue() - commonBlockHeight.getRaw());
+		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight, minBlocks));
 		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
 		//endregion
