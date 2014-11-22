@@ -76,7 +76,7 @@ public class ChainController {
 	public AuthenticatedResponse<SerializableList<Block>> variableBlocksAfter(@RequestBody final AuthenticatedChainRequest request) {
 		final long start = System.currentTimeMillis();
 		final ChainRequest chainRequest = request.getEntity();
-		int numBlocks = Math.min(BlockChainConstants.BLOCKS_LIMIT, chainRequest.getMinBlocks() + 100);
+		int numBlocks = Math.min(BlockChainConstants.BLOCKS_LIMIT, chainRequest.getMinBlocks() + 100); // TODO 20141122 J-B: i think this should be a function on ChainRequest
 		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
 		boolean enough = addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
 		numBlocks = 100;
@@ -101,12 +101,12 @@ public class ChainController {
 			final BlockHeight height,
 			final int numBlocksToRequest,
 			final int maxTransactions) {
-		final int[] numTransactions = new int[1];
-		blockList.asCollection().stream().forEach(b -> numTransactions[0] += b.getTransactions().size());
+		int numTransactions = blockList.asCollection().stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
 		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
-		if (0 == dbBlockList.size()) {
+		if (dbBlockList.isEmpty()) {
 			return true;
 		}
+
 		org.nem.nis.dbmodel.Block previousDbBlock = null;
 		for (final org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
@@ -115,10 +115,11 @@ public class ChainController {
 			}
 
 			previousDbBlock = dbBlock;
-			numTransactions[0] += dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
-			if (numTransactions[0] > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
+			numTransactions += dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
+			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}
+
 			blockList.add(BlockMapper.toModel(dbBlock, this.accountLookup));
 		}
 

@@ -48,16 +48,6 @@ public interface SyncConnector {
 	 * from the specified node.
 	 *
 	 * @param node The remote node.
-	 * @param height The block height.
-	 * @return All blocks in the chain after the specified height.
-	 */
-	public Collection<Block> getChainAfter(final Node node, final BlockHeight height);
-
-	/**
-	 * Requests information about all blocks in the chain after the specified height
-	 * from the specified node.
-	 *
-	 * @param node The remote node.
 	 * @param chainRequest The chain request.
 	 * @return All blocks in the chain as specified in the chain request.
 	 */
