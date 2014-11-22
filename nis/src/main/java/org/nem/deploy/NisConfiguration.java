@@ -141,7 +141,7 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
-	 * Gets the maximum number of transactions that should be in side the blocks returned in the /chain/variable-blocks-after request.
+	 * Gets the maximum number of transactions that should be inside the blocks returned in the /chain/blocks-after request.
 	 *
 	 * @return The maximum number of transactions.
 	 */
