@@ -19,6 +19,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final IpDetectionMode ipDetectionMode;
 	private final int unlockedLimit;
 	private final String[] nonAuditedApiPaths;
+	private final int maxTransactions;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -53,6 +54,7 @@ public class NisConfiguration extends CommonConfiguration {
 		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
 		final String nonAuditedApiPaths = getOptionalString(properties, "nis.nonAuditedApiPaths", "/heartbeat|/status|/chain/height");
 		this.nonAuditedApiPaths = nonAuditedApiPaths.split("\\|");
+		this.maxTransactions = getOptionalInteger(properties, "nis.maxTransactions", 10000);
 	}
 
 	/**
@@ -136,5 +138,14 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public String[] getNonAuditedApiPaths() {
 		return this.nonAuditedApiPaths;
+	}
+
+	/**
+	 * Gets the maximum number of transactions that should be inside the blocks returned in the /chain/blocks-after request.
+	 *
+	 * @return The maximum number of transactions.
+	 */
+	public int getMaxTransactions() {
+		return this.maxTransactions;
 	}
 }

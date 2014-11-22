@@ -28,6 +28,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height" }));
+		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
 	}
 
 	@Test
@@ -44,6 +45,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.ipDetectionMode", "Disabled");
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.nonAuditedApiPaths", "/status|/whatever");
+		properties.setProperty("nis.maxTransactions", "234");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -60,6 +62,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
+		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(234));
 	}
 
 	@Test

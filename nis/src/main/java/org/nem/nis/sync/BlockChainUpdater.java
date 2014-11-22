@@ -5,7 +5,9 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
+import org.nem.deploy.NisConfiguration;
 import org.nem.nis.*;
+import org.nem.nis.controller.requests.ChainRequest;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
@@ -31,6 +33,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final AccountAnalyzer accountAnalyzer;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
@@ -39,13 +42,15 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainContextFactory blockChainContextFactory,
-			final UnconfirmedTransactions unconfirmedTransactions) {
+			final UnconfirmedTransactions unconfirmedTransactions,
+			final NisConfiguration configuration) {
 		this.accountAnalyzer = accountAnalyzer;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
 	}
 
@@ -107,7 +112,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		//endregion
 
 		//region verify peer's chain
-		final Collection<Block> peerChain = connector.getChainAfter(node, commonBlockHeight);
+		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight() - commonBlockHeight.getRaw());
+		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight, minBlocks, configuration.getMaxTransactions()));
 		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 		return NodeInteractionResult.fromValidationResult(validationResult);
 		//endregion
