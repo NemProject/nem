@@ -50,4 +50,9 @@ public class TransactionTypes {
 	 */
 	public static final int MULTISIG_SIGNATURE = MULTISIG_TYPE | 0x02;
 
+	/**
+	 * A multisig transaction.
+	 */
+	public static final int MULTISIG = MULTISIG_TYPE | 0x04;
+
 }
