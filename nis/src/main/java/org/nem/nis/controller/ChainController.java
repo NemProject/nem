@@ -7,7 +7,7 @@ import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.mappers.BlockMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -67,9 +67,46 @@ public class ChainController {
 	@P2PApi
 	@AuthenticatedApi
 	public AuthenticatedResponse<SerializableList<Block>> blocksAfter(@RequestBody final AuthenticatedBlockHeightRequest request) {
+		return variableBlocksAfter(new AuthenticatedChainRequest(new ChainRequest(request.getEntity()), request.getChallenge()));
+	}
+
+	@RequestMapping(value = "/chain/variable-blocks-after", method = RequestMethod.POST)
+	@P2PApi
+	@AuthenticatedApi
+	public AuthenticatedResponse<SerializableList<Block>> variableBlocksAfter(@RequestBody final AuthenticatedChainRequest request) {
 		final long start = System.currentTimeMillis();
+		final ChainRequest chainRequest = request.getEntity();
+		int numBlocks = Math.min(BlockChainConstants.BLOCKS_LIMIT, chainRequest.getMinBlocks() + 100);
 		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
-		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(request.getEntity(), BlockChainConstants.BLOCKS_LIMIT);
+		boolean enough = addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
+		numBlocks = 100;
+		while (!enough) {
+			enough = addBlocks(blockList, blockList.get(blockList.size() - 1).getHeight(), numBlocks, chainRequest.getMaxTransactions());
+		}
+
+		final long stop = System.currentTimeMillis();
+		LOGGER.info(String.format("Pulling %d blocks from db starting at height %d needed %dms.",
+				blockList.size(),
+				chainRequest.getHeight().getRaw(),
+				stop - start));
+		final Node localNode = this.host.getNetwork().getLocalNode();
+		return new AuthenticatedResponse<>(
+				blockList,
+				localNode.getIdentity(),
+				request.getChallenge());
+	}
+
+	private boolean addBlocks(
+			final SerializableList<Block> blockList,
+			final BlockHeight height,
+			final int numBlocksToRequest,
+			final int maxTransactions) {
+		final int[] numTransactions = new int[1];
+		blockList.asCollection().stream().forEach(b -> numTransactions[0] += b.getTransactions().size());
+		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
+		if (0 == dbBlockList.size()) {
+			return true;
+		}
 		org.nem.nis.dbmodel.Block previousDbBlock = null;
 		for (final org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
@@ -78,19 +115,14 @@ public class ChainController {
 			}
 
 			previousDbBlock = dbBlock;
+			numTransactions[0] += dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
+			if (numTransactions[0] > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
+				return true;
+			}
 			blockList.add(BlockMapper.toModel(dbBlock, this.accountLookup));
 		}
 
-		final long stop = System.currentTimeMillis();
-		LOGGER.info(String.format("Pulling %d blocks from db starting at height %d needed %dms.",
-				BlockChainConstants.BLOCKS_LIMIT,
-				request.getEntity().getRaw(),
-				stop - start));
-		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(
-				blockList,
-				localNode.getIdentity(),
-				request.getChallenge());
+		return false;
 	}
 
 	@RequestMapping(value = "/chain/hashes-from", method = RequestMethod.POST)

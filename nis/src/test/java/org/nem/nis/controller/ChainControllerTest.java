@@ -4,15 +4,16 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
-import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.NisUtils;
@@ -259,6 +260,116 @@ public class ChainControllerTest {
 		Mockito.verify(context.blockDao, Mockito.times(1))
 				.getBlocksAfter(new BlockHeight(10), BlockChainConstants.BLOCKS_LIMIT);
 		return result;
+	}
+
+	//endregion
+
+	//region variableBlocksAfter
+
+	@Test
+	public void variableBlocksAfterAuthenticatedReturnsMappedBlocksFromDatabase() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+		final AuthenticatedChainRequest request = new AuthenticatedChainRequest(new ChainRequest(new BlockHeight(10), 10, 10), challenge);
+		final ArrayList<org.nem.nis.dbmodel.Block>[] subsequentBlockLists = (ArrayList<org.nem.nis.dbmodel.Block>[])new ArrayList<?>[1];
+		subsequentBlockLists[0] = new ArrayList<>();
+
+		// Assert:
+		final AuthenticatedResponse<?> response = runVariableBlocksAfterTest(
+				context,
+				c -> c.controller.variableBlocksAfter(request),
+				r -> r.getEntity(localNode.getIdentity(), challenge),
+				createDbBlockList(11, 2),
+				subsequentBlockLists);
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+	}
+
+	@Test
+	public void variableBlocksAfterAuthenticatedReturnsAtMostMaxTransactionsTransactionsInBlocksFromDatabase() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Node localNode = context.network.getLocalNode();
+		final NodeChallenge challenge = new NodeChallenge(Utils.generateRandomBytes());
+		final AuthenticatedChainRequest request = new AuthenticatedChainRequest(new ChainRequest(new BlockHeight(10), 10, 130), challenge);
+		final ArrayList<org.nem.nis.dbmodel.Block>[] subsequentBlockLists = (ArrayList<org.nem.nis.dbmodel.Block>[])new ArrayList<?>[1];
+		subsequentBlockLists[0] = new ArrayList<>();
+
+		// Assert:
+		final AuthenticatedResponse<SerializableList<Block>> response = runVariableBlocksAfterTest(
+				context,
+				c -> c.controller.variableBlocksAfter(request),
+				r -> r.getEntity(localNode.getIdentity(), challenge),
+				createDbBlockList(11, 150),
+				subsequentBlockLists);
+		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
+
+		// 1 transaction per block
+		Assert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130));
+	}
+
+	private static <T> T runVariableBlocksAfterTest(
+			final TestContext context,
+			final Function<TestContext, T> action,
+			final Function<T, SerializableList<Block>> getBlocks,
+			final List<org.nem.nis.dbmodel.Block> blockList,
+			final List<org.nem.nis.dbmodel.Block>[] subsequentBlockLists) {
+		// Arrange:
+		Mockito.when(context.blockDao.getBlocksAfter(Mockito.any(), Mockito.anyInt()))
+				.thenReturn(blockList, subsequentBlockLists);
+
+		// Act:
+		final T result = action.apply(context);
+		final Collection<Block> blocks = getBlocks.apply(result).asCollection();
+
+		// Assert:
+		final long[] heights = new long[1];
+		final int[] timeInstants = new int[1];
+		heights[0] = 11;
+		timeInstants[0] = 400;
+		blocks.stream()
+				.sorted((b1, b2) -> b1.getHeight().compareTo(b2.getHeight()))
+				.forEach(b -> {
+					Assert.assertThat(b.getHeight(), IsEqual.equalTo(new BlockHeight(heights[0]++)));
+					Assert.assertThat(b.getTimeStamp(), IsEqual.equalTo(new TimeInstant(timeInstants[0]++)));
+				});
+		Mockito.verify(context.blockDao, Mockito.times(1))
+				.getBlocksAfter(new BlockHeight(10), 110);
+		return result;
+	}
+
+	private static List<org.nem.nis.dbmodel.Block> createDbBlockList(final int height, final int count) {
+		final List<org.nem.nis.dbmodel.Block> dbBlockList = new ArrayList<>();
+		for (int i=0; i<count; i++) {
+			final org.nem.nis.dbmodel.Block dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
+			dbBlock.setId((long)(height + i));
+			dbBlock.setBlockTransfers(Arrays.asList(createDbTransferWithTimeStamp(400 + i)));
+			dbBlockList.add(dbBlock);
+		}
+
+		return dbBlockList;
+	}
+
+	private static org.nem.nis.dbmodel.Transfer createDbTransferWithTimeStamp(final int timeStamp) {
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
+		account.setPrintableKey(address.getEncoded());
+		account.setPublicKey(address.getPublicKey());
+		return new Transfer(
+				Utils.generateRandomHash(),
+				0,
+				0,
+				0L,
+				timeStamp,
+				1,
+				account,
+				new byte[64],
+				account,
+				0,
+				0,
+				0L,
+				0L);
 	}
 
 	//endregion
