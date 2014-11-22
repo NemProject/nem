@@ -334,6 +334,77 @@ public class PushServiceTest {
 		return mockTransaction;
 	}
 
+	@Test
+	public void pushBlockCachesBlockIfValidationSucceeds() {
+		assertPushServiceBlockCaching(
+				ValidationResult.SUCCESS,
+				1);
+	}
+
+	@Test
+	public void pushBlockDoesNotCacheBlockIfValidationFails() {
+		assertPushServiceBlockCaching(
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				2);
+	}
+
+	private static void assertPushServiceBlockCaching(
+			final ValidationResult blockValidationResult,
+			final int expectedNumberOfInvocations) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block block = NisUtils.createRandomBlockWithHeight(12);
+		block.sign();
+		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(blockValidationResult);
+		Mockito.when(context.blockChain.processBlock(block)).thenReturn(ValidationResult.SUCCESS);
+
+		// Act:
+		// initial push (cached validation result should NOT be used)
+		context.service.pushBlock(block, null);
+
+		// time provider supplies time stamp 5 seconds later than first one --> first block not pruned
+		// (cached validation result should be used)
+		context.service.pushBlock(block, null);
+
+		// Assert:
+		Mockito.verify(context.blockChain, Mockito.times(expectedNumberOfInvocations)).checkPushedBlock(block);
+	}
+
+	@Test
+	public void pushBlockPrunesBlockHashCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block block = NisUtils.createRandomBlockWithTimeStamp(1122448);
+		block.sign();
+		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(context.blockChain.processBlock(block)).thenReturn(ValidationResult.SUCCESS);
+
+		Mockito.when(context.timeProvider.getCurrentTime())
+				.thenReturn(
+						new TimeInstant(1122448),
+						new TimeInstant(1122448),
+						new TimeInstant(1122448 + 500),
+						new TimeInstant(1122448 + 1600),
+						new TimeInstant(1122448 + 1600));
+
+		// Act:
+		// initial push (cached validation result should NOT be used)
+		context.service.pushBlock(block, null);
+
+		// time provider supplies time stamp 500 seconds later than first one --> first block not pruned.
+		context.service.pushBlock(block, null);
+
+		// time provider supplies time stamp 900 seconds later than second one --> first and second block pruned.
+		context.service.pushBlock(block, null);
+
+		// time provider supplies time stamp same as third one --> third block not pruned.
+		context.service.pushBlock(block, null);
+
+		// Assert:
+		// transaction validation should have only occurred twice
+		Mockito.verify(context.blockChain, Mockito.times(2)).checkPushedBlock(block);
+	}
+
 	//endregion
 
 	private static SingleTransactionValidator createValidatorWithResult(final ValidationResult result) {
