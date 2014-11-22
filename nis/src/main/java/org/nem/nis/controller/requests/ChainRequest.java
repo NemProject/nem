@@ -7,13 +7,20 @@ import org.nem.nis.BlockChainConstants;
 /**
  * Request that specifies parameters when pulling data from the db.
  * It gives NIS some flexibility to pull more or less blocks from the db.
- *
- * TODO: would obviously have to update tests!
  */
 public class ChainRequest implements SerializableEntity {
 	private final BlockHeight height;
 	private final int minBlocks;
 	private final int maxTransactions;
+
+	private ChainRequest(
+			final BlockHeight height,
+			final Integer minBlocks,
+			final Integer maxTransactions) {
+		this.height = height;
+		this.minBlocks = clampMinBlocks(minBlocks);
+		this.maxTransactions = clampMinTransactions(maxTransactions);
+	}
 
 	/**
 	 * Creates a chain request.
@@ -24,11 +31,9 @@ public class ChainRequest implements SerializableEntity {
 	 */
 	public ChainRequest(
 			final BlockHeight height,
-			final Integer minBlocks,
-			final Integer maxTransactions) {
-		this.height = height;
-		this.minBlocks = clampMinBlocks(minBlocks);
-		this.maxTransactions = clampMinTransactions(maxTransactions);
+			final int minBlocks,
+			final int maxTransactions) {
+		this(height, Integer.valueOf(minBlocks), Integer.valueOf(maxTransactions));
 	}
 
 	/**
