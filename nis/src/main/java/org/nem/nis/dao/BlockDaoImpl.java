@@ -189,12 +189,12 @@ public class BlockDaoImpl implements BlockDao {
 		final Query getTransactionIdsQuery = this.getCurrentSession()
 				.createQuery("select tx.id from Block b join b." + transfersName + " tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
-		final List<Long> transactionsToDElete = listAndCast(getTransactionIdsQuery);
+		final List<Long> transactionsToDelete = listAndCast(getTransactionIdsQuery);
 
-		if (!transactionsToDElete.isEmpty()) {
+		if (!transactionsToDelete.isEmpty()) {
 			final Query dropTxes = this.getCurrentSession()
 			                           .createQuery("delete from " + tableName + " t where t.id in (:ids)")
-			                           .setParameterList("ids", transactionsToDElete);
+			                           .setParameterList("ids", transactionsToDelete);
 			dropTxes.executeUpdate();
 		}
 	}

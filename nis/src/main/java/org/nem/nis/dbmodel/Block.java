@@ -234,9 +234,9 @@ public class Block {
 		return this.blockMultisigSignerModifications;
 	}
 
-	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModification)
+	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModifications)
 	{
-		this.blockMultisigSignerModifications = blockMultisigSignerModification;
+		this.blockMultisigSignerModifications = blockMultisigSignerModifications;
 	}
 }
 
