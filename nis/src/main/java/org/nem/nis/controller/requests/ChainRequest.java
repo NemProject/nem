@@ -7,6 +7,8 @@ import org.nem.nis.BlockChainConstants;
 /**
  * Request that specifies parameters when pulling data from the db.
  * It gives NIS some flexibility to pull more or less blocks from the db.
+ *
+ * TODO: would obviously have to update tests!
  */
 public class ChainRequest implements SerializableEntity {
 	private final BlockHeight height;
@@ -22,12 +24,11 @@ public class ChainRequest implements SerializableEntity {
 	 */
 	public ChainRequest(
 			final BlockHeight height,
-			final int minBlocks,
-			final int maxTransactions) {
+			final Integer minBlocks,
+			final Integer maxTransactions) {
 		this.height = height;
-		this.minBlocks = Math.min(BlockChainConstants.BLOCKS_LIMIT, Math.max(10, minBlocks));
-		this.maxTransactions =
-				Math.min(BlockChainConstants.TRANSACTIONS_LIMIT, Math.max(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, maxTransactions));
+		this.minBlocks = clampMinBlocks(minBlocks);
+		this.maxTransactions = clampMinTransactions(maxTransactions);
 	}
 
 	/**
@@ -36,7 +37,7 @@ public class ChainRequest implements SerializableEntity {
 	 * @param height The height after which the blocks are pulled.
 	 */
 	public ChainRequest(final BlockHeight height) {
-		this(height, BlockChainConstants.DEFAULT_NUMBER_OF_BLOCKS_TO_PULL, BlockChainConstants.DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS);
+		this(height, null, null);
 	}
 
 	/**
@@ -46,7 +47,7 @@ public class ChainRequest implements SerializableEntity {
 	 * @param minBlocks The minimum number of blocks to pull.
 	 */
 	public ChainRequest(final BlockHeight height, final int minBlocks) {
-		this(height, minBlocks, BlockChainConstants.DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS);
+		this(height, minBlocks, null);
 	}
 
 	/**
@@ -55,7 +56,21 @@ public class ChainRequest implements SerializableEntity {
 	 * @param deserializer The deserializer to use.
 	 */
 	public ChainRequest(final Deserializer deserializer) {
-		this(BlockHeight.readFrom(deserializer, "height"), deserializer.readInt("minBlocks"), deserializer.readInt("maxTransactions"));
+		this.height = BlockHeight.readFrom(deserializer, "height");
+		this.minBlocks = clampMinBlocks(deserializer.readOptionalInt("minBlocks"));
+		this.maxTransactions = clampMinTransactions(deserializer.readOptionalInt("maxTransactions"));
+	}
+
+	private static int clampMinBlocks(final Integer value) {
+		return null == value
+				? BlockChainConstants.DEFAULT_NUMBER_OF_BLOCKS_TO_PULL
+		 		: Math.min(BlockChainConstants.BLOCKS_LIMIT, Math.max(10, value));
+	}
+
+	private static int clampMinTransactions(final Integer value) {
+		return null == value
+				? BlockChainConstants.DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS
+				: Math.min(BlockChainConstants.TRANSACTIONS_LIMIT, Math.max(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, value));
 	}
 
 	/**
