@@ -361,6 +361,9 @@ public class PushServiceTest {
 		// Act:
 		// initial push (cached validation result should NOT be used)
 		context.service.pushBlock(block, null);
+
+		// time provider supplies time stamp 5 seconds later than first one --> first block not pruned
+		// (cached validation result should be used)
 		context.service.pushBlock(block, null);
 
 		// Assert:
