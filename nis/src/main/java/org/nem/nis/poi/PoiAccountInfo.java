@@ -12,10 +12,9 @@ import java.util.stream.Collectors;
  * Account information used by poi.
  */
 public class PoiAccountInfo {
-	private static final long OUTLINK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long OUTLINK_HISTORY = BlockChainConstants.OUTLINK_HISTORY;
 	private final int index;
 	private final PoiAccountState accountState;
-	private final BlockHeight height;
 
 	private final Map<Address, Double> netOutlinks = new HashMap<>();
 	private final List<WeightedLink> outlinks = new ArrayList<>();
@@ -30,7 +29,6 @@ public class PoiAccountInfo {
 	public PoiAccountInfo(final int index, final PoiAccountState accountState, final BlockHeight height) {
 		this.index = index;
 		this.accountState = accountState;
-		this.height = height;
 
 		final AccountImportance importanceInfo = this.accountState.getImportanceInfo();
 		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(height);
@@ -42,6 +40,7 @@ public class PoiAccountInfo {
 			if (OUTLINK_HISTORY < heightDifference && BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK <= height.getRaw()) {
 				continue;
 			}
+
 			final long age = heightDifference / BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 			final double weight = heightDifference < 0
 					? 0.0

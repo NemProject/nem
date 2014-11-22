@@ -48,4 +48,9 @@ public class BlockChainConstants {
 			return Integer.MAX_VALUE;
 		}
 	}
+
+	/**
+	 * The maximum age (in blocks) of outlinks to use in POI calculations.
+	 */
+	public static final int OUTLINK_HISTORY = 30 * ESTIMATED_BLOCKS_PER_DAY;
 }

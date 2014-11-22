@@ -86,18 +86,22 @@ public class PruningObserverTest {
 
 	@Test
 	public void allAccountsArePrunedWhenBlockHeightIsNearOutlinkBlockHistory() {
+		// Arrange:
 		// TODO: Replace with new constant when launching.
+		final long outlinkHistory = OUTLINK_BLOCK_HISTORY_OLD;
+		final long historyDifference = OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY;
+
 		// Assert:
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD, 0, 0);
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 1, OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1);
+		assertAllAccountsArePruned(outlinkHistory, 0, 0);
+		assertAllAccountsArePruned(outlinkHistory + 1, historyDifference + 1, 1);
 
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 360, 0, 0);
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 361, OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY + 361, 361);
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 362, 0, 0);
+		assertAllAccountsArePruned(outlinkHistory + 360, 0, 0);
+		assertAllAccountsArePruned(outlinkHistory + 361, historyDifference + 361, 361);
+		assertAllAccountsArePruned(outlinkHistory + 362, 0, 0);
 
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 720, 0, 0);
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 721, OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY + 721, 721);
-		assertAllAccountsArePruned(OUTLINK_BLOCK_HISTORY_OLD + 722, 0, 0);
+		assertAllAccountsArePruned(outlinkHistory + 720, 0, 0);
+		assertAllAccountsArePruned(outlinkHistory + 721, historyDifference + 721, 721);
+		assertAllAccountsArePruned(outlinkHistory + 722, 0, 0);
 	}
 
 	@Test
