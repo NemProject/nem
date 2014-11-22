@@ -66,22 +66,15 @@ public class ChainController {
 	@RequestMapping(value = "/chain/blocks-after", method = RequestMethod.POST)
 	@P2PApi
 	@AuthenticatedApi
-	public AuthenticatedResponse<SerializableList<Block>> blocksAfter(@RequestBody final AuthenticatedBlockHeightRequest request) {
-		return variableBlocksAfter(new AuthenticatedChainRequest(new ChainRequest(request.getEntity()), request.getChallenge()));
-	}
-
-	@RequestMapping(value = "/chain/variable-blocks-after", method = RequestMethod.POST)
-	@P2PApi
-	@AuthenticatedApi
-	public AuthenticatedResponse<SerializableList<Block>> variableBlocksAfter(@RequestBody final AuthenticatedChainRequest request) {
+	public AuthenticatedResponse<SerializableList<Block>> blocksAfter(@RequestBody final AuthenticatedChainRequest request) {
 		final long start = System.currentTimeMillis();
 		final ChainRequest chainRequest = request.getEntity();
 		int numBlocks = Math.min(BlockChainConstants.BLOCKS_LIMIT, chainRequest.getMinBlocks() + 100); // TODO 20141122 J-B: i think this should be a function on ChainRequest
 		final SerializableList<Block> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
-		boolean enough = addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
+		boolean enough = this.addBlocks(blockList, chainRequest.getHeight(), numBlocks, chainRequest.getMaxTransactions());
 		numBlocks = 100;
 		while (!enough) {
-			enough = addBlocks(blockList, blockList.get(blockList.size() - 1).getHeight(), numBlocks, chainRequest.getMaxTransactions());
+			enough = this.addBlocks(blockList, blockList.get(blockList.size() - 1).getHeight(), numBlocks, chainRequest.getMaxTransactions());
 		}
 
 		final long stop = System.currentTimeMillis();
