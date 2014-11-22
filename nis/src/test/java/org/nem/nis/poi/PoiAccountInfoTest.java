@@ -6,11 +6,14 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.*;
 import org.nem.nis.secret.*;
 
 import java.util.*;
 
 public class PoiAccountInfoTest {
+	private static final long OUTLINK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long BETA_OUTLINK_PRUNING_FORK = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK;
 	private static final double ONE_DAY_DECAY = WeightedBalanceDecayConstants.DECAY_BASE;
 	private static final double TWO_DAY_DECAY = ONE_DAY_DECAY * ONE_DAY_DECAY;
 	private static final double THREE_DAY_DECAY = TWO_DAY_DECAY * ONE_DAY_DECAY;
@@ -81,6 +84,53 @@ public class PoiAccountInfoTest {
 				new WeightedLink(Address.fromEncoded("acc 5"), 8.0e06),
 				new WeightedLink(Address.fromEncoded("acc 6"), 9.0e06));
 		Assert.assertThat(actualLinks, IsEquivalent.equivalentTo(expectedLinks));
+	}
+
+	@Test
+	public void allOutlinksAreProcessedBeforeBetaForkHeight() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoForOldOutlinkBlockHistoryTests(BETA_OUTLINK_PRUNING_FORK - 1);
+
+		// Act:
+		final List<WeightedLink> actualLinks = info.getOutlinks();
+
+		// Assert:
+		Assert.assertThat(actualLinks.size(), IsEqual.equalTo(7));
+	}
+
+	@Test
+	public void outlinksOlderThanOutlinkBlockHistoryDoNotGetProcessedAfterBetaForkHeight() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoForOldOutlinkBlockHistoryTests(BETA_OUTLINK_PRUNING_FORK + 1);
+
+		// Act:
+		final List<WeightedLink> actualLinks = info.getOutlinks();
+
+		// Assert:
+		Assert.assertThat(actualLinks.size(), IsEqual.equalTo(5));
+	}
+
+	@Test
+	public void outlinksOlderThanOutlinkBlockHistoryDoNotGetProcessedAtBetaForkHeight() {
+		// Arrange:
+		final PoiAccountInfo info = createAccountInfoForOldOutlinkBlockHistoryTests(BETA_OUTLINK_PRUNING_FORK);
+
+		// Act:
+		final List<WeightedLink> actualLinks = info.getOutlinks();
+
+		// Assert:
+		Assert.assertThat(actualLinks.size(), IsEqual.equalTo(5));
+	}
+
+	private static PoiAccountInfo createAccountInfoForOldOutlinkBlockHistoryTests(final long accountInfoHeight) {
+		// Arrange:
+		// block heights must be in order so that account links have increasing block heights
+		final int outlinkHistory = (int)OUTLINK_HISTORY;
+		final int height = (int)accountInfoHeight;
+		return createAccountInfoWithOutlinks(
+				height,
+				new int[] { 1, 2, 3, 4, 5, 6, 7 },
+				new int[] { height - outlinkHistory - 100, height - outlinkHistory - 1, height - outlinkHistory, 20000, 30000, 40000, 48998 });
 	}
 
 	//endregion

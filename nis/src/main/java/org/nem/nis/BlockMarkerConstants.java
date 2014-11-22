@@ -24,4 +24,9 @@ public class BlockMarkerConstants {
 	 * Beta hard fork due to adding additional importance transfer validation.
 	 */
 	public static long BETA_IT_VALIDATION_FORK = 44974;
+
+	/**
+	 * Beta hard fork due to a fix in outlink pruning.
+	 */
+	public static long BETA_OUTLINK_PRUNING_FORK = 49000;
 }

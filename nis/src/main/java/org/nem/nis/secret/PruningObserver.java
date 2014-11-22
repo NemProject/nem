@@ -2,16 +2,17 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockChainConstants;
+import org.nem.nis.*;
 import org.nem.nis.poi.*;
 
 /**
- * A block transaction observer that automatically prunes account-related data once every ~30 days.
+ * A block transaction observer that automatically prunes account-related data once every 360 blocks.
  */
 public class PruningObserver implements BlockTransactionObserver {
-	// keep 2 days of weighted balance history and 30 days of outlink history
+	// keep 2 days of weighted balance history and 31 days of outlink history (keep an extra day so that calculations are correct after rollbacks)
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = 2 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-	private static final long OUTLINK_BLOCK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long OUTLINK_BLOCK_HISTORY_OLD = BlockChainConstants.OUTLINK_HISTORY;
 	private static final long PRUNE_INTERVAL = 360;
 	private final PoiFacade poiFacade;
 
@@ -31,7 +32,10 @@ public class PruningObserver implements BlockTransactionObserver {
 		}
 
 		final BlockHeight weightedBalancePruneHeight = getPruneHeight(context.getHeight(), WEIGHTED_BALANCE_BLOCK_HISTORY);
-		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), OUTLINK_BLOCK_HISTORY);
+		final long outlinkBlockHistory = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK <= context.getHeight().getRaw()
+				? OUTLINK_BLOCK_HISTORY
+				: OUTLINK_BLOCK_HISTORY_OLD;
+		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
 		for (final PoiAccountState accountState : this.poiFacade) {
 			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
