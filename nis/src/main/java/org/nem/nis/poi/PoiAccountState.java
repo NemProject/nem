@@ -5,6 +5,8 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.remote.RemoteLinks;
 import org.nem.nis.secret.*;
 
+import java.util.*;
+
 /**
  * Class containing extrinsic NIS-account information that is used to calculate POI.
  */
@@ -13,13 +15,14 @@ public class PoiAccountState {
 	private final AccountImportance importance;
 	private final WeightedBalances weightedBalances;
 	private final RemoteLinks remoteLinks;
+	private final MultisigLinks multisigLinks;
 	private BlockHeight height;
 
 	/**
 	 * Creates a new NIS account state.
 	 */
 	public PoiAccountState(final Address address) {
-		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), null);
+		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new MultisigLinks(), null);
 	}
 
 	private PoiAccountState(
@@ -27,11 +30,13 @@ public class PoiAccountState {
 			final AccountImportance importance,
 			final WeightedBalances weightedBalances,
 			final RemoteLinks remoteLinks,
+			final MultisigLinks multisigLinks,
 			final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
 		this.weightedBalances = weightedBalances;
 		this.remoteLinks = remoteLinks;
+		this.multisigLinks = multisigLinks;
 		this.height = height;
 	}
 
@@ -71,6 +76,23 @@ public class PoiAccountState {
 		return this.remoteLinks;
 	}
 
+
+	public void addMultisig(final Address multisigAddress, final BlockHeight height) {
+		this.multisigLinks.addMultisig(multisigAddress, height);
+	}
+
+	public void addCosignatory(final Address cosignatoryAddress, final BlockHeight height) {
+		this.multisigLinks.addCosignatory(cosignatoryAddress, height);
+	}
+
+	public void removeMultisig(final Address multisigAddress, final BlockHeight height) {
+		this.multisigLinks.removeMultisig(multisigAddress, height);
+	}
+
+	public void removeCosignatory(final Address cosignatoryAddress, final BlockHeight height) {
+		this.multisigLinks.removeCosignatory(cosignatoryAddress, height);
+	}
+
 	/**
 	 * Returns height of an account.
 	 *
@@ -102,6 +124,7 @@ public class PoiAccountState {
 				this.importance.copy(),
 				this.weightedBalances.copy(),
 				this.remoteLinks.copy(),
+				this.multisigLinks.copy(),
 				this.height);
 	}
 }

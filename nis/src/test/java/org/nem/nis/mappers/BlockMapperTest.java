@@ -228,7 +228,7 @@ public class BlockMapperTest {
 		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A*1000L + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C);
+		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A * 1000L + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C);
 		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
@@ -262,7 +262,7 @@ public class BlockMapperTest {
 
 		// order matters, let's assume fees were such that block have been created in such order
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
-		final MultisigSignerModificationTransaction.ModificationType modificationType = MultisigSignerModificationTransaction.ModificationType.Add;
+		final MultisigModificationType modificationType = MultisigModificationType.Add;
 
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
 		context.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(200), context.account1, modificationType, context.account2));
@@ -454,9 +454,9 @@ public class BlockMapperTest {
 
 		public void addMultisigSignerModificationTransactions() {
 			this.model.addTransaction(new MultisigSignerModificationTransaction(
-					new TimeInstant(150), this.account1, MultisigSignerModificationTransaction.ModificationType.Add, this.account2));
+					new TimeInstant(150), this.account1, MultisigModificationType.Add, this.account2));
 			this.model.addTransaction(new MultisigSignerModificationTransaction(
-					new TimeInstant(250), this.account1, MultisigSignerModificationTransaction.ModificationType.Add, this.account3));
+					new TimeInstant(250), this.account1, MultisigModificationType.Add, this.account3));
 
 			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();

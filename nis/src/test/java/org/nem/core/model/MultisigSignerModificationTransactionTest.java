@@ -14,17 +14,17 @@ import java.util.function.Consumer;
 
 public class MultisigSignerModificationTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
-	final MultisigSignerModificationTransaction.ModificationType MODIFICATION_ADD
-			= MultisigSignerModificationTransaction.ModificationType.Add;
-	final MultisigSignerModificationTransaction.ModificationType MODIFICATION_UNKNOWN
-			= MultisigSignerModificationTransaction.ModificationType.Unknown;
+	final MultisigModificationType MODIFICATION_ADD
+			= MultisigModificationType.Add;
+	final MultisigModificationType MODIFICATION_UNKNOWN
+			= MultisigModificationType.Unknown;
 
 	//region constructor
 
 	@Test
 	public void ctorCanCreateMultisigModification() {
 		// Arrange:
-		final MultisigSignerModificationTransaction.ModificationType modificationType = MODIFICATION_ADD;
+		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 
@@ -98,7 +98,7 @@ public class MultisigSignerModificationTransactionTest {
 	@Test
 	public void canRoundtripMultisigModification() {
 		// Arrange:
-		final MultisigSignerModificationTransaction.ModificationType modificationType = MODIFICATION_ADD;
+		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
@@ -130,7 +130,7 @@ public class MultisigSignerModificationTransactionTest {
 	@Test
 	public void minimumFeeIsOneThousandNem() {
 		// Arrange:
-		final MultisigSignerModificationTransaction.ModificationType modificationType = MODIFICATION_ADD;
+		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
@@ -147,7 +147,7 @@ public class MultisigSignerModificationTransactionTest {
 	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
-		final MultisigSignerModificationTransaction.ModificationType modificationType = MODIFICATION_ADD;
+		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
@@ -172,7 +172,7 @@ public class MultisigSignerModificationTransactionTest {
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
-		final MultisigSignerModificationTransaction.ModificationType modificationType = MODIFICATION_ADD;
+		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
@@ -198,7 +198,7 @@ public class MultisigSignerModificationTransactionTest {
 
 	private static MultisigSignerModificationTransaction createMultisigSignerModificationTransaction(
 			final Account sender,
-			final MultisigSignerModificationTransaction.ModificationType modificationType,
+			final MultisigModificationType modificationType,
 			final Account cosignatory) {
 		return new MultisigSignerModificationTransaction(TIME, sender, modificationType, cosignatory);
 	}

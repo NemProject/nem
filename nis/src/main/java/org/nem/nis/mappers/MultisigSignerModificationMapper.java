@@ -59,7 +59,7 @@ public class MultisigSignerModificationMapper {
 		final MultisigSignerModificationTransaction transfer = new MultisigSignerModificationTransaction(
 				new TimeInstant(dbMultisig.getTimeStamp()),
 				sender,
-				MultisigSignerModificationTransaction.ModificationType.fromValueOrDefault(dbMultisig.getModificationType()),
+				MultisigModificationType.fromValueOrDefault(dbMultisig.getModificationType()),
 				cosignatory);
 
 		transfer.setFee(new Amount(dbMultisig.getFee()));

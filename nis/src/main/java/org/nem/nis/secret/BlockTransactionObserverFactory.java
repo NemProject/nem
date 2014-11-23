@@ -39,6 +39,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new BalanceCommitTransferObserver());
 		builder.add(new HarvestRewardCommitObserver());
 		builder.add(new RemoteObserver(poiFacade));
+		builder.add(new MultisigAccountObserver(poiFacade));
 		builder.add(new OutlinkObserver(poiFacade));
 		builder.add(new PruningObserver(poiFacade));
 		return builder;

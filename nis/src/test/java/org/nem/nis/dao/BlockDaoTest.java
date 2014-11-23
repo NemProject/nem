@@ -798,7 +798,7 @@ public class BlockDaoTest {
 		final MultisigSignerModificationTransaction transaction = new MultisigSignerModificationTransaction(
 				new TimeInstant(0),
 				sender,
-				MultisigSignerModificationTransaction.ModificationType.Add,
+				MultisigModificationType.Add,
 				cosignatory
 		);
 		transaction.sign();

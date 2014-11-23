@@ -16,7 +16,7 @@ public class MultisigSignerModificationMapperTest {
 	@Test
 	public void multisigSignerModificationModelWithModificationTypeCanBeMappedToDbModel() {
 		// Arrange:
-		final TestContext context = new TestContext(MultisigSignerModificationTransaction.ModificationType.Add, 123L);
+		final TestContext context = new TestContext(MultisigModificationType.Add, 123L);
 
 		// Act:
 		final MultisigSignerModification dbModel = context.toDbModel(7);
@@ -28,7 +28,7 @@ public class MultisigSignerModificationMapperTest {
 	@Test
 	public void multisigSignerModificationModelWithHighFeeCanBeMappedToDbModel() {
 		// Arrange:
-		final TestContext context = new TestContext(MultisigSignerModificationTransaction.ModificationType.Add, 12345L);
+		final TestContext context = new TestContext(MultisigModificationType.Add, 12345L);
 
 		// Act:
 		final MultisigSignerModification dbModel = context.toDbModel(7);
@@ -41,7 +41,7 @@ public class MultisigSignerModificationMapperTest {
 	@Test
 	public void importanceTransferModelCanBeRoundTripped() {
 		// Arrange:
-		final TestContext context = new TestContext(MultisigSignerModificationTransaction.ModificationType.Add, 123L);
+		final TestContext context = new TestContext(MultisigModificationType.Add, 123L);
 		final MultisigSignerModification dbModel = context.toDbModel(7);
 
 		// Act:
@@ -58,7 +58,7 @@ public class MultisigSignerModificationMapperTest {
 		private final Hash hash;
 		private final long fee;
 
-		public TestContext(final MultisigSignerModificationTransaction.ModificationType modificationType, final Account sender, final Account cosignatoryAccount, final long fee) {
+		public TestContext(final MultisigModificationType modificationType, final Account sender, final Account cosignatoryAccount, final long fee) {
 			this.model = new MultisigSignerModificationTransaction(
 					new TimeInstant(721),
 					sender,
@@ -85,7 +85,7 @@ public class MultisigSignerModificationMapperTest {
 			this.hash = HashUtils.calculateHash(this.model);
 		}
 
-		public TestContext(final MultisigSignerModificationTransaction.ModificationType modificationType, final long fee) {
+		public TestContext(final MultisigModificationType modificationType, final long fee) {
 			this(modificationType, Utils.generateRandomAccount(), Utils.generateRandomAccount(), fee);
 		}
 

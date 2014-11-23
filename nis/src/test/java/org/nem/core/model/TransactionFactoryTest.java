@@ -107,7 +107,7 @@ public class TransactionFactoryTest {
 		return new MultisigSignerModificationTransaction(
 				TimeInstant.ZERO,
 				sender,
-				MultisigSignerModificationTransaction.ModificationType.Add,
+				MultisigModificationType.Add,
 				cosignatory);
 	}
 
