@@ -11,7 +11,7 @@ import org.nem.nis.poi.*;
 import java.util.*;
 
 public class PruningObserverTest {
-	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = 2 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
+	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long PRUNE_INTERVAL = 360;
@@ -72,16 +72,16 @@ public class PruningObserverTest {
 	@Test
 	public void allAccountsArePrunedWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 		// Assert:
-		assertAllAccountsArePruned(2880, 0, 0);
-		assertAllAccountsArePruned(2881, 1, 1);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1);
 
-		assertAllAccountsArePruned(3240, 0, 0);
-		assertAllAccountsArePruned(3241, 361, 1);
-		assertAllAccountsArePruned(3242, 0, 0);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0);
 
-		assertAllAccountsArePruned(3600, 0, 0);
-		assertAllAccountsArePruned(3601, 721, 1);
-		assertAllAccountsArePruned(3602, 0, 0);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1);
+		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0);
 	}
 
 	@Test

@@ -27,6 +27,7 @@ public class BlockMarkerConstants {
 
 	/**
 	 * Beta hard fork due to a fix in outlink pruning.
+	 * Targeting Friday 13 Nov, 8am UTC.
 	 */
-	public static long BETA_OUTLINK_PRUNING_FORK = 49000;
+	public static long BETA_OUTLINK_PRUNING_FORK = 51000;
 }
