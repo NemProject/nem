@@ -1,14 +1,14 @@
 package org.nem.core.model.observers;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 
 /**
  * A notification that cosignatory modification has occured.
  */
-public class CosignatoryModificationNotification extends Notification {
+public class MultisigModificationNotification extends Notification {
 	private final Account multisigAccount;
 	private final Account cosignatoryAccount;
-	private final int modificationType;
+	private final MultisigModificationType modificationType;
 
 	/**
 	 * Creates a new cosignatory modification notification.
@@ -17,7 +17,7 @@ public class CosignatoryModificationNotification extends Notification {
 	 * @param cosignatoryAccount The cosigner account.
 	 * @param modificationType The type of modification.
 	 */
-	public CosignatoryModificationNotification(final Account multisigAccount, final Account cosignatoryAccount, final int modificationType) {
+	public MultisigModificationNotification(final Account multisigAccount, final Account cosignatoryAccount, final MultisigModificationType modificationType) {
 		super(NotificationType.CosignatoryModification);
 		this.multisigAccount = multisigAccount;
 		this.cosignatoryAccount = cosignatoryAccount;
@@ -47,7 +47,7 @@ public class CosignatoryModificationNotification extends Notification {
 	 *
 	 * @return The type of signer modification transaction.
 	 */
-	public int getModificationType() {
+	public MultisigModificationType getModificationType() {
 		return this.modificationType;
 	}
 }

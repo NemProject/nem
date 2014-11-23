@@ -90,7 +90,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new AccountNotification(this.getCosignatory()));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
-		observer.notify(new CosignatoryModificationNotification(this.getSigner(), this.getCosignatory(), this.modificationType.value()));
+		observer.notify(new MultisigModificationNotification(this.getSigner(), this.getCosignatory(), this.modificationType));
 	}
 
 	@Override
