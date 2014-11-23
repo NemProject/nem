@@ -5,7 +5,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
@@ -14,7 +13,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.NisUtils;
@@ -286,7 +285,7 @@ public class ChainControllerTest {
 
 	private static List<org.nem.nis.dbmodel.Block> createDbBlockList(final int height, final int count) {
 		final List<org.nem.nis.dbmodel.Block> dbBlockList = new ArrayList<>();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			final org.nem.nis.dbmodel.Block dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
 			dbBlock.setId((long)(height + i));
 			dbBlock.setBlockTransfers(Arrays.asList(createDbTransferWithTimeStamp(400 + i)));

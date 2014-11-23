@@ -38,7 +38,6 @@ public class AuthenticatedChainRequestTest {
 		// Assert:
 		Assert.assertThat(request.getChallenge(), IsEqual.equalTo(challenge));
 		assertEqual(request.getEntity(), chainRequest);
-
 	}
 
 	private void assertEqual(final ChainRequest lhs, final ChainRequest rhs) {

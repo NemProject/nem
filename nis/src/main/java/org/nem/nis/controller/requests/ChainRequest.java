@@ -69,7 +69,7 @@ public class ChainRequest implements SerializableEntity {
 	private static int clampMinBlocks(final Integer value) {
 		return null == value
 				? BlockChainConstants.DEFAULT_NUMBER_OF_BLOCKS_TO_PULL
-		 		: Math.min(BlockChainConstants.BLOCKS_LIMIT, Math.max(10, value));
+				: Math.min(BlockChainConstants.BLOCKS_LIMIT, Math.max(10, value));
 	}
 
 	private static int clampMinTransactions(final Integer value) {

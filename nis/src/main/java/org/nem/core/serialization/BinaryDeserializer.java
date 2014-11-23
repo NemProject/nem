@@ -27,7 +27,7 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	@Override
 	public Integer readOptionalInt(final String label) {
-		return this.readIfNotEmpty(() ->  {
+		return this.readIfNotEmpty(() -> {
 			final byte[] bytes = this.readBytes(4);
 			return bytes[0] & 0x000000FF
 					| (bytes[1] << 8) & 0x0000FF00
