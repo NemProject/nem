@@ -14,6 +14,7 @@ import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.mappers.AbstractTransferMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.NisUtils;
@@ -300,20 +301,23 @@ public class ChainControllerTest {
 		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
 		account.setPrintableKey(address.getEncoded());
 		account.setPublicKey(address.getPublicKey());
-		return new Transfer(
-				Utils.generateRandomHash(),
-				0,
-				0,
-				0L,
-				timeStamp,
-				1,
-				account,
-				new byte[64],
-				account,
-				0,
-				0,
-				0L,
-				0L);
+		final Transfer transfer = new Transfer();
+		transfer.setTransferHash(Utils.generateRandomHash());
+		transfer.setVersion(0);
+		transfer.setType(0);
+		transfer.setFee(0L);
+		transfer.setTimeStamp(timeStamp);
+		transfer.setDeadline(1);
+		transfer.setRecipient(account);
+		transfer.setSender(account);
+		transfer.setSenderProof(new byte[64]);
+		transfer.setBlkIndex(0);
+
+		transfer.setRecipient(account);
+		transfer.setAmount(0L);
+		transfer.setMessageType(0);
+
+		return transfer;
 	}
 
 	//endregion
