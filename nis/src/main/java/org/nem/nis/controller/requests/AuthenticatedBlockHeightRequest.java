@@ -1,4 +1,4 @@
-package org.nem.nis.controller.viewmodels;
+package org.nem.nis.controller.requests;
 
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.Deserializer;

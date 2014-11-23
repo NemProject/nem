@@ -17,6 +17,20 @@ public class NisConfigurationTest {
 		final NisConfiguration config = new NisConfiguration(properties);
 
 		// Assert:
+		assertDefaultConfiguration(config);
+	}
+
+	@Test
+	public void canReadDefaultConfigurationFromResources() {
+		// Act:
+		final NisConfiguration config = new NisConfiguration();
+
+		// Assert:
+		assertDefaultConfiguration(config);
+	}
+
+	private static void assertDefaultConfiguration(final NisConfiguration config) {
+		// Assert:
 		Assert.assertThat(config.getAutoBootKey(), IsNull.nullValue());
 		Assert.assertThat(config.getAutoBootName(), IsNull.nullValue());
 		Assert.assertThat(config.getNodeLimit(), IsEqual.equalTo(5));
@@ -28,6 +42,10 @@ public class NisConfigurationTest {
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height" }));
+		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
+		Assert.assertThat(
+				config.getAdditionalLocalIps(),
+				IsEqual.equalTo(new String[] { }));
 	}
 
 	@Test
@@ -44,6 +62,8 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.ipDetectionMode", "Disabled");
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.nonAuditedApiPaths", "/status|/whatever");
+		properties.setProperty("nis.maxTransactions", "234");
+		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -60,6 +80,10 @@ public class NisConfigurationTest {
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
+		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(234));
+		Assert.assertThat(
+				config.getAdditionalLocalIps(),
+				IsEqual.equalTo(new String[] { "10.0.0.10", "10.0.0.20" }));
 	}
 
 	@Test
@@ -74,6 +98,50 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
 	}
+
+	//region canReadStringArray
+
+	@Test
+	public void canReadStringArrayWithNoValues() {
+		// Assert:
+		this.assertCanReadStringArray(" \t \t", new String[] { });
+	}
+
+	@Test
+	public void canReadStringArrayWithSingleValue() {
+		// Assert:
+		this.assertCanReadStringArray("10.0.0.10", new String[] { "10.0.0.10" });
+	}
+
+	@Test
+	public void canReadStringArrayWithMultipleValues() {
+		// Assert:
+		this.assertCanReadStringArray(
+				"10.0.0.10|10.0.0.20|10.0.0.30",
+				new String[] { "10.0.0.10", "10.0.0.20", "10.0.0.30" });
+	}
+
+	@Test
+	public void canReadStringArrayWithBlankValues() {
+		// Assert:
+		this.assertCanReadStringArray(
+				"10.0.0.10|| |10.0.0.30",
+				new String[] { "10.0.0.10", "", " ", "10.0.0.30" });
+	}
+
+	private void assertCanReadStringArray(final String value, final String[] expectedValues) {
+		// Arrange:
+		final Properties properties = this.getCommonProperties();
+		properties.setProperty("nis.additionalLocalIps", value);
+
+		// Act:
+		final NisConfiguration config = new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(expectedValues));
+	}
+
+	//endregion
 
 	private Properties getCommonProperties() {
 		final Properties properties = new Properties();

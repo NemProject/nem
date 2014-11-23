@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.Node;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.viewmodels.AuthenticatedBlockHeightRequest;
+import org.nem.nis.controller.requests.AuthenticatedBlockHeightRequest;
 import org.nem.nis.service.BlockIo;
 import org.nem.peer.node.AuthenticatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
