@@ -40,7 +40,7 @@ public class AuthenticatedChainRequestTest {
 		assertEqual(request.getEntity(), chainRequest);
 	}
 
-	private void assertEqual(final ChainRequest lhs, final ChainRequest rhs) {
+	private static void assertEqual(final ChainRequest lhs, final ChainRequest rhs) {
 		Assert.assertThat(lhs.getHeight(), IsEqual.equalTo(rhs.getHeight()));
 		Assert.assertThat(lhs.getMinBlocks(), IsEqual.equalTo(rhs.getMinBlocks()));
 		Assert.assertThat(lhs.getMaxTransactions(), IsEqual.equalTo(rhs.getMaxTransactions()));
