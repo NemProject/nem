@@ -18,6 +18,8 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	 */
 	public void save(Block block);
 
+	public void save(final List<Block> blocks);
+
 	/**
 	 * Retrieves list of at most limit difficulties for blocks starting at given height.
 	 *
