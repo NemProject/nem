@@ -110,7 +110,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because importance transfer deactivation was attempted while already deactivated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20);
+	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20),
+
+	/**
+	 * Validation failed because signer is not a cosigner of given multisig account.
+	 */
+	FAILURE_MULTISIG_NOT_A_COSIGNER(30);
 
 	private final int value;
 

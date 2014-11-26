@@ -40,6 +40,10 @@ public class MultisigLinks {
 		return 0 != this.cosignatoryOf.size();
 	}
 
+	public boolean isCosignatoryOf(final Address signer) {
+		return this.cosignatoryOf.keySet().stream().anyMatch(a -> a.equals(signer));
+	}
+
 	public MultisigLinks copy() {
 		final MultisigLinks multisigLinks = new MultisigLinks();
 		this.cosignatories.forEach((k, v) -> multisigLinks.addCosignatory(k, v));

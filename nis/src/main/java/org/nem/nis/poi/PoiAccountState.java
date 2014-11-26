@@ -1,5 +1,6 @@
 package org.nem.nis.poi;
 
+import org.nem.core.model.Account;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.remote.RemoteLinks;
@@ -91,6 +92,10 @@ public class PoiAccountState {
 
 	public void removeCosignatory(final Address cosignatoryAddress, final BlockHeight height) {
 		this.multisigLinks.removeCosignatory(cosignatoryAddress, height);
+	}
+
+	public boolean isCosignerOf(final Address signer) {
+		return this.multisigLinks.isCosignatoryOf(signer);
 	}
 
 	/**

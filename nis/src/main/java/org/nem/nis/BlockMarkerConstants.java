@@ -30,4 +30,9 @@ public class BlockMarkerConstants {
 	 * Targeting Friday 13 Nov, 8am UTC.
 	 */
 	public static long BETA_OUTLINK_PRUNING_FORK = 51000;
+
+	/**
+	 *
+	 */
+	public static long BETA_MULTISIG_FORK = 70000;
 }

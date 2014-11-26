@@ -113,6 +113,39 @@ public class TransactionFactoryTest {
 
 	//endregion
 
+	//region MultisigSignerModificationTransaction
+
+	@Test
+	public void canDeserializeVerifiableMultisigTransaction() {
+		// Arrange:
+		final Transaction otherTransaction = createTransferTransaction();
+		final Transaction originalTransaction = createMultisigTransaction(otherTransaction);
+
+		// Assert:
+		assertCanDeserializeVerifiable(originalTransaction, MultisigTransaction.class, TransactionTypes.MULTISIG);
+	}
+
+	@Test
+	public void canDeserializeNonVerifiableMultisigTransaction() {
+		// Arrange:
+		final Transaction otherTransaction = createTransferTransaction();
+		final Transaction originalTransaction = createMultisigTransaction(otherTransaction);
+
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, MultisigTransaction.class, TransactionTypes.MULTISIG);
+	}
+
+	private static Transaction createMultisigTransaction(final Transaction transaction) {
+		final Account sender = Utils.generateRandomAccount();
+		final Account cosignatory = Utils.generateRandomAccount();
+		return new MultisigTransaction(
+				TimeInstant.ZERO,
+				sender,
+				transaction);
+	}
+
+	//endregion
+
 	private static void assertCanDeserializeVerifiable(
 			final Transaction originalTransaction,
 			final Class expectedClass,

@@ -39,6 +39,7 @@ public class MultisigLinksTest {
 		context.addMultisig(context.address);
 
 		// Assert:
+		Assert.assertTrue(context.multisigLinks.isCosignatoryOf(context.address));
 		Assert.assertTrue(context.multisigLinks.isCosignatory());
 		Assert.assertFalse(context.multisigLinks.isMultisig());
 	}
@@ -53,6 +54,7 @@ public class MultisigLinksTest {
 		context.addCosignatory(context.address);
 
 		// Assert:
+		Assert.assertTrue(context.multisigLinks.isCosignatoryOf(context.address));
 		Assert.assertTrue(context.multisigLinks.isCosignatory());
 		Assert.assertTrue(context.multisigLinks.isMultisig());
 	}
@@ -113,6 +115,7 @@ public class MultisigLinksTest {
 		final MultisigLinks multisigLinks = context.makeCopy();
 
 		// Assert:
+		Assert.assertTrue(multisigLinks.isCosignatoryOf(context.address));
 		Assert.assertTrue(multisigLinks.isCosignatory());
 		Assert.assertFalse(multisigLinks.isMultisig());
 	}
