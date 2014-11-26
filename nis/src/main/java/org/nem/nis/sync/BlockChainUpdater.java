@@ -79,6 +79,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @return The result of the interaction.
 	 */
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
+		final org.nem.nis.dbmodel.Block curLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer().getAccountCache().asAutoCache());
@@ -114,7 +115,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		//region verify peer's chain
 		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight() - commonBlockHeight.getRaw());
 		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight, minBlocks, configuration.getMaxTransactions()));
-		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
+		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true, curLastBlock);
 		return NodeInteractionResult.fromValidationResult(validationResult);
 		//endregion
 	}
@@ -145,6 +146,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @return The result of the interaction.
 	 */
 	public ValidationResult updateBlock(Block receivedBlock) {
+		final org.nem.nis.dbmodel.Block curLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
@@ -194,7 +196,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
-		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
+		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false, curLastBlock);
 	}
 
 	private Block remapBlock(final Block block, final AccountAnalyzer accountAnalyzer) {
@@ -224,13 +226,19 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return this.blockChainContextFactory.createSyncContext(this.score);
 	}
 
-	private ValidationResult updateOurChain(
+	private synchronized ValidationResult updateOurChain(
 			final BlockChainSyncContext context,
 			final org.nem.nis.dbmodel.Block dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain,
-			final boolean shouldPunishLowerPeerScore) {
+			final boolean shouldPunishLowerPeerScore,
+			final org.nem.nis.dbmodel.Block curLastBlock) {
+		if (!curLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
+			// last block has changed, don't do anything
+			return ValidationResult.NEUTRAL;
+		}
+
 		final BlockChainUpdateContext updateContext = this.blockChainContextFactory.createUpdateContext(
 				context,
 				dbParentBlock,
