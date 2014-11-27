@@ -38,15 +38,15 @@ public class PushController {
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
 	public void pushTransaction(@RequestBody final Deserializer deserializer) {
-		LOGGER.info("[start] /push/transaction");
+		//LOGGER.info("[start] /push/transaction");
 		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
 		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
 
 		final Transaction transaction = secureEntity.getEntity();
-		LOGGER.info(String.format("[end] /push/transaction type: %d, signer %s; recipient: %s",
+		/*LOGGER.info(String.format("[end] /push/transaction type: %d, signer %s; recipient: %s",
 				transaction.getType(),
 				secureEntity.getEntity().getSigner(),
-				getRecipientOrDefault(transaction)));
+				getRecipientOrDefault(transaction)));*/
 	}
 
 	private static Account getRecipientOrDefault(final Transaction transaction) {

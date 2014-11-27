@@ -61,7 +61,7 @@ public class PushService {
 
 		final ValidationResult result = this.pushEntity(
 				entity,
-				transaction -> this.checkTransaction(transaction),
+				transaction -> ValidationResult.SUCCESS,
 				transaction -> this.unconfirmedTransactions.addNew(transaction),
 				transaction -> {},
 				NisPeerId.REST_PUSH_TRANSACTION,
@@ -113,13 +113,11 @@ public class PushService {
 			final Consumer<T> logAdditionalInfo,
 			final NisPeerId broadcastId,
 			final NodeIdentity identity) {
-		final String message = String.format("   received: %s from %s%s   signer: %s%sverify: %s",
+		final String message = String.format("   received: %s from %s%s   signer: %s",
 				entity.getType(),
 				identity,
 				System.lineSeparator(),
-				entity.getSigner().getKeyPair().getPublicKey(),
-				System.lineSeparator(),
-				entity.verify());
+				entity.getSigner().getKeyPair().getPublicKey());
 		LOGGER.info(message);
 		logAdditionalInfo.accept(entity);
 

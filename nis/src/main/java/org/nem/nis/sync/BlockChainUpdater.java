@@ -79,10 +79,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @return The result of the interaction.
 	 */
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
-		final org.nem.nis.dbmodel.Block curLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer().getAccountCache().asAutoCache());
+		LOGGER.severe("compare chains");
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
@@ -114,8 +115,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		//region verify peer's chain
 		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight() - commonBlockHeight.getRaw());
+		LOGGER.severe("get peer chain part");
 		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight, minBlocks, configuration.getMaxTransactions()));
-		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true, curLastBlock);
+		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true, expectedLastBlock);
 		return NodeInteractionResult.fromValidationResult(validationResult);
 		//endregion
 	}
@@ -146,19 +148,21 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @return The result of the interaction.
 	 */
 	public ValidationResult updateBlock(Block receivedBlock) {
-		final org.nem.nis.dbmodel.Block curLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
 		final org.nem.nis.dbmodel.Block dbParent;
 
 		// receivedBlock already seen
+		LOGGER.info("Find block hash");
 		if (this.blockDao.findByHash(blockHash) != null) {
 			// This will happen frequently and is ok
 			return ValidationResult.NEUTRAL;
 		}
 
 		// check if we know previous receivedBlock
+		LOGGER.info("Find parent hash");
 		dbParent = this.blockDao.findByHash(parentHash);
 
 		// if we don't have parent, we can't do anything with this receivedBlock
@@ -172,6 +176,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
+		LOGGER.info("remap block");
 		receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer());
 		// EVIL hack end
 
@@ -190,13 +195,14 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			// block has transaction addressed to that account, it won't be seen later,
 			// (see canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards test for details)
 			// we remap once more to fix accounts references (and possibly add them to AA)
+			LOGGER.info("remap block");
 			receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer());
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
-		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false, curLastBlock);
+		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false, expectedLastBlock);
 	}
 
 	private Block remapBlock(final Block block, final AccountAnalyzer accountAnalyzer) {
@@ -233,9 +239,10 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain,
 			final boolean shouldPunishLowerPeerScore,
-			final org.nem.nis.dbmodel.Block curLastBlock) {
-		if (!curLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
+			final org.nem.nis.dbmodel.Block expectedLastBlock) {
+		if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
 			// last block has changed, don't do anything
+			LOGGER.severe("last block changed!");
 			return ValidationResult.NEUTRAL;
 		}
 
