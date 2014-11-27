@@ -249,8 +249,8 @@ public class PoiImportanceCalculatorTest {
 		// - account 0 starts with 2000 NEM
 		// - accounts 2-5 and 7-10 start with 2100 NEM
 		// - accounts 1 and 6 start with 2200 NEM
-		// - account 1-5 and 2-10 send around NEM in a loop
-		// - account 1-6 send NEM to 0
+		// - account 1-5 and 2-10 send around NEM in a loop (100 NEM each)
+		// - account 1-6 send NEM to 0 (100 NEM each)
 		final List<PoiAccountState> accountStates = new ArrayList<>();
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2200)));
