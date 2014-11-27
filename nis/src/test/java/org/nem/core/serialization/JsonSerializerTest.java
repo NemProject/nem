@@ -192,20 +192,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//region Read
 
-	//region read[Optional]Int
-
-	@Test
-	public void canReadOptionalNullInt() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Integer i = deserializer.readOptionalInt("int");
-
-		// Assert:
-		Assert.assertThat(i, IsNull.nullValue());
-	}
+	//region readInt
 
 	@Test
 	public void canReadLongAsInt() {
@@ -240,20 +227,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//endregion
 
-	//region read[Optional]Long
-
-	@Test
-	public void canReadOptionalNullLong() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Long l = deserializer.readOptionalLong("long");
-
-		// Assert:
-		Assert.assertThat(l, IsNull.nullValue());
-	}
+	//region readLong
 
 	@Test
 	public void canReadIntAsLong() {
@@ -288,20 +262,7 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//endregion
 
-	//region read[Optional]Double
-
-	@Test
-	public void canReadOptionalNullDouble() {
-		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer();
-
-		// Act:
-		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		final Double d = deserializer.readOptionalDouble("double");
-
-		// Assert:
-		Assert.assertThat(d, IsNull.nullValue());
-	}
+	//region readDouble
 
 	@Test
 	public void canReadBigDecimalAsDouble() {

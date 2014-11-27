@@ -22,13 +22,15 @@ import java.util.logging.Logger;
 @Service
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
-	private static final int CACHE_SECONDS = 10;
+	private static final int BLOCK_CACHE_SECONDS = 600;
+	private static final int TX_CACHE_SECONDS = 10;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final SingleTransactionValidator validator;
 	private final BlockChain blockChain;
 	private final NisPeerNetworkHost host;
-	private final TransactionHashCache transactionHashCache;
+	private final HashCache transactionHashCache;
+	private final HashCache blockHashCache;
 
 	@Autowired(required = true)
 	public PushService(
@@ -41,7 +43,8 @@ public class PushService {
 		this.validator = validator;
 		this.blockChain = blockChain;
 		this.host = host;
-		this.transactionHashCache = new TransactionHashCache(timeProvider);
+		this.transactionHashCache = new HashCache(timeProvider, TX_CACHE_SECONDS);
+		this.blockHashCache = new HashCache(timeProvider, BLOCK_CACHE_SECONDS);
 	}
 
 	/**
@@ -85,6 +88,10 @@ public class PushService {
 	 * @param identity The identity of the pushing node.
 	 */
 	public void pushBlock(final Block entity, final NodeIdentity identity) {
+		final Hash hash = HashUtils.calculateHash(entity);
+		if (this.blockHashCache.isKnown(hash)) {
+			return;
+		}
 		final ValidationResult result = this.pushEntity(
 				entity,
 				obj -> this.blockChain.checkPushedBlock(obj),
@@ -94,6 +101,7 @@ public class PushService {
 				identity);
 
 		if (result.isFailure()) {
+			this.blockHashCache.remove(hash);
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 	}
@@ -148,12 +156,14 @@ public class PushService {
 		return status;
 	}
 
-	private static class TransactionHashCache {
+	private static class HashCache {
 		private final HashMap<Hash, TimeInstant> cache;
 		private final TimeProvider timeProvider;
+		private final int cacheSeconds;
 
-		private TransactionHashCache(final TimeProvider timeProvider) {
+		private HashCache(final TimeProvider timeProvider, final int cacheSeconds) {
 			this.timeProvider = timeProvider;
+			this.cacheSeconds = cacheSeconds;
 			this.cache = new HashMap<>();
 		}
 
@@ -176,7 +186,7 @@ public class PushService {
 			final Iterator<Map.Entry<Hash, TimeInstant>> iterator = this.cache.entrySet().iterator();
 			while (iterator.hasNext()) {
 				final Map.Entry<Hash, TimeInstant> entry = iterator.next();
-				if (entry.getValue().addSeconds(CACHE_SECONDS).compareTo(currentTime) <= 0) {
+				if (entry.getValue().addSeconds(this.cacheSeconds).compareTo(currentTime) <= 0) {
 					iterator.remove();
 				}
 			}

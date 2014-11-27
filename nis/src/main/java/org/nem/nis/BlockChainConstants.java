@@ -19,9 +19,24 @@ public class BlockChainConstants {
 	public static final int REWRITE_LIMIT = (ESTIMATED_BLOCKS_PER_DAY / 4);
 
 	/**
-	 * Number of blocks send and compared during synchronization
+	 * Maximum number of blocks to send and compare during synchronization.
 	 */
 	public static final int BLOCKS_LIMIT = REWRITE_LIMIT + 40;
+
+	/**
+	 * Maximum number of transactions to send during synchronization.
+	 */
+	public static final int TRANSACTIONS_LIMIT = 10000;
+
+	/**
+	 * The default number of blocks that are pulled from the database when serving a /chain/blocks-after request.
+	 */
+	public static final int DEFAULT_NUMBER_OF_BLOCKS_TO_PULL = 100;
+
+	/**
+	 * The default maximum of transactions that are allowed to be in the blocks when serving a /chain/blocks-after request.
+	 */
+	public static final int DEFAULT_MAXIMUM_NUMBER_OF_TRANSACTIONS = 5000;
 
 	/**
 	 * The maximum number of seconds in the future that an entity's timestamp can be
@@ -48,4 +63,9 @@ public class BlockChainConstants {
 			return Integer.MAX_VALUE;
 		}
 	}
+
+	/**
+	 * The maximum age (in blocks) of outlinks to use in POI calculations.
+	 */
+	public static final int OUTLINK_HISTORY = 30 * ESTIMATED_BLOCKS_PER_DAY;
 }

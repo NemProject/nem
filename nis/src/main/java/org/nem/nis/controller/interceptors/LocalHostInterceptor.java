@@ -8,6 +8,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.*;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -16,16 +17,28 @@ import java.util.logging.Logger;
 public class LocalHostInterceptor extends HandlerInterceptorAdapter {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
 
-	final InetAddress[] localAddresses;
+	private final List<InetAddress> localAddresses = new ArrayList<InetAddress>() {
+		{
+			this.add(parseAddress("127.0.0.1"));
+			this.add(parseAddress("0:0:0:0:0:0:0:1"));
+		}
+	};
 
 	/**
 	 * Creates a new interceptor.
 	 */
 	public LocalHostInterceptor() {
-		this.localAddresses = new InetAddress[] {
-				parseAddress("127.0.0.1"),
-				parseAddress("0:0:0:0:0:0:0:1")
-		};
+	}
+
+	/**
+	 * Creates a new interceptor with additional local ip addresses.
+	 *
+	 * @param additionalLocalIpAddresses The additional local ip addresses.
+	 */
+	public LocalHostInterceptor(final String[] additionalLocalIpAddresses) {
+		for (final String ipAddress : additionalLocalIpAddresses) {
+			this.localAddresses.add(parseAddress(ipAddress));
+		}
 	}
 
 	@Override
