@@ -113,11 +113,10 @@ public class PushService {
 			final Consumer<T> logAdditionalInfo,
 			final NisPeerId broadcastId,
 			final NodeIdentity identity) {
-		final String message = String.format("   received: %s from %s%s   signer: %s",
+		final String message = String.format("   received: %s from %s  (signer: %s)",
 				entity.getType(),
 				identity,
-				System.lineSeparator(),
-				entity.getSigner().getKeyPair().getPublicKey());
+				Address.fromPublicKey(entity.getSigner().getKeyPair().getPublicKey()));
 		LOGGER.info(message);
 		logAdditionalInfo.accept(entity);
 

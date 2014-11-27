@@ -25,7 +25,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int REFRESH_PLATEAU_INTERVAL = 5 * ONE_MINUTE;
 	private static final int REFRESH_BACK_OFF_TIME = 12 * ONE_HOUR;
 
-	private static final int SYNC_INTERVAL = 3 * ONE_SECOND;
+	private static final int SYNC_INTERVAL = 5 * ONE_SECOND;
 
 	private static final int BROADCAST_INTERVAL = 5 * ONE_MINUTE;
 

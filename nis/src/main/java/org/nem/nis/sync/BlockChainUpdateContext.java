@@ -71,12 +71,10 @@ public class BlockChainUpdateContext {
 	}
 
 	private ValidationResult updateInternal() {
-		LOGGER.severe("validate peer chain");
 		if (!this.validatePeerChain()) {
 			return ValidationResult.FAILURE_CHAIN_INVALID;
 		}
 
-		LOGGER.severe("get peer score");
 		this.peerScore = this.getPeerChainScore();
 
 		logScore(this.ourScore, this.peerScore);
@@ -92,9 +90,9 @@ public class BlockChainUpdateContext {
 			return ValidationResult.NEUTRAL;
 		}
 
-		LOGGER.severe("update our chain");
+		LOGGER.info("updating chain");
 		this.updateOurChain();
-		LOGGER.severe("finished");
+		LOGGER.info("updating chain finished");
 		return ValidationResult.SUCCESS;
 	}
 
