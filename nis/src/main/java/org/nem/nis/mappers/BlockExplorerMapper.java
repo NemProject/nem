@@ -2,6 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.Address;
+import org.nem.core.model.TransactionTypes;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.controller.viewmodels.*;
@@ -39,7 +40,7 @@ public class BlockExplorerMapper {
 	 */
 	public ExplorerTransferViewModel toExplorerViewModel(final Transfer transfer) {
 		return new ExplorerTransferViewModel(
-				transfer.getType(),
+				TransactionTypes.TRANSFER,
 				Amount.fromMicroNem(transfer.getFee()),
 				UnixTime.fromTimeInstant(new TimeInstant(transfer.getTimeStamp())),
 				Address.fromPublicKey(transfer.getSender().getPublicKey()),

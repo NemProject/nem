@@ -304,7 +304,6 @@ public class ChainControllerTest {
 		final Transfer transfer = new Transfer();
 		transfer.setTransferHash(Utils.generateRandomHash());
 		transfer.setVersion(0);
-		transfer.setType(0);
 		transfer.setFee(0L);
 		transfer.setTimeStamp(timeStamp);
 		transfer.setDeadline(1);

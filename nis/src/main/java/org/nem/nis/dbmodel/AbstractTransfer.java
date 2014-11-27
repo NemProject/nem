@@ -16,7 +16,6 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 	private byte[] transferHash;
 
 	private Integer version;
-	private Integer type; // candidate for removal
 	private Long fee;
 	private Integer timeStamp;
 	private Integer deadline;
@@ -74,14 +73,6 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 
 	public void setVersion(final Integer version) {
 		this.version = version;
-	}
-
-	public Integer getType() {
-		return this.type;
-	}
-
-	public void setType(final Integer type) {
-		this.type = type;
 	}
 
 	public Long getFee() {

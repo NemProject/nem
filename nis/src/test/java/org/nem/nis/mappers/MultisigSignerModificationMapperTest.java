@@ -109,7 +109,6 @@ public class MultisigSignerModificationMapperTest {
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
-			Assert.assertThat(dbModel.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNER_MODIFY));
 			Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(Amount.fromNem(Math.max(1000L, this.fee)).getNumMicroNem()));
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 			Assert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(800));
