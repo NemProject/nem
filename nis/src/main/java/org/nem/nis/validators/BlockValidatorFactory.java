@@ -25,8 +25,19 @@ public class BlockValidatorFactory {
 	 * @return The validator.
 	 */
 	public BlockValidator create(final PoiFacade poiFacade) {
-		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
+		return create(new AggregateBlockValidatorBuilder(), poiFacade);
+	}
+
+	/**
+	 * Creates a block validator.
+	 *
+	 * @param builder The aggregate block validator builder.
+	 * @param poiFacade The poi facade.
+	 * @return The validator.
+	 */
+	public BlockValidator create(final AggregateBlockValidatorBuilder builder, final PoiFacade poiFacade) {
 		builder.add(new NonFutureEntityValidator(this.timeProvider));
+		builder.add(new TransactionDeadlineBlockValidator());
 		builder.add(new EligibleSignerBlockValidator(poiFacade));
 		builder.add(new MaxTransactionsBlockValidator());
 		builder.add(new NoSelfSignedTransactionsBlockValidator(poiFacade));
