@@ -157,6 +157,7 @@ public class BlockChainTest {
 				poiFacade);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
+				new HashCache(),
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
@@ -242,6 +243,7 @@ public class BlockChainTest {
 				poiFacade);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
+				new HashCache(),
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,

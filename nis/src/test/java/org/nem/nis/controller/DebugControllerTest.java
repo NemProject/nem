@@ -62,7 +62,7 @@ public class DebugControllerTest {
 
 		// Arrange: simulate block loading by (1) copying all of the information in the AccountAnalyzer
 		// to the AccountAnalyzer copy and (2) then calculate importances (based on the copy)
-		Mockito.when(context.blockAnalyzer.analyze(Mockito.any(), Mockito.eq(10L))).then(invocationOnMock -> {
+		Mockito.when(context.blockAnalyzer.analyze(Mockito.any(), Mockito.any(), Mockito.eq(10L))).then(invocationOnMock -> {
 			final AccountAnalyzer accountAnalyzerCopy = (AccountAnalyzer)invocationOnMock.getArguments()[0];
 			accountAnalyzer.shallowCopyTo(accountAnalyzerCopy);
 
@@ -83,7 +83,7 @@ public class DebugControllerTest {
 		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
 		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(60));
 
-		Mockito.verify(context.blockAnalyzer, Mockito.only()).analyze(Mockito.any(), Mockito.eq(10L));
+		Mockito.verify(context.blockAnalyzer, Mockito.only()).analyze(Mockito.any(), Mockito.any(), Mockito.eq(10L));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(10));
 		Mockito.verify(context.blockDao, Mockito.times(1)).findByHeight(new BlockHeight(9));
 		Mockito.verify(context.blockDao, Mockito.times(2)).findByHeight(Mockito.any());

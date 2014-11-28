@@ -218,7 +218,7 @@ public class BlockChainValidatorIntegrationTest {
 				final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
 				final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 
-				final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer);
+				final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer, new HashCache());
 				factory.executor = block -> executor.execute(block, observer);
 				return factory.create();
 			}

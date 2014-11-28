@@ -25,7 +25,7 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		// Act:
-		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(Mockito.mock(AccountAnalyzer.class));
+		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(Mockito.mock(AccountAnalyzer.class), Mockito.mock(HashCache.class));
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
@@ -37,7 +37,7 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		// Act:
-		final BlockTransactionObserver observer = factory.createUndoCommitObserver(Mockito.mock(AccountAnalyzer.class));
+		final BlockTransactionObserver observer = factory.createUndoCommitObserver(Mockito.mock(AccountAnalyzer.class), Mockito.mock(HashCache.class));
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
@@ -51,7 +51,7 @@ public class BlockTransactionObserverFactoryTest {
 	public void executeUpdatesOutlinks() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer, Mockito.mock(HashCache.class));
 
 		// Act:
 		observer.notify(
@@ -67,7 +67,7 @@ public class BlockTransactionObserverFactoryTest {
 	public void undoUpdatesOutlinks() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer, Mockito.mock(HashCache.class));
 
 		// Act:
 		observer.notify(
@@ -87,7 +87,7 @@ public class BlockTransactionObserverFactoryTest {
 	public void executeUpdatesWeightedBalances() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer, Mockito.mock(HashCache.class));
 
 		// Act:
 		observer.notify(
@@ -106,7 +106,7 @@ public class BlockTransactionObserverFactoryTest {
 	public void undoUpdatesWeightedBalances() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer, Mockito.mock(HashCache.class));
 
 		// Act:
 		observer.notify(
@@ -140,7 +140,7 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).addSend(Mockito.any(), Mockito.any());
 
 		// Act:
-		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer, Mockito.mock(HashCache.class));
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
 				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute));
@@ -164,7 +164,7 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).undoSend(Mockito.any(), Mockito.any());
 
 		// Act:
-		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer, Mockito.mock(HashCache.class));
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
 				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Undo));
