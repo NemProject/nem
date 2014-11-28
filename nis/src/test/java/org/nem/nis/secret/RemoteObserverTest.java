@@ -6,6 +6,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.*;
 
 public class RemoteObserverTest {
@@ -20,7 +21,7 @@ public class RemoteObserverTest {
 		// Act:
 		context.observer.notify(
 				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
-				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
+				new BlockNotificationContext(new BlockHeight(7), new TimeInstant(123), NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
@@ -35,7 +36,7 @@ public class RemoteObserverTest {
 		// Act:
 		context.observer.notify(
 				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
-				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Execute));
+				new BlockNotificationContext(new BlockHeight(7), new TimeInstant(123), NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
@@ -54,7 +55,7 @@ public class RemoteObserverTest {
 		// Act:
 		context.observer.notify(
 				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
-				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
+				new BlockNotificationContext(new BlockHeight(7), new TimeInstant(123), NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.lessorRemoteLinks, Mockito.only())
@@ -69,7 +70,7 @@ public class RemoteObserverTest {
 		// Act:
 		context.observer.notify(
 				new ImportanceTransferNotification(context.lessor, context.lessee, 11),
-				new BlockNotificationContext(new BlockHeight(7), NotificationTrigger.Undo));
+				new BlockNotificationContext(new BlockHeight(7), new TimeInstant(123), NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.lesseeRemoteLinks, Mockito.only())
@@ -88,7 +89,7 @@ public class RemoteObserverTest {
 		// Act:
 		context.observer.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.lessor, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
+				new BlockNotificationContext(new BlockHeight(4), new TimeInstant(123), NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.lessorRemoteLinks, Mockito.never()).addLink(Mockito.any());

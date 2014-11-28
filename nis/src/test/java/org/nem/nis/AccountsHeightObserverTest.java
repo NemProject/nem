@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 
@@ -213,11 +214,11 @@ public class AccountsHeightObserverTest {
 	//endregion
 
 	private static BlockNotificationContext createExecuteNotificationContext(final int height) {
-		return new BlockNotificationContext(new BlockHeight(height), NotificationTrigger.Execute);
+		return new BlockNotificationContext(new BlockHeight(height), new TimeInstant(123), NotificationTrigger.Execute);
 	}
 
 	private static BlockNotificationContext createUndoNotificationContext(final int height) {
-		return new BlockNotificationContext(new BlockHeight(height), NotificationTrigger.Undo);
+		return new BlockNotificationContext(new BlockHeight(height), new TimeInstant(123), NotificationTrigger.Undo);
 	}
 
 	private static class TestContext {

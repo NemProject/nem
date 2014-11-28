@@ -99,7 +99,7 @@ public class BlockExecutor {
 			final Block block,
 			final NotificationTrigger trigger,
 			final BlockTransactionObserver observer) {
-		final BlockNotificationContext context = new BlockNotificationContext(block.getHeight(), trigger);
+		final BlockNotificationContext context = new BlockNotificationContext(block.getHeight(), block.getTimeStamp(), trigger);
 		return new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
 	}
 }

@@ -7,6 +7,7 @@ import org.mockito.stubbing.Answer;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 
@@ -17,6 +18,7 @@ public class AggregateBlockTransactionObserverBuilderTest {
 			Amount.fromNem(12));
 	private static final BlockNotificationContext NOTIFICATION_CONTEXT = new BlockNotificationContext(
 			new BlockHeight(11),
+			new TimeInstant(123),
 			NotificationTrigger.Execute);
 
 	//region add

@@ -6,6 +6,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 
 public class HarvestRewardCommitObserverTest {
 	private static final BlockTransactionObserver OBSERVER = new HarvestRewardCommitObserver();
@@ -39,7 +40,7 @@ public class HarvestRewardCommitObserverTest {
 	private static void notifyHarvestRewardExecute(final Account account) {
 		OBSERVER.notify(
 				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
+				new BlockNotificationContext(new BlockHeight(4), new TimeInstant(123), NotificationTrigger.Execute));
 	}
 
 	//endregion
@@ -73,7 +74,7 @@ public class HarvestRewardCommitObserverTest {
 	private static void notifyHarvestRewardUndo(final Account account) {
 		OBSERVER.notify(
 				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Undo));
+				new BlockNotificationContext(new BlockHeight(4), new TimeInstant(123), NotificationTrigger.Undo));
 	}
 
 	//endregion
@@ -88,7 +89,7 @@ public class HarvestRewardCommitObserverTest {
 		// Act:
 		OBSERVER.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, Amount.fromNem(22)),
-				new BlockNotificationContext(new BlockHeight(4), NotificationTrigger.Execute));
+				new BlockNotificationContext(new BlockHeight(4), new TimeInstant(123), NotificationTrigger.Execute));
 
 		// Assert:
 		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));

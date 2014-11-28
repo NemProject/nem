@@ -9,7 +9,8 @@ import org.nem.nis.poi.*;
  * A block transaction observer that automatically prunes account-related data once every 360 blocks.
  */
 public class PruningObserver implements BlockTransactionObserver {
-	// keep 2 days of weighted balance history and 31 days of outlink history (keep an extra day so that calculations are correct after rollbacks)
+	// keep 1 day of weighted balance history, 31 days of outlink history (keep an extra day so that calculations are correct after rollbacks)
+	// and 1.5 days of transaction hashes.
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = BlockChainConstants.OUTLINK_HISTORY;

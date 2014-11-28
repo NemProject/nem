@@ -5,6 +5,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.poi.*;
 
@@ -52,6 +53,7 @@ public class PruningObserverTest {
 		final Notification notification = createAdjustmentNotification(notificationType);
 		final BlockNotificationContext notificationContext = new BlockNotificationContext(
 				new BlockHeight(notificationHeight),
+				new TimeInstant(123),
 				notificationTrigger);
 		context.observer.notify(notification, notificationContext);
 
@@ -144,6 +146,7 @@ public class PruningObserverTest {
 		final Notification notification = createAdjustmentNotification(NotificationType.HarvestReward);
 		final BlockNotificationContext notificationContext = new BlockNotificationContext(
 				new BlockHeight(notificationHeight),
+				new TimeInstant(123),
 				NotificationTrigger.Execute);
 		context.observer.notify(notification, notificationContext);
 
