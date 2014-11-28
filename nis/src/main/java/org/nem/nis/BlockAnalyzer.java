@@ -37,11 +37,11 @@ public class BlockAnalyzer {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 
-	public boolean analyze(final AccountAnalyzer accountAnalyzer) {
-		return this.analyze(accountAnalyzer, null);
+	public boolean analyze(final AccountAnalyzer accountAnalyzer, final HashCache transactionHashCache) {
+		return this.analyze(accountAnalyzer, transactionHashCache, null);
 	}
 
-	public boolean analyze(final AccountAnalyzer accountAnalyzer, final Long maxHeight) {
+	public boolean analyze(final AccountAnalyzer accountAnalyzer, final HashCache transactionHashCache, final Long maxHeight) {
 		final Block nemesisBlock = this.loadNemesisBlock(accountAnalyzer);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
@@ -69,7 +69,7 @@ public class BlockAnalyzer {
 		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
 		final AccountCache accountCache = accountAnalyzer.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache);
-		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer);
+		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer, transactionHashCache);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
 

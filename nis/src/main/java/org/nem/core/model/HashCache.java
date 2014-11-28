@@ -88,4 +88,27 @@ public class HashCache {
 	public void prune(final TimeInstant timeStamp) {
 		this.hashMap.entrySet().removeIf(entry -> entry.getValue().compareTo(timeStamp) < 0);
 	}
+
+	// TODO 20141128:  Is this fast enough?
+	/**
+	 * Returns a shallow copy of this hash cache.
+	 *
+	 * @return the shallow copy of this hash cache.
+	 */
+	public HashCache shallowCopy() {
+		final HashCache cache = new HashCache();
+		cache.hashMap.putAll(this.hashMap);
+		return cache;
+	}
+
+	// TODO 20141128:  Is this fast enough?
+	/**
+	 * Copies this hash cash to another cache.
+	 *
+	 * @param cache The hash cache to copy to.
+	 */
+	public void shallowCopyTo(final HashCache cache) {
+		cache.hashMap.clear();
+		cache.hashMap.putAll(this.hashMap);
+	}
 }

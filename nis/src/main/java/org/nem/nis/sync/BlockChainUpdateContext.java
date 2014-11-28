@@ -22,6 +22,8 @@ public class BlockChainUpdateContext {
 
 	private final AccountAnalyzer accountAnalyzer;
 	private final AccountAnalyzer originalAnalyzer;
+	private final HashCache transactionHashCache;
+	private final HashCache originalTransactionHashCache;
 	private final BlockScorer blockScorer;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
@@ -36,6 +38,8 @@ public class BlockChainUpdateContext {
 	public BlockChainUpdateContext(
 			final AccountAnalyzer accountAnalyzer,
 			final AccountAnalyzer originalAnalyzer,
+			final HashCache transactionHashCache,
+			final HashCache originalTransactionHashCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
@@ -47,6 +51,8 @@ public class BlockChainUpdateContext {
 
 		this.accountAnalyzer = accountAnalyzer;
 		this.originalAnalyzer = originalAnalyzer;
+		this.transactionHashCache = transactionHashCache;
+		this.originalTransactionHashCache = originalTransactionHashCache;
 		this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
@@ -108,7 +114,7 @@ public class BlockChainUpdateContext {
 	 * @return score or -1 if chain is invalid
 	 */
 	private boolean validatePeerChain() {
-		return this.services.isPeerChainValid(this.accountAnalyzer, this.parentBlock, this.peerChain);
+		return this.services.isPeerChainValid(this.accountAnalyzer, this.transactionHashCache, this.parentBlock, this.peerChain);
 	}
 
 	private BlockChainScore getPeerChainScore() {
@@ -128,6 +134,7 @@ public class BlockChainUpdateContext {
 	 */
 	private void updateOurChain() {
 		this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
+		this.transactionHashCache.shallowCopyTo(this.originalTransactionHashCache);
 
 		if (this.hasOwnChain) {
 			// mind that we're using "new" (replaced) accountAnalyzer

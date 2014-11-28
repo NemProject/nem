@@ -3,6 +3,7 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
+import org.nem.core.model.HashCache;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
@@ -152,6 +153,7 @@ public class NisAppConfig {
 	public BlockChainContextFactory blockChainContextFactory() {
 		return new BlockChainContextFactory(
 				this.accountAnalyzer(),
+				this.transactionHashCache(),
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.blockChainServices(),
@@ -261,7 +263,13 @@ public class NisAppConfig {
 				this.accountAnalyzer(),
 				this.nisPeerNetworkHost(),
 				this.nisConfiguration(),
-				this.blockAnalyzer());
+				this.blockAnalyzer(),
+				this.transactionHashCache());
+	}
+
+	@Bean
+	public HashCache transactionHashCache() {
+		return new HashCache();
 	}
 
 	@Bean

@@ -35,6 +35,7 @@ public class NisMain {
 	private final NisPeerNetworkHost networkHost;
 	private final NisConfiguration nisConfiguration;
 	private final BlockAnalyzer blockAnalyzer;
+	private final HashCache transactionHashCache;
 
 	@Autowired(required = true)
 	public NisMain(
@@ -43,17 +44,19 @@ public class NisMain {
 			final AccountAnalyzer accountAnalyzer,
 			final NisPeerNetworkHost networkHost,
 			final NisConfiguration nisConfiguration,
-			final BlockAnalyzer blockAnalyzer) {
+			final BlockAnalyzer blockAnalyzer,
+			final HashCache transactionHashCache) {
 		this.accountDao = accountDao;
 		this.blockDao = blockDao;
 		this.accountAnalyzer = accountAnalyzer;
 		this.networkHost = networkHost;
 		this.nisConfiguration = nisConfiguration;
 		this.blockAnalyzer = blockAnalyzer;
+		this.transactionHashCache = transactionHashCache;
 	}
 
 	private void analyzeBlocks() {
-		if (!this.blockAnalyzer.analyze(this.accountAnalyzer)) {
+		if (!this.blockAnalyzer.analyze(this.accountAnalyzer, this.transactionHashCache)) {
 			System.exit(-1);
 		}
 	}

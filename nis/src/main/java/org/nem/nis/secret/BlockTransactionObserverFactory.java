@@ -1,5 +1,6 @@
 package org.nem.nis.secret;
 
+import org.nem.core.model.HashCache;
 import org.nem.core.model.observers.BalanceCommitTransferObserver;
 import org.nem.nis.*;
 import org.nem.nis.poi.PoiFacade;
@@ -16,8 +17,10 @@ public class BlockTransactionObserverFactory {
 	 * @param accountAnalyzer The account analyzer.
 	 * @return The observer.
 	 */
-	public BlockTransactionObserver createExecuteCommitObserver(final AccountAnalyzer accountAnalyzer) {
-		return createBuilder(accountAnalyzer).build();
+	public BlockTransactionObserver createExecuteCommitObserver(
+			final AccountAnalyzer accountAnalyzer,
+			final HashCache transactionHashCache) {
+		return createBuilder(accountAnalyzer, transactionHashCache).build();
 	}
 
 	/**
@@ -27,11 +30,15 @@ public class BlockTransactionObserverFactory {
 	 * @param accountAnalyzer The account analyzer.
 	 * @return The observer.
 	 */
-	public BlockTransactionObserver createUndoCommitObserver(final AccountAnalyzer accountAnalyzer) {
-		return createBuilder(accountAnalyzer).buildReverse();
+	public BlockTransactionObserver createUndoCommitObserver(
+			final AccountAnalyzer accountAnalyzer,
+			final HashCache transactionHashCache) {
+		return createBuilder(accountAnalyzer, transactionHashCache).buildReverse();
 	}
 
-	private static AggregateBlockTransactionObserverBuilder createBuilder(final AccountAnalyzer accountAnalyzer) {
+	private static AggregateBlockTransactionObserverBuilder createBuilder(
+			final AccountAnalyzer accountAnalyzer,
+			final HashCache transactionHashCache) {
 		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new WeightedBalancesObserver(poiFacade));
@@ -40,7 +47,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new HarvestRewardCommitObserver());
 		builder.add(new RemoteObserver(poiFacade));
 		builder.add(new OutlinkObserver(poiFacade));
-		builder.add(new PruningObserver(poiFacade));
+		builder.add(new PruningObserver(poiFacade, transactionHashCache));
 		return builder;
 	}
 }
