@@ -223,6 +223,16 @@ public class PoiImportanceCalculatorTest {
 	 * 1 should transfer more importance to 2 than 4 transfers to 5.
 	 *
 	 * Variation of the teleportation probabilities shows this behavior (TP = teleportation prob., ITLP = inter level teleportation prob.):
+	 *
+	 * with beta POI settings: //TODO M: these results seemed weird, but it is because everything gets into a single cluster with the current settings.
+	 *  TP   ILTP
+	 * 0.8  | 0.1  | 0.089 0.097 0.088 0.089 0.090 0.091 0.097 0.088 0.089 0.090 0.091
+	 * 0.6  | 0.3  | 0.088 0.097 0.088 0.090 0.091 0.091 0.097 0.088 0.090 0.091 0.091
+	 * 0.45 | 0.45 | 0.087 0.096 0.089 0.090 0.091 0.091 0.096 0.089 0.090 0.091 0.091
+	 * 0.3  | 0.6  | 0.087 0.096 0.089 0.090 0.091 0.091 0.096 0.089 0.090 0.091 0.091
+	 * 0.1  | 0.8  | 0.086 0.095 0.090 0.090 0.091 0.090 0.095 0.090 0.090 0.091 0.090
+	 *
+	 * with old (pre-beta) POI settings:
 	 *  TP   ILTP
 	 * 0.8  | 0.1  | 0.120 0.104 0.068 0.080 0.090 0.098 0.104 0.068 0.080 0.090 0.098
 	 * 0.6  | 0.3  | 0.131 0.097 0.070 0.083 0.090 0.094 0.097 0.070 0.083 0.090 0.094
@@ -273,6 +283,8 @@ public class PoiImportanceCalculatorTest {
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setTeleportationProbability(0.8);
 		builder.setInterLevelTeleportationProbability(0.1);
+		builder.setMinHarvesterBalance(new Amount(1l));
+		builder.setMinOutlinkWeight(new Amount(1l));
 		final ColumnVector importances = calculateImportances(builder.create(), height, accountStates);
 
 		// Assert:
@@ -285,7 +297,7 @@ public class PoiImportanceCalculatorTest {
 			Assert.assertThat(importance > 0.085 && importance < 0.10, IsEqual.equalTo(true));
 		}
 
-		// - the ring importances should be the same
+		// - the ring importances should be the same for the corresponding position
 		for (int i = 1; i <= 5; ++i) {
 			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(importances.getAt(i + 5)));
 		}
