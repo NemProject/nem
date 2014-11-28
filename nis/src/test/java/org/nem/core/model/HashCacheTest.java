@@ -6,7 +6,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class HashCacheTest {
 
@@ -60,26 +60,89 @@ public class HashCacheTest {
 
 	// endregion
 
-	// region isKnown
+	// region addAll
 
 	@Test
-	public void isKnownReturnsTrueIfHashIsInCache() {
+	public void canAddAllHashesFromListToCache() {
+		// Arrange:
+		final List<Hash> hashes = createHashes(10);
+		final List<TimeInstant> timeStamps = createTimeStamps(10);
+		final HashCache cache = new HashCache();
+
+		// Assert:
+		cache.addAll(hashes, timeStamps);
+	}
+
+	@Test
+	public void cannotAddAllWithDifferentListSizes() {
+		// Arrange:
+		final List<Hash> hashes = createHashes(10);
+		final List<TimeInstant> timeStamps = createTimeStamps(9);
+		final HashCache cache = new HashCache();
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> cache.addAll(hashes, timeStamps), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotAddAllWhenAtLeastOneHashIsKnown() {
+		// Arrange:
+		final List<Hash> hashes = createHashes(10);
+		final List<TimeInstant> timeStamps = createTimeStamps(11);
+		hashes.add(hashes.get(6));
+		final HashCache cache = new HashCache();
+
+		// Assert:
+		ExceptionAssert.assertThrows(v -> cache.addAll(hashes, timeStamps), IllegalArgumentException.class);
+	}
+
+	// endregion
+
+	// region hashExists
+
+	@Test
+	public void hashExistsReturnsTrueIfHashIsInCache() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final HashCache cache = new HashCache();
 		cache.add(hash, new TimeInstant(123));
 
 		// Assert:
-		Assert.assertThat(cache.isKnown(hash), IsEqual.equalTo(true));
+		Assert.assertThat(cache.hashExists(hash), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void isKnownReturnsFalseIfHashIsNotInCache() {
+	public void hashExistsReturnsFalseIfHashIsNotInCache() {
 		// Arrange:
 		final HashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
 
 		// Assert:
-		Assert.assertThat(cache.isKnown(Utils.generateRandomHash()), IsEqual.equalTo(false));
+		Assert.assertThat(cache.hashExists(Utils.generateRandomHash()), IsEqual.equalTo(false));
+	}
+
+	// endregion
+
+	// region anyHashExists
+
+	@Test
+	public void anyHashExistsReturnsTrueIfAnyOfTheGivenHashesIsInCache() {
+		// Arrange:
+		final List<Hash> hashes = createHashes(10);
+		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
+		cache.add(hashes.get(7), new TimeInstant(10));
+
+		// Assert:
+		Assert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void anyHashExistsReturnsFalseIfNoneOfTheGivenHashesIsInCache() {
+		// Arrange:
+		final List<Hash> hashes = createHashes(10);
+		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
+
+		// Assert:
+		Assert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -103,9 +166,9 @@ public class HashCacheTest {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.isKnown(hash1), IsEqual.equalTo(false));
-		Assert.assertThat(cache.isKnown(hash2), IsEqual.equalTo(false));
-		Assert.assertThat(cache.isKnown(hash3), IsEqual.equalTo(false));
+		Assert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(false));
+		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(false));
+		Assert.assertThat(cache.hashExists(hash3), IsEqual.equalTo(false));
 	}
 
 
@@ -123,8 +186,8 @@ public class HashCacheTest {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
-		Assert.assertThat(cache.isKnown(hash1), IsEqual.equalTo(true));
-		Assert.assertThat(cache.isKnown(hash2), IsEqual.equalTo(true));
+		Assert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(true));
+		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -133,5 +196,23 @@ public class HashCacheTest {
 		final HashCache cache = new HashCache();
 		Arrays.stream(timeStamps).forEach(t -> cache.add(Utils.generateRandomHash(), new TimeInstant(t)));
 		return cache;
+	}
+
+	private List<Hash> createHashes(final int count) {
+		final List<Hash> hashes = new ArrayList<>();
+		for (int i=0; i<count; i++) {
+			hashes.add(Utils.generateRandomHash());
+		}
+
+		return hashes;
+	}
+
+	private List<TimeInstant> createTimeStamps(final int count) {
+		final List<TimeInstant> timeStamps = new ArrayList<>();
+		for (int i=0; i<count; i++) {
+			timeStamps.add(Utils.generateRandomTimeStamp());
+		}
+
+		return timeStamps;
 	}
 }

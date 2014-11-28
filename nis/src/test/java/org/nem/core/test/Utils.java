@@ -38,6 +38,16 @@ public class Utils {
 	}
 
 	/**
+	 * Generates a random time stamp.
+	 *
+	 * @return A random time stamp.
+	 */
+	public static TimeInstant generateRandomTimeStamp() {
+		final SecureRandom rand = new SecureRandom();
+		return new TimeInstant(rand.nextInt(1_000_000));
+	}
+
+	/**
 	 * Generates a byte array containing random data.
 	 *
 	 * @return A byte array containing random data.
