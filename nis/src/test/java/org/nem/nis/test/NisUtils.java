@@ -107,6 +107,22 @@ public class NisUtils {
 	}
 
 	/**
+	 * Creates a new random Block with the specified timestamp and height.
+	 *
+	 * @param timeStamp The time stamp.
+v	 * @param height The height.
+	 * @return The block.
+	 */
+	public static Block createRandomBlockWithTimeStampAndHeight(final int timeStamp, final long height) {
+		return new Block(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
+				Utils.generateRandomHash(),
+				new TimeInstant(timeStamp),
+				new BlockHeight(height));
+	}
+
+	/**
 	 * Creates a new list of blocks.
 	 *
 	 * @param parent The parent block.
