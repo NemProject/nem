@@ -76,7 +76,7 @@ public class TransferMapper {
 
 		transfer.setFee(new Amount(dbTransfer.getFee()));
 		transfer.setDeadline(new TimeInstant(dbTransfer.getDeadline()));
-		transfer.setSignature(new Signature(dbTransfer.getSenderProof()));
+		transfer.setSignature(dbTransfer.getSenderProof() == null ? null : new Signature(dbTransfer.getSenderProof()));
 		return transfer;
 	}
 

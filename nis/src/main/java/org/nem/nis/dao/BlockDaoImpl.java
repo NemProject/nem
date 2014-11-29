@@ -47,7 +47,8 @@ public class BlockDaoImpl implements BlockDao {
 		return criteria
 				.setFetchMode("blockTransfers", fetchMode)
 				.setFetchMode("blockImportanceTransfers", fetchMode)
-				.setFetchMode("blockMultisigSignerModifications", fetchMode);
+				.setFetchMode("blockMultisigSignerModifications", fetchMode)
+				.setFetchMode("blockMultisigTransactions", fetchMode);
 	}
 
 	private static Criteria setTransfersToJoin(final Criteria criteria) {
@@ -178,6 +179,9 @@ public class BlockDaoImpl implements BlockDao {
 		dropTransfers(blockHeight, "Transfer", "blockTransfers");
 		dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers");
 		dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications");
+
+		// must be last
+		dropTransfers(blockHeight, "MultisigTransaction", "blockMultisigTransactions");
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")

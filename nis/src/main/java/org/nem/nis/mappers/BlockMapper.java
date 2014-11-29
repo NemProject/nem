@@ -12,6 +12,7 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Static class that contains functions for converting to and from
@@ -19,7 +20,7 @@ import java.util.*;
  */
 public class BlockMapper {
 
-	private static class BlockTransactionMapper {
+	private static class BlockTransactionDbMapper {
 		private final AccountDaoLookup accountDao;
 		private final org.nem.nis.dbmodel.Block dbBlock;
 
@@ -35,60 +36,88 @@ public class BlockMapper {
 		int importanceTransferIndex = 0;
 		int transferIndex = 0;
 
-		private BlockTransactionMapper(final AccountDaoLookup accountDao, final org.nem.nis.dbmodel.Block dbBlock, int initialCapacity) {
+		private BlockTransactionDbMapper(final AccountDaoLookup accountDao, final org.nem.nis.dbmodel.Block dbBlock, int initialCapacity) {
 			this.accountDao = accountDao;
 			this.dbBlock = dbBlock;
 			this.transferTransactions = new ArrayList<>(initialCapacity);
 		}
 
-		private Transaction handleMultisig(Transaction transaction) {
-			final org.nem.core.model.MultisigTransaction multisigTransaction = (org.nem.core.model.MultisigTransaction)transaction;
-
+		private MultisigTransaction handleMultisig(Transaction transaction) {
 			final MultisigTransaction dbTransfer = MultisigTransactionMapper.toDbModel(
-					multisigTransaction,
-					i++,
+					(org.nem.core.model.MultisigTransaction)transaction,
+					i,
 					multisigTransactionsIndex++,
 					accountDao);
 			dbTransfer.setBlock(dbBlock);
 			multisigTransactions.add(dbTransfer);
 
-			return multisigTransaction.getOtherTransaction();
+			return dbTransfer;
 		}
 
 		private void handleTransaction(final Transaction transaction) {
+			handleTransaction(transaction, null);
+		}
+		private void handleTransaction(final Transaction transaction, final MultisigTransaction multisig) {
 			switch (transaction.getType()) {
 				case TransactionTypes.TRANSFER: {
 					final Transfer dbTransfer = TransferMapper.toDbModel(
 							(TransferTransaction)transaction,
-							i++,
+							i,
 							importanceTransferIndex++,
 							accountDao);
 					dbTransfer.setBlock(dbBlock);
 					transferTransactions.add(dbTransfer);
+
+					if (multisig != null) {
+						multisig.setTransfer(dbTransfer);
+					}
 				}
 				break;
 				case TransactionTypes.IMPORTANCE_TRANSFER: {
 					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel(
 							(ImportanceTransferTransaction)transaction,
-							i++,
+							i,
 							transferIndex++,
 							accountDao);
 					dbTransfer.setBlock(dbBlock);
 					importanceTransferTransactions.add(dbTransfer);
+
+					if (multisig != null) {
+						multisig.setImportanceTransfer(dbTransfer);
+					}
 				}
 				break;
 				case TransactionTypes.MULTISIG_SIGNER_MODIFY: {
 					final MultisigSignerModification dbTransfer = MultisigSignerModificationMapper.toDbModel(
 							(MultisigSignerModificationTransaction)transaction,
-							i++,
+							i,
 							multisigSignerModificationsIndex++,
 							accountDao);
 					dbTransfer.setBlock(dbBlock);
 					multisigSignerModificationsTransactions.add(dbTransfer);
+
+					if (multisig != null) {
+						multisig.setMultisigSignerModification(dbTransfer);
+					}
+				}
+				break;
+				case TransactionTypes.MULTISIG: {
+					if (multisig != null) {
+						throw new RuntimeException("multisig inside multisig");
+					}
+
+					final MultisigTransaction multisigTransaction = this.handleMultisig(transaction);
+					// recursive call
+					this.handleTransaction(((org.nem.core.model.MultisigTransaction)transaction).getOtherTransaction(), multisigTransaction);
 				}
 				break;
 				default:
 					throw new RuntimeException("trying to map block with unknown transaction type");
+			}
+
+			// if current transaction is part of multisig transaction we will NOT increment blockindex
+			if (multisig == null) {
+				i++;
 			}
 		}
 
@@ -125,17 +154,12 @@ public class BlockMapper {
 				block.getDifficulty().getRaw(),
 				lessor);
 
-		final BlockTransactionMapper blockTransactionMapper = new BlockTransactionMapper(accountDao, dbBlock, block.getTransactions().size());
+		final BlockTransactionDbMapper blockTransactionDbMapper = new BlockTransactionDbMapper(accountDao, dbBlock, block.getTransactions().size());
 		for (final Transaction transaction : block.getTransactions()) {
-			if (TransactionTypes.MULTISIG == transaction.getType()) {
-				final Transaction innerTransaction = blockTransactionMapper.handleMultisig(transaction);
-				blockTransactionMapper.handleTransaction(innerTransaction);
-			} else {
-				blockTransactionMapper.handleTransaction(transaction);
-			}
+			blockTransactionDbMapper.handleTransaction(transaction);
 		}
 
-		blockTransactionMapper.saveTransfers();
+		blockTransactionDbMapper.saveTransfers();
 		return dbBlock;
 	}
 
@@ -168,23 +192,41 @@ public class BlockMapper {
 		block.setLessor(lessor);
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
+		// note: we must NOT add getBlockMultisigTransactions here
 		final int count =
 				dbBlock.getBlockMultisigSignerModifications().size() +
 				dbBlock.getBlockImportanceTransfers().size() +
 				dbBlock.getBlockTransfers().size();
 		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
 
+		final Set<Integer> transactionsToSkip = dbBlock.getBlockMultisigTransactions().stream()
+				.map(t -> t.getBlkIndex())
+				.collect(Collectors.toSet());
+		for (final MultisigTransaction dbTransfer : dbBlock.getBlockMultisigTransactions()) {
+			final org.nem.core.model.MultisigTransaction transaction = MultisigTransactionMapper.toModel(dbTransfer, accountLookup);
+			transactions.set(dbTransfer.getBlkIndex(), transaction);
+		}
+
 		for (final MultisigSignerModification dbTransfer : dbBlock.getBlockMultisigSignerModifications()) {
+			if (transactionsToSkip.contains(dbTransfer.getBlkIndex())) {
+				continue;
+			}
 			final MultisigSignerModificationTransaction transaction = MultisigSignerModificationMapper.toModel(dbTransfer, accountLookup);
 			transactions.set(dbTransfer.getBlkIndex(), transaction);
 		}
 
 		for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
+			if (transactionsToSkip.contains(dbTransfer.getBlkIndex())) {
+				continue;
+			}
 			final ImportanceTransferTransaction transaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
 			transactions.set(dbTransfer.getBlkIndex(), transaction);
 		}
 
 		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
+			if (transactionsToSkip.contains(dbTransfer.getBlkIndex())) {
+				continue;
+			}
 			final TransferTransaction transaction = TransferMapper.toModel(dbTransfer, accountLookup);
 			transactions.set(dbTransfer.getBlkIndex(), transaction);
 		}
