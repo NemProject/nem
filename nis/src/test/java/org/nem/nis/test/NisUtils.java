@@ -1,12 +1,10 @@
 package org.nem.nis.test;
 
-import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.dao.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
@@ -175,19 +173,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory() {
-		return createTransactionValidatorFactory(Mockito.mock(TransferDao.class));
-	}
-
-	/**
-	 * Creates a (mostly real) transaction validator factory.
-	 *
-	 * @param transferDao The transfer dao.
-	 * @return The factory.
-	 */
-	public static TransactionValidatorFactory createTransactionValidatorFactory(final TransferDao transferDao) {
 		return new TransactionValidatorFactory(
-				transferDao,
-				Mockito.mock(ImportanceTransferDao.class),
 				new SystemTimeProvider(),
 				DEFAULT_POI_OPTIONS);
 	}

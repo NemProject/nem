@@ -146,6 +146,7 @@ public class BlockChainTest {
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
+		final HashCache transactionHashCache = new HashCache();
 		final BlockChainServices services =
 				new BlockChainServices(
 						mockBlockDao,
@@ -154,10 +155,11 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				poiFacade);
+				poiFacade,
+				transactionHashCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
-				new HashCache(),
+				transactionHashCache,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
@@ -232,6 +234,7 @@ public class BlockChainTest {
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
+		final HashCache transactionHashCache = new HashCache();
 		final BlockChainServices services =
 				new BlockChainServices(
 						mockBlockDao,
@@ -240,10 +243,11 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				poiFacade);
+				poiFacade,
+				transactionHashCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				accountAnalyzer,
-				new HashCache(),
+				transactionHashCache,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,

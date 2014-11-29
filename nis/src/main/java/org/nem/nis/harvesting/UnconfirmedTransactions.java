@@ -26,6 +26,7 @@ public class UnconfirmedTransactions {
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
 	private final PoiFacade poiFacade;
+	private final HashCache transactionHashCache;
 
 	private enum BalanceValidationOptions {
 		/**
@@ -58,9 +59,11 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
-			final PoiFacade poiFacade) {
+			final PoiFacade poiFacade,
+			final HashCache transactionHashCache) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
+		this.transactionHashCache = transactionHashCache;
 		this.singleValidator = this.createSingleValidator();
 	}
 
@@ -68,9 +71,11 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
-			final PoiFacade poiFacade) {
+			final PoiFacade poiFacade,
+			final HashCache transactionHashCache) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
+		this.transactionHashCache = transactionHashCache;
 		this.singleValidator = this.createSingleValidator();
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -84,7 +89,8 @@ public class UnconfirmedTransactions {
 				transactions,
 				options,
 				this.validatorFactory,
-				this.poiFacade);
+				this.poiFacade,
+				this.transactionHashCache);
 	}
 
 	/**
@@ -177,7 +183,7 @@ public class UnconfirmedTransactions {
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
 		final TransactionsContextPair pair = new TransactionsContextPair(transactions, new ValidationContext());
-		return this.validatorFactory.createBatch(this.poiFacade).validate(Arrays.asList(pair));
+		return this.validatorFactory.createBatch(this.transactionHashCache).validate(Arrays.asList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {

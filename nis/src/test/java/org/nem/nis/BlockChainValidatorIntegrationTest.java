@@ -8,7 +8,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dao.TransferDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
@@ -167,12 +166,12 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	@Test
-	public void chainIsInvalidIfTransactionAlreadyExistInDb() {
+	public void chainIsInvalidIfTransactionHashAlreadyExistInHashCache() {
 		// Arrange:
 		final long confirmedBlockHeight = 10;
 		final Transaction transaction = createValidSignedTransaction();
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		Mockito.when(factory.transferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(true);
+		Mockito.when(factory.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(true);
 		final BlockChainValidator validator = factory.create();
 
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), confirmedBlockHeight);
@@ -322,16 +321,16 @@ public class BlockChainValidatorIntegrationTest {
 		public int maxChainSize = 21;
 		public final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.poiFacade);
-		public final TransferDao transferDao = Mockito.mock(TransferDao.class);
+		public final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 		public final SingleTransactionValidator transactionValidator;
 		public final BatchTransactionValidator batchTransactionValidator;
 
 		public BlockChainValidatorFactory() {
-			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory(this.transferDao);
+			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			this.transactionValidator = transactionValidatorFactory.createSingle(this.poiFacade);
-			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.poiFacade);
+			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.transactionHashCache);
 
-			Mockito.when(this.transferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(false);
+			Mockito.when(this.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
 			Mockito.when(this.scorer.calculateTarget(Mockito.any(), Mockito.any())).thenReturn(BigInteger.ONE);
 

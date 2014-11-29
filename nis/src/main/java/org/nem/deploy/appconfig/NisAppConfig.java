@@ -172,17 +172,17 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider(), this.poiOptions());
+		return new TransactionValidatorFactory(this.timeProvider(), this.poiOptions());
 	}
 
 	@Bean
 	public SingleTransactionValidator transactionValidator() {
-		return this.transactionValidatorFactory().create(this.poiFacade());
+		return this.transactionValidatorFactory().create(this.poiFacade(), this.transactionHashCache());
 	}
 
 	@Bean
 	public BatchTransactionValidator batchTransactionValidator() {
-		return this.transactionValidatorFactory().createBatch(this.poiFacade());
+		return this.transactionValidatorFactory().createBatch(this.transactionHashCache());
 	}
 
 	@Bean
@@ -247,7 +247,8 @@ public class NisAppConfig {
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory(),
-				this.poiFacade());
+				this.poiFacade(),
+				this.transactionHashCache());
 	}
 
 	@Bean

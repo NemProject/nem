@@ -932,8 +932,8 @@ public class UnconfirmedTransactionsTest {
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator() {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		final TestContext context = new TestContext(
-				factory.create(Mockito.mock(PoiFacade.class)),
-				factory.createBatch(Mockito.mock(PoiFacade.class)));
+				factory.create(Mockito.mock(PoiFacade.class), Mockito.mock(HashCache.class)),
+				factory.createBatch(Mockito.mock(HashCache.class)));
 		return context.transactions;
 	}
 
@@ -1006,11 +1006,13 @@ public class UnconfirmedTransactionsTest {
 			this.batchValidator = batchValidator;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-			Mockito.when(validatorFactory.createBatch(poiFacade)).thenReturn(this.batchValidator);
+			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(poiFacade)).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					poiFacade);
+					poiFacade,
+					transactionHashCache);
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {
