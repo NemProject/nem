@@ -52,7 +52,8 @@ public class BlockExecutorTest {
 		private final List<Integer> undoList = new ArrayList<>();
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache, this.transactionHashCache);
 
 		public UndoExecuteTransactionOrderTestContext() {
 			this.account = Utils.generateRandomAccount();
@@ -354,7 +355,8 @@ public class BlockExecutorTest {
 	private static class ExecutorTestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache, this.transactionHashCache);
 
 		private Account addAccount() {
 			final Account account = Utils.generateRandomAccount();

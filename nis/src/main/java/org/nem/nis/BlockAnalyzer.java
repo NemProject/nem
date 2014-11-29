@@ -68,7 +68,7 @@ public class BlockAnalyzer {
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
 		final AccountCache accountCache = accountAnalyzer.getAccountCache();
-		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache);
+		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache, transactionHashCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer, transactionHashCache);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());

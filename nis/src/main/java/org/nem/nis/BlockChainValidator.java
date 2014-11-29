@@ -62,7 +62,6 @@ public class BlockChainValidator {
 		}
 
 		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
-		final List<TransactionsContextPair> groupedTransactions = new ArrayList<>();
 		final Set<Hash> chainHashes = new HashSet<>();
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
@@ -89,7 +88,13 @@ public class BlockChainValidator {
 			}
 
 			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight);
-			groupedTransactions.add(new TransactionsContextPair(block.getTransactions(), context));
+			final ValidationResult batchTransactionValidationResult =
+					this.batchTransactionValidator.validate(Arrays.asList(new TransactionsContextPair(block.getTransactions(), context)));
+			if (!batchTransactionValidationResult.isSuccess()) {
+				LOGGER.info(String.format("received transaction that failed validation: %s", batchTransactionValidationResult));
+				return false;
+			}
+
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
 					LOGGER.info("received block with unverifiable transaction");
@@ -115,12 +120,7 @@ public class BlockChainValidator {
 			expectedHeight = expectedHeight.next();
 
 			this.executor.accept(block);
-		}
-
-		final ValidationResult transactionValidationResult = this.batchTransactionValidator.validate(groupedTransactions);
-		if (!transactionValidationResult.isSuccess()) {
-			LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
-			return false;
+			chainHashes.clear();
 		}
 
 		return true;

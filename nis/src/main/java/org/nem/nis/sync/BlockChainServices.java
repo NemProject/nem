@@ -55,7 +55,7 @@ public class BlockChainServices {
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
-		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache());
+		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache(), transactionHashCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(accountAnalyzer, transactionHashCache);
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, observer),
@@ -90,7 +90,7 @@ public class BlockChainServices {
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
 				this.observerFactory.createUndoCommitObserver(accountAnalyzer, transactionHashCache),
-				new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache())));
+				new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache(), transactionHashCache)));
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 		BlockIterator.unwindUntil(

@@ -211,10 +211,11 @@ public class BlockChainValidatorIntegrationTest {
 		class TestContext {
 			final AccountCache accountCache = new AccountCache();
 			final PoiFacade poiFacade = new PoiFacade(NisUtils.createImportanceCalculator());
+			final HashCache transactionHashCache = new HashCache();
 
 			private BlockChainValidator createValidator() {
 				final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(this.accountCache, this.poiFacade);
-				final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+				final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache, this.transactionHashCache);
 				final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 
 				final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer, new HashCache());

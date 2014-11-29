@@ -47,6 +47,7 @@ public class HashCache {
 	public TimeInstant get(final Hash hash) {
 		return this.hashMap.get(hash);
 	}
+
 	/**
 	 * Adds a new hash/time stamp pair to the cache if hash is unknown.
 	 *
@@ -78,6 +79,15 @@ public class HashCache {
 				throw new IllegalArgumentException(String.format("hash %s already exists in cache", hashes.get(i)));
 			}
 		}
+	}
+
+	/**
+	 * Removes a hash/time stamp pair from the cache.
+	 *
+	 * @param hash The hash to add.
+	 */
+	public void remove(final Hash hash) {
+		this.hashMap.remove(hash);
 	}
 
 	/**

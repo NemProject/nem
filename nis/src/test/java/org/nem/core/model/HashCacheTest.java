@@ -129,6 +129,27 @@ public class HashCacheTest {
 
 	// endregion
 
+	// region remove
+
+	@Test
+	public void removeRemovesHashFromHashCache() {
+		// Arrange:
+		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final Hash hash = Utils.generateRandomHash();
+		cache.put(hash, new TimeInstant(456));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
+		Assert.assertThat(cache.get(hash), IsEqual.equalTo(new TimeInstant(456)));
+
+		// Act:
+		cache.remove(hash);
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+		Assert.assertThat(null == cache.get(hash), IsEqual.equalTo(true));
+	}
+
+	// endregion
+
 	// region hashExists
 
 	@Test
