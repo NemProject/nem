@@ -9,6 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;
 
@@ -18,6 +19,86 @@ import java.util.*;
  */
 public class BlockMapper {
 
+	private static class BlockTransactionMapper {
+		private final AccountDaoLookup accountDao;
+		private final org.nem.nis.dbmodel.Block dbBlock;
+
+		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<MultisigSignerModification> multisigSignerModificationsTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<MultisigTransaction> multisigTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<Transfer> transferTransactions;
+
+
+		int i = 0;
+		int multisigSignerModificationsIndex = 0;
+		int multisigTransactionsIndex = 0;
+		int importanceTransferIndex = 0;
+		int transferIndex = 0;
+
+		private BlockTransactionMapper(final AccountDaoLookup accountDao, final org.nem.nis.dbmodel.Block dbBlock, int initialCapacity) {
+			this.accountDao = accountDao;
+			this.dbBlock = dbBlock;
+			this.transferTransactions = new ArrayList<>(initialCapacity);
+		}
+
+		private Transaction handleMultisig(Transaction transaction) {
+			final org.nem.core.model.MultisigTransaction multisigTransaction = (org.nem.core.model.MultisigTransaction)transaction;
+
+			final MultisigTransaction dbTransfer = MultisigTransactionMapper.toDbModel(
+					multisigTransaction,
+					i++,
+					multisigTransactionsIndex++,
+					accountDao);
+			dbTransfer.setBlock(dbBlock);
+			multisigTransactions.add(dbTransfer);
+
+			return multisigTransaction.getOtherTransaction();
+		}
+
+		private void handleTransaction(final Transaction transaction) {
+			switch (transaction.getType()) {
+				case TransactionTypes.TRANSFER: {
+					final Transfer dbTransfer = TransferMapper.toDbModel(
+							(TransferTransaction)transaction,
+							i++,
+							importanceTransferIndex++,
+							accountDao);
+					dbTransfer.setBlock(dbBlock);
+					transferTransactions.add(dbTransfer);
+				}
+				break;
+				case TransactionTypes.IMPORTANCE_TRANSFER: {
+					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel(
+							(ImportanceTransferTransaction)transaction,
+							i++,
+							transferIndex++,
+							accountDao);
+					dbTransfer.setBlock(dbBlock);
+					importanceTransferTransactions.add(dbTransfer);
+				}
+				break;
+				case TransactionTypes.MULTISIG_SIGNER_MODIFY: {
+					final MultisigSignerModification dbTransfer = MultisigSignerModificationMapper.toDbModel(
+							(MultisigSignerModificationTransaction)transaction,
+							i++,
+							multisigSignerModificationsIndex++,
+							accountDao);
+					dbTransfer.setBlock(dbBlock);
+					multisigSignerModificationsTransactions.add(dbTransfer);
+				}
+				break;
+				default:
+					throw new RuntimeException("trying to map block with unknown transaction type");
+			}
+		}
+
+		public void saveTransfers() {
+			this.dbBlock.setBlockTransfers(transferTransactions);
+			this.dbBlock.setBlockImportanceTransfers(importanceTransferTransactions);
+			this.dbBlock.setBlockMultisigSignerModifications(multisigSignerModificationsTransactions);
+			this.dbBlock.setBlockMultisigTransactions(multisigTransactions);
+		}
+	}
 	/**
 	 * Converts a Block model to a Block db-model.
 	 *
@@ -44,54 +125,17 @@ public class BlockMapper {
 				block.getDifficulty().getRaw(),
 				lessor);
 
-		int i = 0;
-		int multisigSignerModificationsIndex = 0;
-		int importanceTransferIndex = 0;
-		int transferIndex = 0;
-		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
-		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
-		final List<MultisigSignerModification> multisigSignerModificationsTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
-
+		final BlockTransactionMapper blockTransactionMapper = new BlockTransactionMapper(accountDao, dbBlock, block.getTransactions().size());
 		for (final Transaction transaction : block.getTransactions()) {
-			switch (transaction.getType()) {
-				case TransactionTypes.TRANSFER: {
-					final Transfer dbTransfer = TransferMapper.toDbModel(
-							(TransferTransaction)transaction,
-							i++,
-							importanceTransferIndex++,
-							accountDao);
-					dbTransfer.setBlock(dbBlock);
-					transferTransactions.add(dbTransfer);
-				}
-				break;
-				case TransactionTypes.IMPORTANCE_TRANSFER: {
-					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel(
-							(ImportanceTransferTransaction)transaction,
-							i++,
-							transferIndex++,
-							accountDao);
-					dbTransfer.setBlock(dbBlock);
-					importanceTransferTransactions.add(dbTransfer);
-				}
-				break;
-				case TransactionTypes.MULTISIG_SIGNER_MODIFY: {
-					final MultisigSignerModification dbTransfer = MultisigSignerModificationMapper.toDbModel(
-							(MultisigSignerModificationTransaction)transaction,
-					        i++,
-					        multisigSignerModificationsIndex++,
-					        accountDao);
-					dbTransfer.setBlock(dbBlock);
-					multisigSignerModificationsTransactions.add(dbTransfer);
-				}
-				break;
-				default:
-					throw new RuntimeException("trying to map block with unknown transaction type");
+			if (TransactionTypes.MULTISIG == transaction.getType()) {
+				final Transaction innerTransaction = blockTransactionMapper.handleMultisig(transaction);
+				blockTransactionMapper.handleTransaction(innerTransaction);
+			} else {
+				blockTransactionMapper.handleTransaction(transaction);
 			}
 		}
 
-		dbBlock.setBlockTransfers(transferTransactions);
-		dbBlock.setBlockImportanceTransfers(importanceTransferTransactions);
-		dbBlock.setBlockMultisigSignerModifications(multisigSignerModificationsTransactions);
+		blockTransactionMapper.saveTransfers();
 		return dbBlock;
 	}
 

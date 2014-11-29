@@ -13,6 +13,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "importancetransfers")
 public class ImportanceTransfer extends AbstractTransfer<ImportanceTransfer> {
+	@OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "importanceTransfer")
+	private MultisigTransaction multisigTransactionImportanceTransfer;
+
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "remoteId")
@@ -38,5 +41,14 @@ public class ImportanceTransfer extends AbstractTransfer<ImportanceTransfer> {
 
 	public void setMode(final Integer mode) {
 		this.mode = mode;
+	}
+
+	/* == */
+	public MultisigTransaction getMultisigTransactionImportanceTransfer() {
+		return multisigTransactionImportanceTransfer;
+	}
+
+	public void setMultisigTransactionImportanceTransfer(MultisigTransaction multisigTransactionImportanceTransfer) {
+		this.multisigTransactionImportanceTransfer = multisigTransactionImportanceTransfer;
 	}
 }

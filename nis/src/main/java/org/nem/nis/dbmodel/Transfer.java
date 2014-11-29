@@ -2,7 +2,6 @@ package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.*;
 import org.hibernate.annotations.CascadeType;
-import org.nem.core.crypto.Hash;
 
 import javax.persistence.Entity;
 import javax.persistence.*;
@@ -19,6 +18,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "transfers")
 public class Transfer extends AbstractTransfer<Transfer> {
+	@OneToOne(fetch = FetchType.EAGER, optional = true, mappedBy = "transfer")
+	private MultisigTransaction multisigTransactionTransfer;
+
 	@ManyToOne
 	@Cascade({ CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "recipientId")
@@ -63,5 +65,14 @@ public class Transfer extends AbstractTransfer<Transfer> {
 
 	public void setMessagePayload(final byte[] messagePayload) {
 		this.messagePayload = messagePayload;
+	}
+
+	/* == */
+	public MultisigTransaction getMultisigTransactionTransfer() {
+		return multisigTransactionTransfer;
+	}
+
+	public void setMultisigTransactionTransfer(MultisigTransaction multisigTransactionTransfer) {
+		this.multisigTransactionTransfer = multisigTransactionTransfer;
 	}
 }
