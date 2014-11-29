@@ -84,10 +84,19 @@ public class HashCache {
 	/**
 	 * Removes a hash/time stamp pair from the cache.
 	 *
-	 * @param hash The hash to add.
+	 * @param hash The hash to remove.
 	 */
 	public void remove(final Hash hash) {
 		this.hashMap.remove(hash);
+	}
+
+	/**
+	 * Removes a hash/time stamp pair from the cache.
+	 *
+	 * @param hashes The list of hashes to remove.
+	 */
+	public void removeAll(final List<Hash> hashes) {
+		hashes.stream().forEach(this::remove);
 	}
 
 	/**
