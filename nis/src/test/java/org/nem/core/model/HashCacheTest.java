@@ -7,6 +7,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class HashCacheTest {
 
@@ -56,7 +57,7 @@ public class HashCacheTest {
 		// Arrange:
 		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 		final Hash hash = Utils.generateRandomHash();
-		cache.put(hash, new TimeInstant(456));
+		cache.put(new HashTimeInstantPair(hash, new TimeInstant(456)));
 
 		// Assert:
 		Assert.assertThat(cache.get(hash), IsEqual.equalTo(new TimeInstant(456)));
@@ -83,10 +84,10 @@ public class HashCacheTest {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final HashCache cache = new HashCache();
-		cache.put(hash, new TimeInstant(123));
+		cache.put(new HashTimeInstantPair(hash, new TimeInstant(123)));
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.put(hash, new TimeInstant(234)), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.put(new HashTimeInstantPair(hash, new TimeInstant(234))), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -96,35 +97,22 @@ public class HashCacheTest {
 	@Test
 	public void canPutAllHashesFromListToCache() {
 		// Arrange:
-		final List<Hash> hashes = createHashes(10);
-		final List<TimeInstant> timeStamps = createTimeStamps(10);
+		final List<HashTimeInstantPair> pairs = createPairs(10);
 		final HashCache cache = new HashCache();
 
 		// Assert:
-		cache.putAll(hashes, timeStamps);
-	}
-
-	@Test
-	public void cannotPutAllWithDifferentListSizes() {
-		// Arrange:
-		final List<Hash> hashes = createHashes(10);
-		final List<TimeInstant> timeStamps = createTimeStamps(9);
-		final HashCache cache = new HashCache();
-
-		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.putAll(hashes, timeStamps), IllegalArgumentException.class);
+		cache.putAll(pairs);
 	}
 
 	@Test
 	public void cannotPutAllWhenAtLeastOneHashIsKnown() {
 		// Arrange:
-		final List<Hash> hashes = createHashes(10);
-		final List<TimeInstant> timeStamps = createTimeStamps(11);
-		hashes.add(hashes.get(6));
+		final List<HashTimeInstantPair> pairs = createPairs(10);
+		pairs.add(new HashTimeInstantPair(pairs.get(6).getHash(), new TimeInstant(789)));
 		final HashCache cache = new HashCache();
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> cache.putAll(hashes, timeStamps), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> cache.putAll(pairs), IllegalArgumentException.class);
 	}
 
 	// endregion
@@ -136,7 +124,7 @@ public class HashCacheTest {
 		// Arrange:
 		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 		final Hash hash = Utils.generateRandomHash();
-		cache.put(hash, new TimeInstant(456));
+		cache.put(new HashTimeInstantPair(hash, new TimeInstant(456)));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
 		Assert.assertThat(cache.get(hash), IsEqual.equalTo(new TimeInstant(456)));
 
@@ -150,6 +138,32 @@ public class HashCacheTest {
 
 	// endregion
 
+	// region removeAll
+
+	@Test
+	public void removeAllRemovesHashesFromHashCache() {
+		// Arrange:
+		final List<HashTimeInstantPair> pairs = createPairs(10);
+		final HashCache cache = new HashCache();
+		cache.putAll(pairs);
+		Assert.assertThat(cache.size(), IsEqual.equalTo(10));
+
+		// Act:
+		cache.removeAll(pairs.stream().limit(5).map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		pairs.subList(5,10).stream().forEach(p -> Assert.assertThat(null != cache.get(p.getHash()), IsEqual.equalTo(true)));
+
+		// Act:
+		cache.removeAll(pairs.subList(5,10).stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+	}
+
+	// endregion
+
 	// region hashExists
 
 	@Test
@@ -157,7 +171,7 @@ public class HashCacheTest {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final HashCache cache = new HashCache();
-		cache.put(hash, new TimeInstant(123));
+		cache.put(new HashTimeInstantPair(hash, new TimeInstant(123)));
 
 		// Assert:
 		Assert.assertThat(cache.hashExists(hash), IsEqual.equalTo(true));
@@ -181,7 +195,7 @@ public class HashCacheTest {
 		// Arrange:
 		final List<Hash> hashes = createHashes(10);
 		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
-		cache.put(hashes.get(7), new TimeInstant(10));
+		cache.put(new HashTimeInstantPair(hashes.get(7), new TimeInstant(10)));
 
 		// Assert:
 		Assert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(true));
@@ -208,10 +222,10 @@ public class HashCacheTest {
 		final Hash hash1 = Utils.generateRandomHash();
 		final Hash hash2 = Utils.generateRandomHash();
 		final Hash hash3 = Utils.generateRandomHash();
-		cache.put(hash1, new TimeInstant(123));
-		cache.put(hash2, new TimeInstant(124));
-		cache.put(hash3, new TimeInstant(124));
-		cache.put(Utils.generateRandomHash(), new TimeInstant(125));
+		cache.put(new HashTimeInstantPair(hash1, new TimeInstant(123)));
+		cache.put(new HashTimeInstantPair(hash2, new TimeInstant(124)));
+		cache.put(new HashTimeInstantPair(hash3, new TimeInstant(124)));
+		cache.put(new HashTimeInstantPair(Utils.generateRandomHash(), new TimeInstant(125)));
 
 		// Act:
 		cache.prune(new TimeInstant(125));
@@ -230,8 +244,8 @@ public class HashCacheTest {
 		final HashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
 		final Hash hash1 = Utils.generateRandomHash();
 		final Hash hash2 = Utils.generateRandomHash();
-		cache.put(hash1, new TimeInstant(125));
-		cache.put(hash2, new TimeInstant(234));
+		cache.put(new HashTimeInstantPair(hash1, new TimeInstant(125)));
+		cache.put(new HashTimeInstantPair(hash2, new TimeInstant(234)));
 
 		// Act:
 		cache.prune(new TimeInstant(125));
@@ -288,9 +302,9 @@ public class HashCacheTest {
 		final Hash hash2 = Utils.generateRandomHash();
 		final Hash hash3 = Utils.generateRandomHash();
 		final HashCache cache = new HashCache();
-		cache.put(hash1, new TimeInstant(123));
-		cache.put(hash2, new TimeInstant(234));
-		cache.put(hash3, new TimeInstant(345));
+		cache.put(new HashTimeInstantPair(hash1, new TimeInstant(123)));
+		cache.put(new HashTimeInstantPair(hash2, new TimeInstant(234)));
+		cache.put(new HashTimeInstantPair(hash3, new TimeInstant(345)));
 
 		// Assert:
 		Assert.assertThat(cache.stream().count(), IsEqual.equalTo(3L));
@@ -303,8 +317,17 @@ public class HashCacheTest {
 
 	private HashCache createHashCacheWithTimeStamps(final int... timeStamps) {
 		final HashCache cache = new HashCache();
-		Arrays.stream(timeStamps).forEach(t -> cache.put(Utils.generateRandomHash(), new TimeInstant(t)));
+		Arrays.stream(timeStamps).forEach(t -> cache.put(new HashTimeInstantPair(Utils.generateRandomHash(), new TimeInstant(t))));
 		return cache;
+	}
+
+	private List<HashTimeInstantPair> createPairs(final int count) {
+		final List<HashTimeInstantPair> pairs = new ArrayList<>();
+		for (int i=0; i<count; i++) {
+			pairs.add(new HashTimeInstantPair(Utils.generateRandomHash(), Utils.generateRandomTimeStamp()));
+		}
+
+		return pairs;
 	}
 
 	private List<Hash> createHashes(final int count) {
@@ -314,14 +337,5 @@ public class HashCacheTest {
 		}
 
 		return hashes;
-	}
-
-	private List<TimeInstant> createTimeStamps(final int count) {
-		final List<TimeInstant> timeStamps = new ArrayList<>();
-		for (int i=0; i<count; i++) {
-			timeStamps.add(Utils.generateRandomTimeStamp());
-		}
-
-		return timeStamps;
 	}
 }

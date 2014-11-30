@@ -3,12 +3,12 @@ package org.nem.core;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.HashCache;
+import org.nem.core.model.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class HashCachePerformanceTest {
 	private static final Logger LOGGER = Logger.getLogger(HashCachePerformanceTest.class.getName());
@@ -21,14 +21,14 @@ public class HashCachePerformanceTest {
 
 		// Warm-up:
 		for (int i=0; i<count; i++) {
-			context.cache.put(context.hashes.get(i), context.timeStamps.get(i));
+			context.cache.put(context.pairs.get(i));
 		}
 
 		// Act:
 		context.cache.clear();
 		final long start = System.currentTimeMillis();
 		for (int i=0; i<count; i++) {
-			context.cache.put(context.hashes.get(i), context.timeStamps.get(i));
+			context.cache.put(context.pairs.get(i));
 		}
 
 		final long stop = System.currentTimeMillis();
@@ -46,12 +46,12 @@ public class HashCachePerformanceTest {
 		final TestContext context = new TestContext(count);
 
 		// Warm-up:
-		context.cache.putAll(context.hashes, context.timeStamps);
+		context.cache.putAll(context.pairs);
 
 		// Act:
 		context.cache.clear();
 		final long start = System.currentTimeMillis();
-		context.cache.putAll(context.hashes, context.timeStamps);
+		context.cache.putAll(context.pairs);
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("Add all %d entries to the hash cache needed %dms", count, (stop - start)));
 
@@ -65,7 +65,7 @@ public class HashCachePerformanceTest {
 		// Arrange:
 		final int count = 250_000;
 		final TestContext context = new TestContext(count);
-		context.cache.putAll(context.hashes, context.timeStamps);
+		context.cache.putAll(context.pairs);
 
 		// Act:
 		final long start = System.currentTimeMillis();
@@ -84,7 +84,7 @@ public class HashCachePerformanceTest {
 		final int count = 250_000;
 		final TestContext context = new TestContext(count);
 		final HashCache copy = new HashCache();
-		context.cache.putAll(context.hashes, context.timeStamps);
+		context.cache.putAll(context.pairs);
 
 		// Act:
 		final long start = System.currentTimeMillis();
@@ -103,7 +103,7 @@ public class HashCachePerformanceTest {
 		final int count = 250_000;
 		final TestContext context = new TestContext(count);
 		final Hash hash = Utils.generateRandomHash();
-		context.cache.putAll(context.hashes, context.timeStamps);
+		context.cache.putAll(context.pairs);
 
 		// Warm-up:
 		for (int i=0; i<count; i++) {
@@ -117,16 +117,16 @@ public class HashCachePerformanceTest {
 		}
 
 		long stop = System.currentTimeMillis();
-		LOGGER.info(String.format("search for existent hash %d times needed %dms", count, (stop - start)));
+		LOGGER.info(String.format("search for non existent hash %d times needed %dms", count, (stop - start)));
 
 		// Act:
 		start = System.currentTimeMillis();
 		for (int i=0; i<count; i++) {
-			context.cache.hashExists(context.hashes.get(i));
+			context.cache.hashExists(context.pairs.get(i).getHash());
 		}
 
 		stop = System.currentTimeMillis();
-		LOGGER.info(String.format("search for non existent hash %d times needed %dms", count, (stop - start)));
+		LOGGER.info(String.format("search for existent hash %d times needed %dms", count, (stop - start)));
 
 		// Assert:
 		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
@@ -137,16 +137,16 @@ public class HashCachePerformanceTest {
 		// Arrange:
 		final int count = 250_000;
 		final TestContext context = new TestContext(count);
-		final List<Hash> hashes = context.createHashes(120);
-		context.cache.putAll(context.hashes, context.timeStamps);
+		final List<HashTimeInstantPair> pairs = context.createPairs(120);
+		context.cache.putAll(pairs);
 
 		// Warm-up:
-		context.cache.anyHashExists(hashes);
+		context.cache.anyHashExists(pairs.stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
 
 		// Act:
 		long start = System.currentTimeMillis();
 		for (int i=0; i<1000; i++) {
-			context.cache.anyHashExists(hashes);
+			context.cache.anyHashExists(pairs.stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
 		}
 
 		long stop = System.currentTimeMillis();
@@ -158,31 +158,20 @@ public class HashCachePerformanceTest {
 
 	private class TestContext {
 		private final HashCache cache;
-		private final List<Hash> hashes;
-		private final List<TimeInstant> timeStamps;
+		private final List<HashTimeInstantPair> pairs;
 
 		private TestContext(final int count) {
 			this.cache = new HashCache(count);
-			this.hashes = createHashes(count);
-			this.timeStamps = createTimeStamps(count);
+			this.pairs = createPairs(count);
 		}
 
-		private List<Hash> createHashes(final int count) {
-			final List<Hash> hashes = new ArrayList<>();
+		private List<HashTimeInstantPair> createPairs(final int count) {
+			final List<HashTimeInstantPair> pairs = new ArrayList<>();
 			for (int i=0; i<count; i++) {
-				hashes.add(Utils.generateRandomHash());
+				pairs.add(new HashTimeInstantPair(Utils.generateRandomHash(), Utils.generateRandomTimeStamp()));
 			}
 
-			return hashes;
-		}
-
-		private List<TimeInstant> createTimeStamps(final int count) {
-			final List<TimeInstant> timeStamps = new ArrayList<>();
-			for (int i=0; i<count; i++) {
-				timeStamps.add(Utils.generateRandomTimeStamp());
-			}
-
-			return timeStamps;
+			return pairs;
 		}
 	}
 }

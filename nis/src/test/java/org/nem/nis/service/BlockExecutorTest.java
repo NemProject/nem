@@ -52,8 +52,7 @@ public class BlockExecutorTest {
 		private final List<Integer> undoList = new ArrayList<>();
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache, this.transactionHashCache);
+		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
 
 		public UndoExecuteTransactionOrderTestContext() {
 			this.account = Utils.generateRandomAccount();
@@ -115,7 +114,7 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), context.account1, Amount.fromNem(11));
@@ -134,7 +133,7 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications
 		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(4), context.block.getSigner(), Amount.fromNem(7));
@@ -152,7 +151,7 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = ArgumentCaptor.forClass(BlockNotificationContext.class);
-		Mockito.verify(observer, Mockito.times(5)).notify(Mockito.any(), notificationContextCaptor.capture());
+		Mockito.verify(observer, Mockito.times(6)).notify(Mockito.any(), notificationContextCaptor.capture());
 
 		// check notification contexts
 		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
@@ -173,12 +172,13 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(2), context.account1, Amount.fromNem(11));
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(3), context.account1, Amount.fromNem(9));
-		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(4), context.account2, context.account1, Amount.fromNem(12));
+		// TODO 20141130 BR: should we rely on the specific index?
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(3), context.account1, Amount.fromNem(11));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), context.account1, Amount.fromNem(9));
+		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(5), context.account2, context.account1, Amount.fromNem(12));
 	}
 
 	@Test
@@ -193,7 +193,7 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications
 		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(0), context.block.getSigner(), Amount.fromNem(7));
@@ -212,7 +212,7 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<BlockNotificationContext> notificationContextCaptor = ArgumentCaptor.forClass(BlockNotificationContext.class);
-		Mockito.verify(observer, Mockito.times(5)).notify(Mockito.any(), notificationContextCaptor.capture());
+		Mockito.verify(observer, Mockito.times(6)).notify(Mockito.any(), notificationContextCaptor.capture());
 
 		// check notification contexts
 		for (final BlockNotificationContext notificationContext : notificationContextCaptor.getAllValues()) {
@@ -265,7 +265,7 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
 		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(2), context.realAccount, Amount.fromNem(5));
@@ -285,12 +285,13 @@ public class BlockExecutorTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture(), Mockito.any());
+		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
+		// TODO 20141130 BR: should we rely on the specific index?
 		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(0), context.realAccount, Amount.fromNem(5));
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(2), context.transactionSigner, Amount.fromNem(5));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(3), context.transactionSigner, Amount.fromNem(5));
 	}
 
 	private static class UndoExecuteRemoteHarvestingNotificationTestContext {
@@ -355,8 +356,7 @@ public class BlockExecutorTest {
 	private static class ExecutorTestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache, this.transactionHashCache);
+		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
 
 		private Account addAccount() {
 			final Account account = Utils.generateRandomAccount();

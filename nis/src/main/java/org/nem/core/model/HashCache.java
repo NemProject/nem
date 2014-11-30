@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-// TODO 20141127: Is it worth to code a HashTimeStampPair class?
 /**
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
  */
@@ -49,15 +48,14 @@ public class HashCache {
 	}
 
 	/**
-	 * Adds a new hash/time stamp pair to the cache if hash is unknown.
+	 * Adds a new hash/timestamp pair to the cache if hash is unknown.
 	 *
-	 * @param hash The hash to add.
-	 * @param timeStamp The time stamp.
+	 * @param pair The pair..
 	 */
-	public void put(final Hash hash, final TimeInstant timeStamp) {
-		final TimeInstant original = this.hashMap.putIfAbsent(hash, timeStamp);
+	public void put(final HashTimeInstantPair pair) {
+		final TimeInstant original = this.hashMap.putIfAbsent(pair.getHash(), pair.getTimeStamp());
 		if (null != original) {
-			throw new IllegalArgumentException(String.format("hash %s already exists in cache", hash));
+			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
 		}
 	}
 
@@ -65,18 +63,13 @@ public class HashCache {
 	 * Adds a new hash/time stamp pairs to the cache if hash is unknown.
 	 * Throws if any of the hashes is already in the cache.
 	 *
-	 * @param hashes The hashes to add.
-	 * @param timeStamps The time stamps.
+	 * @param pairs The pairs to add.
 	 */
-	public void putAll(final List<Hash> hashes, final List<TimeInstant> timeStamps) {
-		if (hashes.size() != timeStamps.size()) {
-			throw new IllegalArgumentException("hashes and time stamps lists must have equal size.");
-		}
-
-		for (int i=0; i<hashes.size(); i++) {
-			final TimeInstant original = this.hashMap.putIfAbsent(hashes.get(i), timeStamps.get(i));
+	public void putAll(final List<HashTimeInstantPair> pairs) {
+		for (HashTimeInstantPair pair : pairs) {
+			final TimeInstant original = this.hashMap.putIfAbsent(pair.getHash(), pair.getTimeStamp());
 			if (null != original) {
-				throw new IllegalArgumentException(String.format("hash %s already exists in cache", hashes.get(i)));
+				throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
 			}
 		}
 	}

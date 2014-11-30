@@ -48,6 +48,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new RemoteObserver(poiFacade));
 		builder.add(new OutlinkObserver(poiFacade));
 		builder.add(new PruningObserver(poiFacade, transactionHashCache));
+		builder.add(new TransactionHashesObserver(transactionHashCache));
 		return builder;
 	}
 }

@@ -18,7 +18,6 @@ import java.util.*;
 public class BlockExecutor {
 	private final PoiFacade poiFacade;
 	private final AccountCache accountCache;
-	private final HashCache transactionHashCache;
 
 	/**
 	 * Creates a new block executor.
@@ -27,10 +26,9 @@ public class BlockExecutor {
 	 * @param accountCache The account cache.
 	 */
 	@Autowired(required = true)
-	public BlockExecutor(final PoiFacade poiFacade, final AccountCache accountCache, final HashCache transactionHashCache) {
+	public BlockExecutor(final PoiFacade poiFacade, final AccountCache accountCache) {
 		this.poiFacade = poiFacade;
 		this.accountCache = accountCache;
-		this.transactionHashCache = transactionHashCache;
 	}
 
 	//region execute
@@ -50,9 +48,7 @@ public class BlockExecutor {
 		}
 
 		this.notifyBlockHarvested(transactionObserver, block, trigger);
-
-		// TODO 20141129 BR: this is temporary until the observer is implemented.
-		this.addToTransactionHashCache(block);
+		this.notifyTransactionHashes(transactionObserver, block);
 	}
 
 	//endregion
@@ -70,23 +66,13 @@ public class BlockExecutor {
 		final TransactionObserver transactionObserver = this.createTransactionObserver(block, trigger, observer);
 
 		this.notifyBlockHarvested(transactionObserver, block, trigger);
+		this.notifyTransactionHashes(transactionObserver, block);
 		for (final Transaction transaction : getReverseTransactions(block)) {
 			transaction.undo(transactionObserver);
 		}
-
-		// TODO 20141129 BR: this is temporary until the observer is implemented.
-		this.removeFromTransactionHashCache(block);
 	}
 
 	//endregion undo
-
-	private void addToTransactionHashCache(final Block block) {
-		block.getTransactions().stream().forEach(t -> this.transactionHashCache.put(HashUtils.calculateHash(t), t.getTimeStamp()));
-	}
-
-	private void removeFromTransactionHashCache(final Block block) {
-		block.getTransactions().stream().forEach(t -> this.transactionHashCache.remove(HashUtils.calculateHash(t)));
-	}
 
 	private void notifyBlockHarvested(final TransactionObserver observer, final Block block, final NotificationTrigger trigger) {
 		// in order for all the downstream observers to behave correctly (without needing to know about remote foraging)
@@ -105,6 +91,12 @@ public class BlockExecutor {
 		for (final NotificationType type : types) {
 			observer.notify(new BalanceAdjustmentNotification(type, endowed, block.getTotalFee()));
 		}
+	}
+
+	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
+		final List<HashTimeInstantPair> pairs = new ArrayList<>();
+		block.getTransactions().stream().forEach(t -> pairs.add(new HashTimeInstantPair(HashUtils.calculateHash(t), t.getTimeStamp())));
+		observer.notify(new TransactionHashesNotification(pairs));
 	}
 
 	private static Iterable<Transaction> getReverseTransactions(final Block block) {
