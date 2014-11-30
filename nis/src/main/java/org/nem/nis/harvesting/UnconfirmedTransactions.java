@@ -61,7 +61,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = this.createSingleValidator();
+		this.singleValidator = this.createSingleValidator(false);
 	}
 
 	private UnconfirmedTransactions(
@@ -71,7 +71,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = this.createSingleValidator();
+		this.singleValidator = this.createSingleValidator(true);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -186,10 +186,11 @@ public class UnconfirmedTransactions {
 				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
 	}
 
-	private SingleTransactionValidator createSingleValidator() {
+	private SingleTransactionValidator createSingleValidator(boolean blockCreation) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.poiFacade));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
+		builder.add(new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation, () -> this.transactions.values()));
 		return builder.build();
 	}
 

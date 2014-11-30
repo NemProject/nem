@@ -32,6 +32,10 @@ public class MultisigLinks {
 		this.cosignatoryOf.remove(multisigAddress);
 	}
 
+	public Set<Address> getCosignatories() {
+		return this.cosignatories.keySet();
+	}
+	
 	public boolean isMultisig() {
 		return 0 != this.cosignatories.size();
 	}

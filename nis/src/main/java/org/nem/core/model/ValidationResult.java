@@ -115,7 +115,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because signer is not a cosigner of given multisig account.
 	 */
-	FAILURE_MULTISIG_NOT_A_COSIGNER(30);
+	FAILURE_MULTISIG_NOT_A_COSIGNER(30),
+
+	/**
+	 * Validation failed because not enough cosignatories were present.
+	 */
+	FAILURE_MULTISIG_MISSING_COSIGNERS(31);
 
 	private final int value;
 

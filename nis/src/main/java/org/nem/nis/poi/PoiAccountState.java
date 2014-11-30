@@ -98,6 +98,10 @@ public class PoiAccountState {
 		return this.multisigLinks.isCosignatoryOf(signer);
 	}
 
+	public Set<Address> getCosigners() {
+		return this.multisigLinks.getCosignatories();
+	}
+
 	/**
 	 * Returns height of an account.
 	 *
