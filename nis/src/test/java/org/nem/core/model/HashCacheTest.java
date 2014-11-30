@@ -16,7 +16,7 @@ public class HashCacheTest {
 	@Test
 	public void hashCacheIsInitiallyEmpty() {
 		// Assert:
-		Assert.assertThat(new HashCache().size(), IsEqual.equalTo(0));
+		Assert.assertThat(new HashCache().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	// endregion
@@ -30,6 +30,30 @@ public class HashCacheTest {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
+	}
+
+	// endregion
+
+	// region isEmpty
+
+	@Test
+	public void isEmptyReturnsTrueWhenHashCacheHasZeroElements() {
+		// Arrange:
+		final HashCache cache = new HashCache();
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.isEmpty(), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isEmptyReturnsFalseWhenHashCacheHasNonZeroElements() {
+		// Arrange:
+		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+
+		// Assert:
+		Assert.assertThat(cache.size() > 0, IsEqual.equalTo(true));
+		Assert.assertThat(cache.isEmpty(), IsEqual.equalTo(false));
 	}
 
 	// endregion
@@ -156,7 +180,7 @@ public class HashCacheTest {
 		pairs.subList(5,10).stream().forEach(p -> Assert.assertThat(null != cache.get(p.getHash()), IsEqual.equalTo(true)));
 
 		// Act:
-		cache.removeAll(pairs.subList(5,10).stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
+		cache.removeAll(pairs.subList(5, 10).stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));

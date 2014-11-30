@@ -31,6 +31,15 @@ public class HashCache {
 	}
 
 	/**
+	 * Gets a vlue indicating whether or not the hash cache is empty.
+	 *
+	 * @return true if the hash cache is empty, false otherwise.
+	 */
+	public boolean isEmpty() {
+		return this.hashMap.isEmpty();
+	}
+
+	/**
 	 * Clears the underlying hash map.
 	 */
 	public void clear() {
