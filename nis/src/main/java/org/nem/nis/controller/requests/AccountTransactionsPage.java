@@ -5,16 +5,18 @@ import org.nem.core.utils.StringUtils;
 
 public class AccountTransactionsPage extends AccountId {
 	private final Hash hash;
+	private final Long id;
 
 	/**
 	 * Creates a new account page.
 	 *
 	 * @param address The address.
-	 * @param hash The hash.
+	 * @param id The id.
 	 */
-	public AccountTransactionsPage(final String address, final String hash) {
+	public AccountTransactionsPage(final String address, final String hash, final String id) {
 		super(address);
 		this.hash = StringUtils.isNullOrEmpty(hash) ? null : Hash.fromHexString(hash);
+		this.id = StringUtils.isNullOrEmpty(id) ? null : Long.parseLong(id);
 	}
 
 	/**
@@ -24,5 +26,14 @@ public class AccountTransactionsPage extends AccountId {
 	 */
 	public Hash getHash() {
 		return this.hash;
+	}
+
+	/**
+	 * Gets the id.
+	 *
+	 * @return The id.
+	 */
+	public Long getId() {
+		return this.id;
 	}
 }

@@ -92,29 +92,66 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional
-	public Collection<Object[]> getTransactionsForAccountUsingHash(final Account address, final Hash hash, final TransferType transferType, final int limit) {
+	public Collection<Object[]> getTransactionsForAccountUsingHash(
+			final Account address,
+			final Hash hash,
+			final BlockHeight height,
+			final TransferType transferType,
+			final int limit) {
 		if (hash == null) {
 			return this.getLatestTransactionsForAccount(address, limit, transferType);
 		} else {
 			final String addressString = this.buildAddressQuery(transferType);
-			final Object[] tx = this.getTransactionDescriptorUsingHash(address, hash, limit, addressString);
+			final Object[] tx = this.getTransactionDescriptorUsingHash(address, hash, height, addressString);
 			return this.getTransactionsForAccountUpToTransaction(address, limit, transferType, tx);
 		}
 	}
 
-	private Object[] getTransactionDescriptorUsingHash(final Account address, final Hash hash, final int limit, final String addressString) {
+	private Object[] getTransactionDescriptorUsingHash(
+			final Account address,
+			final Hash hash,
+			final BlockHeight height,
+			final String addressString) {
 		final Query prequery = this.getCurrentSession()
 				.createQuery("select t, t.block.height from Transfer t " +
 						"WHERE " +
 						addressString +
-						" AND t.transferHash = :hash" +
+						" AND t.block.height = :height" +
 						" ORDER BY t.timeStamp desc")
-				.setParameter("hash", hash.getRaw())
-				.setParameter("pubkey", address.getAddress().getEncoded())
-				.setMaxResults(limit);
+				.setParameter("height", height.getRaw())
+				.setParameter("pubkey", address.getAddress().getEncoded());
 		final List<Object[]> tempList = listAndCast(prequery);
 		if (tempList.size() < 1) {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
+		}
+
+		for (Object[] object : tempList) {
+			if (((Transfer)object[0]).getTransferHash().equals(hash)) {
+				return object;
+			}
+		}
+
+		throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
+	}
+
+	@Override
+	@Transactional
+	public Collection<Object[]> getTransactionsForAccountUsingId(final Account address, final Long id, final TransferType transferType, final int limit) {
+		if (id == null) {
+			return this.getLatestTransactionsForAccount(address, limit, transferType);
+		} else {
+			final Object[] tx = this.getTransactionDescriptorUsingId(id);
+			return this.getTransactionsForAccountUpToTransaction(address, limit, transferType, tx);
+		}
+	}
+
+	private Object[] getTransactionDescriptorUsingId(final Long id) {
+		final Query preQuery = this.getCurrentSession()
+				.createQuery("select t, t.block.height from Transfer t WHERE id=:id")
+				.setParameter("id", id);
+		final List<Object[]> tempList = listAndCast(preQuery);
+		if (tempList.size() < 1) {
+			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), id.toString());
 		}
 
 		return tempList.get(0);

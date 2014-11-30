@@ -134,13 +134,21 @@ public class TransferDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Act
-		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
-		final Collection<Object[]> entities2 = this.transferDao.getTransactionsForAccountUsingHash(sender,
+		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(
+				sender,
+				null,
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL,
+				25);
+		final Collection<Object[]> entities2 = this.transferDao.getTransactionsForAccountUsingHash(
+				sender,
 				dbBlock.getBlockTransfers().get(24).getTransferHash(),
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.ALL,
 				25);
 		final Collection<Object[]> entities3 = this.transferDao.getTransactionsForAccountUsingHash(sender,
 				dbBlock.getBlockTransfers().get(29).getTransferHash(),
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.ALL,
 				25);
 
@@ -165,7 +173,12 @@ public class TransferDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Act
-		this.transferDao.getTransactionsForAccountUsingHash(sender, new Hash(new byte[] { 6, 66 }), ReadOnlyTransferDao.TransferType.ALL, 25);
+		this.transferDao.getTransactionsForAccountUsingHash(
+				sender,
+				new Hash(new byte[] { 6, 66 }),
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL,
+				25);
 	}
 
 	// TODO-CR: tests like this with a lot of setup can be hard to follow (i know i don't always follow this rule,
@@ -210,8 +223,10 @@ public class TransferDaoTest {
 		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
-		final List<Transfer> incomingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Transfer> incomingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				null,
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				25).stream()
 				.map(obj -> (Transfer)obj[0])
@@ -221,8 +236,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> incomingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Transfer> incomingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				incomingEntities1.get(24).getTransferHash(),
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				25).stream()
 				.map(obj -> (Transfer)obj[0])
@@ -232,8 +249,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> incomingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Transfer> incomingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				incomingEntities2.get(24).getTransferHash(),
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				25).stream()
 				.map(obj -> (Transfer)obj[0])
@@ -258,8 +277,10 @@ public class TransferDaoTest {
 		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
-		final List<Transfer> outgoingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Transfer> outgoingEntities1 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				null,
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				25).stream()
 				.map(obj -> (Transfer)obj[0])
@@ -269,8 +290,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> outgoingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Transfer> outgoingEntities2 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				outgoingEntities1.get(24).getTransferHash(),
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				25).stream()
 				.map(obj -> (Transfer)obj[0])
@@ -280,8 +303,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
-		final List<Transfer> outgoingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Transfer> outgoingEntities3 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				outgoingEntities2.get(24).getTransferHash(),
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				25).stream()
 				.map(obj -> (Transfer)obj[0])
@@ -306,8 +331,10 @@ public class TransferDaoTest {
 		final Account testedAccount = this.prepareIncomingOutgoingData();
 
 		// Act
-		final List<Transfer> allEntities1 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Transfer> allEntities1 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				null,
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.ALL,
 				25).stream()
 				.map(obj -> (Transfer)obj[0])
@@ -317,8 +344,10 @@ public class TransferDaoTest {
 				.map(obj -> obj.getTimeStamp())
 				.collect(Collectors.toList());
 
-		final List<Integer> allTimeStamps2 = this.transferDao.getTransactionsForAccountUsingHash(testedAccount,
+		final List<Integer> allTimeStamps2 = this.transferDao.getTransactionsForAccountUsingHash(
+				testedAccount,
 				allEntities1.get(24).getTransferHash(),
+				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.ALL,
 				25).stream()
 				.map(obj -> ((Transfer)obj[0]).getTimeStamp())
@@ -377,7 +406,12 @@ public class TransferDaoTest {
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
 
 		// Act
-		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
+		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(
+				sender,
+				null,
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL,
+				25);
 
 		final List<Long> resultHeights = entities1.stream().map(obj -> (Long)obj[1]).collect(Collectors.toList());
 		final List<Integer> resultTimestamps = entities1.stream().map(obj -> ((Transfer)obj[0]).getTimeStamp()).collect(Collectors.toList());
@@ -398,7 +432,12 @@ public class TransferDaoTest {
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, true);
 
 		// Act (transaction is pulled 2 times from db, one should get filtered):
-		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(sender, null, ReadOnlyTransferDao.TransferType.ALL, 25);
+		final Collection<Object[]> entities1 = this.transferDao.getTransactionsForAccountUsingHash(
+				sender,
+				null,
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL,
+				25);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(1));

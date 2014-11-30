@@ -81,7 +81,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.ALL);
+		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.ALL);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.INCOMING);
+		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	/**
@@ -105,12 +105,14 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
+		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
-	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final AccountTransactionsPageBuilder builder, final ReadOnlyTransferDao.TransferType transferType) {
+	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
+			final AccountTransactionsPageBuilder builder,
+			final ReadOnlyTransferDao.TransferType transferType) {
 		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), transferType);
+		return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
 	}
 
 	/**

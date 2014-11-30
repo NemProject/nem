@@ -3,6 +3,7 @@ package org.nem.nis.service;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.SerializableList;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 
@@ -33,10 +34,28 @@ public interface AccountIo extends Iterable<Account> {
 	 *
 	 * @param address The account address.
 	 * @param transactionHash The hash of "top-most" transfer.
+	 * @param height The block height at which to search for the hash.
 	 * @param transfersType The type of transfers.
 	 * @return The transaction information.
 	 */
-	SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final Address address, final Hash transactionHash, final ReadOnlyTransferDao.TransferType transfersType);
+	SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
+			final Address address,
+			final Hash transactionHash,
+			final BlockHeight height,
+			final ReadOnlyTransferDao.TransferType transfersType);
+
+	/**
+	 * Gets all transaction information associated with an account.
+	 *
+	 * @param address The account address.
+	 * @param transactionId The id of "top-most" transfer.
+	 * @param transfersType The type of transfers.
+	 * @return The transaction information.
+	 */
+	SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
+			final Address address,
+			final Long transactionId,
+			final ReadOnlyTransferDao.TransferType transfersType);
 
 	/**
 	 * Gets information about blocks harvested by an account.

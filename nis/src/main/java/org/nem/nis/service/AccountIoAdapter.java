@@ -72,9 +72,31 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	@Override
-	public SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final Address address, final Hash transactionHash, final ReadOnlyTransferDao.TransferType transfersType) {
+	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
+			final Address address,
+			final Hash transactionHash,
+			final BlockHeight height,
+			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, transactionHash, transfersType, 25);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, transactionHash, height, transfersType, 25);
+
+		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
+		transfers.stream()
+				.map(tr -> new TransactionMetaDataPair(
+						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
+						new TransactionMetaData(new BlockHeight((long)tr[1]))
+				))
+				.forEach(obj -> transactionList.add(obj));
+		return transactionList;
+	}
+
+	@Override
+	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
+			final Address address,
+			final Long transactionId,
+			final ReadOnlyTransferDao.TransferType transfersType) {
+		final Account account = this.accountCache.findByAddress(address);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, 25);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()

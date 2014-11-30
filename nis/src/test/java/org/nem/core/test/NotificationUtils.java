@@ -104,4 +104,16 @@ public class NotificationUtils {
 		Assert.assertThat(n.getLessee(), IsEqual.equalTo(expectedLessee));
 		Assert.assertThat(n.getMode(), IsEqual.equalTo(expectedMode));
 	}
+
+	/**
+	 * Asserts that the specified notification is a transaction hashes notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param numPairs The expected number of transaction hashes.
+	 */
+	public static void assertTransactionHashesNotification(final Notification notification, final int numPairs) {
+		final TransactionHashesNotification n = (TransactionHashesNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.TransactionHashes));
+		Assert.assertThat(n.getPairs().size(), IsEqual.equalTo(numPairs));
+	}
 }

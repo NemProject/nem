@@ -141,6 +141,23 @@ public class BlockExecutorTest {
 	}
 
 	@Test
+	public void executePropagatesTransactionHashesNotificationToSubscribedObserver() {
+		// Arrange:
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture(), Mockito.any());
+
+		// check notification
+		NotificationUtils.assertTransactionHashesNotification(notificationCaptor.getAllValues().get(5), 1);
+	}
+
+	@Test
 	public void executePropagatesProperNotificationContextWithAllNotifications() {
 		// Arrange:
 		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
@@ -175,7 +192,6 @@ public class BlockExecutorTest {
 		Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications
-		// TODO 20141130 BR: should we rely on the specific index?
 		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(3), context.account1, Amount.fromNem(11));
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), context.account1, Amount.fromNem(9));
 		NotificationUtils.assertBalanceTransferNotification(notificationCaptor.getAllValues().get(5), context.account2, context.account1, Amount.fromNem(12));
@@ -198,6 +214,24 @@ public class BlockExecutorTest {
 		// check notifications
 		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(0), context.block.getSigner(), Amount.fromNem(7));
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.block.getSigner(), Amount.fromNem(7));
+	}
+
+	@Test
+	public void undoPropagatesTransactionHashesNotificationToSubscribedObserver() {
+		// Arrange:
+		final UndoExecuteNotificationTestContext context = new UndoExecuteNotificationTestContext();
+		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
+
+		// Act:
+		context.execute(Mockito.mock(BlockTransactionObserver.class));
+		context.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(6)).notify(notificationCaptor.capture(), Mockito.any());
+
+		// check notifications
+		NotificationUtils.assertTransactionHashesNotification(notificationCaptor.getAllValues().get(2), 1);
 	}
 
 	@Test

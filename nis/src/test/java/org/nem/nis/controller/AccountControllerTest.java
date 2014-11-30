@@ -132,16 +132,17 @@ public class AccountControllerTest {
 		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
 		pageBuilder.setAddress(address.getEncoded());
 		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+		pageBuilder.setId("1");
 
 		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
-		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, transferType)).thenReturn(expectedList);
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, 1L, transferType)).thenReturn(expectedList);
 
 		// Act:
 		final SerializableList<TransactionMetaDataPair> resultList = controllerMethod.apply(context.controller, pageBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, transferType);
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, 1L, transferType);
 	}
 
 	//endregion
