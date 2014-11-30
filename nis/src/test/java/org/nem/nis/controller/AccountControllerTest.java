@@ -134,7 +134,6 @@ public class AccountControllerTest {
 		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
 		pageBuilder.setId("1");
 
-		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, 1L, transferType)).thenReturn(expectedList);
 
 		// Act:
@@ -146,6 +145,51 @@ public class AccountControllerTest {
 	}
 
 	//endregion
+
+	@Test
+	public void accountTransfersAllDelegatesToMethodUsingHashWhenAccountTransactionsPageBuilderHasNoValidId() {
+		this.accountTransfersMethodsUsesHashWhenAccountTransactionsPageBuilderHasNoValidId(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::accountTransfersAll);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToMethodUsingHashWhenAccountTransactionsPageBuilderHasNoValidId() {
+		this.accountTransfersMethodsUsesHashWhenAccountTransactionsPageBuilderHasNoValidId(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::accountTransfersIncoming);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToMethodUsingHashWhenAccountTransactionsPageBuilderHasNoValidId() {
+		this.accountTransfersMethodsUsesHashWhenAccountTransactionsPageBuilderHasNoValidId(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::accountTransfersOutgoing);
+	}
+
+	public void accountTransfersMethodsUsesHashWhenAccountTransactionsPageBuilderHasNoValidId(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
+		final Address address = Utils.generateRandomAddress();
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash(hash.toString());
+		Mockito.when(context.transactionHashCache.get(hash)).thenReturn(metaData);
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingHash(address, hash, new BlockHeight(12), transferType))
+				.thenReturn(new SerializableList<>(1));
+
+		// Act:
+		controllerMethod.apply(context.controller, pageBuilder);
+
+		// Assert:
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingHash(address, hash, new BlockHeight(12), transferType);
+		Mockito.verify(context.transactionHashCache, Mockito.times(1)).get(hash);
+	}
 
 	//region transactionsUnconfirmed
 
@@ -261,6 +305,7 @@ public class AccountControllerTest {
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
@@ -271,7 +316,8 @@ public class AccountControllerTest {
 					this.unconfirmedTransactions,
 					this.unlockedAccounts,
 					accountIoAdapter,
-					this.poiFacade);
+					this.poiFacade,
+					this.transactionHashCache);
 		}
 	}
 }

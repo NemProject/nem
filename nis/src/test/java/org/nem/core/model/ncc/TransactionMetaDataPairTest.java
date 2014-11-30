@@ -15,7 +15,7 @@ public class TransactionMetaDataPairTest {
 		final Account signer = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(signer, 6);
 		transaction.sign();
-		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(1234));
+		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(1234), 123L);
 		final TransactionMetaDataPair entity = new TransactionMetaDataPair(transaction, metaData);
 
 		// Assert:
@@ -29,7 +29,7 @@ public class TransactionMetaDataPairTest {
 		final Account signer = Utils.generateRandomAccount();
 
 		// Act:
-		final TransactionMetaDataPair metaDataPair = createRoundTrippedPair(signer, 123, 8756);
+		final TransactionMetaDataPair metaDataPair = createRoundTrippedPair(signer, 123, 8756, 5678);
 
 		// Assert:
 		Assert.assertThat(metaDataPair.getTransaction().getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
@@ -38,12 +38,14 @@ public class TransactionMetaDataPairTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 
 		Assert.assertThat(metaDataPair.getMetaData().getHeight(), IsEqual.equalTo(new BlockHeight(8756)));
+		Assert.assertThat(metaDataPair.getMetaData().getId(), IsEqual.equalTo(5678L));
 	}
 
 	private static TransactionMetaDataPair createRoundTrippedPair(
 			final Account signer,
 			final long amount,
-			final long blockHeight) {
+			final long blockHeight,
+			final long transactionId) {
 		// Arrange:
 		final MockAccountLookup accountLookup = new MockAccountLookup();
 		accountLookup.setMockAccount(signer);
@@ -55,7 +57,7 @@ public class TransactionMetaDataPairTest {
 				Amount.fromNem(amount),
 				null);
 		transaction.sign();
-		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(blockHeight));
+		final TransactionMetaData metaData = new TransactionMetaData(new BlockHeight(blockHeight), transactionId);
 		final TransactionMetaDataPair metaDataPair = new TransactionMetaDataPair(transaction, metaData);
 
 		// Act:

@@ -141,7 +141,8 @@ public class TransferDaoImpl implements TransferDao {
 			return this.getLatestTransactionsForAccount(address, limit, transferType);
 		} else {
 			final Object[] tx = this.getTransactionDescriptorUsingId(id);
-			return this.getTransactionsForAccountUpToTransaction(address, limit, transferType, tx);
+			final Collection<Object[]> transactions =  this.getTransactionsForAccountUpToTransaction(address, limit, transferType, tx);
+			return transactions;
 		}
 	}
 

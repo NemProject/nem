@@ -26,17 +26,20 @@ public class AccountController {
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
 	private final PoiFacade poiFacade;
+	private final HashCache transactionHashCache;
 
 	@Autowired(required = true)
 	AccountController(
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
-			final PoiFacade poiFacade) {
+			final PoiFacade poiFacade,
+			final HashCache transactionHashCache) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
 		this.poiFacade = poiFacade;
+		this.transactionHashCache = transactionHashCache;
 	}
 
 	/**
@@ -112,7 +115,25 @@ public class AccountController {
 			final AccountTransactionsPageBuilder builder,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
+		if (null != page.getId()) {
+			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
+		} else {
+			final Hash hash = page.getHash();
+			if (null != hash) {
+				final HashMetaData metaData = this.transactionHashCache.get(hash);
+				if (null != metaData) {
+					return this.accountIo.getAccountTransfersUsingHash(
+							page.getAddress(),
+							hash,
+							this.transactionHashCache.get(hash).getHeight(),
+							transferType);
+				} else {
+					throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
+				}
+			} else {
+				return this.accountIo.getAccountTransfersUsingHash(page.getAddress(), null,	null, transferType);
+			}
+		}
 	}
 
 	/**
