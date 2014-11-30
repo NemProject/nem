@@ -33,7 +33,7 @@ public class TransactionHashesObserver implements BlockTransactionObserver {
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			this.transactionHashCache.putAll(notification.getPairs());
 		} else {
-			this.transactionHashCache.removeAll(notification.getPairs().stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
+			this.transactionHashCache.removeAll(notification.getPairs().stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 		}
 	}
 }

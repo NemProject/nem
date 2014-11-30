@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
  */
 public class HashCache {
-	private final ConcurrentHashMap<Hash, TimeInstant> hashMap;
+	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
 
 	public HashCache() {
 		this(50000);
@@ -47,36 +47,36 @@ public class HashCache {
 	}
 
 	/**
-	 * Gets the time stamp corresponding to the given hash.
+	 * Gets the meta data corresponding to the given hash.
 	 *
 	 * @param hash The hash.
-	 * @return The time stamp.
+	 * @return The meta data.
 	 */
-	public TimeInstant get(final Hash hash) {
+	public HashMetaData get(final Hash hash) {
 		return this.hashMap.get(hash);
 	}
 
 	/**
-	 * Adds a new hash/timestamp pair to the cache if hash is unknown.
+	 * Adds a new hash/meta data pair to the cache if hash is unknown.
 	 *
-	 * @param pair The pair..
+	 * @param pair The pair.
 	 */
-	public void put(final HashTimeInstantPair pair) {
-		final TimeInstant original = this.hashMap.putIfAbsent(pair.getHash(), pair.getTimeStamp());
+	public void put(final HashMetaDataPair pair) {
+		final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
 		if (null != original) {
 			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
 		}
 	}
 
 	/**
-	 * Adds a new hash/time stamp pairs to the cache if hash is unknown.
+	 * Adds new hash/meta data pairs to the cache if hash is unknown.
 	 * Throws if any of the hashes is already in the cache.
 	 *
 	 * @param pairs The pairs to add.
 	 */
-	public void putAll(final List<HashTimeInstantPair> pairs) {
-		for (HashTimeInstantPair pair : pairs) {
-			final TimeInstant original = this.hashMap.putIfAbsent(pair.getHash(), pair.getTimeStamp());
+	public void putAll(final List<HashMetaDataPair> pairs) {
+		for (HashMetaDataPair pair : pairs) {
+			final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
 			if (null != original) {
 				throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
 			}
@@ -84,7 +84,7 @@ public class HashCache {
 	}
 
 	/**
-	 * Removes a hash/time stamp pair from the cache.
+	 * Removes a hash/meta data pair from the cache.
 	 *
 	 * @param hash The hash to remove.
 	 */
@@ -93,7 +93,7 @@ public class HashCache {
 	}
 
 	/**
-	 * Removes a hash/time stamp pair from the cache.
+	 * Removes hash/meta data pairs from the cache.
 	 *
 	 * @param hashes The list of hashes to remove.
 	 */
@@ -133,7 +133,7 @@ public class HashCache {
 	 * @param timeStamp The time stamp.
 	 */
 	public void prune(final TimeInstant timeStamp) {
-		this.hashMap.entrySet().removeIf(entry -> entry.getValue().compareTo(timeStamp) < 0);
+		this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(timeStamp) < 0);
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class HashCache {
 	 *
 	 * @return The stream.
 	 */
-	public Stream<Map.Entry<Hash, TimeInstant>> stream() {
+	public Stream<Map.Entry<Hash, HashMetaData>> stream() {
 		return this.hashMap.entrySet().stream();
 	}
 }

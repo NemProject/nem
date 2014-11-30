@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 import java.util.*;
@@ -137,16 +138,16 @@ public class HashCachePerformanceTest {
 		// Arrange:
 		final int count = 250_000;
 		final TestContext context = new TestContext(count);
-		final List<HashTimeInstantPair> pairs = context.createPairs(120);
+		final List<HashMetaDataPair> pairs = context.createPairs(120);
 		context.cache.putAll(pairs);
 
 		// Warm-up:
-		context.cache.anyHashExists(pairs.stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
+		context.cache.anyHashExists(pairs.stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 
 		// Act:
 		long start = System.currentTimeMillis();
 		for (int i=0; i<1000; i++) {
-			context.cache.anyHashExists(pairs.stream().map(HashTimeInstantPair::getHash).collect(Collectors.toList()));
+			context.cache.anyHashExists(pairs.stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 		}
 
 		long stop = System.currentTimeMillis();
@@ -158,17 +159,17 @@ public class HashCachePerformanceTest {
 
 	private class TestContext {
 		private final HashCache cache;
-		private final List<HashTimeInstantPair> pairs;
+		private final List<HashMetaDataPair> pairs;
 
 		private TestContext(final int count) {
 			this.cache = new HashCache(count);
 			this.pairs = createPairs(count);
 		}
 
-		private List<HashTimeInstantPair> createPairs(final int count) {
-			final List<HashTimeInstantPair> pairs = new ArrayList<>();
+		private List<HashMetaDataPair> createPairs(final int count) {
+			final List<HashMetaDataPair> pairs = new ArrayList<>();
 			for (int i=0; i<count; i++) {
-				pairs.add(new HashTimeInstantPair(Utils.generateRandomHash(), Utils.generateRandomTimeStamp()));
+				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(BlockHeight.ONE, Utils.generateRandomTimeStamp())));
 			}
 
 			return pairs;

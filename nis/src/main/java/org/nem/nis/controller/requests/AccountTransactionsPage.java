@@ -11,6 +11,7 @@ public class AccountTransactionsPage extends AccountId {
 	 * Creates a new account page.
 	 *
 	 * @param address The address.
+	 * @param hash The hash.
 	 * @param id The id.
 	 */
 	public AccountTransactionsPage(final String address, final String hash, final String id) {

@@ -94,8 +94,9 @@ public class BlockExecutor {
 	}
 
 	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
-		final List<HashTimeInstantPair> pairs = new ArrayList<>();
-		block.getTransactions().stream().forEach(t -> pairs.add(new HashTimeInstantPair(HashUtils.calculateHash(t), t.getTimeStamp())));
+		final List<HashMetaDataPair> pairs = new ArrayList<>();
+		block.getTransactions().stream()
+				.forEach(t -> pairs.add(new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp()))));
 		observer.notify(new TransactionHashesNotification(pairs));
 	}
 

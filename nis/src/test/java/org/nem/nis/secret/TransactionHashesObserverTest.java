@@ -23,7 +23,10 @@ public class TransactionHashesObserverTest {
 
 		// Assert:
 		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
-		context.pairs.stream().forEach(p -> Assert.assertThat(context.transactionHashCache.get(p.getHash()), IsEqual.equalTo(p.getTimeStamp())));
+		context.pairs.stream().forEach(p -> {
+			Assert.assertThat(context.transactionHashCache.get(p.getHash()).getHeight(), IsEqual.equalTo(p.getMetaData().getHeight()));
+			Assert.assertThat(context.transactionHashCache.get(p.getHash()).getTimeStamp(), IsEqual.equalTo(p.getMetaData().getTimeStamp()));
+		});
 	}
 
 	//endregion
@@ -47,7 +50,7 @@ public class TransactionHashesObserverTest {
 
 	private static void notifyTransactionHashes(
 			final TransactionHashesObserver observer,
-			final List<HashTimeInstantPair> pairs,
+			final List<HashMetaDataPair> pairs,
 			final NotificationTrigger trigger) {
 		observer.notify(
 				new TransactionHashesNotification(pairs),
@@ -55,7 +58,7 @@ public class TransactionHashesObserverTest {
 	}
 
 	private class TestContext {
-		private final List<HashTimeInstantPair> pairs = createPairs();
+		private final List<HashMetaDataPair> pairs = createPairs();
 		private final HashCache transactionHashCache;
 		private final TransactionHashesObserver observer;
 
@@ -64,10 +67,10 @@ public class TransactionHashesObserverTest {
 			this.observer = new TransactionHashesObserver(transactionHashCache);
 		}
 
-		private List<HashTimeInstantPair> createPairs() {
-			final List<HashTimeInstantPair> pairs = new ArrayList<>();
+		private List<HashMetaDataPair> createPairs() {
+			final List<HashMetaDataPair> pairs = new ArrayList<>();
 			for (int i=0; i<10; i++) {
-				pairs.add(new HashTimeInstantPair(Utils.generateRandomHash(), Utils.generateRandomTimeStamp()));
+				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
 			}
 
 			return pairs;

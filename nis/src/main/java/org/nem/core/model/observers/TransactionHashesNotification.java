@@ -1,6 +1,6 @@
 package org.nem.core.model.observers;
 
-import org.nem.core.model.HashTimeInstantPair;
+import org.nem.core.model.HashMetaDataPair;
 
 import java.util.List;
 
@@ -8,14 +8,14 @@ import java.util.List;
  * A notification that transaction hashes appeared or disappeared from the blockchain.
  */
 public class TransactionHashesNotification extends Notification {
-	private final List<HashTimeInstantPair> pairs;
+	private final List<HashMetaDataPair> pairs;
 
 	/**
 	 * Creates a new transaction hashes notification.
 	 *
 	 * @param pairs The pairs.
 	 */
-	public TransactionHashesNotification(final List<HashTimeInstantPair> pairs) {
+	public TransactionHashesNotification(final List<HashMetaDataPair> pairs) {
 		super(NotificationType.TransactionHashes);
 		this.pairs = pairs;
 	}
@@ -25,7 +25,7 @@ public class TransactionHashesNotification extends Notification {
 	 *
 	 * @return The collection of hashes.
 	 */
-	public List<HashTimeInstantPair> getPairs() {
+	public List<HashMetaDataPair> getPairs() {
 		return this.pairs;
 	}
 }
