@@ -90,7 +90,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		// (because getMinimumFee is protected we can't use mockito to directly test delegation)
-		Assert.assertThat(fee, IsEqual.equalTo(Amount.fromMicroNem(444) ));
+		Assert.assertThat(fee, IsEqual.equalTo(Amount.fromNem(100).add(Amount.fromMicroNem(444))));
 	}
 
 	//endregion

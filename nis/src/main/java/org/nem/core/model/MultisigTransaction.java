@@ -102,7 +102,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected Amount getMinimumFee() {
-		return this.otherTransaction.getMinimumFee();
+		return Amount.fromNem(100L).add(this.otherTransaction.getMinimumFee());
 	}
 
 	@Override
