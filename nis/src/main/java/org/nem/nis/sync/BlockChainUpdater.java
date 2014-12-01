@@ -107,6 +107,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		synchronized(this) {
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
+				// TODO 20141201 J-B: i think the change is ok, but the comment is misleading as the last block could also be changed by a parallel updateChaing call
 				// last block has changed due to a processBlock call, don't do anything
 				LOGGER.warning("updateChain: last block changed. Update not possible");
 				return NodeInteractionResult.NEUTRAL;

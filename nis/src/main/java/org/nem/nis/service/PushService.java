@@ -61,7 +61,7 @@ public class PushService {
 
 		final ValidationResult result = this.pushEntity(
 				entity,
-				transaction -> ValidationResult.SUCCESS,
+				transaction -> ValidationResult.SUCCESS, // TODO 20141201 J-B: did you mean to revert this back?
 				transaction -> this.unconfirmedTransactions.addNew(transaction),
 				transaction -> {},
 				NisPeerId.REST_PUSH_TRANSACTION,
