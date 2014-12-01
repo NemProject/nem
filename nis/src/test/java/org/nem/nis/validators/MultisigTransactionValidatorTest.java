@@ -70,7 +70,7 @@ public class MultisigTransactionValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
 	}
 
-	private class TestContext {
+	private static class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final MultisigTransactionValidator validator = new MultisigTransactionValidator(this.poiFacade);
 		private final Account signer = Utils.generateRandomAccount();

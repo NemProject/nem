@@ -2,6 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 
@@ -23,6 +24,10 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		if (TransactionTypes.MULTISIG != transaction.getType()) {
 			return ValidationResult.SUCCESS;
+		}
+
+		if (context.getBlockHeight().getRaw() < BlockMarkerConstants.BETA_MULTISIG_FORK) {
+			return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 		}
 
 		return this.validate((MultisigTransaction)transaction, context);
@@ -48,6 +53,10 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		final Hash transactionHash = transaction.getOtherTransactionHash();
 		// this loop could be done using reduce, but I'm leaving it like this for readability
 		for (final Address cosignerAddress : multisigAddress.getCosigners()) {
+			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
+				continue;
+			}
+			// TODO 20131201 G-J: do we want cosignatories to sign "otherTransaction" (inner) or multisigTransaction?
 			boolean hasCosigner = this.transactionsSupplier.get().stream()
 					.filter(t -> TransactionTypes.MULTISIG_SIGNATURE == t.getType())
 					.anyMatch(
