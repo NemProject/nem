@@ -5,7 +5,7 @@ import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -148,10 +148,7 @@ public class TransferDaoImpl implements TransferDao {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
 			final Object[] tx = this.getTransactionDescriptorUsingId(id);
-			final long start = System.currentTimeMillis();
 			final Collection<Object[]> transactions =  this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, tx);
-			final long stop = System.currentTimeMillis();
-			System.out.println(String.format("getTransactionsForAccountUpToTransaction needed %dms.", stop - start));
 			return transactions;
 		}
 	}
@@ -199,13 +196,20 @@ public class TransferDaoImpl implements TransferDao {
 		final Query query;
 		final Transfer topMostTransfer = (Transfer)tx[0];
 
-		final String queryString = String.format("SELECT t, t.block.height FROM Transfer t WHERE t.id <= :transactionId AND %s ORDER BY %s, t.id DESC",
-				this.buildAddressQuery(transferType),
-				TransferType.OUTGOING.equals(transferType)? "t.sender.id" : "t.recipient.id");
+		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType)? "t.senderId" : "t.recipientId";
+		final String preQueryString = "SELECT t.*, b.* " +
+				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+				"WHERE %s = %d AND t.id < %d AND t.blockId = b.id " +
+				"ORDER BY %s, t.id DESC";
+		final String queryString = String.format(preQueryString,
+				senderOrRecipient,
+				accountId,
+				topMostTransfer.getId(),
+				senderOrRecipient);
 		query = this.getCurrentSession()
-				.createQuery(queryString)
-				.setParameter("transactionId", topMostTransfer.getId())
-				.setParameter("accountId", accountId)
+				.createSQLQuery(queryString)
+				.addEntity(Transfer.class)
+				.addEntity(Block.class)
 				.setMaxResults(limit);
 		return listAndCast(query);
 	}
@@ -233,7 +237,7 @@ public class TransferDaoImpl implements TransferDao {
 			final Long accountId,
 			final int limit,
 			final TransferType transferType) {
-		final String queryString = String.format("SELECT t, t.block.height FROM Transfer t WHERE %s ORDER BY %s, t.id DESC",
+		final String queryString = String.format("SELECT t, t.block FROM Transfer t WHERE %s ORDER BY %s, t.id DESC",
 				this.buildAddressQuery(transferType),
 				TransferType.OUTGOING.equals(transferType)? "t.sender.id" : "t.recipient.id");
 		final Query query = this.getCurrentSession()
@@ -269,9 +273,9 @@ public class TransferDaoImpl implements TransferDao {
 
 	private int comparePair(final Object[] lhs, final Object[] rhs) {
 		final Transfer lhsTransfer = (Transfer)lhs[0];
-		final Long lhsHeight = (long)lhs[1];
+		final Long lhsHeight = ((Block)lhs[1]).getHeight();
 		final Transfer rhsTransfer = (Transfer)rhs[0];
-		final Long rhsHeight = (long)rhs[1];
+		final Long rhsHeight = ((Block)rhs[1]).getHeight();
 
 		final int heightComparison = -lhsHeight.compareTo(rhsHeight);
 		if (0 != heightComparison) {

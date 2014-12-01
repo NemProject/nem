@@ -131,7 +131,7 @@ public class AccountController {
 					throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
 				}
 			} else {
-				return this.accountIo.getAccountTransfersUsingHash(page.getAddress(), null,	null, transferType);
+				return this.accountIo.getAccountTransfersUsingId(page.getAddress(), null, transferType);
 			}
 		}
 	}

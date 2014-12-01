@@ -84,7 +84,7 @@ public class AccountIoAdapter implements AccountIo {
 		transfers.stream()
 				.map(tr -> new TransactionMetaDataPair(
 						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
-						new TransactionMetaData(new BlockHeight((long)tr[1]), ((Transfer)tr[0]).getId())
+						new TransactionMetaData(new BlockHeight(((org.nem.nis.dbmodel.Block)tr[1]).getHeight()), ((Transfer)tr[0]).getId())
 				))
 				.forEach(obj -> transactionList.add(obj));
 		return transactionList;
@@ -102,7 +102,7 @@ public class AccountIoAdapter implements AccountIo {
 		transfers.stream()
 				.map(tr -> new TransactionMetaDataPair(
 						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
-						new TransactionMetaData(new BlockHeight((long)tr[1]), ((Transfer)tr[0]).getId())
+						new TransactionMetaData(new BlockHeight(((org.nem.nis.dbmodel.Block)tr[1]).getHeight()), ((Transfer)tr[0]).getId())
 				))
 				.forEach(obj -> transactionList.add(obj));
 		return transactionList;
