@@ -22,6 +22,8 @@ import java.util.stream.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 
+// TODO 20141201 J-B: i guess we would need new tests?
+
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransferDaoTest {

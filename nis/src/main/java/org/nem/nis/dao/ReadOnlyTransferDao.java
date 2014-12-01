@@ -55,6 +55,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<Transfer>
 	/**
 	 * Retrieves limit Transfers from db for given account.
 	 * TODO-CR: it might make sense to return a small DTO instead of an Object[]
+	 * TODO 20131201 J-B: can you do this while you're here?
 	 *
 	 * @param account The account.
 	 * @param id The id of "top-most" transfer.

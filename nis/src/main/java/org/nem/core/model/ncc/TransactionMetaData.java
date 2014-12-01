@@ -42,9 +42,9 @@ public class TransactionMetaData implements SerializableEntity {
 	}
 
 	/**
-	 * Returns height of a transaction.
+	 * Returns id of a transaction.
 	 *
-	 * @return The height.
+	 * @return The id.
 	 */
 	public Long getId() {
 		return this.id;

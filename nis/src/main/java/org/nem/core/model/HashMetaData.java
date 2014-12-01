@@ -10,6 +10,12 @@ public class HashMetaData {
 	private final BlockHeight height;
 	private final TimeInstant timeStamp;
 
+	/**
+	 * Creates a hash meta data.
+	 *
+	 * @param height The height.
+	 * @param timeStamp The time stamp.
+	 */
 	public HashMetaData(final BlockHeight height, final TimeInstant timeStamp) {
 		this.height = height;
 		this.timeStamp = timeStamp;

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service for executing blocks.
@@ -94,9 +95,9 @@ public class BlockExecutor {
 	}
 
 	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
-		final List<HashMetaDataPair> pairs = new ArrayList<>();
-		block.getTransactions().stream()
-				.forEach(t -> pairs.add(new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp()))));
+		final List<HashMetaDataPair> pairs = block.getTransactions().stream()
+				.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
+				.collect(Collectors.toList());
 		observer.notify(new TransactionHashesNotification(pairs));
 	}
 

@@ -13,10 +13,18 @@ import java.util.stream.Stream;
 public class HashCache {
 	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
 
+	/**
+	 * Creates a hash cache.
+	 */
 	public HashCache() {
 		this(50000);
 	}
 
+	/**
+	 * Creates a hash cache with the specified capacity.
+	 *
+	 * @param initialCapacity The initial capacity.
+	 */
 	public HashCache(final int initialCapacity) {
 		this.hashMap = new ConcurrentHashMap<>(initialCapacity);
 	}
@@ -31,7 +39,7 @@ public class HashCache {
 	}
 
 	/**
-	 * Gets a vlue indicating whether or not the hash cache is empty.
+	 * Gets a value indicating whether or not the hash cache is empty.
 	 *
 	 * @return true if the hash cache is empty, false otherwise.
 	 */

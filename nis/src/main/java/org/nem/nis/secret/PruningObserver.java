@@ -16,7 +16,7 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = BlockChainConstants.OUTLINK_HISTORY;
-	private static final int TRANSACTION_HASH_CACHE_HISTORY = 129600;
+	private static final int TRANSACTION_HASH_CACHE_HISTORY = 36 * 60 * 60;
 	private static final long PRUNE_INTERVAL = 360;
 	private final PoiFacade poiFacade;
 	private final HashCache transactionHashCache;

@@ -22,6 +22,8 @@ public class BlockValidatorFactoryTest {
 		Assert.assertThat(validator, IsNull.notNullValue());
 	}
 
+	// TODO 20141201 J-B: nice tests; you might want to add something similar to the transaction factory tests
+
 	@Test
 	public void createAddsTransactionDeadlineBlockValidator() {
 		assertCreateAddsValidator(new TransactionDeadlineBlockValidator());
@@ -72,6 +74,9 @@ public class BlockValidatorFactoryTest {
 	}
 
 	private boolean listContainsClass(final List<BlockValidator> validators, Class<?> desiredClass) {
-		return validators.stream().map(v -> v.getClass().equals(desiredClass)).reduce((b1, b2) -> b1 | b2).get();
+		return validators.stream()
+				.map(v -> v.getClass().equals(desiredClass))
+				.reduce((b1, b2) -> b1 || b2)
+				.get();
 	}
 }

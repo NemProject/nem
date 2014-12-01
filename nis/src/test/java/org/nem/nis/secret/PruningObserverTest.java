@@ -77,6 +77,7 @@ public class PruningObserverTest {
 	@Test
 	public void pruneIsCalledWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 		// Assert:
+		// TODO 20131201 J-B: why 1M? we should add a test where the transaction pruning value changes too
 		assertPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 1_000_000, 0, 0, -1);
 		assertPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1_000_000, 1, 1, 1_000_000 - TRANSACTION_HASH_CACHE_HISTORY);
 
@@ -212,6 +213,7 @@ public class PruningObserverTest {
 		private void assertNoPruning() {
 			this.assertNoWeightedBalancePruning();
 			this.assertNoOutlinkPruning();
+			this.assertNoTransactionHashCachePruning();
 		}
 
 		private void assertNoWeightedBalancePruning() {

@@ -17,6 +17,8 @@ import java.util.*;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
+	private static final int DEFAULT_LIMIT = 25;
+
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
 	private final AccountCache accountCache;
@@ -59,7 +61,7 @@ public class AccountIoAdapter implements AccountIo {
 
 		final Account account = this.accountCache.findByAddress(address);
 		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimeStamp, 25);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
@@ -71,6 +73,8 @@ public class AccountIoAdapter implements AccountIo {
 		return transactionList;
 	}
 
+	// TODO 20141201 J-B i guess a test for the new function?
+
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
 			final Address address,
@@ -78,7 +82,7 @@ public class AccountIoAdapter implements AccountIo {
 			final BlockHeight height,
 			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, transactionHash, height, transfersType, 25);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, transactionHash, height, transfersType, DEFAULT_LIMIT);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
@@ -96,8 +100,9 @@ public class AccountIoAdapter implements AccountIo {
 			final Long transactionId,
 			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, 25);
+		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
 
+		// TODO 20141201 J-B: this same mapping is happening in the preceding function, consider refactoring
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		transfers.stream()
 				.map(tr -> new TransactionMetaDataPair(
@@ -111,7 +116,7 @@ public class AccountIoAdapter implements AccountIo {
 	@Override
 	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, 25);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, DEFAULT_LIMIT);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 

@@ -111,28 +111,32 @@ public class AccountController {
 		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
+	// TODO 20141201 J-B: do we need to support all permutations?
+	// TODO 20141201 J-B: i would also add tests for the error cases (where exceptions are thrown)
 	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
 			final AccountTransactionsPageBuilder builder,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		final AccountTransactionsPage page = builder.build();
 		if (null != page.getId()) {
 			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
+		}
+
+		// TODO 20141201 J-B: if we can lookup the id why even pass it in?
+		final Hash hash = page.getHash();
+		if (null == hash) {
+			// TODO 20141201 J-B: what does a null id mean?
+			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), null, transferType);
+		}
+
+		final HashMetaData metaData = this.transactionHashCache.get(hash);
+		if (null != metaData) {
+			return this.accountIo.getAccountTransfersUsingHash(
+					page.getAddress(),
+					hash,
+					this.transactionHashCache.get(hash).getHeight(),
+					transferType);
 		} else {
-			final Hash hash = page.getHash();
-			if (null != hash) {
-				final HashMetaData metaData = this.transactionHashCache.get(hash);
-				if (null != metaData) {
-					return this.accountIo.getAccountTransfersUsingHash(
-							page.getAddress(),
-							hash,
-							this.transactionHashCache.get(hash).getHeight(),
-							transferType);
-				} else {
-					throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
-				}
-			} else {
-				return this.accountIo.getAccountTransfersUsingId(page.getAddress(), null, transferType);
-			}
+			throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
 		}
 	}
 

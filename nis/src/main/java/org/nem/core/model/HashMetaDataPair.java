@@ -9,6 +9,12 @@ public class HashMetaDataPair {
 	private final Hash hash;
 	private final HashMetaData metaData;
 
+	/**
+	 * Creates a pair.
+	 *
+	 * @param hash The hash.
+	 * @param metaData The metadata.
+	 */
 	public HashMetaDataPair(final Hash hash, final HashMetaData metaData) {
 		this.hash = hash;
 		this.metaData = metaData;

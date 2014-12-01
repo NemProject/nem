@@ -133,6 +133,9 @@ public class BlockChainUpdateContext {
 	 * 4. update db with "peer's" chain
 	 */
 	private void updateOurChain() {
+		// TODO 20141201 J-B: there is one thing i don't like ... can we have a single object that includes both the
+		// accountAnalyzer and transactionHashCache?
+		// and pass that down everywhere ... if we ever have a third cache, i wouldn't want to make all the same changes
 		this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
 		this.transactionHashCache.shallowCopyTo(this.originalTransactionHashCache);
 

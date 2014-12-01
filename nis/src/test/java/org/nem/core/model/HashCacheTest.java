@@ -1,14 +1,15 @@
 package org.nem.core.model;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 public class HashCacheTest {
 
@@ -53,7 +54,7 @@ public class HashCacheTest {
 		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
-		Assert.assertThat(cache.size() > 0, IsEqual.equalTo(true));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
 		Assert.assertThat(cache.isEmpty(), IsEqual.equalTo(false));
 	}
 
@@ -126,8 +127,14 @@ public class HashCacheTest {
 		final List<HashMetaDataPair> pairs = createPairs(10);
 		final HashCache cache = new HashCache();
 
-		// Assert:
+		// Act:
 		cache.putAll(pairs);
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(10));
+		for (final HashMetaDataPair pair : pairs) {
+			Assert.assertThat(cache.hashExists(pair.getHash()), IsEqual.equalTo(true));
+		}
 	}
 
 	@Test
@@ -160,7 +167,7 @@ public class HashCacheTest {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		Assert.assertThat(null == cache.get(hash), IsEqual.equalTo(true));
+		Assert.assertThat(cache.get(hash), IsNull.nullValue());
 	}
 
 	// endregion
@@ -297,7 +304,7 @@ public class HashCacheTest {
 
 		// Assert:
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
-		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsEqual.equalTo(e.getValue())));
+		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsSame.sameInstance(e.getValue())));
 	}
 
 	// endregion
@@ -315,7 +322,7 @@ public class HashCacheTest {
 
 		// Assert:
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
-		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsEqual.equalTo(e.getValue())));
+		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsSame.sameInstance(e.getValue())));
 	}
 
 	// endregion
@@ -325,47 +332,46 @@ public class HashCacheTest {
 	@Test
 	public void streamIteratesThroughAllEntries() {
 		// Arrange:
-		final Hash hash1 = Utils.generateRandomHash();
-		final Hash hash2 = Utils.generateRandomHash();
-		final Hash hash3 = Utils.generateRandomHash();
+		final List<HashMetaDataPair> pairs = Arrays.asList(
+				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)),
+				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)),
+				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
 		final HashCache cache = new HashCache();
-		cache.put(new HashMetaDataPair(hash1, createMetaDataWithTimeStamp(123)));
-		cache.put(new HashMetaDataPair(hash2, createMetaDataWithTimeStamp(234)));
-		cache.put(new HashMetaDataPair(hash3, createMetaDataWithTimeStamp(345)));
+		pairs.forEach(cache::put);
 
 		// Assert:
-		Assert.assertThat(cache.stream().count(), IsEqual.equalTo(3L));
-		Assert.assertThat(cache.stream().anyMatch(e -> e.getKey().equals(hash1) && e.getValue().getTimeStamp().equals(new TimeInstant(123))), IsEqual.equalTo(true));
-		Assert.assertThat(cache.stream().anyMatch(e -> e.getKey().equals(hash1) && e.getValue().getHeight().equals(BlockHeight.ONE)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.stream().anyMatch(e -> e.getKey().equals(hash2) && e.getValue().getTimeStamp().equals(new TimeInstant(234))), IsEqual.equalTo(true));
-		Assert.assertThat(cache.stream().anyMatch(e -> e.getKey().equals(hash2) && e.getValue().getHeight().equals(BlockHeight.ONE)), IsEqual.equalTo(true));
-		Assert.assertThat(cache.stream().anyMatch(e -> e.getKey().equals(hash3) && e.getValue().getTimeStamp().equals(new TimeInstant(345))), IsEqual.equalTo(true));
-		Assert.assertThat(cache.stream().anyMatch(e -> e.getKey().equals(hash3) && e.getValue().getHeight().equals(BlockHeight.ONE)), IsEqual.equalTo(true));
+		// TODO 20141201 J-J: should add equality to hashmetadatapair to fix
+		//Assert.assertThat(
+		//		cache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
+		//		IsEquivalent.equivalentTo(pairs));
+		Assert.assertThat(
+				cache.stream().map(e -> e.getKey()).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(pairs.stream().map(p -> p.getHash()).collect(Collectors.toList())));
+		Assert.assertThat(
+				cache.stream().map(e -> e.getValue()).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(pairs.stream().map(p -> p.getMetaData()).collect(Collectors.toList())));
 	}
 
 	// endregion
 
-	private HashMetaData createMetaDataWithTimeStamp(final int timeStamp) {
+	private static HashMetaData createMetaDataWithTimeStamp(final int timeStamp) {
 		return new HashMetaData(BlockHeight.ONE, new TimeInstant(timeStamp));
 	}
 
-	private HashCache createHashCacheWithTimeStamps(final int... timeStamps) {
+	private static HashCache createHashCacheWithTimeStamps(final int... timeStamps) {
 		final HashCache cache = new HashCache();
 		Arrays.stream(timeStamps)
 				.forEach(t -> cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(t))));
 		return cache;
 	}
 
-	private List<HashMetaDataPair> createPairs(final int count) {
-		final List<HashMetaDataPair> pairs = new ArrayList<>();
-		for (int i=0; i<count; i++) {
-			pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(BlockHeight.ONE, Utils.generateRandomTimeStamp())));
-		}
-
-		return pairs;
+	private static List<HashMetaDataPair> createPairs(final int count) {
+		return createHashes(count).stream()
+				.map(hash -> new HashMetaDataPair(hash, createMetaDataWithTimeStamp(Utils.generateRandomTimeStamp().getRawTime())))
+				.collect(Collectors.toList());
 	}
 
-	private List<Hash> createHashes(final int count) {
+	private static List<Hash> createHashes(final int count) {
 		final List<Hash> hashes = new ArrayList<>();
 		for (int i=0; i<count; i++) {
 			hashes.add(Utils.generateRandomHash());

@@ -11,6 +11,7 @@ import org.nem.core.time.TimeInstant;
 import java.util.*;
 
 public class TransactionHashesObserverTest {
+
 	//region execute
 
 	@Test
@@ -23,6 +24,7 @@ public class TransactionHashesObserverTest {
 
 		// Assert:
 		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
+		// TODO 20141201 J-J: should add equality to hashmetadatapair to simplify
 		context.pairs.stream().forEach(p -> {
 			Assert.assertThat(context.transactionHashCache.get(p.getHash()).getHeight(), IsEqual.equalTo(p.getMetaData().getHeight()));
 			Assert.assertThat(context.transactionHashCache.get(p.getHash()).getTimeStamp(), IsEqual.equalTo(p.getMetaData().getTimeStamp()));
@@ -58,7 +60,7 @@ public class TransactionHashesObserverTest {
 	}
 
 	private class TestContext {
-		private final List<HashMetaDataPair> pairs = createPairs();
+		private final List<HashMetaDataPair> pairs = this.createPairs();
 		private final HashCache transactionHashCache;
 		private final TransactionHashesObserver observer;
 
