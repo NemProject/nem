@@ -294,7 +294,6 @@ public class PoiImportanceCalculatorTest {
 		builder.setClusteringStrategy(context.clusteringStrategy);
 
 		// Act:
-
 		final ColumnVector importances = calculateImportances(builder.create(), height, accountStates);
 
 		// Assert:
