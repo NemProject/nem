@@ -287,33 +287,15 @@ public class PoiImportanceCalculatorTest {
 		builder.setInterLevelTeleportationProbability(0.1);
 		builder.setMinHarvesterBalance(new Amount(1l));
 		builder.setMinOutlinkWeight(new Amount(1l));
-		//builder.setEpsilonClusteringValue(0.58);
-		//builder.setMuClusteringValue(2);
-		final PoiOptions poiOptions = builder.create();
 
 		// Build the clusters we expect
-		final TestContext context = new TestContext(poiOptions.getClusteringStrategy(), 11);
-		// hub
-		context.setSimilarity(0, 1, 0);
-		context.setSimilarity(0, 6, 0);
+		final DoubleLoopTestContext context = new DoubleLoopTestContext(accountStates.size());
 
-		// left loop
-		context.setSimilarity(1, 2, 1);
-		context.setSimilarity(2, 3, 1);
-		context.setSimilarity(3, 4, 1);
-		context.setSimilarity(4, 5, 1);
-		context.setSimilarity(5, 1, 1);
-
-		// right loop
-		context.setSimilarity(6, 7, 1);
-		context.setSimilarity(7, 8, 1);
-		context.setSimilarity(8, 9, 1);
-		context.setSimilarity(9, 10, 1);
-		context.setSimilarity(10, 6, 1);
+		builder.setClusteringStrategy(context.clusteringStrategy);
 
 		// Act:
 
-		final ColumnVector importances = calculateImportances(poiOptions, height, accountStates);
+		final ColumnVector importances = calculateImportances(builder.create(), height, accountStates);
 
 		// Assert:
 		// - all balances should be within a small range
@@ -799,33 +781,37 @@ public class PoiImportanceCalculatorTest {
 
 	//endregion
 
-	private static class TestContext {
-		private final NeighborhoodRepository repository = Mockito.mock(NodeNeighborMap.class);
-		private final SimilarityStrategy similarityStrategy = Mockito.mock(SimilarityStrategy.class);
-		private final Neighborhood neighborhood = NisUtils.createNeighborhood(this.repository, this.similarityStrategy);
-		private final GraphClusteringStrategy clusteringStrategy;
+	private static class DoubleLoopTestContext {
+		private final GraphClusteringStrategy clusteringStrategy = Mockito.mock(FastScanClusteringStrategy.class);
 
-		public TestContext(final GraphClusteringStrategy clusteringStrategy, final int neighborhoodSize) {
-			this.clusteringStrategy = clusteringStrategy;
-
+		public DoubleLoopTestContext(final int neighborhoodSize) {
 			//Setup clusters
-			Mockito.when(this.clusteringStrategy.cluster(this.neighborhood)).thenReturn(null);//TODO: finish
-
-			Mockito.when(this.repository.getLogicalSize()).thenReturn(neighborhoodSize);
+			final ClusteringResult clusteringResult = new ClusteringResult(
+					buildLoopClusters(),
+					buildLoopHubs(),
+					buildLoopOutliers());
+			Mockito.when(this.clusteringStrategy.cluster(Mockito.any())).thenReturn(clusteringResult);
 		}
 
-		public void setNeighborIds(final int id, final List<Integer> neighborIds) {
-			Mockito.when(this.repository.getNeighbors(new NodeId(id)))
-					.thenReturn(new NodeNeighbors(neighborIds.stream().map(NodeId::new).sorted().toArray(NodeId[]::new)));
+		private Collection<Cluster> buildLoopClusters() {
+			return Arrays.stream(new Cluster[]{
+					buildCluster(1, 1, 2, 3, 4, 5),
+					buildCluster(6, 6, 7, 8, 9, 10)
+					}).collect(Collectors.toList());
 		}
 
-		public void setSimilarity(final int id1, final int id2, final double similarity) {
-			Mockito.when(this.similarityStrategy.calculateSimilarity(new NodeId(id1), new NodeId(id2))).thenReturn(similarity);
-			Mockito.when(this.similarityStrategy.calculateSimilarity(new NodeId(id2), new NodeId(id1))).thenReturn(similarity);
+		private Collection<Cluster> buildLoopHubs() {
+			return Arrays.stream(new Cluster[]{
+					buildCluster(0, 0)
+			}).collect(Collectors.toList());
 		}
 
-		public void makeAllSimilar() {
-			Mockito.when(this.similarityStrategy.calculateSimilarity(Mockito.any(), Mockito.any())).thenReturn(1.0);
+		private Collection<Cluster> buildLoopOutliers() {
+			return Arrays.stream(new Cluster[] { }).collect(Collectors.toList());
+		}
+
+		private Cluster buildCluster(final int id, final int... nodes) {
+			return new Cluster(new ClusterId(id), Arrays.stream(nodes).mapToObj(i -> new NodeId(i)).collect(Collectors.toList()));
 		}
 	}
 }
