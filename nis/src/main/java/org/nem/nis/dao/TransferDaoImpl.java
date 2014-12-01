@@ -1,6 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
+import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
@@ -83,11 +84,11 @@ public class TransferDaoImpl implements TransferDao {
 	private String buildAddressQuery(final TransferType transferType) {
 		switch (transferType) {
 			case INCOMING:
-				return "(t.recipient.printableKey = :pubkey)";
+				return "(t.recipient.id = :accountId)";
 			case OUTGOING:
-				return "(t.sender.printableKey = :pubkey)";
+				return "(t.sender.id = :accountId)";
 		}
-		return "(t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey)";
+		return "(t.recipient.id = :accountId OR t.sender.id = :accountId)";
 	}
 
 	@Override
@@ -98,17 +99,18 @@ public class TransferDaoImpl implements TransferDao {
 			final BlockHeight height,
 			final TransferType transferType,
 			final int limit) {
+		final Long accountId = this.getAccountId(address);
 		if (hash == null) {
-			return this.getLatestTransactionsForAccount(address, limit, transferType);
+			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
 			final String addressString = this.buildAddressQuery(transferType);
-			final Object[] tx = this.getTransactionDescriptorUsingHash(address, hash, height, addressString);
-			return this.getTransactionsForAccountUpToTransaction(address, limit, transferType, tx);
+			final Object[] tx = this.getTransactionDescriptorUsingHash(accountId, hash, height, addressString);
+			return this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, tx);
 		}
 	}
 
 	private Object[] getTransactionDescriptorUsingHash(
-			final Account address,
+			final Long accountId,
 			final Hash hash,
 			final BlockHeight height,
 			final String addressString) {
@@ -119,7 +121,7 @@ public class TransferDaoImpl implements TransferDao {
 						" AND t.block.height = :height" +
 						" ORDER BY t.timeStamp desc")
 				.setParameter("height", height.getRaw())
-				.setParameter("pubkey", address.getAddress().getEncoded());
+				.setParameter("accountId", accountId);
 		final List<Object[]> tempList = listAndCast(prequery);
 		if (tempList.size() < 1) {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
@@ -136,12 +138,20 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional
-	public Collection<Object[]> getTransactionsForAccountUsingId(final Account address, final Long id, final TransferType transferType, final int limit) {
+	public Collection<Object[]> getTransactionsForAccountUsingId(
+			final Account address,
+			final Long id,
+			final TransferType transferType,
+			final int limit) {
+		final Long accountId = this.getAccountId(address);
 		if (id == null) {
-			return this.getLatestTransactionsForAccount(address, limit, transferType);
+			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
 			final Object[] tx = this.getTransactionDescriptorUsingId(id);
-			final Collection<Object[]> transactions =  this.getTransactionsForAccountUpToTransaction(address, limit, transferType, tx);
+			final long start = System.currentTimeMillis();
+			final Collection<Object[]> transactions =  this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, tx);
+			final long stop = System.currentTimeMillis();
+			System.out.println(String.format("getTransactionsForAccountUpToTransaction needed %dms.", stop - start));
 			return transactions;
 		}
 	}
@@ -158,51 +168,50 @@ public class TransferDaoImpl implements TransferDao {
 		return tempList.get(0);
 	}
 
+	private Long getAccountId(final Account address) {
+		final Query query = this.getCurrentSession()
+				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
+				.addScalar("accountId", LongType.INSTANCE)
+				.setParameter("address", address.getAddress().getEncoded());
+		final Long accountId = (Long)query.uniqueResult();
+		return accountId;
+	}
+
 	private Collection<Object[]> getTransactionsForAccountUpToTransaction(
-			final Account address,
+			final Long accountId,
 			final int limit,
 			final TransferType transferType,
 			final Object[] tx) {
 		if (TransferType.ALL == transferType) {
-			final Collection<Object[]> objects = this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, TransferType.INCOMING, tx);
-			objects.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, TransferType.OUTGOING, tx));
+			final Collection<Object[]> objects = this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.INCOMING, tx);
+			objects.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.OUTGOING, tx));
 			return this.sortAndLimit(objects, limit);
 		} else {
-			return this.getTransactionsForAccountUpToTransactionWithTransferType(address, limit, transferType, tx);
+			return this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, transferType, tx);
 		}
 	}
 
 	private Collection<Object[]> getTransactionsForAccountUpToTransactionWithTransferType(
-			final Account address,
+			final Long accountId,
 			final int limit,
 			final TransferType transferType,
 			final Object[] tx) {
 		final Query query;
 		final Transfer topMostTransfer = (Transfer)tx[0];
 
-		final long blockHeight = (long)tx[1];
-		final int timeStamp = topMostTransfer.getTimeStamp();
-		final int indexInsideBlock = topMostTransfer.getBlkIndex();
-
+		final String queryString = String.format("SELECT t, t.block.height FROM Transfer t WHERE t.id <= :transactionId AND %s ORDER BY %s, t.id DESC",
+				this.buildAddressQuery(transferType),
+				TransferType.OUTGOING.equals(transferType)? "t.sender.id" : "t.recipient.id");
 		query = this.getCurrentSession()
-				.createQuery("select t, t.block.height from Transfer t " +
-						"WHERE " +
-						this.buildAddressQuery(transferType) +
-						// TODO: it might have more sense to use orderId instead of blkIndex here
-						" AND ((t.block.height < :height)" +
-						" OR (t.block.height = :height AND t.timeStamp < :timeStamp)" +
-						" OR (t.block.height = :height AND t.timeStamp = :timeStamp AND t.blkIndex > :blockIndex))" +
-						" ORDER BY t.block.height DESC, t.timeStamp DESC, t.blkIndex ASC")
-				.setParameter("height", blockHeight)
-				.setParameter("timeStamp", timeStamp)
-				.setParameter("blockIndex", indexInsideBlock)
-				.setParameter("pubkey", address.getAddress().getEncoded())
+				.createQuery(queryString)
+				.setParameter("transactionId", topMostTransfer.getId())
+				.setParameter("accountId", accountId)
 				.setMaxResults(limit);
 		return listAndCast(query);
 	}
 
 	private Collection<Object[]> getLatestTransactionsForAccount(
-			final Account address,
+			final Long accountId,
 			final int limit,
 			final TransferType transferType) {
 		// TODO 20141107 J-B: was something wrong with what buildAddressQuery was doing when transfer type was ALL?
@@ -212,25 +221,24 @@ public class TransferDaoImpl implements TransferDao {
 		// TODO                   So I ended up doing two queries and building the union/doing sorting "manually". It is still more than ten times
 		// TODO                   faster then the original query hibernate creates.
 		if (TransferType.ALL == transferType) {
-			final Collection<Object[]> objects = this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.INCOMING);
-			objects.addAll(this.getLatestTransactionsForAccountWithTransferType(address, limit, TransferType.OUTGOING));
+			final Collection<Object[]> objects = this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.INCOMING);
+			objects.addAll(this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.OUTGOING));
 			return this.sortAndLimit(objects, limit);
 		} else {
-			return this.getLatestTransactionsForAccountWithTransferType(address, limit, transferType);
+			return this.getLatestTransactionsForAccountWithTransferType(accountId, limit, transferType);
 		}
 	}
 
 	private Collection<Object[]> getLatestTransactionsForAccountWithTransferType(
-			final Account address,
+			final Long accountId,
 			final int limit,
 			final TransferType transferType) {
+		final String queryString = String.format("SELECT t, t.block.height FROM Transfer t WHERE %s ORDER BY %s, t.id DESC",
+				this.buildAddressQuery(transferType),
+				TransferType.OUTGOING.equals(transferType)? "t.sender.id" : "t.recipient.id");
 		final Query query = this.getCurrentSession()
-				.createQuery("select t, t.block.height from Transfer t " +
-						"WHERE " +
-						this.buildAddressQuery(transferType) +
-						// TODO: it might have more sense to use orderId instead of blkIndex here
-						" ORDER BY t.block.height DESC, t.timeStamp DESC, t.blkIndex ASC, t.transferHash ASC")
-				.setParameter("pubkey", address.getAddress().getEncoded())
+				.createQuery(queryString)
+				.setParameter("accountId", accountId)
 				.setMaxResults(limit);
 		return listAndCast(query);
 	}
