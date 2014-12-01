@@ -11,6 +11,8 @@ import org.nem.core.time.TimeInstant;
  */
 public class MultisigSignatureTransaction extends Transaction implements SerializableEntity {
 	private final Hash otherTransactionHash;
+
+	// TODO 20141201 G-J: why do we need it here?
 	private final Signature otherTransactionSignature;
 
 	/**

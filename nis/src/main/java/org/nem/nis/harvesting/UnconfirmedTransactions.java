@@ -61,7 +61,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = this.createSingleValidator(false);
+		this.singleValidator = this.createSingleValidator(null, false);
 	}
 
 	private UnconfirmedTransactions(
@@ -71,7 +71,7 @@ public class UnconfirmedTransactions {
 			final PoiFacade poiFacade) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
-		this.singleValidator = this.createSingleValidator(true);
+		this.singleValidator = this.createSingleValidator(transactions, true);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -186,11 +186,13 @@ public class UnconfirmedTransactions {
 				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
 	}
 
-	private SingleTransactionValidator createSingleValidator(boolean blockCreation) {
+	private SingleTransactionValidator createSingleValidator(final List<Transaction> transactions, boolean blockCreation) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.poiFacade));
+		// TODO 20141201: this is most likely wrong,
+		// I think it should use transactions passed to UnconfirmedTransactions and not THIS.transactions
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
-		builder.add(new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation, () -> this.transactions.values()));
+		builder.add(new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation, () -> transactions));
 		return builder.build();
 	}
 
