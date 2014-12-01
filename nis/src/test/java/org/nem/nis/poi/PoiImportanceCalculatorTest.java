@@ -226,7 +226,15 @@ public class PoiImportanceCalculatorTest {
 	 *
 	 * Variation of the teleportation probabilities shows this behavior (TP = teleportation prob., ITLP = inter level teleportation prob.):
 	 *
-	 * with beta POI settings: //TODO M: these results seemed weird, but it is because everything gets into a single cluster with the current settings.
+	 * with beta POI settings (and Mockito to guarantee clusters of {1,2,3,4,5}, {6,7,8,9,10}, with a hub as {0}):
+	 *  TP   ILTP
+	 * 0.8  | 0.1  | 0.090 0.097 0.088 0.089 0.090 0.091 0.097 0.088 0.089 0.090 0.091
+	 * 0.6  | 0.3  | 0.093 0.096 0.088 0.089 0.090 0.090 0.096 0.088 0.089 0.090 0.090
+	 * 0.45 | 0.45 | 0.096 0.095 0.088 0.089 0.090 0.090 0.095 0.088 0.089 0.090 0.090
+	 * 0.3  | 0.6  | 0.102 0.094 0.088 0.089 0.089 0.089 0.094 0.088 0.089 0.089 0.089
+	 * 0.1  | 0.8  | 0.117 0.092 0.087 0.087 0.087 0.087 0.092 0.087 0.087 0.087 0.087
+	 *
+	 * with beta POI settings without Mockito and everything is just one big cluster:
 	 *  TP   ILTP
 	 * 0.8  | 0.1  | 0.089 0.097 0.088 0.089 0.090 0.091 0.097 0.088 0.089 0.090 0.091
 	 * 0.6  | 0.3  | 0.088 0.097 0.088 0.090 0.091 0.091 0.097 0.088 0.090 0.091 0.091
@@ -289,8 +297,8 @@ public class PoiImportanceCalculatorTest {
 		builder.setMinOutlinkWeight(new Amount(1l));
 
 		// Build the clusters we expect
+		// - clusters: {0, 1, 2, 3, 4}, {6, 7, 8, 9, 10}; hubs: {0}
 		final DoubleLoopTestContext context = new DoubleLoopTestContext(accountStates.size());
-
 		builder.setClusteringStrategy(context.clusteringStrategy);
 
 		// Act:
