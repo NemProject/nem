@@ -77,6 +77,7 @@ public class PoiAccountState {
 		return this.remoteLinks;
 	}
 
+	// TODO 20141201 J-G: can we just expose MultisigLinks (like RemoteLinks)?
 
 	public void addMultisig(final Address multisigAddress, final BlockHeight height) {
 		this.multisigLinks.addMultisig(multisigAddress, height);

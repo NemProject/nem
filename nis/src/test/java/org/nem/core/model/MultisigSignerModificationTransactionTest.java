@@ -14,10 +14,8 @@ import java.util.function.Consumer;
 
 public class MultisigSignerModificationTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
-	final MultisigModificationType MODIFICATION_ADD
-			= MultisigModificationType.Add;
-	final MultisigModificationType MODIFICATION_UNKNOWN
-			= MultisigModificationType.Unknown;
+	final MultisigModificationType MODIFICATION_ADD = MultisigModificationType.Add;
+	final MultisigModificationType MODIFICATION_UNKNOWN = MultisigModificationType.Unknown;
 
 	//region constructor
 

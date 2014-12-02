@@ -11,7 +11,9 @@ import javax.persistence.*;
  * basing on above and some other reading, it doesn't really make sense :/
  *
  * (That's also why I can't have single field that would be correctly joined :/)
- * I hoped I'll have members  
+ * I hoped I'll have members
+ *
+ * TODO 20141201 J-G: what issues did you have with "table per subclass"
  */
 
 @Entity

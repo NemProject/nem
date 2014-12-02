@@ -41,6 +41,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		}
 
 		// if this is not block creation, we don't want to check if signature of all cosignatories are present
+		// TODO 20141201 J-G: why?
 		if (! blockCreation) {
 			return ValidationResult.SUCCESS;
 		}
@@ -57,6 +58,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 				continue;
 			}
 			// TODO 20131201 G-J: do we want cosignatories to sign "otherTransaction" (inner) or multisigTransaction?
+			// TODO 20141201 J-G: i think they should be signing the "otherTransaction"
 			boolean hasCosigner = this.transactionsSupplier.get().stream()
 					.filter(t -> TransactionTypes.MULTISIG_SIGNATURE == t.getType())
 					.anyMatch(

@@ -102,6 +102,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected Amount getMinimumFee() {
+		// TODO 20141201 - i'm not sure if we want to charge people extra for multisig?
 		return Amount.fromNem(100L).add(this.otherTransaction.getMinimumFee());
 	}
 

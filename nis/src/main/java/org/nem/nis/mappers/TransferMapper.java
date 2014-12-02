@@ -76,6 +76,7 @@ public class TransferMapper {
 
 		transfer.setFee(new Amount(dbTransfer.getFee()));
 		transfer.setDeadline(new TimeInstant(dbTransfer.getDeadline()));
+		// TODO 20141201 J-G: when do we expect the signature to be null?
 		transfer.setSignature(dbTransfer.getSenderProof() == null ? null : new Signature(dbTransfer.getSenderProof()));
 		return transfer;
 	}

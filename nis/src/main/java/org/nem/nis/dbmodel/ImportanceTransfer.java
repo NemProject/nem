@@ -39,5 +39,4 @@ public class ImportanceTransfer extends AbstractTransfer<ImportanceTransfer> {
 	public void setMode(final Integer mode) {
 		this.mode = mode;
 	}
-
 }

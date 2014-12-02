@@ -13,6 +13,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	private final Hash otherTransactionHash;
 
 	// TODO 20141201 G-J: why do we need it here?
+	// TODO 20141201 J-G: where else will the cosigner signature come from?
 	private final Signature otherTransactionSignature;
 
 	/**

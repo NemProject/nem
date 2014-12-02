@@ -6,6 +6,9 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 public class MultisigLinksTest {
+
+	// TODO 20141201 J-G: can we be consistent and use Assert.assertThat?
+
 	//region MultisigLinks
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {

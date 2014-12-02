@@ -9,6 +9,9 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
+// TODO 20141201 J-J: i will need to look at this a bit closer
+// TODO 20141201 J-J: guess we need tests for this
+
 public class MultisigTransactionMapper {
 
 	public static MultisigTransaction toDbModel(

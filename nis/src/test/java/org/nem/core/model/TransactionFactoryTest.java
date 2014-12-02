@@ -144,6 +144,8 @@ public class TransactionFactoryTest {
 				transaction);
 	}
 
+	// TODO 20141201 J-G: i guess we need a pair for multisigsignature too?
+
 	//endregion
 
 	private static void assertCanDeserializeVerifiable(

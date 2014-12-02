@@ -14,6 +14,8 @@ import org.nem.nis.dbmodel.MultisigTransaction;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO 20141201 J-J: i will need to look at this a bit closer
+
 /**
  * Static class that contains functions for converting to and from
  * db-model Block and model Block.
