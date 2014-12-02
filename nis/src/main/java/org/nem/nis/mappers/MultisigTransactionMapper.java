@@ -11,6 +11,8 @@ import org.nem.nis.dbmodel.MultisigTransaction;
 
 // TODO 20141201 J-J: i will need to look at this a bit closer
 // TODO 20141201 J-J: guess we need tests for this
+// TODO 20141202 G-J: since it's heavily intertwined with BlockMapper, I wasn't sure
+// how to make some sensible tests, but I've added few tests in BlockMapperTest
 
 public class MultisigTransactionMapper {
 

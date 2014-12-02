@@ -3,6 +3,8 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -143,8 +145,39 @@ public class TransactionFactoryTest {
 				sender,
 				transaction);
 	}
+	//endregion
 
 	// TODO 20141201 J-G: i guess we need a pair for multisigsignature too?
+	// TODO 20141202 G-J: sorry, had to go yesterday, before I had a chance to add them
+	
+	//region MultisigSignatureTransaction
+
+	@Test
+	public void canDeserializeVerifiableMultisigSignatureTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMultisigSignatureTransaction();
+
+		// Assert:
+		assertCanDeserializeVerifiable(originalTransaction, MultisigSignatureTransaction.class, TransactionTypes.MULTISIG_SIGNATURE);
+	}
+
+	@Test
+	public void canDeserializeNonVerifiableMultisigSignatureTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMultisigSignatureTransaction();
+
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, MultisigSignatureTransaction.class, TransactionTypes.MULTISIG_SIGNATURE);
+	}
+
+	private static Transaction createMultisigSignatureTransaction() {
+		final Account sender = Utils.generateRandomAccount();
+		return new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				sender,
+				Hash.ZERO,
+				new Signature(new byte[64]));
+	}
 
 	//endregion
 

@@ -14,6 +14,10 @@ import javax.persistence.*;
  * I hoped I'll have members
  *
  * TODO 20141201 J-G: what issues did you have with "table per subclass"
+ * TODO 20141202 G-J: I actually haven't tried it,
+ * a) it would require serious changes (but I was actually ready to do them), but
+ * b) take a look at the link above... especially this sentence:
+ * " it retrieves the union of all properties in the entire hierarchy into the result set. "
  */
 
 @Entity

@@ -42,6 +42,8 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 
 		// if this is not block creation, we don't want to check if signature of all cosignatories are present
 		// TODO 20141201 J-G: why?
+		// TODO 20141202 G-J: cause we might not have proper MultisigSignatures YET, and we want to
+		// be able to add MultisigTransaction itself to list of unconfirmed transactions.
 		if (! blockCreation) {
 			return ValidationResult.SUCCESS;
 		}

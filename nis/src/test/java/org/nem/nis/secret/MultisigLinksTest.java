@@ -1,14 +1,12 @@
 package org.nem.nis.secret;
 
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 public class MultisigLinksTest {
-
-	// TODO 20141201 J-G: can we be consistent and use Assert.assertThat?
-
 	//region MultisigLinks
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {
@@ -29,8 +27,8 @@ public class MultisigLinksTest {
 		context.addCosignatory(context.address);
 
 		// Assert:
-		Assert.assertFalse(context.multisigLinks.isCosignatory());
-		Assert.assertTrue(context.multisigLinks.isMultisig());
+		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -42,9 +40,9 @@ public class MultisigLinksTest {
 		context.addMultisig(context.address);
 
 		// Assert:
-		Assert.assertTrue(context.multisigLinks.isCosignatoryOf(context.address));
-		Assert.assertTrue(context.multisigLinks.isCosignatory());
-		Assert.assertFalse(context.multisigLinks.isMultisig());
+		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
+		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(true));
+		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -57,9 +55,9 @@ public class MultisigLinksTest {
 		context.addCosignatory(context.address);
 
 		// Assert:
-		Assert.assertTrue(context.multisigLinks.isCosignatoryOf(context.address));
-		Assert.assertTrue(context.multisigLinks.isCosignatory());
-		Assert.assertTrue(context.multisigLinks.isMultisig());
+		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
+		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(true));
+		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 	//endregion
 
@@ -74,8 +72,8 @@ public class MultisigLinksTest {
 		context.removeCosignatory(context.address);
 
 		// Assert:
-		Assert.assertFalse(context.multisigLinks.isCosignatory());
-		Assert.assertFalse(context.multisigLinks.isMultisig());
+		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -88,8 +86,8 @@ public class MultisigLinksTest {
 		context.removeMultisig(context.address);
 
 		// Assert:
-		Assert.assertFalse(context.multisigLinks.isCosignatory());
-		Assert.assertFalse(context.multisigLinks.isMultisig());
+		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 	//endregion
 
@@ -104,8 +102,8 @@ public class MultisigLinksTest {
 		final MultisigLinks multisigLinks = context.makeCopy();
 
 		// Assert:
-		Assert.assertFalse(multisigLinks.isCosignatory());
-		Assert.assertTrue(multisigLinks.isMultisig());
+		Assert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		Assert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -118,9 +116,9 @@ public class MultisigLinksTest {
 		final MultisigLinks multisigLinks = context.makeCopy();
 
 		// Assert:
-		Assert.assertTrue(multisigLinks.isCosignatoryOf(context.address));
-		Assert.assertTrue(multisigLinks.isCosignatory());
-		Assert.assertFalse(multisigLinks.isMultisig());
+		Assert.assertThat(multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
+		Assert.assertThat(multisigLinks.isCosignatory(), IsEqual.equalTo(true));
+		Assert.assertThat(multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 	//endregion
 

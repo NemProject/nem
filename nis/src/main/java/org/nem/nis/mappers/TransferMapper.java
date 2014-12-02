@@ -77,6 +77,7 @@ public class TransferMapper {
 		transfer.setFee(new Amount(dbTransfer.getFee()));
 		transfer.setDeadline(new TimeInstant(dbTransfer.getDeadline()));
 		// TODO 20141201 J-G: when do we expect the signature to be null?
+		// TODO 20141202 G-J: When TransferTransaction (unsigned ofc) is inside MultisigTransaction?
 		transfer.setSignature(dbTransfer.getSenderProof() == null ? null : new Signature(dbTransfer.getSenderProof()));
 		return transfer;
 	}
