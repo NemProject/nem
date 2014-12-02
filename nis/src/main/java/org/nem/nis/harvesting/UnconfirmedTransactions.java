@@ -191,6 +191,7 @@ public class UnconfirmedTransactions {
 		builder.add(this.validatorFactory.createSingle(this.poiFacade));
 		// TODO 20141201: this is most likely wrong,
 		// I think it should use transactions passed to UnconfirmedTransactions and not THIS.transactions
+		// OK, in case of NonConflictingImportanceTransferTransactionValidator it doesn't matter
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation, () -> transactions));
 		return builder.build();

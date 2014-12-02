@@ -3,11 +3,15 @@ package org.nem.nis.harvesting;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
+import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
@@ -843,7 +847,7 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(10));
 		final Account recipient = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator(Mockito.mock(PoiFacade.class));
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
@@ -881,7 +885,7 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(10));
 		final Account recipient = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator(Mockito.mock(PoiFacade.class));
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
@@ -914,7 +918,7 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(10));
 		final Account recipient = Utils.generateRandomAccount();
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator();
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator(Mockito.mock(PoiFacade.class));
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
@@ -929,11 +933,63 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
-	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator() {
+
+	@Test
+	public void getTransactionForNewBlockCheckMultisigSignatures() {
+		// Arrange:
+		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator(poiFacade);
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		final Account multisig = Utils.generateRandomAccount(Amount.fromNem(10));
+		final Account recipient = Utils.generateRandomAccount();
+		final Account cosigner1 = Utils.generateRandomAccount(Amount.fromNem(101));
+		final Account cosigner2 = Utils.generateRandomAccount(Amount.fromNem(101));
+		final Transaction t1 = createTransferTransaction(currentTime, multisig, recipient, Amount.fromNem(7));
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
+		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
+		//multisigTransaction.sign();
+		final Signature signature = new Signature(Utils.generateRandomBytes(64));
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner2, HashUtils.calculateHash(t1), signature);
+		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
+		//signatureTransaction.sign();
+
+		addPoiState(poiFacade, multisig);
+		addPoiState(poiFacade, cosigner1);
+		addPoiState(poiFacade, cosigner2);
+		makeCosignatory(poiFacade, cosigner1, multisig);
+		makeCosignatory(poiFacade, cosigner2, multisig);
+
+		final ValidationResult result1 = transactions.addExisting(multisigTransaction);
+		final ValidationResult result2 = transactions.addExisting(signatureTransaction);
+
+		// Act:
+		final UnconfirmedTransactions blockTransactions = transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), currentTime.addMinutes(10));
+
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(2));
+	}
+
+	private static  void addPoiState(final PoiFacade poiFacade, final Account account) {
+		final Address address = account.getAddress();
+		final PoiAccountState state = new PoiAccountState(address);
+		Mockito.when(poiFacade.findStateByAddress(address))
+				.thenReturn(state);
+	}
+
+	public static void makeCosignatory(final PoiFacade poiFacade, final Account signer, final Account multisig) {
+		final BlockHeight blockHeight = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK);
+		poiFacade.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
+		poiFacade.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
+	}
+
+	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator(final PoiFacade poiFacade) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		final TestContext context = new TestContext(
-				factory.create(Mockito.mock(PoiFacade.class)),
-				factory.createBatch(Mockito.mock(PoiFacade.class)));
+				factory.create(poiFacade),
+				factory.createBatch(poiFacade),
+				poiFacade);
 		return context.transactions;
 	}
 
@@ -991,21 +1047,20 @@ public class UnconfirmedTransactionsTest {
 		private final UnconfirmedTransactions transactions;
 
 		private TestContext() {
-			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
+			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class), Mockito.mock(PoiFacade.class));
 			this.setSingleValidationResult(ValidationResult.SUCCESS);
 			this.setBatchValidationResult(ValidationResult.SUCCESS);
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator) {
-			this(singleValidator, Mockito.mock(BatchTransactionValidator.class));
+			this(singleValidator, Mockito.mock(BatchTransactionValidator.class), Mockito.mock(PoiFacade.class));
 			this.setBatchValidationResult(ValidationResult.SUCCESS);
 		}
 
-		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
+		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator, final PoiFacade poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 			Mockito.when(validatorFactory.createBatch(poiFacade)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(poiFacade)).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
