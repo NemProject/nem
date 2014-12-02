@@ -107,7 +107,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		synchronized(this) {
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
-				// TODO 20141201 J-B: i think the change is ok, but the comment is misleading as the last block could also be changed by a parallel updateChaing call
+				// TODO 20141201 J-B: i think the change is ok, but the comment is misleading as the last block could also be changed by a parallel updateChain call
+				// TODO 20141202 BR -> J: I don't think updateChain can be called twice, at least I never saw that in the logs.
 				// last block has changed due to a processBlock call, don't do anything
 				LOGGER.warning("updateChain: last block changed. Update not possible");
 				return NodeInteractionResult.NEUTRAL;
