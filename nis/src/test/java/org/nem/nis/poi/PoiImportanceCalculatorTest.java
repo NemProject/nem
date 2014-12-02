@@ -289,16 +289,16 @@ public class PoiImportanceCalculatorTest {
 		final BlockHeight height = new BlockHeight(2);
 		addOutlinksFromGraph(accountStates, height, outlinkMatrix);
 
-		// Set up POI options
+		// set up POI options
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setTeleportationProbability(0.8);
 		builder.setInterLevelTeleportationProbability(0.1);
-		builder.setMinHarvesterBalance(new Amount(1l));
-		builder.setMinOutlinkWeight(new Amount(1l));
+		builder.setMinHarvesterBalance(new Amount(1L));
+		builder.setMinOutlinkWeight(new Amount(1L));
 
 		// Build the clusters we expect
 		// - clusters: {0, 1, 2, 3, 4}, {6, 7, 8, 9, 10}; hubs: {0}
-		final DoubleLoopTestContext context = new DoubleLoopTestContext(accountStates.size());
+		final DoubleLoopTestContext context = new DoubleLoopTestContext();
 		builder.setClusteringStrategy(context.clusteringStrategy);
 
 		// Act:
@@ -363,12 +363,12 @@ public class PoiImportanceCalculatorTest {
 		// Normal page rank
 		LOGGER.info("normal page rank:");
 		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
-		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
+		final double ratio1 = ringImportanceRatio(normalImportances);
 
 		// NCD aware rank
 		LOGGER.info("NCD aware rank:");
 		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
-		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
+		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
 		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
@@ -484,12 +484,12 @@ public class PoiImportanceCalculatorTest {
 		// Normal page rank
 		LOGGER.info("normal page rank:");
 		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
-		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
+		final double ratio1 = ringImportanceRatio(normalImportances);
 
 		// NCD aware rank
 		LOGGER.info("NCD aware rank:");
 		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
-		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
+		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
 		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
@@ -525,7 +525,11 @@ public class PoiImportanceCalculatorTest {
 		return outlinkMatrix;
 	}
 
-	private double ringImportanceSum(final ColumnVector importances, final int ring) {
+	private static double ringImportanceRatio(final ColumnVector importances) {
+		return ringImportanceSum(importances, 1) / ringImportanceSum(importances, 2);
+	}
+
+	private static double ringImportanceSum(final ColumnVector importances, final int ring) {
 		double sum = 0.0;
 		for (int i = 0; i < 6; i++) {
 			sum += importances.getAt(i + 6 * (ring - 1));
@@ -791,8 +795,8 @@ public class PoiImportanceCalculatorTest {
 	private static class DoubleLoopTestContext {
 		private final GraphClusteringStrategy clusteringStrategy = Mockito.mock(FastScanClusteringStrategy.class);
 
-		public DoubleLoopTestContext(final int neighborhoodSize) {
-			//Setup clusters
+		public DoubleLoopTestContext() {
+			// setup clusters
 			final ClusteringResult clusteringResult = new ClusteringResult(
 					buildLoopClusters(),
 					buildLoopHubs(),
@@ -800,24 +804,21 @@ public class PoiImportanceCalculatorTest {
 			Mockito.when(this.clusteringStrategy.cluster(Mockito.any())).thenReturn(clusteringResult);
 		}
 
-		private Collection<Cluster> buildLoopClusters() {
-			return Arrays.stream(new Cluster[]{
+		private static Collection<Cluster> buildLoopClusters() {
+			return Arrays.asList(
 					buildCluster(1, 1, 2, 3, 4, 5),
-					buildCluster(6, 6, 7, 8, 9, 10)
-					}).collect(Collectors.toList());
+					buildCluster(6, 6, 7, 8, 9, 10));
 		}
 
-		private Collection<Cluster> buildLoopHubs() {
-			return Arrays.stream(new Cluster[]{
-					buildCluster(0, 0)
-			}).collect(Collectors.toList());
+		private static Collection<Cluster> buildLoopHubs() {
+			return Arrays.asList(buildCluster(0, 0));
 		}
 
-		private Collection<Cluster> buildLoopOutliers() {
-			return Arrays.stream(new Cluster[] { }).collect(Collectors.toList());
+		private static Collection<Cluster> buildLoopOutliers() {
+			return Arrays.asList();
 		}
 
-		private Cluster buildCluster(final int id, final int... nodes) {
+		private static Cluster buildCluster(final int id, final int... nodes) {
 			return new Cluster(new ClusterId(id), Arrays.stream(nodes).mapToObj(i -> new NodeId(i)).collect(Collectors.toList()));
 		}
 	}
