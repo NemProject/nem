@@ -14,8 +14,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.poiAccount1State, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.poiAccount2State, Mockito.times(1)).addMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount1State, Mockito.times(1)).getMultisigLinks().addCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount2State, Mockito.times(1)).getMultisigLinks().addMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	@Test
@@ -23,8 +23,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Undo);
 
 		// Assert:
-		Mockito.verify(context.poiAccount1State, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.poiAccount2State, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount1State, Mockito.times(1)).getMultisigLinks().removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount2State, Mockito.times(1)).getMultisigLinks().removeMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	// TODO: This test is wrong, it should use MultisigModificationType.Del
@@ -33,8 +33,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.poiAccount1State, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.poiAccount2State, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount1State, Mockito.times(1)).getMultisigLinks().removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount2State, Mockito.times(1)).getMultisigLinks().removeMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	// TODO: This test is wrong, it should use MultisigModificationType.Del
@@ -43,8 +43,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Undo);
 
 		// Assert:
-		Mockito.verify(context.poiAccount1State, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.poiAccount2State, Mockito.times(1)).addMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount1State, Mockito.times(1)).getMultisigLinks().addCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.poiAccount2State, Mockito.times(1)).getMultisigLinks().addMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 

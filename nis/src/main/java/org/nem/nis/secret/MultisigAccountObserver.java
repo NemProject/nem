@@ -29,11 +29,11 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 		boolean add = MultisigModificationType.Add == notification.getModificationType();
 		boolean execute = NotificationTrigger.Execute == context.getTrigger();
 		if ((add && execute) || (!add && !execute)) {
-			multisigState.addCosignatory(cosignatoryAddress, context.getHeight());
-			cosignatoryState.addMultisig(multisigAddress, context.getHeight());
+			multisigState.getMultisigLinks().addCosignatory(cosignatoryAddress, context.getHeight());
+			cosignatoryState.getMultisigLinks().addMultisig(multisigAddress, context.getHeight());
 		} else {
-			multisigState.removeCosignatory(cosignatoryAddress, context.getHeight());
-			cosignatoryState.removeMultisig(multisigAddress, context.getHeight());
+			multisigState.getMultisigLinks().removeCosignatory(cosignatoryAddress, context.getHeight());
+			cosignatoryState.getMultisigLinks().removeMultisig(multisigAddress, context.getHeight());
 		}
 	}
 }

@@ -1,12 +1,9 @@
 package org.nem.nis.poi;
 
-import org.nem.core.model.Account;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.remote.RemoteLinks;
 import org.nem.nis.secret.*;
-
-import java.util.*;
 
 /**
  * Class containing extrinsic NIS-account information that is used to calculate POI.
@@ -78,29 +75,15 @@ public class PoiAccountState {
 	}
 
 	// TODO 20141201 J-G: can we just expose MultisigLinks (like RemoteLinks)?
+	// TODO 20141202 G-J: I'm not sure why I did it in such a dumb way
 
-	public void addMultisig(final Address multisigAddress, final BlockHeight height) {
-		this.multisigLinks.addMultisig(multisigAddress, height);
-	}
-
-	public void addCosignatory(final Address cosignatoryAddress, final BlockHeight height) {
-		this.multisigLinks.addCosignatory(cosignatoryAddress, height);
-	}
-
-	public void removeMultisig(final Address multisigAddress, final BlockHeight height) {
-		this.multisigLinks.removeMultisig(multisigAddress, height);
-	}
-
-	public void removeCosignatory(final Address cosignatoryAddress, final BlockHeight height) {
-		this.multisigLinks.removeCosignatory(cosignatoryAddress, height);
-	}
-
-	public boolean isCosignerOf(final Address signer) {
-		return this.multisigLinks.isCosignatoryOf(signer);
-	}
-
-	public Set<Address> getCosigners() {
-		return this.multisigLinks.getCosignatories();
+	/**
+	 * Gets multisig link information.
+	 *
+	 * @return THe multisig link information.
+	 */
+	public MultisigLinks getMultisigLinks() {
+		return multisigLinks;
 	}
 
 	/**
@@ -134,7 +117,8 @@ public class PoiAccountState {
 				this.importance.copy(),
 				this.weightedBalances.copy(),
 				this.remoteLinks.copy(),
-				this.multisigLinks.copy(),
+				this.getMultisigLinks().copy(),
 				this.height);
 	}
+
 }

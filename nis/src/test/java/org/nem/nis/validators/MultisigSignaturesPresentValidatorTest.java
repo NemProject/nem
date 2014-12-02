@@ -152,8 +152,8 @@ public class MultisigSignaturesPresentValidatorTest {
 		}
 
 		public void makeCosignatory(final Account signer, final Account multisig, final BlockHeight blockHeight) {
-			this.poiFacade.findStateByAddress(signer.getAddress()).addMultisig(multisig.getAddress(), blockHeight);
-			this.poiFacade.findStateByAddress(multisig.getAddress()).addCosignatory(signer.getAddress(), blockHeight);
+			this.poiFacade.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
+			this.poiFacade.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
 		}
 
 		private Collection<Transaction> returnTransactions() {

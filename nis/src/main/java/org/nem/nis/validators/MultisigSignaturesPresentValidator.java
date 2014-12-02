@@ -36,7 +36,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
 		final PoiAccountState senderState = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress());
 
-		if (! senderState.isCosignerOf(transaction.getOtherTransaction().getSigner().getAddress())) {
+		if (!senderState.getMultisigLinks().isCosignatoryOf(transaction.getOtherTransaction().getSigner().getAddress())) {
 			return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
 		}
 
@@ -49,13 +49,13 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		}
 
 		final PoiAccountState multisigAddress = this.poiFacade.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
-		if (multisigAddress.getCosigners().size() == 1) {
+		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {
 			return ValidationResult.SUCCESS;
 		}
 
 		final Hash transactionHash = transaction.getOtherTransactionHash();
 		// this loop could be done using reduce, but I'm leaving it like this for readability
-		for (final Address cosignerAddress : multisigAddress.getCosigners()) {
+		for (final Address cosignerAddress : multisigAddress.getMultisigLinks().getCosignatories()) {
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
 			}
