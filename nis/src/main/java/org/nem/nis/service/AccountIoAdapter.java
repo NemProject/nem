@@ -8,7 +8,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.AccountCache;
 import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.TransferBlockPair;
 import org.nem.nis.mappers.TransferMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,15 +61,15 @@ public class AccountIoAdapter implements AccountIo {
 
 		final Account account = this.accountCache.findByAddress(address);
 		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
-		transfers.stream()
-				.map(tr -> new TransactionMetaDataPair(
-						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
-						new TransactionMetaData(new BlockHeight((long)tr[1]), ((Transfer)tr[0]).getId())
+		pairs.stream()
+				.map(pair -> new TransactionMetaDataPair(
+						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
+						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
 				))
-				.forEach(obj -> transactionList.add(obj));
+				.forEach(transactionList::add);
 		return transactionList;
 	}
 
@@ -82,15 +82,19 @@ public class AccountIoAdapter implements AccountIo {
 			final BlockHeight height,
 			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, transactionHash, height, transfersType, DEFAULT_LIMIT);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingHash(account,
+				transactionHash,
+				height,
+				transfersType,
+				DEFAULT_LIMIT);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
-		transfers.stream()
-				.map(tr -> new TransactionMetaDataPair(
-						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
-						new TransactionMetaData(new BlockHeight(((org.nem.nis.dbmodel.Block)tr[1]).getHeight()), ((Transfer)tr[0]).getId())
+		pairs.stream()
+				.map(pair -> new TransactionMetaDataPair(
+						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
+						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
 				))
-				.forEach(obj -> transactionList.add(obj));
+				.forEach(transactionList::add);
 		return transactionList;
 	}
 
@@ -100,16 +104,16 @@ public class AccountIoAdapter implements AccountIo {
 			final Long transactionId,
 			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
 
 		// TODO 20141201 J-B: this same mapping is happening in the preceding function, consider refactoring
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
-		transfers.stream()
-				.map(tr -> new TransactionMetaDataPair(
-						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
-						new TransactionMetaData(new BlockHeight(((org.nem.nis.dbmodel.Block)tr[1]).getHeight()), ((Transfer)tr[0]).getId())
+		pairs.stream()
+				.map(pair -> new TransactionMetaDataPair(
+						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
+						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
 				))
-				.forEach(obj -> transactionList.add(obj));
+				.forEach(transactionList::add);
 		return transactionList;
 	}
 
@@ -125,7 +129,7 @@ public class AccountIoAdapter implements AccountIo {
 						new BlockHeight(bl.getHeight()),
 						new TimeInstant(bl.getTimeStamp()),
 						Amount.fromMicroNem(bl.getTotalFee())))
-				.forEach(obj -> blockList.add(obj));
+				.forEach(blockList::add);
 		return blockList;
 	}
 

@@ -69,16 +69,16 @@ public class TransferDaoImpl implements TransferDao {
 	// NOTE: this query will also ask for accounts of senders and recipients!
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Object[]> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
+	public Collection<TransferBlockPair> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
 		// TODO: have no idea how to do it using Criteria...
 		final Query query = this.getCurrentSession()
-				.createQuery("select t, t.block.height from Transfer t " +
+				.createQuery("select t, t.block from Transfer t " +
 						"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
 						"order by t.timeStamp desc")
 				.setParameter("timeStamp", timeStamp)
 				.setParameter("pubkey", address.getAddress().getEncoded())
 				.setMaxResults(limit);
-		return listAndCast(query);
+		return executeQuery(query);
 	}
 
 	private String buildAddressQuery(final TransferType transferType) {
@@ -93,7 +93,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional
-	public Collection<Object[]> getTransactionsForAccountUsingHash(
+	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
 			final Account address,
 			final Hash hash,
 			final BlockHeight height,
@@ -104,32 +104,32 @@ public class TransferDaoImpl implements TransferDao {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
 			final String addressString = this.buildAddressQuery(transferType);
-			final Object[] tx = this.getTransactionDescriptorUsingHash(accountId, hash, height, addressString);
-			return this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, tx);
+			final TransferBlockPair pair = this.getTransactionDescriptorUsingHash(accountId, hash, height, addressString);
+			return this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, pair);
 		}
 	}
 
-	private Object[] getTransactionDescriptorUsingHash(
+	private TransferBlockPair getTransactionDescriptorUsingHash(
 			final Long accountId,
 			final Hash hash,
 			final BlockHeight height,
 			final String addressString) {
 		final Query prequery = this.getCurrentSession()
-				.createQuery("select t, t.block.height from Transfer t " +
+				.createQuery("select t, t.block from Transfer t " +
 						"WHERE " +
 						addressString +
 						" AND t.block.height = :height" +
 						" ORDER BY t.timeStamp desc")
 				.setParameter("height", height.getRaw())
 				.setParameter("accountId", accountId);
-		final List<Object[]> tempList = listAndCast(prequery);
+		final List<TransferBlockPair> tempList = executeQuery(prequery);
 		if (tempList.size() < 1) {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
 		}
 
-		for (Object[] object : tempList) {
-			if (((Transfer)object[0]).getTransferHash().equals(hash)) {
-				return object;
+		for (TransferBlockPair pair : tempList) {
+			if (pair.getTransfer().getTransferHash().equals(hash)) {
+				return pair;
 			}
 		}
 
@@ -138,7 +138,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional
-	public Collection<Object[]> getTransactionsForAccountUsingId(
+	public Collection<TransferBlockPair> getTransactionsForAccountUsingId(
 			final Account address,
 			final Long id,
 			final TransferType transferType,
@@ -147,17 +147,16 @@ public class TransferDaoImpl implements TransferDao {
 		if (id == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
-			final Object[] tx = this.getTransactionDescriptorUsingId(id);
-			final Collection<Object[]> transactions =  this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, tx);
-			return transactions;
+			final TransferBlockPair pair = this.getTransactionDescriptorUsingId(id);
+			return this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, pair);
 		}
 	}
 
-	private Object[] getTransactionDescriptorUsingId(final Long id) {
+	private TransferBlockPair getTransactionDescriptorUsingId(final Long id) {
 		final Query preQuery = this.getCurrentSession()
-				.createQuery("select t, t.block.height from Transfer t WHERE id=:id")
+				.createQuery("select t, t.block from Transfer t WHERE t.id=:id")
 				.setParameter("id", id);
-		final List<Object[]> tempList = listAndCast(preQuery);
+		final List<TransferBlockPair> tempList = executeQuery(preQuery);
 		if (tempList.size() < 1) {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), id.toString());
 		}
@@ -170,37 +169,37 @@ public class TransferDaoImpl implements TransferDao {
 				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
 				.addScalar("accountId", LongType.INSTANCE)
 				.setParameter("address", address.getAddress().getEncoded());
-		final Long accountId = (Long)query.uniqueResult();
-		return accountId;
+		return (Long)query.uniqueResult();
 	}
 
-	private Collection<Object[]> getTransactionsForAccountUpToTransaction(
+	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(
 			final Long accountId,
 			final int limit,
 			final TransferType transferType,
-			final Object[] tx) {
+			final TransferBlockPair pair) {
 		if (TransferType.ALL == transferType) {
-			final Collection<Object[]> objects = this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.INCOMING, tx);
-			objects.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.OUTGOING, tx));
-			return this.sortAndLimit(objects, limit);
+			final Collection<TransferBlockPair> pairs =
+					this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.INCOMING, pair);
+			pairs.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.OUTGOING, pair));
+			return this.sortAndLimit(pairs, limit);
 		} else {
-			return this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, transferType, tx);
+			return this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, transferType, pair);
 		}
 	}
 
-	private Collection<Object[]> getTransactionsForAccountUpToTransactionWithTransferType(
+	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransactionWithTransferType(
 			final Long accountId,
 			final int limit,
 			final TransferType transferType,
-			final Object[] tx) {
+			final TransferBlockPair pair) {
 		final Query query;
-		final Transfer topMostTransfer = (Transfer)tx[0];
+		final Transfer topMostTransfer = pair.getTransfer();
 
 		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType)? "t.senderId" : "t.recipientId";
 		final String preQueryString = "SELECT t.*, b.* " +
 				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 				"WHERE %s = %d AND t.id < %d AND t.blockId = b.id " +
-				"ORDER BY %s, t.id DESC";
+				"ORDER BY %s, t.timestamp DESC, t.id DESC";
 		final String queryString = String.format(preQueryString,
 				senderOrRecipient,
 				accountId,
@@ -211,10 +210,10 @@ public class TransferDaoImpl implements TransferDao {
 				.addEntity(Transfer.class)
 				.addEntity(Block.class)
 				.setMaxResults(limit);
-		return listAndCast(query);
+		return executeQuery(query);
 	}
 
-	private Collection<Object[]> getLatestTransactionsForAccount(
+	private Collection<TransferBlockPair> getLatestTransactionsForAccount(
 			final Long accountId,
 			final int limit,
 			final TransferType transferType) {
@@ -225,57 +224,72 @@ public class TransferDaoImpl implements TransferDao {
 		// TODO                   So I ended up doing two queries and building the union/doing sorting "manually". It is still more than ten times
 		// TODO                   faster then the original query hibernate creates.
 		if (TransferType.ALL == transferType) {
-			final Collection<Object[]> objects = this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.INCOMING);
-			objects.addAll(this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.OUTGOING));
-			return this.sortAndLimit(objects, limit);
+			final Collection<TransferBlockPair> pairs = this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.INCOMING);
+			pairs.addAll(this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.OUTGOING));
+			return this.sortAndLimit(pairs, limit);
 		} else {
 			return this.getLatestTransactionsForAccountWithTransferType(accountId, limit, transferType);
 		}
 	}
 
-	private Collection<Object[]> getLatestTransactionsForAccountWithTransferType(
+	private Collection<TransferBlockPair> getLatestTransactionsForAccountWithTransferType(
 			final Long accountId,
 			final int limit,
 			final TransferType transferType) {
-		final String queryString = String.format("SELECT t, t.block FROM Transfer t WHERE %s ORDER BY %s, t.id DESC",
-				this.buildAddressQuery(transferType),
-				TransferType.OUTGOING.equals(transferType)? "t.sender.id" : "t.recipient.id");
-		final Query query = this.getCurrentSession()
-				.createQuery(queryString)
-				.setParameter("accountId", accountId)
+		final Query query;
+		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType)? "t.senderId" : "t.recipientId";
+		final String preQueryString = "SELECT t.*, b.* " +
+				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+				"WHERE %s = %d AND t.blockId = b.id " +
+				"ORDER BY %s, t.timestamp DESC, t.id DESC";
+		final String queryString = String.format(preQueryString,
+				senderOrRecipient,
+				accountId,
+				senderOrRecipient);
+		query = this.getCurrentSession()
+				.createSQLQuery(queryString)
+				.addEntity(Transfer.class)
+				.addEntity(Block.class)
 				.setMaxResults(limit);
-		return listAndCast(query);
+		return executeQuery(query);
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Query q) {
-		return q.list();
+	private static List<TransferBlockPair> executeQuery(final Query q) {
+		// TODO BR: I am too stupid to do it with streams :/
+		final List<TransferBlockPair> pairs = new ArrayList<>();
+		final List<Object[]> list = q.list();
+		for (Object[] o : list) {
+			pairs.add(new TransferBlockPair((Transfer)o[0], (Block)o[1]));
+		}
+
+		return pairs;
 	}
 
-	private Collection<Object[]> sortAndLimit(final Collection<Object[]> objects, final int limit) {
-		final List<Object[]> list = objects.stream()
+	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
+		final List<TransferBlockPair> list = pairs.stream()
 				.sorted(this::comparePair)
 				.collect(Collectors.toList());
-		Object[] curObject = null;
-		final Collection<Object[]> result = new ArrayList<>();
-		for (final Object[] object : list) {
-			if (null == curObject || !((Transfer)curObject[0]).getId().equals(((Transfer)object[0]).getId())) {
-				result.add(object);
+		TransferBlockPair curPair = null;
+		final Collection<TransferBlockPair> result = new ArrayList<>();
+		for (final TransferBlockPair pair : list) {
+			if (null == curPair || !(curPair.getTransfer().getId().equals(pair.getTransfer().getId()))) {
+				result.add(pair);
 				if (limit == result.size()) {
 					break;
 				}
 			}
-			curObject = object;
+			curPair = pair;
 		}
 
 		return result;
 	}
 
-	private int comparePair(final Object[] lhs, final Object[] rhs) {
-		final Transfer lhsTransfer = (Transfer)lhs[0];
-		final Long lhsHeight = ((Block)lhs[1]).getHeight();
-		final Transfer rhsTransfer = (Transfer)rhs[0];
-		final Long rhsHeight = ((Block)rhs[1]).getHeight();
+	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
+		final Transfer lhsTransfer = lhs.getTransfer();
+		final Long lhsHeight = lhs.getBlock().getHeight();
+		final Transfer rhsTransfer = rhs.getTransfer();
+		final Long rhsHeight = rhs.getBlock().getHeight();
 
 		final int heightComparison = -lhsHeight.compareTo(rhsHeight);
 		if (0 != heightComparison) {
