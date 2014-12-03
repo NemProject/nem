@@ -139,17 +139,14 @@ public class TransactionFactoryTest {
 
 	private static Transaction createMultisigTransaction(final Transaction transaction) {
 		final Account sender = Utils.generateRandomAccount();
-		final Account cosignatory = Utils.generateRandomAccount();
 		return new MultisigTransaction(
 				TimeInstant.ZERO,
 				sender,
 				transaction);
 	}
+
 	//endregion
 
-	// TODO 20141201 J-G: i guess we need a pair for multisigsignature too?
-	// TODO 20141202 G-J: sorry, had to go yesterday, before I had a chance to add them
-	
 	//region MultisigSignatureTransaction
 
 	@Test

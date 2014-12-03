@@ -12,11 +12,6 @@ import org.nem.core.time.TimeInstant;
 public class MultisigSignatureTransaction extends Transaction implements SerializableEntity {
 	private final Hash otherTransactionHash;
 
-	// TODO 20141201 G-J: why do we need it here?
-	// TODO 20141201 J-G: where else will the cosigner signature come from?
-	// TODO 20141202 G-J: well MultisigSignatureTransaction is a Tranaction, so it already has signature
-	// proof, and since we consider TX hashes to be unique, signing (above) hash, should be equivalent
-	// to signing TX itself, or not?
 	private final Signature otherTransactionSignature;
 
 	/**

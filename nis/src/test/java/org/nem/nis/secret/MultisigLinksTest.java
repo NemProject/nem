@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 
 public class MultisigLinksTest {
+
 	//region MultisigLinks
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {

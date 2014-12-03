@@ -120,7 +120,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because not enough cosignatories were present.
 	 */
-	FAILURE_MULTISIG_MISSING_COSIGNERS(31);
+	FAILURE_MULTISIG_MISSING_COSIGNERS(31),
+
+	/**
+	 * Validation failed because a multisig signature was not associated with any known multisig transaction.
+	 */
+	FAILURE_MULTISIG_NO_MATCHING_MULTISIG(32);
 
 	private final int value;
 

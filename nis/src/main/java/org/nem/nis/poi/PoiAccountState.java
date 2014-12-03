@@ -74,9 +74,6 @@ public class PoiAccountState {
 		return this.remoteLinks;
 	}
 
-	// TODO 20141201 J-G: can we just expose MultisigLinks (like RemoteLinks)?
-	// TODO 20141202 G-J: I'm not sure why I did it in such a dumb way
-
 	/**
 	 * Gets multisig link information.
 	 *
@@ -117,8 +114,7 @@ public class PoiAccountState {
 				this.importance.copy(),
 				this.weightedBalances.copy(),
 				this.remoteLinks.copy(),
-				this.getMultisigLinks().copy(),
+				this.multisigLinks.copy(),
 				this.height);
 	}
-
 }
