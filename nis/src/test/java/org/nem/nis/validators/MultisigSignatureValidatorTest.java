@@ -7,12 +7,16 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MultisigSignatureValidatorTest {
 	private static final BlockHeight BAD_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK - 1);
@@ -35,21 +39,41 @@ public class MultisigSignatureValidatorTest {
 	public void multisigSignatureWithSignerNotBeingCosignatoryIsInvalid() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction();
+		final Transaction transaction = context.createTransaction(Hash.ZERO);
 
 		// Act:
 		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
 	}
 
 	@Test
-	public void multisigSignatureWithSignerBeingCosignatoryOfAnyAccountIsValid() {
+	public void multisigSignatureWithSignerBeingCosignatoryIsInvalidIfMultisigTransactionIsNotPresent() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction();
+		final Transaction transaction = context.createTransaction(Hash.ZERO);
 		final Account randomAccount = Utils.generateRandomAccount();
+		context.addPoiState(randomAccount);
+		context.makeCosignatory(context.signer, randomAccount);
+
+		// Act:
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
+	}
+
+	@Test
+	public void multisigSignatureWithSignerBeingCosignatoryIsValid() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account randomAccount = Utils.generateRandomAccount();
+		final Account multisigInitiator = Utils.generateRandomAccount();
+		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(randomAccount, multisigInitiator);
+
+		final Transaction transaction = context.createTransaction(HashUtils.calculateHash(multisigTransaction.getOtherTransaction()));
+
 		context.addPoiState(randomAccount);
 		context.makeCosignatory(context.signer, randomAccount);
 
@@ -61,10 +85,10 @@ public class MultisigSignatureValidatorTest {
 	}
 
 	@Test
-	public void multisigSignatureWithSignerBeingCosignatoryBelowForkIsInalid() {
+	public void multisigSignatureWithSignerBeingCosignatoryBelowForkIsInvalid() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction();
+		final Transaction transaction = context.createTransaction(Hash.ZERO);
 		final Account randomAccount = Utils.generateRandomAccount();
 		context.addPoiState(randomAccount);
 		context.makeCosignatory(context.signer, randomAccount);
@@ -78,20 +102,35 @@ public class MultisigSignatureValidatorTest {
 
 	private class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final MultisigSignatureValidator validator = new MultisigSignatureValidator(this.poiFacade);
+		private final MultisigSignatureValidator validator;
 		private final Account signer = Utils.generateRandomAccount();
 		private final Signature signature = new Signature(Utils.generateRandomBytes(64));
+		private final List<Transaction> transactionList = new ArrayList<>();
 
-		public Transaction createTransaction() {
+		private TestContext() {
+			this.validator = new MultisigSignatureValidator(this.poiFacade, () -> this.transactionList);
+		}
+
+		private Transaction createTransaction(final Hash otherTransactionHash) {
 			//signer.incrementBalance(Amount.fromNem(2001));
 			this.addPoiState(signer);
 
 			return new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
 					signer,
-					Hash.ZERO,
+					otherTransactionHash,
 					signature
 			);
+		}
+
+		private MultisigTransaction createMultisigTransaction(final Account multisig, final Account cosignatory) {
+			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, multisig, Utils.generateRandomAccount(), Amount.fromNem(123), null);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, cosignatory, otherTransaction);
+			transaction.sign();
+
+			this.transactionList.add(transaction);
+
+			return transaction;
 		}
 
 		private void addPoiState(final Account account) {
