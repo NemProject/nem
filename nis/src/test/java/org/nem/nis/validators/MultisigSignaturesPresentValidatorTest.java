@@ -130,7 +130,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		private final List<Transaction> otherTransactions = new ArrayList<>();
 
 		private TestContext(final boolean blockCreation) {
-			this.validator = new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation, () -> this.returnTransactions());
+			this.validator = new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation);
 			this.addPoiState(this.signer);
 			this.addPoiState(this.multisig);
 			this.addPoiState(this.dummy);

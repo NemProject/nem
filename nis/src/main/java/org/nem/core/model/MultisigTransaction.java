@@ -74,7 +74,18 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			throw new IllegalArgumentException("trying to add a signature for another transaction to a multisig transaction");
 		}
 
+		// TODO 20141204 G-J: where should we check for duplicate MultisigSignatures ?
+
 		this.signatureTransactions.add(transaction);
+	}
+
+	/**
+	 * Gets list of signature transactions.
+	 *
+	 * @return The list of signature transactions.
+	 */
+	public List<MultisigSignatureTransaction> getCosignerSignatures() {
+		return this.signatureTransactions;
 	}
 
 	/**

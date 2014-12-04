@@ -46,6 +46,9 @@ public class AggregateSingleTransactionValidatorBuilder {
 
 		@Override
 		public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
+			// TODO 20141204 G-J: java documentation does not make this clear to me, is .stream() guaranteed to be executed sequentially?
+			// there's following statement in docs:
+			// "The stream implementations in the JDK create serial streams unless parallelism is explicitly requested."
 			return ValidationResult.aggregate(this.validators.stream()
 					.map(validator -> validator.validate(transaction, context))
 					.iterator());

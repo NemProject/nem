@@ -193,7 +193,12 @@ public class UnconfirmedTransactions {
 		// I think it should use transactions passed to UnconfirmedTransactions and not THIS.transactions
 		// OK, in case of NonConflictingImportanceTransferTransactionValidator it doesn't matter
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
-		builder.add(new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation, () -> transactions));
+		builder.add(new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation));
+
+		// need to be the last one
+		// that is correct we need this.transactions here
+		builder.add(new MultisigSignatureValidator(this.poiFacade, blockCreation, () -> this.transactions.values()));
+
 		return new MultisigAwareSingleTransactionValidator(builder.build());
 	}
 
@@ -263,6 +268,7 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		final List<Transaction> transactions = this.transactions.values().stream()
 				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 				.collect(Collectors.toList());
 
 		return this.sortTransactions(transactions);

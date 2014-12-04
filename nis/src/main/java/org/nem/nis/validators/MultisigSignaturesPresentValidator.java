@@ -12,12 +12,10 @@ import java.util.function.Supplier;
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
 	private final PoiFacade poiFacade;
 	private final boolean blockCreation;
-	private final Supplier<Collection<Transaction>> transactionsSupplier;
 
-	public MultisigSignaturesPresentValidator(final PoiFacade poiFacade, boolean blockCreation, final Supplier<Collection<Transaction>> transactionsSupplier) {
+	public MultisigSignaturesPresentValidator(final PoiFacade poiFacade, boolean blockCreation) {
 		this.poiFacade = poiFacade;
 		this.blockCreation = blockCreation;
-		this.transactionsSupplier = transactionsSupplier;
 	}
 
 	@Override
@@ -44,9 +42,12 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		// TODO 20141201 J-G: why?
 		// TODO 20141202 G-J: cause we might not have proper MultisigSignatures YET, and we want to
 		// be able to add MultisigTransaction itself to list of unconfirmed transactions.
-		if (! blockCreation) {
+		if (! this.blockCreation) {
 			return ValidationResult.SUCCESS;
 		}
+
+		// TODO 20131204 G-G: if we'll be adding MultisigSignature to MultisigTransaction,
+		// whole piece below probably won't be necessary
 
 		final PoiAccountState multisigAddress = this.poiFacade.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
 		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {
@@ -59,10 +60,9 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
 			}
-			boolean hasCosigner = this.transactionsSupplier.get().stream()
-					.filter(t -> TransactionTypes.MULTISIG_SIGNATURE == t.getType())
+			boolean hasCosigner = transaction.getCosignerSignatures().stream()
 					.anyMatch(
-							t -> ((MultisigSignatureTransaction) t).getOtherTransactionHash().equals(transactionHash) &&
+							t -> t.getOtherTransactionHash().equals(transactionHash) &&
 									t.getSigner().getAddress().equals(cosignerAddress)
 					);
 

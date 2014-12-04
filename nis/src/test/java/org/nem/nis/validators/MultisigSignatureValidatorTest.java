@@ -108,7 +108,7 @@ public class MultisigSignatureValidatorTest {
 		private final List<Transaction> transactionList = new ArrayList<>();
 
 		private TestContext() {
-			this.validator = new MultisigSignatureValidator(this.poiFacade, () -> this.transactionList);
+			this.validator = new MultisigSignatureValidator(this.poiFacade, false, () -> this.transactionList);
 		}
 
 		private Transaction createTransaction(final Hash otherTransactionHash) {

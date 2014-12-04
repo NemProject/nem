@@ -968,7 +968,7 @@ public class UnconfirmedTransactionsTest {
 
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(2));
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
 
 	private static  void addPoiState(final PoiFacade poiFacade, final Account account) {

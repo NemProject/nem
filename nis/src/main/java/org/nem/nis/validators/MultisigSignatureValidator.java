@@ -12,10 +12,12 @@ import java.util.stream.Collectors;
 
 public class MultisigSignatureValidator implements SingleTransactionValidator {
 	private final PoiFacade poiFacade;
+	private final boolean blockCreation;
 	private final Supplier<Collection<Transaction>> transactionsSupplier;
 
-	public MultisigSignatureValidator(final PoiFacade poiFacade, final Supplier<Collection<Transaction>> transactionsSupplier) {
+	public MultisigSignatureValidator(final PoiFacade poiFacade, boolean blockCreation, final Supplier<Collection<Transaction>> transactionsSupplier) {
 		this.poiFacade = poiFacade;
+		this.blockCreation = blockCreation;
 		this.transactionsSupplier = transactionsSupplier;
 	}
 
@@ -33,6 +35,10 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 	}
 
 	private ValidationResult validate(final MultisigSignatureTransaction signatureTransaction, final ValidationContext context) {
+		if (this.blockCreation) {
+			throw new RuntimeException("MultisigSignature not allowed during block creation");
+		}
+
 		final PoiAccountState cosignerState = this.poiFacade.findStateByAddress(signatureTransaction.getSigner().getAddress());
 
 		// iterate over "waiting"/current transactions, if there's no proper MultisigTransaction, validation fails
@@ -51,6 +57,16 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 			}
 
 			if (cosignerState.getMultisigLinks().isCosignatoryOf(multisigTransaction.getOtherTransaction().getSigner().getAddress())) {
+
+				// TODO: this most likely shouldn't be here... the following are wanted features:
+				// a) MultisigSignatureTransaction should be added to UnconfirmedTransactions
+				//    (I mean hash, so that we won't process one and the same TX multiple times)
+				// b) MultisigSignature shouldn't be returned when asked for UTs for block
+				//    (that's done by additional filter in UT.getTransactionsBefore)
+				// c) yet it should be removed from UTs, when MultisigTransaction itself is removed
+				//    not yet sure where
+				multisigTransaction.addSignature(signatureTransaction);
+
 				return ValidationResult.SUCCESS;
 			}
 		}
