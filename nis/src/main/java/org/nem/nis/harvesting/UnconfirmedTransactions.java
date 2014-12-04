@@ -194,7 +194,7 @@ public class UnconfirmedTransactions {
 		// OK, in case of NonConflictingImportanceTransferTransactionValidator it doesn't matter
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation, () -> transactions));
-		return builder.build();
+		return new MultisigAwareSingleTransactionValidator(builder.build());
 	}
 
 	/**
