@@ -3,13 +3,15 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
-import org.nem.core.model.HashCache;
+import org.nem.core.model.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.Account;
+import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;
@@ -152,8 +154,7 @@ public class NisAppConfig {
 	@Bean
 	public BlockChainContextFactory blockChainContextFactory() {
 		return new BlockChainContextFactory(
-				this.accountAnalyzer(),
-				this.transactionHashCache(),
+				this.nisCache(),
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.blockChainServices(),
@@ -209,6 +210,16 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public HashCache transactionHashCache() {
+		return new HashCache();
+	}
+
+	@Bean
+	public NisCache nisCache() {
+		return new NisCache(this.accountAnalyzer(), this.transactionHashCache());
+	}
+
+	@Bean
 	public PoiFacade poiFacade() {
 		return new PoiFacade(this.importanceCalculator());
 	}
@@ -261,16 +272,10 @@ public class NisAppConfig {
 		return new NisMain(
 				this.accountDao,
 				this.blockDao,
-				this.accountAnalyzer(),
+				this.nisCache(),
 				this.nisPeerNetworkHost(),
 				this.nisConfiguration(),
-				this.blockAnalyzer(),
-				this.transactionHashCache());
-	}
-
-	@Bean
-	public HashCache transactionHashCache() {
-		return new HashCache();
+				this.blockAnalyzer());
 	}
 
 	@Bean

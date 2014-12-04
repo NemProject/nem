@@ -23,6 +23,7 @@ public class BlockValidatorFactoryTest {
 	}
 
 	// TODO 20141201 J-B: nice tests; you might want to add something similar to the transaction factory tests
+	// TODO 20141204 BR -> J: the TransactionValidatorFactory doesn't expose the builder to the public. You have an idea how to do it?
 
 	@Test
 	public void createAddsTransactionDeadlineBlockValidator() {

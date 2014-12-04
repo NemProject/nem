@@ -219,7 +219,7 @@ public class BlockChainValidatorIntegrationTest {
 				final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 
 				final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
-						.createExecuteCommitObserver(accountAnalyzer, transactionHashCache);
+						.createExecuteCommitObserver(new NisCache(accountAnalyzer, transactionHashCache));
 				factory.executor = block -> executor.execute(block, observer);
 				return factory.create();
 			}

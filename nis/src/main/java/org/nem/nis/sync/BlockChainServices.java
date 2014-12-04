@@ -39,49 +39,45 @@ public class BlockChainServices {
 	/**
 	 * Compares the peer chain to the local chain.
 	 *
-	 * @param accountAnalyzer The current account analyzer.
-	 * @param transactionHashCache The current transaction hash cache.
+	 * @param nisCache The current NIS cache.
 	 * @param parentBlock The parent block.
 	 * @param peerChain The peer chain.
 	 * @return true if the peer chain is valid; false otherwise.
 	 */
 	public boolean isPeerChainValid(
-			final AccountAnalyzer accountAnalyzer,
-			final HashCache transactionHashCache,
+			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
-		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
+		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
-		final BlockExecutor executor = new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache());
-		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(accountAnalyzer, transactionHashCache);
+		final BlockExecutor executor = new BlockExecutor(poiFacade, nisCache.getAccountAnalyzer().getAccountCache());
+		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(poiFacade),
 				this.transactionValidatorFactory.createSingle(poiFacade),
-				this.transactionValidatorFactory.createBatch(transactionHashCache));
+				this.transactionValidatorFactory.createBatch(nisCache.getTransactionHashCache()));
 		return validator.isValid(parentBlock, peerChain);
 	}
 
 	/**
 	 * Undoes all transactions up until the common block height and returns the score.
 	 *
-	 * @param accountAnalyzer The current account analyzer.
-	 * @param transactionHashCache The current transaction hash cache.
+	 * @param nisCache The current NIS cache.
 	 * @param localBlockLookup The local block lookup adapter.
 	 * @param commonBlockHeight The common block height (i.e. the height at which the undo should stop).
 	 * @return The score of the undone transactions.
 	 */
 	public BlockChainScore undoAndGetScore(
-			final AccountAnalyzer accountAnalyzer,
-			final HashCache transactionHashCache,
+			final NisCache nisCache,
 			final BlockLookup localBlockLookup,
 			final BlockHeight commonBlockHeight) {
-		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
+		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
@@ -89,15 +85,15 @@ public class BlockChainServices {
 		// second visitor needs that information
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
-				this.observerFactory.createUndoCommitObserver(accountAnalyzer, transactionHashCache),
-				new BlockExecutor(poiFacade, accountAnalyzer.getAccountCache())));
+				this.observerFactory.createUndoCommitObserver(nisCache),
+				new BlockExecutor(poiFacade, nisCache.getAccountAnalyzer().getAccountCache())));
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 		BlockIterator.unwindUntil(
 				localBlockLookup,
 				commonBlockHeight,
 				visitor);
-		accountAnalyzer.getPoiFacade().undoVesting(commonBlockHeight);
+		nisCache.getAccountAnalyzer().getPoiFacade().undoVesting(commonBlockHeight);
 		return scoreVisitor.getScore();
 	}
 

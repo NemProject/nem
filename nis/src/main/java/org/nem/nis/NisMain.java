@@ -31,32 +31,29 @@ public class NisMain {
 
 	private final AccountDao accountDao;
 	private final BlockDao blockDao;
-	private final AccountAnalyzer accountAnalyzer;
+	private final NisCache nisCache;
 	private final NisPeerNetworkHost networkHost;
 	private final NisConfiguration nisConfiguration;
 	private final BlockAnalyzer blockAnalyzer;
-	private final HashCache transactionHashCache;
 
 	@Autowired(required = true)
 	public NisMain(
 			final AccountDao accountDao,
 			final BlockDao blockDao,
-			final AccountAnalyzer accountAnalyzer,
+			final NisCache nisCache,
 			final NisPeerNetworkHost networkHost,
 			final NisConfiguration nisConfiguration,
-			final BlockAnalyzer blockAnalyzer,
-			final HashCache transactionHashCache) {
+			final BlockAnalyzer blockAnalyzer) {
 		this.accountDao = accountDao;
 		this.blockDao = blockDao;
-		this.accountAnalyzer = accountAnalyzer;
+		this.nisCache = nisCache;
 		this.networkHost = networkHost;
 		this.nisConfiguration = nisConfiguration;
 		this.blockAnalyzer = blockAnalyzer;
-		this.transactionHashCache = transactionHashCache;
 	}
 
 	private void analyzeBlocks() {
-		if (!this.blockAnalyzer.analyze(this.accountAnalyzer, this.transactionHashCache)) {
+		if (!this.blockAnalyzer.analyze(this.nisCache)) {
 			System.exit(-1);
 		}
 	}
@@ -89,15 +86,15 @@ public class NisMain {
 
 	private NemesisBlock loadNemesisBlock() {
 		// set up the nemesis block amounts
-		final Account nemesisAccount = this.accountAnalyzer.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
+		final Account nemesisAccount = this.nisCache.getAccountAnalyzer().getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
 
-		final PoiAccountState nemesisState = this.accountAnalyzer.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		final PoiAccountState nemesisState = this.nisCache.getAccountAnalyzer().getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(this.accountAnalyzer.getAccountCache().asAutoCache()));
+		return NemesisBlock.fromResource(new DeserializationContext(this.nisCache.getAccountAnalyzer().getAccountCache().asAutoCache()));
 	}
 
 	private void logNemesisInformation() {

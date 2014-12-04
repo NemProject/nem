@@ -37,12 +37,12 @@ public class BlockAnalyzer {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 
-	public boolean analyze(final AccountAnalyzer accountAnalyzer, final HashCache transactionHashCache) {
-		return this.analyze(accountAnalyzer, transactionHashCache, null);
+	public boolean analyze(final NisCache nisCache) {
+		return this.analyze(nisCache, null);
 	}
 
-	public boolean analyze(final AccountAnalyzer accountAnalyzer, final HashCache transactionHashCache, final Long maxHeight) {
-		final Block nemesisBlock = this.loadNemesisBlock(accountAnalyzer);
+	public boolean analyze(final NisCache nisCache, final Long maxHeight) {
+		final Block nemesisBlock = this.loadNemesisBlock(nisCache.getAccountAnalyzer());
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
 		Long curBlockHeight;
@@ -66,10 +66,10 @@ public class BlockAnalyzer {
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
-		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
-		final AccountCache accountCache = accountAnalyzer.getAccountCache();
+		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
+		final AccountCache accountCache = nisCache.getAccountAnalyzer().getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache);
-		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(accountAnalyzer, transactionHashCache);
+		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
 
@@ -111,7 +111,7 @@ public class BlockAnalyzer {
 			}
 		} while (dbBlock != null);
 
-		this.initializePoi(accountAnalyzer, parentBlock.getHeight());
+		this.initializePoi(nisCache.getAccountAnalyzer(), parentBlock.getHeight());
 		return true;
 	}
 

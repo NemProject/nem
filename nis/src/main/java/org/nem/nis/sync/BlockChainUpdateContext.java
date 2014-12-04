@@ -20,10 +20,8 @@ import java.util.stream.Collectors;
 public class BlockChainUpdateContext {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdateContext.class.getName());
 
-	private final AccountAnalyzer accountAnalyzer;
-	private final AccountAnalyzer originalAnalyzer;
-	private final HashCache transactionHashCache;
-	private final HashCache originalTransactionHashCache;
+	private final NisCache nisCache;
+	private final NisCache originalNisCache;
 	private final BlockScorer blockScorer;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
@@ -36,10 +34,8 @@ public class BlockChainUpdateContext {
 	private final boolean hasOwnChain;
 
 	public BlockChainUpdateContext(
-			final AccountAnalyzer accountAnalyzer,
-			final AccountAnalyzer originalAnalyzer,
-			final HashCache transactionHashCache,
-			final HashCache originalTransactionHashCache,
+			final NisCache nisCache,
+			final NisCache originalNisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
@@ -49,18 +45,16 @@ public class BlockChainUpdateContext {
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain) {
 
-		this.accountAnalyzer = accountAnalyzer;
-		this.originalAnalyzer = originalAnalyzer;
-		this.transactionHashCache = transactionHashCache;
-		this.originalTransactionHashCache = originalTransactionHashCache;
-		this.blockScorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
+		this.nisCache = nisCache;
+		this.originalNisCache = originalNisCache;
+		this.blockScorer = new BlockScorer(this.nisCache.getAccountAnalyzer().getPoiFacade());
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 
 		// do not trust peer, take first block from our db and convert it
-		this.parentBlock = BlockMapper.toModel(dbParentBlock, this.accountAnalyzer.getAccountCache());
+		this.parentBlock = BlockMapper.toModel(dbParentBlock, this.nisCache.getAccountAnalyzer().getAccountCache());
 
 		this.peerChain = peerChain;
 		this.ourScore = ourScore;
@@ -114,7 +108,7 @@ public class BlockChainUpdateContext {
 	 * @return score or -1 if chain is invalid
 	 */
 	private boolean validatePeerChain() {
-		return this.services.isPeerChainValid(this.accountAnalyzer, this.transactionHashCache, this.parentBlock, this.peerChain);
+		return this.services.isPeerChainValid(this.nisCache, this.parentBlock, this.peerChain);
 	}
 
 	private BlockChainScore getPeerChainScore() {
@@ -136,19 +130,19 @@ public class BlockChainUpdateContext {
 		// TODO 20141201 J-B: there is one thing i don't like ... can we have a single object that includes both the
 		// accountAnalyzer and transactionHashCache?
 		// and pass that down everywhere ... if we ever have a third cache, i wouldn't want to make all the same changes
-		this.accountAnalyzer.shallowCopyTo(this.originalAnalyzer);
-		this.transactionHashCache.shallowCopyTo(this.originalTransactionHashCache);
+		// TODO 20141204 BR -> J: you are right.
+		this.nisCache.shallowCopyTo(this.originalNisCache);
 
 		if (this.hasOwnChain) {
 			// mind that we're using "new" (replaced) accountAnalyzer
 			final Set<Hash> transactionHashes = this.peerChain.stream()
 					.flatMap(bl -> bl.getTransactions().stream())
-					.map(bl -> HashUtils.calculateHash(bl))
+					.map(HashUtils::calculateHash)
 					.collect(Collectors.toSet());
 			this.addRevertedTransactionsAsUnconfirmed(
 					transactionHashes,
 					this.parentBlock.getHeight().getRaw(),
-					this.originalAnalyzer);
+					this.originalNisCache.getAccountAnalyzer());
 		}
 
 		this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());

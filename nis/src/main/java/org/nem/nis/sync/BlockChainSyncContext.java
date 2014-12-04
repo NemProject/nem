@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.HashCache;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
@@ -12,26 +12,32 @@ import org.nem.nis.service.BlockChainLastBlockLayer;
  * a sync only modify the copy.
  */
 public class BlockChainSyncContext {
-	private final AccountAnalyzer accountAnalyzer;
-	private final HashCache transactionHashCache;
+	private final NisCache nisCache;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final BlockChainScore ourScore;
 
 	public BlockChainSyncContext(
-			final AccountAnalyzer accountAnalyzer,
-			final HashCache transactionHashCache,
+			final NisCache nisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final BlockChainScore ourScore) {
-		this.accountAnalyzer = accountAnalyzer.copy();
-		this.transactionHashCache = transactionHashCache.shallowCopy();
+		this.nisCache = nisCache.copy();
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
 		this.ourScore = ourScore;
+	}
+
+	/**
+	 * Gets the working copy of the NIS cache.
+	 *
+	 * @return The NIS cache.
+	 */
+	public NisCache nisCache() {
+		return this.nisCache;
 	}
 
 	/**
@@ -40,7 +46,7 @@ public class BlockChainSyncContext {
 	 * @return The account analyzer.
 	 */
 	public AccountAnalyzer accountAnalyzer() {
-		return this.accountAnalyzer;
+		return this.nisCache.getAccountAnalyzer();
 	}
 
 	/**
@@ -49,7 +55,7 @@ public class BlockChainSyncContext {
 	 * @return The transaction hash cache.
 	 */
 	public HashCache transactionHashCache() {
-		return this.transactionHashCache;
+		return this.nisCache.getTransactionHashCache();
 	}
 
 	/**
@@ -60,7 +66,7 @@ public class BlockChainSyncContext {
 	 * @return score for iterated blocks.
 	 */
 	public BlockChainScore undoTxesAndGetScore(final BlockHeight commonBlockHeight) {
-		return this.services.undoAndGetScore(this.accountAnalyzer, this.transactionHashCache, this.createLocalBlockLookup(), commonBlockHeight);
+		return this.services.undoAndGetScore(this.nisCache, this.createLocalBlockLookup(), commonBlockHeight);
 	}
 
 	/**
@@ -71,7 +77,7 @@ public class BlockChainSyncContext {
 	public BlockLookup createLocalBlockLookup() {
 		return new LocalBlockLookupAdapter(
 				this.blockDao,
-				this.accountAnalyzer.getAccountCache(),
+				this.nisCache.getAccountAnalyzer().getAccountCache(),
 				this.blockChainLastBlockLayer.getLastDbBlock(),
 				this.ourScore,
 				BlockChainConstants.BLOCKS_LIMIT);

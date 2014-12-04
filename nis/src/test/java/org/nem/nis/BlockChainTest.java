@@ -122,6 +122,7 @@ public class BlockChainTest {
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), poiFacade);
+		final HashCache transactionHashCache = new HashCache();
 		final List<Account> accounts = this.prepareSigners(accountAnalyzer);
 		for (final Account account : accounts) {
 			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
@@ -146,7 +147,6 @@ public class BlockChainTest {
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-		final HashCache transactionHashCache = new HashCache();
 		final BlockChainServices services =
 				new BlockChainServices(
 						mockBlockDao,
@@ -158,8 +158,7 @@ public class BlockChainTest {
 				poiFacade,
 				transactionHashCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				accountAnalyzer,
-				transactionHashCache,
+				new NisCache(accountAnalyzer, transactionHashCache),
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
@@ -246,8 +245,7 @@ public class BlockChainTest {
 				poiFacade,
 				transactionHashCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				accountAnalyzer,
-				transactionHashCache,
+				new NisCache(accountAnalyzer, transactionHashCache),
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,

@@ -2,7 +2,6 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockChainScore;
-import org.nem.nis.AccountAnalyzer;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -13,22 +12,19 @@ import java.util.Collection;
  * Helper class for creating contexts used during block synchronization.
  */
 public class BlockChainContextFactory {
-	private final AccountAnalyzer accountAnalyzer;
-	private final HashCache transactionHashCache;
+	private final NisCache nisCache;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 
 	public BlockChainContextFactory(
-			final AccountAnalyzer accountAnalyzer,
-			final HashCache transactionHashCache,
+			final NisCache nisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final UnconfirmedTransactions unconfirmedTransactions) {
-		this.accountAnalyzer = accountAnalyzer;
-		this.transactionHashCache = transactionHashCache;
+		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
@@ -42,8 +38,7 @@ public class BlockChainContextFactory {
 	 */
 	public BlockChainSyncContext createSyncContext(final BlockChainScore localScore) {
 		return new BlockChainSyncContext(
-				this.accountAnalyzer,
-				this.transactionHashCache,
+				this.nisCache,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.services,
@@ -67,10 +62,8 @@ public class BlockChainContextFactory {
 			final BlockChainScore localScore,
 			final boolean hasOwnChain) {
 		return new BlockChainUpdateContext(
-				syncContext.accountAnalyzer(),
-				this.accountAnalyzer,
-				syncContext.transactionHashCache(),
-				this.transactionHashCache,
+				syncContext.nisCache(),
+				this.nisCache,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.services,
