@@ -80,13 +80,13 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void properTransactionWithMultipleCosignersValidates() {
-		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.SUCCESS, (ctx,t) -> ctx.addSignature(ctx.dummy, ((MultisigTransaction)t).getOtherTransaction()));
+		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.SUCCESS, (ctx,t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction) t));
 	}
 
 	private void assertProperTransactionMultiple(final BlockHeight blockHeight, final ValidationResult validationResult, final BiConsumer<TestContext, Transaction> addSignature) {
 		// Arrange:
 		final TestContext context = new TestContext(true);
-		final Transaction transaction = context.createTransaction();
+		final MultisigTransaction transaction = context.createTransaction();
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 		context.makeCosignatory(context.dummy, context.multisig, blockHeight);
 
@@ -106,7 +106,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final Transaction transaction = context.createTransaction();
 		context.makeCosignatory(context.signer, context.multisig, FORK_HEIGHT);
 		context.makeCosignatory(context.dummy, context.multisig, FORK_HEIGHT);
-		context.addSignature(context.dummy, ((MultisigTransaction)transaction).getOtherTransaction());
+		context.addSignature(context.dummy, (MultisigTransaction)transaction);
 
 		final Account thirdAccount = Utils.generateRandomAccount();
 		context.addPoiState(thirdAccount);
@@ -127,7 +127,6 @@ public class MultisigSignaturesPresentValidatorTest {
 		private final Account multisig = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final Account dummy = Utils.generateRandomAccount();
-		private final List<Transaction> otherTransactions = new ArrayList<>();
 
 		private TestContext(final boolean blockCreation) {
 			this.validator = new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation);
@@ -136,7 +135,7 @@ public class MultisigSignaturesPresentValidatorTest {
 			this.addPoiState(this.dummy);
 		}
 
-		public Transaction createTransaction() {
+		public MultisigTransaction createTransaction() {
 			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(123), null);
 			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, signer, otherTransaction);
 			transaction.sign();
@@ -156,12 +155,9 @@ public class MultisigSignaturesPresentValidatorTest {
 			this.poiFacade.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
 		}
 
-		private Collection<Transaction> returnTransactions() {
-			return otherTransactions;
-		}
 
-		private void addSignature(final Account signatureSigner, final Transaction multisigTransaction) {
-			this.otherTransactions.add(new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner, HashUtils.calculateHash(multisigTransaction), null));
+		private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
+			multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner, HashUtils.calculateHash(multisigTransaction.getOtherTransaction()), null));
 		}
 	}
 

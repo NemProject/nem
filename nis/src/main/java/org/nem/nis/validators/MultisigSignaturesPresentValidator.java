@@ -56,6 +56,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 
 		final Hash transactionHash = transaction.getOtherTransactionHash();
 		// this loop could be done using reduce, but I'm leaving it like this for readability
+		// TODO: this probably should be done differently, as right now it allows more MultisigSignatures, than there are actual cosigners
 		for (final Address cosignerAddress : multisigAddress.getMultisigLinks().getCosignatories()) {
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
