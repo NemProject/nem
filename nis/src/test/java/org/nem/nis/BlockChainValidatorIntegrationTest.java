@@ -249,6 +249,58 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
 	}
 
+	//region multisig validation
+
+	// TODO 20141203 J-G: need to set up multisig links correctly in these tests :/
+
+	@Test
+	public void chainIsValidIfInnerMultisigTransactionIsValid() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_MULTISIG_FORK + 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(createSignedMultisigTransaction(createValidSignedTransaction()));
+		block.addTransaction(createValidSignedTransaction());
+		block.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void chainIsInvalidIfInnerMultisigTransactionIsInvalid() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_MULTISIG_FORK + 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(createSignedMultisigTransaction(createInvalidSignedTransaction()));
+		block.addTransaction(createValidSignedTransaction());
+		block.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	private static Transaction createSignedMultisigTransaction(final Transaction transaction) {
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(
+				transaction.getTimeStamp(),
+				Utils.generateRandomAccount(Amount.fromNem(1000)),
+				createInvalidSignedTransaction());
+		multisigTransaction.setDeadline(transaction.getDeadline());
+		multisigTransaction.sign();
+		return multisigTransaction;
+	}
+
+	//endregion
+
 	//region helper functions
 
 	//region transactions / blocks
