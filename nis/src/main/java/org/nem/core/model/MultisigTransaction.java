@@ -70,11 +70,6 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	 * @param transaction The multisig signature transaction.
 	 */
 	public void addSignature(final MultisigSignatureTransaction transaction) {
-		// TODO: add validation!
-		//if (this.otherTransaction.verify(transaction.getSigner()) {
-		//	throw new IllegalArgumentException("signature is not valid");
-		//}
-
 		if (!this.getOtherTransactionHash().equals(transaction.getOtherTransactionHash())) {
 			throw new IllegalArgumentException("trying to add a signature for another transaction to a multisig transaction");
 		}
@@ -90,7 +85,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	 */
 	public List<Account> getSigners() {
 		final List<Account> signers = new ArrayList<>();
-		signers.add(this.getSigner());
+		signers.add(this.getSigner()); // TODO this is probably wrong!
 		signers.addAll(this.signatureTransactions.stream().map(t -> t.getSigner()).collect(Collectors.toList()));
 		return signers;
 	}
@@ -113,7 +108,20 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		serializer.writeObject("other_trans", this.getOtherTransaction().asNonVerifiable());
+		serializer.writeObject("other_trans", this.otherTransaction.asNonVerifiable());
 		// TODO: need to add some other fields here (not complete)
+	}
+
+	@Override
+	public boolean verify() {
+		if (!super.verify()) {
+			return false;
+		}
+
+		final byte[] innerTransactionBytes = BinarySerializer.serializeToBytes(this.otherTransaction.asNonVerifiable());
+		return this.signatureTransactions.stream().allMatch(signatureTransaction -> {
+			final Signer signer = new Signer(signatureTransaction.getSigner().getKeyPair());
+			return signer.verify(innerTransactionBytes, signatureTransaction.getOtherTransactionSignature());
+		});
 	}
 }

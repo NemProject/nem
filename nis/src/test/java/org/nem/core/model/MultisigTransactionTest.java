@@ -58,6 +58,26 @@ public class MultisigTransactionTest {
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
 	}
 
+	// TODO test is failing now, not sure if it makes sense ... need to talk with G
+	@Test
+	public void canRoundtripTransactionWithSignatures() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final Transaction innerTransaction = createDefaultTransferTransaction();
+		final MultisigTransaction originalTransaction = new MultisigTransaction(
+				new TimeInstant(123),
+				account,
+				innerTransaction);
+		originalTransaction.addSignature(createSignatureTransaction(HashUtils.calculateHash(innerTransaction)));
+
+		// Act:
+		final MultisigTransaction transaction = createRoundTrippedTransaction(originalTransaction);
+
+		// Assert:
+		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getSigners(), IsEquivalent.equivalentTo(originalTransaction.getSigners()));
+	}
+
 	private static TransferTransaction createDefaultTransferTransaction() {
 		return new TransferTransaction(
 				new TimeInstant(111),
@@ -182,6 +202,103 @@ public class MultisigTransactionTest {
 	}
 
 	//endregion
+
+	//region verify
+
+	@Test
+	public void canVerifyMultisigTransactionWithThreeCosignerSignatures() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
+		transferTransaction.sign();
+
+		final Account signer1 = Utils.generateRandomAccount();
+		final Account signer2 = Utils.generateRandomAccount();
+		final Account signer3 = Utils.generateRandomAccount();
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(
+				new TimeInstant(123),
+				sender,
+				transferTransaction);
+
+		multisigTransaction.sign();
+		multisigTransaction.addSignature(createSignatureTransaction(signer1, transferTransaction));
+		multisigTransaction.addSignature(createSignatureTransaction(signer2, transferTransaction));
+		multisigTransaction.addSignature(createSignatureTransaction(signer3, transferTransaction));
+
+		// Act:
+		final boolean isVerified = multisigTransaction.verify();
+
+		// Assert:
+		Assert.assertThat(isVerified, IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void cannotVerifyMultisigTransactionWithAtLeastOneIncorrectCosignerSignature() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
+		transferTransaction.sign();
+
+		final Account signer1 = Utils.generateRandomAccount();
+		final Account signer3 = Utils.generateRandomAccount();
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(
+				new TimeInstant(123),
+				sender,
+				transferTransaction);
+
+		multisigTransaction.sign();
+		multisigTransaction.addSignature(createSignatureTransaction(signer1, transferTransaction));
+		multisigTransaction.addSignature(createSignatureTransaction(HashUtils.calculateHash(transferTransaction)));
+		multisigTransaction.addSignature(createSignatureTransaction(signer3, transferTransaction));
+
+		// Act:
+		final boolean isVerified = multisigTransaction.verify();
+
+		// Assert:
+		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+	}
+
+	// TODO 20141203 J-G: i'm not sure i follow how the multisig transaction gets signed? is there a separate multisig account?
+	@Test
+	public void canVerifyMultisigTransactionIfMultisigSignatureIsUnverifiable() {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
+		transferTransaction.sign();
+
+		final Account signer1 = Utils.generateRandomAccount();
+		final Account signer2 = Utils.generateRandomAccount();
+		final Account signer3 = Utils.generateRandomAccount();
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(
+				new TimeInstant(123),
+				sender,
+				transferTransaction);
+
+		multisigTransaction.setSignature(Utils.generateRandomSignature());
+		multisigTransaction.addSignature(createSignatureTransaction(signer1, transferTransaction));
+		multisigTransaction.addSignature(createSignatureTransaction(signer2, transferTransaction));
+		multisigTransaction.addSignature(createSignatureTransaction(signer3, transferTransaction));
+
+		// Act:
+		final boolean isVerified = multisigTransaction.verify();
+
+		// Assert:
+		Assert.assertThat(isVerified, IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	private static MultisigSignatureTransaction createSignatureTransaction(final Account account, final Transaction transaction) {
+		final Signer signer = new Signer(account.getKeyPair());
+		return new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				account,
+				HashUtils.calculateHash(transaction.asNonVerifiable()),
+				signer.sign(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
+	}
 
 	private static MultisigSignatureTransaction createSignatureTransaction(final Hash hash) {
 		return new MultisigSignatureTransaction(
