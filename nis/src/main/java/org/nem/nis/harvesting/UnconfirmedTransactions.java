@@ -150,6 +150,10 @@ public class UnconfirmedTransactions {
 			return ValidationResult.NEUTRAL;
 		}
 
+		if (!transaction.verify()) {
+			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
+		}
+
 		try {
 			return this.addInternal(transaction, transactionHash, execute);
 		} finally {
