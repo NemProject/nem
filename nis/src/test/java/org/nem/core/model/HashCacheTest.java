@@ -6,10 +6,9 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.NisUtils;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 public class HashCacheTest {
 
@@ -341,15 +340,10 @@ public class HashCacheTest {
 
 		// Assert:
 		// TODO 20141201 J-J: should add equality to hashmetadatapair to fix
-		//Assert.assertThat(
-		//		cache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
-		//		IsEquivalent.equivalentTo(pairs));
+		// TODO 20141204 BR -> J: done.
 		Assert.assertThat(
-				cache.stream().map(e -> e.getKey()).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(pairs.stream().map(p -> p.getHash()).collect(Collectors.toList())));
-		Assert.assertThat(
-				cache.stream().map(e -> e.getValue()).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(pairs.stream().map(p -> p.getMetaData()).collect(Collectors.toList())));
+				cache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(pairs));
 	}
 
 	// endregion

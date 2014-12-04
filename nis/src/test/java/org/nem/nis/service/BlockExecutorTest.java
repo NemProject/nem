@@ -326,8 +326,6 @@ public class BlockExecutorTest {
 		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
 
 		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
-		// TODO 20141130 BR: should we rely on the specific index?
-		// TODO 20141201 we probably shouldn't, but it was done to simplify the validation
 		NotificationUtils.assertHarvestRewardNotification(notificationCaptor.getAllValues().get(0), context.realAccount, Amount.fromNem(5));
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
 		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(3), context.transactionSigner, Amount.fromNem(5));

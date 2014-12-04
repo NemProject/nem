@@ -38,4 +38,20 @@ public class HashMetaData {
 	public TimeInstant getTimeStamp() {
 		return this.timeStamp;
 	}
+
+	@Override
+	public int hashCode() {
+		return this.height.hashCode() ^ this.timeStamp.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof HashMetaData)) {
+			return false;
+		}
+
+		final HashMetaData rhs = (HashMetaData)obj;
+		return this.height.equals(rhs.height)
+				&& this.timeStamp.equals(rhs.timeStamp);
+	}
 }

@@ -77,7 +77,9 @@ public class PruningObserverTest {
 	@Test
 	public void pruneIsCalledWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 		// Assert:
-		// TODO 20131201 J-B: why 1M? we should add a test where the transaction pruning value changes too
+		// TODO 20141201 J-B: why 1M? we should add a test where the transaction pruning value changes too
+		// TODO 20141204 BR -> J: 1M is an arbitrary value. Block generation is a random process, there will not be a fixed time at a fixed height.
+		// TODO                   Not sure what kind of additional you had in mind.
 		assertPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 1_000_000, 0, 0, -1);
 		assertPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1_000_000, 1, 1, 1_000_000 - TRANSACTION_HASH_CACHE_HISTORY);
 

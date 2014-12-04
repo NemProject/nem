@@ -7,7 +7,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
-import org.nem.nis.secret.AccountLink;
+import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -262,5 +262,14 @@ v	 * @param height The height.
 				similarityStrategy,
 				DEFAULT_POI_OPTIONS.getMuClusteringValue(),
 				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
+	}
+
+	/**
+	 * Creates a block notification context.
+	 *
+	 * @return The block notification context.
+	 */
+	public static BlockNotificationContext createBlockNotificationContext() {
+		return new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute);
 	}
 }

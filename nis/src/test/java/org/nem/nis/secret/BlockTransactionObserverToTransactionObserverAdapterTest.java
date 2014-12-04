@@ -3,8 +3,7 @@ package org.nem.nis.secret;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.NisUtils;
 
 public class BlockTransactionObserverToTransactionObserverAdapterTest {
 
@@ -13,7 +12,8 @@ public class BlockTransactionObserverToTransactionObserverAdapterTest {
 		// Arrange:
 		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
 		// TODO 20141201 J-B: fine now but you might want to consider adding a helper function for creating the context (e.g. NisUtils.createNotificationContext());
-		final BlockNotificationContext context = new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute);
+		// TODO 20141204 BR -> J: done, though I am not sure why we need that.
+		final BlockNotificationContext context = NisUtils.createBlockNotificationContext();
 		final TransactionObserver adapter = new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
 		final Notification notification = new Notification(NotificationType.BalanceCredit) {
 		};

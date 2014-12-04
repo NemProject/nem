@@ -37,4 +37,20 @@ public class HashMetaDataPair {
 	public HashMetaData getMetaData() {
 		return this.metaData;
 	}
+
+	@Override
+	public int hashCode() {
+		return this.hash.hashCode() ^ this.metaData.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof HashMetaDataPair)) {
+			return false;
+		}
+
+		final HashMetaDataPair rhs = (HashMetaDataPair)obj;
+		return this.hash.equals(rhs.hash)
+				&& this.metaData.equals(rhs.metaData);
+	}
 }

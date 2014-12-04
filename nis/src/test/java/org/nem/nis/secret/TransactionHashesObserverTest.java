@@ -25,10 +25,7 @@ public class TransactionHashesObserverTest {
 		// Assert:
 		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
 		// TODO 20141201 J-J: should add equality to hashmetadatapair to simplify
-		context.pairs.stream().forEach(p -> {
-			Assert.assertThat(context.transactionHashCache.get(p.getHash()).getHeight(), IsEqual.equalTo(p.getMetaData().getHeight()));
-			Assert.assertThat(context.transactionHashCache.get(p.getHash()).getTimeStamp(), IsEqual.equalTo(p.getMetaData().getTimeStamp()));
-		});
+		context.pairs.stream().forEach(p -> Assert.assertThat(context.transactionHashCache.get(p.getHash()), IsEqual.equalTo(p.getMetaData())));
 	}
 
 	//endregion
