@@ -251,21 +251,23 @@ public class BlockChainValidatorIntegrationTest {
 
 	//region multisig validation
 
-	// TODO 20141203 J-G: need to set up multisig links correctly in these tests :/
-
 	@Test
 	public void chainIsValidIfInnerMultisigTransactionIsValid() {
 		// Arrange:
-		final BlockChainValidator validator = createValidator();
+		final BlockChainValidatorFactory validatorFactory = new BlockChainValidatorFactory();
+		final BlockChainValidator validator = validatorFactory.create();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_MULTISIG_FORK + 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
 		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(createSignedMultisigTransaction(createValidSignedTransaction()));
+		final MultisigTransaction transaction = createSignedMultisigTransaction(createValidSignedTransaction());
+		block.addTransaction(transaction);
 		block.addTransaction(createValidSignedTransaction());
 		block.sign();
+
+		makeCosignatory(validatorFactory.poiFacade, transaction.getSigner(), transaction.getOtherTransaction().getSigner(), parentBlock.getHeight());
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
@@ -274,29 +276,46 @@ public class BlockChainValidatorIntegrationTest {
 	@Test
 	public void chainIsInvalidIfInnerMultisigTransactionIsInvalid() {
 		// Arrange:
-		final BlockChainValidator validator = createValidator();
+		final BlockChainValidatorFactory validatorFactory = new BlockChainValidatorFactory();
+		final BlockChainValidator validator = validatorFactory.create();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_MULTISIG_FORK + 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
 		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(createSignedMultisigTransaction(createInvalidSignedTransaction()));
+		final MultisigTransaction transaction = createSignedMultisigTransaction(createInvalidSignedTransaction());
+		block.addTransaction(transaction);
 		block.addTransaction(createValidSignedTransaction());
 		block.sign();
+
+		makeCosignatory(validatorFactory.poiFacade, transaction.getSigner(), transaction.getOtherTransaction().getSigner(), parentBlock.getHeight());
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
 	}
 
-	private static Transaction createSignedMultisigTransaction(final Transaction transaction) {
+	private static MultisigTransaction createSignedMultisigTransaction(final Transaction transaction) {
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(
 				transaction.getTimeStamp(),
 				Utils.generateRandomAccount(Amount.fromNem(1000)),
 				createInvalidSignedTransaction());
-		multisigTransaction.setDeadline(transaction.getDeadline());
+
+		multisigTransaction.setDeadline(transaction.getTimeStamp().addHours(1));
 		multisigTransaction.sign();
 		return multisigTransaction;
+	}
+
+	public static void makeCosignatory(final PoiFacade poiFacade, final Account signer, final Account multisig, final BlockHeight height) {
+		final Address signerAddress = signer.getAddress();
+		final PoiAccountState signerState = new PoiAccountState(signerAddress);
+		Mockito.when(poiFacade.findStateByAddress(signerAddress)).thenReturn(signerState);
+		final Address multisigAddress = multisig.getAddress();
+		final PoiAccountState multisigState = new PoiAccountState(multisigAddress);
+		Mockito.when(poiFacade.findStateByAddress(multisigAddress)).thenReturn(multisigState);
+
+		poiFacade.findStateByAddress(signerAddress).getMultisigLinks().addMultisig(multisigAddress, height);
+		poiFacade.findStateByAddress(multisigAddress).getMultisigLinks().addCosignatory(signerAddress, height);
 	}
 
 	//endregion
