@@ -1,6 +1,10 @@
 package org.nem.nis.dbmodel;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * TODO 20141129 G - J, BR : @J I was (again) thinking for quite a long, to map
@@ -35,6 +39,10 @@ public class MultisigTransaction  extends AbstractTransfer<MultisigTransaction> 
 	@JoinColumn(name = "multisigSignerModificationId")
 	private MultisigSignerModification multisigSignerModification;
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigTransaction", orphanRemoval = true)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Set<MultisigSignature> multisigSignatures;
+
 	public MultisigTransaction() {
 		super(b -> b.getBlockMultisigTransactions());
 	}
@@ -62,5 +70,13 @@ public class MultisigTransaction  extends AbstractTransfer<MultisigTransaction> 
 
 	public void setMultisigSignerModification(final MultisigSignerModification multisigSignerModification) {
 		this.multisigSignerModification = multisigSignerModification;
+	}
+
+	public Set<MultisigSignature> getMultisigSignatures() {
+		return multisigSignatures;
+	}
+
+	public void setMultisigSignatures(final Set<MultisigSignature> multisigSignatures) {
+		this.multisigSignatures = multisigSignatures;
 	}
 }
