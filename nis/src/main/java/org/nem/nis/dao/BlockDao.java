@@ -25,7 +25,7 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	 * @param limit maximal number of elements to return.
 	 * @return list of block's difficulties.
 	 */
-	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, int limit);
+	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, Integer limit);
 
 	/**
 	 * Retrieves list of at most limit timestamps for blocks starting at given height.
@@ -34,7 +34,7 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	 * @param limit maximal number of elements to return.
 	 * @return list of block's timestamps.
 	 */
-	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, int limit);
+	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, Integer limit);
 
 	/**
 	 * Deletes blocks after given block.

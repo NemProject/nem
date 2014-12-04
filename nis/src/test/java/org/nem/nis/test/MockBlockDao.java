@@ -102,10 +102,10 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Block findById(final long id) {
+	public Block findById(final Long id) {
 		++this.numFindByIdCalls;
 		this.lastFindByIdId = id;
-		return this.find(block -> block.getId() == id);
+		return this.find(block -> block.getId().equals(id));
 	}
 
 	@Override
@@ -133,7 +133,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public HashChain getHashesFrom(final BlockHeight height, final int limit) {
+	public HashChain getHashesFrom(final BlockHeight height, final Integer limit) {
 		++this.numGetHashesFromCalls;
 		this.lastGetHashesFromHeight = height;
 		this.lastGetHashesFromLimit = limit;
@@ -141,17 +141,17 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, final Integer limit) {
 		return null;
 	}
 
 	@Override
-	public List<Block> getBlocksAfter(final BlockHeight height, final int limit) {
+	public List<Block> getBlocksAfter(final BlockHeight height, final Integer limit) {
 		return null;
 	}
 
 	@Override
-	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
+	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final Integer limit) {
 		return this.blocks.stream()
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0)
@@ -160,7 +160,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
+	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final Integer limit) {
 		return this.blocks.stream()
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw()) >= 0)
 				.filter(bl -> bl.getHeight().compareTo(height.getRaw() + limit) < 0)

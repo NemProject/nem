@@ -69,7 +69,7 @@ public class TransferDaoImpl implements TransferDao {
 	// NOTE: this query will also ask for accounts of senders and recipients!
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<TransferBlockPair> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
+	public Collection<TransferBlockPair> getTransactionsForAccount(final Account address, final Integer timeStamp, final Integer limit) {
 		// TODO: have no idea how to do it using Criteria...
 		final Query query = this.getCurrentSession()
 				.createQuery("select t, t.block from Transfer t " +
@@ -98,7 +98,7 @@ public class TransferDaoImpl implements TransferDao {
 			final Hash hash,
 			final BlockHeight height,
 			final TransferType transferType,
-			final int limit) {
+			final Integer limit) {
 		final Long accountId = this.getAccountId(address);
 		if (hash == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
@@ -142,7 +142,7 @@ public class TransferDaoImpl implements TransferDao {
 			final Account address,
 			final Long id,
 			final TransferType transferType,
-			final int limit) {
+			final Integer limit) {
 		final Long accountId = this.getAccountId(address);
 		if (id == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
@@ -268,7 +268,7 @@ public class TransferDaoImpl implements TransferDao {
 		return pairs;
 	}
 
-	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
+	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final Integer limit) {
 		final List<TransferBlockPair> list = pairs.stream()
 				.sorted(this::comparePair)
 				.collect(Collectors.toList());

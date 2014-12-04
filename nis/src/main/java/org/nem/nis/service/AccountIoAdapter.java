@@ -74,6 +74,7 @@ public class AccountIoAdapter implements AccountIo {
 	}
 
 	// TODO 20141201 J-B i guess a test for the new function?
+	// TODO 20141204 BR -> J: added delegation tests. Other tests should be in transfer dao test class.
 
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
@@ -82,20 +83,13 @@ public class AccountIoAdapter implements AccountIo {
 			final BlockHeight height,
 			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingHash(account,
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingHash(
+				account,
 				transactionHash,
 				height,
 				transfersType,
 				DEFAULT_LIMIT);
-
-		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
-		pairs.stream()
-				.map(pair -> new TransactionMetaDataPair(
-						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
-						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
-				))
-				.forEach(transactionList::add);
-		return transactionList;
+		return toSerializableTransactionMetaDataPairList(pairs);
 	}
 
 	@Override
@@ -105,8 +99,10 @@ public class AccountIoAdapter implements AccountIo {
 			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
 		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
+		return toSerializableTransactionMetaDataPairList(pairs);
+	}
 
-		// TODO 20141201 J-B: this same mapping is happening in the preceding function, consider refactoring
+	private SerializableList<TransactionMetaDataPair> toSerializableTransactionMetaDataPairList(final Collection<TransferBlockPair> pairs) {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		pairs.stream()
 				.map(pair -> new TransactionMetaDataPair(

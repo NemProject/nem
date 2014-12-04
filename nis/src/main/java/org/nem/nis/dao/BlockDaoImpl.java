@@ -60,7 +60,7 @@ public class BlockDaoImpl implements BlockDao {
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
-	public Block findById(final long id) {
+	public Block findById(final Long id) {
 		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("id", id));
 		return this.executeSingleQuery(criteria);
@@ -100,14 +100,14 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public HashChain getHashesFrom(final BlockHeight height, final int limit) {
+	public HashChain getHashesFrom(final BlockHeight height, final Integer limit) {
 		final List<byte[]> blockList = this.prepareCriteriaGetFor("blockHash", height, limit);
 		return HashChain.fromRawHashes(blockList);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final int limit) {
+	public List<BlockDifficulty> getDifficultiesFrom(final BlockHeight height, final Integer limit) {
 		final List<Long> rawDifficulties = this.prepareCriteriaGetFor("difficulty", height, limit);
 		final List<BlockDifficulty> result = new ArrayList<>(rawDifficulties.size());
 		for (final Long elem : rawDifficulties) {
@@ -119,14 +119,14 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
+	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final Integer limit) {
 		final List<Integer> rawTimeStamps = this.prepareCriteriaGetFor("timeStamp", height, limit);
-		return rawTimeStamps.stream().map(obj -> new TimeInstant(obj)).collect(Collectors.toList());
+		return rawTimeStamps.stream().map(TimeInstant::new).collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, final Integer limit) {
 		final long height = null == hash ? Long.MAX_VALUE : this.findByHash(hash).getHeight();
 		return this.getLatestBlocksForAccount(account, height, limit);
 	}
@@ -153,7 +153,7 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	public Collection<Block> getBlocksAfter(final BlockHeight height, final int limit) {
+	public Collection<Block> getBlocksAfter(final BlockHeight height, final Integer limit) {
 		// whatever it takes : DO NOT ADD setMaxResults here!
 		final long blockHeight = height.getRaw();
 		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
