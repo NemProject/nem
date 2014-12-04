@@ -134,6 +134,30 @@ public class BlockMapperTest {
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 	}
+
+	@Test
+	public void blockModelWithMultisigTransactionWithSignaturesCanBeMappedToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMultisigTransactionsWithSigners();
+
+		// Act:
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+
+		// Assert:
+		context.assertDbModel(dbModel, 1 * (100L + 1));
+		// note: we expect both multisig txes and block transfers
+		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(1));
+
+		final org.nem.nis.dbmodel.MultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(0);
+		final Transaction transaction = context.getModel().getTransactions().get(0);
+		Assert.assertThat(dbMultisig.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+
+		Assert.assertThat(dbMultisig.getMultisigSignatures().size(), IsEqual.equalTo(2));
+	}
 	//endregion
 
 	// roundtrip test of block with transaction
@@ -267,6 +291,24 @@ public class BlockMapperTest {
 			Assert.assertThat(transactionHash, IsEqual.equalTo(originalTransactionHash));
 		}
 	}
+
+	@Test
+	public void blockModelWithMultisigTransactionWithSignaturesCanBeRoundTripped() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMultisigTransactionsWithSigners();
+		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+
+		// Act:
+		final Block model = context.toModel(dbModel);
+
+		// Assert:
+		context.assertModel(model);
+		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(1));
+		final MultisigTransaction transaction = (MultisigTransaction) model.getTransactions().get(0);
+
+		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(2));
+	}
 	//endregion
 
 	//region complex tests
@@ -394,7 +436,7 @@ public class BlockMapperTest {
 		final Block model = context.toModel(dbModel);
 
 		// Assert:
-		context.assertDbModel(dbModel, (100L +1) * 2 + 2);
+		context.assertDbModel(dbModel, (100L + 1) * 2 + 2);
 
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
 		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
@@ -410,6 +452,17 @@ public class BlockMapperTest {
 			final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(2 * i + 1);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+		}
+
+		// WARNING: if test fails here it means you've changed order of TXes inside the dbModel
+		for (int i = 0; i < 2; ++i) {
+			final org.nem.nis.dbmodel.MultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(i);
+			// transfer that "belongs" to multisig
+			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2*i + 1);
+
+			// YES, they should be equal
+			Assert.assertThat(dbMultisig.getBlkIndex(), IsEqual.equalTo(2*i + 1));
+			Assert.assertThat(dbTransfer.getBlkIndex(), IsEqual.equalTo(2*i + 1));
 		}
 
 		for (int i = 0; i < 4; ++i) {
@@ -578,6 +631,30 @@ public class BlockMapperTest {
 
 			this.model.addTransaction(new MultisigTransaction(new TimeInstant(100), this.account3, transfer1));
 			this.model.addTransaction(new MultisigTransaction(new TimeInstant(200), this.account3, transfer2));
+
+			for (final Transaction transaction : this.model.getTransactions()) {
+				transaction.sign();
+			}
+
+			this.signModel();
+		}
+
+		public void addMultisigTransactionsWithSigners() {
+			final Transaction transfer1 = new TransferTransaction(new TimeInstant(100), this.account1, this.account2, new Amount(7), null);
+			final Hash transferHash = HashUtils.calculateHash(transfer1);
+
+			final MultisigTransaction multisigTransaction = new MultisigTransaction(new TimeInstant(100), this.account3, transfer1);
+			this.model.addTransaction(multisigTransaction);
+
+			final Signature signature1 = new Signature(Utils.generateRandomBytes(64));
+			final MultisigSignatureTransaction multisigSignature1 = new MultisigSignatureTransaction(new TimeInstant(123), this.account1, transferHash, signature1);
+			multisigSignature1.sign();
+			multisigTransaction.addSignature(multisigSignature1);
+
+			final Signature signature2 = new Signature(Utils.generateRandomBytes(64));
+			final MultisigSignatureTransaction multisigSignature2 = new MultisigSignatureTransaction(new TimeInstant(132), this.account2, transferHash, signature2);
+			multisigSignature2.sign();
+			multisigTransaction.addSignature(multisigSignature2);
 
 			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();
