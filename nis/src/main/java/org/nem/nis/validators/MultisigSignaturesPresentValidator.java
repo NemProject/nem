@@ -59,8 +59,6 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
 			}
-			// TODO 20131201 G-J: do we want cosignatories to sign "otherTransaction" (inner) or multisigTransaction?
-			// TODO 20141201 J-G: i think they should be signing the "otherTransaction"
 			boolean hasCosigner = this.transactionsSupplier.get().stream()
 					.filter(t -> TransactionTypes.MULTISIG_SIGNATURE == t.getType())
 					.anyMatch(

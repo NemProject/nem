@@ -32,22 +32,29 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 		return this.validate((MultisigSignatureTransaction)transaction, context);
 	}
 
-	private ValidationResult validate(final MultisigSignatureTransaction transaction, final ValidationContext context) {
-		final PoiAccountState cosignerState = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress());
+	private ValidationResult validate(final MultisigSignatureTransaction signatureTransaction, final ValidationContext context) {
+		final PoiAccountState cosignerState = this.poiFacade.findStateByAddress(signatureTransaction.getSigner().getAddress());
 
 		// iterate over "waiting"/current transactions, if there's no proper MultisigTransaction, validation fails
-		final List<Transaction> foo = this.transactionsSupplier.get().stream()
-				.filter(t -> TransactionTypes.MULTISIG == t.getType())
-				.collect(Collectors.toList());
-		boolean hasMatchingMultisigTransaction = this.transactionsSupplier.get().stream()
-				.filter(t -> TransactionTypes.MULTISIG == t.getType())
-				.anyMatch(
-						t -> ((MultisigTransaction) t).getOtherTransactionHash().equals(transaction.getOtherTransactionHash()) &&
-								cosignerState.getMultisigLinks().isCosignatoryOf(((MultisigTransaction)t).getOtherTransaction().getSigner().getAddress()) &&
-								// don't let the MultisigTransaction issuer to create Signature too
-								! transaction.getSigner().equals(t.getSigner())
-				);
+		for (final Transaction parentTransaction : this.transactionsSupplier.get()) {
+			if (TransactionTypes.MULTISIG != parentTransaction.getType()) {
+				continue;
+			}
 
-		return hasMatchingMultisigTransaction ? ValidationResult.SUCCESS : ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG;
+			final MultisigTransaction multisigTransaction = (MultisigTransaction)parentTransaction;
+			if (signatureTransaction.getSigner().equals(multisigTransaction.getSigner())) {
+				continue;
+			}
+
+			if (! multisigTransaction.getOtherTransactionHash().equals(signatureTransaction.getOtherTransactionHash())) {
+				return ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG;
+			}
+
+			if (cosignerState.getMultisigLinks().isCosignatoryOf(multisigTransaction.getOtherTransaction().getSigner().getAddress())) {
+				return ValidationResult.SUCCESS;
+			}
+		}
+
+		return ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG;
 	}
 }
