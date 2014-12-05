@@ -28,7 +28,7 @@ public class HashCache {
 	 */
 	public HashCache(final int initialCapacity, final int retentionTime) {
 		this.hashMap = new ConcurrentHashMap<>(initialCapacity);
-		this.retentionTime = retentionTime;
+		this.retentionTime = (-1 != retentionTime && 36 > retentionTime)? 36 : retentionTime;
 	}
 
 	/**

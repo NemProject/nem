@@ -26,6 +26,12 @@ public class HashCacheTest {
 		Assert.assertThat(new HashCache().getRetentionTime(), IsEqual.equalTo(36));
 	}
 
+	@Test
+	public void hashCacheUsesMinimumRetentionTime() {
+		// Assert:
+		Assert.assertThat(new HashCache(50, 35).getRetentionTime(), IsEqual.equalTo(36));
+	}
+
 	// endregion
 
 	// region size
