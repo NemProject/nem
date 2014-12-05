@@ -158,7 +158,10 @@ public class TransferDaoImpl implements TransferDao {
 				.setParameter("id", id);
 		final List<TransferBlockPair> tempList = executeQuery(preQuery);
 		if (tempList.size() < 1) {
-			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), id.toString());
+			throw new MissingResourceException(
+					String.format("transaction not found in the db (%s, %s)", Hash.class.toString(), id.toString()),
+					Hash.class.toString(),
+					id.toString());
 		}
 
 		return tempList.get(0);

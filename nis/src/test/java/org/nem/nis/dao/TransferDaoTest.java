@@ -1,6 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hamcrest.core.*;
+import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
@@ -8,7 +9,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -26,6 +28,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 // TODO 20141201 J-B: i guess we would need new tests?
+// TODO 20141205 BR -> J: added some new tests.
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -40,6 +43,27 @@ public class TransferDaoTest {
 
 	@Autowired
 	BlockDao blockDao;
+
+	@Autowired
+	SessionFactory sessionFactory;
+
+	private Session session;
+
+	@Before
+	public void before() {
+		this.session = this.sessionFactory.openSession();
+		this.session.createSQLQuery("delete from transfers").executeUpdate();
+		this.session.createSQLQuery("delete from blocks").executeUpdate();
+		this.session.createSQLQuery("delete from accounts").executeUpdate();
+		this.session.createSQLQuery("ALTER TABLE transfers ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		this.session.flush();
+		this.session.clear();
+	}
+
+	@After
+	public void after() {
+		this.session.close();
+	}
 
 	@Test
 	public void savingTransferSavesAccounts() {
@@ -128,14 +152,11 @@ public class TransferDaoTest {
 
 		// Act
 		final Collection<Transfer> entities1 = getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
-		final Collection<Transfer> entities2 = getTransfersFromDbUsingAttribute(context, context.hashes.get(24), null, USE_HASH);
-		final Collection<Transfer> entities3 = getTransfersFromDbUsingAttribute(context, context.hashes.get(29), null, USE_HASH);
+		final Collection<Transfer> entities2 = getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
+		final Collection<Transfer> entities3 = getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
-		// TODO 20141202 BR: this fails, but I think the setup is not correct: transactions which appear *later* in the block have a *higher* id.
-		// TODO              So if we begin at the 25th transaction in the block it is natural to return 24 transactions since there are 24 transactions
-		// TODO              included *earlier* in the block. Same applies to the last assert. I would change the above queries to .get(5) and .get(0).
 		Assert.assertThat(entities2.size(), equalTo(5));
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
@@ -151,6 +172,7 @@ public class TransferDaoTest {
 
 	// TODO-CR: consider refactoring the three following tests; for these tests, it's probably best to have
 	// one test for each entity group (e.g. getTransactionsForAccountUsingHashStrategyIncoming could be split up into three tests - from start, from hash, from end)
+	// TODO 20141205 BR -> J: better?
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromStart() {
@@ -227,7 +249,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsSortedResults() {
 		// Assert:
-		assertGetTransactionsForAccountUsingAttributeReturnsSortedResults(USE_HASH);
+		assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(USE_HASH);
 	}
 
 	@Test
@@ -256,10 +278,10 @@ public class TransferDaoTest {
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 
-	@Test(expected = MissingResourceException.class)
+	@Test
 	public void getTransactionsForAccountUsingIdThrowsWhenHashNotFound() {
 		// Arrange:
-		assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID);
+		ExceptionAssert.assertThrows(v -> assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID), MissingResourceException.class);
 	}
 
 	@Test
@@ -337,7 +359,7 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsSortedResults() {
 		// Assert:
-		assertGetTransactionsForAccountUsingAttributeReturnsSortedResults(USE_ID);
+		assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(USE_ID);
 	}
 
 	@Test
@@ -358,14 +380,14 @@ public class TransferDaoTest {
 		public TestContext(final BlockDao blockDao, final ReadOnlyTransferDao.TransferType transferType) {
 			this.blockDao = blockDao;
 			this.transferType = transferType;
-			this.height = new BlockHeight(2);
+			this.height = BlockHeight.ONE;
 			this.prepareBlockWithIncomingAndOutgoingTransactions();
 		}
 
 		public TestContext(final BlockDao blockDao, final int count) {
 			this.blockDao = blockDao;
 			this.transferType = ReadOnlyTransferDao.TransferType.OUTGOING;
-			this.height = new BlockHeight(2);
+			this.height = BlockHeight.ONE;
 			this.prepareBlockWithOutgoingTransactions(count);
 		}
 
@@ -494,18 +516,17 @@ public class TransferDaoTest {
 		executeGetTransactionsForAccountUsingAttribute(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),
-				null,
+				new SecureRandom().nextLong(),
 				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				callType);
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeReturnsSortedResults(final int type) {
+	public void assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 
-		final List<Long> expectedHeights = Arrays.asList(4l, 4l, 4l, 3l, 3l, 2l, 2l, 1l, 1l);
-		final List<Integer> expectedTimestamps = Arrays.asList(1900, 1700, 1700, 1800, 1600, 1500, 1300, 1400, 1200);
+		final List<Long> expectedIds = Arrays.asList(9l, 8l, 7l, 6l, 5l, 4l, 3l, 2l, 1l);
 		final long heights[] = { 3, 4, 1, 2 };
 		final int blockTimestamp[] = { 1801, 1901, 1401, 1501 };
 		final int txTimestamps[][] = { { 1800, 1600 }, { 1900, 1700, 1700 }, { 1200, 1400 }, { 1300, 1500 } };
@@ -520,13 +541,11 @@ public class TransferDaoTest {
 				ReadOnlyTransferDao.TransferType.ALL,
 				type);
 
-		final List<Long> resultHeights = entities1.stream().map(pair -> pair.getBlock().getHeight()).collect(Collectors.toList());
-		final List<Integer> resultTimestamps = entities1.stream().map(pair -> pair.getTransfer().getTimeStamp()).collect(Collectors.toList());
+		final List<Long> resultIds = entities1.stream().map(pair -> pair.getTransfer().getId()).collect(Collectors.toList());
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(9));
-		Assert.assertThat(resultHeights, equalTo(expectedHeights));
-		Assert.assertThat(resultTimestamps, equalTo(expectedTimestamps));
+		Assert.assertThat(resultIds, equalTo(expectedIds));
 	}
 
 	public void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
@@ -790,6 +809,8 @@ public class TransferDaoTest {
 	}
 
 	// TODO: Move to integration test?
+	// TODO 20141205 BR: I guess we can delete this since we have the transaction cache
+	@Ignore
 	@Test
 	public void anyHashExistsIsFastEnough() {
 		// Arrange:
