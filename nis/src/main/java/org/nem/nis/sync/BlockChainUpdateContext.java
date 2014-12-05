@@ -90,7 +90,9 @@ public class BlockChainUpdateContext {
 			return ValidationResult.NEUTRAL;
 		}
 
+		LOGGER.info("updating chain");
 		this.updateOurChain();
+		LOGGER.info("updating chain finished");
 		return ValidationResult.SUCCESS;
 	}
 

@@ -41,7 +41,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
-				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height", "/push/transaction", "/node/info" }));
+				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height", "/push/transaction", "/node/info", "/node/extended-info" }));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
 		Assert.assertThat(

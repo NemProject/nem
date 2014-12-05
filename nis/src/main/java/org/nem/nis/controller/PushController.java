@@ -38,15 +38,18 @@ public class PushController {
 	@RequestMapping(value = "/push/transaction", method = RequestMethod.POST)
 	@P2PApi
 	public void pushTransaction(@RequestBody final Deserializer deserializer) {
-		LOGGER.info("[start] /push/transaction");
+		// TODO 20141201 J-B: did this speed things up?
+		// TODO 20141202: BR -> J: actually I reduced logging because when watching live action it is impossible to follow when there is too much logging.
+		// TODO                    It also helps to reduce log size. So if you don't mind I delete the logging here.
+		//LOGGER.info("[start] /push/transaction");
 		final SecureSerializableEntity<Transaction> secureEntity = new SecureSerializableEntity<>(deserializer, TransactionFactory.VERIFIABLE);
 		this.pushService.pushTransaction(secureEntity.getEntity(), secureEntity.getIdentity());
 
 		final Transaction transaction = secureEntity.getEntity();
-		LOGGER.info(String.format("[end] /push/transaction type: %d, signer %s; recipient: %s",
+		/*LOGGER.info(String.format("[end] /push/transaction type: %d, signer %s; recipient: %s",
 				transaction.getType(),
 				secureEntity.getEntity().getSigner(),
-				getRecipientOrDefault(transaction)));
+				getRecipientOrDefault(transaction)));*/
 	}
 
 	private static Account getRecipientOrDefault(final Transaction transaction) {

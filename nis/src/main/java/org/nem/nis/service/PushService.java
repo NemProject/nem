@@ -61,7 +61,12 @@ public class PushService {
 
 		final ValidationResult result = this.pushEntity(
 				entity,
-				transaction -> this.checkTransaction(transaction),
+				// TODO 20141201 J-B: did you mean to revert this back?
+				// TODO 20141202 BR -> J: seems I oversaw that unconfirmedTransaction.add() doesn't verify the transaction. But shouldn't it actually do that?
+				// TODO                   When we are polling unconfirmed transactions from a remote, those transaction are not verified? Anyway the idea was to do
+				// TODO                   all verifications inside the UnconfirmedTransactions class. In the current version we are doing everything twice.
+				// TODO 20141205 BR: I included the verify() call in UnconfirmedTransactions.add().
+				transaction -> ValidationResult.SUCCESS,
 				transaction -> this.unconfirmedTransactions.addNew(transaction),
 				transaction -> {},
 				NisPeerId.REST_PUSH_TRANSACTION,
@@ -113,13 +118,10 @@ public class PushService {
 			final Consumer<T> logAdditionalInfo,
 			final NisPeerId broadcastId,
 			final NodeIdentity identity) {
-		final String message = String.format("   received: %s from %s%s   signer: %s%sverify: %s",
+		final String message = String.format("   received: %s from %s  (signer: %s)",
 				entity.getType(),
 				identity,
-				System.lineSeparator(),
-				entity.getSigner().getKeyPair().getPublicKey(),
-				System.lineSeparator(),
-				entity.verify());
+				Address.fromPublicKey(entity.getSigner().getKeyPair().getPublicKey()));
 		LOGGER.info(message);
 		logAdditionalInfo.accept(entity);
 

@@ -55,7 +55,10 @@ public class NisConfiguration extends CommonConfiguration {
 				: IpDetectionMode.valueOf(ipDetectionMode);
 
 		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
-		this.nonAuditedApiPaths = getOptionalStringArray(properties, "nis.nonAuditedApiPaths", "/heartbeat|/status|/chain/height|/push/transaction|/node/info");
+		this.nonAuditedApiPaths = getOptionalStringArray(
+				properties,
+				"nis.nonAuditedApiPaths",
+				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info");
 		this.maxTransactions = getOptionalInteger(properties, "nis.maxTransactions", 10000);
 		this.transactionHashRetentionTime = getOptionalInteger(properties, "nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = getOptionalStringArray(properties, "nis.additionalLocalIps", "");

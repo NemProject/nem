@@ -20,7 +20,8 @@ public class PushServiceTest {
 
 	//region pushTransaction
 
-	@Test
+	// TODO 20141205 BR: Since validation is done completely in UnconfirmedTransactions class I guess these two tests don't make sense any more?
+	/*@Test
 	public void pushTransactionVerifyFailureIncrementsFailedExperience() {
 		// Arrange:
 		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
@@ -28,6 +29,7 @@ public class PushServiceTest {
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
 		transaction.signBy(Utils.generateRandomAccount());
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenCallRealMethod();
 
 		// Act:
 		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
@@ -54,7 +56,7 @@ public class PushServiceTest {
 		context.assertSingleUpdateExperience(ValidationResult.FAILURE_UNKNOWN);
 		Mockito.verify(validator, Mockito.only()).validate(Mockito.any());
 		Mockito.verify(context.network, Mockito.never()).broadcast(Mockito.any(), Mockito.any());
-	}
+	}*/
 
 	@Test
 	public void pushTransactionValidSuccessAcceptedFailureIncrementsFailedExperience() {
@@ -224,6 +226,8 @@ public class PushServiceTest {
 		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
 		transaction.sign();
 
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
+
 		// Act:
 		context.service.pushTransaction(transaction, null);
 
@@ -264,13 +268,15 @@ public class PushServiceTest {
 				1);
 	}
 
+	// TODO 20141205: I would rather want to always cache the transaction. During sync it is hard to follow the logs if every incoming transaction
+	// TODO           (which usually get rejected as the chain is not synced) causes a ten- or twenty-fold error log entry.
 	@Test
 	public void pushTransactionDoesNotCacheTransactionIfValidationFails() {
 		// Assert:
 		assertPushServiceTransactionCaching(
 				ValidationResult.FAILURE_CHAIN_INVALID,
-				ValidationResult.FAILURE_CHAIN_INVALID,
-				2);
+				ValidationResult.NEUTRAL,
+				1);
 	}
 
 	private static void assertPushServiceTransactionCaching(
@@ -294,7 +300,7 @@ public class PushServiceTest {
 
 		// Assert:
 		// transaction validation should have only occurred the expected number of times
-		Mockito.verify(validator, Mockito.times(expectedNumberOfInvocations)).validate(Mockito.any());
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(expectedNumberOfInvocations)).addNew(Mockito.any());
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
@@ -325,7 +331,7 @@ public class PushServiceTest {
 
 		// Assert:
 		// transaction validation should have only occurred twice
-		Mockito.verify(validator, Mockito.times(2)).validate(Mockito.any());
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(2)).addNew(Mockito.any());
 	}
 
 	private static Transaction createMockTransaction() {
