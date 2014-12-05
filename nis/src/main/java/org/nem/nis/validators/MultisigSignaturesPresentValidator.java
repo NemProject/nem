@@ -6,9 +6,6 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 
-import java.util.Collection;
-import java.util.function.Supplier;
-
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
 	private final PoiFacade poiFacade;
 	private final boolean blockCreation;

@@ -296,24 +296,31 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	private static MultisigTransaction createSignedMultisigTransaction(final Transaction transaction) {
+		// TODO 20141204 J-G: i was wondering - could we simplify MultisigTransaction construction
+		// > so that a multisig transaction always has the same timestamp deadline as the other transaction?
+		// > also, why don't we expect the other transaction to be signed initially by one of the cosigners?
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(
 				transaction.getTimeStamp(),
 				Utils.generateRandomAccount(Amount.fromNem(1000)),
-				createInvalidSignedTransaction());
+				transaction);
 
-		multisigTransaction.setDeadline(transaction.getTimeStamp().addHours(1));
+		multisigTransaction.setDeadline(transaction.getDeadline());
 		multisigTransaction.sign();
 		return multisigTransaction;
 	}
 
 	public static void makeCosignatory(final PoiFacade poiFacade, final Account signer, final Account multisig, final BlockHeight height) {
+		// Arrange: set signer state
 		final Address signerAddress = signer.getAddress();
 		final PoiAccountState signerState = new PoiAccountState(signerAddress);
 		Mockito.when(poiFacade.findStateByAddress(signerAddress)).thenReturn(signerState);
+
+		// Arrange: set multisig state
 		final Address multisigAddress = multisig.getAddress();
 		final PoiAccountState multisigState = new PoiAccountState(multisigAddress);
 		Mockito.when(poiFacade.findStateByAddress(multisigAddress)).thenReturn(multisigState);
 
+		// Arrange: set multisig links
 		poiFacade.findStateByAddress(signerAddress).getMultisigLinks().addMultisig(multisigAddress, height);
 		poiFacade.findStateByAddress(multisigAddress).getMultisigLinks().addCosignatory(signerAddress, height);
 	}
@@ -399,7 +406,7 @@ public class BlockChainValidatorIntegrationTest {
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory(this.transferDao);
-			this.transactionValidator = transactionValidatorFactory.createSingle(this.poiFacade);
+			this.transactionValidator = new MultisigAwareSingleTransactionValidator(transactionValidatorFactory.createSingle(this.poiFacade));
 			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.poiFacade);
 
 			Mockito.when(this.transferDao.anyHashExists(Mockito.any(), Mockito.any())).thenReturn(false);
