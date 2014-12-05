@@ -162,7 +162,7 @@ public class HashCachePerformanceTest {
 		private final List<HashMetaDataPair> pairs;
 
 		private TestContext(final int count) {
-			this.cache = new HashCache(count);
+			this.cache = new HashCache(count, 36);
 			this.pairs = createPairs(count);
 		}
 

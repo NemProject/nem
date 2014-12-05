@@ -18,7 +18,7 @@ public class PruningObserverTest {
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long PRUNE_INTERVAL = 360;
 	private static final long BETA_OUTLINK_PRUNING_FORK = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK;
-	private static final int TRANSACTION_HASH_CACHE_HISTORY = 129600;
+	private static final int TRANSACTION_HASH_CACHE_HISTORY = 36 * 60 * 60;
 
 	//region no-op
 
@@ -210,6 +210,7 @@ public class PruningObserverTest {
 			}
 
 			Mockito.when(this.poiFacade.iterator()).thenReturn(this.accountStates.iterator());
+			Mockito.when(this.transactionHashCache.getRetentionTime()).thenReturn(36);
 		}
 
 		private void assertNoPruning() {
@@ -247,7 +248,8 @@ public class PruningObserverTest {
 		}
 
 		private void assertTransactionHashCachePruning(final TimeInstant timeStamp) {
-			Mockito.verify(this.transactionHashCache, Mockito.only()).prune(timeStamp);
+			Mockito.verify(this.transactionHashCache, Mockito.times(1)).prune(timeStamp);
+			Mockito.verify(this.transactionHashCache, Mockito.times(1)).getRetentionTime();
 		}
 	}
 }

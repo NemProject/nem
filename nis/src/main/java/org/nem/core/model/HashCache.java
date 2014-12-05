@@ -12,12 +12,13 @@ import java.util.stream.Stream;
  */
 public class HashCache {
 	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
+	private int retentionTime;
 
 	/**
 	 * Creates a hash cache.
 	 */
 	public HashCache() {
-		this(50000);
+		this(50000, 36);
 	}
 
 	/**
@@ -25,8 +26,18 @@ public class HashCache {
 	 *
 	 * @param initialCapacity The initial capacity.
 	 */
-	public HashCache(final int initialCapacity) {
+	public HashCache(final int initialCapacity, final int retentionTime) {
 		this.hashMap = new ConcurrentHashMap<>(initialCapacity);
+		this.retentionTime = retentionTime;
+	}
+
+	/**
+	 * Gets the retention time.
+	 *
+	 * @return The retention time.
+	 */
+	public int getRetentionTime() {
+		return this.retentionTime;
 	}
 
 	/**
@@ -141,7 +152,9 @@ public class HashCache {
 	 * @param timeStamp The time stamp.
 	 */
 	public void prune(final TimeInstant timeStamp) {
-		this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(timeStamp) < 0);
+		if (-1 != this.retentionTime) {
+			this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(timeStamp) < 0);
+		}
 	}
 
 	/**
@@ -150,7 +163,7 @@ public class HashCache {
 	 * @return the shallow copy of this hash cache.
 	 */
 	public HashCache shallowCopy() {
-		final HashCache cache = new HashCache();
+		final HashCache cache = new HashCache(this.size(), this.getRetentionTime());
 		cache.hashMap.putAll(this.hashMap);
 		return cache;
 	}
@@ -163,6 +176,7 @@ public class HashCache {
 	public void shallowCopyTo(final HashCache cache) {
 		cache.hashMap.clear();
 		cache.hashMap.putAll(this.hashMap);
+		cache.retentionTime = this.retentionTime;
 	}
 
 	/**

@@ -41,8 +41,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(
 				config.getNonAuditedApiPaths(),
-				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height" }));
+				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height", "/push/transaction", "/node/info" }));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
+		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
 		Assert.assertThat(
 				config.getAdditionalLocalIps(),
 				IsEqual.equalTo(new String[] { }));
@@ -63,6 +64,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.unlockedLimit", "123");
 		properties.setProperty("nis.nonAuditedApiPaths", "/status|/whatever");
 		properties.setProperty("nis.maxTransactions", "234");
+		properties.setProperty("nis.transactionHashRetentionTime", "567");
 		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
 
 		// Act:
@@ -81,6 +83,7 @@ public class NisConfigurationTest {
 				config.getNonAuditedApiPaths(),
 				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(234));
+		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(567));
 		Assert.assertThat(
 				config.getAdditionalLocalIps(),
 				IsEqual.equalTo(new String[] { "10.0.0.10", "10.0.0.20" }));

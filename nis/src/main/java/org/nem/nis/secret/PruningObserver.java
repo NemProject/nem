@@ -16,7 +16,6 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = BlockChainConstants.OUTLINK_HISTORY;
-	private static final int TRANSACTION_HASH_CACHE_HISTORY = 36 * 60 * 60;
 	private static final long PRUNE_INTERVAL = 360;
 	private final PoiFacade poiFacade;
 	private final HashCache transactionHashCache;
@@ -47,7 +46,7 @@ public class PruningObserver implements BlockTransactionObserver {
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}
 
-		final TimeInstant pruneTime = getPruneTime(context.getTimeStamp());
+		final TimeInstant pruneTime = getPruneTime(context.getTimeStamp(), this.transactionHashCache.getRetentionTime());
 		this.transactionHashCache.prune(pruneTime);
 	}
 
@@ -55,8 +54,8 @@ public class PruningObserver implements BlockTransactionObserver {
 		return new BlockHeight(Math.max(1, height.getRaw() - numHistoryBlocks));
 	}
 
-	private static TimeInstant getPruneTime(final TimeInstant timestamp) {
-		return new TimeInstant(Math.max(0, timestamp.getRawTime() - TRANSACTION_HASH_CACHE_HISTORY));
+	private static TimeInstant getPruneTime(final TimeInstant timestamp, int retentionTime) {
+		return new TimeInstant(Math.max(0, timestamp.getRawTime() - retentionTime * 60 * 60 ));
 	}
 
 	private static boolean shouldPrune(final Notification notification, final BlockNotificationContext context) {

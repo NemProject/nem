@@ -22,6 +22,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final String[] nonAuditedApiPaths;
 	private final int maxTransactions;
 	private final String[] additionalLocalIps;
+	private final int transactionHashRetentionTime;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -54,8 +55,9 @@ public class NisConfiguration extends CommonConfiguration {
 				: IpDetectionMode.valueOf(ipDetectionMode);
 
 		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
-		this.nonAuditedApiPaths = getOptionalStringArray(properties, "nis.nonAuditedApiPaths", "/heartbeat|/status|/chain/height");
+		this.nonAuditedApiPaths = getOptionalStringArray(properties, "nis.nonAuditedApiPaths", "/heartbeat|/status|/chain/height|/push/transaction|/node/info");
 		this.maxTransactions = getOptionalInteger(properties, "nis.maxTransactions", 10000);
+		this.transactionHashRetentionTime = getOptionalInteger(properties, "nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = getOptionalStringArray(properties, "nis.additionalLocalIps", "");
 	}
 
@@ -148,6 +150,15 @@ public class NisConfiguration extends CommonConfiguration {
 	}
 
 	/**
+	 * Gets the number of hours that the transaction hashes are kept in the cache.
+	 *
+	 * @return The number of hours.
+	 */
+	public int getTransactionHashRetentionTime() {
+		return this.transactionHashRetentionTime;
+	}
+
+	/**
 	 * Gets the maximum number of transactions that should be inside the blocks returned in the /chain/blocks-after request.
 	 *
 	 * @return The maximum number of transactions.
@@ -155,7 +166,6 @@ public class NisConfiguration extends CommonConfiguration {
 	public int getMaxTransactions() {
 		return this.maxTransactions;
 	}
-
 	/**
 	 * Gets the additional IPs that should be treated as local.
 	 *

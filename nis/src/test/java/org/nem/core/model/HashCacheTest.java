@@ -20,6 +20,12 @@ public class HashCacheTest {
 		Assert.assertThat(new HashCache().isEmpty(), IsEqual.equalTo(true));
 	}
 
+	@Test
+	public void hashCacheAppliesDefaultRetentionTime() {
+		// Assert:
+		Assert.assertThat(new HashCache().getRetentionTime(), IsEqual.equalTo(36));
+	}
+
 	// endregion
 
 	// region size
@@ -270,7 +276,6 @@ public class HashCacheTest {
 		Assert.assertThat(cache.hashExists(hash3), IsEqual.equalTo(false));
 	}
 
-
 	@Test
 	public void prunePreservesAllHashesWithEarlierTimeStampThanGivenTimeStamp() {
 		// Arrange:
@@ -289,6 +294,24 @@ public class HashCacheTest {
 		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
 	}
 
+	@Test
+	public void prunePreservesAllHashesIfRetentionTimeIsMinusOne() {
+		// Arrange:
+		final HashCache cache = new HashCache(50, -1);
+		final Hash hash1 = Utils.generateRandomHash();
+		final Hash hash2 = Utils.generateRandomHash();
+		cache.put(new HashMetaDataPair(hash1, createMetaDataWithTimeStamp(125)));
+		cache.put(new HashMetaDataPair(hash2, createMetaDataWithTimeStamp(234)));
+
+		// Act:
+		cache.prune(new TimeInstant(500));
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.hashExists(hash1), IsEqual.equalTo(true));
+		Assert.assertThat(cache.hashExists(hash2), IsEqual.equalTo(true));
+	}
+
 	// endregion
 
 	// region shallowCopy
@@ -296,12 +319,16 @@ public class HashCacheTest {
 	@Test
 	public void shallowCopyCopiesAllEntries() {
 		// Arrange:
-		final HashCache original = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache original = new HashCache(50, 789);
+		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)));
+		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)));
+		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
 
 		// Act:
 		final HashCache copy = original.shallowCopy();
 
 		// Assert:
+		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
 		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsSame.sameInstance(e.getValue())));
 	}
@@ -313,13 +340,17 @@ public class HashCacheTest {
 	@Test
 	public void shallowCopyToCopiesAllEntries() {
 		// Arrange:
-		final HashCache original = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache original = new HashCache(50, 789);
+		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)));
+		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)));
+		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
 		final HashCache copy = createHashCacheWithTimeStamps(321, 432, 543);
 
 		// Act:
 		original.shallowCopyTo(copy);
 
 		// Assert:
+		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
 		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsSame.sameInstance(e.getValue())));
 	}

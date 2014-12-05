@@ -211,7 +211,7 @@ public class NisAppConfig {
 
 	@Bean
 	public HashCache transactionHashCache() {
-		return new HashCache();
+		return new HashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime());
 	}
 
 	@Bean
