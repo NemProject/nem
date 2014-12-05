@@ -323,7 +323,8 @@ public class UnconfirmedTransactions {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
-		// (3) pass validation against the *confirmed* balance
+		// (3) not already be expired
+		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
 		// a) we need to use unconfirmed balance to avoid some stupid situations (and spamming).
@@ -334,6 +335,7 @@ public class UnconfirmedTransactions {
 		return this.filter(
 				this.getTransactionsBefore(blockTime).stream()
 						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
+						.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
 						.collect(Collectors.toList()),
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance);
 	}
