@@ -72,6 +72,7 @@ public class IsEquivalent<T> extends org.hamcrest.BaseMatcher<Collection<T>> {
 	 * @param <T> The element type.
 	 * @return The matcher.
 	 */
+	@SafeVarargs
 	@org.hamcrest.Factory
 	public static <T> org.hamcrest.Matcher<Collection<T>> equivalentTo(final T... array) {
 		return new IsEquivalent<>(array);
