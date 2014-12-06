@@ -169,6 +169,7 @@ public class NisConfiguration extends CommonConfiguration {
 	public int getMaxTransactions() {
 		return this.maxTransactions;
 	}
+
 	/**
 	 * Gets the additional IPs that should be treated as local.
 	 *

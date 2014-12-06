@@ -32,7 +32,6 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<Transfer>
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
-	 * TODO-CR: it might make sense to return a small DTO instead of an Object[]
 	 *
 	 * @param account The account.
 	 * @param hash The hash of "top-most" transfer.
@@ -50,9 +49,6 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<Transfer>
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
-	 * TODO-CR: it might make sense to return a small DTO instead of an Object[]
-	 * TODO 20141201 J-B: can you do this while you're here?
-	 * TODO 20141202 BR -> J: Done. Hope you meant it like that.
 	 *
 	 * @param account The account.
 	 * @param id The id of "top-most" transfer.

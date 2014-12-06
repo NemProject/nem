@@ -3,7 +3,7 @@ package org.nem.core.model;
 import org.nem.core.crypto.Hash;
 
 /**
- * Pair consisting of a hash and a timestamp.
+ * Pair consisting of a hash and metadata.
  */
 public class HashMetaDataPair {
 	private final Hash hash;

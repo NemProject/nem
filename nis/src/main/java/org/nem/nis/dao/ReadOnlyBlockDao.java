@@ -21,6 +21,7 @@ public interface ReadOnlyBlockDao {
 
 	/**
 	 * Retrieves Block from db given it's id in the database.
+	 * TODO 20141205 J-B: do we still need this function; it looks like nothing is calling it?
 	 *
 	 * @param id id of a block.
 	 * @return associated Block or null if there's no block with such id.

@@ -221,13 +221,9 @@ public class TransferDaoImpl implements TransferDao {
 			final Long accountId,
 			final int limit,
 			final TransferType transferType) {
-		// TODO 20141107 J-B: was something wrong with what buildAddressQuery was doing when transfer type was ALL?
-		// TODO 20141108 BR -> J: I noticed that the /transaction/all request that NCC makes for th GUI was terrible slow (needed up to 3 seconds).
-		// TODO                   The reason was the SQL query that hibernate created which was far from being optimal. I would have preferred a SQL query
-		// TODO                   using UNION keyword. But hibernate doesn't support unions even if I explicitly give hibernate a query string using UNION.
-		// TODO                   So I ended up doing two queries and building the union/doing sorting "manually". It is still more than ten times
-		// TODO                   faster then the original query hibernate creates.
 		if (TransferType.ALL == transferType) {
+			// doing two queries and building the union / doing sorting "manually" for TransferType.ALL because
+			// hibernate doesn't support unions even if explicitly given a query string using UNION.
 			final Collection<TransferBlockPair> pairs = this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.INCOMING);
 			pairs.addAll(this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.OUTGOING));
 			return this.sortAndLimit(pairs, limit);
@@ -261,14 +257,8 @@ public class TransferDaoImpl implements TransferDao {
 
 	@SuppressWarnings("unchecked")
 	private static List<TransferBlockPair> executeQuery(final Query q) {
-		// TODO BR: I am too stupid to do it with streams :/
-		final List<TransferBlockPair> pairs = new ArrayList<>();
 		final List<Object[]> list = q.list();
-		for (Object[] o : list) {
-			pairs.add(new TransferBlockPair((Transfer)o[0], (Block)o[1]));
-		}
-
-		return pairs;
+		return list.stream().map(o -> new TransferBlockPair((Transfer)o[0], (Block)o[1])).collect(Collectors.toList());
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final Integer limit) {
@@ -291,6 +281,7 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
+		// TODO 2014 J-B: check with G about if we still need to compare getBlkIndex
 		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
 		/*final Transfer lhsTransfer = lhs.getTransfer();
 		final Long lhsHeight = lhs.getBlock().getHeight();

@@ -17,8 +17,7 @@ public class BatchUniqueHashTransactionValidator implements BatchTransactionVali
 	 *
 	 * @param transactionHashCache The transaction hash cache.
 	 */
-	public BatchUniqueHashTransactionValidator(
-			final HashCache transactionHashCache) {
+	public BatchUniqueHashTransactionValidator(final HashCache transactionHashCache) {
 		this.transactionHashCache = transactionHashCache;
 	}
 

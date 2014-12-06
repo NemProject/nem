@@ -30,6 +30,7 @@ public class BlockValidatorFactory {
 
 	/**
 	 * Creates a block validator.
+	 * TODO why did this signature change?
 	 *
 	 * @param builder The aggregate block validator builder.
 	 * @param poiFacade The poi facade.
