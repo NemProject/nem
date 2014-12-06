@@ -26,7 +26,7 @@ public interface ReadOnlyBlockDao {
 	 * @param id id of a block.
 	 * @return associated Block or null if there's no block with such id.
 	 */
-	public Block findById(Long id);
+	public Block findById(long id);
 
 	/**
 	 * Retrieves Block from db given it's hash.
@@ -52,7 +52,7 @@ public interface ReadOnlyBlockDao {
 	 * @param limit maximum number of hashes to return.
 	 * @return The hash chain.
 	 */
-	public HashChain getHashesFrom(final BlockHeight height, Integer limit);
+	public HashChain getHashesFrom(final BlockHeight height, int limit);
 
 	/**
 	 * Retrieves all Blocks from the database that were forged by the specified account.
@@ -62,7 +62,7 @@ public interface ReadOnlyBlockDao {
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, Integer limit);
+	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, int limit);
 
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.
@@ -71,5 +71,5 @@ public interface ReadOnlyBlockDao {
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<Block> getBlocksAfter(final BlockHeight height, Integer limit);
+	public Collection<Block> getBlocksAfter(final BlockHeight height, int limit);
 }

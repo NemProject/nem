@@ -28,7 +28,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<Transfer>
 	 * @param limit The limit.
 	 * @return Collection of transfer block pairs.
 	 */
-	public Collection<TransferBlockPair> getTransactionsForAccount(final Account account, final Integer timeStamp, final Integer limit);
+	public Collection<TransferBlockPair> getTransactionsForAccount(final Account account, final Integer timeStamp, final int limit);
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
@@ -45,7 +45,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<Transfer>
 			final Hash hash,
 			final BlockHeight height,
 			final TransferType transferType,
-			final Integer limit);
+			final int limit);
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
@@ -60,5 +60,5 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<Transfer>
 			final Account account,
 			final Long id,
 			final TransferType transferType,
-			final Integer limit);
+			final int limit);
 }
