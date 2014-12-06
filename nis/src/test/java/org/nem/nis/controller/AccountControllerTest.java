@@ -105,22 +105,30 @@ public class AccountControllerTest {
 
 	//region accountTransfers[All|Incoming|Outgoing]
 
+	//region accountTransfersMethodsDelegatesToIoWhenIdIsProvided
+
 	@Test
-	public void accountTransfersAllDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.ALL, AccountController::accountTransfersAll);
+	public void accountTransfersAllDelegatesToIoAdapterWhenIdIsProvided() {
+		this.accountTransfersMethodsDelegatesToIoWhenIdIsProvided(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::accountTransfersAll);
 	}
 
 	@Test
-	public void accountTransfersIncomingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.INCOMING, AccountController::accountTransfersIncoming);
+	public void accountTransfersIncomingDelegatesToIoAdapterWhenIdIsProvided() {
+		this.accountTransfersMethodsDelegatesToIoWhenIdIsProvided(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::accountTransfersIncoming);
 	}
 
 	@Test
-	public void accountTransfersOutgoingDelegatesToIoAdapter() {
-		this.accountTransfersMethodsDelegatesToIo(ReadOnlyTransferDao.TransferType.OUTGOING, AccountController::accountTransfersOutgoing);
+	public void accountTransfersOutgoingDelegatesToIoAdapterWhenIdIsProvided() {
+		this.accountTransfersMethodsDelegatesToIoWhenIdIsProvided(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::accountTransfersOutgoing);
 	}
 
-	private void accountTransfersMethodsDelegatesToIo(
+	private void accountTransfersMethodsDelegatesToIoWhenIdIsProvided(
 			final ReadOnlyTransferDao.TransferType transferType,
 			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
 		// Arrange:
@@ -132,17 +140,167 @@ public class AccountControllerTest {
 		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
 		pageBuilder.setAddress(address.getEncoded());
 		pageBuilder.setHash("ffeeddccbbaa99887766554433221100");
+		pageBuilder.setId("1");
 
-		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
-		Mockito.when(accountIoAdapter.getAccountTransfersWithHash(address, hash, transferType)).thenReturn(expectedList);
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, 1L, transferType)).thenReturn(expectedList);
 
 		// Act:
 		final SerializableList<TransactionMetaDataPair> resultList = controllerMethod.apply(context.controller, pageBuilder);
 
 		// Assert:
 		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
-		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersWithHash(address, hash, transferType);
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, 1L, transferType);
 	}
+
+	//endregion
+
+	//region accountTransfersMethodsUsesIoAdapterWhenHashIsProvided
+
+	@Test
+	public void accountTransfersAllDelegatesToIoAdapterWhenHashIsProvided() {
+		this.accountTransfersMethodsUsesIoAdapterWhenHashIsProvided(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::accountTransfersAll);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToIoAdapterWhenHashIsProvided() {
+		this.accountTransfersMethodsUsesIoAdapterWhenHashIsProvided(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::accountTransfersIncoming);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToIoAdapterWhenHashIsProvided() {
+		this.accountTransfersMethodsUsesIoAdapterWhenHashIsProvided(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::accountTransfersOutgoing);
+	}
+
+	public void accountTransfersMethodsUsesIoAdapterWhenHashIsProvided(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+		final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash(hash.toString());
+
+		Mockito.when(context.transactionHashCache.get(hash)).thenReturn(metaData);
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingHash(address, hash, new BlockHeight(12), transferType))
+				.thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = controllerMethod.apply(context.controller, pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingHash(address, hash, new BlockHeight(12), transferType);
+		Mockito.verify(context.transactionHashCache, Mockito.times(1)).get(hash);
+	}
+
+	//endregion
+
+	//region accountTransfersMethodsDelegatesToIoWhenNeitherIdNorHashIsProvided
+
+	@Test
+	public void accountTransfersAllDelegatesToIoAdapterWhenNeitherIdNorHashIsProvided() {
+		this.accountTransfersMethodsDelegatesToIoWhenNeitherIdNorHashIsProvided(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::accountTransfersAll);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToIoAdapterWhenNeitherIdNorHashIsProvided() {
+		this.accountTransfersMethodsDelegatesToIoWhenNeitherIdNorHashIsProvided(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::accountTransfersIncoming);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToIoAdapterWhenNeitherIdNorHashIsProvided() {
+		this.accountTransfersMethodsDelegatesToIoWhenNeitherIdNorHashIsProvided(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::accountTransfersOutgoing);
+	}
+
+	private void accountTransfersMethodsDelegatesToIoWhenNeitherIdNorHashIsProvided(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = controllerMethod.apply(context.controller, pageBuilder);
+
+		// Assert:
+		Assert.assertThat(resultList, IsSame.sameInstance(expectedList));
+		Mockito.verify(accountIoAdapter, Mockito.times(1)).getAccountTransfersUsingId(address, null, transferType);
+	}
+
+	//endregion
+
+	//region accountTransfersFailsWhenUnknownHashIsProvided
+
+	@Test
+	public void accountTransfersAllFailsWhenUnknownHashIsProvided() {
+		this.accountTransfersMethodsFailsWhenUnknownHashIsProvided(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::accountTransfersAll);
+	}
+
+	@Test
+	public void accountTransfersIncomingDelegatesToIoAdapterWhenUnknownHashIsProvided() {
+		this.accountTransfersMethodsFailsWhenUnknownHashIsProvided(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::accountTransfersIncoming);
+	}
+
+	@Test
+	public void accountTransfersOutgoingDelegatesToIoAdapterWhenUnknownHashIsProvided() {
+		this.accountTransfersMethodsFailsWhenUnknownHashIsProvided(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::accountTransfersOutgoing);
+	}
+
+	private void accountTransfersMethodsFailsWhenUnknownHashIsProvided(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountTransactionsPageBuilder, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+
+		final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(address.getEncoded());
+		pageBuilder.setHash(hash.toString());
+
+		Mockito.when(context.transactionHashCache.get(hash)).thenReturn(null);
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> controllerMethod.apply(context.controller, pageBuilder),
+				IllegalArgumentException.class);
+	}
+
+	//endregion
 
 	//endregion
 
@@ -260,6 +418,7 @@ public class AccountControllerTest {
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
@@ -270,7 +429,8 @@ public class AccountControllerTest {
 					this.unconfirmedTransactions,
 					this.unlockedAccounts,
 					accountIoAdapter,
-					this.poiFacade);
+					this.poiFacade,
+					this.transactionHashCache);
 		}
 	}
 }

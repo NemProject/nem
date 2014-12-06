@@ -26,6 +26,7 @@ public class UnconfirmedTransactions {
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
 	private final PoiFacade poiFacade;
+	private final HashCache transactionHashCache;
 
 	private enum BalanceValidationOptions {
 		/**
@@ -58,9 +59,11 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
-			final PoiFacade poiFacade) {
+			final PoiFacade poiFacade,
+			final HashCache transactionHashCache) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
+		this.transactionHashCache = transactionHashCache;
 		this.singleValidator = this.createSingleValidator();
 	}
 
@@ -68,9 +71,11 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
-			final PoiFacade poiFacade) {
+			final PoiFacade poiFacade,
+			final HashCache transactionHashCache) {
 		this.validatorFactory = validatorFactory;
 		this.poiFacade = poiFacade;
+		this.transactionHashCache = transactionHashCache;
 		this.singleValidator = this.createSingleValidator();
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -84,7 +89,8 @@ public class UnconfirmedTransactions {
 				transactions,
 				options,
 				this.validatorFactory,
-				this.poiFacade);
+				this.poiFacade,
+				this.transactionHashCache);
 	}
 
 	/**
@@ -150,6 +156,10 @@ public class UnconfirmedTransactions {
 			return ValidationResult.NEUTRAL;
 		}
 
+		if (!transaction.verify()) {
+			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
+		}
+
 		try {
 			return this.addInternal(transaction, transactionHash, execute);
 		} finally {
@@ -177,7 +187,7 @@ public class UnconfirmedTransactions {
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
 		final TransactionsContextPair pair = new TransactionsContextPair(transactions, new ValidationContext());
-		return this.validatorFactory.createBatch(this.poiFacade).validate(Arrays.asList(pair));
+		return this.validatorFactory.createBatch(this.transactionHashCache).validate(Arrays.asList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {
@@ -319,7 +329,10 @@ public class UnconfirmedTransactions {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
-		// (3) pass validation against the *confirmed* balance
+		// (3) not already be expired
+		// TODO 20141205 J-B: i noticed that the TransactionDeadlineBlockValidator is only for blocks;
+		// > if it is updated to also work for blocks, then shouldn't (3) be satisfied by (4)?
+		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
 		// a) we need to use unconfirmed balance to avoid some stupid situations (and spamming).
@@ -330,6 +343,7 @@ public class UnconfirmedTransactions {
 		return this.filter(
 				this.getTransactionsBefore(blockTime).stream()
 						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
+						.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
 						.collect(Collectors.toList()),
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance);
 	}

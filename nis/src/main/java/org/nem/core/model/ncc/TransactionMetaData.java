@@ -9,14 +9,17 @@ import org.nem.core.serialization.*;
 public class TransactionMetaData implements SerializableEntity {
 
 	private final BlockHeight height;
+	private final Long id;
 
 	/**
 	 * Creates a new meta data.
 	 *
 	 * @param blockHeight The block height.
+	 * @param id The transaction id.
 	 */
-	public TransactionMetaData(final BlockHeight blockHeight) {
+	public TransactionMetaData(final BlockHeight blockHeight, final Long id) {
 		this.height = blockHeight;
+		this.id = id;
 	}
 
 	/**
@@ -25,7 +28,8 @@ public class TransactionMetaData implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public TransactionMetaData(final Deserializer deserializer) {
-		this(BlockHeight.readFrom(deserializer, "height"));
+		this.height = BlockHeight.readFrom(deserializer, "height");
+		this.id = deserializer.readLong("id");
 	}
 
 	/**
@@ -37,8 +41,18 @@ public class TransactionMetaData implements SerializableEntity {
 		return this.height;
 	}
 
+	/**
+	 * Returns id of a transaction.
+	 *
+	 * @return The id.
+	 */
+	public Long getId() {
+		return this.id;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);
+		serializer.writeLong("id", this.id);
 	}
 }

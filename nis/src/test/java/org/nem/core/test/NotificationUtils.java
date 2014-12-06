@@ -2,9 +2,11 @@ package org.nem.core.test;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
+
+import java.util.Collection;
 
 /**
  * Static class providing helper functions for validating notifications.
@@ -103,5 +105,17 @@ public class NotificationUtils {
 		Assert.assertThat(n.getLessor(), IsEqual.equalTo(expectedLessor));
 		Assert.assertThat(n.getLessee(), IsEqual.equalTo(expectedLessee));
 		Assert.assertThat(n.getMode(), IsEqual.equalTo(expectedMode));
+	}
+
+	/**
+	 * Asserts that the specified notification is a transaction hashes notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param pairs The expected transaction hashes.
+	 */
+	public static void assertTransactionHashesNotification(final Notification notification, final Collection<HashMetaDataPair> pairs) {
+		final TransactionHashesNotification n = (TransactionHashesNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.TransactionHashes));
+		Assert.assertThat(n.getPairs(), IsEquivalent.equivalentTo(pairs));
 	}
 }

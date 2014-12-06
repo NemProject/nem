@@ -7,7 +7,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.dao.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -17,21 +16,15 @@ public class BatchUniqueHashTransactionValidatorTest {
 	//region some transaction hash already exists in transfer dao
 
 	@Test
-	public void validateReturnsNeutralIfAtLeastOneHashAlreadyExistsInTransferDao() {
+	public void validateReturnsNeutralIfAtLeastOneHashAlreadyExistsInHashCache() {
 		// Assert:
-		assertNeutralIfTransactionAlreadyExistsInDao(TestContext::setTransferDaoForHashes);
+		assertNeutralIfTransactionAlreadyExistsInHashCache(TestContext::setTransactionHashCacheForHashes);
 	}
 
-	@Test
-	public void validateReturnsNeutralIfAtLeastOneHashAlreadyExistsInImportanceTransferDao() {
-		// Assert:
-		assertNeutralIfTransactionAlreadyExistsInDao(TestContext::setImportanceTransferDaoForHashes);
-	}
-
-	private static void assertNeutralIfTransactionAlreadyExistsInDao(final Consumer<TestContext> setTransactionInDao) {
+	private static void assertNeutralIfTransactionAlreadyExistsInHashCache(final Consumer<TestContext> setTransactionHashCacheForHashes) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		setTransactionInDao.accept(context);
+		setTransactionHashCacheForHashes.accept(context);
 
 		// Act:
 		final ValidationResult result = context.validateAtHeight(10);
@@ -55,7 +48,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 	}
 
 	@Test
-	public void validateReturnsSuccessIfNoneOfTheHashesExistInAnyDao() {
+	public void validateReturnsSuccessIfNoneOfTheHashesExistInHashCache() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -71,9 +64,8 @@ public class BatchUniqueHashTransactionValidatorTest {
 		private final List<Transaction> transactions = new ArrayList<>();
 		private final List<Hash> hashes = new ArrayList<>();
 
-		private final TransferDao transferDao = Mockito.mock(TransferDao.class);
-		private final ImportanceTransferDao importanceTransferDao = Mockito.mock(ImportanceTransferDao.class);
-		private final BatchUniqueHashTransactionValidator validator = new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
+		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		private final BatchUniqueHashTransactionValidator validator = new BatchUniqueHashTransactionValidator(this.transactionHashCache);
 
 		public TestContext() {
 			for (int i = 0; i < 5; ++i) {
@@ -83,13 +75,8 @@ public class BatchUniqueHashTransactionValidatorTest {
 			}
 		}
 
-		private void setTransferDaoForHashes() {
-			Mockito.when(this.transferDao.anyHashExists(this.hashes, this.confirmedBlockHeight))
-					.thenReturn(true);
-		}
-
-		private void setImportanceTransferDaoForHashes() {
-			Mockito.when(this.importanceTransferDao.anyHashExists(this.hashes, this.confirmedBlockHeight))
+		private void setTransactionHashCacheForHashes() {
+			Mockito.when(this.transactionHashCache.anyHashExists(this.hashes))
 					.thenReturn(true);
 		}
 

@@ -3,6 +3,7 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
+import org.nem.core.model.HashCache;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
@@ -151,7 +152,7 @@ public class NisAppConfig {
 	@Bean
 	public BlockChainContextFactory blockChainContextFactory() {
 		return new BlockChainContextFactory(
-				this.accountAnalyzer(),
+				this.nisCache(),
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.blockChainServices(),
@@ -170,17 +171,17 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.transferDao, this.importanceTransferDao, this.timeProvider(), this.poiOptions());
+		return new TransactionValidatorFactory(this.timeProvider(), this.poiOptions());
 	}
 
 	@Bean
 	public SingleTransactionValidator transactionValidator() {
-		return this.transactionValidatorFactory().create(this.poiFacade());
+		return this.transactionValidatorFactory().create(this.poiFacade(), this.transactionHashCache());
 	}
 
 	@Bean
 	public BatchTransactionValidator batchTransactionValidator() {
-		return this.transactionValidatorFactory().createBatch(this.poiFacade());
+		return this.transactionValidatorFactory().createBatch(this.transactionHashCache());
 	}
 
 	@Bean
@@ -204,6 +205,16 @@ public class NisAppConfig {
 	@Bean
 	public AccountCache accountCache() {
 		return new AccountCache();
+	}
+
+	@Bean
+	public HashCache transactionHashCache() {
+		return new HashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime());
+	}
+
+	@Bean
+	public NisCache nisCache() {
+		return new NisCache(this.accountAnalyzer(), this.transactionHashCache());
 	}
 
 	@Bean
@@ -245,7 +256,8 @@ public class NisAppConfig {
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory(),
-				this.poiFacade());
+				this.poiFacade(),
+				this.transactionHashCache());
 	}
 
 	@Bean
@@ -258,7 +270,7 @@ public class NisAppConfig {
 		return new NisMain(
 				this.accountDao,
 				this.blockDao,
-				this.accountAnalyzer(),
+				this.nisCache(),
 				this.nisPeerNetworkHost(),
 				this.nisConfiguration(),
 				this.blockAnalyzer());

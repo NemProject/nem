@@ -13,48 +13,12 @@ import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.peer.*;
 
 public class PushServiceTest {
 
 	//region pushTransaction
-
-	@Test
-	public void pushTransactionVerifyFailureIncrementsFailedExperience() {
-		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-		final TestContext context = new TestContext(validator);
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
-		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
-		transaction.signBy(Utils.generateRandomAccount());
-
-		// Act:
-		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
-
-		// Assert:
-		context.assertSingleUpdateExperience(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE);
-		Mockito.verify(validator, Mockito.never()).validate(Mockito.any());
-		Mockito.verify(context.network, Mockito.never()).broadcast(Mockito.any(), Mockito.any());
-	}
-
-	@Test
-	public void pushTransactionValidFailureIncrementsFailedExperience() {
-		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-		final TestContext context = new TestContext(validator);
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
-		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
-		transaction.sign();
-
-		// Act:
-		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
-
-		// Assert:
-		context.assertSingleUpdateExperience(ValidationResult.FAILURE_UNKNOWN);
-		Mockito.verify(validator, Mockito.only()).validate(Mockito.any());
-		Mockito.verify(context.network, Mockito.never()).broadcast(Mockito.any(), Mockito.any());
-	}
 
 	@Test
 	public void pushTransactionValidSuccessAcceptedFailureIncrementsFailedExperience() {
@@ -221,8 +185,8 @@ public class PushServiceTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
-		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
 		transaction.sign();
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
 		// Act:
 		context.service.pushTransaction(transaction, null);
@@ -238,7 +202,6 @@ public class PushServiceTest {
 		final TestContext context = new TestContext();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.sign();
-
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
@@ -265,12 +228,12 @@ public class PushServiceTest {
 	}
 
 	@Test
-	public void pushTransactionDoesNotCacheTransactionIfValidationFails() {
+	public void pushTransactionCachesTransactionIfValidationFails() {
 		// Assert:
 		assertPushServiceTransactionCaching(
 				ValidationResult.FAILURE_CHAIN_INVALID,
 				ValidationResult.FAILURE_CHAIN_INVALID,
-				2);
+				1);
 	}
 
 	private static void assertPushServiceTransactionCaching(
@@ -278,11 +241,9 @@ public class PushServiceTest {
 			final ValidationResult expectedValidationResult,
 			final int expectedNumberOfInvocations) {
 		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(transactionValidationResult);
-
-		final TestContext context = new TestContext(validator);
+		final TestContext context = new TestContext();
 		final Transaction transaction = createMockTransaction();
-		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(transactionValidationResult);
 
 		// Act:
 		// initial push (cached validation result should NOT be used)
@@ -294,16 +255,14 @@ public class PushServiceTest {
 
 		// Assert:
 		// transaction validation should have only occurred the expected number of times
-		Mockito.verify(validator, Mockito.times(expectedNumberOfInvocations)).validate(Mockito.any());
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(expectedNumberOfInvocations)).addNew(Mockito.any());
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
 	@Test
 	public void pushTransactionPrunesTransactionHashCache() {
 		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.SUCCESS);
-
-		final TestContext context = new TestContext(validator);
+		final TestContext context = new TestContext();
 		final Transaction transaction = createMockTransaction();
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
@@ -325,7 +284,7 @@ public class PushServiceTest {
 
 		// Assert:
 		// transaction validation should have only occurred twice
-		Mockito.verify(validator, Mockito.times(2)).validate(Mockito.any());
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(2)).addNew(Mockito.any());
 	}
 
 	private static Transaction createMockTransaction() {
@@ -342,10 +301,10 @@ public class PushServiceTest {
 	}
 
 	@Test
-	public void pushBlockDoesNotCacheBlockIfValidationFails() {
+	public void pushBlockCachesBlockIfValidationFails() {
 		assertPushServiceBlockCaching(
 				ValidationResult.FAILURE_CHAIN_INVALID,
-				2);
+				1);
 	}
 
 	private static void assertPushServiceBlockCaching(
@@ -424,10 +383,6 @@ public class PushServiceTest {
 		private final PushService service;
 
 		public TestContext() {
-			this(new UniversalTransactionValidator());
-		}
-
-		public TestContext(final SingleTransactionValidator validator) {
 			this.remoteNodeIdentity = new NodeIdentity(new KeyPair());
 			this.remoteNode = new Node(this.remoteNodeIdentity, NodeEndpoint.fromHost("10.0.0.1"));
 
@@ -457,7 +412,6 @@ public class PushServiceTest {
 
 			this.service = new PushService(
 					this.unconfirmedTransactions,
-					validator,
 					this.blockChain,
 					host,
 					this.timeProvider);

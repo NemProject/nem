@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Service for executing blocks.
@@ -48,6 +49,7 @@ public class BlockExecutor {
 		}
 
 		this.notifyBlockHarvested(transactionObserver, block, trigger);
+		this.notifyTransactionHashes(transactionObserver, block);
 	}
 
 	//endregion
@@ -65,6 +67,7 @@ public class BlockExecutor {
 		final TransactionObserver transactionObserver = this.createTransactionObserver(block, trigger, observer);
 
 		this.notifyBlockHarvested(transactionObserver, block, trigger);
+		this.notifyTransactionHashes(transactionObserver, block);
 		for (final Transaction transaction : getReverseTransactions(block)) {
 			transaction.undo(transactionObserver);
 		}
@@ -91,6 +94,13 @@ public class BlockExecutor {
 		}
 	}
 
+	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
+		final List<HashMetaDataPair> pairs = block.getTransactions().stream()
+				.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
+				.collect(Collectors.toList());
+		observer.notify(new TransactionHashesNotification(pairs));
+	}
+
 	private static Iterable<Transaction> getReverseTransactions(final Block block) {
 		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
@@ -99,7 +109,7 @@ public class BlockExecutor {
 			final Block block,
 			final NotificationTrigger trigger,
 			final BlockTransactionObserver observer) {
-		final BlockNotificationContext context = new BlockNotificationContext(block.getHeight(), trigger);
+		final BlockNotificationContext context = new BlockNotificationContext(block.getHeight(), block.getTimeStamp(), trigger);
 		return new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
 	}
 }

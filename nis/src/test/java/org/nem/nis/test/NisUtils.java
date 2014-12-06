@@ -1,15 +1,13 @@
 package org.nem.nis.test;
 
-import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
-import org.nem.nis.dao.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
-import org.nem.nis.secret.AccountLink;
+import org.nem.nis.secret.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -109,6 +107,22 @@ public class NisUtils {
 	}
 
 	/**
+	 * Creates a new random Block with the specified timestamp and height.
+	 *
+	 * @param timeStamp The time stamp.
+	 * @param height The height.
+	 * @return The block.
+	 */
+	public static Block createRandomBlockWithTimeStampAndHeight(final int timeStamp, final long height) {
+		return new Block(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomHash(),
+				Utils.generateRandomHash(),
+				new TimeInstant(timeStamp),
+				new BlockHeight(height));
+	}
+
+	/**
 	 * Creates a new list of blocks.
 	 *
 	 * @param parent The parent block.
@@ -175,19 +189,7 @@ public class NisUtils {
 	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory() {
-		return createTransactionValidatorFactory(Mockito.mock(TransferDao.class));
-	}
-
-	/**
-	 * Creates a (mostly real) transaction validator factory.
-	 *
-	 * @param transferDao The transfer dao.
-	 * @return The factory.
-	 */
-	public static TransactionValidatorFactory createTransactionValidatorFactory(final TransferDao transferDao) {
 		return new TransactionValidatorFactory(
-				transferDao,
-				Mockito.mock(ImportanceTransferDao.class),
 				new SystemTimeProvider(),
 				DEFAULT_POI_OPTIONS);
 	}
@@ -261,4 +263,38 @@ public class NisUtils {
 				DEFAULT_POI_OPTIONS.getMuClusteringValue(),
 				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
 	}
+
+	//region createBlockNotificationContext
+
+	/**
+	 * Creates a block notification context.
+	 *
+	 * @return The block notification context.
+	 */
+	public static BlockNotificationContext createBlockNotificationContext() {
+		return createBlockNotificationContext(NotificationTrigger.Execute);
+	}
+
+	/**
+	 * Creates a block notification context.
+	 *
+	 * @param trigger The notification trigger.
+	 * @return The block notification context.
+	 */
+	public static BlockNotificationContext createBlockNotificationContext(final NotificationTrigger trigger) {
+		return createBlockNotificationContext(new BlockHeight(8888), trigger);
+	}
+
+	/**
+	 * Creates a block notification context.
+	 *
+	 * @param height The notification height.
+	 * @param trigger The notification trigger.
+	 * @return The block notification context.
+	 */
+	public static BlockNotificationContext createBlockNotificationContext(final BlockHeight height, final NotificationTrigger trigger) {
+		return new BlockNotificationContext(height, new TimeInstant(987), trigger);
+	}
+
+	//endregion
 }

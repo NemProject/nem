@@ -261,6 +261,7 @@ public class BlockChainValidatorTest {
 
 	@Test
 	public void chainIsInvalidIfTwoBlocksContainTheSameTransaction() {
+		// Arrange:
 		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
 		parentBlock.sign();
@@ -274,7 +275,11 @@ public class BlockChainValidatorTest {
 		block2.addTransaction(tx);
 		NisUtils.signAllBlocks(blocks);
 
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		// Act:
+		final boolean isValid = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(isValid, IsEqual.equalTo(false));
 	}
 
 	@Test

@@ -30,4 +30,10 @@ public class BlockMarkerConstants {
 	 * Targeting Friday 13 Nov, 8am UTC.
 	 */
 	public static long BETA_OUTLINK_PRUNING_FORK = 51000;
+
+	/**
+	 * Beta hard fork due to a fix in expired transaction detection.
+	 * Targeting Monday 1 Dec.
+	 */
+	public static long BETA_TX_DEADLINE_FORK = 60000;
 }

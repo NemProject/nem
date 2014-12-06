@@ -84,7 +84,7 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param node The other node.
 	 */
 	@Override
-	public synchronized NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
+	public NodeInteractionResult synchronizeNode(final SyncConnectorPool connectorPool, final Node node) {
 		try {
 			return this.synchronizeNodeInternal(connectorPool, node);
 		} catch (final FatalPeerException ex) {
@@ -103,7 +103,7 @@ public class BlockChain implements BlockSynchronizer {
 	 * @param receivedBlock - receivedBlock that's going to be processed
 	 * @return Node experience code which indicates the status of the operation
 	 */
-	public synchronized ValidationResult processBlock(final Block receivedBlock) {
+	public ValidationResult processBlock(final Block receivedBlock) {
 		return updater.updateBlock(receivedBlock);
 	}
 }

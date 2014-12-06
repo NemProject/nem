@@ -3,6 +3,8 @@ package org.nem.nis.validators;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.poi.PoiFacade;
 
+import java.util.function.Consumer;
+
 /**
  * Factory for creating BlockValidator objects.
  */
@@ -26,12 +28,23 @@ public class BlockValidatorFactory {
 	 */
 	public BlockValidator create(final PoiFacade poiFacade) {
 		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
-		builder.add(new NonFutureEntityValidator(this.timeProvider));
-		builder.add(new EligibleSignerBlockValidator(poiFacade));
-		builder.add(new MaxTransactionsBlockValidator());
-		builder.add(new NoSelfSignedTransactionsBlockValidator(poiFacade));
-		builder.add(new BlockImportanceTransferValidator());
-		builder.add(new BlockImportanceTransferBalanceValidator());
+		this.visitSubValidators(builder::add, poiFacade);
 		return builder.build();
+	}
+
+	/**
+	 * Visits all sub validators that comprise the returned aggregate validator.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @param visitor The visitor.
+	 */
+	public void visitSubValidators(final Consumer<BlockValidator> visitor, final PoiFacade poiFacade) {
+		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
+		visitor.accept(new TransactionDeadlineBlockValidator());
+		visitor.accept(new EligibleSignerBlockValidator(poiFacade));
+		visitor.accept(new MaxTransactionsBlockValidator());
+		visitor.accept(new NoSelfSignedTransactionsBlockValidator(poiFacade));
+		visitor.accept(new BlockImportanceTransferValidator());
+		visitor.accept(new BlockImportanceTransferBalanceValidator());
 	}
 }

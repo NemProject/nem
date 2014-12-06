@@ -6,10 +6,11 @@ import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.nis.*;
 import org.nem.nis.poi.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -21,10 +22,11 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createExecuteCommitObserverReturnsValidObserver() {
 		// Arrange:
+		final TestContext context = new TestContext();
 		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		// Act:
-		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(Mockito.mock(AccountAnalyzer.class));
+		final BlockTransactionObserver observer = factory.createExecuteCommitObserver(context.nisCache);
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
@@ -33,10 +35,11 @@ public class BlockTransactionObserverFactoryTest {
 	@Test
 	public void createUndoCommitObserverReturnsValidObserver() {
 		// Arrange:
+		final TestContext context = new TestContext();
 		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		// Act:
-		final BlockTransactionObserver observer = factory.createUndoCommitObserver(Mockito.mock(AccountAnalyzer.class));
+		final BlockTransactionObserver observer = factory.createUndoCommitObserver(context.nisCache);
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
@@ -50,12 +53,12 @@ public class BlockTransactionObserverFactoryTest {
 	public void executeUpdatesOutlinks() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.nisCache);
 
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.importance, Mockito.times(1)).addOutlink(Mockito.any());
@@ -66,12 +69,12 @@ public class BlockTransactionObserverFactoryTest {
 	public void undoUpdatesOutlinks() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.nisCache);
 
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.importance, Mockito.times(1)).removeOutlink(Mockito.any());
@@ -86,15 +89,15 @@ public class BlockTransactionObserverFactoryTest {
 	public void executeUpdatesWeightedBalances() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.nisCache);
 
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 		observer.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.balances, Mockito.times(2)).addSend(Mockito.any(), Mockito.any());
@@ -105,15 +108,15 @@ public class BlockTransactionObserverFactoryTest {
 	public void undoUpdatesWeightedBalances() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.nisCache);
 
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 		observer.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.balances, Mockito.times(2)).undoSend(Mockito.any(), Mockito.any());
@@ -139,10 +142,10 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).addSend(Mockito.any(), Mockito.any());
 
 		// Act:
-		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.nisCache);
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("weighted-balance", "balance", "outlink")));
@@ -163,10 +166,10 @@ public class BlockTransactionObserverFactoryTest {
 		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).undoSend(Mockito.any(), Mockito.any());
 
 		// Act:
-		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.accountAnalyzer);
+		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.nisCache);
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
 		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("outlink", "balance", "weighted-balance")));
@@ -200,7 +203,7 @@ public class BlockTransactionObserverFactoryTest {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final MockAccountContext accountContext1 = this.addAccount();
 		private final MockAccountContext accountContext2 = this.addAccount();
-		private final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), this.poiFacade);
+		private final NisCache nisCache = new NisCache(new AccountAnalyzer(new AccountCache(), this.poiFacade), new HashCache());
 		private final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		private MockAccountContext addAccount() {
