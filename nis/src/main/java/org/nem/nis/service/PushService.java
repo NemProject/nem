@@ -50,25 +50,9 @@ public class PushService {
 	 * @param identity The identity of the pushing node.
 	 */
 	public ValidationResult pushTransaction(final Transaction entity, final NodeIdentity identity) {
-		final Hash hash = HashUtils.calculateHash(entity);
-		if (this.transactionHashCache.isKnown(hash)) {
-			return ValidationResult.NEUTRAL;
-		}
-
-		final ValidationResult result = this.pushEntity(
-				entity,
-				transaction -> ValidationResult.SUCCESS, // addNew does all the validation
-				transaction -> this.unconfirmedTransactions.addNew(transaction),
-				transaction -> {},
-				NisPeerId.REST_PUSH_TRANSACTION,
-				identity);
-
-		if (result.isFailure()) {
-			this.transactionHashCache.remove(hash);
-			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
-		}
-
-		return result;
+		final PushContext<Transaction> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_TRANSACTION);
+		context.isAccepted = this.unconfirmedTransactions::addNew;
+		return this.pushEntityWithCache(context, this.transactionHashCache);
 	}
 
 	/**
@@ -78,47 +62,67 @@ public class PushService {
 	 * @param identity The identity of the pushing node.
 	 */
 	public void pushBlock(final Block entity, final NodeIdentity identity) {
-		final Hash hash = HashUtils.calculateHash(entity);
-		if (this.blockHashCache.isKnown(hash)) {
-			return;
-		}
-		final ValidationResult result = this.pushEntity(
-				entity,
-				obj -> this.blockChain.checkPushedBlock(obj),
-				obj -> this.blockChain.processBlock(obj),
-				block -> LOGGER.info("   block height: " + entity.getHeight()),
-				NisPeerId.REST_PUSH_BLOCK,
-				identity);
+		final PushContext<Block> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_BLOCK);
+		context.isValid = this.blockChain::checkPushedBlock;
+		context.isAccepted = this.blockChain::processBlock;
+		context.logAdditionalInfo = block -> LOGGER.info("   block height: " + block.getHeight());
+		this.pushEntityWithCache(context, this.blockHashCache);
+	}
 
-		if (result.isFailure()) {
-			this.blockHashCache.remove(hash);
-			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
+	private static class PushContext<T> {
+		public T entity;
+		public NodeIdentity identity;
+		public NisPeerId broadcastId;
+		public Function<T, ValidationResult> isValid;
+		public Function<T, ValidationResult> isAccepted;
+		public Consumer<T> logAdditionalInfo;
+
+		public PushContext(final T entity, final NodeIdentity identity, final NisPeerId broadcastId) {
+			this.entity = entity;
+			this.identity = identity;
+			this.broadcastId = broadcastId;
+
+			this.isValid =  e -> ValidationResult.SUCCESS;
+			this.isAccepted =  e -> ValidationResult.SUCCESS;
+			this.logAdditionalInfo = e -> {};
 		}
 	}
 
-	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(
-			final T entity,
-			final Function<T, ValidationResult> isValid,
-			final Function<T, ValidationResult> isAccepted,
-			final Consumer<T> logAdditionalInfo,
-			final NisPeerId broadcastId,
-			final NodeIdentity identity) {
+	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntityWithCache(
+			final PushContext<T> context,
+			final HashCache hashCache) {
+		final Hash hash = HashUtils.calculateHash(context.entity);
+		final ValidationResult cachedResult = hashCache.getCachedResult(hash);
+		if (null != cachedResult) {
+			return cachedResult;
+		}
+
+		final ValidationResult result = this.pushEntity(context);
+		if (result.isFailure()) {
+			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
+		}
+
+		hashCache.setCachedResult(hash, result);
+		return result;
+	}
+
+	private <T extends VerifiableEntity & SerializableEntity> ValidationResult pushEntity(final PushContext<T> context) {
 		final String message = String.format("   received: %s from %s  (signer: %s)",
-				entity.getType(),
-				identity,
-				Address.fromPublicKey(entity.getSigner().getKeyPair().getPublicKey()));
+				context.entity.getType(),
+				context.identity,
+				Address.fromPublicKey(context.entity.getSigner().getKeyPair().getPublicKey()));
 		LOGGER.info(message);
-		logAdditionalInfo.accept(entity);
+		context.logAdditionalInfo.accept(context.entity);
 
 		final PeerNetwork network = this.host.getNetwork();
-		final Node remoteNode = null == identity ? null : network.getNodes().findNodeByIdentity(identity);
+		final Node remoteNode = null == context.identity ? null : network.getNodes().findNodeByIdentity(context.identity);
 		final Consumer<NodeInteractionResult> updateStatus = status -> {
 			if (null != remoteNode) {
 				network.updateExperience(remoteNode, status);
 			}
 		};
 
-		final ValidationResult isValidResult = isValid.apply(entity);
+		final ValidationResult isValidResult = context.isValid.apply(context.entity);
 		if (isValidResult.isFailure()) {
 			// TODO 20141205 J-B: can you remind me why we don't want to mark a node as FAILURE
 			// > when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE
@@ -131,22 +135,22 @@ public class PushService {
 		}
 
 		// validate entity and broadcast (async)
-		final ValidationResult status = isAccepted.apply(entity);
+		final ValidationResult status = context.isAccepted.apply(context.entity);
 		// Good or bad experience with the remote node.
 		updateStatus.accept(NodeInteractionResult.fromValidationResult(status));
 
 		if (status.isSuccess()) {
 			final SecureSerializableEntity<T> secureEntity = new SecureSerializableEntity<>(
-					entity,
+					context.entity,
 					this.host.getNetwork().getLocalNode().getIdentity());
-			network.broadcast(broadcastId, secureEntity);
+			network.broadcast(context.broadcastId, secureEntity);
 		}
 
 		return status;
 	}
 
 	private static class HashCache {
-		private final HashMap<Hash, TimeInstant> cache;
+		private final HashMap<Hash, HashCacheValue> cache;
 		private final TimeProvider timeProvider;
 		private final int cacheSeconds;
 
@@ -156,29 +160,33 @@ public class PushService {
 			this.cache = new HashMap<>();
 		}
 
-		private boolean isKnown(final Hash hash) {
+		private ValidationResult getCachedResult(final Hash hash) {
 			this.prune();
-			if (this.cache.containsKey(hash)) {
-				return true;
-			}
-
-			this.cache.putIfAbsent(hash, this.timeProvider.getCurrentTime());
-			return false;
+			final HashCacheValue cachedValue = this.cache.getOrDefault(hash, null);
+			return null == cachedValue ? null : cachedValue.result;
 		}
 
-		private void remove(final Hash hash) {
-			this.cache.remove(hash);
+		private void setCachedResult(final Hash hash, final ValidationResult result) {
+			final HashCacheValue value = new HashCacheValue();
+			value.timeStamp = this.timeProvider.getCurrentTime();
+			value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
+			this.cache.putIfAbsent(hash, value);
 		}
 
 		private void prune() {
 			final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-			final Iterator<Map.Entry<Hash, TimeInstant>> iterator = this.cache.entrySet().iterator();
+			final Iterator<Map.Entry<Hash, HashCacheValue>> iterator = this.cache.entrySet().iterator();
 			while (iterator.hasNext()) {
-				final Map.Entry<Hash, TimeInstant> entry = iterator.next();
-				if (entry.getValue().addSeconds(this.cacheSeconds).compareTo(currentTime) <= 0) {
+				final Map.Entry<Hash, HashCacheValue> entry = iterator.next();
+				if (entry.getValue().timeStamp.addSeconds(this.cacheSeconds).compareTo(currentTime) <= 0) {
 					iterator.remove();
 				}
 			}
 		}
+	}
+
+	private static class HashCacheValue {
+		TimeInstant timeStamp;
+		ValidationResult result;
 	}
 }

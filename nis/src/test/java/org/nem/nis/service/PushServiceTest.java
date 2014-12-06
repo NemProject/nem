@@ -227,15 +227,13 @@ public class PushServiceTest {
 				1);
 	}
 
-	// TODO 20141205: I would rather want to always cache the transaction. During sync it is hard to follow the logs if every incoming transaction
-	// TODO           (which usually get rejected as the chain is not synced) causes a ten- or twenty-fold error log entry.
 	@Test
-	public void pushTransactionDoesNotCacheTransactionIfValidationFails() {
+	public void pushTransactionCachesTransactionIfValidationFails() {
 		// Assert:
 		assertPushServiceTransactionCaching(
 				ValidationResult.FAILURE_CHAIN_INVALID,
 				ValidationResult.FAILURE_CHAIN_INVALID,
-				2);
+				1);
 	}
 
 	private static void assertPushServiceTransactionCaching(
@@ -303,10 +301,10 @@ public class PushServiceTest {
 	}
 
 	@Test
-	public void pushBlockDoesNotCacheBlockIfValidationFails() {
+	public void pushBlockCachesBlockIfValidationFails() {
 		assertPushServiceBlockCaching(
 				ValidationResult.FAILURE_CHAIN_INVALID,
-				2);
+				1);
 	}
 
 	private static void assertPushServiceBlockCaching(
