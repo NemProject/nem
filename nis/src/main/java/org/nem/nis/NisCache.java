@@ -1,7 +1,6 @@
-package org.nem.core.model;
+package org.nem.nis;
 
-// TODO 20141205 J-J: need to move this to nis or core will break
-import org.nem.nis.AccountAnalyzer;
+import org.nem.core.model.HashCache;
 
 /**
  * Class holding cached data.

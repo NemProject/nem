@@ -1,9 +1,9 @@
-package org.nem.core.model;
+package org.nem.nis;
 
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.nis.*;
+import org.nem.core.model.HashCache;
 import org.nem.nis.poi.PoiFacade;
 
 public class NisCacheTest {
