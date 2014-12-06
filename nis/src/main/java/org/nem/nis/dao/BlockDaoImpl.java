@@ -37,6 +37,16 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	@Override
+	@Transactional
+	public void save(final List<Block> blocks) {
+		for (final Block block : blocks) {
+			this.getCurrentSession().saveOrUpdate(block);
+		}
+		this.getCurrentSession().flush();
+		this.getCurrentSession().clear();
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public Long count() {
 		return (Long)this.getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
