@@ -1,6 +1,7 @@
 package org.nem.nis;
 
 import org.nem.core.model.HashCache;
+import org.nem.nis.poi.PoiFacade;
 
 /**
  * Class holding cached data.
@@ -9,27 +10,42 @@ import org.nem.core.model.HashCache;
  * > i think we should flatten the structure so that this is really a triple of the three components)
  */
 public class NisCache {
-	private final AccountAnalyzer accountAnalyzer;
+	private final AccountCache accountCache;
+	private final PoiFacade poiFacade;
 	private final HashCache transactionHashCache;
 
 	/**
-	 * Creates a NIS cache from an existing account analyzer and a transaction hash cache.
+	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
 	 *
-	 * @param accountAnalyzer The account analyzer.
+	 * @param accountCache The account cache.
+	 * @param poiFacade The poi facade.
 	 * @param transactionHashCache the transaction hash cache.
 	 */
-	public NisCache(final AccountAnalyzer accountAnalyzer, final HashCache transactionHashCache) {
-		this.accountAnalyzer = accountAnalyzer;
+	public NisCache(
+			final AccountCache accountCache,
+			final PoiFacade poiFacade,
+			final HashCache transactionHashCache) {
+		this.accountCache = accountCache;
+		this.poiFacade = poiFacade;
 		this.transactionHashCache = transactionHashCache;
 	}
 
 	/**
-	 * Gets the account analyzer.
+	 * Gets the account cache.
 	 *
-	 * @return The account analyzer.
+	 * @return The account cache.
 	 */
-	public AccountAnalyzer getAccountAnalyzer() {
-		return this.accountAnalyzer;
+	public AccountCache getAccountCache() {
+		return this.accountCache;
+	}
+
+	/**
+	 * Gets the account cache.
+	 *
+	 * @return The account cache.
+	 */
+	public PoiFacade getPoiFacade() {
+		return this.poiFacade;
 	}
 
 	/**
@@ -46,8 +62,9 @@ public class NisCache {
 	 *
 	 * @return The copy.
 	 */
-	public NisCache copy() {
-		return new NisCache(this.accountAnalyzer.copy(), this.transactionHashCache.copy());
+	public NisCache copy()
+	{
+		return new NisCache(this.accountCache.copy(), this.poiFacade.copy(), this.transactionHashCache.copy());
 	}
 
 	/**
@@ -56,7 +73,8 @@ public class NisCache {
 	 * @param nisCache The other cache.
 	 */
 	public void shallowCopyTo(final NisCache nisCache) {
-		this.accountAnalyzer.shallowCopyTo(nisCache.getAccountAnalyzer());
+		this.accountCache.shallowCopyTo(nisCache.getAccountCache());
+		this.poiFacade.shallowCopyTo(nisCache.getPoiFacade());
 		this.transactionHashCache.shallowCopyTo(nisCache.getTransactionHashCache());
 	}
 }

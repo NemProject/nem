@@ -67,9 +67,9 @@ public class BlockChainTest {
 		Assert.assertThat(blockChainLastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
-	private Vector<Account> prepareSigners(final AccountAnalyzer accountAnalyzer) {
-		final AccountCache accountCache = accountAnalyzer.getAccountCache();
-		final PoiFacade poiFacade = accountAnalyzer.getPoiFacade();
+	private Vector<Account> prepareSigners(final NisCache nisCache) {
+		final AccountCache accountCache = nisCache.getAccountCache();
+		final PoiFacade poiFacade = nisCache.getPoiFacade();
 		final Vector<Account> accounts = new Vector<>();
 
 		Account a;
@@ -121,20 +121,19 @@ public class BlockChainTest {
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), poiFacade);
-		final HashCache transactionHashCache = new HashCache();
-		final List<Account> accounts = this.prepareSigners(accountAnalyzer);
+		final NisCache nisCache = new NisCache(new AccountCache(), poiFacade, new HashCache());
+		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
-			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
 
 		final Account signer = accounts.get(0);
 
-		final Block parentBlock = createBlock(signer, accountAnalyzer.getAccountCache());
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
+		final Block parentBlock = createBlock(signer, nisCache.getAccountCache());
+		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
-		final Block block = this.createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
+		final Block block = this.createBlockForTests(accounts, nisCache.getAccountCache(), blocks, scorer);
 
 		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
@@ -155,17 +154,16 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				poiFacade,
-				transactionHashCache);
+				nisCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				new NisCache(accountAnalyzer, transactionHashCache),
+				nisCache,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
 				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
-						accountAnalyzer,
+						nisCache,
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,
@@ -176,7 +174,7 @@ public class BlockChainTest {
 
 		// Act:
 		final ValidationResult result = blockChain.processBlock(block);
-		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
+		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), nisCache.getAccountCache());
 		TransferTransaction transaction;
 
 		// Assert:
@@ -207,19 +205,19 @@ public class BlockChainTest {
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(new AccountCache(), poiFacade);
-		final List<Account> accounts = this.prepareSigners(accountAnalyzer);
+		final NisCache nisCache = new NisCache(new AccountCache(), poiFacade, new HashCache());
+		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
-			accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
 
 		final Account signer = accounts.get(0);
 
-		final Block parentBlock = createBlock(signer, accountAnalyzer.getAccountCache());
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
+		final Block parentBlock = createBlock(signer, nisCache.getAccountCache());
+		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
-		final Block block = this.createBlockForTests(accounts, accountAnalyzer, blocks, scorer);
+		final Block block = this.createBlockForTests(accounts, nisCache.getAccountCache(), blocks, scorer);
 
 		final AccountDao accountDao = mock(AccountDao.class);
 		when(accountDao.getAccountByPrintableAddress(parentBlock.getSigner().getAddress().getEncoded())).thenReturn(
@@ -233,7 +231,6 @@ public class BlockChainTest {
 		mockBlockDao.save(parent);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
 		final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-		final HashCache transactionHashCache = new HashCache();
 		final BlockChainServices services =
 				new BlockChainServices(
 						mockBlockDao,
@@ -242,17 +239,16 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				poiFacade,
-				transactionHashCache);
+				nisCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				new NisCache(accountAnalyzer, transactionHashCache),
+				nisCache,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
 				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
-						accountAnalyzer,
+						nisCache,
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,
@@ -265,7 +261,7 @@ public class BlockChainTest {
 		final ValidationResult result = blockChain.processBlock(block);
 		mockBlockDao.save(dbBlock);
 		mockBlockDao.addBlock(dbBlock);
-		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
+		final Block savedBlock = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), nisCache.getAccountCache());
 		TransferTransaction transaction;
 
 		// Assert:
@@ -281,12 +277,12 @@ public class BlockChainTest {
 		// Act:
 		final Block sibling = this.createBlockSiblingWithBetterScore(block, parentBlock, accounts);
 		final ValidationResult siblingResult = blockChain.processBlock(sibling);
-		final Block savedBlock2 = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), accountAnalyzer.getAccountCache());
+		final Block savedBlock2 = BlockMapper.toModel(mockBlockDao.getLastSavedBlock(), nisCache.getAccountCache());
 
 		// Assert:
 		transaction = (TransferTransaction)savedBlock2.getTransactions().get(0);
 		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
-		Assert.assertTrue(accountAnalyzer.getAccountCache().isKnownAddress(transaction.getRecipient().getAddress()));
+		Assert.assertTrue(nisCache.getAccountCache().isKnownAddress(transaction.getRecipient().getAddress()));
 		Assert.assertTrue(siblingResult == ValidationResult.SUCCESS);
 	}
 
@@ -344,7 +340,7 @@ public class BlockChainTest {
 		return blocks.stream().map(VerifiableEntity::getTimeStamp).collect(Collectors.toList());
 	}
 
-	private Block createBlockForTests(final List<Account> accounts, final AccountAnalyzer accountAnalyzer, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
+	private Block createBlockForTests(final List<Account> accounts, final AccountCache accountCache, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 		final Account forger = accounts.get(0);
@@ -373,7 +369,7 @@ public class BlockChainTest {
 		block.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		block.sign();
 
-		return roundTripBlock(accountAnalyzer.getAccountCache(), block);
+		return roundTripBlock(accountCache, block);
 	}
 
 	private Block createBlockSiblingWithSameScore(final Block block, final Block parentBlock, final List<Account> accounts) {

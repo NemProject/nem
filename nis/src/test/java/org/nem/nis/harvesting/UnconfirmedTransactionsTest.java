@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockChainConstants;
+import org.nem.nis.*;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
@@ -1072,14 +1072,14 @@ public class UnconfirmedTransactionsTest {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
+			final AccountCache accountCache = Mockito.mock(AccountCache.class);
 			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(poiFacade)).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					poiFacade,
-					transactionHashCache);
+					new NisCache(accountCache, poiFacade, transactionHashCache));
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {

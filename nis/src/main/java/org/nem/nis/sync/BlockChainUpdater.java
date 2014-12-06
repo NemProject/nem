@@ -30,21 +30,21 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
-	private final AccountAnalyzer accountAnalyzer;
+	private final NisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
-			final AccountAnalyzer accountAnalyzer,
+			final NisCache nisCache,
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final NisConfiguration configuration) {
-		this.accountAnalyzer = accountAnalyzer;
+		this.nisCache = nisCache;
 		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
@@ -63,7 +63,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	@Override
 	public void updateScore(final Block parentBlock, final Block block) {
-		final BlockScorer scorer = new BlockScorer(this.accountAnalyzer.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(this.nisCache.getPoiFacade());
 		this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 	}
 
@@ -82,7 +82,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
-		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer().getAccountCache().asAutoCache());
+		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache().asAutoCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
@@ -180,7 +180,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		// EVIL hack, see issue#70
 		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
-		receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer());
+		receivedBlock = this.remapBlock(receivedBlock, context.nisCache().getAccountCache());
 		// EVIL hack end
 
 		BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -198,7 +198,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			// block has transaction addressed to that account, it won't be seen later,
 			// (see canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards test for details)
 			// we remap once more to fix accounts references (and possibly add them to AA)
-			receivedBlock = this.remapBlock(receivedBlock, context.accountAnalyzer());
+			receivedBlock = this.remapBlock(receivedBlock, context.nisCache().getAccountCache());
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
@@ -207,9 +207,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
 	}
 
-	private Block remapBlock(final Block block, final AccountAnalyzer accountAnalyzer) {
+	private Block remapBlock(final Block block, final AccountCache accountCache) {
 		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-		return BlockMapper.toModel(dbBlock, accountAnalyzer.getAccountCache().asAutoCache());
+		return BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
@@ -218,9 +218,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// each block that we receive
 		fixGenerationHash(block, parent);
 
-		final PoiFacade poiFacade = this.accountAnalyzer.getPoiFacade();
+		final PoiFacade poiFacade = this.nisCache.getPoiFacade();
 		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
-		final Account lessor = this.accountAnalyzer.getAccountCache().findByAddress(state.getAddress());
+		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
 		block.setLessor(lessor);
 	}
 
