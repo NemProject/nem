@@ -53,8 +53,9 @@ public class PruningObserver implements BlockTransactionObserver {
 		return new BlockHeight(Math.max(1, height.getRaw() - numHistoryBlocks));
 	}
 
-	private static TimeInstant getPruneTime(final TimeInstant timestamp, int retentionTime) {
-		return new TimeInstant(Math.max(0, timestamp.getRawTime() - retentionTime * 60 * 60 ));
+	private static TimeInstant getPruneTime(final TimeInstant currentTime, final int retentionHours) {
+		final TimeInstant retentionTime = TimeInstant.ZERO.addHours(retentionHours);
+		return new TimeInstant(currentTime.compareTo(retentionTime) <= 0 ? 0 : currentTime.subtract(retentionTime));
 	}
 
 	private static boolean shouldPrune(final Notification notification, final BlockNotificationContext context) {
