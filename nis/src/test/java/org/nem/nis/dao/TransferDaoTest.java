@@ -51,9 +51,11 @@ public class TransferDaoTest {
 	public void before() {
 		this.session = this.sessionFactory.openSession();
 		this.session.createSQLQuery("delete from transfers").executeUpdate();
+		this.session.createSQLQuery("delete from importancetransfers").executeUpdate();
 		this.session.createSQLQuery("delete from blocks").executeUpdate();
 		this.session.createSQLQuery("delete from accounts").executeUpdate();
 		this.session.createSQLQuery("ALTER TABLE transfers ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		this.session.createSQLQuery("ALTER TABLE importancetransfers ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		this.session.flush();
 		this.session.clear();
 	}
