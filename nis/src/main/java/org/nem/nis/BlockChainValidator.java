@@ -91,6 +91,8 @@ public class BlockChainValidator {
 			// TODO 20141205 J-B: why did you change how batch validation is happening?
 			// > if you are doing it this way, we can simplify everything and just have this check as a block validator!
 			// > (this is also causing the three remaining test failures)
+			// TODO 20141206 BR -> J: executing a block adds the transaction hashes to the cache. Therefore we can't wait with validation till the end
+			// > because it would fail. i agree that we should have a block validator for it.
 			final ValidationResult batchTransactionValidationResult =
 					this.batchTransactionValidator.validate(Arrays.asList(new TransactionsContextPair(block.getTransactions(), context)));
 			if (!batchTransactionValidationResult.isSuccess()) {

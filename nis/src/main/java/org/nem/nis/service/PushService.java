@@ -126,6 +126,8 @@ public class PushService {
 		if (isValidResult.isFailure()) {
 			// TODO 20141205 J-B: can you remind me why we don't want to mark a node as FAILURE
 			// > when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE
+			// TODO 20141206 BR -> J: we ARE marking the node as FAILURE when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE.
+			// > FAILURE_ENTITY_UNUSABLE is the only exception because that is normal when we are out of sync.
 			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);

@@ -1,5 +1,6 @@
 package org.nem.nis.service;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -95,14 +96,15 @@ public class AccountIoAdapterTest {
 	// region delegation
 
 	// TODO 20141205 J-B; should we also validate return values?
+	// TODO 20141206 BR -> J: my best guess is you want to verify the returned value is an instance of a certain class?
 
 	@Test
 	public void findByAddressDelegatesToAccountCache() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.findByAddress(context.address);
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.findByAddress(context.address), IsInstanceOf.instanceOf(Account.class));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
@@ -113,8 +115,9 @@ public class AccountIoAdapterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.getAccountTransfers(context.address, "123");
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.getAccountTransfers(context.address, "123"),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
@@ -125,8 +128,9 @@ public class AccountIoAdapterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.getAccountTransfers(context.address, "123");
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.getAccountTransfers(context.address, "123"),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
 		// Assert:
 		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(
@@ -140,12 +144,13 @@ public class AccountIoAdapterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingHash(
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.getAccountTransfersUsingHash(
 				context.address,
 				Utils.generateRandomHash(),
 				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.ALL);
+				ReadOnlyTransferDao.TransferType.ALL),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
@@ -156,12 +161,13 @@ public class AccountIoAdapterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingHash(
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.getAccountTransfersUsingHash(
 				context.address,
 				Utils.generateRandomHash(),
 				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.ALL);
+				ReadOnlyTransferDao.TransferType.ALL),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
 		// Assert:
 		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccountUsingHash(
@@ -177,8 +183,9 @@ public class AccountIoAdapterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL);
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
@@ -190,9 +197,10 @@ public class AccountIoAdapterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL);
+		Assert.assertThat(context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
-		// Assert:
+		// Act + Assert:
 		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccountUsingId(
 				Mockito.any(),
 				Mockito.eq(1234L),
@@ -205,8 +213,9 @@ public class AccountIoAdapterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash());
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash()),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
@@ -217,8 +226,9 @@ public class AccountIoAdapterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 
-		// Act:
-		context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash());
+		// Act + Assert:
+		Assert.assertThat(context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash()),
+				IsInstanceOf.instanceOf(SerializableList.class));
 
 		// Assert:
 		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(

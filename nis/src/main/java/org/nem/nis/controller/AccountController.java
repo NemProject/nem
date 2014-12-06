@@ -115,6 +115,10 @@ public class AccountController {
 	// nor a hash. So we need a method which accepts only address and transfer type as parameters.
 	// Not sure if we should support hash as parameter, I left it in order to allow older NCCs/GUIs to query newer NIS versions.
 	// TODO 20141205 J-B: i think we should drop support for hash in release N + 1
+	// TODO 20141206 BR -> J: the id of a tx can be dependent on the node (at least in principle) and cannot be calculated from transaction data while
+	// > a transaction hash is independent of the node queried and can be calculated from a transaction. It seems very natural to query by hash, the
+	// > only problem being the database not supporting it. My idea was to have nodes with unlimited hash cache which can accept such a query. But i don't know
+	// > how a node knows if a remote supports the operation.
 	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
 			final AccountTransactionsPageBuilder builder,
 			final ReadOnlyTransferDao.TransferType transferType) {

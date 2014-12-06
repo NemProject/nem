@@ -332,6 +332,7 @@ public class UnconfirmedTransactions {
 		// (3) not already be expired
 		// TODO 20141205 J-B: i noticed that the TransactionDeadlineBlockValidator is only for blocks;
 		// > if it is updated to also work for blocks, then shouldn't (3) be satisfied by (4)?
+		// TODO 20141206 BR -> J: sorry I don't understand what you mean.
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:

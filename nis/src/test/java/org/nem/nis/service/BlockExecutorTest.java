@@ -267,6 +267,8 @@ public class BlockExecutorTest {
 
 			this.block = this.context.createBlockWithTransaction(this.height, Amount.fromNem(7), transaction);
 			// TODO 20141205 J-B: probably minor, but should the timestamp be associated with the transaction or the containing block?
+			// TODO 20141206 BR -> J: I would say it is more natural to associate it with the tx timestamp. If we ever want to search in the db by
+			// > timestamp when given the hash, it will be handy to be able to map to the timestamp.
 			final HashMetaDataPair pair = new HashMetaDataPair(
 					HashUtils.calculateHash(transaction),
 					new HashMetaData(this.height, transaction.getTimeStamp()));
