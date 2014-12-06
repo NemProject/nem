@@ -97,6 +97,7 @@ public class AccountIoAdapterTest {
 
 	// TODO 20141205 J-B; should we also validate return values?
 	// TODO 20141206 BR -> J: my best guess is you want to verify the returned value is an instance of a certain class?
+	// TODO 20141206 J-B: i'll take a look at updating these
 
 	@Test
 	public void findByAddressDelegatesToAccountCache() {
