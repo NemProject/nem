@@ -43,14 +43,15 @@ public class HashMetaDataTest {
 		Assert.assertThat(map.get("differentTimeStamp").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
 	}
 
-	private HashMap<String, HashMetaData> createTestObjects() {
-		HashMap<String, HashMetaData> map = new HashMap<>();
-		map.put("original", new HashMetaData(new BlockHeight(10), new TimeInstant(123)));
-		map.put("copy", new HashMetaData(new BlockHeight(10), new TimeInstant(123)));
-		map.put("differentHeight", new HashMetaData(new BlockHeight(11), new TimeInstant(123)));
-		map.put("differentTimeStamp", new HashMetaData(new BlockHeight(10), new TimeInstant(234)));
-
-		return map;
+	private static HashMap<String, HashMetaData> createTestObjects() {
+		return new HashMap<String, HashMetaData>() {
+			{
+				this.put("original", new HashMetaData(new BlockHeight(10), new TimeInstant(123)));
+				this.put("copy", new HashMetaData(new BlockHeight(10), new TimeInstant(123)));
+				this.put("differentHeight", new HashMetaData(new BlockHeight(11), new TimeInstant(123)));
+				this.put("differentTimeStamp", new HashMetaData(new BlockHeight(10), new TimeInstant(234)));
+			}
+		};
 	}
 
 	// endregion

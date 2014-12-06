@@ -62,7 +62,7 @@ public class HashCachePerformanceTest {
 	}
 
 	@Test
-	public void shallowCopyPerformanceTest() {
+	public void copyPerformanceTest() {
 		// Arrange:
 		final int count = 250_000;
 		final TestContext context = new TestContext(count);
@@ -70,7 +70,7 @@ public class HashCachePerformanceTest {
 
 		// Act:
 		final long start = System.currentTimeMillis();
-		final HashCache copy = context.cache.shallowCopy();
+		final HashCache copy = context.cache.copy();
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("shallow copy with %d entries needed %dms", count, (stop - start)));
 

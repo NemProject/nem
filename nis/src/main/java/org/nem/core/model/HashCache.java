@@ -11,6 +11,7 @@ import java.util.stream.Stream;
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
  */
 public class HashCache {
+	private static final int MinRetentionHours = 36;
 	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
 	private int retentionTime;
 
@@ -18,17 +19,18 @@ public class HashCache {
 	 * Creates a hash cache.
 	 */
 	public HashCache() {
-		this(50000, 36);
+		this(50000, MinRetentionHours);
 	}
 
 	/**
 	 * Creates a hash cache with the specified capacity.
 	 *
 	 * @param initialCapacity The initial capacity.
+	 * @param retentionTime The hash retention time (in hours).
 	 */
 	public HashCache(final int initialCapacity, final int retentionTime) {
 		this.hashMap = new ConcurrentHashMap<>(initialCapacity);
-		this.retentionTime = (-1 != retentionTime && 36 > retentionTime)? 36 : retentionTime;
+		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MinRetentionHours, retentionTime);
 	}
 
 	/**
@@ -158,11 +160,13 @@ public class HashCache {
 	}
 
 	/**
-	 * Returns a shallow copy of this hash cache.
+	 * Creates a deep copy of this hash cache.
 	 *
-	 * @return the shallow copy of this hash cache.
+	 * @return The copy of this hash cache.
 	 */
-	public HashCache shallowCopy() {
+	public HashCache copy() {
+		// note that this is really creating a shallow copy, which has the effect of a deep copy
+		// because hash map keys and values are immutable
 		final HashCache cache = new HashCache(this.size(), this.getRetentionTime());
 		cache.hashMap.putAll(this.hashMap);
 		return cache;
@@ -171,7 +175,7 @@ public class HashCache {
 	/**
 	 * Copies this hash cash to another cache.
 	 *
-	 * @param cache The hash cache to copy to.
+	 * @param cache The hash cache to copy into.
 	 */
 	public void shallowCopyTo(final HashCache cache) {
 		cache.hashMap.clear();

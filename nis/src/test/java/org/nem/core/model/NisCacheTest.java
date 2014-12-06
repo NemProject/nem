@@ -49,7 +49,7 @@ public class NisCacheTest {
 		cache.copy();
 
 		// Assert:
-		Mockito.verify(transactionsHashCache, Mockito.times(1)).shallowCopy();
+		Mockito.verify(transactionsHashCache, Mockito.times(1)).copy();
 	}
 
 	@Test

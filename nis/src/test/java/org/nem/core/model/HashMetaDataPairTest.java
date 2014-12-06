@@ -20,8 +20,7 @@ public class HashMetaDataPairTest {
 
 		// Assert:
 		Assert.assertThat(pair.getHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
-		Assert.assertThat(metaData.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		Assert.assertThat(pair.getMetaData(), IsEqual.equalTo(metaData));
 	}
 
 	//region equals / hashCode
@@ -48,16 +47,17 @@ public class HashMetaDataPairTest {
 		Assert.assertThat(map.get("differentMetaData").hashCode(), IsNot.not(IsEqual.equalTo(map.get("original").hashCode())));
 	}
 
-	private HashMap<String, HashMetaDataPair> createTestObjects() {
+	private static HashMap<String, HashMetaDataPair> createTestObjects() {
 		final Hash hash = Utils.generateRandomHash();
 		final HashMetaData metaData = new HashMetaData(new BlockHeight(10), new TimeInstant(123));
-		HashMap<String, HashMetaDataPair> map = new HashMap<>();
-		map.put("original", new HashMetaDataPair(hash, metaData));
-		map.put("copy", new HashMetaDataPair(hash, metaData));
-		map.put("differentHash", new HashMetaDataPair(Utils.generateRandomHash(), metaData));
-		map.put("differentMetaData",  new HashMetaDataPair(hash, new HashMetaData(new BlockHeight(10), new TimeInstant(234))));
-
-		return map;
+		return new HashMap<String, HashMetaDataPair>() {
+			{
+				this.put("original", new HashMetaDataPair(hash, metaData));
+				this.put("copy", new HashMetaDataPair(hash, metaData));
+				this.put("differentHash", new HashMetaDataPair(Utils.generateRandomHash(), metaData));
+				this.put("differentMetaData",  new HashMetaDataPair(hash, new HashMetaData(new BlockHeight(10), new TimeInstant(234))));
+			}
+		};
 	}
 
 	// endregion

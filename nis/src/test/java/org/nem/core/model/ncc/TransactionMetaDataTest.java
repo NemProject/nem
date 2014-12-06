@@ -24,7 +24,7 @@ public class TransactionMetaDataTest {
 
 		// Assert:
 		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(new BlockHeight(7546)));
-		Assert.assertThat(metaData.getHeight(), IsEqual.equalTo(456L));
+		Assert.assertThat(metaData.getId(), IsEqual.equalTo(456L));
 	}
 
 	private static TransactionMetaData createTransactionMetaData(final long height, final long id) {

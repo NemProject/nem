@@ -1,5 +1,6 @@
 package org.nem.core.model;
 
+// TODO 20141205 J-J: need to move this to nis or core will break
 import org.nem.nis.AccountAnalyzer;
 
 /**
@@ -39,16 +40,18 @@ public class NisCache {
 	}
 
 	/**
-	 * returns a copy of this NIS cache.
+	 * Creates a deep copy of this NIS cache.
 	 *
 	 * @return The copy.
 	 */
 	public NisCache copy() {
-		return new NisCache(this.accountAnalyzer.copy(), this.transactionHashCache.shallowCopy());
+		return new NisCache(this.accountAnalyzer.copy(), this.transactionHashCache.copy());
 	}
 
 	/**
-	 * Copies this NIS cache to the given one.
+	 * Shallow copies the contents of this NIS cache to the specified cache.
+	 *
+	 * @param nisCache The other cache.
 	 */
 	public void shallowCopyTo(final NisCache nisCache) {
 		this.accountAnalyzer.shallowCopyTo(nisCache.getAccountAnalyzer());

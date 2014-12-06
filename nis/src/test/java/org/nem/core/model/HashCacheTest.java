@@ -27,9 +27,15 @@ public class HashCacheTest {
 	}
 
 	@Test
-	public void hashCacheUsesMinimumRetentionTime() {
+	public void hashCacheCannotHaveRetentionTimeBelowMinimum() {
 		// Assert:
 		Assert.assertThat(new HashCache(50, 35).getRetentionTime(), IsEqual.equalTo(36));
+	}
+
+	@Test
+	public void hashCacheCanHaveUnlimitedRetentionTime() {
+		// Assert:
+		Assert.assertThat(new HashCache(50, -1).getRetentionTime(), IsEqual.equalTo(-1));
 	}
 
 	// endregion
@@ -90,15 +96,24 @@ public class HashCacheTest {
 	// region get
 
 	@Test
-	public void getReturnsCorrectTimeStamp() {
+	public void getReturnsCorrectTimeStampWhenHashIsInCache() {
 		// Arrange:
 		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 		final Hash hash = Utils.generateRandomHash();
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(456)));
 
 		// Assert:
-		Assert.assertThat(cache.get(hash).getHeight(), IsEqual.equalTo(BlockHeight.ONE));
-		Assert.assertThat(cache.get(hash).getTimeStamp(), IsEqual.equalTo(new TimeInstant(456)));
+		Assert.assertThat(cache.get(hash), IsEqual.equalTo(new HashMetaData(BlockHeight.ONE, new TimeInstant(456))));
+	}
+
+	@Test
+	public void getReturnsNullTimeStampWhenHashIsNotInCache() {
+		// Arrange:
+		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final Hash hash = Utils.generateRandomHash();
+
+		// Assert:
+		Assert.assertThat(cache.get(hash), IsNull.nullValue());
 	}
 
 	// endregion
@@ -167,18 +182,18 @@ public class HashCacheTest {
 	public void removeRemovesHashFromHashCache() {
 		// Arrange:
 		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
-		final Hash hash = Utils.generateRandomHash();
-		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(456)));
-		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
-		Assert.assertThat(cache.get(hash).getTimeStamp(), IsEqual.equalTo(new TimeInstant(456)));
-		Assert.assertThat(cache.get(hash).getHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		final HashMetaDataPair pairToRemove = new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(456));
+		cache.put(pairToRemove);
+		cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(567)));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
+		Assert.assertThat(cache.get(pairToRemove.getHash()), IsEqual.equalTo(pairToRemove.getMetaData()));
 
 		// Act:
-		cache.remove(hash);
+		cache.remove(pairToRemove.getHash());
 
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
-		Assert.assertThat(cache.get(hash), IsNull.nullValue());
+		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
+		Assert.assertThat(cache.get(pairToRemove.getHash()), IsNull.nullValue());
 	}
 
 	// endregion
@@ -283,7 +298,7 @@ public class HashCacheTest {
 	}
 
 	@Test
-	public void prunePreservesAllHashesWithEarlierTimeStampThanGivenTimeStamp() {
+	public void prunePreservesAllHashesWithTimeStampAtLeastAsOldAsGivenTimeStamp() {
 		// Arrange:
 		final HashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
 		final Hash hash1 = Utils.generateRandomHash();
@@ -301,7 +316,7 @@ public class HashCacheTest {
 	}
 
 	@Test
-	public void prunePreservesAllHashesIfRetentionTimeIsMinusOne() {
+	public void prunePreservesAllHashesIfRetentionTimeIsUnlimited() {
 		// Arrange:
 		final HashCache cache = new HashCache(50, -1);
 		final Hash hash1 = Utils.generateRandomHash();
@@ -320,10 +335,10 @@ public class HashCacheTest {
 
 	// endregion
 
-	// region shallowCopy
+	// region copy
 
 	@Test
-	public void shallowCopyCopiesAllEntries() {
+	public void copyCopiesAllEntries() {
 		// Arrange:
 		final HashCache original = new HashCache(50, 789);
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)));
@@ -331,7 +346,7 @@ public class HashCacheTest {
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
 
 		// Act:
-		final HashCache copy = original.shallowCopy();
+		final HashCache copy = original.copy();
 
 		// Assert:
 		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
@@ -376,8 +391,6 @@ public class HashCacheTest {
 		pairs.forEach(cache::put);
 
 		// Assert:
-		// TODO 20141201 J-J: should add equality to hashmetadatapair to fix
-		// TODO 20141204 BR -> J: done.
 		Assert.assertThat(
 				cache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(pairs));
