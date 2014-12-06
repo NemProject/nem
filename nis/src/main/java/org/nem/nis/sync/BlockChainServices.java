@@ -48,12 +48,12 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
-		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
+		final PoiFacade poiFacade = nisCache.getPoiFacade();
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
-		final BlockExecutor executor = new BlockExecutor(poiFacade, nisCache.getAccountAnalyzer().getAccountCache());
+		final BlockExecutor executor = new BlockExecutor(poiFacade, nisCache.getAccountCache());
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, observer),
@@ -77,7 +77,7 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final BlockLookup localBlockLookup,
 			final BlockHeight commonBlockHeight) {
-		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
+		final PoiFacade poiFacade = nisCache.getPoiFacade();
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
@@ -86,14 +86,14 @@ public class BlockChainServices {
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(
 				this.observerFactory.createUndoCommitObserver(nisCache),
-				new BlockExecutor(poiFacade, nisCache.getAccountAnalyzer().getAccountCache())));
+				new BlockExecutor(poiFacade, nisCache.getAccountCache())));
 		visitors.add(scoreVisitor);
 		final BlockVisitor visitor = new AggregateBlockVisitor(visitors);
 		BlockIterator.unwindUntil(
 				localBlockLookup,
 				commonBlockHeight,
 				visitor);
-		nisCache.getAccountAnalyzer().getPoiFacade().undoVesting(commonBlockHeight);
+		nisCache.getPoiFacade().undoVesting(commonBlockHeight);
 		return scoreVisitor.getScore();
 	}
 

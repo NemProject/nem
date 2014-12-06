@@ -155,12 +155,12 @@ public class NisPeerNetworkHostTest {
 	}
 
 	private static NisPeerNetworkHost createNetwork() {
-		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
-		Mockito.when(accountAnalyzer.getPoiFacade()).thenReturn(Mockito.mock(PoiFacade.class));
+		final NisCache nisCache = Mockito.mock(NisCache.class);
+		Mockito.when(nisCache.getPoiFacade()).thenReturn(Mockito.mock(PoiFacade.class));
 
 		final AuditCollection auditCollection = new AuditCollection(10, new SystemTimeProvider());
 		return new NisPeerNetworkHost(
-				accountAnalyzer,
+				nisCache,
 				null,
 				null,
 				null,

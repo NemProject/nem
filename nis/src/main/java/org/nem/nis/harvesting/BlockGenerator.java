@@ -2,11 +2,10 @@ package org.nem.nis.harvesting;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.poi.*;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
@@ -18,8 +17,7 @@ import java.util.logging.Logger;
  */
 public class BlockGenerator {
 	private static final Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
-	private final AccountLookup accountLookup;
-	private final PoiFacade poiFacade;
+	private final NisCache nisCache;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockDao blockDao;
 	private final BlockScorer blockScorer;
@@ -28,20 +26,17 @@ public class BlockGenerator {
 	/**
 	 * Creates a new block generator.
 	 *
-	 * @param accountLookup The account lookup.
-	 * @param poiFacade The poi facade.
+	 * @param nisCache The NIS cache.
 	 * @param unconfirmedTransactions The unconfirmed transactions.
 	 * @param blockDao The block dao.
 	 */
 	public BlockGenerator(
-			final AccountLookup accountLookup,
-			final PoiFacade poiFacade,
+			final NisCache nisCache,
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final BlockDao blockDao,
 			final BlockScorer blockScorer,
 			final BlockValidator blockValidator) {
-		this.accountLookup = accountLookup;
-		this.poiFacade = poiFacade;
+		this.nisCache = nisCache;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockDao = blockDao;
 		this.blockScorer = blockScorer;
@@ -90,8 +85,8 @@ public class BlockGenerator {
 			final BlockScorer blockScorer,
 			final TimeInstant blockTime) {
 		final BlockHeight harvestedBlockHeight = lastBlock.getHeight().next();
-		final PoiAccountState ownerState = this.poiFacade.findForwardedStateByAddress(harvesterAccount.getAddress(), harvestedBlockHeight);
-		final Account ownerAccount = this.accountLookup.findByAddress(ownerState.getAddress());
+		final PoiAccountState ownerState = this.nisCache.getPoiFacade().findForwardedStateByAddress(harvesterAccount.getAddress(), harvestedBlockHeight);
+		final Account ownerAccount = this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 
 		final Collection<Transaction> transactions = this.unconfirmedTransactions
 				.getTransactionsForNewBlock(ownerAccount.getAddress(), blockTime)

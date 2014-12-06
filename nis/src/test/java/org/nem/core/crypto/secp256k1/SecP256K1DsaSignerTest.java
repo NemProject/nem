@@ -96,8 +96,6 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		Assert.assertThat(dsaSigner.verify(input, signature2), IsEqual.equalTo(false));
 	}
 
-	// TODO 201401010: i wonder if we should move the speed tests out of the unit tests?
-	// > don't do this now as i'm not sure it's worth it :), but these might be too slow to be in the regular batch of tests
 	@Test
 	public void verifyHasExpectedSpeed() {
 		// Arrange:
@@ -113,18 +111,19 @@ public class SecP256K1DsaSignerTest extends DsaSignerTest {
 		}
 
 		// Act:
+		final int numVerifications = 500;
 		final long start = System.currentTimeMillis();
-		for (int i = 0; i < 500; i++) {
+		for (int i = 0; i < numVerifications; i++) {
 			dsaSigner.verify(input, signature);
 		}
 		final long stop = System.currentTimeMillis();
 
-		// Assert (should be less than 2500 micro seconds per verification on a decent computer):
-		final long timeInMilliSeconds = stop - start;
-		System.out.println(String.format("verify needs %d micro seconds.", timeInMilliSeconds * 2));
+		// Assert (should be less than 5000 micro seconds per verification on a decent computer):
+		final long timeInMicroSeconds = (stop - start) * 1000 / numVerifications;
+		System.out.println(String.format("verify needs %d micro seconds.", timeInMicroSeconds));
 		Assert.assertTrue(
-				String.format("verify needs %d micro seconds (expected less than 500 micro seconds).", timeInMilliSeconds * 2),
-				timeInMilliSeconds < 2500);
+				String.format("verify needs %d micro seconds (expected less than 5000 micro seconds).", timeInMicroSeconds),
+				timeInMicroSeconds < 5000);
 	}
 
 	@Override

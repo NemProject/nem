@@ -42,16 +42,17 @@ public class DebugControllerTest {
 		final BlockHeight height = new BlockHeight(10);
 		final TimeInstant timeStamp = new TimeInstant(1000);
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
-		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(
+		final NisCache nisCache = new NisCache(
 				new AccountCache(),
-				new PoiFacade(NisUtils.createImportanceCalculator()));
-		final Account signer1 = addRandomAccountWithBalance(accountAnalyzer);
-		final Account signer2 = addRandomAccountWithBalance(accountAnalyzer);
+				new PoiFacade(NisUtils.createImportanceCalculator()),
+				new HashCache());
+		final Account signer1 = addRandomAccountWithBalance(nisCache);
+		final Account signer2 = addRandomAccountWithBalance(nisCache);
 
 		final Block blockDaoBlock = createBlock(signer1, timeStamp.addSeconds(60), height, difficulty);
 		final Block blockDaoParent = createBlock(signer2, timeStamp, height.prev(), difficulty);
 
-		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
 		final BigInteger hit = scorer.calculateHit(blockDaoBlock);
 		final BigInteger target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
 
@@ -63,11 +64,11 @@ public class DebugControllerTest {
 		// Arrange: simulate block loading by (1) copying all of the information in the AccountAnalyzer
 		// to the AccountAnalyzer copy and (2) then calculate importances (based on the copy)
 		Mockito.when(context.blockAnalyzer.analyze(Mockito.any(), Mockito.eq(10L))).then(invocationOnMock -> {
-			final AccountAnalyzer accountAnalyzerCopy = (AccountAnalyzer)invocationOnMock.getArguments()[0];
-			accountAnalyzer.shallowCopyTo(accountAnalyzerCopy);
+			final NisCache nisCacheCopy = (NisCache)invocationOnMock.getArguments()[0];
+			nisCache.shallowCopyTo(nisCacheCopy);
 
 			final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
-			accountAnalyzerCopy.getPoiFacade().recalculateImportances(blockHeight);
+			nisCacheCopy.getPoiFacade().recalculateImportances(blockHeight);
 			return null;
 		});
 
@@ -135,7 +136,7 @@ public class DebugControllerTest {
 		Mockito.verify(context.host, Mockito.times(1)).getVisitors();
 		Assert.assertThat(
 				visitors.asCollection().stream().map(v -> v.getTimerName()).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(new String[] { "foo", "bar" }));
+				IsEquivalent.equivalentTo("foo", "bar"));
 	}
 
 	@Test
@@ -168,12 +169,12 @@ public class DebugControllerTest {
 		Mockito.verify(context.host, Mockito.times(1)).getOutgoingAudits();
 	}
 
-	private static Account addRandomAccountWithBalance(final AccountAnalyzer accountAnalyzer) {
+	private static Account addRandomAccountWithBalance(final NisCache nisCache) {
 		final Account accountWithPrivateKey = Utils.generateRandomAccount();
-		final Account account = accountAnalyzer.getAccountCache().addAccountToCache(accountWithPrivateKey.getAddress());
+		final Account account = nisCache.getAccountCache().addAccountToCache(accountWithPrivateKey.getAddress());
 		account.incrementBalance(Amount.fromNem(10000));
 
-		final PoiAccountState accountState = accountAnalyzer.getPoiFacade().findStateByAddress(account.getAddress());
+		final PoiAccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
 		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000));
 		accountState.setHeight(BlockHeight.ONE);
 		return accountWithPrivateKey;

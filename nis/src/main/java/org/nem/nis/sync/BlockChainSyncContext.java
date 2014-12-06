@@ -40,15 +40,6 @@ public class BlockChainSyncContext {
 	}
 
 	/**
-	 * Gets the working copy of the account analyzer.
-	 *
-	 * @return The account analyzer.
-	 */
-	public AccountAnalyzer accountAnalyzer() {
-		return this.nisCache.getAccountAnalyzer();
-	}
-
-	/**
 	 * Reverses transactions between commonBlockHeight and current lastBlock.
 	 * Additionally calculates score.
 	 *
@@ -67,7 +58,7 @@ public class BlockChainSyncContext {
 	public BlockLookup createLocalBlockLookup() {
 		return new LocalBlockLookupAdapter(
 				this.blockDao,
-				this.nisCache.getAccountAnalyzer().getAccountCache(),
+				this.nisCache.getAccountCache(),
 				this.blockChainLastBlockLayer.getLastDbBlock(),
 				this.ourScore,
 				BlockChainConstants.BLOCKS_LIMIT);

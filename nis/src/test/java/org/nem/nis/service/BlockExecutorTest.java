@@ -266,7 +266,6 @@ public class BlockExecutorTest {
 			});
 
 			this.block = this.context.createBlockWithTransaction(this.height, Amount.fromNem(7), transaction);
-			// TODO 20141205 J-B: probably minor, but should the timestamp be associated with the transaction or the containing block?
 			final HashMetaDataPair pair = new HashMetaDataPair(
 					HashUtils.calculateHash(transaction),
 					new HashMetaData(this.height, transaction.getTimeStamp()));

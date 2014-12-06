@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.NisCache;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -25,8 +25,7 @@ public class UnconfirmedTransactions {
 	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
-	private final PoiFacade poiFacade;
-	private final HashCache transactionHashCache;
+	private final NisCache nisCache;
 
 	private enum BalanceValidationOptions {
 		/**
@@ -55,15 +54,13 @@ public class UnconfirmedTransactions {
 	 * Creates a new unconfirmed transactions collection.
 	 *
 	 * @param validatorFactory The transaction validator factory to use.
-	 * @param poiFacade The poi facade to use.
+	 * @param nisCache The NIS cache to use.
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
-			final PoiFacade poiFacade,
-			final HashCache transactionHashCache) {
+			final NisCache nisCache) {
 		this.validatorFactory = validatorFactory;
-		this.poiFacade = poiFacade;
-		this.transactionHashCache = transactionHashCache;
+		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator();
 	}
 
@@ -71,11 +68,9 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
-			final PoiFacade poiFacade,
-			final HashCache transactionHashCache) {
+			final NisCache nisCache) {
 		this.validatorFactory = validatorFactory;
-		this.poiFacade = poiFacade;
-		this.transactionHashCache = transactionHashCache;
+		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator();
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -89,8 +84,7 @@ public class UnconfirmedTransactions {
 				transactions,
 				options,
 				this.validatorFactory,
-				this.poiFacade,
-				this.transactionHashCache);
+				this.nisCache);
 	}
 
 	/**
@@ -187,7 +181,7 @@ public class UnconfirmedTransactions {
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
 		final TransactionsContextPair pair = new TransactionsContextPair(transactions, new ValidationContext());
-		return this.validatorFactory.createBatch(this.transactionHashCache).validate(Arrays.asList(pair));
+		return this.validatorFactory.createBatch(this.nisCache.getTransactionHashCache()).validate(Arrays.asList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {
@@ -198,7 +192,7 @@ public class UnconfirmedTransactions {
 
 	private SingleTransactionValidator createSingleValidator() {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.poiFacade));
+		builder.add(this.validatorFactory.createSingle(this.nisCache.getPoiFacade()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		return builder.build();
 	}
@@ -332,6 +326,9 @@ public class UnconfirmedTransactions {
 		// (3) not already be expired
 		// TODO 20141205 J-B: i noticed that the TransactionDeadlineBlockValidator is only for blocks;
 		// > if it is updated to also work for blocks, then shouldn't (3) be satisfied by (4)?
+		// TODO 20141206 BR -> J: sorry I don't understand what you mean.
+		// TODO 20141206 J -> B: ok, my previous comment didn't make sense, but is there a reason for not calling
+		// > dropExpiredTransactions ? instead of the check below?
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
