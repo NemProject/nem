@@ -6,8 +6,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.poi.*;
+import org.nem.nis.test.NisUtils;
 
 public class OutlinkObserverTest {
 
@@ -22,7 +22,7 @@ public class OutlinkObserverTest {
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.account1, context.account2, new Amount(752)),
-				new BlockNotificationContext(new BlockHeight(111), new TimeInstant(123), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(new BlockHeight(111), NotificationTrigger.Execute));
 
 		// Assert (752 * 0.3 = 225.5):
 		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(225), context.account2.getAddress());
@@ -40,7 +40,7 @@ public class OutlinkObserverTest {
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.account2, context.account1, new Amount(752)),
-				new BlockNotificationContext(new BlockHeight(111), new TimeInstant(123), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(new BlockHeight(111), NotificationTrigger.Undo));
 
 		// Assert (752 * 0.3 = 225.5):
 		final AccountLink expectedLink = new AccountLink(new BlockHeight(111), new Amount(225), context.account2.getAddress());
@@ -58,7 +58,7 @@ public class OutlinkObserverTest {
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.account1, context.account1, new Amount(752)),
-				new BlockNotificationContext(new BlockHeight(111), new TimeInstant(123), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(new BlockHeight(111), NotificationTrigger.Execute));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);
@@ -89,7 +89,7 @@ public class OutlinkObserverTest {
 		// Act:
 		observer.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account1, new Amount(432)),
-				new BlockNotificationContext(new BlockHeight(111), new TimeInstant(123), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);
@@ -119,7 +119,7 @@ public class OutlinkObserverTest {
 		// Act:
 		observer.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, context.account1, new Amount(432)),
-				new BlockNotificationContext(new BlockHeight(111), new TimeInstant(123), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(new BlockHeight(111), isExecute ? NotificationTrigger.Execute : NotificationTrigger.Undo));
 
 		// Assert:
 		verifyCallCounts(context.importance1, 0, 0);

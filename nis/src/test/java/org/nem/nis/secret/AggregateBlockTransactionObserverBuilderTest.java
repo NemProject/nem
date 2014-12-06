@@ -7,7 +7,7 @@ import org.mockito.stubbing.Answer;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 
@@ -16,9 +16,8 @@ public class AggregateBlockTransactionObserverBuilderTest {
 			NotificationType.BalanceCredit,
 			Utils.generateRandomAccount(),
 			Amount.fromNem(12));
-	private static final BlockNotificationContext NOTIFICATION_CONTEXT = new BlockNotificationContext(
+	private static final BlockNotificationContext NOTIFICATION_CONTEXT = NisUtils.createBlockNotificationContext(
 			new BlockHeight(11),
-			new TimeInstant(123),
 			NotificationTrigger.Execute);
 
 	//region add

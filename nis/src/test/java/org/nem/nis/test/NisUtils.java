@@ -110,7 +110,7 @@ public class NisUtils {
 	 * Creates a new random Block with the specified timestamp and height.
 	 *
 	 * @param timeStamp The time stamp.
-v	 * @param height The height.
+	 * @param height The height.
 	 * @return The block.
 	 */
 	public static Block createRandomBlockWithTimeStampAndHeight(final int timeStamp, final long height) {
@@ -264,12 +264,37 @@ v	 * @param height The height.
 				DEFAULT_POI_OPTIONS.getEpsilonClusteringValue());
 	}
 
+	//region createBlockNotificationContext
+
 	/**
 	 * Creates a block notification context.
 	 *
 	 * @return The block notification context.
 	 */
 	public static BlockNotificationContext createBlockNotificationContext() {
-		return new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute);
+		return createBlockNotificationContext(NotificationTrigger.Execute);
 	}
+
+	/**
+	 * Creates a block notification context.
+	 *
+	 * @param trigger The notification trigger.
+	 * @return The block notification context.
+	 */
+	public static BlockNotificationContext createBlockNotificationContext(final NotificationTrigger trigger) {
+		return createBlockNotificationContext(new BlockHeight(8888), trigger);
+	}
+
+	/**
+	 * Creates a block notification context.
+	 *
+	 * @param height The notification height.
+	 * @param trigger The notification trigger.
+	 * @return The block notification context.
+	 */
+	public static BlockNotificationContext createBlockNotificationContext(final BlockHeight height, final NotificationTrigger trigger) {
+		return new BlockNotificationContext(height, new TimeInstant(987), trigger);
+	}
+
+	//endregion
 }

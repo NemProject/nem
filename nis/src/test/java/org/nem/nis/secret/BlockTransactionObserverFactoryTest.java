@@ -8,9 +8,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.poi.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.function.Function;
@@ -58,7 +58,7 @@ public class BlockTransactionObserverFactoryTest {
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.importance, Mockito.times(1)).addOutlink(Mockito.any());
@@ -74,7 +74,7 @@ public class BlockTransactionObserverFactoryTest {
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.importance, Mockito.times(1)).removeOutlink(Mockito.any());
@@ -94,10 +94,10 @@ public class BlockTransactionObserverFactoryTest {
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 		observer.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.balances, Mockito.times(2)).addSend(Mockito.any(), Mockito.any());
@@ -113,10 +113,10 @@ public class BlockTransactionObserverFactoryTest {
 		// Act:
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 		observer.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(context.accountContext1.balances, Mockito.times(2)).undoSend(Mockito.any(), Mockito.any());
@@ -145,7 +145,7 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserver observer = context.factory.createExecuteCommitObserver(context.nisCache);
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext1.account, context.accountContext2.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("weighted-balance", "balance", "outlink")));
@@ -169,7 +169,7 @@ public class BlockTransactionObserverFactoryTest {
 		final BlockTransactionObserver observer = context.factory.createUndoCommitObserver(context.nisCache);
 		observer.notify(
 				new BalanceTransferNotification(context.accountContext2.account, context.accountContext1.account, Amount.fromNem(1)),
-				new BlockNotificationContext(new BlockHeight(11), new TimeInstant(123), NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 
 		// Assert:
 		Assert.assertThat(breadcrumbs, IsEqual.equalTo(Arrays.asList("outlink", "balance", "weighted-balance")));
