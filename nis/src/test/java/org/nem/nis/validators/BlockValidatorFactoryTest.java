@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.poi.PoiFacade;
 

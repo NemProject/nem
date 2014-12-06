@@ -21,14 +21,14 @@ public class HashCachePerformanceTest {
 		final TestContext context = new TestContext(count);
 
 		// Warm-up:
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			context.cache.put(context.pairs.get(i));
 		}
 
 		// Act:
 		context.cache.clear();
 		final long start = System.currentTimeMillis();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			context.cache.put(context.pairs.get(i));
 		}
 
@@ -107,13 +107,13 @@ public class HashCachePerformanceTest {
 		context.cache.putAll(context.pairs);
 
 		// Warm-up:
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			context.cache.hashExists(hash);
 		}
 
 		// Act:
 		long start = System.currentTimeMillis();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			context.cache.hashExists(hash);
 		}
 
@@ -122,7 +122,7 @@ public class HashCachePerformanceTest {
 
 		// Act:
 		start = System.currentTimeMillis();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			context.cache.hashExists(context.pairs.get(i).getHash());
 		}
 
@@ -146,7 +146,7 @@ public class HashCachePerformanceTest {
 
 		// Act:
 		long start = System.currentTimeMillis();
-		for (int i=0; i<1000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			context.cache.anyHashExists(pairs.stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 		}
 
@@ -168,7 +168,7 @@ public class HashCachePerformanceTest {
 
 		private List<HashMetaDataPair> createPairs(final int count) {
 			final List<HashMetaDataPair> pairs = new ArrayList<>();
-			for (int i=0; i<count; i++) {
+			for (int i = 0; i < count; i++) {
 				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(BlockHeight.ONE, Utils.generateRandomTimeStamp())));
 			}
 

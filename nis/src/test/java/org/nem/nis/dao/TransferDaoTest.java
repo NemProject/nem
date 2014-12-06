@@ -438,7 +438,7 @@ public class TransferDaoTest {
 			this.blockDao.save(dbBlock);
 		}
 
-		private List<Integer> getTestIntegerList ( final Function<Integer, Integer> mapper){
+		private List<Integer> getTestIntegerList(final Function<Integer, Integer> mapper) {
 			return IntStream.range(0, 50).map(mapper::apply).boxed().collect(Collectors.toList());
 		}
 	}
@@ -480,8 +480,8 @@ public class TransferDaoTest {
 		final List<Integer> expectedTimeStamps = context.getTestIntegerList(mapper);
 		final List<Integer> timeStamps = getTransfersFromDbUsingAttribute(
 				context,
-				USE_HASH == callType? context.hashes.get(mapper.apply(24)) : null,
-				USE_ID == callType? (long)mapper.apply(24) + 1 : null,
+				USE_HASH == callType ? context.hashes.get(mapper.apply(24)) : null,
+				USE_ID == callType ? (long)mapper.apply(24) + 1 : null,
 				callType).stream()
 				.map(Transfer::getTimeStamp)
 				.collect(Collectors.toList());
@@ -497,7 +497,7 @@ public class TransferDaoTest {
 			final int callType) {
 		// Arrange:
 		final TestContext context = new TestContext(this.blockDao, transferType);
-		final int pos = ReadOnlyTransferDao.TransferType.ALL == transferType? 99 : 49;
+		final int pos = ReadOnlyTransferDao.TransferType.ALL == transferType ? 99 : 49;
 		final List<Integer> timeStamps = getTransfersFromDbUsingAttribute(
 				context,
 				USE_HASH == callType ? context.hashes.get(mapper.apply(pos)) : null,
@@ -560,7 +560,6 @@ public class TransferDaoTest {
 				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.ALL,
 				type);
-
 
 		// Assert:
 		Assert.assertThat(entities.size(), equalTo(1));

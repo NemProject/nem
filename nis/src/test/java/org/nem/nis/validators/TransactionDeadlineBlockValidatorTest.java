@@ -44,7 +44,7 @@ public class TransactionDeadlineBlockValidatorTest {
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final Block block = NisUtils.createRandomBlockWithTimeStampAndHeight(blockTimeStamp, blockHeight);
-		for (int i=0; i<5; i++) {
+		for (int i = 0; i < 5; i++) {
 			// add some not expired transactions
 			addTransaction(block, blockTimeStamp + 10);
 		}

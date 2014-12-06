@@ -238,7 +238,12 @@ public class AccountIoAdapterTest {
 			Mockito.when(this.accountCache.findByAddress(Mockito.any())).thenReturn(Utils.generateRandomAccount());
 			Mockito.when(this.transferDao.getTransactionsForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
 					.thenReturn(new ArrayList<>());
-			Mockito.when(this.transferDao.getTransactionsForAccountUsingHash(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+			Mockito.when(this.transferDao.getTransactionsForAccountUsingHash(
+					Mockito.any(),
+					Mockito.any(),
+					Mockito.any(),
+					Mockito.any(),
+					Mockito.eq(DEFAULT_LIMIT)))
 					.thenReturn(new ArrayList<>());
 			Mockito.when(this.transferDao.getTransactionsForAccountUsingId(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
 					.thenReturn(new ArrayList<>());

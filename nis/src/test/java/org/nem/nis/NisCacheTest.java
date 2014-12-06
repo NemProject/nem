@@ -29,7 +29,7 @@ public class NisCacheTest {
 		// Arrange:
 		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		final NisCache cache =  new NisCache(accountAnalyzer, transactionsHashCache);
+		final NisCache cache = new NisCache(accountAnalyzer, transactionsHashCache);
 
 		// Act:
 		cache.copy();
@@ -43,7 +43,7 @@ public class NisCacheTest {
 		// Arrange:
 		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		final NisCache cache =  new NisCache(accountAnalyzer, transactionsHashCache);
+		final NisCache cache = new NisCache(accountAnalyzer, transactionsHashCache);
 
 		// Act:
 		cache.copy();
@@ -57,8 +57,8 @@ public class NisCacheTest {
 		// Arrange:
 		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		final NisCache cache =  new NisCache(accountAnalyzer, transactionsHashCache);
-		final NisCache other =  createCache();
+		final NisCache cache = new NisCache(accountAnalyzer, transactionsHashCache);
+		final NisCache other = createCache();
 
 		// Act:
 		cache.shallowCopyTo(other);
@@ -72,8 +72,8 @@ public class NisCacheTest {
 		// Arrange:
 		final AccountAnalyzer accountAnalyzer = Mockito.mock(AccountAnalyzer.class);
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		final NisCache cache =  new NisCache(accountAnalyzer, transactionsHashCache);
-		final NisCache other =  createCache();
+		final NisCache cache = new NisCache(accountAnalyzer, transactionsHashCache);
+		final NisCache other = createCache();
 
 		// Act:
 		cache.shallowCopyTo(other);

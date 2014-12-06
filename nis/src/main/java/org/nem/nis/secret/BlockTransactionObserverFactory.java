@@ -1,8 +1,7 @@
 package org.nem.nis.secret;
 
-import org.nem.nis.NisCache;
 import org.nem.core.model.observers.BalanceCommitTransferObserver;
-import org.nem.nis.AccountsHeightObserver;
+import org.nem.nis.*;
 import org.nem.nis.poi.PoiFacade;
 
 /**
@@ -28,11 +27,11 @@ public class BlockTransactionObserverFactory {
 	 * @param nisCache The NIS cache.
 	 * @return The observer.
 	 */
-	public BlockTransactionObserver createUndoCommitObserver(final NisCache nisCache){
+	public BlockTransactionObserver createUndoCommitObserver(final NisCache nisCache) {
 		return createBuilder(nisCache).buildReverse();
 	}
 
-	private static AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache){
+	private static AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache) {
 		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new WeightedBalancesObserver(poiFacade));

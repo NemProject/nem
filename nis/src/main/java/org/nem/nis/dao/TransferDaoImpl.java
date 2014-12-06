@@ -199,7 +199,7 @@ public class TransferDaoImpl implements TransferDao {
 		final Query query;
 		final Transfer topMostTransfer = pair.getTransfer();
 
-		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType)? "t.senderId" : "t.recipientId";
+		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
 		final String preQueryString = "SELECT t.*, b.* " +
 				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 				"WHERE %s = %d AND t.id < %d AND t.blockId = b.id " +
@@ -228,7 +228,7 @@ public class TransferDaoImpl implements TransferDao {
 			pairs.addAll(this.getLatestTransactionsForAccountWithTransferType(accountId, limit, TransferType.OUTGOING));
 			return this.sortAndLimit(pairs, limit);
 		} else {
-			final Collection<TransferBlockPair> pairs =  this.getLatestTransactionsForAccountWithTransferType(accountId, limit, transferType);
+			final Collection<TransferBlockPair> pairs = this.getLatestTransactionsForAccountWithTransferType(accountId, limit, transferType);
 			return this.sortAndLimit(pairs, limit);
 		}
 	}
@@ -238,7 +238,7 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		final Query query;
-		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType)? "t.senderId" : "t.recipientId";
+		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
 		final String preQueryString = "SELECT t.*, b.* " +
 				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 				"WHERE %s = %d AND t.blockId = b.id " +

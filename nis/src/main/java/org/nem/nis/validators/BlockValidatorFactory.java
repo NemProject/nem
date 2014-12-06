@@ -34,8 +34,8 @@ public class BlockValidatorFactory {
 
 	/**
 	 * Visits all sub validators that comprise the returned aggregate validator.
-	 * @param poiFacade The poi facade.
 	 *
+	 * @param poiFacade The poi facade.
 	 * @param visitor The visitor.
 	 */
 	public void visitSubValidators(final Consumer<BlockValidator> visitor, final PoiFacade poiFacade) {

@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.nis.*;
 import org.nem.nis.poi.*;

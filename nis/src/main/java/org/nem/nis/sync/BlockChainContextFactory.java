@@ -1,6 +1,6 @@
 package org.nem.nis.sync;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.NisCache;
 import org.nem.nis.dao.BlockDao;

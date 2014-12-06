@@ -6,7 +6,7 @@ import org.nem.core.model.observers.*;
 import java.util.stream.Collectors;
 
 /**
- *  BlockTransactionObserver that updates the transaction hash cache.
+ * BlockTransactionObserver that updates the transaction hash cache.
  */
 public class TransactionHashesObserver implements BlockTransactionObserver {
 	private final HashCache transactionHashCache;

@@ -55,7 +55,7 @@ public class HashMetaDataPairTest {
 				this.put("original", new HashMetaDataPair(hash, metaData));
 				this.put("copy", new HashMetaDataPair(hash, metaData));
 				this.put("differentHash", new HashMetaDataPair(Utils.generateRandomHash(), metaData));
-				this.put("differentMetaData",  new HashMetaDataPair(hash, new HashMetaData(new BlockHeight(10), new TimeInstant(234))));
+				this.put("differentMetaData", new HashMetaDataPair(hash, new HashMetaData(new BlockHeight(10), new TimeInstant(234))));
 			}
 		};
 	}

@@ -70,7 +70,7 @@ public class TransactionHashesObserverTest {
 
 		private List<HashMetaDataPair> createPairs() {
 			final List<HashMetaDataPair> pairs = new ArrayList<>();
-			for (int i=0; i<10; i++) {
+			for (int i = 0; i < 10; i++) {
 				pairs.add(new HashMetaDataPair(Utils.generateRandomHash(), new HashMetaData(new BlockHeight(12), Utils.generateRandomTimeStamp())));
 			}
 

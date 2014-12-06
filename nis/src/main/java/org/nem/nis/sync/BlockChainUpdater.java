@@ -89,7 +89,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-				synchronized(this) {
+				synchronized (this) {
 					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				}
 				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
@@ -105,7 +105,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight() - commonBlockHeight.getRaw());
 		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight, minBlocks, configuration.getMaxTransactions()));
 
-		synchronized(this) {
+		synchronized (this) {
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
 				// last block has changed due to another call (probably processBlock), don't do anything
 				LOGGER.warning("updateChain: last block changed. Update not possible");

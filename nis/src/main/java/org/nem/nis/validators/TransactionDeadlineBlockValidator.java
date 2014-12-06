@@ -15,7 +15,7 @@ public class TransactionDeadlineBlockValidator implements BlockValidator {
 		}
 
 		return ValidationResult.aggregate(block.getTransactions().stream()
-				.map(t -> t.getDeadline().compareTo(block.getTimeStamp()) >= 0? ValidationResult.SUCCESS : ValidationResult.FAILURE_PAST_DEADLINE)
+				.map(t -> t.getDeadline().compareTo(block.getTimeStamp()) >= 0 ? ValidationResult.SUCCESS : ValidationResult.FAILURE_PAST_DEADLINE)
 				.iterator());
 	}
 }

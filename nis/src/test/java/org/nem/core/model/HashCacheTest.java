@@ -213,7 +213,7 @@ public class HashCacheTest {
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(5));
-		pairs.subList(5,10).stream().forEach(p -> Assert.assertThat(null != cache.get(p.getHash()), IsEqual.equalTo(true)));
+		pairs.subList(5, 10).stream().forEach(p -> Assert.assertThat(null != cache.get(p.getHash()), IsEqual.equalTo(true)));
 
 		// Act:
 		cache.removeAll(pairs.subList(5, 10).stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
@@ -285,7 +285,7 @@ public class HashCacheTest {
 		cache.put(new HashMetaDataPair(hash1, createMetaDataWithTimeStamp(123)));
 		cache.put(new HashMetaDataPair(hash2, createMetaDataWithTimeStamp(124)));
 		cache.put(new HashMetaDataPair(hash3, createMetaDataWithTimeStamp(124)));
-		cache.put(new HashMetaDataPair(Utils.generateRandomHash(),createMetaDataWithTimeStamp(125)));
+		cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(125)));
 
 		// Act:
 		cache.prune(new TimeInstant(125));
@@ -417,7 +417,7 @@ public class HashCacheTest {
 
 	private static List<Hash> createHashes(final int count) {
 		final List<Hash> hashes = new ArrayList<>();
-		for (int i=0; i<count; i++) {
+		for (int i = 0; i < count; i++) {
 			hashes.add(Utils.generateRandomHash());
 		}
 

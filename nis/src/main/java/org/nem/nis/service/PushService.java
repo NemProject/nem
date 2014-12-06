@@ -7,7 +7,6 @@ import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.peer.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
