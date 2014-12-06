@@ -140,7 +140,7 @@ public class NisAppConfig {
 	@Bean
 	public BlockChainUpdater blockChainUpdater() {
 		return new BlockChainUpdater(
-				this.accountAnalyzer(),
+				this.nisCache(),
 				this.accountDao,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
@@ -188,8 +188,7 @@ public class NisAppConfig {
 	public Harvester harvester() {
 		final PoiFacade poiFacade = this.poiFacade();
 		final BlockGenerator generator = new BlockGenerator(
-				this.accountCache(),
-				poiFacade,
+				this.nisCache(),
 				this.unconfirmedTransactions(),
 				this.blockDao,
 				new BlockScorer(poiFacade),
@@ -213,23 +212,18 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public NisCache nisCache() {
-		return new NisCache(this.accountAnalyzer(), this.transactionHashCache());
-	}
-
-	@Bean
 	public PoiFacade poiFacade() {
 		return new PoiFacade(this.importanceCalculator());
 	}
 
 	@Bean
-	public ImportanceCalculator importanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), this.poiOptions());
+	public NisCache nisCache() {
+		return new NisCache(this.accountCache(), this.poiFacade(), this.transactionHashCache());
 	}
 
 	@Bean
-	public AccountAnalyzer accountAnalyzer() {
-		return new AccountAnalyzer(this.accountCache(), this.poiFacade());
+	public ImportanceCalculator importanceCalculator() {
+		return new PoiImportanceCalculator(new PoiScorer(), this.poiOptions());
 	}
 
 	@Bean
@@ -256,8 +250,7 @@ public class NisAppConfig {
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory(),
-				this.poiFacade(),
-				this.transactionHashCache());
+				this.nisCache());
 	}
 
 	@Bean
@@ -295,7 +288,7 @@ public class NisAppConfig {
 		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(this.blockChain());
 
 		return new NisPeerNetworkHost(
-				this.accountAnalyzer(),
+				this.nisCache(),
 				synchronizer,
 				scheduler,
 				this.chainServices(),

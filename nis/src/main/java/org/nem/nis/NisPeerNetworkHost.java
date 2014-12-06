@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * NIS PeerNetworkHost
  */
 public class NisPeerNetworkHost implements AutoCloseable {
-	private final AccountAnalyzer accountAnalyzer;
+	private final NisCache nisCache;
 	private final CountingBlockSynchronizer synchronizer;
 	private final PeerNetworkScheduler scheduler;
 	private final ChainServices chainServices;
@@ -38,7 +38,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(
-			final AccountAnalyzer accountAnalyzer,
+			final NisCache nisCache,
 			final CountingBlockSynchronizer synchronizer,
 			final PeerNetworkScheduler scheduler,
 			final ChainServices chainServices,
@@ -46,7 +46,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 			final HttpConnectorPool httpConnectorPool,
 			final AuditCollection incomingAudits,
 			final AuditCollection outgoingAudits) {
-		this.accountAnalyzer = accountAnalyzer;
+		this.nisCache = nisCache;
 		this.synchronizer = synchronizer;
 		this.scheduler = scheduler;
 		this.chainServices = chainServices;
@@ -167,12 +167,12 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private TimeSynchronizationStrategy createTimeSynchronizationStrategy() {
 		return new DefaultTimeSynchronizationStrategy(
 				new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter())),
-				this.accountAnalyzer.getPoiFacade());
+				this.nisCache.getPoiFacade());
 	}
 
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
-		final PeerConnector peerConnector = this.httpConnectorPool.getPeerConnector(this.accountAnalyzer.getAccountCache());
-		final TimeSynchronizationConnector timeSynchronizationConnector = this.httpConnectorPool.getTimeSyncConnector(this.accountAnalyzer.getAccountCache());
+		final PeerConnector peerConnector = this.httpConnectorPool.getPeerConnector(this.nisCache.getAccountCache());
+		final TimeSynchronizationConnector timeSynchronizationConnector = this.httpConnectorPool.getTimeSyncConnector(this.nisCache.getAccountCache());
 		return new PeerNetworkServicesFactory(
 				networkState,
 				peerConnector,
@@ -193,7 +193,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.nisConfiguration.getTimeSyncNodeLimit(),
 				config.getTrustProvider(),
 				networkState,
-				this.accountAnalyzer.getPoiFacade());
+				this.nisCache.getPoiFacade());
 		return new PeerNetworkBootstrapper(
 				networkState,
 				this.createNetworkServicesFactory(networkState),

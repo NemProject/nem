@@ -1,24 +1,29 @@
 package org.nem.nis.service;
 
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.ncc.TransactionMetaDataPair;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
+import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.AccountCache;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.test.MockAccountDao;
+import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.mock;
@@ -94,7 +99,21 @@ public class AccountIoAdapterTest {
 
 	// region delegation
 
-	// TODO 20141205 J-B; should we also validate return values?
+	@Test
+	public void iteratorAddressDelegatesToAccountCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Iterator<Account> expectedIterator = new ArrayList<Account>().iterator();
+		Mockito.when(context.accountCache.iterator()).thenReturn(expectedIterator);
+
+
+		// Act:
+		final Iterator<Account> iterator = context.accountIoAdapter.iterator();
+
+		// Assert:
+		Assert.assertThat(iterator, IsEqual.equalTo(expectedIterator));
+		Mockito.verify(context.accountCache, Mockito.only()).iterator();
+	}
 
 	@Test
 	public void findByAddressDelegatesToAccountCache() {
@@ -102,21 +121,10 @@ public class AccountIoAdapterTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.accountIoAdapter.findByAddress(context.address);
+		final Account account = context.accountIoAdapter.findByAddress(context.address);
 
 		// Assert:
-		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
-	}
-
-	@Test
-	public void getAccountTransfersDelegatesToAccountCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.accountIoAdapter.getAccountTransfers(context.address, "123");
-
-		// Assert:
+		Assert.assertThat(account, IsEqual.equalTo(context.account));
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
 	}
 
@@ -124,130 +132,255 @@ public class AccountIoAdapterTest {
 	public void getAccountTransfersDelegatesToTransferDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		context.expectTransactionsForAccount();
+		context.seedDefaultTransactions();
 
 		// Act:
-		context.accountIoAdapter.getAccountTransfers(context.address, "123");
+		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfers(context.address, "123");
 
 		// Assert:
-		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.eq(DEFAULT_LIMIT));
+		context.assertDefaultTransactions(pairs);
+		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(context.account, 123, DEFAULT_LIMIT);
 	}
 
 	@Test
-	public void getAccountTransfersUsingHashDelegatesToAccountCache() {
+	public void getAccountTransfersDelegatesToTransferDaoWhenTimeStampIsNotSupplied() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		context.expectTransactionsForAccount();
+		context.seedDefaultTransactions();
 
 		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingHash(
-				context.address,
-				Utils.generateRandomHash(),
-				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.ALL);
+		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfers(context.address, null);
 
 		// Assert:
-		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+		context.assertDefaultTransactions(pairs);
+		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(context.account, Integer.MAX_VALUE, DEFAULT_LIMIT);
+	}
+
+	@Test
+	public void getAccountTransfersDelegatesToTransferDaoWhenTimeStampIsNotParsable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.expectTransactionsForAccount();
+		context.seedDefaultTransactions();
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfers(context.address, "NEM");
+
+		// Assert:
+		context.assertDefaultTransactions(pairs);
+		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(context.account, Integer.MAX_VALUE, DEFAULT_LIMIT);
 	}
 
 	@Test
 	public void getAccountTransfersUsingHashDelegatesToTransferDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		context.expectTransactionsForAccountUsingHash();
+		context.seedDefaultTransactions();
 
 		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingHash(
+		final Hash hash = Utils.generateRandomHash();
+		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfersUsingHash(
 				context.address,
-				Utils.generateRandomHash(),
+				hash,
 				BlockHeight.ONE,
 				ReadOnlyTransferDao.TransferType.ALL);
 
 		// Assert:
+		context.assertDefaultTransactions(pairs);
 		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccountUsingHash(
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.eq(BlockHeight.ONE),
-				Mockito.eq(ReadOnlyTransferDao.TransferType.ALL),
-				Mockito.eq(DEFAULT_LIMIT));
-	}
-
-	@Test
-	public void getAccountTransfersUsingIdDelegatesToAccountCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL);
-
-		// Assert:
-		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+				context.account,
+				hash,
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL,
+				DEFAULT_LIMIT);
 	}
 
 	@Test
 	public void getAccountTransfersUsingIdDelegatesToTransferDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		context.expectTransactionsForAccountUsingId();
+		context.seedDefaultTransactions();
 
 		// Act:
-		context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL);
+		final SerializableList<TransactionMetaDataPair> pairs = context.accountIoAdapter.getAccountTransfersUsingId(
+				context.address,
+				1234L,
+				ReadOnlyTransferDao.TransferType.ALL);
 
 		// Assert:
+		context.assertDefaultTransactions(pairs);
 		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccountUsingId(
-				Mockito.any(),
-				Mockito.eq(1234L),
-				Mockito.eq(ReadOnlyTransferDao.TransferType.ALL),
-				Mockito.eq(DEFAULT_LIMIT));
-	}
-
-	@Test
-	public void getAccountHarvestsDelegatesToAccountCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash());
-
-		// Assert:
-		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+				context.account,
+				1234L,
+				ReadOnlyTransferDao.TransferType.ALL,
+				DEFAULT_LIMIT);
 	}
 
 	@Test
 	public void getAccountHarvestsDelegatesToBlockDao() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		context.expectBlocksForAccount();
+		context.seedDefaultBlocks();
 
-		// Act:
-		context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash());
+		// Act + Assert:
+		final Hash hash = Utils.generateRandomHash();
+		final SerializableList<HarvestInfo> harvestInfos = context.accountIoAdapter.getAccountHarvests(context.address, hash);
 
 		// Assert:
-		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.eq(DEFAULT_LIMIT));
+		context.assertDefaultBlocks(harvestInfos);
+		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(context.account, hash, DEFAULT_LIMIT);
 	}
 
-	private class TestContext {
+	private static class TestContext {
 		private final AccountCache accountCache = mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = mock(ReadOnlyBlockDao.class);
 		private final ReadOnlyTransferDao transferDao = mock(ReadOnlyTransferDao.class);
 		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(transferDao, blockDao, accountCache);
-		private final Address address = Utils.generateRandomAddress();
+		private final Account account = Utils.generateRandomAccount();
+		private final Address address = this.account.getAddress();
+		private final List<TransferBlockPair> pairs = new ArrayList<>();
+		private final List<org.nem.nis.dbmodel.Block> blocks = new ArrayList<>();
 
 		public TestContext() {
-			Mockito.when(this.accountCache.findByAddress(Mockito.any())).thenReturn(Utils.generateRandomAccount());
+			Mockito.when(this.accountCache.findByAddress(this.address)).thenReturn(this.account);
+		}
+
+		//region expect
+
+		public void expectTransactionsForAccount() {
 			Mockito.when(this.transferDao.getTransactionsForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
-					.thenReturn(new ArrayList<>());
+					.thenReturn(this.pairs);
+		}
+
+		public void expectTransactionsForAccountUsingHash() {
 			Mockito.when(this.transferDao.getTransactionsForAccountUsingHash(
 					Mockito.any(),
 					Mockito.any(),
 					Mockito.any(),
 					Mockito.any(),
 					Mockito.eq(DEFAULT_LIMIT)))
-					.thenReturn(new ArrayList<>());
-			Mockito.when(this.transferDao.getTransactionsForAccountUsingId(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
-					.thenReturn(new ArrayList<>());
+					.thenReturn(this.pairs);
 		}
+
+		public void expectTransactionsForAccountUsingId() {
+			Mockito.when(this.transferDao.getTransactionsForAccountUsingId(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+					.thenReturn(this.pairs);
+		}
+
+		public void expectBlocksForAccount() {
+			Mockito.when(this.blockDao.getBlocksForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+					.thenReturn(this.blocks);
+		}
+
+		//endregion
+
+		//region seedDefaultTransactions / addTransaction
+
+		public void seedDefaultTransactions() {
+			this.addTransaction(12, 7, 111);
+			this.addTransaction(12, 8, 222);
+			this.addTransaction(15, 9, 333);
+		}
+
+		public void addTransaction(final int height, final int transactionId, final int amount) {
+			final org.nem.nis.dbmodel.Block block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
+			final Transfer transfer = this.createTransfer(amount);
+			transfer.setId((long)transactionId);
+			this.pairs.add(new TransferBlockPair(transfer, block));
+		}
+
+		private Transfer createTransfer(final int amount) {
+			final Account signer = Utils.generateRandomAccount();
+			final Account recipient = Utils.generateRandomAccount();
+			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient, Amount.fromNem(amount), null);
+			transaction.sign();
+
+			this.addAccount(signer);
+			this.addAccount(recipient);
+
+			return TransferMapper.toDbModel(transaction, 1, 2, new AccountDaoLookupAdapter(new MockAccountDao()));
+		}
+
+		private void addAccount(final Account account) {
+			Mockito.when(this.accountCache.findByAddress(account.getAddress())).thenReturn(account);
+		}
+
+		//endregion
+
+		//region assertDefaultTransactions
+
+		public void assertDefaultTransactions(final SerializableList<TransactionMetaDataPair> pairs) {
+			Assert.assertThat(pairs.size(), IsEqual.equalTo(3));
+			this.assertHeights(pairs, 12L, 12L, 15L);
+			this.assertIds(pairs, 7L, 8L, 9L);
+			this.assertAmounts(pairs, 111L, 222L, 333L);
+		}
+
+		public void assertAmounts(final SerializableList<TransactionMetaDataPair> pairs, final Long... expectedAmounts) {
+			final Collection<Long> amounts = pairs.asCollection().stream()
+					.map(p -> ((TransferTransaction)p.getTransaction()).getAmount().getNumNem())
+					.collect(Collectors.toList());
+			Assert.assertThat(amounts, IsEquivalent.equivalentTo(expectedAmounts));
+		}
+
+		public void assertIds(final SerializableList<TransactionMetaDataPair> pairs, final Long... expectedIds) {
+			final Collection<Long> ids = pairs.asCollection().stream()
+					.map(p -> p.getMetaData().getId())
+					.collect(Collectors.toList());
+			Assert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
+		}
+
+		public void assertHeights(final SerializableList<TransactionMetaDataPair> pairs, final Long... expectedHeights) {
+			final Collection<Long> heights = pairs.asCollection().stream()
+					.map(p -> p.getMetaData().getHeight().getRaw())
+					.collect(Collectors.toList());
+			Assert.assertThat(heights, IsEquivalent.equivalentTo(expectedHeights));
+		}
+
+		//endregion
+
+		//region seedDefaultBlocks
+
+		public void seedDefaultBlocks() {
+			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(897, 444));
+			this.blocks.get(0).setTotalFee(8L);
+			this.blocks.get(0).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(123, 777));
+			this.blocks.get(1).setTotalFee(9L);
+			this.blocks.get(1).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(345, 222));
+			this.blocks.get(2).setTotalFee(7L);
+			this.blocks.get(2).setBlockHash(Utils.generateRandomHash().getRaw());
+		}
+
+		public void assertDefaultBlocks(final SerializableList<HarvestInfo> harvestInfos) {
+			final Collection<Long> heights = harvestInfos.asCollection().stream()
+					.map(p -> p.getBlockHeight().getRaw())
+					.collect(Collectors.toList());
+			Assert.assertThat(heights, IsEquivalent.equivalentTo(444L, 777L, 222L));
+
+			final Collection<Integer> timeStamps = harvestInfos.asCollection().stream()
+					.map(p -> p.getTimeStamp().getRawTime())
+					.collect(Collectors.toList());
+			Assert.assertThat(timeStamps, IsEquivalent.equivalentTo(897, 123, 345));
+
+			final Collection<Long> fees = harvestInfos.asCollection().stream()
+					.map(p -> p.getTotalFee().getNumMicroNem())
+					.collect(Collectors.toList());
+			Assert.assertThat(fees, IsEquivalent.equivalentTo(8L, 9L, 7L));
+
+			final Collection<Hash> hashes = harvestInfos.asCollection().stream()
+					.map(p -> p.getHash())
+					.collect(Collectors.toList());
+			Assert.assertThat(hashes, IsEquivalent.equivalentTo(this.blocks.stream().map(b -> b.getBlockHash()).collect(Collectors.toList())));
+		}
+
+		//endregion
 	}
 
 	// endregion

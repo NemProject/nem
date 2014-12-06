@@ -42,7 +42,7 @@ public class BlockAnalyzer {
 	}
 
 	public boolean analyze(final NisCache nisCache, final Long maxHeight) {
-		final Block nemesisBlock = this.loadNemesisBlock(nisCache.getAccountAnalyzer());
+		final Block nemesisBlock = this.loadNemesisBlock(nisCache);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
 		Long curBlockHeight;
@@ -66,8 +66,8 @@ public class BlockAnalyzer {
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
-		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
-		final AccountCache accountCache = nisCache.getAccountAnalyzer().getAccountCache();
+		final PoiFacade poiFacade = nisCache.getPoiFacade();
+		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 		do {
@@ -111,7 +111,7 @@ public class BlockAnalyzer {
 			}
 		} while (dbBlock != null);
 
-		this.initializePoi(nisCache.getAccountAnalyzer(), parentBlock.getHeight());
+		this.initializePoi(nisCache, parentBlock.getHeight());
 		return true;
 	}
 
@@ -154,26 +154,26 @@ public class BlockAnalyzer {
 		}
 	}
 
-	private void initializePoi(final AccountAnalyzer accountAnalyzer, final BlockHeight height) {
+	private void initializePoi(final NisCache nisCache, final BlockHeight height) {
 		LOGGER.info("Analyzed blocks: " + height);
-		LOGGER.info("Known accounts: " + accountAnalyzer.getAccountCache().size());
-		LOGGER.info(String.format("Initializing PoI for (%d) accounts", accountAnalyzer.getAccountCache().size()));
+		LOGGER.info("Known accounts: " + nisCache.getAccountCache().size());
+		LOGGER.info(String.format("Initializing PoI for (%d) accounts", nisCache.getAccountCache().size()));
 		final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
-		accountAnalyzer.getPoiFacade().recalculateImportances(blockHeight);
+		nisCache.getPoiFacade().recalculateImportances(blockHeight);
 		LOGGER.info("PoI initialized");
 	}
 
-	private NemesisBlock loadNemesisBlock(final AccountAnalyzer accountAnalyzer) {
+	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {
 		// set up the nemesis block amounts
-		final Account nemesisAccount = accountAnalyzer.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
+		final Account nemesisAccount = nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
 
-		final PoiAccountState nemesisState = accountAnalyzer.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		final PoiAccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(accountAnalyzer.getAccountCache().asAutoCache()));
+		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
 	}
 
 	// TODO 20141030: figure out if this should be integrated here or stay in main

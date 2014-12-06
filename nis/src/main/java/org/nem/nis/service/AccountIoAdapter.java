@@ -51,14 +51,8 @@ public class AccountIoAdapter implements AccountIo {
 		return intTimeStamp;
 	}
 
-	// TODO-CR: might make sense to add a test for at least the new code
-
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfers(final Address address, final String timeStamp) {
-
-		// TODO: probably it'll be better to a) ask accountDao about account
-		// TODO: b) pass obtained db-account to getTransactionsForAccount
-
 		final Account account = this.accountCache.findByAddress(address);
 		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
 		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);

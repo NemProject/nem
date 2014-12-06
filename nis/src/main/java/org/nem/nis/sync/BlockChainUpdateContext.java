@@ -47,14 +47,14 @@ public class BlockChainUpdateContext {
 
 		this.nisCache = nisCache;
 		this.originalNisCache = originalNisCache;
-		this.blockScorer = new BlockScorer(this.nisCache.getAccountAnalyzer().getPoiFacade());
+		this.blockScorer = new BlockScorer(this.nisCache.getPoiFacade());
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 
 		// do not trust peer, take first block from our db and convert it
-		this.parentBlock = BlockMapper.toModel(dbParentBlock, this.nisCache.getAccountAnalyzer().getAccountCache());
+		this.parentBlock = BlockMapper.toModel(dbParentBlock, this.nisCache.getAccountCache());
 
 		this.peerChain = peerChain;
 		this.ourScore = ourScore;
@@ -140,7 +140,7 @@ public class BlockChainUpdateContext {
 			this.addRevertedTransactionsAsUnconfirmed(
 					transactionHashes,
 					this.parentBlock.getHeight().getRaw(),
-					this.originalNisCache.getAccountAnalyzer());
+					this.originalNisCache.getAccountCache());
 		}
 
 		this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
@@ -153,7 +153,7 @@ public class BlockChainUpdateContext {
 	private void addRevertedTransactionsAsUnconfirmed(
 			final Set<Hash> transactionHashes,
 			final long wantedHeight,
-			final AccountAnalyzer accountAnalyzer) {
+			final AccountCache accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {
@@ -166,7 +166,7 @@ public class BlockChainUpdateContext {
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
 			block.getBlockTransfers().stream()
 					.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
-					.map(tr -> TransferMapper.toModel(tr, accountAnalyzer.getAccountCache()))
+					.map(tr -> TransferMapper.toModel(tr, accountCache))
 					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
 			currentHeight--;
 		}

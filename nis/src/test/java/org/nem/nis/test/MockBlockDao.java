@@ -107,13 +107,6 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Block findById(final long id) {
-		++this.numFindByIdCalls;
-		this.lastFindByIdId = id;
-		return this.find(block -> block.getId().equals(id));
-	}
-
-	@Override
 	public Block findByHash(final Hash blockHash) {
 		++this.numFindByHashCalls;
 		this.lastFindByHashHash = blockHash;

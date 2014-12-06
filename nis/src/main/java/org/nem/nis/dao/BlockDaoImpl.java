@@ -71,14 +71,6 @@ public class BlockDaoImpl implements BlockDao {
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
-	public Block findById(final long id) {
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
-				.add(Restrictions.eq("id", id));
-		return this.executeSingleQuery(criteria);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
 	public Block findByHeight(final BlockHeight height) {
 		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
 				.add(Restrictions.eq("height", height.getRaw()));

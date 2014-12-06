@@ -32,10 +32,10 @@ public class BlockTransactionObserverFactory {
 	}
 
 	private static AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache) {
-		final PoiFacade poiFacade = nisCache.getAccountAnalyzer().getPoiFacade();
+		final PoiFacade poiFacade = nisCache.getPoiFacade();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new WeightedBalancesObserver(poiFacade));
-		builder.add(new AccountsHeightObserver(nisCache.getAccountAnalyzer()));
+		builder.add(new AccountsHeightObserver(nisCache));
 		builder.add(new BalanceCommitTransferObserver());
 		builder.add(new HarvestRewardCommitObserver());
 		builder.add(new RemoteObserver(poiFacade));

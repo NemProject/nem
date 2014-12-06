@@ -10,15 +10,15 @@ import org.nem.nis.secret.*;
  * A BlockTransactionObserver implementation that updates account heights.
  */
 public class AccountsHeightObserver implements BlockTransactionObserver {
-	final AccountAnalyzer accountAnalyzer;
+	private final NisCache nisCache;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param accountAnalyzer The account analyzer to use.
+	 * @param nisCache The NIS cache to use.
 	 */
-	public AccountsHeightObserver(final AccountAnalyzer accountAnalyzer) {
-		this.accountAnalyzer = accountAnalyzer;
+	public AccountsHeightObserver(final NisCache nisCache) {
+		this.nisCache = nisCache;
 	}
 
 	@Override
@@ -29,16 +29,16 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 
 		final Account account = ((AccountNotification)(notification)).getAccount();
 		if (NotificationTrigger.Execute == context.getTrigger()) {
-			this.addToAccountAnalyzer(context.getHeight(), account);
+			this.addToNisCache(context.getHeight(), account);
 		} else {
 			this.tryRemoveFromAccountAnalyzer(account);
 		}
 	}
 
-	private void addToAccountAnalyzer(final BlockHeight height, final Account account) {
+	private void addToNisCache(final BlockHeight height, final Account account) {
 		final Address address = account.getAddress();
-		final Account cachedAccount = this.accountAnalyzer.getAccountCache().findByAddress(address);
-		final PoiAccountState accountState = this.accountAnalyzer.getPoiFacade().findStateByAddress(address);
+		final Account cachedAccount = this.nisCache.getAccountCache().findByAddress(address);
+		final PoiAccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
 
 		cachedAccount.incrementReferenceCount();
 		accountState.setHeight(height);
@@ -46,18 +46,19 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 
 	private void tryRemoveFromAccountAnalyzer(final Account account) {
 		final Address address = account.getAddress();
-		final Account cachedAccount = this.accountAnalyzer.getAccountCache().findByAddress(address);
+		final Account cachedAccount = this.nisCache.getAccountCache().findByAddress(address);
 		if (null == cachedAccount) {
 			throw new IllegalArgumentException("problem during undo, account not present in cache");
 		}
 
-		final PoiAccountState accountState = this.accountAnalyzer.getPoiFacade().findStateByAddress(address);
+		final PoiAccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
 		if (null == accountState.getHeight()) {
 			throw new IllegalArgumentException("problem during undo, account height not set");
 		}
 
 		if (ReferenceCount.ZERO.equals(cachedAccount.decrementReferenceCount())) {
-			this.accountAnalyzer.removeAccount(address);
+			this.nisCache.getAccountCache().removeFromCache(address);
+			this.nisCache.getPoiFacade().removeFromCache(address);
 		}
 	}
 }
