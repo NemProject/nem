@@ -79,6 +79,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @return The result of the interaction.
 	 */
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
+		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.accountAnalyzer().getAccountCache().asAutoCache());
@@ -88,7 +89,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
-				this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
+				synchronized (this) {
+					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
+				}
 				return NodeInteractionResult.fromComparisonResultCode(result.getCode());
 
 			case REMOTE_IS_NOT_SYNCED:
@@ -99,24 +102,31 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
-		final org.nem.nis.dbmodel.Block dbParent = this.blockDao.findByHeight(commonBlockHeight);
-
-		//region revert TXes inside contemporaryAccountAnalyzer
-		BlockChainScore ourScore = BlockChainScore.ZERO;
-		if (!result.areChainsConsistent()) {
-			LOGGER.info(String.format(
-					"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
-					this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
-			ourScore = context.undoTxesAndGetScore(commonBlockHeight);
-		}
-		//endregion
-
-		//region verify peer's chain
 		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight() - commonBlockHeight.getRaw());
 		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight, minBlocks, configuration.getMaxTransactions()));
-		final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
-		return NodeInteractionResult.fromValidationResult(validationResult);
-		//endregion
+
+		synchronized (this) {
+			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
+				// last block has changed due to another call (probably processBlock), don't do anything
+				LOGGER.warning("updateChain: last block changed. Update not possible");
+				return NodeInteractionResult.NEUTRAL;
+			}
+
+			final org.nem.nis.dbmodel.Block dbParent = this.blockDao.findByHeight(commonBlockHeight);
+
+			// revert TXes inside contemporaryAccountAnalyzer
+			BlockChainScore ourScore = BlockChainScore.ZERO;
+			if (!result.areChainsConsistent()) {
+				LOGGER.info(String.format(
+						"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
+						this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
+				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
+			}
+
+			// verify peer's chain
+			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
+			return NodeInteractionResult.fromValidationResult(validationResult);
+		}
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
@@ -144,7 +154,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @param receivedBlock The receivedBlock.
 	 * @return The result of the interaction.
 	 */
-	public ValidationResult updateBlock(Block receivedBlock) {
+	public synchronized ValidationResult updateBlock(Block receivedBlock) {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 

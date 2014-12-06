@@ -8,7 +8,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.AccountCache;
 import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.TransferBlockPair;
 import org.nem.nis.mappers.TransferMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +17,8 @@ import java.util.*;
 
 @Service
 public class AccountIoAdapter implements AccountIo {
+	private static final int DEFAULT_LIMIT = 25;
+
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
 	private final AccountCache accountCache;
@@ -59,37 +61,59 @@ public class AccountIoAdapter implements AccountIo {
 
 		final Account account = this.accountCache.findByAddress(address);
 		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccount(account, intTimeStamp, 25);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
 
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
-		transfers.stream()
-				.map(tr -> new TransactionMetaDataPair(
-						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
-						new TransactionMetaData(new BlockHeight((long)tr[1]))
+		pairs.stream()
+				.map(pair -> new TransactionMetaDataPair(
+						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
+						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
 				))
-				.forEach(obj -> transactionList.add(obj));
+				.forEach(transactionList::add);
 		return transactionList;
 	}
 
 	@Override
-	public SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final Address address, final Hash transactionHash, final ReadOnlyTransferDao.TransferType transfersType) {
+	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
+			final Address address,
+			final Hash transactionHash,
+			final BlockHeight height,
+			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<Object[]> transfers = this.transferDao.getTransactionsForAccountUsingHash(account, transactionHash, transfersType, 25);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingHash(
+				account,
+				transactionHash,
+				height,
+				transfersType,
+				DEFAULT_LIMIT);
+		return this.toSerializableTransactionMetaDataPairList(pairs);
+	}
 
+	@Override
+	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
+			final Address address,
+			final Long transactionId,
+			final ReadOnlyTransferDao.TransferType transfersType) {
+		final Account account = this.accountCache.findByAddress(address);
+		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
+		return this.toSerializableTransactionMetaDataPairList(pairs);
+	}
+
+	private SerializableList<TransactionMetaDataPair> toSerializableTransactionMetaDataPairList(final Collection<TransferBlockPair> pairs) {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
-		transfers.stream()
-				.map(tr -> new TransactionMetaDataPair(
-						TransferMapper.toModel((Transfer)tr[0], this.accountCache),
-						new TransactionMetaData(new BlockHeight((long)tr[1]))
+		pairs.stream()
+				.map(pair -> new TransactionMetaDataPair(
+						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
+						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
 				))
-				.forEach(obj -> transactionList.add(obj));
+				.forEach(transactionList::add);
 		return transactionList;
 	}
 
 	@Override
 	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, 25);
+		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, DEFAULT_LIMIT);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 
@@ -98,7 +122,7 @@ public class AccountIoAdapter implements AccountIo {
 						new BlockHeight(bl.getHeight()),
 						new TimeInstant(bl.getTimeStamp()),
 						Amount.fromMicroNem(bl.getTotalFee())))
-				.forEach(obj -> blockList.add(obj));
+				.forEach(blockList::add);
 		return blockList;
 	}
 

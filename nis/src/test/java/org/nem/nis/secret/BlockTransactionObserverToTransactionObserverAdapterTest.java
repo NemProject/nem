@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.test.NisUtils;
 
 public class BlockTransactionObserverToTransactionObserverAdapterTest {
 
@@ -11,7 +11,7 @@ public class BlockTransactionObserverToTransactionObserverAdapterTest {
 	public void notificationsAreForwardedToWrappedBlockTransactionObserver() {
 		// Arrange:
 		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
-		final BlockNotificationContext context = new BlockNotificationContext(new BlockHeight(11), NotificationTrigger.Execute);
+		final BlockNotificationContext context = NisUtils.createBlockNotificationContext();
 		final TransactionObserver adapter = new BlockTransactionObserverToTransactionObserverAdapter(observer, context);
 		final Notification notification = new Notification(NotificationType.BalanceCredit) {
 		};

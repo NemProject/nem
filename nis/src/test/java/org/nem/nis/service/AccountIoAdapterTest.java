@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.TransactionMetaDataPair;
@@ -17,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Vector;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.mock;
@@ -26,6 +27,8 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AccountIoAdapterTest {
+	private static final int DEFAULT_LIMIT = 25;
+
 	@Autowired
 	TransferDao transferDao;
 
@@ -88,6 +91,166 @@ public class AccountIoAdapterTest {
 		// Assert:
 		Assert.assertThat(result.size(), equalTo(1));
 	}
+
+	// region delegation
+
+	// TODO 20141205 J-B; should we also validate return values?
+
+	@Test
+	public void findByAddressDelegatesToAccountCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.findByAddress(context.address);
+
+		// Assert:
+		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+	}
+
+	@Test
+	public void getAccountTransfersDelegatesToAccountCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountTransfers(context.address, "123");
+
+		// Assert:
+		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+	}
+
+	@Test
+	public void getAccountTransfersDelegatesToTransferDao() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountTransfers(context.address, "123");
+
+		// Assert:
+		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccount(
+				Mockito.any(),
+				Mockito.any(),
+				Mockito.eq(DEFAULT_LIMIT));
+	}
+
+	@Test
+	public void getAccountTransfersUsingHashDelegatesToAccountCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountTransfersUsingHash(
+				context.address,
+				Utils.generateRandomHash(),
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL);
+
+		// Assert:
+		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+	}
+
+	@Test
+	public void getAccountTransfersUsingHashDelegatesToTransferDao() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountTransfersUsingHash(
+				context.address,
+				Utils.generateRandomHash(),
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL);
+
+		// Assert:
+		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccountUsingHash(
+				Mockito.any(),
+				Mockito.any(),
+				Mockito.eq(BlockHeight.ONE),
+				Mockito.eq(ReadOnlyTransferDao.TransferType.ALL),
+				Mockito.eq(DEFAULT_LIMIT));
+	}
+
+	@Test
+	public void getAccountTransfersUsingIdDelegatesToAccountCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL);
+
+		// Assert:
+		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+	}
+
+	@Test
+	public void getAccountTransfersUsingIdDelegatesToTransferDao() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountTransfersUsingId(context.address, 1234L, ReadOnlyTransferDao.TransferType.ALL);
+
+		// Assert:
+		Mockito.verify(context.transferDao, Mockito.only()).getTransactionsForAccountUsingId(
+				Mockito.any(),
+				Mockito.eq(1234L),
+				Mockito.eq(ReadOnlyTransferDao.TransferType.ALL),
+				Mockito.eq(DEFAULT_LIMIT));
+	}
+
+	@Test
+	public void getAccountHarvestsDelegatesToAccountCache() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash());
+
+		// Assert:
+		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(context.address);
+	}
+
+	@Test
+	public void getAccountHarvestsDelegatesToBlockDao() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.accountIoAdapter.getAccountHarvests(context.address, Utils.generateRandomHash());
+
+		// Assert:
+		Mockito.verify(context.blockDao, Mockito.only()).getBlocksForAccount(
+				Mockito.any(),
+				Mockito.any(),
+				Mockito.eq(DEFAULT_LIMIT));
+	}
+
+	private class TestContext {
+		private final AccountCache accountCache = mock(AccountCache.class);
+		private final ReadOnlyBlockDao blockDao = mock(ReadOnlyBlockDao.class);
+		private final ReadOnlyTransferDao transferDao = mock(ReadOnlyTransferDao.class);
+		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(transferDao, blockDao, accountCache);
+		private final Address address = Utils.generateRandomAddress();
+
+		public TestContext() {
+			Mockito.when(this.accountCache.findByAddress(Mockito.any())).thenReturn(Utils.generateRandomAccount());
+			Mockito.when(this.transferDao.getTransactionsForAccount(Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+					.thenReturn(new ArrayList<>());
+			Mockito.when(this.transferDao.getTransactionsForAccountUsingHash(
+					Mockito.any(),
+					Mockito.any(),
+					Mockito.any(),
+					Mockito.any(),
+					Mockito.eq(DEFAULT_LIMIT)))
+					.thenReturn(new ArrayList<>());
+			Mockito.when(this.transferDao.getTransactionsForAccountUsingId(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.eq(DEFAULT_LIMIT)))
+					.thenReturn(new ArrayList<>());
+		}
+	}
+
+	// endregion
 
 	// note: it would probably be better to mock blockDao and accountDao,
 	// but I find this much easier (mostly stolen from TransferDaoTest)

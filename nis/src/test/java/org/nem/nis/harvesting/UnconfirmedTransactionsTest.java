@@ -32,7 +32,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		for (int i = 0; i < 17; ++i) {
-			context.transactions.addExisting(new MockTransaction(account, i));
+			context.signAndAddExisting(new MockTransaction(account, i));
 		}
 
 		// Assert:
@@ -66,7 +66,7 @@ public class UnconfirmedTransactionsTest {
 				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(4), null));
 		transactions.get(0).setFee(Amount.fromNem(1));
 		transactions.get(1).setFee(Amount.fromNem(2));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Assert:
 		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(3)));
@@ -83,7 +83,7 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final ValidationResult result = context.transactions.addNewBatch(createMockTransactionsAsBatch(1, 2));
+		final ValidationResult result = context.signAndAddNewBatch(createMockTransactionsAsBatch(1, 2));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -101,7 +101,7 @@ public class UnconfirmedTransactionsTest {
 				ValidationResult.FAILURE_ENTITY_UNUSABLE);
 
 		// Act:
-		final ValidationResult result = context.transactions.addNewBatch(createMockTransactionsAsBatch(1, 4));
+		final ValidationResult result = context.signAndAddNewBatch(createMockTransactionsAsBatch(1, 4));
 
 		// Assert: only first transaction was added and validation stopped after the first failure
 		Mockito.verify(context.singleValidator, Mockito.times(2)).validate(Mockito.any(), Mockito.any());
@@ -119,7 +119,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(15));
-		final ValidationResult result = context.transactions.addNewBatch(Arrays.asList(transaction));
+		final ValidationResult result = context.signAndAddNewBatch(Arrays.asList(transaction));
 
 		// Assert:
 		Assert.assertThat(result.isFailure(), IsEqual.equalTo(true));
@@ -134,7 +134,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = context.transactions.addExisting(transaction);
+		final ValidationResult result = context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -146,11 +146,11 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
-		context.transactions.addExisting(new MockTransaction(sender, 7));
+		context.signAndAddExisting(new MockTransaction(sender, 7));
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = context.transactions.addExisting(transaction);
+		final ValidationResult result = context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -164,10 +164,10 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
 
 		// Act:
-		context.transactions.addExisting(new MockTransaction(sender, 7));
+		context.signAndAddExisting(new MockTransaction(sender, 7));
 
 		final MockTransaction transaction = new MockTransaction(sender, 8);
-		final ValidationResult result = context.transactions.addExisting(transaction);
+		final ValidationResult result = context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -186,7 +186,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = context.transactions.addExisting(transaction);
+		final ValidationResult result = context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -203,7 +203,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = context.transactions.addNew(transaction);
+		final ValidationResult result = context.signAndAddNew(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_HASH_EXISTS));
@@ -219,7 +219,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7, new TimeInstant(30));
-		final ValidationResult result = context.transactions.addNew(transaction);
+		final ValidationResult result = context.signAndAddNew(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
@@ -235,7 +235,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		final ValidationResult result = context.transactions.addExisting(transaction);
+		final ValidationResult result = context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
@@ -252,10 +252,10 @@ public class UnconfirmedTransactionsTest {
 
 		final Transaction t1 = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
 		final Transaction t2 = new ImportanceTransferTransaction(new TimeInstant(1), sender, ImportanceTransferTransaction.Mode.Activate, remote);
-		context.transactions.addExisting(t1);
+		context.signAndAddExisting(t1);
 
 		// Act:
-		final ValidationResult result = context.transactions.addExisting(t2);
+		final ValidationResult result = context.signAndAddExisting(t2);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
@@ -270,16 +270,50 @@ public class UnconfirmedTransactionsTest {
 
 		final Transaction t1 = new MockTransaction(sender);
 		t1.setFee(Amount.fromNem(6));
-		context.transactions.addExisting(t1);
+		context.signAndAddExisting(t1);
 
 		// Act:
 		final Transaction t2 = new MockTransaction(sender);
 		t2.setFee(Amount.fromNem(5));
-		final ValidationResult result = context.transactions.addExisting(t2);
+		final ValidationResult result = context.signAndAddExisting(t2);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void addNewFailsIfTransactionDoesNotVerify() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setSingleValidationResult(ValidationResult.SUCCESS);
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(10));
+		final MockTransaction transaction = new MockTransaction(sender);
+		transaction.sign();
+
+		// Act (ruin signature by altering the deadline):
+		transaction.setDeadline(transaction.getDeadline().addMinutes(1));
+		final ValidationResult result = context.transactions.addExisting(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+	}
+
+	@Test
+	public void addExistingFailsIfTransactionDoesNotVerify() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setSingleValidationResult(ValidationResult.SUCCESS);
+		final Account sender = Utils.generateRandomAccount(Amount.fromNem(10));
+		final MockTransaction transaction = new MockTransaction(sender);
+		transaction.sign();
+
+		// Act (ruin signature by altering the deadline):
+		transaction.setDeadline(transaction.getDeadline().addMinutes(1));
+		final ValidationResult result = context.transactions.addExisting(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
 	}
 
 	@Test
@@ -290,7 +324,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		context.transactions.addExisting(transaction);
+		context.signAndAddExisting(transaction);
 
 		// Assert:
 		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
@@ -305,7 +339,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		context.transactions.addNew(transaction);
+		context.signAndAddNew(transaction);
 
 		// Assert:
 		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
@@ -320,7 +354,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		context.transactions.addNewBatch(Arrays.asList(transaction));
+		context.signAndAddNewBatch(Arrays.asList(transaction));
 
 		// Assert:
 		Mockito.verify(context.singleValidator, Mockito.only()).validate(Mockito.eq(transaction), Mockito.any());
@@ -352,7 +386,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = Mockito.spy(new MockTransaction(sender, 7));
-		context.transactions.addExisting(transaction);
+		context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
@@ -368,7 +402,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		context.transactions.addExisting(transaction);
+		context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(0));
@@ -384,13 +418,13 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
 
 		final MockTransaction transaction = new MockTransaction(sender, 7);
-		ValidationResult result = context.transactions.addExisting(transaction);
+		ValidationResult result = context.signAndAddExisting(transaction);
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 
 		Mockito.when(context.singleValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
-		result = context.transactions.addExisting(transaction);
+		result = context.signAndAddExisting(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -407,10 +441,10 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
 
-		context.transactions.addExisting(new MockTransaction(sender, 7));
+		context.signAndAddExisting(new MockTransaction(sender, 7));
 		final Transaction toRemove = new MockTransaction(sender, 8);
-		context.transactions.addExisting(toRemove);
-		context.transactions.addExisting(new MockTransaction(sender, 9));
+		context.signAndAddExisting(toRemove);
+		context.signAndAddExisting(new MockTransaction(sender, 9));
 
 		// Act:
 		final boolean isRemoved = context.transactions.remove(toRemove);
@@ -428,9 +462,9 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = Utils.generateRandomAccount(Amount.fromNem(100));
 
 		// Act:
-		context.transactions.addExisting(new MockTransaction(sender, 7));
+		context.signAndAddExisting(new MockTransaction(sender, 7));
 		final Transaction toRemove = new MockTransaction(sender, 8); // never added
-		context.transactions.addExisting(new MockTransaction(sender, 9));
+		context.signAndAddExisting(new MockTransaction(sender, 9));
 
 		final boolean isRemoved = context.transactions.remove(toRemove);
 		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
@@ -450,7 +484,7 @@ public class UnconfirmedTransactionsTest {
 		// (for some reason passing the spied transaction to both remove and add does not work)
 		final MockTransaction transaction = new MockTransaction(sender, 7);
 		final Transaction spiedTransaction = Mockito.spy(transaction);
-		context.transactions.addExisting(transaction);
+		context.signAndAddExisting(transaction);
 		context.transactions.remove(spiedTransaction);
 
 		// Assert:
@@ -538,7 +572,7 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext();
 		final List<MockTransaction> transactions = createMockTransactions(6, 9);
 		transactions.get(2).setFee(Amount.fromNem(11));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
@@ -597,7 +631,7 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext();
 		final List<MockTransaction> originalTransactions = createMockTransactions(6, 9);
 		originalTransactions.get(2).setFee(Amount.fromNem(11));
-		originalTransactions.forEach(context.transactions::addExisting);
+		originalTransactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
@@ -631,7 +665,7 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext();
 		final List<MockTransaction> transactions = createMockTransactions(6, 9);
 		transactions.get(1).setFee(Amount.fromNem(11));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
@@ -653,7 +687,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.get(1).setDeadline(new TimeInstant(7));
 		transactions.get(2).setDeadline(new TimeInstant(6));
 		transactions.get(3).setDeadline(new TimeInstant(8));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
@@ -672,7 +706,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.get(1).setDeadline(new TimeInstant(7));
 		transactions.get(2).setDeadline(new TimeInstant(6));
 		transactions.get(3).setDeadline(new TimeInstant(8));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
@@ -699,7 +733,7 @@ public class UnconfirmedTransactionsTest {
 				new MockTransaction(account2, 2),
 				new MockTransaction(account1, 3),
 				new MockTransaction(account2, 4));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account1.getAddress());
@@ -720,7 +754,7 @@ public class UnconfirmedTransactionsTest {
 				new TransferTransaction(new TimeInstant(1), account1, account2, Amount.ZERO, null),
 				new TransferTransaction(new TimeInstant(2), account2, account1, Amount.ZERO, null),
 				new TransferTransaction(new TimeInstant(3), account1, account3, Amount.ZERO, null));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account3.getAddress());
@@ -742,7 +776,7 @@ public class UnconfirmedTransactionsTest {
 				new TransferTransaction(new TimeInstant(2), account2, account1, Amount.ZERO, null),
 				new TransferTransaction(new TimeInstant(3), account1, account3, Amount.ZERO, null),
 				new MockTransaction(account2, 1, new TimeInstant(4)));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account2.getAddress());
@@ -761,7 +795,7 @@ public class UnconfirmedTransactionsTest {
 		final List<Transaction> transactions = Arrays.asList(
 				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(10), null),
 				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(6), null));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account2.getAddress());
@@ -786,7 +820,7 @@ public class UnconfirmedTransactionsTest {
 				new MockTransaction(account2, 2, new TimeInstant(4)),
 				new MockTransaction(account2, 3, new TimeInstant(6)),
 				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(6));
@@ -807,7 +841,7 @@ public class UnconfirmedTransactionsTest {
 				new MockTransaction(account2, 2, new TimeInstant(4)),
 				new MockTransaction(account1, 3, new TimeInstant(6)),
 				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(10));
@@ -826,7 +860,8 @@ public class UnconfirmedTransactionsTest {
 		final List<Transaction> transactions = Arrays.asList(
 				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(10), null),
 				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(6), null));
-		transactions.forEach(context.transactions::addExisting);
+		transactions.forEach(t -> t.setDeadline(new TimeInstant(3600)));
+		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
 		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(
@@ -836,6 +871,31 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(1))));
+	}
+
+	@Test
+	public void getTransactionsForNewBlockDoesNotIncludeExpiredTransactions() {
+		// Arrange:
+		final Account account1 = Utils.generateRandomAccount(Amount.fromNem(100));
+		final Account account2 = Utils.generateRandomAccount(Amount.fromNem(100));
+		final TestContext context = new TestContext();
+		final List<MockTransaction> transactions = Arrays.asList(
+				new MockTransaction(account2, 1, new TimeInstant(2)),
+				new MockTransaction(account2, 2, new TimeInstant(4)),
+				new MockTransaction(account2, 3, new TimeInstant(6)),
+				new MockTransaction(account2, 4, new TimeInstant(8)));
+		transactions.forEach(context::signAndAddExisting);
+		final MockTransaction transaction = new MockTransaction(account2, 5, new TimeInstant(1));
+		transaction.setDeadline(new TimeInstant(3600));
+		transaction.sign();
+		context.signAndAddExisting(transaction);
+
+		// Act:
+		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(3601));
+		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
+
+		// Assert:
+		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
 	}
 
 	//endregion
@@ -863,10 +923,12 @@ public class UnconfirmedTransactionsTest {
 		// of a block that would get discarded (TXes are validated first, and then executed)
 
 		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
-		transactions.addExisting(t1);
 		t1.setFee(Amount.fromNem(1));
+		t1.sign();
+		transactions.addExisting(t1);
 		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
 		t2.setFee(Amount.fromNem(2));
+		t2.sign();
 		transactions.addExisting(t2);
 
 		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
@@ -897,9 +959,11 @@ public class UnconfirmedTransactionsTest {
 		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough *confirmed* balance
 		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
 		t1.setFee(Amount.fromNem(3));
+		t1.sign();
 		transactions.addExisting(t1);
 		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
 		t2.setFee(Amount.fromNem(2));
+		t2.sign();
 		transactions.addExisting(t2);
 
 		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
@@ -923,8 +987,10 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(7));
+		t1.sign();
 		final ValidationResult result1 = transactions.addExisting(t1);
 		final Transaction t2 = createTransferTransaction(currentTime.addSeconds(-1), sender, recipient, Amount.fromNem(7));
+		t2.sign();
 		final ValidationResult result2 = transactions.addExisting(t2);
 
 		// Assert:
@@ -932,7 +998,6 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
 	}
-
 
 	@Test
 	public void getTransactionForNewBlockCheckMultisigSignatures() {
@@ -987,8 +1052,8 @@ public class UnconfirmedTransactionsTest {
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator(final PoiFacade poiFacade) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		final TestContext context = new TestContext(
-				factory.create(poiFacade),
-				factory.createBatch(poiFacade),
+				factory.create(poiFacade, Mockito.mock(HashCache.class)),
+				factory.createBatch(Mockito.mock(HashCache.class)),
 				poiFacade);
 		return context.transactions;
 	}
@@ -1025,6 +1090,7 @@ public class UnconfirmedTransactionsTest {
 			final int startCustomField,
 			final int endCustomField) {
 		final List<MockTransaction> transactions = createMockTransactions(startCustomField, endCustomField);
+		transactions.forEach(Transaction::sign);
 		transactions.forEach(unconfirmedTransactions::addExisting);
 		return transactions;
 	}
@@ -1037,7 +1103,7 @@ public class UnconfirmedTransactionsTest {
 
 	private static List<TimeInstant> getTimeInstantsAsList(final Collection<Transaction> transactions) {
 		return transactions.stream()
-				.map(transaction -> transaction.getTimeStamp())
+				.map(Transaction::getTimeStamp)
 				.collect(Collectors.toList());
 	}
 
@@ -1061,11 +1127,13 @@ public class UnconfirmedTransactionsTest {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-			Mockito.when(validatorFactory.createBatch(poiFacade)).thenReturn(this.batchValidator);
+			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(poiFacade)).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					poiFacade);
+					poiFacade,
+					transactionHashCache);
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {
@@ -1075,6 +1143,21 @@ public class UnconfirmedTransactionsTest {
 
 		private void setBatchValidationResult(final ValidationResult result) {
 			Mockito.when(this.batchValidator.validate(Mockito.any())).thenReturn(result);
+		}
+
+		private ValidationResult signAndAddExisting(final Transaction transaction) {
+			transaction.sign();
+			return this.transactions.addExisting(transaction);
+		}
+
+		private ValidationResult signAndAddNew(final Transaction transaction) {
+			transaction.sign();
+			return this.transactions.addNew(transaction);
+		}
+
+		private ValidationResult signAndAddNewBatch(final Collection<Transaction> transactions) {
+			transactions.forEach(Transaction::sign);
+			return this.transactions.addNewBatch(transactions);
 		}
 	}
 }

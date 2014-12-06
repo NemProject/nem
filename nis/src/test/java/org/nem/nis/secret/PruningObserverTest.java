@@ -2,9 +2,11 @@ package org.nem.nis.secret;
 
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.nem.core.model.HashCache;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.poi.*;
 
@@ -16,33 +18,35 @@ public class PruningObserverTest {
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long PRUNE_INTERVAL = 360;
 	private static final long BETA_OUTLINK_PRUNING_FORK = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK;
+	private static final int RETENTION_HOURS = 42;
 
 	//region no-op
 
 	@Test
-	public void noAccountsArePrunedWhenNotificationTriggerIsNotExecute() {
+	public void noPruningIsTriggeredWhenNotificationTriggerIsNotExecute() {
 		// Assert:
-		assertNoAccountsArePruned(432001, NotificationTrigger.Undo, NotificationType.HarvestReward);
+		assertNoPruning(432001, 1, NotificationTrigger.Undo, NotificationType.HarvestReward);
 	}
 
 	@Test
-	public void noAccountsArePrunedWhenNotificationTypeIsNotHarvestReward() {
+	public void noPruningIsTriggeredWhenNotificationTypeIsNotHarvestReward() {
 		// Assert:
-		assertNoAccountsArePruned(432001, NotificationTrigger.Execute, NotificationType.BalanceCredit);
+		assertNoPruning(432001, 1, NotificationTrigger.Execute, NotificationType.BalanceCredit);
 	}
 
 	@Test
-	public void noAccountsArePrunedIfBlockHeightModuloThreeHundredSixtyIsNotOne() {
+	public void noPruningIsTriggeredWhenBlockHeightModuloThreeHundredSixtyIsNotOne() {
 		// Assert:
 		for (int i = 1; i < 1000; ++i) {
 			if (1 != (i % PRUNE_INTERVAL)) {
-				assertNoAccountsArePruned(i, NotificationTrigger.Execute, NotificationType.HarvestReward);
+				assertNoPruning(i, 1, NotificationTrigger.Execute, NotificationType.HarvestReward);
 			}
 		}
 	}
 
-	private static void assertNoAccountsArePruned(
+	private static void assertNoPruning(
 			final long notificationHeight,
+			final int notificationTime,
 			final NotificationTrigger notificationTrigger,
 			final NotificationType notificationType) {
 		// Arrange:
@@ -52,6 +56,7 @@ public class PruningObserverTest {
 		final Notification notification = createAdjustmentNotification(notificationType);
 		final BlockNotificationContext notificationContext = new BlockNotificationContext(
 				new BlockHeight(notificationHeight),
+				new TimeInstant(notificationTime),
 				notificationTrigger);
 		context.observer.notify(notification, notificationContext);
 
@@ -61,53 +66,53 @@ public class PruningObserverTest {
 
 	//endregion
 
-	//region pruning trigger
+	//region block pruning trigger
 
 	@Test
-	public void allAccountsArePrunedAtInitialBlockHeight() {
+	public void blockBasedPruningIsTriggeredAtInitialBlockHeight() {
 		// Assert:
-		assertAllAccountsArePruned(1, 1, 1);
+		assertBlockBasedPruning(1, 1, 1);
 	}
 
 	@Test
-	public void allAccountsArePrunedWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
+	public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearWeightedBalanceBlockHistory() {
 		// Assert:
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0);
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY, 0, 0);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 1, 1, 1);
 
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0);
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1);
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL, 0, 0);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 1, 361, 1);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + PRUNE_INTERVAL + 2, 0, 0);
 
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0);
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1);
-		assertAllAccountsArePruned(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL, 0, 0);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 1, 721, 1);
+		assertBlockBasedPruning(WEIGHTED_BALANCE_BLOCK_HISTORY + 2 * PRUNE_INTERVAL + 2, 0, 0);
 	}
 
 	@Test
-	public void allAccountsArePrunedWhenBlockHeightIsNearOutlinkBlockHistory() {
+	public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearOutlinkBlockHistory() {
 		// Arrange:
 		// TODO: Replace with new constant when launching.
 		final long outlinkHistory = OUTLINK_BLOCK_HISTORY_OLD;
 		final long historyDifference = OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY;
 
 		// Assert:
-		assertAllAccountsArePruned(outlinkHistory, 0, 0);
-		assertAllAccountsArePruned(outlinkHistory + 1, historyDifference + 1, 1);
+		assertBlockBasedPruning(outlinkHistory, 0, 0);
+		assertBlockBasedPruning(outlinkHistory + 1, historyDifference + 1, 1);
 
-		assertAllAccountsArePruned(outlinkHistory + 360, 0, 0);
-		assertAllAccountsArePruned(outlinkHistory + 361, historyDifference + 361, 361);
-		assertAllAccountsArePruned(outlinkHistory + 362, 0, 0);
+		assertBlockBasedPruning(outlinkHistory + 360, 0, 0);
+		assertBlockBasedPruning(outlinkHistory + 361, historyDifference + 361, 361);
+		assertBlockBasedPruning(outlinkHistory + 362, 0, 0);
 
-		assertAllAccountsArePruned(outlinkHistory + 720, 0, 0);
-		assertAllAccountsArePruned(outlinkHistory + 721, historyDifference + 721, 721);
-		assertAllAccountsArePruned(outlinkHistory + 722, 0, 0);
+		assertBlockBasedPruning(outlinkHistory + 720, 0, 0);
+		assertBlockBasedPruning(outlinkHistory + 721, historyDifference + 721, 721);
+		assertBlockBasedPruning(outlinkHistory + 722, 0, 0);
 	}
 
 	@Test
-	public void allAccountsArePrunedWhenBlockHeightIsMuchGreaterThanHistories() {
+	public void blockBasedPruningIsTriggeredWhenBlockHeightIsMuchGreaterThanHistories() {
 		// Assert:
-		assertAllAccountsArePruned(
+		assertBlockBasedPruning(
 				10 * OUTLINK_BLOCK_HISTORY + 1,
 				10 * OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY + 1,
 				10 * OUTLINK_BLOCK_HISTORY - OUTLINK_BLOCK_HISTORY + 1);
@@ -117,7 +122,7 @@ public class PruningObserverTest {
 	public void outlinkPruningUsesOutlinkBlockHistoryOldBeforeBetaOutlinkPruningFork() {
 		// Assert:
 		final long notificationHeight = (BETA_OUTLINK_PRUNING_FORK / 360) * 360 + 1;
-		assertAllAccountsArePruned(
+		assertBlockBasedPruning(
 				notificationHeight,
 				notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
 				notificationHeight - OUTLINK_BLOCK_HISTORY_OLD);
@@ -127,13 +132,13 @@ public class PruningObserverTest {
 	public void outlinkPruningUsesOutlinkBlockHistoryAfterBetaOutlinkPruningFork() {
 		// Assert:
 		final long notificationHeight = (BETA_OUTLINK_PRUNING_FORK / 360 + 1) * 360 + 1;
-		assertAllAccountsArePruned(
+		assertBlockBasedPruning(
 				notificationHeight,
 				notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
 				notificationHeight - OUTLINK_BLOCK_HISTORY);
 	}
 
-	private static void assertAllAccountsArePruned(
+	private static void assertBlockBasedPruning(
 			final long notificationHeight,
 			final long expectedWeightedBalancePruningHeight,
 			final long expectedOutlinkPruningHeight) {
@@ -144,6 +149,7 @@ public class PruningObserverTest {
 		final Notification notification = createAdjustmentNotification(NotificationType.HarvestReward);
 		final BlockNotificationContext notificationContext = new BlockNotificationContext(
 				new BlockHeight(notificationHeight),
+				TimeInstant.ZERO,
 				NotificationTrigger.Execute);
 		context.observer.notify(notification, notificationContext);
 
@@ -163,14 +169,64 @@ public class PruningObserverTest {
 
 	//endregion
 
+	//region time pruning trigger
+
+	@Test
+	public void timeBasedPruningIsTriggeredAtInitialTime() {
+		// Assert:
+		assertTimeBasedPruning(TimeInstant.ZERO, 0);
+	}
+
+	@Test
+	public void timeBasedPruningIsTriggeredNearRetentionTime() {
+		// Assert:
+		final TimeInstant relativeTime1 = TimeInstant.ZERO.addHours(RETENTION_HOURS);
+		assertTimeBasedPruning(relativeTime1.addSeconds(-1), 0);
+		assertTimeBasedPruning(relativeTime1, 0);
+		assertTimeBasedPruning(relativeTime1.addSeconds(1), 1);
+
+		final TimeInstant relativeTime2 = TimeInstant.ZERO.addHours(2 * RETENTION_HOURS);
+		final int expectedTime2 = RETENTION_HOURS * 60 * 60;
+		assertTimeBasedPruning(relativeTime2.addSeconds(-1), expectedTime2 - 1);
+		assertTimeBasedPruning(relativeTime2, expectedTime2);
+		assertTimeBasedPruning(relativeTime2.addSeconds(1), expectedTime2 + 1);
+
+		final TimeInstant relativeTime3 = TimeInstant.ZERO.addHours(3 * RETENTION_HOURS);
+		final int expectedTime3 = 2 * RETENTION_HOURS * 60 * 60;
+		assertTimeBasedPruning(relativeTime3.addSeconds(-1), expectedTime3 - 1);
+		assertTimeBasedPruning(relativeTime3, expectedTime3);
+		assertTimeBasedPruning(relativeTime3.addSeconds(1), expectedTime3 + 1);
+	}
+
+	private static void assertTimeBasedPruning(
+			final TimeInstant notificationTime,
+			final int expectedTransactionHashCachePruningTime) {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final Notification notification = createAdjustmentNotification(NotificationType.HarvestReward);
+		final BlockNotificationContext notificationContext = new BlockNotificationContext(
+				BlockHeight.ONE,
+				notificationTime,
+				NotificationTrigger.Execute);
+		context.observer.notify(notification, notificationContext);
+
+		// Assert:
+		context.assertTransactionHashCachePruning(new TimeInstant(expectedTransactionHashCachePruningTime));
+	}
+
+	//endregion
+
 	private static Notification createAdjustmentNotification(final NotificationType type) {
 		return new BalanceAdjustmentNotification(type, Utils.generateRandomAccount(), Amount.ZERO);
 	}
 
 	private static class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 		private final List<PoiAccountState> accountStates = new ArrayList<>();
-		private final BlockTransactionObserver observer = new PruningObserver(this.poiFacade);
+		private final BlockTransactionObserver observer = new PruningObserver(this.poiFacade, this.transactionHashCache);
 
 		private TestContext() {
 			for (int i = 0; i < 3; ++i) {
@@ -184,11 +240,13 @@ public class PruningObserverTest {
 			}
 
 			Mockito.when(this.poiFacade.iterator()).thenReturn(this.accountStates.iterator());
+			Mockito.when(this.transactionHashCache.getRetentionTime()).thenReturn(RETENTION_HOURS);
 		}
 
 		private void assertNoPruning() {
 			this.assertNoWeightedBalancePruning();
 			this.assertNoOutlinkPruning();
+			this.assertNoTransactionHashCachePruning();
 		}
 
 		private void assertNoWeightedBalancePruning() {
@@ -203,6 +261,10 @@ public class PruningObserverTest {
 			}
 		}
 
+		private void assertNoTransactionHashCachePruning() {
+			Mockito.verify(this.transactionHashCache, Mockito.never()).prune(Mockito.any());
+		}
+
 		private void assertWeightedBalancePruning(final BlockHeight height) {
 			for (final PoiAccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getWeightedBalances(), Mockito.only()).prune(height);
@@ -213,6 +275,11 @@ public class PruningObserverTest {
 			for (final PoiAccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.only()).prune(height);
 			}
+		}
+
+		private void assertTransactionHashCachePruning(final TimeInstant timeStamp) {
+			Mockito.verify(this.transactionHashCache, Mockito.times(1)).prune(timeStamp);
+			Mockito.verify(this.transactionHashCache, Mockito.times(1)).getRetentionTime();
 		}
 	}
 }

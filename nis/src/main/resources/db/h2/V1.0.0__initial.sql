@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   PRIMARY KEY (`id`)  
 );  
 
-CREATE TABLE IF NOT EXISTS `block_transfers` (  
+CREATE TABLE IF NOT EXISTS `block_transfers` (
   `block_id` BIGINT NOT NULL,
   `transfer_id` BIGINT NOT NULL,  
   PRIMARY KEY (`transfer_id`)

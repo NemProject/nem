@@ -26,17 +26,20 @@ public class AccountController {
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
 	private final PoiFacade poiFacade;
+	private final HashCache transactionHashCache;
 
 	@Autowired(required = true)
 	AccountController(
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
-			final PoiFacade poiFacade) {
+			final PoiFacade poiFacade,
+			final HashCache transactionHashCache) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
 		this.poiFacade = poiFacade;
+		this.transactionHashCache = transactionHashCache;
 	}
 
 	/**
@@ -81,7 +84,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.ALL);
+		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.ALL);
 	}
 
 	/**
@@ -93,7 +96,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.INCOMING);
+		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	/**
@@ -105,12 +108,37 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersWithHash(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
+		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
-	private SerializableList<TransactionMetaDataPair> getAccountTransfersWithHash(final AccountTransactionsPageBuilder builder, final ReadOnlyTransferDao.TransferType transferType) {
+	// The GUI should never query with a hash as parameter because it is slower. When the GUI starts however it neither has an id
+	// nor a hash. So we need a method which accepts only address and transfer type as parameters.
+	// Not sure if we should support hash as parameter, I left it in order to allow older NCCs/GUIs to query newer NIS versions.
+	// TODO 20141205 J-B: i think we should drop support for hash in release N + 1
+	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
+			final AccountTransactionsPageBuilder builder,
+			final ReadOnlyTransferDao.TransferType transferType) {
 		final AccountTransactionsPage page = builder.build();
-		return this.accountIo.getAccountTransfersWithHash(page.getAddress(), page.getHash(), transferType);
+		if (null != page.getId()) {
+			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
+		}
+
+		final Hash hash = page.getHash();
+		if (null == hash) {
+			// if a hash was not specified, get the latest transactions for the account
+			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), null, transferType);
+		}
+
+		final HashMetaData metaData = this.transactionHashCache.get(hash);
+		if (null != metaData) {
+			return this.accountIo.getAccountTransfersUsingHash(
+					page.getAddress(),
+					hash,
+					metaData.getHeight(),
+					transferType);
+		} else {
+			throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
+		}
 	}
 
 	/**

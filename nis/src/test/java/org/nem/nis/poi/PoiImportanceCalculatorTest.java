@@ -9,6 +9,8 @@ import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.AccountLink;
 import org.nem.nis.test.*;
 
+import org.mockito.Mockito;
+
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.logging.Logger;
@@ -223,6 +225,24 @@ public class PoiImportanceCalculatorTest {
 	 * 1 should transfer more importance to 2 than 4 transfers to 5.
 	 *
 	 * Variation of the teleportation probabilities shows this behavior (TP = teleportation prob., ITLP = inter level teleportation prob.):
+	 *
+	 * with beta POI settings (and Mockito to guarantee clusters of {1,2,3,4,5}, {6,7,8,9,10}, with a hub as {0}):
+	 *  TP   ILTP
+	 * 0.8  | 0.1  | 0.090 0.097 0.088 0.089 0.090 0.091 0.097 0.088 0.089 0.090 0.091
+	 * 0.6  | 0.3  | 0.093 0.096 0.088 0.089 0.090 0.090 0.096 0.088 0.089 0.090 0.090
+	 * 0.45 | 0.45 | 0.096 0.095 0.088 0.089 0.090 0.090 0.095 0.088 0.089 0.090 0.090
+	 * 0.3  | 0.6  | 0.102 0.094 0.088 0.089 0.089 0.089 0.094 0.088 0.089 0.089 0.089
+	 * 0.1  | 0.8  | 0.117 0.092 0.087 0.087 0.087 0.087 0.092 0.087 0.087 0.087 0.087
+	 *
+	 * with beta POI settings without Mockito and everything is just one big cluster:
+	 *  TP   ILTP
+	 * 0.8  | 0.1  | 0.089 0.097 0.088 0.089 0.090 0.091 0.097 0.088 0.089 0.090 0.091
+	 * 0.6  | 0.3  | 0.088 0.097 0.088 0.090 0.091 0.091 0.097 0.088 0.090 0.091 0.091
+	 * 0.45 | 0.45 | 0.087 0.096 0.089 0.090 0.091 0.091 0.096 0.089 0.090 0.091 0.091
+	 * 0.3  | 0.6  | 0.087 0.096 0.089 0.090 0.091 0.091 0.096 0.089 0.090 0.091 0.091
+	 * 0.1  | 0.8  | 0.086 0.095 0.090 0.090 0.091 0.090 0.095 0.090 0.090 0.091 0.090
+	 *
+	 * with old (pre-beta) POI settings:
 	 *  TP   ILTP
 	 * 0.8  | 0.1  | 0.120 0.104 0.068 0.080 0.090 0.098 0.104 0.068 0.080 0.090 0.098
 	 * 0.6  | 0.3  | 0.131 0.097 0.070 0.083 0.090 0.094 0.097 0.070 0.083 0.090 0.094
@@ -249,8 +269,8 @@ public class PoiImportanceCalculatorTest {
 		// - account 0 starts with 2000 NEM
 		// - accounts 2-5 and 7-10 start with 2100 NEM
 		// - accounts 1 and 6 start with 2200 NEM
-		// - account 1-5 and 2-10 send around NEM in a loop
-		// - account 1-6 send NEM to 0
+		// - account 1-5 and 2-10 send around NEM in a loop (100 NEM each)
+		// - account 1-6 send NEM to 0 (100 NEM each)
 		final List<PoiAccountState> accountStates = new ArrayList<>();
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2200)));
@@ -269,10 +289,19 @@ public class PoiImportanceCalculatorTest {
 		final BlockHeight height = new BlockHeight(2);
 		addOutlinksFromGraph(accountStates, height, outlinkMatrix);
 
-		// Act:
+		// set up POI options
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setTeleportationProbability(0.8);
 		builder.setInterLevelTeleportationProbability(0.1);
+		builder.setMinHarvesterBalance(new Amount(1L));
+		builder.setMinOutlinkWeight(new Amount(1L));
+
+		// Build the clusters we expect
+		// - clusters: {0, 1, 2, 3, 4}, {6, 7, 8, 9, 10}; hubs: {0}
+		final DoubleLoopTestContext context = new DoubleLoopTestContext();
+		builder.setClusteringStrategy(context.clusteringStrategy);
+
+		// Act:
 		final ColumnVector importances = calculateImportances(builder.create(), height, accountStates);
 
 		// Assert:
@@ -285,7 +314,7 @@ public class PoiImportanceCalculatorTest {
 			Assert.assertThat(importance > 0.085 && importance < 0.10, IsEqual.equalTo(true));
 		}
 
-		// - the ring importances should be the same
+		// - the ring importances should be the same for the corresponding position
 		for (int i = 1; i <= 5; ++i) {
 			Assert.assertThat(importances.getAt(i), IsEqual.equalTo(importances.getAt(i + 5)));
 		}
@@ -333,13 +362,13 @@ public class PoiImportanceCalculatorTest {
 		// Act:
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
-		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
+		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
+		final double ratio1 = ringImportanceRatio(normalImportances);
 
-		// NCD aware page rank
-		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
-		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
+		// NCD aware rank
+		LOGGER.info("NCD aware rank:");
+		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
+		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
 		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
@@ -454,13 +483,13 @@ public class PoiImportanceCalculatorTest {
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
-		final double ratio1 = this.ringImportanceSum(normalImportances, 1) / this.ringImportanceSum(normalImportances, 2);
+		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
+		final double ratio1 = ringImportanceRatio(normalImportances);
 
-		// NCD aware page rank
-		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
-		final double ratio2 = this.ringImportanceSum(ncdAwareImportances, 1) / this.ringImportanceSum(ncdAwareImportances, 2);
+		// NCD aware rank
+		LOGGER.info("NCD aware rank:");
+		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
+		final double ratio2 = ringImportanceRatio(ncdAwareImportances);
 
 		LOGGER.info(String.format("normal importance ratio ring 1 : ring 2 is " + ratio1));
 		LOGGER.info(String.format("ncd aware importance ratio ring 1 : ring 2 is " + ratio2));
@@ -496,7 +525,11 @@ public class PoiImportanceCalculatorTest {
 		return outlinkMatrix;
 	}
 
-	private double ringImportanceSum(final ColumnVector importances, final int ring) {
+	private static double ringImportanceRatio(final ColumnVector importances) {
+		return ringImportanceSum(importances, 1) / ringImportanceSum(importances, 2);
+	}
+
+	private static double ringImportanceSum(final ColumnVector importances, final int ring) {
 		double sum = 0.0;
 		for (int i = 0; i < 6; i++) {
 			sum += importances.getAt(i + 6 * (ring - 1));
@@ -547,11 +580,11 @@ public class PoiImportanceCalculatorTest {
 
 		// Normal page rank
 		LOGGER.info("normal page rank:");
-		final ColumnVector normalImportances = context.calculateRing1Importances(accountStates);
+		final ColumnVector normalImportances = context.calculatePageRankImportances(accountStates);
 
-		// NCD aware page rank
-		LOGGER.info("NCD aware page rank:");
-		final ColumnVector ncdAwareImportances = context.calculateRing2Importances(accountStates);
+		// NCD aware rank
+		LOGGER.info("NCD aware rank:");
+		final ColumnVector ncdAwareImportances = context.calculateNCDAwareRankImportances(accountStates);
 
 		// Assert:
 		// Merchant and exchange should have higher importance than users.
@@ -575,12 +608,11 @@ public class PoiImportanceCalculatorTest {
 			this.builder2.setInterLevelTeleportationProbability(0.1);
 		}
 
-		// TODO 20141018 J-B: not sure if i named these correctly; if not you might want to rename
-		public ColumnVector calculateRing1Importances(final Collection<PoiAccountState> accountStates) {
+		public ColumnVector calculatePageRankImportances(final Collection<PoiAccountState> accountStates) {
 			return calculateImportances(this.builder1.create(), this.height1, accountStates, new PageRankScorer());
 		}
 
-		public ColumnVector calculateRing2Importances(final Collection<PoiAccountState> accountStates) {
+		public ColumnVector calculateNCDAwareRankImportances(final Collection<PoiAccountState> accountStates) {
 			return calculateImportances(this.builder2.create(), this.height2, accountStates, new PageRankScorer());
 		}
 	}
@@ -759,4 +791,35 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	//endregion
+
+	private static class DoubleLoopTestContext {
+		private final GraphClusteringStrategy clusteringStrategy = Mockito.mock(FastScanClusteringStrategy.class);
+
+		public DoubleLoopTestContext() {
+			// setup clusters
+			final ClusteringResult clusteringResult = new ClusteringResult(
+					buildLoopClusters(),
+					buildLoopHubs(),
+					buildLoopOutliers());
+			Mockito.when(this.clusteringStrategy.cluster(Mockito.any())).thenReturn(clusteringResult);
+		}
+
+		private static Collection<Cluster> buildLoopClusters() {
+			return Arrays.asList(
+					buildCluster(1, 1, 2, 3, 4, 5),
+					buildCluster(6, 6, 7, 8, 9, 10));
+		}
+
+		private static Collection<Cluster> buildLoopHubs() {
+			return Arrays.asList(buildCluster(0, 0));
+		}
+
+		private static Collection<Cluster> buildLoopOutliers() {
+			return Arrays.asList();
+		}
+
+		private static Cluster buildCluster(final int id, final int... nodes) {
+			return new Cluster(new ClusterId(id), Arrays.stream(nodes).mapToObj(i -> new NodeId(i)).collect(Collectors.toList()));
+		}
+	}
 }

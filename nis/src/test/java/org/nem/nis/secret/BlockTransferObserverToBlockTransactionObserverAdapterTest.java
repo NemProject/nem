@@ -6,6 +6,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.test.NisUtils;
 
 public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 
@@ -23,7 +24,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		// Act:
 		adapter.notify(
 				new BalanceTransferNotification(account1, account2, amount),
-				new BlockNotificationContext(height, NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(observer, Mockito.times(1)).notifySend(height, account1, amount);
@@ -49,7 +50,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		// Act:
 		adapter.notify(
 				new BalanceTransferNotification(account1, account2, amount),
-				new BlockNotificationContext(height, NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account1, amount);
@@ -74,7 +75,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		// Act:
 		adapter.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount),
-				new BlockNotificationContext(height, NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(observer, Mockito.times(1)).notifyReceive(height, account, amount);
@@ -98,7 +99,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		// Act:
 		adapter.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, amount),
-				new BlockNotificationContext(height, NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(observer, Mockito.times(1)).notifySendUndo(height, account, amount);
@@ -122,7 +123,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		// Act:
 		adapter.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount),
-				new BlockNotificationContext(height, NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(observer, Mockito.times(1)).notifySend(height, account, amount);
@@ -146,7 +147,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		// Act:
 		adapter.notify(
 				new BalanceAdjustmentNotification(NotificationType.BalanceDebit, account, amount),
-				new BlockNotificationContext(height, NotificationTrigger.Undo));
+				NisUtils.createBlockNotificationContext(height, NotificationTrigger.Undo));
 
 		// Assert:
 		Mockito.verify(observer, Mockito.times(1)).notifyReceiveUndo(height, account, amount);
@@ -166,7 +167,7 @@ public class BlockTransferObserverToBlockTransactionObserverAdapterTest {
 		// Act:
 		adapter.notify(
 				new AccountNotification(Utils.generateRandomAccount()),
-				new BlockNotificationContext(new BlockHeight(19), NotificationTrigger.Execute));
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
 		Mockito.verify(observer, Mockito.never()).notifySend(Mockito.any(), Mockito.any(), Mockito.any());

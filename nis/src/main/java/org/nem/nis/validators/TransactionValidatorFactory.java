@@ -1,33 +1,25 @@
 package org.nem.nis.validators;
 
+import org.nem.core.model.HashCache;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.dao.*;
 import org.nem.nis.poi.*;
 
 /**
  * Factory for creating TransactionValidator objects.
  */
 public class TransactionValidatorFactory {
-	private final TransferDao transferDao;
-	private final ImportanceTransferDao importanceTransferDao;
 	private final TimeProvider timeProvider;
 	private final PoiOptions poiOptions;
 
 	/**
 	 * Creates a new factory.
 	 *
-	 * @param transferDao The transfer dao.
-	 * @param importanceTransferDao The importance transfer dao.
 	 * @param timeProvider The time provider.
 	 * @param poiOptions The poi options.
 	 */
 	public TransactionValidatorFactory(
-			final TransferDao transferDao,
-			final ImportanceTransferDao importanceTransferDao,
 			final TimeProvider timeProvider,
 			final PoiOptions poiOptions) {
-		this.transferDao = transferDao;
-		this.importanceTransferDao = importanceTransferDao;
 		this.timeProvider = timeProvider;
 		this.poiOptions = poiOptions;
 	}
@@ -36,11 +28,12 @@ public class TransactionValidatorFactory {
 	 * Creates a transaction validator that contains both single and batch validators.
 	 *
 	 * @param poiFacade The poi facade.
+	 * @param transactionHashCache The transaction hash cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator create(final PoiFacade poiFacade) {
+	public SingleTransactionValidator create(final PoiFacade poiFacade, final HashCache transactionHashCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = this.createSingleBuilder(poiFacade);
-		builder.add(new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao));
+		builder.add(new BatchUniqueHashTransactionValidator(transactionHashCache));
 		return builder.build();
 	}
 
@@ -57,11 +50,11 @@ public class TransactionValidatorFactory {
 	/**
 	 * Creates a transaction validator that only contains batch validators.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param transactionHashCache The transaction hash cache.
 	 * @return The validator.
 	 */
-	public BatchTransactionValidator createBatch(final PoiFacade poiFacade) {
-		return new BatchUniqueHashTransactionValidator(this.transferDao, this.importanceTransferDao);
+	public BatchTransactionValidator createBatch(final HashCache transactionHashCache) {
+		return new BatchUniqueHashTransactionValidator(transactionHashCache);
 	}
 
 	private AggregateSingleTransactionValidatorBuilder createSingleBuilder(final PoiFacade poiFacade) {

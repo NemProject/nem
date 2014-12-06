@@ -37,6 +37,11 @@ public enum NotificationType {
 	HarvestReward,
 
 	/**
+	 * The notification represents appearance/disappearance of transaction hashes.
+	 */
+	TransactionHashes,
+
+	/**
 	 * The notification represents a cosigner change.
 	 */
 	CosignatoryModification

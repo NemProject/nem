@@ -7,6 +7,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.poi.*;
+import org.nem.nis.test.NisUtils;
 
 public class MultisigAccountObserverTest {
 	@Test
@@ -56,7 +57,7 @@ public class MultisigAccountObserverTest {
 		// Act:
 		observer.notify(
 				new MultisigModificationNotification(context.account1, context.account2, value),
-				new BlockNotificationContext(new BlockHeight(111), notificationTrigger));
+				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
 		return context;
 	}
 

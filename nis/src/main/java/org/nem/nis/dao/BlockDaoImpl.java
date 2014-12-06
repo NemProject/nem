@@ -36,6 +36,17 @@ public class BlockDaoImpl implements BlockDao {
 		this.getCurrentSession().saveOrUpdate(block);
 	}
 
+	// TODO 20141206 J-G: does it make sense to add a test for this?
+	@Override
+	@Transactional
+	public void save(final List<Block> blocks) {
+		for (final Block block : blocks) {
+			this.getCurrentSession().saveOrUpdate(block);
+		}
+		this.getCurrentSession().flush();
+		this.getCurrentSession().clear();
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public Long count() {
@@ -123,7 +134,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional(readOnly = true)
 	public List<TimeInstant> getTimeStampsFrom(final BlockHeight height, final int limit) {
 		final List<Integer> rawTimeStamps = this.prepareCriteriaGetFor("timeStamp", height, limit);
-		return rawTimeStamps.stream().map(obj -> new TimeInstant(obj)).collect(Collectors.toList());
+		return rawTimeStamps.stream().map(TimeInstant::new).collect(Collectors.toList());
 	}
 
 	@Override

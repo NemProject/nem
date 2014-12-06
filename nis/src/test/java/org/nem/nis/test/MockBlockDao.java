@@ -97,6 +97,11 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
+	public void save(final List<Block> blocks) {
+		throw new RuntimeException("unsupported MockBlockDao.save(...List...)");
+	}
+
+	@Override
 	public Long count() {
 		return null;
 	}
@@ -105,7 +110,7 @@ public class MockBlockDao implements BlockDao {
 	public Block findById(final long id) {
 		++this.numFindByIdCalls;
 		this.lastFindByIdId = id;
-		return this.find(block -> block.getId() == id);
+		return this.find(block -> block.getId().equals(id));
 	}
 
 	@Override
