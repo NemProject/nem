@@ -111,11 +111,10 @@ public class AccountController {
 		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
-	// TODO 20141201 J-B: do we need to support all permutations?
-	// TODO 20141201 J-B: i would also add tests for the error cases (where exceptions are thrown)
-	// TODO 20141202 BR -> J: The GUI should never query with a hash as parameter because it is slower. When the GUI starts however it neither has an id
-	// TODO                   nor a hash. So we need a method which accepts only address and transfer type as parameters.
-	// TODO                   Not sure if we should support hash as parameter, I left it in order to allow older NCCs/GUIs to query newer NIS versions.
+	// The GUI should never query with a hash as parameter because it is slower. When the GUI starts however it neither has an id
+	// nor a hash. So we need a method which accepts only address and transfer type as parameters.
+	// Not sure if we should support hash as parameter, I left it in order to allow older NCCs/GUIs to query newer NIS versions.
+	// TODO 20141205 J-B: i think we should drop support for hash in release N + 1
 	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
 			final AccountTransactionsPageBuilder builder,
 			final ReadOnlyTransferDao.TransferType transferType) {
@@ -124,12 +123,9 @@ public class AccountController {
 			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
 		}
 
-		// TODO 20141201 J-B: if we can lookup the id why even pass it in?
-		// TODO 20141202 BR -> J: See comment above.
 		final Hash hash = page.getHash();
 		if (null == hash) {
-			// TODO 20141201 J-B: what does a null id mean?
-			// TODO 20141202 BR -> J: See comment above (null means "jget the latest transactions for the account).
+			// if a hash was not specified, get the latest transactions for the account
 			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), null, transferType);
 		}
 
@@ -138,7 +134,7 @@ public class AccountController {
 			return this.accountIo.getAccountTransfersUsingHash(
 					page.getAddress(),
 					hash,
-					this.transactionHashCache.get(hash).getHeight(),
+					metaData.getHeight(),
 					transferType);
 		} else {
 			throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
