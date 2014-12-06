@@ -37,7 +37,7 @@ public class AggregateBlockVisitorTest {
 		context.visitor.visit(null, block);
 
 		// Assert:
-		Assert.assertThat(context.visitList, IsEquivalent.equivalentTo(new Integer[] { 1, 2 }));
+		Assert.assertThat(context.visitList, IsEquivalent.equivalentTo(1, 2));
 	}
 
 	private static class TestContext {

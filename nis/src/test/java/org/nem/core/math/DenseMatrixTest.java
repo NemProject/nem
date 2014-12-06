@@ -51,7 +51,7 @@ public class DenseMatrixTest extends MatrixTest<DenseMatrix> {
 		matrix.forEach((row, col, value) -> values.add(value));
 
 		// Assert:
-		Assert.assertThat(values, IsEquivalent.equivalentTo(new Double[] { 2.0, 0.0, 0.0, 1.0, -5.0, 8.0 }));
+		Assert.assertThat(values, IsEquivalent.equivalentTo(2.0, 0.0, 0.0, 1.0, -5.0, 8.0));
 	}
 
 	//endregion

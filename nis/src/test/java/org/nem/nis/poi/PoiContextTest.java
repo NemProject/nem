@@ -158,7 +158,7 @@ public class PoiContextTest {
 		// (1) accounts without outlinks are dangling (2 has inlinks but no outlinks)
 		Assert.assertThat(
 				context.getDangleIndexes(),
-				IsEquivalent.equivalentTo(new Integer[] { 2 }));
+				IsEquivalent.equivalentTo(2));
 	}
 
 	//endregion

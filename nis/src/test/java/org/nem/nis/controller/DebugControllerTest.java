@@ -136,7 +136,7 @@ public class DebugControllerTest {
 		Mockito.verify(context.host, Mockito.times(1)).getVisitors();
 		Assert.assertThat(
 				visitors.asCollection().stream().map(v -> v.getTimerName()).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(new String[] { "foo", "bar" }));
+				IsEquivalent.equivalentTo("foo", "bar"));
 	}
 
 	@Test
