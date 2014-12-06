@@ -1,12 +1,12 @@
 package org.nem.nis.service;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.Block;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
@@ -105,7 +105,6 @@ public class AccountIoAdapterTest {
 		final TestContext context = new TestContext();
 		final Iterator<Account> expectedIterator = new ArrayList<Account>().iterator();
 		Mockito.when(context.accountCache.iterator()).thenReturn(expectedIterator);
-
 
 		// Act:
 		final Iterator<Account> iterator = context.accountIoAdapter.iterator();

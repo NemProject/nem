@@ -281,7 +281,9 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdThrowsWhenHashNotFound() {
 		// Arrange:
-		ExceptionAssert.assertThrows(v -> this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID), MissingResourceException.class);
+		ExceptionAssert.assertThrows(
+				v -> this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID),
+				MissingResourceException.class);
 	}
 
 	@Test

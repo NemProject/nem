@@ -82,8 +82,8 @@ public class PushService {
 			this.identity = identity;
 			this.broadcastId = broadcastId;
 
-			this.isValid =  e -> ValidationResult.SUCCESS;
-			this.isAccepted =  e -> ValidationResult.SUCCESS;
+			this.isValid = e -> ValidationResult.SUCCESS;
+			this.isAccepted = e -> ValidationResult.SUCCESS;
 			this.logAdditionalInfo = e -> {};
 		}
 	}
