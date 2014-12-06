@@ -24,91 +24,44 @@ public class NisCacheTest {
 		Assert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
 	}
 
-	// region delegation
-
 	@Test
-	public void copyDelegatesToAccountCache() {
+	public void copyCreatesNewCacheByDelegatingToComponents() {
 		// Arrange:
+		final AccountCache copyAccountCache = Mockito.mock(AccountCache.class);
+		final PoiFacade copyPoiFacade = Mockito.mock(PoiFacade.class);
+		final HashCache copyTransactionsHashCache = Mockito.mock(HashCache.class);
+
 		final TestContext context = new TestContext();
+		Mockito.when(context.accountCache.copy()).thenReturn(copyAccountCache);
+		Mockito.when(context.poiFacade.copy()).thenReturn(copyPoiFacade);
+		Mockito.when(context.transactionsHashCache.copy()).thenReturn(copyTransactionsHashCache);
 
 		// Act:
-		context.cache.copy();
+		final NisCache copy = context.cache.copy();
 
 		// Assert:
-		Mockito.verify(context.accountCache, Mockito.times(1)).copy();
+		Mockito.verify(context.accountCache, Mockito.only()).copy();
+		Mockito.verify(context.poiFacade, Mockito.only()).copy();
+		Mockito.verify(context.transactionsHashCache, Mockito.only()).copy();
+
+		Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(copyAccountCache));
+		Assert.assertThat(copy.getPoiFacade(), IsSame.sameInstance(copyPoiFacade));
+		Assert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(copyTransactionsHashCache));
 	}
 
 	@Test
-	public void copyDelegatesToPoiFacade() {
+	public void shallowCopyToDelegatesToComponents() {
 		// Arrange:
 		final TestContext context = new TestContext();
+		final TestContext targetContext = new TestContext();
 
 		// Act:
-		context.cache.copy();
+		context.cache.shallowCopyTo(targetContext.cache);
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.times(1)).copy();
-	}
-
-	@Test
-	public void copyDelegatesToTransactionHashCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.cache.copy();
-
-		// Assert:
-		Mockito.verify(context.transactionsHashCache, Mockito.times(1)).copy();
-	}
-
-	@Test
-	public void shallowCopyToDelegatesToAccountCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final NisCache other = createCache();
-
-		// Act:
-		context.cache.shallowCopyTo(other);
-
-		// Assert:
-		Mockito.verify(context.accountCache, Mockito.times(1)).shallowCopyTo(other.getAccountCache());
-	}
-
-
-	@Test
-	public void shallowCopyToDelegatesToPoiFacade() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final NisCache other = createCache();
-
-		// Act:
-		context.cache.shallowCopyTo(other);
-
-		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.times(1)).shallowCopyTo(other.getPoiFacade());
-	}
-
-	@Test
-	public void shallowCopyToDelegatesToTransactionHashCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final NisCache other = createCache();
-
-		// Act:
-		context.cache.shallowCopyTo(other);
-
-		// Assert:
-		Mockito.verify(context.transactionsHashCache, Mockito.times(1)).shallowCopyTo(other.getTransactionHashCache());
-	}
-
-	// endregion
-
-	private static NisCache createCache() {
-		final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		return new NisCache(accountCache, poiFacade, transactionsHashCache);
+		Mockito.verify(context.accountCache, Mockito.only()).shallowCopyTo(targetContext.accountCache);
+		Mockito.verify(context.poiFacade, Mockito.only()).shallowCopyTo(targetContext.poiFacade);
+		Mockito.verify(context.transactionsHashCache, Mockito.only()).shallowCopyTo(targetContext.transactionsHashCache);
 	}
 
 	private class TestContext {

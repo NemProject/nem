@@ -314,14 +314,13 @@ public class BlockGeneratorTest {
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final BlockDifficultyScorer difficultyScorer = Mockito.mock(BlockDifficultyScorer.class);
 		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		private final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		private final BlockGenerator generator = new BlockGenerator(
-				new NisCache(this.accountCache, this.poiFacade, this.transactionHashCache),
+				new NisCache(this.accountCache, this.poiFacade, Mockito.mock(HashCache.class)),
 				this.unconfirmedTransactions,
 				this.blockDao,
 				this.scorer,

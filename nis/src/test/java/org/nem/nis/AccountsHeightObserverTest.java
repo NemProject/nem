@@ -136,8 +136,7 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final AccountCache accountCache = new AccountCache();
 		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
-		final HashCache transactionsHashCache = new HashCache();
-		final AccountsHeightObserver observer = new AccountsHeightObserver(new NisCache(accountCache, poiFacade, transactionsHashCache));
+		final AccountsHeightObserver observer = new AccountsHeightObserver(new NisCache(accountCache, poiFacade, new HashCache()));
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 
 		// Act:

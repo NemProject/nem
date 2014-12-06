@@ -4,10 +4,7 @@ import org.nem.core.model.HashCache;
 import org.nem.nis.poi.PoiFacade;
 
 /**
- * Class holding cached data.
- * TODO 20141204: since the AccountAnalyzer is really just a pair of (accountcache, poifacade),
- * > and this is a pair of that and transactionHashCache;
- * > i think we should flatten the structure so that this is really a triple of the three components)
+ * The central point for accessing NIS-mutable data.
  */
 public class NisCache {
 	private final AccountCache accountCache;
@@ -62,8 +59,7 @@ public class NisCache {
 	 *
 	 * @return The copy.
 	 */
-	public NisCache copy()
-	{
+	public NisCache copy() {
 		return new NisCache(this.accountCache.copy(), this.poiFacade.copy(), this.transactionHashCache.copy());
 	}
 
