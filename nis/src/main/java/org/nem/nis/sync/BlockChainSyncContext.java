@@ -50,15 +50,6 @@ public class BlockChainSyncContext {
 	}
 
 	/**
-	 * Gets the working copy of the transaction hash cache.
-	 *
-	 * @return The transaction hash cache.
-	 */
-	public HashCache transactionHashCache() {
-		return this.nisCache.getTransactionHashCache();
-	}
-
-	/**
 	 * Reverses transactions between commonBlockHeight and current lastBlock.
 	 * Additionally calculates score.
 	 *
