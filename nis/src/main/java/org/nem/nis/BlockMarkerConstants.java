@@ -33,12 +33,12 @@ public class BlockMarkerConstants {
 
 	/**
 	 * Beta hard fork due to a fix in expired transaction detection.
-	 * Targeting Monday 1 Dec.
+	 * Targeting Monday 8 Dec.
 	 */
-	public static long BETA_TX_DEADLINE_FORK = 60000;
+	public static long BETA_TX_DEADLINE_FORK = 71000;
 
 	/**
-	 *
+	 * Beta hard fork due to multisig.
 	 */
 	public static long BETA_MULTISIG_FORK = 70000;
 }
