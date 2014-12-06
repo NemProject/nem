@@ -151,7 +151,7 @@ public class BlockExecutorTest {
 		final ArgumentCaptor<Notification> notificationCaptor = context.captureNotifications(observer);
 
 		// check notification
-		NotificationUtils.assertTransactionHashesNotification(notificationCaptor.getAllValues().get(5), 1);
+		NotificationUtils.assertTransactionHashesNotification(notificationCaptor.getAllValues().get(5), context.transactionHashPairs);
 	}
 
 	@Test
@@ -224,7 +224,7 @@ public class BlockExecutorTest {
 		final ArgumentCaptor<Notification> notificationCaptor = context.captureNotifications(observer);
 
 		// check notifications
-		NotificationUtils.assertTransactionHashesNotification(notificationCaptor.getAllValues().get(2), 1);
+		NotificationUtils.assertTransactionHashesNotification(notificationCaptor.getAllValues().get(2), context.transactionHashPairs);
 	}
 
 	@Test
@@ -254,6 +254,7 @@ public class BlockExecutorTest {
 		private final Account account2 = this.context.addAccount();
 		private final BlockHeight height = new BlockHeight(11);
 		private final Block block;
+		private final List<HashMetaDataPair> transactionHashPairs;
 
 		public UndoExecuteNotificationTestContext() {
 			final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
@@ -265,6 +266,11 @@ public class BlockExecutorTest {
 			});
 
 			this.block = this.context.createBlockWithTransaction(this.height, Amount.fromNem(7), transaction);
+			// TODO 20141205 J-B: probably minor, but should the timestamp be associated with the transaction or the containing block?
+			final HashMetaDataPair pair = new HashMetaDataPair(
+					HashUtils.calculateHash(transaction),
+					new HashMetaData(this.height, transaction.getTimeStamp()));
+			this.transactionHashPairs = Arrays.asList(pair);
 		}
 
 		private void execute(final BlockTransactionObserver observer) {

@@ -5,10 +5,11 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.TransactionHashesNotification;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TransactionHashesObserverTest {
 
@@ -24,8 +25,9 @@ public class TransactionHashesObserverTest {
 
 		// Assert:
 		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
-		// TODO 20141201 J-J: should add equality to hashmetadatapair to simplify
-		context.pairs.stream().forEach(p -> Assert.assertThat(context.transactionHashCache.get(p.getHash()), IsEqual.equalTo(p.getMetaData())));
+		Assert.assertThat(
+				context.transactionHashCache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(context.pairs));
 	}
 
 	//endregion

@@ -4,7 +4,6 @@ package org.nem.nis.dbmodel;
  * DTO containing a db transfer and a db block object.
  */
 public class TransferBlockPair {
-
 	private final Transfer transfer;
 	private final Block block;
 
