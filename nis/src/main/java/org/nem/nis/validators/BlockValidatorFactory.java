@@ -3,6 +3,8 @@ package org.nem.nis.validators;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.poi.PoiFacade;
 
+import java.util.function.Consumer;
+
 /**
  * Factory for creating BlockValidator objects.
  */
@@ -25,25 +27,24 @@ public class BlockValidatorFactory {
 	 * @return The validator.
 	 */
 	public BlockValidator create(final PoiFacade poiFacade) {
-		return create(new AggregateBlockValidatorBuilder(), poiFacade);
+		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
+		this.visitSubValidators(builder::add, poiFacade);
+		return builder.build();
 	}
 
 	/**
-	 * Creates a block validator.
-	 * TODO why did this signature change?
-	 *
-	 * @param builder The aggregate block validator builder.
+	 * Visits all sub validators that comprise the returned aggregate validator.
 	 * @param poiFacade The poi facade.
-	 * @return The validator.
+	 *
+	 * @param visitor The visitor.
 	 */
-	public BlockValidator create(final AggregateBlockValidatorBuilder builder, final PoiFacade poiFacade) {
-		builder.add(new NonFutureEntityValidator(this.timeProvider));
-		builder.add(new TransactionDeadlineBlockValidator());
-		builder.add(new EligibleSignerBlockValidator(poiFacade));
-		builder.add(new MaxTransactionsBlockValidator());
-		builder.add(new NoSelfSignedTransactionsBlockValidator(poiFacade));
-		builder.add(new BlockImportanceTransferValidator());
-		builder.add(new BlockImportanceTransferBalanceValidator());
-		return builder.build();
+	public void visitSubValidators(final Consumer<BlockValidator> visitor, final PoiFacade poiFacade) {
+		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
+		visitor.accept(new TransactionDeadlineBlockValidator());
+		visitor.accept(new EligibleSignerBlockValidator(poiFacade));
+		visitor.accept(new MaxTransactionsBlockValidator());
+		visitor.accept(new NoSelfSignedTransactionsBlockValidator(poiFacade));
+		visitor.accept(new BlockImportanceTransferValidator());
+		visitor.accept(new BlockImportanceTransferBalanceValidator());
 	}
 }

@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.poi.PoiFacade;
 
-import java.util.List;
+import java.util.*;
 
 public class BlockValidatorFactoryTest {
 
@@ -24,60 +24,58 @@ public class BlockValidatorFactoryTest {
 
 	// TODO 20141201 J-B: nice tests; you might want to add something similar to the transaction factory tests
 	// TODO 20141204 BR -> J: the TransactionValidatorFactory doesn't expose the builder to the public. You have an idea how to do it?
+	// TODO 20141205: J-B: i guess we would need to do something similar; also, we might want to consider having a single test
+	// > that validates against all types, i'm not sure if there's much value in splitting up the tests
 
 	@Test
 	public void createAddsTransactionDeadlineBlockValidator() {
-		assertCreateAddsValidator(new TransactionDeadlineBlockValidator());
+		assertCreateAddsValidator(TransactionDeadlineBlockValidator.class);
 	}
 
 	@Test
 	public void createAddsNonFutureEntityValidator() {
-		assertCreateAddsValidator(new NonFutureEntityValidator(Mockito.mock(TimeProvider.class)));
+		assertCreateAddsValidator(NonFutureEntityValidator.class);
 	}
 
 	@Test
 	public void createAddsEligibleSignerBlockValidator() {
-		assertCreateAddsValidator(new EligibleSignerBlockValidator(Mockito.mock(PoiFacade.class)));
+		assertCreateAddsValidator(EligibleSignerBlockValidator.class);
 	}
 
 	@Test
 	public void createAddsMaxTransactionsBlockValidator() {
-		assertCreateAddsValidator(new MaxTransactionsBlockValidator());
+		assertCreateAddsValidator(MaxTransactionsBlockValidator.class);
 	}
 
 	@Test
 	public void createAddsNoSelfSignedTransactionsBlockValidator() {
-		assertCreateAddsValidator(new NoSelfSignedTransactionsBlockValidator(Mockito.mock(PoiFacade.class)));
+		assertCreateAddsValidator(NoSelfSignedTransactionsBlockValidator.class);
 	}
 
 	@Test
 	public void createAddsBlockImportanceTransferValidator() {
-		assertCreateAddsValidator(new BlockImportanceTransferValidator());
+		assertCreateAddsValidator(BlockImportanceTransferValidator.class);
 	}
 
 	@Test
 	public void createAddsBlockImportanceTransferBalanceValidator() {
-		assertCreateAddsValidator(new BlockImportanceTransferBalanceValidator());
+		assertCreateAddsValidator(BlockImportanceTransferBalanceValidator.class);
 	}
 
-	private void assertCreateAddsValidator(final BlockValidator validator) {
+	private static void assertCreateAddsValidator(final Class<?> desiredClass) {
 		// Arrange:
-		final ArgumentCaptor<BlockValidator> captor = ArgumentCaptor.forClass(BlockValidator.class);
-		final AggregateBlockValidatorBuilder builder = Mockito.mock(AggregateBlockValidatorBuilder.class);
 		final BlockValidatorFactory factory = new BlockValidatorFactory(Mockito.mock(TimeProvider.class));
 
 		// Act:
-		factory.create(builder, Mockito.mock(PoiFacade.class));
+		final List<BlockValidator> validators = new ArrayList<>();
+		factory.visitSubValidators(validators::add, Mockito.mock(PoiFacade.class));
 
 		// Assert:
-		Mockito.verify(builder, Mockito.times(7)).add(captor.capture());
-		Assert.assertThat(listContainsClass(captor.getAllValues(), validator.getClass()), IsEqual.equalTo(true));
+		Assert.assertThat(validators.size(), IsEqual.equalTo(7));
+		Assert.assertThat(listContainsClass(validators, desiredClass), IsEqual.equalTo(true));
 	}
 
-	private boolean listContainsClass(final List<BlockValidator> validators, Class<?> desiredClass) {
-		return validators.stream()
-				.map(v -> v.getClass().equals(desiredClass))
-				.reduce((b1, b2) -> b1 || b2)
-				.get();
+	private static boolean listContainsClass(final List<BlockValidator> validators, final Class<?> desiredClass) {
+		return validators.stream().anyMatch(v -> v.getClass().equals(desiredClass));
 	}
 }
