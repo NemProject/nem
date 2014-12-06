@@ -880,7 +880,6 @@ public class UnconfirmedTransactionsTest {
 				new MockTransaction(account2, 2, new TimeInstant(4)),
 				new MockTransaction(account2, 3, new TimeInstant(6)),
 				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(Transaction::sign);
 		transactions.forEach(context::signAndAddExisting);
 		MockTransaction transaction = new MockTransaction(account2, 5, new TimeInstant(1));
 		transaction.setDeadline(new TimeInstant(3600));

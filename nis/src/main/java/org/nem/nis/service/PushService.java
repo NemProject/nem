@@ -26,7 +26,6 @@ public class PushService {
 	private static final int TX_CACHE_SECONDS = 10;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final SingleTransactionValidator validator;
 	private final BlockChain blockChain;
 	private final NisPeerNetworkHost host;
 	private final HashCache transactionHashCache;
@@ -35,12 +34,10 @@ public class PushService {
 	@Autowired(required = true)
 	public PushService(
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final SingleTransactionValidator validator,
 			final BlockChain blockChain,
 			final NisPeerNetworkHost host,
 			final TimeProvider timeProvider) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
-		this.validator = validator;
 		this.blockChain = blockChain;
 		this.host = host;
 		this.transactionHashCache = new HashCache(timeProvider, TX_CACHE_SECONDS);
@@ -61,12 +58,7 @@ public class PushService {
 
 		final ValidationResult result = this.pushEntity(
 				entity,
-				// TODO 20141201 J-B: did you mean to revert this back?
-				// TODO 20141202 BR -> J: seems I oversaw that unconfirmedTransaction.add() doesn't verify the transaction. But shouldn't it actually do that?
-				// TODO                   When we are polling unconfirmed transactions from a remote, those transaction are not verified? Anyway the idea was to do
-				// TODO                   all verifications inside the UnconfirmedTransactions class. In the current version we are doing everything twice.
-				// TODO 20141205 BR: I included the verify() call in UnconfirmedTransactions.add().
-				transaction -> ValidationResult.SUCCESS,
+				transaction -> ValidationResult.SUCCESS, // addNew does all the validation
 				transaction -> this.unconfirmedTransactions.addNew(transaction),
 				transaction -> {},
 				NisPeerId.REST_PUSH_TRANSACTION,
@@ -78,12 +70,6 @@ public class PushService {
 		}
 
 		return result;
-	}
-
-	private ValidationResult checkTransaction(final Transaction transaction) {
-		return !transaction.verify()
-				? ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE
-				: this.validator.validate(transaction);
 	}
 
 	/**
@@ -135,6 +121,8 @@ public class PushService {
 
 		final ValidationResult isValidResult = isValid.apply(entity);
 		if (isValidResult.isFailure()) {
+			// TODO 20141205 J-B: can you remind me why we don't want to mark a node as FAILURE
+			// > when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE
 			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);

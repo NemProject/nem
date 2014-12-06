@@ -88,6 +88,8 @@ public class BlockChainValidator {
 			}
 
 			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight);
+			// TODO 20141205 J-B: why did you change how batch validation is happening?
+			// > if you are doing it this way, we can simplify everything and just have this check as a block validator!
 			final ValidationResult batchTransactionValidationResult =
 					this.batchTransactionValidator.validate(Arrays.asList(new TransactionsContextPair(block.getTransactions(), context)));
 			if (!batchTransactionValidationResult.isSuccess()) {

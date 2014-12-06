@@ -330,6 +330,8 @@ public class UnconfirmedTransactions {
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
 		// (3) not already be expired
+		// TODO 20141205 J-B: i noticed that the TransactionDeadlineBlockValidator is only for blocks;
+		// > if it is updated to also work for blocks, then shouldn't (3) be satisfied by (4)?
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:

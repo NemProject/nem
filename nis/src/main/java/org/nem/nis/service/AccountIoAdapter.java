@@ -73,9 +73,6 @@ public class AccountIoAdapter implements AccountIo {
 		return transactionList;
 	}
 
-	// TODO 20141201 J-B i guess a test for the new function?
-	// TODO 20141204 BR -> J: added delegation tests. Other tests should be in transfer dao test class.
-
 	@Override
 	public SerializableList<TransactionMetaDataPair> getAccountTransfersUsingHash(
 			final Address address,

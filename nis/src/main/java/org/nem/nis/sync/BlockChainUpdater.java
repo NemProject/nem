@@ -107,16 +107,14 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		synchronized(this) {
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {
-				// TODO 20141201 J-B: i think the change is ok, but the comment is misleading as the last block could also be changed by a parallel updateChain call
-				// TODO 20141202 BR -> J: I don't think updateChain can be called twice, at least I never saw that in the logs.
-				// last block has changed due to a processBlock call, don't do anything
+				// last block has changed due to another call (probably processBlock), don't do anything
 				LOGGER.warning("updateChain: last block changed. Update not possible");
 				return NodeInteractionResult.NEUTRAL;
 			}
 
 			final org.nem.nis.dbmodel.Block dbParent = this.blockDao.findByHeight(commonBlockHeight);
 
-			//region revert TXes inside contemporaryAccountAnalyzer
+			// revert TXes inside contemporaryAccountAnalyzer
 			BlockChainScore ourScore = BlockChainScore.ZERO;
 			if (!result.areChainsConsistent()) {
 				LOGGER.info(String.format(
@@ -124,13 +122,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 						this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 			}
-			//endregion
 
-			//region verify peer's chain
+			// verify peer's chain
 			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 			return NodeInteractionResult.fromValidationResult(validationResult);
 		}
-		//endregion
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {

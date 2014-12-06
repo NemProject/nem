@@ -94,6 +94,8 @@ public class AccountIoAdapterTest {
 
 	// region delegation
 
+	// TODO 20141205 J-B; should we also validate return values?
+
 	@Test
 	public void findByAddressDelegatesToAccountCache() {
 		// Arrange:

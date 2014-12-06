@@ -20,44 +20,6 @@ public class PushServiceTest {
 
 	//region pushTransaction
 
-	// TODO 20141205 BR: Since validation is done completely in UnconfirmedTransactions class I guess these two tests don't make sense any more?
-	/*@Test
-	public void pushTransactionVerifyFailureIncrementsFailedExperience() {
-		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-		final TestContext context = new TestContext(validator);
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
-		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
-		transaction.signBy(Utils.generateRandomAccount());
-		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenCallRealMethod();
-
-		// Act:
-		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
-
-		// Assert:
-		context.assertSingleUpdateExperience(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE);
-		Mockito.verify(validator, Mockito.never()).validate(Mockito.any());
-		Mockito.verify(context.network, Mockito.never()).broadcast(Mockito.any(), Mockito.any());
-	}
-
-	@Test
-	public void pushTransactionValidFailureIncrementsFailedExperience() {
-		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
-		final TestContext context = new TestContext(validator);
-		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
-		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
-		transaction.sign();
-
-		// Act:
-		context.service.pushTransaction(transaction, context.remoteNodeIdentity);
-
-		// Assert:
-		context.assertSingleUpdateExperience(ValidationResult.FAILURE_UNKNOWN);
-		Mockito.verify(validator, Mockito.only()).validate(Mockito.any());
-		Mockito.verify(context.network, Mockito.never()).broadcast(Mockito.any(), Mockito.any());
-	}*/
-
 	@Test
 	public void pushTransactionValidSuccessAcceptedFailureIncrementsFailedExperience() {
 		// Assert:
@@ -223,9 +185,7 @@ public class PushServiceTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
-		transaction.setDeadline(MockTransaction.TIMESTAMP.addDays(-10));
 		transaction.sign();
-
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
 		// Act:
@@ -242,7 +202,6 @@ public class PushServiceTest {
 		final TestContext context = new TestContext();
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 12);
 		transaction.sign();
-
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
 		// Act:
@@ -275,8 +234,8 @@ public class PushServiceTest {
 		// Assert:
 		assertPushServiceTransactionCaching(
 				ValidationResult.FAILURE_CHAIN_INVALID,
-				ValidationResult.NEUTRAL,
-				1);
+				ValidationResult.FAILURE_CHAIN_INVALID,
+				2);
 	}
 
 	private static void assertPushServiceTransactionCaching(
@@ -284,11 +243,9 @@ public class PushServiceTest {
 			final ValidationResult expectedValidationResult,
 			final int expectedNumberOfInvocations) {
 		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(transactionValidationResult);
-
-		final TestContext context = new TestContext(validator);
+		final TestContext context = new TestContext();
 		final Transaction transaction = createMockTransaction();
-		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(transactionValidationResult);
 
 		// Act:
 		// initial push (cached validation result should NOT be used)
@@ -307,9 +264,7 @@ public class PushServiceTest {
 	@Test
 	public void pushTransactionPrunesTransactionHashCache() {
 		// Arrange:
-		final SingleTransactionValidator validator = createValidatorWithResult(ValidationResult.SUCCESS);
-
-		final TestContext context = new TestContext(validator);
+		final TestContext context = new TestContext();
 		final Transaction transaction = createMockTransaction();
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
 
@@ -430,10 +385,6 @@ public class PushServiceTest {
 		private final PushService service;
 
 		public TestContext() {
-			this(new UniversalTransactionValidator());
-		}
-
-		public TestContext(final SingleTransactionValidator validator) {
 			this.remoteNodeIdentity = new NodeIdentity(new KeyPair());
 			this.remoteNode = new Node(this.remoteNodeIdentity, NodeEndpoint.fromHost("10.0.0.1"));
 
@@ -463,7 +414,6 @@ public class PushServiceTest {
 
 			this.service = new PushService(
 					this.unconfirmedTransactions,
-					validator,
 					this.blockChain,
 					host,
 					this.timeProvider);
