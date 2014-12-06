@@ -97,6 +97,11 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
+	public void save(final List<Block> blocks) {
+		throw new RuntimeException("unsupported MockBlockDao.save(...List...)");
+	}
+
+	@Override
 	public Long count() {
 		return null;
 	}
