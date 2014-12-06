@@ -96,7 +96,7 @@ public class HashCache {
 	 * @param pairs The pairs to add.
 	 */
 	public void putAll(final List<HashMetaDataPair> pairs) {
-		for (HashMetaDataPair pair : pairs) {
+		for (final HashMetaDataPair pair : pairs) {
 			final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
 			if (null != original) {
 				throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
@@ -139,7 +139,7 @@ public class HashCache {
 	 * @return true if any of the given hashes is already in the cache, false otherwise.
 	 */
 	public boolean anyHashExists(final Collection<Hash> hashes) {
-		for (Hash hash : hashes) {
+		for (final Hash hash : hashes) {
 			if (this.hashMap.containsKey(hash)) {
 				return true;
 			}

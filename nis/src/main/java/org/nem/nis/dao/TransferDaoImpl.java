@@ -127,7 +127,7 @@ public class TransferDaoImpl implements TransferDao {
 			throw new MissingResourceException("transaction not found in the db", Hash.class.toString(), hash.toString());
 		}
 
-		for (TransferBlockPair pair : tempList) {
+		for (final TransferBlockPair pair : tempList) {
 			if (pair.getTransfer().getTransferHash().equals(hash)) {
 				return pair;
 			}
@@ -186,7 +186,7 @@ public class TransferDaoImpl implements TransferDao {
 			pairs.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.OUTGOING, pair));
 			return this.sortAndLimit(pairs, limit);
 		} else {
-			final Collection<TransferBlockPair> pairs = getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, transferType, pair);
+			final Collection<TransferBlockPair> pairs = this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, transferType, pair);
 			return this.sortAndLimit(pairs, limit);
 		}
 	}

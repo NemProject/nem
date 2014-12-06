@@ -84,7 +84,7 @@ public class NisCacheTest {
 
 	// endregion
 
-	private NisCache createCache() {
+	private static NisCache createCache() {
 		final AccountAnalyzer accountAnalyzer = new AccountAnalyzer(Mockito.mock(AccountCache.class), Mockito.mock(PoiFacade.class));
 		final HashCache transactionsHashCache = new HashCache();
 		return new NisCache(accountAnalyzer, transactionsHashCache);

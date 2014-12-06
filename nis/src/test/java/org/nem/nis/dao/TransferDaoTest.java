@@ -34,7 +34,7 @@ public class TransferDaoTest {
 	private static final Logger LOGGER = Logger.getLogger(TransferDaoTest.class.getName());
 	private static final int USE_HASH = 1;
 	private static final int USE_ID = 2;
-	private static int DEFAULT_LIMIT = 25;
+	private static final int DEFAULT_LIMIT = 25;
 
 	@Autowired
 	TransferDao transferDao;
@@ -149,9 +149,9 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, 30);
 
 		// Act
-		final Collection<Transfer> entities1 = getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
-		final Collection<Transfer> entities2 = getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
-		final Collection<Transfer> entities3 = getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
+		final Collection<Transfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
+		final Collection<Transfer> entities2 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
+		final Collection<Transfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -162,7 +162,7 @@ public class TransferDaoTest {
 	@Test(expected = MissingResourceException.class)
 	public void getTransactionsForAccountUsingHashThrowsWhenHashNotFound() {
 		// Arrange:
-		assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_HASH);
+		this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_HASH);
 	}
 
 	// TODO-CR: tests like this with a lot of setup can be hard to follow (i know i don't always follow this rule,
@@ -174,7 +174,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromStart() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				o -> 2 * (49 - o) + 1,
 				USE_HASH);
@@ -182,7 +182,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromMiddle() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				o -> 2 * (49 - o) + 1,
 				USE_HASH);
@@ -190,7 +190,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromEnd() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				o -> 2 * (49 - o) + 1,
 				USE_HASH);
@@ -198,7 +198,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromStart() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				o -> 2 * (49 - o),
 				USE_HASH);
@@ -206,7 +206,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromMiddle() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				o -> 2 * (49 - o),
 				USE_HASH);
@@ -214,7 +214,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromEnd() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				o -> 2 * (49 - o),
 				USE_HASH);
@@ -222,7 +222,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingAllTransfersFromStart() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
 				ReadOnlyTransferDao.TransferType.ALL,
 				o -> 99 - o,
 				USE_HASH);
@@ -230,7 +230,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingAllTransfersFromMiddle() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
 				ReadOnlyTransferDao.TransferType.ALL,
 				o -> 99 - o,
 				USE_HASH);
@@ -238,7 +238,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingAllTransfersFromEnd() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
 				ReadOnlyTransferDao.TransferType.ALL,
 				o -> 99 - o,
 				USE_HASH);
@@ -247,13 +247,13 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsSortedResults() {
 		// Assert:
-		assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(USE_HASH);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(USE_HASH);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingHashFiltersDuplicatesIfTransferTypeIsAll() {
 		// Assert:
-		assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(USE_HASH);
+		this.assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(USE_HASH);
 	}
 
 	// endregion
@@ -266,9 +266,9 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, 30);
 
 		// Act
-		final Collection<Transfer> entities1 = getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
-		final Collection<Transfer> entities2 = getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
-		final Collection<Transfer> entities3 = getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
+		final Collection<Transfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
+		final Collection<Transfer> entities2 = this.getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
+		final Collection<Transfer> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -279,12 +279,12 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdThrowsWhenHashNotFound() {
 		// Arrange:
-		ExceptionAssert.assertThrows(v -> assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID), MissingResourceException.class);
+		ExceptionAssert.assertThrows(v -> this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID), MissingResourceException.class);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingIncomingTransfersFromStart() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				o -> 2 * (49 - o) + 1,
 				USE_ID);
@@ -292,7 +292,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingIncomingTransfersFromMiddle() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				o -> 2 * (49 - o) + 1,
 				USE_ID);
@@ -300,7 +300,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingIncomingTransfersFromEnd() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				o -> 2 * (49 - o) + 1,
 				USE_ID);
@@ -308,7 +308,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromStart() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				o -> 2 * (49 - o),
 				USE_ID);
@@ -316,7 +316,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromMiddle() throws Exception {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				o -> 2 * (49 - o),
 				USE_ID);
@@ -324,7 +324,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromEnd() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				o -> 2 * (49 - o),
 				USE_ID);
@@ -332,7 +332,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingAllTransfersFromStart() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromStart(
 				ReadOnlyTransferDao.TransferType.ALL,
 				o -> 99 - o,
 				USE_ID);
@@ -340,7 +340,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingAllTransfersFromMiddle() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
 				ReadOnlyTransferDao.TransferType.ALL,
 				o -> 99 - o,
 				USE_ID);
@@ -348,7 +348,7 @@ public class TransferDaoTest {
 
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingAllTransfersFromEnd() {
-		assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
+		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromEnd(
 				ReadOnlyTransferDao.TransferType.ALL,
 				o -> 99 - o,
 				USE_ID);
@@ -357,13 +357,13 @@ public class TransferDaoTest {
 	@Test
 	public void getTransactionsForAccountUsingIdReturnsSortedResults() {
 		// Assert:
-		assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(USE_ID);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(USE_ID);
 	}
 
 	@Test
 	public void getTransactionsForAccountUsingIdFiltersDuplicatesIfTransferTypeIsAll() {
 		// Assert:
-		assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(USE_ID);
+		this.assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(USE_ID);
 	}
 
 	// endregion
@@ -372,7 +372,7 @@ public class TransferDaoTest {
 		private final BlockDao blockDao;
 		private final ReadOnlyTransferDao.TransferType transferType;
 		private Account account;
-		private BlockHeight height;
+		private final BlockHeight height;
 		private final List<Hash> hashes = new ArrayList<>();
 
 		public TestContext(final BlockDao blockDao, final ReadOnlyTransferDao.TransferType transferType) {
@@ -393,18 +393,18 @@ public class TransferDaoTest {
 			this.account = Utils.generateRandomAccount();
 			final MockAccountDao mockAccountDao = new MockAccountDao();
 			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-			addMapping(mockAccountDao, this.account);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.account);
 			final Block dummyBlock = new Block(this.account, Hash.ZERO, Hash.ZERO, new TimeInstant(123), this.height);
 			TransferTransaction transferTransaction;
 
 			for (int i = 0; i < 100; i++) {
 				final Account otherAccount = Utils.generateRandomAccount();
-				addMapping(mockAccountDao, otherAccount);
+				TransferDaoTest.this.addMapping(mockAccountDao, otherAccount);
 				if (i % 2 == 0) {
-					transferTransaction = prepareTransferTransaction(this.account, otherAccount, 10, i);
+					transferTransaction = TransferDaoTest.this.prepareTransferTransaction(this.account, otherAccount, 10, i);
 					dummyBlock.addTransaction(transferTransaction);
 				} else {
-					transferTransaction = prepareTransferTransaction(otherAccount, this.account, 10, i);
+					transferTransaction = TransferDaoTest.this.prepareTransferTransaction(otherAccount, this.account, 10, i);
 					dummyBlock.addTransaction(transferTransaction);
 				}
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));
@@ -420,13 +420,13 @@ public class TransferDaoTest {
 			this.account = Utils.generateRandomAccount();
 			final MockAccountDao mockAccountDao = new MockAccountDao();
 			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-			addMapping(mockAccountDao, this.account);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.account);
 			final Block dummyBlock = new Block(this.account, Hash.ZERO, Hash.ZERO, new TimeInstant(123), this.height);
 
 			for (int i = 0; i < count; i++) {
 				final Account recipient = Utils.generateRandomAccount();
-				addMapping(mockAccountDao, recipient);
-				final TransferTransaction transferTransaction = prepareTransferTransaction(this.account, recipient, 10, 123);
+				TransferDaoTest.this.addMapping(mockAccountDao, recipient);
+				final TransferTransaction transferTransaction = TransferDaoTest.this.prepareTransferTransaction(this.account, recipient, 10, 123);
 
 				dummyBlock.addTransaction(transferTransaction);
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));
@@ -444,7 +444,7 @@ public class TransferDaoTest {
 	}
 
 	private Collection<Transfer> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id, final int callType) {
-		return executeGetTransactionsForAccountUsingAttribute(
+		return this.executeGetTransactionsForAccountUsingAttribute(
 				context.account,
 				hash,
 				id,
@@ -462,7 +462,7 @@ public class TransferDaoTest {
 		// Arrange:
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final List<Integer> expectedTimeStamps = context.getTestIntegerList(mapper);
-		final List<Integer> timeStamps = getTransfersFromDbUsingAttribute(context, null, null, callType).stream()
+		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(context, null, null, callType).stream()
 				.map(Transfer::getTimeStamp)
 				.collect(Collectors.toList());
 
@@ -478,7 +478,7 @@ public class TransferDaoTest {
 		// Arrange:
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final List<Integer> expectedTimeStamps = context.getTestIntegerList(mapper);
-		final List<Integer> timeStamps = getTransfersFromDbUsingAttribute(
+		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(
 				context,
 				USE_HASH == callType ? context.hashes.get(mapper.apply(24)) : null,
 				USE_ID == callType ? (long)mapper.apply(24) + 1 : null,
@@ -498,7 +498,7 @@ public class TransferDaoTest {
 		// Arrange:
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final int pos = ReadOnlyTransferDao.TransferType.ALL == transferType ? 99 : 49;
-		final List<Integer> timeStamps = getTransfersFromDbUsingAttribute(
+		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(
 				context,
 				USE_HASH == callType ? context.hashes.get(mapper.apply(pos)) : null,
 				USE_ID == callType ? (long)mapper.apply(pos) + 1 : null,
@@ -511,7 +511,7 @@ public class TransferDaoTest {
 	}
 
 	public void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
-		executeGetTransactionsForAccountUsingAttribute(
+		this.executeGetTransactionsForAccountUsingAttribute(
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash(),
 				new SecureRandom().nextLong(),
@@ -531,7 +531,7 @@ public class TransferDaoTest {
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
 
 		// Act
-		final Collection<TransferBlockPair> entities1 = executeGetTransactionsForAccountUsingAttribute(
+		final Collection<TransferBlockPair> entities1 = this.executeGetTransactionsForAccountUsingAttribute(
 				sender,
 				null,
 				null,
@@ -553,7 +553,7 @@ public class TransferDaoTest {
 		final int blockTimestamp[] = { 1801 };
 		final int txTimestamps[][] = { { 1800 } };
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, true);
-		Collection<TransferBlockPair> entities = executeGetTransactionsForAccountUsingAttribute(
+		final Collection<TransferBlockPair> entities = this.executeGetTransactionsForAccountUsingAttribute(
 				sender,
 				null,
 				null,

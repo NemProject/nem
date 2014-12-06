@@ -86,7 +86,7 @@ public class AccountIoAdapter implements AccountIo {
 				height,
 				transfersType,
 				DEFAULT_LIMIT);
-		return toSerializableTransactionMetaDataPairList(pairs);
+		return this.toSerializableTransactionMetaDataPairList(pairs);
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class AccountIoAdapter implements AccountIo {
 			final ReadOnlyTransferDao.TransferType transfersType) {
 		final Account account = this.accountCache.findByAddress(address);
 		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccountUsingId(account, transactionId, transfersType, DEFAULT_LIMIT);
-		return toSerializableTransactionMetaDataPairList(pairs);
+		return this.toSerializableTransactionMetaDataPairList(pairs);
 	}
 
 	private SerializableList<TransactionMetaDataPair> toSerializableTransactionMetaDataPairList(final Collection<TransferBlockPair> pairs) {

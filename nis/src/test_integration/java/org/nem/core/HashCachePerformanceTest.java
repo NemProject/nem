@@ -145,25 +145,25 @@ public class HashCachePerformanceTest {
 		context.cache.anyHashExists(pairs.stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 
 		// Act:
-		long start = System.currentTimeMillis();
+		final long start = System.currentTimeMillis();
 		for (int i = 0; i < 1000; i++) {
 			context.cache.anyHashExists(pairs.stream().map(HashMetaDataPair::getHash).collect(Collectors.toList()));
 		}
 
-		long stop = System.currentTimeMillis();
+		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("%d batch searches for %d non existent hashes needed %dms", 1000, 120, (stop - start)));
 
 		// Assert:
 		Assert.assertThat(stop - start < 500, IsEqual.equalTo(true));
 	}
 
-	private class TestContext {
+	private static class TestContext {
 		private final HashCache cache;
 		private final List<HashMetaDataPair> pairs;
 
 		private TestContext(final int count) {
 			this.cache = new HashCache(count, 36);
-			this.pairs = createPairs(count);
+			this.pairs = this.createPairs(count);
 		}
 
 		private List<HashMetaDataPair> createPairs(final int count) {

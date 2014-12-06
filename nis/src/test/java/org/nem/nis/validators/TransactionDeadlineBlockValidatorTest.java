@@ -37,7 +37,7 @@ public class TransactionDeadlineBlockValidatorTest {
 		assertBlockValidationResult(123, BETA_TX_DEADLINE_FORK + 1, 124, ValidationResult.SUCCESS);
 	}
 
-	private void assertBlockValidationResult(
+	private static void assertBlockValidationResult(
 			final int blockTimeStamp,
 			final long blockHeight,
 			final int transactionDeadline,
@@ -55,7 +55,7 @@ public class TransactionDeadlineBlockValidatorTest {
 		Assert.assertThat(VALIDATOR.validate(block), IsEqual.equalTo(expectedResult));
 	}
 
-	private void addTransaction(final Block block, final int deadline) {
+	private static void addTransaction(final Block block, final int deadline) {
 		final Transaction transaction = new MockTransaction();
 		transaction.setDeadline(new TimeInstant(deadline));
 		block.addTransaction(transaction);
