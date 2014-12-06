@@ -36,6 +36,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.getCurrentSession().saveOrUpdate(block);
 	}
 
+	// TODO 20141206 J-G: does it make sense to add a test for this?
 	@Override
 	@Transactional
 	public void save(final List<Block> blocks) {

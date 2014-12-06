@@ -12,12 +12,18 @@ import java.util.List;
 public interface BlockDao extends ReadOnlyBlockDao {
 
 	/**
-	 * Saves full block in the database, along with associated transactions, forgers, signers, etc.
+	 * Saves full block in the database, along with associated transactions, signers, etc.
 	 *
 	 * @param block Block to save.
 	 */
 	public void save(Block block);
 
+	/**
+	 * Saves all blocks in the database, along with associated transactions, signers, etc.
+	 * TODO 20141206 J-G: i don't see this being called anywhere; is that intentional?
+	 *
+	 * @param blocks Blocks to save.
+	 */
 	public void save(final List<Block> blocks);
 
 	/**
