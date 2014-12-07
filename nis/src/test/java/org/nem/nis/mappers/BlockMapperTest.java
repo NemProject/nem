@@ -6,6 +6,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
+import org.nem.core.model.MultisigModification;
 import org.nem.core.model.MultisigTransaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;

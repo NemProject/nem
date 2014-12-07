@@ -49,6 +49,7 @@ public class TestConf {
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignerModification.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigTransaction.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
 		return localSessionFactoryBuilder.buildSessionFactory();

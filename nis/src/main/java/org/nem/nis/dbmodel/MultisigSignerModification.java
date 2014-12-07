@@ -1,8 +1,12 @@
 package org.nem.nis.dbmodel;
 
 import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Multisig Signer Modification db entity
@@ -13,30 +17,19 @@ import javax.persistence.*;
 @Entity
 @Table(name = "multisigsignermodifications")
 public class MultisigSignerModification extends AbstractTransfer<MultisigSignerModification> {
-	@ManyToOne
-	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-	@JoinColumn(name = "cosignatoryId")
-	private Account cosignatory;
-
-	private Integer modificationType;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigSignerModification", orphanRemoval = true)
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Set<MultisigModification> multisigModifications;
 
 	public MultisigSignerModification() {
 		super(b -> b.getBlockMultisigSignerModifications());
 	}
 
-	public Account getCosignatory() {
-		return this.cosignatory;
+	public Set<MultisigModification> getMultisigModifications() {
+		return multisigModifications;
 	}
 
-	public void setCosignatory(final Account cosignatory) {
-		this.cosignatory = cosignatory;
-	}
-
-	public Integer getModificationType() {
-		return this.modificationType;
-	}
-
-	public void setModificationType(final Integer modificationType) {
-		this.modificationType = modificationType;
+	public void setMultisigModifications(final Set<MultisigModification> multisigModifications) {
+		this.multisigModifications = multisigModifications;
 	}
 }

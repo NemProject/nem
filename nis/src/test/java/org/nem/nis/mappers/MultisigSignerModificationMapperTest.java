@@ -5,10 +5,11 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.MultisigModification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.MultisigSignerModification;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.MockAccountDao;
 
 import java.util.Arrays;
@@ -114,17 +115,20 @@ public class MultisigSignerModificationMapperTest {
 			Assert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(800));
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
-			Assert.assertThat(dbModel.getCosignatory(), IsEqual.equalTo(this.dbCosignatory));
+			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
+
 			final MultisigModification expectedModification = this.model.getModifications().get(0);
-			Assert.assertThat(dbModel.getModificationType(), IsEqual.equalTo(expectedModification.getModificationType().value()));
+			final PublicKey remotePublicKey = this.model.getModifications().get(0).getCosignatory().getAddress().getPublicKey();
+			for (org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications())
+			{
+				Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(this.dbCosignatory));
+				Assert.assertThat(modification.getCosignatory().getPublicKey(), IsEqual.equalTo(remotePublicKey));
+				Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(expectedModification.getModificationType().value()));
+			}
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
-
-			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
-			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
-			final PublicKey remotePublicKey = this.model.getModifications().get(0).getCosignatory().getAddress().getPublicKey();
-			Assert.assertThat(dbModel.getCosignatory().getPublicKey(), IsEqual.equalTo(remotePublicKey));
 		}
 
 		public void assertModel(final MultisigSignerModificationTransaction rhs) {
