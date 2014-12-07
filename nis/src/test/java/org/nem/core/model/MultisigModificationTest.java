@@ -67,12 +67,9 @@ public class MultisigModificationTest {
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
 		ExceptionAssert.assertThrows(v -> new MultisigModification(deserializer), exceptionClass);
 	}
-
 	//endregion
 
-
 	// region roundtrip
-
 	@Test
 	public void canRoundtripMultisigModification() {
 		// Arrange:
@@ -96,8 +93,6 @@ public class MultisigModificationTest {
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalEntity, accountLookup);
 		return new MultisigModification(deserializer);
 	}
-
-
 	// endregion
 
 	private MultisigModification createMultisigModification(final MultisigModificationType add, final Account cosignatory) {

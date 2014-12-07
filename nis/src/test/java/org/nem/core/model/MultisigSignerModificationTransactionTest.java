@@ -9,6 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,16 +18,34 @@ public class MultisigSignerModificationTransactionTest {
 	final MultisigModificationType MODIFICATION_ADD = MultisigModificationType.Add;
 
 	//region constructor
+	@Test
+	public void cannotCreateMultisigSignerModificationWithNullModifications() {
+		// Arrange:
+		final Account signer = Mockito.mock(Account.class);
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> new MultisigSignerModificationTransaction(TIME, signer, null), IllegalArgumentException.class);
+	}
 
 	@Test
-	public void ctorCanCreateMultisigModification() {
+	public void cannotCreateMultisigSignerModificationWithEmptyModifications() {
+		// Arrange:
+		final Account signer = Mockito.mock(Account.class);
+
+		// Act:
+		ExceptionAssert.assertThrows(v -> new MultisigSignerModificationTransaction(TIME, signer, new ArrayList<>()), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void ctorCanCreateMultisigSignerModification() {
 		// Arrange:
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
+		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
 
 		// Act:
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
 
 		// Assert:
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
@@ -36,20 +55,6 @@ public class MultisigSignerModificationTransactionTest {
 		Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(cosignatory));
 		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(modificationType));
 	}
-
-	@Test
-	public void creatingMultisigSignerModificationForwardsValidationToMultisigModification() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final MultisigModification modification = Mockito.mock(MultisigModification.class);
-
-		// Act:
-		new MultisigSignerModificationTransaction(TIME, signer, Arrays.asList(modification));
-
-		// Assert
-		Mockito.verify(modification, Mockito.times(1)).validate();
-	}
-
 	// endregion
 
 	// region roundtrip
@@ -61,7 +66,7 @@ public class MultisigSignerModificationTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
-		final MultisigSignerModificationTransaction originalTransaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
+		final MultisigSignerModificationTransaction originalTransaction = createMultisigSignerModificationTransaction(signer, createModificationList(modificationType, cosignatory));
 
 		// Act:
 		final MultisigSignerModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
@@ -94,7 +99,7 @@ public class MultisigSignerModificationTransactionTest {
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, createModificationList(modificationType, cosignatory));
 
 		// Act + Assert:
 		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1000)));
@@ -111,7 +116,7 @@ public class MultisigSignerModificationTransactionTest {
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, createModificationList(modificationType, cosignatory));
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -127,7 +132,7 @@ public class MultisigSignerModificationTransactionTest {
 				notificationCaptor.getAllValues().get(2),
 				signer,
 				cosignatory,
-				ImportanceTransferTransaction.Mode.Activate.value());
+				MultisigModificationType.Add);
 	}
 
 	@Test
@@ -136,7 +141,7 @@ public class MultisigSignerModificationTransactionTest {
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationType, cosignatory);
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, createModificationList(modificationType, cosignatory));
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -152,16 +157,18 @@ public class MultisigSignerModificationTransactionTest {
 				notificationCaptor.getAllValues().get(0),
 				signer,
 				cosignatory,
-				ImportanceTransferTransaction.Mode.Activate.value());
+				MultisigModificationType.Add);
 	}
 
 	// endregion
 
+	private static List<MultisigModification> createModificationList(final MultisigModificationType modificationType, final Account cosignatory) {
+		final MultisigModification multisigModification = new MultisigModification(modificationType, cosignatory);
+		return Arrays.asList(multisigModification);
+	}
+
 	private static MultisigSignerModificationTransaction createMultisigSignerModificationTransaction(
-			final Account sender,
-			final MultisigModificationType modificationType,
-			final Account cosignatory) {
-		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(modificationType, cosignatory));
+			final Account sender, final List<MultisigModification> modifications) {
 		return new MultisigSignerModificationTransaction(TIME, sender, modifications);
 	}
 }

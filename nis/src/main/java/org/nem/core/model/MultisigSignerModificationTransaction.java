@@ -33,8 +33,9 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	}
 
 	private static void validateModifications(final List<MultisigModification> modifications) {
-		modifications.stream()
-				.forEach(m -> m.validate());
+		if (modifications == null || modifications.size() == 0) {
+			throw new IllegalArgumentException("no modifications on the list");
+		}
 	}
 
 	/**
@@ -70,7 +71,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
-		// TODO 20141111: decide, but I believe this should be high
+		// TODO 20141111 G-J,B: decide, but I believe this should be high
 		return Amount.fromNem(1000);
 	}
 }
