@@ -209,16 +209,15 @@ public class BlockChainValidatorIntegrationTest {
 	public void chainIsValidIfAccountSpendsAmountReceivedInEarlierBlockInLaterBlock() {
 		// Arrange:
 		class TestContext {
-			final AccountCache accountCache = new AccountCache();
 			final PoiFacade poiFacade = new PoiFacade(NisUtils.createImportanceCalculator());
-			final HashCache transactionHashCache = new HashCache();
+			final NisCache nisCache = new NisCache(new AccountCache(), this.poiFacade, new HashCache());
 
 			private BlockChainValidator createValidator() {
-				final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+				final BlockExecutor executor = new BlockExecutor(this.nisCache);
 				final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 
 				final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
-						.createExecuteCommitObserver(new NisCache(accountCache, poiFacade, transactionHashCache));
+						.createExecuteCommitObserver(this.nisCache);
 				factory.executor = block -> executor.execute(block, observer);
 				return factory.create();
 			}
@@ -321,15 +320,14 @@ public class BlockChainValidatorIntegrationTest {
 		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		public int maxChainSize = 21;
 		public final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.poiFacade);
 		public final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		public final NisCache nisCache = new NisCache(Mockito.mock(AccountCache.class), this.poiFacade, this.transactionHashCache);
+		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.nisCache);
 		public final SingleTransactionValidator transactionValidator;
-		public final BatchTransactionValidator batchTransactionValidator;
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			this.transactionValidator = transactionValidatorFactory.createSingle(this.poiFacade);
-			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.transactionHashCache);
 
 			Mockito.when(this.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -347,8 +345,7 @@ public class BlockChainValidatorIntegrationTest {
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,
-					this.transactionValidator,
-					this.batchTransactionValidator);
+					this.transactionValidator);
 		}
 	}
 

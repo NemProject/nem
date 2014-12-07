@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.poi.*;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.BlockChainScoreManager;
@@ -66,9 +66,8 @@ public class BlockAnalyzer {
 		// This is tricky:
 		// we pass AA to observer and AutoCachedAA to toModel
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
-		final PoiFacade poiFacade = nisCache.getPoiFacade();
 		final AccountCache accountCache = nisCache.getAccountCache();
-		final BlockExecutor executor = new BlockExecutor(poiFacade, accountCache);
+		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
@@ -90,7 +89,7 @@ public class BlockAnalyzer {
 						continue;
 					}
 
-					final PoiAccountState accountState = poiFacade.findStateByAddress(account.getAddress());
+					final PoiAccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
 					accountState.getWeightedBalances().convertToFullyVested();
 				}
 			}

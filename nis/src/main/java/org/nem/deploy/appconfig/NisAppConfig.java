@@ -186,13 +186,12 @@ public class NisAppConfig {
 
 	@Bean
 	public Harvester harvester() {
-		final PoiFacade poiFacade = this.poiFacade();
 		final BlockGenerator generator = new BlockGenerator(
 				this.nisCache(),
 				this.unconfirmedTransactions(),
 				this.blockDao,
-				new BlockScorer(poiFacade),
-				this.blockValidatorFactory().create(poiFacade));
+				new BlockScorer(this.poiFacade()),
+				this.blockValidatorFactory().create(this.nisCache()));
 		return new Harvester(
 				this.accountCache(),
 				this.timeProvider(),
