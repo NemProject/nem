@@ -39,7 +39,9 @@ public class MultisigSignerModificationMapper {
 			final int orderIndex,
 			final AccountDaoLookup accountDaoLookup) {
 
+		final MultisigSignerModification dbMultisigSignerModification = new MultisigSignerModification();
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(multisigSignerModification.getSigner().getAddress());
+
 		// TODO: move it to MultisigModificationMapper
 		final Set<org.nem.nis.dbmodel.MultisigModification> multisigModifications = new HashSet<>(multisigSignerModification.getModifications().size());
 		for (final MultisigModification multisigModification : multisigSignerModification.getModifications()) {
@@ -48,14 +50,14 @@ public class MultisigSignerModificationMapper {
 			dbModification.setCosignatory(remote);
 			dbModification.setModificationType(multisigModification.getModificationType().value());
 
+			dbModification.setMultisigSignerModification(dbMultisigSignerModification);
 			multisigModifications.add(dbModification);
 		}
 
-		final MultisigSignerModification transfer = new MultisigSignerModification();
-		AbstractTransferMapper.toDbModel(multisigSignerModification, sender, blockIndex, orderIndex, transfer);
-		transfer.setMultisigModifications(multisigModifications);
+		AbstractTransferMapper.toDbModel(multisigSignerModification, sender, blockIndex, orderIndex, dbMultisigSignerModification);
+		dbMultisigSignerModification.setMultisigModifications(multisigModifications);
 
-		return transfer;
+		return dbMultisigSignerModification;
 	}
 
 	/**
@@ -69,7 +71,7 @@ public class MultisigSignerModificationMapper {
 	public static MultisigSignerModificationTransaction toModel(final MultisigSignerModification dbMultisig, final AccountLookup accountLookup) {
 		final Address senderAccount = AccountToAddressMapper.toAddress(dbMultisig.getSender());
 		final Account sender = accountLookup.findByAddress(senderAccount);
-		
+
 		final List<MultisigModification> multisigModifications = new ArrayList<>(dbMultisig.getMultisigModifications().size());
 		for (final org.nem.nis.dbmodel.MultisigModification multisigModification : dbMultisig.getMultisigModifications()) {
 			final Address cosignatoryAddress = AccountToAddressMapper.toAddress(multisigModification.getCosignatory());

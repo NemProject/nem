@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -179,12 +181,17 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		dropTransfers(blockHeight, "Transfer", "blockTransfers");
-		dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers");
-		dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications");
+		dropTransfers(blockHeight, "Transfer", "blockTransfers", (v) -> {});
+		dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
+		dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications", (transactionsToDelete)-> {
+			final Query preQuery = this.getCurrentSession()
+					.createQuery("delete from MultisigModification m where m.multisigSignerModification.id in (:ids)")
+					.setParameterList("ids", transactionsToDelete);
+			preQuery.executeUpdate();
+		});
 
 		// must be last
-		dropTransfers(blockHeight, "MultisigTransaction", "blockMultisigTransactions");
+		dropTransfers(blockHeight, "MultisigTransaction", "blockMultisigTransactions", (v) -> {});
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
@@ -192,13 +199,15 @@ public class BlockDaoImpl implements BlockDao {
 		query.executeUpdate();
 	}
 
-	private void dropTransfers(final BlockHeight blockHeight, final String tableName, final String transfersName) {
+	private void dropTransfers(final BlockHeight blockHeight, final String tableName, final String transfersName, final Consumer<List<Long>> preQuery) {
 		final Query getTransactionIdsQuery = this.getCurrentSession()
 				.createQuery("select tx.id from Block b join b." + transfersName + " tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		final List<Long> transactionsToDelete = listAndCast(getTransactionIdsQuery);
 
 		if (!transactionsToDelete.isEmpty()) {
+			preQuery.accept(transactionsToDelete);
+
 			final Query dropTxes = this.getCurrentSession()
 			                           .createQuery("delete from " + tableName + " t where t.id in (:ids)")
 			                           .setParameterList("ids", transactionsToDelete);

@@ -32,6 +32,15 @@ public class MultisigModification {
 	public MultisigModification() {
 	}
 
+
+	public MultisigSignerModification getMultisigSignerModification() {
+		return multisigSignerModification;
+	}
+
+	public void setMultisigSignerModification(MultisigSignerModification multisigSignerModification) {
+		this.multisigSignerModification = multisigSignerModification;
+	}
+
 	public Account getCosignatory() {
 		return this.cosignatory;
 	}
@@ -47,4 +56,5 @@ public class MultisigModification {
 	public void setModificationType(final Integer modificationType) {
 		this.modificationType = modificationType;
 	}
+
 }
