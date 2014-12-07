@@ -103,7 +103,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
 		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight() - commonBlockHeight.getRaw());
-		final Collection<Block> peerChain = connector.getChainAfter(node, new ChainRequest(commonBlockHeight, minBlocks, configuration.getMaxTransactions()));
+		final Collection<Block> peerChain = connector.getChainAfter(
+				node,
+				new ChainRequest(commonBlockHeight, minBlocks, this.configuration.getMaxTransactions()));
 
 		synchronized (this) {
 			if (!expectedLastBlock.getBlockHash().equals(this.blockChainLastBlockLayer.getLastDbBlock().getBlockHash())) {

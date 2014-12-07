@@ -209,16 +209,15 @@ public class BlockChainValidatorIntegrationTest {
 	public void chainIsValidIfAccountSpendsAmountReceivedInEarlierBlockInLaterBlock() {
 		// Arrange:
 		class TestContext {
-			final AccountCache accountCache = new AccountCache();
 			final PoiFacade poiFacade = new PoiFacade(NisUtils.createImportanceCalculator());
-			final HashCache transactionHashCache = new HashCache();
+			final NisCache nisCache = new NisCache(new AccountCache(), this.poiFacade, new HashCache());
 
 			private BlockChainValidator createValidator() {
-				final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+				final BlockExecutor executor = new BlockExecutor(this.nisCache);
 				final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
 
 				final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
-						.createExecuteCommitObserver(new NisCache(accountCache, poiFacade, transactionHashCache));
+						.createExecuteCommitObserver(this.nisCache);
 				factory.executor = block -> executor.execute(block, observer);
 				return factory.create();
 			}
@@ -248,84 +247,6 @@ public class BlockChainValidatorIntegrationTest {
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
 	}
-
-	//region multisig validation
-
-	@Test
-	public void chainIsValidIfInnerMultisigTransactionIsValid() {
-		// Arrange:
-		final BlockChainValidatorFactory validatorFactory = new BlockChainValidatorFactory();
-		final BlockChainValidator validator = validatorFactory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_MULTISIG_FORK + 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block block = blocks.get(1);
-		block.addTransaction(createValidSignedTransaction());
-		final MultisigTransaction transaction = createSignedMultisigTransaction(createValidSignedTransaction());
-		block.addTransaction(transaction);
-		block.addTransaction(createValidSignedTransaction());
-		block.sign();
-
-		makeCosignatory(validatorFactory.poiFacade, transaction.getSigner(), transaction.getOtherTransaction().getSigner(), parentBlock.getHeight());
-
-		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
-	}
-
-	@Test
-	public void chainIsInvalidIfInnerMultisigTransactionIsInvalid() {
-		// Arrange:
-		final BlockChainValidatorFactory validatorFactory = new BlockChainValidatorFactory();
-		final BlockChainValidator validator = validatorFactory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_MULTISIG_FORK + 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block block = blocks.get(1);
-		block.addTransaction(createValidSignedTransaction());
-		final MultisigTransaction transaction = createSignedMultisigTransaction(createInvalidSignedTransaction());
-		block.addTransaction(transaction);
-		block.addTransaction(createValidSignedTransaction());
-		block.sign();
-
-		makeCosignatory(validatorFactory.poiFacade, transaction.getSigner(), transaction.getOtherTransaction().getSigner(), parentBlock.getHeight());
-
-		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-	}
-
-	private static MultisigTransaction createSignedMultisigTransaction(final Transaction transaction) {
-		// TODO 20141204 J-G: i was wondering - could we simplify MultisigTransaction construction
-		// > so that a multisig transaction always has the same timestamp deadline as the other transaction?
-		// > also, why don't we expect the other transaction to be signed initially by one of the cosigners?
-		final MultisigTransaction multisigTransaction = new MultisigTransaction(
-				transaction.getTimeStamp(),
-				Utils.generateRandomAccount(Amount.fromNem(1000)),
-				transaction);
-
-		multisigTransaction.setDeadline(transaction.getDeadline());
-		multisigTransaction.sign();
-		return multisigTransaction;
-	}
-
-	public static void makeCosignatory(final PoiFacade poiFacade, final Account signer, final Account multisig, final BlockHeight height) {
-		// Arrange: set signer state
-		final Address signerAddress = signer.getAddress();
-		final PoiAccountState signerState = new PoiAccountState(signerAddress);
-		Mockito.when(poiFacade.findStateByAddress(signerAddress)).thenReturn(signerState);
-
-		// Arrange: set multisig state
-		final Address multisigAddress = multisig.getAddress();
-		final PoiAccountState multisigState = new PoiAccountState(multisigAddress);
-		Mockito.when(poiFacade.findStateByAddress(multisigAddress)).thenReturn(multisigState);
-
-		// Arrange: set multisig links
-		poiFacade.findStateByAddress(signerAddress).getMultisigLinks().addMultisig(multisigAddress, height);
-		poiFacade.findStateByAddress(multisigAddress).getMultisigLinks().addCosignatory(signerAddress, height);
-	}
-
-	//endregion
 
 	//region helper functions
 
@@ -399,15 +320,14 @@ public class BlockChainValidatorIntegrationTest {
 		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		public int maxChainSize = 21;
 		public final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.poiFacade);
 		public final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		public final NisCache nisCache = new NisCache(Mockito.mock(AccountCache.class), this.poiFacade, this.transactionHashCache);
+		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.nisCache);
 		public final SingleTransactionValidator transactionValidator;
-		public final BatchTransactionValidator batchTransactionValidator;
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			this.transactionValidator = new MultisigAwareSingleTransactionValidator(transactionValidatorFactory.createSingle(this.poiFacade));
-			this.batchTransactionValidator = transactionValidatorFactory.createBatch(this.transactionHashCache);
 
 			Mockito.when(this.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -425,8 +345,7 @@ public class BlockChainValidatorIntegrationTest {
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,
-					this.transactionValidator,
-					this.batchTransactionValidator);
+					this.transactionValidator);
 		}
 	}
 

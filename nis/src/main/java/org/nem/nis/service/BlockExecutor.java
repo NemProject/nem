@@ -3,8 +3,8 @@ package org.nem.nis.service;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.nis.AccountCache;
-import org.nem.nis.poi.*;
+import org.nem.nis.NisCache;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,19 +17,16 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BlockExecutor {
-	private final PoiFacade poiFacade;
-	private final AccountCache accountCache;
+	private final NisCache nisCache;
 
 	/**
 	 * Creates a new block executor.
 	 *
-	 * @param poiFacade The poi facade.
-	 * @param accountCache The account cache.
+	 * @param nisCache The NIS cache.
 	 */
 	@Autowired(required = true)
-	public BlockExecutor(final PoiFacade poiFacade, final AccountCache accountCache) {
-		this.poiFacade = poiFacade;
-		this.accountCache = accountCache;
+	public BlockExecutor(final NisCache nisCache) {
+		this.nisCache = nisCache;
 	}
 
 	//region execute
@@ -79,11 +76,11 @@ public class BlockExecutor {
 		// in order for all the downstream observers to behave correctly (without needing to know about remote foraging)
 		// trigger harvest notifications with the forwarded account (where available) instead of the remote account
 		final Address address = block.getSigner().getAddress();
-		final PoiAccountState poiAccountState = this.poiFacade.findForwardedStateByAddress(address, block.getHeight());
+		final PoiAccountState poiAccountState = this.nisCache.getPoiFacade().findForwardedStateByAddress(address, block.getHeight());
 
 		final Account endowed = poiAccountState.getAddress().equals(address)
 				? block.getSigner()
-				: this.accountCache.findByAddress(poiAccountState.getAddress());
+				: this.nisCache.getAccountCache().findByAddress(poiAccountState.getAddress());
 
 		final List<NotificationType> types = NotificationTrigger.Execute == trigger
 				? Arrays.asList(NotificationType.BalanceCredit, NotificationType.HarvestReward)

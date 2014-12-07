@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 
 public class BatchUniqueHashTransactionValidatorTest {
 
-	//region some transaction hash already exists in transfer dao
+	//region some transaction hash already exists in cache
 
 	@Test
 	public void validateReturnsNeutralIfAtLeastOneHashAlreadyExistsInHashCache() {

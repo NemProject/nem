@@ -68,6 +68,6 @@ public class NisCacheTest {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		private final NisCache cache = new NisCache(accountCache, poiFacade, transactionsHashCache);
+		private final NisCache cache = new NisCache(this.accountCache, this.poiFacade, this.transactionsHashCache);
 	}
 }

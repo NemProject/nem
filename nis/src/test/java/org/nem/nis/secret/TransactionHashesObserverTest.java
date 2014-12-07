@@ -65,7 +65,7 @@ public class TransactionHashesObserverTest {
 
 		private TestContext() {
 			this.transactionHashCache = new HashCache();
-			this.observer = new TransactionHashesObserver(transactionHashCache);
+			this.observer = new TransactionHashesObserver(this.transactionHashCache);
 		}
 
 		private List<HashMetaDataPair> createPairs() {
