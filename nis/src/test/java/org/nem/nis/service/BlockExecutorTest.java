@@ -9,7 +9,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.AccountCache;
+import org.nem.nis.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 
@@ -51,8 +51,8 @@ public class BlockExecutorTest {
 		private final List<Integer> executeList = new ArrayList<>();
 		private final List<Integer> undoList = new ArrayList<>();
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+		private final NisCache nisCache = new NisCache(Mockito.mock(AccountCache.class), this.poiFacade, Mockito.mock(HashCache.class));
+		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
 		public UndoExecuteTransactionOrderTestContext() {
 			this.account = Utils.generateRandomAccount();
@@ -398,7 +398,8 @@ public class BlockExecutorTest {
 	private static class ExecutorTestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final BlockExecutor executor = new BlockExecutor(this.poiFacade, this.accountCache);
+		private final NisCache nisCache = new NisCache(this.accountCache, this.poiFacade, Mockito.mock(HashCache.class));
+		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
 		private Account addAccount() {
 			final Account account = Utils.generateRandomAccount();

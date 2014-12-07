@@ -21,7 +21,6 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final SingleTransactionValidator transactionValidator;
-	private final BatchTransactionValidator batchTransactionValidator;
 
 	/**
 	 * Creates a new block chain validator.
@@ -31,21 +30,18 @@ public class BlockChainValidator {
 	 * @param maxChainSize The maximum chain size.
 	 * @param blockValidator The validator to use for validating blocks.
 	 * @param transactionValidator The validator to use for validating transactions.
-	 * @param batchTransactionValidator The validator to use for validating transactions in batches.
 	 */
 	public BlockChainValidator(
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final BlockValidator blockValidator,
-			final SingleTransactionValidator transactionValidator,
-			final BatchTransactionValidator batchTransactionValidator) {
+			final SingleTransactionValidator transactionValidator) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
-		this.batchTransactionValidator = batchTransactionValidator;
 	}
 
 	/**
@@ -93,13 +89,7 @@ public class BlockChainValidator {
 			// > (this is also causing the three remaining test failures)
 			// TODO 20141206 BR -> J: executing a block adds the transaction hashes to the cache. Therefore we can't wait with validation till the end
 			// > because it would fail. i agree that we should have a block validator for it.
-			final ValidationResult batchTransactionValidationResult =
-					this.batchTransactionValidator.validate(Arrays.asList(new TransactionsContextPair(block.getTransactions(), context)));
-			if (!batchTransactionValidationResult.isSuccess()) {
-				LOGGER.info(String.format("received transaction that failed validation: %s", batchTransactionValidationResult));
-				return false;
-			}
-
+			// TODO 20141207 BR -> J: done.
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
 					LOGGER.info("received block with unverifiable transaction");

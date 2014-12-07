@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.NisCache;
 
 import java.util.function.Consumer;
 
@@ -23,28 +23,29 @@ public class BlockValidatorFactory {
 	/**
 	 * Creates a block validator.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param nisCache The NIS cache.
 	 * @return The validator.
 	 */
-	public BlockValidator create(final PoiFacade poiFacade) {
+	public BlockValidator create(final NisCache nisCache) {
 		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
-		this.visitSubValidators(builder::add, poiFacade);
+		this.visitSubValidators(builder::add, nisCache);
 		return builder.build();
 	}
 
 	/**
 	 * Visits all sub validators that comprise the returned aggregate validator.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param nisCache The NIS cache.
 	 * @param visitor The visitor.
 	 */
-	public void visitSubValidators(final Consumer<BlockValidator> visitor, final PoiFacade poiFacade) {
+	public void visitSubValidators(final Consumer<BlockValidator> visitor, final NisCache nisCache) {
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransactionDeadlineBlockValidator());
-		visitor.accept(new EligibleSignerBlockValidator(poiFacade));
+		visitor.accept(new EligibleSignerBlockValidator(nisCache.getPoiFacade()));
 		visitor.accept(new MaxTransactionsBlockValidator());
-		visitor.accept(new NoSelfSignedTransactionsBlockValidator(poiFacade));
+		visitor.accept(new NoSelfSignedTransactionsBlockValidator(nisCache.getPoiFacade()));
 		visitor.accept(new BlockImportanceTransferValidator());
 		visitor.accept(new BlockImportanceTransferBalanceValidator());
+		visitor.accept(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 	}
 }
