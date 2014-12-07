@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.*;
+import org.nem.core.model.MultisigModification;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -795,11 +796,11 @@ public class BlockDaoTest {
 			final Account cosignatory
 	) {
 		// Arrange:
+		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
 		final MultisigSignerModificationTransaction transaction = new MultisigSignerModificationTransaction(
 				new TimeInstant(0),
 				sender,
-				MultisigModificationType.Add,
-				cosignatory
+				modifications
 		);
 		transaction.sign();
 		return transaction;

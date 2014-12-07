@@ -9,6 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigSignerModification;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;

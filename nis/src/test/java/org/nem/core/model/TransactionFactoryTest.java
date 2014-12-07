@@ -10,6 +10,9 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class TransactionFactoryTest {
 
 	@Test(expected = IllegalArgumentException.class)
@@ -106,11 +109,11 @@ public class TransactionFactoryTest {
 	private static Transaction createMultisigSignerModificationTransaction() {
 		final Account sender = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
+		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
 		return new MultisigSignerModificationTransaction(
 				TimeInstant.ZERO,
 				sender,
-				MultisigModificationType.Add,
-				cosignatory);
+				modifications);
 	}
 
 	//endregion

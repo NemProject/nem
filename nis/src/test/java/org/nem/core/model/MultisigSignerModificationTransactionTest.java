@@ -10,6 +10,8 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class MultisigSignerModificationTransactionTest {
@@ -32,8 +34,10 @@ public class MultisigSignerModificationTransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getCosignatory(), IsEqual.equalTo(cosignatory));
-		Assert.assertThat(transaction.getModificationType(), IsEqual.equalTo(modificationType));
+		Assert.assertThat(transaction.getModifications().size(), IsEqual.equalTo(1));
+		final MultisigModification modification = transaction.getModifications().get(0);
+		Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(cosignatory));
+		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(modificationType));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -105,11 +109,13 @@ public class MultisigSignerModificationTransactionTest {
 		// Act:
 		final MultisigSignerModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
+		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNER_MODIFY));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(transaction.getCosignatory(), IsEqual.equalTo(cosignatory));
-		Assert.assertThat(transaction.getModificationType(), IsEqual.equalTo(modificationType));
+		final MultisigModification modification = transaction.getModifications().get(0);
+		Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(cosignatory));
+		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(modificationType));
 	}
 
 	private MultisigSignerModificationTransaction createRoundTrippedTransaction(
@@ -198,6 +204,7 @@ public class MultisigSignerModificationTransactionTest {
 			final Account sender,
 			final MultisigModificationType modificationType,
 			final Account cosignatory) {
-		return new MultisigSignerModificationTransaction(TIME, sender, modificationType, cosignatory);
+		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(modificationType, cosignatory));
+		return new MultisigSignerModificationTransaction(TIME, sender, modifications);
 	}
 }

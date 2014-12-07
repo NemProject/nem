@@ -22,18 +22,22 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 
 	private void notify(final MultisigModificationNotification notification, final BlockNotificationContext context) {
 		final Address multisigAddress = notification.getMultisigAccount().getAddress();
-		final Address cosignatoryAddress = notification.getCosignatoryAccount().getAddress();
 		final PoiAccountState multisigState = this.poiFacade.findStateByAddress(multisigAddress);
-		final PoiAccountState cosignatoryState = this.poiFacade.findStateByAddress(cosignatoryAddress);
-
-		boolean add = MultisigModificationType.Add == notification.getModificationType();
 		boolean execute = NotificationTrigger.Execute == context.getTrigger();
-		if ((add && execute) || (!add && !execute)) {
-			multisigState.getMultisigLinks().addCosignatory(cosignatoryAddress, context.getHeight());
-			cosignatoryState.getMultisigLinks().addMultisig(multisigAddress, context.getHeight());
-		} else {
-			multisigState.getMultisigLinks().removeCosignatory(cosignatoryAddress, context.getHeight());
-			cosignatoryState.getMultisigLinks().removeMultisig(multisigAddress, context.getHeight());
+
+		for (final MultisigModification modification : notification.getModifications()) {
+			boolean add = MultisigModificationType.Add == modification.getModificationType();
+			final Address cosignatoryAddress = modification.getCosignatory().getAddress();
+			final PoiAccountState cosignatoryState = this.poiFacade.findStateByAddress(cosignatoryAddress);
+
+			if ((add && execute) || (!add && !execute)) {
+				multisigState.getMultisigLinks().addCosignatory(cosignatoryAddress, context.getHeight());
+				cosignatoryState.getMultisigLinks().addMultisig(multisigAddress, context.getHeight());
+			} else {
+				multisigState.getMultisigLinks().removeCosignatory(cosignatoryAddress, context.getHeight());
+				cosignatoryState.getMultisigLinks().removeMultisig(multisigAddress, context.getHeight());
+			}
 		}
+
 	}
 }

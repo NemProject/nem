@@ -8,8 +8,11 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigSignerModification;
 import org.nem.nis.test.MockAccountDao;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class MultisigSignerModificationMapperTest {
 
@@ -59,11 +62,8 @@ public class MultisigSignerModificationMapperTest {
 		private final long fee;
 
 		public TestContext(final MultisigModificationType modificationType, final Account sender, final Account cosignatoryAccount, final long fee) {
-			this.model = new MultisigSignerModificationTransaction(
-					new TimeInstant(721),
-					sender,
-					modificationType,
-					cosignatoryAccount);
+			final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(modificationType, cosignatoryAccount));
+			this.model = new MultisigSignerModificationTransaction(new TimeInstant(721), sender, modifications);
 
 			this.fee = fee;
 			this.model.setFee(Amount.fromNem(fee));
@@ -75,12 +75,12 @@ public class MultisigSignerModificationMapperTest {
 			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
 
 			this.dbCosignatory = new org.nem.nis.dbmodel.Account();
-			this.dbCosignatory.setPrintableKey(this.model.getCosignatory().getAddress().getEncoded());
+			this.dbCosignatory.setPrintableKey(cosignatoryAccount.getAddress().getEncoded());
 			this.dbCosignatory.setPublicKey(cosignatoryAccount.getKeyPair().getPublicKey());
 
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbSender);
-			this.accountDao.addMapping(this.model.getCosignatory(), this.dbCosignatory);
+			this.accountDao.addMapping(cosignatoryAccount, this.dbCosignatory);
 
 			this.hash = HashUtils.calculateHash(this.model);
 		}
@@ -100,7 +100,7 @@ public class MultisigSignerModificationMapperTest {
 		public MultisigSignerModificationTransaction toModel(final MultisigSignerModification dbTransfer) {
 			final MockAccountLookup mockAccountLookup = new MockAccountLookup();
 			mockAccountLookup.setMockAccount(this.model.getSigner());
-			mockAccountLookup.setMockAccount(this.model.getCosignatory());
+			mockAccountLookup.setMockAccount(this.model.getModifications().get(0).getCosignatory());
 			return MultisigSignerModificationMapper.toModel(dbTransfer, mockAccountLookup);
 		}
 
@@ -115,14 +115,15 @@ public class MultisigSignerModificationMapperTest {
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getCosignatory(), IsEqual.equalTo(this.dbCosignatory));
-			Assert.assertThat(dbModel.getModificationType(), IsEqual.equalTo(this.model.getModificationType().value()));
+			final MultisigModification expectedModification = this.model.getModifications().get(0);
+			Assert.assertThat(dbModel.getModificationType(), IsEqual.equalTo(expectedModification.getModificationType().value()));
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockIndex));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
 
 			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
-			final PublicKey remotePublicKey = this.model.getCosignatory().getAddress().getPublicKey();
+			final PublicKey remotePublicKey = this.model.getModifications().get(0).getCosignatory().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getCosignatory().getPublicKey(), IsEqual.equalTo(remotePublicKey));
 		}
 
@@ -135,9 +136,12 @@ public class MultisigSignerModificationMapperTest {
 			Assert.assertThat(rhs.getDeadline(), IsEqual.equalTo(this.model.getDeadline()));
 			Assert.assertThat(rhs.getSigner(), IsEqual.equalTo(this.model.getSigner()));
 			Assert.assertThat(rhs.getSignature(), IsEqual.equalTo(this.model.getSignature()));
-			Assert.assertThat(rhs.getCosignatory(), IsEqual.equalTo(this.model.getCosignatory()));
-			Assert.assertThat(rhs.getCosignatory().getAddress().getPublicKey(), IsEqual.equalTo(this.model.getCosignatory().getAddress().getPublicKey()));
-			Assert.assertThat(rhs.getModificationType(), IsEqual.equalTo(this.model.getModificationType()));
+			Assert.assertThat(rhs.getModifications().size(), IsEqual.equalTo(this.model.getModifications().size()));
+			final MultisigModification rhsModification = rhs.getModifications().get(0);
+			final MultisigModification expectedModification = this.model.getModifications().get(0);
+			Assert.assertThat(rhsModification.getCosignatory(), IsEqual.equalTo(expectedModification.getCosignatory()));
+			Assert.assertThat(rhsModification.getCosignatory().getAddress().getPublicKey(), IsEqual.equalTo(expectedModification.getCosignatory().getAddress().getPublicKey()));
+			Assert.assertThat(rhsModification.getModificationType(), IsEqual.equalTo(expectedModification.getModificationType()));
 		}
 	}
 }

@@ -5,44 +5,36 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.List;
+
 /**
  * A transaction which describes association of cosignatory with a multisig account.
  * <br/>
  * First such transaction converts account to multisig account.
  */
 public class MultisigSignerModificationTransaction extends Transaction {
-
-	//region ModificationType
-
-	//endregion
-
-	private final MultisigModificationType modificationType;
-	private final Account cosignatoryAccount;
+	final List<MultisigModification> modifications;
 
 	/**
 	 * Creates an multisig signer modification transaction.
 	 *
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender (multisig account).
-	 * @param modificationType The type of signer modification transaction.
-	 * @param cosignatoryAccount The cosignatory account.
+	 * @param modifications The list of modifications.
 	 */
 	public MultisigSignerModificationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final MultisigModificationType modificationType,
-			final Account cosignatoryAccount) {
+			final List<MultisigModification> modifications) {
 		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, 1, timeStamp, sender);
-		this.modificationType = modificationType;
-		this.cosignatoryAccount = cosignatoryAccount;
+		this.modifications = modifications;
 
-		if (null == this.cosignatoryAccount) {
-			throw new IllegalArgumentException("cosignatoryAccount is required");
-		}
+		validateModifications(this.modifications);
+	}
 
-		if (!this.modificationType.isValid()) {
-			throw new IllegalArgumentException("invalid mode");
-		}
+	private static void validateModifications(final List<MultisigModification> modifications) {
+		modifications.stream()
+				.forEach(m -> m.validate());
 	}
 
 	/**
@@ -53,44 +45,27 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	 */
 	public MultisigSignerModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, options, deserializer);
-		this.modificationType = MultisigModificationType.fromValueOrDefault(deserializer.readInt("modificationType"));
-		this.cosignatoryAccount = Account.readFrom(deserializer, "cosignatoryAccount", AddressEncoding.PUBLIC_KEY);
 
-		if (!this.modificationType.isValid()) {
-			throw new TypeMismatchException("mode");
-		}
+		this.modifications = deserializer.readObjectArray("modifications", obj -> new MultisigModification(obj));
 	}
 
-	/**
-	 * Gets cosignatory account.
-	 *
-	 * @return The cosignatory account.
-	 */
-	public Account getCosignatory() {
-		return this.cosignatoryAccount;
-	}
-
-	/**
-	 * Gets type of multisig signer modification transaction.
-	 *
-	 * @return The modification type.
-	 */
-	public MultisigModificationType getModificationType() {
-		return this.modificationType;
+	public List<MultisigModification> getModifications() {
+		return this.modifications;
 	}
 
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		serializer.writeInt("modificationType", this.modificationType.value());
-		Account.writeTo(serializer, "cosignatoryAccount", this.cosignatoryAccount, AddressEncoding.PUBLIC_KEY);
+		serializer.writeObjectArray("modifications", this.modifications);
 	}
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new AccountNotification(this.getCosignatory()));
+		for (final MultisigModification modification : this.modifications) {
+			observer.notify(new AccountNotification(modification.getCosignatory()));
+		}
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
-		observer.notify(new MultisigModificationNotification(this.getSigner(), this.getCosignatory(), this.modificationType));
+		observer.notify(new MultisigModificationNotification(this.getSigner(), this.modifications));
 	}
 
 	@Override

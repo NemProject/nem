@@ -6,7 +6,8 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+
+import org.nem.nis.dbmodel.MultisigSignerModification;
 
 /**
  * Static class that contains functions for converting to and from
@@ -30,6 +31,7 @@ public class MultisigSignerModificationMapper {
 			final int blockIndex,
 			final int orderIndex,
 			final AccountDaoLookup accountDaoLookup) {
+		/*
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(multisigSignerModification.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(multisigSignerModification.getCosignatory().getAddress());
 
@@ -39,6 +41,8 @@ public class MultisigSignerModificationMapper {
 		transfer.setCosignatory(remote);
 		transfer.setModificationType(multisigSignerModification.getModificationType().value());
 		return transfer;
+		*/
+		return null;
 	}
 
 	/**
@@ -50,6 +54,7 @@ public class MultisigSignerModificationMapper {
 	 * @return The MultisigSignerModificationTransaction model.
 	 */
 	public static MultisigSignerModificationTransaction toModel(final MultisigSignerModification dbMultisig, final AccountLookup accountLookup) {
+		/*
 		final Address senderAccount = AccountToAddressMapper.toAddress(dbMultisig.getSender());
 		final Account sender = accountLookup.findByAddress(senderAccount);
 
@@ -66,5 +71,7 @@ public class MultisigSignerModificationMapper {
 		transfer.setDeadline(new TimeInstant(dbMultisig.getDeadline()));
 		transfer.setSignature(new Signature(dbMultisig.getSenderProof()));
 		return transfer;
+		*/
+		return null;
 	}
 }

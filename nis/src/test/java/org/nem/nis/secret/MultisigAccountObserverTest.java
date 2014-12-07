@@ -9,6 +9,9 @@ import org.nem.core.test.Utils;
 import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class MultisigAccountObserverTest {
 	@Test
 	public void notifyTransferExecuteAddAddsMultisigLinks() {
@@ -55,8 +58,9 @@ public class MultisigAccountObserverTest {
 		final MultisigAccountObserver observer = context.createObserver();
 
 		// Act:
+		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(value, context.account2));
 		observer.notify(
-				new MultisigModificationNotification(context.account1, context.account2, value),
+				new MultisigModificationNotification(context.account1, modifications),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
 		return context;
 	}

@@ -2,26 +2,25 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.*;
 
+import java.util.List;
+
 /**
  * A notification that cosignatory modification has occured.
  */
 public class MultisigModificationNotification extends Notification {
 	private final Account multisigAccount;
-	private final Account cosignatoryAccount;
-	private final MultisigModificationType modificationType;
+	private final List<MultisigModification> modifications;
 
 	/**
 	 * Creates a new cosignatory modification notification.
 	 *
 	 * @param multisigAccount The multisig account.
-	 * @param cosignatoryAccount The cosigner account.
-	 * @param modificationType The type of modification.
+	 * @param modifications The list of modifications.
 	 */
-	public MultisigModificationNotification(final Account multisigAccount, final Account cosignatoryAccount, final MultisigModificationType modificationType) {
+	public MultisigModificationNotification(final Account multisigAccount, List<MultisigModification> modifications) {
 		super(NotificationType.CosignatoryModification);
 		this.multisigAccount = multisigAccount;
-		this.cosignatoryAccount = cosignatoryAccount;
-		this.modificationType = modificationType;
+		this.modifications = modifications;
 	}
 
 	/**
@@ -34,20 +33,12 @@ public class MultisigModificationNotification extends Notification {
 	}
 
 	/**
-	 * Gets the cosignatory account.
+	 * Gets the list of modifications.
 	 *
-	 * @return The cosignatory account.
+	 * @return The list of modifications.
 	 */
-	public Account getCosignatoryAccount() {
-		return this.cosignatoryAccount;
-	}
+	public List<MultisigModification> getModifications() {
+		return this.modifications;
 
-	/**
-	 * Gets the type of signer modification transaction.
-	 *
-	 * @return The type of signer modification transaction.
-	 */
-	public MultisigModificationType getModificationType() {
-		return this.modificationType;
 	}
 }
