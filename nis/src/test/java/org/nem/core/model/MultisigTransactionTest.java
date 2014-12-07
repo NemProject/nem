@@ -59,6 +59,7 @@ public class MultisigTransactionTest {
 	}
 
 	// TODO test is failing now, not sure if it makes sense ... need to talk with G
+	// TODO: fixed the test, but it's failing (due to missing serialization...)
 	@Test
 	public void canRoundtripTransactionWithSignatures() {
 		// Arrange:
@@ -74,8 +75,9 @@ public class MultisigTransactionTest {
 		final MultisigTransaction transaction = createRoundTrippedTransaction(originalTransaction);
 
 		// Assert:
-		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getSigners(), IsEquivalent.equivalentTo(originalTransaction.getSigners()));
+		Assert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(2));
+		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(2));
+		Assert.assertThat(transaction.getSigners().get(1), IsEqual.equalTo(originalTransaction.getSigners().get(1)));
 	}
 
 	private static TransferTransaction createDefaultTransferTransaction() {

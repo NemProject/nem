@@ -15,7 +15,7 @@ public class MultisigModificationNotificationTest {
 		// Act:
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosigner = Utils.generateRandomAccount();
-		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Unknown, cosigner));
+		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosigner));
 		final MultisigModificationNotification notification = new MultisigModificationNotification(multisig, modifications);
 
 		// Assert:
@@ -24,6 +24,6 @@ public class MultisigModificationNotificationTest {
 		Assert.assertThat(notification.getModifications().size(), IsEqual.equalTo(1));
 		final MultisigModification modification = notification.getModifications().get(0);
 		Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(cosigner));
-		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(MultisigModificationType.Unknown));
+		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(MultisigModificationType.Add));
 	}
 }
