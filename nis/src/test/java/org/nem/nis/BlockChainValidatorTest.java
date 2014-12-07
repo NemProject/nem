@@ -142,9 +142,7 @@ public class BlockChainValidatorTest {
 	@Test
 	public void chainIsInvalidIfSameTransactionIsInDifferentBlocks() {
 		// Arrange:
-		final BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		factory.blockValidator = blockValidator;
 		final BlockChainValidator validator = factory.create();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
@@ -158,7 +156,6 @@ public class BlockChainValidatorTest {
 		lastBlock.addTransaction(transaction);
 		lastBlock.setPrevious(middleBlock);
 		lastBlock.sign();
-		Mockito.when(blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 
 		// Assert:
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
@@ -471,7 +468,6 @@ public class BlockChainValidatorTest {
 		public int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		public SingleTransactionValidator transactionValidator = Mockito.mock(SingleTransactionValidator.class);
-		public BatchTransactionValidator batchTransactionValidator = Mockito.mock(BatchTransactionValidator.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -479,7 +475,6 @@ public class BlockChainValidatorTest {
 
 			Mockito.when(this.blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 			Mockito.when(this.transactionValidator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
-			Mockito.when(this.batchTransactionValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		}
 
 		public BlockChainValidator create() {

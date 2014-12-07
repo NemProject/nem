@@ -12,6 +12,11 @@ import java.util.stream.Collectors;
 public class BlockUniqueHashTransactionValidator implements BlockValidator {
 	private final HashCache transactionHashCache;
 
+	/**
+	 * Creates a new validator.
+	 *
+	 * @param transactionHashCache The transaction hash cache.
+	 */
 	public BlockUniqueHashTransactionValidator(final HashCache transactionHashCache) {
 		this.transactionHashCache = transactionHashCache;
 	}
