@@ -61,7 +61,7 @@ public class UnconfirmedTransactions {
 			final NisCache nisCache) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
-		this.singleValidator = this.createSingleValidator();
+		this.singleValidator = this.createSingleValidator(false);
 	}
 
 	private UnconfirmedTransactions(
@@ -71,7 +71,7 @@ public class UnconfirmedTransactions {
 			final NisCache nisCache) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
-		this.singleValidator = this.createSingleValidator();
+		this.singleValidator = this.createSingleValidator(true);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -190,11 +190,18 @@ public class UnconfirmedTransactions {
 				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
 	}
 
-	private SingleTransactionValidator createSingleValidator() {
+	private SingleTransactionValidator createSingleValidator(boolean blockCreation) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.nisCache.getPoiFacade()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
-		return builder.build();
+
+		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getPoiFacade(), blockCreation));
+
+		// need to be the last one
+		// that is correct we need this.transactions here
+		builder.add(new MultisigSignatureValidator(this.nisCache.getPoiFacade(), blockCreation, () -> this.transactions.values()));
+
+		return new MultisigAwareSingleTransactionValidator(builder.build());
 	}
 
 	/**
@@ -263,6 +270,7 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		final List<Transaction> transactions = this.transactions.values().stream()
 				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 				.collect(Collectors.toList());
 
 		return this.sortTransactions(transactions);

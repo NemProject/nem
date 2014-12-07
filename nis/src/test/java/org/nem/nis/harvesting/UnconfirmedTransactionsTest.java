@@ -1011,11 +1011,11 @@ public class UnconfirmedTransactionsTest {
 		final Transaction t1 = createTransferTransaction(currentTime, multisig, recipient, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
 		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
-		//multisigTransaction.sign();
+		multisigTransaction.sign();
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner2, HashUtils.calculateHash(t1), signature);
 		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
-		//signatureTransaction.sign();
+		signatureTransaction.sign();
 
 		addPoiState(poiFacade, multisig);
 		addPoiState(poiFacade, cosigner1);
@@ -1050,8 +1050,9 @@ public class UnconfirmedTransactionsTest {
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator(final PoiFacade poiFacade) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		final TestContext context = new TestContext(
-				factory.create(Mockito.mock(PoiFacade.class), Mockito.mock(HashCache.class)),
-				factory.createBatch(Mockito.mock(HashCache.class)));
+				factory.create(poiFacade, Mockito.mock(HashCache.class)),
+				factory.createBatch(Mockito.mock(HashCache.class)),
+				poiFacade);
 		return context.transactions;
 	}
 
@@ -1110,22 +1111,22 @@ public class UnconfirmedTransactionsTest {
 		private final UnconfirmedTransactions transactions;
 
 		private TestContext() {
-			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
+			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class), Mockito.mock(PoiFacade.class));
 			this.setSingleValidationResult(ValidationResult.SUCCESS);
 			this.setBatchValidationResult(ValidationResult.SUCCESS);
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator) {
-			this(singleValidator, Mockito.mock(BatchTransactionValidator.class));
+			this(singleValidator, Mockito.mock(BatchTransactionValidator.class), Mockito.mock(PoiFacade.class));
 			this.setBatchValidationResult(ValidationResult.SUCCESS);
 		}
 
-		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
+		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator, final PoiFacade poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final AccountCache accountCache = Mockito.mock(AccountCache.class);
-			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+
 			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(poiFacade)).thenReturn(this.singleValidator);
