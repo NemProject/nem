@@ -998,7 +998,7 @@ public class UnconfirmedTransactionsTest {
 	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator() {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		final TestContext context = new TestContext(
-				factory.create(Mockito.mock(PoiFacade.class), Mockito.mock(HashCache.class)),
+				factory.createSingle(Mockito.mock(PoiFacade.class)),
 				factory.createBatch(Mockito.mock(HashCache.class)));
 		return context.transactions;
 	}

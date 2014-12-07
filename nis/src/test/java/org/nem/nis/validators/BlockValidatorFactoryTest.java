@@ -28,7 +28,7 @@ public class BlockValidatorFactoryTest {
 	public void createAddsDesiredBlockValidators() {
 		// Arrange:
 		final BlockValidatorFactory factory = new BlockValidatorFactory(Mockito.mock(TimeProvider.class));
-		final List<Class<?>> classes = Arrays.asList(
+		final List<Class<?>> expectedClasses = Arrays.asList(
 				TransactionDeadlineBlockValidator.class,
 				NonFutureEntityValidator.class,
 				EligibleSignerBlockValidator.class,
@@ -44,7 +44,7 @@ public class BlockValidatorFactoryTest {
 
 		// Assert:
 		Assert.assertThat(
-				validators.stream().map(BlockValidator::getClass).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(classes));
+				validators.stream().map(Object::getClass).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(expectedClasses));
 	}
 }
