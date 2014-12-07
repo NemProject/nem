@@ -239,7 +239,7 @@ public class AccountIoAdapterTest {
 		private final AccountCache accountCache = mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = mock(ReadOnlyBlockDao.class);
 		private final ReadOnlyTransferDao transferDao = mock(ReadOnlyTransferDao.class);
-		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(transferDao, blockDao, accountCache);
+		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(this.transferDao, this.blockDao, this.accountCache);
 		private final Account account = Utils.generateRandomAccount();
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();

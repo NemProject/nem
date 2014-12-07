@@ -29,7 +29,7 @@ public class BlockUniqueHashTransactionValidatorTest {
 		assertValidationResult(ValidationResult.SUCCESS, 0, true);
 	}
 
-	private void assertValidationResult(
+	private static void assertValidationResult(
 			final ValidationResult expectedResult,
 			final int numTransactions,
 			final boolean anyHashExistsReturnValue) {

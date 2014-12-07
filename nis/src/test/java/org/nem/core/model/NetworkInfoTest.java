@@ -6,7 +6,7 @@ import org.junit.*;
 import java.util.*;
 
 public class NetworkInfoTest {
-	private final Map<String, Address> DESC_TO_ADDRESS_MAP = new HashMap<String, Address>() {
+	private static final Map<String, Address> DESC_TO_ADDRESS_MAP = new HashMap<String, Address>() {
 		{
 			this.put("NON_BASE32_CHARS", Address.fromEncoded("TAAAAAAAAAA1BBBBBBBBBCCCCCCCCCCDDDDDDDDD"));
 			this.put("UNKNOWN_NETWORK", Address.fromEncoded("YAAAAAAAAAABBBBBBBBBBCCCCCCCCCCDDDDDDDDD"));

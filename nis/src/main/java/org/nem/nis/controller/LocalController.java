@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class LocalController {
 	private final static Logger LOGGER = Logger.getLogger(LocalController.class.getName());
 
-	private final long SHUTDOWN_DELAY = 200;
+	private static final long SHUTDOWN_DELAY = 200;
 	private final NisPeerNetworkHost host;
 	private final CommonStarter starter;
 

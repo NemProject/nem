@@ -104,6 +104,6 @@ public class BlockChain implements BlockSynchronizer {
 	 * @return Node experience code which indicates the status of the operation
 	 */
 	public ValidationResult processBlock(final Block receivedBlock) {
-		return updater.updateBlock(receivedBlock);
+		return this.updater.updateBlock(receivedBlock);
 	}
 }

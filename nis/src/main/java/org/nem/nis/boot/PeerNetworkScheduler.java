@@ -134,33 +134,33 @@ public class PeerNetworkScheduler implements AutoCloseable {
 
 		public void addDefaultTasks() {
 			this.addSimpleTask(
-					() -> network.broadcast(NisPeerId.REST_NODE_PING, network.getLocalNodeAndExperiences()),
+					() -> this.network.broadcast(NisPeerId.REST_NODE_PING, this.network.getLocalNodeAndExperiences()),
 					BROADCAST_INTERVAL,
 					"BROADCAST");
 			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(() -> network.synchronize()),
+					this.scheduler.runnableToFutureSupplier(() -> this.network.synchronize()),
 					SYNC_INTERVAL,
 					"SYNC");
 			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(() -> network.pruneInactiveNodes()),
+					this.scheduler.runnableToFutureSupplier(() -> this.network.pruneInactiveNodes()),
 					PRUNE_INACTIVE_NODES_DELAY,
 					"PRUNING INACTIVE NODES");
 			this.addSimpleTask(
-					() -> network.checkChainSynchronization(),
+					() -> this.network.checkChainSynchronization(),
 					CHECK_CHAIN_SYNC_INTERVAL,
 					"CHECKING CHAIN SYNCHRONIZATION");
 		}
 
 		public void addTimeSynchronizationTask() {
 			this.addSimpleTask(
-					() -> network.synchronizeTime(this.scheduler.timeProvider),
+					() -> this.network.synchronizeTime(this.scheduler.timeProvider),
 					getTimeSynchronizationDelayStrategy(),
 					"TIME SYNCHRONIZATION");
 		}
 
 		public void addAutoIpDetectionTask() {
 			this.addSimpleTask(
-					this.scheduler.runnableToFutureSupplier(() -> network.updateLocalNodeEndpoint()),
+					this.scheduler.runnableToFutureSupplier(() -> this.network.updateLocalNodeEndpoint()),
 					AUTO_IP_DETECTION_DELAY,
 					"AUTO IP DETECTION");
 		}

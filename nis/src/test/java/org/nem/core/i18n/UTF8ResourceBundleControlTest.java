@@ -6,7 +6,7 @@ import org.junit.*;
 import java.util.ResourceBundle;
 
 public class UTF8ResourceBundleControlTest {
-	private final ResourceBundle BUNDLE = ResourceBundle.getBundle("test", new UTF8ResourceBundleControl());
+	private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("test", new UTF8ResourceBundleControl());
 
 	@Test
 	public void canLoadAsciiResources() {

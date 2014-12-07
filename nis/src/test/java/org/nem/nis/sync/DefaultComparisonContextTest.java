@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.*;
 
 public class DefaultComparisonContextTest {
-	private final long EFFECTIVE_FORK_HEIGHT = BlockMarkerConstants.BETA_HARD_FORK - BlockChainConstants.BLOCKS_LIMIT;
+	private static final long EFFECTIVE_FORK_HEIGHT = BlockMarkerConstants.BETA_HARD_FORK - BlockChainConstants.BLOCKS_LIMIT;
 
 	@Test
 	public void contextHasCorrectValuesBeforeForkHeight() {
