@@ -9,15 +9,15 @@ public class MultisigModification implements SerializableEntity{
 	public MultisigModification(final MultisigModificationType modificationType, final Account cosignatoryAccount) {
 		this.modificationType = modificationType;
 		this.cosignatoryAccount = cosignatoryAccount;
+
+		this.validate();
 	}
 
 	public MultisigModification(final Deserializer deserializer) {
 		this.modificationType = MultisigModificationType.fromValueOrDefault(deserializer.readInt("modificationType"));
 		this.cosignatoryAccount = Account.readFrom(deserializer, "cosignatoryAccount", AddressEncoding.PUBLIC_KEY);
 
-		if (!this.modificationType.isValid()) {
-			throw new TypeMismatchException("mode");
-		}
+		this.validate();
 	}
 
 	@Override

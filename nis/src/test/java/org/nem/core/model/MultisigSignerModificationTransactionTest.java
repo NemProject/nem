@@ -1,6 +1,5 @@
 package org.nem.core.model;
 
-import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
@@ -12,12 +11,10 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class MultisigSignerModificationTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
 	final MultisigModificationType MODIFICATION_ADD = MultisigModificationType.Add;
-	final MultisigModificationType MODIFICATION_UNKNOWN = MultisigModificationType.Unknown;
 
 	//region constructor
 
@@ -40,57 +37,17 @@ public class MultisigSignerModificationTransactionTest {
 		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(modificationType));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void multisigModificationCannotBeCreatedWithoutCosignatory() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-
-		// Act:
-		createMultisigSignerModificationTransaction(signer, MODIFICATION_ADD, null);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void multisigModificationCannotBeCreatedWithUnknownModificationType() {
-		// Arrange:
-		final Account signer = Utils.generateRandomAccount();
-		final Account cosignatory = Utils.generateRandomAccount();
-
-		// Act:
-		createMultisigSignerModificationTransaction(signer, MODIFICATION_UNKNOWN, cosignatory);
-	}
-
 	@Test
-	public void deserializationFailsWhenCosignatoryIsMissing() {
-		// Assert:
-		this.assertDeserializationFailure(jsonObject -> jsonObject.put("cosignatoryAccount", null));
-	}
-
-	@Test
-	public void deserializationFailsWhenModeIsInvalid() {
-		// Assert:
-		this.assertDeserializationFailure(jsonObject -> jsonObject.put("modificationType", 123));
-	}
-
-	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer) {
+	public void creatingMultisigSignerModificationForwardsValidationToMultisigModification() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		final Account cosignatory = Utils.generateRandomAccount();
-		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
-
-		final MultisigSignerModificationTransaction originalEntity = createMultisigSignerModificationTransaction(
-				signer,
-				MODIFICATION_ADD,
-				cosignatory);
-		originalEntity.sign();
-		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
-		invalidateJsonConsumer.accept(jsonObject); // invalidate the json
+		final MultisigModification modification = Mockito.mock(MultisigModification.class);
 
 		// Act:
-		final Deserializer deserializer = new JsonDeserializer(jsonObject, new DeserializationContext(accountLookup));
-		deserializer.readInt("type");
-		ExceptionAssert.assertThrows(
-				v -> new MultisigSignerModificationTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer),
-				SerializationException.class);
+		new MultisigSignerModificationTransaction(TIME, signer, Arrays.asList(modification));
+
+		// Assert
+		Mockito.verify(modification, Mockito.times(1)).validate();
 	}
 
 	// endregion
