@@ -176,10 +176,9 @@ public class NisAppConfig {
 
 	@Bean
 	public SingleTransactionValidator transactionValidator() {
-		// TODO 20141207 J-B: currently this is only consumed by the TransactionController
-		// > and used in transaction/prepare for validation; i'm not sure if that really needs
-		// > a hash check; in which case this can be replaced with createSingle
-		return this.transactionValidatorFactory().create(this.nisCache());
+		// this is only consumed by the TransactionController and used in transaction/prepare,
+		// which doesn't require a hash check, so createSingle is used
+		return this.transactionValidatorFactory().createSingle(this.nisCache().getPoiFacade());
 	}
 
 	@Bean
