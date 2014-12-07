@@ -3,11 +3,18 @@ package org.nem.nis.mappers;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.MultisigModification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 
-import org.nem.nis.dbmodel.MultisigSignerModification;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigTransaction;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Static class that contains functions for converting to and from
@@ -31,18 +38,24 @@ public class MultisigSignerModificationMapper {
 			final int blockIndex,
 			final int orderIndex,
 			final AccountDaoLookup accountDaoLookup) {
-		/*
+
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(multisigSignerModification.getSigner().getAddress());
-		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(multisigSignerModification.getCosignatory().getAddress());
+		// TODO: move it to MultisigModificationMapper
+		final Set<org.nem.nis.dbmodel.MultisigModification> multisigModifications = new HashSet<>(multisigSignerModification.getModifications().size());
+		for (final MultisigModification multisigModification : multisigSignerModification.getModifications()) {
+			final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(multisigModification.getCosignatory().getAddress());
+			final org.nem.nis.dbmodel.MultisigModification dbModification = new org.nem.nis.dbmodel.MultisigModification();
+			dbModification.setCosignatory(remote);
+			dbModification.setModificationType(multisigModification.getModificationType().value());
+
+			multisigModifications.add(dbModification);
+		}
 
 		final MultisigSignerModification transfer = new MultisigSignerModification();
 		AbstractTransferMapper.toDbModel(multisigSignerModification, sender, blockIndex, orderIndex, transfer);
+		transfer.setMultisigModifications(multisigModifications);
 
-		transfer.setCosignatory(remote);
-		transfer.setModificationType(multisigSignerModification.getModificationType().value());
 		return transfer;
-		*/
-		return null;
 	}
 
 	/**
@@ -54,24 +67,27 @@ public class MultisigSignerModificationMapper {
 	 * @return The MultisigSignerModificationTransaction model.
 	 */
 	public static MultisigSignerModificationTransaction toModel(final MultisigSignerModification dbMultisig, final AccountLookup accountLookup) {
-		/*
 		final Address senderAccount = AccountToAddressMapper.toAddress(dbMultisig.getSender());
 		final Account sender = accountLookup.findByAddress(senderAccount);
+		
+		final List<MultisigModification> multisigModifications = new ArrayList<>(dbMultisig.getMultisigModifications().size());
+		for (final org.nem.nis.dbmodel.MultisigModification multisigModification : dbMultisig.getMultisigModifications()) {
+			final Address cosignatoryAddress = AccountToAddressMapper.toAddress(multisigModification.getCosignatory());
+			final Account cosignatory = accountLookup.findByAddress(cosignatoryAddress);
 
-		final Address cosignatoryAddress = AccountToAddressMapper.toAddress(dbMultisig.getCosignatory());
-		final Account cosignatory = accountLookup.findByAddress(cosignatoryAddress);
-
+			multisigModifications.add(new MultisigModification(
+					MultisigModificationType.fromValueOrDefault(multisigModification.getModificationType()),
+					cosignatory
+			));
+		}
 		final MultisigSignerModificationTransaction transfer = new MultisigSignerModificationTransaction(
 				new TimeInstant(dbMultisig.getTimeStamp()),
 				sender,
-				MultisigModificationType.fromValueOrDefault(dbMultisig.getModificationType()),
-				cosignatory);
+				multisigModifications);
 
 		transfer.setFee(new Amount(dbMultisig.getFee()));
 		transfer.setDeadline(new TimeInstant(dbMultisig.getDeadline()));
 		transfer.setSignature(new Signature(dbMultisig.getSenderProof()));
 		return transfer;
-		*/
-		return null;
 	}
 }

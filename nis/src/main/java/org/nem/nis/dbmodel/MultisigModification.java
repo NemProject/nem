@@ -29,6 +29,9 @@ public class MultisigModification {
 	@JoinColumn(name = "multisigSignerModificationId")
 	private MultisigSignerModification multisigSignerModification;
 
+	public MultisigModification() {
+	}
+
 	public Account getCosignatory() {
 		return this.cosignatory;
 	}

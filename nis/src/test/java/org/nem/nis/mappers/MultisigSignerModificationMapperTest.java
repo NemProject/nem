@@ -43,7 +43,7 @@ public class MultisigSignerModificationMapperTest {
 
 
 	@Test
-	public void importanceTransferModelCanBeRoundTripped() {
+	public void multisigSignerModificationModelCanBeRoundTripped() {
 		// Arrange:
 		final TestContext context = new TestContext(MultisigModificationType.Add, 123L);
 		final MultisigSignerModification dbModel = context.toDbModel(7);
