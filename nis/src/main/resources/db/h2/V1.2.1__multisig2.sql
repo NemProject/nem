@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXISTS `multisigtransactions` (
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
-  `type` INT NOT NULL,
   `fee` BIGINT NOT NULL,
   `timestamp` INT NOT NULL,
   `deadline` INT NOT NULL,
@@ -24,3 +23,15 @@ CREATE TABLE IF NOT EXISTS `multisigtransactions` (
 
   PRIMARY KEY (`id`)
 );
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (blockId)
+  REFERENCES public.blocks(id);
+
+ALTER TABLE public.multisigtransactions ADD
+  FOREIGN KEY (senderId)
+  REFERENCES accounts(id);
+
+CREATE INDEX IDX_MULTISIGTRANSACTIONS_TIMESTAMP ON `multisigtransactions` (timeStamp);
+CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID ON `multisigtransactions` (senderId, id);
+

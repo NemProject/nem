@@ -6,15 +6,12 @@ CREATE TABLE IF NOT EXISTS `multisigsignermodifications` (
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
-  `type` INT NOT NULL,
   `fee` BIGINT NOT NULL,
   `timestamp` INT NOT NULL,
   `deadline` INT NOT NULL,
 
   `senderId` BIGINT NOT NULL, -- reference to accounts
   `senderProof` VARBINARY(66) NOT NULL,
-  `cosignatoryId` BIGINT NOT NULL, -- reference to accounts
-  `modificationType` INT NOT NULL, -- create / destroy
 
   `blkIndex` INT NOT NULL, -- index inside block
   `orderId` INT NOT NULL,
@@ -28,16 +25,29 @@ ALTER TABLE public.multisigsignermodifications ADD
   REFERENCES public.blocks(id);
 
 ALTER TABLE public.multisigsignermodifications ADD
-  FOREIGN KEY (cosignatoryId)
-  REFERENCES public.accounts(id);
-
-ALTER TABLE public.multisigsignermodifications ADD
   FOREIGN KEY (senderId)
   REFERENCES accounts(id);
 
-CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SHORT_ID ON `multisigsignermodifications` (shortId);
-CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_TRANSFERHASH ON `multisigsignermodifications` (transferHash);
 CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_TIMESTAMP ON `multisigsignermodifications` (timeStamp);
-CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID ON `multisigsignermodifications` (senderId);
-CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_COSIGNATORYID ON `multisigsignermodifications` (cosignatoryId);
+CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID ON `multisigsignermodifications` (senderId, id desc);
+
+CREATE TABLE IF NOT EXISTS `multisigmodifications` (
+  `multisigSignerModificationId` BIGINT NOT NULL,
+
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `cosignatoryId` BIGINT NOT NULL, -- reference to accounts
+  `modificationType` INT NOT NULL, -- create / destroy
+
+  PRIMARY KEY(`id`)
+);
+
+ALTER TABLE public.multisigmodifications ADD
+  FOREIGN KEY (multisigSignerModificationId)
+  REFERENCES public.multisigsignermodifications(id);
+
+ALTER TABLE public.multisigmodifications ADD
+  FOREIGN KEY (cosignatoryId)
+  REFERENCES public.accounts(id);
+
+CREATE INDEX IDX_MULTISIGMODIFICATIONS_COSIGNATORYID ON `multisigmodifications` (cosignatoryId);
 
