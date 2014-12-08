@@ -235,6 +235,7 @@ public class MultisigTransactionTest {
 		Assert.assertThat(isVerified, IsEqual.equalTo(true));
 	}
 
+	// TODO 20141208 G-J this currently throws exception, not sure if that's expected
 	@Test
 	public void cannotVerifyMultisigTransactionWithAtLeastOneIncorrectCosignerSignature() {
 		// Arrange:
@@ -295,11 +296,13 @@ public class MultisigTransactionTest {
 
 	private static MultisigSignatureTransaction createSignatureTransaction(final Account account, final Transaction transaction) {
 		final Signer signer = new Signer(account.getKeyPair());
-		return new MultisigSignatureTransaction(
+		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				account,
 				HashUtils.calculateHash(transaction.asNonVerifiable()),
 				signer.sign(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
+		multisigSignatureTransaction.sign();
+		return multisigSignatureTransaction;
 	}
 
 	private static MultisigSignatureTransaction createSignatureTransaction(final Hash hash) {
