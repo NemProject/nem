@@ -123,12 +123,27 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 						"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
 						this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
+
+				peerChain.stream().forEach(b -> this.ensureAllAccountsAreKnown(b, context.nisCache().getAccountCache()));
 			}
 
 			// verify peer's chain
 			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 			return NodeInteractionResult.fromValidationResult(validationResult);
 		}
+	}
+
+	private void ensureAllAccountsAreKnown(final Block block, final AccountCache accountCache) {
+		block.getTransactions().stream().forEach(t -> {
+			switch (t.getType()) {
+				case TransactionTypes.TRANSFER:
+					accountCache.findByAddress(((TransferTransaction)t).getRecipient().getAddress());
+					break;
+				case TransactionTypes.IMPORTANCE_TRANSFER:
+					accountCache.findByAddress(((ImportanceTransferTransaction)t).getRemote().getAddress());
+					break;
+			}
+		});
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
