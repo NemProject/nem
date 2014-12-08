@@ -5,6 +5,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.HexEncoder;
@@ -27,7 +28,7 @@ public class BlockExplorerMapperTest {
 		assertCorrectSerialization(3, 7, 5);
 	}
 
-	private static void assertCorrectSerialization(final int... transferTypes) {
+	private static void assertCorrectSerialization(final int... transferFees) {
 		// Arrange:
 		final Address address = Address.fromPublicKey(PublicKey.fromHexString("88888888999999997777777744444444"));
 		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
@@ -40,9 +41,9 @@ public class BlockExplorerMapperTest {
 		block.setBlockTransfers(new ArrayList<>());
 
 		// TODO: FIX-ME
-//		for (final int transferType : transferTypes) {
-//			block.getBlockTransfers().add(createTransferWithType(transferType));
-//		}
+		for (final int transferType : transferFees) {
+			block.getBlockTransfers().add(createTransferWithFee(transferType));
+		}
 
 		// Act:
 		final ExplorerBlockViewModel viewModel = MAPPER.toExplorerViewModel(block);
@@ -57,15 +58,15 @@ public class BlockExplorerMapperTest {
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
 
 		final JSONArray jsonTransactions = ((JSONArray)jsonObject.get("txes"));
-		Assert.assertThat(jsonTransactions.size(), IsEqual.equalTo(transferTypes.length));
+		Assert.assertThat(jsonTransactions.size(), IsEqual.equalTo(transferFees.length));
 
 		// TODO: FIX-ME
-//		for (int i = 0; i < transferTypes.length; ++i) {
-//			Assert.assertThat(((JSONObject)jsonTransactions.get(i)).get("type"), IsEqual.equalTo(transferTypes[i]));
-//		}
+		for (int i = 0; i < transferFees.length; ++i) {
+			Assert.assertThat(((JSONObject)jsonTransactions.get(i)).get("fee"), IsEqual.equalTo(Amount.fromNem(123 + transferFees[i]).getNumMicroNem()));
+		}
 	}
 
-	private static Transfer createTransferWithType(final int type) {
+	private static Transfer createTransferWithFee(final int fee) {
 		final Address senderAddress = Utils.generateRandomAddressWithPublicKey();
 		final Address recipientAddress = Utils.generateRandomAddress();
 		final Hash hash = Utils.generateRandomHash();
@@ -73,7 +74,7 @@ public class BlockExplorerMapperTest {
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
 		final Transfer transfer = new Transfer();
-		transfer.setFee(123000000L);
+		transfer.setFee(Amount.fromNem(123 + fee).getNumMicroNem());
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
@@ -113,7 +114,6 @@ public class BlockExplorerMapperTest {
 
 		// Assert:
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(11));
-		Assert.assertThat(jsonObject.get("type"), IsEqual.equalTo(7));
 		Assert.assertThat(jsonObject.get("fee"), IsEqual.equalTo(123000000L));
 		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1408966402000L));
 		Assert.assertThat(jsonObject.get("sender"), IsEqual.equalTo(senderAddress.getEncoded()));
