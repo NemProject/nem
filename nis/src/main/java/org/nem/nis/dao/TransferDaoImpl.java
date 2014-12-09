@@ -100,6 +100,10 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final int limit) {
 		final Long accountId = this.getAccountId(address);
+		if (null == accountId) {
+			return new ArrayList<>();
+		}
+
 		if (hash == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
@@ -144,6 +148,10 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final int limit) {
 		final Long accountId = this.getAccountId(address);
+		if (null == accountId) {
+			return new ArrayList<>();
+		}
+
 		if (id == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
