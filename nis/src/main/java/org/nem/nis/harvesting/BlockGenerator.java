@@ -67,7 +67,13 @@ public class BlockGenerator {
 		LOGGER.info("target: 0x" + target.toString(16));
 		LOGGER.info("difficulty: " + (newBlock.getDifficulty().getRaw() * 100L) / BlockDifficulty.INITIAL_DIFFICULTY.getRaw() + "%");
 
-		if (hit.compareTo(target) >= 0 || !this.blockValidator.validate(newBlock).isSuccess()) {
+		if (hit.compareTo(target) >= 0) {
+			return null;
+		}
+
+		final ValidationResult result = this.blockValidator.validate(newBlock);
+		if (!result.isSuccess()) {
+			LOGGER.severe(String.format("generated block did not pass validation: %s", result));
 			return null;
 		}
 
