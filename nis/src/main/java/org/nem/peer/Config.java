@@ -6,12 +6,14 @@ import org.nem.core.serialization.*;
 import org.nem.peer.trust.*;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * Represents peer configuration.
  */
 public class Config {
+	private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
 
 	private final Node localNode;
 	private final PreTrustedNodes preTrustedNodes;
@@ -119,21 +121,21 @@ public class Config {
 	}
 
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
-		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", Config::activate);
+		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", d -> {
+			try {
+				return new Node(d);
+			} catch (final InvalidNodeEndpointException e) {
+				LOGGER.warning(String.format("Skipping invalid known peer: %s", e));
+				return null;
+			}
+		});
+
 		final Set<Node> preTrustedNodes = new HashSet<>();
 		if (null != wellKnownNodes) {
 			preTrustedNodes.addAll(wellKnownNodes.stream().filter(n -> null != n).collect(Collectors.toList()));
 		}
 
 		return new PreTrustedNodes(preTrustedNodes);
-	}
-
-	private static Node activate(final Deserializer obj) {
-		try {
-			return new Node(obj);
-		} catch (Exception e) {
-			return null;
-		}
 	}
 
 	private static TrustParameters getDefaultTrustParameters() {

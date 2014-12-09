@@ -46,13 +46,13 @@ public class NodeEndpointTest {
 
 	//region invalid parameters
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = InvalidNodeEndpointException.class)
 	public void ctorFailsIfProtocolIsInvalid() throws Exception {
 		// Act:
 		new NodeEndpoint("xyz", "10.8.8.2", 12);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = InvalidNodeEndpointException.class)
 	public void ctorFailsIfProtocolIsHostIsInvalid() throws Exception {
 		// Act:
 		new NodeEndpoint("ftp", "10.8.8.2.1", 12);
