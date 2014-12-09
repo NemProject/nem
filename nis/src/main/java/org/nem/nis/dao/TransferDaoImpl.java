@@ -3,9 +3,11 @@ package org.nem.nis.dao;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.Block;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,10 +102,6 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final int limit) {
 		final Long accountId = this.getAccountId(address);
-		if (null == accountId) {
-			return new ArrayList<>();
-		}
-
 		if (hash == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
@@ -148,10 +146,6 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final int limit) {
 		final Long accountId = this.getAccountId(address);
-		if (null == accountId) {
-			return new ArrayList<>();
-		}
-
 		if (id == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
@@ -175,12 +169,21 @@ public class TransferDaoImpl implements TransferDao {
 		return tempList.get(0);
 	}
 
-	private Long getAccountId(final Account address) {
+	private Long getAccountId(final Account account) {
+		final Address address = account.getAddress();
 		final Query query = this.getCurrentSession()
 				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
 				.addScalar("accountId", LongType.INSTANCE)
-				.setParameter("address", address.getAddress().getEncoded());
-		return (Long)query.uniqueResult();
+				.setParameter("address", address.getEncoded());
+		final Long id = (Long)query.uniqueResult();
+		if (null == id) {
+			throw new MissingResourceException(
+					String.format("address not found in db %s", address),
+					Address.class.toString(),
+					address.toString());
+		}
+
+		return id;
 	}
 
 	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(
