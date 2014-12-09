@@ -106,6 +106,22 @@ public class ConfigTest {
 	}
 
 	@Test
+	public void wellKnownPeersOmitUnresolvableHosts() {
+		// Arrange:
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
+		final JSONObject peersConfig = ConfigFactory.createPeersConfigWithUnresolvableHost(new String[] { "10.0.0.1" });
+		final Config config = new Config(localNode, peersConfig, "2.0.0");
+
+		// Act:
+		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
+		final Set<Node> wellKnownPeers = preTrustedNodes.getNodes();
+
+		// Assert:
+		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(1));
+		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
 	public void trustParametersAreInitializedWithDefaultValues() {
 		// Arrange:
 		final Config config = createTestConfig();

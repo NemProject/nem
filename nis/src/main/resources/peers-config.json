@@ -3,7 +3,7 @@
     "knownPeers": [
         {
             "endpoint": {
-                "host": "alice2.nem.ninja",
+                "host": "85.25.36.97",
                 "port": 7890,
                 "protocol": "http"
             },
@@ -14,7 +14,7 @@
         },
         {
             "endpoint": {
-                "host": "alice3.nem.ninja",
+                "host": "85.25.36.92",
                 "port": 7890,
                 "protocol": "http"
             },
@@ -25,13 +25,35 @@
         },
         {
             "endpoint": {
-                "host": "alice4.nem.ninja",
+                "host": "199.217.112.135",
                 "port": 7890,
                 "protocol": "http"
             },
             "identity": {
                 "name": "alice4",
                 "public-key": "c7e68c147fe246caaf6f09d3a1b54a5744b1d3f55a22a8557c3a063d70669262"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "108.61.182.27",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "alice5",
+                "public-key": "c1d806564c3dda901c46e1dd4b533aae28eac148672afd69c91e7b51fe930948"
+            }
+        },
+        {
+            "endpoint": {
+                "host": "108.61.168.86",
+                "port": 7890,
+                "protocol": "http"
+            },
+            "identity": {
+                "name": "alice6",
+                "public-key": "266c29aefaa4dbd3c206ea235c079d791dbb9808c428d4b3b206a088523ed1c8"
             }
         },
         {
