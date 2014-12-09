@@ -49,6 +49,7 @@ public class NisUtils {
 		block.setBlockTransfers(new ArrayList<>());
 		block.setBlockImportanceTransfers(new ArrayList<>());
 		block.setBlockMultisigSignerModifications(new ArrayList<>());
+		block.setBlockMultisigTransactions(new ArrayList<>());
 		return block;
 	}
 
