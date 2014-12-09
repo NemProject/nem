@@ -127,6 +127,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				// TODO 20141208 J-B: i guess this is the same issue where we are modifying accounts not in the cache?
 				// > I guess a cleaner fix would be to add something like Transaction.getAffectedAccounts
 				// TODO 20141208 J-B: i In your block chain test branch, we should add a regression test for this
+				// TODO 20141209 BR -> J: yes, same issue again, we are executing the transaction against an account which is not in the cache.
+				// > A clean fix would be to pass the account cache to the observers so everything gets credited/debited using the accounts in the cache.
 				peerChain.stream().forEach(b -> this.ensureAllAccountsAreKnown(b, context.nisCache().getAccountCache()));
 			}
 
