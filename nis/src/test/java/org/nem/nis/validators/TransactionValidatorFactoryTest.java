@@ -4,8 +4,13 @@ import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.HashCache;
+import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.NisCache;
 import org.nem.nis.poi.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TransactionValidatorFactoryTest {
 
@@ -15,7 +20,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final SingleTransactionValidator validator = factory.create(Mockito.mock(PoiFacade.class), Mockito.mock(HashCache.class));
+		final SingleTransactionValidator validator = factory.create(Mockito.mock(NisCache.class));
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
@@ -43,6 +48,43 @@ public class TransactionValidatorFactoryTest {
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
+	}
+
+	@Test
+	public void createSingleAddsDesiredSingleValidators() {
+		// Arrange:
+		final TransactionValidatorFactory factory = createFactory();
+		final List<Class<?>> expectedClasses = Arrays.asList(
+				UniversalTransactionValidator.class,
+				NonFutureEntityValidator.class,
+				TransferTransactionValidator.class,
+				ImportanceTransferTransactionValidator.class);
+
+		// Act:
+		final List<SingleTransactionValidator> validators = new ArrayList<>();
+		factory.visitSingleSubValidators(validators::add, Mockito.mock(PoiFacade.class));
+
+		// Assert:
+		Assert.assertThat(
+				validators.stream().map(Object::getClass).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(expectedClasses));
+	}
+
+	@Test
+	public void createBatchAddsDesiredBatchValidators() {
+		// Arrange:
+		final TransactionValidatorFactory factory = createFactory();
+		final List<Class<?>> expectedClasses = Arrays.asList(
+				BatchUniqueHashTransactionValidator.class);
+
+		// Act:
+		final List<BatchTransactionValidator> validators = new ArrayList<>();
+		factory.visitBatchSubValidators(validators::add, Mockito.mock(HashCache.class));
+
+		// Assert:
+		Assert.assertThat(
+				validators.stream().map(Object::getClass).collect(Collectors.toList()),
+				IsEquivalent.equivalentTo(expectedClasses));
 	}
 
 	private static TransactionValidatorFactory createFactory() {
