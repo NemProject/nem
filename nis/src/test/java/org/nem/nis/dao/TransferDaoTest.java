@@ -276,7 +276,7 @@ public class TransferDaoTest {
 	}
 
 	@Test
-	public void getTransactionsForAccountUsingIdThrowsWhenHashNotFound() {
+	public void getTransactionsForAccountUsingIdThrowsWhenIdNotFound() {
 		// Arrange:
 		this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID);
 	}
