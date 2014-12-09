@@ -157,7 +157,7 @@ public class MultisigSignaturesPresentValidatorTest {
 
 
 		private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
-			multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner, HashUtils.calculateHash(multisigTransaction.getOtherTransaction()), null));
+			multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner, HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
 		}
 	}
 

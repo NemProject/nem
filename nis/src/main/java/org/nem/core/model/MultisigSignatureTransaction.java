@@ -12,24 +12,19 @@ import org.nem.core.time.TimeInstant;
 public class MultisigSignatureTransaction extends Transaction implements SerializableEntity {
 	private final Hash otherTransactionHash;
 
-	private final Signature otherTransactionSignature;
-
 	/**
 	 * Creates a multisig signature transaction.
 	 *
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender.
 	 * @param otherTransactionHash The hash of the other transaction.
-	 * @param otherTransactionSignature The signature of the other transaction.
 	 */
 	public MultisigSignatureTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final Hash otherTransactionHash,
-			final Signature otherTransactionSignature) {
+			final Hash otherTransactionHash) {
 		super(TransactionTypes.MULTISIG_SIGNATURE, 1, timeStamp, sender);
 		this.otherTransactionHash = otherTransactionHash;
-		this.otherTransactionSignature = otherTransactionSignature;
 	}
 
 	/**
@@ -41,7 +36,6 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	public MultisigSignatureTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_SIGNATURE, options, deserializer);
 		this.otherTransactionHash = deserializer.readObject("other_hash", Hash::new);
-		this.otherTransactionSignature = Signature.readFrom(deserializer, "other_sig");
 	}
 
 	/**
@@ -51,15 +45,6 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	 */
 	public Hash getOtherTransactionHash() {
 		return this.otherTransactionHash;
-	}
-
-	/**
-	 * Gets the signature of the other transaction.
-	 *
-	 * @return The signature of the other transaction.
-	 */
-	public Signature getOtherTransactionSignature() {
-		return this.otherTransactionSignature;
 	}
 
 	@Override
@@ -75,6 +60,5 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeObject("other_hash", this.getOtherTransactionHash());
-		Signature.writeTo(serializer, "other_sig", this.getOtherTransactionSignature());
 	}
 }

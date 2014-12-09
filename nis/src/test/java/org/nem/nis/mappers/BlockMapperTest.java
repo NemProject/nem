@@ -656,13 +656,11 @@ public class BlockMapperTest {
 			final MultisigTransaction multisigTransaction = new MultisigTransaction(new TimeInstant(100), this.account3, transfer1);
 			this.model.addTransaction(multisigTransaction);
 
-			final Signature signature1 = new Signature(Utils.generateRandomBytes(64));
-			final MultisigSignatureTransaction multisigSignature1 = new MultisigSignatureTransaction(new TimeInstant(123), this.account1, transferHash, signature1);
+			final MultisigSignatureTransaction multisigSignature1 = new MultisigSignatureTransaction(new TimeInstant(123), this.account1, transferHash);
 			multisigSignature1.sign();
 			multisigTransaction.addSignature(multisigSignature1);
 
-			final Signature signature2 = new Signature(Utils.generateRandomBytes(64));
-			final MultisigSignatureTransaction multisigSignature2 = new MultisigSignatureTransaction(new TimeInstant(132), this.account2, transferHash, signature2);
+			final MultisigSignatureTransaction multisigSignature2 = new MultisigSignatureTransaction(new TimeInstant(132), this.account2, transferHash);
 			multisigSignature2.sign();
 			multisigTransaction.addSignature(multisigSignature2);
 

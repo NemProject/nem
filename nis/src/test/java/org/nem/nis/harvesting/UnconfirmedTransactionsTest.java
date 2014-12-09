@@ -1012,8 +1012,7 @@ public class UnconfirmedTransactionsTest {
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
 		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
 		multisigTransaction.sign();
-		final Signature signature = new Signature(Utils.generateRandomBytes(64));
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner2, HashUtils.calculateHash(t1), signature);
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner2, HashUtils.calculateHash(t1));
 		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
 		signatureTransaction.sign();
 

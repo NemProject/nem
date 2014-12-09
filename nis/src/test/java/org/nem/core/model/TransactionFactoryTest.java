@@ -175,8 +175,7 @@ public class TransactionFactoryTest {
 		return new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				sender,
-				Hash.ZERO,
-				new Signature(new byte[64]));
+				Hash.ZERO);
 	}
 
 	//endregion

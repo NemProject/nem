@@ -299,8 +299,7 @@ public class MultisigTransactionTest {
 		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				account,
-				HashUtils.calculateHash(transaction.asNonVerifiable()),
-				signer.sign(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
+				HashUtils.calculateHash(transaction.asNonVerifiable()));
 		multisigSignatureTransaction.sign();
 		return multisigSignatureTransaction;
 	}
@@ -309,8 +308,7 @@ public class MultisigTransactionTest {
 		return new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
-				hash,
-				Utils.generateRandomSignature());
+				hash);
 	}
 
 	private static MultisigTransaction createDefaultTransaction(final Transaction innerTransaction) {

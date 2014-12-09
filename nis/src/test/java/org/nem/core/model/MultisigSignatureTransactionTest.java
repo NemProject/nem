@@ -23,8 +23,7 @@ public class MultisigSignatureTransactionTest {
 		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				account,
-				hash,
-				signature);
+				hash);
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
@@ -32,7 +31,6 @@ public class MultisigSignatureTransactionTest {
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(transaction.getOtherTransactionSignature(), IsEqual.equalTo(signature));
 	}
 
 	@Test
@@ -44,8 +42,7 @@ public class MultisigSignatureTransactionTest {
 		final MultisigSignatureTransaction originalTransaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				account,
-				hash,
-				signature);
+				hash);
 
 		// Act:
 		final MultisigSignatureTransaction transaction = createRoundTrippedTransaction(originalTransaction);
@@ -56,7 +53,6 @@ public class MultisigSignatureTransactionTest {
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
-		Assert.assertThat(transaction.getOtherTransactionSignature(), IsEqual.equalTo(signature));
 	}
 
 	private static MultisigSignatureTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
@@ -117,7 +113,6 @@ public class MultisigSignatureTransactionTest {
 		return new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				Utils.generateRandomAccount(),
-				Utils.generateRandomHash(),
-				Utils.generateRandomSignature());
+				Utils.generateRandomHash());
 	}
 }

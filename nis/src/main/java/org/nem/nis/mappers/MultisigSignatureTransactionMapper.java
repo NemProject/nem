@@ -29,8 +29,7 @@ public class MultisigSignatureTransactionMapper {
 		return new MultisigSignatureTransaction(
 				new TimeInstant(multisigSignature.getTimeStamp()),
 				cosigner,
-				HashUtils.calculateHash(otherTransaction),
-				new Signature(new byte[64])
+				HashUtils.calculateHash(otherTransaction)
 		);
 	}
 }

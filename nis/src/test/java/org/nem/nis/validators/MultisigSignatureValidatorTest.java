@@ -104,7 +104,6 @@ public class MultisigSignatureValidatorTest {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final MultisigSignatureValidator validator;
 		private final Account signer = Utils.generateRandomAccount();
-		private final Signature signature = new Signature(Utils.generateRandomBytes(64));
 		private final List<Transaction> transactionList = new ArrayList<>();
 
 		private TestContext() {
@@ -118,8 +117,7 @@ public class MultisigSignatureValidatorTest {
 			return new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
 					signer,
-					otherTransactionHash,
-					signature
+					otherTransactionHash
 			);
 		}
 
