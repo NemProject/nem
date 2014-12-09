@@ -6,6 +6,7 @@ import org.nem.core.serialization.*;
 import org.nem.peer.trust.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents peer configuration.
@@ -118,13 +119,21 @@ public class Config {
 	}
 
 	private static PreTrustedNodes parseWellKnownPeers(final Deserializer deserializer) {
-		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", obj -> new Node(obj));
+		final List<Node> wellKnownNodes = deserializer.readOptionalObjectArray("knownPeers", Config::activate);
 		final Set<Node> preTrustedNodes = new HashSet<>();
 		if (null != wellKnownNodes) {
-			preTrustedNodes.addAll(wellKnownNodes);
+			preTrustedNodes.addAll(wellKnownNodes.stream().filter(n -> null != n).collect(Collectors.toList()));
 		}
 
 		return new PreTrustedNodes(preTrustedNodes);
+	}
+
+	private static Node activate(final Deserializer obj) {
+		try {
+			return new Node(obj);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	private static TrustParameters getDefaultTrustParameters() {
