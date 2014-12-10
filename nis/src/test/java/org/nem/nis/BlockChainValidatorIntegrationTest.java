@@ -248,6 +248,81 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
 	}
 
+	//region balance checks
+
+	@Test
+	public void chainIsInvalidIfItContainsTransferTransactionHavingSignerWithInsufficientBalance() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(7));
+
+		block.addTransaction(createTransfer(signer, Amount.fromNem(5), Amount.fromNem(4)));
+		block.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void chainIsValidIfItContainsTransferTransactionHavingSignerWithExactBalance() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(9));
+
+		block.addTransaction(createTransfer(signer, Amount.fromNem(5), Amount.fromNem(4)));
+		block.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void chainIsInvalidIfItContainsMultipleTransferTransactionsFromSameSignerHavingSignerWithInsufficientBalanceForAll() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+
+		final Account signer = Utils.generateRandomAccount();
+		signer.incrementBalance(Amount.fromNem(34));
+
+		block.addTransaction(createTransfer(signer, Amount.fromNem(30), Amount.fromNem(1)));
+		block.addTransaction(createTransfer(signer, Amount.fromNem(31), Amount.fromNem(1)));
+		block.addTransaction(createTransfer(signer, Amount.fromNem(32), Amount.fromNem(1)));
+		block.sign();
+
+		// Assert:
+		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+	}
+
+	private static Transaction createTransfer(final Account signer, final Amount amount, final Amount fee) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Transaction transaction = new TransferTransaction(currentTime, signer, Utils.generateRandomAccount(), amount, null);
+		transaction.setFee(fee);
+		transaction.setDeadline(currentTime.addSeconds(10));
+		transaction.sign();
+		return transaction;
+	}
+
+	//endregion
+
 	//region helper functions
 
 	//region transactions / blocks
