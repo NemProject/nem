@@ -37,6 +37,7 @@ public class Account {
 		return Address.fromPublicKey(keyPair.getPublicKey());
 	}
 
+	// TODO: remove
 	/**
 	 * Sets the public key associated with this account.
 	 * The public key must be consistent with this account's address.
@@ -79,6 +80,7 @@ public class Account {
 		this.address = getAddressFromKeyPair(keyPair);
 	}
 
+	// TODO remove copy
 	/**
 	 * Creates an unlinked copy of this account.
 	 *
@@ -121,6 +123,8 @@ public class Account {
 		final Account rhs = (Account)obj;
 		return this.address.equals(rhs.address);
 	}
+
+	// TODO: add tostring
 
 	//region inline serialization
 
@@ -180,29 +184,58 @@ public class Account {
 
 	//endregion
 
+	//region crypto
+
+	/**
+	 * Gets a value indicating whether or not this account has a private key.
+	 *
+	 * @return true if this account has a private key.
+	 */
+	public boolean hasPrivateKey() {
+		return null != this.keyPair && this.keyPair.hasPrivateKey();
+	}
+
+	/**
+	 * Gets a value indicating whether or not this account has a public key.
+	 *
+	 * @return true if this account has a private key.
+	 */
+	public boolean hasPublicKey() {
+		return null != this.keyPair;
+	}
+
+	/**
+	 * Creates a signer around this account's key-pair.
+	 *
+	 * @return The signer.
+	 */
 	public Signer createSigner() {
 		if (!this.hasPublicKey()) {
-			throw new IllegalArgumentException("in order to create a signer, an account must have a public key");
+			throw new CryptoException("in order to create a signer, an account must have a public key");
 		}
 
 		return new Signer(this.keyPair);
 	}
 
-	public Cipher createCipher(final Account other, boolean encrypt) {
-		if (!this.hasPrivateKey() && !other.hasPrivateKey()) {
-			throw new IllegalArgumentException("in order to create a cipher, at least one account must have a private key");
+	/**
+	 * Creates a cipher around the key-pairs of this account and another account.
+	 *
+	 * @param other The other account.
+	 * @param encrypt true if the cipher should be used for encrypting data, false otherwise.
+	 * @return The cipher.
+	 */
+	public Cipher createCipher(final Account other, final boolean encrypt) {
+		if (!this.hasPrivateKey() && !other.hasPrivateKey() || !this.hasPublicKey() || !other.hasPublicKey()) {
+			throw new CryptoException("in order to create a cipher, at least one account must have a private key and both accounts must have a public key");
 		}
 
-		return this.hasPrivateKey() && !encrypt
-				? new Cipher(other.keyPair, this.keyPair)
-				: new Cipher(this.keyPair, other.keyPair);
+		final KeyPair keyPairWithPrivateKey = this.hasPrivateKey() ? this.keyPair : other.keyPair;
+		final KeyPair otherKeyPair = !this.hasPrivateKey() ? this.keyPair : other.keyPair;
+
+		return encrypt
+				? new Cipher(keyPairWithPrivateKey, otherKeyPair)
+				: new Cipher(otherKeyPair, keyPairWithPrivateKey);
 	}
 
-	public boolean hasPrivateKey() {
-		return null != this.keyPair && this.keyPair.hasPrivateKey();
-	}
-
-	public boolean hasPublicKey() {
-		return null != this.keyPair;
-	}
+	//endregion
 }

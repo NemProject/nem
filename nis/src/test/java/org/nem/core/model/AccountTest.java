@@ -14,7 +14,7 @@ public class AccountTest {
 	//region Constructor
 
 	@Test
-	public void accountCanBeCreatedAroundKeyPair() {
+	public void accountCanBeCreatedAroundKeyPairWithPrivateKey() {
 		// Arrange:
 		final KeyPair kp = new KeyPair();
 		final Address expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
@@ -28,15 +28,16 @@ public class AccountTest {
 	}
 
 	@Test
-	public void accountCanBeCreatedAroundAddressWithoutPublicKey() {
+	public void accountCanBeCreatedAroundKeyPairWithoutPrivateKey() {
 		// Arrange:
-		final Address expectedAccountId = Utils.generateRandomAddress();
-		final Account account = new Account(expectedAccountId);
+		final KeyPair kp = new KeyPair();
+		final Address expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
+		final Account account = new Account(new KeyPair(kp.getPublicKey()));
 
 		// Assert:
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
@@ -51,6 +52,19 @@ public class AccountTest {
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void accountCanBeCreatedAroundAddressWithoutPublicKey() {
+		// Arrange:
+		final Address expectedAccountId = Utils.generateRandomAddress();
+		final Account account = new Account(expectedAccountId);
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsNull.nullValue());
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
 		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
@@ -346,6 +360,120 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
 		Assert.assertThat(copyAccount.hasPublicKey(), IsEqual.equalTo(true));
 		Assert.assertThat(copyAccount.hasPrivateKey(), IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	//region createSigner
+
+	@Test
+	public void cannotCreateSignerWhenAccountDoesNotHavePublicKey() {
+		// Arrange:
+		final Account account = new Account(Utils.generateRandomAddress());
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> account.createSigner(),
+				CryptoException.class);
+	}
+
+	@Test
+	public void canCreateSignerWhenAccountHasPublicKey() {
+		// Arrange:
+		final Account account = new Account(Utils.generateRandomAddressWithPublicKey());
+
+		// Act:
+		final Signer signer = account.createSigner();
+
+		// Assert:
+		Assert.assertThat(signer, IsNull.notNullValue());
+	}
+
+	@Test
+	public void canSignAndVerifyDataWithSigner() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
+		final Account accountWithOnlyPublicKey = new Account(new KeyPair(keyPair.getPublicKey()));
+		final byte[] payload = Utils.generateRandomBytes();
+
+		// Act:
+		final Signer signer = account.createSigner();
+		final Signature signature = signer.sign(payload);
+		final Signer verifier = accountWithOnlyPublicKey.createSigner();
+		final boolean isVerified = verifier.verify(payload, signature);
+
+		// Assert:
+		Assert.assertThat(isVerified, IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	//region createCipher
+
+	@Test
+	public void cannotCreateCipherIfNeitherAccountHasPrivateKey() {
+		// Arrange:
+		final Account account = new Account(Utils.generateRandomAddressWithPublicKey());
+		final Account otherAccount = new Account(Utils.generateRandomAddressWithPublicKey());
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> account.createCipher(otherAccount, false),
+				CryptoException.class);
+	}
+
+	@Test
+	public void cannotCreateCipherIfAnyAccountDoesNotHavePublicKey() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final Account otherAccount = new Account(Utils.generateRandomAddress());
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> account.createCipher(otherAccount, false),
+				CryptoException.class);
+		ExceptionAssert.assertThrows(
+				v -> otherAccount.createCipher(account, false),
+				CryptoException.class);
+	}
+
+	@Test
+	public void canEncryptAndDecryptDataWithSignerWhenFirstAccountHasPrivateKey() {
+		// Assert:
+		assertCanEncryptAndDecrypt(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccountWithoutPrivateKey());
+	}
+
+	@Test
+	public void canEncryptAndDecryptDataWithSignerWhenSecondAccountHasPrivateKey() {
+		// Assert:
+		assertCanEncryptAndDecrypt(
+				Utils.generateRandomAccountWithoutPrivateKey(),
+				Utils.generateRandomAccount());
+	}
+
+	@Test
+	public void canEncryptAndDecryptDataWithSignerWhenBothAccountsHavePrivateKey() {
+		// Assert:
+		assertCanEncryptAndDecrypt(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
+	}
+
+	private static void assertCanEncryptAndDecrypt(final Account account1, final Account account2) {
+		// Arrange:
+		final byte[] payload = Utils.generateRandomBytes();
+
+		// Act:
+		final Cipher encryptCipher = account1.createCipher(account2, true);
+		final byte[] encryptedPayload = encryptCipher.encrypt(payload);
+		final Cipher decryptCipher = account1.createCipher(account2, false);
+		final byte[] decryptedPayload = decryptCipher.decrypt(encryptedPayload);
+
+		// Assert:
+		Assert.assertThat(decryptedPayload, IsEqual.equalTo(payload));
 	}
 
 	//endregion
