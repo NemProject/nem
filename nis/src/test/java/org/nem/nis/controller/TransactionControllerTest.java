@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -40,6 +40,7 @@ public class TransactionControllerTest {
 		ExceptionAssert.assertThrows(
 				v -> context.controller.transactionPrepare(deserializer),
 				IllegalArgumentException.class);
+		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), Mockito.any());
 	}
 
 	@Test
@@ -57,6 +58,30 @@ public class TransactionControllerTest {
 
 		// Assert:
 		Assert.assertThat(requestPrepare.getData(), IsEqual.equalTo(BinarySerializer.serializeToBytes(transaction.asNonVerifiable())));
+		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	public void transactionPreparePassesCorrectValidationContextToValidator() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+
+		final Transaction transaction = createTransaction();
+		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));
+
+		// Act:
+		context.controller.transactionPrepare(deserializer);
+
+		// Assert:
+		final ArgumentCaptor<ValidationContext> validationContextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
+		Mockito.verify(context.validator, Mockito.only()).validate(Mockito.any(), validationContextCaptor.capture());
+
+		final ValidationContext validationContext = validationContextCaptor.getValue();
+		Assert.assertThat(validationContext.getBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(validationContext.getConfirmedBlockHeight(), IsEqual.equalTo(BlockHeight.MAX));
+		Assert.assertThat(validationContext.getDebitPredicate(), IsEqual.equalTo(context.debitPredicate));
 	}
 
 	//endregion
@@ -202,7 +227,6 @@ public class TransactionControllerTest {
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
-		private final PoiFacade poiFacade;
 		private final DebitPredicate debitPredicate;
 
 		private TestContext() {
@@ -212,10 +236,9 @@ public class TransactionControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			// TODO (IA) 20141210: should pass in validation context directly!
 			this.debitPredicate = Mockito.mock(DebitPredicate.class);
-			this.poiFacade = Mockito.mock(PoiFacade.class);
-			Mockito.when(this.poiFacade.getDebitPredicate()).thenReturn(this.debitPredicate);
+			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+			Mockito.when(poiFacade.getDebitPredicate()).thenReturn(this.debitPredicate);
 
 			this.controller = new TransactionController(
 					this.accountLookup,
@@ -223,7 +246,7 @@ public class TransactionControllerTest {
 					this.unconfirmedTransactions,
 					this.validator,
 					this.host,
-					this.poiFacade);
+					poiFacade);
 		}
 	}
 }
