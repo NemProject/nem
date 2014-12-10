@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.MockTransaction;
+import org.nem.nis.test.DebitPredicates;
 
 public class UniversalTransactionValidatorTest {
 	private static final SingleTransactionValidator VALIDATOR = new UniversalTransactionValidator();
@@ -90,7 +91,7 @@ public class UniversalTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final Transaction transaction) {
-		return validate(transaction, DebitPredicate.True);
+		return validate(transaction, DebitPredicates.True);
 	}
 
 	private static ValidationResult validate(final Transaction transaction, final DebitPredicate debitPredicate) {

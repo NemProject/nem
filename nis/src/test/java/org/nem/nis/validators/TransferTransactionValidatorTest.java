@@ -8,6 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.DebitPredicates;
 
 public class TransferTransactionValidatorTest {
 	private static final SingleTransactionValidator VALIDATOR = new TransferTransactionValidator();
@@ -121,7 +122,7 @@ public class TransferTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final Transaction transaction) {
-		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicate.True));
+		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
 	private static ValidationResult validate(final Transaction transaction, final DebitPredicate debitPredicate) {

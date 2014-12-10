@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 public class NonFutureEntityValidatorTest {
 
@@ -38,7 +38,7 @@ public class NonFutureEntityValidatorTest {
 		final SingleTransactionValidator validator = createValidator(currentTime);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicate.False));
+		final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));

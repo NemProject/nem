@@ -9,6 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.*;
+import org.nem.nis.test.DebitPredicates;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_IT_VALIDATION_FORK);
@@ -449,7 +450,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		}
 
 		private ValidationResult validate(final Transaction transaction, final BlockHeight testHeight) {
-			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicate.True));
+			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicates.True));
 		}
 	}
 }

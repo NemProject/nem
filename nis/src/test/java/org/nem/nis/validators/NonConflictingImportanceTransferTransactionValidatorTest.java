@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.DebitPredicates;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -125,6 +126,6 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 	}
 
 	private static ValidationResult validate(final SingleTransactionValidator validator, final Transaction transaction) {
-		return validator.validate(transaction, new ValidationContext(DebitPredicate.True));
+		return validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 }
