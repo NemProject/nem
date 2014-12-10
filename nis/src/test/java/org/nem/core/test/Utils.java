@@ -89,18 +89,6 @@ public class Utils {
 	}
 
 	/**
-	 * Generates a random account with the specified balance.
-	 *
-	 * @param initialBalance The initial account balance.
-	 * @return A random account.
-	 */
-	public static Account generateRandomAccount(final Amount initialBalance) {
-		final Account account = Utils.generateRandomAccount();
-		account.incrementBalance(initialBalance);
-		return account;
-	}
-
-	/**
 	 * Generates a random account without a private key.
 	 *
 	 * @return A random account without a private key.

@@ -161,7 +161,6 @@ public class ImportanceTransferTransactionTest {
 		// Arrange:
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(10));
@@ -187,7 +186,6 @@ public class ImportanceTransferTransactionTest {
 		// Arrange:
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(10));

@@ -178,7 +178,7 @@ public class AccountInfoControllerTest {
 	private static Transaction createTransfer(final Address address) {
 		return new TransferTransaction(
 				TimeInstant.ZERO,
-				Utils.generateRandomAccount(Amount.fromNem(100)),
+				Utils.generateRandomAccount(),
 				new Account(address),
 				Amount.fromNem(1),
 				null);
