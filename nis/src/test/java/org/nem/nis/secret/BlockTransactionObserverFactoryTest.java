@@ -138,7 +138,7 @@ public class BlockTransactionObserverFactoryTest {
 		};
 
 		Mockito.doAnswer(createAnswer.apply("outlink")).when(context.accountContext1.importance).addOutlink(Mockito.any());
-		Mockito.doAnswer(createAnswer.apply("balance")).when(context.accountContext1.account).decrementBalance(Mockito.any());
+		Mockito.doAnswer(createAnswer.apply("balance")).when(context.accountContext1.accountInfo).decrementBalance(Mockito.any());
 		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).addSend(Mockito.any(), Mockito.any());
 
 		// Act:
@@ -162,7 +162,7 @@ public class BlockTransactionObserverFactoryTest {
 		};
 
 		Mockito.doAnswer(createAnswer.apply("outlink")).when(context.accountContext1.importance).removeOutlink(Mockito.any());
-		Mockito.doAnswer(createAnswer.apply("balance")).when(context.accountContext1.account).incrementBalance(Mockito.any());
+		Mockito.doAnswer(createAnswer.apply("balance")).when(context.accountContext1.accountInfo).incrementBalance(Mockito.any());
 		Mockito.doAnswer(createAnswer.apply("weighted-balance")).when(context.accountContext1.balances).undoSend(Mockito.any(), Mockito.any());
 
 		// Act:
@@ -178,20 +178,17 @@ public class BlockTransactionObserverFactoryTest {
 	//endregion
 
 	private static class MockAccountContext {
-		private final Account account;
-		private final AccountImportance importance;
-		private final WeightedBalances balances;
-		private final Address address;
+		private final Account account = Mockito.mock(Account.class);
+		private final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+		private final AccountImportance importance = Mockito.mock(AccountImportance.class);
+		private final WeightedBalances balances = Mockito.mock(WeightedBalances.class);
+		private final Address address = Utils.generateRandomAddress();
 
 		public MockAccountContext(final PoiFacade poiFacade) {
-			this.account = Mockito.mock(Account.class);
-			this.importance = Mockito.mock(AccountImportance.class);
-			this.balances = Mockito.mock(WeightedBalances.class);
-			this.address = Utils.generateRandomAddress();
-
 			Mockito.when(this.account.getAddress()).thenReturn(this.address);
 
 			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			Mockito.when(accountState.getAccountInfo()).thenReturn(this.accountInfo);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 			Mockito.when(accountState.getImportanceInfo()).thenReturn(this.importance);
 

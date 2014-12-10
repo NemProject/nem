@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 /**
  * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts
  * by their addresses.
+ * TODO 20141210 (IA) - This can probably be simplified a lot now.
  */
 public class AccountCache implements AccountLookup, Iterable<Account> {
 	private static final Logger LOGGER = Logger.getLogger(AccountCache.class.getName());

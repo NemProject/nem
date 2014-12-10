@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * This suite is different from BlockChainValidatorTest because it uses REAL validators
- * (or at least very close to real)
- */
+* This suite is different from BlockChainValidatorTest because it uses REAL validators
+* (or at least very close to real)
+*/
 public class BlockChainValidatorIntegrationTest {
 
 	@Test
@@ -102,7 +102,7 @@ public class BlockChainValidatorIntegrationTest {
 		parentBlock.sign();
 
 		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(12345));
+		//account1.incrementBalance(Amount.fromNem(12345));
 		final Account account2 = Utils.generateRandomAccount();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
@@ -134,9 +134,9 @@ public class BlockChainValidatorIntegrationTest {
 		parentBlock.sign();
 
 		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementBalance(Amount.fromNem(12345));
+		//account1.incrementBalance(Amount.fromNem(12345));
 		final Account account2 = Utils.generateRandomAccount();
-		account2.incrementBalance(Amount.fromNem(12345));
+		//account2.incrementBalance(Amount.fromNem(12345));
 		final Account accountX = Utils.generateRandomAccount();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
@@ -224,8 +224,10 @@ public class BlockChainValidatorIntegrationTest {
 
 			private Account createSeedAccount() {
 				final Amount seedAmount = Amount.fromNem(1000);
-				final Account account = Utils.generateRandomAccount(seedAmount);
-				this.poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances().addFullyVested(BlockHeight.ONE, seedAmount);
+				final Account account = Utils.generateRandomAccount();
+				final PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
+				accountState.getAccountInfo().incrementBalance(seedAmount);
+				accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, seedAmount);
 				return account;
 			}
 		}
@@ -345,7 +347,8 @@ public class BlockChainValidatorIntegrationTest {
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,
-					this.transactionValidator);
+					this.transactionValidator,
+					DebitPredicate.True);
 		}
 	}
 

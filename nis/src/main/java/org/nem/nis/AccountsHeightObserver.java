@@ -37,7 +37,7 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 
 	private void addToNisCache(final BlockHeight height, final Account account) {
 		final Address address = account.getAddress();
-		this.nisCache.getAccountCache().addAccountToCache(address);
+		this.nisCache.getAccountCache().findByAddress(address);
 		final PoiAccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
 
 		accountState.getAccountInfo().incrementReferenceCount();

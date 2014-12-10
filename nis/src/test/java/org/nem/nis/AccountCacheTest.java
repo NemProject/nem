@@ -89,22 +89,6 @@ public class AccountCacheTest {
 		Assert.assertThat(cachedAccount2.getKeyPair().getPublicKey(), IsNull.notNullValue());
 	}
 
-	@Test
-	public void balanceIsPreservedWhenPublicKeyIsAddedToAccountWithNonZeroBalanceWithoutPublicKey() {
-		// Arrange:
-		final AccountCache cache = createAccountCache();
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final Address addressWithoutPublicKey = Address.fromEncoded(address.getEncoded());
-
-		// Act:
-		final Account cachedAccount1 = cache.addAccountToCache(addressWithoutPublicKey);
-		cachedAccount1.incrementBalance(new Amount(9527L));
-		final Account cachedAccount2 = cache.addAccountToCache(address);
-
-		// Assert:
-		Assert.assertThat(cachedAccount2.getBalance(), IsEqual.equalTo(new Amount(9527L)));
-	}
-
 	//endregion
 
 	//region removeFromCache
