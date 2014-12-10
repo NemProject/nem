@@ -36,7 +36,6 @@ public class AddressTest {
 		Assert.assertThat(address.getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(address.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-		Assert.assertThat(address.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 
 	@Test
@@ -49,7 +48,6 @@ public class AddressTest {
 		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(address.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-		Assert.assertThat(address.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 
 	@Test

@@ -45,7 +45,7 @@ public class AccountTest {
 
 		// Assert:
 		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
 	}
 
@@ -74,7 +74,7 @@ public class AccountTest {
 		account.setPublicKey(keyPair.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class AccountTest {
 		account.setPublicKey(keyPair.getPublicKey());
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(true));
 		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
 	}
@@ -295,7 +295,6 @@ public class AccountTest {
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
 		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.nullValue());
 	}
 
@@ -308,7 +307,6 @@ public class AccountTest {
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
 		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
 	}
 

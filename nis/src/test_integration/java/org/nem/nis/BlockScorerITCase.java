@@ -537,7 +537,7 @@ public class BlockScorerITCase {
 	}
 
 	private Block createFirstBlock(final Account account, final Hash previousHash) {
-		final Hash generationHash = HashUtils.nextHash(previousHash, account.getKeyPair().getPublicKey());
+		final Hash generationHash = HashUtils.nextHash(previousHash, account.getAddress().getPublicKey());
 		return new Block(account, previousHash, generationHash, new TimeInstant(1), new BlockHeight(1));
 	}
 

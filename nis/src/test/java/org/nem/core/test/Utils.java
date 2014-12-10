@@ -75,7 +75,7 @@ public class Utils {
 	 * @return A copy of account that only contains the account public key.
 	 */
 	public static Account createPublicOnlyKeyAccount(final Account account) {
-		return new Account(new KeyPair(account.getKeyPair().getPublicKey()));
+		return new Account(new KeyPair(account.getAddress().getPublicKey()));
 	}
 
 	/**

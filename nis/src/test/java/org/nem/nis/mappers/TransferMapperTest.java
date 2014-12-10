@@ -131,7 +131,7 @@ public class TransferMapperTest {
 
 			this.dbSender = new org.nem.nis.dbmodel.Account();
 			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
+			this.dbSender.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
 			this.dbRecipient = new org.nem.nis.dbmodel.Account();
 			this.dbRecipient.setPrintableKey(this.model.getRecipient().getAddress().getEncoded());
@@ -183,9 +183,9 @@ public class TransferMapperTest {
 			// TODO 20141010 J-G why would you want to remove it?
 			Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(blockId));
 
-			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+			final PublicKey signerPublicKey = this.model.getSigner().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
-			final PublicKey recipientPublicKey = this.model.getRecipient().getKeyPair().getPublicKey();
+			final PublicKey recipientPublicKey = this.model.getRecipient().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getRecipient().getPublicKey(), IsEqual.equalTo(recipientPublicKey));
 		}
 

@@ -35,7 +35,7 @@ public class BlockChainTest {
 	private static final org.nem.core.model.Account RECIPIENT1 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static final org.nem.core.model.Account RECIPIENT2 = new org.nem.core.model.Account(Utils.generateRandomAddress());
 	private static final org.nem.nis.dbmodel.Account DB_SENDER = new org.nem.nis.dbmodel.Account(SENDER.getAddress().getEncoded(),
-			SENDER.getKeyPair().getPublicKey());
+			SENDER.getAddress().getPublicKey());
 	private static final org.nem.nis.dbmodel.Account DB_RECIPIENT1 = new org.nem.nis.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
 	private static final org.nem.nis.dbmodel.Account DB_RECIPIENT2 = new org.nem.nis.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
 	private static final SystemTimeProvider time = new SystemTimeProvider();
@@ -292,7 +292,7 @@ public class BlockChainTest {
 	}
 
 	private org.nem.nis.dbmodel.Account retrieveAccount(final long i, final Account signer) {
-		final org.nem.nis.dbmodel.Account ret = new org.nem.nis.dbmodel.Account(signer.getAddress().getEncoded(), signer.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account ret = new org.nem.nis.dbmodel.Account(signer.getAddress().getEncoded(), signer.getAddress().getPublicKey());
 		ret.setId(i);
 		return ret;
 	}

@@ -85,7 +85,7 @@ public class AccountCacheTest {
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cachedAccount2.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
 		Assert.assertThat(cachedAccount2, IsSame.sameInstance(cachedAccount1)); // the public key is updated in place
-		Assert.assertThat(cachedAccount2.getKeyPair().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(cachedAccount2.getAddress().getPublicKey(), IsNull.notNullValue());
 	}
 
 	//endregion
@@ -208,7 +208,7 @@ public class AccountCacheTest {
 		// Assert:
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
 		Assert.assertThat(foundAccount, IsSame.sameInstance(cachedAccount1)); // the public key is updated in place
-		Assert.assertThat(foundAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsNull.notNullValue());
 	}
 
 	//endregion
