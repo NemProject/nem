@@ -44,7 +44,7 @@ public class BlockValidatorFactory {
 		visitor.accept(new EligibleSignerBlockValidator(nisCache.getPoiFacade()));
 		visitor.accept(new MaxTransactionsBlockValidator());
 		visitor.accept(new NoSelfSignedTransactionsBlockValidator(nisCache.getPoiFacade()));
-		visitor.accept(new BlockImportanceTransferValidator(nisCache.getPoiFacade()));
+		visitor.accept(new BlockImportanceTransferValidator());
 		visitor.accept(new BlockImportanceTransferBalanceValidator());
 		visitor.accept(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
 	}
