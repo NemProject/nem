@@ -16,6 +16,7 @@ public class BlockImportanceTransferValidator implements BlockValidator {
 	/**
 	 * Creates an observer.
 	 *
+	 * TODO (IA) 20141210 - add test for this! - move to test? pass in the debit predicate instead!
 	 * @param poiFacade The poi facade.
 	 */
 	public BlockImportanceTransferValidator(final PoiFacade poiFacade) {

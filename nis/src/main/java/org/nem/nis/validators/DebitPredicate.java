@@ -24,4 +24,11 @@ public interface DebitPredicate {
 	 * TODO (IA) 20141210 - add test for this! - move to test?
 	 */
 	public static DebitPredicate True = (account, amount) -> true;
+
+	/**
+	 * A debit predicate that always returns false.
+	 *
+	 * TODO (IA) 20141210 - add test for this! - move to test?
+	 */
+	public static DebitPredicate False = (account, amount) -> false;
 }

@@ -22,7 +22,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(ArrayList::new);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction);
+		final ValidationResult result = validate(validator, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -38,7 +38,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction);
+		final ValidationResult result = validate(validator, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -57,7 +57,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction);
+		final ValidationResult result = validate(validator, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -94,7 +94,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
-		final ValidationResult result = validator.validate(transaction);
+		final ValidationResult result = validate(validator, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
@@ -112,7 +112,7 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> transactions);
 
 		// Act:
-		final ValidationResult result = validator.validate(new MockTransaction(signer, 2));
+		final ValidationResult result = validate(validator, new MockTransaction(signer, 2));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -122,5 +122,9 @@ public class NonConflictingImportanceTransferTransactionValidatorTest {
 
 	private static Transaction createImportanceTransferTransaction(final Account signer, final Account remote) {
 		return new ImportanceTransferTransaction(TimeInstant.ZERO, signer, ImportanceTransferTransaction.Mode.Activate, remote);
+	}
+
+	private static ValidationResult validate(final SingleTransactionValidator validator, final Transaction transaction) {
+		return validator.validate(transaction, new ValidationContext(DebitPredicate.True));
 	}
 }

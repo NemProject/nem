@@ -208,6 +208,16 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 		};
 	}
 
+	//private void assertDefaultDebitPredicateBehavior(final DebitPredicate debitPredicate) {
+	//	// Arrange:
+	//	final Account account = Utils.generateRandomAccount(Amount.fromNem(10));
+	//
+	//	// Assert:
+	//	Assert.assertThat(debitPredicate.canDebit(account, Amount.fromNem(9)), IsEqual.equalTo(true));
+	//	Assert.assertThat(debitPredicate.canDebit(account, Amount.fromNem(10)), IsEqual.equalTo(true));
+	//	Assert.assertThat(debitPredicate.canDebit(account, Amount.fromNem(11)), IsEqual.equalTo(false));
+	//}
+
 	/**
 	 * Creates a copy of this repository.
 	 *
