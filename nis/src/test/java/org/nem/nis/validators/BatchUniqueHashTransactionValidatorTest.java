@@ -88,7 +88,10 @@ public class BatchUniqueHashTransactionValidatorTest {
 		}
 
 		private TransactionsContextPair createPair(final int start, final int end, final long height) {
-			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight);
+			final ValidationContext validationContext = new ValidationContext(
+					new BlockHeight(height),
+					this.confirmedBlockHeight,
+					DebitPredicate.True);
 			final List<Transaction> transactions = new ArrayList<>();
 			for (int i = start; i <= end; ++i) {
 				transactions.add(this.transactions.get(i));

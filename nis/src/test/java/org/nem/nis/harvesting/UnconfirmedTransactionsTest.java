@@ -1083,7 +1083,6 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {
-			Mockito.when(this.singleValidator.validate(Mockito.any())).thenReturn(result);
 			Mockito.when(this.singleValidator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
 		}
 

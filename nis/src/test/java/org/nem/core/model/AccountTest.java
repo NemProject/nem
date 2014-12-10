@@ -24,9 +24,6 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
 	@Test
@@ -38,9 +35,6 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getLabel(), IsNull.nullValue());
 	}
 
 	@Test
@@ -54,23 +48,6 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
 		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getLabel(), IsNull.nullValue());
-	}
-
-	@Test
-	public void accountCanBeCreatedAroundAccountInformation() {
-		// Arrange:
-		final Address expectedAccountId = Utils.generateRandomAddressWithPublicKey();
-		final Account account = new Account(expectedAccountId, Amount.fromNem(124), new BlockAmount(4), "blah");
-
-		// Assert:
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(124)));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo("blah"));
 	}
 
 	//endregion
@@ -114,154 +91,6 @@ public class AccountTest {
 		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(true));
 		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
-	}
-
-	//endregion
-
-	//region Label
-
-	@Test
-	public void labelCanBeSet() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.setLabel("Beta Gamma");
-
-		// Assert:
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo("Beta Gamma"));
-	}
-
-	//endregion
-
-	//region Balance
-
-	@Test
-	public void balanceCanBeIncremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementBalance(new Amount(7));
-
-		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(7)));
-	}
-
-	@Test
-	public void balanceCanBeDecremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementBalance(new Amount(100));
-		account.decrementBalance(new Amount(12));
-
-		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(88)));
-	}
-
-	@Test
-	public void balanceCanBeIncrementedAndDecrementedMultipleTimes() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementBalance(new Amount(100));
-		account.decrementBalance(new Amount(12));
-		account.incrementBalance(new Amount(22));
-		account.decrementBalance(new Amount(25));
-
-		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(85)));
-	}
-
-	//endregion
-
-	//region refCount
-
-	@Test
-	public void referenceCountIsZeroForNewAccount() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Assert:
-		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
-	}
-
-	@Test
-	public void referenceCountCanBeIncremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		final ReferenceCount result = account.incrementReferenceCount();
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(1)));
-		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(1)));
-	}
-
-	@Test
-	public void referenceCountCanBeDecremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		account.incrementReferenceCount();
-
-		// Act:
-		final ReferenceCount result = account.decrementReferenceCount();
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(0)));
-		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
-	}
-
-	//endregion
-
-	//region foraged blocks
-
-	@Test
-	public void foragedBlocksCanBeIncremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-
-		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
-	}
-
-	@Test
-	public void foragedBlocksCanBeDecremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.decrementForagedBlocks();
-
-		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(1)));
-	}
-
-	@Test
-	public void foragedBlocksCanBeIncrementedAndDecrementedMultipleTimes() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.decrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.decrementForagedBlocks();
-
-		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
 	//endregion
@@ -485,9 +314,6 @@ public class AccountTest {
 	}
 
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
-		// Arrange:
-		setAccountValuesForCopyTests(account);
-
 		// Act:
 		final Account copyAccount = account.copy();
 
@@ -495,22 +321,7 @@ public class AccountTest {
 		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(account.getAddress()));
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
 		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
-
-		Assert.assertThat(copyAccount.getBalance(), IsEqual.equalTo(new Amount(1000)));
-		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
-		Assert.assertThat(copyAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 		return copyAccount;
-	}
-
-	private static void setAccountValuesForCopyTests(final Account account) {
-		account.incrementBalance(new Amount(1000));
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.setLabel("Alpha Sigma");
-		account.incrementReferenceCount();
-		account.incrementReferenceCount();
 	}
 
 	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
@@ -530,7 +341,6 @@ public class AccountTest {
 	public void canCreateShallowCopyWithNewKeyPair() {
 		// Arrange:
 		final Account original = new Account(Utils.generateRandomAddress());
-		setAccountValuesForCopyTests(original);
 		final KeyPair keyPair = new KeyPair();
 
 		// Act:
@@ -539,15 +349,6 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
 		assertKeyPairsAreEquivalent(copy.getKeyPair(), keyPair);
-		assertShallowCopy(original, copy);
-	}
-
-	private static void assertShallowCopy(final Account original, final Account copy) {
-		// Assert:
-		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(original.getBalance()));
-		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
-		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
-		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(original.getReferenceCount()));
 	}
 
 	//endregion

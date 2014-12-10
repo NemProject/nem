@@ -13,7 +13,7 @@ import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.*;
@@ -103,14 +103,15 @@ public class BlockChainTest {
 	}
 
 	private static void setBalance(final Account account, final Amount amount, final AccountCache accountCache, final PoiFacade poiFacade) {
-		account.incrementBalance(amount);
-		final Account cachedAccount = accountCache.addAccountToCache(account.getAddress());
+		final AccountInfo accountInfo = poiFacade.findStateByAddress(account.getAddress()).getAccountInfo();
+		accountInfo.incrementBalance(amount);
+		accountCache.addAccountToCache(account.getAddress());
 
 		// since we are assuming that the forager has a balance at block parent, it seems reasonable to assume that
 		// it has been added to the cache before and has a non-zero reference count
-		cachedAccount.incrementReferenceCount();
+		accountInfo.incrementReferenceCount();
 
-		cachedAccount.incrementBalance(amount);
+		accountInfo.incrementBalance(amount);
 		poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, amount);
 	}
 
@@ -182,9 +183,9 @@ public class BlockChainTest {
 		// TODO: add all sorts of different checks
 		Assert.assertTrue(result == ValidationResult.SUCCESS);
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
-		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
-		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(290)));
+		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(290)));
 
 		// siblings with same score must be rejected
 		// Act:
@@ -269,9 +270,9 @@ public class BlockChainTest {
 		// TODO: add all sorts of different checks
 		Assert.assertTrue(result == ValidationResult.SUCCESS);
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
-		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
-		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(290)));
+		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(290)));
 
 		// siblings with same score must be rejected
 		// Act:
@@ -281,9 +282,13 @@ public class BlockChainTest {
 
 		// Assert:
 		transaction = (TransferTransaction)savedBlock2.getTransactions().get(0);
-		Assert.assertThat(transaction.getRecipient().getBalance(), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		Assert.assertTrue(nisCache.getAccountCache().isKnownAddress(transaction.getRecipient().getAddress()));
 		Assert.assertTrue(siblingResult == ValidationResult.SUCCESS);
+	}
+
+	private static Amount getRecipientBalance(final PoiFacade poiFacade, final TransferTransaction transferTransaction) {
+		return poiFacade.findStateByAddress(transferTransaction.getRecipient().getAddress()).getAccountInfo().getBalance();
 	}
 
 	private org.nem.nis.dbmodel.Account retrieveAccount(final long i, final Account signer) {

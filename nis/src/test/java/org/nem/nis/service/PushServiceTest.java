@@ -366,12 +366,6 @@ public class PushServiceTest {
 
 	//endregion
 
-	private static SingleTransactionValidator createValidatorWithResult(final ValidationResult result) {
-		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any(Transaction.class))).thenReturn(result);
-		return validator;
-	}
-
 	private static class TestContext {
 		private final NodeIdentity remoteNodeIdentity;
 		private final Node remoteNode;

@@ -2,45 +2,40 @@ package org.nem.nis.secret;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.nem.core.model.Account;
+import org.mockito.Mockito;
+import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 
 public class HarvestRewardCommitObserverTest {
-	private static final BlockTransactionObserver OBSERVER = new HarvestRewardCommitObserver();
 
 	//region execute
 
 	@Test
-	public void harvestRewardExecuteIncrementsForagedBlocks() {
+	public void harvestRewardExecuteIncrementsHarvestedBlocks() {
 		// Arrange:
-		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final TestContext context = new TestContext(Amount.fromNem(100), 3);
 
 		// Act:
-		notifyHarvestRewardExecute(account);
+		context.notifyHarvestRewardExecute();
 
 		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
+		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
 	}
 
 	@Test
 	public void harvestRewardExecuteDoesNotChangeBalance() {
 		// Arrange:
-		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final TestContext context = new TestContext(Amount.fromNem(100), 3);
 
 		// Act:
-		notifyHarvestRewardExecute(account);
+		context.notifyHarvestRewardExecute();
 
 		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-	}
-
-	private static void notifyHarvestRewardExecute(final Account account) {
-		OBSERVER.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
-				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
+		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	//endregion
@@ -48,35 +43,28 @@ public class HarvestRewardCommitObserverTest {
 	//region undo
 
 	@Test
-	public void harvestRewardUndoDecrementsForagedBlocks() {
+	public void harvestRewardUndoDecrementsHarvestedBlocks() {
 		// Arrange:
-		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final TestContext context = new TestContext(Amount.fromNem(100), 3);
 
 		// Act:
-		notifyHarvestRewardUndo(account);
+		context.notifyHarvestRewardUndo();
 
 		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
 	}
 
 	@Test
 	public void harvestRewardUndoDoesNotChangeBalance() {
 		// Arrange:
-		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final TestContext context = new TestContext(Amount.fromNem(100), 3);
 
 		// Act:
-		notifyHarvestRewardUndo(account);
+		context.notifyHarvestRewardUndo();
 
 		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
-
-	private static void notifyHarvestRewardUndo(final Account account) {
-		OBSERVER.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.fromNem(22)),
-				NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
-	}
-
 	//endregion
 
 	//region other types
@@ -84,27 +72,48 @@ public class HarvestRewardCommitObserverTest {
 	@Test
 	public void otherNotificationTypesAreIgnored() {
 		// Arrange:
-		final Account account = createAccountWithBalanceAndBlocks(Amount.fromNem(100), 3);
+		final TestContext context = new TestContext(Amount.fromNem(100), 3);
 
 		// Act:
-		OBSERVER.notify(
-				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, account, Amount.fromNem(22)),
+		context.observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account, Amount.fromNem(22)),
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		Assert.assertThat(context.accountInfo.getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+		Assert.assertThat(context.accountInfo.getHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 	}
 
 	//endregion
 
-	private static Account createAccountWithBalanceAndBlocks(final Amount balance, final int numHarvestedBlocks) {
-		final Account account = Utils.generateRandomAccount();
-		account.incrementBalance(balance);
-		for (int i = 0; i < numHarvestedBlocks; ++i) {
-			account.incrementForagedBlocks();
+	private static class TestContext {
+		private final Address address = Utils.generateRandomAddress();
+		private final Account account = new Account(this.address);
+		private final AccountInfo accountInfo = new AccountInfo();
+		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final HarvestRewardCommitObserver observer = new HarvestRewardCommitObserver(this.poiFacade);
+
+		public TestContext(final Amount amount, final int numHarvestedBlocks) {
+			this.accountInfo.incrementBalance(amount);
+			for (int i = 0; i < numHarvestedBlocks; ++i) {
+				this.accountInfo.incrementHarvestedBlocks();
+			}
+
+			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			Mockito.when(accountState.getAccountInfo()).thenReturn(this.accountInfo);
+			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(accountState);
 		}
 
-		return account;
+		private void notifyHarvestRewardExecute() {
+			this.observer.notify(
+					new BalanceAdjustmentNotification(NotificationType.HarvestReward, this.account, Amount.fromNem(22)),
+					NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
+		}
+
+		public void notifyHarvestRewardUndo() {
+			this.observer.notify(
+					new BalanceAdjustmentNotification(NotificationType.HarvestReward, this.account, Amount.fromNem(22)),
+					NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
+		}
 	}
 }

@@ -140,17 +140,6 @@ public class AccountInfoFactoryTest {
 
 	//endregion
 
-	private static Account createAccount(final Address address) {
-		// Arrange:
-		final Account account = new Account(address);
-		account.setLabel("alpha gamma");
-		account.incrementBalance(new Amount(747));
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		return account;
-	}
-
 	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance) {
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
@@ -162,7 +151,7 @@ public class AccountInfoFactoryTest {
 
 	private static class TestContext {
 		private final Address address = Utils.generateRandomAddressWithPublicKey();
-		private final Account account = createAccount(this.address);
+		private final Account account = new Account(this.address);
 		private final PoiAccountState accountState = new PoiAccountState(this.address);
 
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
@@ -170,6 +159,13 @@ public class AccountInfoFactoryTest {
 		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.poiFacade);
 
 		private TestContext() {
+			final org.nem.nis.poi.AccountInfo accountInfo = this.accountState.getAccountInfo();
+			accountInfo.setLabel("alpha gamma");
+			accountInfo.incrementBalance(new Amount(747));
+			accountInfo.incrementHarvestedBlocks();
+			accountInfo.incrementHarvestedBlocks();
+			accountInfo.incrementHarvestedBlocks();
+
 			Mockito.when(this.accountLookup.findByAddress(this.address)).thenReturn(this.account);
 			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(this.accountState);
 		}
