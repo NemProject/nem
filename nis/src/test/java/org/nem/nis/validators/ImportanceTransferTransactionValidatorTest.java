@@ -9,6 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.poi.*;
+import org.nem.nis.remote.RemoteLink;
 import org.nem.nis.test.DebitPredicates;
 
 public class ImportanceTransferTransactionValidatorTest {
@@ -69,7 +70,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
-		final ValidationResult result = context.validate(transaction);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE));

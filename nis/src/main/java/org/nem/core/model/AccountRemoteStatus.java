@@ -38,15 +38,20 @@ public enum AccountRemoteStatus {
 		this.status = status;
 	}
 
+	/**
+	 * Creates a new AccountRemoteStatus given a string representation.
+	 *
+	 * @param status The string representation.
+	 * @return The account remote status.
+	 */
 	public static AccountRemoteStatus fromString(final String status) {
-		if (status != null) {
-			for (final AccountRemoteStatus accountStatus : values()) {
-				if (accountStatus.status.equals(status)) {
-					return accountStatus;
-				}
+		for (final AccountRemoteStatus accountStatus : values()) {
+			if (accountStatus.status.equals(status)) {
+				return accountStatus;
 			}
 		}
-		throw new IllegalArgumentException("Invalid account status: " + status);
+
+		throw new IllegalArgumentException(String.format("Invalid account status: %s", status));
 	}
 
 	//region inline serialization

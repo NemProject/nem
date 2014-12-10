@@ -4,13 +4,17 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
+
+import java.util.Arrays;
 
 public class AccountRemoteStatusTest {
-	//region construction
+
+	//region fromString
 
 	@Test
 	public void accountRemoteStatusCanBeCreatedFromCorrectStatusString() {
+		// Assert:
 		for (final AccountRemoteStatus accountRemoteStatus : AccountRemoteStatus.values()) {
 			assertCanCreate(accountRemoteStatus.toString(), accountRemoteStatus);
 		}
@@ -24,10 +28,12 @@ public class AccountRemoteStatusTest {
 		Assert.assertThat(status, IsEqual.equalTo(accountRemoteStatus));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void accountRemoteStatusCannotBeCreatedFromIncorrectStatusString() {
-		// Arrange:
-		AccountRemoteStatus.fromString("TEST");
+		// Act:
+		for (final String str : Arrays.asList(null, "TEST")) {
+			ExceptionAssert.assertThrows(v -> AccountRemoteStatus.fromString(str), IllegalArgumentException.class);
+		}
 	}
 
 	//endregion

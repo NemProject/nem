@@ -32,6 +32,9 @@ public class TransactionFactory {
 
 			case TransactionTypes.IMPORTANCE_TRANSFER:
 				return new ImportanceTransferTransaction(options, deserializer);
+
+			case TransactionTypes.MULTISIG_SIGNER_MODIFY:
+				return new MultisigSignerModificationTransaction(options, deserializer);
 		}
 
 		throw new IllegalArgumentException("Unknown transaction type: " + type);

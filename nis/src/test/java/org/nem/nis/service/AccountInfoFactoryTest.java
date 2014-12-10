@@ -169,13 +169,5 @@ public class AccountInfoFactoryTest {
 			Mockito.when(this.accountLookup.findByAddress(this.address)).thenReturn(this.account);
 			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(this.accountState);
 		}
-
-		public void createRemoteHarvesterLink(final int mode) {
-			this.accountState.getRemoteLinks().addLink(new RemoteLink(this.address, BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
-		}
-
-		public void createHarvestingLink(final int mode) {
-			this.accountState.getRemoteLinks().addLink(new RemoteLink(this.address, BlockHeight.ONE, mode, RemoteLink.Owner.HarvestingRemotely));
-		}
 	}
 }
