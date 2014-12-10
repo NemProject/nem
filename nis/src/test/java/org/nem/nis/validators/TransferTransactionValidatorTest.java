@@ -15,13 +15,13 @@ public class TransferTransactionValidatorTest {
 	//region predicate delegation
 
 	@Test
-	public void validatorDelegatesToDebitPredicateAndUsesResultWhenDebitPredicateSucceeds() {
+	public void validatorDelegatesToDebitPredicateWithFeeAndAmountAndUsesResultWhenDebitPredicateSucceeds() {
 		// Assert:
 		this.assertDebitPredicateDelegation(true, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void validatorDelegatesToDebitPredicateAndUsesResultWhenDebitPredicateFails() {
+	public void validatorDelegatesToDebitPredicateWithFeeAndAmountAndUsesResultWhenDebitPredicateFails() {
 		// Assert:
 		this.assertDebitPredicateDelegation(false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}

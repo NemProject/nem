@@ -61,13 +61,13 @@ public class UniversalTransactionValidatorTest {
 	}
 
 	@Test
-	public void validatorDelegatesToDebitPredicateAndUsesResultWhenDebitPredicateSucceeds() {
+	public void validatorDelegatesToDebitPredicateWithFeeAndUsesResultWhenDebitPredicateSucceeds() {
 		// Assert:
 		assertDebitPredicateDelegation(true, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void validatorDelegatesToDebitPredicateAndUsesResultWhenDebitPredicateFails() {
+	public void validatorDelegatesToDebitPredicateWithFeeAndUsesResultWhenDebitPredicateFails() {
 		// Assert:
 		assertDebitPredicateDelegation(false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
