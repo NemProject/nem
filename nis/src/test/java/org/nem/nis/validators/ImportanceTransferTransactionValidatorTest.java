@@ -70,7 +70,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
+		final ValidationResult result = context.validate(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE));
