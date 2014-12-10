@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.crypto.Signature;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
@@ -105,11 +105,10 @@ public class TransactionControllerTest {
 		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any()))
 				.thenReturn(validationResult);
 
-		final Account account = Utils.generateRandomAccount();
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
 		final Transaction transaction = createTransactionWithSender(account);
-		final RequestPrepareAnnounce request = new RequestPrepareAnnounce(
-				transaction,
-				account.getKeyPair().getPrivateKey());
+		final RequestPrepareAnnounce request = new RequestPrepareAnnounce(transaction, keyPair.getPrivateKey());
 
 		// Act:
 		final NemRequestResult result = context.controller.transactionPrepareAnnounce(request);

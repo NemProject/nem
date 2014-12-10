@@ -2,7 +2,7 @@ package org.nem.core.messages;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Cipher;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
@@ -45,13 +45,16 @@ public class SecureMessageTest {
 	@Test
 	public void canCreateMessageAroundEncodedPayload() {
 		// Act:
-		final Account sender = Utils.generateRandomAccount();
-		final Account recipient = Utils.generateRandomAccount();
+		final KeyPair senderKeyPair = new KeyPair();
+		final KeyPair recipientKeyPair = new KeyPair();
 		final byte[] decodedBytes = new byte[] { 12, 46, 7, 43, 22, 15 };
-		final Cipher cipher = new Cipher(sender.getKeyPair(), recipient.getKeyPair());
+		final Cipher cipher = new Cipher(senderKeyPair, recipientKeyPair);
 		final byte[] encodedBytes = cipher.encrypt(decodedBytes);
 
-		final SecureMessage message = SecureMessage.fromEncodedPayload(sender, recipient, encodedBytes);
+		final SecureMessage message = SecureMessage.fromEncodedPayload(
+				new Account(senderKeyPair),
+				new Account(recipientKeyPair),
+				encodedBytes);
 
 		// Assert:
 		Assert.assertThat(message.getType(), IsEqual.equalTo(MessageTypes.SECURE));

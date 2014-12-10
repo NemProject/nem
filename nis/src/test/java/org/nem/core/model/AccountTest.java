@@ -21,8 +21,10 @@ public class AccountTest {
 		final Account account = new Account(kp);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -32,8 +34,10 @@ public class AccountTest {
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsNull.nullValue());
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -44,9 +48,10 @@ public class AccountTest {
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -88,8 +93,7 @@ public class AccountTest {
 
 		// Assert:
 		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	//endregion
@@ -283,7 +287,8 @@ public class AccountTest {
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
 		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(copyAccount.getKeyPair(), IsNull.nullValue());
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -295,7 +300,8 @@ public class AccountTest {
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
 		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.nullValue());
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -307,7 +313,8 @@ public class AccountTest {
 		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
 		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
@@ -317,17 +324,9 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(account.getAddress()));
 		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
-		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
+		Assert.assertThat(copyAccount.hasPublicKey(), IsEqual.equalTo(account.hasPublicKey()));
+		Assert.assertThat(copyAccount.hasPrivateKey(), IsEqual.equalTo(account.hasPrivateKey()));
 		return copyAccount;
-	}
-
-	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
-		if (null == actual || null == expected) {
-			Assert.assertThat(actual, IsEqual.equalTo(expected));
-		} else {
-			Assert.assertThat(actual.getPublicKey(), IsEqual.equalTo(expected.getPublicKey()));
-			Assert.assertThat(actual.getPrivateKey(), IsEqual.equalTo(expected.getPrivateKey()));
-		}
 	}
 
 	//endregion
@@ -337,15 +336,16 @@ public class AccountTest {
 	@Test
 	public void canCreateShallowCopyWithNewKeyPair() {
 		// Arrange:
-		final Account original = new Account(Utils.generateRandomAddress());
+		final Account account = new Account(Utils.generateRandomAddress());
 		final KeyPair keyPair = new KeyPair();
 
 		// Act:
-		final Account copy = original.shallowCopyWithKeyPair(keyPair);
+		final Account copyAccount = account.shallowCopyWithKeyPair(keyPair);
 
 		// Assert:
-		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
-		assertKeyPairsAreEquivalent(copy.getKeyPair(), keyPair);
+		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
+		Assert.assertThat(copyAccount.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(copyAccount.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	//endregion

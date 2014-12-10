@@ -50,12 +50,13 @@ public class AccountControllerTest {
 	@Test
 	public void unlockDelegatesToUnlockedAccounts() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
 		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
 		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
-		context.controller.accountUnlock(account.getKeyPair().getPrivateKey());
+		context.controller.accountUnlock(keyPair.getPrivateKey());
 
 		// Assert:
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).addUnlockedAccount(Mockito.any());
@@ -64,13 +65,14 @@ public class AccountControllerTest {
 	@Test
 	public void unlockFailureRaisesException() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
 		final TestContext context = createContextAroundAccount(account, Amount.ZERO);
 		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.FAILURE_UNKNOWN_ACCOUNT);
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> context.controller.accountUnlock(account.getKeyPair().getPrivateKey()),
+				v -> context.controller.accountUnlock(keyPair.getPrivateKey()),
 				IllegalArgumentException.class);
 	}
 
@@ -81,14 +83,14 @@ public class AccountControllerTest {
 	@Test
 	public void lockDelegatesToUnlockedAccounts() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
 		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
-		final PrivateKey privateKey = new PrivateKey(account.getKeyPair().getPrivateKey().getRaw());
 		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
-		context.controller.accountUnlock(account.getKeyPair().getPrivateKey());
-		context.controller.accountLock(privateKey);
+		context.controller.accountUnlock(keyPair.getPrivateKey());
+		context.controller.accountLock(keyPair.getPrivateKey());
 
 		// Assert:
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).removeUnlockedAccount(Mockito.any());

@@ -50,7 +50,7 @@ public class Account {
 		}
 
 		// only update the public key if it is not already set
-		if (null != this.getKeyPair()) {
+		if (null != this.keyPair) {
 			return;
 		}
 
@@ -70,7 +70,7 @@ public class Account {
 	}
 
 	private Account(final Account rhs) {
-		this.keyPair = rhs.getKeyPair();
+		this.keyPair = rhs.keyPair;
 		this.address = rhs.getAddress();
 	}
 
@@ -96,15 +96,6 @@ public class Account {
 	 */
 	public Account shallowCopyWithKeyPair(final KeyPair keyPair) {
 		return new Account(this, keyPair);
-	}
-
-	/**
-	 * Gets the account's key pair.
-	 *
-	 * @return This account's key pair.
-	 */
-	public KeyPair getKeyPair() {
-		return this.keyPair;
 	}
 
 	/**
@@ -188,4 +179,30 @@ public class Account {
 	}
 
 	//endregion
+
+	public Signer createSigner() {
+		if (!this.hasPublicKey()) {
+			throw new IllegalArgumentException("in order to create a signer, an account must have a public key");
+		}
+
+		return new Signer(this.keyPair);
+	}
+
+	public Cipher createCipher(final Account other, boolean encrypt) {
+		if (!this.hasPrivateKey() && !other.hasPrivateKey()) {
+			throw new IllegalArgumentException("in order to create a cipher, at least one account must have a private key");
+		}
+
+		return this.hasPrivateKey() && !encrypt
+				? new Cipher(other.keyPair, this.keyPair)
+				: new Cipher(this.keyPair, other.keyPair);
+	}
+
+	public boolean hasPrivateKey() {
+		return null != this.keyPair && this.keyPair.hasPrivateKey();
+	}
+
+	public boolean hasPublicKey() {
+		return null != this.keyPair;
+	}
 }

@@ -42,7 +42,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @param signer The entity signer.
 	 */
 	public VerifiableEntity(final int type, final int version, final TimeInstant timeStamp, final Account signer) {
-		if (null == signer.getKeyPair()) {
+		if (!signer.hasPublicKey()) {
 			throw new IllegalArgumentException("signer key pair is required to create a verifiable entity ");
 		}
 
@@ -172,7 +172,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @param account The account to use for signing.
 	 */
 	public void signBy(final Account account) {
-		if (!account.getKeyPair().hasPrivateKey()) {
+		if (!account.hasPrivateKey()) {
 			throw new IllegalArgumentException("cannot sign because signer does not have private key");
 		}
 
@@ -180,7 +180,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		final byte[] transactionBytes = this.getBytes();
 
 		// (2) sign the buffer
-		final Signer signer = new Signer(account.getKeyPair());
+		final Signer signer = account.createSigner();
 		this.signature = signer.sign(transactionBytes);
 	}
 
@@ -194,7 +194,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 			throw new CryptoException("cannot verify because signature does not exist");
 		}
 
-		final Signer signer = new Signer(this.signer.getKeyPair());
+		final Signer signer = this.signer.createSigner();
 		return signer.verify(this.getBytes(), this.signature);
 	}
 
