@@ -80,7 +80,7 @@ public class NodeEndpoint implements SerializableEntity {
 			final InetAddress address = InetAddress.getByName(host);
 			return address.getHostAddress();
 		} catch (final UnknownHostException e) {
-			throw new IllegalArgumentException("host is unknown", e);
+			throw new InvalidNodeEndpointException("host is unknown", e);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class NodeEndpoint implements SerializableEntity {
 		try {
 			return new URL(this.protocol, this.host, this.port, "/");
 		} catch (final MalformedURLException e) {
-			throw new IllegalArgumentException("url is malformed", e);
+			throw new InvalidNodeEndpointException("url is malformed", e);
 		}
 	}
 

@@ -33,10 +33,10 @@ public class BlockValidatorFactory {
 	}
 
 	/**
-	 * Visits all sub validators that comprise the returned aggregate validator.
+	 * Visits all sub validators that comprise the validator returned by create.
 	 *
-	 * @param nisCache The NIS cache.
 	 * @param visitor The visitor.
+	 * @param nisCache The NIS cache.
 	 */
 	public void visitSubValidators(final Consumer<BlockValidator> visitor, final NisCache nisCache) {
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));

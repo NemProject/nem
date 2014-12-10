@@ -1,4 +1,3 @@
-// TODO: J - review!
 package org.nem.nis.dao;
 
 import org.hamcrest.core.*;
@@ -161,18 +160,10 @@ public class TransferDaoTest {
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 
-	@Test(expected = MissingResourceException.class)
 	public void getTransactionsForAccountUsingHashThrowsWhenHashNotFound() {
 		// Arrange:
 		this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_HASH);
 	}
-
-	// TODO-CR: tests like this with a lot of setup can be hard to follow (i know i don't always follow this rule,
-	// but it might be consider commenting what this utility function does)
-
-	// TODO-CR: consider refactoring the three following tests; for these tests, it's probably best to have
-	// one test for each entity group (e.g. getTransactionsForAccountUsingHashStrategyIncoming could be split up into three tests - from start, from hash, from end)
-	// TODO 20141205 BR -> J: better?
 
 	@Test
 	public void getTransactionsForAccountUsingHashReturnsCorrectTransfersWhenQueryingIncomingTransfersFromStart() {
@@ -258,6 +249,12 @@ public class TransferDaoTest {
 		this.assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(USE_HASH);
 	}
 
+	@Test
+	public void getTransactionsForAccountUsingHashThrowsIfSenderIsUnknown() {
+		// Assert:
+		this.assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(USE_HASH);
+	}
+
 	// endregion
 
 	// region getTransactionsForAccountUsingId
@@ -279,11 +276,9 @@ public class TransferDaoTest {
 	}
 
 	@Test
-	public void getTransactionsForAccountUsingIdThrowsWhenHashNotFound() {
+	public void getTransactionsForAccountUsingIdThrowsWhenIdNotFound() {
 		// Arrange:
-		ExceptionAssert.assertThrows(
-				v -> this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID),
-				MissingResourceException.class);
+		this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID);
 	}
 
 	@Test
@@ -368,6 +363,12 @@ public class TransferDaoTest {
 	public void getTransactionsForAccountUsingIdFiltersDuplicatesIfTransferTypeIsAll() {
 		// Assert:
 		this.assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(USE_ID);
+	}
+
+	@Test
+	public void getTransactionsForAccountUsingIdThrowsIfSenderIsUnknown() {
+		// Assert:
+		this.assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(USE_ID);
 	}
 
 	// endregion
@@ -515,13 +516,15 @@ public class TransferDaoTest {
 	}
 
 	public void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
-		this.executeGetTransactionsForAccountUsingAttribute(
-				Utils.generateRandomAccount(),
-				Utils.generateRandomHash(),
-				new SecureRandom().nextLong(),
-				BlockHeight.ONE,
-				ReadOnlyTransferDao.TransferType.INCOMING,
-				callType);
+		ExceptionAssert.assertThrows(
+				v -> this.executeGetTransactionsForAccountUsingAttribute(
+						Utils.generateRandomAccount(),
+						Utils.generateRandomHash(),
+						new SecureRandom().nextLong(),
+						BlockHeight.ONE,
+						ReadOnlyTransferDao.TransferType.INCOMING,
+						callType),
+				MissingResourceException.class);
 	}
 
 	public void assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(final int type) {
@@ -567,6 +570,26 @@ public class TransferDaoTest {
 
 		// Assert:
 		Assert.assertThat(entities.size(), equalTo(1));
+	}
+
+	public void assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(final int type) {
+		// Arrange:
+		final Account sender = Utils.generateRandomAccount();
+		final long heights[] = { 3, 4, 1, 2 };
+		final int blockTimestamp[] = { 1801, 1901, 1401, 1501 };
+		final int txTimestamps[][] = { { 1800, 1600 }, { 1900, 1700, 1700 }, { 1200, 1400 }, { 1300, 1500 } };
+		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> this.executeGetTransactionsForAccountUsingAttribute(
+						Utils.generateRandomAccount(),
+						null,
+						null,
+						BlockHeight.ONE,
+						ReadOnlyTransferDao.TransferType.ALL,
+						type),
+				MissingResourceException.class);
 	}
 
 	private Collection<TransferBlockPair> executeGetTransactionsForAccountUsingAttribute(
@@ -752,8 +775,7 @@ public class TransferDaoTest {
 		this.saveThreeBlocksWithTransactionsInDatabase(3);
 		final Collection<Hash> hashes = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
-			// TODO 20141029 BR -> all: why does Utils.generateRandomHash() create a 64 byte hash?
-			hashes.add(new Hash(Utils.generateRandomBytes(32)));
+			hashes.add(Utils.generateRandomHash());
 		}
 
 		// Act: second parameter is maximum block height

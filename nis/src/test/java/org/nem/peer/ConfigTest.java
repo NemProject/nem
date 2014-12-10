@@ -12,7 +12,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigTest {
-
 	private static final String DEFAULT_LOCAL_NODE_HOST = ConfigFactory.DEFAULT_LOCAL_NODE_HOST;
 
 	@Test
@@ -103,6 +102,26 @@ public class ConfigTest {
 		// Assert:
 		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(0));
 		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void wellKnownPeersOmitUnresolvableHosts() {
+		// Arrange:
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
+		final String[] expectedWellKnownHosts = new String[] { "10.0.0.1" };
+		final JSONObject peersConfig = ConfigFactory.createPeersConfigWithUnresolvableHost(expectedWellKnownHosts);
+		final Config config = new Config(localNode, peersConfig, "2.0.0");
+
+		// Act:
+		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
+		final List<String> wellKnownPeers = preTrustedNodes.getNodes().stream()
+				.map(node -> node.getEndpoint().getBaseUrl().getHost())
+				.collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(preTrustedNodes.getSize(), IsEqual.equalTo(1));
+		Assert.assertThat(wellKnownPeers.size(), IsEqual.equalTo(1));
+		Assert.assertThat(wellKnownPeers, IsEquivalent.equivalentTo(expectedWellKnownHosts));
 	}
 
 	@Test
