@@ -203,8 +203,6 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
-		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
-		accountInfo.incrementReferenceCount();
 
 		// Act:
 		context.observer.notify(

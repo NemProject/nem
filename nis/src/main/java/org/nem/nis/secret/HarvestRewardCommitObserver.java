@@ -27,7 +27,7 @@ public class HarvestRewardCommitObserver implements BlockTransactionObserver {
 		this.notify((BalanceAdjustmentNotification)notification, context);
 	}
 
-	public void notify(final BalanceAdjustmentNotification notification, final BlockNotificationContext context) {
+	private void notify(final BalanceAdjustmentNotification notification, final BlockNotificationContext context) {
 		final AccountInfo accountInfo = this.poiFacade.findStateByAddress(notification.getAccount().getAddress()).getAccountInfo();
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			accountInfo.incrementHarvestedBlocks();

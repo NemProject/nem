@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class BlockExplorerMapperTest {
 	private static final BlockExplorerMapper MAPPER = new BlockExplorerMapper();
+	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";
 
 	@Test
 	public void canMapBlockToExplorerBlockViewModelWithoutTransactions() {
@@ -29,7 +30,7 @@ public class BlockExplorerMapperTest {
 
 	private static void assertCorrectSerialization(final int... transferTypes) {
 		// Arrange:
-		final Address address = Address.fromPublicKey(PublicKey.fromHexString("88888888999999997777777744444444"));
+		final Address address = Address.fromPublicKey(PublicKey.fromHexString(PUBLIC_KEY_STRING));
 		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
 
 		final Block block = new Block();
@@ -51,7 +52,7 @@ public class BlockExplorerMapperTest {
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(6));
 		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(60L));
 		Assert.assertThat(jsonObject.get("harvester"), IsEqual.equalTo(address.getEncoded()));
-		Assert.assertThat(jsonObject.get("harvesterPk"), IsEqual.equalTo("88888888999999997777777744444444"));
+		Assert.assertThat(jsonObject.get("harvesterPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
 		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1408966402000L));
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
 
@@ -87,7 +88,7 @@ public class BlockExplorerMapperTest {
 	@Test
 	public void canMapTransferToExplorerTransferViewModel() {
 		// Arrange:
-		final Address senderAddress = Address.fromPublicKey(PublicKey.fromHexString("88888888999999997777777744444444"));
+		final Address senderAddress = Address.fromPublicKey(PublicKey.fromHexString(PUBLIC_KEY_STRING));
 		final Address recipientAddress = Address.fromEncoded("RECIPIENT");
 		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
@@ -116,7 +117,7 @@ public class BlockExplorerMapperTest {
 		Assert.assertThat(jsonObject.get("fee"), IsEqual.equalTo(123000000L));
 		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1408966402000L));
 		Assert.assertThat(jsonObject.get("sender"), IsEqual.equalTo(senderAddress.getEncoded()));
-		Assert.assertThat(jsonObject.get("senderPk"), IsEqual.equalTo("88888888999999997777777744444444"));
+		Assert.assertThat(jsonObject.get("senderPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
 		Assert.assertThat(jsonObject.get("signature"), IsEqual.equalTo(signature.toString()));
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
 
