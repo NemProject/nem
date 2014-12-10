@@ -330,12 +330,8 @@ public class UnconfirmedTransactions {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
-		// (3) not already be expired
-		// TODO 20141205 J-B: i noticed that the TransactionDeadlineBlockValidator is only for blocks;
-		// > if it is updated to also work for blocks, then shouldn't (3) be satisfied by (4)?
-		// TODO 20141206 BR -> J: sorry I don't understand what you mean.
-		// TODO 20141206 J -> B: ok, my previous comment didn't make sense, but is there a reason for not calling
-		// > dropExpiredTransactions ? instead of the check below?
+		// (3) not already be expired (relative to the block time)
+		// TODO 20141210 J -> B: i know we talked about this, but i don't remember how expired transactions can get added?
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
