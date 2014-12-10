@@ -2,7 +2,7 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.remote.*;
 
 /**

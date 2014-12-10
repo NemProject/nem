@@ -2,7 +2,6 @@ package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;

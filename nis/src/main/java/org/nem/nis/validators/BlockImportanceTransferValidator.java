@@ -2,7 +2,6 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.poi.PoiFacade;
 
 import java.util.List;
 import java.util.stream.Collectors;

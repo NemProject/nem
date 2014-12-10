@@ -1,9 +1,9 @@
 package org.nem.nis.validators;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.BlockHeight;
 
 public class ValidationContextTest {
 
