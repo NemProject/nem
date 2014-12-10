@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
@@ -52,21 +52,42 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void getUnconfirmedBalanceReturnsConfirmedBalanceAdjustedByAllPendingTransactionsImpactingAccount() {
+	public void getUnconfirmedBalanceReturnsConfirmedBalanceAdjustedByAllPendingTransferTransactionsImpactingAccount() {
 		// Arrange:
-		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
 		final Account account1 = context.addAccount(Amount.fromNem(4));
 		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final TimeInstant currentTime = new TimeInstant(11);
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(5), null),
-				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(4), null));
-		transactions.get(0).setFee(Amount.fromNem(1));
-		transactions.get(1).setFee(Amount.fromNem(2));
+				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(5), null),
+				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(4), null));
+		setFeeAndDeadline(transactions.get(0), Amount.fromNem(1));
+		setFeeAndDeadline(transactions.get(1), Amount.fromNem(2));
 		transactions.forEach(context::signAndAddExisting);
 
 		// Assert:
 		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(3)));
 		Assert.assertThat(context.transactions.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(98)));
+	}
+
+	@Test
+	public void getUnconfirmedBalanceReturnsConfirmedBalanceAdjustedByAllPendingImportanceTransactionsImpactingAccount() {
+		// Arrange:
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
+		final Account sender = context.addAccount(Amount.fromNem(500000));
+		final Account remote = context.addAccount();
+		final TimeInstant currentTime = new TimeInstant(11);
+		final Transaction t1 = new ImportanceTransferTransaction(currentTime, sender, ImportanceTransferTransaction.Mode.Activate, remote);
+		setFeeAndDeadline(t1, Amount.fromNem(10));
+		context.signAndAddExisting(t1);
+
+		// Assert:
+		Assert.assertThat(context.transactions.getUnconfirmedBalance(sender), IsEqual.equalTo(Amount.fromNem(499990)));
+	}
+
+	private static void setFeeAndDeadline(final Transaction transaction, final Amount fee) {
+		transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
+		transaction.setFee(fee);
 	}
 
 	//endregion
@@ -999,10 +1020,12 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
+		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
-				factory.createSingle(Mockito.mock(PoiFacade.class)),
-				factory.createBatch(Mockito.mock(HashCache.class)));
+				factory.createSingle(poiFacade),
+				factory.createBatch(Mockito.mock(HashCache.class)),
+				poiFacade);
 	}
 
 	//endregion
@@ -1029,7 +1052,7 @@ public class UnconfirmedTransactionsTest {
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final PoiFacade poiFacade;
 
 		private TestContext() {
 			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
@@ -1043,8 +1066,13 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
+			this(singleValidator, batchValidator, Mockito.mock(PoiFacade.class));
+		}
+
+		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator, final PoiFacade poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
+			this.poiFacade = poiFacade;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final AccountCache accountCache = Mockito.mock(AccountCache.class);
 			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
