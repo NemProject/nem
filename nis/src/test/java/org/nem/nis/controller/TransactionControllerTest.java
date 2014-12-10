@@ -13,8 +13,9 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.PushService;
-import org.nem.nis.validators.SingleTransactionValidator;
+import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 
@@ -30,7 +31,7 @@ public class TransactionControllerTest {
 	public void transactionPrepareFailsIfTransactionDataFailsValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.validator.validate(Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		Mockito.when(context.validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
 
 		final Transaction transaction = createTransaction();
 		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));
@@ -46,7 +47,7 @@ public class TransactionControllerTest {
 	public void transactionPrepareSucceedsIfTransactionDataPassesValidation() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.validator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
+		Mockito.when(context.validator.validate(Mockito.any(), Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 
 		final Transaction transaction = createTransaction();
 		final Deserializer deserializer = Utils.createDeserializer(JsonSerializer.serializeToJson(transaction.asNonVerifiable()));
@@ -201,6 +202,8 @@ public class TransactionControllerTest {
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
+		private final PoiFacade poiFacade;
+		private final DebitPredicate debitPredicate;
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
@@ -209,12 +212,18 @@ public class TransactionControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
+			// TODO (IA) 20141210: should pass in validation context directly!
+			this.debitPredicate = Mockito.mock(DebitPredicate.class);
+			this.poiFacade = Mockito.mock(PoiFacade.class);
+			Mockito.when(this.poiFacade.getDebitPredicate()).thenReturn(this.debitPredicate);
+
 			this.controller = new TransactionController(
 					this.accountLookup,
 					this.pushService,
 					this.unconfirmedTransactions,
 					this.validator,
-					this.host);
+					this.host,
+					this.poiFacade);
 		}
 	}
 }

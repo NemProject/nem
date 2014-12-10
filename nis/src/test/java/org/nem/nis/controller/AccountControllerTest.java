@@ -95,10 +95,11 @@ public class AccountControllerTest {
 	}
 
 	private static TestContext createContextAroundAccount(final Account account, final Amount amount) {
-		account.incrementBalance(amount);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
-		return new TestContext(accountIoAdapter);
+		final TestContext context = new TestContext(accountIoAdapter);
+		context.addAccount(account, amount);
+		return context;
 	}
 
 	//endregion
@@ -431,6 +432,13 @@ public class AccountControllerTest {
 					accountIoAdapter,
 					this.poiFacade,
 					this.transactionHashCache);
+		}
+
+		private Account addAccount(final Account account, final Amount amount) {
+			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			accountState.getAccountInfo().incrementBalance(amount);
+			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			return account;
 		}
 	}
 }
