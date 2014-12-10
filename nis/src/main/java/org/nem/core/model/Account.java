@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
-import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 
 /**
@@ -10,10 +9,6 @@ import org.nem.core.serialization.*;
 public class Account {
 	private KeyPair keyPair;
 	private Address address;
-	private String label;
-	private Amount balance = Amount.ZERO;
-	private BlockAmount foragedBlocks = BlockAmount.ZERO;
-	private ReferenceCount refCount = ReferenceCount.ZERO;
 
 	/**
 	 * Creates an account around a key pair.
@@ -32,25 +27,6 @@ public class Account {
 	 */
 	public Account(final Address address) {
 		this(getKeyPairFromAddress(address), address);
-	}
-
-	/**
-	 * Creates a new account.
-	 *
-	 * @param address The address.
-	 * @param balance The balance.
-	 * @param numForagedBlocks The number of foraged blocks.
-	 * @param label The label.
-	 */
-	public Account(
-			final Address address,
-			final Amount balance,
-			final BlockAmount numForagedBlocks,
-			final String label) {
-		this(address);
-		this.balance = balance;
-		this.foragedBlocks = numForagedBlocks;
-		this.label = label;
 	}
 
 	private static KeyPair getKeyPairFromAddress(final Address address) {
@@ -96,20 +72,11 @@ public class Account {
 	private Account(final Account rhs) {
 		this.keyPair = rhs.getKeyPair();
 		this.address = rhs.getAddress();
-
-		this.balance = rhs.getBalance();
-		this.label = rhs.getLabel();
-		this.foragedBlocks = rhs.getForagedBlocks();
-		this.refCount = rhs.getReferenceCount();
 	}
 
 	private Account(final Account rhs, final KeyPair keyPair) {
 		this.keyPair = keyPair;
 		this.address = getAddressFromKeyPair(keyPair);
-		this.balance = rhs.getBalance();
-		this.label = rhs.getLabel();
-		this.foragedBlocks = rhs.getForagedBlocks();
-		this.refCount = rhs.getReferenceCount();
 	}
 
 	/**
@@ -147,103 +114,6 @@ public class Account {
 	 */
 	public Address getAddress() {
 		return this.address;
-	}
-
-	/**
-	 * Gets the account's balance.
-	 *
-	 * @return This account's balance.
-	 */
-	public Amount getBalance() {
-		return this.balance;
-	}
-
-	/**
-	 * Adds amount to the account's balance.
-	 *
-	 * @param amount The amount by which to increment the balance.
-	 */
-	public void incrementBalance(final Amount amount) {
-		this.balance = this.balance.add(amount);
-	}
-
-	/**
-	 * Subtracts amount from the account's balance.
-	 *
-	 * @param amount The amount by which to decrement the balance.
-	 */
-	public void decrementBalance(final Amount amount) {
-		this.balance = this.balance.subtract(amount);
-	}
-
-	/**
-	 * Gets number of foraged blocks.
-	 *
-	 * @return Number of blocks foraged by this account.
-	 */
-	public BlockAmount getForagedBlocks() {
-		return this.foragedBlocks;
-	}
-
-	/**
-	 * Increments number of foraged blocks by this account by one.
-	 */
-	public void incrementForagedBlocks() {
-		this.foragedBlocks = this.foragedBlocks.increment();
-	}
-
-	/**
-	 * Decrements number of foraged blocks by this account by one.
-	 */
-	public void decrementForagedBlocks() {
-		this.foragedBlocks = this.foragedBlocks.decrement();
-	}
-
-	/**
-	 * Gets the account's label.
-	 *
-	 * @return The account's label.
-	 */
-	public String getLabel() {
-		return this.label;
-	}
-
-	/**
-	 * Sets the account's label.
-	 *
-	 * @param label The desired label.
-	 */
-	public void setLabel(final String label) {
-		this.label = label;
-	}
-
-	/**
-	 * Returns the reference count.
-	 *
-	 * @return The reference count.
-	 */
-	public ReferenceCount getReferenceCount() {
-		return this.refCount;
-	}
-
-	/**
-	 * Increments the reference count.
-	 *
-	 * @return The new value of the reference count.
-	 */
-	public ReferenceCount incrementReferenceCount() {
-		this.refCount = this.refCount.increment();
-		return this.refCount;
-	}
-
-	/**
-	 * Decrements the reference count.
-	 *
-	 * @return The new value of the reference count.
-	 */
-	public ReferenceCount decrementReferenceCount() {
-		this.refCount = this.refCount.decrement();
-		return this.refCount;
 	}
 
 	@Override

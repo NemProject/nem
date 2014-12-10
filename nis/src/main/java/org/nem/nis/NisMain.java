@@ -86,10 +86,10 @@ public class NisMain {
 
 	private NemesisBlock loadNemesisBlock() {
 		// set up the nemesis block amounts
-		final Account nemesisAccount = this.nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
-		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
+		this.nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
 		final PoiAccountState nemesisState = this.nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);
 

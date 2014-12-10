@@ -2,11 +2,22 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
+import org.nem.nis.poi.*;
 
 /**
  * Transfer observer that commits balance changes to the underlying accounts.
  */
 public class BalanceCommitTransferObserver implements TransferObserver {
+	private final PoiFacade poiFacade;
+
+	/**
+	 * Creates an observer.
+	 *
+	 * @param poiFacade The poi facade.
+	 */
+	public BalanceCommitTransferObserver(final PoiFacade poiFacade) {
+		this.poiFacade = poiFacade;
+	}
 
 	@Override
 	public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
@@ -16,11 +27,15 @@ public class BalanceCommitTransferObserver implements TransferObserver {
 
 	@Override
 	public void notifyCredit(final Account account, final Amount amount) {
-		account.incrementBalance(amount);
+		this.getAccountInfo(account).incrementBalance(amount);
 	}
 
 	@Override
 	public void notifyDebit(final Account account, final Amount amount) {
-		account.decrementBalance(amount);
+		this.getAccountInfo(account).decrementBalance(amount);
+	}
+
+	private AccountInfo getAccountInfo(final Account account) {
+		return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo();
 	}
 }

@@ -2,6 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.poi.PoiFacade;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,6 +11,16 @@ import java.util.stream.Collectors;
  * A block transaction validator that ensures all importance transactions within a block are non-conflicting.
  */
 public class BlockImportanceTransferValidator implements BlockValidator {
+	private final PoiFacade poiFacade;
+
+	/**
+	 * Creates an observer.
+	 *
+	 * @param poiFacade The poi facade.
+	 */
+	public BlockImportanceTransferValidator(final PoiFacade poiFacade) {
+		this.poiFacade = poiFacade;
+	}
 
 	@Override
 	public ValidationResult validate(final Block block) {
@@ -26,7 +37,8 @@ public class BlockImportanceTransferValidator implements BlockValidator {
 			return ValidationResult.SUCCESS;
 		}
 
+		final ValidationContext validationContext = new ValidationContext(this.poiFacade.getDebitPredicate());
 		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> importanceTransfers);
-		return ValidationResult.aggregate(importanceTransfers.stream().map(t -> validator.validate(t)).iterator());
+		return ValidationResult.aggregate(importanceTransfers.stream().map(t -> validator.validate(t, validationContext)).iterator());
 	}
 }

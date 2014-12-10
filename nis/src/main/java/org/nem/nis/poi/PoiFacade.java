@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChainConstants;
+import org.nem.nis.validators.DebitPredicate;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -192,6 +193,19 @@ public class PoiFacade implements Iterable<PoiAccountState> {
 		return null != accountState.getHeight()
 				&& accountState.getHeight().compareTo(blockHeight) <= 0
 				&& !accountState.getAddress().equals(NemesisBlock.ADDRESS);
+	}
+
+	/**
+	 * Gets a debit predicate that checks balances against the account information stored in this cache.
+	 * TODO (IA) 20141210 - add test for this!
+	 *
+	 * @return The debit predicate.
+	 */
+	public DebitPredicate getDebitPredicate() {
+		return (account, amount) -> {
+			final AccountInfo accountInfo = this.findStateByAddress(account.getAddress()).getAccountInfo();
+			return accountInfo.getBalance().compareTo(amount) >= 0;
+		};
 	}
 
 	/**

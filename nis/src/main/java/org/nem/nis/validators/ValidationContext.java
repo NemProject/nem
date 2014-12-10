@@ -11,38 +11,22 @@ public class ValidationContext {
 	private final DebitPredicate debitPredicate;
 
 	/**
-	 * Creates a default validation context.
-	 */
-	public ValidationContext() {
-		this(BlockHeight.MAX);
-	}
-
-	/**
-	 * Creates a validation context with a custom block height.
-	 *
-	 * @param blockHeight The block height.
-	 */
-	public ValidationContext(final BlockHeight blockHeight) {
-		this(blockHeight, blockHeight);
-	}
-
-	/**
-	 * Creates a validation context with a custom block height.
-	 *
-	 * @param blockHeight The block height.
-	 * @param confirmedBlockHeight The confirmed block height.
-	 */
-	public ValidationContext(final BlockHeight blockHeight, final BlockHeight confirmedBlockHeight) {
-		this(blockHeight, confirmedBlockHeight, (account, amount) -> account.getBalance().compareTo(amount) >= 0);
-	}
-
-	/**
 	 * Creates a validation context with a custom debit predicate.
 	 *
 	 * @param debitPredicate The debit predicate.
 	 */
 	public ValidationContext(final DebitPredicate debitPredicate) {
 		this(BlockHeight.MAX, BlockHeight.MAX, debitPredicate);
+	}
+
+	/**
+	 * Creates a validation context with a custom block height.
+	 *
+	 * @param debitPredicate The debit predicate.
+	 * @param blockHeight The block height.
+	 */
+	public ValidationContext(final BlockHeight blockHeight, final DebitPredicate debitPredicate) {
+		this(blockHeight, blockHeight, debitPredicate);
 	}
 
 	/**

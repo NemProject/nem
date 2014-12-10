@@ -60,7 +60,8 @@ public class BlockChainServices {
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
-				this.transactionValidatorFactory.createSingle(poiFacade));
+				this.transactionValidatorFactory.createSingle(poiFacade),
+				poiFacade.getDebitPredicate());
 		return validator.isValid(parentBlock, peerChain);
 	}
 
