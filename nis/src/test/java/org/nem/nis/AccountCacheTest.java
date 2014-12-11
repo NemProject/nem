@@ -84,8 +84,7 @@ public class AccountCacheTest {
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cachedAccount2.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
-		Assert.assertThat(cachedAccount2, IsSame.sameInstance(cachedAccount1)); // the public key is updated in place
-		Assert.assertThat(cachedAccount2.getAddress().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(cachedAccount2.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
 	//endregion
@@ -207,8 +206,7 @@ public class AccountCacheTest {
 
 		// Assert:
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
-		Assert.assertThat(foundAccount, IsSame.sameInstance(cachedAccount1)); // the public key is updated in place
-		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsNull.notNullValue());
+		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
 	//endregion
@@ -279,7 +277,7 @@ public class AccountCacheTest {
 	//region copy
 
 	@Test
-	public void copyCreatesUnlinkedCacheCopy() {
+	public void copyCreatesFullCopyOfAllAccounts() {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
@@ -297,11 +295,30 @@ public class AccountCacheTest {
 		final Account copyAccount2 = copyCache.findByAddress(address2);
 		final Account copyAccount3 = copyCache.findByAddress(address3);
 
-		// Assert:
+		// Assert: since the items are immutable, it is ok for them to be the same
 		Assert.assertThat(copyCache.size(), IsEqual.equalTo(3));
-		Assert.assertThat(copyAccount1, IsNot.not(IsSame.sameInstance(account1)));
-		Assert.assertThat(copyAccount2, IsNot.not(IsSame.sameInstance(account2)));
-		Assert.assertThat(copyAccount3, IsNot.not(IsSame.sameInstance(account3)));
+		Assert.assertThat(copyAccount1, IsSame.sameInstance(account1));
+		Assert.assertThat(copyAccount2, IsSame.sameInstance(account2));
+		Assert.assertThat(copyAccount3, IsSame.sameInstance(account3));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCacheCopy() {
+		// Arrange:
+		final AccountCache cache = createAccountCache();
+		cache.addAccountToCache(Utils.generateRandomAddress());
+		cache.addAccountToCache(Utils.generateRandomAddress());
+		cache.addAccountToCache(Utils.generateRandomAddress());
+
+		// Act:
+		final AccountCache copyCache = cache.copy();
+		copyCache.addAccountToCache(Utils.generateRandomAddress());
+		cache.addAccountToCache(Utils.generateRandomAddress());
+		copyCache.addAccountToCache(Utils.generateRandomAddress());
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
+		Assert.assertThat(copyCache.size(), IsEqual.equalTo(5));
 	}
 
 	@Test
