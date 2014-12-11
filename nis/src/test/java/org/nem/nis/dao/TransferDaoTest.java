@@ -250,9 +250,9 @@ public class TransferDaoTest {
 	}
 
 	@Test
-	public void getTransactionsForAccountUsingHashThrowsIfSenderIsUnknown() {
+	public void getTransactionsForAccountUsingHashReturnsEmptyCollectionIfSenderIsUnknown() {
 		// Assert:
-		this.assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(USE_HASH);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(USE_HASH);
 	}
 
 	// endregion
@@ -366,9 +366,9 @@ public class TransferDaoTest {
 	}
 
 	@Test
-	public void getTransactionsForAccountUsingIdThrowsIfSenderIsUnknown() {
+	public void getTransactionsForAccountUsingIdReturnsEmptyCollectionIfSenderIsUnknown() {
 		// Assert:
-		this.assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(USE_ID);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(USE_ID);
 	}
 
 	// endregion
@@ -572,7 +572,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entities.size(), equalTo(1));
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(final int type) {
+	public void assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final long heights[] = { 3, 4, 1, 2 };
@@ -581,15 +581,16 @@ public class TransferDaoTest {
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> this.executeGetTransactionsForAccountUsingAttribute(
-						Utils.generateRandomAccount(),
-						null,
-						null,
-						BlockHeight.ONE,
-						ReadOnlyTransferDao.TransferType.ALL,
-						type),
-				MissingResourceException.class);
+		final Collection<TransferBlockPair> entities = this.executeGetTransactionsForAccountUsingAttribute(
+				Utils.generateRandomAccount(),
+				null,
+				null,
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL,
+				type);
+
+		// Assert:
+		Assert.assertThat(entities.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	private Collection<TransferBlockPair> executeGetTransactionsForAccountUsingAttribute(

@@ -102,6 +102,10 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final int limit) {
 		final Long accountId = this.getAccountId(address);
+		if (null == accountId) {
+			return new ArrayList<>();
+		}
+
 		if (hash == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
@@ -146,6 +150,10 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final int limit) {
 		final Long accountId = this.getAccountId(address);
+		if (null == accountId) {
+			return new ArrayList<>();
+		}
+
 		if (id == null) {
 			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
 		} else {
@@ -175,15 +183,7 @@ public class TransferDaoImpl implements TransferDao {
 				.createSQLQuery("select id as accountId from accounts WHERE printablekey=:address")
 				.addScalar("accountId", LongType.INSTANCE)
 				.setParameter("address", address.getEncoded());
-		final Long id = (Long)query.uniqueResult();
-		if (null == id) {
-			throw new MissingResourceException(
-					String.format("address not found in db %s", address),
-					Address.class.toString(),
-					address.toString());
-		}
-
-		return id;
+		return (Long)query.uniqueResult();
 	}
 
 	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(
