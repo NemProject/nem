@@ -7,8 +7,8 @@ import org.nem.core.serialization.*;
  * A NEM account.
  */
 public class Account {
-	private KeyPair keyPair;
-	private Address address;
+	private final KeyPair keyPair;
+	private final Address address;
 
 	/**
 	 * Creates an account around a key pair.
@@ -37,28 +37,6 @@ public class Account {
 		return Address.fromPublicKey(keyPair.getPublicKey());
 	}
 
-	// TODO: remove
-	/**
-	 * Sets the public key associated with this account.
-	 * The public key must be consistent with this account's address.
-	 * This function should be used sparingly, and avoided if possible.
-	 *
-	 * @param publicKey The public key.
-	 */
-	public void setPublicKey(final PublicKey publicKey) {
-		if (!Address.fromPublicKey(publicKey).equals(this.address)) {
-			throw new IllegalArgumentException("most probably trying to set public key for wrong account");
-		}
-
-		// only update the public key if it is not already set
-		if (null != this.keyPair) {
-			return;
-		}
-
-		this.keyPair = new KeyPair(publicKey);
-		this.address = Address.fromPublicKey(publicKey);
-	}
-
 	/**
 	 * Creates an account around a key pair and address.
 	 *
@@ -68,36 +46,6 @@ public class Account {
 	protected Account(final KeyPair keyPair, final Address address) {
 		this.keyPair = keyPair;
 		this.address = address;
-	}
-
-	private Account(final Account rhs) {
-		this.keyPair = rhs.keyPair;
-		this.address = rhs.getAddress();
-	}
-
-	private Account(final Account rhs, final KeyPair keyPair) {
-		this.keyPair = keyPair;
-		this.address = getAddressFromKeyPair(keyPair);
-	}
-
-	// TODO remove copy
-	/**
-	 * Creates an unlinked copy of this account.
-	 *
-	 * @return An unlinked copy of this account.
-	 */
-	public Account copy() {
-		return new Account(this);
-	}
-
-	/**
-	 * Creates a shallow copy of this account the the specified key pair.
-	 *
-	 * @param keyPair The desired key pair of the new account.
-	 * @return The shallow copy.
-	 */
-	public Account shallowCopyWithKeyPair(final KeyPair keyPair) {
-		return new Account(this, keyPair);
 	}
 
 	/**
@@ -124,7 +72,10 @@ public class Account {
 		return this.address.equals(rhs.address);
 	}
 
-	// TODO: add tostring
+	@Override
+	public String toString() {
+		return this.address.toString();
+	}
 
 	//region inline serialization
 

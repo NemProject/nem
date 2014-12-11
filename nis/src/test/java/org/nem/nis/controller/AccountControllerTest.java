@@ -27,27 +27,6 @@ public class AccountControllerTest {
 	//region accountUnlock
 
 	@Test
-	public void unlockCopiesRelevantAccountData() {
-		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account accountFromIo = Mockito.mock(Account.class);
-		final Account copyAccount = Mockito.mock(Account.class);
-		Mockito.when(accountFromIo.shallowCopyWithKeyPair(keyPair)).thenReturn(copyAccount);
-
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		Mockito.when(accountIoAdapter.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()))).thenReturn(accountFromIo);
-
-		final TestContext context = new TestContext(accountIoAdapter);
-		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
-
-		// Act:
-		context.controller.accountUnlock(keyPair.getPrivateKey());
-
-		// Assert:
-		Mockito.verify(accountFromIo, Mockito.times(1)).shallowCopyWithKeyPair(Mockito.any());
-	}
-
-	@Test
 	public void unlockDelegatesToUnlockedAccounts() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();

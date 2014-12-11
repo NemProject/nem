@@ -11,7 +11,7 @@ import java.math.BigInteger;
 
 public class AccountTest {
 
-	//region Constructor
+	//region constructor
 
 	@Test
 	public void accountCanBeCreatedAroundKeyPairWithPrivateKey() {
@@ -70,48 +70,6 @@ public class AccountTest {
 
 	//endregion
 
-	//region setPublicKey
-
-	@Test(expected = IllegalArgumentException.class)
-	public void inconsistentPublicKeyCannotBeSet() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
-
-		// Act: the set fails because the public key is not consistent with the account's address
-		account.setPublicKey(publicKey);
-	}
-
-	@Test
-	public void consistentPublicKeyCanBeSet() {
-		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Address address = Address.fromEncoded(Address.fromPublicKey(keyPair.getPublicKey()).getEncoded());
-		final Account account = new Account(address);
-
-		// Act:
-		account.setPublicKey(keyPair.getPublicKey());
-
-		// Assert:
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-	}
-
-	@Test
-	public void settingConsistentPublicKeyDoesNotOverwritePrivateKey() {
-		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account account = new Account(keyPair);
-
-		// Act:
-		account.setPublicKey(keyPair.getPublicKey());
-
-		// Assert:
-		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
-	}
-
-	//endregion
-
 	//region equals / hashCode
 
 	@Test
@@ -164,6 +122,19 @@ public class AccountTest {
 				new Account(new KeyPair(Utils.mutate(keyPair.getPublicKey()))),
 				new Account(new KeyPair(Utils.mutate(keyPair.getPrivateKey())))
 		};
+	}
+
+	//endregion
+
+	//region toString
+
+	@Test
+	public void toStringReturnsEncodedAddress() {
+		// Arrange:
+		final Account account = new Account(Address.fromEncoded("Sigma Gamma"));
+
+		// Assert:
+		Assert.assertThat(account.toString(), IsEqual.equalTo("SIGMA GAMMA"));
 	}
 
 	//endregion
@@ -286,80 +257,6 @@ public class AccountTest {
 		// Assert:
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(originalAccount.getAddress()));
 		Assert.assertThat(accountLookup.getNumFindByIdCalls(), IsEqual.equalTo(1));
-	}
-
-	//endregion
-
-	//region copy
-
-	@Test
-	public void copyCreatesUnlinkedCopyOfAccountWithoutPublicKey() {
-		// Arrange:
-		final Account account = new Account(Utils.generateRandomAddress());
-
-		// Assert:
-		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void copyCreatesUnlinkedCopyOfAccountWithPublicKey() {
-		// Arrange:
-		final Account account = new Account(Utils.generateRandomAddressWithPublicKey());
-
-		// Assert:
-		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void copyCreatesUnlinkedCopyOfAccountWithPrivateKey() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Assert:
-		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
-	}
-
-	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
-		// Act:
-		final Account copyAccount = account.copy();
-
-		// Assert:
-		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(account.getAddress()));
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
-		Assert.assertThat(copyAccount.hasPublicKey(), IsEqual.equalTo(account.hasPublicKey()));
-		Assert.assertThat(copyAccount.hasPrivateKey(), IsEqual.equalTo(account.hasPrivateKey()));
-		return copyAccount;
-	}
-
-	//endregion
-
-	//region shallow copy
-
-	@Test
-	public void canCreateShallowCopyWithNewKeyPair() {
-		// Arrange:
-		final Account account = new Account(Utils.generateRandomAddress());
-		final KeyPair keyPair = new KeyPair();
-
-		// Act:
-		final Account copyAccount = account.shallowCopyWithKeyPair(keyPair);
-
-		// Assert:
-		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
-		Assert.assertThat(copyAccount.hasPublicKey(), IsEqual.equalTo(true));
-		Assert.assertThat(copyAccount.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	//endregion
