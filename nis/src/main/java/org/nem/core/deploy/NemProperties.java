@@ -87,5 +87,4 @@ public class NemProperties {
 		final String stringArray = this.getOptionalString(name, defaultValue);
 		return StringUtils.isNullOrWhitespace(stringArray) ? new String[] { } : stringArray.split("\\|");
 	}
-
 }

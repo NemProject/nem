@@ -1,9 +1,10 @@
 package org.nem.core.deploy;
 
 import org.nem.core.node.NodeEndpoint;
-import org.nem.core.utils.ExceptionUtils;
+import org.nem.core.utils.*;
 
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
@@ -23,6 +24,7 @@ public class CommonConfiguration {
 	private final String home;
 	private final String shutdown;
 	private final Boolean useDosFilter;
+	private final String[] nonAuditedApiPaths;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -47,50 +49,34 @@ public class CommonConfiguration {
 	 * @param properties The specified properties.
 	 */
 	public CommonConfiguration(final Properties properties) {
-		this.shortServerName = getString(properties, "nem.shortServerName");
-		this.nemFolder = getOptionalString(properties, "nem.folder", this.getDefaultFolder()).replace("%h", this.getDefaultFolder());
-		this.maxThreads = getInteger(properties, "nem.maxThreads");
-		this.protocol = getOptionalString(properties, "nem.protocol", "http");
-		this.host = getOptionalString(properties, "nem.host", "localhost");
-		this.httpPort = getInteger(properties, "nem.httpPort");
-		this.httpsPort = getInteger(properties, "nem.httpsPort");
-		this.webContext = getString(properties, "nem.webContext");
-		this.apiContext = getString(properties, "nem.apiContext");
-		this.home = getString(properties, "nem.homePath");
-		this.shutdown = getOptionalString(properties, "nem.shutdownPath", "/shutdown");
-		this.useDosFilter = getOptionalBoolean(properties, "nem.useDosFilter", false);
+		this(new NemProperties(properties));
 	}
 
-	protected static String getString(final Properties properties, final String name) {
-		final String value = properties.getProperty(name);
-		if (null == value) {
-			throw new RuntimeException(String.format("property %s must not be null", name));
-		}
-		return value;
+	/**
+	 * Creates a new configuration object around the specified properties.
+	 *
+	 * @param properties The specified properties.
+	 */
+	public CommonConfiguration(final NemProperties properties) {
+		this.shortServerName = properties.getString("nem.shortServerName");
+		this.nemFolder = properties.getOptionalString("nem.folder", Paths.get("%h", "nem").toString())
+				.replace("%h", this.getDefaultFolder());
+		this.maxThreads = properties.getInteger("nem.maxThreads");
+		this.protocol = properties.getOptionalString("nem.protocol", "http");
+		this.host = properties.getOptionalString("nem.host", "127.0.0.1");
+		this.httpPort = properties.getInteger("nem.httpPort");
+		this.httpsPort = properties.getInteger("nem.httpsPort");
+		this.webContext = properties.getString("nem.webContext");
+		this.apiContext = properties.getString("nem.apiContext");
+		this.home = properties.getString("nem.homePath");
+		this.shutdown = properties.getOptionalString("nem.shutdownPath", "/shutdown");
+		this.useDosFilter = properties.getOptionalBoolean("nem.useDosFilter", true);
+		this.nonAuditedApiPaths = properties.getOptionalStringArray(
+				"nem.nonAuditedApiPaths",
+				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info");
 	}
 
-	protected static int getInteger(final Properties properties, final String name) {
-		final String value = properties.getProperty(name);
-		if (null == value) {
-			throw new RuntimeException(String.format("property %s must not be null", name));
-		}
-		return Integer.valueOf(properties.getProperty(name));
-	}
-
-	protected static String getOptionalString(final Properties properties, final String name, final String defaultValue) {
-		final String value = properties.getProperty(name);
-		return null == value ? defaultValue : value;
-	}
-
-	protected static int getOptionalInteger(final Properties properties, final String name, final Integer defaultValue) {
-		final String value = properties.getProperty(name);
-		return null == value ? defaultValue : Integer.valueOf(value);
-	}
-
-	protected static boolean getOptionalBoolean(final Properties properties, final String name, final Boolean defaultValue) {
-		final String value = properties.getProperty(name);
-		return null == value ? defaultValue : Boolean.valueOf(value);
-	}
+	//region basic settings
 
 	/**
 	 * Get the default folder for database and log files.
@@ -120,6 +106,15 @@ public class CommonConfiguration {
 	}
 
 	/**
+	 * Gets a value indicating if the underlying server is the NCC server.
+	 *
+	 * @return True if the server is NCC, false otherwise.
+	 */
+	public boolean isNcc() {
+		return this.shortServerName.toUpperCase().equals("NCC");
+	}
+
+	/**
 	 * Gets the maximum number of threads used for the thread pool.
 	 *
 	 * @return The maximum number of threads.
@@ -127,6 +122,8 @@ public class CommonConfiguration {
 	public int getMaxThreads() {
 		return this.maxThreads;
 	}
+
+	//endregion
 
 	//region endpoint settings
 
@@ -198,6 +195,8 @@ public class CommonConfiguration {
 
 	//endregion
 
+	//region web servlet settings
+
 	/**
 	 * Gets the base path for web site paths.
 	 *
@@ -244,15 +243,6 @@ public class CommonConfiguration {
 	}
 
 	/**
-	 * .Gets a value indicating if the underlying server is the NCC server.
-	 *
-	 * @return True if the server is NCC, false otherwise.
-	 */
-	public boolean isNcc() {
-		return this.shortServerName.toUpperCase().equals("NCC");
-	}
-
-	/**
 	 * Get the shutdown url as string.
 	 *
 	 * @return The shutdown url as string.
@@ -274,5 +264,16 @@ public class CommonConfiguration {
 				this.getBaseUrl(),
 				this.getWebContext(),
 				this.getHomePath());
+	}
+
+	//endregion
+
+	/**
+	 * Gets the APIs that shouldn't be audited.
+	 *
+	 * @return The APIs that shouldn't be audited.
+	 */
+	public String[] getNonAuditedApiPaths() {
+		return this.nonAuditedApiPaths;
 	}
 }

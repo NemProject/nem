@@ -1,8 +1,7 @@
 package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
-import org.nem.core.deploy.CommonConfiguration;
-import org.nem.core.utils.StringUtils;
+import org.nem.core.deploy.*;
 
 import java.util.Properties;
 
@@ -19,7 +18,6 @@ public class NisConfiguration extends CommonConfiguration {
 	private final boolean useNetworkTime;
 	private final IpDetectionMode ipDetectionMode;
 	private final int unlockedLimit;
-	private final String[] nonAuditedApiPaths;
 	private final int maxTransactions;
 	private final String[] additionalLocalIps;
 	private final int transactionHashRetentionTime;
@@ -37,36 +35,36 @@ public class NisConfiguration extends CommonConfiguration {
 	 * @param properties The specified properties.
 	 */
 	public NisConfiguration(final Properties properties) {
+		this(new NemProperties(properties));
+	}
+
+	/**
+	 * Creates a new configuration object around the specified properties.
+	 *
+	 * @param properties The specified properties.
+	 */
+	public NisConfiguration(final NemProperties properties) {
 		super(properties);
-		final String autoBootKey = getOptionalString(properties, "nis.bootKey", null);
+		final String autoBootKey = properties.getOptionalString("nis.bootKey", null);
 		this.bootKey = null == autoBootKey ? null : PrivateKey.fromHexString(autoBootKey);
 
-		final String autoBootName = getOptionalString(properties, "nis.bootName", null);
+		final String autoBootName = properties.getOptionalString("nis.bootName", null);
 		this.bootName = null == autoBootName ? null : autoBootName.trim();
 
-		this.nodeLimit = getOptionalInteger(properties, "nis.nodeLimit", 5);
-		this.timeSyncNodeLimit = getOptionalInteger(properties, "nis.timeSyncNodeLimit", 20);
-		this.useBinaryTransport = getOptionalBoolean(properties, "nis.useBinaryTransport", true);
-		this.useNetworkTime = getOptionalBoolean(properties, "nis.useNetworkTime", true);
+		this.nodeLimit = properties.getOptionalInteger("nis.nodeLimit", 5);
+		this.timeSyncNodeLimit = properties.getOptionalInteger("nis.timeSyncNodeLimit", 20);
+		this.useBinaryTransport = properties.getOptionalBoolean("nis.useBinaryTransport", true);
+		this.useNetworkTime = properties.getOptionalBoolean("nis.useNetworkTime", true);
 
-		final String ipDetectionMode = getOptionalString(properties, "nis.ipDetectionMode", null);
+		final String ipDetectionMode = properties.getOptionalString("nis.ipDetectionMode", null);
 		this.ipDetectionMode = null == ipDetectionMode
 				? IpDetectionMode.AutoRequired
 				: IpDetectionMode.valueOf(ipDetectionMode);
 
-		this.unlockedLimit = getOptionalInteger(properties, "nis.unlockedLimit", 1);
-		this.nonAuditedApiPaths = getOptionalStringArray(
-				properties,
-				"nis.nonAuditedApiPaths",
-				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info");
-		this.maxTransactions = getOptionalInteger(properties, "nis.maxTransactions", 10000);
-		this.transactionHashRetentionTime = getOptionalInteger(properties, "nis.transactionHashRetentionTime", 36);
-		this.additionalLocalIps = getOptionalStringArray(properties, "nis.additionalLocalIps", "");
-	}
-
-	private static String[] getOptionalStringArray(final Properties properties, final String key, final String defaultValue) {
-		final String stringArray = getOptionalString(properties, key, defaultValue);
-		return StringUtils.isNullOrWhitespace(stringArray) ? new String[] { } : stringArray.split("\\|");
+		this.unlockedLimit = properties.getOptionalInteger("nis.unlockedLimit", 1);
+		this.maxTransactions = properties.getOptionalInteger("nis.maxTransactions", 10000);
+		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
+		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
 	}
 
 	/**
@@ -141,15 +139,6 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public int getUnlockedLimit() {
 		return this.unlockedLimit;
-	}
-
-	/**
-	 * Gets the NIS APIs that shouldn't be audited.
-	 *
-	 * @return The NIS APIs that shouldn't be audited.
-	 */
-	public String[] getNonAuditedApiPaths() {
-		return this.nonAuditedApiPaths;
 	}
 
 	/**
