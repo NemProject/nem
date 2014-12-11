@@ -1,11 +1,13 @@
-package org.nem.core.model;
+package org.nem.nis.cache;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.HashCache;
 
 import java.util.*;
 import java.util.stream.Collectors;

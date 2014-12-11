@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.NodeCollection;
 import org.nem.core.test.NodeUtils;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;

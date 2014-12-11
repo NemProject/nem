@@ -3,7 +3,7 @@ package org.nem.nis.test;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockScorer;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.PoiFacade;
 
 import java.math.BigInteger;
 import java.util.*;

@@ -1,10 +1,11 @@
-package org.nem.nis;
+package org.nem.nis.cache;
 
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.HashCache;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.HashCache;
+import org.nem.nis.cache.*;
+import org.nem.nis.cache.PoiFacade;
 
 public class NisCacheTest {
 

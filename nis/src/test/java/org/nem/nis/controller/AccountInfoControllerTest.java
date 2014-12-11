@@ -9,6 +9,7 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.controller.requests.AccountIdBuilder;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.poi.*;

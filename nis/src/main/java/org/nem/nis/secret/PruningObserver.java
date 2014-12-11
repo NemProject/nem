@@ -1,6 +1,6 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.HashCache;
+import org.nem.nis.cache.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;

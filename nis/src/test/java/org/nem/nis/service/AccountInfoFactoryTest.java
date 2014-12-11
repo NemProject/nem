@@ -8,6 +8,7 @@ import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.poi.*;
 
 public class AccountInfoFactoryTest {

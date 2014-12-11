@@ -1,9 +1,10 @@
-package org.nem.nis;
+package org.nem.nis.cache;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.nis.cache.AccountCache;
 
 import java.util.*;
 import java.util.stream.*;

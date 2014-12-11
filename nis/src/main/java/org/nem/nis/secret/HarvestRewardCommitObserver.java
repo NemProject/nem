@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.observers.*;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.poi.*;
 
 /**

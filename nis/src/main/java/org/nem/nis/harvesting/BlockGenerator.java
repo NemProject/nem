@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.cache.NisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.validators.BlockValidator;

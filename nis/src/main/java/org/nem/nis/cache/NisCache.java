@@ -1,7 +1,4 @@
-package org.nem.nis;
-
-import org.nem.core.model.HashCache;
-import org.nem.nis.poi.PoiFacade;
+package org.nem.nis.cache;
 
 /**
  * The central point for accessing NIS-mutable data.

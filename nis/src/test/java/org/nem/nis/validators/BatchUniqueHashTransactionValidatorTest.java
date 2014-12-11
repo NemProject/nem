@@ -7,6 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.cache.HashCache;
 import org.nem.nis.test.DebitPredicates;
 
 import java.util.*;

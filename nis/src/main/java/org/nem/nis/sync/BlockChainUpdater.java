@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.ChainRequest;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;

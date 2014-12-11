@@ -2,6 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.nis.cache.HashCache;
 
 import java.util.List;
 import java.util.stream.Collectors;

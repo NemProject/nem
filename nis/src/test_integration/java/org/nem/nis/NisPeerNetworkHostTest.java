@@ -9,7 +9,8 @@ import org.nem.core.node.*;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.peer.connect.*;
 
 import java.util.List;

@@ -13,7 +13,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;

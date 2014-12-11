@@ -7,6 +7,7 @@ import org.nem.core.model.observers.TransactionHashesNotification;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.HashCache;
 
 import java.util.*;
 import java.util.stream.Collectors;

@@ -9,6 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.deploy.NisConfiguration;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.harvesting.UnconfirmedTransactions;

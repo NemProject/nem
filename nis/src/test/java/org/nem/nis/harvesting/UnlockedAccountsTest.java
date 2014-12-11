@@ -7,6 +7,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.*;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 

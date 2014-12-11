@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.NisCache;
+import org.nem.nis.cache.NisCache;
 
 import java.util.function.Consumer;
 

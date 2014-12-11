@@ -5,8 +5,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.NisCache;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.validators.*;
 
 import java.util.*;

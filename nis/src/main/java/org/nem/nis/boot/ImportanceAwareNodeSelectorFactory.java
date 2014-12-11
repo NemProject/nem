@@ -1,6 +1,6 @@
 package org.nem.nis.boot;
 
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;

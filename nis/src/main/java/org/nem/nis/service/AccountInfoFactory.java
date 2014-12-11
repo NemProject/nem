@@ -3,6 +3,7 @@ package org.nem.nis.service;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.springframework.beans.factory.annotation.Autowired;

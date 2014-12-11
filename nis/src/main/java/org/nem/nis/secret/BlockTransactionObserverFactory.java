@@ -2,7 +2,8 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.observers.BalanceCommitTransferObserver;
 import org.nem.nis.*;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.PoiFacade;
 
 /**
  * Factory for creating BlockTransactionObserver objects.

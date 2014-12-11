@@ -1,4 +1,4 @@
-package org.nem.nis.poi;
+package org.nem.nis.cache;
 
 import org.hamcrest.core.*;
 import org.junit.*;
@@ -6,6 +6,8 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.poi.*;
 import org.nem.nis.remote.RemoteLink;
 import org.nem.nis.validators.DebitPredicate;
 

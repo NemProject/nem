@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.poi.*;
 import org.nem.nis.remote.RemoteLink;
 import org.nem.nis.test.NisUtils;

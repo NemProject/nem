@@ -7,6 +7,7 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.peer.trust.*;

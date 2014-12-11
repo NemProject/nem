@@ -2,7 +2,7 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.PoiFacade;
 
 /**
  * An observer that updates weighted balance information.

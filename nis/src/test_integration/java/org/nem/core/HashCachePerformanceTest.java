@@ -6,6 +6,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
+import org.nem.nis.cache.HashCache;
 
 import java.util.*;
 import java.util.logging.Logger;

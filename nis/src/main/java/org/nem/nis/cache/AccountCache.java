@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.cache;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;

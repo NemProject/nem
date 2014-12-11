@@ -1,6 +1,7 @@
-package org.nem.core.model;
+package org.nem.nis.cache;
 
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;

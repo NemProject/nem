@@ -3,6 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.AccountIdBuilder;
 import org.nem.nis.harvesting.*;
