@@ -160,6 +160,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 
+	@Test
 	public void getTransactionsForAccountUsingHashThrowsWhenHashNotFound() {
 		// Arrange:
 		this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_HASH);
@@ -515,10 +516,18 @@ public class TransferDaoTest {
 		Assert.assertThat(timeStamps.size(), equalTo(0));
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
+	private void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
+		// Arrange: roundabout way to ensure that account is added to the db under test
+		final Account account = Utils.generateRandomAccount();
+		final long heights[] = { 3 };
+		final int blockTimestamp[] = { 1801 };
+		final int txTimestamps[][] = { { 1800 } };
+		this.createTestBlocks(heights, blockTimestamp, txTimestamps, account, true);
+
+		// Act:
 		ExceptionAssert.assertThrows(
 				v -> this.executeGetTransactionsForAccountUsingAttribute(
-						Utils.generateRandomAccount(),
+						account,
 						Utils.generateRandomHash(),
 						new SecureRandom().nextLong(),
 						BlockHeight.ONE,
@@ -527,7 +536,7 @@ public class TransferDaoTest {
 				MissingResourceException.class);
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(final int type) {
+	private void assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 
@@ -553,7 +562,7 @@ public class TransferDaoTest {
 		Assert.assertThat(resultIds, equalTo(expectedIds));
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
+	private void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final long heights[] = { 3 };
@@ -572,7 +581,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entities.size(), equalTo(1));
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(final int type) {
+	private void assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final long heights[] = { 3, 4, 1, 2 };
