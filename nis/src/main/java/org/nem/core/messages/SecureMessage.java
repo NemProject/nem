@@ -1,6 +1,6 @@
 package org.nem.core.messages;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Cipher;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
