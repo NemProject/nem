@@ -179,7 +179,7 @@ public class BlockTransactionObserverFactoryTest {
 
 	private static class MockAccountContext {
 		private final Account account = Mockito.mock(Account.class);
-		private final ReadOnlyAccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+		private final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 		private final AccountImportance importance = Mockito.mock(AccountImportance.class);
 		private final WeightedBalances balances = Mockito.mock(WeightedBalances.class);
 		private final Address address = Utils.generateRandomAddress();
