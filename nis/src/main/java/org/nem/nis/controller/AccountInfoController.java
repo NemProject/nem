@@ -21,7 +21,7 @@ public class AccountInfoController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
-	private final AccoutStateRepository accoutStateRepository;
+	private final AccountStateRepository accountStateRepository;
 
 	@Autowired(required = true)
 	AccountInfoController(
@@ -29,12 +29,12 @@ public class AccountInfoController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
-			final AccoutStateRepository accoutStateRepository) {
+			final AccountStateRepository accountStateRepository) {
 		this.unlockedAccounts = unlockedAccounts;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
-		this.accoutStateRepository = accoutStateRepository;
+		this.accountStateRepository = accountStateRepository;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class AccountInfoController {
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final AccountState accountState = this.accoutStateRepository.findStateByAddress(address);
+		final AccountState accountState = this.accountStateRepository.findStateByAddress(address);
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
 		return remoteStatus.toAccountRemoteStatus();
 	}

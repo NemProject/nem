@@ -223,10 +223,10 @@ public class PruningObserverTest {
 	}
 
 	private static class TestContext {
-		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
 		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 		private final List<AccountState> accountStates = new ArrayList<>();
-		private final BlockTransactionObserver observer = new PruningObserver(this.accoutStateRepository, this.transactionHashCache);
+		private final BlockTransactionObserver observer = new PruningObserver(this.accountStateRepository, this.transactionHashCache);
 
 		private TestContext() {
 			for (int i = 0; i < 3; ++i) {
@@ -239,7 +239,7 @@ public class PruningObserverTest {
 				this.accountStates.add(accountState);
 			}
 
-			Mockito.when(this.accoutStateRepository.iterator()).thenReturn(this.accountStates.iterator());
+			Mockito.when(this.accountStateRepository.iterator()).thenReturn(this.accountStates.iterator());
 			Mockito.when(this.transactionHashCache.getRetentionTime()).thenReturn(RETENTION_HOURS);
 		}
 

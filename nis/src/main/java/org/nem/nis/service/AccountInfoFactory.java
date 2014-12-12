@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
-	private final AccoutStateRepository accoutStateRepository;
+	private final AccountStateRepository accountStateRepository;
 
 	/**
 	 * Creates a new account info factory.
@@ -24,9 +24,9 @@ public class AccountInfoFactory {
 	@Autowired(required = true)
 	public AccountInfoFactory(
 			final AccountLookup accountLookup,
-			final AccoutStateRepository accoutStateRepository) {
+			final AccountStateRepository accountStateRepository) {
 		this.accountLookup = accountLookup;
-		this.accoutStateRepository = accoutStateRepository;
+		this.accountStateRepository = accountStateRepository;
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class AccountInfoFactory {
 	 */
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
-		final AccountState accountState = this.accoutStateRepository.findStateByAddress(address);
+		final AccountState accountState = this.accountStateRepository.findStateByAddress(address);
 		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
 
 		final AccountImportance ai = accountState.getImportanceInfo();

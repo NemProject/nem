@@ -9,15 +9,15 @@ import org.nem.nis.state.AccountInfo;
  * Transfer observer that commits balance changes to the underlying accounts.
  */
 public class BalanceCommitTransferObserver implements TransferObserver {
-	private final AccoutStateRepository accoutStateRepository;
+	private final AccountStateRepository accountStateRepository;
 
 	/**
 	 * Creates an observer.
 	 *
-	 * @param accoutStateRepository The poi facade.
+	 * @param accountStateRepository The poi facade.
 	 */
-	public BalanceCommitTransferObserver(final AccoutStateRepository accoutStateRepository) {
-		this.accoutStateRepository = accoutStateRepository;
+	public BalanceCommitTransferObserver(final AccountStateRepository accountStateRepository) {
+		this.accountStateRepository = accountStateRepository;
 	}
 
 	@Override
@@ -37,6 +37,6 @@ public class BalanceCommitTransferObserver implements TransferObserver {
 	}
 
 	private AccountInfo getAccountInfo(final Account account) {
-		return this.accoutStateRepository.findStateByAddress(account.getAddress()).getAccountInfo();
+		return this.accountStateRepository.findStateByAddress(account.getAddress()).getAccountInfo();
 	}
 }

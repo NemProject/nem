@@ -12,15 +12,15 @@ import java.math.BigInteger;
  * A block transaction observer that updates outlink information.
  */
 public class OutlinkObserver implements BlockTransactionObserver {
-	private final AccoutStateRepository accoutStateRepository;
+	private final AccountStateRepository accountStateRepository;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param accoutStateRepository The poi facade.
+	 * @param accountStateRepository The poi facade.
 	 */
-	public OutlinkObserver(final AccoutStateRepository accoutStateRepository) {
-		this.accoutStateRepository = accoutStateRepository;
+	public OutlinkObserver(final AccountStateRepository accountStateRepository) {
+		this.accountStateRepository = accountStateRepository;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 	}
 
 	private AccountState getState(final Account account) {
-		return this.accoutStateRepository.findStateByAddress(account.getAddress());
+		return this.accountStateRepository.findStateByAddress(account.getAddress());
 	}
 
 	private static long getNumMicroNem(final Amount amount) {

@@ -32,15 +32,15 @@ public class BlockTransactionObserverFactory {
 	}
 
 	private static AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache) {
-		final AccoutStateRepository accoutStateRepository = nisCache.getPoiFacade();
+		final AccountStateRepository accountStateRepository = nisCache.getPoiFacade();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-		builder.add(new WeightedBalancesObserver(accoutStateRepository));
+		builder.add(new WeightedBalancesObserver(accountStateRepository));
 		builder.add(new AccountsHeightObserver(nisCache));
-		builder.add(new BalanceCommitTransferObserver(accoutStateRepository));
-		builder.add(new HarvestRewardCommitObserver(accoutStateRepository));
-		builder.add(new RemoteObserver(accoutStateRepository));
-		builder.add(new OutlinkObserver(accoutStateRepository));
-		builder.add(new PruningObserver(accoutStateRepository, nisCache.getTransactionHashCache()));
+		builder.add(new BalanceCommitTransferObserver(accountStateRepository));
+		builder.add(new HarvestRewardCommitObserver(accountStateRepository));
+		builder.add(new RemoteObserver(accountStateRepository));
+		builder.add(new OutlinkObserver(accountStateRepository));
+		builder.add(new PruningObserver(accountStateRepository, nisCache.getTransactionHashCache()));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
 		return builder;
 	}

@@ -348,11 +348,11 @@ public class UnconfirmedTransactions {
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
-		private final AccoutStateRepository accoutStateRepository;
+		private final AccountStateRepository accountStateRepository;
 		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
-		public UnconfirmedBalancesObserver(final AccoutStateRepository accoutStateRepository) {
-			this.accoutStateRepository = accoutStateRepository;
+		public UnconfirmedBalancesObserver(final AccountStateRepository accountStateRepository) {
+			this.accountStateRepository = accountStateRepository;
 		}
 
 		public Amount get(final Account account) {
@@ -385,7 +385,7 @@ public class UnconfirmedTransactions {
 		}
 
 		private Amount getBalance(final Account account) {
-			return this.accoutStateRepository.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+			return this.accountStateRepository.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		}
 	}
 }

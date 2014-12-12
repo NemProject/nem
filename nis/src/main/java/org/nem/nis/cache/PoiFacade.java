@@ -1,15 +1,12 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.AccountState;
-import org.nem.nis.validators.DebitPredicate;
 
 /**
  * A repository of all mutable NEM account state.
  * TODO 20141211 - rename to something else!
  */
-public interface PoiFacade extends AccoutStateRepository {
+public interface PoiFacade extends AccountStateRepository {
 
 	/**
 	 * Gets the size of the last poi vector (needed for time synchronization).

@@ -8,20 +8,20 @@ import org.nem.nis.state.*;
  * Block validator that ensures the block signer is valid.
  */
 public class EligibleSignerBlockValidator implements BlockValidator {
-	private final AccoutStateRepository accoutStateRepository;
+	private final AccountStateRepository accountStateRepository;
 
 	/**
 	 * Creates a new validator.
 	 *
-	 * @param accoutStateRepository The poi facade.
+	 * @param accountStateRepository The poi facade.
 	 */
-	public EligibleSignerBlockValidator(final AccoutStateRepository accoutStateRepository) {
-		this.accoutStateRepository = accoutStateRepository;
+	public EligibleSignerBlockValidator(final AccountStateRepository accountStateRepository) {
+		this.accountStateRepository = accountStateRepository;
 	}
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		final AccountState accountState = this.accoutStateRepository.findStateByAddress(block.getSigner().getAddress());
+		final AccountState accountState = this.accountStateRepository.findStateByAddress(block.getSigner().getAddress());
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(block.getHeight());
 
 		switch (remoteStatus) {

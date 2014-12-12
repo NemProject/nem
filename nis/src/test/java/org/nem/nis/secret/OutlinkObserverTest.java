@@ -143,7 +143,7 @@ public class OutlinkObserverTest {
 		private final AccountImportance importance2;
 		private final WeightedBalances weightedBalances1;
 		private final WeightedBalances weightedBalances2;
-		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
 
 		public TestContext() {
 			final BlockHeight height = new BlockHeight(111);
@@ -159,7 +159,7 @@ public class OutlinkObserverTest {
 		}
 
 		private OutlinkObserver createObserver() {
-			return new OutlinkObserver(this.accoutStateRepository);
+			return new OutlinkObserver(this.accountStateRepository);
 		}
 
 		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances, final BlockHeight height) {
@@ -167,7 +167,7 @@ public class OutlinkObserverTest {
 			Mockito.when(account.getAddress()).thenReturn(address);
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
-			Mockito.when(this.accoutStateRepository.findStateByAddress(address)).thenReturn(accountState);
+			Mockito.when(this.accountStateRepository.findStateByAddress(address)).thenReturn(accountState);
 			Mockito.when(accountState.getAddress()).thenReturn(address);
 			Mockito.when(accountState.getImportanceInfo()).thenReturn(importance);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);

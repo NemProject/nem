@@ -91,8 +91,8 @@ public class HarvestRewardCommitObserverTest {
 		private final Address address = Utils.generateRandomAddress();
 		private final Account account = new Account(this.address);
 		private final AccountInfo accountInfo = new AccountInfo();
-		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
-		private final HarvestRewardCommitObserver observer = new HarvestRewardCommitObserver(this.accoutStateRepository);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final HarvestRewardCommitObserver observer = new HarvestRewardCommitObserver(this.accountStateRepository);
 
 		public TestContext(final Amount amount, final int numHarvestedBlocks) {
 			this.accountInfo.incrementBalance(amount);
@@ -102,7 +102,7 @@ public class HarvestRewardCommitObserverTest {
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(this.accountInfo);
-			Mockito.when(this.accoutStateRepository.findStateByAddress(this.address)).thenReturn(accountState);
+			Mockito.when(this.accountStateRepository.findStateByAddress(this.address)).thenReturn(accountState);
 		}
 
 		private void notifyHarvestRewardExecute() {

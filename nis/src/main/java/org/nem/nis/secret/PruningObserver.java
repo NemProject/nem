@@ -16,16 +16,16 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = BlockChainConstants.OUTLINK_HISTORY;
 	private static final long PRUNE_INTERVAL = 360;
-	private final AccoutStateRepository accoutStateRepository;
+	private final AccountStateRepository accountStateRepository;
 	private final HashCache transactionHashCache;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param accoutStateRepository The poi facade.
+	 * @param accountStateRepository The poi facade.
 	 */
-	public PruningObserver(final AccoutStateRepository accoutStateRepository, final HashCache transactionHashCache) {
-		this.accoutStateRepository = accoutStateRepository;
+	public PruningObserver(final AccountStateRepository accountStateRepository, final HashCache transactionHashCache) {
+		this.accountStateRepository = accountStateRepository;
 		this.transactionHashCache = transactionHashCache;
 	}
 
@@ -40,7 +40,7 @@ public class PruningObserver implements BlockTransactionObserver {
 				? OUTLINK_BLOCK_HISTORY
 				: OUTLINK_BLOCK_HISTORY_OLD;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
-		for (final AccountState accountState : this.accoutStateRepository) {
+		for (final AccountState accountState : this.accountStateRepository) {
 			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}

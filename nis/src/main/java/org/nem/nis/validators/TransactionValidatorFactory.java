@@ -42,12 +42,12 @@ public class TransactionValidatorFactory {
 	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
-	 * @param accoutStateRepository The poi facade.
+	 * @param accountStateRepository The poi facade.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final AccoutStateRepository accoutStateRepository) {
+	public SingleTransactionValidator createSingle(final AccountStateRepository accountStateRepository) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, accoutStateRepository);
+		this.visitSingleSubValidators(builder::add, accountStateRepository);
 		return builder.build();
 	}
 
@@ -67,13 +67,13 @@ public class TransactionValidatorFactory {
 	 * Visits all sub validators that comprise the validator returned by createSingle.
 	 *
 	 * @param visitor The visitor.
-	 * @param accoutStateRepository The poi facade.
+	 * @param accountStateRepository The poi facade.
 	 */
-	public void visitSingleSubValidators(final Consumer<SingleTransactionValidator> visitor, final AccoutStateRepository accoutStateRepository) {
+	public void visitSingleSubValidators(final Consumer<SingleTransactionValidator> visitor, final AccountStateRepository accountStateRepository) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());
-		visitor.accept(new ImportanceTransferTransactionValidator(accoutStateRepository, this.poiOptions.getMinHarvesterBalance()));
+		visitor.accept(new ImportanceTransferTransactionValidator(accountStateRepository, this.poiOptions.getMinHarvesterBalance()));
 	}
 
 	/**

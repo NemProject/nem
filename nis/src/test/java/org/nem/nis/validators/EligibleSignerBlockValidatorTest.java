@@ -81,10 +81,10 @@ public class EligibleSignerBlockValidatorTest {
 			accountState.getRemoteLinks().addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(changeHeight), mode, owner));
 		}
 
-		final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
-		Mockito.when(accoutStateRepository.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
+		final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		Mockito.when(accountStateRepository.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
 
-		final BlockValidator validator = new EligibleSignerBlockValidator(accoutStateRepository);
+		final BlockValidator validator = new EligibleSignerBlockValidator(accountStateRepository);
 
 		// Act:
 		final ValidationResult result = validator.validate(block);

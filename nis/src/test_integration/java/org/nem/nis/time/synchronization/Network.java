@@ -250,7 +250,7 @@ public class Network {
 						ageToUse * UPDATE_INTERVAL_ELONGATION_STRENGTH, UPDATE_INTERVAL_MAXIMUM);
 	}
 
-	private AccoutStateRepository resetFacade() {
+	private AccountStateRepository resetFacade() {
 		this.poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -266,7 +266,7 @@ public class Network {
 	 *
 	 * @param facade The POI facade.
 	 */
-	private void initializeFacade(final AccoutStateRepository facade) {
+	private void initializeFacade(final AccountStateRepository facade) {
 		// We assume that evil nodes have significant lower cumulative importance than friendly nodes.
 		final int numberOfEvilNodes = (this.nodes.size() * this.nodeSettings.getPercentageEvilNodes()) / 100;
 		for (final TimeAwareNode node : this.nodes) {
@@ -279,7 +279,7 @@ public class Network {
 		this.setFacadeLastPoiVectorSize(facade, this.nodes.size());
 	}
 
-	private void setFacadeLastPoiVectorSize(final AccoutStateRepository facade, final int lastPoiVectorSize) {
+	private void setFacadeLastPoiVectorSize(final AccountStateRepository facade, final int lastPoiVectorSize) {
 		try {
 			final Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);

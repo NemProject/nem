@@ -5,7 +5,10 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.DebitPredicate;
 
-public interface AccoutStateRepository extends Iterable<AccountState> {
+/**
+ * A repository of all NEM account state.
+ */
+public interface AccountStateRepository extends Iterable<AccountState> {
 	/**
 	 * Finds a poi account state given an address. This function will NOT return
 	 * forwarded states.

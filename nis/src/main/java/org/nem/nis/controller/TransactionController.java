@@ -25,7 +25,7 @@ public class TransactionController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final SingleTransactionValidator validator;
 	private final NisPeerNetworkHost host;
-	private final AccoutStateRepository accoutStateRepository;
+	private final AccountStateRepository accountStateRepository;
 
 	@Autowired(required = true)
 	TransactionController(
@@ -34,13 +34,13 @@ public class TransactionController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final SingleTransactionValidator validator,
 			final NisPeerNetworkHost host,
-			final AccoutStateRepository accoutStateRepository) {
+			final AccountStateRepository accountStateRepository) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.host = host;
-		this.accoutStateRepository = accoutStateRepository;
+		this.accountStateRepository = accountStateRepository;
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class TransactionController {
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
 		final Transaction transfer = deserializeTransaction(deserializer);
 
-		final ValidationContext context = new ValidationContext(this.accoutStateRepository.getDebitPredicate());
+		final ValidationContext context = new ValidationContext(this.accountStateRepository.getDebitPredicate());
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
 			throw new IllegalArgumentException(validationResult.toString());

@@ -184,7 +184,7 @@ public class BlockTransactionObserverFactoryTest {
 		private final WeightedBalances balances = Mockito.mock(WeightedBalances.class);
 		private final Address address = Utils.generateRandomAddress();
 
-		public MockAccountContext(final AccoutStateRepository accoutStateRepository) {
+		public MockAccountContext(final AccountStateRepository accountStateRepository) {
 			Mockito.when(this.account.getAddress()).thenReturn(this.address);
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
@@ -192,7 +192,7 @@ public class BlockTransactionObserverFactoryTest {
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 			Mockito.when(accountState.getImportanceInfo()).thenReturn(this.importance);
 
-			Mockito.when(accoutStateRepository.findStateByAddress(this.address)).thenReturn(accountState);
+			Mockito.when(accountStateRepository.findStateByAddress(this.address)).thenReturn(accountState);
 		}
 	}
 
