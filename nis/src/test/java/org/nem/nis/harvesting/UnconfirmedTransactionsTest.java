@@ -12,6 +12,7 @@ import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -600,6 +601,70 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
+	//region getMostRecentTransactions
+
+	@Test
+	public void getMostRecentTransactionsReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		transactions.forEach(context::signAndAddExisting);
+
+		// Act:
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(20);
+
+		// Assert:
+		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+	}
+
+	@Test
+	public void getMostRecentTransactionsReturnsMaximumTransactionsIfMoreThanGivenLimitTransactionsAreAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(20);
+		transactions.forEach(context::signAndAddExisting);
+
+		// Act:
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(10);
+
+		// Assert:
+		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+	}
+
+	@Test
+	public void getMostRecentTransactionsReturnsMaximumTransactionsIfGivenLimitTransactionsAreAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		transactions.forEach(context::signAndAddExisting);
+
+		// Act:
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(10);
+
+		// Assert:
+		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+	}
+
+	@Test
+	public void getMostRecentTransactionsReturnsTransactionsSortedByTimeInDescendingOrder() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		transactions.forEach(context::signAndAddExisting);
+
+		// Act:
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(25);
+
+		// Assert:
+		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
+		for (Transaction tx : mostRecentTransactions) {
+			Assert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
+			curTimeStamp = tx.getTimeStamp();
+		}
+	}
+
+	//endregion
+
 	//region getTransactions
 
 	@Test
@@ -1122,15 +1187,34 @@ public class UnconfirmedTransactionsTest {
 			final List<MockTransaction> transactions = new ArrayList<>();
 
 			for (int i = startCustomField; i <= endCustomField; ++i) {
-				final MockTransaction transaction = new MockTransaction(
-						this.addAccount(Amount.fromNem(1000)),
-						i,
-						new TimeInstant(i));
-				transaction.setFee(Amount.fromNem(i));
-				transactions.add(transaction);
+				transactions.add(createMockTransaction(Amount.fromNem(1000), i, new TimeInstant(i), Amount.fromNem(i)));
 			}
 
 			return transactions;
+		}
+
+		private List<MockTransaction> createMockTransactionsWithRandomTimeStamp(final int count) {
+			final List<MockTransaction> transactions = new ArrayList<>();
+			final SecureRandom random = new SecureRandom();
+
+			for (int i = 0; i < count; ++i) {
+				transactions.add(createMockTransaction(Amount.fromNem(1000), i, new TimeInstant(random.nextInt(1_000_000)), Amount.fromNem(i)));
+			}
+
+			return transactions;
+		}
+
+		private MockTransaction createMockTransaction(
+				final Amount amount,
+				final int customField,
+				final TimeInstant timeStamp,
+				final Amount fee) {
+			final MockTransaction transaction = new MockTransaction(
+					this.addAccount(amount),
+					customField,
+					timeStamp);
+			transaction.setFee(fee);
+			return transaction;
 		}
 
 		private Collection<Transaction> createMockTransactionsAsBatch(final int startCustomField, final int endCustomField) {

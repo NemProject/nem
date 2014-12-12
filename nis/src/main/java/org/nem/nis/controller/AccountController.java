@@ -22,6 +22,7 @@ import java.util.stream.*;
  */
 @RestController
 public class AccountController {
+	private static final int MAX_UNCONFIRMED_TRANSACTIONS = 25;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
@@ -159,7 +160,9 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		return new SerializableList<>(this.unconfirmedTransactions.getTransactionsForAccount(address).getAll());
+		return new SerializableList<>(this.unconfirmedTransactions
+				.getTransactionsForAccount(address)
+				.getMostRecentTransactions(MAX_UNCONFIRMED_TRANSACTIONS));
 	}
 
 	/**

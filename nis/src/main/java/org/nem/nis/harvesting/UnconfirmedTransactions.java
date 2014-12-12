@@ -250,6 +250,18 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
+	 * Gets the most recent transactions up to a given limit.
+	 *
+	 * @return The most recent transactions from this unconfirmed transactions.
+	 */
+	public List<Transaction> getMostRecentTransactions(final int maxSize) {
+		return this.transactions.values().stream()
+				.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
+				.limit(maxSize)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Gets all transactions up to a given limit of transactions.
 	 *
 	 * @return The list of unconfirmed transactions.
