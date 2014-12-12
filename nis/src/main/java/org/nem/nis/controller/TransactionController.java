@@ -8,7 +8,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
-import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.PushService;
@@ -117,13 +117,13 @@ public class TransactionController {
 	@P2PApi
 	@AuthenticatedApi
 	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(@RequestBody final AuthenticatedUnconfirmedTransactionsRequest request) {
-		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions());
+		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions(request.getEntity()));
 		final Node localNode = this.host.getNetwork().getLocalNode();
 		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), request.getChallenge());
 	}
 
-	private Collection<Transaction> getUnconfirmedTransactions() {
-		return this.unconfirmedTransactions.getAll();
+	private Collection<Transaction> getUnconfirmedTransactions(final UnconfirmedTransactionsRequest request) {
+		return this.unconfirmedTransactions.getUnknownTransactions(request.getHashShortIds());
 	}
 
 	private Transaction deserializeTransaction(final byte[] bytes) {

@@ -189,7 +189,7 @@ public class TransactionControllerTest {
 			final Function<TestContext, T> action,
 			final Function<T, SerializableList<Transaction>> getUnconfirmedTransactions) {
 		// Arrange:
-		Mockito.when(context.unconfirmedTransactions.getAll()).thenReturn(createTransactionList());
+		Mockito.when(context.unconfirmedTransactions.getUnknownTransactions(Mockito.any())).thenReturn(createTransactionList());
 
 		// Act:
 		final T result = action.apply(context);
@@ -198,7 +198,7 @@ public class TransactionControllerTest {
 		// Assert:
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(1));
 		Assert.assertThat(transactions.get(0).getTimeStamp(), IsEqual.equalTo(new TimeInstant(321)));
-		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getAll();
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getUnknownTransactions(Mockito.any());
 		return result;
 	}
 
