@@ -45,11 +45,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountCache accountCache) {
-		return new DefaultNisCache(
-				accountCache,
-				Mockito.mock(AccountStateCache.class),
-				Mockito.mock(SynchronizedPoiFacade.class),
-				Mockito.mock(HashCache.class)).copy();
+		return create(accountCache, null, null, null);
 	}
 
 	/**
@@ -60,11 +56,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountCache accountCache, final AccountStateCache accountStateCache) {
-		return new DefaultNisCache(
-				accountCache,
-				accountStateCache,
-				Mockito.mock(SynchronizedPoiFacade.class),
-				Mockito.mock(HashCache.class)).copy();
+		return create(accountCache, accountStateCache, null, null);
 	}
 
 	/**
@@ -74,11 +66,18 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache) {
-		return new DefaultNisCache(
-				Mockito.mock(AccountCache.class),
-				accountStateCache,
-				Mockito.mock(SynchronizedPoiFacade.class),
-				Mockito.mock(HashCache.class)).copy();
+		return create(null, accountStateCache, null, null);
+	}
+
+	/**
+	 * Creates a NIS cache around a poi facade.
+	 *
+	 * @param accountStateCache The account state cache.
+	 * @param poiFacade The poiFacade.
+	 * @return The NIS cache.
+	 */
+	public static NisCache create(final AccountStateCache accountStateCache, final DefaultPoiFacade poiFacade) {
+		return create(null, accountStateCache, poiFacade, null);
 	}
 
 	/**
@@ -89,11 +88,44 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static NisCache create(final AccountStateCache accountStateCache, final HashCache hashCache) {
-		return new DefaultNisCache(
-				Mockito.mock(AccountCache.class),
-				accountStateCache,
-				Mockito.mock(SynchronizedPoiFacade.class),
-				hashCache).copy();
+		return create(null, accountStateCache, null, hashCache);
+	}
+
+	private static NisCache create(
+			final AccountCache accountCache,
+			final AccountStateCache accountStateCache,
+			final DefaultPoiFacade poiFacade,
+			final HashCache hashCache) {
+		return new NisCache() {
+			@Override
+			public AccountCache getAccountCache() {
+				return null == accountCache ? Mockito.mock(AccountCache.class) : accountCache;
+			}
+
+			@Override
+			public AccountStateCache getAccountStateCache() {
+				return null == accountStateCache ? Mockito.mock(AccountStateCache.class) : accountStateCache;
+			}
+
+			@Override
+			public PoiFacade getPoiFacade() {
+				return null == poiFacade ? Mockito.mock(SynchronizedPoiFacade.class) : new SynchronizedPoiFacade(poiFacade);
+			}
+
+			@Override
+			public HashCache getTransactionHashCache() {
+				return null == hashCache ? Mockito.mock(HashCache.class) : hashCache;
+			}
+
+			@Override
+			public void commit() {
+			}
+
+			@Override
+			public NisCache copy() {
+				throw new IllegalStateException();
+			}
+		};
 	}
 
 	//endregion
@@ -108,10 +140,7 @@ public class NisCacheFactory {
 	* @return The NIS cache.
 	*/
 	public static ReadOnlyNisCache createReadOnly(final AccountCache accountCache, final ReadOnlyAccountStateCache accountStateCache) {
-		return createReadOnly(
-				accountCache,
-				accountStateCache,
-				Mockito.mock(HashCache.class));
+		return createReadOnly(accountCache, accountStateCache, null);
 	}
 
 	/**
@@ -124,10 +153,7 @@ public class NisCacheFactory {
 	public static ReadOnlyNisCache createReadOnly(
 			final ReadOnlyAccountStateCache accountStateCache,
 			final HashCache hashCache) {
-		return createReadOnly(
-				Mockito.mock(AccountCache.class),
-				accountStateCache,
-				hashCache);
+		return createReadOnly(null, accountStateCache, hashCache);
 	}
 
 	private static ReadOnlyNisCache createReadOnly(
@@ -137,12 +163,12 @@ public class NisCacheFactory {
 		return new ReadOnlyNisCache() {
 			@Override
 			public AccountCache getAccountCache() {
-				return accountCache;
+				return null == accountCache ? Mockito.mock(AccountCache.class) : accountCache;
 			}
 
 			@Override
 			public ReadOnlyAccountStateCache getAccountStateCache() {
-				return accountStateCache;
+				return null == accountStateCache ? Mockito.mock(AccountStateCache.class) : accountStateCache;
 			}
 
 			@Override
@@ -152,7 +178,7 @@ public class NisCacheFactory {
 
 			@Override
 			public HashCache getTransactionHashCache() {
-				return hashCache;
+				return null == hashCache ? Mockito.mock(HashCache.class) : hashCache;
 			}
 
 			@Override

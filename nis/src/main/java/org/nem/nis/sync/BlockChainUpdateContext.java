@@ -130,8 +130,8 @@ public class BlockChainUpdateContext {
 	 * 4. update db with "peer's" chain
 	 */
 	private void updateOurChain() {
-		// TODO 20141212 J-*: change to copyFrom
-		//this.nisCache.shallowCopyTo(this.originalNisCache);
+		// copy back changes into the "real" nis cache
+		this.nisCache.commit();
 
 		if (this.hasOwnChain) {
 			// mind that we're using "new" (replaced) accountAnalyzer

@@ -29,6 +29,13 @@ public class BlockAnalyzer {
 	private final BlockChainScoreManager blockChainScoreManager;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 
+	/**
+	 * Creates a new block analyzer.
+	 *
+	 * @param blockDao The block dao.
+	 * @param blockChainScoreManager The block chain score manager.
+	 * @param blockChainLastBlockLayer The block chain last block layer.
+	 */
 	@Autowired(required = true)
 	public BlockAnalyzer(
 			final BlockDao blockDao,
@@ -39,18 +46,24 @@ public class BlockAnalyzer {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 
-	public boolean analyze(final ReadOnlyNisCache nisCache) {
-		return this.analyze(nisCache.copy(), null);
+	/**
+	 * Analyzes all blocks in the database.
+	 *
+	 * @param nisCache The readonly cache.
+	 * @return true if the analysis succeeded.
+	 */
+	public boolean analyze(final NisCache nisCache) {
+		return this.analyze(nisCache, null);
 	}
 
-	public boolean analyze(final ReadOnlyNisCache nisCache, final Long maxHeight) {
-		final NisCache nisCacheCopy = nisCache.copy();
-		final boolean result = this.analyze(nisCacheCopy, maxHeight);
-		nisCacheCopy.commit();
-		return result;
-	}
-
-	private boolean analyze(final NisCache nisCache, final Long maxHeight) {
+	/**
+	 * Analyzes all blocks in the database up to the specified height.
+	 *
+	 * @param nisCache The readonly cache.
+	 * @param maxHeight The max height.
+	 * @return true if the analysis succeeded.
+	 */
+	public boolean analyze(final NisCache nisCache, final Long maxHeight) {
 		final Block nemesisBlock = this.loadNemesisBlock(nisCache);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
@@ -119,7 +132,6 @@ public class BlockAnalyzer {
 			}
 		} while (dbBlock != null);
 
-		this.initializePoi(nisCache, parentBlock.getHeight());
 		return true;
 	}
 
@@ -160,17 +172,6 @@ public class BlockAnalyzer {
 			this.curHeight = dbBlock.getHeight();
 			return dbBlock;
 		}
-	}
-
-	private void initializePoi(final NisCache nisCache, final BlockHeight height) {
-		LOGGER.info("Analyzed blocks: " + height);
-		LOGGER.info("Known accounts: " + nisCache.getAccountCache().size());
-		LOGGER.info(String.format("Initializing PoI for (%d) accounts", nisCache.getAccountCache().size()));
-		final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
-		nisCache.getPoiFacade().recalculateImportances(
-				blockHeight,
-				IteratorUtils.toList(nisCache.getAccountStateCache().iterator()));
-		LOGGER.info("PoI initialized");
 	}
 
 	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {

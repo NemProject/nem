@@ -5,7 +5,7 @@ package org.nem.nis.cache;
  */
 public class DefaultNisCache implements ReadOnlyNisCache {
 	private final AccountCache accountCache;
-	private final AccountStateCache accountStateCache;
+	private final DefaultAccountStateCache accountStateCache;
 	private final SynchronizedPoiFacade poiFacade;
 	private final HashCache transactionHashCache;
 
@@ -18,7 +18,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 */
 	public DefaultNisCache(
 			final AccountCache accountCache,
-			final AccountStateCache accountStateCache,
+			final DefaultAccountStateCache accountStateCache,
 			final SynchronizedPoiFacade poiFacade,
 			final HashCache transactionHashCache) {
 		this.accountCache = accountCache;
@@ -38,7 +38,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 	@Override
 	public ReadOnlyAccountStateCache getAccountStateCache() {
-		return null;
+		return this.accountStateCache;
 	}
 
 	/**
@@ -67,17 +67,16 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private static class DefaultNisCacheCopy implements NisCache {
 		private final DefaultNisCache cache;
 		private final AccountCache accountCache;
-		private final AccountStateCache accountStateCache;
+		private final DefaultAccountStateCache accountStateCache;
 		private final SynchronizedPoiFacade poiFacade;
 		private final HashCache transactionHashCache;
 
 		private DefaultNisCacheCopy(final DefaultNisCache cache) {
 			this.cache = cache;
-			// TODO 20141212 huge bug
-			this.accountCache = cache.accountCache;//.copy();
-			this.accountStateCache = cache.accountStateCache;
-			this.poiFacade = cache.poiFacade;//.copy();
-			this.transactionHashCache = cache.transactionHashCache;//.copy();
+			this.accountCache = cache.accountCache.copy();
+			this.accountStateCache = cache.accountStateCache.copy();
+			this.poiFacade = cache.poiFacade.copy();
+			this.transactionHashCache = cache.transactionHashCache.copy();
 		}
 
 		@Override
@@ -102,12 +101,13 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 		@Override
 		public NisCache copy() {
-			return null;
+			 throw new IllegalStateException("nested copies are not currently allowed");
 		}
 
 		@Override
 		public void commit() {
 			this.accountCache.shallowCopyTo(this.cache.accountCache);
+			this.accountStateCache.shallowCopyTo(this.cache.accountStateCache);
 			this.poiFacade.shallowCopyTo(this.cache.poiFacade);
 			this.transactionHashCache.shallowCopyTo(this.cache.transactionHashCache);
 		}

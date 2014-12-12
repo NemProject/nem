@@ -42,6 +42,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new OutlinkObserver(accountStateCache));
 		builder.add(new PruningObserver(accountStateCache, nisCache.getTransactionHashCache()));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
+		builder.add(new RecalculateImportancesObserver(nisCache));
 		return builder;
 	}
 }

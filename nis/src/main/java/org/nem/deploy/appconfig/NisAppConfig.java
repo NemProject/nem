@@ -209,7 +209,7 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public AccountStateCache accountStateCache() {
+	public DefaultAccountStateCache accountStateCache() {
 		return new DefaultAccountStateCache();
 	}
 

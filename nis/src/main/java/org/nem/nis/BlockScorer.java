@@ -98,8 +98,8 @@ public class BlockScorer {
 	 * @return The forager balance.
 	 */
 	public long calculateForgerBalance(final Block block) {
+		// TODO 20141212 J-*: it would be nice to hide the height grouping in the PoiFacade
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(block.getHeight());
-		// TODO 20141212 broke poi!!! this.accountStateCache.recalculateImportances(groupedHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
 		final ReadOnlyAccountImportance accountImportance = this.accountStateCache

@@ -54,9 +54,12 @@ public class NisMain {
 	}
 
 	private void analyzeBlocks() {
-		if (!this.blockAnalyzer.analyze(this.nisCache)) {
+		final NisCache nisCache = this.nisCache.copy();
+		if (!this.blockAnalyzer.analyze(nisCache)) {
 			System.exit(-1);
 		}
+
+		nisCache.commit();
 	}
 
 	@PostConstruct
