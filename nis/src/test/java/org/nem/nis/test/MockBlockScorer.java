@@ -17,7 +17,7 @@ public class MockBlockScorer extends BlockScorer {
 	private final Map<BlockScoreKey, Long> blockScores = new HashMap<>();
 
 	public MockBlockScorer() {
-		super(Mockito.mock(ReadOnlyAccountStateRepository.class));
+		super(Mockito.mock(ReadOnlyAccountStateCache.class));
 	}
 
 	/**

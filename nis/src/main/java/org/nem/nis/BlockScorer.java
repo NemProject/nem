@@ -39,10 +39,10 @@ public class BlockScorer {
 	 */
 	private static final int POI_GROUPING = 359;
 
-	public final ReadOnlyAccountStateRepository poiFacade;
+	public final ReadOnlyAccountStateCache accountStateCache;
 
-	public BlockScorer(final ReadOnlyAccountStateRepository poiFacade) {
-		this.poiFacade = poiFacade;
+	public BlockScorer(final ReadOnlyAccountStateCache accountStateCache) {
+		this.accountStateCache = accountStateCache;
 	}
 
 	/**
@@ -99,10 +99,10 @@ public class BlockScorer {
 	 */
 	public long calculateForgerBalance(final Block block) {
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(block.getHeight());
-		// TODO 20141212 broke poi!!! this.poiFacade.recalculateImportances(groupedHeight);
+		// TODO 20141212 broke poi!!! this.accountStateCache.recalculateImportances(groupedHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
-		final ReadOnlyAccountImportance accountImportance = this.poiFacade
+		final ReadOnlyAccountImportance accountImportance = this.accountStateCache
 				.findForwardedStateByAddress(signerAddress, block.getHeight())
 				.getImportanceInfo();
 		return (long)(accountImportance.getImportance(groupedHeight) * multiplier);

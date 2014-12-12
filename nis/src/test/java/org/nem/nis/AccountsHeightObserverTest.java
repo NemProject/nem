@@ -8,7 +8,6 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
@@ -51,8 +50,8 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account2), createExecuteNotificationContext(34));
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.times(2)).findStateByAddress(account1.getAddress());
-		Mockito.verify(context.poiFacade, Mockito.times(1)).findStateByAddress(account2.getAddress());
+		Mockito.verify(context.accountStateCache, Mockito.times(2)).findStateByAddress(account1.getAddress());
+		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(account2.getAddress());
 	}
 
 	@Test
@@ -67,7 +66,7 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
 
 		// Assert:
-		final AccountState state = context.poiFacade.findStateByAddress(account1.getAddress());
+		final AccountState state = context.accountStateCache.findStateByAddress(account1.getAddress());
 		Assert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 	}
 
@@ -83,7 +82,7 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
 
 		// Assert:
-		final ReadOnlyAccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		final ReadOnlyAccountInfo accountInfo = context.accountStateCache.findStateByAddress(account1.getAddress()).getAccountInfo();
 		Assert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 	}
 
@@ -107,7 +106,7 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(accountHeight);
-		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		final AccountInfo accountInfo = context.accountStateCache.findStateByAddress(account1.getAddress()).getAccountInfo();
 		accountInfo.incrementReferenceCount();
 
 		// Act:
@@ -115,7 +114,7 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.times(1)).removeFromCache(account1.getAddress());
-		Mockito.verify(context.poiFacade, Mockito.times(1)).removeFromCache(account1.getAddress());
+		Mockito.verify(context.accountStateCache, Mockito.times(1)).removeFromCache(account1.getAddress());
 	}
 
 	@Test
@@ -123,7 +122,7 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(12);
-		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		final AccountInfo accountInfo = context.accountStateCache.findStateByAddress(account1.getAddress()).getAccountInfo();
 		accountInfo.incrementReferenceCount();
 		accountInfo.incrementReferenceCount();
 
@@ -132,15 +131,15 @@ public class AccountsHeightObserverTest {
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.times(0)).removeFromCache(Mockito.any());
-		Mockito.verify(context.poiFacade, Mockito.times(0)).removeFromCache(Mockito.any());
+		Mockito.verify(context.accountStateCache, Mockito.times(0)).removeFromCache(Mockito.any());
 	}
 
 	@Test
 	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
 		final AccountCache accountCache = new AccountCache();
-		final AccountStateRepository poiFacade = new DefaultAccountStateRepository();
-		final AccountsHeightObserver observer = new AccountsHeightObserver(NisCacheFactory.create(accountCache, poiFacade));
+		final AccountStateCache accountStateCache = new DefaultAccountStateCache();
+		final AccountsHeightObserver observer = new AccountsHeightObserver(NisCacheFactory.create(accountCache, accountStateCache));
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 
 		// Act:
@@ -167,7 +166,7 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(12);
-		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		final AccountInfo accountInfo = context.accountStateCache.findStateByAddress(account1.getAddress()).getAccountInfo();
 		accountInfo.incrementReferenceCount();
 
 		// Act:
@@ -179,7 +178,7 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(0);
-		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		final AccountInfo accountInfo = context.accountStateCache.findStateByAddress(account1.getAddress()).getAccountInfo();
 		accountInfo.incrementReferenceCount();
 
 		// Act:
@@ -212,7 +211,7 @@ public class AccountsHeightObserverTest {
 				createExecuteNotificationContext(12));
 
 		// Assert:
-		Mockito.verifyZeroInteractions(context.accountCache, context.poiFacade);
+		Mockito.verifyZeroInteractions(context.accountCache, context.accountStateCache);
 	}
 
 	//endregion
@@ -227,14 +226,14 @@ public class AccountsHeightObserverTest {
 
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final AccountStateRepository poiFacade = Mockito.mock(AccountStateRepository.class);
-		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.poiFacade);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.accountStateCache);
 		private final AccountsHeightObserver observer = new AccountsHeightObserver(this.nisCache);
 
 		private void setupAccount(final Account account) {
 			final Address address = account.getAddress();
 			Mockito.when(this.accountCache.findByAddress(address)).thenReturn(account);
-			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(new AccountState(address));
+			Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(new AccountState(address));
 		}
 
 		private Account createAccountWithHeight(final int height) {
@@ -242,7 +241,7 @@ public class AccountsHeightObserverTest {
 			this.setupAccount(account);
 
 			if (height > 0) {
-				this.poiFacade.findStateByAddress(account.getAddress()).setHeight(new BlockHeight(height));
+				this.accountStateCache.findStateByAddress(account.getAddress()).setHeight(new BlockHeight(height));
 			}
 
 			return account;

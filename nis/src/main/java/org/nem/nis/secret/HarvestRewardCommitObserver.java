@@ -8,15 +8,15 @@ import org.nem.nis.state.AccountInfo;
  * BlockTransactionObserver that commits harvest rewards to accounts.
  */
 public class HarvestRewardCommitObserver implements BlockTransactionObserver {
-	private final AccountStateRepository accountStateRepository;
+	private final AccountStateCache accountStateCache;
 
 	/**
 	 * Creates an observer.
 	 *
-	 * @param accountStateRepository The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
-	public HarvestRewardCommitObserver(final AccountStateRepository accountStateRepository) {
-		this.accountStateRepository = accountStateRepository;
+	public HarvestRewardCommitObserver(final AccountStateCache accountStateCache) {
+		this.accountStateCache = accountStateCache;
 	}
 
 	@Override
@@ -29,7 +29,7 @@ public class HarvestRewardCommitObserver implements BlockTransactionObserver {
 	}
 
 	private void notify(final BalanceAdjustmentNotification notification, final BlockNotificationContext context) {
-		final AccountInfo accountInfo = this.accountStateRepository.findStateByAddress(notification.getAccount().getAddress()).getAccountInfo();
+		final AccountInfo accountInfo = this.accountStateCache.findStateByAddress(notification.getAccount().getAddress()).getAccountInfo();
 		if (NotificationTrigger.Execute == context.getTrigger()) {
 			accountInfo.incrementHarvestedBlocks();
 		} else {

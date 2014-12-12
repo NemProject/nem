@@ -5,11 +5,9 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
-import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 
@@ -50,7 +48,7 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
-		final AccountStateRepository accountStateCache = nisCache.getAccountStateCache();
+		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
@@ -79,7 +77,7 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final BlockLookup localBlockLookup,
 			final BlockHeight commonBlockHeight) {
-		final AccountStateRepository accountStateCache = nisCache.getAccountStateCache();
+		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 

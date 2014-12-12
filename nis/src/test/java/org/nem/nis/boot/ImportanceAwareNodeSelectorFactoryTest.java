@@ -24,7 +24,7 @@ public class ImportanceAwareNodeSelectorFactoryTest {
 				config.getTrustProvider(),
 				new PeerNetworkState(config, new NodeExperiences(), new NodeCollection()),
 				Mockito.mock(PoiFacade.class),
-				Mockito.mock(AccountStateRepository.class));
+				Mockito.mock(AccountStateCache.class));
 
 		// Assert:
 		Assert.assertThat(factory.createNodeSelector(), IsNull.notNullValue());

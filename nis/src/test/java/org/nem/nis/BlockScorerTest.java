@@ -192,7 +192,7 @@ public class BlockScorerTest {
 	private static void assertRecalculateImportancesCalledForHeight(final long height, final long rawGroupedHeight) {
 		// Arrange:
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
+		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height);
 
@@ -200,7 +200,7 @@ public class BlockScorerTest {
 		final Address signerAddress = block.getSigner().getAddress();
 		final AccountState state = new AccountState(signerAddress);
 		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		Mockito.when(accountStateRepository.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
+		Mockito.when(accountStateCache.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
 
 		// Act:
 		context.scorer.calculateForgerBalance(block);
@@ -215,7 +215,7 @@ public class BlockScorerTest {
 		final BlockHeight height = new BlockHeight(1442);
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(height);
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
+		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height.getRaw());
 
@@ -224,8 +224,8 @@ public class BlockScorerTest {
 		final AccountState remoteState = new AccountState(remoteHarvesterAddress);
 		final AccountState ownerState = new AccountState(ownerAddress);
 		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		Mockito.when(accountStateRepository.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
-		Mockito.when(accountStateRepository.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
+		Mockito.when(accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
+		Mockito.when(accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
 
 		// Act:
 		final long score = context.scorer.calculateForgerBalance(block);
@@ -233,7 +233,7 @@ public class BlockScorerTest {
 		// Assert:
 		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
 		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
-		Mockito.verify(accountStateRepository, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
+		Mockito.verify(accountStateCache, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
 
 	//endregion
@@ -265,12 +265,12 @@ public class BlockScorerTest {
 	}
 
 	private static BlockScorer createScorer() {
-		return new BlockScorer(Mockito.mock(AccountStateRepository.class));
+		return new BlockScorer(Mockito.mock(AccountStateCache.class));
 	}
 
 	private static class TestContext {
 		private final PoiFacade poiFacade;
-		private final AccountStateRepository accountStateRepository;
+		private final AccountStateCache accountStateCache;
 		private final BlockScorer scorer;
 
 		private TestContext() {
@@ -285,20 +285,20 @@ public class BlockScorerTest {
 
 		private TestContext(final PoiFacade poiFacade) {
 			this.poiFacade = poiFacade;
-			this.accountStateRepository = new DefaultAccountStateRepository();
-			this.scorer = new BlockScorer(this.accountStateRepository);
+			this.accountStateCache = new DefaultAccountStateCache();
+			this.scorer = new BlockScorer(this.accountStateCache);
 		}
 
 		private Account createAccountWithBalance(final long balance) {
 			final Account account = Utils.generateRandomAccount();
-			final AccountState accountState = this.accountStateRepository.findStateByAddress(account.getAddress());
+			final AccountState accountState = this.accountStateCache.findStateByAddress(account.getAddress());
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
 			accountState.setHeight(BlockHeight.ONE);
 			return account;
 		}
 
 		private AccountImportance getImportanceInfo(final Account account) {
-			return this.accountStateRepository.findStateByAddress(account.getAddress()).getImportanceInfo();
+			return this.accountStateCache.findStateByAddress(account.getAddress()).getImportanceInfo();
 		}
 	}
 }

@@ -27,35 +27,35 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	//public Iterator<AccountState> iterator() {
 	//	// TODO 20141211 this really isn't synchronized.
 	//	synchronized (this.lock) {
-	//		return this.poiFacade.iterator();
+	//		return this.accountStateCache.iterator();
 	//	}
 	//}
 	//
 	//@Override
 	//public AccountState findStateByAddress(final Address address) {
 	//	synchronized (this.lock) {
-	//		return this.poiFacade.findStateByAddress(address);
+	//		return this.accountStateCache.findStateByAddress(address);
 	//	}
 	//}
 	//
 	//@Override
 	//public AccountState findLatestForwardedStateByAddress(final Address address) {
 	//	synchronized (this.lock) {
-	//		return this.poiFacade.findLatestForwardedStateByAddress(address);
+	//		return this.accountStateCache.findLatestForwardedStateByAddress(address);
 	//	}
 	//}
 	//
 	//@Override
 	//public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
 	//	synchronized (this.lock) {
-	//		return this.poiFacade.findForwardedStateByAddress(address, height);
+	//		return this.accountStateCache.findForwardedStateByAddress(address, height);
 	//	}
 	//}
 	//
 	//@Override
 	//public int size() {
 	//	synchronized (this.lock) {
-	//		return this.poiFacade.size();
+	//		return this.accountStateCache.size();
 	//	}
 	//}
 
@@ -76,14 +76,14 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	//@Override
 	//public void removeFromCache(final Address address) {
 	//	synchronized (this.lock) {
-	//		this.poiFacade.removeFromCache(address);
+	//		this.accountStateCache.removeFromCache(address);
 	//	}
 	//}
 	//
 	//@Override
 	//public void undoVesting(final BlockHeight height) {
 	//	synchronized (this.lock) {
-	//		this.poiFacade.undoVesting(height);
+	//		this.accountStateCache.undoVesting(height);
 	//	}
 	//}
 
@@ -98,7 +98,7 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	//public DebitPredicate getDebitPredicate() {
 	//	synchronized (this.lock) {
 	//		// TODO 20141211 this really isn't synchronized.
-	//		return this.poiFacade.getDebitPredicate();
+	//		return this.accountStateCache.getDebitPredicate();
 	//	}
 	//}
 

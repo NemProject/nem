@@ -184,7 +184,7 @@ public class BlockTransactionObserverFactoryTest {
 		private final WeightedBalances balances = Mockito.mock(WeightedBalances.class);
 		private final Address address = Utils.generateRandomAddress();
 
-		public MockAccountContext(final AccountStateRepository accountStateRepository) {
+		public MockAccountContext(final AccountStateCache accountStateCache) {
 			Mockito.when(this.account.getAddress()).thenReturn(this.address);
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
@@ -192,19 +192,19 @@ public class BlockTransactionObserverFactoryTest {
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 			Mockito.when(accountState.getImportanceInfo()).thenReturn(this.importance);
 
-			Mockito.when(accountStateRepository.findStateByAddress(this.address)).thenReturn(accountState);
+			Mockito.when(accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
 		}
 	}
 
 	private static class TestContext {
-		private final AccountStateRepository poiFacade = Mockito.mock(AccountStateRepository.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final MockAccountContext accountContext1 = this.addAccount();
 		private final MockAccountContext accountContext2 = this.addAccount();
-		private final NisCache nisCache = NisCacheFactory.create(this.poiFacade);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache);
 		private final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		private MockAccountContext addAccount() {
-			return new MockAccountContext(this.poiFacade);
+			return new MockAccountContext(this.accountStateCache);
 		}
 	}
 }

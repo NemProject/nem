@@ -18,30 +18,30 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 
 	private final SynchronizationFilter filter;
 	private final ReadOnlyPoiFacade poiFacade;
-	private final ReadOnlyAccountStateRepository accountStateRepository;
+	private final ReadOnlyAccountStateCache accountStateCache;
 
 	/**
 	 * Creates the default synchronization strategy.
 	 *
 	 * @param filter The aggregate filter to use.
 	 * @param poiFacade The poi facade.
-	 * @param accountStateRepository The account state repository.
+	 * @param accountStateCache The account state cache.
 	 */
 	public DefaultTimeSynchronizationStrategy(
 			final SynchronizationFilter filter,
 			final ReadOnlyPoiFacade poiFacade,
-			final ReadOnlyAccountStateRepository accountStateRepository) {
+			final ReadOnlyAccountStateCache accountStateCache) {
 		if (null == filter) {
 			throw new TimeSynchronizationException("synchronization filter cannot be null.");
 		}
 
 		if (null == poiFacade) {
-			throw new TimeSynchronizationException("poiFacade cannot be null.");
+			throw new TimeSynchronizationException("accountStateCache cannot be null.");
 		}
 
 		this.filter = filter;
 		this.poiFacade = poiFacade;
-		this.accountStateRepository = accountStateRepository;
+		this.accountStateCache = accountStateCache;
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	}
 
 	private double getAccountImportance(final Address address) {
-		final ReadOnlyAccountImportance importanceInfo = this.accountStateRepository.findStateByAddress(address).getImportanceInfo();
+		final ReadOnlyAccountImportance importanceInfo = this.accountStateCache.findStateByAddress(address).getImportanceInfo();
 		return importanceInfo.getImportance(importanceInfo.getHeight());
 	}
 

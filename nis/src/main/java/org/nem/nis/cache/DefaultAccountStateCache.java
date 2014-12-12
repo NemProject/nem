@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * A repository of all mutable NEM account state.
  */
-public class DefaultAccountStateRepository implements AccountStateRepository, CopyableCache<DefaultAccountStateRepository> {
+public class DefaultAccountStateCache implements AccountStateCache, CopyableCache<DefaultAccountStateCache> {
 	private final Map<Address, AccountState> addressToStateMap = new ConcurrentHashMap<>();
 
 	@Override
@@ -84,14 +84,14 @@ public class DefaultAccountStateRepository implements AccountStateRepository, Co
 	}
 
 	@Override
-	public void shallowCopyTo(final DefaultAccountStateRepository rhs) {
+	public void shallowCopyTo(final DefaultAccountStateCache rhs) {
 		rhs.addressToStateMap.clear();
 		rhs.addressToStateMap.putAll(this.addressToStateMap);
 	}
 
 	@Override
-	public DefaultAccountStateRepository copy() {
-		final DefaultAccountStateRepository copy = new DefaultAccountStateRepository();
+	public DefaultAccountStateCache copy() {
+		final DefaultAccountStateCache copy = new DefaultAccountStateCache();
 		for (final Map.Entry<Address, AccountState> entry : this.addressToStateMap.entrySet()) {
 			copy.addressToStateMap.put(entry.getKey(), entry.getValue().copy());
 		}

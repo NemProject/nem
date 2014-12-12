@@ -9,14 +9,14 @@ import java.util.Random;
 
 public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	private final ReadOnlyPoiFacade poiFacade;
-	private final ReadOnlyAccountStateRepository accountStateRepository;
+	private final ReadOnlyAccountStateCache accountStateCache;
 
 	/**
 	 * Creates a new new importance aware node selector using a custom random number generator.
 	 *
 	 * @param maxNodes The maximum number of nodes that should be returned from selectNodes.
 	 * @param poiFacade The POI facade containing all importance information.
-	 * @param accountStateRepository The account state repository.
+	 * @param accountStateCache The account state cache.
 	 * @param trustProvider The trust provider.
 	 * @param context The trust context.
 	 * @param random The random number generator.
@@ -24,17 +24,17 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	public ImportanceAwareNodeSelector(
 			final int maxNodes,
 			final ReadOnlyPoiFacade poiFacade,
-			final ReadOnlyAccountStateRepository accountStateRepository,
+			final ReadOnlyAccountStateCache accountStateCache,
 			final TrustProvider trustProvider,
 			final TrustContext context,
 			final Random random) {
 		super(maxNodes, trustProvider, context, random);
 		this.poiFacade = poiFacade;
-		this.accountStateRepository = accountStateRepository;
+		this.accountStateCache = accountStateCache;
 	}
 
 	protected boolean isCandidate(final Node node) {
-		final ReadOnlyAccountState accountState = this.accountStateRepository.findStateByAddress(node.getIdentity().getAddress());
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(node.getIdentity().getAddress());
 		final ReadOnlyAccountImportance importanceInfo = accountState.getImportanceInfo();
 		if (!this.poiFacade.getLastPoiRecalculationHeight().equals(importanceInfo.getHeight())) {
 			return false;

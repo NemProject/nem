@@ -1,13 +1,11 @@
 package org.nem.nis.cache;
 
-import org.nem.nis.state.ReadOnlyAccountState;
-
 /**
  * The central point for accessing NIS-mutable data.
  */
 public class DefaultNisCache implements ReadOnlyNisCache {
 	private final AccountCache accountCache;
-	private final AccountStateRepository accountStateCache;
+	private final AccountStateCache accountStateCache;
 	private final SynchronizedPoiFacade poiFacade;
 	private final HashCache transactionHashCache;
 
@@ -20,7 +18,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 */
 	public DefaultNisCache(
 			final AccountCache accountCache,
-			final AccountStateRepository accountStateCache,
+			final AccountStateCache accountStateCache,
 			final SynchronizedPoiFacade poiFacade,
 			final HashCache transactionHashCache) {
 		this.accountCache = accountCache;
@@ -39,7 +37,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	}
 
 	@Override
-	public ReadOnlyAccountStateRepository getAccountStateCache() {
+	public ReadOnlyAccountStateCache getAccountStateCache() {
 		return null;
 	}
 
@@ -69,7 +67,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private static class DefaultNisCacheCopy implements NisCache {
 		private final DefaultNisCache cache;
 		private final AccountCache accountCache;
-		private final AccountStateRepository accountStateCache;
+		private final AccountStateCache accountStateCache;
 		private final SynchronizedPoiFacade poiFacade;
 		private final HashCache transactionHashCache;
 
@@ -88,7 +86,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		}
 
 		@Override
-		public AccountStateRepository getAccountStateCache() {
+		public AccountStateCache getAccountStateCache() {
 			return this.accountStateCache;
 		}
 

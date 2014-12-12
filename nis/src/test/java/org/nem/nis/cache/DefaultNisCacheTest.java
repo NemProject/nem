@@ -10,20 +10,20 @@ public class DefaultNisCacheTest {
 	public void canCreateNisCache() {
 		// Arrange:
 		final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
+		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
 
 		// Act:
 		final ReadOnlyNisCache cache = new DefaultNisCache(
 				accountCache,
-				accountStateRepository,
+				accountStateCache,
 				poiFacade,
 				transactionsHashCache);
 
 		// Assert:
 		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
-		Assert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateRepository));
+		Assert.assertThat(cache.getAccountStateCache(), IsSame.sameInstance(accountStateCache));
 		Assert.assertThat(cache.getPoiFacade(), IsSame.sameInstance(poiFacade));
 		Assert.assertThat(cache.getTransactionHashCache(), IsSame.sameInstance(transactionsHashCache));
 	}
@@ -65,19 +65,19 @@ public class DefaultNisCacheTest {
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).shallowCopyTo(targetContext.accountCache);
-		// TODO: Mockito.verify(context.accountStateRepository, Mockito.only()).shallowCopyTo(targetContext.accountStateRepository);
+		// TODO: Mockito.verify(context.accountStateCache, Mockito.only()).shallowCopyTo(targetContext.accountStateCache);
 		Mockito.verify(context.poiFacade, Mockito.only()).shallowCopyTo(targetContext.poiFacade);
 		Mockito.verify(context.transactionsHashCache, Mockito.only()).shallowCopyTo(targetContext.transactionsHashCache);
 	}
 
 	private class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		private final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
 		private final ReadOnlyNisCache cache = new DefaultNisCache(
 				this.accountCache,
-				this.accountStateRepository,
+				this.accountStateCache,
 				this.poiFacade,
 				this.transactionsHashCache);
 	}

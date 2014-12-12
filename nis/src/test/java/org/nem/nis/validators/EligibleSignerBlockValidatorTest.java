@@ -81,10 +81,10 @@ public class EligibleSignerBlockValidatorTest {
 			accountState.getRemoteLinks().addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(changeHeight), mode, owner));
 		}
 
-		final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
-		Mockito.when(accountStateRepository.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
+		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		Mockito.when(accountStateCache.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
 
-		final BlockValidator validator = new EligibleSignerBlockValidator(accountStateRepository);
+		final BlockValidator validator = new EligibleSignerBlockValidator(accountStateCache);
 
 		// Act:
 		final ValidationResult result = validator.validate(block);

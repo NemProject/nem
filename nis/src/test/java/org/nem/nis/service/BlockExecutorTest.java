@@ -51,8 +51,8 @@ public class BlockExecutorTest {
 		private final MockTransaction[] transactions;
 		private final List<Integer> executeList = new ArrayList<>();
 		private final List<Integer> undoList = new ArrayList<>();
-		private final AccountStateRepository poiFacade = Mockito.mock(AccountStateRepository.class);
-		private final NisCache nisCache = NisCacheFactory.create(this.poiFacade);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache);
 		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
 		public UndoExecuteTransactionOrderTestContext() {
@@ -70,7 +70,7 @@ public class BlockExecutorTest {
 
 			final AccountState accountState = new AccountState(this.account.getAddress());
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(this.account.getAddress(), this.block.getHeight()))
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(this.account.getAddress(), this.block.getHeight()))
 					.thenReturn(accountState);
 		}
 
@@ -373,7 +373,7 @@ public class BlockExecutorTest {
 		context.execute(Mockito.mock(BlockTransactionObserver.class));
 
 		// Assert:
-		Mockito.verify(context.context.poiFacade, Mockito.times(1))
+		Mockito.verify(context.context.accountStateCache, Mockito.times(1))
 				.findForwardedStateByAddress(context.remoteSigner.getAddress(), context.height);
 	}
 
@@ -392,9 +392,9 @@ public class BlockExecutorTest {
 	//endregion
 
 	private static class ExecutorTestContext {
-		private final AccountStateRepository poiFacade = Mockito.mock(AccountStateRepository.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.poiFacade) ;
+		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.accountStateCache) ;
 		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
 		private Account addAccount() {
@@ -412,7 +412,7 @@ public class BlockExecutorTest {
 
 		private void hookAccount(final Account account) {
 			final AccountState accountState = new AccountState(account.getAddress());
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any()))
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any()))
 					.thenReturn(accountState);
 		}
 
@@ -420,7 +420,7 @@ public class BlockExecutorTest {
 			Mockito.when(this.accountCache.findByAddress(forwardAccount.getAddress())).thenReturn(forwardAccount);
 
 			final AccountState accountState = new AccountState(forwardAccount.getAddress());
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(forwardingAccount.getAddress()), Mockito.any()))
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(forwardingAccount.getAddress()), Mockito.any()))
 					.thenReturn(accountState);
 		}
 	}

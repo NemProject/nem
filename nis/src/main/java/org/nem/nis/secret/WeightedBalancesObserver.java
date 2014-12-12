@@ -9,15 +9,15 @@ import org.nem.nis.state.WeightedBalances;
  * An observer that updates weighted balance information.
  */
 public class WeightedBalancesObserver implements BlockTransferObserver {
-	private final AccountStateRepository accountStateRepository;
+	private final AccountStateCache accountStateCache;
 
 	/**
 	 * Creates a new weighted balances observer.
 	 *
-	 * @param accountStateRepository The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
-	public WeightedBalancesObserver(final AccountStateRepository accountStateRepository) {
-		this.accountStateRepository = accountStateRepository;
+	public WeightedBalancesObserver(final AccountStateCache accountStateCache) {
+		this.accountStateCache = accountStateCache;
 	}
 
 	// keep in mind this is called TWICE for every transaction:
@@ -45,6 +45,6 @@ public class WeightedBalancesObserver implements BlockTransferObserver {
 	}
 
 	private WeightedBalances getWeightedBalances(final Account account) {
-		return this.accountStateRepository.findStateByAddress(account.getAddress()).getWeightedBalances();
+		return this.accountStateCache.findStateByAddress(account.getAddress()).getWeightedBalances();
 	}
 }

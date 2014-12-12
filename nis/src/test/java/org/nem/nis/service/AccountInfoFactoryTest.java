@@ -34,7 +34,7 @@ public class AccountInfoFactoryTest {
 		context.factory.createInfo(context.address);
 
 		// Assert:
-		Mockito.verify(context.accountStateRepository, Mockito.times(1)).findStateByAddress(context.address);
+		Mockito.verify(context.accountStateCache, Mockito.times(1)).findStateByAddress(context.address);
 	}
 
 	@Test
@@ -77,8 +77,8 @@ public class AccountInfoFactoryTest {
 		private final AccountState accountState = new AccountState(this.address);
 
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
-		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.accountStateRepository);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.accountStateCache);
 
 		private TestContext() {
 			final org.nem.nis.state.AccountInfo accountInfo = this.accountState.getAccountInfo();
@@ -89,7 +89,7 @@ public class AccountInfoFactoryTest {
 			accountInfo.incrementHarvestedBlocks();
 
 			Mockito.when(this.accountLookup.findByAddress(this.address)).thenReturn(this.account);
-			Mockito.when(this.accountStateRepository.findStateByAddress(this.address)).thenReturn(this.accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(this.accountState);
 		}
 	}
 }

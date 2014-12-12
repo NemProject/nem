@@ -57,8 +57,8 @@ public class BalanceCommitTransferObserverTest {
 	}
 
 	private static class TestContext {
-		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
-		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.accountStateRepository);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.accountStateCache);
 
 		public ReadOnlyAccountInfo add(final Account account, final Amount amount) {
 			final AccountInfo accountInfo = new AccountInfo();
@@ -66,7 +66,7 @@ public class BalanceCommitTransferObserverTest {
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(accountInfo);
-			Mockito.when(this.accountStateRepository.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return accountInfo;
 		}
 	}

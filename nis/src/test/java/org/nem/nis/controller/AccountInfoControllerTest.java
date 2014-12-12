@@ -203,7 +203,7 @@ public class AccountInfoControllerTest {
 		private final List<Transaction> filteredTransactions = new ArrayList<>();
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		private final ReadOnlyAccountStateRepository accountStateRepository = Mockito.mock(ReadOnlyAccountStateRepository.class);
+		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 
 		public TestContext() {
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
@@ -217,7 +217,7 @@ public class AccountInfoControllerTest {
 					unconfirmedTransactions,
 					this.blockChainLastBlockLayer,
 					this.accountInfoFactory,
-					this.accountStateRepository);
+					this.accountStateCache);
 		}
 
 		private AccountIdBuilder getBuilder() {
@@ -236,7 +236,7 @@ public class AccountInfoControllerTest {
 			final ReadOnlyAccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getRemoteLinks()).thenReturn(remoteLinks);
 
-			Mockito.when(this.accountStateRepository.findStateByAddress(this.address)).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
 		}
 
 		private static RemoteStatus getRemoteStatus(final AccountRemoteStatus accountRemoteStatus) {
@@ -271,8 +271,8 @@ public class AccountInfoControllerTest {
 				final AccountRemoteStatus remoteStatus,
 				final long blockHeight) {
 			Assert.assertThat(accountMetaData.getRemoteStatus(), IsEqual.equalTo(remoteStatus));
-			Mockito.verify(this.accountStateRepository, Mockito.only()).findStateByAddress(this.address);
-			final ReadOnlyRemoteLinks remoteLinks = this.accountStateRepository.findStateByAddress(this.address).getRemoteLinks();
+			Mockito.verify(this.accountStateCache, Mockito.only()).findStateByAddress(this.address);
+			final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(this.address).getRemoteLinks();
 			Mockito.verify(remoteLinks, Mockito.only()).getRemoteStatus(new BlockHeight(blockHeight));
 			Mockito.verify(this.blockChainLastBlockLayer, Mockito.only()).getLastBlockHeight();
 		}

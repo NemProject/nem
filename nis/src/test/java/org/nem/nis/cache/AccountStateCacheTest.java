@@ -2,18 +2,16 @@ package org.nem.nis.cache;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.poi.*;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.DebitPredicate;
 
 import java.util.*;
 import java.util.stream.*;
 
-public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & AccountStateRepository> {
+public abstract class AccountStateCacheTest<T extends CopyableCache<T> & AccountStateCache> {
 
 	/**
 	 * Creates a cache.
@@ -28,13 +26,13 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void findStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		final AccountState state = facade.findStateByAddress(address);
+		final AccountState state = cache.findStateByAddress(address);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(state, IsNull.notNullValue());
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 	}
@@ -43,14 +41,14 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void findStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		final AccountState state1 = facade.findStateByAddress(address);
-		final AccountState state2 = facade.findStateByAddress(address);
+		final AccountState state1 = cache.findStateByAddress(address);
+		final AccountState state2 = cache.findStateByAddress(address);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(state2, IsEqual.equalTo(state1));
 	}
 
@@ -62,13 +60,13 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void findLatestForwardedStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		final AccountState state = facade.findLatestForwardedStateByAddress(address);
+		final AccountState state = cache.findLatestForwardedStateByAddress(address);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(state, IsNull.notNullValue());
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 	}
@@ -92,8 +90,8 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	private boolean isLatestLocalState(final int mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
-		final AccountState state = facade.findStateByAddress(address);
+		final AccountStateCache cache = this.createCache();
+		final AccountState state = cache.findStateByAddress(address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
 				new BlockHeight(remoteBlockHeight),
@@ -102,7 +100,7 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		state.getRemoteLinks().addLink(link);
 
 		// Act:
-		final AccountState forwardedState = facade.findLatestForwardedStateByAddress(address);
+		final AccountState forwardedState = cache.findLatestForwardedStateByAddress(address);
 
 		// Assert:
 		return forwardedState.equals(state);
@@ -116,13 +114,13 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void findForwardedStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		final AccountState state = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+		final AccountState state = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(state, IsNull.notNullValue());
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
 	}
@@ -131,14 +129,14 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void findForwardedStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		final AccountState state1 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
-		final AccountState state2 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+		final AccountState state1 = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
+		final AccountState state2 = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(state2, IsEqual.equalTo(state1));
 	}
 
@@ -146,11 +144,11 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void findForwardedStateByAddressReturnsLocalStateWhenAccountDoesNotHaveRemoteState() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
-		final AccountState state = facade.findStateByAddress(address);
+		final AccountStateCache cache = this.createCache();
+		final AccountState state = cache.findStateByAddress(address);
 
 		// Act:
-		final AccountState forwardedState = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
+		final AccountState forwardedState = cache.findForwardedStateByAddress(address, BlockHeight.ONE);
 
 		// Assert:
 		Assert.assertThat(forwardedState, IsEqual.equalTo(state));
@@ -247,8 +245,8 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	private boolean isLocalState(final int mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
 		// Assert:		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
-		final AccountState state = facade.findStateByAddress(address);
+		final AccountStateCache cache = this.createCache();
+		final AccountState state = cache.findStateByAddress(address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
 				new BlockHeight(remoteBlockHeight),
@@ -257,7 +255,7 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		state.getRemoteLinks().addLink(link);
 
 		// Act:
-		final AccountState forwardedState = facade.findForwardedStateByAddress(address, new BlockHeight(currentBlockHeight));
+		final AccountState forwardedState = cache.findForwardedStateByAddress(address, new BlockHeight(currentBlockHeight));
 
 		// Assert:
 		return forwardedState.equals(state);
@@ -271,42 +269,42 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		facade.findStateByAddress(address);
-		facade.removeFromCache(address);
+		cache.findStateByAddress(address);
+		cache.removeFromCache(address);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
 	public void accountWithPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		facade.findStateByAddress(address);
-		facade.removeFromCache(address);
+		cache.findStateByAddress(address);
+		cache.removeFromCache(address);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
 	public void removeAccountFromCacheDoesNothingIfAddressIsNotInCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		// Act:
-		facade.findStateByAddress(address);
-		facade.removeFromCache(Utils.generateRandomAddress());
+		cache.findStateByAddress(address);
+		cache.removeFromCache(Utils.generateRandomAddress());
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 	}
 
 	//endregion
@@ -319,14 +317,14 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final T facade = this.createCache();
+		final T cache = this.createCache();
 
-		final AccountState state1 = facade.findStateByAddress(address1);
-		final AccountState state2 = facade.findStateByAddress(address2);
-		final AccountState state3 = facade.findStateByAddress(address3);
+		final AccountState state1 = cache.findStateByAddress(address1);
+		final AccountState state2 = cache.findStateByAddress(address2);
+		final AccountState state3 = cache.findStateByAddress(address3);
 
 		// Act:
-		final T copyFacade = facade.copy();
+		final T copyFacade = cache.copy();
 
 		final AccountState copyState1 = copyFacade.findStateByAddress(address1);
 		final AccountState copyState2 = copyFacade.findStateByAddress(address2);
@@ -348,18 +346,18 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	public void copyReturnsSameAccountGivenPublicKeyOrAddress() {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
-		final T facade = this.createCache();
+		final T cache = this.createCache();
 
-		facade.findStateByAddress(address1);
+		cache.findStateByAddress(address1);
 
 		// Act:
-		final AccountStateRepository copyFacade = facade.copy();
+		final AccountStateCache copyCache = cache.copy();
 
-		final AccountState copyStateFromEncoded = copyFacade.findStateByAddress(Address.fromEncoded(address1.getEncoded()));
-		final AccountState copyStateFromPublicKey = copyFacade.findStateByAddress(address1);
+		final AccountState copyStateFromEncoded = copyCache.findStateByAddress(Address.fromEncoded(address1.getEncoded()));
+		final AccountState copyStateFromPublicKey = copyCache.findStateByAddress(address1);
 
 		// Assert:
-		Assert.assertThat(copyFacade.size(), IsEqual.equalTo(1));
+		Assert.assertThat(copyCache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(copyStateFromEncoded, IsSame.sameInstance(copyStateFromPublicKey));
 	}
 
@@ -373,22 +371,22 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final T facade = this.createCache();
+		final T cache = this.createCache();
 
-		final AccountState state1 = facade.findStateByAddress(address1);
-		final AccountState state2 = facade.findStateByAddress(address2);
-		final AccountState state3 = facade.findStateByAddress(address3);
+		final AccountState state1 = cache.findStateByAddress(address1);
+		final AccountState state2 = cache.findStateByAddress(address2);
+		final AccountState state3 = cache.findStateByAddress(address3);
 
 		// Act:
-		final T copyFacade = this.createCache();
-		facade.shallowCopyTo(copyFacade);
+		final T copyCache = this.createCache();
+		cache.shallowCopyTo(copyCache);
 
-		final AccountState copyState1 = copyFacade.findStateByAddress(address1);
-		final AccountState copyState2 = copyFacade.findStateByAddress(address2);
-		final AccountState copyState3 = copyFacade.findStateByAddress(address3);
+		final AccountState copyState1 = copyCache.findStateByAddress(address1);
+		final AccountState copyState2 = copyCache.findStateByAddress(address2);
+		final AccountState copyState3 = copyCache.findStateByAddress(address3);
 
 		// Assert:
-		Assert.assertThat(facade.size(), IsEqual.equalTo(3));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
 		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
 		Assert.assertThat(copyState2, IsSame.sameInstance(state2));
 		Assert.assertThat(copyState3, IsSame.sameInstance(state3));
@@ -399,21 +397,21 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
-		final T facade = this.createCache();
+		final T cache = this.createCache();
 
-		final AccountState state1 = facade.findStateByAddress(address1);
+		final AccountState state1 = cache.findStateByAddress(address1);
 
-		final T copyFacade = this.createCache();
-		final AccountState state2 = copyFacade.findStateByAddress(address2);
+		final T copyCache = this.createCache();
+		final AccountState state2 = copyCache.findStateByAddress(address2);
 
 		// Act:
-		facade.shallowCopyTo(copyFacade);
+		cache.shallowCopyTo(copyCache);
 
-		final AccountState copyState1 = copyFacade.findStateByAddress(address1);
-		final AccountState copyState2 = copyFacade.findStateByAddress(address2);
+		final AccountState copyState1 = copyCache.findStateByAddress(address1);
+		final AccountState copyState2 = copyCache.findStateByAddress(address2);
 
 		// Assert:
-		Assert.assertThat(copyFacade.size(), IsEqual.equalTo(2)); // note that copyState2 is created on access
+		Assert.assertThat(copyCache.size(), IsEqual.equalTo(2)); // note that copyState2 is created on access
 		Assert.assertThat(copyState1, IsSame.sameInstance(state1));
 		Assert.assertThat(copyState2, IsNot.not(IsSame.sameInstance(state2)));
 	}
@@ -425,8 +423,8 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	@Test
 	public void undoVestingDelegatesToWeightedBalances() {
 		// Arrange:
-		final AccountStateRepository facade = this.createCache();
-		final List<AccountState> accountStates = createAccountStatesForUndoVestingTests(3, facade);
+		final AccountStateCache cache = this.createCache();
+		final List<AccountState> accountStates = createAccountStatesForUndoVestingTests(3, cache);
 
 		// Expect: all accounts should have two weighted balance entries
 		for (final AccountState accountState : accountStates) {
@@ -434,7 +432,7 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		}
 
 		// Act:
-		facade.undoVesting(new BlockHeight(7));
+		cache.undoVesting(new BlockHeight(7));
 
 		// Assert: one weighted balance entry should have been removed from all accounts
 		for (final AccountState accountState : accountStates) {
@@ -442,10 +440,10 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		}
 	}
 
-	private static List<AccountState> createAccountStatesForUndoVestingTests(final int numAccounts, final AccountStateRepository facade) {
+	private static List<AccountState> createAccountStatesForUndoVestingTests(final int numAccounts, final AccountStateCache cache) {
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < numAccounts; ++i) {
-			accountStates.add(facade.findStateByAddress(Utils.generateRandomAddress()));
+			accountStates.add(cache.findStateByAddress(Utils.generateRandomAddress()));
 			accountStates.get(i).getWeightedBalances().addFullyVested(new BlockHeight(7), Amount.fromNem(i + 1));
 			accountStates.get(i).getWeightedBalances().addFullyVested(new BlockHeight(8), Amount.fromNem(2 * (i + 1)));
 		}
@@ -460,15 +458,15 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	@Test
 	public void iteratorReturnsAllAccounts() {
 		// Arrange:
-		final AccountStateRepository facade = this.createCache();
+		final AccountStateCache cache = this.createCache();
 
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < 3; ++i) {
-			accountStates.add(facade.findStateByAddress(Utils.generateRandomAddress()));
+			accountStates.add(cache.findStateByAddress(Utils.generateRandomAddress()));
 		}
 
 		// Act:
-		final List<AccountState> iteratedAccountStates = StreamSupport.stream(facade.spliterator(), false)
+		final List<AccountState> iteratedAccountStates = StreamSupport.stream(cache.spliterator(), false)
 				.collect(Collectors.toList());
 
 		// Assert:
@@ -485,12 +483,12 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 	@Test
 	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
 		// Arrange:
-		final AccountStateRepository accountStateRepository = this.createCache();
-		final Account account1 = addAccountWithBalance(accountStateRepository, Amount.fromNem(10));
-		final Account account2 = addAccountWithBalance(accountStateRepository, Amount.fromNem(77));
+		final AccountStateCache accountStateCache = this.createCache();
+		final Account account1 = addAccountWithBalance(accountStateCache, Amount.fromNem(10));
+		final Account account2 = addAccountWithBalance(accountStateCache, Amount.fromNem(77));
 
 		// Act:
-		final DebitPredicate debitPredicate = accountStateRepository.getDebitPredicate();
+		final DebitPredicate debitPredicate = accountStateCache.getDebitPredicate();
 
 		// Assert:
 		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(9)), IsEqual.equalTo(true));
@@ -502,9 +500,9 @@ public abstract class AccountStateRepositoryTest<T extends CopyableCache<T> & Ac
 		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(78)), IsEqual.equalTo(false));
 	}
 
-	private static Account addAccountWithBalance(final AccountStateRepository accountStateRepository, final Amount amount) {
+	private static Account addAccountWithBalance(final AccountStateCache accountStateCache, final Amount amount) {
 		final Account account = Utils.generateRandomAccount();
-		final AccountState accountState = accountStateRepository.findStateByAddress(account.getAddress());
+		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
 		accountState.getAccountInfo().incrementBalance(amount);
 		return account;
 	}

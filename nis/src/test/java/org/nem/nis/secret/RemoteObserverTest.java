@@ -104,8 +104,8 @@ public class RemoteObserverTest {
 		private final Account lessee = Utils.generateRandomAccount();
 		private final RemoteLinks lessorRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final RemoteLinks lesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
-		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateRepository);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateCache);
 
 		private TestContext() {
 			this.hook(this.lessor, this.lessorRemoteLinks);
@@ -115,7 +115,7 @@ public class RemoteObserverTest {
 		private void hook(final Account account, final RemoteLinks remoteLinks) {
 			final AccountState state = Mockito.mock(AccountState.class);
 			Mockito.when(state.getRemoteLinks()).thenReturn(remoteLinks);
-			Mockito.when(this.accountStateRepository.findStateByAddress(account.getAddress())).thenReturn(state);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(state);
 		}
 	}
 }

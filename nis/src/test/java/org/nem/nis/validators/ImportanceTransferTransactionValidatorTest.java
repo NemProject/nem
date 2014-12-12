@@ -390,9 +390,9 @@ public class ImportanceTransferTransactionValidatorTest {
 	//endregion
 
 	private static class TestContext {
-		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
-				this.accountStateRepository,
+				this.accountStateCache,
 				Amount.fromNem(2000));
 
 		private ImportanceTransferTransaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
@@ -410,7 +410,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		private void addRemoteLinks(final Account account) {
 			final Address address = account.getAddress();
 			final AccountState state = new AccountState(address);
-			Mockito.when(this.accountStateRepository.findStateByAddress(address))
+			Mockito.when(this.accountStateCache.findStateByAddress(address))
 					.thenReturn(state);
 		}
 
@@ -418,14 +418,14 @@ public class ImportanceTransferTransactionValidatorTest {
 			final Address sender = account.getSigner().getAddress();
 			final Address remote = account.getRemote().getAddress();
 			final RemoteLink link = new RemoteLink(remote, height, mode.value(), RemoteLink.Owner.HarvestingRemotely);
-			this.accountStateRepository.findStateByAddress(sender).getRemoteLinks().addLink(link);
+			this.accountStateCache.findStateByAddress(sender).getRemoteLinks().addLink(link);
 		}
 
 		private void setLesseeRemoteState(final ImportanceTransferTransaction account, final BlockHeight height, final ImportanceTransferTransaction.Mode mode) {
 			final Address sender = account.getSigner().getAddress();
 			final Address remote = account.getRemote().getAddress();
 			final RemoteLink link = new RemoteLink(sender, height, mode.value(), RemoteLink.Owner.RemoteHarvester);
-			this.accountStateRepository.findStateByAddress(remote).getRemoteLinks().addLink(link);
+			this.accountStateCache.findStateByAddress(remote).getRemoteLinks().addLink(link);
 		}
 
 		private ImportanceTransferTransaction createTransactionWithRemote(final Account remote, final ImportanceTransferTransaction.Mode mode) {
@@ -439,7 +439,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		}
 
 		private AccountInfo getAccountInfo(final Account account) {
-			return this.accountStateRepository.findStateByAddress(account.getAddress()).getAccountInfo();
+			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
 		}
 
 		private ValidationResult validate(final Transaction transaction) {

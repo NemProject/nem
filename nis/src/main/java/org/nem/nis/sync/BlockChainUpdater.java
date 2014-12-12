@@ -241,8 +241,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// each block that we receive
 		fixGenerationHash(block, parent);
 
-		final ReadOnlyAccountStateRepository accountStateRepository = this.nisCache.getAccountStateCache();
-		final ReadOnlyAccountState state = accountStateRepository.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
+		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
+		final ReadOnlyAccountState state = accountStateCache.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
 		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
 		block.setLessor(lessor);
 	}

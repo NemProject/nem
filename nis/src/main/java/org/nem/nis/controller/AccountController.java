@@ -25,7 +25,7 @@ public class AccountController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
-	private final AccountStateRepository accountStateRepository;
+	private final AccountStateCache accountStateCache;
 	private final HashCache transactionHashCache;
 
 	@Autowired(required = true)
@@ -33,12 +33,12 @@ public class AccountController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
-			final AccountStateRepository accountStateRepository,
+			final AccountStateCache accountStateCache,
 			final HashCache transactionHashCache) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
-		this.accountStateRepository = accountStateRepository;
+		this.accountStateCache = accountStateCache;
 		this.transactionHashCache = transactionHashCache;
 	}
 
@@ -183,7 +183,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
 	@PublicApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
-		final List<AccountImportanceViewModel> viewModels = StreamSupport.stream(this.accountStateRepository.spliterator(), false)
+		final List<AccountImportanceViewModel> viewModels = StreamSupport.stream(this.accountStateCache.spliterator(), false)
 				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
 				.collect(Collectors.toList());
 

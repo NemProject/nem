@@ -70,7 +70,7 @@ public class BlockChainTest {
 
 	private Vector<Account> prepareSigners(final NisCache nisCache) {
 		final AccountCache accountCache = nisCache.getAccountCache();
-		final AccountStateRepository accountStateRepository = nisCache.getAccountStateCache();
+		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final Vector<Account> accounts = new Vector<>();
 
 		Account a;
@@ -78,12 +78,12 @@ public class BlockChainTest {
 		// 0 = signer
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		setBalance(a, Amount.fromNem(1_000_000_000), accountCache, accountStateRepository);
+		setBalance(a, Amount.fromNem(1_000_000_000), accountCache, accountStateCache);
 
 		// 1st sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		setBalance(a, Amount.fromNem(1_000), accountCache, accountStateRepository);
+		setBalance(a, Amount.fromNem(1_000), accountCache, accountStateCache);
 
 		// 1st recipient
 		a = Utils.generateRandomAccount();
@@ -93,7 +93,7 @@ public class BlockChainTest {
 		// 2nd sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		setBalance(a, Amount.fromNem(1_000), accountCache, accountStateRepository);
+		setBalance(a, Amount.fromNem(1_000), accountCache, accountStateCache);
 
 		// 2nd recipient
 		a = Utils.generateRandomAccount();
@@ -103,8 +103,8 @@ public class BlockChainTest {
 		return accounts;
 	}
 
-	private static void setBalance(final Account account, final Amount amount, final AccountCache accountCache, final AccountStateRepository accountStateRepository) {
-		final AccountInfo accountInfo = accountStateRepository.findStateByAddress(account.getAddress()).getAccountInfo();
+	private static void setBalance(final Account account, final Amount amount, final AccountCache accountCache, final AccountStateCache accountStateCache) {
+		final AccountInfo accountInfo = accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
 		accountInfo.incrementBalance(amount);
 		accountCache.addAccountToCache(account.getAddress());
 
@@ -113,7 +113,7 @@ public class BlockChainTest {
 		accountInfo.incrementReferenceCount();
 
 		accountInfo.incrementBalance(amount);
-		accountStateRepository.findStateByAddress(account.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, amount);
+		accountStateCache.findStateByAddress(account.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, amount);
 	}
 
 	@Test
@@ -288,8 +288,8 @@ public class BlockChainTest {
 		Assert.assertTrue(siblingResult == ValidationResult.SUCCESS);
 	}
 
-	private static Amount getRecipientBalance(final AccountStateRepository accountStateRepository, final TransferTransaction transferTransaction) {
-		return accountStateRepository.findStateByAddress(transferTransaction.getRecipient().getAddress()).getAccountInfo().getBalance();
+	private static Amount getRecipientBalance(final AccountStateCache accountStateCache, final TransferTransaction transferTransaction) {
+		return accountStateCache.findStateByAddress(transferTransaction.getRecipient().getAddress()).getAccountInfo().getBalance();
 	}
 
 	private org.nem.nis.dbmodel.Account retrieveAccount(final long i, final Account signer) {

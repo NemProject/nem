@@ -8,21 +8,21 @@ import org.nem.nis.state.*;
  * Validator that checks the block signer and rejects a block if any transactions are self-signed.
  */
 public class NoSelfSignedTransactionsBlockValidator implements BlockValidator {
-	private final ReadOnlyAccountStateRepository accountStateRepository;
+	private final ReadOnlyAccountStateCache accountStateCache;
 
 	/**
 	 * Creates a validator.
 	 *
-	 * @param accountStateRepository The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
-	public NoSelfSignedTransactionsBlockValidator(final ReadOnlyAccountStateRepository accountStateRepository) {
-		this.accountStateRepository = accountStateRepository;
+	public NoSelfSignedTransactionsBlockValidator(final ReadOnlyAccountStateCache accountStateCache) {
+		this.accountStateCache = accountStateCache;
 	}
 
 	@Override
 	public ValidationResult validate(final Block block) {
 		final Address harvesterAddress = block.getSigner().getAddress();
-		final ReadOnlyAccountState ownerState = this.accountStateRepository.findForwardedStateByAddress(
+		final ReadOnlyAccountState ownerState = this.accountStateCache.findForwardedStateByAddress(
 				harvesterAddress,
 				block.getHeight());
 		final boolean isSelfSigned = block.getTransactions().stream().anyMatch(transaction -> {

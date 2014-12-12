@@ -9,19 +9,19 @@ import org.nem.nis.state.*;
  * A block transaction observer that updates remote account associations.
  */
 public class RemoteObserver implements BlockTransactionObserver {
-	private final AccountStateRepository accountStateRepository;
+	private final AccountStateCache accountStateCache;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param accountStateRepository The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
-	public RemoteObserver(final AccountStateRepository accountStateRepository) {
-		this.accountStateRepository = accountStateRepository;
+	public RemoteObserver(final AccountStateCache accountStateCache) {
+		this.accountStateCache = accountStateCache;
 	}
 
 	private RemoteLinks getRemoteLinks(final Account account) {
-		return this.accountStateRepository.findStateByAddress(account.getAddress()).getRemoteLinks();
+		return this.accountStateCache.findStateByAddress(account.getAddress()).getRemoteLinks();
 	}
 
 	@Override

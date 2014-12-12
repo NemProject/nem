@@ -74,11 +74,11 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 	private static class TestContext {
 		private final Account harvester = Utils.generateRandomAccount();
 		private final Block block = NisUtils.createRandomBlockWithHeight(this.harvester, 12);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
-		private final BlockValidator validator = new NoSelfSignedTransactionsBlockValidator(this.accountStateRepository);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final BlockValidator validator = new NoSelfSignedTransactionsBlockValidator(this.accountStateCache);
 
 		private TestContext() {
-			Mockito.when(this.accountStateRepository.findForwardedStateByAddress(Mockito.any(), Mockito.eq(new BlockHeight(12))))
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.eq(new BlockHeight(12))))
 					.then(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
 		}
 
@@ -91,7 +91,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		}
 
 		private void setHarvesterOwner(final Address ownerAddress) {
-			Mockito.when(this.accountStateRepository.findForwardedStateByAddress(this.harvester.getAddress(), new BlockHeight(12)))
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(this.harvester.getAddress(), new BlockHeight(12)))
 					.thenReturn(new AccountState(ownerAddress));
 		}
 	}

@@ -16,7 +16,7 @@ import java.util.Iterator;
  */
 public class UnlockedAccounts implements Iterable<Account> {
 	private final AccountLookup accountLookup;
-	private final AccountStateRepository accountStateRepository;
+	private final AccountStateCache accountStateCache;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final CanHarvestPredicate canHarvestPredicate;
 	private final int maxUnlockedAccounts;
@@ -25,12 +25,12 @@ public class UnlockedAccounts implements Iterable<Account> {
 	@Autowired(required = true)
 	public UnlockedAccounts(
 			final AccountLookup accountLookup,
-			final AccountStateRepository accountStateRepository,
+			final AccountStateCache accountStateCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final CanHarvestPredicate canHarvestPredicate,
 			final int maxUnlockedAccounts) {
 		this.accountLookup = accountLookup;
-		this.accountStateRepository = accountStateRepository;
+		this.accountStateCache = accountStateCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.canHarvestPredicate = canHarvestPredicate;
 		this.maxUnlockedAccounts = maxUnlockedAccounts;
@@ -53,7 +53,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 
 		// use the latest forwarded state so that remote harvesters that aren't active yet can be unlocked
 		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
-		final AccountState accountState = this.accountStateRepository.findLatestForwardedStateByAddress(account.getAddress());
+		final AccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress());
 		if (!this.canHarvestPredicate.canHarvest(accountState, currentHeight)) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
 		}

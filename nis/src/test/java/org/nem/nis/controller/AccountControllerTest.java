@@ -356,7 +356,7 @@ public class AccountControllerTest {
 				createAccountState("sigma", 4, 88));
 
 		final TestContext context = new TestContext();
-		Mockito.when(context.accountStateRepository.spliterator()).thenReturn(accountStates.spliterator());
+		Mockito.when(context.accountStateCache.spliterator()).thenReturn(accountStates.spliterator());
 
 		// Act:
 		final SerializableList<AccountImportanceViewModel> viewModels = context.controller.getImportances();
@@ -399,7 +399,7 @@ public class AccountControllerTest {
 		private final AccountController controller;
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 
 		public TestContext() {
@@ -411,14 +411,14 @@ public class AccountControllerTest {
 					this.unconfirmedTransactions,
 					this.unlockedAccounts,
 					accountIoAdapter,
-					this.accountStateRepository,
+					this.accountStateCache,
 					this.transactionHashCache);
 		}
 
 		private Account addAccount(final Account account, final Amount amount) {
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.accountStateRepository.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;
 		}
 	}

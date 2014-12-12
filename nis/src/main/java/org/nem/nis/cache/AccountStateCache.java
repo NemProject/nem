@@ -2,9 +2,13 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.*;
+import org.nem.nis.state.AccountState;
+import org.nem.nis.validators.DebitPredicate;
 
-public interface ReadOnlyAccountStateRepository {
+/**
+ * A repository of all NEM account state.
+ */
+public interface AccountStateCache extends Iterable<AccountState>, ReadOnlyAccountStateCache {
 
 	/**
 	 * Finds a poi account state given an address. This function will NOT return
@@ -13,7 +17,7 @@ public interface ReadOnlyAccountStateRepository {
 	 * @param address The address.
 	 * @return The poi account state.
 	 */
-	ReadOnlyAccountState findStateByAddress(Address address);
+	AccountState findStateByAddress(Address address);
 
 	/**
 	 * Finds the latest poi account state given an address following all forwards.
@@ -32,7 +36,7 @@ public interface ReadOnlyAccountStateRepository {
 	 * @param address The address.
 	 * @return The poi account state.
 	 */
-	ReadOnlyAccountState findLatestForwardedStateByAddress(Address address);
+	AccountState findLatestForwardedStateByAddress(Address address);
 
 	/**
 	 * Finds a poi account state given an address following all forwards at a height.
@@ -52,7 +56,7 @@ public interface ReadOnlyAccountStateRepository {
 	 * @param height Height at which check should be performed.
 	 * @return The poi account state.
 	 */
-	ReadOnlyAccountState findForwardedStateByAddress(Address address, BlockHeight height);
+	AccountState findForwardedStateByAddress(Address address, BlockHeight height);
 
 	/**
 	 * Gets the number of account states.
@@ -61,4 +65,24 @@ public interface ReadOnlyAccountStateRepository {
 	 */
 	int size();
 
+	/**
+	 * Removes an account state from the cache if it is in the cache.
+	 *
+	 * @param address The address of the account state to remove.
+	 */
+	void removeFromCache(Address address);
+
+	/**
+	 * Undoes weighted balances vesting to a given block height.
+	 *
+	 * @param height The block height.
+	 */
+	void undoVesting(BlockHeight height);
+
+	/**
+	 * Gets a debit predicate that checks balances against the account information stored in this cache.
+	 *
+	 * @return The debit predicate.
+	 */
+	DebitPredicate getDebitPredicate();
 }

@@ -7,6 +7,7 @@ import org.nem.core.utils.FormatUtils;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.state.AccountState;
+import org.nem.nis.test.NisUtils;
 import org.nem.nis.time.synchronization.filter.*;
 
 import java.lang.reflect.Field;
@@ -55,7 +56,8 @@ public class Network {
 	private final int viewSize;
 	private final NodeSettings nodeSettings;
 	private TimeSynchronizationStrategy syncStrategy;
-	private AccountStateRepository poiFacade;
+	private AccountStateCache accountStateCache;
+	private PoiFacade poiFacade;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
@@ -78,8 +80,9 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		this.poiFacade = new DefaultAccountStateRepository();
-		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
+		this.accountStateCache = new DefaultAccountStateCache();
+		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
+		this.syncStrategy = this.createSynchronizationStrategy(this.accountStateCache);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
 		for (int i = 1; i <= networkSize; i++) {
@@ -90,7 +93,7 @@ public class Network {
 				numberOfEvilNodes++;
 			}
 		}
-		this.initializeFacade(this.poiFacade);
+		this.initialize(this.poiFacade, this.accountStateCache);
 		if (this.nodeSettings.hasUnstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			log(String.format(
@@ -130,12 +133,12 @@ public class Network {
 		return this.hasConverged;
 	}
 
-	private TimeSynchronizationStrategy createSynchronizationStrategy(final AccountStateRepository accountStateRepository) {
+	private TimeSynchronizationStrategy createSynchronizationStrategy(final AccountStateCache accountStateCache) {
 		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
 		return new DefaultTimeSynchronizationStrategy(
 				filter,
 				new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class)),
-				accountStateRepository);
+				accountStateCache);
 	}
 
 	/**
@@ -253,15 +256,15 @@ public class Network {
 						ageToUse * UPDATE_INTERVAL_ELONGATION_STRENGTH, UPDATE_INTERVAL_MAXIMUM);
 	}
 
-	private AccountStateRepository resetFacade() {
-		this.poiFacade = new DefaultAccountStateRepository();
-		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
+	private AccountStateCache resetCache() {
+		this.accountStateCache = new DefaultAccountStateCache();
+		this.syncStrategy = this.createSynchronizationStrategy(this.accountStateCache);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
 		this.nodeId = 1;
 		oldNodes.stream().forEach(n -> this.nodes.add(this.createNode(n)));
-		return this.poiFacade;
+		return this.accountStateCache;
 	}
 
 	/**
@@ -269,20 +272,20 @@ public class Network {
 	 *
 	 * @param facade The POI facade.
 	 */
-	private void initializeFacade(final AccountStateRepository facade) {
+	private void initialize(final PoiFacade facade, final AccountStateCache accountStateCache) {
 		// We assume that evil nodes have significant lower cumulative importance than friendly nodes.
 		final int numberOfEvilNodes = (this.nodes.size() * this.nodeSettings.getPercentageEvilNodes()) / 100;
 		for (final TimeAwareNode node : this.nodes) {
 			final double importance = node.isEvil() ?
 					this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes :
 					(1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
-			final AccountState state = facade.findStateByAddress(node.getNode().getIdentity().getAddress());
+			final AccountState state = accountStateCache.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
 		this.setFacadeLastPoiVectorSize(facade, this.nodes.size());
 	}
 
-	private void setFacadeLastPoiVectorSize(final AccountStateRepository facade, final int lastPoiVectorSize) {
+	private void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
 		try {
 			final Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
@@ -298,12 +301,12 @@ public class Network {
 	 * @param percentage The percentage to grow the network.
 	 */
 	public void grow(final double percentage) {
-		this.resetFacade();
+		this.resetCache();
 		final int numberOfNewNodes = (int)(this.nodes.size() * percentage / 100);
 		for (int i = 1; i <= numberOfNewNodes; i++) {
 			this.nodes.add(this.createNode());
 		}
-		this.initializeFacade(this.poiFacade);
+		this.initialize(this.poiFacade, this.accountStateCache);
 	}
 
 	/**
@@ -313,10 +316,10 @@ public class Network {
 	 * @param newName The new name for the this network.
 	 */
 	public void join(final Network network, final String newName) {
-		this.resetFacade();
+		this.resetCache();
 		network.getNodes().stream().forEach(n -> this.nodes.add(this.createNode(n)));
 		this.name = newName;
-		this.initializeFacade(this.poiFacade);
+		this.initialize(this.poiFacade, this.accountStateCache);
 	}
 
 	/**
@@ -344,7 +347,7 @@ public class Network {
 		int hits = 0;
 		while (tries < maxTries && hits < this.viewSize) {
 			final int index = this.random.nextInt(this.nodes.size());
-			final AccountState state = this.poiFacade.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
+			final AccountState state = this.accountStateCache.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
 			if (!nodeArray[index].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 				hits++;
 				partners.add(nodeArray[index]);
@@ -358,7 +361,7 @@ public class Network {
 		if (partners.isEmpty()) {
 			// There might be just too many evil nodes. Let's assume we use one pretrusted node if we meet this case in a real environment.
 			for (int i = 0; i < this.nodes.size(); i++) {
-				final AccountState state = this.poiFacade.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
+				final AccountState state = this.accountStateCache.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
 				if (!nodeArray[i].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 					partners.add(nodeArray[i]);
 					break;

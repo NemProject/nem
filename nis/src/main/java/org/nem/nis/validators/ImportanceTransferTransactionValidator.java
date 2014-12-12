@@ -10,19 +10,19 @@ import org.nem.nis.state.*;
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
 public class ImportanceTransferTransactionValidator implements SingleTransactionValidator {
-	private final ReadOnlyAccountStateRepository accountStateRepository;
+	private final ReadOnlyAccountStateCache accountStateCache;
 	private final Amount minHarvesterBalance;
 
 	/**
 	 * Creates a new validator.
 	 *
-	 * @param accountStateRepository The poi facade.
+	 * @param accountStateCache The account state cache.
 	 * @param minHarvesterBalance The minimum balance required for a harvester.
 	 */
 	public ImportanceTransferTransactionValidator(
-			final ReadOnlyAccountStateRepository accountStateRepository,
+			final ReadOnlyAccountStateCache accountStateCache,
 			final Amount minHarvesterBalance) {
-		this.accountStateRepository = accountStateRepository;
+		this.accountStateCache = accountStateCache;
 		this.minHarvesterBalance = minHarvesterBalance;
 	}
 
@@ -59,7 +59,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
-		final ReadOnlyRemoteLinks remoteLinks = this.accountStateRepository.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
@@ -83,7 +83,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				final Amount remoteBalance = this.accountStateRepository.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
+				final Amount remoteBalance = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
 				if (height.getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
 					if (0 != remoteBalance.compareTo(Amount.ZERO)) {
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
@@ -101,7 +101,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
-		final ReadOnlyRemoteLinks remoteLinks = this.accountStateRepository.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}

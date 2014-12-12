@@ -17,7 +17,7 @@ public interface NisCache extends ReadOnlyNisCache {
 	 *
 	 * @return The account state cache.
 	 */
-	public AccountStateRepository getAccountStateCache();
+	public AccountStateCache getAccountStateCache();
 
 	/**
 	 * Gets the poi facade.

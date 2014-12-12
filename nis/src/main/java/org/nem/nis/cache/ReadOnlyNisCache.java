@@ -17,7 +17,7 @@ public interface ReadOnlyNisCache {
 	 *
 	 * @return The account state cache.
 	 */
-	public ReadOnlyAccountStateRepository getAccountStateCache();
+	public ReadOnlyAccountStateCache getAccountStateCache();
 
 	/**
 	 * Gets the account state cache.

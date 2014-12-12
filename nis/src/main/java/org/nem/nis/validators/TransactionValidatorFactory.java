@@ -42,12 +42,12 @@ public class TransactionValidatorFactory {
 	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
-	 * @param accountStateRepository The poi facade.
+	 * @param accountStateCache The account state cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateRepository accountStateRepository) {
+	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, accountStateRepository);
+		this.visitSingleSubValidators(builder::add, accountStateCache);
 		return builder.build();
 	}
 
@@ -67,15 +67,15 @@ public class TransactionValidatorFactory {
 	 * Visits all sub validators that comprise the validator returned by createSingle.
 	 *
 	 * @param visitor The visitor.
-	 * @param accountStateRepository The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
 	public void visitSingleSubValidators(
 			final Consumer<SingleTransactionValidator> visitor,
-			final ReadOnlyAccountStateRepository accountStateRepository) {
+			final ReadOnlyAccountStateCache accountStateCache) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());
-		visitor.accept(new ImportanceTransferTransactionValidator(accountStateRepository, this.poiOptions.getMinHarvesterBalance()));
+		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
 	}
 
 	/**
