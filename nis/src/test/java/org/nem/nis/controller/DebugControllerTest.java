@@ -15,6 +15,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
 

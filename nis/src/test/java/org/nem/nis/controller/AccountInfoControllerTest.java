@@ -12,9 +12,8 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.controller.requests.AccountIdBuilder;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.remote.*;
 import org.nem.nis.service.*;
+import org.nem.nis.state.*;
 
 import java.util.*;
 

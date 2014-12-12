@@ -4,7 +4,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.*;
 
 import java.math.BigInteger;
 

@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.*;
 
 public class WeightedBalancesObserverTest {
 

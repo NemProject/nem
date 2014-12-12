@@ -1,9 +1,10 @@
-package org.nem.nis.secret;
+package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;

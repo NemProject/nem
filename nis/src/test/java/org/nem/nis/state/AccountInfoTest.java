@@ -1,8 +1,9 @@
-package org.nem.nis.poi;
+package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.state.AccountInfo;
 
 public class AccountInfoTest {
 

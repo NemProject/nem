@@ -3,7 +3,7 @@ package org.nem.core.model.observers;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.AccountInfo;
 
 /**
  * Transfer observer that commits balance changes to the underlying accounts.

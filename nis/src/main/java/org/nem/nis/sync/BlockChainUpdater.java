@@ -12,8 +12,8 @@ import org.nem.nis.controller.requests.ChainRequest;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 

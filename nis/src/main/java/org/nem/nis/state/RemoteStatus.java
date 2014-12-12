@@ -1,4 +1,4 @@
-package org.nem.nis.remote;
+package org.nem.nis.state;
 
 // TODO 20141014 J-G: comments
 

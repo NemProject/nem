@@ -1,7 +1,7 @@
 package org.nem.nis.harvesting;
 
 import org.nem.core.model.primitive.*;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.state.PoiAccountState;
 
 /**
  * Predicate class that can be used to check if an account is eligible for harvesting.

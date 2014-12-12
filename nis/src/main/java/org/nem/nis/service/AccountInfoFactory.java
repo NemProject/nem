@@ -4,8 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +38,7 @@ public class AccountInfoFactory {
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
-		final org.nem.nis.poi.AccountInfo accountInfo = accountState.getAccountInfo();
+		final org.nem.nis.state.AccountInfo accountInfo = accountState.getAccountInfo();
 
 		final AccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(

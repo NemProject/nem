@@ -1,8 +1,9 @@
-package org.nem.nis.remote;
+package org.nem.nis.state;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.AccountRemoteStatus;
+import org.nem.nis.state.RemoteStatus;
 
 public class RemoteStatusTest {
 

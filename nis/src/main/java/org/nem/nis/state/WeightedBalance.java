@@ -1,4 +1,4 @@
-package org.nem.nis.secret;
+package org.nem.nis.state;
 
 import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockChainConstants;

@@ -6,6 +6,7 @@ import org.nem.core.time.synchronization.*;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.nis.time.synchronization.filter.*;
 
 import java.lang.reflect.Field;

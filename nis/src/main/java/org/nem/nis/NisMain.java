@@ -11,7 +11,7 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.state.PoiAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;

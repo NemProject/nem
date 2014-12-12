@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.PoiAccountState;
 
 public class AccountInfoFactoryTest {
 
@@ -81,7 +81,7 @@ public class AccountInfoFactoryTest {
 		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.poiFacade);
 
 		private TestContext() {
-			final org.nem.nis.poi.AccountInfo accountInfo = this.accountState.getAccountInfo();
+			final org.nem.nis.state.AccountInfo accountInfo = this.accountState.getAccountInfo();
 			accountInfo.setLabel("alpha gamma");
 			accountInfo.incrementBalance(new Amount(747));
 			accountInfo.incrementHarvestedBlocks();

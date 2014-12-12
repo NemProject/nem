@@ -2,7 +2,7 @@ package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.state.AccountImportance;
 
 /**
  * A simple view model for account importance information.

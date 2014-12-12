@@ -12,12 +12,12 @@ import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * This suite is different from BlockChainValidatorTest because it uses REAL validators

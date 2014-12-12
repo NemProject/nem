@@ -5,7 +5,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.PoiAccountState;
 
 /**
  * A block transaction observer that automatically prunes account-related data once every 360 blocks.

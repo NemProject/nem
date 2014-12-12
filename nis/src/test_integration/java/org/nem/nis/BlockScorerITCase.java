@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.AccountInfo;
 import org.nem.nis.test.NisUtils;
 
 import java.math.BigInteger;

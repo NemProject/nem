@@ -8,6 +8,7 @@ import org.nem.core.test.TimeSyncUtils;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.nis.time.synchronization.filter.*;
 
 import java.lang.reflect.Field;

@@ -6,7 +6,7 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.utils.FormatUtils;
-import org.nem.nis.secret.AccountLink;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
 import java.lang.management.*;

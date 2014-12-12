@@ -4,7 +4,7 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.state.AccountImportance;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
 
 import java.util.List;

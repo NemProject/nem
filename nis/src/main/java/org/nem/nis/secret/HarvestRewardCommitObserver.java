@@ -2,7 +2,7 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.AccountInfo;
 
 /**
  * BlockTransactionObserver that commits harvest rewards to accounts.

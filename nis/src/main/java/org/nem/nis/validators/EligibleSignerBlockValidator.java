@@ -2,8 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
-import org.nem.nis.remote.RemoteStatus;
+import org.nem.nis.state.*;
 
 /**
  * Block validator that ensures the block signer is valid.

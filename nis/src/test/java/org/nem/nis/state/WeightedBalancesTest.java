@@ -1,8 +1,9 @@
-package org.nem.nis.secret;
+package org.nem.nis.state;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
+import org.nem.nis.state.*;
 
 public class WeightedBalancesTest {
 

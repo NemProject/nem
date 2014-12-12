@@ -1,4 +1,4 @@
-package org.nem.nis.remote;
+package org.nem.nis.state;
 
 import org.nem.core.model.ImportanceTransferTransaction;
 import org.nem.core.model.primitive.BlockHeight;

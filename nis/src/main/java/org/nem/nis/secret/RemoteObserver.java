@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.remote.*;
+import org.nem.nis.state.*;
 
 /**
  * A block transaction observer that updates remote account associations.

@@ -1,4 +1,4 @@
-package org.nem.nis.secret;
+package org.nem.nis.state;
 
 /**
  * Constants related to weighted balance decays.

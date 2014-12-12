@@ -2,7 +2,7 @@ package org.nem.nis.time.synchronization;
 
 import org.nem.core.node.Node;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.peer.trust.*;
 
 import java.util.Random;

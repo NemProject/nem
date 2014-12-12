@@ -10,6 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
 public class AccountsHeightObserverTest {

@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.remote.RemoteLink;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.DebitPredicate;
 
 import java.util.*;

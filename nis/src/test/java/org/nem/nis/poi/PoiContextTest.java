@@ -6,7 +6,7 @@ import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.poi.graph.*;
-import org.nem.nis.secret.*;
+import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
 import java.util.*;

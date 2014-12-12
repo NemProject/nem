@@ -1,10 +1,11 @@
-package org.nem.nis.remote;
+package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
+import org.nem.nis.state.RemoteLink;
 
 import java.util.*;
 

@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.nis.validators.DebitPredicate;
 
 import java.util.Iterator;

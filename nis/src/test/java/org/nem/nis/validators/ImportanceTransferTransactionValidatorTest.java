@@ -9,8 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
-import org.nem.nis.remote.RemoteLink;
+import org.nem.nis.state.*;
 import org.nem.nis.test.DebitPredicates;
 
 public class ImportanceTransferTransactionValidatorTest {

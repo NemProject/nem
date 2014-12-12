@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.state.PoiAccountState;
 
 import java.util.Collection;
 

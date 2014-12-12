@@ -1,9 +1,7 @@
-package org.nem.nis.poi;
+package org.nem.nis.state;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.remote.RemoteLinks;
-import org.nem.nis.secret.*;
 
 /**
  * Class containing extrinsic in-memory mutable account information.

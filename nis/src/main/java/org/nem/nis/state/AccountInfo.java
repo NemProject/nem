@@ -1,4 +1,4 @@
-package org.nem.nis.poi;
+package org.nem.nis.state;
 
 import org.nem.core.model.primitive.*;
 

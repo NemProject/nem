@@ -15,8 +15,7 @@ import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.state.*;
 import org.nem.nis.service.AccountIoAdapter;
 
 import java.util.*;

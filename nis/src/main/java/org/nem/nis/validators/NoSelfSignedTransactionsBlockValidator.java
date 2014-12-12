@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.PoiAccountState;
 
 /**
  * Validator that checks the block signer and rejects a block if any transactions are self-signed.

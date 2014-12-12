@@ -1,4 +1,4 @@
-package org.nem.nis.remote;
+package org.nem.nis.state;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;

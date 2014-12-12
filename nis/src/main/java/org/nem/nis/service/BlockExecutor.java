@@ -4,7 +4,7 @@ import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -7,7 +7,7 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.state.PoiAccountState;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.BlockChainScoreManager;
