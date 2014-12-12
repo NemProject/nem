@@ -1021,7 +1021,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
 				factory.createSingle(poiFacade),
@@ -1053,7 +1053,7 @@ public class UnconfirmedTransactionsTest {
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
-		private final PoiFacade poiFacade;
+		private final DefaultPoiFacade poiFacade;
 
 		private TestContext() {
 			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
@@ -1067,21 +1067,20 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
-			this(singleValidator, batchValidator, Mockito.mock(PoiFacade.class));
+			this(singleValidator, batchValidator, Mockito.mock(DefaultPoiFacade.class));
 		}
 
-		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator, final PoiFacade poiFacade) {
+		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator, final DefaultPoiFacade poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			this.poiFacade = poiFacade;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-			final AccountCache accountCache = Mockito.mock(AccountCache.class);
 			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(this.poiFacade)).thenReturn(this.singleValidator);
+			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					new NisCache(accountCache, this.poiFacade, transactionHashCache));
+					NisUtils.createNisCache(this.poiFacade, transactionHashCache));
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {

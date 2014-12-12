@@ -6,7 +6,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.test.NisUtils;
 
@@ -681,7 +681,7 @@ public class BlockScorerITCase {
 	//	}
 
 	private static BlockScorer createBlockScorer() {
-		return new BlockScorer(new PoiFacade(NisUtils.createImportanceCalculator()));
+		return new BlockScorer(new DefaultPoiFacade(NisUtils.createImportanceCalculator()));
 	}
 
 	private static class AccountWithInfo extends Account {

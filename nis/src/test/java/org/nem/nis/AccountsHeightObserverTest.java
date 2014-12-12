@@ -138,8 +138,8 @@ public class AccountsHeightObserverTest {
 	public void multipleReceiveUndoWithinSameBlockArePossible() {
 		// Arrange:
 		final AccountCache accountCache = new AccountCache();
-		final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
-		final AccountsHeightObserver observer = new AccountsHeightObserver(new NisCache(accountCache, poiFacade, new HashCache()));
+		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
+		final AccountsHeightObserver observer = new AccountsHeightObserver(NisUtils.createNisCache(accountCache, poiFacade));
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 
 		// Act:
@@ -226,9 +226,8 @@ public class AccountsHeightObserverTest {
 
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		private final NisCache nisCache = new NisCache(this.accountCache, this.poiFacade, this.transactionHashCache);
+		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final NisCache nisCache = NisUtils.createNisCache(this.accountCache, this.poiFacade);
 		private final AccountsHeightObserver observer = new AccountsHeightObserver(this.nisCache);
 
 		private void setupAccount(final Account account) {

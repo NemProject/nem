@@ -43,10 +43,7 @@ public class DebugControllerTest {
 		final BlockHeight height = new BlockHeight(10);
 		final TimeInstant timeStamp = new TimeInstant(1000);
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
-		final NisCache nisCache = new NisCache(
-				new AccountCache(),
-				new PoiFacade(NisUtils.createImportanceCalculator()),
-				new HashCache());
+		final NisCache nisCache = NisUtils.createRealNisCache();
 		final Account signer1 = addRandomAccountWithBalance(nisCache);
 		final Account signer2 = addRandomAccountWithBalance(nisCache);
 

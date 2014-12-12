@@ -13,7 +13,7 @@ public class NisCacheTest {
 	public void canCreateNisCache() {
 		// Arrange:
 		final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
 
 		// Act:
@@ -29,7 +29,7 @@ public class NisCacheTest {
 	public void copyCreatesNewCacheByDelegatingToComponents() {
 		// Arrange:
 		final AccountCache copyAccountCache = Mockito.mock(AccountCache.class);
-		final PoiFacade copyPoiFacade = Mockito.mock(PoiFacade.class);
+		final SynchronizedPoiFacade copyPoiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		final HashCache copyTransactionsHashCache = Mockito.mock(HashCache.class);
 
 		final TestContext context = new TestContext();
@@ -67,7 +67,7 @@ public class NisCacheTest {
 
 	private class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		private final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
 		private final NisCache cache = new NisCache(this.accountCache, this.poiFacade, this.transactionsHashCache);
 	}

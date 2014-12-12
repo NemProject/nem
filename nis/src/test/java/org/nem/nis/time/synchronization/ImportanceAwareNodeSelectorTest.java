@@ -7,7 +7,7 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
 import org.nem.peer.trust.*;
@@ -202,7 +202,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	//endregion
 
 	private static class TestContext {
-		private final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
+		private final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);
@@ -240,12 +240,12 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			this.selector = new ImportanceAwareNodeSelector(maxNodes, this.poiFacade, this.trustProvider, this.context, random);
 		}
 
-		private static void setFacadeInternalValues(final PoiFacade facade, final int lastPoiVectorSize, final BlockHeight height) {
+		private static void setFacadeInternalValues(final DefaultPoiFacade facade, final int lastPoiVectorSize, final BlockHeight height) {
 			try {
-				Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+				Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
 				field.setAccessible(true);
 				field.set(facade, lastPoiVectorSize);
-				field = PoiFacade.class.getDeclaredField("lastPoiRecalculationHeight");
+				field = DefaultPoiFacade.class.getDeclaredField("lastPoiRecalculationHeight");
 				field.setAccessible(true);
 				field.set(facade, height);
 			} catch (IllegalAccessException | NoSuchFieldException e) {

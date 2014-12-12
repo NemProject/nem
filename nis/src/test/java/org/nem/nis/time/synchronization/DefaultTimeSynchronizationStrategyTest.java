@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.TimeSyncUtils;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.time.synchronization.filter.*;
 
@@ -48,7 +48,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createTolerableSortedSamples(0, 1);
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		Mockito.when(filter.filter(samples, new NodeAge(0))).thenReturn(samples);
-		final PoiFacade facade = this.createPoiFacade();
+		final DefaultPoiFacade facade = this.createPoiFacade();
 		createAccountStatesWithUniformImportancesForPoiFacade(facade, samples);
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(filter, facade);
 
@@ -65,7 +65,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createTimeSynchronizationSamplesWithDifferentKeyPairs(1000, 100);
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		Mockito.when(filter.filter(samples, new NodeAge(0))).thenReturn(samples);
-		final PoiFacade facade = this.createPoiFacade();
+		final DefaultPoiFacade facade = this.createPoiFacade();
 		createAccountStatesWithUniformImportancesForPoiFacade(facade, samples);
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(filter, facade);
 
@@ -84,7 +84,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(100, 500);
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
-		final PoiFacade facade = this.createPoiFacade();
+		final DefaultPoiFacade facade = this.createPoiFacade();
 		createAccountStatesWithUniformImportancesForPoiFacade(facade, samples);
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(filter, facade);
 
@@ -103,7 +103,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createTimeSynchronizationSamplesWithDifferentKeyPairs(1000, 100);
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
-		final PoiFacade facade = this.createPoiFacade();
+		final DefaultPoiFacade facade = this.createPoiFacade();
 		createAccountStatesWithUniformImportancesForPoiFacade(facade, samples);
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(filter, facade);
 
@@ -124,7 +124,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(2, 1000);
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
-		final PoiFacade facade = this.createPoiFacade();
+		final DefaultPoiFacade facade = this.createPoiFacade();
 		final double[] importances = { 0.1, 0.9 };
 		createAccountStatesWithGivenImportancesAndLastPoiVectorSizeForPoiFacade(facade, samples, importances, 2);
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(filter, facade);
@@ -146,7 +146,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final List<TimeSynchronizationSample> samples = TimeSyncUtils.createRandomTolerableSamplesWithDifferentKeyPairsAroundMean(2, 10000);
 		final AggregateSynchronizationFilter filter = Mockito.mock(AggregateSynchronizationFilter.class);
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
-		final PoiFacade facade = this.createPoiFacade();
+		final DefaultPoiFacade facade = this.createPoiFacade();
 		final double[] importances = { 0.0005, 0.0005 };
 		createAccountStatesWithGivenImportancesAndLastPoiVectorSizeForPoiFacade(facade, samples, importances, 20);
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(filter, facade);
@@ -196,13 +196,13 @@ public class DefaultTimeSynchronizationStrategyTest {
 		return new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
 	}
 
-	private PoiFacade createPoiFacade() {
-		return new PoiFacade(Mockito.mock(ImportanceCalculator.class));
+	private DefaultPoiFacade createPoiFacade() {
+		return new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 	}
 
-	private static void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
+	private static void setFacadeLastPoiVectorSize(final DefaultPoiFacade facade, final int lastPoiVectorSize) {
 		try {
-			final Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
@@ -211,7 +211,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 	}
 
 	private static List<PoiAccountState> createAccountStatesWithUniformImportancesForPoiFacade(
-			final PoiFacade facade,
+			final DefaultPoiFacade facade,
 			final List<TimeSynchronizationSample> samples) {
 		final List<PoiAccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < samples.size(); i++) {
@@ -224,7 +224,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 	}
 
 	private static List<PoiAccountState> createAccountStatesWithGivenImportancesAndLastPoiVectorSizeForPoiFacade(
-			final PoiFacade facade,
+			final DefaultPoiFacade facade,
 			final List<TimeSynchronizationSample> samples,
 			final double[] importances,
 			final int lastPoiVectorSize) {

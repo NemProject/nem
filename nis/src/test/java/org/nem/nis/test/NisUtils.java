@@ -1,10 +1,12 @@
 package org.nem.nis.test;
 
+import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.*;
@@ -294,6 +296,89 @@ public class NisUtils {
 	 */
 	public static BlockNotificationContext createBlockNotificationContext(final BlockHeight height, final NotificationTrigger trigger) {
 		return new BlockNotificationContext(height, new TimeInstant(987), trigger);
+	}
+
+	//endregion
+
+	//region createNisCache
+
+	/**
+	 * Creates a real NIS cache.
+	 *
+	 * @return The NIS cache.
+	 */
+	public static NisCache createRealNisCache() {
+		return new NisCache(
+				new AccountCache(),
+				new SynchronizedPoiFacade(new DefaultPoiFacade(createImportanceCalculator())),
+				new HashCache());
+	}
+
+	/**
+	 * Creates a real NIS cache around a poi facade.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @return The NIS cache.
+	 */
+	public static NisCache createRealNisCache(final DefaultPoiFacade poiFacade) {
+		return new NisCache(
+				new AccountCache(),
+				new SynchronizedPoiFacade(poiFacade),
+				new HashCache());
+	}
+
+	/**
+	 * Creates a NIS cache around an account.
+	 *
+	 * @param accountCache The account cache.
+	 * @return The NIS cache.
+	 */
+	public static NisCache createNisCache(final AccountCache accountCache) {
+		return new NisCache(
+				accountCache,
+				Mockito.mock(SynchronizedPoiFacade.class),
+				Mockito.mock(HashCache.class));
+	}
+
+	/**
+	 * Creates a NIS cache around an account cache and poi facade.
+	 *
+	 * @param accountCache The account cache.
+	 * @param poiFacade The poi facade.
+	 * @return The NIS cache.
+	 */
+	public static NisCache createNisCache(final AccountCache accountCache, final DefaultPoiFacade poiFacade) {
+		return new NisCache(
+				accountCache,
+				new SynchronizedPoiFacade(poiFacade),
+				Mockito.mock(HashCache.class));
+	}
+
+	/**
+	 * Creates a NIS cache around a poi facade.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @return The NIS cache.
+	 */
+	public static NisCache createNisCache(final DefaultPoiFacade poiFacade) {
+		return new NisCache(
+				Mockito.mock(AccountCache.class),
+				new SynchronizedPoiFacade(poiFacade),
+				Mockito.mock(HashCache.class));
+	}
+
+	/**
+	 * Creates a NIS cache around a poi facade and hash cache.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @param hashCache The hash cache.
+	 * @return The NIS cache.
+	 */
+	public static NisCache createNisCache(final DefaultPoiFacade poiFacade, final HashCache hashCache) {
+		return new NisCache(
+				Mockito.mock(AccountCache.class),
+				new SynchronizedPoiFacade(poiFacade),
+				hashCache);
 	}
 
 	//endregion

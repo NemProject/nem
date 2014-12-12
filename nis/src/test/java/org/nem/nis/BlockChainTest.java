@@ -119,11 +119,11 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithSameScoreGetsRejectedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
+		final DefaultPoiFacade poiFacade = new DefaultPoiFacade((blockHeight, accountStates) ->
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = new NisCache(new AccountCache(), poiFacade, new HashCache());
+		final NisCache nisCache = NisUtils.createRealNisCache(poiFacade);
 		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
 			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
@@ -203,11 +203,11 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
+		final DefaultPoiFacade poiFacade = new DefaultPoiFacade((blockHeight, accountStates) ->
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = new NisCache(new AccountCache(), poiFacade, new HashCache());
+		final NisCache nisCache = NisUtils.createRealNisCache(poiFacade);
 		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
 			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);

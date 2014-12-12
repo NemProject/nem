@@ -214,8 +214,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public PoiFacade poiFacade() {
-		return new PoiFacade(this.importanceCalculator());
+	public SynchronizedPoiFacade poiFacade() {
+		return new SynchronizedPoiFacade(new DefaultPoiFacade(this.importanceCalculator()));
 	}
 
 	@Bean

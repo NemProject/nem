@@ -5,7 +5,7 @@ package org.nem.nis.cache;
  */
 public class NisCache {
 	private final AccountCache accountCache;
-	private final PoiFacade poiFacade;
+	private final SynchronizedPoiFacade poiFacade;
 	private final HashCache transactionHashCache;
 
 	/**
@@ -17,7 +17,7 @@ public class NisCache {
 	 */
 	public NisCache(
 			final AccountCache accountCache,
-			final PoiFacade poiFacade,
+			final SynchronizedPoiFacade poiFacade,
 			final HashCache transactionHashCache) {
 		this.accountCache = accountCache;
 		this.poiFacade = poiFacade;
@@ -67,7 +67,7 @@ public class NisCache {
 	 */
 	public void shallowCopyTo(final NisCache nisCache) {
 		this.accountCache.shallowCopyTo(nisCache.getAccountCache());
-		this.poiFacade.shallowCopyTo(nisCache.getPoiFacade());
+		this.poiFacade.shallowCopyTo(nisCache.poiFacade);
 		this.transactionHashCache.shallowCopyTo(nisCache.getTransactionHashCache());
 	}
 }

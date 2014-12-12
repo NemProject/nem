@@ -6,7 +6,6 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.poi.*;
 import org.nem.nis.remote.RemoteLink;
 import org.nem.nis.validators.DebitPredicate;
@@ -14,7 +13,24 @@ import org.nem.nis.validators.DebitPredicate;
 import java.util.*;
 import java.util.stream.*;
 
-public class PoiFacadeTest {
+public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
+
+	/**
+	 * Creates a poi facade given an importance calculator.
+	 *
+	 * @param importanceCalculator The importance calculator.
+	 * @return The poi facade
+	 */
+	protected abstract T createPoiFacade(final ImportanceCalculator importanceCalculator);
+
+	/**
+	 * Creates a poi facade.
+	 *
+	 * @return The poi facade
+	 */
+	protected T createPoiFacade() {
+		return this.createPoiFacade(Mockito.mock(ImportanceCalculator.class));
+	}
 
 	//region findStateByAddress
 
@@ -22,7 +38,7 @@ public class PoiFacadeTest {
 	public void findStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		final PoiAccountState state = facade.findStateByAddress(address);
@@ -37,7 +53,7 @@ public class PoiFacadeTest {
 	public void findStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		final PoiAccountState state1 = facade.findStateByAddress(address);
@@ -56,7 +72,7 @@ public class PoiFacadeTest {
 	public void findLatestForwardedStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		final PoiAccountState state = facade.findLatestForwardedStateByAddress(address);
@@ -83,10 +99,10 @@ public class PoiFacadeTest {
 		Assert.assertThat(isLatestLocalState(1, 1000, owner), IsEqual.equalTo(false));
 	}
 
-	private static boolean isLatestLocalState(final int mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
+	private boolean isLatestLocalState(final int mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 		final PoiAccountState state = facade.findStateByAddress(address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
@@ -110,7 +126,7 @@ public class PoiFacadeTest {
 	public void findForwardedStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		final PoiAccountState state = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
@@ -125,7 +141,7 @@ public class PoiFacadeTest {
 	public void findForwardedStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		final PoiAccountState state1 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
@@ -140,7 +156,7 @@ public class PoiFacadeTest {
 	public void findForwardedStateByAddressReturnsLocalStateWhenAccountDoesNotHaveRemoteState() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 		final PoiAccountState state = facade.findStateByAddress(address);
 
 		// Act:
@@ -238,10 +254,10 @@ public class PoiFacadeTest {
 
 	//endregion
 
-	private static boolean isLocalState(final int mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
+	private boolean isLocalState(final int mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
 		// Assert:		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 		final PoiAccountState state = facade.findStateByAddress(address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
@@ -265,7 +281,7 @@ public class PoiFacadeTest {
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		facade.findStateByAddress(address);
@@ -279,7 +295,7 @@ public class PoiFacadeTest {
 	public void accountWithPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		facade.findStateByAddress(address);
@@ -293,7 +309,7 @@ public class PoiFacadeTest {
 	public void removeAccountFromCacheDoesNothingIfAddressIsNotInCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		// Act:
 		facade.findStateByAddress(address);
@@ -313,14 +329,14 @@ public class PoiFacadeTest {
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final T facade = this.createPoiFacade();
 
 		final PoiAccountState state1 = facade.findStateByAddress(address1);
 		final PoiAccountState state2 = facade.findStateByAddress(address2);
 		final PoiAccountState state3 = facade.findStateByAddress(address3);
 
 		// Act:
-		final PoiFacade copyFacade = facade.copy();
+		final T copyFacade = facade.copy();
 
 		final PoiAccountState copyState1 = copyFacade.findStateByAddress(address1);
 		final PoiAccountState copyState2 = copyFacade.findStateByAddress(address2);
@@ -343,7 +359,7 @@ public class PoiFacadeTest {
 		// Arrange:
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final T facade = this.createPoiFacade(importanceCalculator);
 		facade.recalculateImportances(new BlockHeight(1234));
 
 		// Act:
@@ -359,7 +375,7 @@ public class PoiFacadeTest {
 	public void copyReturnsSameAccountGivenPublicKeyOrAddress() {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final T facade = this.createPoiFacade();
 
 		facade.findStateByAddress(address1);
 
@@ -384,14 +400,14 @@ public class PoiFacadeTest {
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final T facade = this.createPoiFacade();
 
 		final PoiAccountState state1 = facade.findStateByAddress(address1);
 		final PoiAccountState state2 = facade.findStateByAddress(address2);
 		final PoiAccountState state3 = facade.findStateByAddress(address3);
 
 		// Act:
-		final PoiFacade copyFacade = createPoiFacade();
+		final T copyFacade = this.createPoiFacade();
 		facade.shallowCopyTo(copyFacade);
 
 		final PoiAccountState copyState1 = copyFacade.findStateByAddress(address1);
@@ -409,11 +425,11 @@ public class PoiFacadeTest {
 	public void shallowCopyDoesNotRecalculateImportancesForSameBlock() {
 		// Arrange:
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final T facade = this.createPoiFacade(importanceCalculator);
 		facade.recalculateImportances(new BlockHeight(1234));
 
 		// Act:
-		final PoiFacade copyFacade = createPoiFacade();
+		final T copyFacade = this.createPoiFacade();
 		facade.shallowCopyTo(copyFacade);
 
 		facade.recalculateImportances(new BlockHeight(1234));
@@ -427,11 +443,11 @@ public class PoiFacadeTest {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
-		final PoiFacade facade = createPoiFacade();
+		final T facade = this.createPoiFacade();
 
 		final PoiAccountState state1 = facade.findStateByAddress(address1);
 
-		final PoiFacade copyFacade = createPoiFacade();
+		final T copyFacade = this.createPoiFacade();
 		final PoiAccountState state2 = copyFacade.findStateByAddress(address2);
 
 		// Act:
@@ -455,7 +471,7 @@ public class PoiFacadeTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(70);
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -472,7 +488,7 @@ public class PoiFacadeTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(20);
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -489,7 +505,7 @@ public class PoiFacadeTest {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(70);
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 		facade.findStateByAddress(NemesisBlock.ADDRESS);
 
@@ -506,7 +522,7 @@ public class PoiFacadeTest {
 	public void recalculateImportancesDoesNotRecalculateImportancesForLastBlockHeight() {
 		// Arrange:
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 
 		// Act:
 		facade.recalculateImportances(new BlockHeight(7));
@@ -523,7 +539,7 @@ public class PoiFacadeTest {
 		final int height2 = 80;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -542,7 +558,7 @@ public class PoiFacadeTest {
 		final int height1 = 70;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -558,7 +574,7 @@ public class PoiFacadeTest {
 		final int height1 = 70;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
-		final PoiFacade facade = new PoiFacade(importanceCalculator);
+		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		createAccountStatesForRecalculateTests(3, facade);
 
 		// Act:
@@ -596,7 +612,7 @@ public class PoiFacadeTest {
 	@Test
 	public void undoVestingDelegatesToWeightedBalances() {
 		// Arrange:
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 		final List<PoiAccountState> accountStates = createAccountStatesForUndoVestingTests(3, facade);
 
 		// Expect: all accounts should have two weighted balance entries
@@ -631,7 +647,7 @@ public class PoiFacadeTest {
 	@Test
 	public void iteratorReturnsAllAccounts() {
 		// Arrange:
-		final PoiFacade facade = createPoiFacade();
+		final PoiFacade facade = this.createPoiFacade();
 
 		final List<PoiAccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < 3; ++i) {
@@ -656,7 +672,7 @@ public class PoiFacadeTest {
 	@Test
 	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
 		// Arrange:
-		final PoiFacade poiFacade = createPoiFacade();
+		final PoiFacade poiFacade = this.createPoiFacade();
 		final Account account1 = addAccountWithBalance(poiFacade, Amount.fromNem(10));
 		final Account account2 = addAccountWithBalance(poiFacade, Amount.fromNem(77));
 
@@ -681,8 +697,4 @@ public class PoiFacadeTest {
 	}
 
 	//endregion
-
-	private static PoiFacade createPoiFacade() {
-		return new PoiFacade(Mockito.mock(ImportanceCalculator.class));
-	}
 }

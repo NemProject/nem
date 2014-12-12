@@ -4,7 +4,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.synchronization.*;
 import org.nem.core.utils.FormatUtils;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.time.synchronization.filter.*;
 
@@ -77,7 +77,7 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		this.poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
+		this.poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
@@ -250,7 +250,7 @@ public class Network {
 	}
 
 	private PoiFacade resetFacade() {
-		this.poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
+		this.poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);

@@ -370,12 +370,11 @@ public class BlockChainValidatorIntegrationTest {
 	//endregion
 
 	private static class BlockChainValidatorFactory {
-		public Consumer<Block> executor = block -> { };
 		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		public int maxChainSize = 21;
-		public final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
+		public final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		public final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		public final NisCache nisCache = new NisCache(Mockito.mock(AccountCache.class), this.poiFacade, this.transactionHashCache);
+		public final NisCache nisCache = NisUtils.createNisCache(this.poiFacade, this.transactionHashCache);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.nisCache);
 		public final SingleTransactionValidator transactionValidator;
 
@@ -389,7 +388,7 @@ public class BlockChainValidatorIntegrationTest {
 		}
 
 		public BlockChainValidator create() {
-			final NisCache nisCache = new NisCache(new AccountCache(), this.poiFacade, new HashCache());
+			final NisCache nisCache = NisUtils.createNisCache(this.poiFacade);
 			final BlockExecutor executor = new BlockExecutor(nisCache);
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 			return new BlockChainValidator(
