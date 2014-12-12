@@ -82,11 +82,6 @@ public class BlockChainValidator {
 				return false;
 			}
 
-			if (!this.isBlockHit(parentBlock, block)) {
-				LOGGER.info(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
-				return false;
-			}
-
 			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.debitPredicate);
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
@@ -109,10 +104,16 @@ public class BlockChainValidator {
 				chainHashes.add(hash);
 			}
 
+			this.executor.accept(block);
+
+			// check if the block is a hit last to delay potential poi recalculation
+			if (!this.isBlockHit(parentBlock, block)) {
+				LOGGER.info(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
+				return false;
+			}
+
 			parentBlock = block;
 			expectedHeight = expectedHeight.next();
-
-			this.executor.accept(block);
 		}
 
 		return true;

@@ -92,7 +92,6 @@ public class BlockScorer {
 
 	/**
 	 * Calculates forager balance for block.
-	 * This has the side-effect of recalculating importances.
 	 *
 	 * @param block The signed, "hit" block.
 	 * @return The forager balance.

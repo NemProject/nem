@@ -123,11 +123,14 @@ public class BlockChainTest {
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = NisCacheFactory.createReal(poiFacade);
-		final List<Account> accounts = this.prepareSigners(nisCache);
+		final ReadOnlyNisCache nisCache = NisCacheFactory.createReal(poiFacade);
+		final NisCache mutableNisCache = nisCache.copy();
+		final List<Account> accounts = this.prepareSigners(mutableNisCache);
 		for (final Account account : accounts) {
-			nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			mutableNisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
+
+		mutableNisCache.commit();
 
 		final Account signer = accounts.get(0);
 
@@ -207,11 +210,14 @@ public class BlockChainTest {
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = NisCacheFactory.createReal(poiFacade);
-		final List<Account> accounts = this.prepareSigners(nisCache);
+		final ReadOnlyNisCache nisCache = NisCacheFactory.createReal(poiFacade);
+		final NisCache mutableNisCache = nisCache.copy();
+		final List<Account> accounts = this.prepareSigners(mutableNisCache);
 		for (final Account account : accounts) {
-			nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			mutableNisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
+
+		mutableNisCache.commit();
 
 		final Account signer = accounts.get(0);
 
@@ -288,7 +294,7 @@ public class BlockChainTest {
 		Assert.assertTrue(siblingResult == ValidationResult.SUCCESS);
 	}
 
-	private static Amount getRecipientBalance(final AccountStateCache accountStateCache, final TransferTransaction transferTransaction) {
+	private static Amount getRecipientBalance(final ReadOnlyAccountStateCache accountStateCache, final TransferTransaction transferTransaction) {
 		return accountStateCache.findStateByAddress(transferTransaction.getRecipient().getAddress()).getAccountInfo().getBalance();
 	}
 

@@ -12,12 +12,12 @@ public class NisCacheFactory {
 	 *
 	 * @return The NIS cache.
 	 */
-	public static NisCache createReal() {
+	public static ReadOnlyNisCache createReal() {
 		return new DefaultNisCache(
 				new AccountCache(),
 				new DefaultAccountStateCache(),
 				new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
-				new HashCache()).copy();
+				new HashCache());
 	}
 
 	/**
@@ -26,12 +26,12 @@ public class NisCacheFactory {
 	 * @param poiFacade The poi facade.
 	 * @return The NIS cache.
 	 */
-	public static NisCache createReal(final DefaultPoiFacade poiFacade) {
+	public static ReadOnlyNisCache createReal(final DefaultPoiFacade poiFacade) {
 		return new DefaultNisCache(
 				new AccountCache(),
 				new DefaultAccountStateCache(),
 				new SynchronizedPoiFacade(poiFacade),
-				new HashCache()).copy();
+				new HashCache());
 	}
 
 	//endregion
