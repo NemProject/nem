@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
@@ -166,7 +167,9 @@ public class BlockAnalyzer {
 		LOGGER.info("Known accounts: " + nisCache.getAccountCache().size());
 		LOGGER.info(String.format("Initializing PoI for (%d) accounts", nisCache.getAccountCache().size()));
 		final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
-		nisCache.getPoiFacade().recalculateImportances(blockHeight);
+		nisCache.getPoiFacade().recalculateImportances(
+				blockHeight,
+				IteratorUtils.toList(nisCache.getAccountStateCache().iterator()));
 		LOGGER.info("PoI initialized");
 	}
 

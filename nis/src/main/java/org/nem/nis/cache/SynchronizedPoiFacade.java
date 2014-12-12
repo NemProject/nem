@@ -5,7 +5,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.DebitPredicate;
 
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * A synchronized PoiFacade implementation.
@@ -88,9 +88,9 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	//}
 
 	@Override
-	public void recalculateImportances(final BlockHeight blockHeight) {
+	public void recalculateImportances(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
 		synchronized (this.lock) {
-			this.poiFacade.recalculateImportances(blockHeight);
+			this.poiFacade.recalculateImportances(blockHeight, accountStates);
 		}
 	}
 	//

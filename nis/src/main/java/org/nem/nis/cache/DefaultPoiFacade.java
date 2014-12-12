@@ -1,10 +1,12 @@
 package org.nem.nis.cache;
 
+import org.apache.commons.collections4.IteratorUtils;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.poi.*;
 import org.nem.nis.state.*;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,6 +14,18 @@ import java.util.stream.Collectors;
  * A repository of all mutable NEM account state.
  */
 public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFacade> {
+	/**
+	 * Number of blocks that should be treated as a group for POI purposes.
+	 * In other words, POI importances will only be calculated at blocks that
+	 * are a multiple of this grouping number.
+	 */
+	private static final int POI_GROUPING = 359;
+
+	/**
+	 * BigInteger constant 2^64
+	 */
+	public static final BigInteger TWO_TO_THE_POWER_OF_64 = new BigInteger("18446744073709551616");
+
 	private final ImportanceCalculator importanceCalculator;
 	private BlockHeight lastPoiRecalculationHeight;
 	private int lastPoiVectorSize;
@@ -36,23 +50,20 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	}
 
 	@Override
-	public void recalculateImportances(final BlockHeight blockHeight) {
+	public void recalculateImportances(
+			final BlockHeight blockHeight,
+			Collection<AccountState> accountStates) {
 		if (null != this.lastPoiRecalculationHeight && 0 == this.lastPoiRecalculationHeight.compareTo(blockHeight)) {
 			return;
 		}
 
-		final Collection<AccountState> accountStates = this.getAccountStates(blockHeight);
+		accountStates = accountStates.stream()
+				.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
+				.collect(Collectors.toList());
+
 		this.lastPoiVectorSize = accountStates.size();
 		this.importanceCalculator.recalculate(blockHeight, accountStates);
 		this.lastPoiRecalculationHeight = blockHeight;
-	}
-
-	private Collection<AccountState> getAccountStates(final BlockHeight blockHeight) {
-		// TODO 20141212 figure out what to do here!
-		return null;
-		//return this.addressToStateMap.values().stream()
-		//		.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
-		//		.collect(Collectors.toList());
 	}
 
 	private static boolean shouldIncludeInImportanceCalculation(final AccountState accountState, final BlockHeight blockHeight) {

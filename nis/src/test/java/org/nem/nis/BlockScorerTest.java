@@ -98,7 +98,7 @@ public class BlockScorerTest {
 		final Block block = createBlock(blockSigner, 101, 11);
 
 		block.setDifficulty(new BlockDifficulty((long)60E12));
-		context.poiFacade.recalculateImportances(block.getHeight());
+		context.poiFacade.recalculateImportances(block.getHeight(), new ArrayList<>());
 
 		// Act:
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
@@ -192,7 +192,6 @@ public class BlockScorerTest {
 	private static void assertRecalculateImportancesCalledForHeight(final long height, final long rawGroupedHeight) {
 		// Arrange:
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height);
 
@@ -200,13 +199,13 @@ public class BlockScorerTest {
 		final Address signerAddress = block.getSigner().getAddress();
 		final AccountState state = new AccountState(signerAddress);
 		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		Mockito.when(accountStateCache.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
+		final Collection<AccountState> accountStates = Arrays.asList(state);
 
 		// Act:
 		context.scorer.calculateForgerBalance(block);
 
 		// Assert:
-		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight, accountStates);
 	}
 
 	@Test
@@ -224,6 +223,7 @@ public class BlockScorerTest {
 		final AccountState remoteState = new AccountState(remoteHarvesterAddress);
 		final AccountState ownerState = new AccountState(ownerAddress);
 		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
+		final Collection<AccountState> accountStates = Arrays.asList(ownerState, remoteState);
 		Mockito.when(accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
 		Mockito.when(accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
 
@@ -232,7 +232,7 @@ public class BlockScorerTest {
 
 		// Assert:
 		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
-		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
+		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(Mockito.eq(groupedHeight), Mockito.any());
 		Mockito.verify(accountStateCache, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
 
