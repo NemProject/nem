@@ -27,7 +27,7 @@ public class PoiContext {
 	 * @param options The poi options.
 	 */
 	public PoiContext(
-			final Iterable<PoiAccountState> accountStates,
+			final Iterable<AccountState> accountStates,
 			final BlockHeight height,
 			final PoiOptions options) {
 		// (1) build the account vectors and matrices
@@ -166,7 +166,7 @@ public class PoiContext {
 		private final Map<Address, Integer> addressToIndexMap = new HashMap<>();
 
 		public AccountProcessor(
-				final Iterable<PoiAccountState> accountStates,
+				final Iterable<AccountState> accountStates,
 				final BlockHeight height,
 				final PoiOptions options) {
 			this.height = height;
@@ -175,7 +175,7 @@ public class PoiContext {
 
 			int i = 0;
 			final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(this.options.getMinHarvesterBalance());
-			for (final PoiAccountState accountState : accountStates) {
+			for (final AccountState accountState : accountStates) {
 				final PoiAccountInfo accountInfo = new PoiAccountInfo(i, accountState, height);
 				if (!canHarvestPredicate.canHarvest(accountState, height)) {
 					continue;
@@ -205,7 +205,7 @@ public class PoiContext {
 			int i = 0;
 			int numOutlinks = 0;
 			for (final PoiAccountInfo accountInfo : this.accountInfos) {
-				final PoiAccountState accountState = accountInfo.getState();
+				final AccountState accountState = accountInfo.getState();
 				numOutlinks += accountState.getImportanceInfo().getOutlinksSize(this.height);
 				this.vestedBalanceVector.setAt(i, accountState.getWeightedBalances().getVested(this.height).getNumMicroNem());
 				++i;

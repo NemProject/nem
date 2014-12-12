@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 
 public class AccountInfoFactoryTest {
 
@@ -74,7 +74,7 @@ public class AccountInfoFactoryTest {
 	private static class TestContext {
 		private final Address address = Utils.generateRandomAddressWithPublicKey();
 		private final Account account = new Account(this.address);
-		private final PoiAccountState accountState = new PoiAccountState(this.address);
+		private final AccountState accountState = new AccountState(this.address);
 
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);

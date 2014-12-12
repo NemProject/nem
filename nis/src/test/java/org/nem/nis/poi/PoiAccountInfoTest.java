@@ -22,7 +22,7 @@ public class PoiAccountInfoTest {
 	public void accountInfoExposesConstructorParameters() {
 		// Arrange:
 		final BlockHeight height = BlockHeight.ONE;
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final PoiAccountInfo info = new PoiAccountInfo(17, state, height);
 
 		// Assert:
@@ -268,7 +268,7 @@ public class PoiAccountInfoTest {
 
 	private static PoiAccountInfo createAccountInfoWithOutlinks(final List<AccountLink> outlinks) {
 		final BlockHeight height = BlockHeight.ONE;
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		addAllOutlinks(state, outlinks);
 		return new PoiAccountInfo(11, state, height);
 	}
@@ -299,12 +299,12 @@ public class PoiAccountInfoTest {
 			outlinks.add(link);
 		}
 
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		addAllOutlinks(state, outlinks);
 		return new PoiAccountInfo(11, state, new BlockHeight(referenceHeight));
 	}
 
-	private static void addAllOutlinks(final PoiAccountState state, final List<AccountLink> outlinks) {
+	private static void addAllOutlinks(final AccountState state, final List<AccountLink> outlinks) {
 		if (null == outlinks) {
 			return;
 		}

@@ -8,7 +8,7 @@ import org.nem.core.test.TimeSyncUtils;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.time.synchronization.filter.*;
 
 import java.lang.reflect.Field;
@@ -211,10 +211,10 @@ public class DefaultTimeSynchronizationStrategyTest {
 		}
 	}
 
-	private static List<PoiAccountState> createAccountStatesWithUniformImportancesForPoiFacade(
+	private static List<AccountState> createAccountStatesWithUniformImportancesForPoiFacade(
 			final DefaultPoiFacade facade,
 			final List<TimeSynchronizationSample> samples) {
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < samples.size(); i++) {
 			accountStates.add(facade.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));
 			accountStates.get(i).getImportanceInfo().setImportance(new BlockHeight(10), 1.0 / samples.size());
@@ -224,12 +224,12 @@ public class DefaultTimeSynchronizationStrategyTest {
 		return accountStates;
 	}
 
-	private static List<PoiAccountState> createAccountStatesWithGivenImportancesAndLastPoiVectorSizeForPoiFacade(
+	private static List<AccountState> createAccountStatesWithGivenImportancesAndLastPoiVectorSizeForPoiFacade(
 			final DefaultPoiFacade facade,
 			final List<TimeSynchronizationSample> samples,
 			final double[] importances,
 			final int lastPoiVectorSize) {
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < samples.size(); i++) {
 			accountStates.add(facade.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));
 			accountStates.get(i).getImportanceInfo().setImportance(new BlockHeight(10), importances[i]);

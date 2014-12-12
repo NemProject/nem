@@ -2,7 +2,7 @@ package org.nem.nis.time.synchronization;
 
 import org.nem.core.node.Node;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.peer.trust.*;
 
 import java.util.Random;
@@ -30,7 +30,7 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	}
 
 	protected boolean isCandidate(final Node node) {
-		final PoiAccountState accountState = this.poiFacade.findStateByAddress(node.getIdentity().getAddress());
+		final AccountState accountState = this.poiFacade.findStateByAddress(node.getIdentity().getAddress());
 		if (!this.poiFacade.getLastPoiRecalculationHeight().equals(accountState.getImportanceInfo().getHeight())) {
 			return false;
 		}

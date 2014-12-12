@@ -4,7 +4,7 @@ import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,11 +76,11 @@ public class BlockExecutor {
 		// in order for all the downstream observers to behave correctly (without needing to know about remote foraging)
 		// trigger harvest notifications with the forwarded account (where available) instead of the remote account
 		final Address address = block.getSigner().getAddress();
-		final PoiAccountState poiAccountState = this.nisCache.getPoiFacade().findForwardedStateByAddress(address, block.getHeight());
+		final AccountState accountState = this.nisCache.getPoiFacade().findForwardedStateByAddress(address, block.getHeight());
 
-		final Account endowed = poiAccountState.getAddress().equals(address)
+		final Account endowed = accountState.getAddress().equals(address)
 				? block.getSigner()
-				: this.nisCache.getAccountCache().findByAddress(poiAccountState.getAddress());
+				: this.nisCache.getAccountCache().findByAddress(accountState.getAddress());
 
 		final List<NotificationType> types = NotificationTrigger.Execute == trigger
 				? Arrays.asList(NotificationType.BalanceCredit, NotificationType.HarvestReward)

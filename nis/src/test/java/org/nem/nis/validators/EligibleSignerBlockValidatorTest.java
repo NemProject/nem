@@ -76,7 +76,7 @@ public class EligibleSignerBlockValidatorTest {
 		final int changeHeight = 5;
 		final Block block = NisUtils.createRandomBlockWithHeight(changeHeight + blockHeight);
 
-		final PoiAccountState accountState = new PoiAccountState(block.getSigner().getAddress());
+		final AccountState accountState = new AccountState(block.getSigner().getAddress());
 		if (null != owner) {
 			accountState.getRemoteLinks().addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(changeHeight), mode, owner));
 		}

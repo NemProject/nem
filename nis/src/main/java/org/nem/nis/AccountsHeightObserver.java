@@ -4,7 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.secret.*;
 
 /**
@@ -39,7 +39,7 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 	private void addToNisCache(final BlockHeight height, final Account account) {
 		final Address address = account.getAddress();
 		this.nisCache.getAccountCache().findByAddress(address);
-		final PoiAccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
+		final AccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
 
 		accountState.getAccountInfo().incrementReferenceCount();
 		accountState.setHeight(height);
@@ -52,7 +52,7 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 			throw new IllegalArgumentException("problem during undo, account not present in cache");
 		}
 
-		final PoiAccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
+		final AccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
 		if (null == accountState.getHeight()) {
 			throw new IllegalArgumentException("problem during undo, account height not set");
 		}

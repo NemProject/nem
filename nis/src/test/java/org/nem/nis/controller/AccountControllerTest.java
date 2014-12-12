@@ -350,7 +350,7 @@ public class AccountControllerTest {
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
 		// Arrange:
-		final List<PoiAccountState> accountStates = Arrays.asList(
+		final List<AccountState> accountStates = Arrays.asList(
 				createAccountState("alpha", 12, 45),
 				createAccountState("gamma", 0, 0),
 				createAccountState("sigma", 4, 88));
@@ -369,11 +369,11 @@ public class AccountControllerTest {
 		Assert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
 	}
 
-	private static PoiAccountState createAccountState(
+	private static AccountState createAccountState(
 			final String encodedAddress,
 			final int blockHeight,
 			final int importance) {
-		final PoiAccountState state = new PoiAccountState(Address.fromEncoded(encodedAddress));
+		final AccountState state = new AccountState(Address.fromEncoded(encodedAddress));
 		if (blockHeight > 0) {
 			state.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
 		}
@@ -416,7 +416,7 @@ public class AccountControllerTest {
 		}
 
 		private Account addAccount(final Account account, final Amount amount) {
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;

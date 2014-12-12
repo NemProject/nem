@@ -406,7 +406,7 @@ public class BlockChainValidatorIntegrationTest {
 
 		private Account createAccountWithBalance(final Amount balance) {
 			final Account account = Utils.generateRandomAccount();
-			final PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
+			final AccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(balance);
 			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
 			return account;

@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 
 /**
  * Validator that checks the block signer and rejects a block if any transactions are self-signed.
@@ -22,7 +22,7 @@ public class NoSelfSignedTransactionsBlockValidator implements BlockValidator {
 	@Override
 	public ValidationResult validate(final Block block) {
 		final Address harvesterAddress = block.getSigner().getAddress();
-		final PoiAccountState ownerState = this.poiFacade.findForwardedStateByAddress(harvesterAddress, block.getHeight());
+		final AccountState ownerState = this.poiFacade.findForwardedStateByAddress(harvesterAddress, block.getHeight());
 		final boolean isSelfSigned = block.getTransactions().stream().anyMatch(transaction -> {
 			final Address signerAddress = transaction.getSigner().getAddress();
 			return signerAddress.equals(harvesterAddress) || signerAddress.equals(ownerState.getAddress());

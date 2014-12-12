@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * A repository of all mutable NEM account state.
  */
 public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFacade> {
-	private final Map<Address, PoiAccountState> addressToStateMap = new ConcurrentHashMap<>();
+	private final Map<Address, AccountState> addressToStateMap = new ConcurrentHashMap<>();
 	private final ImportanceCalculator importanceCalculator;
 	private BlockHeight lastPoiRecalculationHeight;
 	private int lastPoiVectorSize;
@@ -30,10 +30,10 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	}
 
 	@Override
-	public PoiAccountState findStateByAddress(final Address address) {
-		PoiAccountState state = this.addressToStateMap.getOrDefault(address, null);
+	public AccountState findStateByAddress(final Address address) {
+		AccountState state = this.addressToStateMap.getOrDefault(address, null);
 		if (null == state) {
-			state = new PoiAccountState(address);
+			state = new AccountState(address);
 			this.addressToStateMap.put(address, state);
 		}
 
@@ -41,16 +41,16 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	}
 
 	@Override
-	public PoiAccountState findLatestForwardedStateByAddress(final Address address) {
-		final PoiAccountState state = this.findStateByAddress(address);
+	public AccountState findLatestForwardedStateByAddress(final Address address) {
+		final AccountState state = this.findStateByAddress(address);
 		final RemoteLinks remoteLinks = state.getRemoteLinks();
 		final RemoteLink remoteLink = remoteLinks.getCurrent();
 		return !remoteLinks.isRemoteHarvester() ? state : this.findStateByAddress(remoteLink.getLinkedAddress());
 	}
 
 	@Override
-	public PoiAccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
-		final PoiAccountState state = this.findStateByAddress(address);
+	public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
+		final AccountState state = this.findStateByAddress(address);
 		final RemoteLinks remoteLinks = state.getRemoteLinks();
 		if (!remoteLinks.isRemoteHarvester()) {
 			return state;
@@ -105,19 +105,19 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 			return;
 		}
 
-		final Collection<PoiAccountState> accountStates = this.getAccountStates(blockHeight);
+		final Collection<AccountState> accountStates = this.getAccountStates(blockHeight);
 		this.lastPoiVectorSize = accountStates.size();
 		this.importanceCalculator.recalculate(blockHeight, accountStates);
 		this.lastPoiRecalculationHeight = blockHeight;
 	}
 
-	private Collection<PoiAccountState> getAccountStates(final BlockHeight blockHeight) {
+	private Collection<AccountState> getAccountStates(final BlockHeight blockHeight) {
 		return this.addressToStateMap.values().stream()
 				.filter(a -> shouldIncludeInImportanceCalculation(a, blockHeight))
 				.collect(Collectors.toList());
 	}
 
-	private static boolean shouldIncludeInImportanceCalculation(final PoiAccountState accountState, final BlockHeight blockHeight) {
+	private static boolean shouldIncludeInImportanceCalculation(final AccountState accountState, final BlockHeight blockHeight) {
 		return null != accountState.getHeight()
 				&& accountState.getHeight().compareTo(blockHeight) <= 0
 				&& !accountState.getAddress().equals(NemesisBlock.ADDRESS);
@@ -141,7 +141,7 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	@Override
 	public DefaultPoiFacade copy() {
 		final DefaultPoiFacade copy = new DefaultPoiFacade(this.importanceCalculator);
-		for (final Map.Entry<Address, PoiAccountState> entry : this.addressToStateMap.entrySet()) {
+		for (final Map.Entry<Address, AccountState> entry : this.addressToStateMap.entrySet()) {
 			copy.addressToStateMap.put(entry.getKey(), entry.getValue().copy());
 		}
 
@@ -150,7 +150,7 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	}
 
 	@Override
-	public Iterator<PoiAccountState> iterator() {
+	public Iterator<AccountState> iterator() {
 		return this.addressToStateMap.values().iterator();
 	}
 }

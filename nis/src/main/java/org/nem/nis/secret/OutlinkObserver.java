@@ -69,7 +69,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 		return Amount.fromMicroNem(rawAdjustedWeight);
 	}
 
-	private PoiAccountState getState(final Account account) {
+	private AccountState getState(final Account account) {
 		return this.poiFacade.findStateByAddress(account.getAddress());
 	}
 

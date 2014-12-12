@@ -100,7 +100,7 @@ public class HarvestRewardCommitObserverTest {
 				this.accountInfo.incrementHarvestedBlocks();
 			}
 
-			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(this.accountInfo);
 			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(accountState);
 		}

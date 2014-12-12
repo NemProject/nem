@@ -67,7 +67,7 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
 
 		// Assert:
-		final PoiAccountState state = context.poiFacade.findStateByAddress(account1.getAddress());
+		final AccountState state = context.poiFacade.findStateByAddress(account1.getAddress());
 		Assert.assertThat(state.getHeight(), IsEqual.equalTo(new BlockHeight(12)));
 	}
 
@@ -234,7 +234,7 @@ public class AccountsHeightObserverTest {
 		private void setupAccount(final Account account) {
 			final Address address = account.getAddress();
 			Mockito.when(this.accountCache.findByAddress(address)).thenReturn(account);
-			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(new PoiAccountState(address));
+			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(new AccountState(address));
 		}
 
 		private Account createAccountWithHeight(final int height) {

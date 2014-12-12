@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class PoiAccountInfo {
 	private static final long OUTLINK_HISTORY = BlockChainConstants.OUTLINK_HISTORY;
 	private final int index;
-	private final PoiAccountState accountState;
+	private final AccountState accountState;
 
 	private final Map<Address, Double> netOutlinks = new HashMap<>();
 	private final List<WeightedLink> outlinks = new ArrayList<>();
@@ -26,7 +26,7 @@ public class PoiAccountInfo {
 	 * @param accountState The account state.
 	 * @param height The height at which the strength is evaluated.
 	 */
-	public PoiAccountInfo(final int index, final PoiAccountState accountState, final BlockHeight height) {
+	public PoiAccountInfo(final int index, final AccountState accountState, final BlockHeight height) {
 		this.index = index;
 		this.accountState = accountState;
 
@@ -69,7 +69,7 @@ public class PoiAccountInfo {
 	 *
 	 * @return The account state.
 	 */
-	public PoiAccountState getState() {
+	public AccountState getState() {
 		return this.accountState;
 	}
 

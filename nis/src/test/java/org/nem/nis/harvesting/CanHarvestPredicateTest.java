@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 
 public class CanHarvestPredicateTest {
 
@@ -32,7 +32,7 @@ public class CanHarvestPredicateTest {
 	private static boolean canHarvest(final Amount vestedBalance) {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(33);
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		state.getWeightedBalances().addFullyVested(height, vestedBalance);
 
 		// Act:

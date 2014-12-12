@@ -225,12 +225,12 @@ public class PruningObserverTest {
 	private static class TestContext {
 		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		private final List<PoiAccountState> accountStates = new ArrayList<>();
+		private final List<AccountState> accountStates = new ArrayList<>();
 		private final BlockTransactionObserver observer = new PruningObserver(this.poiFacade, this.transactionHashCache);
 
 		private TestContext() {
 			for (int i = 0; i < 3; ++i) {
-				final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+				final AccountState accountState = Mockito.mock(AccountState.class);
 				final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
 				final WeightedBalances weightedBalances = Mockito.mock(WeightedBalances.class);
 
@@ -250,13 +250,13 @@ public class PruningObserverTest {
 		}
 
 		private void assertNoWeightedBalancePruning() {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getWeightedBalances(), Mockito.never()).prune(Mockito.any());
 			}
 		}
 
 		private void assertNoOutlinkPruning() {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.never()).prune(Mockito.any());
 			}
 		}
@@ -266,13 +266,13 @@ public class PruningObserverTest {
 		}
 
 		private void assertWeightedBalancePruning(final BlockHeight height) {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getWeightedBalances(), Mockito.only()).prune(height);
 			}
 		}
 
 		private void assertOutlinkPruning(final BlockHeight height) {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.only()).prune(height);
 			}
 		}

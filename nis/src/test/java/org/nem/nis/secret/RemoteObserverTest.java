@@ -113,7 +113,7 @@ public class RemoteObserverTest {
 		}
 
 		private void hook(final Account account, final RemoteLinks remoteLinks) {
-			final PoiAccountState state = Mockito.mock(PoiAccountState.class);
+			final AccountState state = Mockito.mock(AccountState.class);
 			Mockito.when(state.getRemoteLinks()).thenReturn(remoteLinks);
 			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(state);
 		}

@@ -15,7 +15,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.peer.PeerNetwork;
 
@@ -173,7 +173,7 @@ public class DebugControllerTest {
 		final Account account = nisCache.getAccountCache().addAccountToCache(accountWithPrivateKey.getAddress());
 
 		final Amount balance = Amount.fromNem(10000);
-		final PoiAccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
+		final AccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
 		accountState.getAccountInfo().incrementBalance(balance);
 		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
 		accountState.setHeight(BlockHeight.ONE);

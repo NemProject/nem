@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 
 public class NoSelfSignedTransactionsBlockValidatorTest {
@@ -79,7 +79,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 
 		private TestContext() {
 			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.eq(new BlockHeight(12))))
-					.then(invocationOnMock -> new PoiAccountState((Address)invocationOnMock.getArguments()[0]));
+					.then(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
 		}
 
 		private void addTransaction() {
@@ -92,7 +92,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 
 		private void setHarvesterOwner(final Address ownerAddress) {
 			Mockito.when(this.poiFacade.findForwardedStateByAddress(this.harvester.getAddress(), new BlockHeight(12)))
-					.thenReturn(new PoiAccountState(ownerAddress));
+					.thenReturn(new AccountState(ownerAddress));
 		}
 	}
 }

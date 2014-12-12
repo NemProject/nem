@@ -197,7 +197,7 @@ public class BlockScorerTest {
 
 		final BlockHeight groupedHeight = new BlockHeight(rawGroupedHeight);
 		final Address signerAddress = block.getSigner().getAddress();
-		final PoiAccountState state = new PoiAccountState(signerAddress);
+		final AccountState state = new AccountState(signerAddress);
 		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
 		Mockito.when(poiFacade.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
 
@@ -219,8 +219,8 @@ public class BlockScorerTest {
 
 		final Address remoteHarvesterAddress = block.getSigner().getAddress();
 		final Address ownerAddress = Utils.generateRandomAddress();
-		final PoiAccountState remoteState = new PoiAccountState(remoteHarvesterAddress);
-		final PoiAccountState ownerState = new PoiAccountState(ownerAddress);
+		final AccountState remoteState = new AccountState(remoteHarvesterAddress);
+		final AccountState ownerState = new AccountState(ownerAddress);
 		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
 		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
 		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
@@ -272,7 +272,7 @@ public class BlockScorerTest {
 
 		private TestContext() {
 			this(new DefaultPoiFacade((blockHeight, accountStates) -> {
-				for (final PoiAccountState accountState : accountStates) {
+				for (final AccountState accountState : accountStates) {
 					final Amount balance = accountState.getWeightedBalances().getUnvested(blockHeight);
 					final double importance = balance.getNumMicroNem() / 1000.0;
 					accountState.getImportanceInfo().setImportance(blockHeight, importance);
@@ -287,7 +287,7 @@ public class BlockScorerTest {
 
 		private Account createAccountWithBalance(final long balance) {
 			final Account account = Utils.generateRandomAccount();
-			final PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
+			final AccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
 			accountState.setHeight(BlockHeight.ONE);
 			return account;

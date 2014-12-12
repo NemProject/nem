@@ -5,9 +5,8 @@ import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.state.*;
 
-public class PoiAccountStateTest {
+public class AccountStateTest {
 
 	//region creation
 
@@ -15,7 +14,7 @@ public class PoiAccountStateTest {
 	public void poiAccountStateCanBeCreated() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiAccountState state = new PoiAccountState(address);
+		final AccountState state = new AccountState(address);
 
 		// Assert:
 		Assert.assertThat(state.getAddress(), IsEqual.equalTo(address));
@@ -34,10 +33,10 @@ public class PoiAccountStateTest {
 	public void copyCopiesAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiAccountState state = new PoiAccountState(address);
+		final AccountState state = new AccountState(address);
 
 		// Act:
-		final PoiAccountState copy = state.copy();
+		final AccountState copy = state.copy();
 
 		// Assert:
 		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(address));
@@ -46,13 +45,13 @@ public class PoiAccountStateTest {
 	@Test
 	public void copyCreatesUnlinkedCopyOfAccountImportance() {
 		// Arrange:
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final AccountImportance importance = state.getImportanceInfo();
 		importance.setImportance(BlockHeight.ONE, 0.03125);
 		importance.addOutlink(new AccountLink(BlockHeight.ONE, Amount.fromNem(12), Utils.generateRandomAddress()));
 
 		// Act:
-		final PoiAccountState copy = state.copy();
+		final AccountState copy = state.copy();
 		final AccountImportance copyImportance = copy.getImportanceInfo();
 		copy.getImportanceInfo().setImportance(new BlockHeight(2), 0.0234375);
 
@@ -69,12 +68,12 @@ public class PoiAccountStateTest {
 	@Test
 	public void copyCreatesUnlinkedCopyOfWeightedBalances() {
 		// Arrange:
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final WeightedBalances balances = state.getWeightedBalances();
 		balances.addReceive(new BlockHeight(17), Amount.fromNem(1234));
 
 		// Act:
-		final PoiAccountState copy = state.copy();
+		final AccountState copy = state.copy();
 		final WeightedBalances copyBalances = copy.getWeightedBalances();
 
 		// Assert:
@@ -85,7 +84,7 @@ public class PoiAccountStateTest {
 	@Test
 	public void copyCopiesHeightRemoteLinks() {
 		// Arrange:
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final RemoteLinks links = state.getRemoteLinks();
 		final RemoteLink link1 = new RemoteLink(Address.fromEncoded("a"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
 		final RemoteLink link2 = new RemoteLink(Address.fromEncoded("b"), new BlockHeight(7), 1, RemoteLink.Owner.RemoteHarvester);
@@ -95,7 +94,7 @@ public class PoiAccountStateTest {
 		links.addLink(link3);
 
 		// Act:
-		final PoiAccountState copy = state.copy();
+		final AccountState copy = state.copy();
 
 		// Act:
 		final RemoteLinks copyLinks = copy.getRemoteLinks();
@@ -111,11 +110,11 @@ public class PoiAccountStateTest {
 	@Test
 	public void copyCreatesUnlinkedCopyOfAccountInfo() {
 		// Arrange:
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		state.getAccountInfo().incrementBalance(Amount.fromNem(1234));
 
 		// Act:
-		final PoiAccountState copy = state.copy();
+		final AccountState copy = state.copy();
 		copy.getAccountInfo().decrementBalance(Amount.fromNem(234));
 
 		// Assert:
@@ -126,11 +125,11 @@ public class PoiAccountStateTest {
 	@Test
 	public void copyCopiesHeight() {
 		// Arrange:
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		state.setHeight(new BlockHeight(17));
 
 		// Act:
-		final PoiAccountState copy = state.copy();
+		final AccountState copy = state.copy();
 
 		// Assert:
 		Assert.assertThat(copy.getHeight(), IsEqual.equalTo(new BlockHeight(17)));
@@ -143,7 +142,7 @@ public class PoiAccountStateTest {
 	@Test
 	public void accountHeightCanBeSetIfNull() {
 		// Arrange:
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 
 		// Act:
 		state.setHeight(new BlockHeight(17));
@@ -155,7 +154,7 @@ public class PoiAccountStateTest {
 	@Test
 	public void accountHeightCannotBeUpdatedIfNonNull() {
 		// Arrange:
-		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
 
 		// Act:
 		state.setHeight(new BlockHeight(17));

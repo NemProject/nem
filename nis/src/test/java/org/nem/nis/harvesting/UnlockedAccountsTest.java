@@ -9,7 +9,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.*;
 import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 
 import java.util.*;
 import java.util.stream.*;
@@ -218,7 +218,7 @@ public class UnlockedAccountsTest {
 		private void setCanForageAtHeight(final Account account, final long lastBlockHeight, final boolean canForage) {
 			Mockito.when(this.lastBlockLayer.getLastBlockHeight()).thenReturn(lastBlockHeight);
 
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getWeightedBalances().addFullyVested(new BlockHeight(lastBlockHeight), Amount.fromNem(canForage ? 10000 : 1));
 			Mockito.when(this.poiFacade.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
 

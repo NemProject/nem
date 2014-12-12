@@ -233,7 +233,7 @@ public class AccountInfoControllerTest {
 			Mockito.when(remoteLinks.getRemoteStatus(new BlockHeight(blockHeight)))
 					.thenReturn(getRemoteStatus(accountRemoteStatus));
 
-			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getRemoteLinks()).thenReturn(remoteLinks);
 
 			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(accountState);

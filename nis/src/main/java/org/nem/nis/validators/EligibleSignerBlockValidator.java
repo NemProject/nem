@@ -21,7 +21,7 @@ public class EligibleSignerBlockValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		final PoiAccountState accountState = this.poiFacade.findStateByAddress(block.getSigner().getAddress());
+		final AccountState accountState = this.poiFacade.findStateByAddress(block.getSigner().getAddress());
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(block.getHeight());
 
 		switch (remoteStatus) {

@@ -64,7 +64,7 @@ public class BalanceCommitTransferObserverTest {
 			final AccountInfo accountInfo = new AccountInfo();
 			accountInfo.incrementBalance(amount);
 
-			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(accountInfo);
 			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return accountInfo;

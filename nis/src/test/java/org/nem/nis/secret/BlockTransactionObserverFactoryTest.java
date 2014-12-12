@@ -187,7 +187,7 @@ public class BlockTransactionObserverFactoryTest {
 		public MockAccountContext(final PoiFacade poiFacade) {
 			Mockito.when(this.account.getAddress()).thenReturn(this.address);
 
-			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(this.accountInfo);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 			Mockito.when(accountState.getImportanceInfo()).thenReturn(this.importance);

@@ -13,7 +13,7 @@ import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 
@@ -242,7 +242,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		fixGenerationHash(block, parent);
 
 		final PoiFacade poiFacade = this.nisCache.getPoiFacade();
-		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
+		final AccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
 		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
 		block.setLessor(lessor);
 	}

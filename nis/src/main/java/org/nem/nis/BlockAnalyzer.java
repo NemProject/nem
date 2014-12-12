@@ -7,7 +7,7 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.BlockChainScoreManager;
@@ -90,7 +90,7 @@ public class BlockAnalyzer {
 						continue;
 					}
 
-					final PoiAccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
+					final AccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
 					accountState.getWeightedBalances().convertToFullyVested();
 				}
 			}
@@ -168,7 +168,7 @@ public class BlockAnalyzer {
 		// set up the nemesis block amounts
 		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
-		final PoiAccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		final AccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
 		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);

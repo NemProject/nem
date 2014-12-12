@@ -409,7 +409,7 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		private void addRemoteLinks(final Account account) {
 			final Address address = account.getAddress();
-			final PoiAccountState state = new PoiAccountState(address);
+			final AccountState state = new AccountState(address);
 			Mockito.when(this.poiFacade.findStateByAddress(address))
 					.thenReturn(state);
 		}

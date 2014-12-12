@@ -2,14 +2,14 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.DebitPredicate;
 
 /**
  * A repository of all mutable NEM account state.
  * TODO 20141211 - rename to something else!
  */
-public interface PoiFacade extends Iterable<PoiAccountState> {
+public interface PoiFacade extends Iterable<AccountState> {
 
 	/**
 	 * Finds a poi account state given an address. This function will NOT return
@@ -18,7 +18,7 @@ public interface PoiFacade extends Iterable<PoiAccountState> {
 	 * @param address The address.
 	 * @return The poi account state.
 	 */
-	public PoiAccountState findStateByAddress(final Address address);
+	public AccountState findStateByAddress(final Address address);
 
 	/**
 	 * Finds the latest poi account state given an address following all forwards.
@@ -37,7 +37,7 @@ public interface PoiFacade extends Iterable<PoiAccountState> {
 	 * @param address The address.
 	 * @return The poi account state.
 	 */
-	public PoiAccountState findLatestForwardedStateByAddress(final Address address);
+	public AccountState findLatestForwardedStateByAddress(final Address address);
 
 	/**
 	 * Finds a poi account state given an address following all forwards at a height.
@@ -57,7 +57,7 @@ public interface PoiFacade extends Iterable<PoiAccountState> {
 	 * @param height Height at which check should be performed.
 	 * @return The poi account state.
 	 */
-	public PoiAccountState findForwardedStateByAddress(final Address address, final BlockHeight height);
+	public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height);
 
 	/**
 	 * Gets the number of account states.

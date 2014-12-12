@@ -86,7 +86,7 @@ public class WeightedBalancesObserverTest {
 
 			this.balances = Mockito.mock(WeightedBalances.class);
 
-			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 
 			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);

@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
  * Class containing extrinsic in-memory mutable account information.
  * TODO 20141209 J-*: really, really need to rename this class to AccountState!!!
  */
-public class PoiAccountState {
+public class AccountState {
 	private final Address address;
 	private final AccountImportance importance;
 	private final WeightedBalances weightedBalances;
@@ -18,11 +18,11 @@ public class PoiAccountState {
 	/**
 	 * Creates a new NIS account state.
 	 */
-	public PoiAccountState(final Address address) {
+	public AccountState(final Address address) {
 		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new AccountInfo(), null);
 	}
 
-	private PoiAccountState(
+	private AccountState(
 			final Address address,
 			final AccountImportance importance,
 			final WeightedBalances weightedBalances,
@@ -107,8 +107,8 @@ public class PoiAccountState {
 	 *
 	 * @return A copy of this state.
 	 */
-	public PoiAccountState copy() {
-		return new PoiAccountState(
+	public AccountState copy() {
+		return new AccountState(
 				this.address,
 				this.importance.copy(),
 				this.weightedBalances.copy(),

@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.DebitPredicate;
 
 import java.util.Iterator;
@@ -24,7 +24,7 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	}
 
 	@Override
-	public Iterator<PoiAccountState> iterator() {
+	public Iterator<AccountState> iterator() {
 		// TODO 20141211 this really isn't synchronized.
 		synchronized (this.lock) {
 			return this.poiFacade.iterator();
@@ -32,21 +32,21 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	}
 
 	@Override
-	public PoiAccountState findStateByAddress(final Address address) {
+	public AccountState findStateByAddress(final Address address) {
 		synchronized (this.lock) {
 			return this.poiFacade.findStateByAddress(address);
 		}
 	}
 
 	@Override
-	public PoiAccountState findLatestForwardedStateByAddress(final Address address) {
+	public AccountState findLatestForwardedStateByAddress(final Address address) {
 		synchronized (this.lock) {
 			return this.poiFacade.findLatestForwardedStateByAddress(address);
 		}
 	}
 
 	@Override
-	public PoiAccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
+	public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
 		synchronized (this.lock) {
 			return this.poiFacade.findForwardedStateByAddress(address, height);
 		}

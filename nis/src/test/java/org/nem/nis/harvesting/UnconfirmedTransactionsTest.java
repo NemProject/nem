@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 
@@ -1112,7 +1112,7 @@ public class UnconfirmedTransactionsTest {
 
 		private Account addAccount(final Amount amount) {
 			final Account account = Utils.generateRandomAccount();
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;

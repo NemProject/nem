@@ -75,7 +75,7 @@ public class NxtGraphClusteringITCase {
 		// Arrange:
 		final int endHeight = DEFAULT_END_HEIGHT;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+		final Collection<AccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		// Act:
 		outputImportancesCsv(
@@ -105,7 +105,7 @@ public class NxtGraphClusteringITCase {
 		// load account states from the database
 		final int endHeight = DEFAULT_END_HEIGHT;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-		final Collection<PoiAccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+		final Collection<AccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		// how I learned to stop worrying and love the loop
 		for (final long minHarvesterBalance : minHarvesterBalances) {
@@ -139,7 +139,7 @@ public class NxtGraphClusteringITCase {
 
 	private static void outputImportancesCsv(
 			final PoiOptionsBuilder optionsBuilder,
-			final Collection<PoiAccountState> eligibleAccountStates,
+			final Collection<AccountState> eligibleAccountStates,
 			final BlockHeight endBlockHeight) throws IOException {
 		final PoiOptions options = optionsBuilder.create();
 		final String optionsDescription = String.format(
@@ -387,7 +387,7 @@ public class NxtGraphClusteringITCase {
 		private final BlockHeight endBlockHeight = new BlockHeight(this.endHeight);
 		private final Map<Long, ColumnVector> parameterToImportanceMap = new HashMap<>();
 		private final Map<Double, ColumnVector> doubleParameterToImportanceMap = new HashMap<>();
-		private final Collection<PoiAccountState> dbAccountStates;
+		private final Collection<AccountState> dbAccountStates;
 
 		public SensitivityTestHarness() {
 			// load account states
@@ -403,15 +403,15 @@ public class NxtGraphClusteringITCase {
 				final PoiOptionsBuilder optionsBuilder = createOptionsBuilder.apply(value);
 				final PoiOptions options = optionsBuilder.create();
 
-				final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(options.getMinHarvesterBalance());
+				final Collection<AccountState> eligibleAccountStates = this.copyAndFilter(options.getMinHarvesterBalance());
 				final ColumnVector importances = getAccountImportances(this.endBlockHeight, eligibleAccountStates, optionsBuilder, scorer);
 				this.parameterToImportanceMap.put(value, importances);
 			}
 		}
 
-		private Collection<PoiAccountState> copyAndFilter(final Amount minHarvesterBalance) {
+		private Collection<AccountState> copyAndFilter(final Amount minHarvesterBalance) {
 			return this.dbAccountStates.stream()
-					.map(PoiAccountState::copy)
+					.map(AccountState::copy)
 					.filter(accountState -> {
 						final Amount balance = mapPoiAccountStateToBalance(accountState, this.endBlockHeight);
 						return balance.compareTo(minHarvesterBalance) >= 0;
@@ -432,7 +432,7 @@ public class NxtGraphClusteringITCase {
 				builder.append(System.lineSeparator());
 				builder.append(String.format("* %s |", keyNames.get(i)));
 
-				final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(Amount.fromNem(keys.get(i)));
+				final Collection<AccountState> eligibleAccountStates = this.copyAndFilter(Amount.fromNem(keys.get(i)));
 				final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
 				final ColumnVector importances = this.parameterToImportanceMap.get(keys.get(i));
 				final double correlation = balances.correlation(importances);
@@ -448,7 +448,7 @@ public class NxtGraphClusteringITCase {
 		}
 
 		private void renderAsTable(final Amount minHarvesterBalance, final Function<Long, String> keyToKeyName) {
-			final Collection<PoiAccountState> eligibleAccountStates = this.copyAndFilter(minHarvesterBalance);
+			final Collection<AccountState> eligibleAccountStates = this.copyAndFilter(minHarvesterBalance);
 			final ColumnVector balances = getBalances(this.endBlockHeight, eligibleAccountStates);
 			this.parameterToImportanceMap.put(0L, balances);
 
@@ -486,8 +486,8 @@ public class NxtGraphClusteringITCase {
 		}
 	}
 
-	private static Collection<PoiAccountState> copy(final Collection<PoiAccountState> accountStates) {
-		return accountStates.stream().map(PoiAccountState::copy).collect(Collectors.toList());
+	private static Collection<AccountState> copy(final Collection<AccountState> accountStates) {
+		return accountStates.stream().map(AccountState::copy).collect(Collectors.toList());
 	}
 
 	private static String getFriendlyLabel(final long key) {
@@ -496,7 +496,7 @@ public class NxtGraphClusteringITCase {
 
 	private static ColumnVector getBalances(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates) {
+			final Collection<AccountState> accountStates) {
 		final List<Amount> balances = accountStates.stream()
 				.map(state -> mapPoiAccountStateToBalance(state, blockHeight))
 				.collect(Collectors.toList());
@@ -510,7 +510,7 @@ public class NxtGraphClusteringITCase {
 		return balancesVector;
 	}
 
-	private static Amount mapPoiAccountStateToBalance(final PoiAccountState accountState, final BlockHeight blockHeight) {
+	private static Amount mapPoiAccountStateToBalance(final AccountState accountState, final BlockHeight blockHeight) {
 		final Amount vested = accountState.getWeightedBalances().getVested(blockHeight);
 		final Amount unvested = accountState.getWeightedBalances().getUnvested(blockHeight);
 		final Amount total = vested.add(unvested);
@@ -555,7 +555,7 @@ public class NxtGraphClusteringITCase {
 			final GraphClusteringStrategy clusteringStrategy,
 			final String name) {
 		// 0. Load transactions.
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		LOGGER.info(String.format("*** Poi calculation: %s **", name));
 		final long start = System.currentTimeMillis();
@@ -668,36 +668,36 @@ public class NxtGraphClusteringITCase {
 		optionsBuilder.setEpsilonClusteringValue(0.20);
 
 		// Act:
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, optionsBuilder);
+		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, optionsBuilder);
 		getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	// endregion
 
-	private static Collection<PoiAccountState> loadEligibleHarvestingAccountStates(
+	private static Collection<AccountState> loadEligibleHarvestingAccountStates(
 			final long startHeight,
 			final long endHeight,
 			final PoiOptionsBuilder optionsBuilder) {
 		return loadEligibleHarvestingAccountStates(startHeight, endHeight, optionsBuilder.create().getMinHarvesterBalance());
 	}
 
-	private static Collection<PoiAccountState> loadEligibleHarvestingAccountStates(
+	private static Collection<AccountState> loadEligibleHarvestingAccountStates(
 			final long startHeight,
 			final long endHeight,
 			final Amount minHarvesterBalance) {
 		final Collection<NxtTransaction> transactionData = loadTransactionData(startHeight, endHeight);
-		final Map<Address, PoiAccountState> accountStateMap = createAccountStatesFromTransactionData(transactionData);
+		final Map<Address, AccountState> accountStateMap = createAccountStatesFromTransactionData(transactionData);
 		return selectHarvestingEligibleAccounts(accountStateMap, new BlockHeight(endHeight), minHarvesterBalance);
 	}
 
-	private static Map<Address, PoiAccountState> createAccountStatesFromTransactionData(final Collection<NxtTransaction> transactions) {
+	private static Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<NxtTransaction> transactions) {
 		LOGGER.info("Creating PoiAccountStates from transaction data...");
 
-		final Map<Address, PoiAccountState> accountStateMap = new HashMap<>();
+		final Map<Address, AccountState> accountStateMap = new HashMap<>();
 
 		// 1. Create accounts in the genesis block.
 		final Amount nxtGenesisAmount = Amount.fromNem(1000000000); // 10^9
-		final PoiAccountState genesis = createAccountWithBalance(Address.fromEncoded("1739068987193023818"), 1, nxtGenesisAmount);
+		final AccountState genesis = createAccountWithBalance(Address.fromEncoded("1739068987193023818"), 1, nxtGenesisAmount);
 		accountStateMap.put(genesis.getAddress(), genesis);
 
 		// 2. Iterate through transactions, creating new accounts as needed.
@@ -708,11 +708,11 @@ public class NxtGraphClusteringITCase {
 			final BlockHeight blockHeight = new BlockHeight(trans.getHeight() + 1); // NXT blocks start at 0 but NEM blocks start at 1
 
 			if (!accountStateMap.containsKey(recipient)) {
-				accountStateMap.put(recipient, new PoiAccountState(recipient));
+				accountStateMap.put(recipient, new AccountState(recipient));
 			}
 
-			final PoiAccountState senderAccountState = accountStateMap.get(sender);
-			final PoiAccountState recipientAccountState = accountStateMap.get(recipient);
+			final AccountState senderAccountState = accountStateMap.get(sender);
+			final AccountState recipientAccountState = accountStateMap.get(recipient);
 			final long balance = mapPoiAccountStateToBalance(senderAccountState, blockHeight).getNumMicroNem();
 
 			// We need to add some balance sometimes because the transactions don't account for fees earned from forged blocks
@@ -747,8 +747,8 @@ public class NxtGraphClusteringITCase {
 		return accountStateMap;
 	}
 
-	private static Collection<PoiAccountState> selectHarvestingEligibleAccounts(
-			final Map<Address, PoiAccountState> accountStateMap,
+	private static Collection<AccountState> selectHarvestingEligibleAccounts(
+			final Map<Address, AccountState> accountStateMap,
 			final BlockHeight height,
 			final Amount minHarvesterBalance) {
 		final CanHarvestPredicate canHarvestPredicate = new CanHarvestPredicate(minHarvesterBalance);
@@ -799,7 +799,7 @@ public class NxtGraphClusteringITCase {
 		builder.setEpsilonClusteringValue(0.40);
 		builder.setMinOutlinkWeight(Amount.fromNem(1000));
 		builder.setMinHarvesterBalance(Amount.fromNem(10000));
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, stopHeight, builder);
+		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, stopHeight, builder);
 		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(stopHeight), builder.create());
 		final SparseMatrix outlinkMatrix = poiContext.getOutlinkMatrix();
 		final ClusteringResult result = poiContext.getClusteringResult();
@@ -830,7 +830,7 @@ public class NxtGraphClusteringITCase {
 	}
 
 	private SparseMatrix createNetOutlinkMatrix(final long startHeight, final long endHeight, final PoiOptionsBuilder builder) {
-		final Collection<PoiAccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight, builder);
+		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight, builder);
 		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), builder.create());
 		return poiContext.getOutlinkMatrix();
 	}
@@ -857,15 +857,15 @@ public class NxtGraphClusteringITCase {
 		});
 	}
 
-	private static PoiAccountState createAccountWithBalance(final Address address, final long blockHeight, final Amount amount) {
-		final PoiAccountState state = new PoiAccountState(address);
+	private static AccountState createAccountWithBalance(final Address address, final long blockHeight, final Amount amount) {
+		final AccountState state = new AccountState(address);
 		state.getWeightedBalances().addFullyVested(new BlockHeight(blockHeight), amount);
 		return state;
 	}
 
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> acctStates,
+			final Collection<AccountState> acctStates,
 			final GraphClusteringStrategy clusteringStrategy) {
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
@@ -874,7 +874,7 @@ public class NxtGraphClusteringITCase {
 
 	private static ColumnVector getAccountImportances(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> acctStates,
+			final Collection<AccountState> acctStates,
 			final PoiOptionsBuilder poiOptionsBuilder,
 			final ImportanceScorer scorer) {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(scorer, poiOptionsBuilder.create());

@@ -6,7 +6,7 @@ import org.nem.core.time.synchronization.*;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
-import org.nem.nis.state.PoiAccountState;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.time.synchronization.filter.*;
 
 import java.lang.reflect.Field;
@@ -273,7 +273,7 @@ public class Network {
 			final double importance = node.isEvil() ?
 					this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes :
 					(1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
-			final PoiAccountState state = facade.findStateByAddress(node.getNode().getIdentity().getAddress());
+			final AccountState state = facade.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
 		this.setFacadeLastPoiVectorSize(facade, this.nodes.size());
@@ -341,7 +341,7 @@ public class Network {
 		int hits = 0;
 		while (tries < maxTries && hits < this.viewSize) {
 			final int index = this.random.nextInt(this.nodes.size());
-			final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
+			final AccountState state = this.poiFacade.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
 			if (!nodeArray[index].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 				hits++;
 				partners.add(nodeArray[index]);
@@ -355,7 +355,7 @@ public class Network {
 		if (partners.isEmpty()) {
 			// There might be just too many evil nodes. Let's assume we use one pretrusted node if we meet this case in a real environment.
 			for (int i = 0; i < this.nodes.size(); i++) {
-				final PoiAccountState state = this.poiFacade.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
+				final AccountState state = this.poiFacade.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
 				if (!nodeArray[i].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
 					partners.add(nodeArray[i]);
 					break;

@@ -37,7 +37,7 @@ public class AccountInfoFactory {
 	 */
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
-		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
+		final AccountState accountState = this.poiFacade.findStateByAddress(address);
 		final org.nem.nis.state.AccountInfo accountInfo = accountState.getAccountInfo();
 
 		final AccountImportance ai = accountState.getImportanceInfo();

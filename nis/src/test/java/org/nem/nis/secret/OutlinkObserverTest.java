@@ -166,11 +166,11 @@ public class OutlinkObserverTest {
 			final Address address = Utils.generateRandomAddress();
 			Mockito.when(account.getAddress()).thenReturn(address);
 
-			final PoiAccountState poiAccountState = Mockito.mock(PoiAccountState.class);
-			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(poiAccountState);
-			Mockito.when(poiAccountState.getAddress()).thenReturn(address);
-			Mockito.when(poiAccountState.getImportanceInfo()).thenReturn(importance);
-			Mockito.when(poiAccountState.getWeightedBalances()).thenReturn(weightedBalances);
+			final AccountState accountState = Mockito.mock(AccountState.class);
+			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(accountState);
+			Mockito.when(accountState.getAddress()).thenReturn(address);
+			Mockito.when(accountState.getImportanceInfo()).thenReturn(importance);
+			Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);
 			Mockito.when(weightedBalances.getUnvested(height)).thenReturn(Amount.fromNem(7));
 			Mockito.when(weightedBalances.getVested(height)).thenReturn(Amount.fromNem(3));
 		}
