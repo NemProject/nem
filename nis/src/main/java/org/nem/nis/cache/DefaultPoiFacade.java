@@ -126,7 +126,7 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	@Override
 	public DebitPredicate getDebitPredicate() {
 		return (account, amount) -> {
-			final AccountInfo accountInfo = this.findStateByAddress(account.getAddress()).getAccountInfo();
+			final ReadOnlyAccountInfo accountInfo = this.findStateByAddress(account.getAddress()).getAccountInfo();
 			return accountInfo.getBalance().compareTo(amount) >= 0;
 		};
 	}

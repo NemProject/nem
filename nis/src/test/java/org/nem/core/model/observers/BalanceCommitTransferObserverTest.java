@@ -16,9 +16,9 @@ public class BalanceCommitTransferObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount();
-		final AccountInfo senderAccountInfo = context.add(sender, Amount.fromNem(100));
+		final ReadOnlyAccountInfo senderAccountInfo = context.add(sender, Amount.fromNem(100));
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountInfo recipientAccountInfo = context.add(recipient, Amount.fromNem(100));
+		final ReadOnlyAccountInfo recipientAccountInfo = context.add(recipient, Amount.fromNem(100));
 
 		// Act:
 		context.observer.notifyTransfer(sender, recipient, Amount.fromNem(20));
@@ -33,7 +33,7 @@ public class BalanceCommitTransferObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
-		final AccountInfo accountInfo = context.add(account, Amount.fromNem(100));
+		final ReadOnlyAccountInfo accountInfo = context.add(account, Amount.fromNem(100));
 
 		// Act:
 		context.observer.notifyCredit(account, Amount.fromNem(20));
@@ -47,7 +47,7 @@ public class BalanceCommitTransferObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
-		final AccountInfo accountInfo = context.add(account, Amount.fromNem(100));
+		final ReadOnlyAccountInfo accountInfo = context.add(account, Amount.fromNem(100));
 
 		// Act:
 		context.observer.notifyDebit(account, Amount.fromNem(20));
@@ -60,7 +60,7 @@ public class BalanceCommitTransferObserverTest {
 		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
 		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.accoutStateRepository);
 
-		public AccountInfo add(final Account account, final Amount amount) {
+		public ReadOnlyAccountInfo add(final Account account, final Amount amount) {
 			final AccountInfo accountInfo = new AccountInfo();
 			accountInfo.incrementBalance(amount);
 

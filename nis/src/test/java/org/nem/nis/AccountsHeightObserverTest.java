@@ -83,7 +83,7 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
 
 		// Assert:
-		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		final ReadOnlyAccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
 		Assert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 	}
 

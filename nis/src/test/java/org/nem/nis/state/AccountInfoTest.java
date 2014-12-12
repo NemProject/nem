@@ -3,14 +3,13 @@ package org.nem.nis.state;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.state.AccountInfo;
 
 public class AccountInfoTest {
 
 	@Test
 	public void infoInfoCanBeCreated() {
 		// Act:
-		final AccountInfo info = new AccountInfo();
+		final ReadOnlyAccountInfo info = new AccountInfo();
 
 		// Assert:
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.ZERO));
@@ -173,7 +172,7 @@ public class AccountInfoTest {
 		info.incrementReferenceCount();
 
 		// Act:
-		final AccountInfo copy = info.copy();
+		final ReadOnlyAccountInfo copy = info.copy();
 
 		// Assert:
 		Assert.assertThat(copy, IsNot.not(IsSame.sameInstance(info)));

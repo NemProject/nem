@@ -38,7 +38,7 @@ public class AccountInfoFactory {
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
 		final AccountState accountState = this.accoutStateRepository.findStateByAddress(address);
-		final org.nem.nis.state.AccountInfo accountInfo = accountState.getAccountInfo();
+		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
 
 		final AccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
