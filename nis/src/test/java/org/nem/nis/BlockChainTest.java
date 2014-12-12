@@ -123,7 +123,7 @@ public class BlockChainTest {
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = NisUtils.createRealNisCache(poiFacade);
+		final NisCache nisCache = NisCacheFactory.createReal(poiFacade);
 		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
 			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
@@ -207,7 +207,7 @@ public class BlockChainTest {
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = NisUtils.createRealNisCache(poiFacade);
+		final NisCache nisCache = NisCacheFactory.createReal(poiFacade);
 		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
 			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);

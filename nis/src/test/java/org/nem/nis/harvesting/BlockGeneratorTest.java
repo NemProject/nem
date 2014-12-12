@@ -12,7 +12,7 @@ import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
@@ -321,7 +321,7 @@ public class BlockGeneratorTest {
 		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		private final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		private final BlockGenerator generator = new BlockGenerator(
-				NisUtils.createReadOnlyNisCache(this.accountCache, this.poiFacade),
+				NisCacheFactory.createReadOnly(this.accountCache, this.poiFacade),
 				this.unconfirmedTransactions,
 				this.blockDao,
 				this.scorer,

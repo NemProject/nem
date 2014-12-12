@@ -13,7 +13,7 @@ import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.state.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
@@ -374,7 +374,7 @@ public class BlockChainValidatorIntegrationTest {
 		public int maxChainSize = 21;
 		public final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		public final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		public final ReadOnlyNisCache nisCache = NisUtils.createReadOnlyNisCache(this.poiFacade, this.transactionHashCache);
+		public final ReadOnlyNisCache nisCache = NisCacheFactory.createReadOnly(this.poiFacade, this.transactionHashCache);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.nisCache);
 		public final SingleTransactionValidator transactionValidator;
 
@@ -388,7 +388,7 @@ public class BlockChainValidatorIntegrationTest {
 		}
 
 		public BlockChainValidator create() {
-			final NisCache nisCache = NisUtils.createNisCache(this.poiFacade);
+			final NisCache nisCache = NisCacheFactory.create(this.poiFacade);
 			final BlockExecutor executor = new BlockExecutor(nisCache);
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 			return new BlockChainValidator(

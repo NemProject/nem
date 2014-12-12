@@ -10,7 +10,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.util.*;
 import java.util.function.Function;
@@ -200,7 +200,7 @@ public class BlockTransactionObserverFactoryTest {
 		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
 		private final MockAccountContext accountContext1 = this.addAccount();
 		private final MockAccountContext accountContext2 = this.addAccount();
-		private final NisCache nisCache = NisUtils.createNisCache(this.poiFacade);
+		private final NisCache nisCache = NisCacheFactory.create(this.poiFacade);
 		private final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		private MockAccountContext addAccount() {

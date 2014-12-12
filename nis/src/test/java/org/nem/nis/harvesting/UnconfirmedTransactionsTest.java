@@ -10,7 +10,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -1080,7 +1080,7 @@ public class UnconfirmedTransactionsTest {
 			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisUtils.createReadOnlyNisCache(this.poiFacade, transactionHashCache));
+					NisCacheFactory.createReadOnly(this.poiFacade, transactionHashCache));
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {

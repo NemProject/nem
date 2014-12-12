@@ -11,7 +11,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 public class AccountsHeightObserverTest {
 
@@ -140,7 +140,7 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final AccountCache accountCache = new AccountCache();
 		final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
-		final AccountsHeightObserver observer = new AccountsHeightObserver(NisUtils.createNisCache(accountCache, poiFacade));
+		final AccountsHeightObserver observer = new AccountsHeightObserver(NisCacheFactory.create(accountCache, poiFacade));
 		final Account account1 = accountCache.addAccountToCache(Utils.generateRandomAddress());
 
 		// Act:
@@ -228,7 +228,7 @@ public class AccountsHeightObserverTest {
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
-		private final NisCache nisCache = NisUtils.createNisCache(this.accountCache, this.poiFacade);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.poiFacade);
 		private final AccountsHeightObserver observer = new AccountsHeightObserver(this.nisCache);
 
 		private void setupAccount(final Account account) {
