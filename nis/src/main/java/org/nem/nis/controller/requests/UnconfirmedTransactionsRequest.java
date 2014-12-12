@@ -32,7 +32,7 @@ public class UnconfirmedTransactionsRequest implements SerializableEntity {
 	}
 
 	/**
-	 * Creates an unconfirmed transactions request.
+	 * Creates a chain request.
 	 *
 	 * @param deserializer The deserializer to use.
 	 */
