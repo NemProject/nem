@@ -21,7 +21,7 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	 */
 	public ImportanceAwareNodeSelector(
 			final int maxNodes,
-			final PoiFacade poiFacade,
+			final PoiFacade poiFacade, // TODO: 20141212 - this should get cleaned up
 			final TrustProvider trustProvider,
 			final TrustContext context,
 			final Random random) {

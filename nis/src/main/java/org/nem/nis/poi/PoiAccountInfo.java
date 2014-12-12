@@ -30,7 +30,7 @@ public class PoiAccountInfo {
 		this.index = index;
 		this.accountState = accountState;
 
-		final AccountImportance importanceInfo = this.accountState.getImportanceInfo();
+		final ReadOnlyAccountImportance importanceInfo = this.accountState.getImportanceInfo();
 		final Iterator<AccountLink> outlinks = importanceInfo.getOutlinksIterator(height);
 
 		// weight = out-link amount * DECAY_BASE^(age in days)

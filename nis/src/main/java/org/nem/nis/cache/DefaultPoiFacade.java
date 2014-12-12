@@ -43,7 +43,7 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	@Override
 	public AccountState findLatestForwardedStateByAddress(final Address address) {
 		final AccountState state = this.findStateByAddress(address);
-		final RemoteLinks remoteLinks = state.getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = state.getRemoteLinks();
 		final RemoteLink remoteLink = remoteLinks.getCurrent();
 		return !remoteLinks.isRemoteHarvester() ? state : this.findStateByAddress(remoteLink.getLinkedAddress());
 	}
@@ -51,7 +51,7 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	@Override
 	public AccountState findForwardedStateByAddress(final Address address, final BlockHeight height) {
 		final AccountState state = this.findStateByAddress(address);
-		final RemoteLinks remoteLinks = state.getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = state.getRemoteLinks();
 		if (!remoteLinks.isRemoteHarvester()) {
 			return state;
 		}

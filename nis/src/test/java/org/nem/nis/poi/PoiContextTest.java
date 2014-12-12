@@ -276,7 +276,7 @@ public class PoiContextTest {
 		// - accounts without harvesting power are given 0 importance
 		final List<Double> importances = accountStates.stream()
 				.map(a -> {
-					final AccountImportance ai = a.getImportanceInfo();
+					final ReadOnlyAccountImportance ai = a.getImportanceInfo();
 					return ai.isSet() ? ai.getImportance(height) : 0.0;
 				})
 				.collect(Collectors.toList());

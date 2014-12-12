@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * Container for vested balances.
  * Methods of this class, assume, that they are called in paired order
  */
-public class WeightedBalances {
+public class WeightedBalances implements ReadOnlyWeightedBalances {
 
 	private final List<WeightedBalance> balances;
 
@@ -145,12 +145,7 @@ public class WeightedBalances {
 		return index;
 	}
 
-	/**
-	 * Gets the vested amount at the specified height.
-	 *
-	 * @param height The height.
-	 * @return The vested amount.
-	 */
+	@Override
 	public Amount getVested(final BlockHeight height) {
 		if (this.balances.isEmpty()) {
 			return Amount.ZERO;
@@ -164,12 +159,7 @@ public class WeightedBalances {
 		return this.balances.get(index).getVestedBalance();
 	}
 
-	/**
-	 * Gets the unvested amount at the specified height.
-	 *
-	 * @param height The height.
-	 * @return The unvested amount.
-	 */
+	@Override
 	public Amount getUnvested(final BlockHeight height) {
 		if (this.balances.isEmpty()) {
 			return Amount.ZERO;
@@ -183,6 +173,7 @@ public class WeightedBalances {
 		return this.balances.get(index).getUnvestedBalance();
 	}
 
+	@Override
 	public int size() {
 		return this.balances.size();
 	}

@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.AccountImportance;
+import org.nem.nis.state.*;
 
 import java.math.BigInteger;
 
@@ -102,7 +102,7 @@ public class BlockScorer {
 		// TODO 20141212 broke poi!!! this.poiFacade.recalculateImportances(groupedHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
-		final AccountImportance accountImportance = this.poiFacade
+		final ReadOnlyAccountImportance accountImportance = this.poiFacade
 				.findForwardedStateByAddress(signerAddress, block.getHeight())
 				.getImportanceInfo();
 		return (long)(accountImportance.getImportance(groupedHeight) * multiplier);

@@ -46,20 +46,20 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 		return this.validateOwner(context.getBlockHeight(), transaction, context.getDebitPredicate());
 	}
 
-	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
+	private static boolean isRemoteActivated(final ReadOnlyRemoteLinks remoteLinks) {
 		return !remoteLinks.isEmpty() && ImportanceTransferTransaction.Mode.Activate.value() == remoteLinks.getCurrent().getMode();
 	}
 
-	private static boolean isRemoteDeactivated(final RemoteLinks remoteLinks) {
+	private static boolean isRemoteDeactivated(final ReadOnlyRemoteLinks remoteLinks) {
 		return remoteLinks.isEmpty() || ImportanceTransferTransaction.Mode.Deactivate.value() == remoteLinks.getCurrent().getMode();
 	}
 
-	private static boolean isRemoteChangeWithinOneDay(final RemoteLinks remoteLinks, final BlockHeight height) {
+	private static boolean isRemoteChangeWithinOneDay(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
 		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	}
 
 	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
-		final RemoteLinks remoteLinks = this.accountStateRepository.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateRepository.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
@@ -101,7 +101,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
-		final RemoteLinks remoteLinks = this.accountStateRepository.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateRepository.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}

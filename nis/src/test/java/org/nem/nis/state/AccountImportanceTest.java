@@ -4,7 +4,6 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;
@@ -16,7 +15,7 @@ public class AccountImportanceTest {
 	@Test
 	public void importanceIsInitiallyUnset() {
 		// Arrange:
-		final AccountImportance ai = new AccountImportance();
+		final ReadOnlyAccountImportance ai = new AccountImportance();
 
 		// Assert:
 		Assert.assertThat(ai.isSet(), IsEqual.equalTo(false));
@@ -30,10 +29,10 @@ public class AccountImportanceTest {
 	@Test
 	public void canRoundtripUnsetImportance() {
 		// Arrange:
-		final AccountImportance original = new AccountImportance();
+		final ReadOnlyAccountImportance original = new AccountImportance();
 
 		// Act:
-		final AccountImportance ai = roundtripImportance(original);
+		final ReadOnlyAccountImportance ai = roundtripImportance(original);
 
 		// Assert:
 		Assert.assertThat(ai.isSet(), IsEqual.equalTo(false));
@@ -48,7 +47,7 @@ public class AccountImportanceTest {
 		original.setLastPageRank(12);
 
 		// Act:
-		final AccountImportance ai = roundtripImportance(original);
+		final ReadOnlyAccountImportance ai = roundtripImportance(original);
 		final double importance = ai.getImportance(new BlockHeight(5));
 
 		// Assert:
@@ -58,7 +57,7 @@ public class AccountImportanceTest {
 		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(12.0));
 	}
 
-	private static AccountImportance roundtripImportance(final AccountImportance original) {
+	private static ReadOnlyAccountImportance roundtripImportance(final ReadOnlyAccountImportance original) {
 		return new AccountImportance(Utils.roundtripSerializableEntity(original, null));
 	}
 
@@ -156,7 +155,7 @@ public class AccountImportanceTest {
 	@Test
 	public void getImportanceReturnsZeroWhenUnset() {
 		// Arrange:
-		final AccountImportance ai = new AccountImportance();
+		final ReadOnlyAccountImportance ai = new AccountImportance();
 
 		// Act:
 		Assert.assertThat(ai.getImportance(new BlockHeight(7)), IsEqual.equalTo(0.0));
@@ -226,7 +225,7 @@ public class AccountImportanceTest {
 	@Test
 	public void pageRankIsInitiallyZero() {
 		// Arrange:
-		final AccountImportance ai = new AccountImportance();
+		final ReadOnlyAccountImportance ai = new AccountImportance();
 
 		// Assert:
 		Assert.assertThat(ai.getLastPageRank(), IsEqual.equalTo(0.0));
@@ -256,7 +255,7 @@ public class AccountImportanceTest {
 		ai.setLastPageRank(12.0);
 
 		// Act:
-		final AccountImportance copy = ai.copy();
+		final ReadOnlyAccountImportance copy = ai.copy();
 		final double importance = copy.getImportance(new BlockHeight(5));
 
 		// Assert:
@@ -275,7 +274,7 @@ public class AccountImportanceTest {
 		ai.addOutlink(NisUtils.createLink(9, 18, "AAA"));
 
 		// Act:
-		final AccountImportance copy = ai.copy();
+		final ReadOnlyAccountImportance copy = ai.copy();
 
 		// Assert:
 		final List<AccountLink> expectedLinks = Arrays.asList(

@@ -54,7 +54,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 	}
 
 	private Amount calculateLinkWeight(final BlockHeight height, final Account sender, final Amount amount) {
-		final WeightedBalances weightedBalances = this.getState(sender).getWeightedBalances();
+		final ReadOnlyWeightedBalances weightedBalances = this.getState(sender).getWeightedBalances();
 		final BigInteger vested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getVested(height)));
 		final BigInteger unvested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getUnvested(height)));
 		if (unvested.compareTo(BigInteger.ZERO) <= 0) {

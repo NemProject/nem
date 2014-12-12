@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Encapsulates management of an account's importance.
  */
-public class AccountImportance implements SerializableEntity {
+public class AccountImportance implements ReadOnlyAccountImportance {
 	private static final Logger LOGGER = Logger.getLogger(AccountImportance.class.getName());
 
 	private final HistoricalOutlinks historicalOutlinks;
@@ -20,7 +20,7 @@ public class AccountImportance implements SerializableEntity {
 	private double importance;
 	private double lastPageRank;
 
-	public static final ObjectDeserializer<AccountImportance> DESERIALIZER =
+	public static final ObjectDeserializer<ReadOnlyAccountImportance> DESERIALIZER =
 			deserializer -> new AccountImportance(deserializer);
 
 	/**
@@ -74,22 +74,12 @@ public class AccountImportance implements SerializableEntity {
 				accountLink.getAmount());
 	}
 
-	/**
-	 * Gets an iterator that returns all outlinks at or before the (inclusive) given height.
-	 *
-	 * @param blockHeight The block height.
-	 * @return The matching links.
-	 */
+	@Override
 	public Iterator<AccountLink> getOutlinksIterator(final BlockHeight blockHeight) {
 		return this.historicalOutlinks.outlinksIterator(blockHeight);
 	}
 
-	/**
-	 * Gets the number of outlinks at or before the (inclusive) given height.
-	 *
-	 * @param blockHeight The block height.
-	 * @return The number of matching links.
-	 */
+	@Override
 	public int getOutlinksSize(final BlockHeight blockHeight) {
 		return this.historicalOutlinks.outlinksSize(blockHeight);
 	}
@@ -114,11 +104,7 @@ public class AccountImportance implements SerializableEntity {
 		this.importance = importance;
 	}
 
-	/**
-	 * Gets the last page rank.
-	 *
-	 * @return The last page rank.
-	 */
+	@Override
 	public double getLastPageRank() {
 		return this.lastPageRank;
 	}
@@ -132,12 +118,7 @@ public class AccountImportance implements SerializableEntity {
 		this.lastPageRank = lastPageRank;
 	}
 
-	/**
-	 * Gets the page rank at the specified block height.
-	 *
-	 * @param blockHeight The block height.
-	 * @return The importance.
-	 */
+	@Override
 	public double getImportance(final BlockHeight blockHeight) {
 		if (this.importanceHeight == null) {
 			LOGGER.warning("your balance hasn't vested yet, harvesting does not make sense");
@@ -150,20 +131,12 @@ public class AccountImportance implements SerializableEntity {
 		return this.importance;
 	}
 
-	/**
-	 * Gets the height at which importance is set.
-	 *
-	 * @return The height of importance.
-	 */
+	@Override
 	public BlockHeight getHeight() {
 		return this.importanceHeight;
 	}
 
-	/**
-	 * Gets a value indicating whether or not the importance is set.
-	 *
-	 * @return true if the importance is set.
-	 */
+	@Override
 	public boolean isSet() {
 		return null != this.importanceHeight;
 	}

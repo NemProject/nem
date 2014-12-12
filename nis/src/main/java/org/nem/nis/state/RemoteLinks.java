@@ -8,7 +8,7 @@ import org.nem.nis.BlockChainConstants;
 /**
  * A collection of remote states associated with an account.
  */
-public class RemoteLinks {
+public class RemoteLinks implements ReadOnlyRemoteLinks {
 	private static final int REMOTE_LINKS_SIZE = 2;
 
 	// The following rules will apply:
@@ -48,45 +48,29 @@ public class RemoteLinks {
 		this.remoteLinks.pop();
 	}
 
-	/**
-	 * Gets a value indicating whether or not any links are associated with the owning account.
-	 *
-	 * @return true if links are associated with the owning account.
-	 */
+	@Override
 	public boolean isEmpty() {
 		return 0 == this.remoteLinks.size();
 	}
 
-	/**
-	 * Gets a value indicating whether or the owning account has enabled remote harvesting
-	 * and is forwarding its foraging power to a remote account.
-	 *
-	 * @return true if the owning account has enabled remote harvesting.
-	 */
+	@Override
 	public boolean isHarvestingRemotely() {
 		return !this.isEmpty() && RemoteLink.Owner.HarvestingRemotely == this.remoteLinks.peek().getOwner();
 	}
 
-	/**
-	 * Gets a value indicating whether or not the owning account is a remote harvester account.
-	 *
-	 * @return true if the owning account is a remote harvester.
-	 */
+	@Override
 	public boolean isRemoteHarvester() {
 		return !this.isEmpty() && RemoteLink.Owner.RemoteHarvester == this.remoteLinks.peek().getOwner();
 	}
 
-	/**
-	 * Gets the current remote link.
-	 *
-	 * @return The current remote link.
-	 */
+	@Override
 	public RemoteLink getCurrent() {
 		return this.isEmpty() ? null : this.remoteLinks.peek();
 	}
 
-	// TODO 20131014 J-G: tests for this function ;)
+	// TODO 20131014 J-G: tests for this function and please comment in the interface! ;)
 
+	@Override
 	public RemoteStatus getRemoteStatus(final BlockHeight height) {
 		if (this.isEmpty()) {
 			return RemoteStatus.NOT_SET;

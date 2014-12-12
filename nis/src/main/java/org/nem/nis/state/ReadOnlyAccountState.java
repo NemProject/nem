@@ -20,21 +20,21 @@ public interface ReadOnlyAccountState {
 	 *
 	 * @return The weighted balances.
 	 */
-	public WeightedBalances getWeightedBalances();
+	public ReadOnlyWeightedBalances getWeightedBalances();
 
 	/**
 	 * Gets the importance information.
 	 *
 	 * @return The importance information.
 	 */
-	public AccountImportance getImportanceInfo();
+	public ReadOnlyAccountImportance getImportanceInfo();
 
 	/**
 	 * Gets the remote link information.
 	 *
 	 * @return The remote link information.
 	 */
-	public RemoteLinks getRemoteLinks();
+	public ReadOnlyRemoteLinks getRemoteLinks();
 
 	/**
 	 * Gets the account info.

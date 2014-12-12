@@ -52,7 +52,7 @@ public class AccountStateTest {
 
 		// Act:
 		final AccountState copy = state.copy();
-		final AccountImportance copyImportance = copy.getImportanceInfo();
+		final ReadOnlyAccountImportance copyImportance = copy.getImportanceInfo();
 		copy.getImportanceInfo().setImportance(new BlockHeight(2), 0.0234375);
 
 		// Assert:
@@ -74,7 +74,7 @@ public class AccountStateTest {
 
 		// Act:
 		final AccountState copy = state.copy();
-		final WeightedBalances copyBalances = copy.getWeightedBalances();
+		final ReadOnlyWeightedBalances copyBalances = copy.getWeightedBalances();
 
 		// Assert:
 		Assert.assertThat(copyBalances, IsNot.not(IsSame.sameInstance(balances)));

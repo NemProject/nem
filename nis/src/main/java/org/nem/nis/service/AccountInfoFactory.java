@@ -40,7 +40,7 @@ public class AccountInfoFactory {
 		final AccountState accountState = this.accountStateRepository.findStateByAddress(address);
 		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
 
-		final AccountImportance ai = accountState.getImportanceInfo();
+		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
 				account.getAddress(),
 				accountInfo.getBalance(),

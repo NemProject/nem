@@ -2,7 +2,7 @@ package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
-import org.nem.nis.state.AccountImportance;
+import org.nem.nis.state.*;
 
 /**
  * A simple view model for account importance information.
@@ -10,7 +10,7 @@ import org.nem.nis.state.AccountImportance;
 public class AccountImportanceViewModel implements SerializableEntity {
 
 	private final Address address;
-	private final AccountImportance importance;
+	private final ReadOnlyAccountImportance importance;
 
 	/**
 	 * Creates a new account importance view model.
@@ -18,7 +18,7 @@ public class AccountImportanceViewModel implements SerializableEntity {
 	 * @param address The address.
 	 * @param importance The importance.
 	 */
-	public AccountImportanceViewModel(final Address address, final AccountImportance importance) {
+	public AccountImportanceViewModel(final Address address, final ReadOnlyAccountImportance importance) {
 		this.address = address;
 		this.importance = importance;
 	}
@@ -47,7 +47,7 @@ public class AccountImportanceViewModel implements SerializableEntity {
 	 *
 	 * @return The importance.
 	 */
-	public AccountImportance getImportance() {
+	public ReadOnlyAccountImportance getImportance() {
 		return this.importance;
 	}
 
@@ -62,7 +62,7 @@ public class AccountImportanceViewModel implements SerializableEntity {
 		return this.address.hashCode() ^ getHashCode(this.importance);
 	}
 
-	private static int getHashCode(final AccountImportance ai) {
+	private static int getHashCode(final ReadOnlyAccountImportance ai) {
 		return ai.isSet() ? ai.getHeight().hashCode() : 0;
 	}
 
@@ -76,7 +76,7 @@ public class AccountImportanceViewModel implements SerializableEntity {
 		return this.address.equals(rhs.address) && areImportancesEqual(this.importance, rhs.importance);
 	}
 
-	private static boolean areImportancesEqual(final AccountImportance lhs, final AccountImportance rhs) {
+	private static boolean areImportancesEqual(final ReadOnlyAccountImportance lhs, final ReadOnlyAccountImportance rhs) {
 		if (!lhs.isSet() && !rhs.isSet()) {
 			return true;
 		}

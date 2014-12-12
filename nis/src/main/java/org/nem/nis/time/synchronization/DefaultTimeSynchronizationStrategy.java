@@ -4,7 +4,7 @@ import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
 import org.nem.nis.cache.PoiFacade;
-import org.nem.nis.state.AccountImportance;
+import org.nem.nis.state.*;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	}
 
 	private double getAccountImportance(final Address address) {
-		final AccountImportance importanceInfo = this.poiFacade.findStateByAddress(address).getImportanceInfo();
+		final ReadOnlyAccountImportance importanceInfo = this.poiFacade.findStateByAddress(address).getImportanceInfo();
 		return importanceInfo.getImportance(importanceInfo.getHeight());
 	}
 

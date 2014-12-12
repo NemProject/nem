@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.state.*;
 
 public class RemoteLinksTest {
 
@@ -14,7 +13,7 @@ public class RemoteLinksTest {
 	@Test
 	public void remotesAreNotSetUpByDefault() {
 		// Arrange:
-		final RemoteLinks links = new RemoteLinks();
+		final ReadOnlyRemoteLinks links = new RemoteLinks();
 
 		// Assert:
 		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(true));
