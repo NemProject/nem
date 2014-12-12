@@ -97,7 +97,7 @@ public class NisMain {
 
 		// load the nemesis block
 		final NemesisBlock nemesisBlock = NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
-		this.nisCache.commit(nisCache);
+		nisCache.commit();
 		return nemesisBlock;
 	}
 

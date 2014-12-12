@@ -220,7 +220,7 @@ public class NisAppConfig {
 
 	@Bean
 	public ReadOnlyNisCache nisCache() {
-		return new ReadOnlyNisCache(this.accountCache(), this.poiFacade(), this.transactionHashCache());
+		return new DefaultNisCache(this.accountCache(), this.poiFacade(), this.transactionHashCache());
 	}
 
 	@Bean

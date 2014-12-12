@@ -1,71 +1,41 @@
 package org.nem.nis.cache;
 
-import org.nem.nis.state.ReadOnlyAccountState;
-
 /**
  * The central point for accessing NIS-mutable data.
  */
-public class NisCache {
-	private final AccountCache accountCache;
-	private final SynchronizedPoiFacade poiFacade;
-	private final HashCache transactionHashCache;
-
-	/**
-	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
-	 *
-	 * @param accountCache The account cache.
-	 * @param poiFacade The poi facade.
-	 * @param transactionHashCache the transaction hash cache.
-	 */
-	public NisCache(
-			final AccountCache accountCache,
-			final SynchronizedPoiFacade poiFacade,
-			final HashCache transactionHashCache) {
-		this.accountCache = accountCache;
-		this.poiFacade = poiFacade;
-		this.transactionHashCache = transactionHashCache;
-	}
+public interface NisCache {
 
 	/**
 	 * Gets the account cache.
 	 *
 	 * @return The account cache.
 	 */
-	public AccountCache getAccountCache() {
-		return this.accountCache;
-	}
+	public AccountCache getAccountCache();
 
 	/**
-	 * Gets the account cache.
+	 * Gets the poi facade.
 	 *
-	 * @return The account cache.
+	 * @return The poi facade.
 	 */
-	public AccountStateRepository getPoiFacade() {
-		return this.poiFacade;
-	}
+	public AccountStateRepository getPoiFacade();
 
 	/**
 	 * Gets the transaction hash cache.
 	 *
 	 * @return The transaction hash cache.
 	 */
-	public HashCache getTransactionHashCache() {
-		return this.transactionHashCache;
-	}
+	public HashCache getTransactionHashCache();
 
 	/**
-	 * Creates a read-only representation of this cache.
+	 * Gets a read-only representation of this cache.
 	 *
-	 * @return A read-only representation of this cache.
+	 * @return The read-only representation.
 	 */
-	public ReadOnlyNisCache asReadOnly() {
-		return new ReadOnlyNisCache(
-				this.accountCache,
-				this.poiFacade,
-				this.transactionHashCache);
-	}
+	public ReadOnlyNisCache asReadOnly();
 
-	public void commit(final ReadOnlyAccountState accountState) {
 
-	}
+	/**
+	 * Commits all changes to the "real" cache.
+	 */
+	public void commit();
 }

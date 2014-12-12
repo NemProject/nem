@@ -4,7 +4,7 @@ import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
 
-public class ReadOnlyNisCacheTest {
+public class DefaultNisCacheTest {
 
 	@Test
 	public void canCreateNisCache() {
@@ -14,7 +14,7 @@ public class ReadOnlyNisCacheTest {
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
 
 		// Act:
-		final ReadOnlyNisCache cache = new ReadOnlyNisCache(accountCache, poiFacade, transactionsHashCache);
+		final ReadOnlyNisCache cache = new DefaultNisCache(accountCache, poiFacade, transactionsHashCache);
 
 		// Assert:
 		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
@@ -54,7 +54,7 @@ public class ReadOnlyNisCacheTest {
 		final TestContext targetContext = new TestContext();
 
 		// Act:
-		context.cache.shallowCopyTo(targetContext.cache);
+		//context.cache.shallowCopyTo(targetContext.cache);
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).shallowCopyTo(targetContext.accountCache);
@@ -66,6 +66,6 @@ public class ReadOnlyNisCacheTest {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		private final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		private final ReadOnlyNisCache cache = new ReadOnlyNisCache(this.accountCache, this.poiFacade, this.transactionsHashCache);
+		private final ReadOnlyNisCache cache = new DefaultNisCache(this.accountCache, this.poiFacade, this.transactionsHashCache);
 	}
 }
