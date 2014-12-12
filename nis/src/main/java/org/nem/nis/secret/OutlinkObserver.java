@@ -3,7 +3,7 @@ package org.nem.nis.secret;
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 import java.math.BigInteger;
@@ -12,15 +12,15 @@ import java.math.BigInteger;
  * A block transaction observer that updates outlink information.
  */
 public class OutlinkObserver implements BlockTransactionObserver {
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 */
-	public OutlinkObserver(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
+	public OutlinkObserver(final AccoutStateRepository accoutStateRepository) {
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 	}
 
 	private AccountState getState(final Account account) {
-		return this.poiFacade.findStateByAddress(account.getAddress());
+		return this.accoutStateRepository.findStateByAddress(account.getAddress());
 	}
 
 	private static long getNumMicroNem(final Amount amount) {

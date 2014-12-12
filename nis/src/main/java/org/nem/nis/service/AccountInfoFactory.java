@@ -3,7 +3,7 @@ package org.nem.nis.service;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	/**
 	 * Creates a new account info factory.
@@ -24,9 +24,9 @@ public class AccountInfoFactory {
 	@Autowired(required = true)
 	public AccountInfoFactory(
 			final AccountLookup accountLookup,
-			final PoiFacade poiFacade) {
+			final AccoutStateRepository accoutStateRepository) {
 		this.accountLookup = accountLookup;
-		this.poiFacade = poiFacade;
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class AccountInfoFactory {
 	 */
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
-		final AccountState accountState = this.poiFacade.findStateByAddress(address);
+		final AccountState accountState = this.accoutStateRepository.findStateByAddress(address);
 		final org.nem.nis.state.AccountInfo accountInfo = accountState.getAccountInfo();
 
 		final AccountImportance ai = accountState.getImportanceInfo();

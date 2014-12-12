@@ -7,7 +7,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.*;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 
@@ -201,12 +201,12 @@ public class UnlockedAccountsTest {
 
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final CanHarvestPredicate canHarvestPredicate = Mockito.mock(CanHarvestPredicate.class);
 		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(
 				this.accountLookup,
-				this.poiFacade,
+				this.accoutStateRepository,
 				this.lastBlockLayer,
 				this.canHarvestPredicate,
 				MAX_UNLOCKED_ACCOUNTS);
@@ -220,7 +220,7 @@ public class UnlockedAccountsTest {
 
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getWeightedBalances().addFullyVested(new BlockHeight(lastBlockHeight), Amount.fromNem(canForage ? 10000 : 1));
-			Mockito.when(this.poiFacade.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accoutStateRepository.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
 
 			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, new BlockHeight(lastBlockHeight))).thenReturn(canForage);
 		}
@@ -243,7 +243,7 @@ public class UnlockedAccountsTest {
 
 		private void assertCanForageDelegation(final Account account) {
 			Mockito.verify(this.lastBlockLayer, Mockito.times(1)).getLastBlockHeight();
-			Mockito.verify(this.poiFacade, Mockito.times(1)).findLatestForwardedStateByAddress(account.getAddress());
+			Mockito.verify(this.accoutStateRepository, Mockito.times(1)).findLatestForwardedStateByAddress(account.getAddress());
 		}
 
 		private void assertAccountIsLocked(final Account account) {

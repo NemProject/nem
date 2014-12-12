@@ -3,26 +3,26 @@ package org.nem.nis.validators;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.*;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
 public class ImportanceTransferTransactionValidator implements SingleTransactionValidator {
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 	private final Amount minHarvesterBalance;
 
 	/**
 	 * Creates a new validator.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 * @param minHarvesterBalance The minimum balance required for a harvester.
 	 */
 	public ImportanceTransferTransactionValidator(
-			final PoiFacade poiFacade,
+			final AccoutStateRepository accoutStateRepository,
 			final Amount minHarvesterBalance) {
-		this.poiFacade = poiFacade;
+		this.accoutStateRepository = accoutStateRepository;
 		this.minHarvesterBalance = minHarvesterBalance;
 	}
 
@@ -59,7 +59,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
-		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
+		final RemoteLinks remoteLinks = this.accoutStateRepository.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
@@ -83,7 +83,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				final Amount remoteBalance = this.poiFacade.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
+				final Amount remoteBalance = this.accoutStateRepository.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
 				if (height.getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
 					if (0 != remoteBalance.compareTo(Amount.ZERO)) {
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
@@ -101,7 +101,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
-		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+		final RemoteLinks remoteLinks = this.accoutStateRepository.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}

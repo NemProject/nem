@@ -8,7 +8,7 @@ import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 
 public class AccountInfoFactoryTest {
@@ -34,7 +34,7 @@ public class AccountInfoFactoryTest {
 		context.factory.createInfo(context.address);
 
 		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.times(1)).findStateByAddress(context.address);
+		Mockito.verify(context.accoutStateRepository, Mockito.times(1)).findStateByAddress(context.address);
 	}
 
 	@Test
@@ -77,8 +77,8 @@ public class AccountInfoFactoryTest {
 		private final AccountState accountState = new AccountState(this.address);
 
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.poiFacade);
+		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.accoutStateRepository);
 
 		private TestContext() {
 			final org.nem.nis.state.AccountInfo accountInfo = this.accountState.getAccountInfo();
@@ -89,7 +89,7 @@ public class AccountInfoFactoryTest {
 			accountInfo.incrementHarvestedBlocks();
 
 			Mockito.when(this.accountLookup.findByAddress(this.address)).thenReturn(this.account);
-			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(this.accountState);
+			Mockito.when(this.accoutStateRepository.findStateByAddress(this.address)).thenReturn(this.accountState);
 		}
 	}
 }

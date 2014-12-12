@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.AccountIdBuilder;
 import org.nem.nis.harvesting.*;
@@ -21,7 +21,7 @@ public class AccountInfoController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	@Autowired(required = true)
 	AccountInfoController(
@@ -29,12 +29,12 @@ public class AccountInfoController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
-			final PoiFacade poiFacade) {
+			final AccoutStateRepository accoutStateRepository) {
 		this.unlockedAccounts = unlockedAccounts;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
-		this.poiFacade = poiFacade;
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class AccountInfoController {
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final AccountState accountState = this.poiFacade.findStateByAddress(address);
+		final AccountState accountState = this.accoutStateRepository.findStateByAddress(address);
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
 		return remoteStatus.toAccountRemoteStatus();
 	}

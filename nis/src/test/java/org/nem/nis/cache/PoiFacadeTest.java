@@ -38,7 +38,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void findStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		final AccountState state = facade.findStateByAddress(address);
@@ -53,7 +53,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void findStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		final AccountState state1 = facade.findStateByAddress(address);
@@ -72,7 +72,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void findLatestForwardedStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		final AccountState state = facade.findLatestForwardedStateByAddress(address);
@@ -102,7 +102,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	private boolean isLatestLocalState(final int mode, final int remoteBlockHeight, final RemoteLink.Owner owner) {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 		final AccountState state = facade.findStateByAddress(address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
@@ -126,7 +126,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void findForwardedStateByAddressReturnsStateForAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		final AccountState state = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
@@ -141,7 +141,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void findForwardedStateByAddressReturnsSameStateForSameAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		final AccountState state1 = facade.findForwardedStateByAddress(address, BlockHeight.ONE);
@@ -156,7 +156,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void findForwardedStateByAddressReturnsLocalStateWhenAccountDoesNotHaveRemoteState() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 		final AccountState state = facade.findStateByAddress(address);
 
 		// Act:
@@ -257,7 +257,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	private boolean isLocalState(final int mode, final int remoteBlockHeight, final int currentBlockHeight, final RemoteLink.Owner owner) {
 		// Assert:		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 		final AccountState state = facade.findStateByAddress(address);
 		final RemoteLink link = new RemoteLink(
 				Utils.generateRandomAddress(),
@@ -281,7 +281,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		facade.findStateByAddress(address);
@@ -295,7 +295,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void accountWithPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		facade.findStateByAddress(address);
@@ -309,7 +309,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void removeAccountFromCacheDoesNothingIfAddressIsNotInCache() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		// Act:
 		facade.findStateByAddress(address);
@@ -380,7 +380,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		facade.findStateByAddress(address1);
 
 		// Act:
-		final PoiFacade copyFacade = facade.copy();
+		final AccoutStateRepository copyFacade = facade.copy();
 
 		final AccountState copyStateFromEncoded = copyFacade.findStateByAddress(Address.fromEncoded(address1.getEncoded()));
 		final AccountState copyStateFromPublicKey = copyFacade.findStateByAddress(address1);
@@ -584,7 +584,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		Assert.assertThat(facade.getLastPoiRecalculationHeight(), IsEqual.equalTo(new BlockHeight(70)));
 	}
 
-	private static List<AccountState> createAccountStatesForRecalculateTests(final int numAccounts, final PoiFacade facade) {
+	private static List<AccountState> createAccountStatesForRecalculateTests(final int numAccounts, final AccoutStateRepository facade) {
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < numAccounts; ++i) {
 			accountStates.add(facade.findStateByAddress(Utils.generateRandomAddress()));
@@ -612,7 +612,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	@Test
 	public void undoVestingDelegatesToWeightedBalances() {
 		// Arrange:
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 		final List<AccountState> accountStates = createAccountStatesForUndoVestingTests(3, facade);
 
 		// Expect: all accounts should have two weighted balance entries
@@ -629,7 +629,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		}
 	}
 
-	private static List<AccountState> createAccountStatesForUndoVestingTests(final int numAccounts, final PoiFacade facade) {
+	private static List<AccountState> createAccountStatesForUndoVestingTests(final int numAccounts, final AccoutStateRepository facade) {
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < numAccounts; ++i) {
 			accountStates.add(facade.findStateByAddress(Utils.generateRandomAddress()));
@@ -647,7 +647,7 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	@Test
 	public void iteratorReturnsAllAccounts() {
 		// Arrange:
-		final PoiFacade facade = this.createPoiFacade();
+		final AccoutStateRepository facade = this.createPoiFacade();
 
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < 3; ++i) {
@@ -672,12 +672,12 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	@Test
 	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
 		// Arrange:
-		final PoiFacade poiFacade = this.createPoiFacade();
-		final Account account1 = addAccountWithBalance(poiFacade, Amount.fromNem(10));
-		final Account account2 = addAccountWithBalance(poiFacade, Amount.fromNem(77));
+		final AccoutStateRepository accoutStateRepository = this.createPoiFacade();
+		final Account account1 = addAccountWithBalance(accoutStateRepository, Amount.fromNem(10));
+		final Account account2 = addAccountWithBalance(accoutStateRepository, Amount.fromNem(77));
 
 		// Act:
-		final DebitPredicate debitPredicate = poiFacade.getDebitPredicate();
+		final DebitPredicate debitPredicate = accoutStateRepository.getDebitPredicate();
 
 		// Assert:
 		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(9)), IsEqual.equalTo(true));
@@ -689,9 +689,9 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(78)), IsEqual.equalTo(false));
 	}
 
-	private static Account addAccountWithBalance(final PoiFacade poiFacade, final Amount amount) {
+	private static Account addAccountWithBalance(final AccoutStateRepository accoutStateRepository, final Amount amount) {
 		final Account account = Utils.generateRandomAccount();
-		final AccountState accountState = poiFacade.findStateByAddress(account.getAddress());
+		final AccountState accountState = accoutStateRepository.findStateByAddress(account.getAddress());
 		accountState.getAccountInfo().incrementBalance(amount);
 		return account;
 	}

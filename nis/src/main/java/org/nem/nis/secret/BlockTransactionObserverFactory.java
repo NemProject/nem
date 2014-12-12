@@ -2,8 +2,7 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.observers.BalanceCommitTransferObserver;
 import org.nem.nis.*;
-import org.nem.nis.cache.NisCache;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 
 /**
  * Factory for creating BlockTransactionObserver objects.
@@ -33,15 +32,15 @@ public class BlockTransactionObserverFactory {
 	}
 
 	private static AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache) {
-		final PoiFacade poiFacade = nisCache.getPoiFacade();
+		final AccoutStateRepository accoutStateRepository = nisCache.getPoiFacade();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
-		builder.add(new WeightedBalancesObserver(poiFacade));
+		builder.add(new WeightedBalancesObserver(accoutStateRepository));
 		builder.add(new AccountsHeightObserver(nisCache));
-		builder.add(new BalanceCommitTransferObserver(poiFacade));
-		builder.add(new HarvestRewardCommitObserver(poiFacade));
-		builder.add(new RemoteObserver(poiFacade));
-		builder.add(new OutlinkObserver(poiFacade));
-		builder.add(new PruningObserver(poiFacade, nisCache.getTransactionHashCache()));
+		builder.add(new BalanceCommitTransferObserver(accoutStateRepository));
+		builder.add(new HarvestRewardCommitObserver(accoutStateRepository));
+		builder.add(new RemoteObserver(accoutStateRepository));
+		builder.add(new OutlinkObserver(accoutStateRepository));
+		builder.add(new PruningObserver(accoutStateRepository, nisCache.getTransactionHashCache()));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
 		return builder;
 	}

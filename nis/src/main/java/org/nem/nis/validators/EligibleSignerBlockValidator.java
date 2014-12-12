@@ -1,27 +1,27 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 /**
  * Block validator that ensures the block signer is valid.
  */
 public class EligibleSignerBlockValidator implements BlockValidator {
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	/**
 	 * Creates a new validator.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 */
-	public EligibleSignerBlockValidator(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
+	public EligibleSignerBlockValidator(final AccoutStateRepository accoutStateRepository) {
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		final AccountState accountState = this.poiFacade.findStateByAddress(block.getSigner().getAddress());
+		final AccountState accountState = this.accoutStateRepository.findStateByAddress(block.getSigner().getAddress());
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(block.getHeight());
 
 		switch (remoteStatus) {

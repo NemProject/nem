@@ -4,7 +4,7 @@ import org.eclipse.jetty.util.ConcurrentHashSet;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.Iterator;
  */
 public class UnlockedAccounts implements Iterable<Account> {
 	private final AccountLookup accountLookup;
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final CanHarvestPredicate canHarvestPredicate;
 	private final int maxUnlockedAccounts;
@@ -25,12 +25,12 @@ public class UnlockedAccounts implements Iterable<Account> {
 	@Autowired(required = true)
 	public UnlockedAccounts(
 			final AccountLookup accountLookup,
-			final PoiFacade poiFacade,
+			final AccoutStateRepository accoutStateRepository,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final CanHarvestPredicate canHarvestPredicate,
 			final int maxUnlockedAccounts) {
 		this.accountLookup = accountLookup;
-		this.poiFacade = poiFacade;
+		this.accoutStateRepository = accoutStateRepository;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.canHarvestPredicate = canHarvestPredicate;
 		this.maxUnlockedAccounts = maxUnlockedAccounts;
@@ -53,7 +53,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 
 		// use the latest forwarded state so that remote harvesters that aren't active yet can be unlocked
 		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
-		final AccountState accountState = this.poiFacade.findLatestForwardedStateByAddress(account.getAddress());
+		final AccountState accountState = this.accoutStateRepository.findLatestForwardedStateByAddress(account.getAddress());
 		if (!this.canHarvestPredicate.canHarvest(accountState, currentHeight)) {
 			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
 		}

@@ -2,22 +2,22 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.WeightedBalances;
 
 /**
  * An observer that updates weighted balance information.
  */
 public class WeightedBalancesObserver implements BlockTransferObserver {
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	/**
 	 * Creates a new weighted balances observer.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 */
-	public WeightedBalancesObserver(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
+	public WeightedBalancesObserver(final AccoutStateRepository accoutStateRepository) {
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	// keep in mind this is called TWICE for every transaction:
@@ -45,6 +45,6 @@ public class WeightedBalancesObserver implements BlockTransferObserver {
 	}
 
 	private WeightedBalances getWeightedBalances(final Account account) {
-		return this.poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances();
+		return this.accoutStateRepository.findStateByAddress(account.getAddress()).getWeightedBalances();
 	}
 }

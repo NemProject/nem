@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 public class BalanceCommitTransferObserverTest {
@@ -57,8 +57,8 @@ public class BalanceCommitTransferObserverTest {
 	}
 
 	private static class TestContext {
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.poiFacade);
+		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
+		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.accoutStateRepository);
 
 		public AccountInfo add(final Account account, final Amount amount) {
 			final AccountInfo accountInfo = new AccountInfo();
@@ -66,7 +66,7 @@ public class BalanceCommitTransferObserverTest {
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(accountInfo);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accoutStateRepository.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return accountInfo;
 		}
 	}

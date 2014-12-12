@@ -2,26 +2,26 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 /**
  * A block transaction observer that updates remote account associations.
  */
 public class RemoteObserver implements BlockTransactionObserver {
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 */
-	public RemoteObserver(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
+	public RemoteObserver(final AccoutStateRepository accoutStateRepository) {
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	private RemoteLinks getRemoteLinks(final Account account) {
-		return this.poiFacade.findStateByAddress(account.getAddress()).getRemoteLinks();
+		return this.accoutStateRepository.findStateByAddress(account.getAddress()).getRemoteLinks();
 	}
 
 	@Override

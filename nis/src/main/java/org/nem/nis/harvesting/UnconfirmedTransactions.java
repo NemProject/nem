@@ -5,8 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.NisCache;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -349,11 +348,11 @@ public class UnconfirmedTransactions {
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
-		private final PoiFacade poiFacade;
+		private final AccoutStateRepository accoutStateRepository;
 		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
-		public UnconfirmedBalancesObserver(final PoiFacade poiFacade) {
-			this.poiFacade = poiFacade;
+		public UnconfirmedBalancesObserver(final AccoutStateRepository accoutStateRepository) {
+			this.accoutStateRepository = accoutStateRepository;
 		}
 
 		public Amount get(final Account account) {
@@ -386,7 +385,7 @@ public class UnconfirmedTransactions {
 		}
 
 		private Amount getBalance(final Account account) {
-			return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+			return this.accoutStateRepository.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		}
 	}
 }

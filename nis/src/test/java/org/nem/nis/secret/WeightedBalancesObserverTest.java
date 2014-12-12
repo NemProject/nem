@@ -5,7 +5,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 public class WeightedBalancesObserverTest {
@@ -89,10 +89,10 @@ public class WeightedBalancesObserverTest {
 			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 
-			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-			Mockito.when(poiFacade.findStateByAddress(address)).thenReturn(accountState);
+			final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
+			Mockito.when(accoutStateRepository.findStateByAddress(address)).thenReturn(accountState);
 
-			this.observer = new WeightedBalancesObserver(poiFacade);
+			this.observer = new WeightedBalancesObserver(accoutStateRepository);
 		}
 	}
 }

@@ -2,22 +2,22 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountInfo;
 
 /**
  * Transfer observer that commits balance changes to the underlying accounts.
  */
 public class BalanceCommitTransferObserver implements TransferObserver {
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	/**
 	 * Creates an observer.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 */
-	public BalanceCommitTransferObserver(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
+	public BalanceCommitTransferObserver(final AccoutStateRepository accoutStateRepository) {
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	@Override
@@ -37,6 +37,6 @@ public class BalanceCommitTransferObserver implements TransferObserver {
 	}
 
 	private AccountInfo getAccountInfo(final Account account) {
-		return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo();
+		return this.accoutStateRepository.findStateByAddress(account.getAddress()).getAccountInfo();
 	}
 }

@@ -12,8 +12,8 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;
@@ -236,8 +236,8 @@ public class TransactionControllerTest {
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			this.debitPredicate = Mockito.mock(DebitPredicate.class);
-			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-			Mockito.when(poiFacade.getDebitPredicate()).thenReturn(this.debitPredicate);
+			final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
+			Mockito.when(accoutStateRepository.getDebitPredicate()).thenReturn(this.debitPredicate);
 
 			this.controller = new TransactionController(
 					this.accountLookup,
@@ -245,7 +245,7 @@ public class TransactionControllerTest {
 					this.unconfirmedTransactions,
 					this.validator,
 					this.host,
-					poiFacade);
+					accoutStateRepository);
 		}
 	}
 }

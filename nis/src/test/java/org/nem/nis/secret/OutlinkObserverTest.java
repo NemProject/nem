@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
@@ -143,7 +143,7 @@ public class OutlinkObserverTest {
 		private final AccountImportance importance2;
 		private final WeightedBalances weightedBalances1;
 		private final WeightedBalances weightedBalances2;
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
 
 		public TestContext() {
 			final BlockHeight height = new BlockHeight(111);
@@ -159,7 +159,7 @@ public class OutlinkObserverTest {
 		}
 
 		private OutlinkObserver createObserver() {
-			return new OutlinkObserver(this.poiFacade);
+			return new OutlinkObserver(this.accoutStateRepository);
 		}
 
 		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances, final BlockHeight height) {
@@ -167,7 +167,7 @@ public class OutlinkObserverTest {
 			Mockito.when(account.getAddress()).thenReturn(address);
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
-			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(accountState);
+			Mockito.when(this.accoutStateRepository.findStateByAddress(address)).thenReturn(accountState);
 			Mockito.when(accountState.getAddress()).thenReturn(address);
 			Mockito.when(accountState.getImportanceInfo()).thenReturn(importance);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);

@@ -42,12 +42,12 @@ public class TransactionValidatorFactory {
 	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final PoiFacade poiFacade) {
+	public SingleTransactionValidator createSingle(final AccoutStateRepository accoutStateRepository) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, poiFacade);
+		this.visitSingleSubValidators(builder::add, accoutStateRepository);
 		return builder.build();
 	}
 
@@ -67,13 +67,13 @@ public class TransactionValidatorFactory {
 	 * Visits all sub validators that comprise the validator returned by createSingle.
 	 *
 	 * @param visitor The visitor.
-	 * @param poiFacade The poi facade.
+	 * @param accoutStateRepository The poi facade.
 	 */
-	public void visitSingleSubValidators(final Consumer<SingleTransactionValidator> visitor, final PoiFacade poiFacade) {
+	public void visitSingleSubValidators(final Consumer<SingleTransactionValidator> visitor, final AccoutStateRepository accoutStateRepository) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());
-		visitor.accept(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
+		visitor.accept(new ImportanceTransferTransactionValidator(accoutStateRepository, this.poiOptions.getMinHarvesterBalance()));
 	}
 
 	/**

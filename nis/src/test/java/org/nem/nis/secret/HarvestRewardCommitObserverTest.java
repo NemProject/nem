@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
@@ -91,8 +91,8 @@ public class HarvestRewardCommitObserverTest {
 		private final Address address = Utils.generateRandomAddress();
 		private final Account account = new Account(this.address);
 		private final AccountInfo accountInfo = new AccountInfo();
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final HarvestRewardCommitObserver observer = new HarvestRewardCommitObserver(this.poiFacade);
+		private final AccoutStateRepository accoutStateRepository = Mockito.mock(PoiFacade.class);
+		private final HarvestRewardCommitObserver observer = new HarvestRewardCommitObserver(this.accoutStateRepository);
 
 		public TestContext(final Amount amount, final int numHarvestedBlocks) {
 			this.accountInfo.incrementBalance(amount);
@@ -102,7 +102,7 @@ public class HarvestRewardCommitObserverTest {
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(this.accountInfo);
-			Mockito.when(this.poiFacade.findStateByAddress(this.address)).thenReturn(accountState);
+			Mockito.when(this.accoutStateRepository.findStateByAddress(this.address)).thenReturn(accountState);
 		}
 
 		private void notifyHarvestRewardExecute() {

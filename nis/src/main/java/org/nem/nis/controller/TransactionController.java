@@ -7,9 +7,9 @@ import org.nem.core.node.Node;
 import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
 import org.nem.peer.node.*;
@@ -25,7 +25,7 @@ public class TransactionController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final SingleTransactionValidator validator;
 	private final NisPeerNetworkHost host;
-	private final PoiFacade poiFacade;
+	private final AccoutStateRepository accoutStateRepository;
 
 	@Autowired(required = true)
 	TransactionController(
@@ -34,13 +34,13 @@ public class TransactionController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final SingleTransactionValidator validator,
 			final NisPeerNetworkHost host,
-			final PoiFacade poiFacade) {
+			final AccoutStateRepository accoutStateRepository) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.host = host;
-		this.poiFacade = poiFacade;
+		this.accoutStateRepository = accoutStateRepository;
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class TransactionController {
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
 		final Transaction transfer = deserializeTransaction(deserializer);
 
-		final ValidationContext context = new ValidationContext(this.poiFacade.getDebitPredicate());
+		final ValidationContext context = new ValidationContext(this.accoutStateRepository.getDebitPredicate());
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
 			throw new IllegalArgumentException(validationResult.toString());
