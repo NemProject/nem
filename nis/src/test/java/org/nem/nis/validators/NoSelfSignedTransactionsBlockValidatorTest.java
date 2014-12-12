@@ -74,7 +74,7 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 	private static class TestContext {
 		private final Account harvester = Utils.generateRandomAccount();
 		private final Block block = NisUtils.createRandomBlockWithHeight(this.harvester, 12);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		private final BlockValidator validator = new NoSelfSignedTransactionsBlockValidator(this.accountStateRepository);
 
 		private TestContext() {

@@ -39,9 +39,9 @@ public class BlockScorer {
 	 */
 	private static final int POI_GROUPING = 359;
 
-	public final AccountStateRepository poiFacade;
+	public final ReadOnlyAccountStateRepository poiFacade;
 
-	public BlockScorer(final AccountStateRepository poiFacade) {
+	public BlockScorer(final ReadOnlyAccountStateRepository poiFacade) {
 		this.poiFacade = poiFacade;
 	}
 

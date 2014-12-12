@@ -192,6 +192,7 @@ public class BlockScorerTest {
 	private static void assertRecalculateImportancesCalledForHeight(final long height, final long rawGroupedHeight) {
 		// Arrange:
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height);
 
@@ -199,7 +200,7 @@ public class BlockScorerTest {
 		final Address signerAddress = block.getSigner().getAddress();
 		final AccountState state = new AccountState(signerAddress);
 		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		Mockito.when(poiFacade.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
+		Mockito.when(accountStateRepository.findForwardedStateByAddress(signerAddress, new BlockHeight(height))).thenReturn(state);
 
 		// Act:
 		context.scorer.calculateForgerBalance(block);
@@ -214,6 +215,7 @@ public class BlockScorerTest {
 		final BlockHeight height = new BlockHeight(1442);
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(height);
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		final TestContext context = new TestContext(poiFacade);
 		final Block block = NisUtils.createRandomBlockWithHeight(height.getRaw());
 
@@ -222,8 +224,8 @@ public class BlockScorerTest {
 		final AccountState remoteState = new AccountState(remoteHarvesterAddress);
 		final AccountState ownerState = new AccountState(ownerAddress);
 		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
-		Mockito.when(poiFacade.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
+		Mockito.when(accountStateRepository.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
+		Mockito.when(accountStateRepository.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
 
 		// Act:
 		final long score = context.scorer.calculateForgerBalance(block);
@@ -231,7 +233,7 @@ public class BlockScorerTest {
 		// Assert:
 		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
 		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight);
-		Mockito.verify(poiFacade, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
+		Mockito.verify(accountStateRepository, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
 
 	//endregion
@@ -263,11 +265,12 @@ public class BlockScorerTest {
 	}
 
 	private static BlockScorer createScorer() {
-		return new BlockScorer(Mockito.mock(PoiFacade.class));
+		return new BlockScorer(Mockito.mock(AccountStateRepository.class));
 	}
 
 	private static class TestContext {
 		private final PoiFacade poiFacade;
+		private final AccountStateRepository accountStateRepository;
 		private final BlockScorer scorer;
 
 		private TestContext() {
@@ -282,19 +285,20 @@ public class BlockScorerTest {
 
 		private TestContext(final PoiFacade poiFacade) {
 			this.poiFacade = poiFacade;
-			this.scorer = new BlockScorer(this.poiFacade);
+			this.accountStateRepository = new DefaultAccountStateRepository();
+			this.scorer = new BlockScorer(this.accountStateRepository);
 		}
 
 		private Account createAccountWithBalance(final long balance) {
 			final Account account = Utils.generateRandomAccount();
-			final AccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
+			final AccountState accountState = this.accountStateRepository.findStateByAddress(account.getAddress());
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, Amount.fromNem(balance));
 			accountState.setHeight(BlockHeight.ONE);
 			return account;
 		}
 
 		private AccountImportance getImportanceInfo(final Account account) {
-			return this.poiFacade.findStateByAddress(account.getAddress()).getImportanceInfo();
+			return this.accountStateRepository.findStateByAddress(account.getAddress()).getImportanceInfo();
 		}
 	}
 }

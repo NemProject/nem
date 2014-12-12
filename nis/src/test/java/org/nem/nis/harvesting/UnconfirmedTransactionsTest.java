@@ -1021,7 +1021,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		final ReadOnlyAccountStateRepository poiFacade = Mockito.mock(ReadOnlyAccountStateRepository.class);
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
 				factory.createSingle(poiFacade),
@@ -1053,7 +1053,7 @@ public class UnconfirmedTransactionsTest {
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
-		private final DefaultPoiFacade poiFacade;
+		private final ReadOnlyAccountStateRepository poiFacade;
 
 		private TestContext() {
 			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
@@ -1067,10 +1067,13 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
-			this(singleValidator, batchValidator, Mockito.mock(DefaultPoiFacade.class));
+			this(singleValidator, batchValidator, Mockito.mock(ReadOnlyAccountStateRepository.class));
 		}
 
-		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator, final DefaultPoiFacade poiFacade) {
+		private TestContext(
+				final SingleTransactionValidator singleValidator,
+				final BatchTransactionValidator batchValidator,
+				final ReadOnlyAccountStateRepository poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			this.poiFacade = poiFacade;

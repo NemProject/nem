@@ -90,7 +90,7 @@ public class NisMain {
 		final NisCache nisCache = this.nisCache.copy();
 		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
-		final AccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		final AccountState nemesisState = nisCache.getAccountStateCache().findStateByAddress(NemesisBlock.ADDRESS);
 		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);

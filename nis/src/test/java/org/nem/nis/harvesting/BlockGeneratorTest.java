@@ -314,7 +314,7 @@ public class BlockGeneratorTest {
 
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final ReadOnlyAccountStateRepository poiFacade = Mockito.mock(ReadOnlyAccountStateRepository.class);
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final BlockDifficultyScorer difficultyScorer = Mockito.mock(BlockDifficultyScorer.class);

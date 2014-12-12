@@ -197,7 +197,7 @@ public class BlockTransactionObserverFactoryTest {
 	}
 
 	private static class TestContext {
-		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final AccountStateRepository poiFacade = Mockito.mock(AccountStateRepository.class);
 		private final MockAccountContext accountContext1 = this.addAccount();
 		private final MockAccountContext accountContext2 = this.addAccount();
 		private final NisCache nisCache = NisCacheFactory.create(this.poiFacade);

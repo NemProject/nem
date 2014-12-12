@@ -7,7 +7,7 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.sync.BlockChainScoreManager;
@@ -42,8 +42,15 @@ public class BlockAnalyzer {
 		return this.analyze(nisCache.copy(), null);
 	}
 
+	public boolean analyze(final ReadOnlyNisCache nisCache, final Long maxHeight) {
+		final NisCache nisCacheCopy = nisCache.copy();
+		final boolean result = this.analyze(nisCacheCopy, maxHeight);
+		nisCacheCopy.commit();
+		return result;
+	}
+
 	private boolean analyze(final NisCache nisCache, final Long maxHeight) {
-		final Block nemesisBlock = this.loadNemesisBlock(nisCache.asReadOnly());
+		final Block nemesisBlock = this.loadNemesisBlock(nisCache);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
 
 		Long curBlockHeight;
@@ -90,7 +97,7 @@ public class BlockAnalyzer {
 						continue;
 					}
 
-					final AccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
+					final AccountState accountState = nisCache.getAccountStateCache().findStateByAddress(account.getAddress());
 					accountState.getWeightedBalances().convertToFullyVested();
 				}
 			}
@@ -111,7 +118,7 @@ public class BlockAnalyzer {
 			}
 		} while (dbBlock != null);
 
-		this.initializePoi(nisCache.asReadOnly(), parentBlock.getHeight());
+		this.initializePoi(nisCache, parentBlock.getHeight());
 		return true;
 	}
 
@@ -154,7 +161,7 @@ public class BlockAnalyzer {
 		}
 	}
 
-	private void initializePoi(final ReadOnlyNisCache nisCache, final BlockHeight height) {
+	private void initializePoi(final NisCache nisCache, final BlockHeight height) {
 		LOGGER.info("Analyzed blocks: " + height);
 		LOGGER.info("Known accounts: " + nisCache.getAccountCache().size());
 		LOGGER.info(String.format("Initializing PoI for (%d) accounts", nisCache.getAccountCache().size()));
@@ -163,12 +170,12 @@ public class BlockAnalyzer {
 		LOGGER.info("PoI initialized");
 	}
 
-	private NemesisBlock loadNemesisBlock(final ReadOnlyNisCache nisCache) {
+	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {
 		// TODO 20141210 J-*: why is this function in two places (also in NisMain)
 		// set up the nemesis block amounts
 		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
-		final AccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		final AccountState nemesisState = nisCache.getAccountStateCache().findStateByAddress(NemesisBlock.ADDRESS);
 		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);

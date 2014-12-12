@@ -3,7 +3,7 @@ package org.nem.nis.time.synchronization;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.synchronization.TimeSynchronizationSample;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
 
@@ -17,23 +17,31 @@ import java.util.List;
 public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationStrategy {
 
 	private final SynchronizationFilter filter;
-	private final PoiFacade poiFacade;
+	private final ReadOnlyPoiFacade poiFacade;
+	private final ReadOnlyAccountStateRepository accountStateRepository;
 
 	/**
 	 * Creates the default synchronization strategy.
 	 *
 	 * @param filter The aggregate filter to use.
-	 * @param poiFacade The poi facade to query account importances.
+	 * @param poiFacade The poi facade.
+	 * @param accountStateRepository The account state repository.
 	 */
-	public DefaultTimeSynchronizationStrategy(final SynchronizationFilter filter, final PoiFacade poiFacade) {
+	public DefaultTimeSynchronizationStrategy(
+			final SynchronizationFilter filter,
+			final ReadOnlyPoiFacade poiFacade,
+			final ReadOnlyAccountStateRepository accountStateRepository) {
 		if (null == filter) {
 			throw new TimeSynchronizationException("synchronization filter cannot be null.");
 		}
+
 		if (null == poiFacade) {
 			throw new TimeSynchronizationException("poiFacade cannot be null.");
 		}
+
 		this.filter = filter;
 		this.poiFacade = poiFacade;
+		this.accountStateRepository = accountStateRepository;
 	}
 
 	/**
@@ -51,7 +59,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 	}
 
 	private double getAccountImportance(final Address address) {
-		final ReadOnlyAccountImportance importanceInfo = this.poiFacade.findStateByAddress(address).getImportanceInfo();
+		final ReadOnlyAccountImportance importanceInfo = this.accountStateRepository.findStateByAddress(address).getImportanceInfo();
 		return importanceInfo.getImportance(importanceInfo.getHeight());
 	}
 

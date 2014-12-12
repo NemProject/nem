@@ -143,7 +143,7 @@ public class OutlinkObserverTest {
 		private final AccountImportance importance2;
 		private final WeightedBalances weightedBalances1;
 		private final WeightedBalances weightedBalances2;
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 
 		public TestContext() {
 			final BlockHeight height = new BlockHeight(111);

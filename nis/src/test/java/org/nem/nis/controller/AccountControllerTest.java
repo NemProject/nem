@@ -399,7 +399,7 @@ public class AccountControllerTest {
 		private final AccountController controller;
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 
 		public TestContext() {

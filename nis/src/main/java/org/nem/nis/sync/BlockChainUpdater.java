@@ -13,7 +13,7 @@ import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 
@@ -64,7 +64,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	@Override
 	public void updateScore(final Block parentBlock, final Block block) {
-		final BlockScorer scorer = new BlockScorer(this.nisCache.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(this.nisCache.getAccountStateCache());
 		this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 	}
 
@@ -241,8 +241,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// each block that we receive
 		fixGenerationHash(block, parent);
 
-		final AccountStateRepository accountStateRepository = this.nisCache.getPoiFacade();
-		final AccountState state = accountStateRepository.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
+		final ReadOnlyAccountStateRepository accountStateRepository = this.nisCache.getAccountStateCache();
+		final ReadOnlyAccountState state = accountStateRepository.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
 		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
 		block.setLessor(lessor);
 	}

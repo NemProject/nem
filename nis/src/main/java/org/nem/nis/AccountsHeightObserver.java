@@ -39,7 +39,7 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 	private void addToNisCache(final BlockHeight height, final Account account) {
 		final Address address = account.getAddress();
 		this.nisCache.getAccountCache().findByAddress(address);
-		final AccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
+		final AccountState accountState = this.nisCache.getAccountStateCache().findStateByAddress(address);
 
 		accountState.getAccountInfo().incrementReferenceCount();
 		accountState.setHeight(height);
@@ -52,14 +52,14 @@ public class AccountsHeightObserver implements BlockTransactionObserver {
 			throw new IllegalArgumentException("problem during undo, account not present in cache");
 		}
 
-		final AccountState accountState = this.nisCache.getPoiFacade().findStateByAddress(address);
+		final AccountState accountState = this.nisCache.getAccountStateCache().findStateByAddress(address);
 		if (null == accountState.getHeight()) {
 			throw new IllegalArgumentException("problem during undo, account height not set");
 		}
 
 		if (ReferenceCount.ZERO.equals(accountState.getAccountInfo().decrementReferenceCount())) {
 			this.nisCache.getAccountCache().removeFromCache(address);
-			this.nisCache.getPoiFacade().removeFromCache(address);
+			this.nisCache.getAccountStateCache().removeFromCache(address);
 		}
 	}
 }

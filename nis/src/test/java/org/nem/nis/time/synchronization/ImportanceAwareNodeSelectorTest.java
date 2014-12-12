@@ -28,10 +28,18 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final AccountState state = Mockito.mock(AccountState.class);
 		Mockito.when(state.getImportanceInfo()).thenReturn(importance);
 
+		final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
+		Mockito.when(accountStateRepository.findStateByAddress(Mockito.any())).thenReturn(state);
+
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		Mockito.when(poiFacade.findStateByAddress(Mockito.any())).thenReturn(state);
 		Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(new BlockHeight(14));
-		return new ImportanceAwareNodeSelector(maxNodes, poiFacade, trustProvider, context, random);
+		return new ImportanceAwareNodeSelector(
+				maxNodes,
+				poiFacade,
+				accountStateRepository,
+				trustProvider,
+				context,
+				random);
 	}
 
 	//region selectNode
@@ -203,6 +211,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 	private static class TestContext {
 		private final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
+		private final AccountStateRepository accountStateRepository = new DefaultAccountStateRepository();
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);
@@ -225,7 +234,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			this.nodes = new Node[trustValues.size()];
 			for (int i = 0; i < this.nodes.length; ++i) {
 				this.nodes[i] = new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("127.0.0.1"));
-				final AccountState state = this.poiFacade.findStateByAddress(this.nodes[i].getIdentity().getAddress());
+				final AccountState state = this.accountStateRepository.findStateByAddress(this.nodes[i].getIdentity().getAddress());
 				state.getImportanceInfo().setImportance(new BlockHeight((long)heightValues.getAt(i)), importanceValues.getAt(i));
 			}
 
@@ -237,7 +246,13 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
 			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
-			this.selector = new ImportanceAwareNodeSelector(maxNodes, this.poiFacade, this.trustProvider, this.context, random);
+			this.selector = new ImportanceAwareNodeSelector(
+					maxNodes,
+					this.poiFacade,
+					this.accountStateRepository,
+					this.trustProvider,
+					this.context,
+					random);
 		}
 
 		private static void setFacadeInternalValues(final DefaultPoiFacade facade, final int lastPoiVectorSize, final BlockHeight height) {

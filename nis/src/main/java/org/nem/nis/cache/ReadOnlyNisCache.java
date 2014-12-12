@@ -17,7 +17,14 @@ public interface ReadOnlyNisCache {
 	 *
 	 * @return The account state cache.
 	 */
-	public PoiFacade getPoiFacade(); // TODO 20141212 fix me!
+	public ReadOnlyAccountStateRepository getAccountStateCache();
+
+	/**
+	 * Gets the account state cache.
+	 *
+	 * @return The account state cache.
+	 */
+	public ReadOnlyPoiFacade getPoiFacade(); // TODO 20141212 fix me!
 
 	/**
 	 * Gets the transaction hash cache.

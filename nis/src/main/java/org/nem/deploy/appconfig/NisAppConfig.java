@@ -179,7 +179,7 @@ public class NisAppConfig {
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
 		// which doesn't require a hash check, so createSingle is used
-		return this.transactionValidatorFactory().createSingle(this.nisCache().getPoiFacade());
+		return this.transactionValidatorFactory().createSingle(this.accountStateCache());
 	}
 
 	@Bean
@@ -193,7 +193,7 @@ public class NisAppConfig {
 				this.nisCache(),
 				this.unconfirmedTransactions(),
 				this.blockDao,
-				new BlockScorer(this.poiFacade()),
+				new BlockScorer(this.accountStateCache()),
 				this.blockValidatorFactory().create(this.nisCache()));
 		return new Harvester(
 				this.accountCache(),
@@ -209,6 +209,11 @@ public class NisAppConfig {
 	}
 
 	@Bean
+	public AccountStateRepository accountStateCache() {
+		return new DefaultAccountStateRepository();
+	}
+
+	@Bean
 	public HashCache transactionHashCache() {
 		return new HashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime());
 	}
@@ -220,7 +225,11 @@ public class NisAppConfig {
 
 	@Bean
 	public ReadOnlyNisCache nisCache() {
-		return new DefaultNisCache(this.accountCache(), this.poiFacade(), this.transactionHashCache());
+		return new DefaultNisCache(
+				this.accountCache(),
+				this.accountStateCache(),
+				this.poiFacade(),
+				this.transactionHashCache());
 	}
 
 	@Bean
@@ -232,7 +241,7 @@ public class NisAppConfig {
 	public UnlockedAccounts unlockedAccounts() {
 		return new UnlockedAccounts(
 				this.accountCache(),
-				this.poiFacade(),
+				this.accountStateCache(),
 				this.blockChainLastBlockLayer,
 				this.canHarvestPredicate(),
 				this.nisConfiguration().getUnlockedLimit());

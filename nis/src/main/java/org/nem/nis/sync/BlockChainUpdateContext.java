@@ -48,7 +48,7 @@ public class BlockChainUpdateContext {
 
 		this.nisCache = nisCache;
 		this.originalNisCache = originalNisCache;
-		this.blockScorer = new BlockScorer(this.nisCache.getPoiFacade());
+		this.blockScorer = new BlockScorer(this.nisCache.getAccountStateCache());
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;

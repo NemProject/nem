@@ -201,7 +201,7 @@ public class UnlockedAccountsTest {
 
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final CanHarvestPredicate canHarvestPredicate = Mockito.mock(CanHarvestPredicate.class);
 		private final UnlockedAccounts unlockedAccounts = new UnlockedAccounts(

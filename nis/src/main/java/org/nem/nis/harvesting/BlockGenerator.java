@@ -6,7 +6,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
@@ -92,7 +92,9 @@ public class BlockGenerator {
 			final BlockScorer blockScorer,
 			final TimeInstant blockTime) {
 		final BlockHeight harvestedBlockHeight = lastBlock.getHeight().next();
-		final AccountState ownerState = this.nisCache.getPoiFacade().findForwardedStateByAddress(harvesterAccount.getAddress(), harvestedBlockHeight);
+		final ReadOnlyAccountState ownerState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(
+				harvesterAccount.getAddress(),
+				harvestedBlockHeight);
 		final Account ownerAccount = this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 
 		final Collection<Transaction> transactions = this.unconfirmedTransactions

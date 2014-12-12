@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 /**
  * The central point for accessing NIS-mutable data.
  */
-public interface NisCache {
+public interface NisCache extends ReadOnlyNisCache {
 
 	/**
 	 * Gets the account cache.
@@ -13,11 +13,18 @@ public interface NisCache {
 	public AccountCache getAccountCache();
 
 	/**
+	 * Gets the account state cache.
+	 *
+	 * @return The account state cache.
+	 */
+	public AccountStateRepository getAccountStateCache();
+
+	/**
 	 * Gets the poi facade.
 	 *
 	 * @return The poi facade.
 	 */
-	public AccountStateRepository getPoiFacade();
+	public PoiFacade getPoiFacade();
 
 	/**
 	 * Gets the transaction hash cache.
@@ -25,14 +32,6 @@ public interface NisCache {
 	 * @return The transaction hash cache.
 	 */
 	public HashCache getTransactionHashCache();
-
-	/**
-	 * Gets a read-only representation of this cache.
-	 *
-	 * @return The read-only representation.
-	 */
-	public ReadOnlyNisCache asReadOnly();
-
 
 	/**
 	 * Commits all changes to the "real" cache.

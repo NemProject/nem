@@ -203,7 +203,7 @@ public class AccountInfoControllerTest {
 		private final List<Transaction> filteredTransactions = new ArrayList<>();
 		private final AccountInfoFactory accountInfoFactory = Mockito.mock(AccountInfoFactory.class);
 		private final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		private final ReadOnlyAccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final ReadOnlyAccountStateRepository accountStateRepository = Mockito.mock(ReadOnlyAccountStateRepository.class);
 
 		public TestContext() {
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);

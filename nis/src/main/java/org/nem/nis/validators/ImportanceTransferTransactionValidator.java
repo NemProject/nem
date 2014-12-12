@@ -10,7 +10,7 @@ import org.nem.nis.state.*;
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
 public class ImportanceTransferTransactionValidator implements SingleTransactionValidator {
-	private final AccountStateRepository accountStateRepository;
+	private final ReadOnlyAccountStateRepository accountStateRepository;
 	private final Amount minHarvesterBalance;
 
 	/**
@@ -20,7 +20,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	 * @param minHarvesterBalance The minimum balance required for a harvester.
 	 */
 	public ImportanceTransferTransactionValidator(
-			final AccountStateRepository accountStateRepository,
+			final ReadOnlyAccountStateRepository accountStateRepository,
 			final Amount minHarvesterBalance) {
 		this.accountStateRepository = accountStateRepository;
 		this.minHarvesterBalance = minHarvesterBalance;

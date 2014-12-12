@@ -89,7 +89,7 @@ public class WeightedBalancesObserverTest {
 			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 
-			final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+			final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 			Mockito.when(accountStateRepository.findStateByAddress(address)).thenReturn(accountState);
 
 			this.observer = new WeightedBalancesObserver(accountStateRepository);

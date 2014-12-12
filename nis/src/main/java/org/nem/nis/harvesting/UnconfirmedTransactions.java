@@ -74,7 +74,7 @@ public class UnconfirmedTransactions {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator();
-		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getPoiFacade());
+		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -198,7 +198,7 @@ public class UnconfirmedTransactions {
 
 	private SingleTransactionValidator createSingleValidator() {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.nisCache.getPoiFacade()));
+		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		return builder.build();
 	}
@@ -348,10 +348,10 @@ public class UnconfirmedTransactions {
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
-		private final AccountStateRepository accountStateRepository;
+		private final ReadOnlyAccountStateRepository accountStateRepository;
 		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
-		public UnconfirmedBalancesObserver(final AccountStateRepository accountStateRepository) {
+		public UnconfirmedBalancesObserver(final ReadOnlyAccountStateRepository accountStateRepository) {
 			this.accountStateRepository = accountStateRepository;
 		}
 

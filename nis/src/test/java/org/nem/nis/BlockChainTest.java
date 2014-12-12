@@ -70,7 +70,7 @@ public class BlockChainTest {
 
 	private Vector<Account> prepareSigners(final NisCache nisCache) {
 		final AccountCache accountCache = nisCache.getAccountCache();
-		final AccountStateRepository accountStateRepository = nisCache.getPoiFacade();
+		final AccountStateRepository accountStateRepository = nisCache.getAccountStateCache();
 		final Vector<Account> accounts = new Vector<>();
 
 		Account a;
@@ -126,13 +126,13 @@ public class BlockChainTest {
 		final NisCache nisCache = NisCacheFactory.createReal(poiFacade);
 		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
-			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
 
 		final Account signer = accounts.get(0);
 
 		final Block parentBlock = createBlock(signer, nisCache.getAccountCache());
-		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(nisCache.getAccountStateCache());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = this.createBlockForTests(accounts, nisCache.getAccountCache(), blocks, scorer);
@@ -156,16 +156,16 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				nisCache.asReadOnly());
+				nisCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				nisCache.asReadOnly(),
+				nisCache,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
 				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
-						nisCache.asReadOnly(),
+						nisCache,
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,
@@ -184,9 +184,9 @@ public class BlockChainTest {
 		// TODO: add all sorts of different checks
 		Assert.assertTrue(result == ValidationResult.SUCCESS);
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(290)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(290)));
 
 		// siblings with same score must be rejected
 		// Act:
@@ -210,13 +210,13 @@ public class BlockChainTest {
 		final NisCache nisCache = NisCacheFactory.createReal(poiFacade);
 		final List<Account> accounts = this.prepareSigners(nisCache);
 		for (final Account account : accounts) {
-			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			nisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
 
 		final Account signer = accounts.get(0);
 
 		final Block parentBlock = createBlock(signer, nisCache.getAccountCache());
-		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(nisCache.getAccountStateCache());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = this.createBlockForTests(accounts, nisCache.getAccountCache(), blocks, scorer);
@@ -241,16 +241,16 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				nisCache.asReadOnly());
+				nisCache);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				nisCache.asReadOnly(),
+				nisCache,
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
 				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
-						nisCache.asReadOnly(),
+						nisCache,
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,
@@ -271,9 +271,9 @@ public class BlockChainTest {
 		// TODO: add all sorts of different checks
 		Assert.assertTrue(result == ValidationResult.SUCCESS);
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(290)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(290)));
 
 		// siblings with same score must be rejected
 		// Act:
@@ -283,7 +283,7 @@ public class BlockChainTest {
 
 		// Assert:
 		transaction = (TransferTransaction)savedBlock2.getTransactions().get(0);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		Assert.assertTrue(nisCache.getAccountCache().isKnownAddress(transaction.getRecipient().getAddress()));
 		Assert.assertTrue(siblingResult == ValidationResult.SUCCESS);
 	}

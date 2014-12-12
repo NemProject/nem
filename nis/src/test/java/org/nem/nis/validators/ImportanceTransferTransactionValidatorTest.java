@@ -390,7 +390,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	//endregion
 
 	private static class TestContext {
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
 				this.accountStateRepository,
 				Amount.fromNem(2000));

@@ -4,23 +4,8 @@ import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * A repository of all mutable NEM account state.
- * TODO 20141211 - rename to something else!
  */
-public interface PoiFacade extends AccountStateRepository {
-
-	/**
-	 * Gets the size of the last poi vector (needed for time synchronization).
-	 *
-	 * @return The size of the last poi vector.
-	 */
-	public int getLastPoiVectorSize();
-
-	/**
-	 * Gets the height at which the last recalculation was (needed for time synchronization).
-	 *
-	 * @return The the height at which the last recalculation was.
-	 */
-	public BlockHeight getLastPoiRecalculationHeight();
+public interface PoiFacade extends ReadOnlyPoiFacade {
 
 	/**
 	 * Recalculates the importance of all accounts at the specified block height.

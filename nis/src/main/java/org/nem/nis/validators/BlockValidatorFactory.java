@@ -41,9 +41,9 @@ public class BlockValidatorFactory {
 	public void visitSubValidators(final Consumer<BlockValidator> visitor, final ReadOnlyNisCache nisCache) {
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransactionDeadlineBlockValidator());
-		visitor.accept(new EligibleSignerBlockValidator(nisCache.getPoiFacade()));
+		visitor.accept(new EligibleSignerBlockValidator(nisCache.getAccountStateCache()));
 		visitor.accept(new MaxTransactionsBlockValidator());
-		visitor.accept(new NoSelfSignedTransactionsBlockValidator(nisCache.getPoiFacade()));
+		visitor.accept(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
 		visitor.accept(new BlockImportanceTransferValidator());
 		visitor.accept(new BlockImportanceTransferBalanceValidator());
 		visitor.accept(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));

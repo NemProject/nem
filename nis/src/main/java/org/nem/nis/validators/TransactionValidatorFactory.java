@@ -34,7 +34,7 @@ public class TransactionValidatorFactory {
 	 */
 	public SingleTransactionValidator create(final ReadOnlyNisCache nisCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, nisCache.getPoiFacade());
+		this.visitSingleSubValidators(builder::add, nisCache.getAccountStateCache());
 		this.visitBatchSubValidators(builder::add, nisCache.getTransactionHashCache());
 		return builder.build();
 	}
@@ -45,7 +45,7 @@ public class TransactionValidatorFactory {
 	 * @param accountStateRepository The poi facade.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final AccountStateRepository accountStateRepository) {
+	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateRepository accountStateRepository) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		this.visitSingleSubValidators(builder::add, accountStateRepository);
 		return builder.build();
@@ -69,7 +69,9 @@ public class TransactionValidatorFactory {
 	 * @param visitor The visitor.
 	 * @param accountStateRepository The poi facade.
 	 */
-	public void visitSingleSubValidators(final Consumer<SingleTransactionValidator> visitor, final AccountStateRepository accountStateRepository) {
+	public void visitSingleSubValidators(
+			final Consumer<SingleTransactionValidator> visitor,
+			final ReadOnlyAccountStateRepository accountStateRepository) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());

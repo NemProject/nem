@@ -168,7 +168,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private TimeSynchronizationStrategy createTimeSynchronizationStrategy() {
 		return new DefaultTimeSynchronizationStrategy(
 				new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter())),
-				this.nisCache.getPoiFacade());
+				this.nisCache.getPoiFacade(),
+				this.nisCache.getAccountStateCache());
 	}
 
 	private PeerNetworkServicesFactory createNetworkServicesFactory(final PeerNetworkState networkState) {
@@ -194,7 +195,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				this.nisConfiguration.getTimeSyncNodeLimit(),
 				config.getTrustProvider(),
 				networkState,
-				this.nisCache.getPoiFacade());
+				this.nisCache.getPoiFacade(),
+				this.nisCache.getAccountStateCache());
 		return new PeerNetworkBootstrapper(
 				networkState,
 				this.createNetworkServicesFactory(networkState),

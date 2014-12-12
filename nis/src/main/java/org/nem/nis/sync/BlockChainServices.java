@@ -50,8 +50,8 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
-		final AccountStateRepository poiFacade = nisCache.getPoiFacade();
-		final BlockScorer scorer = new BlockScorer(poiFacade);
+		final AccountStateRepository accountStateCache = nisCache.getAccountStateCache();
+		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
@@ -61,9 +61,9 @@ public class BlockChainServices {
 				block -> executor.execute(block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
-				this.blockValidatorFactory.create(nisCache.asReadOnly()),
-				this.transactionValidatorFactory.createSingle(poiFacade),
-				poiFacade.getDebitPredicate());
+				this.blockValidatorFactory.create(nisCache),
+				this.transactionValidatorFactory.createSingle(accountStateCache),
+				accountStateCache.getDebitPredicate());
 		return validator.isValid(parentBlock, peerChain);
 	}
 
@@ -79,8 +79,8 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final BlockLookup localBlockLookup,
 			final BlockHeight commonBlockHeight) {
-		final AccountStateRepository poiFacade = nisCache.getPoiFacade();
-		final BlockScorer scorer = new BlockScorer(poiFacade);
+		final AccountStateRepository accountStateCache = nisCache.getAccountStateCache();
+		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
 		// this is delicate and the order matters, first visitor during undo changes amount of foraged blocks
@@ -95,7 +95,7 @@ public class BlockChainServices {
 				localBlockLookup,
 				commonBlockHeight,
 				visitor);
-		nisCache.getPoiFacade().undoVesting(commonBlockHeight);
+		accountStateCache.undoVesting(commonBlockHeight);
 		return scoreVisitor.getScore();
 	}
 

@@ -32,7 +32,7 @@ public class BlockTransactionObserverFactory {
 	}
 
 	private static AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache) {
-		final AccountStateRepository accountStateRepository = nisCache.getPoiFacade();
+		final AccountStateRepository accountStateRepository = nisCache.getAccountStateCache();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new WeightedBalancesObserver(accountStateRepository));
 		builder.add(new AccountsHeightObserver(nisCache));

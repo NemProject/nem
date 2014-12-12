@@ -236,7 +236,7 @@ public class TransactionControllerTest {
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			this.debitPredicate = Mockito.mock(DebitPredicate.class);
-			final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+			final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 			Mockito.when(accountStateRepository.getDebitPredicate()).thenReturn(this.debitPredicate);
 
 			this.controller = new TransactionController(

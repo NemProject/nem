@@ -55,7 +55,7 @@ public class Network {
 	private final int viewSize;
 	private final NodeSettings nodeSettings;
 	private TimeSynchronizationStrategy syncStrategy;
-	private PoiFacade poiFacade;
+	private AccountStateRepository poiFacade;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
@@ -78,7 +78,7 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		this.poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
+		this.poiFacade = new DefaultAccountStateRepository();
 		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
@@ -130,9 +130,12 @@ public class Network {
 		return this.hasConverged;
 	}
 
-	private TimeSynchronizationStrategy createSynchronizationStrategy(final PoiFacade facade) {
+	private TimeSynchronizationStrategy createSynchronizationStrategy(final AccountStateRepository accountStateRepository) {
 		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
-		return new DefaultTimeSynchronizationStrategy(filter, facade);
+		return new DefaultTimeSynchronizationStrategy(
+				filter,
+				new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class)),
+				accountStateRepository);
 	}
 
 	/**
@@ -251,7 +254,7 @@ public class Network {
 	}
 
 	private AccountStateRepository resetFacade() {
-		this.poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
+		this.poiFacade = new DefaultAccountStateRepository();
 		this.syncStrategy = this.createSynchronizationStrategy(this.poiFacade);
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);

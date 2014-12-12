@@ -77,7 +77,7 @@ public class AccountInfoFactoryTest {
 		private final AccountState accountState = new AccountState(this.address);
 
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		private final AccountInfoFactory factory = new AccountInfoFactory(this.accountLookup, this.accountStateRepository);
 
 		private TestContext() {

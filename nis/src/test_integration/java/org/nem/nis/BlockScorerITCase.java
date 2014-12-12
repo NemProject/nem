@@ -681,7 +681,7 @@ public class BlockScorerITCase {
 	//	}
 
 	private static BlockScorer createBlockScorer() {
-		return new BlockScorer(new DefaultPoiFacade(NisUtils.createImportanceCalculator()));
+		return new BlockScorer(new DefaultAccountStateRepository());
 	}
 
 	private static class AccountWithInfo extends Account {

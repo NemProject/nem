@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.NodeCollection;
 import org.nem.core.test.NodeUtils;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.peer.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
@@ -23,7 +23,8 @@ public class ImportanceAwareNodeSelectorFactoryTest {
 				15,
 				config.getTrustProvider(),
 				new PeerNetworkState(config, new NodeExperiences(), new NodeCollection()),
-				this.createPoiFacade());
+				Mockito.mock(PoiFacade.class),
+				Mockito.mock(AccountStateRepository.class));
 
 		// Assert:
 		Assert.assertThat(factory.createNodeSelector(), IsNull.notNullValue());
@@ -40,9 +41,5 @@ public class ImportanceAwareNodeSelectorFactoryTest {
 		Mockito.when(config.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 		Mockito.when(config.getPreTrustedNodes()).thenReturn(new PreTrustedNodes(new HashSet<>()));
 		return config;
-	}
-
-	private PoiFacade createPoiFacade() {
-		return Mockito.mock(PoiFacade.class);
 	}
 }

@@ -57,7 +57,7 @@ public class BalanceCommitTransferObserverTest {
 	}
 
 	private static class TestContext {
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.accountStateRepository);
 
 		public ReadOnlyAccountInfo add(final Account account, final Amount amount) {

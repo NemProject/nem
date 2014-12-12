@@ -51,7 +51,7 @@ public class BlockExecutorTest {
 		private final MockTransaction[] transactions;
 		private final List<Integer> executeList = new ArrayList<>();
 		private final List<Integer> undoList = new ArrayList<>();
-		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final AccountStateRepository poiFacade = Mockito.mock(AccountStateRepository.class);
 		private final NisCache nisCache = NisCacheFactory.create(this.poiFacade);
 		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
@@ -392,7 +392,7 @@ public class BlockExecutorTest {
 	//endregion
 
 	private static class ExecutorTestContext {
-		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
+		private final AccountStateRepository poiFacade = Mockito.mock(AccountStateRepository.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.poiFacade) ;
 		private final BlockExecutor executor = new BlockExecutor(this.nisCache);

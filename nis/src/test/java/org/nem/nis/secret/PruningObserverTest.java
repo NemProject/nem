@@ -223,7 +223,7 @@ public class PruningObserverTest {
 	}
 
 	private static class TestContext {
-		private final AccountStateRepository accountStateRepository = Mockito.mock(PoiFacade.class);
+		private final AccountStateRepository accountStateRepository = Mockito.mock(AccountStateRepository.class);
 		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
 		private final List<AccountState> accountStates = new ArrayList<>();
 		private final BlockTransactionObserver observer = new PruningObserver(this.accountStateRepository, this.transactionHashCache);
