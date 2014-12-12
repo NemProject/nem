@@ -8,7 +8,8 @@ import org.nem.nis.validators.DebitPredicate;
 /**
  * A repository of all NEM account state.
  */
-public interface AccountStateRepository extends Iterable<AccountState> {
+public interface AccountStateRepository extends Iterable<AccountState>, ReadOnlyAccountStateRepository {
+
 	/**
 	 * Finds a poi account state given an address. This function will NOT return
 	 * forwarded states.

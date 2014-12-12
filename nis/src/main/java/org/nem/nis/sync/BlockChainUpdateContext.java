@@ -22,7 +22,7 @@ public class BlockChainUpdateContext {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdateContext.class.getName());
 
 	private final NisCache nisCache;
-	private final NisCache originalNisCache;
+	private final ReadOnlyNisCache originalNisCache;
 	private final BlockScorer blockScorer;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
@@ -36,7 +36,7 @@ public class BlockChainUpdateContext {
 
 	public BlockChainUpdateContext(
 			final NisCache nisCache,
-			final NisCache originalNisCache,
+			final ReadOnlyNisCache originalNisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
@@ -130,7 +130,8 @@ public class BlockChainUpdateContext {
 	 * 4. update db with "peer's" chain
 	 */
 	private void updateOurChain() {
-		this.nisCache.shallowCopyTo(this.originalNisCache);
+		// TODO 20141212 J-*: change to copyFrom
+		//this.nisCache.shallowCopyTo(this.originalNisCache);
 
 		if (this.hasOwnChain) {
 			// mind that we're using "new" (replaced) accountAnalyzer

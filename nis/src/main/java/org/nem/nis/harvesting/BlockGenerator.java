@@ -4,7 +4,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.BlockValidator;
@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class BlockGenerator {
 	private static final Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockDao blockDao;
 	private final BlockScorer blockScorer;
@@ -32,7 +32,7 @@ public class BlockGenerator {
 	 * @param blockDao The block dao.
 	 */
 	public BlockGenerator(
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final BlockDao blockDao,
 			final BlockScorer blockScorer,

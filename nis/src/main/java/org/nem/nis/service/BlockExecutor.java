@@ -3,7 +3,7 @@ package org.nem.nis.service;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;

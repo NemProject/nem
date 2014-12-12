@@ -1,11 +1,9 @@
 package org.nem.nis.cache;
 
-import org.nem.nis.state.ReadOnlyAccountState;
-
 /**
  * The central point for accessing NIS-mutable data.
  */
-public class NisCache {
+public class ReadOnlyNisCache {
 	private final AccountCache accountCache;
 	private final SynchronizedPoiFacade poiFacade;
 	private final HashCache transactionHashCache;
@@ -17,7 +15,7 @@ public class NisCache {
 	 * @param poiFacade The poi facade.
 	 * @param transactionHashCache the transaction hash cache.
 	 */
-	public NisCache(
+	public ReadOnlyNisCache(
 			final AccountCache accountCache,
 			final SynchronizedPoiFacade poiFacade,
 			final HashCache transactionHashCache) {
@@ -36,11 +34,11 @@ public class NisCache {
 	}
 
 	/**
-	 * Gets the account cache.
+	 * Gets the account state cache.
 	 *
-	 * @return The account cache.
+	 * @return The account state cache.
 	 */
-	public AccountStateRepository getPoiFacade() {
+	public PoiFacade getPoiFacade() {
 		return this.poiFacade;
 	}
 
@@ -54,18 +52,25 @@ public class NisCache {
 	}
 
 	/**
-	 * Creates a read-only representation of this cache.
+	 * Creates a deep copy of this NIS cache.
 	 *
-	 * @return A read-only representation of this cache.
+	 * @return The copy.
 	 */
-	public ReadOnlyNisCache asReadOnly() {
-		return new ReadOnlyNisCache(
-				this.accountCache,
-				this.poiFacade,
-				this.transactionHashCache);
+	public NisCache copy() {
+		return null; //new ReadOnlyNisCache(this.accountCache.copy(), this.poiFacade.copy(), this.transactionHashCache.copy());
 	}
 
-	public void commit(final ReadOnlyAccountState accountState) {
+	/**
+	 * Shallow copies the contents of this NIS cache to the specified cache.
+	 *
+	 * @param nisCache The other cache.
+	 */
+	public void shallowCopyTo(final ReadOnlyNisCache nisCache) {
+		this.accountCache.shallowCopyTo(nisCache.getAccountCache());
+		this.poiFacade.shallowCopyTo(nisCache.poiFacade);
+		this.transactionHashCache.shallowCopyTo(nisCache.getTransactionHashCache());
+	}
 
+	public void commit(final NisCache nisCache) {
 	}
 }

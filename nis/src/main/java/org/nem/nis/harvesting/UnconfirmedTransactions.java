@@ -25,7 +25,7 @@ public class UnconfirmedTransactions {
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 
 	private enum BalanceValidationOptions {
 		/**
@@ -58,7 +58,7 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
-			final NisCache nisCache) {
+			final ReadOnlyNisCache nisCache) {
 		this(
 				new ArrayList<>(),
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
@@ -70,7 +70,7 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
-			final NisCache nisCache) {
+			final ReadOnlyNisCache nisCache) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator();

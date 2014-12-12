@@ -2,7 +2,7 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -13,14 +13,14 @@ import java.util.Collection;
  * Helper class for creating contexts used during block synchronization.
  */
 public class BlockChainContextFactory {
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 
 	public BlockChainContextFactory(
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,

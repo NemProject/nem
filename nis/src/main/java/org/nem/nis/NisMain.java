@@ -8,7 +8,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.state.AccountState;
@@ -32,7 +32,7 @@ public class NisMain {
 
 	private final AccountDao accountDao;
 	private final BlockDao blockDao;
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final NisPeerNetworkHost networkHost;
 	private final NisConfiguration nisConfiguration;
 	private final BlockAnalyzer blockAnalyzer;
@@ -41,7 +41,7 @@ public class NisMain {
 	public NisMain(
 			final AccountDao accountDao,
 			final BlockDao blockDao,
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final NisPeerNetworkHost networkHost,
 			final NisConfiguration nisConfiguration,
 			final BlockAnalyzer blockAnalyzer) {
@@ -87,15 +87,18 @@ public class NisMain {
 
 	private NemesisBlock loadNemesisBlock() {
 		// set up the nemesis block amounts
-		this.nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
+		final NisCache nisCache = this.nisCache.copy();
+		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
-		final AccountState nemesisState = this.nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		final AccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
 		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(this.nisCache.getAccountCache().asAutoCache()));
+		final NemesisBlock nemesisBlock = NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
+		this.nisCache.commit(nisCache);
+		return nemesisBlock;
 	}
 
 	private void logNemesisInformation() {

@@ -32,7 +32,7 @@ public class TransactionValidatorFactory {
 	 * @param nisCache The NIS cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator create(final NisCache nisCache) {
+	public SingleTransactionValidator create(final ReadOnlyNisCache nisCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		this.visitSingleSubValidators(builder::add, nisCache.getPoiFacade());
 		this.visitBatchSubValidators(builder::add, nisCache.getTransactionHashCache());

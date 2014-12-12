@@ -3,11 +3,8 @@ package org.nem.nis.cache;
 import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.nis.cache.HashCache;
-import org.nem.nis.cache.*;
-import org.nem.nis.cache.PoiFacade;
 
-public class NisCacheTest {
+public class ReadOnlyNisCacheTest {
 
 	@Test
 	public void canCreateNisCache() {
@@ -17,7 +14,7 @@ public class NisCacheTest {
 		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
 
 		// Act:
-		final NisCache cache = new NisCache(accountCache, poiFacade, transactionsHashCache);
+		final ReadOnlyNisCache cache = new ReadOnlyNisCache(accountCache, poiFacade, transactionsHashCache);
 
 		// Assert:
 		Assert.assertThat(cache.getAccountCache(), IsSame.sameInstance(accountCache));
@@ -69,6 +66,6 @@ public class NisCacheTest {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		private final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
-		private final NisCache cache = new NisCache(this.accountCache, this.poiFacade, this.transactionsHashCache);
+		private final ReadOnlyNisCache cache = new ReadOnlyNisCache(this.accountCache, this.poiFacade, this.transactionsHashCache);
 	}
 }

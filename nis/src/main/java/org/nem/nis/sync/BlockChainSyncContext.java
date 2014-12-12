@@ -2,7 +2,7 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.primitive.*;
 import org.nem.nis.*;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
@@ -19,7 +19,7 @@ public class BlockChainSyncContext {
 	private final BlockChainScore ourScore;
 
 	public BlockChainSyncContext(
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,

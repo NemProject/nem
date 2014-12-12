@@ -321,7 +321,7 @@ public class BlockGeneratorTest {
 		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		private final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		private final BlockGenerator generator = new BlockGenerator(
-				NisUtils.createNisCache(this.accountCache, this.poiFacade),
+				NisUtils.createReadOnlyNisCache(this.accountCache, this.poiFacade),
 				this.unconfirmedTransactions,
 				this.blockDao,
 				this.scorer,

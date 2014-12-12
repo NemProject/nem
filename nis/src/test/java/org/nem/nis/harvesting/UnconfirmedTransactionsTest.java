@@ -1080,7 +1080,7 @@ public class UnconfirmedTransactionsTest {
 			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisUtils.createNisCache(this.poiFacade, transactionHashCache));
+					NisUtils.createReadOnlyNisCache(this.poiFacade, transactionHashCache));
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {

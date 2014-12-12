@@ -219,8 +219,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public NisCache nisCache() {
-		return new NisCache(this.accountCache(), this.poiFacade(), this.transactionHashCache());
+	public ReadOnlyNisCache nisCache() {
+		return new ReadOnlyNisCache(this.accountCache(), this.poiFacade(), this.transactionHashCache());
 	}
 
 	@Bean

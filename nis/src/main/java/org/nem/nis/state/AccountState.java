@@ -5,7 +5,6 @@ import org.nem.core.model.primitive.BlockHeight;
 
 /**
  * Class containing extrinsic in-memory mutable account information.
- * TODO 20141209 J-*: really, really need to rename this class to AccountState!!!
  */
 public class AccountState implements ReadOnlyAccountState {
 	private final Address address;
@@ -78,7 +77,7 @@ public class AccountState implements ReadOnlyAccountState {
 	 *
 	 * @return The account info.
 	 */
-	public ReadOnlyAccountInfo getAccountInfo() {
+	public AccountInfo getAccountInfo() {
 		return this.accountInfo;
 	}
 

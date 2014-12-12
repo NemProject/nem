@@ -4,11 +4,12 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.cache.PoiFacade;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 
@@ -49,7 +50,7 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
-		final PoiFacade poiFacade = nisCache.getPoiFacade();
+		final AccountStateRepository poiFacade = nisCache.getPoiFacade();
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
@@ -60,7 +61,7 @@ public class BlockChainServices {
 				block -> executor.execute(block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
-				this.blockValidatorFactory.create(nisCache),
+				this.blockValidatorFactory.create(nisCache.asReadOnly()),
 				this.transactionValidatorFactory.createSingle(poiFacade),
 				poiFacade.getDebitPredicate());
 		return validator.isValid(parentBlock, peerChain);
@@ -78,7 +79,7 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final BlockLookup localBlockLookup,
 			final BlockHeight commonBlockHeight) {
-		final PoiFacade poiFacade = nisCache.getPoiFacade();
+		final AccountStateRepository poiFacade = nisCache.getPoiFacade();
 		final BlockScorer scorer = new BlockScorer(poiFacade);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 

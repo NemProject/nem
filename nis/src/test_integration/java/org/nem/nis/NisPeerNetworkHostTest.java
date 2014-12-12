@@ -9,8 +9,8 @@ import org.nem.core.node.*;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
-import org.nem.nis.cache.NisCache;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.peer.connect.*;
 
 import java.util.List;
@@ -156,7 +156,7 @@ public class NisPeerNetworkHostTest {
 	}
 
 	private static NisPeerNetworkHost createNetwork() {
-		final NisCache nisCache = Mockito.mock(NisCache.class);
+		final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
 		Mockito.when(nisCache.getPoiFacade()).thenReturn(Mockito.mock(PoiFacade.class));
 
 		final AuditCollection auditCollection = new AuditCollection(10, new SystemTimeProvider());

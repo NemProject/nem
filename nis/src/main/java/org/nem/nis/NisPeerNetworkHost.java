@@ -7,7 +7,7 @@ import org.nem.core.node.*;
 import org.nem.deploy.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.*;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.service.ChainServices;
 import org.nem.nis.time.synchronization.*;
 import org.nem.nis.time.synchronization.filter.*;
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * NIS PeerNetworkHost
  */
 public class NisPeerNetworkHost implements AutoCloseable {
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final CountingBlockSynchronizer synchronizer;
 	private final PeerNetworkScheduler scheduler;
 	private final ChainServices chainServices;
@@ -39,7 +39,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	@Autowired(required = true)
 	public NisPeerNetworkHost(
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final CountingBlockSynchronizer synchronizer,
 			final PeerNetworkScheduler scheduler,
 			final ChainServices chainServices,

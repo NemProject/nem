@@ -31,14 +31,14 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,

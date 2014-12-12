@@ -2,7 +2,7 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.cache.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountImportance;
 
 import java.math.BigInteger;
@@ -39,9 +39,9 @@ public class BlockScorer {
 	 */
 	private static final int POI_GROUPING = 359;
 
-	public final PoiFacade poiFacade;
+	public final AccountStateRepository poiFacade;
 
-	public BlockScorer(final PoiFacade poiFacade) {
+	public BlockScorer(final AccountStateRepository poiFacade) {
 		this.poiFacade = poiFacade;
 	}
 
@@ -99,7 +99,7 @@ public class BlockScorer {
 	 */
 	public long calculateForgerBalance(final Block block) {
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(block.getHeight());
-		this.poiFacade.recalculateImportances(groupedHeight);
+		// TODO 20141212 broke poi!!! this.poiFacade.recalculateImportances(groupedHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
 		final AccountImportance accountImportance = this.poiFacade

@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.cache.NisCache;
+import org.nem.nis.cache.*;
 
 import java.util.function.Consumer;
 
@@ -26,7 +26,7 @@ public class BlockValidatorFactory {
 	 * @param nisCache The NIS cache.
 	 * @return The validator.
 	 */
-	public BlockValidator create(final NisCache nisCache) {
+	public BlockValidator create(final ReadOnlyNisCache nisCache) {
 		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
 		this.visitSubValidators(builder::add, nisCache);
 		return builder.build();
@@ -38,7 +38,7 @@ public class BlockValidatorFactory {
 	 * @param visitor The visitor.
 	 * @param nisCache The NIS cache.
 	 */
-	public void visitSubValidators(final Consumer<BlockValidator> visitor, final NisCache nisCache) {
+	public void visitSubValidators(final Consumer<BlockValidator> visitor, final ReadOnlyNisCache nisCache) {
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransactionDeadlineBlockValidator());
 		visitor.accept(new EligibleSignerBlockValidator(nisCache.getPoiFacade()));

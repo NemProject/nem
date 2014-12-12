@@ -156,16 +156,16 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				nisCache);
+				nisCache.asReadOnly());
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				nisCache,
+				nisCache.asReadOnly(),
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
 				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
-						nisCache,
+						nisCache.asReadOnly(),
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,
@@ -241,16 +241,16 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				nisCache);
+				nisCache.asReadOnly());
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
-				nisCache,
+				nisCache.asReadOnly(),
 				blockChainLastBlockLayer,
 				mockBlockDao,
 				services,
 				unconfirmedTransactions);
 		final BlockChainUpdater updater =
 				new BlockChainUpdater(
-						nisCache,
+						nisCache.asReadOnly(),
 						accountDao,
 						blockChainLastBlockLayer,
 						mockBlockDao,

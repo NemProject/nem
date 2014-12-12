@@ -309,10 +309,10 @@ public class NisUtils {
 	 * @return The NIS cache.
 	 */
 	public static NisCache createRealNisCache() {
-		return new NisCache(
+		return null; /*new ReadOnlyNisCache(
 				new AccountCache(),
 				new SynchronizedPoiFacade(new DefaultPoiFacade(createImportanceCalculator())),
-				new HashCache());
+				new HashCache());*/
 	}
 
 	/**
@@ -322,10 +322,10 @@ public class NisUtils {
 	 * @return The NIS cache.
 	 */
 	public static NisCache createRealNisCache(final DefaultPoiFacade poiFacade) {
-		return new NisCache(
+		return null; /*new ReadOnlyNisCache(
 				new AccountCache(),
 				new SynchronizedPoiFacade(poiFacade),
-				new HashCache());
+				new HashCache());*/
 	}
 
 	/**
@@ -335,10 +335,10 @@ public class NisUtils {
 	 * @return The NIS cache.
 	 */
 	public static NisCache createNisCache(final AccountCache accountCache) {
-		return new NisCache(
+		return null; /*new ReadOnlyNisCache(
 				accountCache,
 				Mockito.mock(SynchronizedPoiFacade.class),
-				Mockito.mock(HashCache.class));
+				Mockito.mock(HashCache.class));*/
 	}
 
 	/**
@@ -349,7 +349,48 @@ public class NisUtils {
 	 * @return The NIS cache.
 	 */
 	public static NisCache createNisCache(final AccountCache accountCache, final DefaultPoiFacade poiFacade) {
-		return new NisCache(
+		return null; /*return new ReadOnlyNisCache(
+				accountCache,
+				new SynchronizedPoiFacade(poiFacade),
+				Mockito.mock(HashCache.class));*/
+	}
+
+	/**
+	 * Creates a NIS cache around a poi facade.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @return The NIS cache.
+	 */
+	public static NisCache createNisCache(final DefaultPoiFacade poiFacade) {
+		return null; /*return new ReadOnlyNisCache(
+				Mockito.mock(AccountCache.class),
+				new SynchronizedPoiFacade(poiFacade),
+				Mockito.mock(HashCache.class));*/
+	}
+
+	/**
+	 * Creates a NIS cache around a poi facade and hash cache.
+	 *
+	 * @param poiFacade The poi facade.
+	 * @param hashCache The hash cache.
+	 * @return The NIS cache.
+	 */
+	public static NisCache createNisCache(final DefaultPoiFacade poiFacade, final HashCache hashCache) {
+		return /*new ReadOnlyNisCache(
+				Mockito.mock(AccountCache.class),
+				new SynchronizedPoiFacade(poiFacade),
+				hashCache);*/ null;
+	}
+
+	/**
+	 * Creates a NIS cache around an account cache and poi facade.
+	 *
+	 * @param accountCache The account cache.
+	 * @param poiFacade The poi facade.
+	 * @return The NIS cache.
+	 */
+	public static ReadOnlyNisCache createReadOnlyNisCache(final AccountCache accountCache, final DefaultPoiFacade poiFacade) {
+		return new ReadOnlyNisCache(
 				accountCache,
 				new SynchronizedPoiFacade(poiFacade),
 				Mockito.mock(HashCache.class));
@@ -361,8 +402,8 @@ public class NisUtils {
 	 * @param poiFacade The poi facade.
 	 * @return The NIS cache.
 	 */
-	public static NisCache createNisCache(final DefaultPoiFacade poiFacade) {
-		return new NisCache(
+	public static ReadOnlyNisCache createReadOnlyNisCache(final DefaultPoiFacade poiFacade) {
+		return new ReadOnlyNisCache(
 				Mockito.mock(AccountCache.class),
 				new SynchronizedPoiFacade(poiFacade),
 				Mockito.mock(HashCache.class));
@@ -375,12 +416,11 @@ public class NisUtils {
 	 * @param hashCache The hash cache.
 	 * @return The NIS cache.
 	 */
-	public static NisCache createNisCache(final DefaultPoiFacade poiFacade, final HashCache hashCache) {
-		return new NisCache(
+	public static ReadOnlyNisCache createReadOnlyNisCache(final DefaultPoiFacade poiFacade, final HashCache hashCache) {
+		return new ReadOnlyNisCache(
 				Mockito.mock(AccountCache.class),
 				new SynchronizedPoiFacade(poiFacade),
 				hashCache);
 	}
-
 	//endregion
 }

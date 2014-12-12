@@ -19,7 +19,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final SingleTransactionValidator validator = factory.create(Mockito.mock(NisCache.class));
+		final SingleTransactionValidator validator = factory.create(Mockito.mock(ReadOnlyNisCache.class));
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());

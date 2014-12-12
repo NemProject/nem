@@ -5,6 +5,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.*;
 
 public interface ReadOnlyAccountStateRepository {
+
 	/**
 	 * Finds a poi account state given an address. This function will NOT return
 	 * forwarded states.

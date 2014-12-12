@@ -374,7 +374,7 @@ public class BlockChainValidatorIntegrationTest {
 		public int maxChainSize = 21;
 		public final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 		public final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		public final NisCache nisCache = NisUtils.createNisCache(this.poiFacade, this.transactionHashCache);
+		public final ReadOnlyNisCache nisCache = NisUtils.createReadOnlyNisCache(this.poiFacade, this.transactionHashCache);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.nisCache);
 		public final SingleTransactionValidator transactionValidator;
 
