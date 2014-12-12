@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
@@ -601,14 +601,70 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
+	// region getUnknownTransactions
+
+	@Test
+	public void getUnknownTransactionsReturnsAllTransactionsIfHashShortIdListIsEmpty() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(3);
+		context.signAndAddNewBatch(transactions);
+
+		// Act:
+		final List<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(new ArrayList<>());
+
+		// Assert:
+		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(transactions));
+	}
+
+	@Test
+	public void getUnknownTransactionsFiltersKnownTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(6);
+		context.signAndAddNewBatch(transactions);
+		final List<HashShortId> hashShortIds = new ArrayList<>();
+		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(1)).getShortId()));
+		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(2)).getShortId()));
+		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(4)).getShortId()));
+
+		// Act:
+		final List<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
+
+		// Assert:
+		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(Arrays.asList(
+				transactions.get(0),
+				transactions.get(3),
+				transactions.get(5))));
+	}
+
+	@Test
+	public void getUnknownTransactionsReturnsEmptyListIfAllTransactionsAreKnown() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(6);
+		context.signAndAddNewBatch(transactions);
+		final List<HashShortId> hashShortIds = transactions.stream()
+				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
+				.collect(Collectors.toList());
+
+		// Act:
+		final List<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
+
+		// Assert:
+		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(new ArrayList<>()));
+	}
+
+	// endregion
+
 	//region getMostRecentTransactions
 
 	@Test
 	public void getMostRecentTransactionsReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
-		transactions.forEach(context::signAndAddExisting);
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		context.signAndAddNewBatch(transactions);
 
 		// Act:
 		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(20);
@@ -621,8 +677,8 @@ public class UnconfirmedTransactionsTest {
 	public void getMostRecentTransactionsReturnsMaximumTransactionsIfMoreThanGivenLimitTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(20);
-		transactions.forEach(context::signAndAddExisting);
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(20);
+		context.signAndAddNewBatch(transactions);
 
 		// Act:
 		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(10);
@@ -635,8 +691,8 @@ public class UnconfirmedTransactionsTest {
 	public void getMostRecentTransactionsReturnsMaximumTransactionsIfGivenLimitTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
-		transactions.forEach(context::signAndAddExisting);
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		context.signAndAddNewBatch(transactions);
 
 		// Act:
 		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(10);
@@ -649,8 +705,8 @@ public class UnconfirmedTransactionsTest {
 	public void getMostRecentTransactionsReturnsTransactionsSortedByTimeInDescendingOrder() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<MockTransaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
-		transactions.forEach(context::signAndAddExisting);
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		context.signAndAddNewBatch(transactions);
 
 		// Act:
 		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(25);
@@ -1193,8 +1249,8 @@ public class UnconfirmedTransactionsTest {
 			return transactions;
 		}
 
-		private List<MockTransaction> createMockTransactionsWithRandomTimeStamp(final int count) {
-			final List<MockTransaction> transactions = new ArrayList<>();
+		private List<Transaction> createMockTransactionsWithRandomTimeStamp(final int count) {
+			final List<Transaction> transactions = new ArrayList<>();
 			final SecureRandom random = new SecureRandom();
 
 			for (int i = 0; i < count; ++i) {

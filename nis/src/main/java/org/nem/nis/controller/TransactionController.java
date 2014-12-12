@@ -8,11 +8,12 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
-import org.nem.peer.node.*;
+import org.nem.peer.node.AuthenticatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -109,16 +110,16 @@ public class TransactionController {
 	/**
 	 * Gets unconfirmed transaction information.
 	 *
-	 * @param challenge The node challenge.
+	 * @param request The authenticated unconfirmed transactions request.
 	 * @return List of unconfirmed transactions.
 	 */
 	@RequestMapping(value = "/transactions/unconfirmed", method = RequestMethod.POST)
 	@P2PApi
 	@AuthenticatedApi
-	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(@RequestBody final NodeChallenge challenge) {
+	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(@RequestBody final AuthenticatedUnconfirmedTransactionsRequest request) {
 		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions());
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), challenge);
+		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), request.getChallenge());
 	}
 
 	private Collection<Transaction> getUnconfirmedTransactions() {

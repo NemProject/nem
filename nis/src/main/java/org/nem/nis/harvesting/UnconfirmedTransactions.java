@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisCache;
 import org.nem.nis.poi.PoiFacade;
@@ -247,6 +247,23 @@ public class UnconfirmedTransactions {
 				.collect(Collectors.toList());
 
 		return this.sortTransactions(transactions);
+	}
+
+	/**
+	 * Gets the transactions for which its hash short id is not in the given collection.
+	 *
+	 * @return The unknown transactions.
+	 */
+	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
+		// probably faster to use hash map than collection
+		final HashMap<HashShortId, Integer> unknownHashShortIds = new HashMap<>(this.transactions.size());
+		this.transactions.values().stream()
+				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), 0));
+		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
+
+		return this.transactions.values().stream()
+				.filter(t -> unknownHashShortIds.containsKey(new HashShortId(HashUtils.calculateHash(t).getShortId())))
+				.collect(Collectors.toList());
 	}
 
 	/**

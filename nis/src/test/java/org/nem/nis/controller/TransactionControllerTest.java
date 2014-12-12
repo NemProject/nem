@@ -12,6 +12,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.PushService;
@@ -178,7 +179,7 @@ public class TransactionControllerTest {
 		// Assert:
 		final AuthenticatedResponse<?> response = runTransactionsUnconfirmedTest(
 				context,
-				c -> c.controller.transactionsUnconfirmed(challenge),
+				c -> c.controller.transactionsUnconfirmed(new AuthenticatedUnconfirmedTransactionsRequest(challenge)),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
