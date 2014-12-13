@@ -259,7 +259,7 @@ public class BlockScorerTest {
 		final Block block = new Block(account, Hash.ZERO, Hash.ZERO, new TimeInstant(timeStamp), new BlockHeight(height));
 		block.sign();
 
-		final AccountCache accountCache = new AccountCache();
+		final AccountCache accountCache = new DefaultAccountCache();
 		accountCache.addAccountToCache(account.getAddress());
 		return roundTripBlock(accountCache, block);
 	}

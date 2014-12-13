@@ -9,7 +9,7 @@ import org.nem.nis.cache.AccountCache;
 import java.util.*;
 import java.util.stream.*;
 
-public class AccountCacheTest {
+public class DefaultAccountCacheTest {
 
 	//region addAccountToCache
 
@@ -283,7 +283,7 @@ public class AccountCacheTest {
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final AccountCache cache = createAccountCache();
+		final DefaultAccountCache cache = createAccountCache();
 
 		final Account account1 = cache.addAccountToCache(address1);
 		final Account account2 = cache.addAccountToCache(address2);
@@ -306,7 +306,7 @@ public class AccountCacheTest {
 	@Test
 	public void copyCreatesUnlinkedCacheCopy() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final DefaultAccountCache cache = createAccountCache();
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
@@ -326,7 +326,7 @@ public class AccountCacheTest {
 	public void copyReturnsSameAccountGivenPublicKeyOrAddress() {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
-		final AccountCache cache = createAccountCache();
+		final DefaultAccountCache cache = createAccountCache();
 
 		cache.addAccountToCache(address1);
 
@@ -351,14 +351,14 @@ public class AccountCacheTest {
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final AccountCache cache = createAccountCache();
+		final DefaultAccountCache cache = createAccountCache();
 
 		final Account account1 = cache.addAccountToCache(address1);
 		final Account account2 = cache.addAccountToCache(address2);
 		final Account account3 = cache.addAccountToCache(address3);
 
 		// Act:
-		final AccountCache copyCache = createAccountCache();
+		final DefaultAccountCache copyCache = createAccountCache();
 		cache.shallowCopyTo(copyCache);
 
 		final Account copyAccount1 = copyCache.findByAddress(address1);
@@ -377,11 +377,11 @@ public class AccountCacheTest {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
-		final AccountCache cache = createAccountCache();
+		final DefaultAccountCache cache = createAccountCache();
 
 		final Account account1 = cache.addAccountToCache(address1);
 
-		final AccountCache copyCache = createAccountCache();
+		final DefaultAccountCache copyCache = createAccountCache();
 		final Account account2 = copyCache.addAccountToCache(address2);
 
 		// Act:
@@ -421,7 +421,7 @@ public class AccountCacheTest {
 
 	//endregion
 
-	private static AccountCache createAccountCache() {
-		return new AccountCache();
+	private static DefaultAccountCache createAccountCache() {
+		return new DefaultAccountCache();
 	}
 }

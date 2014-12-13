@@ -4,7 +4,7 @@ package org.nem.nis.cache;
  * The central point for accessing NIS-mutable data.
  */
 public class DefaultNisCache implements ReadOnlyNisCache {
-	private final AccountCache accountCache;
+	private final DefaultAccountCache accountCache;
 	private final SynchronizedAccountStateCache accountStateCache;
 	private final SynchronizedPoiFacade poiFacade;
 	private final SynchronizedHashCache transactionHashCache;
@@ -13,11 +13,12 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
 	 *
 	 * @param accountCache The account cache.
+	 * @param accountStateCache The account state cache.
 	 * @param poiFacade The poi facade.
 	 * @param transactionHashCache the transaction hash cache.
 	 */
 	public DefaultNisCache(
-			final AccountCache accountCache,
+			final DefaultAccountCache accountCache,
 			final SynchronizedAccountStateCache accountStateCache,
 			final SynchronizedPoiFacade poiFacade,
 			final SynchronizedHashCache transactionHashCache) {
@@ -54,7 +55,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 	private static class DefaultNisCacheCopy implements NisCache {
 		private final DefaultNisCache cache;
-		private final AccountCache accountCache;
+		private final DefaultAccountCache accountCache;
 		private final SynchronizedAccountStateCache accountStateCache;
 		private final SynchronizedPoiFacade poiFacade;
 		private final SynchronizedHashCache transactionHashCache;

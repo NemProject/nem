@@ -11,7 +11,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.nis.*;
-import org.nem.nis.cache.AccountCache;
+import org.nem.nis.cache.*;
 import org.nem.peer.Config;
 import org.nem.peer.node.ImpersonatingPeerException;
 
@@ -26,7 +26,7 @@ public class HttpConnectorTest {
 	private final Communicator communicator = new HttpCommunicator(
 			new HttpMethodClient<>(),
 			CommunicationMode.JSON,
-			new DeserializationContext(new AccountCache()));
+			new DeserializationContext(new DefaultAccountCache()));
 	private final HttpConnector connector = new HttpConnector(this.communicator);
 
 	@Test

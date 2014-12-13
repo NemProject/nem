@@ -204,8 +204,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public AccountCache accountCache() {
-		return new AccountCache();
+	public DefaultAccountCache accountCache() {
+		return new DefaultAccountCache();
 	}
 
 	@Bean
