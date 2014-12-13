@@ -45,6 +45,7 @@ public class Harvester {
 		}
 
 		final TimeInstant blockTime = this.timeProvider.getCurrentTime();
+		this.generator.dropExpireTransactions(blockTime);
 		final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 
