@@ -37,7 +37,7 @@ public class RecalculateImportancesObserverTest {
 
 		// Assert:
 		Mockito.verify(context.poiFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
-		Mockito.verify(context.accountStateCache, Mockito.never()).iterator();
+		Mockito.verify(context.accountStateCache, Mockito.never()).mutableContents();
 	}
 
 	private static void assertImportanceRecalculation(final NotificationTrigger trigger) {
@@ -51,7 +51,7 @@ public class RecalculateImportancesObserverTest {
 
 		// Assert:
 		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(new BlockHeight(127)), Mockito.any());
-		Mockito.verify(context.accountStateCache, Mockito.only()).iterator();
+		Mockito.verify(context.accountStateCache, Mockito.only()).mutableContents();
 	}
 
 	private static class TestContext {
@@ -61,7 +61,7 @@ public class RecalculateImportancesObserverTest {
 		private final BlockTransactionObserver observer = new RecalculateImportancesObserver(this.nisCache);
 
 		public TestContext(){
-			Mockito.when(this.accountStateCache.iterator()).thenReturn(new ArrayList<AccountState>().iterator());
+			Mockito.when(this.accountStateCache.mutableContents()).thenReturn(new CacheContents<>(new ArrayList<>()));
 		}
 	}
 }

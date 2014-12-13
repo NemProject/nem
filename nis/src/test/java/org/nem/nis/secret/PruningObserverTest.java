@@ -239,7 +239,7 @@ public class PruningObserverTest {
 				this.accountStates.add(accountState);
 			}
 
-			Mockito.when(this.accountStateCache.iterator()).thenReturn(this.accountStates.iterator());
+			Mockito.when(this.accountStateCache.mutableContents()).thenReturn(new CacheContents<>(this.accountStates));
 			Mockito.when(this.transactionHashCache.getRetentionTime()).thenReturn(RETENTION_HOURS);
 		}
 

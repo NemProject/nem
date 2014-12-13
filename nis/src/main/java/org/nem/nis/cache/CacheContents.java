@@ -15,7 +15,7 @@ public class CacheContents<T> implements Iterable<T> {
 	 *
 	 * @param source The source collection.
 	 */
-	public CacheContents(final Collection<T> source) {
+	public CacheContents(final Collection<? extends T> source) {
 		this.contents = new ArrayList<>(source);
 	}
 

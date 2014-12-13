@@ -9,6 +9,7 @@ import org.nem.nis.state.*;
 import org.nem.nis.validators.DebitPredicate;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.*;
 
 public abstract class AccountStateCacheTest<T extends CopyableCache<T> & AccountStateCache> {
@@ -453,10 +454,21 @@ public abstract class AccountStateCacheTest<T extends CopyableCache<T> & Account
 
 	//endregion
 
-	//region iterator
+	//region contents / mutable contents
 
 	@Test
-	public void iteratorReturnsAllAccounts() {
+	public void contentsReturnsAllAccounts() {
+		// Assert:
+		this.assertContentsReturnsAllAccounts(cache -> cache.contents());
+	}
+
+	@Test
+	public void mutableContentsReturnsAllAccounts() {
+		// Assert:
+		this.assertContentsReturnsAllAccounts(cache -> cache.mutableContents());
+	}
+
+	private void assertContentsReturnsAllAccounts(final Function<AccountStateCache, CacheContents<? extends ReadOnlyAccountState>> toContents) {
 		// Arrange:
 		final AccountStateCache cache = this.createCache();
 
@@ -466,13 +478,12 @@ public abstract class AccountStateCacheTest<T extends CopyableCache<T> & Account
 		}
 
 		// Act:
-		final List<AccountState> iteratedAccountStates = StreamSupport.stream(cache.spliterator(), false)
-				.collect(Collectors.toList());
+		final Collection<? extends ReadOnlyAccountState> contents = toContents.apply(cache).asCollection();
 
 		// Assert:
-		Assert.assertThat(iteratedAccountStates.size(), IsEqual.equalTo(3));
+		Assert.assertThat(contents.size(), IsEqual.equalTo(3));
 		Assert.assertThat(
-				iteratedAccountStates.stream().map(AccountState::getAddress).collect(Collectors.toList()),
+				contents.stream().map(ReadOnlyAccountState::getAddress).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(accountStates.stream().map(AccountState::getAddress).collect(Collectors.toList())));
 	}
 

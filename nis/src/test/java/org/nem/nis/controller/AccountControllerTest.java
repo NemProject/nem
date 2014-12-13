@@ -356,7 +356,7 @@ public class AccountControllerTest {
 				createAccountState("sigma", 4, 88));
 
 		final TestContext context = new TestContext();
-		Mockito.when(context.accountStateCache.spliterator()).thenReturn(accountStates.spliterator());
+		Mockito.when(context.accountStateCache.contents()).thenReturn(new CacheContents<>(accountStates));
 
 		// Act:
 		final SerializableList<AccountImportanceViewModel> viewModels = context.controller.getImportances();

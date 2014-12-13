@@ -2,13 +2,13 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.DebitPredicate;
 
 /**
  * A repository of all NEM account state.
  */
-public interface AccountStateCache extends Iterable<AccountState>, ReadOnlyAccountStateCache {
+public interface AccountStateCache extends ReadOnlyAccountStateCache {
 
 	/**
 	 * Finds a poi account state given an address. This function will NOT return
@@ -85,4 +85,11 @@ public interface AccountStateCache extends Iterable<AccountState>, ReadOnlyAccou
 	 * @return The debit predicate.
 	 */
 	DebitPredicate getDebitPredicate();
+
+	/**
+	 * Gets the mutable contents of this cache.
+	 *
+	 * @return The cache contents.
+	 */
+	public CacheContents<AccountState> mutableContents();
 }

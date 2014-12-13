@@ -67,6 +67,11 @@ public class DefaultAccountStateCache implements AccountStateCache, CopyableCach
 	}
 
 	@Override
+	public CacheContents<ReadOnlyAccountState> contents() {
+		return new CacheContents<>(this.addressToStateMap.values());
+	}
+
+	@Override
 	public void removeFromCache(final Address address) {
 		this.addressToStateMap.remove(address);
 	}
@@ -85,6 +90,11 @@ public class DefaultAccountStateCache implements AccountStateCache, CopyableCach
 	}
 
 	@Override
+	public CacheContents<AccountState> mutableContents() {
+		return new CacheContents<>(this.addressToStateMap.values());
+	}
+
+	@Override
 	public void shallowCopyTo(final DefaultAccountStateCache rhs) {
 		rhs.addressToStateMap.clear();
 		rhs.addressToStateMap.putAll(this.addressToStateMap);
@@ -98,11 +108,5 @@ public class DefaultAccountStateCache implements AccountStateCache, CopyableCach
 		}
 
 		return copy;
-	}
-
-	// TODO: is this necessary?
-	@Override
-	public Iterator<AccountState> iterator() {
-		return this.addressToStateMap.values().iterator();
 	}
 }

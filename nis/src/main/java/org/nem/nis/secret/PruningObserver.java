@@ -40,7 +40,7 @@ public class PruningObserver implements BlockTransactionObserver {
 				? OUTLINK_BLOCK_HISTORY
 				: OUTLINK_BLOCK_HISTORY_OLD;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
-		for (final AccountState accountState : this.accountStateCache) {
+		for (final AccountState accountState : this.accountStateCache.mutableContents()) {
 			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}

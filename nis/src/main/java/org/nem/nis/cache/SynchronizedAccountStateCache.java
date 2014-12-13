@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.DebitPredicate;
 
 import java.util.Iterator;
@@ -21,14 +21,6 @@ public class SynchronizedAccountStateCache implements AccountStateCache, Copyabl
 	 */
 	public SynchronizedAccountStateCache(final DefaultAccountStateCache accountStateCache) {
 		this.accountStateCache = accountStateCache;
-	}
-
-	@Override
-	public Iterator<AccountState> iterator() {
-		// TODO 20141214 this really isn't synchronized.
-		synchronized (this.lock) {
-			return this.accountStateCache.iterator();
-		}
 	}
 
 	@Override
@@ -60,6 +52,13 @@ public class SynchronizedAccountStateCache implements AccountStateCache, Copyabl
 	}
 
 	@Override
+	public CacheContents<ReadOnlyAccountState> contents() {
+		synchronized (this.lock) {
+			return this.accountStateCache.contents();
+		}
+	}
+
+	@Override
 	public void removeFromCache(final Address address) {
 		synchronized (this.lock) {
 			this.accountStateCache.removeFromCache(address);
@@ -78,6 +77,13 @@ public class SynchronizedAccountStateCache implements AccountStateCache, Copyabl
 		// TODO 20141214 this really isn't synchronized.
 		synchronized (this.lock) {
 			return this.accountStateCache.getDebitPredicate();
+		}
+	}
+
+	@Override
+	public CacheContents<AccountState> mutableContents() {
+		synchronized (this.lock) {
+			return this.accountStateCache.mutableContents();
 		}
 	}
 
