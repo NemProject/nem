@@ -35,7 +35,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -60,7 +60,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -93,7 +93,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		addSignature.accept(context, transaction);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -113,7 +113,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(thirdAccount, context.multisig, FORK_HEIGHT);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(FORK_HEIGHT));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(FORK_HEIGHT, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS));
@@ -158,6 +158,11 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
 			multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner, HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
+		}
+
+		public boolean debitPredicate(Account account, Amount amount) {
+			final Amount balance = this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+			return balance.compareTo(amount) >= 0;
 		}
 	}
 

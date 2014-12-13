@@ -1024,13 +1024,13 @@ public class UnconfirmedTransactionsTest {
 	public void getTransactionForNewBlockCheckMultisigSignatures() {
 		// Arrange:
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		final UnconfirmedTransactions transactions = createUnconfirmedTransactionsWithRealValidator(poiFacade);
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(poiFacade);
 		final TimeInstant currentTime = new TimeInstant(11);
 
-		final Account multisig = Utils.generateRandomAccount(Amount.fromNem(10));
+		final Account multisig = Utils.generateRandomAccount(); //Amount.fromNem(10));
 		final Account recipient = Utils.generateRandomAccount();
-		final Account cosigner1 = Utils.generateRandomAccount(Amount.fromNem(101));
-		final Account cosigner2 = Utils.generateRandomAccount(Amount.fromNem(101));
+		final Account cosigner1 = Utils.generateRandomAccount(); //Amount.fromNem(101));
+		final Account cosigner2 = Utils.generateRandomAccount(); //Amount.fromNem(101));
 		final Transaction t1 = createTransferTransaction(currentTime, multisig, recipient, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
 		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
@@ -1045,11 +1045,11 @@ public class UnconfirmedTransactionsTest {
 		makeCosignatory(poiFacade, cosigner1, multisig);
 		makeCosignatory(poiFacade, cosigner2, multisig);
 
-		final ValidationResult result1 = transactions.addExisting(multisigTransaction);
-		final ValidationResult result2 = transactions.addExisting(signatureTransaction);
+		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction);
+		final ValidationResult result2 = context.transactions.addExisting(signatureTransaction);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), currentTime.addMinutes(10));
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), currentTime.addMinutes(10));
 
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -1069,11 +1069,11 @@ public class UnconfirmedTransactionsTest {
 		poiFacade.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
 	}
 
-	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator() {
+	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
 		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(PoiFacade.class));
 	}
 
-	private static UnconfirmedTransactions createUnconfirmedTransactionsWithRealValidator(final PoiFacade poiFacade) {
+	private static TestContext createUnconfirmedTransactionsWithRealValidator(final PoiFacade poiFacade) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
 				factory.createSingle(poiFacade),
@@ -1094,7 +1094,7 @@ public class UnconfirmedTransactionsTest {
 
 		for (int i = startCustomField; i <= endCustomField; ++i) {
 			final MockTransaction transaction = new MockTransaction(
-					Utils.generateRandomAccount(Amount.fromNem(1000)),
+					Utils.generateRandomAccount(), //Amount.fromNem(1000)),
 					i,
 					new TimeInstant(i));
 			transaction.setFee(Amount.fromNem(i));

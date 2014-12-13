@@ -114,7 +114,7 @@ public class MultisigSignerModificationTransactionTest {
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
-		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
+		final Account signer = Utils.generateRandomAccount(); //Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modificationList = createModificationList(modificationType, cosignatory);
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationList);
@@ -139,7 +139,7 @@ public class MultisigSignerModificationTransactionTest {
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
-		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
+		final Account signer = Utils.generateRandomAccount(); //Amount.fromNem(90));
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modificationList = createModificationList(modificationType, cosignatory);
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationList);
@@ -164,7 +164,7 @@ public class MultisigSignerModificationTransactionTest {
 	public void executeRaisesAccountNotificationForAllModifications() {
 		// Arrange:
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
-		final Account signer = Utils.generateRandomAccount(Amount.fromNem(90));
+		final Account signer = Utils.generateRandomAccount(); //Amount.fromNem(90));
 		final Account cosignatory1 = Utils.generateRandomAccount();
 		final Account cosignatory2 = Utils.generateRandomAccount();
 		final List<MultisigModification> modificationList = Arrays.asList(

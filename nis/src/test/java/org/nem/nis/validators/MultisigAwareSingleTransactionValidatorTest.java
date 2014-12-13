@@ -30,7 +30,7 @@ public class MultisigAwareSingleTransactionValidatorTest {
 		final MultisigAwareSingleTransactionValidator validator = new MultisigAwareSingleTransactionValidator(innerValidator);
 
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
-		final ValidationContext context = new ValidationContext();
+		final ValidationContext context = new ValidationContext((account, amount) -> false);
 		Mockito.when(innerValidator.validate(transaction, context)).thenReturn(expectedResult);
 
 		// Act:
@@ -115,7 +115,7 @@ public class MultisigAwareSingleTransactionValidatorTest {
 
 		private final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		private final MultisigTransaction multisigTransaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), innerTransaction);
-		private final ValidationContext context = new ValidationContext();
+		private final ValidationContext context = new ValidationContext((account, amount) -> false);
 
 		private void setMultisigTransactionValidationResult(final ValidationResult result) {
 			Mockito.when(this.innerValidator.validate(this.multisigTransaction, this.context)).thenReturn(result);

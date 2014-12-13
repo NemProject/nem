@@ -23,7 +23,7 @@ public class MultisigTransactionValidatorTest {
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(BlockHeight.ONE, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -36,7 +36,7 @@ public class MultisigTransactionValidatorTest {
 		final Transaction transaction = context.createTransaction();
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
@@ -50,7 +50,7 @@ public class MultisigTransactionValidatorTest {
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -64,7 +64,7 @@ public class MultisigTransactionValidatorTest {
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT.prev()));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(TEST_HEIGHT.prev(), context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
@@ -78,9 +78,9 @@ public class MultisigTransactionValidatorTest {
 
 		private MultisigTransaction createTransaction() {
 			final Account recipient = Utils.generateRandomAccount();
-			signer.incrementBalance(Amount.fromNem(2001));
 			this.addPoiState(signer);
 			this.addPoiState(multisig);
+			this.poiFacade.findStateByAddress(signer.getAddress()).getAccountInfo().incrementBalance(Amount.fromNem(2001));
 			final Transaction otherTransaction = new TransferTransaction(
 					TimeInstant.ZERO,
 					multisig,
@@ -104,6 +104,11 @@ public class MultisigTransactionValidatorTest {
 		public void makeCosignatory(final Account signer, final Account multisig) {
 			this.poiFacade.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), TEST_HEIGHT);
 			this.poiFacade.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), TEST_HEIGHT);
+		}
+
+		public boolean debitPredicate(Account account, Amount amount) {
+			final Amount balance = this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+			return balance.compareTo(amount) >= 0;
 		}
 	}
 }

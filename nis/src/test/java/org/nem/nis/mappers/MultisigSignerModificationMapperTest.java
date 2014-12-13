@@ -73,11 +73,11 @@ public class MultisigSignerModificationMapperTest {
 
 			this.dbSender = new org.nem.nis.dbmodel.Account();
 			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
+			this.dbSender.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
 			this.dbCosignatory = new org.nem.nis.dbmodel.Account();
 			this.dbCosignatory.setPrintableKey(cosignatoryAccount.getAddress().getEncoded());
-			this.dbCosignatory.setPublicKey(cosignatoryAccount.getKeyPair().getPublicKey());
+			this.dbCosignatory.setPublicKey(cosignatoryAccount.getAddress().getPublicKey());
 
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbSender);
@@ -115,7 +115,7 @@ public class MultisigSignerModificationMapperTest {
 			Assert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(800));
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getSenderProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
-			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+			final PublicKey signerPublicKey = this.model.getSigner().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
 
 			final MultisigModification expectedModification = this.model.getModifications().get(0);

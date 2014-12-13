@@ -295,7 +295,6 @@ public class MultisigTransactionTest {
 	//endregion
 
 	private static MultisigSignatureTransaction createSignatureTransaction(final Account account, final Transaction transaction) {
-		final Signer signer = new Signer(account.getKeyPair());
 		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				account,
