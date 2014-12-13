@@ -98,7 +98,7 @@ public class BlockScorerTest {
 		final Block block = createBlock(blockSigner, 101, 11);
 
 		block.setDifficulty(new BlockDifficulty((long)60E12));
-		context.poiFacade.recalculateImportances(block.getHeight(), new ArrayList<>());
+		context.recalculateImportances(block.getHeight());
 
 		// Act:
 		final BigInteger target = context.scorer.calculateTarget(previousBlock, block);
@@ -126,7 +126,10 @@ public class BlockScorerTest {
 		final Block block2 = createBlock(blockSigner, 201, 11);
 
 		// Act:
+		context.recalculateImportances(block1.getHeight());
 		final BigInteger target1 = context.scorer.calculateTarget(previousBlock, block1);
+
+		context.recalculateImportances(block2.getHeight());
 		final BigInteger target2 = context.scorer.calculateTarget(previousBlock, block2);
 
 		// Assert: (time-difference * block-signer-balance * magic-number)
@@ -182,40 +185,11 @@ public class BlockScorerTest {
 	}
 
 	@Test
-	public void calculateForgerBalanceCallsRecalculateImportancesForGroupedBlock() {
-		// Assert:
-		for (final Map.Entry<Integer, Integer> pair : HEIGHT_TO_GROUPED_HEIGHT_MAP.entrySet()) {
-			assertRecalculateImportancesCalledForHeight(pair.getKey(), pair.getValue());
-		}
-	}
-
-	private static void assertRecalculateImportancesCalledForHeight(final long height, final long rawGroupedHeight) {
-		// Arrange:
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		final TestContext context = new TestContext(poiFacade);
-		final Block block = NisUtils.createRandomBlockWithHeight(height);
-
-		final BlockHeight groupedHeight = new BlockHeight(rawGroupedHeight);
-		final Address signerAddress = block.getSigner().getAddress();
-		final AccountState state = new AccountState(signerAddress);
-		state.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		final Collection<AccountState> accountStates = Arrays.asList(state);
-
-		// Act:
-		context.scorer.calculateForgerBalance(block);
-
-		// Assert:
-		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(groupedHeight, accountStates);
-	}
-
-	@Test
 	public void accountAtProperHeightIsForwardedIfRemoteHarvestingAccountIsUsed() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(1442);
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(height);
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		final TestContext context = new TestContext(poiFacade);
+		final TestContext context = new TestContext(Mockito.mock(AccountStateCache.class));
 		final Block block = NisUtils.createRandomBlockWithHeight(height.getRaw());
 
 		final Address remoteHarvesterAddress = block.getSigner().getAddress();
@@ -223,17 +197,21 @@ public class BlockScorerTest {
 		final AccountState remoteState = new AccountState(remoteHarvesterAddress);
 		final AccountState ownerState = new AccountState(ownerAddress);
 		ownerState.getImportanceInfo().setImportance(groupedHeight, 0.75);
-		final Collection<AccountState> accountStates = Arrays.asList(ownerState, remoteState);
-		Mockito.when(accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, height)).thenReturn(ownerState);
-		Mockito.when(accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight)).thenReturn(remoteState);
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, height))
+				.thenReturn(ownerState);
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(remoteHarvesterAddress, groupedHeight))
+				.thenReturn(remoteState);
+		Mockito.when(context.accountStateCache.mutableContents())
+				.thenReturn(new CacheContents<>(Arrays.asList(ownerState, remoteState)));
+
+		context.recalculateImportances(block.getHeight());
 
 		// Act:
 		final long score = context.scorer.calculateForgerBalance(block);
 
 		// Assert:
 		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
-		Mockito.verify(poiFacade, Mockito.times(1)).recalculateImportances(Mockito.eq(groupedHeight), Mockito.any());
-		Mockito.verify(accountStateCache, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
+		Mockito.verify(context.accountStateCache, Mockito.times(1)).findForwardedStateByAddress(remoteHarvesterAddress, height);
 	}
 
 	//endregion
@@ -269,24 +247,25 @@ public class BlockScorerTest {
 	}
 
 	private static class TestContext {
-		private final PoiFacade poiFacade;
 		private final AccountStateCache accountStateCache;
 		private final BlockScorer scorer;
+		private final PoiFacade poiFacade;
 
 		private TestContext() {
-			this(new DefaultPoiFacade((blockHeight, accountStates) -> {
+			this(new DefaultAccountStateCache());
+		}
+
+		private TestContext(final AccountStateCache accountStateCache) {
+			this.accountStateCache = accountStateCache;
+			this.scorer = new BlockScorer(this.accountStateCache);
+
+			this.poiFacade = new DefaultPoiFacade((blockHeight, accountStates) -> {
 				for (final AccountState accountState : accountStates) {
 					final Amount balance = accountState.getWeightedBalances().getUnvested(blockHeight);
 					final double importance = balance.getNumMicroNem() / 1000.0;
 					accountState.getImportanceInfo().setImportance(blockHeight, importance);
 				}
-			}));
-		}
-
-		private TestContext(final PoiFacade poiFacade) {
-			this.poiFacade = poiFacade;
-			this.accountStateCache = new DefaultAccountStateCache();
-			this.scorer = new BlockScorer(this.accountStateCache);
+			});
 		}
 
 		private Account createAccountWithBalance(final long balance) {
@@ -299,6 +278,12 @@ public class BlockScorerTest {
 
 		private AccountImportance getImportanceInfo(final Account account) {
 			return this.accountStateCache.findStateByAddress(account.getAddress()).getImportanceInfo();
+		}
+
+		private void recalculateImportances(final BlockHeight height) {
+			this.poiFacade.recalculateImportances(
+					BlockScorer.getGroupedHeight(height),
+					this.accountStateCache.mutableContents().asCollection());
 		}
 	}
 }

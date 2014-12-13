@@ -49,8 +49,8 @@ public class RecalculateImportancesObserverTest {
 				new BalanceAdjustmentNotification(NotificationType.HarvestReward, Utils.generateRandomAccount(), Amount.ZERO),
 				NisUtils.createBlockNotificationContext(new BlockHeight(127), trigger));
 
-		// Assert:
-		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(new BlockHeight(127)), Mockito.any());
+		// Assert: recalculateImportances is called with grouped height
+		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(new BlockHeight(1)), Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.only()).mutableContents();
 	}
 
