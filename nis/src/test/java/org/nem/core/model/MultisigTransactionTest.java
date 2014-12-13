@@ -72,6 +72,7 @@ public class MultisigTransactionTest {
 		final MultisigSignatureTransaction signature = createSignatureTransaction(HashUtils.calculateHash(innerTransaction));
 		signature.sign();
 		originalTransaction.addSignature(signature);
+		originalTransaction.sign();
 
 		// Act:
 		final MultisigTransaction transaction = createRoundTrippedTransaction(originalTransaction);
@@ -93,9 +94,9 @@ public class MultisigTransactionTest {
 
 	private static MultisigTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction.asNonVerifiable(), new MockAccountLookup());
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalTransaction, new MockAccountLookup());
 		deserializer.readInt("type");
-		return new MultisigTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
+		return new MultisigTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 	}
 
 	//endregion

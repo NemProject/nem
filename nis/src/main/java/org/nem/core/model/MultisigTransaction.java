@@ -49,7 +49,13 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	public void deserializeNonVerifiableData(final Deserializer deserializer) {
 		super.deserializeNonVerifiableData(deserializer);
 		// TODO 20141213 C1: adding this causes exception if "signatures" are not present, so how is this "optional"?
-		deserializer.readOptionalObjectArray("signatures", s -> new MultisigSignatureTransaction(DeserializationOptions.VERIFIABLE, s));
+		deserializer.readOptionalObjectArray("signatures", d -> {
+			final MultisigSignatureTransaction entity= new MultisigSignatureTransaction(DeserializationOptions.VERIFIABLE, d);
+			// TODO: can't call addSignature here, as MultisigTransaction is not ready at this time
+			//this.addSignature(entity);
+			this.signatureTransactions.add(entity);
+			return entity;
+		});
 	}
 
 	/**
@@ -146,6 +152,8 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 //			final Signer signer = new Signer(signatureTransaction.getSigner().getKeyPair());
 //			return signer.verify(innerTransactionBytes, signatureTransaction.getOtherTransactionSignature());
 //		});
-		return this.signatureTransactions.stream().allMatch(signatureTransaction -> signatureTransaction.verify());
+		return
+				this.signatureTransactions.stream().allMatch(signatureTransactions -> signatureTransactions.getOtherTransactionHash().equals(this.getOtherTransactionHash())) &&
+				this.signatureTransactions.stream().allMatch(signatureTransaction -> signatureTransaction.verify());
 	}
 }
