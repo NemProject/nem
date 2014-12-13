@@ -9,6 +9,10 @@ import org.nem.nis.cache.NisCache;
 /**
  * An observer that recalculates POI importances.
  */
+// TODO 20141213 G-J: introduction of this, causes, that poi is recalculated also during loading of blockchain
+// earlier recalculation was done after all the blocks have been loaded,
+// (for 70k blocks that is >180 recalculations)
+// I don't think that it's important as it's only fraction of time, just wanted to note the difference with previous behaviour
 public class RecalculateImportancesObserver implements BlockTransactionObserver {
 	private final NisCache nisCache;
 
