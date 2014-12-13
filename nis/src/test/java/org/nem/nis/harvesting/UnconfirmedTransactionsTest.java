@@ -1282,9 +1282,9 @@ public class UnconfirmedTransactionsTest {
 				final TimeInstant timeStamp,
 				final Amount fee) {
 			// TODO 20141213 J-B: can you call add account?
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			final MockTransaction transaction = new MockTransaction(account, customField, timeStamp);
 			transaction.setFee(fee);
 			return transaction;
