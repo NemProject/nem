@@ -50,7 +50,7 @@ public class AuthenticatedUnconfirmedTransactionsRequestTest {
 		final UnconfirmedTransactionsRequest original = new UnconfirmedTransactionsRequest(Arrays.asList(new MockTransaction()));
 
 		// Act:
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(
+		final Deserializer deserializer = Utils.roundtripSerializableEntityWithBinarySerializer(
 				new AuthenticatedRequest<>(original, challenge),
 				null);
 		final AuthenticatedUnconfirmedTransactionsRequest request = new AuthenticatedUnconfirmedTransactionsRequest(deserializer);

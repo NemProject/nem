@@ -239,6 +239,24 @@ public class Utils {
 	}
 
 	/**
+	 * Serializes serializable and returns an binary ObjectDeserializer
+	 * that can deserialize it.
+	 *
+	 * @param originalEntity The original entity.
+	 * @param accountLookup The account lookup policy to use.
+	 * @param <T> The concrete SerializableEntity type.
+	 * @return The binary object deserializer.
+	 */
+	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntityWithBinarySerializer(
+			final T originalEntity,
+			final AccountLookup accountLookup) {
+		// Act:
+		final BinarySerializer binarySerializer = new BinarySerializer();
+		originalEntity.serialize(binarySerializer);
+		return new BinaryDeserializer(binarySerializer.getBytes(), new DeserializationContext(accountLookup));
+	}
+
+	/**
 	 * Waits on the specified monitor.
 	 *
 	 * @param monitor The monitor.

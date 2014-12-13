@@ -63,7 +63,7 @@ public class HarvesterTest {
 
 		// Assert:
 		Assert.assertThat(block, IsNull.nullValue());
-		Mockito.verify(context.generator, Mockito.only())
+		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
 
@@ -82,7 +82,7 @@ public class HarvesterTest {
 
 		// Assert:
 		Assert.assertThat(block, IsEqual.equalTo(generatedBlock.getBlock()));
-		Mockito.verify(context.generator, Mockito.only())
+		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(Mockito.any(), Mockito.eq(account), Mockito.any());
 	}
 
@@ -96,7 +96,7 @@ public class HarvesterTest {
 		context.harvester.harvestBlock();
 
 		// Assert:
-		Mockito.verify(context.generator, Mockito.only())
+		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(Mockito.any(), Mockito.any(), Mockito.eq(new TimeInstant(14)));
 	}
 
@@ -115,7 +115,7 @@ public class HarvesterTest {
 
 		// Assert:
 		final ArgumentCaptor<Block> blockCaptor = ArgumentCaptor.forClass(Block.class);
-		Mockito.verify(context.generator, Mockito.only())
+		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(blockCaptor.capture(), Mockito.any(), Mockito.any());
 		Assert.assertThat(blockCaptor.getValue().getTimeStamp(), IsEqual.equalTo(new TimeInstant(50)));
 	}
@@ -154,6 +154,22 @@ public class HarvesterTest {
 	}
 
 	//endregion
+
+	// side effect: dropping expired transactions
+
+	@Test
+	public void harvestBlockCallsCDropExpiredTransactionOnGenerator() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.harvester.harvestBlock();
+
+		// Assert:
+		Mockito.verify(context.generator, Mockito.times(1)).dropExpireTransactions(Mockito.any());
+	}
+
+	// endregion
 
 	private static class TestContext {
 		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);

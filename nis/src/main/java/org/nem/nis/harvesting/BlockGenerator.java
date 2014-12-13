@@ -55,9 +55,6 @@ public class BlockGenerator {
 			final Block lastBlock,
 			final Account harvesterAccount,
 			final TimeInstant blockTime) {
-		// remove all expired transactions
-		this.unconfirmedTransactions.dropExpiredTransactions(blockTime);
-
 		final Block newBlock = this.createBlock(lastBlock, harvesterAccount, this.blockScorer, blockTime);
 		LOGGER.info(String.format("generated signature: %s", newBlock.getSignature()));
 
@@ -114,5 +111,14 @@ public class BlockGenerator {
 		final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
 		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 		return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps, lastBlockHeight.getRaw() + 1);
+	}
+
+	/**
+	 * Drops transactions that have already expired.
+	 *
+	 * @param time The current time.
+	 */
+	public void dropExpireTransactions(final TimeInstant time) {
+		this.unconfirmedTransactions.dropExpiredTransactions(time);
 	}
 }

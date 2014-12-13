@@ -295,16 +295,14 @@ public class AccountControllerTest {
 		final AccountIdBuilder builder = new AccountIdBuilder();
 		builder.setAddress(address.getEncoded());
 
-		final UnconfirmedTransactions originalUnconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		final List<Transaction> originalTransactions = Arrays.asList(
 				new MockTransaction(7, new TimeInstant(1)),
 				new MockTransaction(11, new TimeInstant(2)),
 				new MockTransaction(5, new TimeInstant(3)));
-		Mockito.when(originalUnconfirmedTransactions.getAll()).thenReturn(originalTransactions);
 		final TestContext context = new TestContext();
 
-		Mockito.when(context.unconfirmedTransactions.getTransactionsForAccount(address))
-				.thenReturn(originalUnconfirmedTransactions);
+		Mockito.when(context.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 25))
+				.thenReturn(originalTransactions);
 
 		// Act:
 		final SerializableList<Transaction> transactions = context.controller.transactionsUnconfirmed(builder);
@@ -313,7 +311,7 @@ public class AccountControllerTest {
 		Assert.assertThat(
 				transactions.asCollection().stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
-		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getTransactionsForAccount(address);
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
 	}
 
 	//endregion

@@ -327,15 +327,11 @@ public class UnconfirmedTransactions {
 	 * @return The filtered list of transactions.
 	 */
 	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-		final long start = System.currentTimeMillis();
-		final UnconfirmedTransactions unconfirmed = this.filter(
+		return this.filter(
 				this.getAll().stream()
 						.filter(tx -> matchAddress(tx, address))
 						.collect(Collectors.toList()),
 				BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
-		final long stop = System.currentTimeMillis();
-		System.out.println(String.format("transactionsUnconfirmed needed %dms", stop - start));
-		return unconfirmed;
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
