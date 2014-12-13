@@ -161,8 +161,7 @@ public class AccountController {
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
 		return new SerializableList<>(this.unconfirmedTransactions
-				.getTransactionsForAccount(address)
-				.getMostRecentTransactions(MAX_UNCONFIRMED_TRANSACTIONS));
+				.getMostRecentTransactionsForAccount(address, MAX_UNCONFIRMED_TRANSACTIONS));
 	}
 
 	/**

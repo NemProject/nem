@@ -245,7 +245,6 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getAll() {
 		final List<Transaction> transactions = this.transactions.values().stream()
 				.collect(Collectors.toList());
-
 		return this.sortTransactions(transactions);
 	}
 
@@ -271,8 +270,9 @@ public class UnconfirmedTransactions {
 	 *
 	 * @return The most recent transactions from this unconfirmed transactions.
 	 */
-	public List<Transaction> getMostRecentTransactions(final int maxSize) {
+	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
 		return this.transactions.values().stream()
+				.filter(tx -> matchAddress(tx, address))
 				.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
 				.limit(maxSize)
 				.collect(Collectors.toList());
@@ -327,11 +327,15 @@ public class UnconfirmedTransactions {
 	 * @return The filtered list of transactions.
 	 */
 	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-		return this.filter(
+		final long start = System.currentTimeMillis();
+		final UnconfirmedTransactions unconfirmed = this.filter(
 				this.getAll().stream()
 						.filter(tx -> matchAddress(tx, address))
 						.collect(Collectors.toList()),
 				BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
+		final long stop = System.currentTimeMillis();
+		System.out.println(String.format("transactionsUnconfirmed needed %dms", stop - start));
+		return unconfirmed;
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {

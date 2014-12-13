@@ -607,7 +607,8 @@ public class UnconfirmedTransactionsTest {
 	public void getUnknownTransactionsReturnsAllTransactionsIfHashShortIdListIsEmpty() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(3);
+		final Account account = Utils.generateRandomAccount();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 3);
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
@@ -621,7 +622,8 @@ public class UnconfirmedTransactionsTest {
 	public void getUnknownTransactionsFiltersKnownTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(6);
+		final Account account = Utils.generateRandomAccount();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 6);
 		context.signAndAddNewBatch(transactions);
 		final List<HashShortId> hashShortIds = new ArrayList<>();
 		hashShortIds.add(new HashShortId(HashUtils.calculateHash(transactions.get(1)).getShortId()));
@@ -642,7 +644,8 @@ public class UnconfirmedTransactionsTest {
 	public void getUnknownTransactionsReturnsEmptyListIfAllTransactionsAreKnown() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(6);
+		final Account account = Utils.generateRandomAccount();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 6);
 		context.signAndAddNewBatch(transactions);
 		final List<HashShortId> hashShortIds = transactions.stream()
 				.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
@@ -657,17 +660,18 @@ public class UnconfirmedTransactionsTest {
 
 	// endregion
 
-	//region getMostRecentTransactions
+	//region getMostRecentTransactionsForAccount
 
 	@Test
 	public void getMostRecentTransactionsReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		final Account account = Utils.generateRandomAccount();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 10);
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(20);
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 20);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -677,11 +681,12 @@ public class UnconfirmedTransactionsTest {
 	public void getMostRecentTransactionsReturnsMaximumTransactionsIfMoreThanGivenLimitTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(20);
+		final Account account = Utils.generateRandomAccount();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 20);
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(10);
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -691,11 +696,12 @@ public class UnconfirmedTransactionsTest {
 	public void getMostRecentTransactionsReturnsMaximumTransactionsIfGivenLimitTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		final Account account = Utils.generateRandomAccount();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 10);
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(10);
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 10);
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
@@ -705,11 +711,12 @@ public class UnconfirmedTransactionsTest {
 	public void getMostRecentTransactionsReturnsTransactionsSortedByTimeInDescendingOrder() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(10);
+		final Account account = Utils.generateRandomAccount();
+		final List<Transaction> transactions = context.createMockTransactionsWithRandomTimeStamp(account, 10);
 		context.signAndAddNewBatch(transactions);
 
 		// Act:
-		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactions(25);
+		final List<Transaction> mostRecentTransactions = context.transactions.getMostRecentTransactionsForAccount(account.getAddress(), 25);
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
@@ -1243,30 +1250,39 @@ public class UnconfirmedTransactionsTest {
 			final List<MockTransaction> transactions = new ArrayList<>();
 
 			for (int i = startCustomField; i <= endCustomField; ++i) {
-				transactions.add(createMockTransaction(Amount.fromNem(1000), i, new TimeInstant(i), Amount.fromNem(i)));
+				transactions.add(createMockTransaction(
+						Utils.generateRandomAccount(),
+						Amount.fromNem(1000),
+						i,
+						new TimeInstant(i),
+						Amount.fromNem(i)));
 			}
 
 			return transactions;
 		}
 
-		private List<Transaction> createMockTransactionsWithRandomTimeStamp(final int count) {
+		private List<Transaction> createMockTransactionsWithRandomTimeStamp(final Account account, final int count) {
 			final List<Transaction> transactions = new ArrayList<>();
 			final SecureRandom random = new SecureRandom();
 
 			for (int i = 0; i < count; ++i) {
-				transactions.add(createMockTransaction(Amount.fromNem(1000), i, new TimeInstant(random.nextInt(1_000_000)), Amount.fromNem(i)));
+				transactions.add(createMockTransaction(account, Amount.fromNem(1000), i, new TimeInstant(random.nextInt(1_000_000)), Amount.fromNem(i)));
 			}
 
 			return transactions;
 		}
 
 		private MockTransaction createMockTransaction(
+				final Account account,
 				final Amount amount,
 				final int customField,
 				final TimeInstant timeStamp,
 				final Amount fee) {
+			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			accountState.getAccountInfo().incrementBalance(amount);
+			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			final MockTransaction transaction = new MockTransaction(
-					this.addAccount(amount),
+					account,
 					customField,
 					timeStamp);
 			transaction.setFee(fee);
