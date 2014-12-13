@@ -1,9 +1,7 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.validators.DebitPredicate;
 
 import java.util.*;
 
@@ -25,7 +23,7 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	//
 	//@Override
 	//public Iterator<AccountState> iterator() {
-	//	// TODO 20141211 this really isn't synchronized.
+	//	// TODO 20141214 this really isn't synchronized.
 	//	synchronized (this.lock) {
 	//		return this.accountStateCache.iterator();
 	//	}
@@ -97,7 +95,7 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 	//@Override
 	//public DebitPredicate getDebitPredicate() {
 	//	synchronized (this.lock) {
-	//		// TODO 20141211 this really isn't synchronized.
+	//		// TODO 20141214 this really isn't synchronized.
 	//		return this.accountStateCache.getDebitPredicate();
 	//	}
 	//}
