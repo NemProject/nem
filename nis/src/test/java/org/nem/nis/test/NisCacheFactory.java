@@ -24,7 +24,7 @@ public class NisCacheFactory {
 	 */
 	public static ReadOnlyNisCache createReal(final DefaultPoiFacade poiFacade) {
 		return new DefaultNisCache(
-				new DefaultAccountCache(),
+				new SynchronizedAccountCache(new DefaultAccountCache()),
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
 				new SynchronizedPoiFacade(poiFacade),
 				new SynchronizedHashCache(new DefaultHashCache()));
