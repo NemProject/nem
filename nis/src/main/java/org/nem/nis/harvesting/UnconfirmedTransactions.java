@@ -6,6 +6,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisCache;
+import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 
@@ -64,17 +65,19 @@ public class UnconfirmedTransactions {
 				new ArrayList<>(),
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
 				validatorFactory,
-				nisCache);
+				nisCache,
+				false);
 	}
 
 	private UnconfirmedTransactions(
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
-			final NisCache nisCache) {
+			final NisCache nisCache,
+			final boolean blockCreation) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
-		this.singleValidator = this.createSingleValidator(true);
+		this.singleValidator = this.createSingleValidator(blockCreation);
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getPoiFacade());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
@@ -89,7 +92,8 @@ public class UnconfirmedTransactions {
 				transactions,
 				options,
 				this.validatorFactory,
-				this.nisCache);
+				this.nisCache,
+				true);
 	}
 
 	/**
@@ -398,7 +402,8 @@ public class UnconfirmedTransactions {
 		}
 
 		private Amount getBalance(final Account account) {
-			return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+			final PoiAccountState poiAccountState = this.poiFacade.findStateByAddress(account.getAddress());
+			return poiAccountState.getAccountInfo().getBalance();
 		}
 	}
 }

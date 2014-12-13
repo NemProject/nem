@@ -1027,10 +1027,10 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator(poiFacade);
 		final TimeInstant currentTime = new TimeInstant(11);
 
-		final Account multisig = Utils.generateRandomAccount(); //Amount.fromNem(10));
+		final Account multisig = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
-		final Account cosigner1 = Utils.generateRandomAccount(); //Amount.fromNem(101));
-		final Account cosigner2 = Utils.generateRandomAccount(); //Amount.fromNem(101));
+		final Account cosigner1 = Utils.generateRandomAccount();
+		final Account cosigner2 = Utils.generateRandomAccount();
 		final Transaction t1 = createTransferTransaction(currentTime, multisig, recipient, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
 		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
@@ -1039,9 +1039,11 @@ public class UnconfirmedTransactionsTest {
 		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
 		signatureTransaction.sign();
 
-		addPoiState(poiFacade, multisig);
-		addPoiState(poiFacade, cosigner1);
-		addPoiState(poiFacade, cosigner2);
+		addPoiState(poiFacade, multisig).getAccountInfo().incrementBalance(Amount.fromNem(10));
+		// TODO 20141213 G: temporary hack, need to check it
+		addPoiState(poiFacade, recipient);
+		addPoiState(poiFacade, cosigner1).getAccountInfo().incrementBalance(Amount.fromNem(101));
+		addPoiState(poiFacade, cosigner2).getAccountInfo().incrementBalance(Amount.fromNem(101));
 		makeCosignatory(poiFacade, cosigner1, multisig);
 		makeCosignatory(poiFacade, cosigner2, multisig);
 
@@ -1056,11 +1058,13 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
 
-	private static  void addPoiState(final PoiFacade poiFacade, final Account account) {
+	private static PoiAccountState addPoiState(final PoiFacade poiFacade, final Account account) {
 		final Address address = account.getAddress();
 		final PoiAccountState state = new PoiAccountState(address);
 		Mockito.when(poiFacade.findStateByAddress(address))
 				.thenReturn(state);
+
+		return state;
 	}
 
 	public static void makeCosignatory(final PoiFacade poiFacade, final Account signer, final Account multisig) {
