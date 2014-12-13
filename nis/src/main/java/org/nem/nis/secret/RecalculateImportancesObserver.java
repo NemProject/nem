@@ -2,6 +2,7 @@ package org.nem.nis.secret;
 
 import org.apache.commons.collections4.IteratorUtils;
 import org.nem.core.model.observers.*;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.NisCache;
 
@@ -23,6 +24,11 @@ public class RecalculateImportancesObserver implements BlockTransactionObserver 
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
 		if (NotificationType.HarvestReward != notification.getType()) {
+			return;
+		}
+
+		// TODO 20141212: this is a hack
+		if (context.getHeight().equals(BlockHeight.ONE)) {
 			return;
 		}
 

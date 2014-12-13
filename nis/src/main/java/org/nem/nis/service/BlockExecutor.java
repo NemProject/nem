@@ -4,7 +4,7 @@ import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BlockExecutor {
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 
 	/**
 	 * Creates a new block executor.
@@ -25,7 +25,7 @@ public class BlockExecutor {
 	 * @param nisCache The NIS cache.
 	 */
 	@Autowired(required = true)
-	public BlockExecutor(final NisCache nisCache) {
+	public BlockExecutor(final ReadOnlyNisCache nisCache) {
 		this.nisCache = nisCache;
 	}
 
@@ -76,7 +76,7 @@ public class BlockExecutor {
 		// in order for all the downstream observers to behave correctly (without needing to know about remote foraging)
 		// trigger harvest notifications with the forwarded account (where available) instead of the remote account
 		final Address address = block.getSigner().getAddress();
-		final AccountState accountState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(address, block.getHeight());
+		final ReadOnlyAccountState accountState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(address, block.getHeight());
 
 		final Account endowed = accountState.getAddress().equals(address)
 				? block.getSigner()
