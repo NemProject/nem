@@ -4,7 +4,6 @@ import org.nem.core.model.primitive.*;
 
 /**
  * Information about an account.
- * TODO 20141209 J-*: might want to come up with a better name for this
  */
 public class AccountInfo implements ReadOnlyAccountInfo {
 	private String label;
@@ -12,11 +11,6 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 	private BlockAmount harvestedBlocks = BlockAmount.ZERO;
 	private ReferenceCount refCount = ReferenceCount.ZERO;
 
-	/**
-	 * Gets the account's balance.
-	 *
-	 * @return This account's balance.
-	 */
 	@Override
 	public Amount getBalance() {
 		return this.balance;
@@ -40,11 +34,6 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.balance = this.balance.subtract(amount);
 	}
 
-	/**
-	 * Gets number of harvested blocks.
-	 *
-	 * @return Number of blocks harvested by the account.
-	 */
 	@Override
 	public BlockAmount getHarvestedBlocks() {
 		return this.harvestedBlocks;
@@ -64,11 +53,6 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.harvestedBlocks = this.harvestedBlocks.decrement();
 	}
 
-	/**
-	 * Gets the account's label.
-	 *
-	 * @return The account's label.
-	 */
 	@Override
 	public String getLabel() {
 		return this.label;
@@ -83,11 +67,6 @@ public class AccountInfo implements ReadOnlyAccountInfo {
 		this.label = label;
 	}
 
-	/**
-	 * Returns the reference count.
-	 *
-	 * @return The reference count.
-	 */
 	@Override
 	public ReferenceCount getReferenceCount() {
 		return this.refCount;

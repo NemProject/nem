@@ -39,8 +39,13 @@ public class BlockScorer {
 	 */
 	private static final int POI_GROUPING = 359;
 
-	public final ReadOnlyAccountStateCache accountStateCache;
+	private final ReadOnlyAccountStateCache accountStateCache;
 
+	/**
+	 * Creates a new block scorer.
+	 *
+	 * @param accountStateCache The account state cache.
+	 */
 	public BlockScorer(final ReadOnlyAccountStateCache accountStateCache) {
 		this.accountStateCache = accountStateCache;
 	}

@@ -22,7 +22,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
 				this.createPoiFacade(),
-				this.createaccountStateCache());
+				this.createAccountStateCache());
 	}
 
 	@Test(expected = TimeSynchronizationException.class)
@@ -31,7 +31,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		new DefaultTimeSynchronizationStrategy(
 				null,
 				this.createPoiFacade(),
-				this.createaccountStateCache());
+				this.createAccountStateCache());
 	}
 
 	@Test(expected = TimeSynchronizationException.class)
@@ -40,7 +40,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
 				null,
-				this.createaccountStateCache());
+				this.createAccountStateCache());
 	}
 
 	@Test(expected = TimeSynchronizationException.class)
@@ -49,7 +49,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		final DefaultTimeSynchronizationStrategy strategy = new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
 				this.createPoiFacade(),
-				this.createaccountStateCache());
+				this.createAccountStateCache());
 
 		// Act:
 		strategy.calculateTimeOffset(new ArrayList<>(), new NodeAge(0));
@@ -195,7 +195,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		return new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
 	}
 
-	private DefaultAccountStateCache createaccountStateCache() {
+	private DefaultAccountStateCache createAccountStateCache() {
 		return new DefaultAccountStateCache();
 	}
 
@@ -213,7 +213,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		return new DefaultTimeSynchronizationStrategy(
 				this.createAggregateFilter(),
 				this.createPoiFacade(),
-				this.createaccountStateCache());
+				this.createAccountStateCache());
 	}
 
 	private DefaultTimeSynchronizationStrategy createStrategy(
@@ -223,7 +223,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
 		final DefaultPoiFacade facade = this.createPoiFacade();
 
-		final DefaultAccountStateCache cache = this.createaccountStateCache();
+		final DefaultAccountStateCache cache = this.createAccountStateCache();
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < samples.size(); i++) {
 			accountStates.add(cache.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));
@@ -243,7 +243,7 @@ public class DefaultTimeSynchronizationStrategyTest {
 		Mockito.when(filter.filter(samples, age)).thenReturn(samples);
 		final DefaultPoiFacade facade = this.createPoiFacade();
 
-		final DefaultAccountStateCache cache = this.createaccountStateCache();
+		final DefaultAccountStateCache cache = this.createAccountStateCache();
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < samples.size(); i++) {
 			accountStates.add(cache.findStateByAddress(samples.get(i).getNode().getIdentity().getAddress()));

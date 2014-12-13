@@ -6,7 +6,7 @@ import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.AccountCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.TransferBlockPair;
 import org.nem.nis.mappers.TransferMapper;
@@ -21,13 +21,13 @@ public class AccountIoAdapter implements AccountIo {
 
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
-	private final AccountCache accountCache;
+	private final ReadOnlyAccountCache accountCache;
 
 	@Autowired(required = true)
 	public AccountIoAdapter(
 			final ReadOnlyTransferDao transferDao,
 			final ReadOnlyBlockDao blockDao,
-			final AccountCache accountCache) {
+			final ReadOnlyAccountCache accountCache) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
 		this.accountCache = accountCache;

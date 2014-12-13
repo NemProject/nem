@@ -1,11 +1,9 @@
 package org.nem.nis.time.synchronization;
 
-import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.synchronization.*;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.time.synchronization.filter.*;
@@ -25,8 +23,8 @@ public class Network {
 	public static final long MINUTE = 60 * SECOND;
 	public static final long HOUR = 60 * MINUTE;
 	public static final long DAY = 24 * HOUR;
-	private static final long TICK_INTERVALL = MINUTE;
-	private static final long CLOCK_ADJUSTMENT_INTERVALL = DAY;
+	private static final long TICK_INTERVAL = MINUTE;
+	private static final long CLOCK_ADJUSTMENT_INTERVAL = DAY;
 	private static final BlockHeight HEIGHT = new BlockHeight(10);
 
 	/**
@@ -55,9 +53,9 @@ public class Network {
 	private int nodeId = 1;
 	private final int viewSize;
 	private final NodeSettings nodeSettings;
-	private TimeSynchronizationStrategy syncStrategy;
+	private final TimeSynchronizationStrategy syncStrategy;
 	private AccountStateCache accountStateCache;
-	private final PoiFacade poiFacade;
+	private PoiFacade poiFacade;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
@@ -82,7 +80,7 @@ public class Network {
 		this.nodeSettings = nodeSettings;
 		this.accountStateCache = new DefaultAccountStateCache();
 		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
-		this.syncStrategy = this.createSynchronizationStrategy(this.accountStateCache);
+		this.syncStrategy = this.createSynchronizationStrategy();
 		long cumulativeInaccuracy = 0;
 		int numberOfEvilNodes = 0;
 		for (int i = 1; i <= networkSize; i++) {
@@ -93,7 +91,7 @@ public class Network {
 				numberOfEvilNodes++;
 			}
 		}
-		this.initialize(this.poiFacade, this.accountStateCache);
+		this.initialize();
 		if (this.nodeSettings.hasUnstableClock()) {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			log(String.format(
@@ -133,12 +131,9 @@ public class Network {
 		return this.hasConverged;
 	}
 
-	private TimeSynchronizationStrategy createSynchronizationStrategy(final AccountStateCache accountStateCache) {
+	private TimeSynchronizationStrategy createSynchronizationStrategy() {
 		final SynchronizationFilter filter = new AggregateSynchronizationFilter(Arrays.asList(new ClampingFilter(), new AlphaTrimmedMeanFilter()));
-		return new DefaultTimeSynchronizationStrategy(
-				filter,
-				new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class)),
-				accountStateCache);
+		return new DefaultTimeSynchronizationStrategy(filter, this.poiFacade, this.accountStateCache);
 	}
 
 	/**
@@ -187,10 +182,10 @@ public class Network {
 	 * @param loggingInterval The logging interval.
 	 */
 	public void advanceInTime(final long timeInterval, final long loggingInterval) {
-		final int numberOfTicks = (int)(timeInterval / TICK_INTERVALL);
-		final int ticksUntilLog = (int)(loggingInterval / TICK_INTERVALL);
-		final int ticksUntilClockAdjustment = (int)(CLOCK_ADJUSTMENT_INTERVALL / this.nodes.size() / TICK_INTERVALL);
-		final int ticksUntilClockInaccuracy = (int)(HOUR / TICK_INTERVALL);
+		final int numberOfTicks = (int)(timeInterval / TICK_INTERVAL);
+		final int ticksUntilLog = (int)(loggingInterval / TICK_INTERVAL);
+		final int ticksUntilClockAdjustment = (int)(CLOCK_ADJUSTMENT_INTERVAL / this.nodes.size() / TICK_INTERVAL);
+		final int ticksUntilClockInaccuracy = (int)(HOUR / TICK_INTERVAL);
 		for (int i = 0; i < numberOfTicks; i++) {
 			if (loggingInterval > 0 && i % ticksUntilLog == 0) {
 				this.updateStatistics();
@@ -207,8 +202,8 @@ public class Network {
 	}
 
 	public void tick() {
-		this.realTime += TICK_INTERVALL;
-		final List<TimeAwareNode> nodesToUpdate = this.getNodesToUpdate(TICK_INTERVALL);
+		this.realTime += TICK_INTERVAL;
+		final List<TimeAwareNode> nodesToUpdate = this.getNodesToUpdate(TICK_INTERVAL);
 		nodesToUpdate.stream().forEach(n -> {
 			Set<TimeAwareNode> partners = this.selectSyncPartnersForNode(n);
 			List<TimeSynchronizationSample> samples = this.createSynchronizationSamples(n, partners);
@@ -258,7 +253,7 @@ public class Network {
 
 	private AccountStateCache resetCache() {
 		this.accountStateCache = new DefaultAccountStateCache();
-		this.syncStrategy = this.createSynchronizationStrategy(this.accountStateCache);
+		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
@@ -269,20 +264,18 @@ public class Network {
 
 	/**
 	 * Updates the POI facade with the nodes importance.
-	 *
-	 * @param facade The POI facade.
 	 */
-	private void initialize(final PoiFacade facade, final AccountStateCache accountStateCache) {
+	private void initialize() {
 		// We assume that evil nodes have significant lower cumulative importance than friendly nodes.
 		final int numberOfEvilNodes = (this.nodes.size() * this.nodeSettings.getPercentageEvilNodes()) / 100;
 		for (final TimeAwareNode node : this.nodes) {
 			final double importance = node.isEvil() ?
 					this.nodeSettings.getEvilNodesCumulativeImportance() / numberOfEvilNodes :
 					(1.0 - this.nodeSettings.getEvilNodesCumulativeImportance()) / (this.nodes.size() - numberOfEvilNodes);
-			final AccountState state = accountStateCache.findStateByAddress(node.getNode().getIdentity().getAddress());
+			final AccountState state = this.accountStateCache.findStateByAddress(node.getNode().getIdentity().getAddress());
 			state.getImportanceInfo().setImportance(HEIGHT, importance);
 		}
-		this.setFacadeLastPoiVectorSize(facade, this.nodes.size());
+		this.setFacadeLastPoiVectorSize(this.poiFacade, this.nodes.size());
 	}
 
 	private void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
@@ -306,7 +299,7 @@ public class Network {
 		for (int i = 1; i <= numberOfNewNodes; i++) {
 			this.nodes.add(this.createNode());
 		}
-		this.initialize(this.poiFacade, this.accountStateCache);
+		this.initialize();
 	}
 
 	/**
@@ -319,7 +312,7 @@ public class Network {
 		this.resetCache();
 		network.getNodes().stream().forEach(n -> this.nodes.add(this.createNode(n)));
 		this.name = newName;
-		this.initialize(this.poiFacade, this.accountStateCache);
+		this.initialize();
 	}
 
 	/**
