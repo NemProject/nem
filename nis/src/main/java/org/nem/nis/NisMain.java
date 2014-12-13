@@ -66,13 +66,15 @@ public class NisMain {
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
-		// load the nemesis block information
-		this.nemesisBlock = this.loadNemesisBlock();
+		// load the nemesis block information (but do not update the cache)
+		this.nemesisBlock = this.blockAnalyzer.loadNemesisBlock();
 		this.nemesisBlockHash = HashUtils.calculateHash(this.nemesisBlock);
 		this.logNemesisInformation();
 
+		// initialize the database
 		this.populateDb();
 
+		// analyze the blocks
 		this.analyzeBlocks();
 
 		final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
@@ -86,22 +88,6 @@ public class NisMain {
 		LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
 		this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
 		LOGGER.warning("auto-booted!");
-	}
-
-	private NemesisBlock loadNemesisBlock() {
-		// set up the nemesis block amounts
-		final NisCache nisCache = this.nisCache.copy();
-		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
-
-		final AccountState nemesisState = nisCache.getAccountStateCache().findStateByAddress(NemesisBlock.ADDRESS);
-		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
-		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
-		nemesisState.setHeight(BlockHeight.ONE);
-
-		// load the nemesis block
-		final NemesisBlock nemesisBlock = NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
-		nisCache.commit();
-		return nemesisBlock;
 	}
 
 	private void logNemesisInformation() {

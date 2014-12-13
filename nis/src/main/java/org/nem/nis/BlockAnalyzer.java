@@ -48,7 +48,7 @@ public class BlockAnalyzer {
 	/**
 	 * Analyzes all blocks in the database.
 	 *
-	 * @param nisCache The readonly cache.
+	 * @param nisCache The cache.
 	 * @return true if the analysis succeeded.
 	 */
 	public boolean analyze(final NisCache nisCache) {
@@ -58,7 +58,7 @@ public class BlockAnalyzer {
 	/**
 	 * Analyzes all blocks in the database up to the specified height.
 	 *
-	 * @param nisCache The readonly cache.
+	 * @param nisCache The cache.
 	 * @param maxHeight The max height.
 	 * @return true if the analysis succeeded.
 	 */
@@ -174,7 +174,6 @@ public class BlockAnalyzer {
 	}
 
 	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {
-		// TODO 20141210 J-*: why is this function in two places (also in NisMain)
 		// set up the nemesis block amounts
 		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
@@ -187,37 +186,12 @@ public class BlockAnalyzer {
 		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
 	}
 
-	// TODO 20141030: figure out if this should be integrated here or stay in main
-
-	//private void logNemesisInformation() {
-	//	LOGGER.info("nemesis block hash:" + this.nemesisBlockHash);
-	//
-	//	final KeyPair nemesisKeyPair = this.nemesisBlock.getSigner().getKeyPair();
-	//	final Address nemesisAddress = this.nemesisBlock.getSigner().getAddress();
-	//	LOGGER.info("nemesis account private key          : " + nemesisKeyPair.getPrivateKey());
-	//	LOGGER.info("nemesis account            public key: " + nemesisKeyPair.getPublicKey());
-	//	LOGGER.info("nemesis account compressed public key: " + nemesisAddress.getEncoded());
-	//	LOGGER.info("nemesis account generation hash      : " + this.nemesisBlock.getGenerationHash());
-	//}
-
-	//private void populateDb() {
-	//	if (0 != this.blockDao.count()) {
-	//		return;
-	//	}
-	//
-	//	this.saveBlock(this.nemesisBlock);
-	//}
-	//
-	//private org.nem.nis.dbmodel.Block saveBlock(final Block block) {
-	//	org.nem.nis.dbmodel.Block dbBlock;
-	//
-	//	dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
-	//	if (null != dbBlock) {
-	//		return dbBlock;
-	//	}
-	//
-	//	dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-	//	this.blockDao.save(dbBlock);
-	//	return dbBlock;
-	//}
+	/**
+	 * Loads the nemesis block.
+	 *
+	 * @return The nemesis block
+	 */
+	public NemesisBlock loadNemesisBlock() {
+		return NemesisBlock.fromResource(new DeserializationContext(new DefaultAccountCache()));
+	}
 }
