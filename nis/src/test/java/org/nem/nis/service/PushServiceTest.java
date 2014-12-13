@@ -13,7 +13,6 @@ import org.nem.core.time.*;
 import org.nem.nis.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.test.NisUtils;
-import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.peer.*;
 
 public class PushServiceTest {
@@ -365,12 +364,6 @@ public class PushServiceTest {
 	}
 
 	//endregion
-
-	private static SingleTransactionValidator createValidatorWithResult(final ValidationResult result) {
-		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any(Transaction.class))).thenReturn(result);
-		return validator;
-	}
 
 	private static class TestContext {
 		private final NodeIdentity remoteNodeIdentity;

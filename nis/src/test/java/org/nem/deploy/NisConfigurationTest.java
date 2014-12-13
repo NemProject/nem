@@ -3,15 +3,43 @@ package org.nem.deploy;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
+import org.nem.core.test.*;
 
-import java.util.Properties;
+import java.util.*;
 
 public class NisConfigurationTest {
+	private final static List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList(
+			"nem.shortServerName",
+			"nem.httpPort",
+			"nem.httpsPort",
+			"nem.webContext",
+			"nem.apiContext",
+			"nem.homePath",
+			"nem.maxThreads");
+
+	private final static List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList(
+			"nem.folder",
+			"nem.protocol",
+			"nem.host",
+			"nem.shutdownPath",
+			"nem.useDosFilter",
+			"nem.nonAuditedApiPaths",
+			"nis.bootName",
+			"nis.bootKey",
+			"nis.nodeLimit",
+			"nis.timeSyncNodeLimit",
+			"nis.useBinaryTransport",
+			"nis.useNetworkTime",
+			"nis.ipDetectionMode",
+			"nis.unlockedLimit",
+			"nis.maxTransactions",
+			"nis.transactionHashRetentionTime",
+			"nis.additionalLocalIps");
 
 	@Test
 	public void canReadDefaultConfiguration() {
 		// Arrange:
-		final Properties properties = this.getCommonProperties();
+		final Properties properties = getCommonProperties();
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -39,9 +67,6 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.AutoRequired));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
-		Assert.assertThat(
-				config.getNonAuditedApiPaths(),
-				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height", "/push/transaction", "/node/info", "/node/extended-info" }));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
 		Assert.assertThat(
@@ -53,7 +78,7 @@ public class NisConfigurationTest {
 	public void canReadCustomConfiguration() {
 		// Arrange:
 		final PrivateKey originalPrivateKey = new KeyPair().getPrivateKey();
-		final Properties properties = this.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.bootKey", originalPrivateKey.toString());
 		properties.setProperty("nis.bootName", "my name");
 		properties.setProperty("nis.nodeLimit", "8");
@@ -62,7 +87,6 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.useNetworkTime", "false");
 		properties.setProperty("nis.ipDetectionMode", "Disabled");
 		properties.setProperty("nis.unlockedLimit", "123");
-		properties.setProperty("nis.nonAuditedApiPaths", "/status|/whatever");
 		properties.setProperty("nis.maxTransactions", "234");
 		properties.setProperty("nis.transactionHashRetentionTime", "567");
 		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
@@ -79,9 +103,6 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.useNetworkTime(), IsEqual.equalTo(false));
 		Assert.assertThat(config.getIpDetectionMode(), IsEqual.equalTo(IpDetectionMode.Disabled));
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(123));
-		Assert.assertThat(
-				config.getNonAuditedApiPaths(),
-				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(234));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(567));
 		Assert.assertThat(
@@ -89,10 +110,40 @@ public class NisConfigurationTest {
 				IsEqual.equalTo(new String[] { "10.0.0.10", "10.0.0.20" }));
 	}
 
+	//endregion
+
+	//region property required status
+
+	@Test
+	public void requiredPropertiesAreDetectedCorrectly() {
+		// Arrange:
+		final MockNemProperties properties = new MockNemProperties(getCommonProperties());
+
+		// Act:
+		new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(properties.getRequiredPropertyNames(), IsEquivalent.equivalentTo(REQUIRED_PROPERTY_NAMES));
+	}
+
+	@Test
+	public void optionalPropertiesAreDetectedCorrectly() {
+		// Arrange:
+		final MockNemProperties properties = new MockNemProperties(getCommonProperties());
+
+		// Act:
+		new NisConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(properties.getOptionalPropertyNames(), IsEquivalent.equivalentTo(OPTIONAL_PROPERTY_NAMES));
+	}
+
+	//endregion
+
 	@Test
 	public void autoBootNameIsTrimmedOfLeadingAndTrailingWhitespace() {
 		// Arrange:
-		final Properties properties = this.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nis.bootName", " \t string with spaces\t  ");
 
 		// Act:
@@ -102,51 +153,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
 	}
 
-	//region canReadStringArray
-
-	@Test
-	public void canReadStringArrayWithNoValues() {
-		// Assert:
-		this.assertCanReadStringArray(" \t \t", new String[] { });
-	}
-
-	@Test
-	public void canReadStringArrayWithSingleValue() {
-		// Assert:
-		this.assertCanReadStringArray("10.0.0.10", new String[] { "10.0.0.10" });
-	}
-
-	@Test
-	public void canReadStringArrayWithMultipleValues() {
-		// Assert:
-		this.assertCanReadStringArray(
-				"10.0.0.10|10.0.0.20|10.0.0.30",
-				new String[] { "10.0.0.10", "10.0.0.20", "10.0.0.30" });
-	}
-
-	@Test
-	public void canReadStringArrayWithBlankValues() {
-		// Assert:
-		this.assertCanReadStringArray(
-				"10.0.0.10|| |10.0.0.30",
-				new String[] { "10.0.0.10", "", " ", "10.0.0.30" });
-	}
-
-	private void assertCanReadStringArray(final String value, final String[] expectedValues) {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty("nis.additionalLocalIps", value);
-
-		// Act:
-		final NisConfiguration config = new NisConfiguration(properties);
-
-		// Assert:
-		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(expectedValues));
-	}
-
-	//endregion
-
-	private Properties getCommonProperties() {
+	private static Properties getCommonProperties() {
 		final Properties properties = new Properties();
 		properties.setProperty("nem.shortServerName", "Nis");
 		properties.setProperty("nem.folder", "folder");

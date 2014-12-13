@@ -1,6 +1,6 @@
 package org.nem.core.messages;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Cipher;
 import org.nem.core.model.*;
 import org.nem.core.serialization.*;
 
@@ -26,11 +26,11 @@ public class SecureMessage extends Message {
 	 * @param payload The unencrypted payload.
 	 */
 	public static SecureMessage fromDecodedPayload(final Account sender, final Account recipient, final byte[] payload) {
-		if (!sender.getKeyPair().hasPrivateKey()) {
+		if (!sender.hasPrivateKey()) {
 			throw new IllegalArgumentException("sender private key is required for creating secure message");
 		}
 
-		final Cipher cipher = new Cipher(sender.getKeyPair(), recipient.getKeyPair());
+		final Cipher cipher = sender.createCipher(recipient, true);
 		return new SecureMessage(sender, recipient, cipher.encrypt(payload));
 	}
 
@@ -113,13 +113,8 @@ public class SecureMessage extends Message {
 		}
 
 		public boolean canDecode() {
-			final KeyPair senderKeyPair = this.getSenderKeyPair();
-			final KeyPair recipientKeyPair = this.getRecipientKeyPair();
-			if (null == senderKeyPair || null == recipientKeyPair) {
-				return false;
-			}
-
-			return senderKeyPair.hasPrivateKey() || recipientKeyPair.hasPrivateKey();
+			return this.getSender().hasPrivateKey() && this.getRecipient().hasPublicKey()
+					|| this.getRecipient().hasPrivateKey() && this.getSender().hasPublicKey();
 		}
 
 		public byte[] getEncoded() {
@@ -131,10 +126,7 @@ public class SecureMessage extends Message {
 				return null;
 			}
 
-			final Cipher cipher =
-					this.getRecipientKeyPair().hasPrivateKey()
-							? new Cipher(this.getSenderKeyPair(), this.getRecipientKeyPair())
-							: new Cipher(this.getRecipientKeyPair(), this.getSenderKeyPair());
+			final Cipher cipher = this.getSender().createCipher(this.getRecipient(), false);
 			return cipher.decrypt(this.payload);
 		}
 
@@ -153,9 +145,9 @@ public class SecureMessage extends Message {
 			return this.recipientAddress;
 		}
 
-		protected abstract KeyPair getSenderKeyPair();
+		protected abstract Account getSender();
 
-		protected abstract KeyPair getRecipientKeyPair();
+		protected abstract Account getRecipient();
 
 		@Override
 		public int hashCode() {
@@ -184,13 +176,13 @@ public class SecureMessage extends Message {
 		}
 
 		@Override
-		protected KeyPair getSenderKeyPair() {
-			return this.deserializationContext.findAccountByAddress(this.getSenderAddress()).getKeyPair();
+		protected Account getSender() {
+			return this.deserializationContext.findAccountByAddress(this.getSenderAddress());
 		}
 
 		@Override
-		protected KeyPair getRecipientKeyPair() {
-			return this.deserializationContext.findAccountByAddress(this.getRecipientAddress()).getKeyPair();
+		protected Account getRecipient() {
+			return this.deserializationContext.findAccountByAddress(this.getRecipientAddress());
 		}
 	}
 
@@ -205,13 +197,13 @@ public class SecureMessage extends Message {
 		}
 
 		@Override
-		protected KeyPair getSenderKeyPair() {
-			return this.sender.getKeyPair();
+		protected Account getSender() {
+			return this.sender;
 		}
 
 		@Override
-		protected KeyPair getRecipientKeyPair() {
-			return this.recipient.getKeyPair();
+		protected Account getRecipient() {
+			return this.recipient;
 		}
 	}
 

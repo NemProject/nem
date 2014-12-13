@@ -203,7 +203,6 @@ public class TransferTransactionTest {
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
 		transaction.setFee(Amount.fromNem(10));
@@ -228,7 +227,6 @@ public class TransferTransactionTest {
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
 		transaction.setFee(Amount.fromNem(10));

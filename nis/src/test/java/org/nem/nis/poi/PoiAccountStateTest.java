@@ -23,6 +23,7 @@ public class PoiAccountStateTest {
 		Assert.assertThat(state.getWeightedBalances(), IsNull.notNullValue());
 		Assert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
 		Assert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
+		Assert.assertThat(state.getAccountInfo(), IsNull.notNullValue());
 		Assert.assertThat(state.getHeight(), IsNull.nullValue());
 	}
 
@@ -106,6 +107,21 @@ public class PoiAccountStateTest {
 		Assert.assertThat(links.isEmpty(), IsEqual.equalTo(false));
 		Assert.assertThat(copyLinks.isEmpty(), IsEqual.equalTo(true));
 		Assert.assertThat(copyLinks.getCurrent(), IsNull.nullValue());
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfAccountInfo() {
+		// Arrange:
+		final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+		state.getAccountInfo().incrementBalance(Amount.fromNem(1234));
+
+		// Act:
+		final PoiAccountState copy = state.copy();
+		copy.getAccountInfo().decrementBalance(Amount.fromNem(234));
+
+		// Assert:
+		Assert.assertThat(state.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
+		Assert.assertThat(copy.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
 	}
 
 	@Test

@@ -81,8 +81,8 @@ public class AccountsHeightObserverTest {
 		context.observer.notify(new AccountNotification(account1), createExecuteNotificationContext(13));
 
 		// Assert:
-		final Account cachedAccount = context.accountCache.findByAddress(account1.getAddress());
-		Assert.assertThat(cachedAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
+		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		Assert.assertThat(accountInfo.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
 	}
 
 	//endregion
@@ -105,7 +105,8 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(accountHeight);
-		account1.incrementReferenceCount();
+		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		accountInfo.incrementReferenceCount();
 
 		// Act:
 		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(undoHeight));
@@ -120,8 +121,9 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(12);
-		account1.incrementReferenceCount();
-		account1.incrementReferenceCount();
+		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		accountInfo.incrementReferenceCount();
+		accountInfo.incrementReferenceCount();
 
 		// Act:
 		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(12));
@@ -163,7 +165,8 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(12);
-		account1.incrementReferenceCount();
+		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		accountInfo.incrementReferenceCount();
 
 		// Act:
 		context.observer.notify(new AccountNotification(Utils.generateRandomAccount()), createUndoNotificationContext(12));
@@ -174,7 +177,8 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = context.createAccountWithHeight(0);
-		account1.incrementReferenceCount();
+		final AccountInfo accountInfo = context.poiFacade.findStateByAddress(account1.getAddress()).getAccountInfo();
+		accountInfo.incrementReferenceCount();
 
 		// Act:
 		context.observer.notify(new AccountNotification(account1), createUndoNotificationContext(13));
@@ -199,7 +203,6 @@ public class AccountsHeightObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account1 = Utils.generateRandomAccount();
-		account1.incrementReferenceCount();
 
 		// Act:
 		context.observer.notify(

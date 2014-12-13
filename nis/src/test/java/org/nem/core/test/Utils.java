@@ -4,7 +4,6 @@ import net.minidev.json.JSONObject;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -86,7 +85,7 @@ public class Utils {
 	 * @return A copy of account that only contains the account public key.
 	 */
 	public static Account createPublicOnlyKeyAccount(final Account account) {
-		return new Account(new KeyPair(account.getKeyPair().getPublicKey()));
+		return new Account(new KeyPair(account.getAddress().getPublicKey()));
 	}
 
 	/**
@@ -96,18 +95,6 @@ public class Utils {
 	 */
 	public static Account generateRandomAccount() {
 		return new Account(new KeyPair());
-	}
-
-	/**
-	 * Generates a random account with the specified balance.
-	 *
-	 * @param initialBalance The initial account balance.
-	 * @return A random account.
-	 */
-	public static Account generateRandomAccount(final Amount initialBalance) {
-		final Account account = Utils.generateRandomAccount();
-		account.incrementBalance(initialBalance);
-		return account;
 	}
 
 	/**

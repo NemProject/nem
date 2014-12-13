@@ -105,9 +105,8 @@ public class TransferDaoTest {
 		// Assert:
 		Assert.assertThat(entity, notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbTransfer.getId()));
-		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getKeyPair().getPublicKey()));
-		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
-		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getAddress().getPublicKey()));
+		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getAmount(), equalTo(transferTransaction.getAmount().getNumMicroNem()));
 		Assert.assertThat(entity.getSenderProof(), equalTo(transferTransaction.getSignature().getBytes()));
 		// TODO 20141010 J-G why did you remove the blockindex assert (and should we add one for order index)?
@@ -160,6 +159,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 
+	@Test
 	public void getTransactionsForAccountUsingHashThrowsWhenHashNotFound() {
 		// Arrange:
 		this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_HASH);
@@ -250,9 +250,9 @@ public class TransferDaoTest {
 	}
 
 	@Test
-	public void getTransactionsForAccountUsingHashThrowsIfSenderIsUnknown() {
+	public void getTransactionsForAccountUsingHashReturnsEmptyCollectionIfSenderIsUnknown() {
 		// Assert:
-		this.assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(USE_HASH);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(USE_HASH);
 	}
 
 	// endregion
@@ -366,9 +366,9 @@ public class TransferDaoTest {
 	}
 
 	@Test
-	public void getTransactionsForAccountUsingIdThrowsIfSenderIsUnknown() {
+	public void getTransactionsForAccountUsingIdReturnsEmptyCollectionIfSenderIsUnknown() {
 		// Assert:
-		this.assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(USE_ID);
+		this.assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(USE_ID);
 	}
 
 	// endregion
@@ -515,10 +515,18 @@ public class TransferDaoTest {
 		Assert.assertThat(timeStamps.size(), equalTo(0));
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
+	private void assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(final int callType) {
+		// Arrange: roundabout way to ensure that account is added to the db under test
+		final Account account = Utils.generateRandomAccount();
+		final long heights[] = { 3 };
+		final int blockTimestamp[] = { 1801 };
+		final int txTimestamps[][] = { { 1800 } };
+		this.createTestBlocks(heights, blockTimestamp, txTimestamps, account, true);
+
+		// Act:
 		ExceptionAssert.assertThrows(
 				v -> this.executeGetTransactionsForAccountUsingAttribute(
-						Utils.generateRandomAccount(),
+						account,
 						Utils.generateRandomHash(),
 						new SecureRandom().nextLong(),
 						BlockHeight.ONE,
@@ -527,7 +535,7 @@ public class TransferDaoTest {
 				MissingResourceException.class);
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(final int type) {
+	private void assertGetTransactionsForAccountUsingAttributeReturnsResultsSortedById(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 
@@ -553,7 +561,7 @@ public class TransferDaoTest {
 		Assert.assertThat(resultIds, equalTo(expectedIds));
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
+	private void assertGetTransactionsForAccountUsingAttributeFiltersDuplicatesIfTransferTypeIsAll(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final long heights[] = { 3 };
@@ -572,7 +580,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entities.size(), equalTo(1));
 	}
 
-	public void assertGetTransactionsForAccountUsingAttributeThrowsIfSenderIsUnknown(final int type) {
+	private void assertGetTransactionsForAccountUsingAttributeReturnsEmptyCollectionIfSenderIsUnknown(final int type) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final long heights[] = { 3, 4, 1, 2 };
@@ -581,15 +589,16 @@ public class TransferDaoTest {
 		this.createTestBlocks(heights, blockTimestamp, txTimestamps, sender, false);
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> this.executeGetTransactionsForAccountUsingAttribute(
-						Utils.generateRandomAccount(),
-						null,
-						null,
-						BlockHeight.ONE,
-						ReadOnlyTransferDao.TransferType.ALL,
-						type),
-				MissingResourceException.class);
+		final Collection<TransferBlockPair> entities = this.executeGetTransactionsForAccountUsingAttribute(
+				Utils.generateRandomAccount(),
+				null,
+				null,
+				BlockHeight.ONE,
+				ReadOnlyTransferDao.TransferType.ALL,
+				type);
+
+		// Assert:
+		Assert.assertThat(entities.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	private Collection<TransferBlockPair> executeGetTransactionsForAccountUsingAttribute(
@@ -894,16 +903,17 @@ public class TransferDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(),
-				recipient.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(
+				recipient.getAddress().getEncoded(),
+				recipient.getAddress().getPublicKey());
 		mockAccountDao.addMapping(sender, dbSender);
 		mockAccountDao.addMapping(recipient, dbRecipient);
 		return new AccountDaoLookupAdapter(mockAccountDao);

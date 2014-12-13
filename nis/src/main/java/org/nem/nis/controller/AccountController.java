@@ -54,9 +54,8 @@ public class AccountController {
 	// > any nis for my harvesting purposes ... i think we need a ticket / token to allow a NIS to reject unauthorized harvesters
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
 		final KeyPair keyPair = new KeyPair(privateKey);
-		final Account account = this.accountIo.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()));
-		final Account copyOfAccount = account.shallowCopyWithKeyPair(keyPair);
-		final UnlockResult result = this.unlockedAccounts.addUnlockedAccount(copyOfAccount);
+		final Account account = new Account(keyPair);
+		final UnlockResult result = this.unlockedAccounts.addUnlockedAccount(account);
 
 		if (UnlockResult.SUCCESS != result) {
 			throw new IllegalArgumentException(result.toString());

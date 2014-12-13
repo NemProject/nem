@@ -21,6 +21,7 @@ public class BlockChainValidator {
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
 	private final SingleTransactionValidator transactionValidator;
+	private final DebitPredicate debitPredicate;
 
 	/**
 	 * Creates a new block chain validator.
@@ -30,18 +31,21 @@ public class BlockChainValidator {
 	 * @param maxChainSize The maximum chain size.
 	 * @param blockValidator The validator to use for validating blocks.
 	 * @param transactionValidator The validator to use for validating transactions.
+	 * @param debitPredicate The debit predicate to use for validating transactions.
 	 */
 	public BlockChainValidator(
 			final Consumer<Block> executor,
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final BlockValidator blockValidator,
-			final SingleTransactionValidator transactionValidator) {
+			final SingleTransactionValidator transactionValidator,
+			final DebitPredicate debitPredicate) {
 		this.executor = executor;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
 		this.transactionValidator = transactionValidator;
+		this.debitPredicate = debitPredicate;
 	}
 
 	/**
@@ -83,7 +87,7 @@ public class BlockChainValidator {
 				return false;
 			}
 
-			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight);
+			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.debitPredicate);
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
 					LOGGER.info("received block with unverifiable transaction");

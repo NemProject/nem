@@ -29,7 +29,7 @@ public class PushControllerTest {
 
 		final NodeIdentity identity = new NodeIdentity(new KeyPair());
 		final JSONObject jsonIdentity = new JSONObject();
-		jsonIdentity.put("public-key", HexEncoder.getString(identity.getKeyPair().getPublicKey().getRaw()));
+		jsonIdentity.put("public-key", identity.getAddress().getPublicKey().toString());
 		jsonIdentity.put("name", "test");
 
 		final Signature signature = identity.sign(HashUtils.calculateHash(transaction).getRaw());

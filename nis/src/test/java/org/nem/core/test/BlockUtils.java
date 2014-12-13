@@ -71,7 +71,6 @@ public class BlockUtils {
 				DUMMY_GENERATION_HASH,
 				new TimeInstant(7),
 				height);
-		forger.incrementForagedBlocks();
 		return block;
 	}
 

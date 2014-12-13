@@ -3,7 +3,7 @@ package org.nem.nis.validators;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.remote.*;
 
 /**
@@ -83,8 +83,9 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
+				final Amount remoteBalance = this.poiFacade.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
 				if (height.getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
-					if (0 != transaction.getRemote().getBalance().compareTo(Amount.ZERO)) {
+					if (0 != remoteBalance.compareTo(Amount.ZERO)) {
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
 					}
 				}

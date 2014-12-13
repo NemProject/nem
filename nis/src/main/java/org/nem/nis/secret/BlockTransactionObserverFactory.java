@@ -36,8 +36,8 @@ public class BlockTransactionObserverFactory {
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new WeightedBalancesObserver(poiFacade));
 		builder.add(new AccountsHeightObserver(nisCache));
-		builder.add(new BalanceCommitTransferObserver());
-		builder.add(new HarvestRewardCommitObserver());
+		builder.add(new BalanceCommitTransferObserver(poiFacade));
+		builder.add(new HarvestRewardCommitObserver(poiFacade));
 		builder.add(new RemoteObserver(poiFacade));
 		builder.add(new MultisigAccountObserver(poiFacade));
 		builder.add(new OutlinkObserver(poiFacade));

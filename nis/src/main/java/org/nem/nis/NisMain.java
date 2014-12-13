@@ -86,10 +86,10 @@ public class NisMain {
 
 	private NemesisBlock loadNemesisBlock() {
 		// set up the nemesis block amounts
-		final Account nemesisAccount = this.nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
-		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
+		this.nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
 		final PoiAccountState nemesisState = this.nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);
 
@@ -100,10 +100,8 @@ public class NisMain {
 	private void logNemesisInformation() {
 		LOGGER.info("nemesis block hash:" + this.nemesisBlockHash);
 
-		final KeyPair nemesisKeyPair = this.nemesisBlock.getSigner().getKeyPair();
 		final Address nemesisAddress = this.nemesisBlock.getSigner().getAddress();
-		LOGGER.info("nemesis account private key          : " + nemesisKeyPair.getPrivateKey());
-		LOGGER.info("nemesis account            public key: " + nemesisKeyPair.getPublicKey());
+		LOGGER.info("nemesis account            public key: " + nemesisAddress.getPublicKey());
 		LOGGER.info("nemesis account compressed public key: " + nemesisAddress.getEncoded());
 		LOGGER.info("nemesis account generation hash      : " + this.nemesisBlock.getGenerationHash());
 	}

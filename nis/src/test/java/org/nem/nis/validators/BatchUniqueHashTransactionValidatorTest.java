@@ -7,6 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.test.DebitPredicates;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -88,7 +89,10 @@ public class BatchUniqueHashTransactionValidatorTest {
 		}
 
 		private TransactionsContextPair createPair(final int start, final int end, final long height) {
-			final ValidationContext validationContext = new ValidationContext(new BlockHeight(height), this.confirmedBlockHeight);
+			final ValidationContext validationContext = new ValidationContext(
+					new BlockHeight(height),
+					this.confirmedBlockHeight,
+					DebitPredicates.Throw);
 			final List<Transaction> transactions = new ArrayList<>();
 			for (int i = start; i <= end; ++i) {
 				transactions.add(this.transactions.get(i));

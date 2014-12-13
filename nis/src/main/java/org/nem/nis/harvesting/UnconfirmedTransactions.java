@@ -6,6 +6,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisCache;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -21,8 +22,8 @@ public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
-	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
-	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
+	private final UnconfirmedBalancesObserver unconfirmedBalances;
+	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
 	private final NisCache nisCache;
@@ -59,9 +60,11 @@ public class UnconfirmedTransactions {
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
 			final NisCache nisCache) {
-		this.validatorFactory = validatorFactory;
-		this.nisCache = nisCache;
-		this.singleValidator = this.createSingleValidator(false);
+		this(
+				new ArrayList<>(),
+				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
+				validatorFactory,
+				nisCache);
 	}
 
 	private UnconfirmedTransactions(
@@ -72,6 +75,8 @@ public class UnconfirmedTransactions {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator(true);
+		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getPoiFacade());
+		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -180,14 +185,16 @@ public class UnconfirmedTransactions {
 	}
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
-		final TransactionsContextPair pair = new TransactionsContextPair(transactions, new ValidationContext());
+		final TransactionsContextPair pair = new TransactionsContextPair(transactions, this.createValidationContext());
 		return this.validatorFactory.createBatch(this.nisCache.getTransactionHashCache()).validate(Arrays.asList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {
-		return this.singleValidator.validate(
-				transaction,
-				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
+		return this.singleValidator.validate(transaction, this.createValidationContext());
+	}
+
+	private ValidationContext createValidationContext() {
+		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
 	private SingleTransactionValidator createSingleValidator(boolean blockCreation) {
@@ -354,10 +361,15 @@ public class UnconfirmedTransactions {
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
+		private final PoiFacade poiFacade;
 		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
+		public UnconfirmedBalancesObserver(final PoiFacade poiFacade) {
+			this.poiFacade = poiFacade;
+		}
+
 		public Amount get(final Account account) {
-			return this.unconfirmedBalances.getOrDefault(account, account.getBalance());
+			return this.unconfirmedBalances.getOrDefault(account, this.getBalance(account));
 		}
 
 		@Override
@@ -382,7 +394,11 @@ public class UnconfirmedTransactions {
 
 		private void addToCache(final Account account) {
 			// it's ok to put reference here, thanks to Account being non-mutable
-			this.unconfirmedBalances.putIfAbsent(account, account.getBalance());
+			this.unconfirmedBalances.putIfAbsent(account, this.getBalance(account));
+		}
+
+		private Amount getBalance(final Account account) {
+			return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		}
 	}
 }

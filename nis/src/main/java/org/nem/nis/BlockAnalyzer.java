@@ -163,11 +163,12 @@ public class BlockAnalyzer {
 	}
 
 	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {
+		// TODO 20141210 J-*: why is this function in two places (also in NisMain)
 		// set up the nemesis block amounts
-		final Account nemesisAccount = nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
-		nemesisAccount.incrementBalance(NemesisBlock.AMOUNT);
+		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
 		final PoiAccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);
 

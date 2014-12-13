@@ -38,7 +38,7 @@ public class HttpConnectorTest {
 		final Node remoteNode = this.connector.getInfo(node).join();
 
 		// Assert:
-		Assert.assertThat(remoteNode.getIdentity().getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(remoteNode.getIdentity().getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
 	}
 
 	@Test

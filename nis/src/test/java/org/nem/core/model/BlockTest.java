@@ -62,7 +62,7 @@ public class BlockTest {
 		Assert.assertThat(block.getDifficulty(), IsEqual.equalTo(BlockDifficulty.INITIAL_DIFFICULTY));
 		final Hash expectedGenerationHash = HashUtils.nextHash(
 				previousBlock.getGenerationHash(),
-				signer.getKeyPair().getPublicKey());
+				signer.getAddress().getPublicKey());
 		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 		Assert.assertThat(block.getLessor(), IsNull.nullValue());
 	}
@@ -84,7 +84,7 @@ public class BlockTest {
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(previousBlock)));
 		final Hash expectedGenerationHash = HashUtils.nextHash(
 				previousBlock.getGenerationHash(),
-				block.getSigner().getKeyPair().getPublicKey());
+				block.getSigner().getAddress().getPublicKey());
 		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 	}
 
@@ -100,7 +100,7 @@ public class BlockTest {
 		// Assert:
 		final Hash expectedGenerationHash = HashUtils.nextHash(
 				previousGenerationHash,
-				block.getSigner().getKeyPair().getPublicKey());
+				block.getSigner().getAddress().getPublicKey());
 		Assert.assertThat(block.getGenerationHash(), IsEqual.equalTo(expectedGenerationHash));
 	}
 

@@ -27,35 +27,15 @@ public class AccountControllerTest {
 	//region accountUnlock
 
 	@Test
-	public void unlockCopiesRelevantAccountData() {
-		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account accountFromIo = Mockito.mock(Account.class);
-		final Account copyAccount = Mockito.mock(Account.class);
-		Mockito.when(accountFromIo.shallowCopyWithKeyPair(keyPair)).thenReturn(copyAccount);
-
-		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
-		Mockito.when(accountIoAdapter.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()))).thenReturn(accountFromIo);
-
-		final TestContext context = new TestContext(accountIoAdapter);
-		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
-
-		// Act:
-		context.controller.accountUnlock(keyPair.getPrivateKey());
-
-		// Assert:
-		Mockito.verify(accountFromIo, Mockito.times(1)).shallowCopyWithKeyPair(Mockito.any());
-	}
-
-	@Test
 	public void unlockDelegatesToUnlockedAccounts() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
 		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
 		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
-		context.controller.accountUnlock(account.getKeyPair().getPrivateKey());
+		context.controller.accountUnlock(keyPair.getPrivateKey());
 
 		// Assert:
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).addUnlockedAccount(Mockito.any());
@@ -64,13 +44,14 @@ public class AccountControllerTest {
 	@Test
 	public void unlockFailureRaisesException() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
 		final TestContext context = createContextAroundAccount(account, Amount.ZERO);
 		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.FAILURE_UNKNOWN_ACCOUNT);
 
 		// Act:
 		ExceptionAssert.assertThrows(
-				v -> context.controller.accountUnlock(account.getKeyPair().getPrivateKey()),
+				v -> context.controller.accountUnlock(keyPair.getPrivateKey()),
 				IllegalArgumentException.class);
 	}
 
@@ -81,24 +62,25 @@ public class AccountControllerTest {
 	@Test
 	public void lockDelegatesToUnlockedAccounts() {
 		// Arrange:
-		final Account account = org.nem.core.test.Utils.generateRandomAccount();
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
 		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
-		final PrivateKey privateKey = new PrivateKey(account.getKeyPair().getPrivateKey().getRaw());
 		Mockito.when(context.unlockedAccounts.addUnlockedAccount(Mockito.any())).thenReturn(UnlockResult.SUCCESS);
 
 		// Act:
-		context.controller.accountUnlock(account.getKeyPair().getPrivateKey());
-		context.controller.accountLock(privateKey);
+		context.controller.accountUnlock(keyPair.getPrivateKey());
+		context.controller.accountLock(keyPair.getPrivateKey());
 
 		// Assert:
 		Mockito.verify(context.unlockedAccounts, Mockito.times(1)).removeUnlockedAccount(Mockito.any());
 	}
 
 	private static TestContext createContextAroundAccount(final Account account, final Amount amount) {
-		account.incrementBalance(amount);
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		Mockito.when(accountIoAdapter.findByAddress(account.getAddress())).thenReturn(account);
-		return new TestContext(accountIoAdapter);
+		final TestContext context = new TestContext(accountIoAdapter);
+		context.addAccount(account, amount);
+		return context;
 	}
 
 	//endregion
@@ -431,6 +413,13 @@ public class AccountControllerTest {
 					accountIoAdapter,
 					this.poiFacade,
 					this.transactionHashCache);
+		}
+
+		private Account addAccount(final Account account, final Amount amount) {
+			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			accountState.getAccountInfo().incrementBalance(amount);
+			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			return account;
 		}
 	}
 }

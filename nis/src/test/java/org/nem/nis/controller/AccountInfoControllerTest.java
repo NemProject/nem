@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
+import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -180,7 +181,7 @@ public class AccountInfoControllerTest {
 	private static Transaction createTransfer(final Address address) {
 		return new TransferTransaction(
 				TimeInstant.ZERO,
-				Utils.generateRandomAccount(Amount.fromNem(100)),
+				Utils.generateRandomAccount(),
 				new Account(address),
 				Amount.fromNem(1),
 				null);

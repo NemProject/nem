@@ -6,7 +6,8 @@ import org.nem.nis.remote.RemoteLinks;
 import org.nem.nis.secret.*;
 
 /**
- * Class containing extrinsic NIS-account information that is used to calculate POI.
+ * Class containing extrinsic in-memory mutable account information.
+ * TODO 20141209 J-*: really, really need to rename this class to AccountState!!!
  */
 public class PoiAccountState {
 	private final Address address;
@@ -14,13 +15,14 @@ public class PoiAccountState {
 	private final WeightedBalances weightedBalances;
 	private final RemoteLinks remoteLinks;
 	private final MultisigLinks multisigLinks;
+	private final AccountInfo accountInfo;
 	private BlockHeight height;
 
 	/**
 	 * Creates a new NIS account state.
 	 */
 	public PoiAccountState(final Address address) {
-		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new MultisigLinks(), null);
+		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new MultisigLinks(), new AccountInfo(), null);
 	}
 
 	private PoiAccountState(
@@ -29,12 +31,14 @@ public class PoiAccountState {
 			final WeightedBalances weightedBalances,
 			final RemoteLinks remoteLinks,
 			final MultisigLinks multisigLinks,
+			final AccountInfo accountInfo,
 			final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
 		this.weightedBalances = weightedBalances;
 		this.remoteLinks = remoteLinks;
 		this.multisigLinks = multisigLinks;
+		this.accountInfo = accountInfo;
 		this.height = height;
 	}
 
@@ -82,6 +86,14 @@ public class PoiAccountState {
 	public MultisigLinks getMultisigLinks() {
 		return multisigLinks;
 	}
+	/**
+	 * Gets the account info.
+	 *
+	 * @return The account info.
+	 */
+	public AccountInfo getAccountInfo() {
+		return this.accountInfo;
+	}
 
 	/**
 	 * Returns height of an account.
@@ -115,6 +127,7 @@ public class PoiAccountState {
 				this.weightedBalances.copy(),
 				this.remoteLinks.copy(),
 				this.multisigLinks.copy(),
+				this.accountInfo.copy(),
 				this.height);
 	}
 }

@@ -82,11 +82,11 @@ public class ImportanceTransferMapperTest {
 
 			this.dbSender = new org.nem.nis.dbmodel.Account();
 			this.dbSender.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbSender.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
+			this.dbSender.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
 			this.dbRemote = new org.nem.nis.dbmodel.Account();
 			this.dbRemote.setPrintableKey(this.model.getRemote().getAddress().getEncoded());
-			this.dbRemote.setPublicKey(remote.getKeyPair().getPublicKey());
+			this.dbRemote.setPublicKey(remote.getAddress().getPublicKey());
 
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbSender);
@@ -130,7 +130,7 @@ public class ImportanceTransferMapperTest {
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 			Assert.assertThat(dbModel.getBlock(), IsNull.nullValue());
 
-			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+			final PublicKey signerPublicKey = this.model.getSigner().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getSender().getPublicKey(), IsEqual.equalTo(signerPublicKey));
 			final PublicKey remotePublicKey = this.model.getRemote().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getRemote().getPublicKey(), IsEqual.equalTo(remotePublicKey));

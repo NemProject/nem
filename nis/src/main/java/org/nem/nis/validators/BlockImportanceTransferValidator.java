@@ -26,7 +26,11 @@ public class BlockImportanceTransferValidator implements BlockValidator {
 			return ValidationResult.SUCCESS;
 		}
 
+		// it is ok to pass in a validation context with a null debit predicate because the
+		// NonConflictingImportanceTransferTransactionValidator does not require debit checks
+		// and doing so avoids a dependency on the poi facade
+		final ValidationContext validationContext = new ValidationContext(null);
 		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> importanceTransfers);
-		return ValidationResult.aggregate(importanceTransfers.stream().map(t -> validator.validate(t)).iterator());
+		return ValidationResult.aggregate(importanceTransfers.stream().map(t -> validator.validate(t, validationContext)).iterator());
 	}
 }

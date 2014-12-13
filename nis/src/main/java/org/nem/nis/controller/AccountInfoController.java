@@ -47,7 +47,7 @@ public class AccountInfoController {
 	@ClientApi
 	public AccountMetaDataPair accountGet(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		final AccountInfo account = this.accountInfoFactory.createInfo(address);
+		final org.nem.core.model.ncc.AccountInfo account = this.accountInfoFactory.createInfo(address);
 		final AccountMetaData metaData = this.accountStatus(builder);
 		return new AccountMetaDataPair(account, metaData);
 	}

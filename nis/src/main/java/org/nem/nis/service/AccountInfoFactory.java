@@ -2,7 +2,6 @@ package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
@@ -39,13 +38,14 @@ public class AccountInfoFactory {
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
+		final org.nem.nis.poi.AccountInfo accountInfo = accountState.getAccountInfo();
 
 		final AccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
 				account.getAddress(),
-				account.getBalance(),
-				account.getForagedBlocks(),
-				account.getLabel(),
+				accountInfo.getBalance(),
+				accountInfo.getHarvestedBlocks(),
+				accountInfo.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
 	}
 }

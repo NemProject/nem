@@ -1,49 +1,158 @@
 package org.nem.core.deploy;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.node.NodeEndpoint;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 
 import java.net.MalformedURLException;
-import java.util.Properties;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class CommonConfigurationTest {
+	private final static List<String> REQUIRED_PROPERTY_NAMES = Arrays.asList(
+			"nem.shortServerName",
+			"nem.httpPort",
+			"nem.httpsPort",
+			"nem.webContext",
+			"nem.apiContext",
+			"nem.homePath",
+			"nem.maxThreads");
 
-	//region valid construction/retrieval of information
+	private final static List<String> OPTIONAL_PROPERTY_NAMES = Arrays.asList(
+			"nem.folder",
+			"nem.protocol",
+			"nem.host",
+			"nem.shutdownPath",
+			"nem.useDosFilter",
+			"nem.nonAuditedApiPaths");
+
+	//region basic construction
 
 	@Test
-	public void allPropertiesAreSetInConstructor() {
+	public void canReadDefaultConfigurationFromResources() {
+		// Act:
+		final CommonConfiguration config = new CommonConfiguration();
+
+		// Assert:
+		assertDefaultRequiredConfiguration(config);
+		assertDefaultOptionalConfiguration(config);
+	}
+
+	@Test
+	public void canReadCustomConfiguration() {
 		// Arrange:
-		final Properties properties = this.getCommonProperties();
+		final Properties properties = getCommonProperties();
 
 		// Act:
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
 		// Assert
+		assertCustomRequiredConfiguration(config);
+		assertCustomOptionalConfiguration(config);
+	}
+
+	@Test
+	public void canReadCustomConfigurationWithoutOptionalProperties() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		OPTIONAL_PROPERTY_NAMES.forEach(properties::remove);
+
+		// Act:
+		final CommonConfiguration config = new CommonConfiguration(properties);
+
+		// Assert
+		assertCustomRequiredConfiguration(config);
+		assertDefaultOptionalConfiguration(config);
+	}
+
+	private static void assertDefaultRequiredConfiguration(final CommonConfiguration config) {
+		// Assert:
+		Assert.assertThat(config.getShortServerName(), IsEqual.equalTo("Nis"));
+		Assert.assertThat(config.getMaxThreads(), IsEqual.equalTo(500));
+		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(7890));
+		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(7891));
+		Assert.assertThat(config.getWebContext(), IsEqual.equalTo(""));
+		Assert.assertThat(config.getApiContext(), IsEqual.equalTo(""));
+		Assert.assertThat(config.getHomePath(), IsEqual.equalTo(""));
+	}
+
+	private static void assertDefaultOptionalConfiguration(final CommonConfiguration config) {
+		// Assert:
+		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo(Paths.get(System.getProperty("user.home"), "nem").toString()));
+		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
+		Assert.assertThat(config.getHost(), IsEqual.equalTo("127.0.0.1"));
+		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/shutdown"));
+		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
+		Assert.assertThat(
+				config.getNonAuditedApiPaths(),
+				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height", "/push/transaction", "/node/info", "/node/extended-info" }));
+	}
+
+	private static void assertCustomRequiredConfiguration(final CommonConfiguration config) {
+		// Assert:
 		Assert.assertThat(config.getShortServerName(), IsEqual.equalTo("Ncc"));
-		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo("folder"));
 		Assert.assertThat(config.getMaxThreads(), IsEqual.equalTo(1));
-		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("ftp"));
-		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.1"));
 		Assert.assertThat(config.getHttpPort(), IsEqual.equalTo(100));
 		Assert.assertThat(config.getHttpsPort(), IsEqual.equalTo(101));
 		Assert.assertThat(config.getWebContext(), IsEqual.equalTo("/web"));
 		Assert.assertThat(config.getApiContext(), IsEqual.equalTo("/api"));
 		Assert.assertThat(config.getHomePath(), IsEqual.equalTo("/home"));
+	}
+
+	private static void assertCustomOptionalConfiguration(final CommonConfiguration config) {
+		// Assert:
+		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo("folder"));
+		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("ftp"));
+		Assert.assertThat(config.getHost(), IsEqual.equalTo("10.0.0.1"));
 		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/sd"));
 		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
+		Assert.assertThat(
+				config.getNonAuditedApiPaths(),
+				IsEqual.equalTo(new String[] { "/status", "/whatever" }));
 	}
+
+	//endregion
+
+	//region property required status
+
+	@Test
+	public void requiredPropertiesAreDetectedCorrectly() {
+		// Arrange:
+		final MockNemProperties properties = new MockNemProperties(getCommonProperties());
+
+		// Act:
+		new CommonConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(properties.getRequiredPropertyNames(), IsEquivalent.equivalentTo(REQUIRED_PROPERTY_NAMES));
+	}
+
+	@Test
+	public void optionalPropertiesAreDetectedCorrectly() {
+		// Arrange:
+		final MockNemProperties properties = new MockNemProperties(getCommonProperties());
+
+		// Act:
+		new CommonConfiguration(properties);
+
+		// Assert:
+		Assert.assertThat(properties.getOptionalPropertyNames(), IsEquivalent.equivalentTo(OPTIONAL_PROPERTY_NAMES));
+	}
+
+	//endregion
+
+	//region derivative information
 
 	@Test
 	public void additionalInformationCanBeRetrieved() {
 		// Arrange:
-		final Properties properties = this.getCommonProperties();
+		final Properties properties = getCommonProperties();
 
 		// Act:
 		final CommonConfiguration config = new CommonConfiguration(properties);
 
-		// Assert
+		// Assert:
 		Assert.assertThat(config.isNcc(), IsEqual.equalTo(true));
 		Assert.assertThat(config.getBaseUrl(), IsEqual.equalTo("ftp://10.0.0.1:100"));
 		Assert.assertThat(config.getShutdownUrl(), IsEqual.equalTo("ftp://10.0.0.1:100/api/sd"));
@@ -53,7 +162,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadEndpointSettingsWithHttpPort() throws MalformedURLException {
 		// Arrange:
-		final Properties properties = this.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nem.protocol", "http");
 		properties.setProperty("nem.host", "10.0.0.12");
 		properties.setProperty("nem.httpPort", "100");
@@ -75,7 +184,7 @@ public class CommonConfigurationTest {
 	@Test
 	public void canReadEndpointSettingsWithHttpsPort() throws MalformedURLException {
 		// Arrange:
-		final Properties properties = this.getCommonProperties();
+		final Properties properties = getCommonProperties();
 		properties.setProperty("nem.protocol", "https");
 		properties.setProperty("nem.host", "10.0.0.12");
 		properties.setProperty("nem.httpPort", "100");
@@ -96,151 +205,7 @@ public class CommonConfigurationTest {
 
 	//endregion
 
-	//region mandatory entries
-
-	@Test(expected = RuntimeException.class)
-	public void cannotReadConfigurationWithoutShortServerName() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.shortServerName");
-
-		// Act:
-		new CommonConfiguration(properties);
-	}
-
-	@Test
-	public void cannotReadConfigurationWithoutMaxThreads() {
-		// Act:
-		this.assertIntPropertyIsRequired("nem.maxThreads");
-	}
-
-	@Test
-	public void cannotReadConfigurationWithUnparsableMaxThreads() {
-		// Act:
-		this.assertIntPropertyMustBeParsable("nem.maxThreads");
-	}
-
-	@Test
-	public void cannotReadConfigurationWithoutHttpPort() {
-		// Act:
-		this.assertIntPropertyIsRequired("nem.httpPort");
-	}
-
-	@Test
-	public void cannotReadConfigurationWithUnparsableHttpPort() {
-		// Act:
-		this.assertIntPropertyMustBeParsable("nem.httpPort");
-	}
-
-	@Test
-	public void cannotReadConfigurationWithoutHttpsPort() {
-		// Act:
-		this.assertIntPropertyIsRequired("nem.httpsPort");
-	}
-
-	@Test
-	public void cannotReadConfigurationWithUnparsableHttpsPort() {
-		// Act:
-		this.assertIntPropertyMustBeParsable("nem.httpsPort");
-	}
-
-	@Test(expected = RuntimeException.class)
-	public void cannotReadConfigurationWithoutWebContext() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.webContext");
-
-		// Act:
-		new CommonConfiguration(properties);
-	}
-
-	@Test(expected = RuntimeException.class)
-	public void cannotReadConfigurationWithoutApiContext() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.apiContext");
-
-		// Act:
-		new CommonConfiguration(properties);
-	}
-
-	@Test(expected = RuntimeException.class)
-	public void cannotReadConfigurationWithoutHomePath() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.homePath");
-
-		// Act:
-		new CommonConfiguration(properties);
-	}
-
-	//endregion
-
-	//region optional entries
-
-	@Test
-	public void canReadConfigurationWithoutFolder() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.folder");
-
-		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
-
-		Assert.assertThat(config.getNemFolder(), IsEqual.equalTo(System.getProperty("user.home")));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutProtocol() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.protocol");
-
-		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
-
-		Assert.assertThat(config.getProtocol(), IsEqual.equalTo("http"));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutHost() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.host");
-
-		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
-
-		Assert.assertThat(config.getHost(), IsEqual.equalTo("localhost"));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutShutdownPath() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.shutdownPath");
-
-		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
-
-		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/shutdown"));
-	}
-
-	@Test
-	public void canReadConfigurationWithoutUseDosFilter() {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove("nem.useDosFilter");
-
-		// Act:
-		final CommonConfiguration config = new CommonConfiguration(properties);
-
-		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(false));
-	}
-
-	//endregion
-
-	private Properties getCommonProperties() {
+	private static Properties getCommonProperties() {
 		final Properties properties = new Properties();
 		properties.setProperty("nem.shortServerName", "Ncc");
 		properties.setProperty("nem.folder", "folder");
@@ -254,24 +219,7 @@ public class CommonConfigurationTest {
 		properties.setProperty("nem.homePath", "/home");
 		properties.setProperty("nem.shutdownPath", "/sd");
 		properties.setProperty("nem.useDosFilter", "true");
+		properties.setProperty("nem.nonAuditedApiPaths", "/status|/whatever");
 		return properties;
-	}
-
-	private void assertIntPropertyIsRequired(final String propName) {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.remove(propName);
-
-		// Act:
-		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), RuntimeException.class);
-	}
-
-	private void assertIntPropertyMustBeParsable(final String propName) {
-		// Arrange:
-		final Properties properties = this.getCommonProperties();
-		properties.setProperty(propName, "notANumber");
-
-		// Act:
-		ExceptionAssert.assertThrows(v -> new CommonConfiguration(properties), NumberFormatException.class);
 	}
 }

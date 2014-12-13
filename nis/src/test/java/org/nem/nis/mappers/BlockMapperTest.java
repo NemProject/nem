@@ -545,7 +545,7 @@ public class BlockMapperTest {
 
 			this.dbForager = new org.nem.nis.dbmodel.Account();
 			this.dbForager.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbForager.setPublicKey(this.model.getSigner().getKeyPair().getPublicKey());
+			this.dbForager.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
 			this.account1 = Utils.generateRandomAccount();
 			this.dbAccount1 = this.createDbAccount(this.account1);
@@ -572,7 +572,7 @@ public class BlockMapperTest {
 
 		private org.nem.nis.dbmodel.Account createDbAccount(final Account account) {
 			final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account();
-			dbAccount.setPublicKey(account.getKeyPair().getPublicKey());
+			dbAccount.setPublicKey(account.getAddress().getPublicKey());
 			dbAccount.setPrintableKey(account.getAddress().getEncoded());
 			return dbAccount;
 		}
@@ -692,7 +692,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.blockGenerationHash));
 			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(this.dbLessor));
 
-			final PublicKey signerPublicKey = this.model.getSigner().getKeyPair().getPublicKey();
+			final PublicKey signerPublicKey = this.model.getSigner().getAddress().getPublicKey();
 			Assert.assertThat(dbModel.getForger().getPublicKey(), IsEqual.equalTo(signerPublicKey));
 		}
 
