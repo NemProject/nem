@@ -26,7 +26,7 @@ public class AccountController {
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
 	private final AccountStateCache accountStateCache;
-	private final DefaultHashCache transactionHashCache;
+	private final ReadOnlyHashCache transactionHashCache;
 
 	@Autowired(required = true)
 	AccountController(
@@ -34,7 +34,7 @@ public class AccountController {
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
 			final AccountStateCache accountStateCache,
-			final DefaultHashCache transactionHashCache) {
+			final ReadOnlyHashCache transactionHashCache) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
