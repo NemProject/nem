@@ -125,9 +125,4 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 		cache.hashMap.putAll(this.hashMap);
 		cache.retentionTime = this.retentionTime;
 	}
-
-	@Override
-	public Stream<Map.Entry<Hash, HashMetaData>> stream() {
-		return this.hashMap.entrySet().stream();
-	}
 }

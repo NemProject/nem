@@ -358,10 +358,11 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void copyCopiesAllEntries() {
 		// Arrange:
+		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345).stream()
+				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
+				.collect(Collectors.toList());
 		final T original = this.createCacheWithRetentionTime(789);
-		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)));
-		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)));
-		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
+		original.putAll(pairs);
 
 		// Act:
 		final T copy = original.copy();
@@ -369,7 +370,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		// Assert:
 		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
-		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsSame.sameInstance(e.getValue())));
+		assertSameContents(copy, pairs);
 	}
 
 	// endregion
@@ -379,10 +380,12 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void shallowCopyToCopiesAllEntries() {
 		// Arrange:
+		final List<HashMetaDataPair> pairs = Arrays.asList(123, 234, 345).stream()
+				.map(timeStamp -> new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(timeStamp)))
+				.collect(Collectors.toList());
 		final T original = this.createCacheWithRetentionTime(789);
-		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)));
-		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)));
-		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
+		original.putAll(pairs);
+
 		final T copy = this.createHashCacheWithTimeStamps(321, 432, 543);
 
 		// Act:
@@ -391,7 +394,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		// Assert:
 		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
 		Assert.assertThat(copy.size(), IsEqual.equalTo(original.size()));
-		copy.stream().forEach(e -> Assert.assertThat(original.get(e.getKey()), IsSame.sameInstance(e.getValue())));
+		assertSameContents(copy, pairs);
 	}
 
 	// endregion
@@ -409,13 +412,10 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		pairs.forEach(cache::put);
 
 		// Assert:
-		Assert.assertThat(
-				cache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(pairs));
+		assertEquivalentContents(cache, pairs);
 	}
 
 	// endregion
-
 
 	//region utilities
 
@@ -461,6 +461,22 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		}
 
 		return hashes;
+	}
+
+	private static void assertSameContents(final ReadOnlyHashCache cache, final List<HashMetaDataPair> pairs) {
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
+		for (final HashMetaDataPair pair : pairs) {
+			Assert.assertThat(cache.get(pair.getHash()), IsSame.sameInstance(pair.getMetaData()));
+		}
+	}
+
+	private static void assertEquivalentContents(final ReadOnlyHashCache cache, final List<HashMetaDataPair> pairs) {
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(pairs.size()));
+		for (final HashMetaDataPair pair : pairs) {
+			Assert.assertThat(cache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
+		}
 	}
 
 	//endregion

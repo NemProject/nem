@@ -53,12 +53,4 @@ public interface HashCache extends ReadOnlyHashCache {
 	 * Clears the underlying hash map.
 	 */
 	public void clear();
-
-	// TODO 20141212: for consistency maybe this should be an iterator?
-	/**
-	 * Returns a stream of map entries.
-	 *
-	 * @return The stream.
-	 */
-	public Stream<Map.Entry<Hash, HashMetaData>> stream();
 }

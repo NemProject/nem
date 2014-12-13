@@ -26,9 +26,9 @@ public class TransactionHashesObserverTest {
 
 		// Assert:
 		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
-		Assert.assertThat(
-				context.transactionHashCache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(context.pairs));
+		for (final HashMetaDataPair pair : context.pairs) {
+			Assert.assertThat(context.transactionHashCache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
+		}
 	}
 
 	//endregion

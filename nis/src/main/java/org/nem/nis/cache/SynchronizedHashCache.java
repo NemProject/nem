@@ -67,13 +67,6 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 	}
 
 	@Override
-	public Stream<Map.Entry<Hash, HashMetaData>> stream() {
-		synchronized (this.lock) {
-			return this.cache.stream();
-		}
-	}
-
-	@Override
 	public int getRetentionTime() {
 		synchronized (this.lock) {
 			return this.cache.getRetentionTime();
