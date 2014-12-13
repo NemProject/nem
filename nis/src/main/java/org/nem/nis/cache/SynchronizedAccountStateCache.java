@@ -73,14 +73,6 @@ public class SynchronizedAccountStateCache implements AccountStateCache, Copyabl
 	}
 
 	@Override
-	public DebitPredicate getDebitPredicate() {
-		// TODO 20141214 this really isn't synchronized.
-		synchronized (this.lock) {
-			return this.accountStateCache.getDebitPredicate();
-		}
-	}
-
-	@Override
 	public CacheContents<AccountState> mutableContents() {
 		synchronized (this.lock) {
 			return this.accountStateCache.mutableContents();

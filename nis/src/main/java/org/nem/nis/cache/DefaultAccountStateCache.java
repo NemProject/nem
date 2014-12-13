@@ -82,14 +82,6 @@ public class DefaultAccountStateCache implements AccountStateCache, CopyableCach
 	}
 
 	@Override
-	public DebitPredicate getDebitPredicate() {
-		return (account, amount) -> {
-			final ReadOnlyAccountInfo accountInfo = this.findStateByAddress(account.getAddress()).getAccountInfo();
-			return accountInfo.getBalance().compareTo(amount) >= 0;
-		};
-	}
-
-	@Override
 	public CacheContents<AccountState> mutableContents() {
 		return new CacheContents<>(this.addressToStateMap.values());
 	}

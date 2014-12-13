@@ -226,7 +226,7 @@ public class TransactionControllerTest {
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;
 		private final TransactionController controller;
-		private final DebitPredicate debitPredicate;
+		private final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
 
 		private TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
@@ -235,17 +235,13 @@ public class TransactionControllerTest {
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
-			this.debitPredicate = Mockito.mock(DebitPredicate.class);
-			final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-			Mockito.when(accountStateCache.getDebitPredicate()).thenReturn(this.debitPredicate);
-
 			this.controller = new TransactionController(
 					this.accountLookup,
 					this.pushService,
 					this.unconfirmedTransactions,
 					this.validator,
 					this.host,
-					accountStateCache);
+					this.debitPredicate);
 		}
 	}
 }

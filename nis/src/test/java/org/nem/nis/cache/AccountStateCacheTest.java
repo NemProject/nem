@@ -488,35 +488,4 @@ public abstract class AccountStateCacheTest<T extends CopyableCache<T> & Account
 	}
 
 	//endregion
-
-	//region getDebitPredicate
-
-	@Test
-	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
-		// Arrange:
-		final AccountStateCache accountStateCache = this.createCache();
-		final Account account1 = addAccountWithBalance(accountStateCache, Amount.fromNem(10));
-		final Account account2 = addAccountWithBalance(accountStateCache, Amount.fromNem(77));
-
-		// Act:
-		final DebitPredicate debitPredicate = accountStateCache.getDebitPredicate();
-
-		// Assert:
-		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(9)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(10)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(11)), IsEqual.equalTo(false));
-
-		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(76)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(77)), IsEqual.equalTo(true));
-		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(78)), IsEqual.equalTo(false));
-	}
-
-	private static Account addAccountWithBalance(final AccountStateCache accountStateCache, final Amount amount) {
-		final Account account = Utils.generateRandomAccount();
-		final AccountState accountState = accountStateCache.findStateByAddress(account.getAddress());
-		accountState.getAccountInfo().incrementBalance(amount);
-		return account;
-	}
-
-	//endregion
 }

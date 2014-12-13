@@ -80,13 +80,6 @@ public interface AccountStateCache extends ReadOnlyAccountStateCache {
 	void undoVesting(BlockHeight height);
 
 	/**
-	 * Gets a debit predicate that checks balances against the account information stored in this cache.
-	 *
-	 * @return The debit predicate.
-	 */
-	DebitPredicate getDebitPredicate();
-
-	/**
 	 * Gets the mutable contents of this cache.
 	 *
 	 * @return The cache contents.

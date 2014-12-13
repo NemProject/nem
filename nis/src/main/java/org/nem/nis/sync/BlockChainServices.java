@@ -61,7 +61,7 @@ public class BlockChainServices {
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
 				this.transactionValidatorFactory.createSingle(accountStateCache),
-				accountStateCache.getDebitPredicate());
+				new DefaultDebitPredicate(accountStateCache));
 		return validator.isValid(parentBlock, peerChain);
 	}
 

@@ -12,6 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.state.*;
+import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
@@ -396,7 +397,7 @@ public class BlockChainValidatorIntegrationTest {
 					this.maxChainSize,
 					this.blockValidator,
 					this.transactionValidator,
-					this.accountStateCache.getDebitPredicate());
+					new DefaultDebitPredicate(this.accountStateCache));
 		}
 
 		public AccountInfo getAccountInfo(final Account account) {

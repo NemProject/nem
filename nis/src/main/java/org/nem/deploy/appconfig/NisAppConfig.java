@@ -332,4 +332,9 @@ public class NisAppConfig {
 	public CommonStarter commonStarter() {
 		return CommonStarter.INSTANCE;
 	}
+
+	@Bean
+	public DebitPredicate debitPredicate() {
+		return new DefaultDebitPredicate(this.accountStateCache());
+	}
 }
