@@ -7,7 +7,7 @@ import org.nem.core.node.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.synchronization.CommunicationTimeStamps;
 import org.nem.core.utils.ExceptionUtils;
-import org.nem.nis.controller.requests.ChainRequest;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.time.synchronization.TimeSynchronizationConnector;
 import org.nem.peer.node.*;
 
@@ -103,12 +103,13 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	}
 
 	@Override
-	public Collection<Transaction> getUnconfirmedTransactions(final Node node) {
+	public Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest) {
 		final URL url = getUrl(node, NisPeerId.REST_TRANSACTIONS_UNCONFIRMED);
 		return this.postAuthenticated(
 				url,
 				node.getIdentity(),
-				d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE)).join().asCollection();
+				d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE),
+				unconfirmedTransactionsRequest).join().asCollection();
 	}
 
 	@Override

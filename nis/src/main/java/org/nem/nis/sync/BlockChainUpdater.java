@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.*;
-import org.nem.nis.controller.requests.ChainRequest;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
@@ -88,7 +88,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
-				final Collection<Transaction> unconfirmedTransactions = connector.getUnconfirmedTransactions(node);
+				final Collection<Transaction> unconfirmedTransactions =
+						connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
 				synchronized (this) {
 					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				}

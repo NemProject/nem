@@ -37,6 +37,6 @@ public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRe
 	 * @param deserializer The deserializer
 	 */
 	public AuthenticatedUnconfirmedTransactionsRequest(final Deserializer deserializer) {
-		super(deserializer, UnconfirmedTransactionsRequest::new);
+		super(deserializer.readOptionalObject("entity", UnconfirmedTransactionsRequest::new), deserializer.readObject("challenge", NodeChallenge::new));
 	}
 }
