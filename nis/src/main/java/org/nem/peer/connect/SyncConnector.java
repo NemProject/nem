@@ -4,7 +4,7 @@ import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.nis.controller.requests.ChainRequest;
+import org.nem.nis.controller.requests.*;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -63,12 +63,13 @@ public interface SyncConnector {
 	public BlockChainScore getChainScore(final Node node);
 
 	/**
-	 * Requests information about the unconfirmed transaction from the specified node.
+	 * Requests new unconfirmed transactions from the specified node.
 	 *
 	 * @param node The remote node.
-	 * @return All non conflicting unconfirmed transactions the endpoint has.
+	 * @param unconfirmedTransactionsRequest The unconfirmed transactions request.
+	 * @return All new unconfirmed transactions from the endpoint.
 	 */
-	public Collection<Transaction> getUnconfirmedTransactions(final Node node);
+	public Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest);
 
 	// endregion
 

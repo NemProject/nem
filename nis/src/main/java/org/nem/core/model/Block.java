@@ -171,7 +171,7 @@ public class Block extends VerifiableEntity {
 	public void setPreviousGenerationHash(final Hash previousGenerationHash) {
 		this.generationHash = HashUtils.nextHash(
 				previousGenerationHash,
-				this.getSigner().getKeyPair().getPublicKey());
+				this.getSigner().getAddress().getPublicKey());
 	}
 
 	/**

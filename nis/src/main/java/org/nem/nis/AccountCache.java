@@ -79,15 +79,14 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	}
 
 	private Account findByAddressImpl(final Address address) {
-		final Account account = this.addressToAccountMap.get(address);
+		Account account = this.addressToAccountMap.get(address);
 		if (null == account) {
 			return null;
 		}
 
 		if (null == account.getAddress().getPublicKey() && null != address.getPublicKey()) {
-			// earlier there was new object created and data copied into it
-			// this was very, VERY wrong
-			account.setPublicKey(address.getPublicKey());
+			account = new Account(address);
+			this.addressToAccountMap.put(address, account);
 		}
 
 		return account;
@@ -124,7 +123,7 @@ public class AccountCache implements AccountLookup, Iterable<Account> {
 	public AccountCache copy() {
 		final AccountCache copy = new AccountCache();
 		for (final Map.Entry<Address, Account> entry : this.addressToAccountMap.entrySet()) {
-			copy.addressToAccountMap.put(entry.getKey(), entry.getValue().copy());
+			copy.addressToAccountMap.put(entry.getKey(), entry.getValue());
 		}
 
 		return copy;

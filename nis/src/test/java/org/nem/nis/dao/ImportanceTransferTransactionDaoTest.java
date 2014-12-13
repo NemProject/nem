@@ -116,10 +116,10 @@ public class ImportanceTransferTransactionDaoTest {
 		private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 			// Arrange:
 			final MockAccountDao mockAccountDao = new MockAccountDao();
-			final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
+			final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
 			final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(
 					recipient.getAddress().getEncoded(),
-					recipient.getKeyPair().getPublicKey());
+					recipient.getAddress().getPublicKey());
 			mockAccountDao.addMapping(sender, dbSender);
 			mockAccountDao.addMapping(recipient, dbRecipient);
 			return new AccountDaoLookupAdapter(mockAccountDao);
@@ -153,8 +153,8 @@ public class ImportanceTransferTransactionDaoTest {
 		}
 
 		public void assertTransaction(final ImportanceTransfer entity) {
-			Assert.assertThat(entity.getSender().getPublicKey(), equalTo(this.sender.getKeyPair().getPublicKey()));
-			Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(this.recipient.getKeyPair().getPublicKey()));
+			Assert.assertThat(entity.getSender().getPublicKey(), equalTo(this.sender.getAddress().getPublicKey()));
+			Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(this.recipient.getAddress().getPublicKey()));
 			Assert.assertThat(entity.getMode(), equalTo(this.transaction.getMode().value()));
 			Assert.assertThat(entity.getSenderProof(), equalTo(this.transaction.getSignature().getBytes()));
 		}

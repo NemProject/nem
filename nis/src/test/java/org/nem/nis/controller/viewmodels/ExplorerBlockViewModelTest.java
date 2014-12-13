@@ -13,6 +13,7 @@ import org.nem.core.time.UnixTime;
 import java.util.function.Consumer;
 
 public class ExplorerBlockViewModelTest {
+	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";
 
 	@Test
 	public void canSerializeViewModelWithoutTransactions() {
@@ -36,7 +37,7 @@ public class ExplorerBlockViewModelTest {
 			final Consumer<ExplorerBlockViewModel> addTransactions,
 			final int numExpectedTransactions) {
 		// Arrange:
-		final Address address = Address.fromPublicKey(PublicKey.fromHexString("88888888999999997777777744444444"));
+		final Address address = Address.fromPublicKey(PublicKey.fromHexString(PUBLIC_KEY_STRING));
 		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
 
 		// Act:
@@ -52,7 +53,7 @@ public class ExplorerBlockViewModelTest {
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(6));
 		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(60L));
 		Assert.assertThat(jsonObject.get("harvester"), IsEqual.equalTo(address.getEncoded()));
-		Assert.assertThat(jsonObject.get("harvesterPk"), IsEqual.equalTo("88888888999999997777777744444444"));
+		Assert.assertThat(jsonObject.get("harvesterPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
 		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1408966402000L));
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
 		Assert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(numExpectedTransactions));

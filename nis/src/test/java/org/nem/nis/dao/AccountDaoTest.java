@@ -47,6 +47,6 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbAccount.getId()));
 		Assert.assertThat(entity.getPrintableKey(), equalTo(account.getAddress().getEncoded()));
-		Assert.assertThat(entity.getPublicKey(), equalTo(account.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getPublicKey(), equalTo(account.getAddress().getPublicKey()));
 	}
 }

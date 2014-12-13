@@ -208,7 +208,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
 		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
-		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
@@ -231,7 +231,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
 		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
-		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
@@ -427,7 +427,7 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getForger().getId()));
-		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 	}
 
 	@Test
@@ -454,7 +454,7 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getForger().getId()));
-		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 		Assert.assertThat(transfer1, nullValue());
 		Assert.assertThat(transfer2, nullValue());
 		Assert.assertThat(transfer3, nullValue());
@@ -731,7 +731,7 @@ public class BlockDaoTest {
 	}
 
 	private org.nem.core.model.Block createTestEmptyBlock(final Account signer, final long height, final int i) {
-		final Hash generationHash = HashUtils.nextHash(Hash.ZERO, signer.getKeyPair().getPublicKey());
+		final Hash generationHash = HashUtils.nextHash(Hash.ZERO, signer.getAddress().getPublicKey());
 		final org.nem.core.model.Block emptyBlock = new org.nem.core.model.Block(signer,
 				Hash.ZERO,
 				generationHash,
@@ -791,7 +791,7 @@ public class BlockDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 

@@ -172,10 +172,11 @@ public class DebugControllerTest {
 	private static Account addRandomAccountWithBalance(final NisCache nisCache) {
 		final Account accountWithPrivateKey = Utils.generateRandomAccount();
 		final Account account = nisCache.getAccountCache().addAccountToCache(accountWithPrivateKey.getAddress());
-		account.incrementBalance(Amount.fromNem(10000));
 
+		final Amount balance = Amount.fromNem(10000);
 		final PoiAccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
-		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(10000));
+		accountState.getAccountInfo().incrementBalance(balance);
+		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
 		accountState.setHeight(BlockHeight.ONE);
 		return accountWithPrivateKey;
 	}

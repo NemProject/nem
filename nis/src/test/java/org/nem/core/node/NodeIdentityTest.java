@@ -201,7 +201,6 @@ public class NodeIdentityTest {
 
 		// Assert:
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
 		Assert.assertThat(identity.getName(), IsEqual.equalTo("alice"));
@@ -217,7 +216,6 @@ public class NodeIdentityTest {
 
 		// Assert:
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsNull.nullValue());
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(false));
 		Assert.assertThat(identity.getName(), IsEqual.equalTo("bob"));
@@ -254,7 +252,6 @@ public class NodeIdentityTest {
 
 		// Assert:
 		Assert.assertThat(identity.getAddress().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(identity.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
 		Assert.assertThat(identity.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
 		Assert.assertThat(identity.isOwned(), IsEqual.equalTo(true));
 		Assert.assertThat(identity.getName(), IsEqual.equalTo("trudy"));

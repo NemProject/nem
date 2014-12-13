@@ -1,13 +1,11 @@
-package org.nem.nis.poi;
+package org.nem.nis.remote;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.Objects;
 
-// TODO 20140920 J-G: not sure if this belongs in the POI package
 // TODO 20140920 J-G: might want to use the enum all the way to this point
-// TODO 20140922 G-J: i think these are still questions
 
 /**
  * Represents a link between an account and a remote account.

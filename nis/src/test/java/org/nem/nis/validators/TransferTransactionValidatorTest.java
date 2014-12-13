@@ -2,76 +2,49 @@ package org.nem.nis.validators;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.test.DebitPredicates;
 
 public class TransferTransactionValidatorTest {
 	private static final SingleTransactionValidator VALIDATOR = new TransferTransactionValidator();
 
-	//region predicate precedence
+	//region predicate delegation
 
 	@Test
-	public void validateGivesPrecedenceToFailingCanDebitPredicate() {
-		// Arrange: (sender-balance == amount + fee)
-		final Transaction transaction = this.createTransaction(2, 1, 1);
-
+	public void validatorDelegatesToDebitPredicateWithFeeAndAmountAndUsesResultWhenDebitPredicateSucceeds() {
 		// Assert:
-		Assert.assertThat(VALIDATOR.validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(
-				VALIDATOR.validate(transaction, new ValidationContext((account, amount) -> false)),
-				IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+		this.assertDebitPredicateDelegation(true, ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void validateGivesPrecedenceToSucceedingCanDebitPredicate() {
-		// Arrange: (sender-balance < amount + fee)
-		final Transaction transaction = this.createTransaction(2, 2, 1);
-
+	public void validatorDelegatesToDebitPredicateWithFeeAndAmountAndUsesResultWhenDebitPredicateFails() {
 		// Assert:
-		Assert.assertThat(VALIDATOR.validate(transaction), IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
-		Assert.assertThat(
-				VALIDATOR.validate(transaction, new ValidationContext((account, amount) -> true)),
-				IsEqual.equalTo(ValidationResult.SUCCESS));
+		this.assertDebitPredicateDelegation(false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
 	}
 
-	//endregion
+	private void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
+		// Arrange:
+		final Transaction transaction = createTransaction(12, 7);
 
-	//region amounts
+		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
+		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(predicateResult);
 
-	@Test
-	public void transactionsWithNonNegativeAmountAreValid() {
+		// Act:
+		final ValidationResult result = validate(transaction, debitPredicate);
+
 		// Assert:
-		final ValidationResult expectedResult = ValidationResult.SUCCESS;
-		Assert.assertThat(this.isTransactionAmountValid(100, 0, 1), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 1, 10), IsEqual.equalTo(expectedResult));
+		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), Amount.fromNem(19));
+		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
-	@Test
-	public void transactionsUpToSignerBalanceAreValid() {
-		// Assert:
-		final ValidationResult expectedResult = ValidationResult.SUCCESS;
-		Assert.assertThat(this.isTransactionAmountValid(100, 10, 1), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 990, 10), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 50, 950), IsEqual.equalTo(expectedResult));
-	}
-
-	@Test
-	public void transactionsExceedingSignerBalanceAreInvalid() {
-		// Assert:
-		final ValidationResult expectedResult = ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
-		Assert.assertThat(this.isTransactionAmountValid(1000, 990, 11), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 51, 950), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 1001, 11), IsEqual.equalTo(expectedResult));
-		Assert.assertThat(this.isTransactionAmountValid(1000, 51, 1001), IsEqual.equalTo(expectedResult));
-	}
-
-	private TransferTransaction createTransaction(final int senderBalance, final int amount, final int fee) {
+	private static TransferTransaction createTransaction(final int amount, final int fee) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(senderBalance));
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, amount, null);
 		transaction.setFee(Amount.fromNem(fee));
@@ -79,12 +52,20 @@ public class TransferTransactionValidatorTest {
 		return transaction;
 	}
 
-	private ValidationResult isTransactionAmountValid(final int senderBalance, final int amount, final int fee) {
+	//endregion
+
+	//region zero amount
+
+	@Test
+	public void transactionWithZeroAmountIsValid() {
 		// Arrange:
-		final TransferTransaction transaction = this.createTransaction(senderBalance, amount, fee);
+		final Transaction transaction = createTransaction(0, 1);
 
 		// Act:
-		return VALIDATOR.validate(transaction);
+		final ValidationResult result = validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -110,14 +91,13 @@ public class TransferTransactionValidatorTest {
 	private ValidationResult isMessageSizeValid(final int messageSize) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
 		final Account recipient = Utils.generateRandomAccount();
 		final PlainMessage message = new PlainMessage(new byte[messageSize]);
 		final TransferTransaction transaction = createTransferTransaction(signer, recipient, 1, message);
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
 
 		// Act:
-		return VALIDATOR.validate(transaction);
+		return validate(transaction);
 	}
 
 	//endregion
@@ -127,17 +107,25 @@ public class TransferTransactionValidatorTest {
 	@Test
 	public void otherTransactionTypesPassValidation() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount(Amount.fromNem(100));
+		final Account account = Utils.generateRandomAccount();
 		final MockTransaction transaction = new MockTransaction(account);
 		transaction.setFee(Amount.fromNem(200));
 
 		// Assert:
-		Assert.assertThat(VALIDATOR.validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
 
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
 		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
+	}
+
+	private static ValidationResult validate(final Transaction transaction) {
+		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.True));
+	}
+
+	private static ValidationResult validate(final Transaction transaction, final DebitPredicate debitPredicate) {
+		return VALIDATOR.validate(transaction, new ValidationContext(debitPredicate));
 	}
 }

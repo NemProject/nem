@@ -4,7 +4,6 @@ import net.minidev.json.JSONObject;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.*;
 import org.nem.core.utils.ExceptionUtils;
@@ -76,7 +75,7 @@ public class Utils {
 	 * @return A copy of account that only contains the account public key.
 	 */
 	public static Account createPublicOnlyKeyAccount(final Account account) {
-		return new Account(new KeyPair(account.getKeyPair().getPublicKey()));
+		return new Account(new KeyPair(account.getAddress().getPublicKey()));
 	}
 
 	/**
@@ -86,18 +85,6 @@ public class Utils {
 	 */
 	public static Account generateRandomAccount() {
 		return new Account(new KeyPair());
-	}
-
-	/**
-	 * Generates a random account with the specified balance.
-	 *
-	 * @param initialBalance The initial account balance.
-	 * @return A random account.
-	 */
-	public static Account generateRandomAccount(final Amount initialBalance) {
-		final Account account = Utils.generateRandomAccount();
-		account.incrementBalance(initialBalance);
-		return account;
 	}
 
 	/**
@@ -213,8 +200,7 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes originalEntity and returns an ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns a Deserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param accountLookup The account lookup policy to use.
@@ -234,8 +220,7 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes serializable and returns an ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns a Deserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param accountLookup The account lookup policy to use.
@@ -249,6 +234,23 @@ public class Utils {
 		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
 		return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+	}
+
+	/**
+	 * Serializes originalEntity and returns a binary Deserializer that can deserialize it.
+	 *
+	 * @param originalEntity The original entity.
+	 * @param accountLookup The account lookup policy to use.
+	 * @param <T> The concrete SerializableEntity type.
+	 * @return The binary object deserializer.
+	 */
+	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntityWithBinarySerializer(
+			final T originalEntity,
+			final AccountLookup accountLookup) {
+		// Act:
+		final BinarySerializer binarySerializer = new BinarySerializer();
+		originalEntity.serialize(binarySerializer);
+		return new BinaryDeserializer(binarySerializer.getBytes(), new DeserializationContext(accountLookup));
 	}
 
 	/**

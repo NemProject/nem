@@ -8,10 +8,12 @@ import org.nem.core.serialization.*;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.*;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.PushService;
-import org.nem.nis.validators.SingleTransactionValidator;
-import org.nem.peer.node.*;
+import org.nem.nis.validators.*;
+import org.nem.peer.node.AuthenticatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +26,7 @@ public class TransactionController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final SingleTransactionValidator validator;
 	private final NisPeerNetworkHost host;
+	private final PoiFacade poiFacade;
 
 	@Autowired(required = true)
 	TransactionController(
@@ -31,12 +34,14 @@ public class TransactionController {
 			final PushService pushService,
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final SingleTransactionValidator validator,
-			final NisPeerNetworkHost host) {
+			final NisPeerNetworkHost host,
+			final PoiFacade poiFacade) {
 		this.accountLookup = accountLookup;
 		this.pushService = pushService;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.validator = validator;
 		this.host = host;
+		this.poiFacade = poiFacade;
 	}
 
 	/**
@@ -54,7 +59,8 @@ public class TransactionController {
 	public RequestPrepare transactionPrepare(@RequestBody final Deserializer deserializer) {
 		final Transaction transfer = deserializeTransaction(deserializer);
 
-		final ValidationResult validationResult = this.validator.validate(transfer);
+		final ValidationContext context = new ValidationContext(this.poiFacade.getDebitPredicate());
+		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
 			throw new IllegalArgumentException(validationResult.toString());
 		}
@@ -104,20 +110,20 @@ public class TransactionController {
 	/**
 	 * Gets unconfirmed transaction information.
 	 *
-	 * @param challenge The node challenge.
+	 * @param request The authenticated unconfirmed transactions request.
 	 * @return List of unconfirmed transactions.
 	 */
 	@RequestMapping(value = "/transactions/unconfirmed", method = RequestMethod.POST)
 	@P2PApi
 	@AuthenticatedApi
-	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(@RequestBody final NodeChallenge challenge) {
-		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions());
+	public AuthenticatedResponse<SerializableList<Transaction>> transactionsUnconfirmed(@RequestBody final AuthenticatedUnconfirmedTransactionsRequest request) {
+		final SerializableList<Transaction> transactions = new SerializableList<>(this.getUnconfirmedTransactions(request.getEntity()));
 		final Node localNode = this.host.getNetwork().getLocalNode();
-		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), challenge);
+		return new AuthenticatedResponse<>(transactions, localNode.getIdentity(), request.getChallenge());
 	}
 
-	private Collection<Transaction> getUnconfirmedTransactions() {
-		return this.unconfirmedTransactions.getAll();
+	private Collection<Transaction> getUnconfirmedTransactions(final UnconfirmedTransactionsRequest request) {
+		return this.unconfirmedTransactions.getUnknownTransactions(request.getHashShortIds());
 	}
 
 	private Transaction deserializeTransaction(final byte[] bytes) {

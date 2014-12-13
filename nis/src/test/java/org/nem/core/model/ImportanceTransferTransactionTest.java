@@ -33,14 +33,14 @@ public class ImportanceTransferTransactionTest {
 		final Account remote = Utils.generateRandomAccount();
 
 		// Act:
-		final ImportanceTransferTransaction importanceTransferTransaction = createImportanceTransferTransaction(signer, mode, remote);
+		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Assert:
-		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(importanceTransferTransaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
+		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
+		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -118,13 +118,14 @@ public class ImportanceTransferTransactionTest {
 		final ImportanceTransferTransaction originalTransaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Act:
-		final ImportanceTransferTransaction importanceTransferTransaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
+		final ImportanceTransferTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
 
-		Assert.assertThat(importanceTransferTransaction.getTimeStamp(), IsEqual.equalTo(TIME));
-		Assert.assertThat(importanceTransferTransaction.getSigner(), IsEqual.equalTo(signer));
-		Assert.assertThat(importanceTransferTransaction.getRemote(), IsEqual.equalTo(remote));
-		Assert.assertThat(importanceTransferTransaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(importanceTransferTransaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
+		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
+		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
+		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
 	}
 
 	private ImportanceTransferTransaction createRoundTrippedTransaction(
@@ -161,7 +162,6 @@ public class ImportanceTransferTransactionTest {
 		// Arrange:
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(10));
@@ -187,7 +187,6 @@ public class ImportanceTransferTransactionTest {
 		// Arrange:
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(90));
 		final Account remote = Utils.generateRandomAccount();
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 		transaction.setFee(Amount.fromNem(10));

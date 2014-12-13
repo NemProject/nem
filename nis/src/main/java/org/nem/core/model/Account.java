@@ -1,19 +1,14 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.*;
-import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 
 /**
  * A NEM account.
  */
 public class Account {
-	private KeyPair keyPair;
-	private Address address;
-	private String label;
-	private Amount balance = Amount.ZERO;
-	private BlockAmount foragedBlocks = BlockAmount.ZERO;
-	private ReferenceCount refCount = ReferenceCount.ZERO;
+	private final KeyPair keyPair;
+	private final Address address;
 
 	/**
 	 * Creates an account around a key pair.
@@ -34,52 +29,12 @@ public class Account {
 		this(getKeyPairFromAddress(address), address);
 	}
 
-	/**
-	 * Creates a new account.
-	 *
-	 * @param address The address.
-	 * @param balance The balance.
-	 * @param numForagedBlocks The number of foraged blocks.
-	 * @param label The label.
-	 */
-	public Account(
-			final Address address,
-			final Amount balance,
-			final BlockAmount numForagedBlocks,
-			final String label) {
-		this(address);
-		this.balance = balance;
-		this.foragedBlocks = numForagedBlocks;
-		this.label = label;
-	}
-
 	private static KeyPair getKeyPairFromAddress(final Address address) {
 		return null == address.getPublicKey() ? null : new KeyPair(address.getPublicKey());
 	}
 
 	private static Address getAddressFromKeyPair(final KeyPair keyPair) {
 		return Address.fromPublicKey(keyPair.getPublicKey());
-	}
-
-	/**
-	 * Sets the public key associated with this account.
-	 * The public key must be consistent with this account's address.
-	 * This function should be used sparingly, and avoided if possible.
-	 *
-	 * @param publicKey The public key.
-	 */
-	public void setPublicKey(final PublicKey publicKey) {
-		if (!Address.fromPublicKey(publicKey).equals(this.address)) {
-			throw new IllegalArgumentException("most probably trying to set public key for wrong account");
-		}
-
-		// only update the public key if it is not already set
-		if (null != this.getKeyPair()) {
-			return;
-		}
-
-		this.keyPair = new KeyPair(publicKey);
-		this.address = Address.fromPublicKey(publicKey);
 	}
 
 	/**
@@ -93,53 +48,6 @@ public class Account {
 		this.address = address;
 	}
 
-	private Account(final Account rhs) {
-		this.keyPair = rhs.getKeyPair();
-		this.address = rhs.getAddress();
-
-		this.balance = rhs.getBalance();
-		this.label = rhs.getLabel();
-		this.foragedBlocks = rhs.getForagedBlocks();
-		this.refCount = rhs.getReferenceCount();
-	}
-
-	private Account(final Account rhs, final KeyPair keyPair) {
-		this.keyPair = keyPair;
-		this.address = getAddressFromKeyPair(keyPair);
-		this.balance = rhs.getBalance();
-		this.label = rhs.getLabel();
-		this.foragedBlocks = rhs.getForagedBlocks();
-		this.refCount = rhs.getReferenceCount();
-	}
-
-	/**
-	 * Creates an unlinked copy of this account.
-	 *
-	 * @return An unlinked copy of this account.
-	 */
-	public Account copy() {
-		return new Account(this);
-	}
-
-	/**
-	 * Creates a shallow copy of this account the the specified key pair.
-	 *
-	 * @param keyPair The desired key pair of the new account.
-	 * @return The shallow copy.
-	 */
-	public Account shallowCopyWithKeyPair(final KeyPair keyPair) {
-		return new Account(this, keyPair);
-	}
-
-	/**
-	 * Gets the account's key pair.
-	 *
-	 * @return This account's key pair.
-	 */
-	public KeyPair getKeyPair() {
-		return this.keyPair;
-	}
-
 	/**
 	 * Gets the account's address.
 	 *
@@ -147,103 +55,6 @@ public class Account {
 	 */
 	public Address getAddress() {
 		return this.address;
-	}
-
-	/**
-	 * Gets the account's balance.
-	 *
-	 * @return This account's balance.
-	 */
-	public Amount getBalance() {
-		return this.balance;
-	}
-
-	/**
-	 * Adds amount to the account's balance.
-	 *
-	 * @param amount The amount by which to increment the balance.
-	 */
-	public void incrementBalance(final Amount amount) {
-		this.balance = this.balance.add(amount);
-	}
-
-	/**
-	 * Subtracts amount from the account's balance.
-	 *
-	 * @param amount The amount by which to decrement the balance.
-	 */
-	public void decrementBalance(final Amount amount) {
-		this.balance = this.balance.subtract(amount);
-	}
-
-	/**
-	 * Gets number of foraged blocks.
-	 *
-	 * @return Number of blocks foraged by this account.
-	 */
-	public BlockAmount getForagedBlocks() {
-		return this.foragedBlocks;
-	}
-
-	/**
-	 * Increments number of foraged blocks by this account by one.
-	 */
-	public void incrementForagedBlocks() {
-		this.foragedBlocks = this.foragedBlocks.increment();
-	}
-
-	/**
-	 * Decrements number of foraged blocks by this account by one.
-	 */
-	public void decrementForagedBlocks() {
-		this.foragedBlocks = this.foragedBlocks.decrement();
-	}
-
-	/**
-	 * Gets the account's label.
-	 *
-	 * @return The account's label.
-	 */
-	public String getLabel() {
-		return this.label;
-	}
-
-	/**
-	 * Sets the account's label.
-	 *
-	 * @param label The desired label.
-	 */
-	public void setLabel(final String label) {
-		this.label = label;
-	}
-
-	/**
-	 * Returns the reference count.
-	 *
-	 * @return The reference count.
-	 */
-	public ReferenceCount getReferenceCount() {
-		return this.refCount;
-	}
-
-	/**
-	 * Increments the reference count.
-	 *
-	 * @return The new value of the reference count.
-	 */
-	public ReferenceCount incrementReferenceCount() {
-		this.refCount = this.refCount.increment();
-		return this.refCount;
-	}
-
-	/**
-	 * Decrements the reference count.
-	 *
-	 * @return The new value of the reference count.
-	 */
-	public ReferenceCount decrementReferenceCount() {
-		this.refCount = this.refCount.decrement();
-		return this.refCount;
 	}
 
 	@Override
@@ -259,6 +70,11 @@ public class Account {
 
 		final Account rhs = (Account)obj;
 		return this.address.equals(rhs.address);
+	}
+
+	@Override
+	public String toString() {
+		return this.address.toString();
 	}
 
 	//region inline serialization
@@ -315,6 +131,61 @@ public class Account {
 			final AddressEncoding encoding) {
 		final Address address = Address.readFrom(deserializer, label, encoding);
 		return deserializer.getContext().findAccountByAddress(address);
+	}
+
+	//endregion
+
+	//region crypto
+
+	/**
+	 * Gets a value indicating whether or not this account has a private key.
+	 *
+	 * @return true if this account has a private key.
+	 */
+	public boolean hasPrivateKey() {
+		return null != this.keyPair && this.keyPair.hasPrivateKey();
+	}
+
+	/**
+	 * Gets a value indicating whether or not this account has a public key.
+	 *
+	 * @return true if this account has a private key.
+	 */
+	public boolean hasPublicKey() {
+		return null != this.keyPair;
+	}
+
+	/**
+	 * Creates a signer around this account's key-pair.
+	 *
+	 * @return The signer.
+	 */
+	public Signer createSigner() {
+		if (!this.hasPublicKey()) {
+			throw new CryptoException("in order to create a signer, an account must have a public key");
+		}
+
+		return new Signer(this.keyPair);
+	}
+
+	/**
+	 * Creates a cipher around the key-pairs of this account and another account.
+	 *
+	 * @param other The other account.
+	 * @param encrypt true if the cipher should be used for encrypting data, false otherwise.
+	 * @return The cipher.
+	 */
+	public Cipher createCipher(final Account other, final boolean encrypt) {
+		if (!this.hasPrivateKey() && !other.hasPrivateKey() || !this.hasPublicKey() || !other.hasPublicKey()) {
+			throw new CryptoException("in order to create a cipher, at least one account must have a private key and both accounts must have a public key");
+		}
+
+		final KeyPair keyPairWithPrivateKey = this.hasPrivateKey() ? this.keyPair : other.keyPair;
+		final KeyPair otherKeyPair = !this.hasPrivateKey() ? this.keyPair : other.keyPair;
+
+		return encrypt
+				? new Cipher(keyPairWithPrivateKey, otherKeyPair)
+				: new Cipher(otherKeyPair, keyPairWithPrivateKey);
 	}
 
 	//endregion

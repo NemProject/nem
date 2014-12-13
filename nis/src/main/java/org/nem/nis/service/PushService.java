@@ -110,7 +110,7 @@ public class PushService {
 		final String message = String.format("   received: %s from %s  (signer: %s)",
 				context.entity.getType(),
 				context.identity,
-				Address.fromPublicKey(context.entity.getSigner().getKeyPair().getPublicKey()));
+				context.entity.getSigner().getAddress());
 		LOGGER.info(message);
 		context.logAdditionalInfo.accept(context.entity);
 

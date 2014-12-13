@@ -56,11 +56,6 @@ public class BlockExecutorTest {
 
 		public UndoExecuteTransactionOrderTestContext() {
 			this.account = Utils.generateRandomAccount();
-			this.account.incrementBalance(new Amount(100));
-			for (int i = 0; i < 3; ++i) {
-				this.account.incrementForagedBlocks();
-			}
-
 			this.transactions = new MockTransaction[] {
 					this.createTransaction(1, 17),
 					this.createTransaction(2, 11),
@@ -265,7 +260,7 @@ public class BlockExecutorTest {
 				to.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.account1, Amount.fromNem(11)));
 			});
 
-			this.block = this.context.createBlockWithTransaction(this.height, Amount.fromNem(7), transaction);
+			this.block = this.context.createBlockWithTransaction(this.height, transaction);
 			final HashMetaDataPair pair = new HashMetaDataPair(
 					HashUtils.calculateHash(transaction),
 					new HashMetaData(this.height, transaction.getTimeStamp()));
@@ -407,10 +402,9 @@ public class BlockExecutorTest {
 			return account;
 		}
 
-		private Block createBlockWithTransaction(final BlockHeight height, final Amount amount, final Transaction transaction) {
+		private Block createBlockWithTransaction(final BlockHeight height, final Transaction transaction) {
 			final Block block = BlockUtils.createBlockWithHeight(height);
 			this.hookAccount(block.getSigner());
-			block.getSigner().incrementBalance(amount);
 			block.addTransaction(transaction);
 			return block;
 		}

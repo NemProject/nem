@@ -105,9 +105,8 @@ public class TransferDaoTest {
 		// Assert:
 		Assert.assertThat(entity, notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbTransfer.getId()));
-		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getKeyPair().getPublicKey()));
-		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
-		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getKeyPair().getPublicKey()));
+		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getAddress().getPublicKey()));
+		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getAmount(), equalTo(transferTransaction.getAmount().getNumMicroNem()));
 		Assert.assertThat(entity.getSenderProof(), equalTo(transferTransaction.getSignature().getBytes()));
 		// TODO 20141010 J-G why did you remove the blockindex assert (and should we add one for order index)?
@@ -904,16 +903,17 @@ public class TransferDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getKeyPair().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(recipient.getAddress().getEncoded(),
-				recipient.getKeyPair().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
+		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(
+				recipient.getAddress().getEncoded(),
+				recipient.getAddress().getPublicKey());
 		mockAccountDao.addMapping(sender, dbSender);
 		mockAccountDao.addMapping(recipient, dbRecipient);
 		return new AccountDaoLookupAdapter(mockAccountDao);

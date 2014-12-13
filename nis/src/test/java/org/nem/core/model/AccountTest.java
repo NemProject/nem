@@ -4,7 +4,6 @@ import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
@@ -12,35 +11,34 @@ import java.math.BigInteger;
 
 public class AccountTest {
 
-	//region Constructor
+	//region constructor
 
 	@Test
-	public void accountCanBeCreatedAroundKeyPair() {
+	public void accountCanBeCreatedAroundKeyPairWithPrivateKey() {
 		// Arrange:
 		final KeyPair kp = new KeyPair();
 		final Address expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
 		final Account account = new Account(kp);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair(), IsEqual.equalTo(kp));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void accountCanBeCreatedAroundAddressWithoutPublicKey() {
+	public void accountCanBeCreatedAroundKeyPairWithoutPrivateKey() {
 		// Arrange:
-		final Address expectedAccountId = Utils.generateRandomAddress();
-		final Account account = new Account(expectedAccountId);
+		final KeyPair kp = new KeyPair();
+		final Address expectedAccountId = Address.fromPublicKey(kp.getPublicKey());
+		final Account account = new Account(new KeyPair(kp.getPublicKey()));
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair(), IsNull.nullValue());
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(kp.getPublicKey()));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -51,217 +49,23 @@ public class AccountTest {
 		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(publicKey));
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(BlockAmount.ZERO));
-		Assert.assertThat(account.getLabel(), IsNull.nullValue());
+		Assert.assertThat(account.getAddress().getPublicKey(), IsEqual.equalTo(publicKey));
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(true));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
-	public void accountCanBeCreatedAroundAccountInformation() {
+	public void accountCanBeCreatedAroundAddressWithoutPublicKey() {
 		// Arrange:
-		final Address expectedAccountId = Utils.generateRandomAddressWithPublicKey();
-		final Account account = new Account(expectedAccountId, Amount.fromNem(124), new BlockAmount(4), "blah");
+		final Address expectedAccountId = Utils.generateRandomAddress();
+		final Account account = new Account(expectedAccountId);
 
 		// Assert:
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsNull.notNullValue());
 		Assert.assertThat(account.getAddress(), IsEqual.equalTo(expectedAccountId));
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(Amount.fromNem(124)));
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(4)));
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo("blah"));
-	}
-
-	//endregion
-
-	//region setPublicKey
-
-	@Test(expected = IllegalArgumentException.class)
-	public void inconsistentPublicKeyCannotBeSet() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		final PublicKey publicKey = Utils.generateRandomPublicKey();
-
-		// Act: the set fails because the public key is not consistent with the account's address
-		account.setPublicKey(publicKey);
-	}
-
-	@Test
-	public void consistentPublicKeyCanBeSet() {
-		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Address address = Address.fromEncoded(Address.fromPublicKey(keyPair.getPublicKey()).getEncoded());
-		final Account account = new Account(address);
-
-		// Act:
-		account.setPublicKey(keyPair.getPublicKey());
-
-		// Assert:
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-	}
-
-	@Test
-	public void settingConsistentPublicKeyDoesNotOverwritePrivateKey() {
-		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account account = new Account(keyPair);
-
-		// Act:
-		account.setPublicKey(keyPair.getPublicKey());
-
-		// Assert:
-		Assert.assertThat(account.getKeyPair().getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(account.getKeyPair().hasPrivateKey(), IsEqual.equalTo(true));
-		Assert.assertThat(account.getKeyPair().getPrivateKey(), IsEqual.equalTo(keyPair.getPrivateKey()));
-	}
-
-	//endregion
-
-	//region Label
-
-	@Test
-	public void labelCanBeSet() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.setLabel("Beta Gamma");
-
-		// Assert:
-		Assert.assertThat(account.getLabel(), IsEqual.equalTo("Beta Gamma"));
-	}
-
-	//endregion
-
-	//region Balance
-
-	@Test
-	public void balanceCanBeIncremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementBalance(new Amount(7));
-
-		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(7)));
-	}
-
-	@Test
-	public void balanceCanBeDecremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementBalance(new Amount(100));
-		account.decrementBalance(new Amount(12));
-
-		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(88)));
-	}
-
-	@Test
-	public void balanceCanBeIncrementedAndDecrementedMultipleTimes() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementBalance(new Amount(100));
-		account.decrementBalance(new Amount(12));
-		account.incrementBalance(new Amount(22));
-		account.decrementBalance(new Amount(25));
-
-		// Assert:
-		Assert.assertThat(account.getBalance(), IsEqual.equalTo(new Amount(85)));
-	}
-
-	//endregion
-
-	//region refCount
-
-	@Test
-	public void referenceCountIsZeroForNewAccount() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Assert:
-		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
-	}
-
-	@Test
-	public void referenceCountCanBeIncremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		final ReferenceCount result = account.incrementReferenceCount();
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(1)));
-		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(1)));
-	}
-
-	@Test
-	public void referenceCountCanBeDecremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		account.incrementReferenceCount();
-
-		// Act:
-		final ReferenceCount result = account.decrementReferenceCount();
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(new ReferenceCount(0)));
-		Assert.assertThat(account.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(0)));
-	}
-
-	//endregion
-
-	//region foraged blocks
-
-	@Test
-	public void foragedBlocksCanBeIncremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-
-		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
-	}
-
-	@Test
-	public void foragedBlocksCanBeDecremented() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.decrementForagedBlocks();
-
-		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(1)));
-	}
-
-	@Test
-	public void foragedBlocksCanBeIncrementedAndDecrementedMultipleTimes() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Act:
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.decrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.decrementForagedBlocks();
-
-		// Assert:
-		Assert.assertThat(account.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(2)));
+		Assert.assertThat(account.getAddress().getPublicKey(), IsNull.nullValue());
+		Assert.assertThat(account.hasPublicKey(), IsEqual.equalTo(false));
+		Assert.assertThat(account.hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	//endregion
@@ -318,6 +122,19 @@ public class AccountTest {
 				new Account(new KeyPair(Utils.mutate(keyPair.getPublicKey()))),
 				new Account(new KeyPair(Utils.mutate(keyPair.getPrivateKey())))
 		};
+	}
+
+	//endregion
+
+	//region toString
+
+	@Test
+	public void toStringReturnsEncodedAddress() {
+		// Arrange:
+		final Account account = new Account(Address.fromEncoded("Sigma Gamma"));
+
+		// Assert:
+		Assert.assertThat(account.toString(), IsEqual.equalTo("SIGMA GAMMA"));
 	}
 
 	//endregion
@@ -444,110 +261,116 @@ public class AccountTest {
 
 	//endregion
 
-	//region copy
+	//region createSigner
 
 	@Test
-	public void copyCreatesUnlinkedCopyOfAccountWithoutPublicKey() {
+	public void cannotCreateSignerWhenAccountDoesNotHavePublicKey() {
 		// Arrange:
 		final Account account = new Account(Utils.generateRandomAddress());
 
-		// Assert:
-		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(copyAccount.getKeyPair(), IsNull.nullValue());
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> account.createSigner(),
+				CryptoException.class);
 	}
 
 	@Test
-	public void copyCreatesUnlinkedCopyOfAccountWithPublicKey() {
+	public void canCreateSignerWhenAccountHasPublicKey() {
 		// Arrange:
 		final Account account = new Account(Utils.generateRandomAddressWithPublicKey());
 
+		// Act:
+		final Signer signer = account.createSigner();
+
 		// Assert:
-		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.nullValue());
+		Assert.assertThat(signer, IsNull.notNullValue());
 	}
 
 	@Test
-	public void copyCreatesUnlinkedCopyOfAccountWithPrivateKey() {
+	public void canSignAndVerifyDataWithSigner() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-
-		// Assert:
-		final Account copyAccount = assertCopyCreatesUnlinkedAccount(account);
-		Assert.assertThat(copyAccount.getAddress().getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPublicKey(), IsNull.notNullValue());
-		Assert.assertThat(copyAccount.getKeyPair().getPrivateKey(), IsNull.notNullValue());
-	}
-
-	public static Account assertCopyCreatesUnlinkedAccount(final Account account) {
-		// Arrange:
-		setAccountValuesForCopyTests(account);
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
+		final Account accountWithOnlyPublicKey = new Account(new KeyPair(keyPair.getPublicKey()));
+		final byte[] payload = Utils.generateRandomBytes();
 
 		// Act:
-		final Account copyAccount = account.copy();
+		final Signer signer = account.createSigner();
+		final Signature signature = signer.sign(payload);
+		final Signer verifier = accountWithOnlyPublicKey.createSigner();
+		final boolean isVerified = verifier.verify(payload, signature);
 
 		// Assert:
-		Assert.assertThat(copyAccount.getAddress(), IsEqual.equalTo(account.getAddress()));
-		Assert.assertThat(copyAccount.getAddress().getPublicKey(), IsEqual.equalTo(account.getAddress().getPublicKey()));
-		assertKeyPairsAreEquivalent(copyAccount.getKeyPair(), account.getKeyPair());
-
-		Assert.assertThat(copyAccount.getBalance(), IsEqual.equalTo(new Amount(1000)));
-		Assert.assertThat(copyAccount.getForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
-		Assert.assertThat(copyAccount.getLabel(), IsEqual.equalTo("Alpha Sigma"));
-		Assert.assertThat(copyAccount.getReferenceCount(), IsEqual.equalTo(new ReferenceCount(2)));
-		return copyAccount;
-	}
-
-	private static void setAccountValuesForCopyTests(final Account account) {
-		account.incrementBalance(new Amount(1000));
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.incrementForagedBlocks();
-		account.setLabel("Alpha Sigma");
-		account.incrementReferenceCount();
-		account.incrementReferenceCount();
-	}
-
-	private static void assertKeyPairsAreEquivalent(final KeyPair actual, final KeyPair expected) {
-		if (null == actual || null == expected) {
-			Assert.assertThat(actual, IsEqual.equalTo(expected));
-		} else {
-			Assert.assertThat(actual.getPublicKey(), IsEqual.equalTo(expected.getPublicKey()));
-			Assert.assertThat(actual.getPrivateKey(), IsEqual.equalTo(expected.getPrivateKey()));
-		}
+		Assert.assertThat(isVerified, IsEqual.equalTo(true));
 	}
 
 	//endregion
 
-	//region shallow copy
+	//region createCipher
 
 	@Test
-	public void canCreateShallowCopyWithNewKeyPair() {
+	public void cannotCreateCipherIfNeitherAccountHasPrivateKey() {
 		// Arrange:
-		final Account original = new Account(Utils.generateRandomAddress());
-		setAccountValuesForCopyTests(original);
-		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(Utils.generateRandomAddressWithPublicKey());
+		final Account otherAccount = new Account(Utils.generateRandomAddressWithPublicKey());
 
 		// Act:
-		final Account copy = original.shallowCopyWithKeyPair(keyPair);
-
-		// Assert:
-		Assert.assertThat(copy.getAddress(), IsEqual.equalTo(Address.fromPublicKey(keyPair.getPublicKey())));
-		assertKeyPairsAreEquivalent(copy.getKeyPair(), keyPair);
-		assertShallowCopy(original, copy);
+		ExceptionAssert.assertThrows(
+				v -> account.createCipher(otherAccount, false),
+				CryptoException.class);
 	}
 
-	private static void assertShallowCopy(final Account original, final Account copy) {
+	@Test
+	public void cannotCreateCipherIfAnyAccountDoesNotHavePublicKey() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final Account otherAccount = new Account(Utils.generateRandomAddress());
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> account.createCipher(otherAccount, false),
+				CryptoException.class);
+		ExceptionAssert.assertThrows(
+				v -> otherAccount.createCipher(account, false),
+				CryptoException.class);
+	}
+
+	@Test
+	public void canEncryptAndDecryptDataWithSignerWhenFirstAccountHasPrivateKey() {
 		// Assert:
-		Assert.assertThat(copy.getBalance(), IsEqual.equalTo(original.getBalance()));
-		Assert.assertThat(copy.getForagedBlocks(), IsEqual.equalTo(original.getForagedBlocks()));
-		Assert.assertThat(copy.getLabel(), IsEqual.equalTo(original.getLabel()));
-		Assert.assertThat(copy.getReferenceCount(), IsEqual.equalTo(original.getReferenceCount()));
+		assertCanEncryptAndDecrypt(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccountWithoutPrivateKey());
+	}
+
+	@Test
+	public void canEncryptAndDecryptDataWithSignerWhenSecondAccountHasPrivateKey() {
+		// Assert:
+		assertCanEncryptAndDecrypt(
+				Utils.generateRandomAccountWithoutPrivateKey(),
+				Utils.generateRandomAccount());
+	}
+
+	@Test
+	public void canEncryptAndDecryptDataWithSignerWhenBothAccountsHavePrivateKey() {
+		// Assert:
+		assertCanEncryptAndDecrypt(
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount());
+	}
+
+	private static void assertCanEncryptAndDecrypt(final Account account1, final Account account2) {
+		// Arrange:
+		final byte[] payload = Utils.generateRandomBytes();
+
+		// Act:
+		final Cipher encryptCipher = account1.createCipher(account2, true);
+		final byte[] encryptedPayload = encryptCipher.encrypt(payload);
+		final Cipher decryptCipher = account1.createCipher(account2, false);
+		final byte[] decryptedPayload = decryptCipher.decrypt(encryptedPayload);
+
+		// Assert:
+		Assert.assertThat(decryptedPayload, IsEqual.equalTo(payload));
 	}
 
 	//endregion

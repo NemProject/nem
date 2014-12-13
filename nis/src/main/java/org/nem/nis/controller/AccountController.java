@@ -14,7 +14,7 @@ import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.*;
 
 /**
@@ -22,6 +22,7 @@ import java.util.stream.*;
  */
 @RestController
 public class AccountController {
+	private static final int MAX_UNCONFIRMED_TRANSACTIONS = 25;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
@@ -54,9 +55,8 @@ public class AccountController {
 	// > any nis for my harvesting purposes ... i think we need a ticket / token to allow a NIS to reject unauthorized harvesters
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
 		final KeyPair keyPair = new KeyPair(privateKey);
-		final Account account = this.accountIo.findByAddress(Address.fromPublicKey(keyPair.getPublicKey()));
-		final Account copyOfAccount = account.shallowCopyWithKeyPair(keyPair);
-		final UnlockResult result = this.unlockedAccounts.addUnlockedAccount(copyOfAccount);
+		final Account account = new Account(keyPair);
+		final UnlockResult result = this.unlockedAccounts.addUnlockedAccount(account);
 
 		if (UnlockResult.SUCCESS != result) {
 			throw new IllegalArgumentException(result.toString());
@@ -160,7 +160,10 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		return new SerializableList<>(this.unconfirmedTransactions.getTransactionsForAccount(address).getAll());
+		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(
+				address,
+				MAX_UNCONFIRMED_TRANSACTIONS);
+		return new SerializableList<>(transactions);
 	}
 
 	/**

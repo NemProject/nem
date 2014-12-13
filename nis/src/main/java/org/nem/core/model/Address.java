@@ -14,7 +14,7 @@ public class Address {
 	private static final int NUM_DECODED_BYTES_LENGTH = 40;
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
 	private final String encoded; // base-32 encoded address
-	private final PublicKey publicKey;
+	private final KeyPair keyPair;
 
 	/**
 	 * Creates an Address from a public key.
@@ -48,6 +48,27 @@ public class Address {
 	}
 
 	/**
+	 * Creates an Address from a key pair.
+	 *
+	 * @param keyPair The key pair.
+	 * @return An address object.
+	 */
+	public static Address fromKeyPair(final KeyPair keyPair) {
+		return fromKeyPair(NetworkInfo.getDefault().getVersion(), keyPair);
+	}
+
+	/**
+	 * Creates an Address from a key pair.
+	 *
+	 * @param version The address version.
+	 * @param keyPair The key pair.
+	 * @return An address object.
+	 */
+	public static Address fromKeyPair(final byte version, final KeyPair keyPair) {
+		return new Address(version, keyPair);
+	}
+
+	/**
 	 * Creates an Address from both public key and an encoded address string.
 	 * This is protected because consistency is not checked.
 	 *
@@ -55,16 +76,24 @@ public class Address {
 	 * @param encoded The encoded address string.
 	 */
 	protected Address(final PublicKey publicKey, final String encoded) {
-		this.publicKey = publicKey;
+		this(new KeyPair(publicKey), encoded);
+	}
+
+	private Address(final KeyPair keyPair, final String encoded) {
+		this.keyPair = keyPair;
 		this.encoded = encoded;
 	}
 
 	private Address(final String encoded) {
-		this(null, encoded);
+		this((KeyPair)null, encoded);
 	}
 
 	private Address(final byte version, final PublicKey publicKey) {
 		this(publicKey, generateEncoded(version, publicKey.getRaw()));
+	}
+
+	private Address(final byte version, final KeyPair keyPair) {
+		this(keyPair, generateEncoded(version, keyPair.getPublicKey().getRaw()));
 	}
 
 	private static String generateEncoded(final byte version, final byte[] publicKey) {
@@ -106,11 +135,21 @@ public class Address {
 
 	/**
 	 * Gets the address public key.
+	 * TODO 20141209 J-*: this can be dropped.
 	 *
 	 * @return The address public key.
 	 */
 	public PublicKey getPublicKey() {
-		return this.publicKey;
+		return null == this.keyPair ? null : this.keyPair.getPublicKey();
+	}
+
+	/**
+	 * Gets the address key pair.
+	 *
+	 * @return The address key pair.
+	 */
+	public KeyPair getKeyPair() {
+		return this.keyPair;
 	}
 
 	/**
@@ -192,7 +231,8 @@ public class Address {
 			final AddressEncoding encoding) {
 		switch (encoding) {
 			case PUBLIC_KEY:
-				serializer.writeBytes(label, null == address.publicKey ? null : address.publicKey.getRaw());
+				final PublicKey publicKey = address.getPublicKey();
+				serializer.writeBytes(label, null == publicKey ? null : publicKey.getRaw());
 				break;
 
 			case COMPRESSED:

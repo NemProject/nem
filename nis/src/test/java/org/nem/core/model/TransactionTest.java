@@ -153,7 +153,6 @@ public class TransactionTest {
 	public void feeCannotBeSetBelowMinimum() {
 		// Arrange (category spam attack):
 		final Account signer = Utils.generateRandomAccount();
-		signer.incrementBalance(Amount.fromNem(1000));
 		final MockTransaction transaction = new MockTransaction(signer, 6);
 		transaction.setDeadline(new TimeInstant(60));
 		transaction.setMinimumFee(Amount.fromNem(100).getNumMicroNem());

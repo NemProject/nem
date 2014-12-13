@@ -47,7 +47,7 @@ public class AccountInfoTest {
 
 		// Assert:
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
 		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
@@ -115,7 +115,7 @@ public class AccountInfoTest {
 			Assert.assertThat(info.getKeyPair(), IsNull.nullValue());
 		} else {
 			Assert.assertThat(info.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-			Assert.assertThat(info.getKeyPair().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
+			Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(expectedPublicKey));
 		}
 
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(747L)));

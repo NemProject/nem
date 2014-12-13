@@ -3,9 +3,10 @@ package org.nem.nis.harvesting;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisCache;
+import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -21,8 +22,8 @@ public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
-	private final UnconfirmedBalancesObserver unconfirmedBalances = new UnconfirmedBalancesObserver();
-	private final TransactionObserver transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
+	private final UnconfirmedBalancesObserver unconfirmedBalances;
+	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
 	private final NisCache nisCache;
@@ -59,9 +60,11 @@ public class UnconfirmedTransactions {
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
 			final NisCache nisCache) {
-		this.validatorFactory = validatorFactory;
-		this.nisCache = nisCache;
-		this.singleValidator = this.createSingleValidator();
+		this(
+				new ArrayList<>(),
+				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
+				validatorFactory,
+				nisCache);
 	}
 
 	private UnconfirmedTransactions(
@@ -72,6 +75,8 @@ public class UnconfirmedTransactions {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator();
+		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getPoiFacade());
+		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -180,14 +185,16 @@ public class UnconfirmedTransactions {
 	}
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
-		final TransactionsContextPair pair = new TransactionsContextPair(transactions, new ValidationContext());
+		final TransactionsContextPair pair = new TransactionsContextPair(transactions, this.createValidationContext());
 		return this.validatorFactory.createBatch(this.nisCache.getTransactionHashCache()).validate(Arrays.asList(pair));
 	}
 
 	private ValidationResult validateSingle(final Transaction transaction) {
-		return this.singleValidator.validate(
-				transaction,
-				new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0));
+		return this.singleValidator.validate(transaction, this.createValidationContext());
+	}
+
+	private ValidationContext createValidationContext() {
+		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
 	private SingleTransactionValidator createSingleValidator() {
@@ -238,8 +245,38 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getAll() {
 		final List<Transaction> transactions = this.transactions.values().stream()
 				.collect(Collectors.toList());
-
 		return this.sortTransactions(transactions);
+	}
+
+	/**
+	 * Gets the transactions for which the hash short id is not in the given collection.
+	 *
+	 * @return The unknown transactions.
+	 */
+	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
+		// probably faster to use hash map than collection
+		// TODO 201412123: why not hash map of hashshortid -> transaction to avoid recalculating the hashes twice?
+		final HashMap<HashShortId, Integer> unknownHashShortIds = new HashMap<>(this.transactions.size());
+		this.transactions.values().stream()
+				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), 0));
+		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
+
+		return this.transactions.values().stream()
+				.filter(t -> unknownHashShortIds.containsKey(new HashShortId(HashUtils.calculateHash(t).getShortId())))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Gets the most recent transactions up to a given limit.
+	 *
+	 * @return The most recent transactions from this unconfirmed transactions.
+	 */
+	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
+		return this.transactions.values().stream()
+				.filter(tx -> matchAddress(tx, address))
+				.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
+				.limit(maxSize)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -323,12 +360,8 @@ public class UnconfirmedTransactions {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
-		// (3) not already be expired
-		// TODO 20141205 J-B: i noticed that the TransactionDeadlineBlockValidator is only for blocks;
-		// > if it is updated to also work for blocks, then shouldn't (3) be satisfied by (4)?
-		// TODO 20141206 BR -> J: sorry I don't understand what you mean.
-		// TODO 20141206 J -> B: ok, my previous comment didn't make sense, but is there a reason for not calling
-		// > dropExpiredTransactions ? instead of the check below?
+		// (3) not already be expired (relative to the block time)
+		// TODO 20141210 J -> B: i know we talked about this, but i don't remember how expired transactions can get added?
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
@@ -346,10 +379,15 @@ public class UnconfirmedTransactions {
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
+		private final PoiFacade poiFacade;
 		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
+		public UnconfirmedBalancesObserver(final PoiFacade poiFacade) {
+			this.poiFacade = poiFacade;
+		}
+
 		public Amount get(final Account account) {
-			return this.unconfirmedBalances.getOrDefault(account, account.getBalance());
+			return this.unconfirmedBalances.getOrDefault(account, this.getBalance(account));
 		}
 
 		@Override
@@ -374,7 +412,11 @@ public class UnconfirmedTransactions {
 
 		private void addToCache(final Account account) {
 			// it's ok to put reference here, thanks to Account being non-mutable
-			this.unconfirmedBalances.putIfAbsent(account, account.getBalance());
+			this.unconfirmedBalances.putIfAbsent(account, this.getBalance(account));
+		}
+
+		private Amount getBalance(final Account account) {
+			return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		}
 	}
 }

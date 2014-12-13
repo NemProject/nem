@@ -6,6 +6,8 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.nis.remote.RemoteLink;
+import org.nem.nis.validators.DebitPredicate;
 
 import java.util.*;
 import java.util.stream.*;
@@ -643,6 +645,37 @@ public class PoiFacadeTest {
 		Assert.assertThat(
 				iteratedAccountStates.stream().map(PoiAccountState::getAddress).collect(Collectors.toList()),
 				IsEquivalent.equivalentTo(accountStates.stream().map(PoiAccountState::getAddress).collect(Collectors.toList())));
+	}
+
+	//endregion
+
+	//region getDebitPredicate
+
+	@Test
+	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
+		// Arrange:
+		final PoiFacade poiFacade = createPoiFacade();
+		final Account account1 = addAccountWithBalance(poiFacade, Amount.fromNem(10));
+		final Account account2 = addAccountWithBalance(poiFacade, Amount.fromNem(77));
+
+		// Act:
+		final DebitPredicate debitPredicate = poiFacade.getDebitPredicate();
+
+		// Assert:
+		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(9)), IsEqual.equalTo(true));
+		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(10)), IsEqual.equalTo(true));
+		Assert.assertThat(debitPredicate.canDebit(account1, Amount.fromNem(11)), IsEqual.equalTo(false));
+
+		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(76)), IsEqual.equalTo(true));
+		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(77)), IsEqual.equalTo(true));
+		Assert.assertThat(debitPredicate.canDebit(account2, Amount.fromNem(78)), IsEqual.equalTo(false));
+	}
+
+	private static Account addAccountWithBalance(final PoiFacade poiFacade, final Amount amount) {
+		final Account account = Utils.generateRandomAccount();
+		final PoiAccountState accountState = poiFacade.findStateByAddress(account.getAddress());
+		accountState.getAccountInfo().incrementBalance(amount);
+		return account;
 	}
 
 	//endregion

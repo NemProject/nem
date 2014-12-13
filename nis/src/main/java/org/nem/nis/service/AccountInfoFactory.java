@@ -2,7 +2,6 @@ package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.AccountImportance;
@@ -39,36 +38,14 @@ public class AccountInfoFactory {
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
 		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
+		final org.nem.nis.poi.AccountInfo accountInfo = accountState.getAccountInfo();
 
 		final AccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
 				account.getAddress(),
-				account.getBalance(),
-				account.getForagedBlocks(),
-				account.getLabel(),
+				accountInfo.getBalance(),
+				accountInfo.getHarvestedBlocks(),
+				accountInfo.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
-	}
-
-	// TODO 20141014 J-G - can't this move to the caller (is it called more than once)?
-	// > you can also add a function to the enum to do the mapping (RemoteStatus.toAccountRemoteStatus())
-	// TODO 20141014 J-G - the tests you added are good, but i'd move them to RemoteStatus
-	public AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
-		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
-		switch (remoteStatus) {
-			case NOT_SET:
-				return AccountRemoteStatus.INACTIVE;
-			case OWNER_INACTIVE:
-				return AccountRemoteStatus.INACTIVE;
-			case OWNER_ACTIVATING:
-				return AccountRemoteStatus.ACTIVATING;
-			case OWNER_ACTIVE:
-				return AccountRemoteStatus.ACTIVE;
-			case OWNER_DEACTIVATING:
-				return AccountRemoteStatus.DEACTIVATING;
-
-			default:
-				return AccountRemoteStatus.REMOTE;
-		}
 	}
 }
