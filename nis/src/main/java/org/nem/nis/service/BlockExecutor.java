@@ -3,8 +3,8 @@ package org.nem.nis.service;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.nis.NisCache;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 import org.nem.nis.secret.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BlockExecutor {
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 
 	/**
 	 * Creates a new block executor.
@@ -25,7 +25,7 @@ public class BlockExecutor {
 	 * @param nisCache The NIS cache.
 	 */
 	@Autowired(required = true)
-	public BlockExecutor(final NisCache nisCache) {
+	public BlockExecutor(final ReadOnlyNisCache nisCache) {
 		this.nisCache = nisCache;
 	}
 
@@ -76,11 +76,11 @@ public class BlockExecutor {
 		// in order for all the downstream observers to behave correctly (without needing to know about remote foraging)
 		// trigger harvest notifications with the forwarded account (where available) instead of the remote account
 		final Address address = block.getSigner().getAddress();
-		final PoiAccountState poiAccountState = this.nisCache.getPoiFacade().findForwardedStateByAddress(address, block.getHeight());
+		final ReadOnlyAccountState accountState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(address, block.getHeight());
 
-		final Account endowed = poiAccountState.getAddress().equals(address)
+		final Account endowed = accountState.getAddress().equals(address)
 				? block.getSigner()
-				: this.nisCache.getAccountCache().findByAddress(poiAccountState.getAddress());
+				: this.nisCache.getAccountCache().findByAddress(accountState.getAddress());
 
 		final List<NotificationType> types = NotificationTrigger.Execute == trigger
 				? Arrays.asList(NotificationType.BalanceCredit, NotificationType.HarvestReward)

@@ -2,6 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.nis.cache.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,14 +11,14 @@ import java.util.stream.Collectors;
  * A batch transaction validator that ensures all transaction hashes are unique.
  */
 public class BatchUniqueHashTransactionValidator implements BatchTransactionValidator {
-	private final HashCache transactionHashCache;
+	private final ReadOnlyHashCache transactionHashCache;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param transactionHashCache The transaction hash cache.
 	 */
-	public BatchUniqueHashTransactionValidator(final HashCache transactionHashCache) {
+	public BatchUniqueHashTransactionValidator(final ReadOnlyHashCache transactionHashCache) {
 		this.transactionHashCache = transactionHashCache;
 	}
 
@@ -32,8 +33,7 @@ public class BatchUniqueHashTransactionValidator implements BatchTransactionVali
 				.map(HashUtils::calculateHash)
 				.collect(Collectors.toList());
 
-		final ValidationResult result = this.validate(hashes);
-		return result;
+		return this.validate(hashes);
 	}
 
 	private ValidationResult validate(final Collection<Hash> hashes) {

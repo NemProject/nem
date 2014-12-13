@@ -6,7 +6,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
 public class OutlinkObserverTest {
@@ -142,7 +143,7 @@ public class OutlinkObserverTest {
 		private final AccountImportance importance2;
 		private final WeightedBalances weightedBalances1;
 		private final WeightedBalances weightedBalances2;
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 
 		public TestContext() {
 			final BlockHeight height = new BlockHeight(111);
@@ -158,18 +159,18 @@ public class OutlinkObserverTest {
 		}
 
 		private OutlinkObserver createObserver() {
-			return new OutlinkObserver(this.poiFacade);
+			return new OutlinkObserver(this.accountStateCache);
 		}
 
 		private void hook(final Account account, final AccountImportance importance, final WeightedBalances weightedBalances, final BlockHeight height) {
 			final Address address = Utils.generateRandomAddress();
 			Mockito.when(account.getAddress()).thenReturn(address);
 
-			final PoiAccountState poiAccountState = Mockito.mock(PoiAccountState.class);
-			Mockito.when(this.poiFacade.findStateByAddress(address)).thenReturn(poiAccountState);
-			Mockito.when(poiAccountState.getAddress()).thenReturn(address);
-			Mockito.when(poiAccountState.getImportanceInfo()).thenReturn(importance);
-			Mockito.when(poiAccountState.getWeightedBalances()).thenReturn(weightedBalances);
+			final AccountState accountState = Mockito.mock(AccountState.class);
+			Mockito.when(this.accountStateCache.findStateByAddress(address)).thenReturn(accountState);
+			Mockito.when(accountState.getAddress()).thenReturn(address);
+			Mockito.when(accountState.getImportanceInfo()).thenReturn(importance);
+			Mockito.when(accountState.getWeightedBalances()).thenReturn(weightedBalances);
 			Mockito.when(weightedBalances.getUnvested(height)).thenReturn(Amount.fromNem(7));
 			Mockito.when(weightedBalances.getVested(height)).thenReturn(Amount.fromNem(3));
 		}

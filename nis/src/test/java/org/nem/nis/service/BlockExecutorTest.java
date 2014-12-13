@@ -9,9 +9,10 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
+import org.nem.nis.state.AccountState;
+import org.nem.nis.test.NisCacheFactory;
 
 import java.util.*;
 
@@ -50,8 +51,8 @@ public class BlockExecutorTest {
 		private final MockTransaction[] transactions;
 		private final List<Integer> executeList = new ArrayList<>();
 		private final List<Integer> undoList = new ArrayList<>();
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final NisCache nisCache = new NisCache(Mockito.mock(AccountCache.class), this.poiFacade, Mockito.mock(HashCache.class));
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache);
 		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
 		public UndoExecuteTransactionOrderTestContext() {
@@ -67,9 +68,9 @@ public class BlockExecutorTest {
 				this.block.addTransaction(transaction);
 			}
 
-			final PoiAccountState accountState = new PoiAccountState(this.account.getAddress());
+			final AccountState accountState = new AccountState(this.account.getAddress());
 			accountState.getWeightedBalances().addReceive(BlockHeight.ONE, new Amount(100));
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(this.account.getAddress(), this.block.getHeight()))
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(this.account.getAddress(), this.block.getHeight()))
 					.thenReturn(accountState);
 		}
 
@@ -372,7 +373,7 @@ public class BlockExecutorTest {
 		context.execute(Mockito.mock(BlockTransactionObserver.class));
 
 		// Assert:
-		Mockito.verify(context.context.poiFacade, Mockito.times(1))
+		Mockito.verify(context.context.accountStateCache, Mockito.times(1))
 				.findForwardedStateByAddress(context.remoteSigner.getAddress(), context.height);
 	}
 
@@ -391,9 +392,9 @@ public class BlockExecutorTest {
 	//endregion
 
 	private static class ExecutorTestContext {
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final NisCache nisCache = new NisCache(this.accountCache, this.poiFacade, Mockito.mock(HashCache.class));
+		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.accountStateCache) ;
 		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
 		private Account addAccount() {
@@ -410,16 +411,16 @@ public class BlockExecutorTest {
 		}
 
 		private void hookAccount(final Account account) {
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any()))
+			final AccountState accountState = new AccountState(account.getAddress());
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any()))
 					.thenReturn(accountState);
 		}
 
 		private void setForwardingAccount(final Account forwardingAccount, final Account forwardAccount) {
 			Mockito.when(this.accountCache.findByAddress(forwardAccount.getAddress())).thenReturn(forwardAccount);
 
-			final PoiAccountState accountState = new PoiAccountState(forwardAccount.getAddress());
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.eq(forwardingAccount.getAddress()), Mockito.any()))
+			final AccountState accountState = new AccountState(forwardAccount.getAddress());
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(forwardingAccount.getAddress()), Mockito.any()))
 					.thenReturn(accountState);
 		}
 	}

@@ -3,11 +3,11 @@ package org.nem.nis.controller;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.nem.nis.controller.requests.AccountIdBuilder;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.remote.RemoteStatus;
+import org.nem.nis.state.*;
 import org.nem.nis.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +21,7 @@ public class AccountInfoController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
-	private final PoiFacade poiFacade;
+	private final ReadOnlyAccountStateCache accountStateCache;
 
 	@Autowired(required = true)
 	AccountInfoController(
@@ -29,12 +29,12 @@ public class AccountInfoController {
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
-			final PoiFacade poiFacade) {
+			final ReadOnlyAccountStateCache accountStateCache) {
 		this.unlockedAccounts = unlockedAccounts;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.accountInfoFactory = accountInfoFactory;
-		this.poiFacade = poiFacade;
+		this.accountStateCache = accountStateCache;
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class AccountInfoController {
 	}
 
 	private AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
 		return remoteStatus.toAccountRemoteStatus();
 	}

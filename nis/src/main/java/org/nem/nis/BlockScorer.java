@@ -2,8 +2,8 @@ package org.nem.nis;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.PoiFacade;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 
 import java.math.BigInteger;
 
@@ -39,10 +39,15 @@ public class BlockScorer {
 	 */
 	private static final int POI_GROUPING = 359;
 
-	public final PoiFacade poiFacade;
+	private final ReadOnlyAccountStateCache accountStateCache;
 
-	public BlockScorer(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
+	/**
+	 * Creates a new block scorer.
+	 *
+	 * @param accountStateCache The account state cache.
+	 */
+	public BlockScorer(final ReadOnlyAccountStateCache accountStateCache) {
+		this.accountStateCache = accountStateCache;
 	}
 
 	/**
@@ -92,17 +97,16 @@ public class BlockScorer {
 
 	/**
 	 * Calculates forager balance for block.
-	 * This has the side-effect of recalculating importances.
 	 *
 	 * @param block The signed, "hit" block.
 	 * @return The forager balance.
 	 */
 	public long calculateForgerBalance(final Block block) {
+		// TODO 20141212 J-*: it would be nice to hide the height grouping in the PoiFacade
 		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(block.getHeight());
-		this.poiFacade.recalculateImportances(groupedHeight);
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
-		final AccountImportance accountImportance = this.poiFacade
+		final ReadOnlyAccountImportance accountImportance = this.accountStateCache
 				.findForwardedStateByAddress(signerAddress, block.getHeight())
 				.getImportanceInfo();
 		return (long)(accountImportance.getImportance(groupedHeight) * multiplier);

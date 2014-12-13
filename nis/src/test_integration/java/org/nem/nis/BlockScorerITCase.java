@@ -6,8 +6,8 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.poi.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.AccountInfo;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -680,7 +680,7 @@ public class BlockScorerITCase {
 	//	}
 
 	private static BlockScorer createBlockScorer() {
-		return new BlockScorer(new PoiFacade(NisUtils.createImportanceCalculator()));
+		return new BlockScorer(new DefaultAccountStateCache());
 	}
 
 	private static class AccountWithInfo extends Account {

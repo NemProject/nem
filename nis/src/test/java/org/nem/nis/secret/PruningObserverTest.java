@@ -2,13 +2,13 @@ package org.nem.nis.secret;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.model.HashCache;
+import org.nem.nis.cache.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.*;
 
 import java.util.*;
 
@@ -223,14 +223,14 @@ public class PruningObserverTest {
 	}
 
 	private static class TestContext {
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		private final List<PoiAccountState> accountStates = new ArrayList<>();
-		private final BlockTransactionObserver observer = new PruningObserver(this.poiFacade, this.transactionHashCache);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
+		private final List<AccountState> accountStates = new ArrayList<>();
+		private final BlockTransactionObserver observer = new PruningObserver(this.accountStateCache, this.transactionHashCache);
 
 		private TestContext() {
 			for (int i = 0; i < 3; ++i) {
-				final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+				final AccountState accountState = Mockito.mock(AccountState.class);
 				final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
 				final WeightedBalances weightedBalances = Mockito.mock(WeightedBalances.class);
 
@@ -239,7 +239,7 @@ public class PruningObserverTest {
 				this.accountStates.add(accountState);
 			}
 
-			Mockito.when(this.poiFacade.iterator()).thenReturn(this.accountStates.iterator());
+			Mockito.when(this.accountStateCache.mutableContents()).thenReturn(new CacheContents<>(this.accountStates));
 			Mockito.when(this.transactionHashCache.getRetentionTime()).thenReturn(RETENTION_HOURS);
 		}
 
@@ -250,13 +250,13 @@ public class PruningObserverTest {
 		}
 
 		private void assertNoWeightedBalancePruning() {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getWeightedBalances(), Mockito.never()).prune(Mockito.any());
 			}
 		}
 
 		private void assertNoOutlinkPruning() {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.never()).prune(Mockito.any());
 			}
 		}
@@ -266,13 +266,13 @@ public class PruningObserverTest {
 		}
 
 		private void assertWeightedBalancePruning(final BlockHeight height) {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getWeightedBalances(), Mockito.only()).prune(height);
 			}
 		}
 
 		private void assertOutlinkPruning(final BlockHeight height) {
-			for (final PoiAccountState accountState : this.accountStates) {
+			for (final AccountState accountState : this.accountStates) {
 				Mockito.verify(accountState.getImportanceInfo(), Mockito.only()).prune(height);
 			}
 		}

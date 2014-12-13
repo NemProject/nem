@@ -1,8 +1,7 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.HashCache;
+import org.nem.nis.cache.*;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.NisCache;
 import org.nem.nis.poi.*;
 
 import java.util.function.Consumer;
@@ -33,9 +32,9 @@ public class TransactionValidatorFactory {
 	 * @param nisCache The NIS cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator create(final NisCache nisCache) {
+	public SingleTransactionValidator create(final ReadOnlyNisCache nisCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, nisCache.getPoiFacade());
+		this.visitSingleSubValidators(builder::add, nisCache.getAccountStateCache());
 		this.visitBatchSubValidators(builder::add, nisCache.getTransactionHashCache());
 		return builder.build();
 	}
@@ -43,12 +42,12 @@ public class TransactionValidatorFactory {
 	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accountStateCache The account state cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final PoiFacade poiFacade) {
+	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, poiFacade);
+		this.visitSingleSubValidators(builder::add, accountStateCache);
 		return builder.build();
 	}
 
@@ -58,7 +57,7 @@ public class TransactionValidatorFactory {
 	 * @param transactionHashCache The transaction hash cache.
 	 * @return The validator.
 	 */
-	public BatchTransactionValidator createBatch(final HashCache transactionHashCache) {
+	public BatchTransactionValidator createBatch(final ReadOnlyHashCache transactionHashCache) {
 		final AggregateBatchTransactionValidatorBuilder builder = new AggregateBatchTransactionValidatorBuilder();
 		this.visitBatchSubValidators(builder::add, transactionHashCache);
 		return builder.build();
@@ -68,13 +67,15 @@ public class TransactionValidatorFactory {
 	 * Visits all sub validators that comprise the validator returned by createSingle.
 	 *
 	 * @param visitor The visitor.
-	 * @param poiFacade The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
-	public void visitSingleSubValidators(final Consumer<SingleTransactionValidator> visitor, final PoiFacade poiFacade) {
+	public void visitSingleSubValidators(
+			final Consumer<SingleTransactionValidator> visitor,
+			final ReadOnlyAccountStateCache accountStateCache) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());
-		visitor.accept(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
+		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
 	}
 
 	/**
@@ -83,7 +84,9 @@ public class TransactionValidatorFactory {
 	 * @param visitor The visitor.
 	 * @param transactionHashCache The transaction hash cache.
 	 */
-	public void visitBatchSubValidators(final Consumer<BatchTransactionValidator> visitor, final HashCache transactionHashCache) {
+	public void visitBatchSubValidators(
+			final Consumer<BatchTransactionValidator> visitor,
+			final ReadOnlyHashCache transactionHashCache) {
 		visitor.accept(new BatchUniqueHashTransactionValidator(transactionHashCache));
 	}
 }

@@ -4,12 +4,12 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -26,20 +26,20 @@ public class AccountController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
-	private final PoiFacade poiFacade;
-	private final HashCache transactionHashCache;
+	private final ReadOnlyAccountStateCache accountStateCache;
+	private final ReadOnlyHashCache transactionHashCache;
 
 	@Autowired(required = true)
 	AccountController(
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
-			final PoiFacade poiFacade,
-			final HashCache transactionHashCache) {
+			final ReadOnlyAccountStateCache accountStateCache,
+			final ReadOnlyHashCache transactionHashCache) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
-		this.poiFacade = poiFacade;
+		this.accountStateCache = accountStateCache;
 		this.transactionHashCache = transactionHashCache;
 	}
 
@@ -187,7 +187,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
 	@PublicApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
-		final List<AccountImportanceViewModel> viewModels = StreamSupport.stream(this.poiFacade.spliterator(), false)
+		final List<AccountImportanceViewModel> viewModels = this.accountStateCache.contents().stream()
 				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
 				.collect(Collectors.toList());
 

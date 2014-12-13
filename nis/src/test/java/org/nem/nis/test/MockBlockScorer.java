@@ -3,7 +3,7 @@ package org.nem.nis.test;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
 import org.nem.nis.BlockScorer;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -17,7 +17,7 @@ public class MockBlockScorer extends BlockScorer {
 	private final Map<BlockScoreKey, Long> blockScores = new HashMap<>();
 
 	public MockBlockScorer() {
-		super(Mockito.mock(PoiFacade.class));
+		super(Mockito.mock(ReadOnlyAccountStateCache.class));
 	}
 
 	/**

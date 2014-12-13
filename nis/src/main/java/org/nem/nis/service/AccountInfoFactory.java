@@ -3,8 +3,8 @@ package org.nem.nis.service;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.poi.*;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountInfoFactory {
 	private final AccountLookup accountLookup;
-	private final PoiFacade poiFacade;
+	private final ReadOnlyAccountStateCache accountStateCache;
 
 	/**
 	 * Creates a new account info factory.
@@ -24,9 +24,9 @@ public class AccountInfoFactory {
 	@Autowired(required = true)
 	public AccountInfoFactory(
 			final AccountLookup accountLookup,
-			final PoiFacade poiFacade) {
+			final ReadOnlyAccountStateCache accountStateCache) {
 		this.accountLookup = accountLookup;
-		this.poiFacade = poiFacade;
+		this.accountStateCache = accountStateCache;
 	}
 
 	/**
@@ -37,10 +37,10 @@ public class AccountInfoFactory {
 	 */
 	public AccountInfo createInfo(final Address address) {
 		final Account account = this.accountLookup.findByAddress(address);
-		final PoiAccountState accountState = this.poiFacade.findStateByAddress(address);
-		final org.nem.nis.poi.AccountInfo accountInfo = accountState.getAccountInfo();
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+		final ReadOnlyAccountInfo accountInfo = accountState.getAccountInfo();
 
-		final AccountImportance ai = accountState.getImportanceInfo();
+		final ReadOnlyAccountImportance ai = accountState.getImportanceInfo();
 		return new AccountInfo(
 				account.getAddress(),
 				accountInfo.getBalance(),

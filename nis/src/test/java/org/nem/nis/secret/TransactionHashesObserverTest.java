@@ -7,6 +7,7 @@ import org.nem.core.model.observers.TransactionHashesNotification;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.DefaultHashCache;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,9 +26,9 @@ public class TransactionHashesObserverTest {
 
 		// Assert:
 		Assert.assertThat(context.transactionHashCache.size(), IsEqual.equalTo(10));
-		Assert.assertThat(
-				context.transactionHashCache.stream().map(e -> new HashMetaDataPair(e.getKey(), e.getValue())).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(context.pairs));
+		for (final HashMetaDataPair pair : context.pairs) {
+			Assert.assertThat(context.transactionHashCache.get(pair.getHash()), IsEqual.equalTo(pair.getMetaData()));
+		}
 	}
 
 	//endregion
@@ -60,11 +61,11 @@ public class TransactionHashesObserverTest {
 
 	private class TestContext {
 		private final List<HashMetaDataPair> pairs = this.createPairs();
-		private final HashCache transactionHashCache;
+		private final DefaultHashCache transactionHashCache;
 		private final TransactionHashesObserver observer;
 
 		private TestContext() {
-			this.transactionHashCache = new HashCache();
+			this.transactionHashCache = new DefaultHashCache();
 			this.observer = new TransactionHashesObserver(this.transactionHashCache);
 		}
 

@@ -6,7 +6,8 @@ import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.*;
 
 public class BalanceCommitTransferObserverTest {
 
@@ -15,9 +16,9 @@ public class BalanceCommitTransferObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = Utils.generateRandomAccount();
-		final AccountInfo senderAccountInfo = context.add(sender, Amount.fromNem(100));
+		final ReadOnlyAccountInfo senderAccountInfo = context.add(sender, Amount.fromNem(100));
 		final Account recipient = Utils.generateRandomAccount();
-		final AccountInfo recipientAccountInfo = context.add(recipient, Amount.fromNem(100));
+		final ReadOnlyAccountInfo recipientAccountInfo = context.add(recipient, Amount.fromNem(100));
 
 		// Act:
 		context.observer.notifyTransfer(sender, recipient, Amount.fromNem(20));
@@ -32,7 +33,7 @@ public class BalanceCommitTransferObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
-		final AccountInfo accountInfo = context.add(account, Amount.fromNem(100));
+		final ReadOnlyAccountInfo accountInfo = context.add(account, Amount.fromNem(100));
 
 		// Act:
 		context.observer.notifyCredit(account, Amount.fromNem(20));
@@ -46,7 +47,7 @@ public class BalanceCommitTransferObserverTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
-		final AccountInfo accountInfo = context.add(account, Amount.fromNem(100));
+		final ReadOnlyAccountInfo accountInfo = context.add(account, Amount.fromNem(100));
 
 		// Act:
 		context.observer.notifyDebit(account, Amount.fromNem(20));
@@ -56,16 +57,16 @@ public class BalanceCommitTransferObserverTest {
 	}
 
 	private static class TestContext {
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.poiFacade);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final BalanceCommitTransferObserver observer = new BalanceCommitTransferObserver(this.accountStateCache);
 
-		public AccountInfo add(final Account account, final Amount amount) {
+		public ReadOnlyAccountInfo add(final Account account, final Amount amount) {
 			final AccountInfo accountInfo = new AccountInfo();
 			accountInfo.incrementBalance(amount);
 
-			final PoiAccountState accountState = Mockito.mock(PoiAccountState.class);
+			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getAccountInfo()).thenReturn(accountInfo);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return accountInfo;
 		}
 	}

@@ -7,12 +7,13 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.state.*;
 import org.nem.peer.NodeInteractionResult;
 import org.nem.peer.connect.*;
 
@@ -30,14 +31,14 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
@@ -63,7 +64,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	@Override
 	public void updateScore(final Block parentBlock, final Block block) {
-		final BlockScorer scorer = new BlockScorer(this.nisCache.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(this.nisCache.getAccountStateCache());
 		this.score = this.score.add(new BlockChainScore(scorer.calculateBlockScore(parentBlock, block)));
 	}
 
@@ -248,8 +249,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		// each block that we receive
 		fixGenerationHash(block, parent);
 
-		final PoiFacade poiFacade = this.nisCache.getPoiFacade();
-		final PoiAccountState state = poiFacade.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
+		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
+		final ReadOnlyAccountState state = accountStateCache.findForwardedStateByAddress(block.getSigner().getAddress(), block.getHeight());
 		final Account lessor = this.nisCache.getAccountCache().findByAddress(state.getAddress());
 		block.setLessor(lessor);
 	}

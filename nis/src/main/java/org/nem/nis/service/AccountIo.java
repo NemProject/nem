@@ -10,7 +10,7 @@ import org.nem.nis.dao.ReadOnlyTransferDao;
 /**
  * An account input / output service.
  */
-public interface AccountIo extends Iterable<Account> {
+public interface AccountIo {
 
 	/**
 	 * Finds an account given an address.

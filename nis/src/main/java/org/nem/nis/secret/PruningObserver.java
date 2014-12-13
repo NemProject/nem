@@ -1,11 +1,11 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.HashCache;
+import org.nem.nis.cache.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.state.AccountState;
 
 /**
  * A block transaction observer that automatically prunes account-related data once every 360 blocks.
@@ -16,16 +16,16 @@ public class PruningObserver implements BlockTransactionObserver {
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY_OLD = BlockChainConstants.OUTLINK_HISTORY;
 	private static final long PRUNE_INTERVAL = 360;
-	private final PoiFacade poiFacade;
+	private final AccountStateCache accountStateCache;
 	private final HashCache transactionHashCache;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
-	public PruningObserver(final PoiFacade poiFacade, final HashCache transactionHashCache) {
-		this.poiFacade = poiFacade;
+	public PruningObserver(final AccountStateCache accountStateCache, final HashCache transactionHashCache) {
+		this.accountStateCache = accountStateCache;
 		this.transactionHashCache = transactionHashCache;
 	}
 
@@ -40,7 +40,7 @@ public class PruningObserver implements BlockTransactionObserver {
 				? OUTLINK_BLOCK_HISTORY
 				: OUTLINK_BLOCK_HISTORY_OLD;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
-		for (final PoiAccountState accountState : this.poiFacade) {
+		for (final AccountState accountState : this.accountStateCache.mutableContents()) {
 			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}

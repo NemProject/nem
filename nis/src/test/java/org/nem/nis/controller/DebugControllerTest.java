@@ -11,10 +11,11 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.state.AccountState;
 import org.nem.peer.PeerNetwork;
 
 import java.math.BigInteger;
@@ -42,34 +43,32 @@ public class DebugControllerTest {
 		final BlockHeight height = new BlockHeight(10);
 		final TimeInstant timeStamp = new TimeInstant(1000);
 		final BlockDifficulty difficulty = new BlockDifficulty(123_000_000_000_000L);
-		final NisCache nisCache = new NisCache(
-				new AccountCache(),
-				new PoiFacade(NisUtils.createImportanceCalculator()),
-				new HashCache());
-		final Account signer1 = addRandomAccountWithBalance(nisCache);
-		final Account signer2 = addRandomAccountWithBalance(nisCache);
 
-		final Block blockDaoBlock = createBlock(signer1, timeStamp.addSeconds(60), height, difficulty);
-		final Block blockDaoParent = createBlock(signer2, timeStamp, height.prev(), difficulty);
+		// Arrange: simulate block loading by (1) copying all of the information in the NisCache
+		class TestState {
+			Account signer1;
+			BigInteger hit;
+			BigInteger target;
+		}
 
-		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
-		final BigInteger hit = scorer.calculateHit(blockDaoBlock);
-		final BigInteger target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
-
-		final org.nem.nis.dbmodel.Block dbBlock = createDbBlock(blockDaoBlock);
-		final org.nem.nis.dbmodel.Block dbParent = createDbBlock(blockDaoParent);
-		Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
-		Mockito.when(context.blockDao.findByHeight(new BlockHeight(9))).thenReturn(dbParent);
-
-		// Arrange: simulate block loading by (1) copying all of the information in the AccountAnalyzer
-		// to the AccountAnalyzer copy and (2) then calculate importances (based on the copy)
+		final TestState state = new TestState();
 		Mockito.when(context.blockAnalyzer.analyze(Mockito.any(), Mockito.eq(10L))).then(invocationOnMock -> {
-			final NisCache nisCacheCopy = (NisCache)invocationOnMock.getArguments()[0];
-			nisCache.shallowCopyTo(nisCacheCopy);
+			final NisCache nisCache = ((NisCache)invocationOnMock.getArguments()[0]).copy();
+			state.signer1 = addRandomAccountWithBalance(nisCache);
+			final Account signer2 = addRandomAccountWithBalance(nisCache);
 
-			final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
-			nisCacheCopy.getPoiFacade().recalculateImportances(blockHeight);
-			return null;
+			final Block blockDaoBlock = createBlock(state.signer1, timeStamp.addSeconds(60), height, difficulty);
+			final Block blockDaoParent = createBlock(signer2, timeStamp, height.prev(), difficulty);
+
+			final BlockScorer scorer = new BlockScorer(nisCache.getAccountStateCache());
+			state.hit = scorer.calculateHit(blockDaoBlock);
+			state.target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
+
+			final org.nem.nis.dbmodel.Block dbBlock = createDbBlock(blockDaoBlock);
+			final org.nem.nis.dbmodel.Block dbParent = createDbBlock(blockDaoParent);
+			Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
+			Mockito.when(context.blockDao.findByHeight(new BlockHeight(9))).thenReturn(dbParent);
+			return true;
 		});
 
 		// Act:
@@ -77,11 +76,11 @@ public class DebugControllerTest {
 
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(signer1.getAddress()));
+		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(state.signer1.getAddress()));
 		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp.addSeconds(60)));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
-		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
-		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(target));
+		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(state.hit));
+		Assert.assertThat(blockDebugInfo.getTarget(), IsEqual.equalTo(state.target));
 		Assert.assertThat(blockDebugInfo.getInterBlockTime(), IsEqual.equalTo(60));
 
 		Mockito.verify(context.blockAnalyzer, Mockito.only()).analyze(Mockito.any(), Mockito.eq(10L));
@@ -174,7 +173,7 @@ public class DebugControllerTest {
 		final Account account = nisCache.getAccountCache().addAccountToCache(accountWithPrivateKey.getAddress());
 
 		final Amount balance = Amount.fromNem(10000);
-		final PoiAccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
+		final AccountState accountState = nisCache.getAccountStateCache().findStateByAddress(account.getAddress());
 		accountState.getAccountInfo().incrementBalance(balance);
 		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
 		accountState.setHeight(BlockHeight.ONE);

@@ -5,8 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.NisCache;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -26,7 +25,7 @@ public class UnconfirmedTransactions {
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 
 	private enum BalanceValidationOptions {
 		/**
@@ -59,7 +58,7 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
-			final NisCache nisCache) {
+			final ReadOnlyNisCache nisCache) {
 		this(
 				new ArrayList<>(),
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
@@ -71,11 +70,11 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
-			final NisCache nisCache) {
+			final ReadOnlyNisCache nisCache) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator();
-		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getPoiFacade());
+		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -199,7 +198,7 @@ public class UnconfirmedTransactions {
 
 	private SingleTransactionValidator createSingleValidator() {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.nisCache.getPoiFacade()));
+		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		return builder.build();
 	}
@@ -360,8 +359,10 @@ public class UnconfirmedTransactions {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
-		// (3) not already be expired (relative to the block time)
-		// TODO 20141210 J -> B: i know we talked about this, but i don't remember how expired transactions can get added?
+		// (3) not already be expired (relative to the block time):
+		// - BlockGenerator.generateNextBlock() calls dropExpiredTransactions() and later getTransactionsForNewBlock().
+		// - In-between it is possible that unconfirmed transactions are polled and thus expired (relative to the block time)
+		// - transactions are in our cache when we call getTransactionsForNewBlock().
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
@@ -379,11 +380,11 @@ public class UnconfirmedTransactions {
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
-		private final PoiFacade poiFacade;
+		private final ReadOnlyAccountStateCache accountStateCache;
 		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
-		public UnconfirmedBalancesObserver(final PoiFacade poiFacade) {
-			this.poiFacade = poiFacade;
+		public UnconfirmedBalancesObserver(final ReadOnlyAccountStateCache accountStateCache) {
+			this.accountStateCache = accountStateCache;
 		}
 
 		public Amount get(final Account account) {
@@ -416,7 +417,7 @@ public class UnconfirmedTransactions {
 		}
 
 		private Amount getBalance(final Account account) {
-			return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		}
 	}
 }

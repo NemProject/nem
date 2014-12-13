@@ -10,12 +10,12 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.state.*;
 import org.nem.nis.service.AccountIoAdapter;
 
 import java.util.*;
@@ -348,13 +348,13 @@ public class AccountControllerTest {
 	@Test
 	public void getImportancesReturnsImportanceInformationForAllAccounts() {
 		// Arrange:
-		final List<PoiAccountState> accountStates = Arrays.asList(
+		final List<AccountState> accountStates = Arrays.asList(
 				createAccountState("alpha", 12, 45),
 				createAccountState("gamma", 0, 0),
 				createAccountState("sigma", 4, 88));
 
 		final TestContext context = new TestContext();
-		Mockito.when(context.poiFacade.spliterator()).thenReturn(accountStates.spliterator());
+		Mockito.when(context.accountStateCache.contents()).thenReturn(new CacheContents<>(accountStates));
 
 		// Act:
 		final SerializableList<AccountImportanceViewModel> viewModels = context.controller.getImportances();
@@ -367,11 +367,11 @@ public class AccountControllerTest {
 		Assert.assertThat(viewModels.asCollection(), IsEquivalent.equivalentTo(expectedViewModels));
 	}
 
-	private static PoiAccountState createAccountState(
+	private static AccountState createAccountState(
 			final String encodedAddress,
 			final int blockHeight,
 			final int importance) {
-		final PoiAccountState state = new PoiAccountState(Address.fromEncoded(encodedAddress));
+		final AccountState state = new AccountState(Address.fromEncoded(encodedAddress));
 		if (blockHeight > 0) {
 			state.getImportanceInfo().setImportance(new BlockHeight(blockHeight), importance);
 		}
@@ -397,8 +397,8 @@ public class AccountControllerTest {
 		private final AccountController controller;
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
@@ -409,14 +409,14 @@ public class AccountControllerTest {
 					this.unconfirmedTransactions,
 					this.unlockedAccounts,
 					accountIoAdapter,
-					this.poiFacade,
+					this.accountStateCache,
 					this.transactionHashCache);
 		}
 
 		private Account addAccount(final Account account, final Amount amount) {
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;
 		}
 	}

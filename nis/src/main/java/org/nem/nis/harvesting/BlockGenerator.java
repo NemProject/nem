@@ -4,8 +4,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.poi.PoiAccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
@@ -17,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class BlockGenerator {
 	private static final Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockDao blockDao;
 	private final BlockScorer blockScorer;
@@ -31,7 +32,7 @@ public class BlockGenerator {
 	 * @param blockDao The block dao.
 	 */
 	public BlockGenerator(
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final BlockDao blockDao,
 			final BlockScorer blockScorer,
@@ -88,7 +89,9 @@ public class BlockGenerator {
 			final BlockScorer blockScorer,
 			final TimeInstant blockTime) {
 		final BlockHeight harvestedBlockHeight = lastBlock.getHeight().next();
-		final PoiAccountState ownerState = this.nisCache.getPoiFacade().findForwardedStateByAddress(harvesterAccount.getAddress(), harvestedBlockHeight);
+		final ReadOnlyAccountState ownerState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(
+				harvesterAccount.getAddress(),
+				harvestedBlockHeight);
 		final Account ownerAccount = this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 
 		final Collection<Transaction> transactions = this.unconfirmedTransactions
