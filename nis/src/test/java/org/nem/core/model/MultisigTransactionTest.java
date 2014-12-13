@@ -235,7 +235,7 @@ public class MultisigTransactionTest {
 		Assert.assertThat(isVerified, IsEqual.equalTo(true));
 	}
 
-	// TODO 20141208 G-J this currently throws exception, not sure if that's expected
+	// TODO 20141213 G-J this currently throws exception, not sure if that's expected
 	@Test
 	public void cannotVerifyMultisigTransactionWithAtLeastOneIncorrectCosignerSignature() {
 		// Arrange:
