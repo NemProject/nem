@@ -43,6 +43,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		super(TransactionTypes.MULTISIG, options, deserializer);
 		this.otherTransaction = deserializer.readObject("other_trans", TransactionFactory.NON_VERIFIABLE);
 		this.otherTransactionHash = HashUtils.calculateHash(otherTransaction.asNonVerifiable());
+
+		// TODO 20141213 C1: adding this causes exception if "signatures" are not present, so how is this "optional"?
+		deserializer.readOptionalObjectArray("signatures", s -> new MultisigSignatureTransaction(DeserializationOptions.VERIFIABLE, s));
 	}
 
 	/**
@@ -121,6 +124,10 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		super.serializeImpl(serializer);
 		serializer.writeObject("other_trans", this.otherTransaction.asNonVerifiable());
 		// TODO: need to add some other fields here (not complete)
+
+		// TODO 20141213 C2: adding this makes addingCosignersDoesNotAffectHash to fail
+		// we need hash to match, as if hash does not match, .verify() won't work
+		// serializer.writeObjectArray("signatures", this.signatureTransactions);
 	}
 
 	@Override

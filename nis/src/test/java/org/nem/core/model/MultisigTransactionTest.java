@@ -69,7 +69,9 @@ public class MultisigTransactionTest {
 				new TimeInstant(123),
 				account,
 				innerTransaction);
-		originalTransaction.addSignature(createSignatureTransaction(HashUtils.calculateHash(innerTransaction)));
+		final MultisigSignatureTransaction signature = createSignatureTransaction(HashUtils.calculateHash(innerTransaction));
+		signature.sign();
+		originalTransaction.addSignature(signature);
 
 		// Act:
 		final MultisigTransaction transaction = createRoundTrippedTransaction(originalTransaction);
@@ -96,6 +98,31 @@ public class MultisigTransactionTest {
 		return new MultisigTransaction(VerifiableEntity.DeserializationOptions.NON_VERIFIABLE, deserializer);
 	}
 
+	//endregion
+
+	//region hash
+	@Test
+	public void addingCosignersDoesNotAffectHash() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final Transaction innerTransaction = createDefaultTransferTransaction();
+		final MultisigTransaction originalTransaction = new MultisigTransaction(
+				new TimeInstant(123),
+				account,
+				innerTransaction);
+
+
+		// Act:
+		final Hash expectedHash = HashUtils.calculateHash(originalTransaction);
+		final MultisigSignatureTransaction signature = createSignatureTransaction(HashUtils.calculateHash(innerTransaction));
+		signature.sign();
+		originalTransaction.addSignature(signature);
+
+		final Hash actualHash = HashUtils.calculateHash(originalTransaction);
+
+		// Assert:
+		Assert.assertThat(actualHash, IsEqual.equalTo(expectedHash));
+	}
 	//endregion
 
 	//region getFee
@@ -304,10 +331,12 @@ public class MultisigTransactionTest {
 	}
 
 	private static MultisigSignatureTransaction createSignatureTransaction(final Hash hash) {
-		return new MultisigSignatureTransaction(
+		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				hash);
+		multisigSignatureTransaction.sign();
+		return multisigSignatureTransaction;
 	}
 
 	private static MultisigTransaction createDefaultTransaction(final Transaction innerTransaction) {
