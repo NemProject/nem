@@ -3,6 +3,7 @@ package org.nem.nis.sync;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
@@ -155,7 +156,7 @@ public class BlockChainUpdateContext {
 	private void addRevertedTransactionsAsUnconfirmed(
 			final Set<Hash> transactionHashes,
 			final long wantedHeight,
-			final AccountCache accountCache) {
+			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {

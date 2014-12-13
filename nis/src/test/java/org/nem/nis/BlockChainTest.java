@@ -352,7 +352,7 @@ public class BlockChainTest {
 		return blocks.stream().map(VerifiableEntity::getTimeStamp).collect(Collectors.toList());
 	}
 
-	private Block createBlockForTests(final List<Account> accounts, final AccountCache accountCache, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
+	private Block createBlockForTests(final List<Account> accounts, final AccountLookup accountCache, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 		final Account forger = accounts.get(0);
