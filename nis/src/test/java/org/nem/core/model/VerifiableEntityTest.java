@@ -65,6 +65,7 @@ public class VerifiableEntityTest {
 		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
+		Assert.assertThat(entity.getNonVerifiableData(), IsEqual.equalTo(8));
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
 		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 	}
@@ -82,8 +83,61 @@ public class VerifiableEntityTest {
 		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
 		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
 		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
+		Assert.assertThat(entity.getNonVerifiableData(), IsEqual.equalTo(0)); // unset
 		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
 		Assert.assertThat(entity.getSignature(), IsNull.nullValue());
+	}
+
+	static class Mock2 extends MockVerifiableEntity {
+		private int innerNonVerifiableData;
+		public Mock2(final Account signer, final int customField, final int innerNonVerifiableData) {
+			super(signer, customField);
+			this.innerNonVerifiableData = innerNonVerifiableData;
+		}
+
+		public Mock2(final Deserializer deserializer) {
+			super(deserializer);
+		}
+
+		@Override
+		public void deserializeNonVerifiableData(final Deserializer deserializer) {
+			super.deserializeNonVerifiableData(deserializer);
+			this.innerNonVerifiableData = deserializer.readInt("innerNonVerifiableData");
+		}
+
+		@Override
+		protected void serializeImpl(final Serializer serializer) {
+			super.serializeImpl(serializer);
+		}
+
+		@Override
+		protected void serializeNonVerifiableData(final Serializer serializer) {
+			super.serializeNonVerifiableData(serializer);
+			serializer.writeInt("innerNonVerifiableData", this.innerNonVerifiableData);
+		}
+
+		public int getInnerNonVerifiableData() {
+			return innerNonVerifiableData;
+		}
+	}
+
+	@Test
+	public void verifiableHierarchyCanBeRoundTripped() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account signerPublicKeyOnly = Utils.createPublicOnlyKeyAccount(signer);
+		final Mock2 originalEntity = new Mock2(signer, 7, 543);
+		final Mock2 entity = createRoundTrippedEntity(originalEntity, signerPublicKeyOnly);
+
+		// Assert:
+		Assert.assertThat(entity.getType(), IsEqual.equalTo(MockVerifiableEntity.TYPE));
+		Assert.assertThat(entity.getVersion(), IsEqual.equalTo(MockVerifiableEntity.VERSION));
+		Assert.assertThat(entity.getTimeStamp(), IsEqual.equalTo(MockVerifiableEntity.TIMESTAMP));
+		Assert.assertThat(entity.getCustomField(), IsEqual.equalTo(7));
+		Assert.assertThat(entity.getNonVerifiableData(), IsEqual.equalTo(8));
+		Assert.assertThat(entity.getInnerNonVerifiableData(), IsEqual.equalTo(543));
+		Assert.assertThat(entity.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
+		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 	}
 
 	@Test(expected = SerializationException.class)
@@ -138,6 +192,22 @@ public class VerifiableEntityTest {
 		Assert.assertThat(object.containsKey("signature"), IsEqual.equalTo(false));
 	}
 
+	@Test
+	public void nonVerifiableSerializationExcludesNonVerifiableData() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final MockVerifiableEntity entity = new MockVerifiableEntity(signer);
+		final JsonSerializer serializer = new JsonSerializer();
+
+		// Act:
+		entity.sign();
+		entity.asNonVerifiable().serialize(serializer);
+		final JSONObject object = serializer.getObject();
+
+		// Assert:
+		Assert.assertThat(object.containsKey("nonVerifiableField"), IsEqual.equalTo(false));
+	}
+
 	//endregion
 
 	//region Sign / Verify
@@ -184,6 +254,21 @@ public class VerifiableEntityTest {
 		// Assert:
 		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(entity.verify(), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void changingNonVerifiableDataDoesNotInvalidateSignature() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 7);
+
+		// Act:
+		entity.sign();
+		entity.setNonVerifiableData(123);
+
+		// Assert:
+		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -296,6 +381,14 @@ public class VerifiableEntityTest {
 		// Act:
 		final MockVerifiableEntity originalEntity = new MockVerifiableEntity(originalSigner, customField);
 		return createRoundTrippedEntity(originalEntity, deserializedSigner);
+	}
+
+	private static Mock2 createRoundTrippedEntity(
+			final Mock2 originalEntity,
+			final Account deserializedSigner) {
+		// Act:
+		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalEntity, deserializedSigner);
+		return new Mock2(deserializer);
 	}
 
 	private static MockVerifiableEntity createRoundTrippedEntity(

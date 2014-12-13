@@ -67,6 +67,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
 		if (DeserializationOptions.VERIFIABLE == options) {
 			this.signature = Signature.readFrom(deserializer, "signature");
+			this.deserializeNonVerifiableData(deserializer);
 		}
 	}
 
@@ -147,6 +148,7 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
 		if (includeSignature) {
 			Signature.writeTo(serializer, "signature", this.getSignature());
+			this.serializeNonVerifiableData(serializer);
 		}
 
 		this.serializeImpl(serializer);
@@ -158,6 +160,26 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @param serializer The serializer to use.
 	 */
 	protected abstract void serializeImpl(final Serializer serializer);
+
+	/**
+	 * Serializes non-verifiable data.
+	 *
+	 * @param serializer The serializer to use.
+	 */
+	protected void serializeNonVerifiableData(final Serializer serializer) {
+	}
+
+	/**
+	 * Deserializes non-verifiable data.
+	 *
+	 * @param deserializer The deserializer to use.
+	 */
+	protected void deserializeNonVerifiableData(final Deserializer deserializer) {
+		// note: instead of making a function that's called from ctor,
+		// we could do simple check: "if (.NON_VERIFIABLE == options) {"
+		// but then we'd have problems if there would be multiple objects in
+		// hierarchy that have non-verifiable data (see verifiableHierarchyCanBeRoundTripped)
+	}
 
 	/**
 	 * Signs this entity with the owner's private key.
