@@ -255,15 +255,11 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		// probably faster to use hash map than collection
-		// TODO 201412123: why not hash map of hashshortid -> transaction to avoid recalculating the hashes twice?
-		final HashMap<HashShortId, Integer> unknownHashShortIds = new HashMap<>(this.transactions.size());
+		final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
 		this.transactions.values().stream()
-				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), 0));
+				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
-
-		return this.transactions.values().stream()
-				.filter(t -> unknownHashShortIds.containsKey(new HashShortId(HashUtils.calculateHash(t).getShortId())))
-				.collect(Collectors.toList());
+		return unknownHashShortIds.values().stream().collect(Collectors.toList());
 	}
 
 	/**

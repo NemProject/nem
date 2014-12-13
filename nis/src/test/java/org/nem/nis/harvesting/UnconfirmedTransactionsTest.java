@@ -1238,7 +1238,10 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private Account addAccount(final Amount amount) {
-			final Account account = Utils.generateRandomAccount();
+			return prepareAccount(Utils.generateRandomAccount(), amount);
+		}
+
+		private Account prepareAccount(final Account account, final Amount amount) {
 			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
@@ -1249,12 +1252,7 @@ public class UnconfirmedTransactionsTest {
 			final List<MockTransaction> transactions = new ArrayList<>();
 
 			for (int i = startCustomField; i <= endCustomField; ++i) {
-				transactions.add(createMockTransaction(
-						Utils.generateRandomAccount(),
-						Amount.fromNem(1000),
-						i,
-						new TimeInstant(i),
-						Amount.fromNem(i)));
+				transactions.add(createMockTransaction(Utils.generateRandomAccount(), new TimeInstant(i), i));
 			}
 
 			return transactions;
@@ -1265,25 +1263,16 @@ public class UnconfirmedTransactionsTest {
 			final SecureRandom random = new SecureRandom();
 
 			for (int i = 0; i < count; ++i) {
-				// TODO 20141213 J-B: might want another createMockTransaction overload with fewer parameters as multiple parameters here are same as above
-				transactions.add(createMockTransaction(account, Amount.fromNem(1000), i, new TimeInstant(random.nextInt(1_000_000)), Amount.fromNem(i)));
+				transactions.add(createMockTransaction(account, new TimeInstant(random.nextInt(1_000_000)), i));
 			}
 
 			return transactions;
 		}
 
-		private MockTransaction createMockTransaction(
-				final Account account,
-				final Amount amount,
-				final int customField,
-				final TimeInstant timeStamp,
-				final Amount fee) {
-			// TODO 20141213 J-B: can you call add account?
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
-			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+		private MockTransaction createMockTransaction(final Account account, final TimeInstant timeStamp, final int customField) {
+			this.prepareAccount(account, Amount.fromNem(1000));
 			final MockTransaction transaction = new MockTransaction(account, customField, timeStamp);
-			transaction.setFee(fee);
+			transaction.setFee(Amount.fromNem(customField));
 			return transaction;
 		}
 
