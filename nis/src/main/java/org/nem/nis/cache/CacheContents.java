@@ -1,6 +1,7 @@
 package org.nem.nis.cache;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Represents the contents of a cache.
@@ -31,5 +32,14 @@ public class CacheContents<T> implements Iterable<T> {
 	 */
 	public Collection<T> asCollection() {
 		return this.contents;
+	}
+
+	/**
+	 * Streams the cache contents.
+	 *
+	 * @return The contents.
+	 */
+	public Stream<T> stream() {
+		return this.contents.stream();
 	}
 }

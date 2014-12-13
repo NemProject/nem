@@ -23,6 +23,12 @@ public class CacheContentsTest {
 		assertCopyOfSourceCollection(contents -> contents.asCollection());
 	}
 
+	@Test
+	public void streamExposesCopyOfSourceCollection() {
+		// Assert:
+		assertCopyOfSourceCollection(contents -> contents.stream().collect(Collectors.toList()));
+	}
+
 	private static void assertCopyOfSourceCollection(final Function<CacheContents<Integer>, Collection<Integer>> toCollection) {
 		// Arrange:
 		final List<Integer> original = new ArrayList<>(Arrays.asList(6, 2, 5));

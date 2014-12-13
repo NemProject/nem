@@ -183,8 +183,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
 	@PublicApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
-		// TODO 20141212 add stream to contents!
-		final List<AccountImportanceViewModel> viewModels = this.accountStateCache.contents().asCollection().stream()
+		final List<AccountImportanceViewModel> viewModels = this.accountStateCache.contents().stream()
 				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
 				.collect(Collectors.toList());
 
