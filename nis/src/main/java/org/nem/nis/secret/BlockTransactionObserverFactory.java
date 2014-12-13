@@ -1,7 +1,6 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.observers.BalanceCommitTransferObserver;
-import org.nem.nis.*;
 import org.nem.nis.cache.*;
 
 /**

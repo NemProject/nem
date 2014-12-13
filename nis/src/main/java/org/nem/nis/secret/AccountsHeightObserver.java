@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.secret;
 
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
