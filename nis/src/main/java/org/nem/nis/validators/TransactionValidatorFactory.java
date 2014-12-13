@@ -75,7 +75,6 @@ public class TransactionValidatorFactory {
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());
 		visitor.accept(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
-		visitor.accept(new ImportanceTransferTransactionValidator(poiFacade, this.poiOptions.getMinHarvesterBalance()));
 	}
 
 	/**
