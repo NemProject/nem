@@ -329,8 +329,10 @@ public class UnconfirmedTransactions {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
-		// (3) not already be expired (relative to the block time)
-		// TODO 20141210 J -> B: i know we talked about this, but i don't remember how expired transactions can get added?
+		// (3) not already be expired (relative to the block time):
+		// - BlockGenerator.generateNextBlock() calls dropExpiredTransactions() and later getTransactionsForNewBlock().
+		// - In-between it is possible that unconfirmed transactions are polled and thus expired (relative to the block time)
+		// - transactions are in our cache when we call getTransactionsForNewBlock().
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
