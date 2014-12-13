@@ -12,6 +12,7 @@ import org.nem.peer.node.*;
  * have a constructor that accepts a single Deserializer parameter.
  */
 public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRequest<UnconfirmedTransactionsRequest> {
+	private static int availableBytes = 0;
 	/**
 	 * Creates a new authenticated request.
 	 *
@@ -38,9 +39,11 @@ public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRe
 	 */
 	public AuthenticatedUnconfirmedTransactionsRequest(final Deserializer deserializer) {
 		// TODO Remove this ugly fix in the next release!
-		super(((BinaryDeserializer)deserializer).availableBytes() > 68
-				? deserializer.readOptionalObject("entity", UnconfirmedTransactionsRequest::new)
+		super((availableBytes = ((BinaryDeserializer)deserializer).availableBytes()) > 68
+				? deserializer.readObject("entity", UnconfirmedTransactionsRequest::new)
 				: new UnconfirmedTransactionsRequest(),
-				new NodeChallenge(deserializer));
+				availableBytes > 68
+				? deserializer.readObject("challenge", NodeChallenge::new)
+				: new NodeChallenge(deserializer));
 	}
 }
