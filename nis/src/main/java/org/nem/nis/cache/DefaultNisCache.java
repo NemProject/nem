@@ -5,7 +5,7 @@ package org.nem.nis.cache;
  */
 public class DefaultNisCache implements ReadOnlyNisCache {
 	private final AccountCache accountCache;
-	private final DefaultAccountStateCache accountStateCache;
+	private final SynchronizedAccountStateCache accountStateCache;
 	private final SynchronizedPoiFacade poiFacade;
 	private final HashCache transactionHashCache;
 
@@ -18,7 +18,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 */
 	public DefaultNisCache(
 			final AccountCache accountCache,
-			final DefaultAccountStateCache accountStateCache,
+			final SynchronizedAccountStateCache accountStateCache,
 			final SynchronizedPoiFacade poiFacade,
 			final HashCache transactionHashCache) {
 		this.accountCache = accountCache;
@@ -67,7 +67,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private static class DefaultNisCacheCopy implements NisCache {
 		private final DefaultNisCache cache;
 		private final AccountCache accountCache;
-		private final DefaultAccountStateCache accountStateCache;
+		private final SynchronizedAccountStateCache accountStateCache;
 		private final SynchronizedPoiFacade poiFacade;
 		private final HashCache transactionHashCache;
 

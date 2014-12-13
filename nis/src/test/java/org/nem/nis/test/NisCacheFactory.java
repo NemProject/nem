@@ -15,7 +15,7 @@ public class NisCacheFactory {
 	public static ReadOnlyNisCache createReal() {
 		return new DefaultNisCache(
 				new AccountCache(),
-				new DefaultAccountStateCache(),
+				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
 				new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
 				new HashCache());
 	}
@@ -29,7 +29,7 @@ public class NisCacheFactory {
 	public static ReadOnlyNisCache createReal(final DefaultPoiFacade poiFacade) {
 		return new DefaultNisCache(
 				new AccountCache(),
-				new DefaultAccountStateCache(),
+				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
 				new SynchronizedPoiFacade(poiFacade),
 				new HashCache());
 	}
@@ -173,7 +173,7 @@ public class NisCacheFactory {
 
 			@Override
 			public ReadOnlyPoiFacade getPoiFacade() {
-				return Mockito.mock(SynchronizedPoiFacade.class);
+				return Mockito.mock(PoiFacade.class);
 			}
 
 			@Override
