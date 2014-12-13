@@ -220,6 +220,6 @@ public class GraphClustererImplITCase {
 	}
 
 	private static class TestContext {
-		SecureRandom random = new SecureRandom();
+		final SecureRandom random = new SecureRandom();
 	}
 }

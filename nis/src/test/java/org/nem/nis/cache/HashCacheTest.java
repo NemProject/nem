@@ -63,7 +63,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void sizeReturnsCorrectSize() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
@@ -86,7 +86,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void isEmptyReturnsFalseWhenHashCacheHasNonZeroElements() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
@@ -100,7 +100,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void clearEmptiesHashCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Act:
 		cache.clear();
@@ -116,7 +116,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void getReturnsCorrectTimeStampWhenHashIsInCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 		final Hash hash = Utils.generateRandomHash();
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(456)));
 
@@ -127,7 +127,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void getReturnsNullTimeStampWhenHashIsNotInCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 		final Hash hash = Utils.generateRandomHash();
 
 		// Assert:
@@ -141,13 +141,13 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void canPutHashesWithDifferentTimeStampsToCache() {
 		// Assert:
-		createHashCacheWithTimeStamps(123, 234, 345);
+		this.createHashCacheWithTimeStamps(123, 234, 345);
 	}
 
 	@Test
 	public void canPutHashesWithSameTimeStampsToCache() {
 		// Assert:
-		createHashCacheWithTimeStamps(123, 123, 123);
+		this.createHashCacheWithTimeStamps(123, 123, 123);
 	}
 
 	@Test
@@ -199,7 +199,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void removeRemovesHashFromHashCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345);
 		final HashMetaDataPair pairToRemove = new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(456));
 		cache.put(pairToRemove);
 		cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(567)));
@@ -258,7 +258,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void hashExistsReturnsFalseIfHashIsNotInCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 124, 124);
 
 		// Assert:
 		Assert.assertThat(cache.hashExists(Utils.generateRandomHash()), IsEqual.equalTo(false));
@@ -272,7 +272,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	public void anyHashExistsReturnsTrueIfAnyOfTheGivenHashesIsInCache() {
 		// Arrange:
 		final List<Hash> hashes = createHashes(10);
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
 		cache.put(new HashMetaDataPair(hashes.get(7), createMetaDataWithTimeStamp(10)));
 
 		// Assert:
@@ -283,7 +283,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	public void anyHashExistsReturnsFalseIfNoneOfTheGivenHashesIsInCache() {
 		// Arrange:
 		final List<Hash> hashes = createHashes(10);
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
 
 		// Assert:
 		Assert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(false));
@@ -318,7 +318,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 	@Test
 	public void prunePreservesAllHashesWithTimeStampAtLeastAsOldAsGivenTimeStamp() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
+		final HashCache cache = this.createHashCacheWithTimeStamps(123, 124, 124);
 		final Hash hash1 = Utils.generateRandomHash();
 		final Hash hash2 = Utils.generateRandomHash();
 		cache.put(new HashMetaDataPair(hash1, createMetaDataWithTimeStamp(125)));

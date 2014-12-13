@@ -3,7 +3,6 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
-import org.nem.nis.cache.DefaultHashCache;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;

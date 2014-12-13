@@ -46,7 +46,7 @@ public class CommonStarter implements ServletContextListener {
 	/**
 	 * The common starter.
 	 */
-	public static CommonStarter INSTANCE = new CommonStarter();
+	public static final CommonStarter INSTANCE = new CommonStarter();
 
 	private static final int IDLE_TIMEOUT = 30000;
 	private static final int HTTPS_HEADER_SIZE = 8192;

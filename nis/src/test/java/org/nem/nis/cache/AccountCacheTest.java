@@ -23,7 +23,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void accountWithoutPublicKeyCanBeAddedToCache() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
@@ -37,7 +37,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void accountWithPublicKeyCanBeAddedToCache() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -51,7 +51,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void cachedAccountWithPublicKeyIsUnchangedWhenQueryingByPublicKey() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -66,7 +66,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void cachedAccountWithoutPublicKeyIsUnchangedWhenQueryingByEncodedAddress() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
@@ -81,7 +81,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void cachedAccountWithoutPublicKeyIsUpdatedWhenQueryingWithPublicKey() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final Address addressWithoutPublicKey = Address.fromEncoded(address.getEncoded());
 
@@ -102,7 +102,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void accountWithoutPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
@@ -116,7 +116,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void accountWithPublicKeyCanBeRemovedFromCache() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -130,7 +130,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void removeAccountFromCacheDoesNothingIfAddressIsNotInCache() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -148,7 +148,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test(expected = MissingResourceException.class)
 	public void findByAddressFailsIfAddressIsInvalid() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Address.fromPublicKey(Utils.generateRandomPublicKey());
 		final String realAddress = address.getEncoded();
 		final String fakeAddress = realAddress.substring(0, realAddress.length() - 1);
@@ -160,7 +160,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void findByAddressReturnsCachedAddressIfAvailable() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -174,7 +174,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void findByAddressReturnsNonCachedAddressIfPublicKeyIsNotFound() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -189,7 +189,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void findByAddressReturnsNonCachedAddressIfEncodedAddressIsNotFound() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
@@ -204,7 +204,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void findByAddressUpdatesAccountPublicKeyIfQueryingAccountHasPublicKeyButCachedAccountDoesNot() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final Address addressWithoutPublicKey = Address.fromEncoded(address.getEncoded());
 
@@ -224,7 +224,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void isKnownAddressReturnsTrueIfAddressIsKnown() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
@@ -237,7 +237,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void isKnownAddressReturnsFalseIfAddressIsUnknown() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 
@@ -255,7 +255,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void asAutoCacheFindByAddressReturnsCachedAddressIfPublicKeyIsNotFound() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -269,7 +269,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void asAutoCacheFindByAddressReturnsCachedAddressIfEncodedAddressIsNotFound() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
@@ -290,7 +290,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final T cache = createAccountCache();
+		final T cache = this.createAccountCache();
 
 		final Account account1 = cache.addAccountToCache(address1);
 		final Account account2 = cache.addAccountToCache(address2);
@@ -313,7 +313,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void copyCreatesUnlinkedCacheCopy() {
 		// Arrange:
-		final T cache = createAccountCache();
+		final T cache = this.createAccountCache();
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
 		cache.addAccountToCache(Utils.generateRandomAddress());
@@ -333,7 +333,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	public void copyReturnsSameAccountGivenPublicKeyOrAddress() {
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
-		final T cache = createAccountCache();
+		final T cache = this.createAccountCache();
 
 		cache.addAccountToCache(address1);
 
@@ -358,14 +358,14 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
 		final Address address3 = Utils.generateRandomAddress();
-		final T cache = createAccountCache();
+		final T cache = this.createAccountCache();
 
 		final Account account1 = cache.addAccountToCache(address1);
 		final Account account2 = cache.addAccountToCache(address2);
 		final Account account3 = cache.addAccountToCache(address3);
 
 		// Act:
-		final T copyCache = createAccountCache();
+		final T copyCache = this.createAccountCache();
 		cache.shallowCopyTo(copyCache);
 
 		final Account copyAccount1 = copyCache.findByAddress(address1);
@@ -384,11 +384,11 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 		// Arrange:
 		final Address address1 = Utils.generateRandomAddress();
 		final Address address2 = Utils.generateRandomAddress();
-		final T cache = createAccountCache();
+		final T cache = this.createAccountCache();
 
 		final Account account1 = cache.addAccountToCache(address1);
 
-		final T copyCache = createAccountCache();
+		final T copyCache = this.createAccountCache();
 		final Account account2 = copyCache.addAccountToCache(address2);
 
 		// Act:
@@ -410,7 +410,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void iteratorReturnsAllAccounts() {
 		// Arrange:
-		final AccountCache cache = createAccountCache();
+		final AccountCache cache = this.createAccountCache();
 
 		final List<Account> accounts = new ArrayList<>();
 		for (int i = 0; i < 3; ++i) {

@@ -482,10 +482,10 @@ public class BlockChainValidatorTest {
 	private static class BlockChainValidatorFactory {
 		public Consumer<Block> executor = block -> { };
 		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
-		public int maxChainSize = 21;
+		public final int maxChainSize = 21;
 		public BlockValidator blockValidator = Mockito.mock(BlockValidator.class);
 		public SingleTransactionValidator transactionValidator = Mockito.mock(SingleTransactionValidator.class);
-		public DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
+		public final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
 
 		public BlockChainValidatorFactory() {
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);

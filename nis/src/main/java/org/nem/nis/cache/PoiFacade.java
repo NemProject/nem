@@ -1,10 +1,8 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.*;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
 /**

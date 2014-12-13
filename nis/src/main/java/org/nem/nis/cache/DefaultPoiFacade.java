@@ -1,6 +1,5 @@
 package org.nem.nis.cache;
 
-import org.apache.commons.collections4.IteratorUtils;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.poi.*;

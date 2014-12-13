@@ -16,7 +16,6 @@ import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.*;
 import org.nem.peer.PeerNetwork;
 
 import java.math.BigInteger;

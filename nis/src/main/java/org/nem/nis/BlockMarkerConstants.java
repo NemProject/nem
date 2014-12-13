@@ -11,29 +11,29 @@ public class BlockMarkerConstants {
 	 * <br/>
 	 * Targeting Wed, 17 UTC.
 	 */
-	public static long BETA_HARD_FORK = 24244;
+	public static final long BETA_HARD_FORK = 24244;
 
 	/**
 	 * Beta hard fork due to changing the maximum number of transactions inside a block.
 	 * <br/>
 	 * Targeting Friday 13 Nov, 8am UTC.
 	 */
-	public static long BETA_TX_COUNT_FORK = 36500;
+	public static final long BETA_TX_COUNT_FORK = 36500;
 
 	/**
 	 * Beta hard fork due to adding additional importance transfer validation.
 	 */
-	public static long BETA_IT_VALIDATION_FORK = 44974;
+	public static final long BETA_IT_VALIDATION_FORK = 44974;
 
 	/**
 	 * Beta hard fork due to a fix in outlink pruning.
 	 * Targeting Friday 13 Nov, 8am UTC.
 	 */
-	public static long BETA_OUTLINK_PRUNING_FORK = 51000;
+	public static final long BETA_OUTLINK_PRUNING_FORK = 51000;
 
 	/**
 	 * Beta hard fork due to a fix in expired transaction detection.
 	 * Targeting Monday 8 Dec.
 	 */
-	public static long BETA_TX_DEADLINE_FORK = 71000;
+	public static final long BETA_TX_DEADLINE_FORK = 71000;
 }

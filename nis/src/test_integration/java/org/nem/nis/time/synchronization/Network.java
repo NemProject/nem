@@ -57,7 +57,7 @@ public class Network {
 	private final NodeSettings nodeSettings;
 	private TimeSynchronizationStrategy syncStrategy;
 	private AccountStateCache accountStateCache;
-	private PoiFacade poiFacade;
+	private final PoiFacade poiFacade;
 	private long realTime = 0;
 	private double mean;
 	private double standardDeviation;
