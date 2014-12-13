@@ -128,7 +128,6 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 
 	/**
 	 * Gets the number of unread bytes in the buffer.
-	 * TODO 20141213 J-B: might want to update the hasMoreData tests to also check this
 	 *
 	 * @return The number of unread bytes.
 	 */
