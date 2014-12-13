@@ -41,9 +41,9 @@ public class UnconfirmedTransactionsRequest implements SerializableEntity {
 	}
 
 	/**
-	 * Gets the collection of the hashes short ids
+	 * Gets the collection of the hash short ids.
 	 *
-	 * @return the collection of short ids
+	 * @return The collection of short ids.
 	 */
 	public Collection<HashShortId> getHashShortIds() {
 		return this.hashShortIds;

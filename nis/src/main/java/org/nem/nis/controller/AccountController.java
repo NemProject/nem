@@ -14,7 +14,7 @@ import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.*;
 
 /**
@@ -160,8 +160,10 @@ public class AccountController {
 	@ClientApi
 	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		return new SerializableList<>(this.unconfirmedTransactions
-				.getMostRecentTransactionsForAccount(address, MAX_UNCONFIRMED_TRANSACTIONS));
+		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(
+				address,
+				MAX_UNCONFIRMED_TRANSACTIONS);
+		return new SerializableList<>(transactions);
 	}
 
 	/**

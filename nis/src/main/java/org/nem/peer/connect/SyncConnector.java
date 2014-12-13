@@ -67,7 +67,7 @@ public interface SyncConnector {
 	 *
 	 * @param node The remote node.
 	 * @param unconfirmedTransactionsRequest The unconfirmed transactions request.
-	 * @return All new unconfirmed transactions the endpoint has.
+	 * @return All new unconfirmed transactions from the endpoint.
 	 */
 	public Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest);
 

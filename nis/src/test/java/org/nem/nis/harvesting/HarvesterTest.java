@@ -158,7 +158,7 @@ public class HarvesterTest {
 	// side effect: dropping expired transactions
 
 	@Test
-	public void harvestBlockCallsCDropExpiredTransactionOnGenerator() {
+	public void harvestBlockCallsDropExpiredTransactionOnGenerator() {
 		// Arrange:
 		final TestContext context = new TestContext();
 

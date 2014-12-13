@@ -292,7 +292,7 @@ public class BlockGeneratorTest {
 
 	//endregion
 
-	//region side-effects
+	//region dropExpireTransactions
 
 	@Test
 	public void dropExpiredTransactionsDelegatesToUnconfirmedTransactions() {

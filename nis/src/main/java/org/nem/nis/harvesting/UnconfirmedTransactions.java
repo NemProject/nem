@@ -249,12 +249,13 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Gets the transactions for which its hash short id is not in the given collection.
+	 * Gets the transactions for which the hash short id is not in the given collection.
 	 *
 	 * @return The unknown transactions.
 	 */
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		// probably faster to use hash map than collection
+		// TODO 201412123: why not hash map of hashshortid -> transaction to avoid recalculating the hashes twice?
 		final HashMap<HashShortId, Integer> unknownHashShortIds = new HashMap<>(this.transactions.size());
 		this.transactions.values().stream()
 				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), 0));

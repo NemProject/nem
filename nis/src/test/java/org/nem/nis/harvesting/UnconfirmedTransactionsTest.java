@@ -634,10 +634,9 @@ public class UnconfirmedTransactionsTest {
 		final List<Transaction> unknownTransactions = context.transactions.getUnknownTransactions(hashShortIds);
 
 		// Assert:
-		Assert.assertThat(unknownTransactions, IsEquivalent.equivalentTo(Arrays.asList(
-				transactions.get(0),
-				transactions.get(3),
-				transactions.get(5))));
+		Assert.assertThat(
+				unknownTransactions,
+				IsEquivalent.equivalentTo(Arrays.asList(transactions.get(0), transactions.get(3), transactions.get(5))));
 	}
 
 	@Test
@@ -1266,6 +1265,7 @@ public class UnconfirmedTransactionsTest {
 			final SecureRandom random = new SecureRandom();
 
 			for (int i = 0; i < count; ++i) {
+				// TODO 20141213 J-B: might want another createMockTransaction overload with fewer parameters as multiple parameters here are same as above
 				transactions.add(createMockTransaction(account, Amount.fromNem(1000), i, new TimeInstant(random.nextInt(1_000_000)), Amount.fromNem(i)));
 			}
 
@@ -1278,13 +1278,11 @@ public class UnconfirmedTransactionsTest {
 				final int customField,
 				final TimeInstant timeStamp,
 				final Amount fee) {
+			// TODO 20141213 J-B: can you call add account?
 			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
-			final MockTransaction transaction = new MockTransaction(
-					account,
-					customField,
-					timeStamp);
+			final MockTransaction transaction = new MockTransaction(account, customField, timeStamp);
 			transaction.setFee(fee);
 			return transaction;
 		}

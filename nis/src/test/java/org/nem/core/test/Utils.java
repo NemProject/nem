@@ -200,8 +200,7 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes originalEntity and returns an ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns a Deserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param accountLookup The account lookup policy to use.
@@ -221,8 +220,7 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes serializable and returns an ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns a Deserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param accountLookup The account lookup policy to use.
@@ -239,8 +237,7 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes serializable and returns an binary ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns a binary Deserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param accountLookup The account lookup policy to use.
