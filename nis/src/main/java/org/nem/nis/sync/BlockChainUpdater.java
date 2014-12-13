@@ -4,7 +4,7 @@ import org.nem.core.connect.FatalPeerException;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.node.Node;
+import org.nem.core.node.*;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
@@ -88,8 +88,15 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
+				// TODO Remove this ugly fix in the next release!
+				final NodeVersion version = node.getMetaData().getVersion();
+				final boolean canHandleUTRequest =
+						(version.getMinorVersion() >= 4 && version.getBuildVersion() > 40) ||
+						"DEVELOPER BUILD".equals(version.getTag());
 				final Collection<Transaction> unconfirmedTransactions =
-						connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
+						canHandleUTRequest
+						? connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()))
+						: connector.getUnconfirmedTransactions(node, null);
 				synchronized (this) {
 					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				}

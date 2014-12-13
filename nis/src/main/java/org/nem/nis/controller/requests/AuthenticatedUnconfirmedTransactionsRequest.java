@@ -1,6 +1,6 @@
 package org.nem.nis.controller.requests;
 
-import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.*;
 import org.nem.peer.node.*;
 
 /**
@@ -37,6 +37,10 @@ public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRe
 	 * @param deserializer The deserializer
 	 */
 	public AuthenticatedUnconfirmedTransactionsRequest(final Deserializer deserializer) {
-		super(deserializer.readOptionalObject("entity", UnconfirmedTransactionsRequest::new), deserializer.readObject("challenge", NodeChallenge::new));
+		// TODO Remove this ugly fix in the next release!
+		super(((BinaryDeserializer)deserializer).availableBytes() > 68
+				? deserializer.readOptionalObject("entity", UnconfirmedTransactionsRequest::new)
+				: new UnconfirmedTransactionsRequest(),
+				new NodeChallenge(deserializer));
 	}
 }

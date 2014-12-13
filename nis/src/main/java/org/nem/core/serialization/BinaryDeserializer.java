@@ -126,6 +126,15 @@ public class BinaryDeserializer extends Deserializer implements AutoCloseable {
 		return 0 != this.stream.available();
 	}
 
+	/**
+	 * Gets the number of unread bytes in the buffer.
+	 *
+	 * @return The number of unread bytes.
+	 */
+	public int availableBytes() {
+		return this.stream.available();
+	}
+
 	private <T> T readIfNotEmpty(final Supplier<T> supplier) {
 		return this.hasMoreData() ? supplier.get() : null;
 	}
