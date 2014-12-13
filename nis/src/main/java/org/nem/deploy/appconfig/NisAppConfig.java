@@ -214,8 +214,8 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public DefaultHashCache transactionHashCache() {
-		return new DefaultHashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime());
+	public SynchronizedHashCache transactionHashCache() {
+		return new SynchronizedHashCache(new DefaultHashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime()));
 	}
 
 	@Bean

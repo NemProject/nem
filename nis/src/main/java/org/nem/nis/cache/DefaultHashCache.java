@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 /**
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.
  */
-public class DefaultHashCache implements HashCache {
+public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCache> {
 	private static final int MinRetentionHours = 36;
 	private final ConcurrentHashMap<Hash, HashMetaData> hashMap;
 	private int retentionTime;
@@ -34,7 +34,63 @@ public class DefaultHashCache implements HashCache {
 		this.retentionTime = -1 == retentionTime ? -1 : Math.max(MinRetentionHours, retentionTime);
 	}
 
-	//region HashCache
+	@Override
+	public int getRetentionTime() {
+		return this.retentionTime;
+	}
+
+	@Override
+	public int size() {
+		return this.hashMap.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return this.hashMap.isEmpty();
+	}
+
+	@Override
+	public void clear() {
+		this.hashMap.clear();
+	}
+
+	@Override
+	public HashMetaData get(final Hash hash) {
+		return this.hashMap.get(hash);
+	}
+
+	@Override
+	public void put(final HashMetaDataPair pair) {
+		final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
+		if (null != original) {
+			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
+		}
+	}
+
+	@Override
+	public void putAll(final List<HashMetaDataPair> pairs) {
+		for (final HashMetaDataPair pair : pairs) {
+			final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
+			if (null != original) {
+				throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
+			}
+		}
+	}
+
+	@Override
+	public void remove(final Hash hash) {
+		this.hashMap.remove(hash);
+	}
+
+	@Override
+	public void removeAll(final List<Hash> hashes) {
+		hashes.stream().forEach(this::remove);
+	}
+
+	@Override
+	public boolean hashExists(final Hash hash) {
+		return this.hashMap.containsKey(hash);
+	}
 
 	@Override
 	public boolean anyHashExists(final Collection<Hash> hashes) {
@@ -48,106 +104,13 @@ public class DefaultHashCache implements HashCache {
 	}
 
 	@Override
-	public int getRetentionTime() {
-		return this.retentionTime;
-	}
-
-
-	@Override
-	public void putAll(final List<HashMetaDataPair> pairs) {
-		for (final HashMetaDataPair pair : pairs) {
-			final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
-			if (null != original) {
-				throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
-			}
-		}
-	}
-
-	@Override
-	public void removeAll(final List<Hash> hashes) {
-		hashes.stream().forEach(this::remove);
-	}
-
-	@Override
 	public void prune(final TimeInstant timeStamp) {
 		if (-1 != this.retentionTime) {
 			this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(timeStamp) < 0);
 		}
 	}
 
-	//endregion
-
-	/**
-	 * Gets the size of the underlying hash map.
-	 *
-	 * @return The size.
-	 */
-	public int size() {
-		return this.hashMap.size();
-	}
-
-	/**
-	 * Gets a value indicating whether or not the hash cache is empty.
-	 *
-	 * @return true if the hash cache is empty, false otherwise.
-	 */
-	public boolean isEmpty() {
-		return this.hashMap.isEmpty();
-	}
-
-	/**
-	 * Clears the underlying hash map.
-	 */
-	public void clear() {
-		this.hashMap.clear();
-	}
-
-	/**
-	 * Gets the meta data corresponding to the given hash.
-	 *
-	 * @param hash The hash.
-	 * @return The meta data.
-	 */
-	public HashMetaData get(final Hash hash) {
-		return this.hashMap.get(hash);
-	}
-
-	/**
-	 * Adds a new hash/meta data pair to the cache if hash is unknown.
-	 *
-	 * @param pair The pair.
-	 */
-	public void put(final HashMetaDataPair pair) {
-		final HashMetaData original = this.hashMap.putIfAbsent(pair.getHash(), pair.getMetaData());
-		if (null != original) {
-			throw new IllegalArgumentException(String.format("hash %s already exists in cache", pair.getHash()));
-		}
-	}
-
-	/**
-	 * Removes a hash/meta data pair from the cache.
-	 *
-	 * @param hash The hash to remove.
-	 */
-	public void remove(final Hash hash) {
-		this.hashMap.remove(hash);
-	}
-
-	/**
-	 * Gets a value indicating whether or not a given hash is in the cache.
-	 *
-	 * @param hash The hash to check.
-	 * @return true if the hash is already in the cache, false otherwise.
-	 */
-	public boolean hashExists(final Hash hash) {
-		return this.hashMap.containsKey(hash);
-	}
-
-	/**
-	 * Creates a deep copy of this hash cache.
-	 *
-	 * @return The copy of this hash cache.
-	 */
+	@Override
 	public DefaultHashCache copy() {
 		// note that this is really creating a shallow copy, which has the effect of a deep copy
 		// because hash map keys and values are immutable
@@ -156,22 +119,14 @@ public class DefaultHashCache implements HashCache {
 		return cache;
 	}
 
-	/**
-	 * Copies this hash cash to another cache.
-	 *
-	 * @param cache The hash cache to copy into.
-	 */
+	@Override
 	public void shallowCopyTo(final DefaultHashCache cache) {
 		cache.hashMap.clear();
 		cache.hashMap.putAll(this.hashMap);
 		cache.retentionTime = this.retentionTime;
 	}
 
-	/**
-	 * Returns a stream of map entries.
-	 *
-	 * @return The stream.
-	 */
+	@Override
 	public Stream<Map.Entry<Hash, HashMetaData>> stream() {
 		return this.hashMap.entrySet().stream();
 	}

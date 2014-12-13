@@ -13,11 +13,7 @@ public class NisCacheFactory {
 	 * @return The NIS cache.
 	 */
 	public static ReadOnlyNisCache createReal() {
-		return new DefaultNisCache(
-				new AccountCache(),
-				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
-				new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
-				new DefaultHashCache());
+		return createReal(new DefaultPoiFacade(NisUtils.createImportanceCalculator()));
 	}
 
 	/**
@@ -31,7 +27,7 @@ public class NisCacheFactory {
 				new AccountCache(),
 				new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
 				new SynchronizedPoiFacade(poiFacade),
-				new DefaultHashCache());
+				new SynchronizedHashCache(new DefaultHashCache()));
 	}
 
 	//endregion

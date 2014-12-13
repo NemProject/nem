@@ -7,7 +7,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	private final AccountCache accountCache;
 	private final SynchronizedAccountStateCache accountStateCache;
 	private final SynchronizedPoiFacade poiFacade;
-	private final DefaultHashCache transactionHashCache;
+	private final SynchronizedHashCache transactionHashCache;
 
 	/**
 	 * Creates a NIS cache from an existing account cache, a poi facade and a transaction hash cache.
@@ -20,18 +20,14 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 			final AccountCache accountCache,
 			final SynchronizedAccountStateCache accountStateCache,
 			final SynchronizedPoiFacade poiFacade,
-			final DefaultHashCache transactionHashCache) {
+			final SynchronizedHashCache transactionHashCache) {
 		this.accountCache = accountCache;
 		this.accountStateCache = accountStateCache;
 		this.poiFacade = poiFacade;
 		this.transactionHashCache = transactionHashCache;
 	}
 
-	/**
-	 * Gets the account cache.
-	 *
-	 * @return The account cache.
-	 */
+	@Override
 	public AccountCache getAccountCache() {
 		return this.accountCache;
 	}
@@ -41,21 +37,13 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		return this.accountStateCache;
 	}
 
-	/**
-	 * Gets the poi facade.
-	 *
-	 * @return The poi facade.
-	 */
-	public PoiFacade getPoiFacade() {
+	@Override
+	public ReadOnlyPoiFacade getPoiFacade() {
 		return this.poiFacade;
 	}
 
-	/**
-	 * Gets the transaction hash cache.
-	 *
-	 * @return The transaction hash cache.
-	 */
-	public DefaultHashCache getTransactionHashCache() {
+	@Override
+	public ReadOnlyHashCache getTransactionHashCache() {
 		return this.transactionHashCache;
 	}
 
@@ -69,7 +57,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		private final AccountCache accountCache;
 		private final SynchronizedAccountStateCache accountStateCache;
 		private final SynchronizedPoiFacade poiFacade;
-		private final DefaultHashCache transactionHashCache;
+		private final SynchronizedHashCache transactionHashCache;
 
 		private DefaultNisCacheCopy(final DefaultNisCache cache) {
 			this.cache = cache;
@@ -95,7 +83,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		}
 
 		@Override
-		public DefaultHashCache getTransactionHashCache() {
+		public HashCache getTransactionHashCache() {
 			return this.transactionHashCache;
 		}
 
