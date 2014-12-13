@@ -13,7 +13,7 @@ public class DefaultNisCacheTest {
 		final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		final SynchronizedAccountStateCache accountStateCache = Mockito.mock(SynchronizedAccountStateCache.class);
 		final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
-		final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
+		final DefaultHashCache transactionsHashCache = Mockito.mock(DefaultHashCache.class);
 
 		// Act:
 		final ReadOnlyNisCache cache = new DefaultNisCache(
@@ -93,7 +93,7 @@ public class DefaultNisCacheTest {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final SynchronizedAccountStateCache accountStateCache = Mockito.mock(SynchronizedAccountStateCache.class);
 		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
-		private final HashCache transactionsHashCache = Mockito.mock(HashCache.class);
+		private final DefaultHashCache transactionsHashCache = Mockito.mock(DefaultHashCache.class);
 		private final ReadOnlyNisCache cache = new DefaultNisCache(
 				this.accountCache,
 				this.accountStateCache,

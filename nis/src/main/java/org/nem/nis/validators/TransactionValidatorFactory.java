@@ -57,7 +57,7 @@ public class TransactionValidatorFactory {
 	 * @param transactionHashCache The transaction hash cache.
 	 * @return The validator.
 	 */
-	public BatchTransactionValidator createBatch(final HashCache transactionHashCache) {
+	public BatchTransactionValidator createBatch(final ReadOnlyHashCache transactionHashCache) {
 		final AggregateBatchTransactionValidatorBuilder builder = new AggregateBatchTransactionValidatorBuilder();
 		this.visitBatchSubValidators(builder::add, transactionHashCache);
 		return builder.build();
@@ -84,7 +84,9 @@ public class TransactionValidatorFactory {
 	 * @param visitor The visitor.
 	 * @param transactionHashCache The transaction hash cache.
 	 */
-	public void visitBatchSubValidators(final Consumer<BatchTransactionValidator> visitor, final HashCache transactionHashCache) {
+	public void visitBatchSubValidators(
+			final Consumer<BatchTransactionValidator> visitor,
+			final ReadOnlyHashCache transactionHashCache) {
 		visitor.accept(new BatchUniqueHashTransactionValidator(transactionHashCache));
 	}
 }

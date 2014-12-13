@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.nis.cache.HashCache;
+import org.nem.nis.cache.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,14 +11,14 @@ import java.util.stream.Collectors;
  * A block transaction validator that ensures all transaction hashes in the block are not known.
  */
 public class BlockUniqueHashTransactionValidator implements BlockValidator {
-	private final HashCache transactionHashCache;
+	private final ReadOnlyHashCache transactionHashCache;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param transactionHashCache The transaction hash cache.
 	 */
-	public BlockUniqueHashTransactionValidator(final HashCache transactionHashCache) {
+	public BlockUniqueHashTransactionValidator(final ReadOnlyHashCache transactionHashCache) {
 		this.transactionHashCache = transactionHashCache;
 	}
 

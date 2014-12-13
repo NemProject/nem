@@ -7,37 +7,36 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.HashCache;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HashCacheTest {
+public class DefaultHashCacheTest {
 
 	// region construction
 
 	@Test
 	public void hashCacheIsInitiallyEmpty() {
 		// Assert:
-		Assert.assertThat(new HashCache().isEmpty(), IsEqual.equalTo(true));
+		Assert.assertThat(new DefaultHashCache().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
 	public void hashCacheAppliesDefaultRetentionTime() {
 		// Assert:
-		Assert.assertThat(new HashCache().getRetentionTime(), IsEqual.equalTo(36));
+		Assert.assertThat(new DefaultHashCache().getRetentionTime(), IsEqual.equalTo(36));
 	}
 
 	@Test
 	public void hashCacheCannotHaveRetentionTimeBelowMinimum() {
 		// Assert:
-		Assert.assertThat(new HashCache(50, 35).getRetentionTime(), IsEqual.equalTo(36));
+		Assert.assertThat(new DefaultHashCache(50, 35).getRetentionTime(), IsEqual.equalTo(36));
 	}
 
 	@Test
 	public void hashCacheCanHaveUnlimitedRetentionTime() {
 		// Assert:
-		Assert.assertThat(new HashCache(50, -1).getRetentionTime(), IsEqual.equalTo(-1));
+		Assert.assertThat(new DefaultHashCache(50, -1).getRetentionTime(), IsEqual.equalTo(-1));
 	}
 
 	// endregion
@@ -47,7 +46,7 @@ public class HashCacheTest {
 	@Test
 	public void sizeReturnsCorrectSize() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
@@ -60,7 +59,7 @@ public class HashCacheTest {
 	@Test
 	public void isEmptyReturnsTrueWhenHashCacheHasZeroElements() {
 		// Arrange:
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
@@ -70,7 +69,7 @@ public class HashCacheTest {
 	@Test
 	public void isEmptyReturnsFalseWhenHashCacheHasNonZeroElements() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(3));
@@ -84,7 +83,7 @@ public class HashCacheTest {
 	@Test
 	public void clearEmptiesHashCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 
 		// Act:
 		cache.clear();
@@ -100,7 +99,7 @@ public class HashCacheTest {
 	@Test
 	public void getReturnsCorrectTimeStampWhenHashIsInCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 		final Hash hash = Utils.generateRandomHash();
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(456)));
 
@@ -111,7 +110,7 @@ public class HashCacheTest {
 	@Test
 	public void getReturnsNullTimeStampWhenHashIsNotInCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 		final Hash hash = Utils.generateRandomHash();
 
 		// Assert:
@@ -138,7 +137,7 @@ public class HashCacheTest {
 	public void cannotPutSameHashTwiceToCache() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(123)));
 
 		// Assert:
@@ -153,7 +152,7 @@ public class HashCacheTest {
 	public void canPutAllHashesFromListToCache() {
 		// Arrange:
 		final List<HashMetaDataPair> pairs = createPairs(10);
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 
 		// Act:
 		cache.putAll(pairs);
@@ -170,7 +169,7 @@ public class HashCacheTest {
 		// Arrange:
 		final List<HashMetaDataPair> pairs = createPairs(10);
 		pairs.add(new HashMetaDataPair(pairs.get(6).getHash(), createMetaDataWithTimeStamp(789)));
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 
 		// Assert:
 		ExceptionAssert.assertThrows(v -> cache.putAll(pairs), IllegalArgumentException.class);
@@ -183,7 +182,7 @@ public class HashCacheTest {
 	@Test
 	public void removeRemovesHashFromHashCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345);
 		final HashMetaDataPair pairToRemove = new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(456));
 		cache.put(pairToRemove);
 		cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(567)));
@@ -206,7 +205,7 @@ public class HashCacheTest {
 	public void removeAllRemovesHashesFromHashCache() {
 		// Arrange:
 		final List<HashMetaDataPair> pairs = createPairs(10);
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 		cache.putAll(pairs);
 		Assert.assertThat(cache.size(), IsEqual.equalTo(10));
 
@@ -232,7 +231,7 @@ public class HashCacheTest {
 	public void hashExistsReturnsTrueIfHashIsInCache() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 		cache.put(new HashMetaDataPair(hash, createMetaDataWithTimeStamp(123)));
 
 		// Assert:
@@ -242,7 +241,7 @@ public class HashCacheTest {
 	@Test
 	public void hashExistsReturnsFalseIfHashIsNotInCache() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
 
 		// Assert:
 		Assert.assertThat(cache.hashExists(Utils.generateRandomHash()), IsEqual.equalTo(false));
@@ -256,7 +255,7 @@ public class HashCacheTest {
 	public void anyHashExistsReturnsTrueIfAnyOfTheGivenHashesIsInCache() {
 		// Arrange:
 		final List<Hash> hashes = createHashes(10);
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
 		cache.put(new HashMetaDataPair(hashes.get(7), createMetaDataWithTimeStamp(10)));
 
 		// Assert:
@@ -267,7 +266,7 @@ public class HashCacheTest {
 	public void anyHashExistsReturnsFalseIfNoneOfTheGivenHashesIsInCache() {
 		// Arrange:
 		final List<Hash> hashes = createHashes(10);
-		final HashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 234, 345, 456, 567);
 
 		// Assert:
 		Assert.assertThat(cache.anyHashExists(hashes), IsEqual.equalTo(false));
@@ -280,7 +279,7 @@ public class HashCacheTest {
 	@Test
 	public void pruneRemovesAllHashesWithEarlierTimeStampThanGivenTimeStamp() {
 		// Arrange:
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 		final Hash hash1 = Utils.generateRandomHash();
 		final Hash hash2 = Utils.generateRandomHash();
 		final Hash hash3 = Utils.generateRandomHash();
@@ -302,7 +301,7 @@ public class HashCacheTest {
 	@Test
 	public void prunePreservesAllHashesWithTimeStampAtLeastAsOldAsGivenTimeStamp() {
 		// Arrange:
-		final HashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
+		final DefaultHashCache cache = createHashCacheWithTimeStamps(123, 124, 124);
 		final Hash hash1 = Utils.generateRandomHash();
 		final Hash hash2 = Utils.generateRandomHash();
 		cache.put(new HashMetaDataPair(hash1, createMetaDataWithTimeStamp(125)));
@@ -320,7 +319,7 @@ public class HashCacheTest {
 	@Test
 	public void prunePreservesAllHashesIfRetentionTimeIsUnlimited() {
 		// Arrange:
-		final HashCache cache = new HashCache(50, -1);
+		final DefaultHashCache cache = new DefaultHashCache(50, -1);
 		final Hash hash1 = Utils.generateRandomHash();
 		final Hash hash2 = Utils.generateRandomHash();
 		cache.put(new HashMetaDataPair(hash1, createMetaDataWithTimeStamp(125)));
@@ -342,13 +341,13 @@ public class HashCacheTest {
 	@Test
 	public void copyCopiesAllEntries() {
 		// Arrange:
-		final HashCache original = new HashCache(50, 789);
+		final DefaultHashCache original = new DefaultHashCache(50, 789);
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)));
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)));
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
 
 		// Act:
-		final HashCache copy = original.copy();
+		final DefaultHashCache copy = original.copy();
 
 		// Assert:
 		Assert.assertThat(copy.getRetentionTime(), IsEqual.equalTo(789));
@@ -363,11 +362,11 @@ public class HashCacheTest {
 	@Test
 	public void shallowCopyToCopiesAllEntries() {
 		// Arrange:
-		final HashCache original = new HashCache(50, 789);
+		final DefaultHashCache original = new DefaultHashCache(50, 789);
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)));
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)));
 		original.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
-		final HashCache copy = createHashCacheWithTimeStamps(321, 432, 543);
+		final DefaultHashCache copy = createHashCacheWithTimeStamps(321, 432, 543);
 
 		// Act:
 		original.shallowCopyTo(copy);
@@ -389,7 +388,7 @@ public class HashCacheTest {
 				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(123)),
 				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(234)),
 				new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(345)));
-		final HashCache cache = new HashCache();
+		final DefaultHashCache cache = new DefaultHashCache();
 		pairs.forEach(cache::put);
 
 		// Assert:
@@ -404,8 +403,8 @@ public class HashCacheTest {
 		return new HashMetaData(BlockHeight.ONE, new TimeInstant(timeStamp));
 	}
 
-	private static HashCache createHashCacheWithTimeStamps(final int... timeStamps) {
-		final HashCache cache = new HashCache();
+	private static DefaultHashCache createHashCacheWithTimeStamps(final int... timeStamps) {
+		final DefaultHashCache cache = new DefaultHashCache();
 		Arrays.stream(timeStamps)
 				.forEach(t -> cache.put(new HashMetaDataPair(Utils.generateRandomHash(), createMetaDataWithTimeStamp(t))));
 		return cache;

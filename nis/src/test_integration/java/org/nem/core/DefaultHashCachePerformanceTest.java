@@ -6,14 +6,14 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.HashCache;
+import org.nem.nis.cache.DefaultHashCache;
 
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class HashCachePerformanceTest {
-	private static final Logger LOGGER = Logger.getLogger(HashCachePerformanceTest.class.getName());
+public class DefaultHashCachePerformanceTest {
+	private static final Logger LOGGER = Logger.getLogger(DefaultHashCachePerformanceTest.class.getName());
 
 	@Test
 	public void putPerformanceTest() {
@@ -71,7 +71,7 @@ public class HashCachePerformanceTest {
 
 		// Act:
 		final long start = System.currentTimeMillis();
-		final HashCache copy = context.cache.copy();
+		final DefaultHashCache copy = context.cache.copy();
 		final long stop = System.currentTimeMillis();
 		LOGGER.info(String.format("shallow copy with %d entries needed %dms", count, (stop - start)));
 
@@ -85,7 +85,7 @@ public class HashCachePerformanceTest {
 		// Arrange:
 		final int count = 250_000;
 		final TestContext context = new TestContext(count);
-		final HashCache copy = new HashCache();
+		final DefaultHashCache copy = new DefaultHashCache();
 		context.cache.putAll(context.pairs);
 
 		// Act:
@@ -159,11 +159,11 @@ public class HashCachePerformanceTest {
 	}
 
 	private static class TestContext {
-		private final HashCache cache;
+		private final DefaultHashCache cache;
 		private final List<HashMetaDataPair> pairs;
 
 		private TestContext(final int count) {
-			this.cache = new HashCache(count, 36);
+			this.cache = new DefaultHashCache(count, 36);
 			this.pairs = this.createPairs(count);
 		}
 

@@ -43,7 +43,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final BatchTransactionValidator validator = factory.createBatch(Mockito.mock(HashCache.class));
+		final BatchTransactionValidator validator = factory.createBatch(Mockito.mock(DefaultHashCache.class));
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
@@ -78,7 +78,7 @@ public class TransactionValidatorFactoryTest {
 
 		// Act:
 		final List<BatchTransactionValidator> validators = new ArrayList<>();
-		factory.visitBatchSubValidators(validators::add, Mockito.mock(HashCache.class));
+		factory.visitBatchSubValidators(validators::add, Mockito.mock(DefaultHashCache.class));
 
 		// Assert:
 		Assert.assertThat(

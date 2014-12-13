@@ -1025,7 +1025,7 @@ public class UnconfirmedTransactionsTest {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
 				factory.createSingle(accountStateCache),
-				factory.createBatch(Mockito.mock(HashCache.class)),
+				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
 				accountStateCache);
 	}
 
@@ -1078,7 +1078,7 @@ public class UnconfirmedTransactionsTest {
 			this.batchValidator = batchValidator;
 			this.accountStateCache = accountStateCache;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(

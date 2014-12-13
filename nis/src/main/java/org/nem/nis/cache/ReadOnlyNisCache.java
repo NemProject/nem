@@ -31,7 +31,7 @@ public interface ReadOnlyNisCache {
 	 *
 	 * @return The transaction hash cache.
 	 */
-	public HashCache getTransactionHashCache();
+	public ReadOnlyHashCache getTransactionHashCache();
 
 	/**
 	 * Creates a mutable copy of this NIS cache.

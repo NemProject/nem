@@ -400,7 +400,7 @@ public class AccountControllerTest {
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 
 		public TestContext() {
 			this(Mockito.mock(AccountIoAdapter.class));
