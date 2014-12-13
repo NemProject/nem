@@ -47,6 +47,15 @@ public class MockTransaction extends Transaction {
 	/**
 	 * Creates a mock transaction.
 	 *
+	 * @param timeStamp The transaction's timestamp.
+	 */
+	public MockTransaction(final TimeInstant timeStamp) {
+		this(0, timeStamp);
+	}
+
+	/**
+	 * Creates a mock transaction.
+	 *
 	 * @param sender The transaction sender's account.
 	 * @param customField The initial custom field value.
 	 */

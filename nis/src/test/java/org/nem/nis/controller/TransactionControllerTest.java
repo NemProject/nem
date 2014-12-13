@@ -12,6 +12,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.PushService;
@@ -178,7 +179,7 @@ public class TransactionControllerTest {
 		// Assert:
 		final AuthenticatedResponse<?> response = runTransactionsUnconfirmedTest(
 				context,
-				c -> c.controller.transactionsUnconfirmed(challenge),
+				c -> c.controller.transactionsUnconfirmed(new AuthenticatedUnconfirmedTransactionsRequest(challenge)),
 				r -> r.getEntity(localNode.getIdentity(), challenge));
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 	}
@@ -188,7 +189,7 @@ public class TransactionControllerTest {
 			final Function<TestContext, T> action,
 			final Function<T, SerializableList<Transaction>> getUnconfirmedTransactions) {
 		// Arrange:
-		Mockito.when(context.unconfirmedTransactions.getAll()).thenReturn(createTransactionList());
+		Mockito.when(context.unconfirmedTransactions.getUnknownTransactions(Mockito.any())).thenReturn(createTransactionList());
 
 		// Act:
 		final T result = action.apply(context);
@@ -197,7 +198,7 @@ public class TransactionControllerTest {
 		// Assert:
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(1));
 		Assert.assertThat(transactions.get(0).getTimeStamp(), IsEqual.equalTo(new TimeInstant(321)));
-		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getAll();
+		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getUnknownTransactions(Mockito.any());
 		return result;
 	}
 

@@ -200,8 +200,7 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes originalEntity and returns an ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns a Deserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param accountLookup The account lookup policy to use.
@@ -221,8 +220,7 @@ public class Utils {
 	}
 
 	/**
-	 * Serializes serializable and returns an ObjectDeserializer
-	 * that can deserialize it.
+	 * Serializes originalEntity and returns a Deserializer that can deserialize it.
 	 *
 	 * @param originalEntity The original entity.
 	 * @param accountLookup The account lookup policy to use.
@@ -236,6 +234,23 @@ public class Utils {
 		final JsonSerializer jsonSerializer = new JsonSerializer(true);
 		originalEntity.serialize(jsonSerializer);
 		return new JsonDeserializer(jsonSerializer.getObject(), new DeserializationContext(accountLookup));
+	}
+
+	/**
+	 * Serializes originalEntity and returns a binary Deserializer that can deserialize it.
+	 *
+	 * @param originalEntity The original entity.
+	 * @param accountLookup The account lookup policy to use.
+	 * @param <T> The concrete SerializableEntity type.
+	 * @return The binary object deserializer.
+	 */
+	public static <T extends SerializableEntity> Deserializer roundtripSerializableEntityWithBinarySerializer(
+			final T originalEntity,
+			final AccountLookup accountLookup) {
+		// Act:
+		final BinarySerializer binarySerializer = new BinarySerializer();
+		originalEntity.serialize(binarySerializer);
+		return new BinaryDeserializer(binarySerializer.getBytes(), new DeserializationContext(accountLookup));
 	}
 
 	/**

@@ -292,18 +292,15 @@ public class BlockGeneratorTest {
 
 	//endregion
 
-	//region side-effects
+	//region dropExpireTransactions
 
 	@Test
-	public void generateNextBlockDropsExpiredTransactions() {
+	public void dropExpiredTransactionsDelegatesToUnconfirmedTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.generateNextBlock(
-				NisUtils.createRandomBlockWithHeight(7),
-				Utils.generateRandomAccount(),
-				new TimeInstant(22));
+		context.generator.dropExpireTransactions(new TimeInstant(22));
 
 		// Assert:
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).dropExpiredTransactions(new TimeInstant(22));

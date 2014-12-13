@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisCache;
 import org.nem.nis.poi.PoiFacade;
@@ -245,8 +245,38 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getAll() {
 		final List<Transaction> transactions = this.transactions.values().stream()
 				.collect(Collectors.toList());
-
 		return this.sortTransactions(transactions);
+	}
+
+	/**
+	 * Gets the transactions for which the hash short id is not in the given collection.
+	 *
+	 * @return The unknown transactions.
+	 */
+	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
+		// probably faster to use hash map than collection
+		// TODO 201412123: why not hash map of hashshortid -> transaction to avoid recalculating the hashes twice?
+		final HashMap<HashShortId, Integer> unknownHashShortIds = new HashMap<>(this.transactions.size());
+		this.transactions.values().stream()
+				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), 0));
+		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
+
+		return this.transactions.values().stream()
+				.filter(t -> unknownHashShortIds.containsKey(new HashShortId(HashUtils.calculateHash(t).getShortId())))
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Gets the most recent transactions up to a given limit.
+	 *
+	 * @return The most recent transactions from this unconfirmed transactions.
+	 */
+	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
+		return this.transactions.values().stream()
+				.filter(tx -> matchAddress(tx, address))
+				.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
+				.limit(maxSize)
+				.collect(Collectors.toList());
 	}
 
 	/**
