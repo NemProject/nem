@@ -100,21 +100,6 @@ public class AccountIoAdapterTest {
 	// region delegation
 
 	@Test
-	public void iteratorAddressDelegatesToAccountCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Iterator<Account> expectedIterator = new ArrayList<Account>().iterator();
-		Mockito.when(context.accountCache.iterator()).thenReturn(expectedIterator);
-
-		// Act:
-		final Iterator<Account> iterator = context.accountIoAdapter.iterator();
-
-		// Assert:
-		Assert.assertThat(iterator, IsEqual.equalTo(expectedIterator));
-		Mockito.verify(context.accountCache, Mockito.only()).iterator();
-	}
-
-	@Test
 	public void findByAddressDelegatesToAccountCache() {
 		// Arrange:
 		final TestContext context = new TestContext();

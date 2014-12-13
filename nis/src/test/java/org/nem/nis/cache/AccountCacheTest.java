@@ -405,10 +405,10 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 
 	//endregion
 
-	//region iterator
+	//region contents
 
 	@Test
-	public void iteratorReturnsAllAccounts() {
+	public void contentsReturnsAllAccounts() {
 		// Arrange:
 		final AccountCache cache = this.createAccountCache();
 
@@ -418,8 +418,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 		}
 
 		// Act:
-		final List<Account> iteratedAccounts = StreamSupport.stream(cache.spliterator(), false)
-				.collect(Collectors.toList());
+		final Collection<Account> iteratedAccounts = cache.contents().asCollection();
 
 		// Assert:
 		Assert.assertThat(iteratedAccounts.size(), IsEqual.equalTo(3));

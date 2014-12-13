@@ -22,13 +22,6 @@ public class SynchronizedAccountCache implements AccountCache, CopyableCache<Syn
 	}
 
 	@Override
-	public Iterator<Account> iterator() {
-		synchronized (this.lock) {
-			return this.accountCache.iterator();
-		}
-	}
-
-	@Override
 	public Account addAccountToCache(final Address address) {
 		synchronized (this.lock) {
 			return this.accountCache.addAccountToCache(address);
@@ -53,6 +46,13 @@ public class SynchronizedAccountCache implements AccountCache, CopyableCache<Syn
 	public int size() {
 		synchronized (this.lock) {
 			return this.accountCache.size();
+		}
+	}
+
+	@Override
+	public CacheContents<Account> contents() {
+		synchronized (this.lock) {
+			return this.accountCache.contents();
 		}
 	}
 

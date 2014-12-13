@@ -6,7 +6,7 @@ import org.nem.core.serialization.AccountLookup;
 /**
  * A read only account cache.
  */
-public interface ReadOnlyAccountCache extends AccountLookup, Iterable<Account> {
+public interface ReadOnlyAccountCache extends AccountLookup {
 
 	/**
 	 * Gets the number of accounts.
@@ -14,5 +14,11 @@ public interface ReadOnlyAccountCache extends AccountLookup, Iterable<Account> {
 	 * @return The number of accounts.
 	 */
 	public int size();
+
+	/**
+	 * Gets the contents of this cache.
+	 *
+	 * @return The cache contents.
+	 */
+	public CacheContents<Account> contents();
 }
-// TODO: 20141212 - can this just be account lookup ?

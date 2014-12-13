@@ -119,9 +119,4 @@ public class AccountIoAdapter implements AccountIo {
 				.forEach(blockList::add);
 		return blockList;
 	}
-
-	@Override
-	public Iterator<Account> iterator() {
-		return this.accountCache.iterator();
-	}
 }

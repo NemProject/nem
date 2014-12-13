@@ -24,6 +24,11 @@ public class DefaultAccountCache implements AccountCache, CopyableCache<DefaultA
 	}
 
 	@Override
+	public CacheContents<Account> contents() {
+		return new CacheContents<>(this.addressToAccountMap.values());
+	}
+
+	@Override
 	public AccountLookup asAutoCache() {
 		return new AutoCacheAccountLookup(this);
 	}
@@ -97,11 +102,6 @@ public class DefaultAccountCache implements AccountCache, CopyableCache<DefaultA
 		}
 
 		return copy;
-	}
-
-	@Override
-	public Iterator<Account> iterator() {
-		return this.addressToAccountMap.values().iterator();
 	}
 
 	private static class AutoCacheAccountLookup implements AccountLookup {

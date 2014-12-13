@@ -105,7 +105,7 @@ public class BlockAnalyzer {
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {
-				for (final Account account : accountCache) {
+				for (final Account account : accountCache.contents()) {
 					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
 						continue;
 					}
