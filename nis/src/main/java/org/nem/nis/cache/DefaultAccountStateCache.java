@@ -17,6 +17,7 @@ public class DefaultAccountStateCache implements AccountStateCache, CopyableCach
 
 	@Override
 	public AccountState findStateByAddress(final Address address) {
+		// TODO 20141212: need an autocache mode
 		AccountState state = this.addressToStateMap.getOrDefault(address, null);
 		if (null == state) {
 			state = new AccountState(address);
