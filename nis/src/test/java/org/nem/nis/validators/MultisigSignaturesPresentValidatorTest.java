@@ -10,12 +10,9 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.poi.PoiAccountState;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.state.AccountState;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public class MultisigSignaturesPresentValidatorTest {
@@ -121,7 +118,7 @@ public class MultisigSignaturesPresentValidatorTest {
 	//endregion
 
 	private static class TestContext {
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
 		private final MultisigSignaturesPresentValidator validator;
 		private final Account signer = Utils.generateRandomAccount();
 		private final Account multisig = Utils.generateRandomAccount();
@@ -129,7 +126,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		private final Account dummy = Utils.generateRandomAccount();
 
 		private TestContext(final boolean blockCreation) {
-			this.validator = new MultisigSignaturesPresentValidator(this.poiFacade, blockCreation);
+			this.validator = new MultisigSignaturesPresentValidator(this.accountCache, blockCreation);
 			this.addPoiState(this.signer);
 			this.addPoiState(this.multisig);
 			this.addPoiState(this.dummy);
@@ -145,14 +142,14 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		private void addPoiState(final Account account) {
 			final Address address = account.getAddress();
-			final PoiAccountState state = new PoiAccountState(address);
-			Mockito.when(this.poiFacade.findStateByAddress(address))
+			final AccountState state = new AccountState(address);
+			Mockito.when(this.accountCache.findStateByAddress(address))
 					.thenReturn(state);
 		}
 
 		public void makeCosignatory(final Account signer, final Account multisig, final BlockHeight blockHeight) {
-			this.poiFacade.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
-			this.poiFacade.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
+			this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
+			this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
 		}
 
 
@@ -161,7 +158,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		}
 
 		public boolean debitPredicate(Account account, Amount amount) {
-			final Amount balance = this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+			final Amount balance = this.accountCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 			return balance.compareTo(amount) >= 0;
 		}
 	}

@@ -2,14 +2,14 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.poi.PoiAccountState;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.state.AccountState;
 
 public class MultisigTransactionValidator implements SingleTransactionValidator {
-    private final PoiFacade poiFacade;
+    private final AccountStateCache stateCache;
 
-    public MultisigTransactionValidator(final PoiFacade poiFacade) {
-        this.poiFacade = poiFacade;
+    public MultisigTransactionValidator(final AccountStateCache stateCache) {
+        this.stateCache = stateCache;
     }
 
     @Override
@@ -26,7 +26,7 @@ public class MultisigTransactionValidator implements SingleTransactionValidator 
     }
 
     private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
-        final PoiAccountState cosignerState = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress());
+        final AccountState cosignerState = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
 
         if (!cosignerState.getMultisigLinks().isCosignatoryOf(transaction.getOtherTransaction().getSigner().getAddress())) {
             return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;

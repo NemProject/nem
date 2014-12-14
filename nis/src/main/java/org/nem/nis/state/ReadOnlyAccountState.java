@@ -37,6 +37,13 @@ public interface ReadOnlyAccountState {
 	public ReadOnlyRemoteLinks getRemoteLinks();
 
 	/**
+	 * Gets multisig link information.
+	 *
+	 * @return The multisig link information.
+	 */
+	public ReadOnlyMultisigLinks getMultisigLinks();
+
+	/**
 	 * Gets the account info.
 	 *
 	 * @return The account info.

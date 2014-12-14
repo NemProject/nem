@@ -380,7 +380,7 @@ public class BlockChainValidatorIntegrationTest {
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-his.accountStateCache.findStateByAddress(account.getAddress())			this.transactionValidator = new MultisigAwareSingleTransactionValidator(transactionValidatorFactory.createSingle(this.accountStateCache));
+			this.transactionValidator = new MultisigAwareSingleTransactionValidator(transactionValidatorFactory.createSingle(this.accountStateCache));
 
 			Mockito.when(this.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);

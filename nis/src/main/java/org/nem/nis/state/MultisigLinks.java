@@ -1,11 +1,11 @@
-package org.nem.nis.secret;
+package org.nem.nis.state;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
-public class MultisigLinks {
+public class MultisigLinks implements ReadOnlyMultisigLinks {
 	private final Map<Address, BlockHeight> cosignatories;
 	private final Map<Address, BlockHeight> cosignatoryOf;
 

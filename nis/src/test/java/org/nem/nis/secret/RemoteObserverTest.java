@@ -9,7 +9,6 @@ import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
-import org.nem.nis.remote.*;
 
 public class RemoteObserverTest {
 

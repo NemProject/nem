@@ -5,10 +5,10 @@ import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
@@ -1151,7 +1151,7 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void getTransactionForNewBlockCheckMultisigSignatures() {
 		// Arrange:
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final AccountStateCache poiFacade = Mockito.mock(AccountStateCache.class);
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator(poiFacade);
 		final TimeInstant currentTime = new TimeInstant(11);
 
@@ -1186,31 +1186,31 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
 
-	private static PoiAccountState addPoiState(final PoiFacade poiFacade, final Account account) {
+	private static AccountState addPoiState(final AccountStateCache poiFacade, final Account account) {
 		final Address address = account.getAddress();
-		final PoiAccountState state = new PoiAccountState(address);
+		final AccountState state = new AccountState(address);
 		Mockito.when(poiFacade.findStateByAddress(address))
 				.thenReturn(state);
 
 		return state;
 	}
 
-	public static void makeCosignatory(final PoiFacade poiFacade, final Account signer, final Account multisig) {
+	public static void makeCosignatory(final AccountStateCache stateCache, final Account signer, final Account multisig) {
 		final BlockHeight blockHeight = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK);
-		poiFacade.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
-		poiFacade.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
+		stateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
+		stateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
 	}
 
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(PoiFacade.class));
+		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class));
 	}
 
-	private static TestContext createUnconfirmedTransactionsWithRealValidator(final PoiFacade poiFacade) {
+	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
-				factory.createSingle(accountStateCache),
+				factory.createSingle(stateCache),
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
-				accountStateCache);
+				stateCache);
 	}
 
 	//endregion

@@ -3,15 +3,15 @@ package org.nem.nis.validators;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.poi.PoiAccountState;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.state.ReadOnlyAccountState;
 
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
-	private final PoiFacade poiFacade;
+	private final ReadOnlyAccountStateCache stateCache;
 	private final boolean blockCreation;
 
-	public MultisigSignaturesPresentValidator(final PoiFacade poiFacade, boolean blockCreation) {
-		this.poiFacade = poiFacade;
+	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache, boolean blockCreation) {
+		this.stateCache = stateCache;
 		this.blockCreation = blockCreation;
 	}
 
@@ -29,7 +29,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	}
 
 	private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
-		final PoiAccountState senderState = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress());
+		final ReadOnlyAccountState senderState = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
 
 		if (!senderState.getMultisigLinks().isCosignatoryOf(transaction.getOtherTransaction().getSigner().getAddress())) {
 			return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
@@ -46,7 +46,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		// TODO 20131204 G-G: if we'll be adding MultisigSignature to MultisigTransaction,
 		// whole piece below probably won't be necessary
 
-		final PoiAccountState multisigAddress = this.poiFacade.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
+		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
 		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {
 			return ValidationResult.SUCCESS;
 		}

@@ -6,7 +6,6 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -205,11 +204,11 @@ public class UnconfirmedTransactions {
 		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 
-		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getPoiFacade(), blockCreation));
+		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getAccountStateCache(), blockCreation));
 
 		// need to be the last one
 		// that is correct we need this.transactions here
-		builder.add(new MultisigSignatureValidator(this.nisCache.getPoiFacade(), blockCreation, () -> this.transactions.values()));
+		builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), blockCreation, () -> this.transactions.values()));
 
 		return new MultisigAwareSingleTransactionValidator(builder.build());
 	}

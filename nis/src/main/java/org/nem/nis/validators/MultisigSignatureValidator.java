@@ -2,21 +2,19 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.poi.PoiAccountState;
-import org.nem.nis.poi.PoiFacade;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.state.ReadOnlyAccountState;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class MultisigSignatureValidator implements SingleTransactionValidator {
-	private final PoiFacade poiFacade;
+	private final ReadOnlyAccountStateCache stateCache;
 	private final boolean blockCreation;
 	private final Supplier<Collection<Transaction>> transactionsSupplier;
 
-	public MultisigSignatureValidator(final PoiFacade poiFacade, boolean blockCreation, final Supplier<Collection<Transaction>> transactionsSupplier) {
-		this.poiFacade = poiFacade;
+	public MultisigSignatureValidator(final ReadOnlyAccountStateCache stateCache, boolean blockCreation, final Supplier<Collection<Transaction>> transactionsSupplier) {
+		this.stateCache = stateCache;
 		this.blockCreation = blockCreation;
 		this.transactionsSupplier = transactionsSupplier;
 	}
@@ -39,7 +37,7 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 			throw new RuntimeException("MultisigSignature not allowed during block creation");
 		}
 
-		final PoiAccountState cosignerState = this.poiFacade.findStateByAddress(signatureTransaction.getSigner().getAddress());
+		final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(signatureTransaction.getSigner().getAddress());
 
 		// iterate over "waiting"/current transactions, if there's no proper MultisigTransaction, validation fails
 		for (final Transaction parentTransaction : this.transactionsSupplier.get()) {
