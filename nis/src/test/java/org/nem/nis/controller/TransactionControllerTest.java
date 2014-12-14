@@ -12,7 +12,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
-import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.PushService;

@@ -3,9 +3,9 @@ package org.nem.nis.service;
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.secret.*;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

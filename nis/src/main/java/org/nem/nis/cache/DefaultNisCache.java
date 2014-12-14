@@ -90,7 +90,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 		@Override
 		public NisCache copy() {
-			 throw new IllegalStateException("nested copies are not currently allowed");
+			throw new IllegalStateException("nested copies are not currently allowed");
 		}
 
 		@Override

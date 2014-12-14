@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 

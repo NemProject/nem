@@ -8,7 +8,7 @@ import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 
 public class AccountInfoFactoryTest {

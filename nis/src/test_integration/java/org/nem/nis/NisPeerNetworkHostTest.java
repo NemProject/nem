@@ -10,7 +10,6 @@ import org.nem.core.time.SystemTimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.*;
-import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.peer.connect.*;
 
 import java.util.List;

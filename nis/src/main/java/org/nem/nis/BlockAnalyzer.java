@@ -7,9 +7,9 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.state.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -129,12 +129,12 @@ public class NisCacheFactory {
 	//region createReadOnly
 
 	/**
-	* Creates a NIS cache around an account cache and poi facade.
-	*
-	* @param accountCache The account cache.
-	* @param accountStateCache The account state cache.
-	* @return The NIS cache.
-	*/
+	 * Creates a NIS cache around an account cache and poi facade.
+	 *
+	 * @param accountCache The account cache.
+	 * @param accountStateCache The account state cache.
+	 * @return The NIS cache.
+	 */
 	public static ReadOnlyNisCache createReadOnly(final AccountCache accountCache, final ReadOnlyAccountStateCache accountStateCache) {
 		return createReadOnly(accountCache, accountStateCache, null);
 	}

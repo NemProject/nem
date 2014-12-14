@@ -4,9 +4,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.state.*;
-import org.nem.nis.validators.DebitPredicate;
 
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

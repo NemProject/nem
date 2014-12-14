@@ -2,15 +2,14 @@ package org.nem.nis.cache;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.state.*;
-import org.nem.nis.validators.DebitPredicate;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 public abstract class AccountStateCacheTest<T extends CopyableCache<T> & AccountStateCache> {
 

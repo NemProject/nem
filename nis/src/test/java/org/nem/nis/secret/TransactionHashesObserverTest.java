@@ -5,12 +5,11 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.TransactionHashesNotification;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.DefaultHashCache;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TransactionHashesObserverTest {
 

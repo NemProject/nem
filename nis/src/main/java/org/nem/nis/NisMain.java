@@ -3,15 +3,12 @@ package org.nem.nis;
 import org.nem.core.crypto.*;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.state.AccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;

@@ -1,16 +1,16 @@
 package org.nem.nis.cache;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
-import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.NemesisBlock;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.state.*;
+import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.state.AccountState;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 

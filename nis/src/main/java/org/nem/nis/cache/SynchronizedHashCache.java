@@ -22,7 +22,6 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 		this.cache = cache;
 	}
 
-
 	@Override
 	public void prune(final TimeInstant timeStamp) {
 		synchronized (this.lock) {
