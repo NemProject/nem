@@ -11,7 +11,9 @@ import org.nem.nis.cache.NisCache;
 // TODO 20141213 G-J: introduction of this, causes, that poi is recalculated also during loading of blockchain
 // earlier recalculation was done after all the blocks have been loaded,
 // (for 70k blocks that is >180 recalculations)
-// I don't think that it's important as it's only fraction of time, just wanted to note the difference with previous behaviour
+// TODO 20131214 G-J: ok, so it's not a fraction, for 79k blocks that we currently have:
+// poi recalculation took 190s (3 minutes), while whole load took 373s 6m13s...
+// for some reason webstart version is much slower...
 public class RecalculateImportancesObserver implements BlockTransactionObserver {
 	private final NisCache nisCache;
 
