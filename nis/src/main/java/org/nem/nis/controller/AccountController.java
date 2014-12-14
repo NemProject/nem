@@ -77,6 +77,19 @@ public class AccountController {
 	}
 
 	/**
+	 * Checks if given account is unlocked.
+	 *
+	 * @param privateKey The private key of the account to lock.
+	 */
+	@RequestMapping(value = "/account/isunlocked", method = RequestMethod.POST)
+	@ClientApi
+	public String accountIsUnlocked(@RequestBody final PrivateKey privateKey) {
+		final Account account = new Account(new KeyPair(privateKey));
+		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
+	}
+
+
+	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
 	 *
 	 * @param builder The page builder.
