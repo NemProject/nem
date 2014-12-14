@@ -78,6 +78,8 @@ public class AccountController {
 
 	/**
 	 * Checks if given account is unlocked.
+	 * TODO 20141214: J-J i'd rather pass in something other than a private key here (address) !
+	 * > Also should have two tests one for when account is unlocked and one for when it's not
 	 *
 	 * @param privateKey The private key of the account to lock.
 	 */
@@ -87,7 +89,6 @@ public class AccountController {
 		final Account account = new Account(new KeyPair(privateKey));
 		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
 	}
-
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
