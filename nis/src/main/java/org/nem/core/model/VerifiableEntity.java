@@ -148,10 +148,13 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
 		if (includeSignature) {
 			Signature.writeTo(serializer, "signature", this.getSignature());
-			this.serializeNonVerifiableData(serializer);
 		}
 
 		this.serializeImpl(serializer);
+
+		if (includeSignature) {
+			this.serializeNonVerifiableData(serializer);
+		}
 	}
 
 	/**
@@ -179,6 +182,9 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		// we could do simple check: "if (.NON_VERIFIABLE == options) {"
 		// but then we'd have problems if there would be multiple objects in
 		// hierarchy that have non-verifiable data (see verifiableHierarchyCanBeRoundTripped)
+		// TODO 20141213 J-G: you're right that this only works for a single level;
+		// > should be good enough for now, but i might change it later ^^
+		// > hopefully this unblocks you
 	}
 
 	/**

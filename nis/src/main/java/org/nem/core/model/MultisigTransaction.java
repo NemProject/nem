@@ -43,19 +43,12 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		super(TransactionTypes.MULTISIG, options, deserializer);
 		this.otherTransaction = deserializer.readObject("other_trans", TransactionFactory.NON_VERIFIABLE);
 		this.otherTransactionHash = HashUtils.calculateHash(otherTransaction.asNonVerifiable());
-	}
 
-	@Override
-	public void deserializeNonVerifiableData(final Deserializer deserializer) {
-		super.deserializeNonVerifiableData(deserializer);
-		// TODO 20141213 C1: adding this causes exception if "signatures" are not present, so how is this "optional"?
-		deserializer.readOptionalObjectArray("signatures", d -> {
-			final MultisigSignatureTransaction entity= new MultisigSignatureTransaction(DeserializationOptions.VERIFIABLE, d);
-			// TODO: can't call addSignature here, as MultisigTransaction is not ready at this time
-			//this.addSignature(entity);
-			this.signatureTransactions.add(entity);
-			return entity;
+		final Collection<MultisigSignatureTransaction> signatures = deserializer.readOptionalObjectArray("signatures", d -> {
+			return new MultisigSignatureTransaction(DeserializationOptions.VERIFIABLE, d);
 		});
+
+		signatures.forEach(this::addSignature);
 	}
 
 	/**
@@ -133,7 +126,6 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeObject("other_trans", this.otherTransaction.asNonVerifiable());
-		// TODO: need to add some other fields here (not complete)
 	}
 
 	@Override
