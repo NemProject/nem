@@ -58,17 +58,6 @@
         },
         {
             "endpoint": {
-                "host": "bob.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "bob",
-                "public-key": "7b1cd05cf440d067f9893069a4af148ed1f141d9000d849bf766b99d9a59f344"
-            }
-        },
-        {
-            "endpoint": {
                 "host": "san.nem.ninja",
                 "port": 7890,
                 "protocol": "http"
@@ -135,47 +124,36 @@
         },
         {
             "endpoint": {
-                "host": "94.156.77.147",
+                "protocol": "http",
                 "port": 7890,
-                "protocol": "http"
+                "host": "46.28.202.213"
             },
             "identity": {
-                "name": "nemtrader-jaded",
-                "public-key": "7ebf6f3fe7417ae8d5218cb3ace87acc72fa7d30bca97ce3519333c5f6ed3a82"
+                "name": "rigel3",
+                "public-key": "9a59c94e8fe73dbe4bca79deb9b11476e65c4ccf944155a3d9ea8ed2022d800e"
             }
         },
         {
             "endpoint": {
-                "host": "5.249.147.16",
+                "protocol": "http",
                 "port": 7890,
-                "protocol": "http"
+                "host": "222.104.228.16"
             },
             "identity": {
-                "name": "rigel",
-                "public-key": "f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56"
+                "name": "jabo38",
+                "public-key": "3800de1304f392369fe21d7e5e3747c55976be4760aae65dae561c60967bd3ed"
             }
         },
         {
             "endpoint": {
-                "host": "87.121.52.165",
+                "protocol": "http",
                 "port": 7890,
-                "protocol": "http"
+                "host": "5.79.193.164"
             },
             "identity": {
-                "name": "nemdeck",
-                "public-key": "e80e3aefc762e28caa72b998791132444f9bdb572f0296c306fb1fa7c1a130c1"
+                "name": "Elena82",
+                "public-key": "5c0797a67c59c91ab2f73b99c7eaed4df760bf8c9099b6b6f564cec5571da3fb"
             }
         },
-        {
-            "endpoint": {
-                "host": "178.254.43.15",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "Trudy<3",
-                "public-key": "f457167a134b60275ddad5baa40f9160c8728fb6943513c94384e1986006d852"
-            }
-        }
     ]
 }
