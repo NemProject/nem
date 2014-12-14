@@ -8,6 +8,7 @@ import org.nem.core.time.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.*;
+import org.nem.nis.state.AccountLink;
 import org.nem.nis.validators.*;
 
 import java.util.*;

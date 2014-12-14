@@ -13,7 +13,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.AccountCache;
+import org.nem.nis.cache.AccountCache;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
@@ -98,21 +98,6 @@ public class AccountIoAdapterTest {
 	}
 
 	// region delegation
-
-	@Test
-	public void iteratorAddressDelegatesToAccountCache() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Iterator<Account> expectedIterator = new ArrayList<Account>().iterator();
-		Mockito.when(context.accountCache.iterator()).thenReturn(expectedIterator);
-
-		// Act:
-		final Iterator<Account> iterator = context.accountIoAdapter.iterator();
-
-		// Assert:
-		Assert.assertThat(iterator, IsEqual.equalTo(expectedIterator));
-		Mockito.verify(context.accountCache, Mockito.only()).iterator();
-	}
 
 	@Test
 	public void findByAddressDelegatesToAccountCache() {

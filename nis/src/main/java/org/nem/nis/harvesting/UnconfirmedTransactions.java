@@ -5,9 +5,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.NisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.poi.PoiAccountState;
-import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -27,7 +26,7 @@ public class UnconfirmedTransactions {
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 
 	private enum BalanceValidationOptions {
 		/**
@@ -60,7 +59,7 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
-			final NisCache nisCache) {
+			final ReadOnlyNisCache nisCache) {
 		this(
 				new ArrayList<>(),
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
@@ -73,12 +72,12 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final boolean blockCreation) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.singleValidator = this.createSingleValidator(blockCreation);
-		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getPoiFacade());
+		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -203,7 +202,7 @@ public class UnconfirmedTransactions {
 
 	private SingleTransactionValidator createSingleValidator(boolean blockCreation) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.nisCache.getPoiFacade()));
+		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 
 		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getPoiFacade(), blockCreation));
@@ -266,15 +265,11 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		// probably faster to use hash map than collection
-		// TODO 201412123: why not hash map of hashshortid -> transaction to avoid recalculating the hashes twice?
-		final HashMap<HashShortId, Integer> unknownHashShortIds = new HashMap<>(this.transactions.size());
+		final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
 		this.transactions.values().stream()
-				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), 0));
+				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
-
-		return this.transactions.values().stream()
-				.filter(t -> unknownHashShortIds.containsKey(new HashShortId(HashUtils.calculateHash(t).getShortId())))
-				.collect(Collectors.toList());
+		return unknownHashShortIds.values().stream().collect(Collectors.toList());
 	}
 
 	/**
@@ -372,12 +367,10 @@ public class UnconfirmedTransactions {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
-		// (3) not already be expired
-		// TODO 20141205 J-B: i noticed that the TransactionDeadlineBlockValidator is only for blocks;
-		// > if it is updated to also work for blocks, then shouldn't (3) be satisfied by (4)?
-		// TODO 20141206 BR -> J: sorry I don't understand what you mean.
-		// TODO 20141206 J -> B: ok, my previous comment didn't make sense, but is there a reason for not calling
-		// > dropExpiredTransactions ? instead of the check below?
+		// (3) not already be expired (relative to the block time):
+		// - BlockGenerator.generateNextBlock() calls dropExpiredTransactions() and later getTransactionsForNewBlock().
+		// - In-between it is possible that unconfirmed transactions are polled and thus expired (relative to the block time)
+		// - transactions are in our cache when we call getTransactionsForNewBlock().
 		// (4) pass validation against the *confirmed* balance
 
 		// this filter validates all transactions against confirmed balance:
@@ -395,11 +388,11 @@ public class UnconfirmedTransactions {
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
-		private final PoiFacade poiFacade;
+		private final ReadOnlyAccountStateCache accountStateCache;
 		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
 
-		public UnconfirmedBalancesObserver(final PoiFacade poiFacade) {
-			this.poiFacade = poiFacade;
+		public UnconfirmedBalancesObserver(final ReadOnlyAccountStateCache accountStateCache) {
+			this.accountStateCache = accountStateCache;
 		}
 
 		public Amount get(final Account account) {
@@ -432,8 +425,7 @@ public class UnconfirmedTransactions {
 		}
 
 		private Amount getBalance(final Account account) {
-			final PoiAccountState poiAccountState = this.poiFacade.findStateByAddress(account.getAddress());
-			return poiAccountState.getAccountInfo().getBalance();
+			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 		}
 	}
 }

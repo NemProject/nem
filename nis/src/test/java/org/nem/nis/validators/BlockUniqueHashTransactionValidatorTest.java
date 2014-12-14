@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.nis.cache.DefaultHashCache;
 
 import java.util.*;
 
@@ -48,7 +49,7 @@ public class BlockUniqueHashTransactionValidatorTest {
 		private final Block block = Mockito.mock(Block.class);
 		private final List<Transaction> transactions = new ArrayList<>();
 		private final List<Hash> hashes = new ArrayList<>();
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 		private final BlockUniqueHashTransactionValidator validator = new BlockUniqueHashTransactionValidator(this.transactionHashCache);
 
 		private TestContext(final int count) {

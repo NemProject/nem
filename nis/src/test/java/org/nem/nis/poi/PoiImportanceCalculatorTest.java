@@ -7,7 +7,7 @@ import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.poi.graph.*;
-import org.nem.nis.secret.AccountLink;
+import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
 import java.security.SecureRandom;
@@ -98,7 +98,7 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	private static ColumnVector calculateImportances(final GraphClusteringStrategy clusteringStrategy) {
-		final Collection<PoiAccountState> accountStates = createAccountStatesFromGraph(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
+		final Collection<AccountState> accountStates = createAccountStatesFromGraph(GraphTypeEpsilon040.GRAPH_THREE_CLUSTERS_TWO_HUBS_THREE_OUTLIERS);
 
 		final PoiOptionsBuilder poiOptionsBuilder = new PoiOptionsBuilder();
 		poiOptionsBuilder.setClusteringStrategy(clusteringStrategy);
@@ -131,7 +131,7 @@ public class PoiImportanceCalculatorTest {
 		// - account 0 starts with 2000 NEM
 		// - accounts 1-10 start with 2100 NEM
 		// - accounts 1-10 send 100 NEM to 0
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+		final List<AccountState> accountStates = new ArrayList<>();
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 
 		final Matrix outlinkMatrix = new DenseMatrix(11, 11);
@@ -181,7 +181,7 @@ public class PoiImportanceCalculatorTest {
 		// - account 0 starts with 3000 NEM
 		// - accounts 1-10 start with 2000 NEM
 		// - account 0 sends 100 NEM to accounts 0-10
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+		final List<AccountState> accountStates = new ArrayList<>();
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(3000)));
 
 		final Matrix outlinkMatrix = new DenseMatrix(11, 11);
@@ -270,7 +270,7 @@ public class PoiImportanceCalculatorTest {
 		// - accounts 1 and 6 start with 2200 NEM
 		// - account 1-5 and 2-10 send around NEM in a loop (100 NEM each)
 		// - account 1-6 send NEM to 0 (100 NEM each)
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+		final List<AccountState> accountStates = new ArrayList<>();
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2200)));
 		for (int i = 2; i <= 5; ++i) { accountStates.add(createAccountStateWithBalance(Amount.fromNem(2100))); }
@@ -343,7 +343,7 @@ public class PoiImportanceCalculatorTest {
 	public void spamLinksDoNotHaveABigImpactOnImportance() {
 		// Arrange:
 		// - all (12) accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = this.setupAccountStates(12);
+		final List<AccountState> accountStates = this.setupAccountStates(12);
 		final StandardContext context = new StandardContext();
 		context.builder1.setClusteringStrategy(new SingleClusterScan());
 
@@ -461,7 +461,7 @@ public class PoiImportanceCalculatorTest {
 	public void linkFromRingTwoToRingOneTransfersImportanceToLeftBlock() {
 		// Arrange:
 		// - all accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = this.setupAccountStates(12);
+		final List<AccountState> accountStates = this.setupAccountStates(12);
 		final StandardContext context = new StandardContext();
 		context.builder1.setTeleportationProbability(1.00);
 		context.builder1.setInterLevelTeleportationProbability(0.0);
@@ -501,9 +501,9 @@ public class PoiImportanceCalculatorTest {
 
 	// endregion
 
-	private List<PoiAccountState> setupAccountStates(final int numAccounts) {
+	private List<AccountState> setupAccountStates(final int numAccounts) {
 		// All accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < numAccounts; i++) {
 			accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 		}
@@ -563,7 +563,7 @@ public class PoiImportanceCalculatorTest {
 	public void merchantAndExchangeGetALotMoreImportance() {
 		// Arrange:
 		// - all accounts start with 2000 NEM
-		final List<PoiAccountState> accountStates = this.setupAccountStates(12);
+		final List<AccountState> accountStates = this.setupAccountStates(12);
 		final StandardContext context = new StandardContext();
 
 		// Setup transfers from users, merchant and exchange.
@@ -607,11 +607,11 @@ public class PoiImportanceCalculatorTest {
 			this.builder2.setInterLevelTeleportationProbability(0.1);
 		}
 
-		public ColumnVector calculatePageRankImportances(final Collection<PoiAccountState> accountStates) {
+		public ColumnVector calculatePageRankImportances(final Collection<AccountState> accountStates) {
 			return calculateImportances(this.builder1.create(), this.height1, accountStates, new PageRankScorer());
 		}
 
-		public ColumnVector calculateNCDAwareRankImportances(final Collection<PoiAccountState> accountStates) {
+		public ColumnVector calculateNCDAwareRankImportances(final Collection<AccountState> accountStates) {
 			return calculateImportances(this.builder2.create(), this.height2, accountStates, new PageRankScorer());
 		}
 	}
@@ -624,7 +624,7 @@ public class PoiImportanceCalculatorTest {
 	@Test
 	public void outlinkHasPositiveImpactOnImportance() {
 		// Arrange:
-		final List<PoiAccountState> accountStates = Arrays.asList(
+		final List<AccountState> accountStates = Arrays.asList(
 				createAccountStateWithBalance(Amount.fromNem(101000)),
 				createAccountStateWithBalance(Amount.fromNem(100000)),
 				createAccountStateWithBalance(Amount.fromNem(100000)));
@@ -650,8 +650,8 @@ public class PoiImportanceCalculatorTest {
 	//region test helpers
 
 	private static void addOutlink(
-			final PoiAccountState senderAccountState,
-			final PoiAccountState recipientAccountState,
+			final AccountState senderAccountState,
+			final AccountState recipientAccountState,
 			final BlockHeight blockHeight,
 			final Amount amount) {
 		final Amount adjustedAmount = Amount.fromMicroNem(amount.getNumNem() * MIN_OUTLINK_WEIGHT);
@@ -662,24 +662,24 @@ public class PoiImportanceCalculatorTest {
 		recipientAccountState.getWeightedBalances().addReceive(blockHeight, adjustedAmount);
 	}
 
-	private static PoiAccountState createAccountStateWithBalance(final Amount balance) {
+	private static AccountState createAccountStateWithBalance(final Amount balance) {
 		// multiply the balance by MIN_OUTLINK_WEIGHT so that the ratio between balances
 		// and outlink amounts stays the same
 		final Amount adjustedBalance = Amount.fromMicroNem(balance.getNumNem() * MIN_OUTLINK_WEIGHT);
-		final PoiAccountState accountState = new PoiAccountState(Utils.generateRandomAddress());
+		final AccountState accountState = new AccountState(Utils.generateRandomAddress());
 		accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, adjustedBalance);
 		return accountState;
 	}
 
-	private static Collection<PoiAccountState> createAccountStatesFromGraph(final GraphTypeEpsilon040 graphType) {
+	private static Collection<AccountState> createAccountStatesFromGraph(final GraphTypeEpsilon040 graphType) {
 		final Matrix outlinkMatrix = OutlinkMatrixFactory.create(graphType);
 		return createAccountStatesFromGraph(outlinkMatrix);
 	}
 
-	private static Collection<PoiAccountState> createAccountStatesFromGraph(final Matrix outlinkMatrix) {
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+	private static Collection<AccountState> createAccountStatesFromGraph(final Matrix outlinkMatrix) {
+		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < outlinkMatrix.getRowCount(); ++i) {
-			final PoiAccountState accountState = new PoiAccountState(Utils.generateRandomAddress());
+			final AccountState accountState = new AccountState(Utils.generateRandomAddress());
 			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, Amount.fromNem(1000000000));
 			accountStates.add(accountState);
 		}
@@ -689,7 +689,7 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	private static void addOutlinksFromGraph(
-			final List<PoiAccountState> accountStates,
+			final List<AccountState> accountStates,
 			final BlockHeight blockHeight,
 			final Matrix outlinkMatrix) {
 		for (int i = 0; i < outlinkMatrix.getRowCount(); ++i) {
@@ -698,8 +698,8 @@ public class PoiImportanceCalculatorTest {
 				final MatrixElement element = iterator.next();
 				final Amount amount = Amount.fromNem(element.getValue().longValue());
 				if (amount.compareTo(Amount.ZERO) > 0) {
-					final PoiAccountState senderAccountState = accountStates.get(element.getColumn());
-					final PoiAccountState recipientAccountState = accountStates.get(element.getRow());
+					final AccountState senderAccountState = accountStates.get(element.getColumn());
+					final AccountState recipientAccountState = accountStates.get(element.getRow());
 					addOutlink(senderAccountState, recipientAccountState, blockHeight, amount);
 				}
 			}
@@ -709,14 +709,14 @@ public class PoiImportanceCalculatorTest {
 	private static ColumnVector calculateImportances(
 			final PoiOptions options,
 			final BlockHeight importanceBlockHeight,
-			final Collection<PoiAccountState> accountStates) {
+			final Collection<AccountState> accountStates) {
 		return calculateImportances(options, importanceBlockHeight, accountStates, DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private static ColumnVector calculateImportances(
 			final PoiOptions options,
 			final BlockHeight importanceBlockHeight,
-			final Collection<PoiAccountState> accountStates,
+			final Collection<AccountState> accountStates,
 			final ImportanceScorer scorer) {
 		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
 				scorer,
@@ -727,7 +727,7 @@ public class PoiImportanceCalculatorTest {
 
 	private static ColumnVector getBalances(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates) {
+			final Collection<AccountState> accountStates) {
 		final List<Amount> balances = accountStates.stream()
 				.map(a -> a.getWeightedBalances().getVested(blockHeight))
 				.collect(Collectors.toList());
@@ -743,7 +743,7 @@ public class PoiImportanceCalculatorTest {
 
 	private static void assertEqualBalances(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates,
+			final Collection<AccountState> accountStates,
 			final double amount) {
 		// Act:
 		final ColumnVector balances = getBalances(blockHeight, accountStates);
@@ -757,7 +757,7 @@ public class PoiImportanceCalculatorTest {
 
 	private static void assertBalancesInRange(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates,
+			final Collection<AccountState> accountStates,
 			final double lowAmount,
 			final double highAmount) {
 		// Act:
@@ -775,7 +775,7 @@ public class PoiImportanceCalculatorTest {
 
 	private static ColumnVector getImportances(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates) {
+			final Collection<AccountState> accountStates) {
 		final List<Double> importances = accountStates.stream()
 				.map(a -> a.getImportanceInfo().getImportance(blockHeight))
 				.collect(Collectors.toList());

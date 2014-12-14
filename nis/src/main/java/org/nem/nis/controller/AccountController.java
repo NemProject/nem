@@ -4,18 +4,18 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
+import org.nem.nis.cache.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.*;
+import java.util.stream.Collectors;
 
 /**
  * REST API for interacting with Account objects.
@@ -26,20 +26,20 @@ public class AccountController {
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final UnlockedAccounts unlockedAccounts;
 	private final AccountIo accountIo;
-	private final PoiFacade poiFacade;
-	private final HashCache transactionHashCache;
+	private final ReadOnlyAccountStateCache accountStateCache;
+	private final ReadOnlyHashCache transactionHashCache;
 
 	@Autowired(required = true)
 	AccountController(
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final UnlockedAccounts unlockedAccounts,
 			final AccountIo accountIo,
-			final PoiFacade poiFacade,
-			final HashCache transactionHashCache) {
+			final ReadOnlyAccountStateCache accountStateCache,
+			final ReadOnlyHashCache transactionHashCache) {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.unlockedAccounts = unlockedAccounts;
 		this.accountIo = accountIo;
-		this.poiFacade = poiFacade;
+		this.accountStateCache = accountStateCache;
 		this.transactionHashCache = transactionHashCache;
 	}
 
@@ -53,6 +53,7 @@ public class AccountController {
 	// TODO 20141010 J-G i think it still makes sense to reject if remote AND the private key is NOT for a remote account
 	// TODO 20141010 J-G actually, i don't think this api is good enough as-is ... in its current form, i can "borrow"
 	// > any nis for my harvesting purposes ... i think we need a ticket / token to allow a NIS to reject unauthorized harvesters
+	// TODO 20141214 G-J: I think comment above can already be removed...
 	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
 		final KeyPair keyPair = new KeyPair(privateKey);
 		final Account account = new Account(keyPair);
@@ -74,6 +75,19 @@ public class AccountController {
 		final Account account = new Account(new KeyPair(privateKey));
 		this.unlockedAccounts.removeUnlockedAccount(account);
 	}
+
+	/**
+	 * Checks if given account is unlocked.
+	 *
+	 * @param privateKey The private key of the account to lock.
+	 */
+	@RequestMapping(value = "/account/isunlocked", method = RequestMethod.POST)
+	@ClientApi
+	public String accountIsUnlocked(@RequestBody final PrivateKey privateKey) {
+		final Account account = new Account(new KeyPair(privateKey));
+		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
+	}
+
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
@@ -187,7 +201,7 @@ public class AccountController {
 	@RequestMapping(value = "/account/importances", method = RequestMethod.GET)
 	@PublicApi
 	public SerializableList<AccountImportanceViewModel> getImportances() {
-		final List<AccountImportanceViewModel> viewModels = StreamSupport.stream(this.poiFacade.spliterator(), false)
+		final List<AccountImportanceViewModel> viewModels = this.accountStateCache.contents().stream()
 				.map(a -> new AccountImportanceViewModel(a.getAddress(), a.getImportanceInfo()))
 				.collect(Collectors.toList());
 

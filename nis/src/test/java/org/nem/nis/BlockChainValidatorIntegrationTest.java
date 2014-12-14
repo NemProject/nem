@@ -8,15 +8,16 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.state.*;
+import org.nem.nis.sync.DefaultDebitPredicate;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * This suite is different from BlockChainValidatorTest because it uses REAL validators
@@ -369,18 +370,17 @@ public class BlockChainValidatorIntegrationTest {
 	//endregion
 
 	private static class BlockChainValidatorFactory {
-		public Consumer<Block> executor = block -> { };
-		public BlockScorer scorer = Mockito.mock(BlockScorer.class);
-		public int maxChainSize = 21;
-		public final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
-		public final HashCache transactionHashCache = Mockito.mock(HashCache.class);
-		public final NisCache nisCache = new NisCache(Mockito.mock(AccountCache.class), this.poiFacade, this.transactionHashCache);
+		public final BlockScorer scorer = Mockito.mock(BlockScorer.class);
+		public final int maxChainSize = 21;
+		public final AccountStateCache accountStateCache = new DefaultAccountStateCache();
+		public final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
+		public final ReadOnlyNisCache nisCache = NisCacheFactory.createReadOnly(this.accountStateCache, this.transactionHashCache);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.nisCache);
 		public final SingleTransactionValidator transactionValidator;
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-			this.transactionValidator = new MultisigAwareSingleTransactionValidator(transactionValidatorFactory.createSingle(this.poiFacade));
+his.accountStateCache.findStateByAddress(account.getAddress())			this.transactionValidator = new MultisigAwareSingleTransactionValidator(transactionValidatorFactory.createSingle(this.accountStateCache));
 
 			Mockito.when(this.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);
@@ -388,7 +388,7 @@ public class BlockChainValidatorIntegrationTest {
 		}
 
 		public BlockChainValidator create() {
-			final NisCache nisCache = new NisCache(new AccountCache(), this.poiFacade, new HashCache());
+			final NisCache nisCache = NisCacheFactory.create(this.accountStateCache);
 			final BlockExecutor executor = new BlockExecutor(nisCache);
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 			return new BlockChainValidator(
@@ -397,16 +397,16 @@ public class BlockChainValidatorIntegrationTest {
 					this.maxChainSize,
 					this.blockValidator,
 					this.transactionValidator,
-					this.poiFacade.getDebitPredicate());
+					new DefaultDebitPredicate(this.accountStateCache));
 		}
 
 		public AccountInfo getAccountInfo(final Account account) {
-			return this.poiFacade.findStateByAddress(account.getAddress()).getAccountInfo();
+			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
 		}
 
 		private Account createAccountWithBalance(final Amount balance) {
 			final Account account = Utils.generateRandomAccount();
-			final PoiAccountState accountState = this.poiFacade.findStateByAddress(account.getAddress());
+			final AccountState accountState = this.accountStateCache.findStateByAddress(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(balance);
 			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
 			return account;

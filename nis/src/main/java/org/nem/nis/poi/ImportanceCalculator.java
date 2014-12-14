@@ -1,6 +1,7 @@
 package org.nem.nis.poi;
 
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.state.AccountState;
 
 import java.util.Collection;
 
@@ -17,5 +18,5 @@ public interface ImportanceCalculator {
 	 */
 	public void recalculate(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates);
+			final Collection<AccountState> accountStates);
 }

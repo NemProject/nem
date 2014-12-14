@@ -7,6 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
+import org.nem.nis.cache.DefaultHashCache;
 import org.nem.nis.test.DebitPredicates;
 
 import java.util.*;
@@ -65,7 +66,7 @@ public class BatchUniqueHashTransactionValidatorTest {
 		private final List<Transaction> transactions = new ArrayList<>();
 		private final List<Hash> hashes = new ArrayList<>();
 
-		private final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+		private final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 		private final BatchUniqueHashTransactionValidator validator = new BatchUniqueHashTransactionValidator(this.transactionHashCache);
 
 		public TestContext() {

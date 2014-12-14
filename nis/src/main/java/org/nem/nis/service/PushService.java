@@ -70,9 +70,9 @@ public class PushService {
 	}
 
 	private static class PushContext<T> {
-		public T entity;
-		public NodeIdentity identity;
-		public NisPeerId broadcastId;
+		public final T entity;
+		public final NodeIdentity identity;
+		public final NisPeerId broadcastId;
 		public Function<T, ValidationResult> isValid;
 		public Function<T, ValidationResult> isAccepted;
 		public Consumer<T> logAdditionalInfo;

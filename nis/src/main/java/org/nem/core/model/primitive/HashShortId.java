@@ -1,6 +1,7 @@
 package org.nem.core.model.primitive;
 
 import org.nem.core.serialization.*;
+
 /**
  * Represents a hash's short id.
  */

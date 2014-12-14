@@ -12,7 +12,7 @@ public class NodeVersion {
 	/**
 	 * Zero version.
 	 */
-	public static NodeVersion ZERO = new NodeVersion(0, 0, 0, null);
+	public static final NodeVersion ZERO = new NodeVersion(0, 0, 0, null);
 
 	private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(.*))?");
 

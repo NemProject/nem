@@ -3,12 +3,12 @@ package org.nem.deploy.appconfig;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.core.deploy.*;
-import org.nem.core.model.HashCache;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.*;
 import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.PeerNetworkScheduler;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
@@ -182,7 +182,7 @@ public class NisAppConfig {
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
 		// which doesn't require a hash check, so createSingle is used
-		final SingleTransactionValidator validator = this.transactionValidatorFactory().createSingle(this.nisCache().getPoiFacade());
+		final SingleTransactionValidator validator = this.transactionValidatorFactory().createSingle(this.accountStateCache());
 
 		// TODO 20141203 J-J,G: i would prefer to have the builder return MultisigAwareSingleTransactionValidator,
 		// but that doesn't work because unconfirmed transactions would have to wrap it again, and there should only
@@ -201,7 +201,7 @@ public class NisAppConfig {
 				this.nisCache(),
 				this.unconfirmedTransactions(),
 				this.blockDao,
-				new BlockScorer(this.poiFacade()),
+				new BlockScorer(this.accountStateCache()),
 				this.blockValidatorFactory().create(this.nisCache()));
 		return new Harvester(
 				this.accountCache(),
@@ -212,23 +212,32 @@ public class NisAppConfig {
 	}
 
 	@Bean
-	public AccountCache accountCache() {
-		return new AccountCache();
+	public SynchronizedAccountCache accountCache() {
+		return new SynchronizedAccountCache(new DefaultAccountCache());
 	}
 
 	@Bean
-	public HashCache transactionHashCache() {
-		return new HashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime());
+	public SynchronizedAccountStateCache accountStateCache() {
+		return new SynchronizedAccountStateCache(new DefaultAccountStateCache());
 	}
 
 	@Bean
-	public PoiFacade poiFacade() {
-		return new PoiFacade(this.importanceCalculator());
+	public SynchronizedHashCache transactionHashCache() {
+		return new SynchronizedHashCache(new DefaultHashCache(50000, this.nisConfiguration().getTransactionHashRetentionTime()));
 	}
 
 	@Bean
-	public NisCache nisCache() {
-		return new NisCache(this.accountCache(), this.poiFacade(), this.transactionHashCache());
+	public SynchronizedPoiFacade poiFacade() {
+		return new SynchronizedPoiFacade(new DefaultPoiFacade(this.importanceCalculator()));
+	}
+
+	@Bean
+	public ReadOnlyNisCache nisCache() {
+		return new DefaultNisCache(
+				this.accountCache(),
+				this.accountStateCache(),
+				this.poiFacade(),
+				this.transactionHashCache());
 	}
 
 	@Bean
@@ -240,7 +249,7 @@ public class NisAppConfig {
 	public UnlockedAccounts unlockedAccounts() {
 		return new UnlockedAccounts(
 				this.accountCache(),
-				this.poiFacade(),
+				this.accountStateCache(),
 				this.blockChainLastBlockLayer,
 				this.canHarvestPredicate(),
 				this.nisConfiguration().getUnlockedLimit());
@@ -331,5 +340,10 @@ public class NisAppConfig {
 	@Bean
 	public CommonStarter commonStarter() {
 		return CommonStarter.INSTANCE;
+	}
+
+	@Bean
+	public DebitPredicate debitPredicate() {
+		return new DefaultDebitPredicate(this.accountStateCache());
 	}
 }

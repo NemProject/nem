@@ -6,7 +6,8 @@ import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 import org.nem.nis.remote.*;
 
@@ -104,8 +105,8 @@ public class RemoteObserverTest {
 		private final Account lessee = Utils.generateRandomAccount();
 		private final RemoteLinks lessorRemoteLinks = Mockito.mock(RemoteLinks.class);
 		private final RemoteLinks lesseeRemoteLinks = Mockito.mock(RemoteLinks.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BlockTransactionObserver observer = new RemoteObserver(this.poiFacade);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final BlockTransactionObserver observer = new RemoteObserver(this.accountStateCache);
 
 		private TestContext() {
 			this.hook(this.lessor, this.lessorRemoteLinks);
@@ -113,9 +114,9 @@ public class RemoteObserverTest {
 		}
 
 		private void hook(final Account account, final RemoteLinks remoteLinks) {
-			final PoiAccountState state = Mockito.mock(PoiAccountState.class);
+			final AccountState state = Mockito.mock(AccountState.class);
 			Mockito.when(state.getRemoteLinks()).thenReturn(remoteLinks);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(state);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(state);
 		}
 	}
 }

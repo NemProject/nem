@@ -6,7 +6,8 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 
 public class NoSelfSignedTransactionsBlockValidatorTest {
@@ -73,12 +74,12 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 	private static class TestContext {
 		private final Account harvester = Utils.generateRandomAccount();
 		private final Block block = NisUtils.createRandomBlockWithHeight(this.harvester, 12);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		private final BlockValidator validator = new NoSelfSignedTransactionsBlockValidator(this.poiFacade);
+		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final BlockValidator validator = new NoSelfSignedTransactionsBlockValidator(this.accountStateCache);
 
 		private TestContext() {
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.eq(new BlockHeight(12))))
-					.then(invocationOnMock -> new PoiAccountState((Address)invocationOnMock.getArguments()[0]));
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.eq(new BlockHeight(12))))
+					.then(invocationOnMock -> new AccountState((Address)invocationOnMock.getArguments()[0]));
 		}
 
 		private void addTransaction() {
@@ -90,8 +91,8 @@ public class NoSelfSignedTransactionsBlockValidatorTest {
 		}
 
 		private void setHarvesterOwner(final Address ownerAddress) {
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(this.harvester.getAddress(), new BlockHeight(12)))
-					.thenReturn(new PoiAccountState(ownerAddress));
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(this.harvester.getAddress(), new BlockHeight(12)))
+					.thenReturn(new AccountState(ownerAddress));
 		}
 	}
 }

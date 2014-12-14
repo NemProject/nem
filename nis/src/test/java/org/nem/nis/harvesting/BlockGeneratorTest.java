@@ -9,9 +9,10 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.poi.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.state.AccountState;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;
@@ -96,8 +97,8 @@ public class BlockGeneratorTest {
 		final TestContext context = new TestContext();
 		final Account remoteAccount = Utils.generateRandomAccount();
 		final Account ownerAccount = Utils.generateRandomAccount();
-		Mockito.when(context.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
-				.then(o -> new PoiAccountState(ownerAccount.getAddress()));
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
+				.then(o -> new AccountState(ownerAccount.getAddress()));
 		Mockito.when(context.accountCache.findByAddress(Mockito.any())).thenReturn(ownerAccount);
 
 		// Act:
@@ -108,7 +109,7 @@ public class BlockGeneratorTest {
 		// Assert:
 		Assert.assertThat(block.getSigner(), IsEqual.equalTo(remoteAccount));
 		Assert.assertThat(block.getLessor(), IsEqual.equalTo(ownerAccount));
-		Mockito.verify(context.poiFacade, Mockito.only()).findForwardedStateByAddress(remoteAccount.getAddress(), new BlockHeight(8));
+		Mockito.verify(context.accountStateCache, Mockito.only()).findForwardedStateByAddress(remoteAccount.getAddress(), new BlockHeight(8));
 		Mockito.verify(context.accountCache, Mockito.only()).findByAddress(ownerAccount.getAddress());
 	}
 
@@ -137,8 +138,8 @@ public class BlockGeneratorTest {
 
 		final Account remoteAccount = Utils.generateRandomAccount();
 		final Account ownerAccount = Utils.generateRandomAccount();
-		Mockito.when(context.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
-				.then(o -> new PoiAccountState(ownerAccount.getAddress()));
+		Mockito.when(context.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
+				.then(o -> new AccountState(ownerAccount.getAddress()));
 		Mockito.when(context.accountCache.findByAddress(Mockito.any())).thenReturn(ownerAccount);
 
 		// Act:
@@ -310,14 +311,14 @@ public class BlockGeneratorTest {
 
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final BlockDifficultyScorer difficultyScorer = Mockito.mock(BlockDifficultyScorer.class);
 		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		private final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		private final BlockGenerator generator = new BlockGenerator(
-				new NisCache(this.accountCache, this.poiFacade, Mockito.mock(HashCache.class)),
+				NisCacheFactory.createReadOnly(this.accountCache, this.accountStateCache),
 				this.unconfirmedTransactions,
 				this.blockDao,
 				this.scorer,
@@ -325,8 +326,8 @@ public class BlockGeneratorTest {
 
 		private TestContext() {
 			final Account signer = Utils.generateRandomAccount();
-			Mockito.when(this.poiFacade.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
-					.thenReturn(new PoiAccountState(signer.getAddress()));
+			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.any(), Mockito.any()))
+					.thenReturn(new AccountState(signer.getAddress()));
 			Mockito.when(this.accountCache.findByAddress(Mockito.any())).thenReturn(signer);
 
 			this.setBlockTransactions(new ArrayList<>());

@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class NodeChallenge implements SerializableEntity {
 
-	public byte[] data;
+	public final byte[] data;
 
 	/**
 	 * Creates a new challenge.

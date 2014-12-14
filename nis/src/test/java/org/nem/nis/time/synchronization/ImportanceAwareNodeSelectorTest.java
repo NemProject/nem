@@ -7,8 +7,9 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.cache.*;
+import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.state.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 
@@ -24,13 +25,21 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		Mockito.when(importance.getImportance(Mockito.any())).thenReturn(0.125);
 		Mockito.when(importance.getHeight()).thenReturn(new BlockHeight(14));
 
-		final PoiAccountState state = Mockito.mock(PoiAccountState.class);
+		final AccountState state = Mockito.mock(AccountState.class);
 		Mockito.when(state.getImportanceInfo()).thenReturn(importance);
 
+		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		Mockito.when(accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
+
 		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		Mockito.when(poiFacade.findStateByAddress(Mockito.any())).thenReturn(state);
 		Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(new BlockHeight(14));
-		return new ImportanceAwareNodeSelector(maxNodes, poiFacade, trustProvider, context, random);
+		return new ImportanceAwareNodeSelector(
+				maxNodes,
+				poiFacade,
+				accountStateCache,
+				trustProvider,
+				context,
+				random);
 	}
 
 	//region selectNode
@@ -201,7 +210,8 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 	//endregion
 
 	private static class TestContext {
-		private final PoiFacade poiFacade = new PoiFacade(Mockito.mock(ImportanceCalculator.class));
+		private final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
+		private final AccountStateCache accountStateCache = new DefaultAccountStateCache();
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);
@@ -224,7 +234,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			this.nodes = new Node[trustValues.size()];
 			for (int i = 0; i < this.nodes.length; ++i) {
 				this.nodes[i] = new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("127.0.0.1"));
-				final PoiAccountState state = this.poiFacade.findStateByAddress(this.nodes[i].getIdentity().getAddress());
+				final AccountState state = this.accountStateCache.findStateByAddress(this.nodes[i].getIdentity().getAddress());
 				state.getImportanceInfo().setImportance(new BlockHeight((long)heightValues.getAt(i)), importanceValues.getAt(i));
 			}
 
@@ -236,15 +246,21 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 			Mockito.when(this.context.getNodeExperiences()).thenReturn(this.nodeExperiences);
 
 			Mockito.when(this.trustProvider.computeTrust(this.context)).thenReturn(trustValues);
-			this.selector = new ImportanceAwareNodeSelector(maxNodes, this.poiFacade, this.trustProvider, this.context, random);
+			this.selector = new ImportanceAwareNodeSelector(
+					maxNodes,
+					this.poiFacade,
+					this.accountStateCache,
+					this.trustProvider,
+					this.context,
+					random);
 		}
 
-		private static void setFacadeInternalValues(final PoiFacade facade, final int lastPoiVectorSize, final BlockHeight height) {
+		private static void setFacadeInternalValues(final DefaultPoiFacade facade, final int lastPoiVectorSize, final BlockHeight height) {
 			try {
-				Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+				Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
 				field.setAccessible(true);
 				field.set(facade, lastPoiVectorSize);
-				field = PoiFacade.class.getDeclaredField("lastPoiRecalculationHeight");
+				field = DefaultPoiFacade.class.getDeclaredField("lastPoiRecalculationHeight");
 				field.setAccessible(true);
 				field.set(facade, height);
 			} catch (IllegalAccessException | NoSuchFieldException e) {

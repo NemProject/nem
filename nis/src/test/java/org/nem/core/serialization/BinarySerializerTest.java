@@ -232,6 +232,29 @@ public class BinarySerializerTest extends SerializerTest<BinarySerializer, Binar
 
 	//endregion
 
+	//region availableBytes
+
+	@Test
+	public void availableBytesReturnsNumberOfAvailableBytes() throws Exception {
+		// Arrange:
+		try (final BinarySerializer serializer = new BinarySerializer()) {
+			// Act:
+			serializer.writeInt("int", 0x09513510);
+			serializer.writeLong("long", 0x0951351001234567L);
+
+			try (BinaryDeserializer deserializer = this.createBinaryDeserializer(serializer.getBytes())) {
+				// Assert:
+				Assert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(12));
+				deserializer.readInt("int");
+				Assert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(8));
+				deserializer.readLong("long");
+				Assert.assertThat(deserializer.availableBytes(), IsEqual.equalTo(0));
+			}
+		}
+	}
+
+	//endregion
+
 	//region Corrupt Data Handling
 
 	@Test(expected = SerializationException.class)

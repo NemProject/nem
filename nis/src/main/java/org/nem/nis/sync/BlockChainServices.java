@@ -4,8 +4,8 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.poi.PoiFacade;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.validators.*;
@@ -48,8 +48,8 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final Block parentBlock,
 			final Collection<Block> peerChain) {
-		final PoiFacade poiFacade = nisCache.getPoiFacade();
-		final BlockScorer scorer = new BlockScorer(poiFacade);
+		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
+		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		this.calculatePeerChainDifficulties(parentBlock, peerChain, scorer);
 
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
@@ -60,8 +60,8 @@ public class BlockChainServices {
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
-				this.transactionValidatorFactory.createSingle(poiFacade),
-				poiFacade.getDebitPredicate());
+				this.transactionValidatorFactory.createSingle(accountStateCache),
+				new DefaultDebitPredicate(accountStateCache));
 		return validator.isValid(parentBlock, peerChain);
 	}
 
@@ -77,8 +77,8 @@ public class BlockChainServices {
 			final NisCache nisCache,
 			final BlockLookup localBlockLookup,
 			final BlockHeight commonBlockHeight) {
-		final PoiFacade poiFacade = nisCache.getPoiFacade();
-		final BlockScorer scorer = new BlockScorer(poiFacade);
+		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
+		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
 		// this is delicate and the order matters, first visitor during undo changes amount of foraged blocks
@@ -93,7 +93,7 @@ public class BlockChainServices {
 				localBlockLookup,
 				commonBlockHeight,
 				visitor);
-		nisCache.getPoiFacade().undoVesting(commonBlockHeight);
+		accountStateCache.undoVesting(commonBlockHeight);
 		return scoreVisitor.getScore();
 	}
 
