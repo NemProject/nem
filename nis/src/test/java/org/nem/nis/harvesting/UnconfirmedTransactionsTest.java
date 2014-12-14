@@ -720,7 +720,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
-		for (Transaction tx : mostRecentTransactions) {
+		for (final Transaction tx : mostRecentTransactions) {
 			Assert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
 			curTimeStamp = tx.getTimeStamp();
 		}
@@ -1241,7 +1241,7 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private Account addAccount(final Amount amount) {
-			return prepareAccount(Utils.generateRandomAccount(), amount);
+			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
 
 		private Account prepareAccount(final Account account, final Amount amount) {
@@ -1255,7 +1255,7 @@ public class UnconfirmedTransactionsTest {
 			final List<MockTransaction> transactions = new ArrayList<>();
 
 			for (int i = startCustomField; i <= endCustomField; ++i) {
-				transactions.add(createMockTransaction(Utils.generateRandomAccount(), new TimeInstant(i), i));
+				transactions.add(this.createMockTransaction(Utils.generateRandomAccount(), new TimeInstant(i), i));
 			}
 
 			return transactions;
@@ -1266,7 +1266,7 @@ public class UnconfirmedTransactionsTest {
 			final SecureRandom random = new SecureRandom();
 
 			for (int i = 0; i < count; ++i) {
-				transactions.add(createMockTransaction(account, new TimeInstant(random.nextInt(1_000_000)), i));
+				transactions.add(this.createMockTransaction(account, new TimeInstant(random.nextInt(1_000_000)), i));
 			}
 
 			return transactions;
