@@ -3,8 +3,6 @@ package org.nem.nis.cache;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 
-import java.util.Iterator;
-
 /**
  * A synchronized AccountCache implementation.
  */
@@ -72,7 +70,7 @@ public class SynchronizedAccountCache implements AccountCache, CopyableCache<Syn
 
 	@Override
 	public void shallowCopyTo(final SynchronizedAccountCache rhs) {
-		synchronized (this.lock) {
+		synchronized (rhs.lock) {
 			this.accountCache.shallowCopyTo(rhs.accountCache);
 		}
 	}

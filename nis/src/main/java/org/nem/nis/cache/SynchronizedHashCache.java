@@ -5,7 +5,6 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * A synchronized hash cache implementation.
@@ -112,7 +111,7 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 
 	@Override
 	public void shallowCopyTo(final SynchronizedHashCache rhs) {
-		synchronized (this.lock) {
+		synchronized (rhs.lock) {
 			this.cache.shallowCopyTo(rhs.cache);
 		}
 	}

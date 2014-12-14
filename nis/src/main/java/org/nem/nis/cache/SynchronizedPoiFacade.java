@@ -3,7 +3,7 @@ package org.nem.nis.cache;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.AccountState;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * A synchronized PoiFacade implementation.
@@ -46,7 +46,7 @@ public class SynchronizedPoiFacade implements PoiFacade, CopyableCache<Synchroni
 
 	@Override
 	public void shallowCopyTo(final SynchronizedPoiFacade rhs) {
-		synchronized (this.lock) {
+		synchronized (rhs.lock) {
 			this.poiFacade.shallowCopyTo(rhs.poiFacade);
 		}
 	}
