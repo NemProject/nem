@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
@@ -24,15 +25,14 @@ public class MultisigTransactionMapper {
 			final int blockIndex,
 			final int orderIndex,
 			final AccountDaoLookup accountDaoLookup) {
-		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(transaction.getSigner().getAddress());
+		final org.nem.nis.dbmodel.Account multisigSender = accountDaoLookup.findByAddress(transaction.getSigner().getAddress());
 
 		final MultisigTransaction multisigTransaction = new MultisigTransaction();
-		AbstractTransferMapper.toDbModel(transaction, sender, blockIndex, orderIndex, multisigTransaction);
+		AbstractTransferMapper.toDbModel(transaction, multisigSender, blockIndex, orderIndex, multisigTransaction);
 
 		final Set<MultisigSignature> multisigSignatures = new HashSet<>();
 		for (final MultisigSignatureTransaction model : transaction.getCosignerSignatures()) {
-			final MultisigSignature dbModel = MultisigSignatureTransactionMapper.toDbModel(sender, model);
-			dbModel.setMultisigTransaction(multisigTransaction);
+			final MultisigSignature dbModel = MultisigSignatureTransactionMapper.toDbModel(multisigTransaction, accountDaoLookup, model);
 			multisigSignatures.add(dbModel);
 		}
 		multisigTransaction.setMultisigSignatures(multisigSignatures);
@@ -67,7 +67,7 @@ public class MultisigTransactionMapper {
 		transaction.setSignature(new Signature(dbTransfer.getSenderProof()));
 
 		for (final MultisigSignature multisigSignature : dbTransfer.getMultisigSignatures()) {
-			transaction.addSignature(MultisigSignatureTransactionMapper.toModel(multisigSignature, accountLookup, otherTransaction));
+			transaction.addSignature(MultisigSignatureTransactionMapper.toModel(multisigSignature, accountLookup, transaction));
 		}
 
 		return transaction;

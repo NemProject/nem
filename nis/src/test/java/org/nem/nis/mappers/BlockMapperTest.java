@@ -304,6 +304,7 @@ public class BlockMapperTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMultisigTransactionsWithSigners();
+		context.signModel();
 		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Act:

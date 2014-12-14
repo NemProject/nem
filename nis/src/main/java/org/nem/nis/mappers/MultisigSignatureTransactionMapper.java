@@ -3,12 +3,15 @@ package org.nem.nis.mappers;
 import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.MultisigSignature;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigTransaction;
 
 public class MultisigSignatureTransactionMapper {
-	static MultisigSignature toDbModel(org.nem.nis.dbmodel.Account sender, MultisigSignatureTransaction model) {
+	static MultisigSignature toDbModel(final MultisigTransaction multisigTransaction, final AccountDaoLookup accountDaoLookup, final MultisigSignatureTransaction model) {
 		final MultisigSignature dbModel = new MultisigSignature();
 
 		final Hash txHash = HashUtils.calculateHash(model);
@@ -17,19 +20,25 @@ public class MultisigSignatureTransactionMapper {
 		dbModel.setFee(model.getFee().getNumMicroNem());
 		dbModel.setTimeStamp(model.getTimeStamp().getRawTime());
 		dbModel.setDeadline(model.getDeadline().getRawTime());
-		dbModel.setSender(sender);
+		dbModel.setSender(accountDaoLookup.findByAddress(model.getSigner().getAddress()));
 		dbModel.setSenderProof(model.getSignature().getBytes());
+
+		dbModel.setMultisigTransaction(multisigTransaction);
 		return dbModel;
 	}
 
-	static MultisigSignatureTransaction toModel(final MultisigSignature multisigSignature, final AccountLookup accountLookup, final Transaction otherTransaction) {
+	static MultisigSignatureTransaction toModel(final MultisigSignature multisigSignature, final AccountLookup accountLookup, final org.nem.core.model.MultisigTransaction multisigTransaction) {
 		final Address cosignerAddress = AccountToAddressMapper.toAddress(multisigSignature.getSender());
 		final Account cosigner = accountLookup.findByAddress(cosignerAddress);
 
-		return new MultisigSignatureTransaction(
+		final MultisigSignatureTransaction transaction= new MultisigSignatureTransaction(
 				new TimeInstant(multisigSignature.getTimeStamp()),
 				cosigner,
-				HashUtils.calculateHash(otherTransaction)
+				multisigTransaction.getOtherTransactionHash()
 		);
+		transaction.setFee(Amount.fromMicroNem(multisigSignature.getFee()));
+		transaction.setDeadline(new TimeInstant(multisigSignature.getDeadline()));
+		transaction.setSignature(new Signature(multisigSignature.getSenderProof()));
+		return transaction;
 	}
 }
