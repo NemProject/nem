@@ -14,8 +14,10 @@
   </security>
   <update check="always" policy="always"></update>
   <resources>
-    <java version="1.8+" java-vm-args="-esa -Xnoclassgc"/>
+    <java version="1.8+" java-vm-args="-Xms512M -Xmx1G -esa -Xnoclassgc"/>
     $dependencies
+    <!-- client-download-marker -->
+
 <!-- Progress Bar add download="progress" -->
 </resources>
   <application-desc main-class="$mainClass" progress-class="org.nem.client.download.SplashProgressBar">
