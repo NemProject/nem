@@ -1,11 +1,10 @@
 package org.nem.nis.cache;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.*;
+import org.nem.core.model.HashMetaDataPair;
 import org.nem.core.time.TimeInstant;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * A transaction hash cache.

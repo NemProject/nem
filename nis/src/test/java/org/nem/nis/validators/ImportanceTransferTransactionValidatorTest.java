@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.DebitPredicates;
 

@@ -2,7 +2,7 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.WeightedBalances;
 
 /**

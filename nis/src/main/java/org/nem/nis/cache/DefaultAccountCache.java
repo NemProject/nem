@@ -48,7 +48,6 @@ public class DefaultAccountCache implements AccountCache, CopyableCache<DefaultA
 		});
 	}
 
-
 	@Override
 	public void removeFromCache(final Address address) {
 		this.addressToAccountMap.remove(address);

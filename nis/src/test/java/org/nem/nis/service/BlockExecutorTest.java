@@ -394,7 +394,7 @@ public class BlockExecutorTest {
 	private static class ExecutorTestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.accountStateCache) ;
+		private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.accountStateCache);
 		private final BlockExecutor executor = new BlockExecutor(this.nisCache);
 
 		private Account addAccount() {

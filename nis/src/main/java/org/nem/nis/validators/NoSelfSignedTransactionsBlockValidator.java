@@ -1,8 +1,8 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.state.ReadOnlyAccountState;
 
 /**
  * Validator that checks the block signer and rejects a block if any transactions are self-signed.

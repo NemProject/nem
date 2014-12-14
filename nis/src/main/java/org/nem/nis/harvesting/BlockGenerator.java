@@ -6,7 +6,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.state.*;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.BlockValidator;
 
 import java.math.BigInteger;

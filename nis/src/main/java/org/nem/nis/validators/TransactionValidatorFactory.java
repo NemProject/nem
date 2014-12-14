@@ -1,8 +1,8 @@
 package org.nem.nis.validators;
 
-import org.nem.nis.cache.*;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.*;
+import org.nem.nis.poi.PoiOptions;
 
 import java.util.function.Consumer;
 

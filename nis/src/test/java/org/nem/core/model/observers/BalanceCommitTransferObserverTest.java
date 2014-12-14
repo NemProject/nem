@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 
 public class BalanceCommitTransferObserverTest {

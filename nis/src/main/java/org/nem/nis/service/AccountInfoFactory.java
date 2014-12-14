@@ -3,7 +3,7 @@ package org.nem.nis.service;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

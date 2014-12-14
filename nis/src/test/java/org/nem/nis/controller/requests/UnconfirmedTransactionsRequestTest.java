@@ -76,7 +76,7 @@ public class UnconfirmedTransactionsRequestTest {
 
 		private List<Transaction> createTransactions(final int count) {
 			final List<Transaction> list = new ArrayList<>();
-			for (int i=0; i<count; i++) {
+			for (int i = 0; i < count; i++) {
 				list.add(new MockTransaction(new TimeInstant(i)));
 			}
 

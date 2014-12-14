@@ -6,7 +6,6 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>> {
 
@@ -16,7 +15,6 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	 * @return The account cache.
 	 */
 	protected abstract T createAccountCache();
-
 
 	//region addAccountToCache
 

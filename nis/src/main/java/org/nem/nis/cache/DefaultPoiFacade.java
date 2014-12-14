@@ -1,12 +1,12 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
+import org.nem.core.model.NemesisBlock;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.*;
-import org.nem.nis.state.*;
+import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.state.AccountState;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**

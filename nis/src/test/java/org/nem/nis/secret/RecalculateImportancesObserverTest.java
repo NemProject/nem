@@ -1,12 +1,11 @@
 package org.nem.nis.secret;
 
-import org.junit.*;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class RecalculateImportancesObserverTest {
 		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poiFacade);
 		private final BlockTransactionObserver observer = new RecalculateImportancesObserver(this.nisCache);
 
-		public TestContext(){
+		public TestContext() {
 			Mockito.when(this.accountStateCache.mutableContents()).thenReturn(new CacheContents<>(new ArrayList<>()));
 		}
 	}

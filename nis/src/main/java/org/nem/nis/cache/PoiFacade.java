@@ -1,7 +1,7 @@
 package org.nem.nis.cache;
 
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.state.*;
+import org.nem.nis.state.AccountState;
 
 import java.util.Collection;
 

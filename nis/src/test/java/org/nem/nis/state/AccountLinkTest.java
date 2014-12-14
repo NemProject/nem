@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.nis.state.AccountLink;
 import org.nem.nis.test.NisUtils;
 
 public class AccountLinkTest {

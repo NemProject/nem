@@ -1,8 +1,8 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.*;
+import org.nem.core.model.HashMetaDataPair;
 import org.nem.core.model.observers.*;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.HashCache;
 
 import java.util.stream.Collectors;
 

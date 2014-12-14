@@ -5,7 +5,6 @@ import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * A synchronized hash cache implementation.
@@ -22,7 +21,6 @@ public class SynchronizedHashCache implements HashCache, CopyableCache<Synchroni
 	public SynchronizedHashCache(final DefaultHashCache cache) {
 		this.cache = cache;
 	}
-
 
 	@Override
 	public void prune(final TimeInstant timeStamp) {

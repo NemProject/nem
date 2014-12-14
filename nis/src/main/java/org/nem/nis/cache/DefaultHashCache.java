@@ -6,7 +6,6 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 /**
  * General class for holding hashes and checking for duplicate hashes. Supports pruning.

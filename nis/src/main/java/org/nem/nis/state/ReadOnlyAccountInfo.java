@@ -34,5 +34,4 @@ public interface ReadOnlyAccountInfo {
 	 * @return The reference count.
 	 */
 	public ReferenceCount getReferenceCount();
-
 }
