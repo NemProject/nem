@@ -185,6 +185,8 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		// TODO 20141213 J-G: you're right that this only works for a single level;
 		// > should be good enough for now, but i might change it later ^^
 		// > hopefully this unblocks you
+		// TODO 20141214 G-J: caught you! someone wasn't running the tests :>
+		// VerifiableEntityTest are broken now :]
 	}
 
 	/**
