@@ -3,7 +3,8 @@ package org.nem.nis.secret;
 import org.nem.core.model.Account;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.state.*;
 
 import java.math.BigInteger;
 
@@ -11,15 +12,15 @@ import java.math.BigInteger;
  * A block transaction observer that updates outlink information.
  */
 public class OutlinkObserver implements BlockTransactionObserver {
-	private final PoiFacade poiFacade;
+	private final AccountStateCache accountStateCache;
 
 	/**
 	 * Creates a new observer.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accountStateCache The account state cache.
 	 */
-	public OutlinkObserver(final PoiFacade poiFacade) {
-		this.poiFacade = poiFacade;
+	public OutlinkObserver(final AccountStateCache accountStateCache) {
+		this.accountStateCache = accountStateCache;
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class OutlinkObserver implements BlockTransactionObserver {
 	}
 
 	private Amount calculateLinkWeight(final BlockHeight height, final Account sender, final Amount amount) {
-		final WeightedBalances weightedBalances = this.getState(sender).getWeightedBalances();
+		final ReadOnlyWeightedBalances weightedBalances = this.getState(sender).getWeightedBalances();
 		final BigInteger vested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getVested(height)));
 		final BigInteger unvested = BigInteger.valueOf(getNumMicroNem(weightedBalances.getUnvested(height)));
 		if (unvested.compareTo(BigInteger.ZERO) <= 0) {
@@ -68,8 +69,8 @@ public class OutlinkObserver implements BlockTransactionObserver {
 		return Amount.fromMicroNem(rawAdjustedWeight);
 	}
 
-	private PoiAccountState getState(final Account account) {
-		return this.poiFacade.findStateByAddress(account.getAddress());
+	private AccountState getState(final Account account) {
+		return this.accountStateCache.findStateByAddress(account.getAddress());
 	}
 
 	private static long getNumMicroNem(final Amount amount) {

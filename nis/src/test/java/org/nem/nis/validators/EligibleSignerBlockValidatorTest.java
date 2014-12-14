@@ -5,8 +5,8 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.*;
-import org.nem.nis.remote.RemoteLink;
+import org.nem.nis.cache.AccountStateCache;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
 public class EligibleSignerBlockValidatorTest {
@@ -76,15 +76,15 @@ public class EligibleSignerBlockValidatorTest {
 		final int changeHeight = 5;
 		final Block block = NisUtils.createRandomBlockWithHeight(changeHeight + blockHeight);
 
-		final PoiAccountState accountState = new PoiAccountState(block.getSigner().getAddress());
+		final AccountState accountState = new AccountState(block.getSigner().getAddress());
 		if (null != owner) {
 			accountState.getRemoteLinks().addLink(new RemoteLink(block.getSigner().getAddress(), new BlockHeight(changeHeight), mode, owner));
 		}
 
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-		Mockito.when(poiFacade.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
+		final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		Mockito.when(accountStateCache.findStateByAddress(block.getSigner().getAddress())).thenReturn(accountState);
 
-		final BlockValidator validator = new EligibleSignerBlockValidator(poiFacade);
+		final BlockValidator validator = new EligibleSignerBlockValidator(accountStateCache);
 
 		// Act:
 		final ValidationResult result = validator.validate(block);

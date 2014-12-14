@@ -3,11 +3,10 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.HashCache;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.NisCache;
-import org.nem.nis.poi.*;
+import org.nem.nis.cache.*;
+import org.nem.nis.poi.PoiOptions;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final SingleTransactionValidator validator = factory.create(Mockito.mock(NisCache.class));
+		final SingleTransactionValidator validator = factory.create(Mockito.mock(ReadOnlyNisCache.class));
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
@@ -32,7 +31,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final SingleTransactionValidator validator = factory.createSingle(Mockito.mock(PoiFacade.class));
+		final SingleTransactionValidator validator = factory.createSingle(Mockito.mock(ReadOnlyAccountStateCache.class));
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
@@ -44,7 +43,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final BatchTransactionValidator validator = factory.createBatch(Mockito.mock(HashCache.class));
+		final BatchTransactionValidator validator = factory.createBatch(Mockito.mock(DefaultHashCache.class));
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
@@ -62,7 +61,7 @@ public class TransactionValidatorFactoryTest {
 
 		// Act:
 		final List<SingleTransactionValidator> validators = new ArrayList<>();
-		factory.visitSingleSubValidators(validators::add, Mockito.mock(PoiFacade.class));
+		factory.visitSingleSubValidators(validators::add, Mockito.mock(ReadOnlyAccountStateCache.class));
 
 		// Assert:
 		Assert.assertThat(
@@ -79,7 +78,7 @@ public class TransactionValidatorFactoryTest {
 
 		// Act:
 		final List<BatchTransactionValidator> validators = new ArrayList<>();
-		factory.visitBatchSubValidators(validators::add, Mockito.mock(HashCache.class));
+		factory.visitBatchSubValidators(validators::add, Mockito.mock(DefaultHashCache.class));
 
 		// Assert:
 		Assert.assertThat(

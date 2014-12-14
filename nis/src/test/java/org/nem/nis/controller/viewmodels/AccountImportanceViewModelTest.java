@@ -5,7 +5,7 @@ import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
-import org.nem.nis.secret.AccountImportance;
+import org.nem.nis.state.*;
 
 public class AccountImportanceViewModelTest {
 
@@ -15,7 +15,7 @@ public class AccountImportanceViewModelTest {
 	public void viewModelCanBeCreated() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountImportance importance = new AccountImportance();
+		final ReadOnlyAccountImportance importance = new AccountImportance();
 
 		// Act:
 		final AccountImportanceViewModel viewModel = new AccountImportanceViewModel(address, importance);
@@ -115,7 +115,7 @@ public class AccountImportanceViewModelTest {
 	//endregion
 
 	private static AccountImportanceViewModel createViewModel(final String encodedAddress) {
-		final AccountImportance importance = new AccountImportance();
+		final ReadOnlyAccountImportance importance = new AccountImportance();
 		return new AccountImportanceViewModel(Address.fromEncoded(encodedAddress), importance);
 	}
 

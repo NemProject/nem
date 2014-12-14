@@ -4,11 +4,12 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.DeserializationContext;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.poi.PoiAccountState;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,6 +28,13 @@ public class BlockAnalyzer {
 	private final BlockChainScoreManager blockChainScoreManager;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 
+	/**
+	 * Creates a new block analyzer.
+	 *
+	 * @param blockDao The block dao.
+	 * @param blockChainScoreManager The block chain score manager.
+	 * @param blockChainLastBlockLayer The block chain last block layer.
+	 */
 	@Autowired(required = true)
 	public BlockAnalyzer(
 			final BlockDao blockDao,
@@ -37,10 +45,23 @@ public class BlockAnalyzer {
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 
+	/**
+	 * Analyzes all blocks in the database.
+	 *
+	 * @param nisCache The cache.
+	 * @return true if the analysis succeeded.
+	 */
 	public boolean analyze(final NisCache nisCache) {
 		return this.analyze(nisCache, null);
 	}
 
+	/**
+	 * Analyzes all blocks in the database up to the specified height.
+	 *
+	 * @param nisCache The cache.
+	 * @param maxHeight The max height.
+	 * @return true if the analysis succeeded.
+	 */
 	public boolean analyze(final NisCache nisCache, final Long maxHeight) {
 		final Block nemesisBlock = this.loadNemesisBlock(nisCache);
 		final Hash nemesisBlockHash = HashUtils.calculateHash(nemesisBlock);
@@ -84,12 +105,12 @@ public class BlockAnalyzer {
 
 			// fully vest all transactions coming out of the nemesis block
 			if (null == parentBlock) {
-				for (final Account account : accountCache) {
+				for (final Account account : accountCache.contents()) {
 					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
 						continue;
 					}
 
-					final PoiAccountState accountState = nisCache.getPoiFacade().findStateByAddress(account.getAddress());
+					final AccountState accountState = nisCache.getAccountStateCache().findStateByAddress(account.getAddress());
 					accountState.getWeightedBalances().convertToFullyVested();
 				}
 			}
@@ -110,7 +131,6 @@ public class BlockAnalyzer {
 			}
 		} while (dbBlock != null);
 
-		this.initializePoi(nisCache, parentBlock.getHeight());
 		return true;
 	}
 
@@ -153,21 +173,11 @@ public class BlockAnalyzer {
 		}
 	}
 
-	private void initializePoi(final NisCache nisCache, final BlockHeight height) {
-		LOGGER.info("Analyzed blocks: " + height);
-		LOGGER.info("Known accounts: " + nisCache.getAccountCache().size());
-		LOGGER.info(String.format("Initializing PoI for (%d) accounts", nisCache.getAccountCache().size()));
-		final BlockHeight blockHeight = BlockScorer.getGroupedHeight(height);
-		nisCache.getPoiFacade().recalculateImportances(blockHeight);
-		LOGGER.info("PoI initialized");
-	}
-
 	private NemesisBlock loadNemesisBlock(final NisCache nisCache) {
-		// TODO 20141210 J-*: why is this function in two places (also in NisMain)
 		// set up the nemesis block amounts
 		nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
 
-		final PoiAccountState nemesisState = nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
+		final AccountState nemesisState = nisCache.getAccountStateCache().findStateByAddress(NemesisBlock.ADDRESS);
 		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
 		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
 		nemesisState.setHeight(BlockHeight.ONE);
@@ -176,37 +186,12 @@ public class BlockAnalyzer {
 		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
 	}
 
-	// TODO 20141030: figure out if this should be integrated here or stay in main
-
-	//private void logNemesisInformation() {
-	//	LOGGER.info("nemesis block hash:" + this.nemesisBlockHash);
-	//
-	//	final KeyPair nemesisKeyPair = this.nemesisBlock.getSigner().getKeyPair();
-	//	final Address nemesisAddress = this.nemesisBlock.getSigner().getAddress();
-	//	LOGGER.info("nemesis account private key          : " + nemesisKeyPair.getPrivateKey());
-	//	LOGGER.info("nemesis account            public key: " + nemesisKeyPair.getPublicKey());
-	//	LOGGER.info("nemesis account compressed public key: " + nemesisAddress.getEncoded());
-	//	LOGGER.info("nemesis account generation hash      : " + this.nemesisBlock.getGenerationHash());
-	//}
-
-	//private void populateDb() {
-	//	if (0 != this.blockDao.count()) {
-	//		return;
-	//	}
-	//
-	//	this.saveBlock(this.nemesisBlock);
-	//}
-	//
-	//private org.nem.nis.dbmodel.Block saveBlock(final Block block) {
-	//	org.nem.nis.dbmodel.Block dbBlock;
-	//
-	//	dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
-	//	if (null != dbBlock) {
-	//		return dbBlock;
-	//	}
-	//
-	//	dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-	//	this.blockDao.save(dbBlock);
-	//	return dbBlock;
-	//}
+	/**
+	 * Loads the nemesis block.
+	 *
+	 * @return The nemesis block
+	 */
+	public NemesisBlock loadNemesisBlock() {
+		return NemesisBlock.fromResource(new DeserializationContext(new DefaultAccountCache()));
+	}
 }

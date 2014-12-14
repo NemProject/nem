@@ -7,9 +7,10 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.*;
-import org.nem.nis.poi.*;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.BlockChainConstants;
+import org.nem.nis.cache.*;
+import org.nem.nis.state.AccountState;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.security.SecureRandom;
@@ -719,7 +720,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		TimeInstant curTimeStamp = new TimeInstant(Integer.MAX_VALUE);
-		for (Transaction tx : mostRecentTransactions) {
+		for (final Transaction tx : mostRecentTransactions) {
 			Assert.assertThat(tx.getTimeStamp().compareTo(curTimeStamp) <= 0, IsEqual.equalTo(true));
 			curTimeStamp = tx.getTimeStamp();
 		}
@@ -1147,12 +1148,12 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
+		final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
-				factory.createSingle(poiFacade),
-				factory.createBatch(Mockito.mock(HashCache.class)),
-				poiFacade);
+				factory.createSingle(accountStateCache),
+				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
+				accountStateCache);
 	}
 
 	//endregion
@@ -1179,7 +1180,7 @@ public class UnconfirmedTransactionsTest {
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
-		private final PoiFacade poiFacade;
+		private final ReadOnlyAccountStateCache accountStateCache;
 
 		private TestContext() {
 			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
@@ -1193,21 +1194,23 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
-			this(singleValidator, batchValidator, Mockito.mock(PoiFacade.class));
+			this(singleValidator, batchValidator, Mockito.mock(ReadOnlyAccountStateCache.class));
 		}
 
-		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator, final PoiFacade poiFacade) {
+		private TestContext(
+				final SingleTransactionValidator singleValidator,
+				final BatchTransactionValidator batchValidator,
+				final ReadOnlyAccountStateCache accountStateCache) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
-			this.poiFacade = poiFacade;
+			this.accountStateCache = accountStateCache;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
-			final AccountCache accountCache = Mockito.mock(AccountCache.class);
-			final HashCache transactionHashCache = Mockito.mock(HashCache.class);
+			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(this.poiFacade)).thenReturn(this.singleValidator);
+			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					new NisCache(accountCache, this.poiFacade, transactionHashCache));
+					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache));
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {
@@ -1238,10 +1241,13 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private Account addAccount(final Amount amount) {
-			final Account account = Utils.generateRandomAccount();
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
+			return this.prepareAccount(Utils.generateRandomAccount(), amount);
+		}
+
+		private Account prepareAccount(final Account account, final Amount amount) {
+			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;
 		}
 
@@ -1249,12 +1255,7 @@ public class UnconfirmedTransactionsTest {
 			final List<MockTransaction> transactions = new ArrayList<>();
 
 			for (int i = startCustomField; i <= endCustomField; ++i) {
-				transactions.add(createMockTransaction(
-						Utils.generateRandomAccount(),
-						Amount.fromNem(1000),
-						i,
-						new TimeInstant(i),
-						Amount.fromNem(i)));
+				transactions.add(this.createMockTransaction(Utils.generateRandomAccount(), new TimeInstant(i), i));
 			}
 
 			return transactions;
@@ -1265,25 +1266,16 @@ public class UnconfirmedTransactionsTest {
 			final SecureRandom random = new SecureRandom();
 
 			for (int i = 0; i < count; ++i) {
-				// TODO 20141213 J-B: might want another createMockTransaction overload with fewer parameters as multiple parameters here are same as above
-				transactions.add(createMockTransaction(account, Amount.fromNem(1000), i, new TimeInstant(random.nextInt(1_000_000)), Amount.fromNem(i)));
+				transactions.add(this.createMockTransaction(account, new TimeInstant(random.nextInt(1_000_000)), i));
 			}
 
 			return transactions;
 		}
 
-		private MockTransaction createMockTransaction(
-				final Account account,
-				final Amount amount,
-				final int customField,
-				final TimeInstant timeStamp,
-				final Amount fee) {
-			// TODO 20141213 J-B: can you call add account?
-			final PoiAccountState accountState = new PoiAccountState(account.getAddress());
-			accountState.getAccountInfo().incrementBalance(amount);
-			Mockito.when(this.poiFacade.findStateByAddress(account.getAddress())).thenReturn(accountState);
+		private MockTransaction createMockTransaction(final Account account, final TimeInstant timeStamp, final int customField) {
+			this.prepareAccount(account, Amount.fromNem(1000));
 			final MockTransaction transaction = new MockTransaction(account, customField, timeStamp);
-			transaction.setFee(fee);
+			transaction.setFee(Amount.fromNem(customField));
 			return transaction;
 		}
 

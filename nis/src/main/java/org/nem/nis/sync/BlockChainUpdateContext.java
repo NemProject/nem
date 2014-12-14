@@ -3,7 +3,9 @@ package org.nem.nis.sync;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.*;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
@@ -21,7 +23,7 @@ public class BlockChainUpdateContext {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdateContext.class.getName());
 
 	private final NisCache nisCache;
-	private final NisCache originalNisCache;
+	private final ReadOnlyNisCache originalNisCache;
 	private final BlockScorer blockScorer;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
@@ -35,7 +37,7 @@ public class BlockChainUpdateContext {
 
 	public BlockChainUpdateContext(
 			final NisCache nisCache,
-			final NisCache originalNisCache,
+			final ReadOnlyNisCache originalNisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
@@ -47,7 +49,7 @@ public class BlockChainUpdateContext {
 
 		this.nisCache = nisCache;
 		this.originalNisCache = originalNisCache;
-		this.blockScorer = new BlockScorer(this.nisCache.getPoiFacade());
+		this.blockScorer = new BlockScorer(this.nisCache.getAccountStateCache());
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
@@ -129,7 +131,8 @@ public class BlockChainUpdateContext {
 	 * 4. update db with "peer's" chain
 	 */
 	private void updateOurChain() {
-		this.nisCache.shallowCopyTo(this.originalNisCache);
+		// copy back changes into the "real" nis cache
+		this.nisCache.commit();
 
 		if (this.hasOwnChain) {
 			// mind that we're using "new" (replaced) accountAnalyzer
@@ -153,7 +156,7 @@ public class BlockChainUpdateContext {
 	private void addRevertedTransactionsAsUnconfirmed(
 			final Set<Hash> transactionHashes,
 			final long wantedHeight,
-			final AccountCache accountCache) {
+			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
 		while (currentHeight != wantedHeight) {

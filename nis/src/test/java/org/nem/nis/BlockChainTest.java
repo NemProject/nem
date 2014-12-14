@@ -9,13 +9,14 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.deploy.NisConfiguration;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.state.AccountInfo;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.TransactionValidatorFactory;
@@ -69,7 +70,7 @@ public class BlockChainTest {
 
 	private Vector<Account> prepareSigners(final NisCache nisCache) {
 		final AccountCache accountCache = nisCache.getAccountCache();
-		final PoiFacade poiFacade = nisCache.getPoiFacade();
+		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final Vector<Account> accounts = new Vector<>();
 
 		Account a;
@@ -77,12 +78,12 @@ public class BlockChainTest {
 		// 0 = signer
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		setBalance(a, Amount.fromNem(1_000_000_000), accountCache, poiFacade);
+		setBalance(a, Amount.fromNem(1_000_000_000), accountCache, accountStateCache);
 
 		// 1st sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		setBalance(a, Amount.fromNem(1_000), accountCache, poiFacade);
+		setBalance(a, Amount.fromNem(1_000), accountCache, accountStateCache);
 
 		// 1st recipient
 		a = Utils.generateRandomAccount();
@@ -92,7 +93,7 @@ public class BlockChainTest {
 		// 2nd sender
 		a = Utils.generateRandomAccount();
 		accounts.add(a);
-		setBalance(a, Amount.fromNem(1_000), accountCache, poiFacade);
+		setBalance(a, Amount.fromNem(1_000), accountCache, accountStateCache);
 
 		// 2nd recipient
 		a = Utils.generateRandomAccount();
@@ -102,8 +103,8 @@ public class BlockChainTest {
 		return accounts;
 	}
 
-	private static void setBalance(final Account account, final Amount amount, final AccountCache accountCache, final PoiFacade poiFacade) {
-		final AccountInfo accountInfo = poiFacade.findStateByAddress(account.getAddress()).getAccountInfo();
+	private static void setBalance(final Account account, final Amount amount, final AccountCache accountCache, final AccountStateCache accountStateCache) {
+		final AccountInfo accountInfo = accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
 		accountInfo.incrementBalance(amount);
 		accountCache.addAccountToCache(account.getAddress());
 
@@ -112,26 +113,29 @@ public class BlockChainTest {
 		accountInfo.incrementReferenceCount();
 
 		accountInfo.incrementBalance(amount);
-		poiFacade.findStateByAddress(account.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, amount);
+		accountStateCache.findStateByAddress(account.getAddress()).getWeightedBalances().addReceive(BlockHeight.ONE, amount);
 	}
 
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithSameScoreGetsRejectedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
+		final DefaultPoiFacade poiFacade = new DefaultPoiFacade((blockHeight, accountStates) ->
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = new NisCache(new AccountCache(), poiFacade, new HashCache());
-		final List<Account> accounts = this.prepareSigners(nisCache);
+		final ReadOnlyNisCache nisCache = NisCacheFactory.createReal(poiFacade);
+		final NisCache mutableNisCache = nisCache.copy();
+		final List<Account> accounts = this.prepareSigners(mutableNisCache);
 		for (final Account account : accounts) {
-			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			mutableNisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
+
+		mutableNisCache.commit();
 
 		final Account signer = accounts.get(0);
 
 		final Block parentBlock = createBlock(signer, nisCache.getAccountCache());
-		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(nisCache.getAccountStateCache());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = this.createBlockForTests(accounts, nisCache.getAccountCache(), blocks, scorer);
@@ -183,9 +187,9 @@ public class BlockChainTest {
 		// TODO: add all sorts of different checks
 		Assert.assertTrue(result == ValidationResult.SUCCESS);
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(290)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(290)));
 
 		// siblings with same score must be rejected
 		// Act:
@@ -202,20 +206,23 @@ public class BlockChainTest {
 	@Test
 	public void canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards() throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final PoiFacade poiFacade = new PoiFacade((blockHeight, accountStates) ->
+		final DefaultPoiFacade poiFacade = new DefaultPoiFacade((blockHeight, accountStates) ->
 				accountStates.stream()
 						.forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 
-		final NisCache nisCache = new NisCache(new AccountCache(), poiFacade, new HashCache());
-		final List<Account> accounts = this.prepareSigners(nisCache);
+		final ReadOnlyNisCache nisCache = NisCacheFactory.createReal(poiFacade);
+		final NisCache mutableNisCache = nisCache.copy();
+		final List<Account> accounts = this.prepareSigners(mutableNisCache);
 		for (final Account account : accounts) {
-			nisCache.getPoiFacade().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
+			mutableNisCache.getAccountStateCache().findStateByAddress(account.getAddress()).setHeight(BlockHeight.ONE);
 		}
+
+		mutableNisCache.commit();
 
 		final Account signer = accounts.get(0);
 
 		final Block parentBlock = createBlock(signer, nisCache.getAccountCache());
-		final BlockScorer scorer = new BlockScorer(nisCache.getPoiFacade());
+		final BlockScorer scorer = new BlockScorer(nisCache.getAccountStateCache());
 		final List<Block> blocks = new LinkedList<>();
 		blocks.add(parentBlock);
 		final Block block = this.createBlockForTests(accounts, nisCache.getAccountCache(), blocks, scorer);
@@ -270,9 +277,9 @@ public class BlockChainTest {
 		// TODO: add all sorts of different checks
 		Assert.assertTrue(result == ValidationResult.SUCCESS);
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(0);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		transaction = (TransferTransaction)savedBlock.getTransactions().get(1);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(290)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(290)));
 
 		// siblings with same score must be rejected
 		// Act:
@@ -282,13 +289,13 @@ public class BlockChainTest {
 
 		// Assert:
 		transaction = (TransferTransaction)savedBlock2.getTransactions().get(0);
-		Assert.assertThat(getRecipientBalance(poiFacade, transaction), IsEqual.equalTo(Amount.fromNem(17)));
+		Assert.assertThat(getRecipientBalance(nisCache.getAccountStateCache(), transaction), IsEqual.equalTo(Amount.fromNem(17)));
 		Assert.assertTrue(nisCache.getAccountCache().isKnownAddress(transaction.getRecipient().getAddress()));
 		Assert.assertTrue(siblingResult == ValidationResult.SUCCESS);
 	}
 
-	private static Amount getRecipientBalance(final PoiFacade poiFacade, final TransferTransaction transferTransaction) {
-		return poiFacade.findStateByAddress(transferTransaction.getRecipient().getAddress()).getAccountInfo().getBalance();
+	private static Amount getRecipientBalance(final ReadOnlyAccountStateCache accountStateCache, final TransferTransaction transferTransaction) {
+		return accountStateCache.findStateByAddress(transferTransaction.getRecipient().getAddress()).getAccountInfo().getBalance();
 	}
 
 	private org.nem.nis.dbmodel.Account retrieveAccount(final long i, final Account signer) {
@@ -345,7 +352,7 @@ public class BlockChainTest {
 		return blocks.stream().map(VerifiableEntity::getTimeStamp).collect(Collectors.toList());
 	}
 
-	private Block createBlockForTests(final List<Account> accounts, final AccountCache accountCache, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
+	private Block createBlockForTests(final List<Account> accounts, final AccountLookup accountCache, final List<Block> blocks, final BlockScorer scorer) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
 		final Block lastBlock = blocks.get(blocks.size() - 1);
 		final Account forger = accounts.get(0);

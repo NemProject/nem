@@ -6,7 +6,7 @@ import org.nem.core.math.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.poi.graph.*;
-import org.nem.nis.secret.*;
+import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
 import java.util.*;
@@ -25,7 +25,7 @@ public class PoiContextTest {
 		final List<TestAccountInfo> accountInfos = Arrays.asList();
 
 		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
+		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> createPoiContext(accountStates, height), IllegalArgumentException.class);
@@ -40,7 +40,7 @@ public class PoiContextTest {
 				new TestAccountInfo(multiplier - 1, null)); // non-foraging account
 
 		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
+		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// Act:
 		ExceptionAssert.assertThrows(v -> createPoiContext(accountStates, height), IllegalArgumentException.class);
@@ -248,7 +248,7 @@ public class PoiContextTest {
 	public void canUpdateFilteredAccountsWithCompatiblePageRankVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
+		final List<AccountState> accountStates = createDefaultTestAccountStates(height);
 		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Act:
@@ -266,7 +266,7 @@ public class PoiContextTest {
 	public void canUpdateFilteredAccountsWithCompatibleImportanceVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
+		final List<AccountState> accountStates = createDefaultTestAccountStates(height);
 		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Act:
@@ -276,7 +276,7 @@ public class PoiContextTest {
 		// - accounts without harvesting power are given 0 importance
 		final List<Double> importances = accountStates.stream()
 				.map(a -> {
-					final AccountImportance ai = a.getImportanceInfo();
+					final ReadOnlyAccountImportance ai = a.getImportanceInfo();
 					return ai.isSet() ? ai.getImportance(height) : 0.0;
 				})
 				.collect(Collectors.toList());
@@ -287,7 +287,7 @@ public class PoiContextTest {
 	public void cannotUpdateFilteredAccountsWithIncompatiblePageRankVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
+		final List<AccountState> accountStates = createDefaultTestAccountStates(height);
 		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Assert:
@@ -303,7 +303,7 @@ public class PoiContextTest {
 	public void cannotUpdateFilteredAccountsWithIncompatibleImportanceVector() {
 		// Arrange:
 		final BlockHeight height = new BlockHeight(17);
-		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
+		final List<AccountState> accountStates = createDefaultTestAccountStates(height);
 		final PoiContext context = createPoiContext(accountStates, height);
 
 		// Assert:
@@ -323,20 +323,20 @@ public class PoiContextTest {
 
 	private static void addAccountLink(
 			final BlockHeight height,
-			final PoiAccountState sender,
-			final PoiAccountState recipient,
+			final AccountState sender,
+			final AccountState recipient,
 			final int weight) {
 		final Amount amount = Amount.fromMicroNem(weight * MIN_OUTLINK_WEIGHT);
 		final AccountLink link = new AccountLink(height, amount, recipient.getAddress());
 		sender.getImportanceInfo().addOutlink(link);
 	}
 
-	private static List<PoiAccountState> createTestPoiAccountStates(
+	private static List<AccountState> createTestPoiAccountStates(
 			final List<TestAccountInfo> accountInfos,
 			final BlockHeight height) {
-		final List<PoiAccountState> accountStates = new ArrayList<>();
+		final List<AccountState> accountStates = new ArrayList<>();
 		for (final TestAccountInfo info : accountInfos) {
-			final PoiAccountState state = new PoiAccountState(Utils.generateRandomAddress());
+			final AccountState state = new AccountState(Utils.generateRandomAddress());
 			state.getWeightedBalances().addFullyVested(height, Amount.fromMicroNem(info.vestedBalance));
 
 			for (final int amount : info.amounts) {
@@ -350,7 +350,7 @@ public class PoiContextTest {
 		return accountStates;
 	}
 
-	private static List<PoiAccountState> createDefaultTestAccountStates(final BlockHeight height) {
+	private static List<AccountState> createDefaultTestAccountStates(final BlockHeight height) {
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
 				new TestAccountInfo(3 * MIN_HARVESTING_BALANCE - 1, null),
 				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, new int[] { 1 }), // 1 (insufficient balance)
@@ -387,11 +387,11 @@ public class PoiContextTest {
 
 	private static PoiContext createPoiContextWithDefaultTestAccountStates() {
 		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createDefaultTestAccountStates(height);
+		final List<AccountState> accountStates = createDefaultTestAccountStates(height);
 		return createPoiContext(accountStates, height);
 	}
 
-	private static PoiContext createPoiContext(final List<PoiAccountState> accountStates, final BlockHeight height) {
+	private static PoiContext createPoiContext(final List<AccountState> accountStates, final BlockHeight height) {
 		return new PoiContext(accountStates, height, DEFAULT_OPTIONS);
 	}
 
@@ -409,7 +409,7 @@ public class PoiContextTest {
 				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, null)); // non-foraging account
 
 		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
+		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// set up account links
 		addAccountLink(height, accountStates.get(0), accountStates.get(1), 8);
@@ -440,7 +440,7 @@ public class PoiContextTest {
 		}
 
 		final BlockHeight height = new BlockHeight(21);
-		final List<PoiAccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
+		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
 
 		// set up account links
 		for (int i = 0; i < matrix.getRowCount(); ++i) {

@@ -69,14 +69,14 @@ public class UnconfirmedTransactionsRequestTest {
 		private TestContext(final int count) {
 			this.transactions = this.createTransactions(count);
 			this.request = new UnconfirmedTransactionsRequest(this.transactions);
-			this.hashShortIds = transactions.stream()
+			this.hashShortIds = this.transactions.stream()
 					.map(t -> new HashShortId(HashUtils.calculateHash(t).getShortId()))
 					.collect(Collectors.toList());
 		}
 
 		private List<Transaction> createTransactions(final int count) {
 			final List<Transaction> list = new ArrayList<>();
-			for (int i=0; i<count; i++) {
+			for (int i = 0; i < count; i++) {
 				list.add(new MockTransaction(new TimeInstant(i)));
 			}
 

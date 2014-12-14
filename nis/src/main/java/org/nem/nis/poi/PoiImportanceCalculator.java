@@ -3,6 +3,7 @@ package org.nem.nis.poi;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.poi.graph.InterLevelProximityMatrix;
+import org.nem.nis.state.AccountState;
 
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -41,7 +42,7 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	@Override
 	public void recalculate(
 			final BlockHeight blockHeight,
-			final Collection<PoiAccountState> accountStates) {
+			final Collection<AccountState> accountStates) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
 		final PoiContext context = new PoiContext(accountStates, blockHeight, this.options);

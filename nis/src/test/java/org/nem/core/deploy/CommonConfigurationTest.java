@@ -1,6 +1,6 @@
 package org.nem.core.deploy;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.node.NodeEndpoint;
 import org.nem.core.test.*;

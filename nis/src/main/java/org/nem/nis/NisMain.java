@@ -3,14 +3,12 @@ package org.nem.nis;
 import org.nem.core.crypto.*;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.poi.PoiAccountState;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -31,7 +29,7 @@ public class NisMain {
 
 	private final AccountDao accountDao;
 	private final BlockDao blockDao;
-	private final NisCache nisCache;
+	private final ReadOnlyNisCache nisCache;
 	private final NisPeerNetworkHost networkHost;
 	private final NisConfiguration nisConfiguration;
 	private final BlockAnalyzer blockAnalyzer;
@@ -40,7 +38,7 @@ public class NisMain {
 	public NisMain(
 			final AccountDao accountDao,
 			final BlockDao blockDao,
-			final NisCache nisCache,
+			final ReadOnlyNisCache nisCache,
 			final NisPeerNetworkHost networkHost,
 			final NisConfiguration nisConfiguration,
 			final BlockAnalyzer blockAnalyzer) {
@@ -53,22 +51,27 @@ public class NisMain {
 	}
 
 	private void analyzeBlocks() {
-		if (!this.blockAnalyzer.analyze(this.nisCache)) {
+		final NisCache nisCache = this.nisCache.copy();
+		if (!this.blockAnalyzer.analyze(nisCache)) {
 			System.exit(-1);
 		}
+
+		nisCache.commit();
 	}
 
 	@PostConstruct
 	private void init() {
 		LOGGER.warning("context ================== current: " + TIME_PROVIDER.getCurrentTime());
 
-		// load the nemesis block information
-		this.nemesisBlock = this.loadNemesisBlock();
+		// load the nemesis block information (but do not update the cache)
+		this.nemesisBlock = this.blockAnalyzer.loadNemesisBlock();
 		this.nemesisBlockHash = HashUtils.calculateHash(this.nemesisBlock);
 		this.logNemesisInformation();
 
+		// initialize the database
 		this.populateDb();
 
+		// analyze the blocks
 		this.analyzeBlocks();
 
 		final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
@@ -82,19 +85,6 @@ public class NisMain {
 		LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
 		this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
 		LOGGER.warning("auto-booted!");
-	}
-
-	private NemesisBlock loadNemesisBlock() {
-		// set up the nemesis block amounts
-		this.nisCache.getAccountCache().addAccountToCache(NemesisBlock.ADDRESS);
-
-		final PoiAccountState nemesisState = this.nisCache.getPoiFacade().findStateByAddress(NemesisBlock.ADDRESS);
-		nemesisState.getAccountInfo().incrementBalance(NemesisBlock.AMOUNT);
-		nemesisState.getWeightedBalances().addReceive(BlockHeight.ONE, NemesisBlock.AMOUNT);
-		nemesisState.setHeight(BlockHeight.ONE);
-
-		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(this.nisCache.getAccountCache().asAutoCache()));
 	}
 
 	private void logNemesisInformation() {

@@ -3,26 +3,26 @@ package org.nem.nis.validators;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.*;
-import org.nem.nis.poi.PoiFacade;
-import org.nem.nis.remote.*;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.state.*;
 
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
 public class ImportanceTransferTransactionValidator implements SingleTransactionValidator {
-	private final PoiFacade poiFacade;
+	private final ReadOnlyAccountStateCache accountStateCache;
 	private final Amount minHarvesterBalance;
 
 	/**
 	 * Creates a new validator.
 	 *
-	 * @param poiFacade The poi facade.
+	 * @param accountStateCache The account state cache.
 	 * @param minHarvesterBalance The minimum balance required for a harvester.
 	 */
 	public ImportanceTransferTransactionValidator(
-			final PoiFacade poiFacade,
+			final ReadOnlyAccountStateCache accountStateCache,
 			final Amount minHarvesterBalance) {
-		this.poiFacade = poiFacade;
+		this.accountStateCache = accountStateCache;
 		this.minHarvesterBalance = minHarvesterBalance;
 	}
 
@@ -46,20 +46,20 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 		return this.validateOwner(context.getBlockHeight(), transaction, context.getDebitPredicate());
 	}
 
-	private static boolean isRemoteActivated(final RemoteLinks remoteLinks) {
+	private static boolean isRemoteActivated(final ReadOnlyRemoteLinks remoteLinks) {
 		return !remoteLinks.isEmpty() && ImportanceTransferTransaction.Mode.Activate.value() == remoteLinks.getCurrent().getMode();
 	}
 
-	private static boolean isRemoteDeactivated(final RemoteLinks remoteLinks) {
+	private static boolean isRemoteDeactivated(final ReadOnlyRemoteLinks remoteLinks) {
 		return remoteLinks.isEmpty() || ImportanceTransferTransaction.Mode.Deactivate.value() == remoteLinks.getCurrent().getMode();
 	}
 
-	private static boolean isRemoteChangeWithinOneDay(final RemoteLinks remoteLinks, final BlockHeight height) {
+	private static boolean isRemoteChangeWithinOneDay(final ReadOnlyRemoteLinks remoteLinks, final BlockHeight height) {
 		return !remoteLinks.isEmpty() && height.subtract(remoteLinks.getCurrent().getEffectiveHeight()) < BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	}
 
 	private ValidationResult validateOwner(final BlockHeight height, final ImportanceTransferTransaction transaction, final DebitPredicate predicate) {
-		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getSigner().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
@@ -83,7 +83,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// second attack vector, user X announces account Y as his remote
 				// EVIL also announces Y as his remote... (handled by this.validateRemote and by BlockImportanceTransferValidator)
 				// again this cuts off X from harvesting
-				final Amount remoteBalance = this.poiFacade.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
+				final Amount remoteBalance = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
 				if (height.getRaw() >= BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
 					if (0 != remoteBalance.compareTo(Amount.ZERO)) {
 						return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
@@ -101,7 +101,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	private ValidationResult validateRemote(final BlockHeight height, final ImportanceTransferTransaction transaction) {
-		final RemoteLinks remoteLinks = this.poiFacade.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
+		final ReadOnlyRemoteLinks remoteLinks = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getRemoteLinks();
 		if (isRemoteChangeWithinOneDay(remoteLinks, height)) {
 			return ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS;
 		}
