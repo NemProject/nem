@@ -40,12 +40,12 @@ public class Harvester {
 	 * @return Best block that could be created by unlocked accounts.
 	 */
 	public Block harvestBlock() {
+		final TimeInstant blockTime = this.timeProvider.getCurrentTime();
+		this.generator.dropExpireTransactions(blockTime);
 		if (this.blockChainLastBlockLayer.getLastDbBlock() == null || this.unlockedAccounts.size() == 0) {
 			return null;
 		}
 
-		final TimeInstant blockTime = this.timeProvider.getCurrentTime();
-		this.generator.dropExpireTransactions(blockTime);
 		final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final Block lastBlock = BlockMapper.toModel(dbLastBlock, this.accountLookup);
 
