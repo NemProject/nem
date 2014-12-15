@@ -15,7 +15,7 @@ import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.logging.Logger;
 
 // TODO 20141030: this class needs tests
@@ -92,7 +92,7 @@ public class BlockAnalyzer {
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
-				.createExecuteCommitObserver(nisCache, BlockTransactionObserverFactory.Options.NoIncrementalPoi);
+				.createExecuteCommitObserver(nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
 

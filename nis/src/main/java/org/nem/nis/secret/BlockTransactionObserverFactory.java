@@ -3,28 +3,12 @@ package org.nem.nis.secret;
 import org.nem.core.model.observers.BalanceCommitTransferObserver;
 import org.nem.nis.cache.*;
 
+import java.util.EnumSet;
+
 /**
  * Factory for creating BlockTransactionObserver objects.
  */
 public class BlockTransactionObserverFactory {
-
-	// TODO 20141214 should probably improve the tests for this class to match the other factories.
-	// TODO 20141214 should use a real enum
-
-	/**
-	 * Options to customize the observers created by this factory.
-	 */
-	public static class Options {
-		/**
-		 * The default options.
-		 */
-		public final static int Default = 0;
-
-		/**
-		 * Excludes the incremental poi observer.
-		 */
-		public final static int NoIncrementalPoi = 1;
-	}
 
 	/**
 	 * Creates a block transaction observer that commits all changes in order.
@@ -34,7 +18,7 @@ public class BlockTransactionObserverFactory {
 	 * @return The observer.
 	 */
 	public BlockTransactionObserver createExecuteCommitObserver(final NisCache nisCache) {
-		return this.createExecuteCommitObserver(nisCache, Options.Default);
+		return this.createExecuteCommitObserver(nisCache, EnumSet.of(ObserverOption.Default));
 	}
 
 	/**
@@ -45,7 +29,7 @@ public class BlockTransactionObserverFactory {
 	 * @param options The options.
 	 * @return The observer.
 	 */
-	public BlockTransactionObserver createExecuteCommitObserver(final NisCache nisCache, final int options) {
+	public BlockTransactionObserver createExecuteCommitObserver(final NisCache nisCache, final EnumSet<ObserverOption> options) {
 		return this.createBuilder(nisCache, options).build();
 	}
 
@@ -57,7 +41,7 @@ public class BlockTransactionObserverFactory {
 	 * @return The observer.
 	 */
 	public BlockTransactionObserver createUndoCommitObserver(final NisCache nisCache) {
-		return this.createUndoCommitObserver(nisCache, Options.Default);
+		return this.createUndoCommitObserver(nisCache, EnumSet.of(ObserverOption.Default));
 	}
 
 	/**
@@ -68,11 +52,11 @@ public class BlockTransactionObserverFactory {
 	 * @param options The options.
 	 * @return The observer.
 	 */
-	public BlockTransactionObserver createUndoCommitObserver(final NisCache nisCache, final int options) {
+	public BlockTransactionObserver createUndoCommitObserver(final NisCache nisCache, final EnumSet<ObserverOption> options) {
 		return this.createBuilder(nisCache, options).buildReverse();
 	}
 
-	private AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache, final int options) {
+	private AggregateBlockTransactionObserverBuilder createBuilder(final NisCache nisCache, final EnumSet<ObserverOption> options) {
 		final AccountStateCache accountStateCache = nisCache.getAccountStateCache();
 		final AggregateBlockTransactionObserverBuilder builder = new AggregateBlockTransactionObserverBuilder();
 		builder.add(new WeightedBalancesObserver(accountStateCache));
@@ -84,7 +68,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new PruningObserver(accountStateCache, nisCache.getTransactionHashCache()));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));
 
-		if (0 == (options & Options.NoIncrementalPoi)) {
+		if (!options.contains(ObserverOption.NoIncrementalPoi)) {
 			builder.add(new RecalculateImportancesObserver(nisCache));
 		}
 
