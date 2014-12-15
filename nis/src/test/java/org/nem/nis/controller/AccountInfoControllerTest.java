@@ -207,10 +207,8 @@ public class AccountInfoControllerTest {
 
 		public TestContext() {
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
-			final UnconfirmedTransactions filteredUnconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
-			Mockito.when(unconfirmedTransactions.getTransactionsForAccount(Mockito.any()))
-					.thenReturn(filteredUnconfirmedTransactions);
-			Mockito.when(filteredUnconfirmedTransactions.getAll()).thenReturn(this.filteredTransactions);
+			Mockito.when(unconfirmedTransactions.getMostRecentTransactionsForAccount(Mockito.any(), Mockito.eq(Integer.MAX_VALUE)))
+					.thenReturn(this.filteredTransactions);
 
 			this.controller = new AccountInfoController(
 					this.unlockedAccounts,
