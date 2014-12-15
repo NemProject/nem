@@ -859,7 +859,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void dropExpiredTransactionsUndoesRemovedTransactions() {
+	public void dropExpiredTransactionsExecutesAllNonExpiredTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<MockTransaction> transactions = context.createMockTransactions(6, 9);
@@ -873,10 +873,10 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
 
 		// Assert:
-		Assert.assertThat(transactions.get(0).getNumTransferCalls(), IsEqual.equalTo(2));
-		Assert.assertThat(transactions.get(1).getNumTransferCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(transactions.get(2).getNumTransferCalls(), IsEqual.equalTo(2));
-		Assert.assertThat(transactions.get(3).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(0).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(1).getNumTransferCalls(), IsEqual.equalTo(2));
+		Assert.assertThat(transactions.get(2).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(3).getNumTransferCalls(), IsEqual.equalTo(2));
 	}
 
 	//endregion
