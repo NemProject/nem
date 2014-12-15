@@ -2,8 +2,10 @@ package org.nem.nis;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.observers.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.BlockMapper;
@@ -89,7 +91,8 @@ public class BlockAnalyzer {
 		// it creates accounts for us inside AA but without height, so inside observer we'll set height
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
-		final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
+		final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
+				.createExecuteCommitObserver(nisCache, BlockTransactionObserverFactory.Options.NoIncrementalPoi);
 		do {
 			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
 
@@ -131,7 +134,15 @@ public class BlockAnalyzer {
 			}
 		} while (dbBlock != null);
 
+		recalculateImportancesAtHeight(nisCache, new BlockHeight(curBlockHeight));
 		return true;
+	}
+
+	private static void recalculateImportancesAtHeight(final NisCache nisCache, final BlockHeight height) {
+		final BlockTransactionObserver recalculateObserver = new RecalculateImportancesObserver(nisCache);
+		recalculateObserver.notify(
+				new BalanceAdjustmentNotification(NotificationType.HarvestReward, new Account(NemesisBlock.ADDRESS), Amount.ZERO),
+				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
 	}
 
 	private static class BlockIterator {
