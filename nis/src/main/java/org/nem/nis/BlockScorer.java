@@ -70,7 +70,7 @@ public class BlockScorer {
 			return BigInteger.ZERO;
 		}
 
-		final long forgerBalance = this.calculateForgerBalance(block);
+		final long forgerBalance = this.calculateHarvesterBalance(block);
 		return BigInteger.valueOf(timeStampDifference)
 				.multiply(BigInteger.valueOf(forgerBalance))
 				.multiply(TWO_TO_THE_POWER_OF_64)
@@ -83,7 +83,7 @@ public class BlockScorer {
 	 * @param block The signed, "hit" block.
 	 * @return The forager balance.
 	 */
-	public long calculateForgerBalance(final Block block) {
+	public long calculateHarvesterBalance(final Block block) {
 		// TODO 20141212 J-*: it would be nice to hide the height grouping in the PoiFacade
 		final BlockHeight groupedHeight = GroupedHeight.fromHeight(block.getHeight());
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();

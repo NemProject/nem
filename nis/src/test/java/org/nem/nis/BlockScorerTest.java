@@ -137,7 +137,7 @@ public class BlockScorerTest {
 		Assert.assertTrue(target1.compareTo(target2) < 0);
 	}
 
-	//region calculateForgerBalance
+	//region calculateHarvesterBalance
 
 	@Test
 	public void calculateForgerBalanceDerivesBalanceFromImportance() {
@@ -147,7 +147,7 @@ public class BlockScorerTest {
 		context.getImportanceInfo(block.getSigner()).setImportance(new BlockHeight(718), 0.75); // this is the grouped height
 
 		// Act:
-		final long balance = context.scorer.calculateForgerBalance(block);
+		final long balance = context.scorer.calculateHarvesterBalance(block);
 
 		// Assert:
 		Assert.assertThat(balance, IsEqual.equalTo(3_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
@@ -176,7 +176,7 @@ public class BlockScorerTest {
 		context.recalculateImportances(block.getHeight());
 
 		// Act:
-		final long score = context.scorer.calculateForgerBalance(block);
+		final long score = context.scorer.calculateHarvesterBalance(block);
 
 		// Assert:
 		Assert.assertThat(score, IsNot.not(IsEqual.equalTo(0L)));
