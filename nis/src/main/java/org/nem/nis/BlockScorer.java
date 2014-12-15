@@ -3,6 +3,7 @@ package org.nem.nis;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.poi.GroupedHeight;
 import org.nem.nis.state.ReadOnlyAccountImportance;
 
 import java.math.BigInteger;
@@ -31,13 +32,6 @@ public class BlockScorer {
 	 * Helper constant calculating the logarithm of BigInteger
 	 */
 	private static final double TWO_TO_THE_POWER_OF_256 = Math.pow(2.0, 256.0);
-
-	/**
-	 * Number of blocks that should be treated as a group for POI purposes.
-	 * In other words, POI importances will only be calculated at blocks that
-	 * are a multiple of this grouping number.
-	 */
-	private static final int POI_GROUPING = 359;
 
 	private final ReadOnlyAccountStateCache accountStateCache;
 
@@ -84,18 +78,6 @@ public class BlockScorer {
 	}
 
 	/**
-	 * Gets the grouped height for the specified un-grouped height.
-	 *
-	 * @param height The un-grouped height.
-	 * @return The grouped height.
-	 */
-	public static BlockHeight getGroupedHeight(final BlockHeight height) {
-		final long backInTime = height.getRaw() - 1;
-		final long grouped = (backInTime / POI_GROUPING) * POI_GROUPING;
-		return 0 == grouped ? BlockHeight.ONE : new BlockHeight(grouped);
-	}
-
-	/**
 	 * Calculates forager balance for block.
 	 *
 	 * @param block The signed, "hit" block.
@@ -103,7 +85,7 @@ public class BlockScorer {
 	 */
 	public long calculateForgerBalance(final Block block) {
 		// TODO 20141212 J-*: it would be nice to hide the height grouping in the PoiFacade
-		final BlockHeight groupedHeight = BlockScorer.getGroupedHeight(block.getHeight());
+		final BlockHeight groupedHeight = GroupedHeight.fromHeight(block.getHeight());
 		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final Address signerAddress = block.getSigner().getAddress();
 		final ReadOnlyAccountImportance accountImportance = this.accountStateCache

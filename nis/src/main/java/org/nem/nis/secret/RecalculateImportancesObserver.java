@@ -4,6 +4,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.NisCache;
+import org.nem.nis.poi.GroupedHeight;
 
 /**
  * An observer that recalculates POI importances.
@@ -38,7 +39,7 @@ public class RecalculateImportancesObserver implements BlockTransactionObserver 
 		}
 
 		this.nisCache.getPoiFacade().recalculateImportances(
-				BlockScorer.getGroupedHeight(context.getHeight()),
+				GroupedHeight.fromHeight(context.getHeight()),
 				this.nisCache.getAccountStateCache().mutableContents().asCollection());
 	}
 }
