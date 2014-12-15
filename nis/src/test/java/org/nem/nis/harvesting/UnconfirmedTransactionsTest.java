@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
 	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
+	private static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
 	//region size
 
@@ -300,6 +301,20 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void addFailsIfTransactionHasExpired() {
+		// Arrange:
+		final TestContext context = new TestContext(new TransactionDeadlineValidator(TIME_PROVIDER));
+		final MockTransaction transaction = new MockTransaction();
+		transaction.setDeadline(TIME_PROVIDER.getCurrentTime().addSeconds(-1));
+
+		// Act:
+		final ValidationResult result = context.signAndAddNew(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
 	}
 
 	@Test
@@ -1296,7 +1311,8 @@ public class UnconfirmedTransactionsTest {
 			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache));
+					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
+					TIME_PROVIDER);
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {

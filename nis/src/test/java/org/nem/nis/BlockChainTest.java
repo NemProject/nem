@@ -39,7 +39,7 @@ public class BlockChainTest {
 			SENDER.getAddress().getPublicKey());
 	private static final org.nem.nis.dbmodel.Account DB_RECIPIENT1 = new org.nem.nis.dbmodel.Account(RECIPIENT1.getAddress().getEncoded(), null);
 	private static final org.nem.nis.dbmodel.Account DB_RECIPIENT2 = new org.nem.nis.dbmodel.Account(RECIPIENT2.getAddress().getEncoded(), null);
-	private static final SystemTimeProvider time = new SystemTimeProvider();
+	private static final SystemTimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
 	final static Hash DUMMY_PREVIOUS_HASH = Utils.generateRandomHash();
 	private static final Hash DUMMY_GENERATION_HASH = Utils.generateRandomHash();
@@ -159,7 +159,8 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				nisCache);
+				nisCache,
+				TIME_PROVIDER);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				nisCache,
 				blockChainLastBlockLayer,
@@ -247,7 +248,8 @@ public class BlockChainTest {
 						transactionValidatorFactory);
 		final UnconfirmedTransactions unconfirmedTransactions = new UnconfirmedTransactions(
 				transactionValidatorFactory,
-				nisCache);
+				nisCache,
+				TIME_PROVIDER);
 		final BlockChainContextFactory contextFactory = new BlockChainContextFactory(
 				nisCache,
 				blockChainLastBlockLayer,
@@ -306,7 +308,7 @@ public class BlockChainTest {
 
 	private static Block createBlock(final Account forger, final AccountLookup accountLookup) throws NoSuchFieldException, IllegalAccessException {
 		// Arrange:
-		final Block block = new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, time.getCurrentTime().addHours(-1), new BlockHeight(3));
+		final Block block = new Block(forger, DUMMY_PREVIOUS_HASH, DUMMY_GENERATION_HASH, TIME_PROVIDER.getCurrentTime().addHours(-1), new BlockHeight(3));
 		block.sign();
 
 		return roundTripBlock(accountLookup, block);
@@ -419,7 +421,7 @@ public class BlockChainTest {
 				SENDER,
 				Hash.ZERO,
 				Hash.ZERO,
-				time.getCurrentTime(),
+				TIME_PROVIDER.getCurrentTime(),
 				BlockHeight.ONE);
 
 		b.addTransaction(tx1);

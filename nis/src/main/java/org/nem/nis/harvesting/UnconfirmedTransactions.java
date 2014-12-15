@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.time.TimeInstant;
+import org.nem.core.time.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.validators.*;
 
@@ -26,6 +26,7 @@ public class UnconfirmedTransactions {
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
 	private final ReadOnlyNisCache nisCache;
+	private final TimeProvider timeProvider;
 
 	private enum BalanceValidationOptions {
 		/**
@@ -58,12 +59,14 @@ public class UnconfirmedTransactions {
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
-			final ReadOnlyNisCache nisCache) {
+			final ReadOnlyNisCache nisCache,
+			final TimeProvider timeProvider) {
 		this(
 				new ArrayList<>(),
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
 				validatorFactory,
 				nisCache,
+				timeProvider,
 				false);
 	}
 
@@ -72,9 +75,11 @@ public class UnconfirmedTransactions {
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
 			final ReadOnlyNisCache nisCache,
+			final TimeProvider timeProvider,
 			final boolean blockCreation) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
+		this.timeProvider = timeProvider;
 		this.singleValidator = this.createSingleValidator(blockCreation);
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
@@ -91,6 +96,7 @@ public class UnconfirmedTransactions {
 				options,
 				this.validatorFactory,
 				this.nisCache,
+				this.timeProvider,
 				true);
 	}
 
@@ -203,7 +209,7 @@ public class UnconfirmedTransactions {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
-
+		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getAccountStateCache(), blockCreation));
 
 		// need to be the last one
