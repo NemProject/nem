@@ -85,6 +85,40 @@ public class AccountControllerTest {
 
 	//endregion
 
+	//region accountIsUnlocked
+
+	@Test
+	public void accountIsUnlockedReturnsOkWhenAccountIsUnlocked() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
+		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
+		Mockito.when(context.unlockedAccounts.isAccountUnlocked(account)).thenReturn(true);
+
+		// Act:
+		final String result = context.controller.accountIsUnlocked(account.getAddress());
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo("ok"));
+	}
+
+	@Test
+	public void accountIsUnlockedReturnsNopeWhenAccountIsLocked() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final Account account = new Account(keyPair);
+		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
+		Mockito.when(context.unlockedAccounts.isAccountUnlocked(account)).thenReturn(false);
+
+		// Act:
+		final String result = context.controller.accountIsUnlocked(account.getAddress());
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo("nope"));
+	}
+
+	//endregion
+
 	//region accountTransfers[All|Incoming|Outgoing]
 
 	//region accountTransfersMethodsDelegatesToIoWhenIdIsProvided

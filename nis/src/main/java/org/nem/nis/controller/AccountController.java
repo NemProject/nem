@@ -78,15 +78,13 @@ public class AccountController {
 
 	/**
 	 * Checks if given account is unlocked.
-	 * TODO 20141214: J-J i'd rather pass in something other than a private key here (address) !
-	 * > Also should have two tests one for when account is unlocked and one for when it's not
 	 *
-	 * @param privateKey The private key of the account to lock.
+	 * @param address The address of the account to check.
 	 */
 	@RequestMapping(value = "/account/isunlocked", method = RequestMethod.POST)
 	@ClientApi
-	public String accountIsUnlocked(@RequestBody final PrivateKey privateKey) {
-		final Account account = new Account(new KeyPair(privateKey));
+	public String accountIsUnlocked(@RequestBody final Address address) {
+		final Account account = new Account(address);
 		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
 	}
 
