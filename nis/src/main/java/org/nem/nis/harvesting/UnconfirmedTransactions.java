@@ -6,6 +6,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.*;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -302,6 +303,22 @@ public class UnconfirmedTransactions {
 				.collect(Collectors.toList());
 	}
 
+	// TODO G-G 20141215: this needs tests! and test if there is multisigmodification inside and if it's type is Del
+	// (to have N-1 cosignatories "exception")
+	private boolean filterMultisigTransactions(final Transaction transaction) {
+		if (transaction.getType() != TransactionTypes.MULTISIG) {
+			return true;
+		}
+		final MultisigTransaction multisigTransaction = (MultisigTransaction)transaction;
+		final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
+		final ReadOnlyAccountState multisigState = this.nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
+		if (multisigState.getMultisigLinks().getCosignatories().size() == multisigTransaction.getCosignerSignatures().size()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
@@ -312,6 +329,7 @@ public class UnconfirmedTransactions {
 		final List<Transaction> transactions = this.transactions.values().stream()
 				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
 				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
+				.filter(tx -> this.filterMultisigTransactions(tx))
 				.collect(Collectors.toList());
 
 		return this.sortTransactions(transactions);
