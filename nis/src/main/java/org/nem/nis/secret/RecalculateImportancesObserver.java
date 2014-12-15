@@ -27,11 +27,6 @@ public class RecalculateImportancesObserver implements BlockTransactionObserver 
 			return;
 		}
 
-		// TODO 20141212: this is a hack
-		if (context.getHeight().equals(BlockHeight.ONE)) {
-			return;
-		}
-
 		this.nisCache.getPoiFacade().recalculateImportances(
 				context.getHeight(),
 				this.nisCache.getAccountStateCache().mutableContents().asCollection());

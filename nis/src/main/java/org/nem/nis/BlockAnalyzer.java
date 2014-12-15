@@ -106,18 +106,6 @@ public class BlockAnalyzer {
 
 			executor.execute(block, observer);
 
-			// fully vest all transactions coming out of the nemesis block
-			if (null == parentBlock) {
-				for (final Account account : accountCache.contents()) {
-					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
-						continue;
-					}
-
-					final AccountState accountState = nisCache.getAccountStateCache().findStateByAddress(account.getAddress());
-					accountState.getWeightedBalances().convertToFullyVested();
-				}
-			}
-
 			parentBlock = block;
 
 			curBlockHeight = dbBlock.getHeight() + 1;
