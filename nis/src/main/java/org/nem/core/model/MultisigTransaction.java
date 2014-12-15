@@ -48,7 +48,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			return new MultisigSignatureTransaction(DeserializationOptions.VERIFIABLE, d);
 		});
 
-		signatures.forEach(this::addSignature);
+		if (signatures != null) {
+			signatures.forEach(this::addSignature);
+		}
 	}
 
 	/**
