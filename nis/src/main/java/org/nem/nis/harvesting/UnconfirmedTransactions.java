@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
@@ -250,14 +251,36 @@ public class UnconfirmedTransactions {
 	 */
 	public void removeAll(final Block block) {
 		synchronized (this.lock) {
-			for (final Transaction transaction : block.getTransactions()) {
-				final Hash transactionHash = HashUtils.calculateHash(transaction);
+			// this is ugly but we cannot let an exception bubble up because NIS would need a restart.
+			// The exception means we have to rebuild the cache because it is corrupt.
+			// In theory it should never throw here.
+			try {
+				// undo in reverse order!
+				for (final Transaction transaction : getReverseTransactions(block)) {
+					this.remove(transaction);
+				}
+			} catch (Exception e) {
+				LOGGER.severe("exception during removal of unconfirmed transactions, rebuilding cache");
+				this.rebuildCache(this.getAll());
+				return;
+			}
 
-				// don't call this.remove because transactions should not be removed when undone;
-				// otherwise, the unconfirmed balances would not be correct
-				this.transactions.remove(transactionHash);
+			// Consider the following scenario:
+			// Account A has 10 NEM and sends tx 1 (A -> B 8 NEM) to node 1 and tx2 (A -> B 9 NEM) to node 2.
+			// UnconfirmedBalancesObserver of node 1 sees for A: balance 10, credited 0, debited 8 -> unconfirmed balance is 2
+			// Now node 2 harvests a block and includes tx2. node 1 receives + executes the block with tx2.
+			// UnconfirmedBalancesObserver of node 1 sees for A: balance 1, credited 0, debited 8 -> unconfirmed balance is -7
+			// Next call to UnconfirmedBalancesObserver.get(A) results in an exception.
+			// This means a new block can ruin the unconfirmed balance. We have to check if all balances are still valid.
+			if (!this.unconfirmedBalances.unconfirmedBalancesAreValid()) {
+				LOGGER.warning("invalid unconfirmed balance detected, rebuilding cache");
+				this.rebuildCache(this.getAll());
 			}
 		}
+	}
+
+	private static Iterable<Transaction> getReverseTransactions(final Block block) {
+		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
 
 	/**
@@ -353,11 +376,16 @@ public class UnconfirmedTransactions {
 				return;
 			}
 
-			this.transactions.clear();
-			this.pendingTransactions.clear();
-			this.unconfirmedBalances.clearCache();
-			this.addNewBatch(notExpiredTransactions);
+			LOGGER.info("expired unconfirmed transaction in cache detected, rebuilding cache");
+			this.rebuildCache(notExpiredTransactions);
 		}
+	}
+
+	private void rebuildCache(final List<Transaction> transactions) {
+		this.transactions.clear();
+		this.pendingTransactions.clear();
+		this.unconfirmedBalances.clearCache();
+		this.addNewBatch(transactions);
 	}
 
 	/**
@@ -467,6 +495,16 @@ public class UnconfirmedTransactions {
 		private void clearCache() {
 			this.creditedAmounts.clear();
 			this.debitedAmounts.clear();
+		}
+
+		private boolean unconfirmedBalancesAreValid() {
+			for (Account account : this.creditedAmounts.keySet()) {
+				if (this.getBalance(account).add(this.getCreditedAmount(account)).compareTo(this.getDebitedAmount(account)) < 0) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		private Amount getBalance(final Account account) {
