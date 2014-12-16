@@ -59,8 +59,6 @@ public class MultisigTransactionTest {
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
 	}
 
-	// TODO test is failing now, not sure if it makes sense ... need to talk with G
-	// TODO: fixed the test, but it's failing (due to missing serialization...)
 	@Test
 	public void canRoundtripTransactionWithSignatures() {
 		// Arrange:
@@ -79,9 +77,9 @@ public class MultisigTransactionTest {
 		final MultisigTransaction transaction = createRoundTrippedTransaction(originalTransaction);
 
 		// Assert:
-		Assert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(2));
-		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(2));
-		Assert.assertThat(transaction.getSigners().get(1), IsEqual.equalTo(originalTransaction.getSigners().get(1)));
+		Assert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getSigners().get(0), IsEqual.equalTo(originalTransaction.getSigners().get(0)));
 	}
 
 	private static TransferTransaction createDefaultTransferTransaction() {
@@ -204,7 +202,7 @@ public class MultisigTransactionTest {
 	}
 
 	@Test
-	public void getSignersIncludesMultisigTransactionSigner() {
+	public void getSignersDoesNotIncludeMultisigTransactionSigner() {
 		// Arrange:
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
@@ -213,7 +211,7 @@ public class MultisigTransactionTest {
 		final List<Account> signers = msTransaction.getSigners();
 
 		// Assert:
-		Assert.assertThat(signers, IsEquivalent.equivalentTo(Arrays.asList(msTransaction.getSigner())));
+		Assert.assertThat(signers.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -229,7 +227,7 @@ public class MultisigTransactionTest {
 		final List<Account> signers = msTransaction.getSigners();
 
 		// Assert:
-		Assert.assertThat(signers, IsEquivalent.equivalentTo(Arrays.asList(msTransaction.getSigner(), sigTransaction.getSigner())));
+		Assert.assertThat(signers, IsEquivalent.equivalentTo(Arrays.asList(sigTransaction.getSigner())));
 	}
 
 	//endregion

@@ -103,10 +103,8 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	 * @return All signers.
 	 */
 	public List<Account> getSigners() {
-		final List<Account> signers = new ArrayList<>();
-		signers.add(this.getSigner()); // TODO this is probably wrong!
-		signers.addAll(this.signatureTransactions.stream().map(t -> t.getSigner()).collect(Collectors.toList()));
-		return signers;
+		// removed "+1" to keep it consistent with getCosignerSignatures
+		return this.signatureTransactions.stream().map(t -> t.getSigner()).collect(Collectors.toList());
 	}
 
 	@Override
