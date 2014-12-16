@@ -303,8 +303,7 @@ public class UnconfirmedTransactions {
 				.collect(Collectors.toList());
 	}
 
-	// TODO G-G 20141215: this needs tests! and test if there is multisigmodification inside and if it's type is Del
-	// (to have N-1 cosignatories "exception")
+	// TODO G-G 20141215: this needs tests! and
 	private boolean filterMultisigTransactions(final Transaction transaction) {
 		if (transaction.getType() != TransactionTypes.MULTISIG) {
 			return true;
@@ -312,7 +311,15 @@ public class UnconfirmedTransactions {
 		final MultisigTransaction multisigTransaction = (MultisigTransaction)transaction;
 		final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
 		final ReadOnlyAccountState multisigState = this.nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
-		if (multisigState.getMultisigLinks().getCosignatories().size() == multisigTransaction.getCosignerSignatures().size()) {
+
+		if (multisigTransaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
+			final MultisigSignerModificationTransaction modification = (MultisigSignerModificationTransaction)multisigTransaction.getOtherTransaction();
+			// TODO test if there is multisigmodification inside and if it's type is Del
+			// (N-2 cosignatories "exception")
+		}
+
+		// we require N-1 signatures
+		if (multisigState.getMultisigLinks().getCosignatories().size() - 1 == multisigTransaction.getCosignerSignatures().size()) {
 			return true;
 		}
 

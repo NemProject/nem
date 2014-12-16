@@ -1,6 +1,7 @@
 package org.nem.nis.harvesting;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
@@ -1059,7 +1060,6 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
 	}
-
 	//endregion
 
 	//region tests with real validator
@@ -1164,8 +1164,47 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
+
 	@Test
-	public void getTransactionForNewBlockCheckMultisigSignatures() {
+	public void getTransactionsForNewBlockDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
+		// Arrange:
+		final AccountStateCache poiFacade = Mockito.mock(AccountStateCache.class);
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(poiFacade);
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		final Account multisig = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Account cosigner1 = Utils.generateRandomAccount();
+		final Account cosigner2 = Utils.generateRandomAccount();
+		final Transaction t1 = createTransferTransaction(currentTime, multisig, recipient, Amount.fromNem(7));
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
+		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
+		multisigTransaction.sign();
+
+		addPoiState(poiFacade, multisig).getAccountInfo().incrementBalance(Amount.fromNem(10));
+		// TODO 20141213 G: temporary hack, need to check it
+		addPoiState(poiFacade, recipient);
+		addPoiState(poiFacade, cosigner1).getAccountInfo().incrementBalance(Amount.fromNem(101));
+		addPoiState(poiFacade, cosigner2);
+		makeCosignatory(poiFacade, cosigner1, multisig);
+		makeCosignatory(poiFacade, cosigner2, multisig);
+
+		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction);
+
+		// Act:
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), currentTime.addMinutes(10));
+
+		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(0));
+	}
+
+	// note: this test actually tests few things, which means it's most likely ugly
+	// * adding multisig signature adds it to PRESENT MultisigTransaction
+	// * multisig signatures are NOT returned by getTransactionsForNewBlock
+	// * multisig transaction is returned only if (number of cosignatories-1) == number of sigs
+	@Test
+	public void addingMultisigSignatureAddsItToMultisigTransaction() {
 		// Arrange:
 		final AccountStateCache poiFacade = Mockito.mock(AccountStateCache.class);
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator(poiFacade);
@@ -1197,9 +1236,13 @@ public class UnconfirmedTransactionsTest {
 		// Act:
 		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), currentTime.addMinutes(10));
 
+		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+		final MultisigTransaction transaction = (MultisigTransaction)blockTransactions.getAll().get(0);
+		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getCosignerSignatures().get(0), IsSame.sameInstance(signatureTransaction));
 	}
 
 	private static AccountState addPoiState(final AccountStateCache poiFacade, final Account account) {
