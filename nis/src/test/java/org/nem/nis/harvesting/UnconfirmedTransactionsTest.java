@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
 	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
-	private static final TimeProvider TIME_PROVIDER = new SystemTimeProvider();
 
 	//region size
 
@@ -306,9 +305,11 @@ public class UnconfirmedTransactionsTest {
 	@Test
 	public void addFailsIfTransactionHasExpired() {
 		// Arrange:
-		final TestContext context = new TestContext(new TransactionDeadlineValidator(TIME_PROVIDER));
+		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		Mockito.when(timeProvider.getCurrentTime()).thenReturn(new TimeInstant(1122450));
+		final TestContext context = new TestContext(new TransactionDeadlineValidator(timeProvider));
 		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(TIME_PROVIDER.getCurrentTime().addSeconds(-1));
+		transaction.setDeadline(timeProvider.getCurrentTime().addSeconds(-1));
 
 		// Act:
 		final ValidationResult result = context.signAndAddNew(transaction);
@@ -1282,6 +1283,7 @@ public class UnconfirmedTransactionsTest {
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyAccountStateCache accountStateCache;
+		private final TimeProvider timeProvider;
 
 		private TestContext() {
 			this(Mockito.mock(SingleTransactionValidator.class), Mockito.mock(BatchTransactionValidator.class));
@@ -1305,14 +1307,16 @@ public class UnconfirmedTransactionsTest {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			this.accountStateCache = accountStateCache;
+			this.timeProvider = Mockito.mock(TimeProvider.class);
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
+			Mockito.when(timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
 					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
-					TIME_PROVIDER);
+					this.timeProvider);
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {
