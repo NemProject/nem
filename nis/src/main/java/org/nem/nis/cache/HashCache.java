@@ -8,7 +8,9 @@ import java.util.List;
 
 /**
  * A transaction hash cache.
- * TODO 20141212 J-J: consider pruning the hashcache interfaces.
+ * TODO 20141212 J-B: i'm not sure if it makes sense for this object to know about it's retention time
+ * > since it isn't using it. I think it might make more sense for either (1) the caller to manage the retention time
+ * > or (2) this object to do the retention time calculation in prune. thoughts?
  */
 public interface HashCache extends ReadOnlyHashCache {
 
