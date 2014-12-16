@@ -2,7 +2,6 @@ package org.nem.nis.cache;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,7 +12,7 @@ import java.util.logging.Logger;
  * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts
  * by their addresses.
  */
-public class DefaultAccountCache implements AccountCache, CopyableCache<DefaultAccountCache> {
+public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountCache> {
 	private static final Logger LOGGER = Logger.getLogger(DefaultAccountCache.class.getName());
 
 	private final ConcurrentHashMap<Address, Account> addressToAccountMap = new ConcurrentHashMap<>();
@@ -29,8 +28,8 @@ public class DefaultAccountCache implements AccountCache, CopyableCache<DefaultA
 	}
 
 	@Override
-	public AccountLookup asAutoCache() {
-		return new AutoCacheAccountLookup(this);
+	public AccountCache asAutoCache() {
+		return new AutoCacheDefaultAccountCache(this);
 	}
 
 	@Override
@@ -103,10 +102,10 @@ public class DefaultAccountCache implements AccountCache, CopyableCache<DefaultA
 		return copy;
 	}
 
-	private static class AutoCacheAccountLookup implements AccountLookup {
+	private static class AutoCacheDefaultAccountCache implements AccountCache {
 		private final DefaultAccountCache accountCache;
 
-		public AutoCacheAccountLookup(final DefaultAccountCache accountCache) {
+		public AutoCacheDefaultAccountCache(final DefaultAccountCache accountCache) {
 			this.accountCache = accountCache;
 		}
 
@@ -118,6 +117,26 @@ public class DefaultAccountCache implements AccountCache, CopyableCache<DefaultA
 		@Override
 		public boolean isKnownAddress(final Address address) {
 			return this.accountCache.isKnownAddress(address);
+		}
+
+		@Override
+		public int size() {
+			return this.accountCache.size();
+		}
+
+		@Override
+		public CacheContents<Account> contents() {
+			return this.accountCache.contents();
+		}
+
+		@Override
+		public Account addAccountToCache(final Address address) {
+			return this.accountCache.addAccountToCache(address);
+		}
+
+		@Override
+		public void removeFromCache(final Address address) {
+			this.accountCache.removeFromCache(address);
 		}
 	}
 }

@@ -94,7 +94,7 @@ public class BlockAnalyzer {
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
 				.createExecuteCommitObserver(nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
 		do {
-			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
+			final Block block = BlockMapper.toModel(dbBlock, accountCache);
 
 			if ((block.getHeight().getRaw() % 5000) == 0) {
 				LOGGER.info(String.format("%d", block.getHeight().getRaw()));
@@ -182,7 +182,7 @@ public class BlockAnalyzer {
 		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
+		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache()));
 	}
 
 	/**

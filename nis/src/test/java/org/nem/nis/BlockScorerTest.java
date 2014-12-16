@@ -221,7 +221,7 @@ public class BlockScorerTest {
 		private final PoiFacade poiFacade;
 
 		private TestContext() {
-			this(new DefaultAccountStateCache());
+			this(new DefaultAccountStateCache().asAutoCache());
 		}
 
 		private TestContext(final AccountStateCache accountStateCache) {

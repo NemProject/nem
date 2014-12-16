@@ -211,7 +211,7 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 	private static class TestContext {
 		private final DefaultPoiFacade poiFacade = new DefaultPoiFacade(Mockito.mock(ImportanceCalculator.class));
-		private final AccountStateCache accountStateCache = new DefaultAccountStateCache();
+		private final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		private final TrustContext context = Mockito.mock(TrustContext.class);
 		private final TrustProvider trustProvider = Mockito.mock(TrustProvider.class);
 		private final Node localNode = Mockito.mock(Node.class);

@@ -83,7 +83,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
-		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache().asAutoCache());
+		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
@@ -240,7 +240,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private Block remapBlock(final Block block, final AccountCache accountCache) {
 		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-		return BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
+		return BlockMapper.toModel(dbBlock, accountCache);
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
