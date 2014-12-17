@@ -260,7 +260,8 @@ public class NisAppConfig {
 	public UnconfirmedTransactions unconfirmedTransactions() {
 		return new UnconfirmedTransactions(
 				this.transactionValidatorFactory(),
-				this.nisCache());
+				this.nisCache(),
+				this.timeProvider());
 	}
 
 	@Bean

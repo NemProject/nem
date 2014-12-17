@@ -12,6 +12,8 @@ import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * REST API for retrieving account related information
  */
@@ -83,8 +85,8 @@ public class AccountInfoController {
 	}
 
 	private boolean hasPendingImportanceTransfer(final Address address) {
-		final UnconfirmedTransactions transactions = this.unconfirmedTransactions.getTransactionsForAccount(address);
-		for (final Transaction transaction : transactions.getAll()) {
+		final List<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, Integer.MAX_VALUE);
+		for (final Transaction transaction : transactions) {
 			if (TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType()) {
 				return true;
 			}
