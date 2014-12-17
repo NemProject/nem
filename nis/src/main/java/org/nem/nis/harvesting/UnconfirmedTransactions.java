@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
@@ -27,6 +28,7 @@ public class UnconfirmedTransactions {
 	private final SingleTransactionValidator singleValidator;
 	private final ReadOnlyNisCache nisCache;
 	private final TimeProvider timeProvider;
+	private final Object lock = new Object();
 
 	private enum BalanceValidationOptions {
 		/**
@@ -89,12 +91,14 @@ public class UnconfirmedTransactions {
 	private UnconfirmedTransactions filter(
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options) {
-		return new UnconfirmedTransactions(
-				transactions,
-				options,
-				this.validatorFactory,
-				this.nisCache,
-				this.timeProvider);
+		synchronized (this.lock) {
+			return new UnconfirmedTransactions(
+					transactions,
+					options,
+					this.validatorFactory,
+					this.nisCache,
+					this.timeProvider);
+		}
 	}
 
 	/**
@@ -103,7 +107,9 @@ public class UnconfirmedTransactions {
 	 * @return The number of unconfirmed transactions.
 	 */
 	public int size() {
-		return this.transactions.size();
+		synchronized (this.lock) {
+			return this.transactions.size();
+		}
 	}
 
 	/**
@@ -113,7 +119,9 @@ public class UnconfirmedTransactions {
 	 * @return The unconfirmed balance.
 	 */
 	public Amount getUnconfirmedBalance(final Account account) {
-		return this.unconfirmedBalances.get(account);
+		synchronized (this.lock) {
+			return this.unconfirmedBalances.get(account);
+		}
 	}
 
 	/**
@@ -123,12 +131,14 @@ public class UnconfirmedTransactions {
 	 * @return SUCCESS if all transactions were added successfully, NEUTRAL or FAILURE otherwise.
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
-		final ValidationResult transactionValidationResult = this.validateBatch(transactions);
-		if (!transactionValidationResult.isSuccess()) {
-			return transactionValidationResult;
-		}
+		synchronized (this.lock) {
+			final ValidationResult transactionValidationResult = this.validateBatch(transactions);
+			if (!transactionValidationResult.isSuccess()) {
+				return transactionValidationResult;
+			}
 
-		return ValidationResult.aggregate(transactions.stream().map(transaction -> this.add(transaction, true)).iterator());
+			return ValidationResult.aggregate(transactions.stream().map(transaction -> this.add(transaction, true)).iterator());
+		}
 	}
 
 	/**
@@ -138,10 +148,12 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
-		final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
-		return transactionValidationResult.isSuccess()
-				? this.add(transaction, true)
-				: transactionValidationResult;
+		synchronized (this.lock) {
+			final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
+			return transactionValidationResult.isSuccess()
+					? this.add(transaction, true)
+					: transactionValidationResult;
+		}
 	}
 
 	/**
@@ -155,19 +167,21 @@ public class UnconfirmedTransactions {
 	}
 
 	private ValidationResult add(final Transaction transaction, final boolean execute) {
-		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, true)) {
-			return ValidationResult.NEUTRAL;
-		}
+		synchronized (this.lock) {
+			final Hash transactionHash = HashUtils.calculateHash(transaction);
+			if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, true)) {
+				return ValidationResult.NEUTRAL;
+			}
 
-		if (!transaction.verify()) {
-			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
-		}
+			if (!transaction.verify()) {
+				return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
+			}
 
-		try {
-			return this.addInternal(transaction, transactionHash, execute);
-		} finally {
-			this.pendingTransactions.remove(transactionHash);
+			try {
+				return this.addInternal(transaction, transactionHash, execute);
+			} finally {
+				this.pendingTransactions.remove(transactionHash);
+			}
 		}
 	}
 
@@ -217,15 +231,17 @@ public class UnconfirmedTransactions {
 	 * @return true if the transaction was found and removed; false if the transaction was not found.
 	 */
 	public boolean remove(final Transaction transaction) {
-		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (!this.transactions.containsKey(transactionHash)) {
-			return false;
+		synchronized (this.lock) {
+			final Hash transactionHash = HashUtils.calculateHash(transaction);
+			if (!this.transactions.containsKey(transactionHash)) {
+				return false;
+			}
+
+			transaction.undo(this.transferObserver);
+
+			this.transactions.remove(transactionHash);
+			return true;
 		}
-
-		transaction.undo(this.transferObserver);
-
-		this.transactions.remove(transactionHash);
-		return true;
 	}
 
 	/**
@@ -234,13 +250,37 @@ public class UnconfirmedTransactions {
 	 * @param block The block.
 	 */
 	public void removeAll(final Block block) {
-		for (final Transaction transaction : block.getTransactions()) {
-			final Hash transactionHash = HashUtils.calculateHash(transaction);
+		synchronized (this.lock) {
+			// this is ugly but we cannot let an exception bubble up because NIS would need a restart.
+			// The exception means we have to rebuild the cache because it is corrupt.
+			// In theory it should never throw here.
+			try {
+				// undo in reverse order!
+				for (final Transaction transaction : getReverseTransactions(block)) {
+					this.remove(transaction);
+				}
+			} catch (Exception e) {
+				LOGGER.severe("exception during removal of unconfirmed transactions, rebuilding cache");
+				this.rebuildCache(this.getAll());
+				return;
+			}
 
-			// don't call this.remove because transactions should not be removed when undone;
-			// otherwise, the unconfirmed balances would not be correct
-			this.transactions.remove(transactionHash);
+			// Consider the following scenario:
+			// Account A has 10 NEM and sends tx 1 (A -> B 8 NEM) to node 1 and tx2 (A -> B 9 NEM) to node 2.
+			// UnconfirmedBalancesObserver of node 1 sees for A: balance 10, credited 0, debited 8 -> unconfirmed balance is 2
+			// Now node 2 harvests a block and includes tx2. node 1 receives + executes the block with tx2.
+			// UnconfirmedBalancesObserver of node 1 sees for A: balance 1, credited 0, debited 8 -> unconfirmed balance is -7
+			// Next call to UnconfirmedBalancesObserver.get(A) results in an exception.
+			// This means a new block can ruin the unconfirmed balance. We have to check if all balances are still valid.
+			if (!this.unconfirmedBalances.unconfirmedBalancesAreValid()) {
+				LOGGER.warning("invalid unconfirmed balance detected, rebuilding cache");
+				this.rebuildCache(this.getAll());
+			}
 		}
+	}
+
+	private static Iterable<Transaction> getReverseTransactions(final Block block) {
+		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
 
 	/**
@@ -249,9 +289,11 @@ public class UnconfirmedTransactions {
 	 * @return All transaction from this unconfirmed transactions.
 	 */
 	public List<Transaction> getAll() {
-		final List<Transaction> transactions = this.transactions.values().stream()
-				.collect(Collectors.toList());
-		return this.sortTransactions(transactions);
+		synchronized (this.lock) {
+			final List<Transaction> transactions = this.transactions.values().stream()
+					.collect(Collectors.toList());
+			return this.sortTransactions(transactions);
+		}
 	}
 
 	/**
@@ -261,11 +303,13 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		// probably faster to use hash map than collection
-		final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
-		this.transactions.values().stream()
-				.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
-		knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
-		return unknownHashShortIds.values().stream().collect(Collectors.toList());
+		synchronized (this.lock) {
+			final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
+			this.transactions.values().stream()
+					.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
+			knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
+			return unknownHashShortIds.values().stream().collect(Collectors.toList());
+		}
 	}
 
 	/**
@@ -274,11 +318,13 @@ public class UnconfirmedTransactions {
 	 * @return The most recent transactions from this unconfirmed transactions.
 	 */
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
-		return this.transactions.values().stream()
-				.filter(tx -> matchAddress(tx, address))
-				.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
-				.limit(maxSize)
-				.collect(Collectors.toList());
+		synchronized (this.lock) {
+			return this.transactions.values().stream()
+					.filter(tx -> matchAddress(tx, address))
+					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
+					.limit(maxSize)
+					.collect(Collectors.toList());
+		}
 	}
 
 	/**
@@ -287,10 +333,12 @@ public class UnconfirmedTransactions {
 	 * @return The list of unconfirmed transactions.
 	 */
 	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
-		return this.transactions.values().stream()
-				.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
-				.limit(maxTransactions)
-				.collect(Collectors.toList());
+		synchronized (this.lock) {
+			return this.transactions.values().stream()
+					.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
+					.limit(maxTransactions)
+					.collect(Collectors.toList());
+		}
 	}
 
 	/**
@@ -300,11 +348,13 @@ public class UnconfirmedTransactions {
 	 * @return The sorted list of all transactions before the specified time.
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		final List<Transaction> transactions = this.transactions.values().stream()
-				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-				.collect(Collectors.toList());
+		synchronized (this.lock) {
+			final List<Transaction> transactions = this.transactions.values().stream()
+					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+					.collect(Collectors.toList());
 
-		return this.sortTransactions(transactions);
+			return this.sortTransactions(transactions);
+		}
 	}
 
 	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
@@ -318,9 +368,24 @@ public class UnconfirmedTransactions {
 	 * @param time The current time.
 	 */
 	public void dropExpiredTransactions(final TimeInstant time) {
-		this.transactions.values().stream()
-				.filter(tx -> tx.getDeadline().compareTo(time) < 0)
-				.forEach(tx -> this.remove(tx));
+		synchronized (this.lock) {
+			final List<Transaction> notExpiredTransactions = this.transactions.values().stream()
+					.filter(tx -> tx.getDeadline().compareTo(time) >= 0)
+					.collect(Collectors.toList());
+			if (notExpiredTransactions.size() == this.transactions.size()) {
+				return;
+			}
+
+			LOGGER.info("expired unconfirmed transaction in cache detected, rebuilding cache");
+			this.rebuildCache(notExpiredTransactions);
+		}
+	}
+
+	private void rebuildCache(final List<Transaction> transactions) {
+		this.transactions.clear();
+		this.pendingTransactions.clear();
+		this.unconfirmedBalances.clearCache();
+		this.addNewBatch(transactions);
 	}
 
 	/**
@@ -330,11 +395,13 @@ public class UnconfirmedTransactions {
 	 * @return The filtered list of transactions.
 	 */
 	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-		return this.filter(
-				this.getAll().stream()
-						.filter(tx -> matchAddress(tx, address))
-						.collect(Collectors.toList()),
-				BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
+		synchronized (this.lock) {
+			return this.filter(
+					this.getAll().stream()
+							.filter(tx -> matchAddress(tx, address))
+							.collect(Collectors.toList()),
+					BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
+		}
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
@@ -374,24 +441,27 @@ public class UnconfirmedTransactions {
 		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
 		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
 		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
-		return this.filter(
-				this.getTransactionsBefore(blockTime).stream()
-						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
-						.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
-						.collect(Collectors.toList()),
-				BalanceValidationOptions.ValidateAgainstConfirmedBalance);
+		synchronized (this.lock) {
+			return this.filter(
+					this.getTransactionsBefore(blockTime).stream()
+							.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
+							.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
+							.collect(Collectors.toList()),
+					BalanceValidationOptions.ValidateAgainstConfirmedBalance);
+		}
 	}
 
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
 		private final ReadOnlyAccountStateCache accountStateCache;
-		private final Map<Account, Amount> unconfirmedBalances = new ConcurrentHashMap<>();
+		private final Map<Account, Amount> creditedAmounts = new ConcurrentHashMap<>();
+		private final Map<Account, Amount> debitedAmounts = new ConcurrentHashMap<>();
 
 		public UnconfirmedBalancesObserver(final ReadOnlyAccountStateCache accountStateCache) {
 			this.accountStateCache = accountStateCache;
 		}
 
 		public Amount get(final Account account) {
-			return this.unconfirmedBalances.getOrDefault(account, this.getBalance(account));
+			return this.getBalance(account).add(this.getCreditedAmount(account)).subtract(this.getDebitedAmount(account));
 		}
 
 		@Override
@@ -403,24 +473,50 @@ public class UnconfirmedTransactions {
 		@Override
 		public void notifyCredit(final Account account, final Amount amount) {
 			this.addToCache(account);
-			final Amount newBalance = this.unconfirmedBalances.get(account).add(amount);
-			this.unconfirmedBalances.replace(account, newBalance);
+			final Amount newCreditedAmount = this.getCreditedAmount(account).add(amount);
+			this.creditedAmounts.replace(account, newCreditedAmount);
 		}
 
 		@Override
 		public void notifyDebit(final Account account, final Amount amount) {
 			this.addToCache(account);
-			final Amount newBalance = this.unconfirmedBalances.get(account).subtract(amount);
-			this.unconfirmedBalances.replace(account, newBalance);
+			final Amount newDebitedAmount = this.getDebitedAmount(account).add(amount);
+			// should not be necessary but do it anyway as check
+			this.getBalance(account).add(this.getCreditedAmount(account)).subtract(newDebitedAmount);
+			this.debitedAmounts.replace(account, newDebitedAmount);
 		}
 
 		private void addToCache(final Account account) {
 			// it's ok to put reference here, thanks to Account being non-mutable
-			this.unconfirmedBalances.putIfAbsent(account, this.getBalance(account));
+			this.creditedAmounts.putIfAbsent(account, Amount.ZERO);
+			this.debitedAmounts.putIfAbsent(account, Amount.ZERO);
+		}
+
+		private void clearCache() {
+			this.creditedAmounts.clear();
+			this.debitedAmounts.clear();
+		}
+
+		private boolean unconfirmedBalancesAreValid() {
+			for (Account account : this.creditedAmounts.keySet()) {
+				if (this.getBalance(account).add(this.getCreditedAmount(account)).compareTo(this.getDebitedAmount(account)) < 0) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		private Amount getBalance(final Account account) {
 			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
+		}
+
+		private Amount getCreditedAmount(final Account account) {
+			return this.creditedAmounts.getOrDefault(account, Amount.ZERO);
+		}
+
+		private Amount getDebitedAmount(final Account account) {
+			return this.debitedAmounts.getOrDefault(account, Amount.ZERO);
 		}
 	}
 }

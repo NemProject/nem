@@ -273,7 +273,7 @@ public class PushServiceTest {
 		// (cached validation result should be used)
 		context.service.pushTransaction(transaction, null);
 
-		// time provider supplies time stamp 11 seconds later than second one --> first and second transaction pruned.
+		// time provider supplies time stamp 64 seconds later than second one --> first and second transaction pruned.
 		// (cached validation result should NOT be used)
 		context.service.pushTransaction(transaction, null);
 
@@ -397,8 +397,8 @@ public class PushServiceTest {
 							new TimeInstant(1122448),
 							new TimeInstant(1122448),
 							new TimeInstant(1122448 + 5),
-							new TimeInstant(1122448 + 16),
-							new TimeInstant(1122448 + 16));
+							new TimeInstant(1122448 + 64),
+							new TimeInstant(1122448 + 64));
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
