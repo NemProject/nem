@@ -259,7 +259,7 @@ public class UnconfirmedTransactions {
 				for (final Transaction transaction : getReverseTransactions(block)) {
 					this.remove(transaction);
 				}
-			} catch (Exception e) { // TODO 20141218 J-B: can we at least catch a more specific exception? we can't really recover from every possible failure
+			} catch (final Exception e) { // TODO 20141218 J-B: can we at least catch a more specific exception? we can't really recover from every possible failure
 				LOGGER.severe("exception during removal of unconfirmed transactions, rebuilding cache");
 				this.rebuildCache(this.getAll());
 				return;
@@ -501,7 +501,7 @@ public class UnconfirmedTransactions {
 		}
 
 		private boolean unconfirmedBalancesAreValid() {
-			for (Account account : this.creditedAmounts.keySet()) {
+			for (final Account account : this.creditedAmounts.keySet()) {
 				if (this.getBalance(account).add(this.getCreditedAmount(account)).compareTo(this.getDebitedAmount(account)) < 0) {
 					return false;
 				}
