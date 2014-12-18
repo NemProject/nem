@@ -118,7 +118,7 @@ public class VerifiableEntityTest {
 		}
 
 		public int getInnerNonVerifiableData() {
-			return innerNonVerifiableData;
+			return this.innerNonVerifiableData;
 		}
 	}
 

@@ -13,7 +13,7 @@ public class MultisigModificationTest {
 	//region creation
 	@Test
 	public void canCreateMultisigModificationAdd() {
-		assertCreateMultisigModification(MultisigModificationType.Add);
+		this.assertCreateMultisigModification(MultisigModificationType.Add);
 	}
 
 	@Test
@@ -50,13 +50,13 @@ public class MultisigModificationTest {
 		this.assertDeserializationFailure(jsonObject -> jsonObject.put("modificationType", 123), IllegalArgumentException.class);
 	}
 
-	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer, Class<?> exceptionClass) {
+	private void assertDeserializationFailure(final Consumer<JSONObject> invalidateJsonConsumer, final Class<?> exceptionClass) {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
 
-		final MultisigModification originalEntity = createMultisigModification(MultisigModificationType.Add, cosignatory);
+		final MultisigModification originalEntity = this.createMultisigModification(MultisigModificationType.Add, cosignatory);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(originalEntity);
 		invalidateJsonConsumer.accept(jsonObject); // invalidate the json
 
@@ -73,7 +73,7 @@ public class MultisigModificationTest {
 		final MultisigModificationType modificationType = MultisigModificationType.Add;
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(cosignatory);
-		final MultisigModification originalEntity = createMultisigModification(modificationType, cosignatory);
+		final MultisigModification originalEntity = this.createMultisigModification(modificationType, cosignatory);
 
 		// Act:
 		final MultisigModification entity = this.createRoundTrippedTransaction(originalEntity, accountLookup);

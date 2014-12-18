@@ -13,7 +13,7 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 	private final boolean blockCreation;
 	private final Supplier<Collection<Transaction>> transactionsSupplier;
 
-	public MultisigSignatureValidator(final ReadOnlyAccountStateCache stateCache, boolean blockCreation, final Supplier<Collection<Transaction>> transactionsSupplier) {
+	public MultisigSignatureValidator(final ReadOnlyAccountStateCache stateCache, final boolean blockCreation, final Supplier<Collection<Transaction>> transactionsSupplier) {
 		this.stateCache = stateCache;
 		this.blockCreation = blockCreation;
 		this.transactionsSupplier = transactionsSupplier;

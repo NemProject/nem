@@ -33,7 +33,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	}
 
 	private static void validateModifications(final List<MultisigModification> modifications) {
-		if (modifications == null || modifications.size() == 0) {
+		if (modifications == null || modifications.isEmpty()) {
 			throw new IllegalArgumentException("no modifications on the list");
 		}
 	}

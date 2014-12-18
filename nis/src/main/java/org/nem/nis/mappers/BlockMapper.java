@@ -38,26 +38,26 @@ public class BlockMapper {
 		int importanceTransferIndex = 0;
 		int transferIndex = 0;
 
-		private BlockTransactionDbMapper(final AccountDaoLookup accountDao, final org.nem.nis.dbmodel.Block dbBlock, int initialCapacity) {
+		private BlockTransactionDbMapper(final AccountDaoLookup accountDao, final org.nem.nis.dbmodel.Block dbBlock, final int initialCapacity) {
 			this.accountDao = accountDao;
 			this.dbBlock = dbBlock;
 			this.transferTransactions = new ArrayList<>(initialCapacity);
 		}
 
-		private MultisigTransaction handleMultisig(Transaction transaction) {
+		private MultisigTransaction handleMultisig(final Transaction transaction) {
 			final MultisigTransaction dbTransfer = MultisigTransactionMapper.toDbModel(
 					(org.nem.core.model.MultisigTransaction)transaction,
-					i,
-					multisigTransactionsIndex++,
-					accountDao);
-			dbTransfer.setBlock(dbBlock);
-			multisigTransactions.add(dbTransfer);
+					this.i,
+					this.multisigTransactionsIndex++,
+					this.accountDao);
+			dbTransfer.setBlock(this.dbBlock);
+			this.multisigTransactions.add(dbTransfer);
 
 			return dbTransfer;
 		}
 
 		private void handleTransaction(final Transaction transaction) {
-			handleTransaction(transaction, null);
+			this.handleTransaction(transaction, null);
 		}
 
 		private void handleTransaction(final Transaction transaction, final MultisigTransaction multisig) {
@@ -65,11 +65,11 @@ public class BlockMapper {
 				case TransactionTypes.TRANSFER: {
 					final Transfer dbTransfer = TransferMapper.toDbModel(
 							(TransferTransaction)transaction,
-							i,
-							importanceTransferIndex++,
-							accountDao);
-					dbTransfer.setBlock(dbBlock);
-					transferTransactions.add(dbTransfer);
+							this.i,
+							this.importanceTransferIndex++,
+							this.accountDao);
+					dbTransfer.setBlock(this.dbBlock);
+					this.transferTransactions.add(dbTransfer);
 
 					if (multisig != null) {
 						multisig.setTransfer(dbTransfer);
@@ -79,11 +79,11 @@ public class BlockMapper {
 				case TransactionTypes.IMPORTANCE_TRANSFER: {
 					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel(
 							(ImportanceTransferTransaction)transaction,
-							i,
-							transferIndex++,
-							accountDao);
-					dbTransfer.setBlock(dbBlock);
-					importanceTransferTransactions.add(dbTransfer);
+							this.i,
+							this.transferIndex++,
+							this.accountDao);
+					dbTransfer.setBlock(this.dbBlock);
+					this.importanceTransferTransactions.add(dbTransfer);
 
 					if (multisig != null) {
 						multisig.setImportanceTransfer(dbTransfer);
@@ -93,11 +93,11 @@ public class BlockMapper {
 				case TransactionTypes.MULTISIG_SIGNER_MODIFY: {
 					final MultisigSignerModification dbTransfer = MultisigSignerModificationMapper.toDbModel(
 							(MultisigSignerModificationTransaction)transaction,
-							i,
-							multisigSignerModificationsIndex++,
-							accountDao);
-					dbTransfer.setBlock(dbBlock);
-					multisigSignerModificationsTransactions.add(dbTransfer);
+							this.i,
+							this.multisigSignerModificationsIndex++,
+							this.accountDao);
+					dbTransfer.setBlock(this.dbBlock);
+					this.multisigSignerModificationsTransactions.add(dbTransfer);
 
 					if (multisig != null) {
 						multisig.setMultisigSignerModification(dbTransfer);
@@ -120,15 +120,15 @@ public class BlockMapper {
 
 			// if current transaction is part of multisig transaction we will NOT increment blockindex
 			if (multisig == null) {
-				i++;
+				this.i++;
 			}
 		}
 
 		public void saveTransfers() {
-			this.dbBlock.setBlockTransfers(transferTransactions);
-			this.dbBlock.setBlockImportanceTransfers(importanceTransferTransactions);
-			this.dbBlock.setBlockMultisigSignerModifications(multisigSignerModificationsTransactions);
-			this.dbBlock.setBlockMultisigTransactions(multisigTransactions);
+			this.dbBlock.setBlockTransfers(this.transferTransactions);
+			this.dbBlock.setBlockImportanceTransfers(this.importanceTransferTransactions);
+			this.dbBlock.setBlockMultisigSignerModifications(this.multisigSignerModificationsTransactions);
+			this.dbBlock.setBlockMultisigTransactions(this.multisigTransactions);
 		}
 	}
 

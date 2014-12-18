@@ -24,10 +24,10 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 	private void notify(final MultisigModificationNotification notification, final BlockNotificationContext context) {
 		final Address multisigAddress = notification.getMultisigAccount().getAddress();
 		final AccountState multisigState = this.stateCache.findStateByAddress(multisigAddress);
-		boolean execute = NotificationTrigger.Execute == context.getTrigger();
+		final boolean execute = NotificationTrigger.Execute == context.getTrigger();
 
 		for (final MultisigModification modification : notification.getModifications()) {
-			boolean add = MultisigModificationType.Add == modification.getModificationType();
+			final boolean add = MultisigModificationType.Add == modification.getModificationType();
 			final Address cosignatoryAddress = modification.getCosignatory().getAddress();
 			final AccountState cosignatoryState = this.stateCache.findStateByAddress(cosignatoryAddress);
 

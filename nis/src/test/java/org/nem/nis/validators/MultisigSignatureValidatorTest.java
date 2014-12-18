@@ -108,11 +108,11 @@ public class MultisigSignatureValidatorTest {
 
 		private Transaction createTransaction(final Hash otherTransactionHash) {
 			//signer.incrementBalance(Amount.fromNem(2001));
-			this.addPoiState(signer);
+			this.addPoiState(this.signer);
 
 			return new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
-					signer,
+					this.signer,
 					otherTransactionHash
 			);
 		}
@@ -143,7 +143,7 @@ public class MultisigSignatureValidatorTest {
 			this.stateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), TEST_HEIGHT);
 		}
 
-		public boolean debitPredicate(Account account, Amount amount) {
+		public boolean debitPredicate(final Account account, final Amount amount) {
 			final Amount balance = this.stateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 			return balance.compareTo(amount) >= 0;
 		}

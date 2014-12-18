@@ -30,7 +30,7 @@ public class MultisigSignature {
 	private MultisigTransaction multisigTransaction;
 
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final Long id) {
@@ -38,7 +38,7 @@ public class MultisigSignature {
 	}
 
 	public Long getShortId() {
-		return shortId;
+		return this.shortId;
 	}
 
 	public void setShortId(final Long shortId) {
@@ -55,15 +55,15 @@ public class MultisigSignature {
 	}
 
 	public Integer getVersion() {
-		return version;
+		return this.version;
 	}
 
-	public void setVersion(Integer version) {
+	public void setVersion(final Integer version) {
 		this.version = version;
 	}
 
 	public Long getFee() {
-		return fee;
+		return this.fee;
 	}
 
 	public void setFee(final Long fee) {
@@ -71,7 +71,7 @@ public class MultisigSignature {
 	}
 
 	public Integer getTimeStamp() {
-		return timeStamp;
+		return this.timeStamp;
 	}
 
 	public void setTimeStamp(final Integer timeStamp) {
@@ -79,7 +79,7 @@ public class MultisigSignature {
 	}
 
 	public Integer getDeadline() {
-		return deadline;
+		return this.deadline;
 	}
 
 	public void setDeadline(final Integer deadline) {
@@ -87,7 +87,7 @@ public class MultisigSignature {
 	}
 
 	public Account getSender() {
-		return sender;
+		return this.sender;
 	}
 
 	public void setSender(final Account sender) {
@@ -103,7 +103,7 @@ public class MultisigSignature {
 	}
 
 	public MultisigTransaction getMultisigTransaction() {
-		return multisigTransaction;
+		return this.multisigTransaction;
 	}
 
 	public void setMultisigTransaction(final MultisigTransaction multisigTransaction) {

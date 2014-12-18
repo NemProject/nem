@@ -15,7 +15,7 @@ import java.util.*;
 public class MultisigAccountObserverTest {
 	@Test
 	public void notifyTransferExecuteAddAddsMultisigLinks() {
-		final TestContext context = notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Execute);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Execute);
 
 		// Assert:
 		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().addCosignatory(context.account2.getAddress(), new BlockHeight(111));
@@ -24,7 +24,7 @@ public class MultisigAccountObserverTest {
 
 	@Test
 	public void notifyTransferUndoAddRemovesMultisigLinks() {
-		final TestContext context = notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Undo);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Undo);
 
 		// Assert:
 		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
@@ -34,7 +34,7 @@ public class MultisigAccountObserverTest {
 	// TODO: This test is wrong, it should use MultisigModificationType.Del
 	@Test
 	public void notifyTransferExecuteDelRemovedMultisigLinks() {
-		final TestContext context = notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Execute);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Execute);
 
 		// Assert:
 		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
@@ -44,7 +44,7 @@ public class MultisigAccountObserverTest {
 	// TODO: This test is wrong, it should use MultisigModificationType.Del
 	@Test
 	public void notifyTransferUndoDelAddsMultisigLinks() {
-		final TestContext context = notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Undo);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Undo);
 
 		// Assert:
 		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().addCosignatory(context.account2.getAddress(), new BlockHeight(111));

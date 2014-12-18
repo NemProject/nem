@@ -130,23 +130,23 @@ public class MultisigLinksTest {
 		final BlockHeight blockHeight = new BlockHeight(1234L);
 
 		public void addCosignatory(final Address address) {
-			multisigLinks.addCosignatory(address, blockHeight);
+			this.multisigLinks.addCosignatory(address, this.blockHeight);
 		}
 
 		public void removeCosignatory(final Address address) {
-			multisigLinks.removeCosignatory(address, blockHeight);
+			this.multisigLinks.removeCosignatory(address, this.blockHeight);
 		}
 
 		public void addMultisig(final Address address) {
-			multisigLinks.addMultisig(address, blockHeight);
+			this.multisigLinks.addMultisig(address, this.blockHeight);
 		}
 
 		public void removeMultisig(final Address address) {
-			multisigLinks.removeMultisig(address, blockHeight);
+			this.multisigLinks.removeMultisig(address, this.blockHeight);
 		}
 
 		public MultisigLinks makeCopy() {
-			return multisigLinks.copy();
+			return this.multisigLinks.copy();
 		}
 	}
 }

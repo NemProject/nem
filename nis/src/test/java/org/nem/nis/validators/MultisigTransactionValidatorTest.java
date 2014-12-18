@@ -76,19 +76,19 @@ public class MultisigTransactionValidatorTest {
 
 		private MultisigTransaction createTransaction() {
 			final Account recipient = Utils.generateRandomAccount();
-			this.addPoiState(signer);
-			this.addPoiState(multisig);
-			this.stateCache.findStateByAddress(signer.getAddress()).getAccountInfo().incrementBalance(Amount.fromNem(2001));
+			this.addPoiState(this.signer);
+			this.addPoiState(this.multisig);
+			this.stateCache.findStateByAddress(this.signer.getAddress()).getAccountInfo().incrementBalance(Amount.fromNem(2001));
 			final Transaction otherTransaction = new TransferTransaction(
 					TimeInstant.ZERO,
-					multisig,
+					this.multisig,
 					recipient,
 					Amount.fromNem(1234),
 					null
 			);
 			return new MultisigTransaction(
 					TimeInstant.ZERO,
-					signer,
+					this.signer,
 					otherTransaction);
 		}
 
@@ -104,7 +104,7 @@ public class MultisigTransactionValidatorTest {
 			this.stateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), TEST_HEIGHT);
 		}
 
-		public boolean debitPredicate(Account account, Amount amount) {
+		public boolean debitPredicate(final Account account, final Amount amount) {
 			final Amount balance = this.stateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 			return balance.compareTo(amount) >= 0;
 		}

@@ -220,7 +220,7 @@ public class UnconfirmedTransactions {
 		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
-	private SingleTransactionValidator createSingleValidator(boolean blockCreation) {
+	private SingleTransactionValidator createSingleValidator(final boolean blockCreation) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));

@@ -117,7 +117,7 @@ public class MultisigSignerModificationMapperTest {
 
 			final MultisigModification expectedModification = this.model.getModifications().get(0);
 			final PublicKey remotePublicKey = this.model.getModifications().get(0).getCosignatory().getAddress().getPublicKey();
-			for (org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications()) {
+			for (final org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications()) {
 				Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(this.dbCosignatory));
 				Assert.assertThat(modification.getCosignatory().getPublicKey(), IsEqual.equalTo(remotePublicKey));
 				Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(expectedModification.getModificationType().value()));

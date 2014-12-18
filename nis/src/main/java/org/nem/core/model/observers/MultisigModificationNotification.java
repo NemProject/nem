@@ -17,7 +17,7 @@ public class MultisigModificationNotification extends Notification {
 	 * @param multisigAccount The multisig account.
 	 * @param modifications The list of modifications.
 	 */
-	public MultisigModificationNotification(final Account multisigAccount, List<MultisigModification> modifications) {
+	public MultisigModificationNotification(final Account multisigAccount, final List<MultisigModification> modifications) {
 		super(NotificationType.CosignatoryModification);
 		this.multisigAccount = multisigAccount;
 		this.modifications = modifications;

@@ -47,7 +47,7 @@ public class MultisigTransaction extends AbstractTransfer<MultisigTransaction> {
 	}
 
 	public Transfer getTransfer() {
-		return transfer;
+		return this.transfer;
 	}
 
 	public void setTransfer(final Transfer transfer) {
@@ -55,7 +55,7 @@ public class MultisigTransaction extends AbstractTransfer<MultisigTransaction> {
 	}
 
 	public ImportanceTransfer getImportanceTransfer() {
-		return importanceTransfer;
+		return this.importanceTransfer;
 	}
 
 	public void setImportanceTransfer(final ImportanceTransfer importanceTransfer) {
@@ -63,7 +63,7 @@ public class MultisigTransaction extends AbstractTransfer<MultisigTransaction> {
 	}
 
 	public MultisigSignerModification getMultisigSignerModification() {
-		return multisigSignerModification;
+		return this.multisigSignerModification;
 	}
 
 	public void setMultisigSignerModification(final MultisigSignerModification multisigSignerModification) {
@@ -71,7 +71,7 @@ public class MultisigTransaction extends AbstractTransfer<MultisigTransaction> {
 	}
 
 	public Set<MultisigSignature> getMultisigSignatures() {
-		return multisigSignatures;
+		return this.multisigSignatures;
 	}
 
 	public void setMultisigSignatures(final Set<MultisigSignature> multisigSignatures) {

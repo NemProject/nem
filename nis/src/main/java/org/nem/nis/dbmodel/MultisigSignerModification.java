@@ -26,7 +26,7 @@ public class MultisigSignerModification extends AbstractTransfer<MultisigSignerM
 	}
 
 	public Set<MultisigModification> getMultisigModifications() {
-		return multisigModifications;
+		return this.multisigModifications;
 	}
 
 	public void setMultisigModifications(final Set<MultisigModification> multisigModifications) {

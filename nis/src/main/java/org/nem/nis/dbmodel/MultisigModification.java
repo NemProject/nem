@@ -32,10 +32,10 @@ public class MultisigModification {
 	}
 
 	public MultisigSignerModification getMultisigSignerModification() {
-		return multisigSignerModification;
+		return this.multisigSignerModification;
 	}
 
-	public void setMultisigSignerModification(MultisigSignerModification multisigSignerModification) {
+	public void setMultisigSignerModification(final MultisigSignerModification multisigSignerModification) {
 		this.multisigSignerModification = multisigSignerModification;
 	}
 

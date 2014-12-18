@@ -10,7 +10,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	private final ReadOnlyAccountStateCache stateCache;
 	private final boolean blockCreation;
 
-	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache, boolean blockCreation) {
+	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache, final boolean blockCreation) {
 		this.stateCache = stateCache;
 		this.blockCreation = blockCreation;
 	}
@@ -58,7 +58,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
 			}
-			boolean hasCosigner = transaction.getCosignerSignatures().stream()
+			final boolean hasCosigner = transaction.getCosignerSignatures().stream()
 					.anyMatch(
 							t -> t.getOtherTransactionHash().equals(transactionHash) &&
 									t.getSigner().getAddress().equals(cosignerAddress)

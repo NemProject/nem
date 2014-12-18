@@ -37,11 +37,11 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	}
 
 	public boolean isMultisig() {
-		return 0 != this.cosignatories.size();
+		return !this.cosignatories.isEmpty();
 	}
 
 	public boolean isCosignatory() {
-		return 0 != this.cosignatoryOf.size();
+		return !this.cosignatoryOf.isEmpty();
 	}
 
 	public boolean isCosignatoryOf(final Address signer) {

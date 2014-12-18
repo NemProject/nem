@@ -41,7 +41,7 @@ public class MultisigTransactionMapper {
 	}
 
 	public static org.nem.core.model.MultisigTransaction toModel(final MultisigTransaction dbTransfer, final AccountLookup accountLookup) {
-		Transaction otherTransaction;
+		final Transaction otherTransaction;
 		if (dbTransfer.getTransfer() != null) {
 			otherTransaction = TransferMapper.toModel(dbTransfer.getTransfer(), accountLookup);
 		} else if (dbTransfer.getImportanceTransfer() != null) {

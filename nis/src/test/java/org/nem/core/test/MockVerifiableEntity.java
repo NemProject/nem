@@ -83,7 +83,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
 		return this.nonVerifiableData;
 	}
 
-	public void setNonVerifiableData(int nonVerifiableData) {
+	public void setNonVerifiableData(final int nonVerifiableData) {
 		this.nonVerifiableData = nonVerifiableData;
 	}
 

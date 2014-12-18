@@ -82,7 +82,7 @@ public class MultisigSignatureTransactionMapperTest {
 		}
 
 		public MultisigSignatureTransaction toModel(final MultisigSignature dbModel) {
-			MultisigSignatureTransaction f = MultisigSignatureTransactionMapper.toModel(dbModel, this.mockAccountLookup, this.multisigTransaction);
+			final MultisigSignatureTransaction f = MultisigSignatureTransactionMapper.toModel(dbModel, this.mockAccountLookup, this.multisigTransaction);
 			return f;
 		}
 

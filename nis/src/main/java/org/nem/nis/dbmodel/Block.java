@@ -244,7 +244,7 @@ public class Block {
 	}
 
 	public List<MultisigTransaction> getBlockMultisigTransactions() {
-		return blockMultisigTransactions;
+		return this.blockMultisigTransactions;
 	}
 
 	public void setBlockMultisigTransactions(final List<MultisigTransaction> blockMultisigTransactions) {

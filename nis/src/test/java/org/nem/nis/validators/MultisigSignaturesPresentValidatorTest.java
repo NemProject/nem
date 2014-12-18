@@ -21,7 +21,7 @@ public class MultisigSignaturesPresentValidatorTest {
 	@Test
 	public void validatorCanValidateOtherTransactions() {
 		assertCanValidateOtherTransactions(BlockHeight.ONE);
-		assertCanValidateOtherTransactions(FORK_HEIGHT);
+		assertCanValidateOtherTransactions(this.FORK_HEIGHT);
 	}
 
 	private static void assertCanValidateOtherTransactions(final BlockHeight blockHeight) {
@@ -40,15 +40,15 @@ public class MultisigSignaturesPresentValidatorTest {
 	//region single cosigner
 	@Test
 	public void properTransactionWithSingleCosignerBelowForkDoesNotValidate() {
-		assertProperTransaction(BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		assertProperTransaction(this.BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE);
 	}
 
 	@Test
 	public void properTransactionWithSingleCosignerValidates() {
-		assertProperTransaction(FORK_HEIGHT, ValidationResult.SUCCESS);
+		assertProperTransaction(this.FORK_HEIGHT, ValidationResult.SUCCESS);
 	}
 
-	private static void assertProperTransaction(final BlockHeight blockHeight, ValidationResult validationResult) {
+	private static void assertProperTransaction(final BlockHeight blockHeight, final ValidationResult validationResult) {
 		// Arrange:
 		final TestContext context = new TestContext(true);
 		final Transaction transaction = context.createTransaction();
@@ -65,17 +65,17 @@ public class MultisigSignaturesPresentValidatorTest {
 	//region multiple cosigner
 	@Test
 	public void properTransactionWithMultipleCosignersBelowForkDoesNotValidate() {
-		assertProperTransactionMultiple(BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE, (ctx, t) -> {});
+		this.assertProperTransactionMultiple(this.BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE, (ctx, t) -> {});
 	}
 
 	@Test
 	public void properTransactionWithMultipleCosignersDoesNotValidateIfSignaturesAreMissing() {
-		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS, (ctx, t) -> {});
+		this.assertProperTransactionMultiple(this.FORK_HEIGHT, ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS, (ctx, t) -> {});
 	}
 
 	@Test
 	public void properTransactionWithMultipleCosignersValidates() {
-		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.SUCCESS, (ctx, t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction)t));
+		this.assertProperTransactionMultiple(this.FORK_HEIGHT, ValidationResult.SUCCESS, (ctx, t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction)t));
 	}
 
 	private void assertProperTransactionMultiple(final BlockHeight blockHeight, final ValidationResult validationResult, final BiConsumer<TestContext, Transaction> addSignature) {
@@ -99,16 +99,16 @@ public class MultisigSignaturesPresentValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext(true);
 		final Transaction transaction = context.createTransaction();
-		context.makeCosignatory(context.signer, context.multisig, FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
 		context.addSignature(context.dummy, (MultisigTransaction)transaction);
 
 		final Account thirdAccount = Utils.generateRandomAccount();
 		context.addPoiState(thirdAccount);
-		context.makeCosignatory(thirdAccount, context.multisig, FORK_HEIGHT);
+		context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(FORK_HEIGHT, context::debitPredicate));
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(this.FORK_HEIGHT, context::debitPredicate));
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS));
@@ -131,8 +131,8 @@ public class MultisigSignaturesPresentValidatorTest {
 		}
 
 		public MultisigTransaction createTransaction() {
-			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(123), null);
-			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, signer, otherTransaction);
+			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, this.multisig, this.recipient, Amount.fromNem(123), null);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);
 			transaction.sign();
 			return transaction;
 		}
@@ -155,7 +155,7 @@ public class MultisigSignaturesPresentValidatorTest {
 					HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
 		}
 
-		public boolean debitPredicate(Account account, Amount amount) {
+		public boolean debitPredicate(final Account account, final Amount amount) {
 			final Amount balance = this.accountCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
 			return balance.compareTo(amount) >= 0;
 		}

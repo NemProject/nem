@@ -180,9 +180,9 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		dropTransfers(blockHeight, "Transfer", "blockTransfers", (v) -> {});
-		dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
-		dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications", (transactionsToDelete) -> {
+		this.dropTransfers(blockHeight, "Transfer", "blockTransfers", (v) -> {});
+		this.dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
+		this.dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications", (transactionsToDelete) -> {
 			final Query preQuery = this.getCurrentSession()
 					.createQuery("delete from MultisigModification m where m.multisigSignerModification.id in (:ids)")
 					.setParameterList("ids", transactionsToDelete);
@@ -190,7 +190,7 @@ public class BlockDaoImpl implements BlockDao {
 		});
 
 		// must be last
-		dropTransfers(blockHeight, "MultisigTransaction", "blockMultisigTransactions", (v) -> {});
+		this.dropTransfers(blockHeight, "MultisigTransaction", "blockMultisigTransactions", (v) -> {});
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
