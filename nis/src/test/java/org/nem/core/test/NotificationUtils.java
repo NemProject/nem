@@ -6,8 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Static class providing helper functions for validating notifications.

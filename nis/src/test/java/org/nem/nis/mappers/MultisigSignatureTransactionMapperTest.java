@@ -1,20 +1,14 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsNull;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.PublicKey;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.MultisigTransaction;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.MockAccountLookup;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigSignature;
 import org.nem.nis.test.MockAccountDao;
 
 public class MultisigSignatureTransactionMapperTest {
@@ -71,7 +65,6 @@ public class MultisigSignatureTransactionMapperTest {
 			this.model.setFee(Amount.fromNem(11));
 			this.model.setDeadline(new TimeInstant(800));
 			this.model.sign();
-
 
 			this.hash = HashUtils.calculateHash(this.model);
 			this.mockAccountLookup.setMockAccount(this.model.getSigner());

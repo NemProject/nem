@@ -50,7 +50,7 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 				continue;
 			}
 
-			if (! multisigTransaction.getOtherTransactionHash().equals(signatureTransaction.getOtherTransactionHash())) {
+			if (!multisigTransaction.getOtherTransactionHash().equals(signatureTransaction.getOtherTransactionHash())) {
 				return ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG;
 			}
 

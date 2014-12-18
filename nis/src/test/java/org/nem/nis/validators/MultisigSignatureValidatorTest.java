@@ -1,21 +1,18 @@
 package org.nem.nis.validators;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MultisigSignatureValidatorTest {
 	private static final BlockHeight BAD_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK - 1);
@@ -121,7 +118,11 @@ public class MultisigSignatureValidatorTest {
 		}
 
 		private MultisigTransaction createMultisigTransaction(final Account multisig, final Account cosignatory) {
-			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, multisig, Utils.generateRandomAccount(), Amount.fromNem(123), null);
+			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO,
+					multisig,
+					Utils.generateRandomAccount(),
+					Amount.fromNem(123),
+					null);
 			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, cosignatory, otherTransaction);
 			transaction.sign();
 
@@ -141,7 +142,6 @@ public class MultisigSignatureValidatorTest {
 			this.stateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), TEST_HEIGHT);
 			this.stateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), TEST_HEIGHT);
 		}
-
 
 		public boolean debitPredicate(Account account, Amount amount) {
 			final Amount balance = this.stateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();

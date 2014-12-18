@@ -1,6 +1,5 @@
 package org.nem.nis.dbmodel;
 
-
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -32,7 +31,6 @@ public class MultisigModification {
 	public MultisigModification() {
 	}
 
-
 	public MultisigSignerModification getMultisigSignerModification() {
 		return multisigSignerModification;
 	}
@@ -56,5 +54,4 @@ public class MultisigModification {
 	public void setModificationType(final Integer modificationType) {
 		this.modificationType = modificationType;
 	}
-
 }

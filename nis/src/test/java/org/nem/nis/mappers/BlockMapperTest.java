@@ -13,11 +13,9 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.MultisigSignerModification;
 import org.nem.nis.test.MockAccountDao;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class BlockMapperTest {
 
@@ -313,7 +311,7 @@ public class BlockMapperTest {
 		// Assert:
 		context.assertModel(model);
 		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(1));
-		final MultisigTransaction transaction = (MultisigTransaction) model.getTransactions().get(0);
+		final MultisigTransaction transaction = (MultisigTransaction)model.getTransactions().get(0);
 
 		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(2));
 	}
@@ -455,7 +453,7 @@ public class BlockMapperTest {
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(4));
 		for (int i = 0; i < 2; ++i) {
 			// note: we're skipping in DB too, as those are the ones that "belong" to multisig TXes
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2*i);
+			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2 * i);
 			final Transaction transaction = context.getModel().getTransactions().get(2 * i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -469,11 +467,11 @@ public class BlockMapperTest {
 		for (int i = 0; i < 2; ++i) {
 			final org.nem.nis.dbmodel.MultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(i);
 			// transfer that "belongs" to multisig
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2*i + 1);
+			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2 * i + 1);
 
 			// YES, they should be equal
-			Assert.assertThat(dbMultisig.getBlkIndex(), IsEqual.equalTo(2*i + 1));
-			Assert.assertThat(dbTransfer.getBlkIndex(), IsEqual.equalTo(2*i + 1));
+			Assert.assertThat(dbMultisig.getBlkIndex(), IsEqual.equalTo(2 * i + 1));
+			Assert.assertThat(dbTransfer.getBlkIndex(), IsEqual.equalTo(2 * i + 1));
 		}
 
 		for (int i = 0; i < 4; ++i) {

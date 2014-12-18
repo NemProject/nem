@@ -28,7 +28,7 @@ public class MockVerifiableEntity extends VerifiableEntity {
 	/**
 	 * Creates a mock verifiable entity.
 	 *
-	 * @param signer      The owner's account.
+	 * @param signer The owner's account.
 	 * @param customField The initial custom field value.
 	 */
 	public MockVerifiableEntity(final Account signer, final int customField) {

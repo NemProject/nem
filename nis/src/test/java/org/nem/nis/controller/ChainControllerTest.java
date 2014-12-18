@@ -14,7 +14,6 @@ import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.Transfer;
-import org.nem.nis.mappers.AbstractTransferMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.NisUtils;

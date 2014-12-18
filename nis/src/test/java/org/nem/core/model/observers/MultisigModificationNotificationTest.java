@@ -5,8 +5,7 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class MultisigModificationNotificationTest {
 

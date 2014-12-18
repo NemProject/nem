@@ -16,11 +16,10 @@ public enum MultisigModificationType {
 
 	/**
 	 * Removal summary:
-	 *
 	 * 1. Removal will only be allowed in multisig transactions
 	 * 2. There can be only one Del per MultisigSignerModificationTransaction
 	 * 3. There will be N-2 signatures required
-	 *    (1 that gets removed, and 1 for person issuing MultisigTransaction)
+	 * (1 that gets removed, and 1 for person issuing MultisigTransaction)
 	 */
 	//Del(2);
 
@@ -33,7 +32,7 @@ public enum MultisigModificationType {
 	public boolean isValid() {
 		switch (this) {
 			case Add:
-			//case Del:
+				//case Del:
 				return true;
 		}
 

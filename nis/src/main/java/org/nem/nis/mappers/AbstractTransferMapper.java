@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.AbstractTransfer;
 
 // TODO 20141119 - this is a temporary class to illustrate the MappedSuperclass
 public class AbstractTransferMapper {

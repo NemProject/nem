@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.persistence.Entity;
-import java.lang.reflect.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -694,7 +694,6 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(blocks.size(), IsEqual.equalTo(7));
 	}
-
 
 	@Test
 	public void getBlocksAfterReturnsBlocksWithTransactions() throws Exception {

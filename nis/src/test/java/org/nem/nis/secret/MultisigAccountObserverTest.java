@@ -1,17 +1,16 @@
 package org.nem.nis.secret;
 
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.observers.MultisigModificationNotification;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.NisUtils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class MultisigAccountObserverTest {
 	@Test
@@ -51,7 +50,6 @@ public class MultisigAccountObserverTest {
 		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().addCosignatory(context.account2.getAddress(), new BlockHeight(111));
 		Mockito.verify(context.account2State, Mockito.times(1)).getMultisigLinks().addMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
-
 
 	private TestContext notifyTransferPrepare(final MultisigModificationType value, final NotificationTrigger notificationTrigger) {
 		// Arrange:

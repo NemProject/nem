@@ -2,13 +2,10 @@ package org.nem.core.model;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.*;
-import org.nem.core.test.ExceptionAssert;
-import org.nem.core.test.MockAccountLookup;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
 import java.util.function.Consumer;
 
@@ -100,5 +97,4 @@ public class MultisigModificationTest {
 				add,
 				cosignatory);
 	}
-
 }

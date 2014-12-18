@@ -39,6 +39,5 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 				cosignatoryState.getMultisigLinks().removeMultisig(multisigAddress, context.getHeight());
 			}
 		}
-
 	}
 }

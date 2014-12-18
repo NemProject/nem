@@ -1,15 +1,13 @@
 package org.nem.nis.harvesting;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChainConstants;
-import org.nem.nis.BlockMarkerConstants;
+import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
@@ -1165,7 +1163,6 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
-
 	@Test
 	public void getTransactionsForNewBlockDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
 		// Arrange:
@@ -1191,7 +1188,8 @@ public class UnconfirmedTransactionsTest {
 		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), currentTime.addMinutes(10));
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(),
+				currentTime.addMinutes(10));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -1231,7 +1229,8 @@ public class UnconfirmedTransactionsTest {
 		final ValidationResult result2 = context.transactions.addExisting(signatureTransaction);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(), currentTime.addMinutes(10));
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(),
+				currentTime.addMinutes(10));
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));

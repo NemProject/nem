@@ -35,7 +35,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	public Set<Address> getCosignatories() {
 		return this.cosignatories.keySet();
 	}
-	
+
 	public boolean isMultisig() {
 		return 0 != this.cosignatories.size();
 	}

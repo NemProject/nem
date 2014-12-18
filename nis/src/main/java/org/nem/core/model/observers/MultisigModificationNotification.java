@@ -39,6 +39,5 @@ public class MultisigModificationNotification extends Notification {
 	 */
 	public List<MultisigModification> getModifications() {
 		return this.modifications;
-
 	}
 }

@@ -2,7 +2,7 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-public class MultisigModification implements SerializableEntity{
+public class MultisigModification implements SerializableEntity {
 	private final MultisigModificationType modificationType;
 	private final Account cosignatoryAccount;
 
@@ -43,7 +43,6 @@ public class MultisigModification implements SerializableEntity{
 	public MultisigModificationType getModificationType() {
 		return this.modificationType;
 	}
-
 
 	public void validate() {
 		if (null == this.cosignatoryAccount) {

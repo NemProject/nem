@@ -1,20 +1,13 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.MultisigModification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.MultisigSignerModification;
 
-import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.MultisigTransaction;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Static class that contains functions for converting to and from
@@ -30,7 +23,6 @@ public class MultisigSignerModificationMapper {
 	 * @param blockIndex The index of the transfer within the owning block.
 	 * @param orderIndex The index of the transfer within the owning block's collection of similar transactions.
 	 * @param accountDaoLookup The account dao lookup object.
-	 *
 	 * @return The MultisigSignerModification db-model.
 	 */
 	public static MultisigSignerModification toDbModel(
@@ -65,7 +57,6 @@ public class MultisigSignerModificationMapper {
 	 *
 	 * @param dbMultisig The importance transfer db-model.
 	 * @param accountLookup The account lookup object.
-	 *
 	 * @return The MultisigSignerModificationTransaction model.
 	 */
 	public static MultisigSignerModificationTransaction toModel(final MultisigSignerModification dbMultisig, final AccountLookup accountLookup) {

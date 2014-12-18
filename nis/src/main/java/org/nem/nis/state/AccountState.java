@@ -83,6 +83,7 @@ public class AccountState implements ReadOnlyAccountState {
 	public MultisigLinks getMultisigLinks() {
 		return multisigLinks;
 	}
+
 	/**
 	 * Gets the account info.
 	 *

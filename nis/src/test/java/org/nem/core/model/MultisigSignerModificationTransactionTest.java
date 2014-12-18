@@ -9,9 +9,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class MultisigSignerModificationTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
@@ -66,7 +64,8 @@ public class MultisigSignerModificationTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
-		final MultisigSignerModificationTransaction originalTransaction = createMultisigSignerModificationTransaction(signer, createModificationList(modificationType, cosignatory));
+		final MultisigSignerModificationTransaction originalTransaction = createMultisigSignerModificationTransaction(signer,
+				createModificationList(modificationType, cosignatory));
 
 		// Act:
 		final MultisigSignerModificationTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, accountLookup);
@@ -99,7 +98,8 @@ public class MultisigSignerModificationTransactionTest {
 		final MultisigModificationType modificationType = MODIFICATION_ADD;
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, createModificationList(modificationType, cosignatory));
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer,
+				createModificationList(modificationType, cosignatory));
 
 		// Act + Assert:
 		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1000)));

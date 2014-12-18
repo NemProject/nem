@@ -1,9 +1,11 @@
 package org.nem.nis.dbmodel;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.*;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.*;
+import javax.persistence.Table;
 import java.util.Set;
 
 /**
@@ -11,12 +13,9 @@ import java.util.Set;
  * our model inheritance in DB (probably using "table per subclass", I went through some blogs
  * this probably is the closest one:
  * http://chriswongdevblog.blogspot.fr/2009/10/polymorphic-one-to-many-relationships.html
- *
  * basing on above and some other reading, it doesn't really make sense :/
- *
  * (That's also why I can't have single field that would be correctly joined :/)
  * I hoped I'll have members
- *
  * TODO 20141201 J-G: what issues did you have with "table per subclass"
  * TODO 20141202 G-J: I actually haven't tried it,
  * a) it would require serious changes (but I was actually ready to do them), but
@@ -26,7 +25,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "multisigtransactions")
-public class MultisigTransaction  extends AbstractTransfer<MultisigTransaction> {
+public class MultisigTransaction extends AbstractTransfer<MultisigTransaction> {
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "transferId")
 	private Transfer transfer;
@@ -46,7 +45,6 @@ public class MultisigTransaction  extends AbstractTransfer<MultisigTransaction> 
 	public MultisigTransaction() {
 		super(b -> b.getBlockMultisigTransactions());
 	}
-
 
 	public Transfer getTransfer() {
 		return transfer;

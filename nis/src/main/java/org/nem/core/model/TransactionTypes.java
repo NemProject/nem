@@ -54,5 +54,4 @@ public class TransactionTypes {
 	 * A multisig transaction.
 	 */
 	public static final int MULTISIG = MULTISIG_TYPE | 0x04;
-
 }

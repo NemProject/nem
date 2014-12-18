@@ -4,16 +4,13 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.MultisigModification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigSignerModification;
 import org.nem.nis.test.MockAccountDao;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class MultisigSignerModificationMapperTest {
 
@@ -41,7 +38,6 @@ public class MultisigSignerModificationMapperTest {
 		context.assertDbModel(dbModel, 7);
 	}
 
-
 	@Test
 	public void multisigSignerModificationModelCanBeRoundTripped() {
 		// Arrange:
@@ -54,6 +50,7 @@ public class MultisigSignerModificationMapperTest {
 		// Assert:
 		context.assertModel(model);
 	}
+
 	private class TestContext {
 		private final MultisigSignerModificationTransaction model;
 		private final org.nem.nis.dbmodel.Account dbSender;
@@ -120,8 +117,7 @@ public class MultisigSignerModificationMapperTest {
 
 			final MultisigModification expectedModification = this.model.getModifications().get(0);
 			final PublicKey remotePublicKey = this.model.getModifications().get(0).getCosignatory().getAddress().getPublicKey();
-			for (org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications())
-			{
+			for (org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications()) {
 				Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(this.dbCosignatory));
 				Assert.assertThat(modification.getCosignatory().getPublicKey(), IsEqual.equalTo(remotePublicKey));
 				Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(expectedModification.getModificationType().value()));
@@ -144,7 +140,8 @@ public class MultisigSignerModificationMapperTest {
 			final MultisigModification rhsModification = rhs.getModifications().get(0);
 			final MultisigModification expectedModification = this.model.getModifications().get(0);
 			Assert.assertThat(rhsModification.getCosignatory(), IsEqual.equalTo(expectedModification.getCosignatory()));
-			Assert.assertThat(rhsModification.getCosignatory().getAddress().getPublicKey(), IsEqual.equalTo(expectedModification.getCosignatory().getAddress().getPublicKey()));
+			Assert.assertThat(rhsModification.getCosignatory().getAddress().getPublicKey(),
+					IsEqual.equalTo(expectedModification.getCosignatory().getAddress().getPublicKey()));
 			Assert.assertThat(rhsModification.getModificationType(), IsEqual.equalTo(expectedModification.getModificationType()));
 		}
 	}

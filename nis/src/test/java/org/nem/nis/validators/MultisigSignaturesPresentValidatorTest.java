@@ -1,12 +1,10 @@
 package org.nem.nis.validators;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
@@ -67,17 +65,17 @@ public class MultisigSignaturesPresentValidatorTest {
 	//region multiple cosigner
 	@Test
 	public void properTransactionWithMultipleCosignersBelowForkDoesNotValidate() {
-		assertProperTransactionMultiple(BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE, (ctx,t)->{});
+		assertProperTransactionMultiple(BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE, (ctx, t) -> {});
 	}
 
 	@Test
 	public void properTransactionWithMultipleCosignersDoesNotValidateIfSignaturesAreMissing() {
-		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS, (ctx,t)->{});
+		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS, (ctx, t) -> {});
 	}
 
 	@Test
 	public void properTransactionWithMultipleCosignersValidates() {
-		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.SUCCESS, (ctx,t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction) t));
+		assertProperTransactionMultiple(FORK_HEIGHT, ValidationResult.SUCCESS, (ctx, t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction)t));
 	}
 
 	private void assertProperTransactionMultiple(final BlockHeight blockHeight, final ValidationResult validationResult, final BiConsumer<TestContext, Transaction> addSignature) {
@@ -139,7 +137,6 @@ public class MultisigSignaturesPresentValidatorTest {
 			return transaction;
 		}
 
-
 		private void addPoiState(final Account account) {
 			final Address address = account.getAddress();
 			final AccountState state = new AccountState(address);
@@ -152,9 +149,10 @@ public class MultisigSignaturesPresentValidatorTest {
 			this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
 		}
 
-
 		private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
-			multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO, signatureSigner, HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
+			multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO,
+					signatureSigner,
+					HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
 		}
 
 		public boolean debitPredicate(Account account, Amount amount) {
@@ -162,5 +160,4 @@ public class MultisigSignaturesPresentValidatorTest {
 			return balance.compareTo(amount) >= 0;
 		}
 	}
-
 }

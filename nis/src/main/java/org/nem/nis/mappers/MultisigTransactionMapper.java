@@ -1,17 +1,15 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.Hash;
 import org.nem.core.crypto.Signature;
-import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 // TODO 20141201 J-J: i will need to look at this a bit closer
 // TODO 20141201 J-J: guess we need tests for this

@@ -384,8 +384,8 @@ public class UnconfirmedTransactions {
 		synchronized (this.lock) {
 			final List<Transaction> transactions = this.transactions.values().stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-				.filter(tx -> this.filterMultisigTransactions(tx))
+					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
+					.filter(tx -> this.filterMultisigTransactions(tx))
 					.collect(Collectors.toList());
 
 			return this.sortTransactions(transactions);

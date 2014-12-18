@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
@@ -139,13 +139,13 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			return false;
 		}
 
-//		final byte[] innerTransactionBytes = BinarySerializer.serializeToBytes(this.otherTransaction.asNonVerifiable());
-//		return this.signatureTransactions.stream().allMatch(signatureTransaction -> {
-//			final Signer signer = new Signer(signatureTransaction.getSigner().getKeyPair());
-//			return signer.verify(innerTransactionBytes, signatureTransaction.getOtherTransactionSignature());
-//		});
+		//		final byte[] innerTransactionBytes = BinarySerializer.serializeToBytes(this.otherTransaction.asNonVerifiable());
+		//		return this.signatureTransactions.stream().allMatch(signatureTransaction -> {
+		//			final Signer signer = new Signer(signatureTransaction.getSigner().getKeyPair());
+		//			return signer.verify(innerTransactionBytes, signatureTransaction.getOtherTransactionSignature());
+		//		});
 		return
 				this.signatureTransactions.stream().allMatch(signatureTransactions -> signatureTransactions.getOtherTransactionHash().equals(this.getOtherTransactionHash())) &&
-				this.signatureTransactions.stream().allMatch(signatureTransaction -> signatureTransaction.verify());
+						this.signatureTransactions.stream().allMatch(signatureTransaction -> signatureTransaction.verify());
 	}
 }

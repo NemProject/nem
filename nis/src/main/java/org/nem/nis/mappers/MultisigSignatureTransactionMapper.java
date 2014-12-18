@@ -1,9 +1,8 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.Hash;
-import org.nem.core.crypto.Signature;
-import org.nem.core.model.*;
+import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
@@ -31,7 +30,7 @@ public class MultisigSignatureTransactionMapper {
 		final Address cosignerAddress = AccountToAddressMapper.toAddress(multisigSignature.getSender());
 		final Account cosigner = accountLookup.findByAddress(cosignerAddress);
 
-		final MultisigSignatureTransaction transaction= new MultisigSignatureTransaction(
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
 				new TimeInstant(multisigSignature.getTimeStamp()),
 				cosigner,
 				multisigTransaction.getOtherTransactionHash()

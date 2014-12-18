@@ -90,6 +90,7 @@ public class VerifiableEntityTest {
 
 	static class Mock2 extends MockVerifiableEntity {
 		private int innerNonVerifiableData;
+
 		public Mock2(final Account signer, final int customField, final int innerNonVerifiableData) {
 			super(signer, customField);
 			this.innerNonVerifiableData = innerNonVerifiableData;

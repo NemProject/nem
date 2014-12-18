@@ -6,7 +6,7 @@ import org.mockito.*;
 import org.nem.core.crypto.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 

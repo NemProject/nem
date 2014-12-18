@@ -39,7 +39,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		// TODO 20141201 J-G: why?
 		// TODO 20141202 G-J: cause we might not have proper MultisigSignatures YET, and we want to
 		// be able to add MultisigTransaction itself to list of unconfirmed transactions.
-		if (! this.blockCreation) {
+		if (!this.blockCreation) {
 			return ValidationResult.SUCCESS;
 		}
 
@@ -64,7 +64,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 									t.getSigner().getAddress().equals(cosignerAddress)
 					);
 
-			if (! hasCosigner) {
+			if (!hasCosigner) {
 				return ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS;
 			}
 		}

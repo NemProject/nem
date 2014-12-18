@@ -1,11 +1,11 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
-import org.nem.core.model.Address;
-import org.nem.core.model.TransactionTypes;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.controller.viewmodels.*;
+import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.*;
 
 /**

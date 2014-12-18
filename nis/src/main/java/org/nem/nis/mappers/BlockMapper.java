@@ -9,7 +9,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.MultisigSignerModification;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;
@@ -28,10 +27,10 @@ public class BlockMapper {
 		private final org.nem.nis.dbmodel.Block dbBlock;
 
 		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
-		final List<MultisigSignerModification> multisigSignerModificationsTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<MultisigSignerModification> multisigSignerModificationsTransactions = new ArrayList<>(
+				BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
 		final List<MultisigTransaction> multisigTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
 		final List<Transfer> transferTransactions;
-
 
 		int i = 0;
 		int multisigSignerModificationsIndex = 0;
@@ -60,6 +59,7 @@ public class BlockMapper {
 		private void handleTransaction(final Transaction transaction) {
 			handleTransaction(transaction, null);
 		}
+
 		private void handleTransaction(final Transaction transaction, final MultisigTransaction multisig) {
 			switch (transaction.getType()) {
 				case TransactionTypes.TRANSFER: {
@@ -131,6 +131,7 @@ public class BlockMapper {
 			this.dbBlock.setBlockMultisigTransactions(multisigTransactions);
 		}
 	}
+
 	/**
 	 * Converts a Block model to a Block db-model.
 	 *
@@ -198,8 +199,8 @@ public class BlockMapper {
 		// note: we must NOT add getBlockMultisigTransactions here
 		final int count =
 				dbBlock.getBlockMultisigSignerModifications().size() +
-				dbBlock.getBlockImportanceTransfers().size() +
-				dbBlock.getBlockTransfers().size();
+						dbBlock.getBlockImportanceTransfers().size() +
+						dbBlock.getBlockTransfers().size();
 		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
 
 		final Set<Integer> transactionsToSkip = dbBlock.getBlockMultisigTransactions().stream()

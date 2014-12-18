@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -183,7 +182,7 @@ public class BlockDaoImpl implements BlockDao {
 
 		dropTransfers(blockHeight, "Transfer", "blockTransfers", (v) -> {});
 		dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
-		dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications", (transactionsToDelete)-> {
+		dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications", (transactionsToDelete) -> {
 			final Query preQuery = this.getCurrentSession()
 					.createQuery("delete from MultisigModification m where m.multisigSignerModification.id in (:ids)")
 					.setParameterList("ids", transactionsToDelete);
@@ -209,8 +208,8 @@ public class BlockDaoImpl implements BlockDao {
 			preQuery.accept(transactionsToDelete);
 
 			final Query dropTxes = this.getCurrentSession()
-			                           .createQuery("delete from " + tableName + " t where t.id in (:ids)")
-			                           .setParameterList("ids", transactionsToDelete);
+					.createQuery("delete from " + tableName + " t where t.id in (:ids)")
+					.setParameterList("ids", transactionsToDelete);
 			dropTxes.executeUpdate();
 		}
 	}
