@@ -1183,8 +1183,6 @@ public class UnconfirmedTransactionsTest {
 		multisigTransaction.sign();
 
 		addPoiState(poiFacade, multisig).getAccountInfo().incrementBalance(Amount.fromNem(10));
-		// TODO 20141213 G: temporary hack, need to check it
-		addPoiState(poiFacade, recipient);
 		addPoiState(poiFacade, cosigner1).getAccountInfo().incrementBalance(Amount.fromNem(101));
 		addPoiState(poiFacade, cosigner2);
 		makeCosignatory(poiFacade, cosigner1, multisig);
@@ -1224,8 +1222,6 @@ public class UnconfirmedTransactionsTest {
 		signatureTransaction.sign();
 
 		addPoiState(poiFacade, multisig).getAccountInfo().incrementBalance(Amount.fromNem(10));
-		// TODO 20141213 G: temporary hack, need to check it
-		addPoiState(poiFacade, recipient);
 		addPoiState(poiFacade, cosigner1).getAccountInfo().incrementBalance(Amount.fromNem(101));
 		addPoiState(poiFacade, cosigner2).getAccountInfo().incrementBalance(Amount.fromNem(101));
 		makeCosignatory(poiFacade, cosigner1, multisig);
