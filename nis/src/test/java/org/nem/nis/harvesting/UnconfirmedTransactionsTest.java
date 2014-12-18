@@ -558,6 +558,8 @@ public class UnconfirmedTransactionsTest {
 		// Act:
 		context.transactions.removeAll(block);
 		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+
+		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
 	}
 

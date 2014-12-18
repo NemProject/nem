@@ -9,12 +9,19 @@ import org.nem.core.time.TimeProvider;
 public class TransactionDeadlineValidator implements SingleTransactionValidator {
 	private final TimeProvider timeProvider;
 
+	/**
+	 * Creates a new validator.
+	 *
+	 * @param timeProvider The time provider.
+	 */
 	public TransactionDeadlineValidator(final TimeProvider timeProvider) {
 		this.timeProvider = timeProvider;
 	}
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		return transaction.getDeadline().compareTo(this.timeProvider.getCurrentTime()) >= 0 ? ValidationResult.SUCCESS : ValidationResult.FAILURE_PAST_DEADLINE;
+		return transaction.getDeadline().compareTo(this.timeProvider.getCurrentTime()) >= 0
+				? ValidationResult.SUCCESS
+				: ValidationResult.FAILURE_PAST_DEADLINE;
 	}
 }

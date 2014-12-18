@@ -259,7 +259,7 @@ public class UnconfirmedTransactions {
 				for (final Transaction transaction : getReverseTransactions(block)) {
 					this.remove(transaction);
 				}
-			} catch (Exception e) {
+			} catch (Exception e) { // TODO 20141218 J-B: can we at least catch a more specific exception? we can't really recover from every possible failure
 				LOGGER.severe("exception during removal of unconfirmed transactions, rebuilding cache");
 				this.rebuildCache(this.getAll());
 				return;
@@ -451,6 +451,9 @@ public class UnconfirmedTransactions {
 		}
 	}
 
+	// TODO 20141218 J-B: changes look pretty good, nice job; i have a few comments:
+	// > it might make sense to pull UnconfirmedBalancesObserver out into its own class so we can test it more directly
+	// > should definitely add tests for the cases that trigger the cache rebuild (since this is presumably the source of our bugs)
 	private static class UnconfirmedBalancesObserver implements TransferObserver {
 		private final ReadOnlyAccountStateCache accountStateCache;
 		private final Map<Account, Amount> creditedAmounts = new ConcurrentHashMap<>();
