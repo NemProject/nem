@@ -10,7 +10,6 @@ import org.nem.peer.trust.NodeSelector;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * NIS time synchronization with other NIS nodes.
@@ -42,22 +41,24 @@ public class NisTimeSynchronizer implements TimeSynchronizer {
 		final List<TimeSynchronizationSample> samples = new ArrayList<>();
 		final List<Node> nodes = this.selector.selectNodes();
 		LOGGER.info(String.format("Time synchronization: found %d nodes to synchronize with.", nodes.size()));
-		final List<CompletableFuture> futures = nodes.stream()
-				.map(n -> {
-					final NetworkTimeStamp sendTimeStamp = this.timeProvider.getNetworkTime();
-					return this.connector.getCommunicationTimeStamps(n)
-							.thenApply(c -> {
-								final NetworkTimeStamp receiveTimeStamp = this.timeProvider.getNetworkTime();
-								final TimeSynchronizationSample sample = new TimeSynchronizationSample(
-										n,
-										new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp),
-										c);
-								samples.add(sample);
-								return sample;
-							});
-				})
-				.collect(Collectors.toList());
-		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]))
+		final CompletableFuture[] futures = new CompletableFuture[nodes.size()];
+		int i = 0;
+		for (final Node n : nodes) {
+			final NetworkTimeStamp sendTimeStamp = this.timeProvider.getNetworkTime();
+			final CompletableFuture<TimeSynchronizationSample> future = this.connector.getCommunicationTimeStamps(n)
+					.thenApply(c -> {
+						final NetworkTimeStamp receiveTimeStamp = this.timeProvider.getNetworkTime();
+						final TimeSynchronizationSample sample = new TimeSynchronizationSample(
+								n,
+								new CommunicationTimeStamps(sendTimeStamp, receiveTimeStamp),
+								c);
+						samples.add(sample);
+						return sample;
+					});
+			futures[i++] = future;
+		}
+
+		return CompletableFuture.allOf(futures)
 				.whenComplete((o, e) -> {
 					final TimeOffset timeOffset = this.syncStrategy.calculateTimeOffset(samples, this.networkState.getNodeAge());
 					this.networkState.updateTimeSynchronizationResults(this.timeProvider.updateTimeOffset(timeOffset));
