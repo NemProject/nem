@@ -5,6 +5,8 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
+// TODO 20141218 J-G needs comments
+
 public class MultisigLinks implements ReadOnlyMultisigLinks {
 	private final Map<Address, BlockHeight> cosignatories;
 	private final Map<Address, BlockHeight> cosignatoryOf;

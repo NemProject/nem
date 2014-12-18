@@ -5,6 +5,7 @@ import org.nem.core.crypto.Hash;
 
 import javax.persistence.*;
 
+// TODO 20141218 J-G: any reason this doesn't derive from AbstractTransfer?
 @Entity
 @Table(name = "multisigsignatures")
 public class MultisigSignature {
