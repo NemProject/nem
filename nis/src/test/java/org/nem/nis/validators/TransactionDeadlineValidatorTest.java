@@ -3,36 +3,41 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.test.MockTransaction;
+import org.nem.core.test.*;
 import org.nem.core.time.*;
 
 public class TransactionDeadlineValidatorTest {
-	private static TimeProvider TIME_PROVIDER = new SystemTimeProvider();
-	private static final TransactionDeadlineValidator VALIDATOR = new TransactionDeadlineValidator(TIME_PROVIDER);
 
 	@Test
 	public void validateReturnsSuccessIfTransactionHasNotExpired() {
-		// Arrange:
-		final Transaction transaction = new MockTransaction();
-		transaction.setDeadline(TIME_PROVIDER.getCurrentTime());
-
-		// Act:
-		ValidationResult result = VALIDATOR.validate(transaction, null);
-
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertValidationResult(1, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void validateReturnsSuccessIfTransactionHasNotExpiredAndDeadlineIsEqualToTimeStamp() {
+		// Assert:
+		assertValidationResult(0, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void validateReturnsFailureIfTransactionHasExpired() {
+		// Assert:
+		assertValidationResult(-1, ValidationResult.FAILURE_PAST_DEADLINE);
+	}
+
+	private static void assertValidationResult(final int relativeDeadline, final ValidationResult expectedResult) {
 		// Arrange:
+		final TimeProvider timeProvider = Utils.createMockTimeProvider(100);
+		final TransactionDeadlineValidator validator = new TransactionDeadlineValidator(timeProvider);
+
 		final Transaction transaction = new MockTransaction();
-		transaction.setDeadline(TIME_PROVIDER.getCurrentTime().addSeconds(-1));
+		transaction.setDeadline(new TimeInstant(100 + relativeDeadline));
 
 		// Act:
-		ValidationResult result = VALIDATOR.validate(transaction, null);
+		final ValidationResult result = validator.validate(transaction, null);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 }

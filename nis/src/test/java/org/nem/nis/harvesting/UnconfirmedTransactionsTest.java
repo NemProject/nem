@@ -566,7 +566,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void removeAllDoesNotUndoTransactions() {
+	public void removeAllDoesUndoTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<MockTransaction> transactions = context.addMockTransactions(context.transactions, 6, 9);
@@ -579,10 +579,11 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.removeAll(block);
 
 		// Assert:
-		for (final MockTransaction transaction : transactions) {
-			// not the greatest test, but the count is 1 for all because it is incremented by execute
-			Assert.assertThat(transaction.getNumTransferCalls(), IsEqual.equalTo(1));
-		}
+		// not the greatest test, but the count is 2 for the removed transactions and 1 for the others
+		Assert.assertThat(transactions.get(0).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(2).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(1).getNumTransferCalls(), IsEqual.equalTo(2));
+		Assert.assertThat(transactions.get(3).getNumTransferCalls(), IsEqual.equalTo(2));
 	}
 
 	//endregion
@@ -861,7 +862,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void dropExpiredTransactionsUndoesRemovedTransactions() {
+	public void dropExpiredTransactionsExecutesAllNonExpiredTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final List<MockTransaction> transactions = context.createMockTransactions(6, 9);
@@ -875,10 +876,10 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
 
 		// Assert:
-		Assert.assertThat(transactions.get(0).getNumTransferCalls(), IsEqual.equalTo(2));
-		Assert.assertThat(transactions.get(1).getNumTransferCalls(), IsEqual.equalTo(1));
-		Assert.assertThat(transactions.get(2).getNumTransferCalls(), IsEqual.equalTo(2));
-		Assert.assertThat(transactions.get(3).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(0).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(1).getNumTransferCalls(), IsEqual.equalTo(2));
+		Assert.assertThat(transactions.get(2).getNumTransferCalls(), IsEqual.equalTo(1));
+		Assert.assertThat(transactions.get(3).getNumTransferCalls(), IsEqual.equalTo(2));
 	}
 
 	//endregion
@@ -1355,7 +1356,7 @@ public class UnconfirmedTransactionsTest {
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
-			Mockito.when(timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
+			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
 					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
