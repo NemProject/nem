@@ -6,6 +6,10 @@ import org.nem.core.crypto.Hash;
 import javax.persistence.*;
 
 // TODO 20141218 J-G: any reason this doesn't derive from AbstractTransfer?
+// TODO 20141219 G-J: AbstractTransfer has things like blkIndex, orderId and actually block itself
+// MultisigSignature is not within the block itself, it's enclosing entity is  MultisigTransaction,
+// we could probably extract common thigs from here and AbstractTransfer into even more abstract
+// thingy, but I'm not sure if that makes any sense
 @Entity
 @Table(name = "multisigsignatures")
 public class MultisigSignature {
