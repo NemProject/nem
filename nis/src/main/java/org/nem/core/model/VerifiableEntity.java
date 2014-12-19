@@ -139,17 +139,17 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		this.serialize(serializer, true);
 	}
 
-	private void serialize(final Serializer serializer, final boolean includeSignature) {
+	private void serialize(final Serializer serializer, final boolean includeNonVerifiableData) {
 		serializer.writeInt("type", this.getType());
 		serializer.writeInt("version", this.getVersion());
 		TimeInstant.writeTo(serializer, "timeStamp", this.getTimeStamp());
 		Account.writeTo(serializer, "signer", this.getSigner(), AddressEncoding.PUBLIC_KEY);
 
-		if (includeSignature) {
+		if (includeNonVerifiableData) {
 			Signature.writeTo(serializer, "signature", this.getSignature());
 		}
 
-		this.serializeImpl(serializer);
+		this.serializeImpl(serializer, includeNonVerifiableData);
 	}
 
 	/**
@@ -158,6 +158,17 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	 * @param serializer The serializer to use.
 	 */
 	protected abstract void serializeImpl(final Serializer serializer);
+
+	/**
+	 * Serializes derived-class state.
+	 *
+	 * @param serializer The serializer to use.
+	 * @param includeNonVerifiableData true if non-verifiable data should be included.
+	 */
+	protected void serializeImpl(final Serializer serializer, final boolean includeNonVerifiableData) {
+		// since most derived classes don't have non-verifiable data, the default implementation of this function ignore the flag
+		this.serializeImpl(serializer);
+	}
 
 	/**
 	 * Signs this entity with the owner's private key.
