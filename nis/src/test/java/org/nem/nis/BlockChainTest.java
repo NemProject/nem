@@ -447,41 +447,26 @@ public class BlockChainTest {
 				null
 		);
 
-		final Transfer dbTransaction1 = new Transfer(
-				HashUtils.calculateHash(tx1),
-				tx1.getVersion(),
-				tx1.getType(),
-				0L,
-				0, // timestamp
-				0, // deadline
-				DB_SENDER,
-				// proof
-				tx1.getSignature().getBytes(),
-				DB_RECIPIENT1,
-				0, // order
-				0, // block index
-				RECIPIENT1_AMOUNT,
-				0L // referenced tx
-		);
+		final Transfer dbTransaction1 = new Transfer();
+		dbTransaction1.setTransferHash(HashUtils.calculateHash(tx1));
+		dbTransaction1.setVersion(tx1.getVersion());
+		dbTransaction1.setType(tx1.getType());
+		dbTransaction1.setSender(DB_SENDER);
+		dbTransaction1.setSenderProof(tx1.getSignature().getBytes());
+		dbTransaction1.setRecipient(DB_RECIPIENT1);
+		dbTransaction1.setAmount(RECIPIENT1_AMOUNT);
 
-		final Transfer dbTransaction2 = new Transfer(
-				HashUtils.calculateHash(tx2),
-				tx2.getVersion(),
-				tx2.getType(),
-				0L,
-				0, // timestamp
-				0, // deadline
-				DB_SENDER,
-				// proof
-				tx1.getSignature().getBytes(),
-				DB_RECIPIENT2,
-				1, // order
-				1, // block index
-				RECIPIENT2_AMOUNT,
-				0L // referenced tx
-		);
+		final Transfer dbTransaction2 = new Transfer();
+		dbTransaction2.setTransferHash(HashUtils.calculateHash(tx1));
+		dbTransaction2.setVersion(tx2.getVersion());
+		dbTransaction2.setType(tx2.getType());
+		dbTransaction2.setSender(DB_SENDER);
+		dbTransaction2.setSenderProof(tx1.getSignature().getBytes());
+		dbTransaction2.setOrderId(1);
+		dbTransaction2.setBlkIndex(1);
+		dbTransaction2.setRecipient(DB_RECIPIENT2);
+		dbTransaction2.setAmount(RECIPIENT2_AMOUNT);
 		dbBlock.setBlockTransfers(Arrays.asList(dbTransaction1, dbTransaction2));
-
 		return dbBlock;
 	}
 }
