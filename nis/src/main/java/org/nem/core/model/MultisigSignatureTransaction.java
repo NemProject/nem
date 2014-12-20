@@ -37,7 +37,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	 */
 	public MultisigSignatureTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_SIGNATURE, options, deserializer);
-		this.otherTransactionHash = deserializer.readObject("other_hash", Hash::new);
+		this.otherTransactionHash = deserializer.readObject("otherHash", Hash::new);
 	}
 
 	/**
@@ -67,6 +67,6 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
-		serializer.writeObject("other_hash", this.getOtherTransactionHash());
+		serializer.writeObject("otherHash", this.getOtherTransactionHash());
 	}
 }
