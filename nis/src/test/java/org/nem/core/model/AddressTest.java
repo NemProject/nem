@@ -23,7 +23,6 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
 		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
-		Assert.assertThat(address.getKeyPair(), IsNull.nullValue());
 	}
 
 	@Test
@@ -35,7 +34,6 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsNull.notNullValue());
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(address.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -47,31 +45,6 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
-		Assert.assertThat(address.getKeyPair().hasPrivateKey(), IsEqual.equalTo(false));
-	}
-
-	@Test
-	public void addressCanBeCreatedAroundKeyPairKey() {
-		// Act:
-		final KeyPair keyPair = new KeyPair();
-		final Address address = Address.fromKeyPair(keyPair);
-
-		// Assert:
-		Assert.assertThat(address.getEncoded(), IsNull.notNullValue());
-		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(address.getKeyPair(), IsEqual.equalTo(keyPair));
-	}
-
-	@Test
-	public void addressCanBeCreatedAroundKeyPairAndCustomVersion() {
-		// Act:
-		final KeyPair keyPair = new KeyPair();
-		final Address address = Address.fromKeyPair((byte)0x88, keyPair);
-
-		// Assert:
-		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
-		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(keyPair.getPublicKey()));
-		Assert.assertThat(address.getKeyPair(), IsEqual.equalTo(keyPair));
 	}
 
 	//endregion

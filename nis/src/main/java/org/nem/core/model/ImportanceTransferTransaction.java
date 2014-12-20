@@ -5,6 +5,8 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.*;
+
 /**
  * A transaction which describes cancellation or creation of
  * transfer of importance from signer to remote account.
@@ -152,5 +154,10 @@ public class ImportanceTransferTransaction extends Transaction {
 	@Override
 	protected Amount getMinimumFee() {
 		return Amount.fromNem(1);
+	}
+
+	@Override
+	protected Collection<Account> getOtherAccounts() {
+		return Arrays.asList(this.remoteAccount);
 	}
 }

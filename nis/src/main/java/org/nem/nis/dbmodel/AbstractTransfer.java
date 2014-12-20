@@ -7,6 +7,11 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Base class for all transfer db entities.
+ *
+ * @param <TDerived> The derived transfer type.
+ */
 @MappedSuperclass
 public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 	@Id

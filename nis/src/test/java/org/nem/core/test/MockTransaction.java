@@ -6,13 +6,13 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
  * A mock Transaction implementation.
  */
 public class MockTransaction extends Transaction {
-
 	public static final int TYPE = 124;
 	public static final int VERSION = 758;
 	public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
@@ -20,6 +20,8 @@ public class MockTransaction extends Transaction {
 
 	private int customField;
 	private long minimumFee;
+
+	private Collection<Account> otherAccounts = new ArrayList<>();
 
 	private Consumer<TransactionObserver> transferAction = o -> {
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(o);
@@ -174,6 +176,20 @@ public class MockTransaction extends Transaction {
 	@Override
 	protected Amount getMinimumFee() {
 		return new Amount(this.minimumFee);
+	}
+
+	/**
+	 * Sets the other accounts.
+	 *
+	 * @param accounts The other accounts.
+	 */
+	public void setOtherAccounts(final Collection<Account> accounts) {
+		this.otherAccounts = accounts;
+	}
+
+	@Override
+	protected Collection<Account> getOtherAccounts() {
+		return this.otherAccounts;
 	}
 
 	@Override

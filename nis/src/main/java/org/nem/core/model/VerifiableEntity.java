@@ -67,7 +67,6 @@ public abstract class VerifiableEntity implements SerializableEntity {
 
 		if (DeserializationOptions.VERIFIABLE == options) {
 			this.signature = Signature.readFrom(deserializer, "signature");
-			this.deserializeNonVerifiableData(deserializer);
 		}
 	}
 
@@ -140,21 +139,17 @@ public abstract class VerifiableEntity implements SerializableEntity {
 		this.serialize(serializer, true);
 	}
 
-	private void serialize(final Serializer serializer, final boolean includeSignature) {
+	private void serialize(final Serializer serializer, final boolean includeNonVerifiableData) {
 		serializer.writeInt("type", this.getType());
 		serializer.writeInt("version", this.getVersion());
 		TimeInstant.writeTo(serializer, "timeStamp", this.getTimeStamp());
 		Account.writeTo(serializer, "signer", this.getSigner(), AddressEncoding.PUBLIC_KEY);
 
-		if (includeSignature) {
+		if (includeNonVerifiableData) {
 			Signature.writeTo(serializer, "signature", this.getSignature());
 		}
 
-		this.serializeImpl(serializer);
-
-		if (includeSignature) {
-			this.serializeNonVerifiableData(serializer);
-		}
+		this.serializeImpl(serializer, includeNonVerifiableData);
 	}
 
 	/**
@@ -165,28 +160,14 @@ public abstract class VerifiableEntity implements SerializableEntity {
 	protected abstract void serializeImpl(final Serializer serializer);
 
 	/**
-	 * Serializes non-verifiable data.
+	 * Serializes derived-class state.
 	 *
 	 * @param serializer The serializer to use.
+	 * @param includeNonVerifiableData true if non-verifiable data should be included.
 	 */
-	protected void serializeNonVerifiableData(final Serializer serializer) {
-	}
-
-	/**
-	 * Deserializes non-verifiable data.
-	 *
-	 * @param deserializer The deserializer to use.
-	 */
-	protected void deserializeNonVerifiableData(final Deserializer deserializer) {
-		// note: instead of making a function that's called from ctor,
-		// we could do simple check: "if (.NON_VERIFIABLE == options) {"
-		// but then we'd have problems if there would be multiple objects in
-		// hierarchy that have non-verifiable data (see verifiableHierarchyCanBeRoundTripped)
-		// TODO 20141213 J-G: you're right that this only works for a single level;
-		// > should be good enough for now, but i might change it later ^^
-		// > hopefully this unblocks you
-		// TODO 20141214 G-J: caught you! someone wasn't running the tests :>
-		// VerifiableEntityTest are broken now :]
+	protected void serializeImpl(final Serializer serializer, final boolean includeNonVerifiableData) {
+		// since most derived classes don't have non-verifiable data, the default implementation of this function ignore the flag
+		this.serializeImpl(serializer);
 	}
 
 	/**

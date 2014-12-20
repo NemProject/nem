@@ -450,6 +450,7 @@ public class BlockChainTest {
 		final Transfer dbTransaction1 = new Transfer();
 		dbTransaction1.setTransferHash(HashUtils.calculateHash(tx1));
 		dbTransaction1.setVersion(tx1.getVersion());
+		dbTransaction1.setType(tx1.getType());
 		dbTransaction1.setSender(DB_SENDER);
 		dbTransaction1.setSenderProof(tx1.getSignature().getBytes());
 		dbTransaction1.setRecipient(DB_RECIPIENT1);
@@ -458,6 +459,7 @@ public class BlockChainTest {
 		final Transfer dbTransaction2 = new Transfer();
 		dbTransaction2.setTransferHash(HashUtils.calculateHash(tx1));
 		dbTransaction2.setVersion(tx2.getVersion());
+		dbTransaction2.setType(tx2.getType());
 		dbTransaction2.setSender(DB_SENDER);
 		dbTransaction2.setSenderProof(tx1.getSignature().getBytes());
 		dbTransaction2.setOrderId(1);
