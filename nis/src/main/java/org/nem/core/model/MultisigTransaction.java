@@ -117,9 +117,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		// TODO 20141201 - i'm not sure if we want to charge people extra for multisig?
 		// TODO 20141202 G-J: 1) it requires a lot of additional processing, so that is a good reason
 		// to require additional fee. Maybe 100 is bit too much, but it should be high.
-		// 2) Also if I understand correctly: otherTransaction.getMinimumFee() should be subtracted from multisig acct
-		// while 100 (or whatever we will decide) should be subtracted from person who signed MultisigTransaction
-		return Amount.fromNem(100L).add(this.otherTransaction.getMinimumFee());
+		//
+		// MultisigAwareSingleTransactionValidator takes care of validating fee on inner transaction
+		return Amount.fromNem(100L);
 	}
 
 	@Override

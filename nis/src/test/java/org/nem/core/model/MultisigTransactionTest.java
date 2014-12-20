@@ -127,7 +127,7 @@ public class MultisigTransactionTest {
 	//region getFee
 
 	@Test
-	public void minimumFeeDelegatesToInnerTransaction() {
+	public void minimumFeeDoesNotIncludeInnerTransactionFee() {
 		// Arrange:
 		final MockTransaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		innerTransaction.setMinimumFee(444);
@@ -138,7 +138,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		// (because getMinimumFee is protected we can't use mockito to directly test delegation)
-		Assert.assertThat(fee, IsEqual.equalTo(Amount.fromNem(100).add(Amount.fromMicroNem(444))));
+		Assert.assertThat(fee, IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
 	//endregion
