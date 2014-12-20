@@ -128,6 +128,12 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	}
 
 	@Override
+	public Collection<Transaction> getChildTransactions() {
+		// TODO 20141220 J-G: should review / test this
+		return Arrays.asList(this.otherTransaction);
+	}
+
+	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		// this shouldn't be called since the other overload is implemented
 	}
