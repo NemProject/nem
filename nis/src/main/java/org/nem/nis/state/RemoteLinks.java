@@ -69,6 +69,7 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 	}
 
 	// TODO 20131014 J-G: tests for this function and please comment in the interface! ;)
+	// TODO 20141220 G-J: everything is commented in ReadOnlyRemoteLinks, isn't it?
 
 	@Override
 	public RemoteStatus getRemoteStatus(final BlockHeight height) {
