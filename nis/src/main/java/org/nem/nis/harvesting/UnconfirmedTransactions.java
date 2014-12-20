@@ -231,7 +231,7 @@ public class UnconfirmedTransactions {
 		// that is correct we need this.transactions here
 		builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), blockCreation, () -> this.transactions.values()));
 
-		return new MultisigAwareSingleTransactionValidator(builder.build());
+		return new ChildAwareSingleTransactionValidator(builder.build());
 	}
 
 	/**
