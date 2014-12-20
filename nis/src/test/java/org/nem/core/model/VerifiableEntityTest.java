@@ -176,32 +176,31 @@ public class VerifiableEntityTest {
 	public void changingFieldInvalidatesSignature() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
-		final MockVerifiableEntity entity = new MockVerifiableEntity(signer, 7);
+		final MockVerifiableEntityWithNonVerifiableData entity = new MockVerifiableEntityWithNonVerifiableData(signer, 7, 11, 6);
 
 		// Act:
 		entity.sign();
-		entity.setCustomField(12);
+		entity.setVerifiableField1(5);
 
 		// Assert:
 		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
 		Assert.assertThat(entity.verify(), IsEqual.equalTo(false));
 	}
 
-	// TODO 20141220 J-J fix this test.
-	//@Test
-	//public void changingNonVerifiableDataDoesNotInvalidateSignature() {
-	//	// Arrange:
-	//	final Account signer = Utils.generateRandomAccount();
-	//	final MockVerifiableEntityWithNonVerifiableData entity = new MockVerifiableEntityWithNonVerifiableData(signer, 7, 11, 6);
-	//
-	//	// Act:
-	//	entity.sign();
-	//	entity.setNonVerifiableData(123);
-	//
-	//	// Assert:
-	//	Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
-	//	Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
-	//}
+	@Test
+	public void changingNonVerifiableFieldDoesNotInvalidateSignature() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final MockVerifiableEntityWithNonVerifiableData entity = new MockVerifiableEntityWithNonVerifiableData(signer, 7, 11, 6);
+
+		// Act:
+		entity.sign();
+		entity.setNonVerifiableField1(5);
+
+		// Assert:
+		Assert.assertThat(entity.getSignature(), IsNull.notNullValue());
+		Assert.assertThat(entity.verify(), IsEqual.equalTo(true));
+	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotSignWithoutPrivateKey() {
@@ -508,9 +507,9 @@ public class VerifiableEntityTest {
 		public static final int VERSION = 24;
 		public static final TimeInstant TIMESTAMP = new TimeInstant(127435);
 
-		private final int verifiableField1;
+		private int verifiableField1;
 		private final int verifiableField2;
-		private final int nonVerifiableField1;
+		private int nonVerifiableField1;
 
 		public MockVerifiableEntityWithNonVerifiableData(
 				final Account signer,
@@ -558,6 +557,14 @@ public class VerifiableEntityTest {
 			if (includeNonVerifiableData) {
 				serializer.writeInt("nonVerifiableField1", this.nonVerifiableField1);
 			}
+		}
+
+		public void setVerifiableField1(final int value) {
+			this.verifiableField1 = value;
+		}
+
+		public void setNonVerifiableField1(final int value) {
+			this.nonVerifiableField1 = value;
 		}
 	}
 
