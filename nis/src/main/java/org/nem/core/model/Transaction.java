@@ -137,6 +137,16 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	/**
+	 * Gets all transactions that are children of this transaction.
+	 * In other words, this transaction is an aggregate of the child transactions.
+	 *
+	 * @return The child transactions.
+	 */
+	public Collection<Transaction> getChildTransactions() {
+		return Collections.emptyList();
+	}
+
+	/**
 	 * Executes all transfers using the specified observer.
 	 *
 	 * @param observer The transfer observer.

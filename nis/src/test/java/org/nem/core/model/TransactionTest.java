@@ -217,6 +217,22 @@ public class TransactionTest {
 
 	//endregion
 
+	//region Child Transactions
+
+	@Test
+	public void defaultGetChildTransactionsImplementationReturnsEmptyCollection() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		// Act:
+		final Collection<Transaction> childTransactions = transaction.getChildTransactions();
+
+		// Assert:
+		Assert.assertThat(childTransactions.isEmpty(), IsEqual.equalTo(true));
+	}
+
+	//endregion
+
 	//region Execute and Undo
 
 	@Test

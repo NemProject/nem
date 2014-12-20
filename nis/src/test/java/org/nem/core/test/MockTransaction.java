@@ -22,6 +22,7 @@ public class MockTransaction extends Transaction {
 	private long minimumFee;
 
 	private Collection<Account> otherAccounts = new ArrayList<>();
+	private Collection<Transaction> childTransactions = new ArrayList<>();
 
 	private Consumer<TransactionObserver> transferAction = o -> {
 		final TransferObserver transferObserver = new TransactionObserverToTransferObserverAdapter(o);
@@ -187,9 +188,23 @@ public class MockTransaction extends Transaction {
 		this.otherAccounts = accounts;
 	}
 
+	/**
+	 * Sets the child transactions.
+	 *
+	 * @param transactions The child transactions.
+	 */
+	public void setChildTransactions(final Collection<Transaction> transactions) {
+		this.childTransactions = transactions;
+	}
+
 	@Override
 	protected Collection<Account> getOtherAccounts() {
 		return this.otherAccounts;
+	}
+
+	@Override
+	public Collection<Transaction> getChildTransactions() {
+		return this.childTransactions;
 	}
 
 	@Override
