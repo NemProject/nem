@@ -3,7 +3,6 @@ package org.nem.core.time;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.*;
-import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 
 import java.util.function.Consumer;
 

@@ -3,7 +3,7 @@ package org.nem.nis.controller;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.primitive.NetworkTimeStamp;
+import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.node.Node;
 import org.nem.core.test.*;
 import org.nem.core.time.*;

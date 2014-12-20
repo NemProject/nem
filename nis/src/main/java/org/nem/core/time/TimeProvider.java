@@ -1,8 +1,6 @@
 package org.nem.core.time;
 
-// TODO 20141112 J-B: i think i would prefer to move these dependencies into this (core.time) package
 import org.nem.core.model.primitive.*;
-import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
 
 /**
  * Interface that provides time-related information.

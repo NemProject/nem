@@ -1,6 +1,6 @@
 package org.nem.core.time.synchronization;
 
-import org.nem.core.model.primitive.NetworkTimeStamp;
+import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.serialization.*;
 
 /**

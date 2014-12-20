@@ -3,7 +3,7 @@ package org.nem.peer;
 import org.nem.core.node.*;
 import org.nem.core.serialization.SerializableEntity;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
+import org.nem.core.time.TimeSynchronizationResult;
 import org.nem.nis.service.ChainServices;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 import org.nem.peer.trust.NodeSelector;

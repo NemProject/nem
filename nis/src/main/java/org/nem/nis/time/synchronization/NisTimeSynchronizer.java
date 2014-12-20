@@ -2,7 +2,7 @@ package org.nem.nis.time.synchronization;
 
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.time.*;
 import org.nem.core.time.synchronization.*;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.trust.NodeSelector;

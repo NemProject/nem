@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
+import org.nem.core.time.TimeSynchronizationResult;
 import org.nem.peer.test.*;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.*;
