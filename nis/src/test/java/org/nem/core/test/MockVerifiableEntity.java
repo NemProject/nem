@@ -13,7 +13,6 @@ public class MockVerifiableEntity extends VerifiableEntity {
 	public static final TimeInstant TIMESTAMP = new TimeInstant(127435);
 
 	private int customField;
-	private int nonVerifiableData;
 
 	/**
 	 * Creates a mock verifiable entity.
@@ -33,7 +32,6 @@ public class MockVerifiableEntity extends VerifiableEntity {
 	public MockVerifiableEntity(final Account signer, final int customField) {
 		super(TYPE, VERSION, TIMESTAMP, signer);
 		this.customField = customField;
-		this.setNonVerifiableData(customField + 1);
 	}
 
 	/**
@@ -43,11 +41,6 @@ public class MockVerifiableEntity extends VerifiableEntity {
 	 */
 	public MockVerifiableEntity(final Deserializer deserializer) {
 		this(DeserializationOptions.VERIFIABLE, deserializer);
-	}
-
-	@Override
-	public void deserializeNonVerifiableData(final Deserializer deserializer) {
-		this.nonVerifiableData = deserializer.readInt("nonVerifiableField");
 	}
 
 	/**
@@ -78,21 +71,8 @@ public class MockVerifiableEntity extends VerifiableEntity {
 		this.customField = customField;
 	}
 
-	public int getNonVerifiableData() {
-		return this.nonVerifiableData;
-	}
-
-	public void setNonVerifiableData(final int nonVerifiableData) {
-		this.nonVerifiableData = nonVerifiableData;
-	}
-
 	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		serializer.writeInt("customField", this.customField);
-	}
-
-	@Override
-	protected void serializeNonVerifiableData(final Serializer serializer) {
-		serializer.writeInt("nonVerifiableField", this.nonVerifiableData);
 	}
 }

@@ -6,6 +6,8 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.*;
+
 /**
  * A multisig signature transaction.
  */
@@ -54,6 +56,12 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	@Override
 	protected Amount getMinimumFee() {
 		return Amount.ZERO;
+	}
+
+	@Override
+	protected Collection<Account> getOtherAccounts() {
+		// TODO 20141220 J-G: should review / test this
+		return new ArrayList<>();
 	}
 
 	@Override

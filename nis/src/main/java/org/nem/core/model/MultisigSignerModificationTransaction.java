@@ -5,7 +5,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * A transaction which describes association of cosignatory with a multisig account.
@@ -73,5 +73,11 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	protected Amount getMinimumFee() {
 		// TODO 20141111 G-J,B: decide, but I believe this should be high
 		return Amount.fromNem(1000);
+	}
+
+	@Override
+	protected Collection<Account> getOtherAccounts() {
+		// TODO 20141220 J-G: should review / test this
+		return new ArrayList<>();
 	}
 }
