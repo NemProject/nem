@@ -6,6 +6,8 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.*;
+
 /**
  * A transaction that represents the exchange of funds and/or a message
  * between a sender and a recipient.
@@ -91,6 +93,11 @@ public class TransferTransaction extends Transaction {
 		}
 
 		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
+	}
+
+	@Override
+	protected Collection<Account> getOtherAccounts() {
+		return Arrays.asList(this.recipient);
 	}
 
 	private long getMinimumTransferFee() {
