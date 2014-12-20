@@ -30,7 +30,6 @@ public class AbstractTransferMapper {
 		final Hash txHash = HashUtils.calculateHash(model);
 		dbModel.setTransferHash(txHash);
 		dbModel.setVersion(model.getVersion());
-		dbModel.setType(model.getType());
 		dbModel.setFee(model.getFee().getNumMicroNem());
 		dbModel.setTimeStamp(model.getTimeStamp().getRawTime());
 		dbModel.setDeadline(model.getDeadline().getRawTime());

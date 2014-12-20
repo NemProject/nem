@@ -28,7 +28,7 @@ public class BlockExplorerMapperTest {
 		assertCorrectSerialization(3, 7, 5);
 	}
 
-	private static void assertCorrectSerialization(final int... transferTypes) {
+	private static void assertCorrectSerialization(final int... transferTimeStamps) {
 		// Arrange:
 		final Address address = Address.fromPublicKey(PublicKey.fromHexString(PUBLIC_KEY_STRING));
 		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
@@ -36,12 +36,11 @@ public class BlockExplorerMapperTest {
 		final Block block = new Block();
 		block.setHeight(60L);
 		block.setForger(new Account(address.getEncoded(), address.getPublicKey()));
-		block.setTimeStamp(1856002);
 		block.setBlockHash(hash.getRaw());
 		block.setBlockTransfers(new ArrayList<>());
 
-		for (final int transferType : transferTypes) {
-			block.getBlockTransfers().add(createTransferWithType(transferType));
+		for (final int timeStamp : transferTimeStamps) {
+			block.getBlockTransfers().add(createTransferWithTimeStamp(timeStamp));
 		}
 
 		// Act:
@@ -57,13 +56,13 @@ public class BlockExplorerMapperTest {
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
 
 		final JSONArray jsonTransactions = ((JSONArray)jsonObject.get("txes"));
-		Assert.assertThat(jsonTransactions.size(), IsEqual.equalTo(transferTypes.length));
-		for (int i = 0; i < transferTypes.length; ++i) {
-			Assert.assertThat(((JSONObject)jsonTransactions.get(i)).get("type"), IsEqual.equalTo(transferTypes[i]));
+		Assert.assertThat(jsonTransactions.size(), IsEqual.equalTo(transferTimeStamps.length));
+		for (int i = 0; i < transferTimeStamps.length; ++i) {
+			Assert.assertThat(((JSONObject)jsonTransactions.get(i)).get("type"), IsEqual.equalTo(transferTimeStamps[i]));
 		}
 	}
 
-	private static Transfer createTransferWithType(final int type) {
+	private static Transfer createTransferWithTimeStamp(final int timeStamp) {
 		final Address senderAddress = Utils.generateRandomAddressWithPublicKey();
 		final Address recipientAddress = Utils.generateRandomAddress();
 		final Hash hash = Utils.generateRandomHash();
@@ -71,9 +70,8 @@ public class BlockExplorerMapperTest {
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
 		final Transfer transfer = new Transfer();
-		transfer.setType(type);
 		transfer.setFee(123000000L);
-		transfer.setTimeStamp(1856002);
+		transfer.setTimeStamp(timeStamp);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
 		transfer.setTransferHash(hash);
@@ -95,7 +93,6 @@ public class BlockExplorerMapperTest {
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
 		final Transfer transfer = new Transfer();
-		transfer.setType(7);
 		transfer.setFee(123000000L);
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
