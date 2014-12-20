@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
+import org.nem.nis.state.MultisigLinks;
 import org.nem.nis.test.NisUtils;
 
 import java.util.*;
@@ -18,8 +19,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.account2State, Mockito.times(1)).getMultisigLinks().addMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	@Test
@@ -27,8 +28,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Undo);
 
 		// Assert:
-		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.account2State, Mockito.times(1)).getMultisigLinks().removeMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	// TODO: This test is wrong, it should use MultisigModificationType.Del
@@ -37,8 +38,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.account2State, Mockito.times(1)).getMultisigLinks().removeMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	// TODO: This test is wrong, it should use MultisigModificationType.Del
@@ -47,8 +48,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Undo);
 
 		// Assert:
-		Mockito.verify(context.account1State, Mockito.times(1)).getMultisigLinks().addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.account2State, Mockito.times(1)).getMultisigLinks().addMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	private TestContext notifyTransferPrepare(final MultisigModificationType value, final NotificationTrigger notificationTrigger) {
@@ -68,18 +69,21 @@ public class MultisigAccountObserverTest {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final Account account1 = Utils.generateRandomAccount();
 		private final Account account2 = Utils.generateRandomAccount();
+		final MultisigLinks multisigLinks1 = Mockito.mock(MultisigLinks.class);
+		final MultisigLinks multisigLinks2 = Mockito.mock(MultisigLinks.class);
 		final AccountState account1State = Mockito.mock(AccountState.class);
 		final AccountState account2State = Mockito.mock(AccountState.class);
 
 		public MultisigAccountObserver createObserver() {
-			this.hook(this.account1, this.account1State);
-			this.hook(this.account2, this.account2State);
+			this.hook(this.account1, this.account1State, this.multisigLinks1);
+			this.hook(this.account2, this.account2State, this.multisigLinks2);
 			return new MultisigAccountObserver(this.accountStateCache);
 		}
 
-		public void hook(final Account account, final AccountState accountState) {
+		public void hook(final Account account, final AccountState accountState, final MultisigLinks multisigLinks) {
 			final Address address = account.getAddress();
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
+			Mockito.when(accountState.getMultisigLinks()).thenReturn(multisigLinks);
 			Mockito.when(accountState.getAddress()).thenReturn(address);
 		}
 	}
