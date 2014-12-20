@@ -405,17 +405,9 @@ public class UnconfirmedTransactions {
 	}
 
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
-		if (transaction.getSigner().getAddress().equals(address)) {
-			return true;
-		}
-
-		switch (transaction.getType()) {
-			case TransactionTypes.TRANSFER:
-				return ((TransferTransaction)transaction).getRecipient().getAddress().equals(address);
-
-			default:
-				return false;
-		}
+		return transaction.getAccounts().stream()
+				.map(account -> account.getAddress())
+				.anyMatch(transactionAddress -> transactionAddress.equals(address));
 	}
 
 	/**
