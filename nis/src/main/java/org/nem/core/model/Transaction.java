@@ -142,7 +142,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @return The child transactions.
 	 */
-	public final Collection<Transaction> getChildTransactions() {
+	public Collection<Transaction> getChildTransactions() {
 		return Collections.emptyList();
 	}
 
