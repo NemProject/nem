@@ -1,10 +1,15 @@
 package org.nem.nis.state;
 
-// TODO 20141014 J-G: comments
-
 import org.nem.core.model.AccountRemoteStatus;
 
+/**
+ * An enumeration of possible remote statuses.
+ */
 public enum RemoteStatus {
+
+	/**
+	 * Queried account has not participated in remote harvesting; neither as an owner nor a remote.
+	 */
 	NOT_SET,
 
 	/**
