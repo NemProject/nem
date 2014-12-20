@@ -34,7 +34,7 @@ public class AbstractTransferMapper {
 		dbModel.setTimeStamp(model.getTimeStamp().getRawTime());
 		dbModel.setDeadline(model.getDeadline().getRawTime());
 		dbModel.setSender(sender);
-		dbModel.setSenderProof(model.getSignature().getBytes());
+		dbModel.setSenderProof(null == model.getSignature() ? null : model.getSignature().getBytes());
 		dbModel.setOrderId(orderIndex); // TODO 20141119 J-G: not sure the point of this since you are never actually returning this from getOrderId??
 		dbModel.setBlkIndex(blockIndex);
 		dbModel.setReferencedTransaction(0L);

@@ -44,7 +44,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		this.otherTransaction = deserializer.readObject("other_trans", TransactionFactory.NON_VERIFIABLE);
 		this.otherTransactionHash = HashUtils.calculateHash(this.otherTransaction.asNonVerifiable());
 
-		final Collection<MultisigSignatureTransaction> signatures = DeserializationOptions.NON_VERIFIABLE == options
+		final Collection<MultisigSignatureTransaction> signatures = DeserializationOptions.VERIFIABLE == options
 				? deserializer.readObjectArray("signatures", d -> new MultisigSignatureTransaction(DeserializationOptions.VERIFIABLE, d))
 				: new ArrayList<>();
 
