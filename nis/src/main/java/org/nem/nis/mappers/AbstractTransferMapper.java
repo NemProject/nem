@@ -7,6 +7,8 @@ import org.nem.nis.dbmodel.*;
 /**
  * Mapper for mapping generic transfer properties to and from db and model entities.
  * TODO 20141119 - this is a temporary class to illustrate the MappedSuperclass
+ * > for example, sender should ideally be determined from model
+ * > and order id should make some sense ^^
  */
 public class AbstractTransferMapper {
 
