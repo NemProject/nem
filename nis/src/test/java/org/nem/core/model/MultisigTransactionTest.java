@@ -160,8 +160,9 @@ public class MultisigTransactionTest {
 		Assert.assertThat(innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
 
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(0), innerTransaction.getSigner(), Amount.fromMicroNem(222));
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(0), transaction.getSigner(), Amount.fromNem(100));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), innerTransaction.getSigner(), Amount.fromMicroNem(222));
 	}
 
 	@Test
@@ -179,8 +180,9 @@ public class MultisigTransactionTest {
 		Assert.assertThat(innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
 
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
 		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), innerTransaction.getSigner(), Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), transaction.getSigner(), Amount.fromNem(100));
 	}
 
 	//endregion

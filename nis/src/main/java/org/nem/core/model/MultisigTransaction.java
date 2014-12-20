@@ -109,6 +109,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 		this.otherTransaction.transfer(observer);
 	}
 
