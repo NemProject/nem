@@ -2,7 +2,7 @@ package org.nem.peer;
 
 import org.nem.core.model.primitive.NodeAge;
 import org.nem.core.node.*;
-import org.nem.nis.controller.viewmodels.TimeSynchronizationResult;
+import org.nem.core.time.TimeSynchronizationResult;
 import org.nem.peer.trust.TrustContext;
 import org.nem.peer.trust.score.*;
 

@@ -10,6 +10,8 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.Collection;
+
 public class TransferTransactionTest {
 
 	//region Constructor
@@ -193,6 +195,25 @@ public class TransferTransactionTest {
 
 		// Act:
 		return transaction.getFee();
+	}
+
+	//endregion
+
+	//region getAccounts
+
+	@Test
+	public void getAccountsReturnsCorrectAccounts() {
+		// Arrange:
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		final Account signer = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);
+
+		// Act:
+		final Collection<Account> accounts = transaction.getAccounts();
+
+		// Assert:
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, recipient));
 	}
 
 	//endregion

@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
 	private static final int BLOCK_CACHE_SECONDS = 600;
-	private static final int TX_CACHE_SECONDS = 10;
+	private static final int TX_CACHE_SECONDS = 60;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockChain blockChain;

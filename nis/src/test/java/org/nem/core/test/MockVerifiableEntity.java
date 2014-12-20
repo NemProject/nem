@@ -8,7 +8,6 @@ import org.nem.core.time.TimeInstant;
  * A mock VerifiableEntity implementation.
  */
 public class MockVerifiableEntity extends VerifiableEntity {
-
 	public static final int TYPE = 12;
 	public static final int VERSION = 24;
 	public static final TimeInstant TIMESTAMP = new TimeInstant(127435);

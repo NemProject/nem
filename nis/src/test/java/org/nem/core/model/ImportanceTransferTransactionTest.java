@@ -10,6 +10,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 
 public class ImportanceTransferTransactionTest {
@@ -151,6 +152,25 @@ public class ImportanceTransferTransactionTest {
 
 		// Act + Assert:
 		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1)));
+	}
+
+	//endregion
+
+	//region getAccounts
+
+	@Test
+	public void getAccountsReturnsCorrectAccounts() {
+		// Arrange:
+		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
+		final Account signer = Utils.generateRandomAccount();
+		final Account remote = Utils.generateRandomAccount();
+		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
+
+		// Act:
+		final Collection<Account> accounts = transaction.getAccounts();
+
+		// Assert:
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, remote));
 	}
 
 	//endregion

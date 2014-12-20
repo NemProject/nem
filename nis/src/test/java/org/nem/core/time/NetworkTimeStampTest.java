@@ -1,4 +1,4 @@
-package org.nem.core.model.primitive;
+package org.nem.core.time;
 
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;

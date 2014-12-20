@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.core.time.SystemTimeProvider;
+import org.nem.core.time.*;
 import org.nem.core.time.synchronization.*;
 import org.nem.peer.PeerNetworkState;
 import org.nem.peer.trust.NodeSelector;
