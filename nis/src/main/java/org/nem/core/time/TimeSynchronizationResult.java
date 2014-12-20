@@ -2,7 +2,6 @@ package org.nem.core.time;
 
 import org.nem.core.model.primitive.TimeOffset;
 import org.nem.core.serialization.*;
-import org.nem.core.time.*;
 
 /**
  * Information about the result of a time synchronization with other nodes.

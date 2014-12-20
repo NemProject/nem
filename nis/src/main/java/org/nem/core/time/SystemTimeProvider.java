@@ -1,6 +1,6 @@
 package org.nem.core.time;
 
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.TimeOffset;
 
 import java.util.*;
 

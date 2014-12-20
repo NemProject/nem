@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.TimeOffset;
 import org.nem.core.test.Utils;
-import org.nem.core.time.*;
 
 public class TimeSynchronizationResultTest {
 

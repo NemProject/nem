@@ -5,7 +5,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.serialization.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.NetworkTimeStamp;
 
 public class NetworkTimeStampTest {
 

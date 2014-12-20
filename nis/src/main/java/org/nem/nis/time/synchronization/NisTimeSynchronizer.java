@@ -1,6 +1,6 @@
 package org.nem.nis.time.synchronization;
 
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.TimeOffset;
 import org.nem.core.node.Node;
 import org.nem.core.time.*;
 import org.nem.core.time.synchronization.*;

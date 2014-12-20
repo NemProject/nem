@@ -3,9 +3,9 @@ package org.nem.core.time.synchronization;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.node.NodeIdentity;
 import org.nem.core.test.TimeSyncUtils;
+import org.nem.core.time.NetworkTimeStamp;
 
 import java.util.HashMap;
 

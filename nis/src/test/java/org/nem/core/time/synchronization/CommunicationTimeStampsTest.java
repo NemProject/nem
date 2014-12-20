@@ -2,8 +2,8 @@ package org.nem.core.time.synchronization;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.test.Utils;
+import org.nem.core.time.NetworkTimeStamp;
 
 import java.util.HashMap;
 
