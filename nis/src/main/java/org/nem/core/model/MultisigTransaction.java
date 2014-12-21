@@ -5,6 +5,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.MultisigSignature;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class MultisigTransaction extends Transaction implements SerializableEntity {
 	private final Transaction otherTransaction;
 	private final Hash otherTransactionHash;
-	private final List<MultisigSignatureTransaction> signatureTransactions = new ArrayList<>();
+	private final SortedSet<MultisigSignatureTransaction> signatureTransactions = new TreeSet<>();
 
 	/**
 	 * Creates a multisig transaction.
@@ -81,7 +82,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		}
 
 		// TODO 20141204 G-J: where should we check for duplicate MultisigSignatures ?
-
+		// TODO 20141221 G-J: after changing to SortedSet, changing compareTo and equals in MultisigSignatureTransaction could do the trick
 		this.signatureTransactions.add(transaction);
 	}
 
@@ -90,7 +91,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	 *
 	 * @return The list of signature transactions.
 	 */
-	public List<MultisigSignatureTransaction> getCosignerSignatures() {
+	public SortedSet<MultisigSignatureTransaction> getCosignerSignatures() {
 		return this.signatureTransactions;
 	}
 

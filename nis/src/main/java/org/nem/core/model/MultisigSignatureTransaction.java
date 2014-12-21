@@ -65,6 +65,27 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	}
 
 	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof MultisigSignatureTransaction)) {
+			return false;
+		}
+
+		final MultisigSignatureTransaction rhs = (MultisigSignatureTransaction)obj;
+		return (0 == rhs.compareTo(rhs));
+	}
+
+	@Override
+	public int compareTo(final Transaction rhs) {
+		// first sort by fees (lowest first) and then timestamps (newest first)
+		int result = super.compareTo(rhs);
+		if (result != 0) {
+			return result;
+		}
+
+		return this.getSignature().compareTo(rhs.getSignature());
+	}
+
+	@Override
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeObject("otherHash", this.getOtherTransactionHash());

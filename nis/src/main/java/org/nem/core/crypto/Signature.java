@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * A EC signature.
  */
-public class Signature {
+public class Signature implements Comparable<Signature> {
 	private static final BigInteger MAXIMUM_VALUE = BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE);
 
 	private final byte[] r;
@@ -108,6 +108,15 @@ public class Signature {
 	@Override
 	public int hashCode() {
 		return Arrays.hashCode(this.r) ^ Arrays.hashCode(this.s);
+	}
+
+	@Override
+	public int compareTo(Signature o) {
+		int r = this.getR().compareTo(o.getR());
+		if (r != 0) {
+			return r;
+		}
+		return this.getS().compareTo(o.getS());
 	}
 
 	@Override
