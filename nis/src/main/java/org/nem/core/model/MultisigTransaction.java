@@ -111,6 +111,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
+		this.signatureTransactions.stream().forEach(t -> t.transfer(observer));
 		this.otherTransaction.transfer(observer);
 	}
 
@@ -157,11 +158,6 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			return false;
 		}
 
-		//		final byte[] innerTransactionBytes = BinarySerializer.serializeToBytes(this.otherTransaction.asNonVerifiable());
-		//		return this.signatureTransactions.stream().allMatch(signatureTransaction -> {
-		//			final Signer signer = new Signer(signatureTransaction.getSigner().getKeyPair());
-		//			return signer.verify(innerTransactionBytes, signatureTransaction.getOtherTransactionSignature());
-		//		});
 		return
 				this.signatureTransactions.stream().allMatch(signatureTransactions -> signatureTransactions.getOtherTransactionHash().equals(this.getOtherTransactionHash())) &&
 						this.signatureTransactions.stream().allMatch(signatureTransaction -> signatureTransaction.verify());

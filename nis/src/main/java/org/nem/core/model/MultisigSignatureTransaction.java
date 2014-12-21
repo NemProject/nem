@@ -1,6 +1,8 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.observers.BalanceAdjustmentNotification;
+import org.nem.core.model.observers.NotificationType;
 import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
@@ -52,6 +54,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 	}
 
 	@Override
