@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.MultisigSignature;
 
 import java.util.*;
 
@@ -231,6 +232,30 @@ public class MultisigTransactionTest {
 		Assert.assertThat(signers, IsEquivalent.equivalentTo(Arrays.asList(sigTransaction.getSigner())));
 	}
 
+	@Test
+	public void addingSameSignatureDoesNotOverwritePreviousOne() {
+		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
+		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
+		final MultisigSignatureTransaction sigTransaction = createUnverifiableSignatureTransaction(innerTransactionHash);
+		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
+		sigTransaction.setFee(Amount.fromNem(6));
+
+		final MultisigSignatureTransaction nextSignature = new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				sigTransaction.getSigner(),
+				innerTransactionHash);
+		nextSignature.setSignature(Utils.generateRandomSignature());
+		nextSignature.setFee(Amount.fromNem(12345));
+
+		msTransaction.addSignature(sigTransaction);
+
+		// Act:
+		msTransaction.addSignature(nextSignature);
+		final MultisigSignatureTransaction result = msTransaction.getCosignerSignatures().first();
+
+		// Assert:
+		Assert.assertThat(result.getFee(), IsEqual.equalTo(Amount.fromNem(6)));
+	}
 	//endregion
 
 	//region verify

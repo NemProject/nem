@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsNot;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.*;
@@ -107,6 +108,133 @@ public class MultisigSignatureTransactionTest {
 		Mockito.verify(observer, Mockito.never()).notify(notificationCaptor.capture());
 	}
 
+	//endregion
+
+	//region comparing
+	@Test
+	public void comparingWithDifferentTransactionTypeYieldsSmaller() {
+		// Arrange:
+		final Transaction transaction = createDefaultTransaction();
+		final Transaction rhs = Mockito.mock(Transaction.class);
+
+		// Act
+		final int result = transaction.compareTo(rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(-1));
+	}
+
+	@Test
+	public void comparingEqualTransactionsYieldsEqual() {
+		// Arrange:
+		final TimeInstant timeInstant = new TimeInstant(123);
+		final Account sender = Utils.generateRandomAccount();
+		final Hash hash = Utils.generateRandomHash();
+		final Transaction transaction = new MultisigSignatureTransaction(timeInstant, sender, hash);
+		final Transaction rhs = new MultisigSignatureTransaction(timeInstant, sender, hash);
+
+		// Act
+		final int result = transaction.compareTo(rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void changingFeeDoesNotChangeComparisonResult() {
+		// Arrange:
+		final TimeInstant timeInstant = new TimeInstant(123);
+		final Account sender = Utils.generateRandomAccount();
+		final Hash hash = Utils.generateRandomHash();
+		final Transaction transaction = new MultisigSignatureTransaction(timeInstant, sender, hash);
+		final Transaction rhs = new MultisigSignatureTransaction(timeInstant, sender, hash);
+
+		transaction.setFee(Amount.fromNem(12345));
+
+		// Act
+		final int result = transaction.compareTo(rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void changingTimestampDoesNotChangeComparisonResult() {
+		// Arrange:
+		final TimeInstant timeInstant1 = new TimeInstant(123);
+		final TimeInstant timeInstant2 = new TimeInstant(123);
+		final Account sender = Utils.generateRandomAccount();
+		final Hash hash = Utils.generateRandomHash();
+		final Transaction transaction = new MultisigSignatureTransaction(timeInstant1, sender, hash);
+		final Transaction rhs = new MultisigSignatureTransaction(timeInstant2, sender, hash);
+
+		transaction.setFee(Amount.fromNem(12345));
+
+		// Act
+		final int result = transaction.compareTo(rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void differentSenderYieldsDifferentTransaction() {
+		// Arrange:
+		final TimeInstant timeInstant = new TimeInstant(123);
+		final Account sender1 = Utils.generateRandomAccount();
+		final Account sender2 = Utils.generateRandomAccount();
+		final Hash hash = Utils.generateRandomHash();
+		final Transaction transaction = new MultisigSignatureTransaction(timeInstant, sender1, hash);
+		final Transaction rhs = new MultisigSignatureTransaction(timeInstant, sender2, hash);
+
+		// Act
+		final int result = transaction.compareTo(rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(0)));
+	}
+
+	@Test
+	public void differentHashYieldsDifferentTransaction() {
+		// Arrange:
+		final TimeInstant timeInstant = new TimeInstant(123);
+		final Account sender = Utils.generateRandomAccount();
+		final Hash hash1 = Utils.generateRandomHash();
+		final Hash hash2 = Utils.generateRandomHash();
+		final Transaction transaction = new MultisigSignatureTransaction(timeInstant, sender, hash1);
+		final Transaction rhs = new MultisigSignatureTransaction(timeInstant, sender, hash2);
+
+		// Act
+		final int result = transaction.compareTo(rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsNot.not(IsEqual.equalTo(0)));
+	}
+	//endregion
+
+	//region equals
+	@Test
+	public void equalsWithDifferentTransactionTypeYieldsFalse() {
+		// Arrange:
+		final Transaction transaction = createDefaultTransaction();
+		final Transaction rhs = Mockito.mock(Transaction.class);
+
+		// Act
+		final boolean result = transaction.equals(rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void equalsForwardsToCompareTo() {
+		// Arrange:
+		final Transaction transaction = Mockito.mock(MultisigSignatureTransaction.class);
+		final Transaction rhs = Mockito.mock(MultisigSignatureTransaction.class);
+
+		// dunno how to test it with mockito
+		Assert.assertThat(true, IsEqual.equalTo(false));
+	}
 	//endregion
 
 	private static MultisigSignatureTransaction createDefaultTransaction() {
