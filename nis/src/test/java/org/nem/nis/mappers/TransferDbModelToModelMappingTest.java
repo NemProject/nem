@@ -10,7 +10,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Transfer;
 
-public class TransferToTransactionMappingTest {
+public class TransferDbModelToModelMappingTest {
 
 	@Test
 	public void transferWithNoMessageCanBeMappedToModel() {
@@ -84,7 +84,7 @@ public class TransferToTransactionMappingTest {
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final Signature signature = Utils.generateRandomSignature();
-		private final TransferToTransactionMapping mapping = new TransferToTransactionMapping(this.mapper);
+		private final TransferDbModelToModelMapping mapping = new TransferDbModelToModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);

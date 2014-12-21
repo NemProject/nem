@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 
-public class DbAccountToAccountMappingTest {
+public class AccountDbModelToModelMappingTest {
 
 	@Test
 	public void canMapDbAccountWithPublicKeyToAccount() {
@@ -35,7 +35,7 @@ public class DbAccountToAccountMappingTest {
 		final Account accountReturnedByAccountLookup = Mockito.mock(Account.class);
 		Mockito.when(accountLookup.findByAddress(Mockito.any())).thenReturn(accountReturnedByAccountLookup);
 
-		final DbAccountToAccountMapping mapping = new DbAccountToAccountMapping(accountLookup);
+		final AccountDbModelToModelMapping mapping = new AccountDbModelToModelMapping(accountLookup);
 
 		// Act:
 		final Account account = mapping.map(dbAccount);

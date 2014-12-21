@@ -9,7 +9,7 @@ import org.nem.nis.dbmodel.Transfer;
 /**
  * A mapping that is able to map a db transfer to a model transfer transaction.
  */
-public class TransferToTransactionMapping implements IMapping<Transfer, TransferTransaction> {
+public class TransferDbModelToModelMapping implements IMapping<Transfer, TransferTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -17,7 +17,7 @@ public class TransferToTransactionMapping implements IMapping<Transfer, Transfer
 	 *
 	 * @param mapper the mapper.
 	 */
-	public TransferToTransactionMapping(final IMapper mapper) {
+	public TransferDbModelToModelMapping(final IMapper mapper) {
 		this.mapper = mapper;
 	}
 

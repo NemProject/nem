@@ -7,7 +7,7 @@ import org.nem.core.serialization.AccountLookup;
 /**
  * A mapping that is able to map a db account to a model account.
  */
-public class DbAccountToAccountMapping implements IMapping<org.nem.nis.dbmodel.Account, Account> {
+public class AccountDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.Account, Account> {
 	private final AccountLookup accountLookup;
 
 	/**
@@ -15,7 +15,7 @@ public class DbAccountToAccountMapping implements IMapping<org.nem.nis.dbmodel.A
 	 *
 	 * @param accountLookup The account lookup.
 	 */
-	public DbAccountToAccountMapping(final AccountLookup accountLookup) {
+	public AccountDbModelToModelMapping(final AccountLookup accountLookup) {
 		this.accountLookup = accountLookup;
 	}
 

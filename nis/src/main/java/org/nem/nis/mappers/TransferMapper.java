@@ -53,8 +53,8 @@ public class TransferMapper {
 	public static TransferTransaction toModel(final Transfer dbTransfer, final AccountLookup accountLookup) {
 		// TODO 20141221: there's no need to recreate the MappingRepository each time
 		final MappingRepository mappingRepository = new MappingRepository();
-		mappingRepository.addMapping(Transfer.class, TransferTransaction.class, new TransferToTransactionMapping(mappingRepository));
-		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new DbAccountToAccountMapping(accountLookup));
+		mappingRepository.addMapping(Transfer.class, TransferTransaction.class, new TransferDbModelToModelMapping(mappingRepository));
+		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new AccountDbModelToModelMapping(accountLookup));
 		return mappingRepository.map(dbTransfer, TransferTransaction.class);
 	}
 }
