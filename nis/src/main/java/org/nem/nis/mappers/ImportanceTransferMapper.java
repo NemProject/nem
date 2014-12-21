@@ -48,21 +48,12 @@ public class ImportanceTransferMapper {
 	 * @return The ImportanceTransferTransaction model.
 	 */
 	public static ImportanceTransferTransaction toModel(final ImportanceTransfer dbImportanceTransfer, final AccountLookup accountLookup) {
-		final Address senderAccount = AccountToAddressMapper.toAddress(dbImportanceTransfer.getSender());
-		final Account sender = accountLookup.findByAddress(senderAccount);
-
-		final Address remoteAddress = AccountToAddressMapper.toAddress(dbImportanceTransfer.getRemote());
-		final Account remote = accountLookup.findByAddress(remoteAddress);
-
-		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(
-				new TimeInstant(dbImportanceTransfer.getTimeStamp()),
-				sender,
-				ImportanceTransferTransaction.Mode.fromValueOrDefault(dbImportanceTransfer.getMode()),
-				remote);
-
-		transfer.setFee(new Amount(dbImportanceTransfer.getFee()));
-		transfer.setDeadline(new TimeInstant(dbImportanceTransfer.getDeadline()));
-		transfer.setSignature(new Signature(dbImportanceTransfer.getSenderProof()));
-		return transfer;
+		// TODO 20141221: there's no need to recreate the MappingRepository each time
+		final MappingRepository mappingRepository = new MappingRepository();
+		mappingRepository.addMapping(ImportanceTransfer.class,
+				ImportanceTransferTransaction.class,
+				new ImportanceTransferDbModelToModelMapping(mappingRepository));
+		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new AccountDbModelToModelMapping(accountLookup));
+		return mappingRepository.map(dbImportanceTransfer, ImportanceTransferTransaction.class);
 	}
 }

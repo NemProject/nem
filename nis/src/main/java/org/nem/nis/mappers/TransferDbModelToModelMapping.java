@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Transfer;
+
 /**
  * A mapping that is able to map a db transfer to a model transfer transaction.
  */
