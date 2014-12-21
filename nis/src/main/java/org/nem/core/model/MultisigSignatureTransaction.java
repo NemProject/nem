@@ -5,6 +5,7 @@ import org.nem.core.model.observers.TransactionObserver;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.core.utils.ArrayUtils;
 
 import java.util.*;
 
@@ -74,15 +75,25 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 		return (0 == rhs.compareTo(rhs));
 	}
 
+	/**
+	 * For MultisigSignature We take into consideration only signer and other transaction hash.
+	 *
+	 * @param rhs Transaction to compare to
+	 * @return -1, 0 or 1
+	 */
 	@Override
 	public int compareTo(final Transaction rhs) {
+		if (!(rhs instanceof  MultisigSignatureTransaction)) {
+			return -1;
+		}
+
 		// first sort by fees (lowest first) and then timestamps (newest first)
-		int result = super.compareTo(rhs);
+		int result = this.getSigner().getAddress().getEncoded().compareTo(rhs.getSigner().getAddress().getEncoded());
 		if (result != 0) {
 			return result;
 		}
 
-		return this.getSignature().compareTo(rhs.getSignature());
+		return ArrayUtils.compare(this.getOtherTransactionHash().getRaw(), ((MultisigSignatureTransaction)rhs).getOtherTransactionHash().getRaw());
 	}
 
 	@Override

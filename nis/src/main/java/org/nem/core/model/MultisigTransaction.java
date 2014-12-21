@@ -82,7 +82,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		}
 
 		// TODO 20141204 G-J: where should we check for duplicate MultisigSignatures ?
-		// TODO 20141221 G-J: after changing to SortedSet, changing compareTo and equals in MultisigSignatureTransaction could do the trick
+		// TODO 20141221 G-J: after changing to SortedSet, changing compareTo and equals in
+		// MultisigSignatureTransaction could do the trick
+		// Not sure if that's a good idea, but I've changed comparator in such way
 		this.signatureTransactions.add(transaction);
 	}
 
