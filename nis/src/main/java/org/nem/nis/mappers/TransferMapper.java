@@ -1,12 +1,8 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.*;
-import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 /**
@@ -55,44 +51,10 @@ public class TransferMapper {
 	 * @return The TransferTransaction model.
 	 */
 	public static TransferTransaction toModel(final Transfer dbTransfer, final AccountLookup accountLookup) {
-		final Address senderAccount = AccountToAddressMapper.toAddress(dbTransfer.getSender());
-		final Account sender = accountLookup.findByAddress(senderAccount);
-
-		final Address recipientAccount = Address.fromEncoded(dbTransfer.getRecipient().getPrintableKey());
-		final Account recipient = accountLookup.findByAddress(recipientAccount);
-
-		final Message message = messagePayloadToModel(
-				dbTransfer.getMessagePayload(),
-				dbTransfer.getMessageType(),
-				sender,
-				recipient);
-
-		final TransferTransaction transfer = new TransferTransaction(
-				new TimeInstant(dbTransfer.getTimeStamp()),
-				sender,
-				recipient,
-				new Amount(dbTransfer.getAmount()),
-				message);
-
-		transfer.setFee(new Amount(dbTransfer.getFee()));
-		transfer.setDeadline(new TimeInstant(dbTransfer.getDeadline()));
-		transfer.setSignature(new Signature(dbTransfer.getSenderProof()));
-		return transfer;
-	}
-
-	private static Message messagePayloadToModel(final byte[] payload, final Integer messageType, final Account sender, final Account recipient) {
-		if (null == payload) {
-			return null;
-		}
-
-		switch (messageType) {
-			case MessageTypes.PLAIN:
-				return new PlainMessage(payload);
-
-			case MessageTypes.SECURE:
-				return SecureMessage.fromEncodedPayload(sender, recipient, payload);
-		}
-
-		throw new IllegalArgumentException("Unknown message type in database");
+		// TODO 20141221: there's no need to recreate the MappingRepository each time
+		final MappingRepository mappingRepository = new MappingRepository();
+		mappingRepository.addMapping(Transfer.class, TransferTransaction.class, new TransferToTransactionMapping(mappingRepository));
+		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new DbAccountToAccountMapping(accountLookup));
+		return mappingRepository.map(dbTransfer, TransferTransaction.class);
 	}
 }
