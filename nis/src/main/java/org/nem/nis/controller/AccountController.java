@@ -85,6 +85,7 @@ public class AccountController {
 	@ClientApi
 	public String accountIsUnlocked(@RequestBody final Address address) {
 		final Account account = new Account(address);
+		// TODO 20141222 BR: I guess the attack gimre described is not that severe?
 		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
 	}
 

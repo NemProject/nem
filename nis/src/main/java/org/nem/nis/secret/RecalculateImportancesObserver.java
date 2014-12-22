@@ -1,10 +1,7 @@
 package org.nem.nis.secret;
 
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.NisCache;
-import org.nem.nis.poi.GroupedHeight;
 
 /**
  * An observer that recalculates POI importances.
@@ -23,6 +20,7 @@ public class RecalculateImportancesObserver implements BlockTransactionObserver 
 
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
+		// TODO 20141222 BR _> J: Can we either have an individual notification type for each observer or at least have a more general naming for block notifications?
 		if (NotificationType.HarvestReward != notification.getType()) {
 			return;
 		}

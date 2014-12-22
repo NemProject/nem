@@ -7,7 +7,7 @@ import org.nem.nis.state.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.*;
+import java.util.function.Function;
 
 /**
  * A repository of all mutable NEM account state.
@@ -18,6 +18,9 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 			this.addressToStateMap,
 			address -> new AccountState(address));
 	// TODO 20141215 J-B: not sure what the best default action is; return a temporary state or throw an exception?
+	// TODO 20141222 BR -> J: I think i lost the overview over this cache stuff. We now have 14 interface and 12 classes implementing it.
+	// > I need to go through every findStateByAddress usage to decide if it is ok to throw if the address is unknown. At least in the past
+	// > there were places which relied on the cache to (secretly) create a new object.
 
 	@Override
 	public AccountState findStateByAddress(final Address address) {
