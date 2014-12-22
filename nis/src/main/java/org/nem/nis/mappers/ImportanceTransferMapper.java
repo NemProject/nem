@@ -29,15 +29,15 @@ public class ImportanceTransferMapper {
 			final int blockIndex,
 			final int orderIndex,
 			final AccountDaoLookup accountDaoLookup) {
-		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(importanceTransferTransaction.getSigner().getAddress());
-		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(importanceTransferTransaction.getRemote().getAddress());
+		// TODO 20141221: there's no need to recreate the MappingRepository each time
+		final MappingRepository mappingRepository = new MappingRepository();
+		mappingRepository.addMapping(ImportanceTransferTransaction.class, ImportanceTransfer.class, new ImportanceTransferModelToDbModelMapping(mappingRepository));
+		mappingRepository.addMapping(Account.class, org.nem.nis.dbmodel.Account.class, new AccountModelToDbModelMapping(accountDaoLookup));
 
-		final ImportanceTransfer transfer = new ImportanceTransfer();
-		AbstractTransferMapper.toDbModel(importanceTransferTransaction, sender, blockIndex, orderIndex, transfer);
-
-		transfer.setRemote(remote);
-		transfer.setMode(importanceTransferTransaction.getMode().value());
-		return transfer;
+		final ImportanceTransfer dbTransfer = mappingRepository.map(importanceTransferTransaction, ImportanceTransfer.class);
+		dbTransfer.setOrderId(orderIndex);
+		dbTransfer.setBlkIndex(blockIndex);
+		return dbTransfer;
 	}
 
 	/**
@@ -50,7 +50,8 @@ public class ImportanceTransferMapper {
 	public static ImportanceTransferTransaction toModel(final ImportanceTransfer dbImportanceTransfer, final AccountLookup accountLookup) {
 		// TODO 20141221: there's no need to recreate the MappingRepository each time
 		final MappingRepository mappingRepository = new MappingRepository();
-		mappingRepository.addMapping(ImportanceTransfer.class,
+		mappingRepository.addMapping(
+				ImportanceTransfer.class,
 				ImportanceTransferTransaction.class,
 				new ImportanceTransferDbModelToModelMapping(mappingRepository));
 		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new AccountDbModelToModelMapping(accountLookup));

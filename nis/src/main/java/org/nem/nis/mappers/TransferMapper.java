@@ -25,21 +25,14 @@ public class TransferMapper {
 			final int blockIndex,
 			final int orderIndex,
 			final AccountDaoLookup accountDaoLookup) {
-		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(transfer.getSigner().getAddress());
-		final org.nem.nis.dbmodel.Account recipient = accountDaoLookup.findByAddress(transfer.getRecipient().getAddress());
+		// TODO 20141221: there's no need to recreate the MappingRepository each time
+		final MappingRepository mappingRepository = new MappingRepository();
+		mappingRepository.addMapping(TransferTransaction.class, Transfer.class, new TransferModelToDbModelMapping(mappingRepository));
+		mappingRepository.addMapping(Account.class, org.nem.nis.dbmodel.Account.class, new AccountModelToDbModelMapping(accountDaoLookup));
 
-		final Transfer dbTransfer = new Transfer();
-		AbstractTransferMapper.toDbModel(transfer, sender, blockIndex, orderIndex, dbTransfer);
-
-		dbTransfer.setRecipient(recipient);
-		dbTransfer.setAmount(transfer.getAmount().getNumMicroNem());
-
-		final Message message = transfer.getMessage();
-		if (null != message) {
-			dbTransfer.setMessageType(message.getType());
-			dbTransfer.setMessagePayload(message.getEncodedPayload());
-		}
-
+		final Transfer dbTransfer = mappingRepository.map(transfer, Transfer.class);
+		dbTransfer.setOrderId(orderIndex);
+		dbTransfer.setBlkIndex(blockIndex);
 		return dbTransfer;
 	}
 
