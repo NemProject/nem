@@ -83,6 +83,29 @@ public class MultisigTransactionTest {
 		Assert.assertThat(transaction.getSigners().get(0), IsEqual.equalTo(originalTransaction.getSigners().get(0)));
 	}
 
+	@Test
+	public void canBinaryRoundtripTransactionWithSignatures() {
+		// Arrange:
+		final Account account = Utils.generateRandomAccount();
+		final Transaction innerTransaction = createDefaultTransferTransaction();
+		final MultisigTransaction originalTransaction = new MultisigTransaction(
+				new TimeInstant(123),
+				account,
+				innerTransaction);
+		final MultisigSignatureTransaction signature = createUnverifiableSignatureTransaction(HashUtils.calculateHash(innerTransaction));
+		signature.sign();
+		originalTransaction.addSignature(signature);
+		originalTransaction.sign();
+
+		// Act:
+		final MultisigTransaction transaction = createBinaryRoundTrippedTransaction(originalTransaction);
+
+		// Assert:
+		Assert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getSigners().get(0), IsEqual.equalTo(originalTransaction.getSigners().get(0)));
+	}
+
 	private static TransferTransaction createDefaultTransferTransaction() {
 		return new TransferTransaction(
 				new TimeInstant(111),
@@ -90,6 +113,13 @@ public class MultisigTransactionTest {
 				Utils.generateRandomAccount(),
 				Amount.fromNem(789),
 				null);
+	}
+
+	private static MultisigTransaction createBinaryRoundTrippedTransaction(final Transaction originalTransaction) {
+		// Act:
+		final Deserializer deserializer = Utils.roundtripSerializableEntityWithBinarySerializer(originalTransaction, new MockAccountLookup());
+		deserializer.readInt("type");
+		return new MultisigTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
 	}
 
 	private static MultisigTransaction createRoundTrippedTransaction(final Transaction originalTransaction) {
