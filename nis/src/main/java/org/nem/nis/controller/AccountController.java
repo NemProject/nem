@@ -86,6 +86,8 @@ public class AccountController {
 	public String accountIsUnlocked(@RequestBody final Address address) {
 		final Account account = new Account(address);
 		// TODO 20141222 BR: I guess the attack gimre described is not that severe?
+		// TODO 20141222 J-*: I didn't think it was so severe, as this can still be figured out by which machine
+		// > is originating the block (but harder), and the ecosystem make nicer graphs
 		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
 	}
 

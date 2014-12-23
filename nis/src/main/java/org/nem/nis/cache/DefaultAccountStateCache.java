@@ -21,6 +21,8 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 	// TODO 20141222 BR -> J: I think i lost the overview over this cache stuff. We now have 14 interface and 12 classes implementing it.
 	// > I need to go through every findStateByAddress usage to decide if it is ok to throw if the address is unknown. At least in the past
 	// > there were places which relied on the cache to (secretly) create a new object.
+	// TODO 20141223 J-B: 'there were places which relied on the cache to (secretly) create a new object.' -
+	// > this is now happening automatically on all "writable" caches (so NisCache.copy() returns a writable copy that has auto-cache mode turned on)
 
 	@Override
 	public AccountState findStateByAddress(final Address address) {
