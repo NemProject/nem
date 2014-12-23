@@ -261,8 +261,6 @@ public class UnconfirmedTransactions {
 					this.remove(transaction);
 				}
 			} catch (final IllegalArgumentException e) {
-				// TODO 20141218 J-B: can we at least catch a more specific exception? we can't really recover from every possible failure
-				// TODO 20141222 BR -> J: I have only seen illegal argument exceptions due to negative amounts so I guess it is enough to catch them.
 				LOGGER.severe("illegal argument exception during removal of unconfirmed transactions, rebuilding cache");
 				this.rebuildCache(this.getAll());
 				return;
@@ -276,6 +274,7 @@ public class UnconfirmedTransactions {
 			// Next call to UnconfirmedBalancesObserver.get(A) results in an exception.
 			// This means a new block can ruin the unconfirmed balance. We have to check if all balances are still valid.
 			if (!this.unconfirmedBalances.unconfirmedBalancesAreValid()) {
+				// TODO 20141223 J-B: it would be good to have a test that hits this case
 				LOGGER.warning("invalid unconfirmed balance detected, rebuilding cache");
 				this.rebuildCache(this.getAll());
 			}

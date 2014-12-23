@@ -8,9 +8,6 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-// TODO 20141218 J-B: changes look pretty good, nice job; i have a few comments:
-// > it might make sense to pull UnconfirmedBalancesObserver out into its own class so we can test it more directly
-// > should definitely add tests for the cases that trigger the cache rebuild (since this is presumably the source of our bugs)
 /**
  * An observer that updates unconfirmed balance information
  */
@@ -19,10 +16,21 @@ public class UnconfirmedBalancesObserver implements TransferObserver {
 	private final Map<Account, Amount> creditedAmounts = new ConcurrentHashMap<>();
 	private final Map<Account, Amount> debitedAmounts = new ConcurrentHashMap<>();
 
+	/**
+	 * Creates an unconfirmed balances observer.
+	 *
+	 * @param accountStateCache The account state cache.
+	 */
 	public UnconfirmedBalancesObserver(final ReadOnlyAccountStateCache accountStateCache) {
 		this.accountStateCache = accountStateCache;
 	}
 
+	/**
+	 * Gets the (unconfirmed) balance of the specified account.
+	 *
+	 * @param account The account.
+	 * @return The balance.
+	 */
 	public Amount get(final Account account) {
 		return this.getBalance(account).add(this.getCreditedAmount(account)).subtract(this.getDebitedAmount(account));
 	}
@@ -45,6 +53,7 @@ public class UnconfirmedBalancesObserver implements TransferObserver {
 		this.addToCache(account);
 		final Amount newDebitedAmount = this.getDebitedAmount(account).add(amount);
 		// should not be necessary but do it anyway as check
+		// TODO 20141223 J-B: i guess you are checking that the amount cannot become negative?
 		this.getBalance(account).add(this.getCreditedAmount(account)).subtract(newDebitedAmount);
 		this.debitedAmounts.replace(account, newDebitedAmount);
 	}
@@ -55,19 +64,22 @@ public class UnconfirmedBalancesObserver implements TransferObserver {
 		this.debitedAmounts.putIfAbsent(account, Amount.ZERO);
 	}
 
+	/**
+	 * Clears the cache.
+	 */
 	public void clearCache() {
 		this.creditedAmounts.clear();
 		this.debitedAmounts.clear();
 	}
 
+	/**
+	 * Gets a value indicating whether or not all unconfirmed balances are valid (positive).
+	 *
+	 * @return true if all unconfirmed balances are valid.
+	 */
 	public boolean unconfirmedBalancesAreValid() {
-		for (final Account account : this.creditedAmounts.keySet()) {
-			if (this.getBalance(account).add(this.getCreditedAmount(account)).compareTo(this.getDebitedAmount(account)) < 0) {
-				return false;
-			}
-		}
-
-		return true;
+		return this.creditedAmounts.keySet().stream()
+				.allMatch(account -> this.getBalance(account).add(this.getCreditedAmount(account)).compareTo(this.getDebitedAmount(account)) >= 0);
 	}
 
 	private Amount getBalance(final Account account) {

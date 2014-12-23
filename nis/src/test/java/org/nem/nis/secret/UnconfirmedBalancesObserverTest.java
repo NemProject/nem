@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 
@@ -37,6 +37,17 @@ public class UnconfirmedBalancesObserverTest {
 	}
 
 	@Test
+	public void notifyDebitCannotDecreaseUnconfirmedBalanceBelowZero() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> context.observer.notifyDebit(context.sender, Amount.fromNem(12)),
+				IllegalArgumentException.class);
+	}
+
+	@Test
 	public void notifyCreditIncreasesAccountsUnconfirmedBalance() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -49,6 +60,21 @@ public class UnconfirmedBalancesObserverTest {
 	}
 
 	@Test
+	public void notifyCreditAndDebitChangesAreAppliedCumulativelyToUnconfirmedBalance() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.observer.notifyCredit(context.recipient, Amount.fromNem(17));
+		context.observer.notifyDebit(context.recipient, Amount.fromNem(8));
+		context.observer.notifyCredit(context.recipient, Amount.fromNem(12));
+		context.observer.notifyDebit(context.recipient, Amount.fromNem(5));
+
+		// Assert:
+		Assert.assertThat(context.observer.get(context.recipient), IsEqual.equalTo(Amount.fromNem(16)));
+	}
+
+	@Test
 	public void clearCacheClearsCreditedAndDebitedAmounts() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -56,7 +82,6 @@ public class UnconfirmedBalancesObserverTest {
 		context.observer.notifyDebit(context.recipient, Amount.fromNem(8));
 
 		// Act:
-		Assert.assertThat(context.observer.get(context.recipient), IsEqual.equalTo(Amount.fromNem(9)));
 		context.observer.clearCache();
 
 		// Assert:
