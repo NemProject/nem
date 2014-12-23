@@ -7,7 +7,7 @@ import org.nem.core.test.*;
 
 import java.util.*;
 
-public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>> {
+public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 
 	/**
 	 * Creates an account cache
@@ -253,7 +253,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void asAutoCacheFindByAddressReturnsCachedAddressIfPublicKeyIsNotFound() {
 		// Arrange:
-		final AccountCache cache = this.createAccountCache();
+		final T cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
@@ -267,7 +267,7 @@ public abstract class AccountCacheTest<T extends AccountCache & CopyableCache<T>
 	@Test
 	public void asAutoCacheFindByAddressReturnsCachedAddressIfEncodedAddressIsNotFound() {
 		// Arrange:
-		final AccountCache cache = this.createAccountCache();
+		final T cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:

@@ -372,7 +372,7 @@ public class BlockChainValidatorIntegrationTest {
 	private static class BlockChainValidatorFactory {
 		public final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		public final int maxChainSize = 21;
-		public final AccountStateCache accountStateCache = new DefaultAccountStateCache();
+		public final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		public final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 		public final ReadOnlyNisCache nisCache = NisCacheFactory.createReadOnly(this.accountStateCache, this.transactionHashCache);
 		public final BlockValidator blockValidator = NisUtils.createBlockValidatorFactory().create(this.nisCache);

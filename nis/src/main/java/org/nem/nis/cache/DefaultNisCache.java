@@ -70,12 +70,12 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 		@Override
 		public AccountCache getAccountCache() {
-			return this.accountCache;
+			return this.accountCache.asAutoCache();
 		}
 
 		@Override
 		public AccountStateCache getAccountStateCache() {
-			return this.accountStateCache;
+			return this.accountStateCache.asAutoCache();
 		}
 
 		@Override

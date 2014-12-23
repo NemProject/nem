@@ -11,36 +11,17 @@ import org.nem.nis.test.*;
 import java.util.ArrayList;
 
 public class RecalculateImportancesObserverTest {
-	private final static int POI_GROUPING = 359;
 
 	@Test
 	public void recalculateImportancesIsCalledForHarvestRewardExecuteNotification() {
 		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(127), BlockHeight.ONE);
+		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(127), new BlockHeight(128));
 	}
 
 	@Test
 	public void recalculateImportancesIsCalledForHarvestRewardExecuteUndoNotification() {
 		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), BlockHeight.ONE);
-	}
-
-	@Test
-	public void recalculateImportancesIsCalledWithGroupedContextBlockHeightWhenHeightIsOneLessThanMultipleOfPoiGrouping() {
-		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(3 * POI_GROUPING - 1), new BlockHeight(2 * POI_GROUPING));
-	}
-
-	@Test
-	public void recalculateImportancesIsCalledWithGroupedContextBlockHeightWhenHeightIsMultipleOfPoiGrouping() {
-		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(3 * POI_GROUPING), new BlockHeight(3 * POI_GROUPING));
-	}
-
-	@Test
-	public void recalculateImportancesIsCalledWithGroupedContextBlockHeightWhenHeightIsOneGreaterThanMultipleOfPoiGrouping() {
-		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(3 * POI_GROUPING + 1), new BlockHeight(3 * POI_GROUPING));
+		assertImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(128));
 	}
 
 	@Test
@@ -61,7 +42,7 @@ public class RecalculateImportancesObserverTest {
 	private static void assertImportanceRecalculation(
 			final NotificationTrigger trigger,
 			final BlockHeight height,
-			final BlockHeight expectedGroupedBlockHeight) {
+			final BlockHeight expectedRecalculateBlockHeight) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -71,7 +52,7 @@ public class RecalculateImportancesObserverTest {
 				NisUtils.createBlockNotificationContext(height, trigger));
 
 		// Assert: recalculateImportances is called with grouped height
-		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(expectedGroupedBlockHeight), Mockito.any());
+		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.only()).mutableContents();
 	}
 
