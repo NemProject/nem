@@ -1,6 +1,7 @@
 package org.nem.nis.secret;
 
-import org.junit.Test;
+import org.hamcrest.core.IsEqual;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
@@ -26,14 +27,58 @@ public class WeightedBalancesObserverTest {
 	@Test
 	public void notifyReceiveCallsWeightedBalancesAddReceive() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final BlockHeight height = new BlockHeight(123);
+		final WeightedBalances balances = new WeightedBalances();
+		final TestContext context = new TestContext(Utils.generateRandomAccount(), Mockito.spy(balances));
 
 		// Act:
-		context.observer.notifyReceive(new BlockHeight(123), context.account, new Amount(54));
+		context.observer.notifyReceive(height, context.account, new Amount(54));
 
 		// Assert:
 		Mockito.verify(context.balances, Mockito.times(1)).addReceive(new BlockHeight(123), new Amount(54));
+		Mockito.verify(context.balances, Mockito.never()).convertToFullyVested();
 		verifyCallCounts(context.balances, 0, 1, 0, 0);
+
+		Assert.assertThat(balances.getUnvested(height), IsEqual.equalTo(new Amount(54)));
+		Assert.assertThat(balances.getVested(height), IsEqual.equalTo(Amount.ZERO));
+	}
+
+	@Test
+	public void notifyReceiveAtHeightOneCallsWeightedBalancesAddReceiveForNemesisAccount() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(123);
+		final WeightedBalances balances = new WeightedBalances();
+		final TestContext context = new TestContext(new Account(NemesisBlock.ADDRESS), Mockito.spy(balances));
+
+		// Act:
+		context.observer.notifyReceive(BlockHeight.ONE, context.account, new Amount(54));
+
+		// Assert:
+		Mockito.verify(context.balances, Mockito.times(1)).addReceive(BlockHeight.ONE, new Amount(54));
+		Mockito.verify(context.balances, Mockito.never()).convertToFullyVested();
+		verifyCallCounts(context.balances, 0, 1, 0, 0);
+
+		Assert.assertThat(balances.getUnvested(height), IsEqual.equalTo(new Amount(54)));
+		Assert.assertThat(balances.getVested(height), IsEqual.equalTo(Amount.ZERO));
+	}
+
+	@Test
+	public void notifyReceiveAtHeightOneCallsWeightedBalancesAddReceiveAndConvertToFullyVestedForNonNemesisAccount() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(123);
+		final WeightedBalances balances = new WeightedBalances();
+		final TestContext context = new TestContext(Utils.generateRandomAccount(), Mockito.spy(balances));
+
+		// Act:
+		context.observer.notifyReceive(BlockHeight.ONE, context.account, new Amount(54));
+
+		// Assert:
+		Mockito.verify(context.balances, Mockito.times(1)).addReceive(BlockHeight.ONE, new Amount(54));
+		Mockito.verify(context.balances, Mockito.times(1)).convertToFullyVested();
+		verifyCallCounts(context.balances, 0, 1, 0, 1);
+
+		Assert.assertThat(balances.getUnvested(height), IsEqual.equalTo(Amount.ZERO));
+		Assert.assertThat(balances.getVested(height), IsEqual.equalTo(new Amount(54)));
 	}
 
 	@Test
@@ -79,20 +124,21 @@ public class WeightedBalancesObserverTest {
 		private final WeightedBalances balances;
 		private final WeightedBalancesObserver observer;
 
-		public TestContext() {
-			final Address address = Utils.generateRandomAddress();
-			this.account = Mockito.mock(Account.class);
-			Mockito.when(this.account.getAddress()).thenReturn(address);
-
-			this.balances = Mockito.mock(WeightedBalances.class);
+		public TestContext(final Account account, final WeightedBalances balances) {
+			this.account = account;
+			this.balances = balances;
 
 			final AccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 
 			final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-			Mockito.when(accountStateCache.findStateByAddress(address)).thenReturn(accountState);
+			Mockito.when(accountStateCache.findStateByAddress(this.account.getAddress())).thenReturn(accountState);
 
 			this.observer = new WeightedBalancesObserver(accountStateCache);
+		}
+
+		public TestContext() {
+			this (Utils.generateRandomAccount(), Mockito.mock(WeightedBalances.class));
 		}
 	}
 }

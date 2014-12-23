@@ -1,9 +1,9 @@
 package org.nem.nis.secret;
 
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.WeightedBalances;
+import org.nem.nis.state.*;
 
 /**
  * An observer that updates weighted balance information.
@@ -29,7 +29,14 @@ public class WeightedBalancesObserver implements BlockTransferObserver {
 
 	@Override
 	public void notifyReceive(final BlockHeight height, final Account account, final Amount amount) {
-		this.getWeightedBalances(account).addReceive(height, amount);
+		final WeightedBalances weightedBalances = this.getWeightedBalances(account);
+		weightedBalances.addReceive(height, amount);
+
+		// fully vest all transactions coming out of the nemesis block
+		// TODO 20141215 J-G: is there any reason we don't filter out Amount.ZERO?
+		if (BlockHeight.ONE.equals(height) && !NemesisBlock.ADDRESS.equals(account.getAddress())) {
+			weightedBalances.convertToFullyVested();
+		}
 	}
 
 	// keep in mind this is called TWICE for every transaction:

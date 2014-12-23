@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
@@ -584,6 +584,29 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.get(3).getNumTransferCalls(), IsEqual.equalTo(2));
 	}
 
+	@Test
+	public void removeAllRebuildsCacheIfIllegalArgumentExceptionOccurs() {
+		// Arrange:
+		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(10, 2, 0);
+		context.setBalance(transactions.get(0).getSigner(), Amount.fromNem(5));
+
+		final Block block = NisUtils.createRandomBlock();
+		block.addTransaction(transactions.get(0));
+
+		// Act:
+		final int numTransactions = context.transactions.size();
+		context.transactions.removeAll(block);
+
+		// Assert:
+		// - removing first transaction triggers exception during cache rebuild
+		// - first transaction cannot be added - account1 balance (5) < 8 + 1
+		// - second transaction cannot be added - account2 balance (2) < 5 + 1
+		// - third transaction can be added - account2 balance (2) == 1 + 1
+		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
+		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(2))));
+	}
+
 	//endregion
 
 	//region getAll
@@ -878,6 +901,24 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.get(1).getNumTransferCalls(), IsEqual.equalTo(2));
 		Assert.assertThat(transactions.get(2).getNumTransferCalls(), IsEqual.equalTo(1));
 		Assert.assertThat(transactions.get(3).getNumTransferCalls(), IsEqual.equalTo(2));
+	}
+
+	@Test
+	public void dropExpiredTransactionsDropsAllTransactionsThatAreDependentOnTheDroppedTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(10, 2, 0);
+
+		// Act:
+		final int numTransactions = context.transactions.size();
+		context.transactions.dropExpiredTransactions(new TimeInstant(7));
+
+		// Assert:
+		// - first transaction was dropped because it expired
+		// - second was dropped because it was dependent on the first - account2 balance (2) < 5 + 1
+		// - third transaction can be added - account2 balance (2) == 1 + 1
+		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
+		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(2))));
 	}
 
 	//endregion
@@ -1265,7 +1306,7 @@ public class UnconfirmedTransactionsTest {
 			return this.prepareAccount(Utils.generateRandomAccount(), amount);
 		}
 
-		private Account prepareAccount(final Account account, final Amount amount) {
+		public Account prepareAccount(final Account account, final Amount amount) {
 			final AccountState accountState = new AccountState(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
@@ -1312,6 +1353,36 @@ public class UnconfirmedTransactionsTest {
 			transactions.forEach(Transaction::sign);
 			transactions.forEach(unconfirmedTransactions::addExisting);
 			return transactions;
+		}
+
+		private TransferTransaction createTransferTransaction(
+				final Account sender,
+				final Account recipient,
+				final Amount amount,
+				final TimeInstant deadline) {
+			final TransferTransaction transaction = new TransferTransaction(deadline, sender, recipient, amount, null);
+			transaction.setFee(Amount.fromNem(1));
+			transaction.setDeadline(deadline);
+			return transaction;
+		}
+
+		public List<TransferTransaction> createThreeTransferTransactions(
+				final int amount1,
+				final int amount2,
+				final int amount3) {
+			final Account account1 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(amount1));
+			final Account account2 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(amount2));
+			final Account account3 = this.prepareAccount(Utils.generateRandomAccount(), Amount.fromNem(amount3));
+			final List<TransferTransaction> transactions = new ArrayList<>();
+			transactions.add(this.createTransferTransaction(account1, account2, Amount.fromNem(8), new TimeInstant(5)));
+			transactions.add(this.createTransferTransaction(account2, account3, Amount.fromNem(5), new TimeInstant(8)));
+			transactions.add(this.createTransferTransaction(account2, account3, Amount.fromNem(1), new TimeInstant(9)));
+			transactions.forEach(this::signAndAddExisting);
+			return transactions;
+		}
+
+		public void setBalance(final Account account, final Amount amount) {
+			this.prepareAccount(account, amount);
 		}
 	}
 }

@@ -2,7 +2,7 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.NemesisBlock;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.poi.ImportanceCalculator;
+import org.nem.nis.poi.*;
 import org.nem.nis.state.AccountState;
 
 import java.math.BigInteger;
@@ -49,9 +49,11 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	}
 
 	@Override
-	public void recalculateImportances(
-			final BlockHeight blockHeight,
-			Collection<AccountState> accountStates) {
+	public void recalculateImportances(final BlockHeight blockHeight, final Collection<AccountState> accountStates) {
+		this.recalculateImportancesAtGroupedHeight(GroupedHeight.fromHeight(blockHeight), accountStates);
+	}
+
+	private void recalculateImportancesAtGroupedHeight(final BlockHeight blockHeight, Collection<AccountState> accountStates) {
 		if (null != this.lastPoiRecalculationHeight && 0 == this.lastPoiRecalculationHeight.compareTo(blockHeight)) {
 			return;
 		}
