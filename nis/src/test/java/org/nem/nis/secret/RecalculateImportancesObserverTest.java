@@ -26,9 +26,21 @@ public class RecalculateImportancesObserverTest {
 	}
 
 	@Test
-	public void recalculateImportancesIsCalledWithContextBlockHeightWhenContextHeightIsAMultipleOfPoiGrouping() {
+	public void recalculateImportancesIsCalledWithGroupedContextBlockHeightWhenHeightIsOneLessThanMultipleOfPoiGrouping() {
+		// Assert:
+		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(3 * POI_GROUPING - 1), new BlockHeight(2 * POI_GROUPING));
+	}
+
+	@Test
+	public void recalculateImportancesIsCalledWithGroupedContextBlockHeightWhenHeightIsMultipleOfPoiGrouping() {
 		// Assert:
 		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(3 * POI_GROUPING), new BlockHeight(3 * POI_GROUPING));
+	}
+
+	@Test
+	public void recalculateImportancesIsCalledWithGroupedContextBlockHeightWhenHeightIsOneGreaterThanMultipleOfPoiGrouping() {
+		// Assert:
+		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(3 * POI_GROUPING + 1), new BlockHeight(3 * POI_GROUPING));
 	}
 
 	@Test
