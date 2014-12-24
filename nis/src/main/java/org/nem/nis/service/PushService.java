@@ -97,12 +97,17 @@ public class PushService {
 			return cachedResult;
 		}
 
+		// cache immediately neutral result which gets updated below
+		// the reason is that pushEntity() includes broadcast() and can take some time
+		// meanwhile the same transaction could be processed many times
+		hashCache.setCachedResult(hash, ValidationResult.NEUTRAL);
+
 		final ValidationResult result = this.pushEntity(context);
 		if (result.isFailure()) {
 			LOGGER.info(String.format("Warning: ValidationResult=%s", result));
 		}
 
-		hashCache.setCachedResult(hash, result);
+		hashCache.updateCachedResult(hash, result);
 		return result;
 	}
 
@@ -174,7 +179,16 @@ public class PushService {
 			final HashCacheValue value = new HashCacheValue();
 			value.timeStamp = this.timeProvider.getCurrentTime();
 			value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
-			this.cache.putIfAbsent(hash, value);
+			this.cache.put(hash, value);
+		}
+
+		private void updateCachedResult(final Hash hash, final ValidationResult result) {
+			final HashCacheValue value = this.cache.getOrDefault(hash, new HashCacheValue());
+			if (null == value.timeStamp) {
+				value.timeStamp = this.timeProvider.getCurrentTime();
+			}
+			value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
+			this.cache.put(hash, value);
 		}
 
 		private void prune() {
