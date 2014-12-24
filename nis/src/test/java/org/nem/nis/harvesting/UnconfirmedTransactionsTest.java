@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
@@ -599,12 +599,44 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.removeAll(block);
 
 		// Assert:
-		// - removing first transaction triggers exception during cache rebuild
+		// - removing first transaction triggers exception and forces caches rebuild
 		// - first transaction cannot be added - account1 balance (5) < 8 + 1
 		// - second transaction cannot be added - account2 balance (2) < 5 + 1
 		// - third transaction can be added - account2 balance (2) == 1 + 1
 		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
 		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(2))));
+	}
+
+	@Test
+	public void removeAllRebuildsCacheIfInvalidTransactionInCacheIsDetected() {
+		// Arrange:
+		final TestContext context = new TestContext(new TransferTransactionValidator());
+		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(10, 2, 0);
+
+		final Block block = NisUtils.createRandomBlock();
+		final TransferTransaction transaction = context.createTransferTransaction(
+				transactions.get(0).getSigner(),
+				transactions.get(0).getRecipient(),
+				Amount.fromNem(8),
+				new TimeInstant(8));
+		block.addTransaction(transaction);
+
+		// Act:
+		final int numTransactions = context.transactions.size();
+
+		// Before the call to removeAll the transaction contained in the block is usually executed and thus
+		// account1 is debited 8 + 1 NEM and account2 is credited 8 NEM
+		context.setBalance(transactions.get(0).getSigner(), Amount.fromNem(1));
+		context.setBalance(transactions.get(1).getSigner(), Amount.fromNem(10));
+		context.transactions.removeAll(block);
+
+		// Assert:
+		// - after call to removeAll the first transaction in the list is invalid and forces a cache rebuild
+		// - first transaction cannot be added - account1 balance (1) < 8 + 1
+		// - second transaction can be added - account2 balance (10) >= 5 + 1
+		// - third transaction can be added - account2 balance (4) >= 1 + 1
+		Assert.assertThat(numTransactions, IsEqual.equalTo(3));
+		Assert.assertThat(context.transactions.getAll(), IsEqual.equalTo(Arrays.asList(transactions.get(1), transactions.get(2))));
 	}
 
 	//endregion
@@ -1355,7 +1387,7 @@ public class UnconfirmedTransactionsTest {
 			return transactions;
 		}
 
-		private TransferTransaction createTransferTransaction(
+		public TransferTransaction createTransferTransaction(
 				final Account sender,
 				final Account recipient,
 				final Amount amount,
