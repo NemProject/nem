@@ -599,7 +599,7 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.removeAll(block);
 
 		// Assert:
-		// - removing first transaction triggers exception and forces caches rebuild
+		// - removing the first transaction triggers an exception and forces a cache rebuild
 		// - first transaction cannot be added - account1 balance (5) < 8 + 1
 		// - second transaction cannot be added - account2 balance (2) < 5 + 1
 		// - third transaction can be added - account2 balance (2) == 1 + 1
