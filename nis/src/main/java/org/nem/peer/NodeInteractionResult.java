@@ -49,7 +49,6 @@ public enum NodeInteractionResult {
 	public static NodeInteractionResult fromComparisonResultCode(final ComparisonResult.Code comparisonResultCode) {
 		switch (comparisonResultCode) {
 			case REMOTE_IS_SYNCED:
-			case REMOTE_IS_TOO_FAR_BEHIND:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
 			case REMOTE_REPORTED_LOWER_CHAIN_SCORE:
 				return NodeInteractionResult.NEUTRAL;
