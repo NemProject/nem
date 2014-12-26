@@ -252,9 +252,22 @@ public class UnconfirmedTransactions {
 	 */
 	public void removeAll(final Block block) {
 		synchronized (this.lock) {
-			// this is ugly but we cannot let an exception bubble up because NIS would need a restart.
+			// This is ugly but we cannot let an exception bubble up because NIS would need a restart.
 			// The exception means we have to rebuild the cache because it is corrupt.
-			// In theory it should never throw here.
+			// This can happen during synchronization. Consider the following scenario:
+			// The complete blockchain has height y and our blockchain has height x < y.
+			// At height y account A has 100 NEM confirmed balance and at height x it has 0 NEM confirmed balance.
+			// Another account B has enough NEM for transactions at all considered heights.
+			// Our node receives an unconfirmed tx T1: B -> A 10 NEM (+1 NEM fee) which is old and was included in the block at height x + 1.
+			// Our node does not know about block x + 1 yet so it accepts T1 as unconfirmed transaction.
+			// Our node pulls block x + 1 via synchronizeNode(). After validation, execution and committing the NisCache
+			// the unconfirmed balance of account A that our node sees is
+			// unconfirmed = 10 NEM (confirmed) + 10 NEM (still credited amount) - 0 NEM (debited amount) = 20 NEM.
+			// At this point (i.e. before removeAll() is called for block x + 1) our node receives another unconfirmed transaction
+			// T2: A -> B 15 NEM (+1 NEM fee). The transaction is valid since our node sees 20 NEM as unconfirmed balance for account A and thus is accepted.
+			// Our node now sees 4 NEM as unconfirmed balance for account A
+			// Now removeAll() is called for block x + 1 and this triggers T1.undo() which results in an illegal argument exception (4 - 10 < 0).
+			// The scenario shows that exceptions can occur in a natural way and we therefore ought to catch them here.
 			try {
 				// undo in reverse order!
 				for (final Transaction transaction : getReverseTransactions(block)) {
