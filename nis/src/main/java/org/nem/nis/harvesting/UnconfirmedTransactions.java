@@ -287,7 +287,6 @@ public class UnconfirmedTransactions {
 			// Next call to UnconfirmedBalancesObserver.get(A) results in an exception.
 			// This means a new block can ruin the unconfirmed balance. We have to check if all balances are still valid.
 			if (!this.unconfirmedBalances.unconfirmedBalancesAreValid()) {
-				// TODO 20141223 J-B: it would be good to have a test that hits this case
 				LOGGER.warning("invalid unconfirmed balance detected, rebuilding cache");
 				this.rebuildCache(this.getAll());
 			}

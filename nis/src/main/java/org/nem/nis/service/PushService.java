@@ -176,10 +176,7 @@ public class PushService {
 		}
 
 		private void setCachedResult(final Hash hash, final ValidationResult result) {
-			final HashCacheValue value = new HashCacheValue();
-			value.timeStamp = this.timeProvider.getCurrentTime();
-			value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
-			this.cache.put(hash, value);
+			this.updateCachedResult(hash, result);
 		}
 
 		private void updateCachedResult(final Hash hash, final ValidationResult result) {
@@ -187,6 +184,7 @@ public class PushService {
 			if (null == value.timeStamp) {
 				value.timeStamp = this.timeProvider.getCurrentTime();
 			}
+
 			value.result = ValidationResult.SUCCESS == result ? ValidationResult.NEUTRAL : result;
 			this.cache.put(hash, value);
 		}

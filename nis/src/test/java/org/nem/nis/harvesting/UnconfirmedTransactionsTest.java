@@ -624,8 +624,8 @@ public class UnconfirmedTransactionsTest {
 		// Act:
 		final int numTransactions = context.transactions.size();
 
-		// Before the call to removeAll the transaction contained in the block is usually executed and thus
-		// account1 is debited 8 + 1 NEM and account2 is credited 8 NEM
+		// Before the call to removeAll the transaction contained in the block is usually executed (which
+		// will change the confirmed balance) and thus account1 is debited 8 + 1 NEM and account2 is credited 8 NEM
 		context.setBalance(transactions.get(0).getSigner(), Amount.fromNem(1));
 		context.setBalance(transactions.get(1).getSigner(), Amount.fromNem(10));
 		context.transactions.removeAll(block);
