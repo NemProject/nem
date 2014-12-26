@@ -83,8 +83,8 @@ public class BlockExecutor {
 				: this.nisCache.getAccountCache().findByAddress(accountState.getAddress());
 
 		final List<NotificationType> types = NotificationTrigger.Execute == trigger
-				? Arrays.asList(NotificationType.BalanceCredit, NotificationType.HarvestReward)
-				: Arrays.asList(NotificationType.HarvestReward, NotificationType.BalanceDebit);
+				? Arrays.asList(NotificationType.BalanceCredit, NotificationType.BlockHarvest)
+				: Arrays.asList(NotificationType.BlockHarvest, NotificationType.BalanceDebit);
 
 		for (final NotificationType type : types) {
 			observer.notify(new BalanceAdjustmentNotification(type, endowed, block.getTotalFee()));

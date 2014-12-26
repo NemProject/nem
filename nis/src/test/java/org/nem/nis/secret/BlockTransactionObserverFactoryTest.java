@@ -116,7 +116,7 @@ public class BlockTransactionObserverFactoryTest {
 
 	private static void notifyHarvestReward(final BlockTransactionObserver observer, final Account account, final NotificationTrigger trigger) {
 		observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, account, Amount.ZERO),
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, account, Amount.ZERO),
 				new BlockNotificationContext(BlockHeight.ONE, TimeInstant.ZERO, trigger));
 	}
 

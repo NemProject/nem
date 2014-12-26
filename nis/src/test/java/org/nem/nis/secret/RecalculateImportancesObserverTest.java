@@ -48,7 +48,7 @@ public class RecalculateImportancesObserverTest {
 
 		// Act:
 		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, Utils.generateRandomAccount(), Amount.ZERO),
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, Utils.generateRandomAccount(), Amount.ZERO),
 				NisUtils.createBlockNotificationContext(height, trigger));
 
 		// Assert: recalculateImportances is called with grouped height

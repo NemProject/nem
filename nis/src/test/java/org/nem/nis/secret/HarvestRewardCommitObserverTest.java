@@ -107,13 +107,13 @@ public class HarvestRewardCommitObserverTest {
 
 		private void notifyHarvestRewardExecute() {
 			this.observer.notify(
-					new BalanceAdjustmentNotification(NotificationType.HarvestReward, this.account, Amount.fromNem(22)),
+					new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
 					NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 		}
 
 		public void notifyHarvestRewardUndo() {
 			this.observer.notify(
-					new BalanceAdjustmentNotification(NotificationType.HarvestReward, this.account, Amount.fromNem(22)),
+					new BalanceAdjustmentNotification(NotificationType.BlockHarvest, this.account, Amount.fromNem(22)),
 					NisUtils.createBlockNotificationContext(NotificationTrigger.Undo));
 		}
 	}

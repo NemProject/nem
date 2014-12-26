@@ -62,7 +62,7 @@ public class NotificationUtils {
 	 */
 	public static void assertHarvestRewardNotification(final Notification notification, final Account expectedAccount, final Amount expectedAmount) {
 		final BalanceAdjustmentNotification n = (BalanceAdjustmentNotification)notification;
-		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.HarvestReward));
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.BlockHarvest));
 		Assert.assertThat(n.getAccount(), IsEqual.equalTo(expectedAccount));
 		Assert.assertThat(n.getAmount(), IsEqual.equalTo(expectedAmount));
 	}

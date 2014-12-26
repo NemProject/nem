@@ -129,7 +129,7 @@ public class BlockAnalyzer {
 	private static void recalculateImportancesAtHeight(final NisCache nisCache, final BlockHeight height) {
 		final BlockTransactionObserver recalculateObserver = new RecalculateImportancesObserver(nisCache);
 		recalculateObserver.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, new Account(NemesisBlock.ADDRESS), Amount.ZERO),
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, new Account(NemesisBlock.ADDRESS), Amount.ZERO),
 				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
 	}
 
