@@ -273,7 +273,7 @@ public class UnconfirmedTransactions {
 				for (final Transaction transaction : getReverseTransactions(block)) {
 					this.remove(transaction);
 				}
-			} catch (final IllegalArgumentException e) {
+			} catch (final NegativeBalanceException e) {
 				LOGGER.severe("illegal argument exception during removal of unconfirmed transactions, rebuilding cache");
 				this.rebuildCache(this.getAll());
 				return;
