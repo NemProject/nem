@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.AbstractTransfer;
 
 /**
  * Mapper for mapping generic transfer properties to and from db and model entities.

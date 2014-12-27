@@ -1,13 +1,12 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.Transfer;
 
 /**
  * Static class that contains functions for converting to and from
