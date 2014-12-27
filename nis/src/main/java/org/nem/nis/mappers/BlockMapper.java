@@ -86,41 +86,12 @@ public class BlockMapper {
 	 * @return The Block model.
 	 */
 	public static Block toModel(final org.nem.nis.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
-		if (1 == dbBlock.getHeight()) {
-			return NemesisBlock.fromResource(new DeserializationContext(accountLookup));
-		}
-
-		final Address foragerAddress = AccountToAddressMapper.toAddress(dbBlock.getForger());
-		final Account forager = accountLookup.findByAddress(foragerAddress);
-		final Address lessorAddress = dbBlock.getLessor() != null ? AccountToAddressMapper.toAddress(dbBlock.getLessor()) : null;
-		final Account lessor = lessorAddress != null ? accountLookup.findByAddress(lessorAddress) : null;
-
-		final Block block = new org.nem.core.model.Block(
-				forager,
-				dbBlock.getPrevBlockHash(),
-				dbBlock.getGenerationHash(),
-				new TimeInstant(dbBlock.getTimeStamp()),
-				new BlockHeight(dbBlock.getHeight()));
-
-		final Long difficulty = dbBlock.getDifficulty();
-		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
-		block.setLessor(lessor);
-		block.setSignature(new Signature(dbBlock.getForgerProof()));
-
-		final int count = dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
-		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
-
-		for (final ImportanceTransfer dbTransfer : dbBlock.getBlockImportanceTransfers()) {
-			final ImportanceTransferTransaction importanceTransferTransaction = ImportanceTransferMapper.toModel(dbTransfer, accountLookup);
-			transactions.set(dbTransfer.getBlkIndex(), importanceTransferTransaction);
-		}
-
-		for (final Transfer dbTransfer : dbBlock.getBlockTransfers()) {
-			final TransferTransaction transfer = TransferMapper.toModel(dbTransfer, accountLookup);
-			transactions.set(dbTransfer.getBlkIndex(), transfer);
-		}
-
-		block.addTransactions(transactions);
-		return block;
+		// TODO 20141221: there's no need to recreate the MappingRepository each time
+		final MappingRepository mappingRepository = new MappingRepository();
+		mappingRepository.addMapping(Transfer.class, TransferTransaction.class, new TransferDbModelToModelMapping(mappingRepository));
+		mappingRepository.addMapping(ImportanceTransfer.class, ImportanceTransferTransaction.class, new ImportanceTransferDbModelToModelMapping(mappingRepository));
+		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new AccountDbModelToModelMapping(accountLookup));
+		mappingRepository.addMapping(org.nem.nis.dbmodel.Block.class, Block.class, new BlockDbModelToModelMapping(mappingRepository, accountLookup));
+		return mappingRepository.map(dbBlock, Block.class);
 	}
 }
