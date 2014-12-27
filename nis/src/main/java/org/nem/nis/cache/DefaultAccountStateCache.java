@@ -100,7 +100,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 				throw new MissingResourceException("invalid address: ", Address.class.getName(), address.toString());
 			}
 
-			AccountState state = this.addressToStateMap.getOrDefault(address, null);
+			final AccountState state = this.addressToStateMap.getOrDefault(address, null);
 			if (null != state) {
 				return state;
 			}

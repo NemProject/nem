@@ -112,11 +112,11 @@ public class UnconfirmedBalancesObserverTest {
 		private final Account sender = new Account(Utils.generateRandomAddress());
 		private final Account recipient = new Account(Utils.generateRandomAddress());
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-		private final UnconfirmedBalancesObserver observer = Mockito.spy(new UnconfirmedBalancesObserver(accountStateCache));
+		private final UnconfirmedBalancesObserver observer = Mockito.spy(new UnconfirmedBalancesObserver(this.accountStateCache));
 
 		public TestContext() {
-			this.hookAccount(sender, Amount.fromNem(10));
-			this.hookAccount(recipient, Amount.fromNem(0));
+			this.hookAccount(this.sender, Amount.fromNem(10));
+			this.hookAccount(this.recipient, Amount.fromNem(0));
 		}
 
 		private void hookAccount(final Account account, final Amount amount) {
