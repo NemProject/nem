@@ -46,7 +46,7 @@ public class AmountTest {
 
 	//region constructor
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = NegativeBalanceException.class)
 	public void cannotBeCreatedAroundNegativeAmount() {
 		// Act:
 		new Amount(-1);
@@ -114,7 +114,7 @@ public class AmountTest {
 		Assert.assertThat(result, IsEqual.equalTo(new Amount(46)));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = NegativeBalanceException.class)
 	public void largerAmountCannotBeSubtractedFromSmallerAmount() {
 		// Arrange:
 		final Amount amount1 = new Amount(65);

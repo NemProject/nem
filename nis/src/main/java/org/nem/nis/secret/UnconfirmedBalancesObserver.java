@@ -52,8 +52,9 @@ public class UnconfirmedBalancesObserver implements TransferObserver {
 	public void notifyDebit(final Account account, final Amount amount) {
 		this.addToCache(account);
 		final Amount newDebitedAmount = this.getDebitedAmount(account).add(amount);
-		// should not be necessary but do it anyway as check
-		// TODO 20141223 J-B: i guess you are checking that the amount cannot become negative?
+		// if, for some reason, a transaction got validated but meanwhile the confirmed balance changed,
+		// it's probably better to let an exception bubble out here (the following line will throw
+		// if the new unconfirmed balance is negative)
 		this.getBalance(account).add(this.getCreditedAmount(account)).subtract(newDebitedAmount);
 		this.debitedAmounts.replace(account, newDebitedAmount);
 	}

@@ -21,7 +21,7 @@ public class HarvestRewardCommitObserver implements BlockTransactionObserver {
 
 	@Override
 	public void notify(final Notification notification, final BlockNotificationContext context) {
-		if (NotificationType.HarvestReward != notification.getType()) {
+		if (NotificationType.BlockHarvest != notification.getType()) {
 			return;
 		}
 

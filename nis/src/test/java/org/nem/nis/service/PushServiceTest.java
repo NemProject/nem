@@ -341,8 +341,8 @@ public class PushServiceTest {
 				.thenReturn(
 						new TimeInstant(1122448),
 						new TimeInstant(1122448),
+						new TimeInstant(1122448),
 						new TimeInstant(1122448 + 500),
-						new TimeInstant(1122448 + 1600),
 						new TimeInstant(1122448 + 1600));
 
 		// Act:
@@ -396,8 +396,8 @@ public class PushServiceTest {
 					.thenReturn(
 							new TimeInstant(1122448),
 							new TimeInstant(1122448),
+							new TimeInstant(1122448),
 							new TimeInstant(1122448 + 5),
-							new TimeInstant(1122448 + 64),
 							new TimeInstant(1122448 + 64));
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
