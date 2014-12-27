@@ -138,7 +138,7 @@ public class WeightedBalancesObserverTest {
 		}
 
 		public TestContext() {
-			this (Utils.generateRandomAccount(), Mockito.mock(WeightedBalances.class));
+			this(Utils.generateRandomAccount(), Mockito.mock(WeightedBalances.class));
 		}
 	}
 }

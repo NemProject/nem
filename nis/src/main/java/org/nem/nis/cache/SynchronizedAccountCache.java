@@ -1,7 +1,5 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
-
 /**
  * A synchronized AccountCache implementation.
  */

@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.state.*;
 

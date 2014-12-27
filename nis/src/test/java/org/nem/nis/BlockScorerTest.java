@@ -16,7 +16,7 @@ import org.nem.nis.test.NisUtils;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
 
 public class BlockScorerTest {
 
