@@ -12,7 +12,7 @@ public class ImportanceTransferModelToDbModelMapping implements IMapping<Importa
 	/**
 	 * Creates a new mapping.
 	 *
-	 * @param mapper the mapper.
+	 * @param mapper The mapper.
 	 */
 	public ImportanceTransferModelToDbModelMapping(final IMapper mapper) {
 		this.mapper = mapper;

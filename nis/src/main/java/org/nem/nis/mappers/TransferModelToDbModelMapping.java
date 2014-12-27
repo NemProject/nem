@@ -12,7 +12,7 @@ public class TransferModelToDbModelMapping implements IMapping<TransferTransacti
 	/**
 	 * Creates a new mapping.
 	 *
-	 * @param mapper the mapper.
+	 * @param mapper The mapper.
 	 */
 	public TransferModelToDbModelMapping(final IMapper mapper) {
 		this.mapper = mapper;

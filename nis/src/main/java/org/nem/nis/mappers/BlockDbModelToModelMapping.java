@@ -21,8 +21,7 @@ public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.
 	/**
 	 * Creates a new mapping.
 	 *
-	 * // TODO 20141226 J-J: rename to The mapper
-	 * @param mapper the mapper.
+	 * @param mapper The mapper.
 	 * @param accountLookup The account lookup.
 	 */
 	public BlockDbModelToModelMapping(

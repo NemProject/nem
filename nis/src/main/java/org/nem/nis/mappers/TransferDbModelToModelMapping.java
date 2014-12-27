@@ -16,7 +16,7 @@ public class TransferDbModelToModelMapping implements IMapping<Transfer, Transfe
 	/**
 	 * Creates a new mapping.
 	 *
-	 * @param mapper the mapper.
+	 * @param mapper The mapper.
 	 */
 	public TransferDbModelToModelMapping(final IMapper mapper) {
 		this.mapper = mapper;
