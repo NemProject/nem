@@ -14,35 +14,7 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.sync.*;
 import org.nem.nis.test.MockBlockDao;
 
-import java.lang.reflect.Field;
-
 public class BlockChainUtils {
-
-	// TODO 20141225 BR: evil hack! need to add some way to make deep copies of a DefaultNisCache.
-	public static DefaultNisCache createDeepNisCacheCopy(final DefaultNisCache nisCache) {
-		try {
-			Field field = DefaultNisCache.class.getDeclaredField("accountCache");
-			field.setAccessible(true);
-			final SynchronizedAccountCache accountCacheCopy = ((SynchronizedAccountCache)field.get(nisCache)).copy();
-			field = DefaultNisCache.class.getDeclaredField("accountStateCache");
-			field.setAccessible(true);
-			final SynchronizedAccountStateCache accountStateCacheCopy = ((SynchronizedAccountStateCache)field.get(nisCache)).copy();
-			field = DefaultNisCache.class.getDeclaredField("poiFacade");
-			field.setAccessible(true);
-			final SynchronizedPoiFacade poiFacadeCopy = ((SynchronizedPoiFacade)field.get(nisCache)).copy();
-			field = DefaultNisCache.class.getDeclaredField("transactionHashCache");
-			field.setAccessible(true);
-			final SynchronizedHashCache transactionHashCacheCopy = ((SynchronizedHashCache)field.get(nisCache)).copy();
-			return new DefaultNisCache(
-					accountCacheCopy,
-					accountStateCacheCopy,
-					poiFacadeCopy,
-					transactionHashCacheCopy
-			);
-		} catch (IllegalAccessException | NoSuchFieldException e) {
-			throw new RuntimeException("Exception in createDeepNisCacheCopy");
-		}
-	}
 
 	public static void assertBlockDaoCalls(
 			final BlockDao blockDao,

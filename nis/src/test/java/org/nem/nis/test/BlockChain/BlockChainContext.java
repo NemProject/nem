@@ -59,7 +59,7 @@ public class BlockChainContext {
 
 		for (int i=0; i<this.options.numNodes(); i++) {
 			final Node node = this.createNode(i + 1);
-			final DefaultNisCache nisCache = Mockito.spy(BlockChainUtils.createDeepNisCacheCopy((DefaultNisCache)commonNisCache));
+			final DefaultNisCache nisCache = Mockito.spy(((DefaultNisCache)commonNisCache).deepCopy());
 			final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 			final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, accountDao));
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(accountDao, blockDao));

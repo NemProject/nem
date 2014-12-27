@@ -74,7 +74,7 @@ public class BlockChainUpdaterTest {
 		final NodeContext nodeContext = context.getNodeContexts().get(0);
 		final MockBlockDao blockDao = nodeContext.getMockBlockDao().shallowCopy();
 		final Block child = context.createChild(nodeContext.getChain(), 5);
-		final DefaultNisCache nisCache = BlockChainUtils.createDeepNisCacheCopy(nodeContext.getNisCache());
+		final DefaultNisCache nisCache = nodeContext.getNisCache().deepCopy();
 		nodeContext.processBlock(child, blockDao, nisCache);
 
 		// Act:
@@ -89,7 +89,7 @@ public class BlockChainUpdaterTest {
 		// Arrange:
 		final BlockChainContext context = new BlockChainContext(DEFAULT_TEST_OPTIONS);
 		final NodeContext nodeContext = context.getNodeContexts().get(0);
-		final DefaultNisCache nisCache = BlockChainUtils.createDeepNisCacheCopy(nodeContext.getNisCache());
+		final DefaultNisCache nisCache = nodeContext.getNisCache().deepCopy();
 		final Block child = context.createChild(nodeContext.getChain(), 5);
 		nodeContext.processBlock(child, nodeContext.getMockBlockDao().shallowCopy(), nisCache);
 
@@ -174,7 +174,7 @@ public class BlockChainUpdaterTest {
 		final Block child = context.createChild(chain, 3);
 		final Block sibling = context.createSibling(child, chain.get(chain.size() - 1), -5);
 		final MockBlockDao blockDao = nodeContext.getMockBlockDao().shallowCopy();
-		final DefaultNisCache nisCache = BlockChainUtils.createDeepNisCacheCopy(nodeContext.getNisCache());
+		final DefaultNisCache nisCache = nodeContext.getNisCache().deepCopy();
 		nodeContext.processBlock(sibling, blockDao, nisCache);
 		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
@@ -193,7 +193,7 @@ public class BlockChainUpdaterTest {
 		final List<Block> chain = nodeContext.getChain();
 		final Block child = context.createChild(chain, 3);
 		final Block sibling = context.createSibling(child, chain.get(chain.size() - 1), -5);
-		final DefaultNisCache nisCache = BlockChainUtils.createDeepNisCacheCopy(nodeContext.getNisCache());
+		final DefaultNisCache nisCache = nodeContext.getNisCache().deepCopy();
 		nodeContext.processBlock(sibling, nodeContext.getMockBlockDao().shallowCopy(), nisCache);
 		Assert.assertThat(nodeContext.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
 
