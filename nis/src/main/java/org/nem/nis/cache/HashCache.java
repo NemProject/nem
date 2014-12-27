@@ -19,7 +19,7 @@ import java.util.List;
 public interface HashCache extends ReadOnlyHashCache {
 
 	/**
-	 * Removes all elements that have time stamp prior to the given time stamp.
+	 * Removes all elements that have time stamp prior to the given time stamp - retention time.
 	 *
 	 * @param timeStamp The time stamp.
 	 */
