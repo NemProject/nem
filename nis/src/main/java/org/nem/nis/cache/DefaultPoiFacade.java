@@ -76,12 +76,14 @@ public class DefaultPoiFacade implements PoiFacade, CopyableCache<DefaultPoiFaca
 	@Override
 	public void shallowCopyTo(final DefaultPoiFacade rhs) {
 		rhs.lastPoiRecalculationHeight = this.lastPoiRecalculationHeight;
+		rhs.lastPoiVectorSize = this.lastPoiVectorSize;
 	}
 
 	@Override
 	public DefaultPoiFacade copy() {
 		final DefaultPoiFacade copy = new DefaultPoiFacade(this.importanceCalculator);
 		copy.lastPoiRecalculationHeight = this.lastPoiRecalculationHeight;
+		copy.lastPoiVectorSize = this.lastPoiVectorSize;
 		return copy;
 	}
 }
