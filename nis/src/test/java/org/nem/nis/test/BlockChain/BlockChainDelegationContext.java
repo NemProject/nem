@@ -188,8 +188,13 @@ public class BlockChainDelegationContext {
 				this.blockChainServices,
 				this.unconfirmedTransactions,
 				(org.nem.nis.dbmodel.Block)invocation.getArguments()[1],
-				(Collection<Block>)invocation.getArguments()[2],
+				castToBlockCollection(invocation.getArguments()[2]),
 				(BlockChainScore)invocation.getArguments()[3],
 				(Boolean)invocation.getArguments()[4]));
+	}
+
+	@SuppressWarnings("unchecked")
+	private static Collection<Block> castToBlockCollection(final Object obj) {
+		return (Collection<Block>)obj;
 	}
 }
