@@ -71,7 +71,7 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, 0, accountDaoLookup);
+		final Transfer entity = mapToTransfer(transferTransaction, accountDaoLookup);
 
 		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
 		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
@@ -93,7 +93,7 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
-		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
+		final Transfer dbTransfer = mapToTransfer(transferTransaction, accountDaoLookup);
 
 		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
 		this.addToDummyBlock(dbAccount, dbTransfer);
@@ -119,9 +119,9 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final Transfer dbTransfer1 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
-		final Transfer dbTransfer2 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
-		final Transfer dbTransfer3 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
+		final Transfer dbTransfer1 = mapToTransfer(transferTransaction, accountDaoLookup);
+		final Transfer dbTransfer2 = mapToTransfer(transferTransaction, accountDaoLookup);
+		final Transfer dbTransfer3 = mapToTransfer(transferTransaction, accountDaoLookup);
 		final Long initialCount = this.transferDao.count();
 
 		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
@@ -876,7 +876,7 @@ public class TransferDaoTest {
 			this.addMapping(mockAccountDao, recipient);
 			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-				final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
+				final Transfer dbTransfer = mapToTransfer(transferTransaction, accountDaoLookup);
 				hashes.add(dbTransfer.getTransferHash());
 				dummyBlock.addTransaction(transferTransaction);
 			}
@@ -926,5 +926,9 @@ public class TransferDaoTest {
 		for (final Transfer transfer : dbTransfers) {
 			transfer.setBlock(block);
 		}
+	}
+
+	private static Transfer mapToTransfer(final TransferTransaction transaction, final AccountDaoLookup accountDaoLookup) {
+		return MapperFactory.createModelToDbModelMapper(accountDaoLookup).map(transaction, Transfer.class);
 	}
 }

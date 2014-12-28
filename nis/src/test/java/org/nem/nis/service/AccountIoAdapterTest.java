@@ -287,7 +287,8 @@ public class AccountIoAdapterTest {
 			this.addAccount(signer);
 			this.addAccount(recipient);
 
-			return TransferMapper.toDbModel(transaction, 1, 2, new AccountDaoLookupAdapter(new MockAccountDao()));
+			return MapperFactory.createModelToDbModelMapper(new AccountDaoLookupAdapter(new MockAccountDao()))
+					.map(transaction, Transfer.class);
 		}
 
 		private void addAccount(final Account account) {

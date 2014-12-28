@@ -159,6 +159,7 @@ public class BlockChainUpdateContext {
 			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
+		final IMapper mapper = MapperFactory.createDbModelToModelMapper(accountCache);
 		while (currentHeight != wantedHeight) {
 			final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
@@ -167,10 +168,16 @@ public class BlockChainUpdateContext {
 			// at this point, only "state" (in accountAnalyzer and so on) is reverted.
 			// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
+			// TODO 20141227 J-*: this is fragile code, we should come up with a better way of keeping it up to date
 			block.getBlockTransfers().stream()
 					.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
-					.map(tr -> TransferMapper.toModel(tr, accountCache))
+					.map(tr -> mapper.map(tr, TransferTransaction.class))
 					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
+			block.getBlockImportanceTransfers().stream()
+					.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
+					.map(tr -> mapper.map(tr, ImportanceTransferTransaction.class))
+					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
+
 			currentHeight--;
 		}
 	}

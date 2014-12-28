@@ -9,7 +9,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountCache;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.TransferBlockPair;
-import org.nem.nis.mappers.TransferMapper;
+import org.nem.nis.mappers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +22,7 @@ public class AccountIoAdapter implements AccountIo {
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
 	private final ReadOnlyAccountCache accountCache;
+	private final IMapper mapper;
 
 	@Autowired(required = true)
 	public AccountIoAdapter(
@@ -31,6 +32,7 @@ public class AccountIoAdapter implements AccountIo {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
 		this.accountCache = accountCache;
+		this.mapper = MapperFactory.createDbModelToModelMapper(this.accountCache);
 	}
 
 	@Override
@@ -56,15 +58,7 @@ public class AccountIoAdapter implements AccountIo {
 		final Account account = this.accountCache.findByAddress(address);
 		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
 		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
-
-		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
-		pairs.stream()
-				.map(pair -> new TransactionMetaDataPair(
-						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
-						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
-				))
-				.forEach(transactionList::add);
-		return transactionList;
+		return toSerializableTransactionMetaDataPairList(pairs);
 	}
 
 	@Override
@@ -97,7 +91,7 @@ public class AccountIoAdapter implements AccountIo {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		pairs.stream()
 				.map(pair -> new TransactionMetaDataPair(
-						TransferMapper.toModel(pair.getTransfer(), this.accountCache),
+						this.mapper.map(pair.getTransfer(), TransferTransaction.class),
 						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
 				))
 				.forEach(transactionList::add);
