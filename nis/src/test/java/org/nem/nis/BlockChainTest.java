@@ -101,4 +101,6 @@ public class BlockChainTest {
 	}
 
 	// endregion
+		dbTransaction1.setType(tx1.getType());
+		dbTransaction2.setType(tx2.getType());
 }
