@@ -37,6 +37,7 @@ public class MockAccountDao implements AccountDao {
 			this.id++;
 			this.refCounts.put(dbAccount, ReferenceCount.ZERO);
 		}
+
 		this.incrementReferenceCount(this.knownAccounts.get(address.getEncoded()));
 	}
 
@@ -76,7 +77,6 @@ public class MockAccountDao implements AccountDao {
 		copy.id = this.id;
 		copy.knownAccounts.putAll(this.knownAccounts);
 		copy.refCounts.putAll(this.refCounts);
-
 		return copy;
 	}
 

@@ -40,7 +40,8 @@ public class BlockChainUpdaterTest {
 		nodeContext.getBlockChainUpdater().updateScore(parent, child);
 
 		// Assert:
-		Assert.assertThat(nodeContext.getBlockChainUpdater().getScore(),
+		Assert.assertThat(
+				nodeContext.getBlockChainUpdater().getScore(),
 				IsEqual.equalTo(oldScore.add(new BlockChainScore(child.getDifficulty().getRaw() - timeDiff))));
 	}
 
@@ -68,7 +69,7 @@ public class BlockChainUpdaterTest {
 	// In the following tests, MockBlockDao (and MockAccountDao inside it) play the role of the h2 db.
 	// So "UpdatesDb" really means that BlockDao.Save() and BlockDao.deleteBlocksAfter() were called.
 	@Test
-	public void updateBlockUpdatesDBIfBlockIsValid() {
+	public void updateBlockUpdatesDbIfBlockIsValid() {
 		// Arrange:
 		final BlockChainContext context = new BlockChainContext(DEFAULT_TEST_OPTIONS);
 		final NodeContext nodeContext = context.getNodeContexts().get(0);

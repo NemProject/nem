@@ -20,8 +20,6 @@ import org.nem.peer.connect.*;
 import java.util.*;
 import java.util.logging.Logger;
 
-// TODO 20140920 J-* this class needs tests!!!
-
 /**
  * Facade for updating a block chain.
  */

@@ -88,11 +88,6 @@ public class BlockChainContext {
 			final BlockChain blockChain = new BlockChain(
 					blockChainLastBlockLayer,
 					blockChainUpdater);
-			// TODO 20141106 J-B: does everything above (except node) really need to be created each iteration?
-			// > if you make some of them class members (esp the daos) you won't need to pass as many objects between functions
-			// TODO 20141107 BR -> J: some objects can be create for all nodes, but esp. the daos need to be created per node.
-			// TODO                   There will be scenarios with many nodes, each having its own chain. To test if the daos have
-			// TODO                   the same state or differ after synchronization I need to have separate objects.
 			final NodeContext nodeContext = new NodeContext(
 					node,
 					blockChain,
@@ -203,8 +198,7 @@ public class BlockChainContext {
 		final BigInteger hit = this.scorer.calculateHit(block);
 
 		// add 10 seconds to be able to create superior siblings
-		// TODO 20141106 J-B: is this comment valid since it is in createChild?
-		// TODO 20141107 BR -> J: yes, the block generation is delayed a bit so that we can construct a better sibling by subtracting a few seconds.
+		// (the block generation is delayed a bit so that we can construct a better sibling by subtracting a few seconds)
 		final int seconds = hit
 				.multiply(block.getDifficulty().asBigInteger())
 				.multiply(BigInteger.valueOf(this.options.numAccounts() + 1))
@@ -220,9 +214,8 @@ public class BlockChainContext {
 		return block;
 	}
 
-	// TODO 20141106 J-B: question so a sibling has the same transactions as the other block plus one?
-	// TODO 20141107 BR -> J: the sibling should always have a different block hash even in case timeDiff is 0.
 	public Block createSibling(final Block block, final Block parentBlock, final int timeDiff) {
+		// add a new transaction to the sibling so that it has a different block hash even when timeDiff is 0
 		final Block sibling = new Block(block.getSigner(), parentBlock, block.getTimeStamp().addSeconds(timeDiff));
 		sibling.setDifficulty(block.getDifficulty());
 		this.addTransactions(sibling, 1);
