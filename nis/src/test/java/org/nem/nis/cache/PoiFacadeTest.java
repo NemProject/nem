@@ -1,6 +1,7 @@
 package org.nem.nis.cache;
 
 import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.IsSame;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.NemesisBlock;
@@ -69,6 +70,25 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 
 		// Assert: recalculate was only called once because the copy is using the cached result from the original
 		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void shallowCopyCopiesAllTheFields() {
+		// Arrange:
+		final BlockHeight height1 = G_HEIGHT_70_PLUS;
+
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final DefaultPoiFacade facade = new DefaultPoiFacade(importanceCalculator);
+		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
+		facade.recalculateImportances(height1, accountStates);
+
+		// Act:
+		final DefaultPoiFacade result = new DefaultPoiFacade(importanceCalculator);
+		facade.shallowCopyTo(result);
+
+		// Assert:
+		Assert.assertThat(result.getLastPoiRecalculationHeight(), IsSame.sameInstance(facade.getLastPoiRecalculationHeight()));
+		Assert.assertThat(result.getLastPoiVectorSize(), IsEqual.equalTo(facade.getLastPoiVectorSize()));
 	}
 
 	//endregion
