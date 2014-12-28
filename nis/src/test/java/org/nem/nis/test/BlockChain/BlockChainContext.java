@@ -51,10 +51,10 @@ public class BlockChainContext {
 						accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poiFacade);
 		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
-		this.nemesisAccount = addAccount(commonNisCache);
+		this.nemesisAccount = this.addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
 		this.nemesisBlock = this.createNemesisBlock(this.nemesisAccount);
-		final List<Block> commonChain = createChain(this.nemesisBlock, this.options.commonChainHeight());
+		final List<Block> commonChain = this.createChain(this.nemesisBlock, this.options.commonChainHeight());
 		this.nodeContexts = new ArrayList<>();
 
 		for (int i = 0; i < this.options.numNodes(); i++) {
@@ -64,10 +64,10 @@ public class BlockChainContext {
 			final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, accountDao));
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(accountDao, blockDao));
 			final UnconfirmedTransactions unconfirmedTransactions =
-					Mockito.spy(new UnconfirmedTransactions(transactionValidatorFactory, nisCache, new SystemTimeProvider()));
+					Mockito.spy(new UnconfirmedTransactions(this.transactionValidatorFactory, nisCache, new SystemTimeProvider()));
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(
 					blockDao,
-					blockTransactionObserverFactory,
+					this.blockTransactionObserverFactory,
 					this.blockValidatorFactory,
 					this.transactionValidatorFactory));
 			final BlockChainContextFactory contextFactory = Mockito.spy(new BlockChainContextFactory(
@@ -117,7 +117,7 @@ public class BlockChainContext {
 	// nemesis accounts
 	private void createNemesisAccounts(final int numAccounts, final ReadOnlyNisCache nisCache) {
 		for (int i = 0; i < numAccounts; i++) {
-			addAccount(nisCache);
+			this.addAccount(nisCache);
 		}
 	}
 
@@ -196,11 +196,11 @@ public class BlockChainContext {
 		Block block = new Block(harvester, parent, new TimeInstant(parent.getTimeStamp().getRawTime() + 1));
 		final List<Block> historicalBlocks = chain.subList(Math.max(0, chain.size() - BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION), chain.size());
 		final BlockDifficulty difficulty = this.scorer.getDifficultyScorer().calculateDifficulty(
-				historicalDifficulties(historicalBlocks),
-				historicalTimestamps(historicalBlocks),
+				this.historicalDifficulties(historicalBlocks),
+				this.historicalTimestamps(historicalBlocks),
 				block.getHeight().getRaw());
 		block.setDifficulty(difficulty);
-		final BigInteger hit = scorer.calculateHit(block);
+		final BigInteger hit = this.scorer.calculateHit(block);
 
 		// add 10 seconds to be able to create superior siblings
 		// TODO 20141106 J-B: is this comment valid since it is in createChild?
@@ -233,7 +233,7 @@ public class BlockChainContext {
 	public List<Block> createChain(final Block startBlock, final int size) {
 		final List<Block> chain = new ArrayList<>();
 		chain.add(startBlock);
-		chain.addAll(newChainPart(chain, size));
+		chain.addAll(this.newChainPart(chain, size));
 		return chain;
 	}
 
@@ -241,7 +241,7 @@ public class BlockChainContext {
 		final List<Block> newChain = new ArrayList<>();
 		newChain.addAll(chain);
 		for (int i = 0; i < size; i++) {
-			final Block block = createChild(newChain, 0);
+			final Block block = this.createChild(newChain, 0);
 			newChain.add(block);
 		}
 

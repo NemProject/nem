@@ -94,7 +94,7 @@ public class BlockChainTest {
 	private class TestContext {
 		private final BlockChainUpdater updater = Mockito.mock(BlockChainUpdater.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		private final BlockChain blockChain = new BlockChain(lastBlockLayer, updater);
+		private final BlockChain blockChain = new BlockChain(this.lastBlockLayer, this.updater);
 		private final SyncConnectorPool connectorPool = Mockito.mock(SyncConnectorPool.class);
 		private final Node node = Mockito.mock(Node.class);
 		private final Block block = Mockito.mock(Block.class);

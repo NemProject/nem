@@ -110,7 +110,7 @@ public class NodeContext {
 
 	public void setupSyncConnectorPool() {
 		this.connectorPool = Mockito.mock(SyncConnectorPool.class);
-		Mockito.when(connectorPool.getSyncConnector(Mockito.any()))
+		Mockito.when(this.connectorPool.getSyncConnector(Mockito.any()))
 				.thenAnswer(invocation -> new MockSyncConnector((AccountLookup)invocation.getArguments()[0]));
 	}
 
@@ -123,30 +123,30 @@ public class NodeContext {
 
 		@Override
 		public Block getLastBlock(final Node node) {
-			return this.checkNull(BlockMapper.toModel(blockDao.getLastBlock(), nisCache.getAccountCache()));
+			return this.checkNull(BlockMapper.toModel(NodeContext.this.blockDao.getLastBlock(), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
 		public Block getBlockAt(final Node node, final BlockHeight height) {
-			return this.checkNull(BlockMapper.toModel(blockDao.findByHeight(height), nisCache.getAccountCache()));
+			return this.checkNull(BlockMapper.toModel(NodeContext.this.blockDao.findByHeight(height), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
 		public HashChain getHashesFrom(final Node node, final BlockHeight height) {
-			return this.checkNull(blockDao.getHashesFrom(height, BlockChainConstants.BLOCKS_LIMIT));
+			return this.checkNull(NodeContext.this.blockDao.getHashesFrom(height, BlockChainConstants.BLOCKS_LIMIT));
 		}
 
 		@Override
 		public Collection<Block> getChainAfter(final Node node, final ChainRequest request) {
 			final List<Block> blocks = new ArrayList<>();
-			final List<org.nem.nis.dbmodel.Block> dbBlocks = blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
+			final List<org.nem.nis.dbmodel.Block> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
 			dbBlocks.stream().forEach(dbBlock -> blocks.add(BlockMapper.toModel(dbBlock, this.accountLookup)));
 			return this.checkNull(blocks);
 		}
 
 		@Override
 		public BlockChainScore getChainScore(final Node node) {
-			return this.checkNull(blockChainUpdater.getScore());
+			return this.checkNull(NodeContext.this.blockChainUpdater.getScore());
 		}
 
 		@Override
@@ -207,10 +207,10 @@ public class NodeContext {
 			final TransferTransaction transaction,
 			final BlockHeight height,
 			final NisCache nisCache) {
-		final Account sender = addAccount(transaction.getSigner(), nisCache);
-		final Account recipient = addAccount(transaction.getRecipient(), nisCache);
-		decrementBalance(nisCache, sender, height, transaction.getAmount().add(transaction.getFee()));
-		incrementBalance(nisCache, recipient, height, transaction.getAmount());
+		final Account sender = this.addAccount(transaction.getSigner(), nisCache);
+		final Account recipient = this.addAccount(transaction.getRecipient(), nisCache);
+		this.decrementBalance(nisCache, sender, height, transaction.getAmount().add(transaction.getFee()));
+		this.incrementBalance(nisCache, recipient, height, transaction.getAmount());
 	}
 
 	public void processBlock(
@@ -218,11 +218,11 @@ public class NodeContext {
 			final MockBlockDao blockDao,
 			final DefaultNisCache nisCache) {
 		final NisCache nisCacheCopy = nisCache.copy();
-		final Account harvester = addAccount(block.getSigner(), nisCacheCopy);
+		final Account harvester = this.addAccount(block.getSigner(), nisCacheCopy);
 		this.incrementBalance(nisCacheCopy, harvester, block.getHeight(), block.getTotalFee());
 		this.getAccountInfo(nisCacheCopy, harvester).incrementHarvestedBlocks();
-		for (Transaction transaction : block.getTransactions()) {
-			processTransaction((TransferTransaction)transaction, block.getHeight(), nisCacheCopy);
+		for (final Transaction transaction : block.getTransactions()) {
+			this.processTransaction((TransferTransaction)transaction, block.getHeight(), nisCacheCopy);
 		}
 
 		nisCacheCopy.commit();
@@ -231,14 +231,14 @@ public class NodeContext {
 
 	public void processChain(
 			final List<Block> newChainPart) {
-		for (Block block : newChainPart) {
+		for (final Block block : newChainPart) {
 			this.chain.add(block);
-			processBlock(block, this.blockDao, this.nisCache);
+			this.processBlock(block, this.blockDao, this.nisCache);
 			if (block.getHeight().compareTo(BlockHeight.ONE) > 0) {
 				final Block parent = this.chain.get((int)block.getHeight().getRaw() - 2);
 				this.blockChainUpdater.updateScore(parent, block);
 			}
 		}
-		this.blockChainLastBlockLayer.analyzeLastBlock(mapBlockToDbModel(this.getLastBlock(), this.blockDao.getAccountDao()));
+		this.blockChainLastBlockLayer.analyzeLastBlock(this.mapBlockToDbModel(this.getLastBlock(), this.blockDao.getAccountDao()));
 	}
 }

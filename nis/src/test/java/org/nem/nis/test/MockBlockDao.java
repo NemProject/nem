@@ -104,7 +104,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	public Block getLastBlock() {
-		return blocks.get(blocks.size() - 1);
+		return this.blocks.get(this.blocks.size() - 1);
 	}
 
 	@Override

@@ -39,9 +39,9 @@ public class BlockChainDelegationContext {
 	private org.nem.nis.dbmodel.Block dbParent;
 	private org.nem.nis.dbmodel.Block dbBlock;
 	private final Account blockHarvester = Utils.generateRandomAccount();
-	private final AccountState blockHarvesterState = new AccountState(blockHarvester.getAddress());
+	private final AccountState blockHarvesterState = new AccountState(this.blockHarvester.getAddress());
 	private final Account parentHarvester = Utils.generateRandomAccount();
-	private final AccountState parentHarvesterState = new AccountState(parentHarvester.getAddress());
+	private final AccountState parentHarvesterState = new AccountState(this.parentHarvester.getAddress());
 
 	public BlockChainDelegationContext() {
 		this.blockChainUpdater = Mockito.spy(new BlockChainUpdater(
@@ -118,10 +118,10 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareAccountDao() {
-		Mockito.when(this.accountDao.getAccountByPrintableAddress(blockHarvester.getAddress().getEncoded()))
-				.thenReturn(new org.nem.nis.dbmodel.Account(blockHarvester.getAddress().getEncoded(), blockHarvester.getAddress().getPublicKey()));
-		Mockito.when(this.accountDao.getAccountByPrintableAddress(parentHarvester.getAddress().getEncoded()))
-				.thenReturn(new org.nem.nis.dbmodel.Account(parentHarvester.getAddress().getEncoded(), parentHarvester.getAddress().getPublicKey()));
+		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.blockHarvester.getAddress().getEncoded()))
+				.thenReturn(new org.nem.nis.dbmodel.Account(this.blockHarvester.getAddress().getEncoded(), this.blockHarvester.getAddress().getPublicKey()));
+		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.parentHarvester.getAddress().getEncoded()))
+				.thenReturn(new org.nem.nis.dbmodel.Account(this.parentHarvester.getAddress().getEncoded(), this.parentHarvester.getAddress().getPublicKey()));
 	}
 
 	private void prepareBlockDao() {
@@ -142,13 +142,13 @@ public class BlockChainDelegationContext {
 	}
 
 	private void prepareAccountCache() {
-		Mockito.when(this.accountCache.findByAddress(blockHarvester.getAddress())).thenReturn(this.blockHarvester);
-		Mockito.when(this.accountCache.findByAddress(parentHarvester.getAddress())).thenReturn(this.parentHarvester);
+		Mockito.when(this.accountCache.findByAddress(this.blockHarvester.getAddress())).thenReturn(this.blockHarvester);
+		Mockito.when(this.accountCache.findByAddress(this.parentHarvester.getAddress())).thenReturn(this.parentHarvester);
 	}
 
 	private void prepareAccountStateCache() {
-		Mockito.when(this.accountStateCache.findStateByAddress(blockHarvester.getAddress())).thenReturn(this.blockHarvesterState);
-		Mockito.when(this.accountStateCache.findStateByAddress(parentHarvester.getAddress())).thenReturn(this.parentHarvesterState);
+		Mockito.when(this.accountStateCache.findStateByAddress(this.blockHarvester.getAddress())).thenReturn(this.blockHarvesterState);
+		Mockito.when(this.accountStateCache.findStateByAddress(this.parentHarvester.getAddress())).thenReturn(this.parentHarvesterState);
 		Mockito.when(this.accountStateCache.findForwardedStateByAddress(this.block.getSigner().getAddress(), this.block.getHeight()))
 				.thenReturn(this.blockHarvesterState);
 	}

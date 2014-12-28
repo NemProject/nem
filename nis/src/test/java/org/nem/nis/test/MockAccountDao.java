@@ -37,7 +37,7 @@ public class MockAccountDao implements AccountDao {
 			this.id++;
 			this.refCounts.put(dbAccount, ReferenceCount.ZERO);
 		}
-		incrementReferenceCount(this.knownAccounts.get(address.getEncoded()));
+		this.incrementReferenceCount(this.knownAccounts.get(address.getEncoded()));
 	}
 
 	private ReferenceCount incrementReferenceCount(final org.nem.nis.dbmodel.Account dbAccount) {

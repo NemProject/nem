@@ -299,7 +299,7 @@ public class BlockChainUpdaterTest {
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
 
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
 				null);
@@ -317,7 +317,7 @@ public class BlockChainUpdaterTest {
 		final BlockChainContext context = new BlockChainContext(new TestOptions(100, 2, 10));
 		final NodeContext nodeContext1 = context.getNodeContexts().get(0);
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
 				null);
@@ -343,7 +343,7 @@ public class BlockChainUpdaterTest {
 		final NodeContext nodeContext2 = context.getNodeContexts().get(1);
 		final Block child = context.createChild(nodeContext2.getChain(), 0);
 		Assert.assertThat(nodeContext2.getBlockChainUpdater().updateBlock(child), IsEqual.equalTo(ValidationResult.SUCCESS));
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
 				null);
@@ -366,7 +366,7 @@ public class BlockChainUpdaterTest {
 
 		// make the remote's last block null
 		nodeContext2.getChain().add(null);
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
 				null);
@@ -387,7 +387,7 @@ public class BlockChainUpdaterTest {
 		nodeContext1.processChain(context.newChainPart(nodeContext1.getChain(), BlockChainConstants.REWRITE_LIMIT + 10));
 
 		// simulate that remote reports better score although our last block has a much higher height
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				new BlockChainScore(BigInteger.ONE.shiftLeft(64)),
 				nodeContext2.getLastBlock(),
 				null);
@@ -410,7 +410,7 @@ public class BlockChainUpdaterTest {
 		nodeContext2.getChain().add(child);
 
 		// remote supplies more hashes than allowed
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
 				new HashChain(NisUtils.createHashesList(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY + 1)));
@@ -430,7 +430,7 @@ public class BlockChainUpdaterTest {
 		nodeContext2.getChain().add(child);
 
 		// remote supplies some random hashes
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				nodeContext2.getBlockChainUpdater().getScore(),
 				nodeContext2.getLastBlock(),
 				new HashChain(NisUtils.createHashesList(5)));
@@ -449,7 +449,7 @@ public class BlockChainUpdaterTest {
 		nodeContext2.getChain().add(child);
 
 		// remote reports huge chain score but supplies less hashes than we know
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				new BlockChainScore(BigInteger.ONE.shiftLeft(64)),
 				nodeContext2.getLastBlock(),
 				nodeContext2.getMockBlockDao().getHashesFrom(BlockHeight.ONE, 5));
@@ -468,7 +468,7 @@ public class BlockChainUpdaterTest {
 		nodeContext2.getChain().add(child);
 
 		// remote reports huge chain score but supplies exactly all hashes that we know
-		final SyncConnectorPool connectorPool = mockSyncConnectorForTwoNodesAction(
+		final SyncConnectorPool connectorPool = this.mockSyncConnectorForTwoNodesAction(
 				new BlockChainScore(BigInteger.ONE.shiftLeft(64)),
 				nodeContext2.getLastBlock(),
 				nodeContext2.getMockBlockDao().getHashesFrom(BlockHeight.ONE, 100));
@@ -526,7 +526,7 @@ public class BlockChainUpdaterTest {
 		final SecureRandom random = new SecureRandom();
 		final BlockChainContext context = new BlockChainContext(new TestOptions(100, numNodes, 10));
 		BlockChainScore bestScore = BlockChainScore.ZERO;
-		for (NodeContext nodeContext : context.getNodeContexts()) {
+		for (final NodeContext nodeContext : context.getNodeContexts()) {
 			final int growBySize = random.nextInt(BlockChainConstants.REWRITE_LIMIT);
 			LOGGER.info(String.format("%s: growing chain by %d blocks", nodeContext.getNode().getIdentity(), growBySize));
 			nodeContext.processChain(context.newChainPart(nodeContext.getChain(), growBySize));
@@ -540,7 +540,7 @@ public class BlockChainUpdaterTest {
 		// in each round each node picks a random partner and synchronizes
 		int round;
 		for (round = 1; round <= numRounds; round++) {
-			for (NodeContext nodeContext : context.getNodeContexts()) {
+			for (final NodeContext nodeContext : context.getNodeContexts()) {
 				NodeContext partner = context.getNodeContexts().get(random.nextInt(numNodes));
 				while (nodeContext == partner) {
 					partner = context.getNodeContexts().get(random.nextInt(numNodes));
@@ -560,7 +560,7 @@ public class BlockChainUpdaterTest {
 						result.toString()));
 				Assert.assertThat(result, IsNot.not(NodeInteractionResult.FAILURE));
 			}
-			if (allBlockChainsHaveEqualScore(context.getNodeContexts())) {
+			if (this.allBlockChainsHaveEqualScore(context.getNodeContexts())) {
 				break;
 			}
 		}
