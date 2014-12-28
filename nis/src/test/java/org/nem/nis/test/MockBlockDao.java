@@ -27,11 +27,14 @@ public class MockBlockDao implements BlockDao {
 	private BlockHeight lastFindByHeightHeight;
 	private BlockHeight lastGetHashesFromHeight;
 	private int lastGetHashesFromLimit;
-	private Long lastId;
+	private long lastId;
 
-	private final ArrayList<Block> blocks;
+	private final List<Block> blocks;
 	private final MockBlockDaoMode mockMode;
 	private Block lastSavedBlock;
+
+	// In order to simulate the db we need to update the mock account dao.
+	private final MockAccountDao accountDao;
 
 	/**
 	 * Possible mocking modes.
@@ -47,6 +50,18 @@ public class MockBlockDao implements BlockDao {
 		 * The DAO supports multiple blocks and will search through them.
 		 */
 		MultipleBlocks
+	}
+
+	/**
+	 * Creates a mock block dao.
+	 *
+	 * @param mode The mocking mode.
+	 */
+	public MockBlockDao(final MockBlockDaoMode mode, final MockAccountDao accountDao) {
+		this.mockMode = mode;
+		this.chain = new HashChain(1);
+		this.blocks = new ArrayList<>();
+		this.accountDao = accountDao;
 	}
 
 	/**
@@ -81,18 +96,25 @@ public class MockBlockDao implements BlockDao {
 		this.addBlock(block);
 		this.lastId = 1L;
 		this.mockMode = mode;
+		this.accountDao = new MockAccountDao();
 	}
 
 	public void addBlock(final Block block) {
 		this.blocks.add(block);
 	}
 
+	public Block getLastBlock() {
+		return this.blocks.get(this.blocks.size() - 1);
+	}
+
 	@Override
 	public void save(final Block block) {
-		if (block.getId() == null) {
+		if (null == block.getId()) {
 			block.setId(this.lastId);
 			this.lastId++;
 			this.lastSavedBlock = block;
+			this.addBlock(block);
+			this.accountDao.blockAdded(block);
 		}
 	}
 
@@ -103,7 +125,7 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public Long count() {
-		return null;
+		return (long)this.blocks.size();
 	}
 
 	@Override
@@ -130,12 +152,20 @@ public class MockBlockDao implements BlockDao {
 		}
 	}
 
+	private static Predicate<Block> heightFilter(final BlockHeight height, final int limit) {
+		return (block -> block.getHeight().compareTo(height.getRaw()) >= 0 && block.getHeight().compareTo(height.getRaw() + limit) < 0);
+	}
+
 	@Override
 	public HashChain getHashesFrom(final BlockHeight height, final int limit) {
 		++this.numGetHashesFromCalls;
 		this.lastGetHashesFromHeight = height;
 		this.lastGetHashesFromLimit = limit;
-		return this.chain;
+		return new HashChain(
+				this.blocks.stream()
+						.filter(heightFilter(height, limit))
+						.map(Block::getBlockHash)
+						.collect(Collectors.toList()));
 	}
 
 	@Override
@@ -145,7 +175,9 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public List<Block> getBlocksAfter(final BlockHeight height, final int limit) {
-		return null;
+		return this.blocks.stream()
+				.filter(heightFilter(height.next(), limit))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -172,9 +204,55 @@ public class MockBlockDao implements BlockDao {
 		while (iterator.hasNext()) {
 			final Block block = iterator.next();
 			if (block.getHeight().compareTo(height.getRaw()) > 0) {
+				this.accountDao.blockDeleted(block);
 				iterator.remove();
+				this.lastId--;
 			}
 		}
+	}
+
+	public MockBlockDao shallowCopy() {
+		final MockBlockDao copy = new MockBlockDao(this.mockMode, this.accountDao.shallowCopy());
+		copy.numFindByIdCalls = this.numFindByIdCalls;
+		copy.numFindByHashCalls = this.numFindByHashCalls;
+		copy.numFindByHeightCalls = this.numFindByHeightCalls;
+		copy.numGetHashesFromCalls = this.numGetHashesFromCalls;
+		copy.lastFindByIdId = this.lastFindByIdId;
+		copy.lastFindByHashHash = this.lastFindByHashHash;
+		copy.lastFindByHeightHeight = this.lastFindByHeightHeight;
+		copy.lastGetHashesFromHeight = this.lastGetHashesFromHeight;
+		copy.lastGetHashesFromLimit = this.lastGetHashesFromLimit;
+		copy.lastId = this.lastId;
+		copy.lastSavedBlock = this.lastSavedBlock;
+		copy.blocks.addAll(this.blocks);
+		this.chain.asCollection().stream().forEach(copy.chain::add);
+		return copy;
+	}
+
+	// Not exactly what equals should look like but good enough for us.
+	public boolean equals(final MockBlockDao rhs) {
+		if (this.blocks.size() != rhs.blocks.size()) {
+			return false;
+		}
+
+		for (int i = 0; i < this.blocks.size(); i++) {
+			if (!this.blocks.get(i).getBlockHash().equals(rhs.blocks.get(i).getBlockHash())) {
+				return false;
+			}
+		}
+
+		if (!this.accountDao.equals(rhs.accountDao)) {
+			return false;
+		}
+
+		return this.mockMode == rhs.mockMode &&
+				this.lastId == rhs.lastId &&
+				this.lastSavedBlock.getBlockHash().equals(rhs.lastSavedBlock.getBlockHash()) &&
+				this.chain.asCollection().equals(rhs.chain.asCollection());
+	}
+
+	public MockAccountDao getAccountDao() {
+		return this.accountDao;
 	}
 
 	/**

@@ -199,7 +199,8 @@ public class BlockChainComparerTest {
 	}
 
 	@Test
-	public void remoteIsSyncedIfLocalIsSameSizeAsRemoteChainAndContainsAllHashesInRemoteChain() {
+	public void remoteLiedAboutChainScoreIfLocalIsSameSizeAsRemoteChainAndContainsAllHashesInRemoteChain() {
+		// hashes are only compared if the remote promises a better chain
 		// Arrange:
 		final BlockChainComparer comparer = createBlockChainComparer();
 
@@ -213,7 +214,7 @@ public class BlockChainComparerTest {
 				new MockBlockLookup(createVerifiableBlock(8), new BlockChainScore(10), remoteChain)).getCode();
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_IS_SYNCED));
+		Assert.assertThat(result, IsEqual.equalTo(ComparisonResult.Code.REMOTE_LIED_ABOUT_CHAIN_SCORE));
 	}
 
 	@Test

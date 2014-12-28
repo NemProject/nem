@@ -71,6 +71,7 @@ public class BlockExplorerMapperTest {
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
 		final Transfer transfer = new Transfer();
+		transfer.setType(1337);
 		transfer.setFee(fee);
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
@@ -94,6 +95,7 @@ public class BlockExplorerMapperTest {
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
 		final Transfer transfer = new Transfer();
+		transfer.setType(1337);
 		transfer.setFee(123000000L);
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
@@ -111,7 +113,7 @@ public class BlockExplorerMapperTest {
 
 		// Assert:
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(11));
-		Assert.assertThat(jsonObject.get("type"), IsEqual.equalTo(0x0101));
+		Assert.assertThat(jsonObject.get("type"), IsEqual.equalTo(1337));
 		Assert.assertThat(jsonObject.get("fee"), IsEqual.equalTo(123000000L));
 		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1408966402000L));
 		Assert.assertThat(jsonObject.get("sender"), IsEqual.equalTo(senderAddress.getEncoded()));
