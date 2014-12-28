@@ -21,7 +21,7 @@ public class RecalculateImportancesObserverTest {
 	@Test
 	public void recalculateImportancesIsCalledForHarvestRewardExecuteUndoNotification() {
 		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(128));
+		assertImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(127));
 	}
 
 	@Test
