@@ -69,6 +69,9 @@ public class ImportanceTransferModelToDbModelMappingTest {
 				final ImportanceTransfer dbModel,
 				final Integer expectedMode,
 				final Hash expectedHash) {
+			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
+			Assert.assertThat(dbModel.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
+
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(4444));
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
 			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
