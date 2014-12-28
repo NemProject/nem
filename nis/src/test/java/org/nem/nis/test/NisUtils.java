@@ -20,6 +20,28 @@ public class NisUtils {
 	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
 
 	/**
+	 * Creates a dummy DB Block.
+	 *
+	 * @param harvester The harvester account.
+	 * @return The db block.
+	 */
+	public static org.nem.nis.dbmodel.Block createDummyDbBlock(final org.nem.nis.dbmodel.Account harvester) {
+		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
+		dbBlock.setBlockHash(Hash.ZERO);
+		dbBlock.setVersion(1);
+		dbBlock.setGenerationHash(Hash.ZERO);
+		dbBlock.setPrevBlockHash(Hash.ZERO);
+		dbBlock.setTimeStamp(TimeInstant.ZERO.getRawTime());
+		dbBlock.setForger(harvester);
+		dbBlock.setForgerProof(Utils.generateRandomSignature().getBytes());
+		dbBlock.setHeight(1L);
+		dbBlock.setTotalAmount(0L);
+		dbBlock.setTotalFee(1L);
+		dbBlock.setDifficulty(1L);
+		return dbBlock;
+	}
+
+	/**
 	 * Creates a DB Block that can be mapped to a model Block.
 	 *
 	 * @param timeStamp The block timestamp.

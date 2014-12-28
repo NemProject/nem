@@ -107,8 +107,8 @@ public class DebugControllerTest {
 	private static org.nem.nis.dbmodel.Block createDbBlock(final Block block) {
 		final Address signerAddress = block.getSigner().getAddress();
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
-		dbBlock.setPrevBlockHash(block.getPreviousBlockHash().getRaw());
-		dbBlock.setGenerationHash(block.getGenerationHash().getRaw());
+		dbBlock.setPrevBlockHash(block.getPreviousBlockHash());
+		dbBlock.setGenerationHash(block.getGenerationHash());
 		dbBlock.setForger(new org.nem.nis.dbmodel.Account(signerAddress.getEncoded(), signerAddress.getPublicKey()));
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setHeight(block.getHeight().getRaw());

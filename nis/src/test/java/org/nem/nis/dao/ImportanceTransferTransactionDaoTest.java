@@ -10,7 +10,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.test.MockAccountDao;
+import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -92,9 +92,7 @@ public class ImportanceTransferTransactionDaoTest {
 	}
 
 	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final ImportanceTransfer... dbTransfers) {
-		final Block block = new Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
-				account, new byte[] { 1, 2, 3, 4 },
-				1L, 1L, 1L, 123L, null);
+		final Block block = NisUtils.createDummyDbBlock(account);
 		this.blockDao.save(block);
 
 		for (final ImportanceTransfer importanceTransfer : dbTransfers) {

@@ -33,8 +33,8 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
 		dbBlock.setBlockHash(blockHash);
 		dbBlock.setVersion(block.getVersion());
-		dbBlock.setGenerationHash(block.getGenerationHash().getRaw());
-		dbBlock.setPrevBlockHash(block.getPreviousBlockHash().getRaw());
+		dbBlock.setGenerationHash(block.getGenerationHash());
+		dbBlock.setPrevBlockHash(block.getPreviousBlockHash());
 		dbBlock.setTimeStamp(block.getTimeStamp().getRawTime());
 		dbBlock.setForger(harvester);
 		dbBlock.setForgerProof(block.getSignature().getBytes());

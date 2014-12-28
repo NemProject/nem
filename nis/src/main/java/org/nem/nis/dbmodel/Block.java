@@ -65,36 +65,6 @@ public class Block {
 	public Block() {
 	}
 
-	public Block(
-			final Hash hash,
-			final Integer version,
-			final Hash generationHash,
-			final Hash prevBlockHash,
-			final Integer timeStamp,
-			final Account forger,
-			final byte[] forgerProof,
-			final Long height,
-			final Long totalAmount,
-			final Long totalFee,
-			final Long difficulty,
-			final Account lessor) {
-
-		this.shortId = hash.getShortId();
-		this.version = version;
-		this.generationHash = generationHash.getRaw();
-		this.prevBlockHash = prevBlockHash.getRaw();
-		this.blockHash = hash.getRaw();
-		this.timeStamp = timeStamp;
-		this.forger = forger;
-		this.forgerProof = forgerProof;
-		this.height = height;
-		this.totalAmount = totalAmount;
-		this.totalFee = totalFee;
-		this.difficulty = difficulty;
-
-		this.lessor = lessor;
-	}
-
 	public Long getId() {
 		return this.id;
 	}
@@ -123,8 +93,8 @@ public class Block {
 		return new Hash(this.prevBlockHash);
 	}
 
-	public void setPrevBlockHash(final byte[] prevBlockHash) {
-		this.prevBlockHash = prevBlockHash;
+	public void setPrevBlockHash(final Hash prevBlockHash) {
+		this.prevBlockHash = prevBlockHash.getRaw();
 	}
 
 	public Hash getBlockHash() {
@@ -140,8 +110,8 @@ public class Block {
 		return new Hash(this.generationHash);
 	}
 
-	public void setGenerationHash(final byte[] generationHash) {
-		this.generationHash = generationHash;
+	public void setGenerationHash(final Hash generationHash) {
+		this.generationHash = generationHash.getRaw();
 	}
 
 	public Integer getTimeStamp() {

@@ -176,8 +176,8 @@ public class BlockDbModelToModelMappingTest {
 		public org.nem.nis.dbmodel.Block createDbBlock(final Long difficulty, final org.nem.nis.dbmodel.Account lessor) {
 			final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
 			dbBlock.setForger(this.dbForger);
-			dbBlock.setPrevBlockHash(this.prevBlockHash.getRaw());
-			dbBlock.setGenerationHash(this.generationBlockHash.getRaw());
+			dbBlock.setPrevBlockHash(this.prevBlockHash);
+			dbBlock.setGenerationHash(this.generationBlockHash);
 			dbBlock.setTimeStamp(4444);
 			dbBlock.setHeight(7L);
 

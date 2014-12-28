@@ -429,23 +429,17 @@ public class BlockChainTest {
 
 		b.sign();
 
-		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
-				HashUtils.calculateHash(b),
-				1,
-				// generation hash
-				Hash.ZERO,
-				// prev hash
-				Hash.ZERO,
-				0, // timestamp
-				DB_SENDER,
-				// proof
-				b.getSignature().getBytes(),
-				b.getHeight().getRaw(), // height
-				RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT,
-				0L,
-				123L,
-				null
-		);
+		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
+		dbBlock.setBlockHash(HashUtils.calculateHash(b));
+		dbBlock.setVersion(1);
+		dbBlock.setGenerationHash(Hash.ZERO);
+		dbBlock.setPrevBlockHash(Hash.ZERO);
+		dbBlock.setTimeStamp(0);
+		dbBlock.setForger(DB_SENDER);
+		dbBlock.setForgerProof(b.getSignature().getBytes());
+		dbBlock.setHeight(RECIPIENT1_AMOUNT + RECIPIENT2_AMOUNT);
+		dbBlock.setTotalFee(0L);
+		dbBlock.setDifficulty(123L);
 
 		final Transfer dbTransaction1 = new Transfer();
 		dbTransaction1.setTransferHash(HashUtils.calculateHash(tx1));
