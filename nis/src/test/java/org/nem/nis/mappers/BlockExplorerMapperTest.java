@@ -37,7 +37,7 @@ public class BlockExplorerMapperTest {
 		block.setHeight(60L);
 		block.setForger(new Account(address.getEncoded(), address.getPublicKey()));
 		block.setTimeStamp(1856002);
-		block.setBlockHash(hash.getRaw());
+		block.setBlockHash(hash);
 		block.setBlockTransfers(new ArrayList<>());
 
 		for (final long fee : transferFees) {

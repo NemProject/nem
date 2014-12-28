@@ -25,11 +25,11 @@ public class BlockDbModelToModelMappingTest {
 		// Arrange:
 		final DeserializationContext deserializationContext = new DeserializationContext(new MockAccountLookup());
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.createDbBlock(null, null);
-		dbModel.setHeight(1L);
+		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
+		dbBlock.setHeight(1L);
 
 		// Act:
-		final Block model = context.mapping.map(dbModel);
+		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
 		Assert.assertThat(model, IsInstanceOf.instanceOf(NemesisBlock.class));
@@ -108,14 +108,14 @@ public class BlockDbModelToModelMappingTest {
 			final Class<?> expectedClass) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.createDbBlock(null, null);
+		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
 
-		final Transaction transfer2 = factory.create(context, dbModel, 2);
-		final Transaction transfer0 = factory.create(context, dbModel, 0);
-		final Transaction transfer1 = factory.create(context, dbModel, 1);
+		final Transaction transfer2 = factory.create(context, dbBlock, 2);
+		final Transaction transfer0 = factory.create(context, dbBlock, 0);
+		final Transaction transfer1 = factory.create(context, dbBlock, 1);
 
 		// Act:
-		final Block model = context.mapping.map(dbModel);
+		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
 		context.assertModel(model);
@@ -128,16 +128,16 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithMixedTransfersCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.createDbBlock(null, null);
+		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
 
-		final Transaction transfer2 = context.addTransfer(dbModel, 2);
-		final Transaction transfer0 = context.addImportanceTransfer(dbModel, 0);
-		final Transaction transfer1 = context.addTransfer(dbModel, 1);
-		final Transaction transfer4 = context.addTransfer(dbModel, 4);
-		final Transaction transfer3 = context.addImportanceTransfer(dbModel, 3);
+		final Transaction transfer2 = context.addTransfer(dbBlock, 2);
+		final Transaction transfer0 = context.addImportanceTransfer(dbBlock, 0);
+		final Transaction transfer1 = context.addTransfer(dbBlock, 1);
+		final Transaction transfer4 = context.addTransfer(dbBlock, 4);
+		final Transaction transfer3 = context.addImportanceTransfer(dbBlock, 3);
 
 		// Act:
-		final Block model = context.mapping.map(dbModel);
+		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
 		context.assertModel(model);

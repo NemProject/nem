@@ -333,13 +333,13 @@ public class AccountIoAdapterTest {
 		public void seedDefaultBlocks() {
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(897, 444));
 			this.blocks.get(0).setTotalFee(8L);
-			this.blocks.get(0).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.get(0).setBlockHash(Utils.generateRandomHash());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(123, 777));
 			this.blocks.get(1).setTotalFee(9L);
-			this.blocks.get(1).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.get(1).setBlockHash(Utils.generateRandomHash());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(345, 222));
 			this.blocks.get(2).setTotalFee(7L);
-			this.blocks.get(2).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.get(2).setBlockHash(Utils.generateRandomHash());
 		}
 
 		public void assertDefaultBlocks(final SerializableList<HarvestInfo> harvestInfos) {

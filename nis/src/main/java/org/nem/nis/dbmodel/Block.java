@@ -131,8 +131,9 @@ public class Block {
 		return new Hash(this.blockHash);
 	}
 
-	public void setBlockHash(final byte[] blockHash) {
-		this.blockHash = blockHash;
+	public void setBlockHash(final Hash blockHash) {
+		this.blockHash = blockHash.getRaw();
+		this.shortId = blockHash.getShortId();
 	}
 
 	public Hash getGenerationHash() {

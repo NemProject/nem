@@ -21,61 +21,17 @@ public class BlockMapper {
 	 * Converts a Block model to a Block db-model.
 	 *
 	 * @param block The block model.
-	 * @param accountDao The account dao lookup object.
+	 * @param accountDaoLookup The account dao lookup object.
 	 * @return The Block db-model.
 	 */
-	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
-		final org.nem.nis.dbmodel.Account harvester = accountDao.findByAddress(block.getSigner().getAddress());
-		final org.nem.nis.dbmodel.Account lessor = block.getLessor() != null ? accountDao.findByAddress(block.getLessor().getAddress()) : null;
-
-		final Hash blockHash = HashUtils.calculateHash(block);
-		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block(
-				blockHash,
-				block.getVersion(),
-				block.getGenerationHash(),
-				block.getPreviousBlockHash(),
-				block.getTimeStamp().getRawTime(),
-				harvester,
-				block.getSignature().getBytes(),
-				block.getHeight().getRaw(),
-				0L,
-				block.getTotalFee().getNumMicroNem(),
-				block.getDifficulty().getRaw(),
-				lessor);
-
-		int i = 0;
-		int importanceTransferIndex = 0;
-		int transferIndex = 0;
-		final List<Transfer> transferTransactions = new ArrayList<>(block.getTransactions().size());
-		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(block.getTransactions().size());
-		for (final Transaction transaction : block.getTransactions()) {
-			switch (transaction.getType()) {
-				case TransactionTypes.TRANSFER: {
-					final Transfer dbTransfer = TransferMapper.toDbModel(
-							(TransferTransaction)transaction,
-							i++,
-							importanceTransferIndex++,
-							accountDao);
-					dbTransfer.setBlock(dbBlock);
-					transferTransactions.add(dbTransfer);
-				}
-				break;
-				case TransactionTypes.IMPORTANCE_TRANSFER: {
-					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel(
-							(ImportanceTransferTransaction)transaction,
-							i++,
-							transferIndex++,
-							accountDao);
-					dbTransfer.setBlock(dbBlock);
-					importanceTransferTransactions.add(dbTransfer);
-				}
-				break;
-			}
-		}
-
-		dbBlock.setBlockTransfers(transferTransactions);
-		dbBlock.setBlockImportanceTransfers(importanceTransferTransactions);
-		return dbBlock;
+	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
+		// TODO 20141221: there's no need to recreate the MappingRepository each time
+		final MappingRepository mappingRepository = new MappingRepository();
+		mappingRepository.addMapping(TransferTransaction.class, Transfer.class, new TransferModelToDbModelMapping(mappingRepository));
+		mappingRepository.addMapping(ImportanceTransferTransaction.class, ImportanceTransfer.class, new ImportanceTransferModelToDbModelMapping(mappingRepository));
+		mappingRepository.addMapping(Account.class, org.nem.nis.dbmodel.Account.class, new AccountModelToDbModelMapping(accountDaoLookup));
+		mappingRepository.addMapping(Block.class, org.nem.nis.dbmodel.Block.class, new BlockModelToDbModelMapping(mappingRepository));
+		return mappingRepository.map(block, org.nem.nis.dbmodel.Block.class);
 	}
 
 	/**
