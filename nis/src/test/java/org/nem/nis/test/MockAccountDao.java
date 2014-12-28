@@ -90,7 +90,7 @@ public class MockAccountDao implements AccountDao {
 				.mapToInt(a1 -> {
 					final Account a2 = rhs.knownAccounts.get(a1.getPrintableKey());
 					if (!a1.getPrintableKey().equals(a2.getPrintableKey()) ||
-						(null != a1.getPublicKey() && !a1.getPublicKey().equals(a2.getPublicKey()))) {
+							(null != a1.getPublicKey() && !a1.getPublicKey().equals(a2.getPublicKey()))) {
 						return 1;
 					}
 

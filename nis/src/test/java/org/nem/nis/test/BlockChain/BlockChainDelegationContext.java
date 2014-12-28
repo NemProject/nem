@@ -175,11 +175,11 @@ public class BlockChainDelegationContext {
 		Mockito.when(this.contextFactory.createSyncContext(Mockito.any(BlockChainScore.class)))
 				.thenReturn(syncContext);
 		Mockito.when(this.contextFactory.createUpdateContext(
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.any(),
-				Mockito.anyBoolean())
+						Mockito.any(),
+						Mockito.any(),
+						Mockito.any(),
+						Mockito.any(),
+						Mockito.anyBoolean())
 		).thenAnswer(invocation -> new BlockChainUpdateContext(
 				((BlockChainSyncContext)invocation.getArguments()[0]).nisCache(),
 				this.nisCache,

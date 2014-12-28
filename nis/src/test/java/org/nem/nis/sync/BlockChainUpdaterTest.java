@@ -539,7 +539,7 @@ public class BlockChainUpdaterTest {
 		// Act:
 		// in each round each node picks a random partner and synchronizes
 		int round;
-		for (round=1; round<=numRounds; round++) {
+		for (round = 1; round <= numRounds; round++) {
 			for (NodeContext nodeContext : context.getNodeContexts()) {
 				NodeContext partner = context.getNodeContexts().get(random.nextInt(numNodes));
 				while (nodeContext == partner) {
@@ -569,7 +569,7 @@ public class BlockChainUpdaterTest {
 		LOGGER.info(String.format("synchronization ended after %d rounds", round));
 		Assert.assertThat(round <= numRounds, IsEqual.equalTo(true));
 		Assert.assertThat(bestScore, IsEqual.equalTo(context.getNodeContexts().get(0).getBlockChainUpdater().getScore()));
-		for (int i=0; i<context.getNodeContexts().size() - 1; i++) {
+		for (int i = 0; i < context.getNodeContexts().size() - 1; i++) {
 			final NodeContext nodeContext1 = context.getNodeContexts().get(i);
 			final NodeContext nodeContext2 = context.getNodeContexts().get(i + 1);
 			BlockChainUtils.assertNisCachesAreEquivalent(nodeContext1.getNisCache(), nodeContext2.getNisCache());
@@ -578,7 +578,7 @@ public class BlockChainUpdaterTest {
 	}
 
 	private boolean allBlockChainsHaveEqualScore(final List<NodeContext> nodeContexts) {
-		for (int i=0; i<nodeContexts.size() - 1; i++) {
+		for (int i = 0; i < nodeContexts.size() - 1; i++) {
 			if (!nodeContexts.get(i).getBlockChainUpdater().getScore().equals(nodeContexts.get(i + 1).getBlockChainUpdater().getScore())) {
 				return false;
 			}

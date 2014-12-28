@@ -163,11 +163,11 @@ public class MockBlockDao implements BlockDao {
 		this.lastGetHashesFromLimit = limit;
 		return new HashChain(
 				this.blocks.stream()
-				// TODO 20141106 J-B: consider refactoring the filtering (since its the same as in getBlocksAfter)
-				// TODO 20141107 BR -> J: done.
-				.filter(heightFilter(height, limit))
-				.map(Block::getBlockHash)
-				.collect(Collectors.toList()));
+						// TODO 20141106 J-B: consider refactoring the filtering (since its the same as in getBlocksAfter)
+						// TODO 20141107 BR -> J: done.
+						.filter(heightFilter(height, limit))
+						.map(Block::getBlockHash)
+						.collect(Collectors.toList()));
 	}
 
 	@Override
@@ -238,7 +238,7 @@ public class MockBlockDao implements BlockDao {
 			return false;
 		}
 
-		for (int i=0; i<this.blocks.size(); i++) {
+		for (int i = 0; i < this.blocks.size(); i++) {
 			if (!this.blocks.get(i).getBlockHash().equals(rhs.blocks.get(i).getBlockHash())) {
 				return false;
 			}

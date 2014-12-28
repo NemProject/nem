@@ -50,14 +50,14 @@ public class BlockChainContext {
 				(blockHeight, accountStates) ->
 						accountStates.stream().forEach(a -> a.getImportanceInfo().setImportance(blockHeight, 1.0 / accountStates.size())));
 		final ReadOnlyNisCache commonNisCache = NisCacheFactory.createReal(poiFacade);
-		this.scorer  = new BlockScorer(commonNisCache.getAccountStateCache());
+		this.scorer = new BlockScorer(commonNisCache.getAccountStateCache());
 		this.nemesisAccount = addAccount(commonNisCache);
 		this.createNemesisAccounts(this.options.numAccounts(), commonNisCache);
 		this.nemesisBlock = this.createNemesisBlock(this.nemesisAccount);
 		final List<Block> commonChain = createChain(this.nemesisBlock, this.options.commonChainHeight());
 		this.nodeContexts = new ArrayList<>();
 
-		for (int i=0; i<this.options.numNodes(); i++) {
+		for (int i = 0; i < this.options.numNodes(); i++) {
 			final Node node = this.createNode(i + 1);
 			final DefaultNisCache nisCache = Mockito.spy(((DefaultNisCache)commonNisCache).deepCopy());
 			final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
@@ -116,7 +116,7 @@ public class BlockChainContext {
 
 	// nemesis accounts
 	private void createNemesisAccounts(final int numAccounts, final ReadOnlyNisCache nisCache) {
-		for (int i=0; i<numAccounts; i++) {
+		for (int i = 0; i < numAccounts; i++) {
 			addAccount(nisCache);
 		}
 	}
@@ -185,7 +185,7 @@ public class BlockChainContext {
 	}
 
 	public void addTransactions(final Block block, final int numTransactions) {
-		for (int i=0; i<numTransactions; i++) {
+		for (int i = 0; i < numTransactions; i++) {
 			block.addTransaction(this.createTransferTransaction(block.getSigner(), block.getTimeStamp().addMinutes(-5)));
 		}
 	}
@@ -240,7 +240,7 @@ public class BlockChainContext {
 	public List<Block> newChainPart(final List<Block> chain, final int size) {
 		final List<Block> newChain = new ArrayList<>();
 		newChain.addAll(chain);
-		for (int i=0; i<size; i++) {
+		for (int i = 0; i < size; i++) {
 			final Block block = createChild(newChain, 0);
 			newChain.add(block);
 		}

@@ -34,11 +34,11 @@ public class BlockChainUtils {
 		Mockito.verify(blockDao, Mockito.times(getHashesFromCalls)).getHashesFrom(BlockHeight.ONE, BlockChainConstants.BLOCKS_LIMIT);
 	}
 
-	public static  void assertAccountDaoCalls(final AccountDao accountDao, final int getAccountByPrintableAddressCalls) {
+	public static void assertAccountDaoCalls(final AccountDao accountDao, final int getAccountByPrintableAddressCalls) {
 		Mockito.verify(accountDao, Mockito.times(getAccountByPrintableAddressCalls)).getAccountByPrintableAddress(Mockito.any());
 	}
 
-	public static  void assertNisCacheCalls(
+	public static void assertNisCacheCalls(
 			final ReadOnlyNisCache nisCache,
 			final int getAccountCacheCalls,
 			final int getAccountStateCacheCalls,
@@ -50,7 +50,7 @@ public class BlockChainUtils {
 		Mockito.verify(nisCache, Mockito.times(copyCalls)).copy();
 	}
 
-	public static  void assertBlockChainServicesCalls(
+	public static void assertBlockChainServicesCalls(
 			final BlockChainServices blockChainServices,
 			final int isPeerChainValidCalls,
 			final int undoAndGetScoreCalls) {
@@ -83,7 +83,7 @@ public class BlockChainUtils {
 				Mockito.anyBoolean());
 	}
 
-	public static  void assertUnconfirmedTransactionsCalls(
+	public static void assertUnconfirmedTransactionsCalls(
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final int addExistingCalls,
 			final int removeAllCalls) {
@@ -91,7 +91,7 @@ public class BlockChainUtils {
 		Mockito.verify(unconfirmedTransactions, Mockito.times(removeAllCalls)).removeAll(Mockito.any());
 	}
 
-	public static  void assertNisCachesAreEquivalent(final ReadOnlyNisCache lhs, final ReadOnlyNisCache rhs) {
+	public static void assertNisCachesAreEquivalent(final ReadOnlyNisCache lhs, final ReadOnlyNisCache rhs) {
 		// we are only interested in the accounts and balances of the accounts
 		final ReadOnlyAccountStateCache lhsCache = lhs.getAccountStateCache();
 		final ReadOnlyAccountStateCache rhsCache = rhs.getAccountStateCache();
@@ -104,8 +104,7 @@ public class BlockChainUtils {
 		}
 	}
 
-	public static  void assertMockBlockDaosAreEquivalent(final MockBlockDao lhs, final MockBlockDao rhs) {
+	public static void assertMockBlockDaosAreEquivalent(final MockBlockDao lhs, final MockBlockDao rhs) {
 		Assert.assertThat(lhs.equals(rhs), IsEqual.equalTo(true));
 	}
-
 }
