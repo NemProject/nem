@@ -83,7 +83,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
-		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache().asAutoCache());
+		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
@@ -138,6 +138,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				// TODO 20141208 J-B: i In your block chain test branch, we should add a regression test for this
 				// TODO 20141209 BR -> J: yes, same issue again, we are executing the transaction against an account which is not in the cache.
 				// > A clean fix would be to pass the account cache to the observers so everything gets credited/debited using the accounts in the cache.
+				// TODO 20141219 BR -> J considering all the recent changes, do we still need this?
 				peerChain.stream().forEach(b -> this.ensureAllAccountsAreKnown(b, context.nisCache().getAccountCache()));
 			}
 
@@ -148,16 +149,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	}
 
 	private void ensureAllAccountsAreKnown(final Block block, final AccountCache accountCache) {
-		block.getTransactions().stream().forEach(t -> {
-			switch (t.getType()) {
-				case TransactionTypes.TRANSFER:
-					accountCache.findByAddress(((TransferTransaction)t).getRecipient().getAddress());
-					break;
-				case TransactionTypes.IMPORTANCE_TRANSFER:
-					accountCache.findByAddress(((ImportanceTransferTransaction)t).getRemote().getAddress());
-					break;
-			}
-		});
+		block.getTransactions().stream().flatMap(t -> t.getAccounts().stream()).forEach(
+				a -> accountCache.findByAddress(a.getAddress()));
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
@@ -240,7 +233,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private Block remapBlock(final Block block, final AccountCache accountCache) {
 		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-		return BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
+		return BlockMapper.toModel(dbBlock, accountCache);
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {

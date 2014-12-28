@@ -15,13 +15,13 @@ public class RecalculateImportancesObserverTest {
 	@Test
 	public void recalculateImportancesIsCalledForHarvestRewardExecuteNotification() {
 		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Execute);
+		assertImportanceRecalculation(NotificationTrigger.Execute, new BlockHeight(127), new BlockHeight(128));
 	}
 
 	@Test
 	public void recalculateImportancesIsCalledForHarvestRewardExecuteUndoNotification() {
 		// Assert:
-		assertImportanceRecalculation(NotificationTrigger.Undo);
+		assertImportanceRecalculation(NotificationTrigger.Undo, new BlockHeight(127), new BlockHeight(127));
 	}
 
 	@Test
@@ -39,17 +39,20 @@ public class RecalculateImportancesObserverTest {
 		Mockito.verify(context.accountStateCache, Mockito.never()).mutableContents();
 	}
 
-	private static void assertImportanceRecalculation(final NotificationTrigger trigger) {
+	private static void assertImportanceRecalculation(
+			final NotificationTrigger trigger,
+			final BlockHeight height,
+			final BlockHeight expectedRecalculateBlockHeight) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
 		context.observer.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, Utils.generateRandomAccount(), Amount.ZERO),
-				NisUtils.createBlockNotificationContext(new BlockHeight(127), trigger));
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, Utils.generateRandomAccount(), Amount.ZERO),
+				NisUtils.createBlockNotificationContext(height, trigger));
 
 		// Assert: recalculateImportances is called with grouped height
-		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(new BlockHeight(1)), Mockito.any());
+		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.eq(expectedRecalculateBlockHeight), Mockito.any());
 		Mockito.verify(context.accountStateCache, Mockito.only()).mutableContents();
 	}
 

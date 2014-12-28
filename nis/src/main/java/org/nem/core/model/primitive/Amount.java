@@ -43,7 +43,7 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 		super(amount, Amount.class);
 
 		if (amount < 0) {
-			throw new IllegalArgumentException("amount must be non-negative");
+			throw new NegativeBalanceException(amount);
 		}
 	}
 

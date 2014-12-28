@@ -10,7 +10,7 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TransactionTest {
@@ -64,8 +64,6 @@ public class TransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(new TimeInstant(726)));
 	}
-
-	//endregion
 
 	//endregion
 
@@ -165,6 +163,72 @@ public class TransactionTest {
 		// Assert: the fee is set to the minimum fee
 		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
 		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(100)));
+	}
+
+	//endregion
+
+	//region Accounts
+
+	@Test
+	public void accountsAlwaysIncludeSigner() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+
+		// Act:
+		final Collection<Account> accounts = transaction.getAccounts();
+
+		// Assert:
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer));
+	}
+
+	@Test
+	public void accountsIncludeSignerAndNonSignerAccounts() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account other1 = Utils.generateRandomAccount();
+		final Account other2 = Utils.generateRandomAccount();
+		final Account other3 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setOtherAccounts(Arrays.asList(other1, other2, other3));
+
+		// Act:
+		final Collection<Account> accounts = transaction.getAccounts();
+
+		// Assert:
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, other1, other2, other3));
+	}
+
+	@Test
+	public void accountsFiltersOutDuplicateAccounts() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account other1 = Utils.generateRandomAccount();
+		final Account other2 = Utils.generateRandomAccount();
+		final MockTransaction transaction = new MockTransaction(signer, 6);
+		transaction.setOtherAccounts(Arrays.asList(other1, other1, other2, signer));
+
+		// Act:
+		final Collection<Account> accounts = transaction.getAccounts();
+
+		// Assert:
+		Assert.assertThat(accounts, IsEquivalent.equivalentTo(signer, other1, other2));
+	}
+
+	//endregion
+
+	//region Child Transactions
+
+	@Test
+	public void defaultGetChildTransactionsImplementationReturnsEmptyCollection() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount(), 6);
+
+		// Act:
+		final Collection<Transaction> childTransactions = transaction.getChildTransactions();
+
+		// Assert:
+		Assert.assertThat(childTransactions.isEmpty(), IsEqual.equalTo(true));
 	}
 
 	//endregion

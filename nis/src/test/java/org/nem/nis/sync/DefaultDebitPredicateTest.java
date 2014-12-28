@@ -14,7 +14,7 @@ public class DefaultDebitPredicateTest {
 	@Test
 	public void getDebitPredicateEvaluatesAmountAgainstBalancesInAccountState() {
 		// Arrange:
-		final AccountStateCache accountStateCache = new DefaultAccountStateCache();
+		final AccountStateCache accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		final Account account1 = addAccountWithBalance(accountStateCache, Amount.fromNem(10));
 		final Account account2 = addAccountWithBalance(accountStateCache, Amount.fromNem(77));
 

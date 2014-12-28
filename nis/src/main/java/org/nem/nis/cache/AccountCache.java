@@ -1,7 +1,6 @@
 package org.nem.nis.cache;
 
 import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
 
 /**
  * An account cache that maps addresses to public keys.
@@ -22,11 +21,4 @@ public interface AccountCache extends ReadOnlyAccountCache {
 	 * @param address The address of the account to remove.
 	 */
 	public void removeFromCache(final Address address);
-
-	/**
-	 * Returns an AccountLookup that automatically caches unknown accounts.
-	 *
-	 * @return An AccountLookup that automatically caches unknown accounts.
-	 */
-	public AccountLookup asAutoCache();
 }

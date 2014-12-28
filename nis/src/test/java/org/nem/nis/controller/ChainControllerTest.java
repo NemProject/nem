@@ -300,20 +300,17 @@ public class ChainControllerTest {
 		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
 		account.setPrintableKey(address.getEncoded());
 		account.setPublicKey(address.getPublicKey());
-		return new Transfer(
-				Utils.generateRandomHash(),
-				0,
-				0,
-				0L,
-				timeStamp,
-				1,
-				account,
-				new byte[64],
-				account,
-				0,
-				0,
-				0L,
-				0L);
+		final Transfer dbTransfer = new Transfer();
+		dbTransfer.setTransferHash(Utils.generateRandomHash());
+		dbTransfer.setSender(account);
+		dbTransfer.setSenderProof(Utils.generateRandomBytes(64));
+		dbTransfer.setRecipient(account);
+		dbTransfer.setTimeStamp(timeStamp);
+		dbTransfer.setAmount(0L);
+		dbTransfer.setFee(0L);
+		dbTransfer.setDeadline(0);
+		dbTransfer.setBlkIndex(0);
+		return dbTransfer;
 	}
 
 	//endregion

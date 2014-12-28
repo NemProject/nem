@@ -6,14 +6,15 @@ import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.*;
 
 public class BlockTransactionObserverFactoryTest {
 
@@ -43,6 +44,80 @@ public class BlockTransactionObserverFactoryTest {
 
 		// Assert:
 		Assert.assertThat(observer, IsNull.notNullValue());
+	}
+
+	//endregion
+
+	//region options
+
+	@Test
+	public void createExecuteDoesPerformIncrementalPoiWhenEnabled() {
+		// Arrange:
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+
+		// Assert:
+		assertRecalculateImportancesIsCalled(factory::createExecuteCommitObserver, NotificationTrigger.Execute);
+	}
+
+	@Test
+	public void createExecuteDoesNotPerformIncrementalPoiWhenDisabled() {
+		// Arrange:
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+
+		// Assert:
+		assertRecalculateImportancesIsNotCalled(factory::createExecuteCommitObserver, NotificationTrigger.Execute);
+	}
+
+	@Test
+	public void createUndoDoesPerformIncrementalPoiWhenEnabled() {
+		// Arrange:
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+
+		// Assert:
+		assertRecalculateImportancesIsCalled(factory::createUndoCommitObserver, NotificationTrigger.Undo);
+	}
+
+	@Test
+	public void createUndoDoesNotPerformIncrementalPoiWhenDisabled() {
+		// Arrange:
+		final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
+
+		// Assert:
+		assertRecalculateImportancesIsNotCalled(factory::createUndoCommitObserver, NotificationTrigger.Undo);
+	}
+
+	private static void assertRecalculateImportancesIsCalled(
+			final BiFunction<NisCache, EnumSet<ObserverOption>, BlockTransactionObserver> createObserver,
+			final NotificationTrigger trigger) {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final BlockTransactionObserver observer = createObserver.apply(context.nisCache, EnumSet.of(ObserverOption.Default));
+		notifyHarvestReward(observer, context.accountContext1.account, trigger);
+
+		// Assert:
+		Mockito.verify(context.poiFacade, Mockito.only()).recalculateImportances(Mockito.any(), Mockito.any());
+	}
+
+	private static void assertRecalculateImportancesIsNotCalled(
+			final BiFunction<NisCache, EnumSet<ObserverOption>, BlockTransactionObserver> createObserver,
+			final NotificationTrigger trigger) {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final BlockTransactionObserver observer = createObserver.apply(context.nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
+		notifyHarvestReward(observer, context.accountContext1.account, trigger);
+
+		// Assert:
+		Mockito.verify(context.poiFacade, Mockito.never()).recalculateImportances(Mockito.any(), Mockito.any());
+	}
+
+	private static void notifyHarvestReward(final BlockTransactionObserver observer, final Account account, final NotificationTrigger trigger) {
+		observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, account, Amount.ZERO),
+				new BlockNotificationContext(BlockHeight.ONE, TimeInstant.ZERO, trigger));
 	}
 
 	//endregion
@@ -191,6 +266,8 @@ public class BlockTransactionObserverFactoryTest {
 			Mockito.when(accountState.getAccountInfo()).thenReturn(this.accountInfo);
 			Mockito.when(accountState.getWeightedBalances()).thenReturn(this.balances);
 			Mockito.when(accountState.getImportanceInfo()).thenReturn(this.importance);
+			Mockito.when(accountState.getImportanceInfo()).thenReturn(this.importance);
+			Mockito.when(accountStateCache.mutableContents()).thenReturn(new CacheContents<>(new ArrayList<>()));
 
 			Mockito.when(accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
 		}
@@ -198,9 +275,10 @@ public class BlockTransactionObserverFactoryTest {
 
 	private static class TestContext {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
+		private final DefaultPoiFacade poiFacade = Mockito.mock(DefaultPoiFacade.class);
 		private final MockAccountContext accountContext1 = this.addAccount();
 		private final MockAccountContext accountContext2 = this.addAccount();
-		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache);
+		private final NisCache nisCache = NisCacheFactory.create(this.accountStateCache, this.poiFacade);
 		private final BlockTransactionObserverFactory factory = new BlockTransactionObserverFactory();
 
 		private MockAccountContext addAccount() {

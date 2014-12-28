@@ -15,7 +15,7 @@ import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Iterator;
+import java.util.*;
 import java.util.logging.Logger;
 
 // TODO 20141030: this class needs tests
@@ -92,9 +92,9 @@ public class BlockAnalyzer {
 		final AccountCache accountCache = nisCache.getAccountCache();
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
-				.createExecuteCommitObserver(nisCache, BlockTransactionObserverFactory.Options.NoIncrementalPoi);
+				.createExecuteCommitObserver(nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
 		do {
-			final Block block = BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
+			final Block block = BlockMapper.toModel(dbBlock, accountCache);
 
 			if ((block.getHeight().getRaw() % 5000) == 0) {
 				LOGGER.info(String.format("%d", block.getHeight().getRaw()));
@@ -105,18 +105,6 @@ public class BlockAnalyzer {
 			}
 
 			executor.execute(block, observer);
-
-			// fully vest all transactions coming out of the nemesis block
-			if (null == parentBlock) {
-				for (final Account account : accountCache.contents()) {
-					if (NemesisBlock.ADDRESS.equals(account.getAddress())) {
-						continue;
-					}
-
-					final AccountState accountState = nisCache.getAccountStateCache().findStateByAddress(account.getAddress());
-					accountState.getWeightedBalances().convertToFullyVested();
-				}
-			}
 
 			parentBlock = block;
 
@@ -141,7 +129,7 @@ public class BlockAnalyzer {
 	private static void recalculateImportancesAtHeight(final NisCache nisCache, final BlockHeight height) {
 		final BlockTransactionObserver recalculateObserver = new RecalculateImportancesObserver(nisCache);
 		recalculateObserver.notify(
-				new BalanceAdjustmentNotification(NotificationType.HarvestReward, new Account(NemesisBlock.ADDRESS), Amount.ZERO),
+				new BalanceAdjustmentNotification(NotificationType.BlockHarvest, new Account(NemesisBlock.ADDRESS), Amount.ZERO),
 				new BlockNotificationContext(height, TimeInstant.ZERO, NotificationTrigger.Execute));
 	}
 
@@ -194,7 +182,7 @@ public class BlockAnalyzer {
 		nemesisState.setHeight(BlockHeight.ONE);
 
 		// load the nemesis block
-		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache().asAutoCache()));
+		return NemesisBlock.fromResource(new DeserializationContext(nisCache.getAccountCache()));
 	}
 
 	/**

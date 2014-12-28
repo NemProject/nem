@@ -68,7 +68,7 @@ public class RemoteLinks implements ReadOnlyRemoteLinks {
 		return this.isEmpty() ? null : this.remoteLinks.peek();
 	}
 
-	// TODO 20131014 J-G: tests for this function and please comment in the interface! ;)
+	// TODO 20141220 J-G: tests for getRemoteStatus
 
 	@Override
 	public RemoteStatus getRemoteStatus(final BlockHeight height) {

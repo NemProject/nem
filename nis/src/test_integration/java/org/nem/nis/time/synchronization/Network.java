@@ -1,6 +1,7 @@
 package org.nem.nis.time.synchronization;
 
 import org.nem.core.model.primitive.*;
+import org.nem.core.time.NetworkTimeStamp;
 import org.nem.core.time.synchronization.*;
 import org.nem.core.utils.FormatUtils;
 import org.nem.nis.cache.*;

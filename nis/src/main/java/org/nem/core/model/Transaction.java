@@ -5,6 +5,8 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
+import java.util.*;
+
 /**
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
@@ -77,6 +79,18 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		this.deadline = deadline;
 	}
 
+	/**
+	 * Gets all accounts that are affected by this transaction.
+	 *
+	 * @return The accounts.
+	 */
+	public Collection<Account> getAccounts() {
+		final Set<Account> accounts = new HashSet<>();
+		accounts.add(this.getSigner());
+		accounts.addAll(this.getOtherAccounts());
+		return accounts;
+	}
+
 	//endregion
 
 	@Override
@@ -123,6 +137,16 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	}
 
 	/**
+	 * Gets all transactions that are children of this transaction.
+	 * In other words, this transaction is an aggregate of the child transactions.
+	 *
+	 * @return The child transactions.
+	 */
+	public Collection<Transaction> getChildTransactions() {
+		return Collections.emptyList();
+	}
+
+	/**
 	 * Executes all transfers using the specified observer.
 	 *
 	 * @param observer The transfer observer.
@@ -135,4 +159,11 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The minimum fee.
 	 */
 	protected abstract Amount getMinimumFee();
+
+	/**
+	 * Gets all accounts (excluding the signer) that are affected by this transaction.
+	 *
+	 * @return The accounts.
+	 */
+	protected abstract Collection<Account> getOtherAccounts();
 }

@@ -1,12 +1,16 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.ImportanceTransfer;
 
+/**
+ * Static class that contains functions for converting to and from
+ * db-model ImportanceTransfer and model ImportanceTransferTransaction.
+ */
 public class ImportanceTransferMapper {
 	/**
 	 * Converts a ImportanceTransferTransaction model to a ImportanceTransfer db-model.
@@ -28,22 +32,12 @@ public class ImportanceTransferMapper {
 		final org.nem.nis.dbmodel.Account sender = accountDaoLookup.findByAddress(importanceTransferTransaction.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account remote = accountDaoLookup.findByAddress(importanceTransferTransaction.getRemote().getAddress());
 
-		final Hash txHash = HashUtils.calculateHash(importanceTransferTransaction);
-		return new ImportanceTransfer(
-				txHash,
-				importanceTransferTransaction.getVersion(),
-				importanceTransferTransaction.getType(),
-				importanceTransferTransaction.getFee().getNumMicroNem(),
-				importanceTransferTransaction.getTimeStamp().getRawTime(),
-				importanceTransferTransaction.getDeadline().getRawTime(),
-				sender,
-				// proof
-				importanceTransferTransaction.getSignature().getBytes(),
-				remote,
-				importanceTransferTransaction.getMode().value(),
-				orderIndex,
-				blockIndex, // index
-				0L);
+		final ImportanceTransfer transfer = new ImportanceTransfer();
+		AbstractTransferMapper.toDbModel(importanceTransferTransaction, sender, blockIndex, orderIndex, transfer);
+
+		transfer.setRemote(remote);
+		transfer.setMode(importanceTransferTransaction.getMode().value());
+		return transfer;
 	}
 
 	/**

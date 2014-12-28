@@ -1,5 +1,6 @@
-package org.nem.core.model.primitive;
+package org.nem.core.time;
 
+import org.nem.core.model.primitive.AbstractPrimitive;
 import org.nem.core.serialization.*;
 
 /**

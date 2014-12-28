@@ -37,6 +37,16 @@ public class Utils {
 	}
 
 	/**
+	 * Generates a random signature.
+	 *
+	 * @return A random signature.
+	 */
+	public static Signature generateRandomSignature() {
+		final byte[] bytes = Utils.generateRandomBytes(64);
+		return new Signature(bytes);
+	}
+
+	/**
 	 * Generates a random time stamp.
 	 *
 	 * @return A random time stamp.
