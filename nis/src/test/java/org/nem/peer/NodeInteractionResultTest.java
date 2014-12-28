@@ -37,7 +37,6 @@ public class NodeInteractionResultTest {
 		// Arrange:
 		final Set<ComparisonResult.Code> neutralCodes = new HashSet<>(Arrays.asList(
 				ComparisonResult.Code.REMOTE_IS_SYNCED,
-				ComparisonResult.Code.REMOTE_IS_TOO_FAR_BEHIND,
 				ComparisonResult.Code.REMOTE_REPORTED_EQUAL_CHAIN_SCORE,
 				ComparisonResult.Code.REMOTE_REPORTED_LOWER_CHAIN_SCORE
 		));
