@@ -104,9 +104,17 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 
 	@Override
 	public void prune(final TimeInstant timeStamp) {
-		if (-1 != this.retentionTime) {
-			this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(timeStamp) < 0);
+		if (-1 == this.retentionTime) {
+			return;
 		}
+
+		final TimeInstant pruneTime = this.getPruneTime(timeStamp, this.retentionTime);
+		this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(pruneTime) < 0);
+	}
+
+	private TimeInstant getPruneTime(final TimeInstant currentTime, final int retentionHours) {
+		final TimeInstant retentionTime = TimeInstant.ZERO.addHours(retentionHours);
+		return new TimeInstant(currentTime.compareTo(retentionTime) <= 0 ? 0 : currentTime.subtract(retentionTime));
 	}
 
 	@Override
