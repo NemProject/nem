@@ -10,10 +10,6 @@ public class Ed25519KeyAnalyzer implements KeyAnalyzer {
 
 	@Override
 	public boolean isKeyCompressed(final PublicKey publicKey) {
-		if (COMPRESSED_KEY_SIZE != publicKey.getRaw().length) {
-			return false;
-		}
-
-		return true;
+		return COMPRESSED_KEY_SIZE == publicKey.getRaw().length;
 	}
 }

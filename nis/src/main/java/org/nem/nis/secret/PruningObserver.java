@@ -2,7 +2,6 @@ package org.nem.nis.secret;
 
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
@@ -45,17 +44,11 @@ public class PruningObserver implements BlockTransactionObserver {
 			accountState.getImportanceInfo().prune(outlinkPruneHeight);
 		}
 
-		final TimeInstant pruneTime = getPruneTime(context.getTimeStamp(), this.transactionHashCache.getRetentionTime());
-		this.transactionHashCache.prune(pruneTime);
+		this.transactionHashCache.prune(context.getTimeStamp());
 	}
 
 	private static BlockHeight getPruneHeight(final BlockHeight height, final long numHistoryBlocks) {
 		return new BlockHeight(Math.max(1, height.getRaw() - numHistoryBlocks));
-	}
-
-	private static TimeInstant getPruneTime(final TimeInstant currentTime, final int retentionHours) {
-		final TimeInstant retentionTime = TimeInstant.ZERO.addHours(retentionHours);
-		return new TimeInstant(currentTime.compareTo(retentionTime) <= 0 ? 0 : currentTime.subtract(retentionTime));
 	}
 
 	private static boolean shouldPrune(final Notification notification, final BlockNotificationContext context) {
