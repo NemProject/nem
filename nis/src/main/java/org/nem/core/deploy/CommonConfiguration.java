@@ -59,8 +59,13 @@ public class CommonConfiguration {
 	 */
 	public CommonConfiguration(final NemProperties properties) {
 		this.shortServerName = properties.getString("nem.shortServerName");
-		this.nemFolder = properties.getOptionalString("nem.folder", Paths.get("%h", "nem").toString())
+
+		// use '/' as the path separator in the default value in order to match the value in the resources file
+		// otherwise, the default value (from resources) and the default value (in code) will not match on all OSs
+		this.nemFolder = properties.getOptionalString("nem.folder", "%h/nem")
+				.replace("/", System.getProperty("file.separator"))
 				.replace("%h", this.getDefaultFolder());
+
 		this.maxThreads = properties.getInteger("nem.maxThreads");
 		this.protocol = properties.getOptionalString("nem.protocol", "http");
 		this.host = properties.getOptionalString("nem.host", "127.0.0.1");
@@ -73,7 +78,7 @@ public class CommonConfiguration {
 		this.useDosFilter = properties.getOptionalBoolean("nem.useDosFilter", true);
 		this.nonAuditedApiPaths = properties.getOptionalStringArray(
 				"nem.nonAuditedApiPaths",
-				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info");
+				"/heartbeat|/status|/chain/height|/push/transaction|/node/info|/node/extended-info|/account/get|/account/status");
 	}
 
 	//region basic settings

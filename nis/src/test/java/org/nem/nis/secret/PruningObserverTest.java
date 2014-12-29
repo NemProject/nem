@@ -174,33 +174,29 @@ public class PruningObserverTest {
 	@Test
 	public void timeBasedPruningIsTriggeredAtInitialTime() {
 		// Assert:
-		assertTimeBasedPruning(TimeInstant.ZERO, 0);
+		assertTimeBasedPruning(TimeInstant.ZERO);
 	}
 
 	@Test
-	public void timeBasedPruningIsTriggeredNearRetentionTime() {
+	public void timeBasedPruningIsTriggeredAtAllTimes() {
 		// Assert:
 		final TimeInstant relativeTime1 = TimeInstant.ZERO.addHours(RETENTION_HOURS);
-		assertTimeBasedPruning(relativeTime1.addSeconds(-1), 0);
-		assertTimeBasedPruning(relativeTime1, 0);
-		assertTimeBasedPruning(relativeTime1.addSeconds(1), 1);
+		assertTimeBasedPruning(relativeTime1.addSeconds(-1));
+		assertTimeBasedPruning(relativeTime1);
+		assertTimeBasedPruning(relativeTime1.addSeconds(1));
 
 		final TimeInstant relativeTime2 = TimeInstant.ZERO.addHours(2 * RETENTION_HOURS);
-		final int expectedTime2 = RETENTION_HOURS * 60 * 60;
-		assertTimeBasedPruning(relativeTime2.addSeconds(-1), expectedTime2 - 1);
-		assertTimeBasedPruning(relativeTime2, expectedTime2);
-		assertTimeBasedPruning(relativeTime2.addSeconds(1), expectedTime2 + 1);
+		assertTimeBasedPruning(relativeTime2.addSeconds(-1));
+		assertTimeBasedPruning(relativeTime2);
+		assertTimeBasedPruning(relativeTime2.addSeconds(1));
 
 		final TimeInstant relativeTime3 = TimeInstant.ZERO.addHours(3 * RETENTION_HOURS);
-		final int expectedTime3 = 2 * RETENTION_HOURS * 60 * 60;
-		assertTimeBasedPruning(relativeTime3.addSeconds(-1), expectedTime3 - 1);
-		assertTimeBasedPruning(relativeTime3, expectedTime3);
-		assertTimeBasedPruning(relativeTime3.addSeconds(1), expectedTime3 + 1);
+		assertTimeBasedPruning(relativeTime3.addSeconds(-1));
+		assertTimeBasedPruning(relativeTime3);
+		assertTimeBasedPruning(relativeTime3.addSeconds(1));
 	}
 
-	private static void assertTimeBasedPruning(
-			final TimeInstant notificationTime,
-			final int expectedTransactionHashCachePruningTime) {
+	private static void assertTimeBasedPruning(final TimeInstant notificationTime) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -213,7 +209,7 @@ public class PruningObserverTest {
 		context.observer.notify(notification, notificationContext);
 
 		// Assert:
-		context.assertTransactionHashCachePruning(new TimeInstant(expectedTransactionHashCachePruningTime));
+		context.assertTransactionHashCachePruning(notificationTime);
 	}
 
 	//endregion
@@ -279,7 +275,6 @@ public class PruningObserverTest {
 
 		private void assertTransactionHashCachePruning(final TimeInstant timeStamp) {
 			Mockito.verify(this.transactionHashCache, Mockito.times(1)).prune(timeStamp);
-			Mockito.verify(this.transactionHashCache, Mockito.times(1)).getRetentionTime();
 		}
 	}
 }
