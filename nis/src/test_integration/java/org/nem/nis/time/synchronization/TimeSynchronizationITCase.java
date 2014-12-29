@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class TimeSynchronizationITCase {
-	private static final int STANDARD_NETWORK_SIZE = 500;
+	private static final int STANDARD_NETWORK_SIZE = 100;
 	private static final int INITIAL_TIME_SPREAD = 50000;
 	private static final boolean REMOTE_RECEIVE_SEND_DELAY = true;
 	private static final boolean ASYMMETRIC_CHANNELS = true;

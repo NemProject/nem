@@ -20,7 +20,7 @@ public class TimeAwareNode {
 
 	private final Node node;
 	private NodeAge age;
-	private final TimeSynchronizationStrategy syncStrategy;
+	private TimeSynchronizationStrategy syncStrategy;
 	private final TimeOffset communicationDelay;
 	private final TimeOffset clockInaccuracy;
 	private TimeOffset cumulativeInaccuracy = new TimeOffset(0);

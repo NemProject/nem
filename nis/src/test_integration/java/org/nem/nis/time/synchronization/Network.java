@@ -54,7 +54,7 @@ public class Network {
 	private int nodeId = 1;
 	private final int viewSize;
 	private final NodeSettings nodeSettings;
-	private final TimeSynchronizationStrategy syncStrategy;
+	private TimeSynchronizationStrategy syncStrategy;
 	private AccountStateCache accountStateCache;
 	private PoiFacade poiFacade;
 	private long realTime = 0;
@@ -79,7 +79,7 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		this.accountStateCache = new DefaultAccountStateCache();
+		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		long cumulativeInaccuracy = 0;
@@ -253,8 +253,9 @@ public class Network {
 	}
 
 	private AccountStateCache resetCache() {
-		this.accountStateCache = new DefaultAccountStateCache();
+		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
+		this.syncStrategy = this.createSynchronizationStrategy();
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
@@ -281,7 +282,7 @@ public class Network {
 
 	private void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
 		try {
-			final Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
