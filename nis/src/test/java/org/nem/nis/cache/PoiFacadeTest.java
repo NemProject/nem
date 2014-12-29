@@ -54,18 +54,17 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void copyCopiesAllFields() {
 		// Arrange:
 		final BlockHeight height1 = G_HEIGHT_70_PLUS;
-
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
-		final DefaultPoiFacade facade = new DefaultPoiFacade(importanceCalculator);
+		final T facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
 		facade.recalculateImportances(height1, accountStates);
 
 		// Act:
-		final DefaultPoiFacade result = facade.copy();
+		final PoiFacade copyFacade = facade.copy();
 
 		// Assert:
-		Assert.assertThat(result.getLastPoiRecalculationHeight(), IsSame.sameInstance(facade.getLastPoiRecalculationHeight()));
-		Assert.assertThat(result.getLastPoiVectorSize(), IsEqual.equalTo(facade.getLastPoiVectorSize()));
+		Assert.assertThat(copyFacade.getLastPoiVectorSize(), IsEqual.equalTo(3));
+		Assert.assertThat(copyFacade.getLastPoiRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	//endregion
@@ -93,19 +92,18 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	public void shallowCopyCopiesAllFields() {
 		// Arrange:
 		final BlockHeight height1 = G_HEIGHT_70_PLUS;
-
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
-		final DefaultPoiFacade facade = new DefaultPoiFacade(importanceCalculator);
+		final T facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
 		facade.recalculateImportances(height1, accountStates);
 
 		// Act:
-		final DefaultPoiFacade result = new DefaultPoiFacade(importanceCalculator);
-		facade.shallowCopyTo(result);
+		final T copyFacade = this.createPoiFacade();
+		facade.shallowCopyTo(copyFacade);
 
 		// Assert:
-		Assert.assertThat(result.getLastPoiRecalculationHeight(), IsSame.sameInstance(facade.getLastPoiRecalculationHeight()));
-		Assert.assertThat(result.getLastPoiVectorSize(), IsEqual.equalTo(facade.getLastPoiVectorSize()));
+		Assert.assertThat(copyFacade.getLastPoiVectorSize(), IsEqual.equalTo(3));
+		Assert.assertThat(copyFacade.getLastPoiRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	//endregion
