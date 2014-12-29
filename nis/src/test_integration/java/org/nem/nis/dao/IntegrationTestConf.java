@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 import java.io.IOException;
 
+// TODO 20141229 J-G: do we need a separate TestConf for the integration tests?
+// > can you at least resolve (or delete) the todo below?
+
 @Configuration
 @ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = {
 		@ComponentScan.Filter(type = FilterType.ANNOTATION, value = org.springframework.stereotype.Controller.class)
