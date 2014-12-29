@@ -59,9 +59,13 @@ public class CommonConfiguration {
 	 */
 	public CommonConfiguration(final NemProperties properties) {
 		this.shortServerName = properties.getString("nem.shortServerName");
+
+		// use '/' as the path separator in the default value in order to match the value in the resources file
+		// otherwise, the default value (from resources) and the default value (in code) will not match on all OSs
 		this.nemFolder = properties.getOptionalString("nem.folder", "%h/nem")
 				.replace("/", System.getProperty("file.separator"))
 				.replace("%h", this.getDefaultFolder());
+
 		this.maxThreads = properties.getInteger("nem.maxThreads");
 		this.protocol = properties.getOptionalString("nem.protocol", "http");
 		this.host = properties.getOptionalString("nem.host", "127.0.0.1");
