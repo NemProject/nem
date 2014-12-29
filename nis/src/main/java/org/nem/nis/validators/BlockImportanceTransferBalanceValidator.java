@@ -39,6 +39,6 @@ public class BlockImportanceTransferBalanceValidator implements BlockValidator {
 		final boolean hasTransfer = block.getTransactions().stream()
 				.filter(t -> t.getType() == TransactionTypes.TRANSFER)
 				.anyMatch(t -> importanceTransfers.contains(((TransferTransaction)t).getRecipient().getAddress()));
-		return hasTransfer ? ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER : ValidationResult.SUCCESS;
+		return hasTransfer ? ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE : ValidationResult.SUCCESS;
 	}
 }
