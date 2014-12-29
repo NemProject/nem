@@ -31,10 +31,9 @@ public enum NotificationType {
 	Account,
 
 	/**
-	 * The notification represents a block harvest reward (this is different from BalanceCredit
-	 * because harvest fees can be forwarded whereas regular credits cannot).
+	 * The notification represents a block was harvested (and includes information about the harvester fees).
 	 */
-	HarvestReward,
+	BlockHarvest,
 
 	/**
 	 * The notification represents appearance/disappearance of transaction hashes.

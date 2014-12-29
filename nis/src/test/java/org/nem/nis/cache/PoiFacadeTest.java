@@ -1,6 +1,6 @@
 package org.nem.nis.cache;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.NemesisBlock;
@@ -50,6 +50,24 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), Mockito.any());
 	}
 
+	@Test
+	public void copyCopiesAllFields() {
+		// Arrange:
+		final BlockHeight height1 = G_HEIGHT_70_PLUS;
+
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final DefaultPoiFacade facade = new DefaultPoiFacade(importanceCalculator);
+		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
+		facade.recalculateImportances(height1, accountStates);
+
+		// Act:
+		final DefaultPoiFacade result = facade.copy();
+
+		// Assert:
+		Assert.assertThat(result.getLastPoiRecalculationHeight(), IsSame.sameInstance(facade.getLastPoiRecalculationHeight()));
+		Assert.assertThat(result.getLastPoiVectorSize(), IsEqual.equalTo(facade.getLastPoiVectorSize()));
+	}
+
 	//endregion
 
 	//region shallowCopyTo
@@ -71,14 +89,50 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), Mockito.any());
 	}
 
+	@Test
+	public void shallowCopyCopiesAllFields() {
+		// Arrange:
+		final BlockHeight height1 = G_HEIGHT_70_PLUS;
+
+		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
+		final DefaultPoiFacade facade = new DefaultPoiFacade(importanceCalculator);
+		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
+		facade.recalculateImportances(height1, accountStates);
+
+		// Act:
+		final DefaultPoiFacade result = new DefaultPoiFacade(importanceCalculator);
+		facade.shallowCopyTo(result);
+
+		// Assert:
+		Assert.assertThat(result.getLastPoiRecalculationHeight(), IsSame.sameInstance(facade.getLastPoiRecalculationHeight()));
+		Assert.assertThat(result.getLastPoiVectorSize(), IsEqual.equalTo(facade.getLastPoiVectorSize()));
+	}
+
 	//endregion
 
 	//region recalculateImportances
 
+	/**
+	 * The grouping calculation is always based on the previous block height:
+	 * - GroupedHeight.fromHeight(359 * N + 1) == 359 * N
+	 * - GroupedHeight.fromHeight(359 * N) == 359 * (N - 1)
+	 * X == GroupedHeight.fromHeight(X) is only true when X == 1.
+	 * createAccountStatesForRecalculateTests creates account using GROUPING * X * 10,
+	 * which is equal to the grouped height of (GROUPING * X * 10 + 1).
+	 */
+
+	private final static BlockHeight G_HEIGHT_A1 = new BlockHeight(359 * 10);
+	private final static BlockHeight G_HEIGHT_A2 = new BlockHeight(359 * 20);
+	private final static BlockHeight G_HEIGHT_20 = new BlockHeight(359 * 20 + 1);
+	private final static BlockHeight G_HEIGHT_A3 = new BlockHeight(359 * 30);
+	private final static BlockHeight G_HEIGHT_70 = new BlockHeight(359 * 70 + 1);
+	private final static BlockHeight G_HEIGHT_70_PLUS = new BlockHeight(359 * 70 + 200);
+	private final static List<BlockHeight> G_HEIGHTS_A1_TO_A3 = Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2, G_HEIGHT_A3);
+
 	@Test
 	public void recalculateImportancesDelegatesToImportanceGenerator() {
 		// Arrange:
-		final BlockHeight height = new BlockHeight(70);
+		final BlockHeight height = G_HEIGHT_70_PLUS;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
@@ -88,14 +142,14 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 
 		// Assert: the generator was called once and passed a collection with three accounts
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_70.prev()), argument.capture());
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
 	}
 
 	@Test
 	public void recalculateImportancesIgnoresAccountsWithGreaterHeight() {
 		// Arrange:
-		final BlockHeight height = new BlockHeight(20);
+		final BlockHeight height = G_HEIGHT_20;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
@@ -105,14 +159,14 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 
 		// Assert: the generator was called once and passed a collection with two accounts
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L)));
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_20.prev()), argument.capture());
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(G_HEIGHT_A1, G_HEIGHT_A2)));
 	}
 
 	@Test
 	public void recalculateImportancesIgnoresNemesisAccount() {
 		// Arrange:
-		final BlockHeight height = new BlockHeight(70);
+		final BlockHeight height = G_HEIGHT_70;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
@@ -123,8 +177,8 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 
 		// Assert: the generator was called once and passed a collection with three accounts (but not the nemesis account)
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
-		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_70.prev()), argument.capture());
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
 	}
 
 	@Test
@@ -134,44 +188,44 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 
 		// Act:
-		facade.recalculateImportances(new BlockHeight(7), new ArrayList<>());
-		facade.recalculateImportances(new BlockHeight(7), new ArrayList<>());
+		facade.recalculateImportances(G_HEIGHT_20, new ArrayList<>());
+		facade.recalculateImportances(G_HEIGHT_20, new ArrayList<>());
 
 		// Assert: the generator was only called once
-		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.any(), Mockito.any());
+		Mockito.verify(importanceCalculator, Mockito.times(1)).recalculate(Mockito.eq(G_HEIGHT_20.prev()), Mockito.any());
 	}
 
 	@Test
 	public void recalculateImportancesRecalculatesImportancesForNewBlockHeight() {
 		// Arrange:
-		final int height1 = 70;
-		final int height2 = 80;
+		final BlockHeight height1 = G_HEIGHT_20;
+		final BlockHeight height2 = G_HEIGHT_70;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
 
 		// Act:
-		facade.recalculateImportances(new BlockHeight(height1), accountStates);
-		facade.recalculateImportances(new BlockHeight(height2), accountStates);
+		facade.recalculateImportances(height1, accountStates);
+		facade.recalculateImportances(height2, accountStates);
 
 		// Assert: the generator was called twice and passed a collection with three accounts
 		final ArgumentCaptor<Collection<AccountState>> argument = createAccountStateCollectionArgumentCaptor();
 		Mockito.verify(importanceCalculator, Mockito.times(2)).recalculate(Mockito.any(), argument.capture());
-		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(Arrays.asList(10L, 20L, 30L)));
+		Assert.assertThat(this.heightsAsList(argument.getValue()), IsEquivalent.equivalentTo(G_HEIGHTS_A1_TO_A3));
 	}
 
 	@Test
 	public void recalculateImportancesUpdatesLastPoiVectorSize() {
 		// Arrange:
-		final int height1 = 70;
+		final BlockHeight height1 = G_HEIGHT_70_PLUS;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
 
 		// Act:
-		facade.recalculateImportances(new BlockHeight(height1), accountStates);
+		facade.recalculateImportances(height1, accountStates);
 
 		// Assert:
 		Assert.assertThat(facade.getLastPoiVectorSize(), IsEqual.equalTo(3));
@@ -180,32 +234,32 @@ public abstract class PoiFacadeTest<T extends CopyableCache<T> & PoiFacade> {
 	@Test
 	public void recalculateImportancesUpdatesLastPoiRecalculationHeight() {
 		// Arrange:
-		final int height1 = 70;
+		final BlockHeight height1 = G_HEIGHT_70_PLUS;
 		final ImportanceCalculator importanceCalculator = Mockito.mock(ImportanceCalculator.class);
 
 		final PoiFacade facade = this.createPoiFacade(importanceCalculator);
 		final List<AccountState> accountStates = createAccountStatesForRecalculateTests(3);
 
 		// Act:
-		facade.recalculateImportances(new BlockHeight(height1), accountStates);
+		facade.recalculateImportances(height1, accountStates);
 
 		// Assert:
-		Assert.assertThat(facade.getLastPoiRecalculationHeight(), IsEqual.equalTo(new BlockHeight(70)));
+		Assert.assertThat(facade.getLastPoiRecalculationHeight(), IsEqual.equalTo(G_HEIGHT_70.prev()));
 	}
 
 	private static List<AccountState> createAccountStatesForRecalculateTests(final int numAccounts) {
 		final List<AccountState> accountStates = new ArrayList<>();
 		for (int i = 0; i < numAccounts; ++i) {
 			accountStates.add(new AccountState(Utils.generateRandomAddress()));
-			accountStates.get(i).setHeight(new BlockHeight((i + 1) * 10));
+			accountStates.get(i).setHeight(new BlockHeight(359 * ((i + 1) * 10)));
 		}
 
 		return accountStates;
 	}
 
-	private List<Long> heightsAsList(final Collection<AccountState> accountStates) {
+	private List<BlockHeight> heightsAsList(final Collection<AccountState> accountStates) {
 		return accountStates.stream()
-				.map(as -> as.getHeight().getRaw())
+				.map(AccountState::getHeight)
 				.collect(Collectors.toList());
 	}
 

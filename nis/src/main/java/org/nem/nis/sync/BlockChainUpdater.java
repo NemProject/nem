@@ -4,7 +4,7 @@ import org.nem.core.connect.FatalPeerException;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.node.*;
+import org.nem.core.node.Node;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.*;
@@ -19,8 +19,6 @@ import org.nem.peer.connect.*;
 
 import java.util.*;
 import java.util.logging.Logger;
-
-// TODO 20140920 J-* this class needs tests!!!
 
 /**
  * Facade for updating a block chain.
@@ -83,21 +81,14 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
-		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache().asAutoCache());
+		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
 		final ComparisonResult result = this.compareChains(connector, context.createLocalBlockLookup(), node);
 
 		switch (result.getCode()) {
 			case REMOTE_IS_SYNCED:
 			case REMOTE_REPORTED_EQUAL_CHAIN_SCORE:
-				// TODO Remove this ugly fix in the next release!
-				final NodeVersion version = node.getMetaData().getVersion();
-				final boolean canHandleUTRequest =
-						(version.getMinorVersion() >= 4 && version.getBuildVersion() > 40) ||
-								"DEVELOPER BUILD".equals(version.getTag());
 				final Collection<Transaction> unconfirmedTransactions =
-						canHandleUTRequest
-								? connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()))
-								: connector.getUnconfirmedTransactions(node, null);
+						connector.getUnconfirmedTransactions(node, new UnconfirmedTransactionsRequest(this.unconfirmedTransactions.getAll()));
 				synchronized (this) {
 					this.unconfirmedTransactions.addNewBatch(unconfirmedTransactions);
 				}
@@ -233,7 +224,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private Block remapBlock(final Block block, final AccountCache accountCache) {
 		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-		return BlockMapper.toModel(dbBlock, accountCache.asAutoCache());
+		return BlockMapper.toModel(dbBlock, accountCache);
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {

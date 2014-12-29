@@ -1,6 +1,6 @@
 package org.nem.nis.controller.requests;
 
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 import org.nem.peer.node.*;
 
 /**
@@ -12,7 +12,6 @@ import org.nem.peer.node.*;
  * have a constructor that accepts a single Deserializer parameter.
  */
 public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRequest<UnconfirmedTransactionsRequest> {
-	private static int availableBytes = 0;
 
 	/**
 	 * Creates a new authenticated request.
@@ -39,12 +38,6 @@ public class AuthenticatedUnconfirmedTransactionsRequest extends AuthenticatedRe
 	 * @param deserializer The deserializer
 	 */
 	public AuthenticatedUnconfirmedTransactionsRequest(final Deserializer deserializer) {
-		// TODO Remove this ugly fix in the next release!
-		super((availableBytes = ((BinaryDeserializer)deserializer).availableBytes()) > 68
-						? deserializer.readObject("entity", UnconfirmedTransactionsRequest::new)
-						: new UnconfirmedTransactionsRequest(),
-				availableBytes > 68
-						? deserializer.readObject("challenge", NodeChallenge::new)
-						: new NodeChallenge(deserializer));
+		super(deserializer.readObject("entity", UnconfirmedTransactionsRequest::new), deserializer.readObject("challenge", NodeChallenge::new));
 	}
 }

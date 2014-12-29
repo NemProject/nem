@@ -34,7 +34,7 @@ public enum RemoteStatus {
 
 	/**
 	 * Queried account is a remote, remote harvesting is inactive.
-	 *
+	 * <br/>
 	 * note: this indicates, that account was at some point used as a remote account.
 	 */
 	REMOTE_INACTIVE,

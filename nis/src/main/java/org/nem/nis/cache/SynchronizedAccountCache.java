@@ -1,14 +1,10 @@
 package org.nem.nis.cache;
 
-import org.nem.core.model.*;
-import org.nem.core.serialization.AccountLookup;
-
 /**
  * A synchronized AccountCache implementation.
  */
-public class SynchronizedAccountCache implements AccountCache, CopyableCache<SynchronizedAccountCache> {
+public class SynchronizedAccountCache extends BasicSynchronizedAccountCache implements ExtendedAccountCache<SynchronizedAccountCache> {
 	private final DefaultAccountCache accountCache;
-	private final Object lock = new Object();
 
 	/**
 	 * Creates a new cache.
@@ -16,55 +12,14 @@ public class SynchronizedAccountCache implements AccountCache, CopyableCache<Syn
 	 * @param accountCache The account cache.
 	 */
 	public SynchronizedAccountCache(final DefaultAccountCache accountCache) {
+		super(accountCache);
 		this.accountCache = accountCache;
 	}
 
 	@Override
-	public Account addAccountToCache(final Address address) {
+	public AccountCache asAutoCache() {
 		synchronized (this.lock) {
-			return this.accountCache.addAccountToCache(address);
-		}
-	}
-
-	@Override
-	public void removeFromCache(final Address address) {
-		synchronized (this.lock) {
-			this.accountCache.removeFromCache(address);
-		}
-	}
-
-	@Override
-	public AccountLookup asAutoCache() {
-		synchronized (this.lock) {
-			return this.accountCache.asAutoCache();
-		}
-	}
-
-	@Override
-	public int size() {
-		synchronized (this.lock) {
-			return this.accountCache.size();
-		}
-	}
-
-	@Override
-	public CacheContents<Account> contents() {
-		synchronized (this.lock) {
-			return this.accountCache.contents();
-		}
-	}
-
-	@Override
-	public Account findByAddress(final Address id) {
-		synchronized (this.lock) {
-			return this.accountCache.findByAddress(id);
-		}
-	}
-
-	@Override
-	public boolean isKnownAddress(final Address id) {
-		synchronized (this.lock) {
-			return this.accountCache.isKnownAddress(id);
+			return new BasicSynchronizedAccountCache(this.lock, this.accountCache.asAutoCache());
 		}
 	}
 

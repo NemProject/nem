@@ -53,6 +53,19 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 		return new DefaultNisCacheCopy(this);
 	}
 
+	/**
+	 * Creates a deep copy of this NIS cache.
+	 *
+	 * @return The deep copy.
+	 */
+	public DefaultNisCache deepCopy() {
+		return new DefaultNisCache(
+				this.accountCache.copy(),
+				this.accountStateCache.copy(),
+				this.poiFacade.copy(),
+				this.transactionHashCache.copy());
+	}
+
 	private static class DefaultNisCacheCopy implements NisCache {
 		private final DefaultNisCache cache;
 		private final SynchronizedAccountCache accountCache;
@@ -70,12 +83,12 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 
 		@Override
 		public AccountCache getAccountCache() {
-			return this.accountCache;
+			return this.accountCache.asAutoCache();
 		}
 
 		@Override
 		public AccountStateCache getAccountStateCache() {
-			return this.accountStateCache;
+			return this.accountStateCache.asAutoCache();
 		}
 
 		@Override

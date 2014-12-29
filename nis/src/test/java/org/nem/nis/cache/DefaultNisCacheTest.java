@@ -5,6 +5,8 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.ExceptionAssert;
 
+import java.util.function.Function;
+
 public class DefaultNisCacheTest {
 
 	@Test
@@ -31,13 +33,26 @@ public class DefaultNisCacheTest {
 
 	@Test
 	public void copyCreatesNewCacheByDelegatingToComponents() {
+		// Assert:
+		assertFunctionCreatesNewCacheByDelegatingToComponents(DefaultNisCache::copy, true);
+	}
+
+	@Test
+	public void deepCopyCreatesNewCacheByDelegatingToComponents() {
+		// Assert:
+		assertFunctionCreatesNewCacheByDelegatingToComponents(DefaultNisCache::deepCopy, false);
+	}
+
+	private static void assertFunctionCreatesNewCacheByDelegatingToComponents(
+			final Function<DefaultNisCache, ReadOnlyNisCache> createCopy,
+			final boolean isCopyAutoCached) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final TestContext context2 = new TestContext();
 		setupCopy(context, context2);
 
 		// Act:
-		final NisCache copy = context.cache.copy();
+		final ReadOnlyNisCache copy = createCopy.apply(context.cache);
 
 		// Assert:
 		Mockito.verify(context.accountCache, Mockito.only()).copy();
@@ -45,8 +60,14 @@ public class DefaultNisCacheTest {
 		Mockito.verify(context.poiFacade, Mockito.only()).copy();
 		Mockito.verify(context.transactionsHashCache, Mockito.only()).copy();
 
-		Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
-		Assert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
+		if (isCopyAutoCached) {
+			Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountAutoCache));
+			Assert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateAutoCache));
+		} else {
+			Assert.assertThat(copy.getAccountCache(), IsSame.sameInstance(context2.accountCache));
+			Assert.assertThat(copy.getAccountStateCache(), IsSame.sameInstance(context2.accountStateCache));
+		}
+
 		Assert.assertThat(copy.getPoiFacade(), IsSame.sameInstance(context2.poiFacade));
 		Assert.assertThat(copy.getTransactionHashCache(), IsSame.sameInstance(context2.transactionsHashCache));
 	}
@@ -87,14 +108,19 @@ public class DefaultNisCacheTest {
 		Mockito.when(original.accountStateCache.copy()).thenReturn(copy.accountStateCache);
 		Mockito.when(original.poiFacade.copy()).thenReturn(copy.poiFacade);
 		Mockito.when(original.transactionsHashCache.copy()).thenReturn(copy.transactionsHashCache);
+
+		Mockito.when(copy.accountCache.asAutoCache()).thenReturn(copy.accountAutoCache);
+		Mockito.when(copy.accountStateCache.asAutoCache()).thenReturn(copy.accountStateAutoCache);
 	}
 
-	private class TestContext {
+	private static class TestContext {
 		private final SynchronizedAccountCache accountCache = Mockito.mock(SynchronizedAccountCache.class);
+		private final AccountCache accountAutoCache = Mockito.mock(AccountCache.class);
 		private final SynchronizedAccountStateCache accountStateCache = Mockito.mock(SynchronizedAccountStateCache.class);
+		private final AccountStateCache accountStateAutoCache = Mockito.mock(AccountStateCache.class);
 		private final SynchronizedPoiFacade poiFacade = Mockito.mock(SynchronizedPoiFacade.class);
 		private final SynchronizedHashCache transactionsHashCache = Mockito.mock(SynchronizedHashCache.class);
-		private final ReadOnlyNisCache cache = new DefaultNisCache(
+		private final DefaultNisCache cache = new DefaultNisCache(
 				this.accountCache,
 				this.accountStateCache,
 				this.poiFacade,

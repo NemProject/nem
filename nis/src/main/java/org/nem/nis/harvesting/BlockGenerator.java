@@ -75,7 +75,7 @@ public class BlockGenerator {
 			return null;
 		}
 
-		LOGGER.info(String.format("[HIT] forger balance: %s", this.blockScorer.calculateForgerBalance(newBlock)));
+		LOGGER.info(String.format("[HIT] harvester balance: %s", this.blockScorer.calculateHarvesterBalance(newBlock)));
 		LOGGER.info(String.format("[HIT] last block: %s", newBlock.getPreviousBlockHash()));
 		LOGGER.info(String.format("[HIT] timestamp diff: %s", newBlock.getTimeStamp().subtract(lastBlock.getTimeStamp())));
 		LOGGER.info(String.format("[HIT] block diff: %s", newBlock.getDifficulty()));

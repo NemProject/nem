@@ -25,7 +25,7 @@ public class PruningObserverTest {
 	@Test
 	public void noPruningIsTriggeredWhenNotificationTriggerIsNotExecute() {
 		// Assert:
-		assertNoPruning(432001, 1, NotificationTrigger.Undo, NotificationType.HarvestReward);
+		assertNoPruning(432001, 1, NotificationTrigger.Undo, NotificationType.BlockHarvest);
 	}
 
 	@Test
@@ -39,7 +39,7 @@ public class PruningObserverTest {
 		// Assert:
 		for (int i = 1; i < 1000; ++i) {
 			if (1 != (i % PRUNE_INTERVAL)) {
-				assertNoPruning(i, 1, NotificationTrigger.Execute, NotificationType.HarvestReward);
+				assertNoPruning(i, 1, NotificationTrigger.Execute, NotificationType.BlockHarvest);
 			}
 		}
 	}
@@ -146,7 +146,7 @@ public class PruningObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final Notification notification = createAdjustmentNotification(NotificationType.HarvestReward);
+		final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);
 		final BlockNotificationContext notificationContext = new BlockNotificationContext(
 				new BlockHeight(notificationHeight),
 				TimeInstant.ZERO,
@@ -205,7 +205,7 @@ public class PruningObserverTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final Notification notification = createAdjustmentNotification(NotificationType.HarvestReward);
+		final Notification notification = createAdjustmentNotification(NotificationType.BlockHarvest);
 		final BlockNotificationContext notificationContext = new BlockNotificationContext(
 				BlockHeight.ONE,
 				notificationTime,

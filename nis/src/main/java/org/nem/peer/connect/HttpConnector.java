@@ -105,17 +105,11 @@ public class HttpConnector implements PeerConnector, SyncConnector, TimeSynchron
 	@Override
 	public Collection<Transaction> getUnconfirmedTransactions(final Node node, final UnconfirmedTransactionsRequest unconfirmedTransactionsRequest) {
 		final URL url = getUrl(node, NisPeerId.REST_TRANSACTIONS_UNCONFIRMED);
-		// TODO Remove this ugly fix in the next release!
-		return null != unconfirmedTransactionsRequest
-				? this.postAuthenticated(
+		return this.postAuthenticated(
 				url,
 				node.getIdentity(),
 				d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE),
-				unconfirmedTransactionsRequest).join().asCollection()
-				: this.postAuthenticated(
-				url,
-				node.getIdentity(),
-				d -> new SerializableList<>(d, TransactionFactory.VERIFIABLE)).join().asCollection();
+				unconfirmedTransactionsRequest).join().asCollection();
 	}
 
 	@Override

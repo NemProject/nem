@@ -6,8 +6,9 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.state.ReadOnlyAccountState;
+import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -261,16 +262,29 @@ public class UnconfirmedTransactions {
 	 */
 	public void removeAll(final Block block) {
 		synchronized (this.lock) {
-			// this is ugly but we cannot let an exception bubble up because NIS would need a restart.
+			// This is ugly but we cannot let an exception bubble up because NIS would need a restart.
 			// The exception means we have to rebuild the cache because it is corrupt.
-			// In theory it should never throw here.
+			// This can happen during synchronization. Consider the following scenario:
+			// The complete blockchain has height y and our blockchain has height x < y.
+			// At height y account A has 100 NEM confirmed balance and at height x it has 0 NEM confirmed balance.
+			// Another account B has enough NEM for transactions at all considered heights.
+			// Our node receives an unconfirmed tx T1: B -> A 10 NEM (+1 NEM fee) which is old and was included in the block at height x + 1.
+			// Our node does not know about block x + 1 yet so it accepts T1 as unconfirmed transaction.
+			// Our node pulls block x + 1 via synchronizeNode(). After validation, execution and committing the NisCache
+			// the unconfirmed balance of account A that our node sees is
+			// unconfirmed = 10 NEM (confirmed) + 10 NEM (still credited amount) - 0 NEM (debited amount) = 20 NEM.
+			// At this point (i.e. before removeAll() is called for block x + 1) our node receives another unconfirmed transaction
+			// T2: A -> B 15 NEM (+1 NEM fee). The transaction is valid since our node sees 20 NEM as unconfirmed balance for account A and thus is accepted.
+			// Our node now sees 4 NEM as unconfirmed balance for account A
+			// Now removeAll() is called for block x + 1 and this triggers T1.undo() which results in an illegal argument exception (4 - 10 < 0).
+			// The scenario shows that exceptions can occur in a natural way and we therefore ought to catch them here.
 			try {
 				// undo in reverse order!
 				for (final Transaction transaction : getReverseTransactions(block)) {
 					this.remove(transaction);
 				}
-			} catch (final Exception e) { // TODO 20141218 J-B: can we at least catch a more specific exception? we can't really recover from every possible failure
-				LOGGER.severe("exception during removal of unconfirmed transactions, rebuilding cache");
+			} catch (final NegativeBalanceException e) {
+				LOGGER.severe("illegal argument exception during removal of unconfirmed transactions, rebuilding cache");
 				this.rebuildCache(this.getAll());
 				return;
 			}
@@ -420,7 +434,9 @@ public class UnconfirmedTransactions {
 		this.transactions.clear();
 		this.pendingTransactions.clear();
 		this.unconfirmedBalances.clearCache();
-		this.addNewBatch(transactions);
+
+		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
+		transactions.stream().forEach(t -> this.addNew(t));
 	}
 
 	/**
@@ -475,78 +491,6 @@ public class UnconfirmedTransactions {
 							.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
 							.collect(Collectors.toList()),
 					BalanceValidationOptions.ValidateAgainstConfirmedBalance);
-		}
-	}
-
-	// TODO 20141218 J-B: changes look pretty good, nice job; i have a few comments:
-	// > it might make sense to pull UnconfirmedBalancesObserver out into its own class so we can test it more directly
-	// > should definitely add tests for the cases that trigger the cache rebuild (since this is presumably the source of our bugs)
-	private static class UnconfirmedBalancesObserver implements TransferObserver {
-		private final ReadOnlyAccountStateCache accountStateCache;
-		private final Map<Account, Amount> creditedAmounts = new ConcurrentHashMap<>();
-		private final Map<Account, Amount> debitedAmounts = new ConcurrentHashMap<>();
-
-		public UnconfirmedBalancesObserver(final ReadOnlyAccountStateCache accountStateCache) {
-			this.accountStateCache = accountStateCache;
-		}
-
-		public Amount get(final Account account) {
-			return this.getBalance(account).add(this.getCreditedAmount(account)).subtract(this.getDebitedAmount(account));
-		}
-
-		@Override
-		public void notifyTransfer(final Account sender, final Account recipient, final Amount amount) {
-			this.notifyDebit(sender, amount);
-			this.notifyCredit(recipient, amount);
-		}
-
-		@Override
-		public void notifyCredit(final Account account, final Amount amount) {
-			this.addToCache(account);
-			final Amount newCreditedAmount = this.getCreditedAmount(account).add(amount);
-			this.creditedAmounts.replace(account, newCreditedAmount);
-		}
-
-		@Override
-		public void notifyDebit(final Account account, final Amount amount) {
-			this.addToCache(account);
-			final Amount newDebitedAmount = this.getDebitedAmount(account).add(amount);
-			// should not be necessary but do it anyway as check
-			this.getBalance(account).add(this.getCreditedAmount(account)).subtract(newDebitedAmount);
-			this.debitedAmounts.replace(account, newDebitedAmount);
-		}
-
-		private void addToCache(final Account account) {
-			// it's ok to put reference here, thanks to Account being non-mutable
-			this.creditedAmounts.putIfAbsent(account, Amount.ZERO);
-			this.debitedAmounts.putIfAbsent(account, Amount.ZERO);
-		}
-
-		private void clearCache() {
-			this.creditedAmounts.clear();
-			this.debitedAmounts.clear();
-		}
-
-		private boolean unconfirmedBalancesAreValid() {
-			for (final Account account : this.creditedAmounts.keySet()) {
-				if (this.getBalance(account).add(this.getCreditedAmount(account)).compareTo(this.getDebitedAmount(account)) < 0) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		private Amount getBalance(final Account account) {
-			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
-		}
-
-		private Amount getCreditedAmount(final Account account) {
-			return this.creditedAmounts.getOrDefault(account, Amount.ZERO);
-		}
-
-		private Amount getDebitedAmount(final Account account) {
-			return this.debitedAmounts.getOrDefault(account, Amount.ZERO);
 		}
 	}
 }

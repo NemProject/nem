@@ -78,15 +78,19 @@ public class AccountController {
 
 	/**
 	 * Checks if given account is unlocked.
-	 * TODO 20141214: J-J i'd rather pass in something other than a private key here (address) !
-	 * > Also should have two tests one for when account is unlocked and one for when it's not
 	 *
-	 * @param privateKey The private key of the account to lock.
+	 * @param address The address of the account to check.
 	 */
 	@RequestMapping(value = "/account/isunlocked", method = RequestMethod.POST)
 	@ClientApi
-	public String accountIsUnlocked(@RequestBody final PrivateKey privateKey) {
-		final Account account = new Account(new KeyPair(privateKey));
+	public String accountIsUnlocked(@RequestBody final Address address) {
+		final Account account = new Account(address);
+		// TODO 20141222 BR: I guess the attack gimre described is not that severe?
+		// TODO 20141222 J-*: I didn't think it was so severe, as this can still be figured out by which machine
+		// > is originating the block (but harder), and the ecosystem make nicer graphs
+		// TODO 20141229 G-J: but it makes harvesting script more complicated, cause
+		// > if you want turn harvesting on and check if it's actually harvesting you need both
+		// > private key and address...
 		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
 	}
 
