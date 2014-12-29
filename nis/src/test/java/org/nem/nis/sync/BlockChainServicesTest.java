@@ -10,6 +10,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.BlockChainValidator;
 import org.nem.nis.NisMain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
@@ -47,6 +48,38 @@ public class BlockChainServicesTest {
 
 		// Act+Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
+	}
+
+	// The idea is to check if inner transaction gets to the hash transaction cache
+	@Test
+	public void chainIsInvalidIfContainsMultipleMultisigTransactionsWithSameInnerTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		final Block parentBlock = createParentBlock(blockSigner, 11);
+		parentBlock.sign();
+
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
+		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
+		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
+		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
+		transaction1.sign();
+
+		final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
+		transaction2.setDeadline(transaction2.getTimeStamp().addSeconds(11));
+		transaction2.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
+		final Block block = blocks.get(1);
+		block.addTransaction(transaction1);
+		block.addTransaction(transaction2);
+		block.sign();
+
+		final boolean result = context.isValid(parentBlock, blocks);
+
+		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	private static Block createParentBlock(final Account account, final long height) {
