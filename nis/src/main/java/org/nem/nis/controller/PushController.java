@@ -8,8 +8,6 @@ import org.nem.peer.SecureSerializableEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.logging.Logger;
-
 /**
  * This controller will handle data propagation:
  * * /push/transaction - for what is now model.Transaction
@@ -21,8 +19,6 @@ import java.util.logging.Logger;
  */
 @RestController
 public class PushController {
-	private static final Logger LOGGER = Logger.getLogger(PushController.class.getName());
-
 	private final PushService pushService;
 
 	@Autowired(required = true)
@@ -50,11 +46,7 @@ public class PushController {
 	@RequestMapping(value = "/push/block", method = RequestMethod.POST)
 	@P2PApi
 	public void pushBlock(@RequestBody final Deserializer deserializer) {
-		LOGGER.info("[start] /push/block");
 		final SecureSerializableEntity<Block> secureEntity = new SecureSerializableEntity<>(deserializer, BlockFactory.VERIFIABLE);
 		this.pushService.pushBlock(secureEntity.getEntity(), secureEntity.getIdentity());
-		LOGGER.info(String.format("[end] /push/block height: %s; signer: %s",
-				secureEntity.getEntity().getHeight(),
-				secureEntity.getEntity().getSigner()));
 	}
 }

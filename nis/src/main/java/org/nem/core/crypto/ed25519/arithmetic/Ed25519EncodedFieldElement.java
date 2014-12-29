@@ -416,7 +416,6 @@ public class Ed25519EncodedFieldElement {
 		s12 += carry11;
 		s11 -= carry11 << 21;
 
-		// TODO-CR BR: Is it really needed to do it TWO times? (it doesn't hurt, just a question).
 		s0 += s12 * 666643;
 		s1 += s12 * 470296;
 		s2 += s12 * 654183;

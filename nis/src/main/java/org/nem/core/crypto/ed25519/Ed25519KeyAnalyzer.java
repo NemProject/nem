@@ -14,7 +14,6 @@ public class Ed25519KeyAnalyzer implements KeyAnalyzer {
 			return false;
 		}
 
-		// TODO 20141005 BR: more tests?
 		return true;
 	}
 }

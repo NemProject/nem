@@ -7,7 +7,6 @@ public class KeyPair {
 
 	/**
 	 * Creates a random key pair.
-	 * TODO 20141018: change constructors to factory functions.
 	 */
 	public KeyPair() {
 		final KeyGenerator generator = CryptoEngines.defaultEngine().createKeyGenerator();
