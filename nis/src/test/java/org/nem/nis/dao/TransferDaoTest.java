@@ -30,7 +30,6 @@ import static org.hamcrest.core.IsNull.notNullValue;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransferDaoTest {
-	private static final Logger LOGGER = Logger.getLogger(TransferDaoTest.class.getName());
 	private static final int USE_HASH = 1;
 	private static final int USE_ID = 2;
 	private static final int DEFAULT_LIMIT = 25;
@@ -838,29 +837,6 @@ public class TransferDaoTest {
 
 		// Assert:
 		Assert.assertThat(exists, IsEqual.equalTo(false));
-	}
-
-	// TODO: Move to integration test?
-	// TODO 20141205 BR: I guess we can delete this since we have the transaction cache
-	@Ignore
-	@Test
-	public void anyHashExistsIsFastEnough() {
-		// Arrange:
-		this.saveThreeBlocksWithTransactionsInDatabase(10000);
-		final Collection<Hash> hashes = new ArrayList<>();
-		for (int i = 0; i < 10000; i++) {
-			hashes.add(new Hash(Utils.generateRandomBytes(32)));
-		}
-
-		// Act: second parameter is maximum block height
-		final long start = System.currentTimeMillis();
-		final boolean exists = this.transferDao.anyHashExists(hashes, new BlockHeight(3));
-		final long stop = System.currentTimeMillis();
-		LOGGER.info(String.format("anyHashExists need %dms.", stop - start));
-
-		// Assert:
-		Assert.assertThat(exists, IsEqual.equalTo(false));
-		Assert.assertThat(stop - start < 1000, IsEqual.equalTo(true));
 	}
 
 	private List<Hash> saveThreeBlocksWithTransactionsInDatabase(final int transactionsPerBlock) {
