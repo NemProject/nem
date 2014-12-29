@@ -343,7 +343,7 @@ public class Network {
 		while (tries < maxTries && hits < this.viewSize) {
 			final int index = this.random.nextInt(this.nodes.size());
 			final AccountState state = this.accountStateCache.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
-			if (!nodeArray[index].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+			if (!nodeArray[index].equals(node) && this.isEligiblePartner(state)) {
 				hits++;
 				partners.add(nodeArray[index]);
 				if (nodeArray[index].isEvil()) {
@@ -357,7 +357,7 @@ public class Network {
 			// There might be just too many evil nodes. Let's assume we use one pretrusted node if we meet this case in a real environment.
 			for (int i = 0; i < this.nodes.size(); i++) {
 				final AccountState state = this.accountStateCache.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
-				if (!nodeArray[i].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+				if (!nodeArray[i].equals(node) && this.isEligiblePartner(state)) {
 					partners.add(nodeArray[i]);
 					break;
 				}
@@ -365,6 +365,11 @@ public class Network {
 		}
 
 		return partners;
+	}
+
+	private boolean isEligiblePartner(final AccountState state) {
+		final double adjustedMinimumImportance = TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE * 500 / this.nodes.size();
+		return adjustedMinimumImportance < state.getImportanceInfo().getImportance(HEIGHT);
 	}
 
 	/**
