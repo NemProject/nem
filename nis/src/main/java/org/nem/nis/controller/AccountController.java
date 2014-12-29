@@ -88,6 +88,9 @@ public class AccountController {
 		// TODO 20141222 BR: I guess the attack gimre described is not that severe?
 		// TODO 20141222 J-*: I didn't think it was so severe, as this can still be figured out by which machine
 		// > is originating the block (but harder), and the ecosystem make nicer graphs
+		// TODO 20141229 G-J: but it makes harvesting script more complicated, cause
+		// > if you want turn harvesting on and check if it's actually harvesting you need both
+		// > private key and address...
 		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
 	}
 
