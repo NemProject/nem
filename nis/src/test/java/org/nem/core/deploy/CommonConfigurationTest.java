@@ -84,9 +84,18 @@ public class CommonConfigurationTest {
 		Assert.assertThat(config.getHost(), IsEqual.equalTo("127.0.0.1"));
 		Assert.assertThat(config.getShutdownPath(), IsEqual.equalTo("/shutdown"));
 		Assert.assertThat(config.useDosFilter(), IsEqual.equalTo(true));
-		Assert.assertThat(
-				config.getNonAuditedApiPaths(),
-				IsEqual.equalTo(new String[] { "/heartbeat", "/status", "/chain/height", "/push/transaction", "/node/info", "/node/extended-info" }));
+
+		final String[] expectedNonAuditedApiPaths = new String[] {
+				"/heartbeat",
+				"/status",
+				"/chain/height",
+				"/push/transaction",
+				"/node/info",
+				"/node/extended-info",
+				"/account/get",
+				"/account/status"
+		};
+		Assert.assertThat(config.getNonAuditedApiPaths(), IsEqual.equalTo(expectedNonAuditedApiPaths));
 	}
 
 	private static void assertCustomRequiredConfiguration(final CommonConfiguration config) {
