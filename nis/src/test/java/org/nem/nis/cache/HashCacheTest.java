@@ -344,7 +344,7 @@ public abstract class HashCacheTest<T extends CopyableCache<T> & HashCache> {
 		cache.put(new HashMetaDataPair(hash2, createMetaDataWithTimeStamp(234)));
 
 		// Act:
-		cache.prune(new TimeInstant(500));
+		cache.prune(new TimeInstant(RetentionTime + 500));
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(2));

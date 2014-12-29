@@ -8,18 +8,11 @@ import java.util.List;
 
 /**
  * A transaction hash cache.
- * TODO 20141212 J-B: i'm not sure if it makes sense for this object to know about it's retention time
- * > since it isn't using it. I think it might make more sense for either (1) the caller to manage the retention time
- * > or (2) this object to do the retention time calculation in prune. thoughts?
- * TODO 20141222 BR -> J: I don't like (1) because 2 callers could call with different retention times on the same cache.
- * > If caller 1 relies on 12 hours cache and caller 2 on only 3 hours, caller 1 could experience a disaster.
- * > So I would prefer (2), pass the current time, the cache calculates the pruning time and does the pruning.
- * TODO 20141222 BR -> J: i like (2) as well
  */
 public interface HashCache extends ReadOnlyHashCache {
 
 	/**
-	 * Removes all elements that have time stamp prior to the given time stamp - retention time.
+	 * Removes all elements that have time stamp prior to the given time stamp minus retention time.
 	 *
 	 * @param timeStamp The time stamp.
 	 */

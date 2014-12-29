@@ -108,12 +108,12 @@ public class DefaultHashCache implements HashCache, CopyableCache<DefaultHashCac
 			return;
 		}
 
-		final TimeInstant pruneTime = this.getPruneTime(timeStamp, this.retentionTime);
+		final TimeInstant pruneTime = this.getPruneTime(timeStamp);
 		this.hashMap.entrySet().removeIf(entry -> entry.getValue().getTimeStamp().compareTo(pruneTime) < 0);
 	}
 
-	private TimeInstant getPruneTime(final TimeInstant currentTime, final int retentionHours) {
-		final TimeInstant retentionTime = TimeInstant.ZERO.addHours(retentionHours);
+	private TimeInstant getPruneTime(final TimeInstant currentTime) {
+		final TimeInstant retentionTime = TimeInstant.ZERO.addHours(this.retentionTime);
 		return new TimeInstant(currentTime.compareTo(retentionTime) <= 0 ? 0 : currentTime.subtract(retentionTime));
 	}
 

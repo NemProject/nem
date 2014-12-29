@@ -177,10 +177,8 @@ public class PruningObserverTest {
 		assertTimeBasedPruning(TimeInstant.ZERO);
 	}
 
-	// TODO 20141227 BR -> J: I am not sure what this test should prove (even the original one), pruning takes place every time prune()
-	// > is called, not only at specific time instances.
 	@Test
-	public void timeBasedPruningIsTriggeredNearRetentionTime() {
+	public void timeBasedPruningIsTriggeredAtAllTimes() {
 		// Assert:
 		final TimeInstant relativeTime1 = TimeInstant.ZERO.addHours(RETENTION_HOURS);
 		assertTimeBasedPruning(relativeTime1.addSeconds(-1));
@@ -198,8 +196,7 @@ public class PruningObserverTest {
 		assertTimeBasedPruning(relativeTime3.addSeconds(1));
 	}
 
-	private static void assertTimeBasedPruning(
-			final TimeInstant notificationTime) {
+	private static void assertTimeBasedPruning(final TimeInstant notificationTime) {
 		// Arrange:
 		final TestContext context = new TestContext();
 
