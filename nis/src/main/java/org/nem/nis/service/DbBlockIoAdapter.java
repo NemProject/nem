@@ -3,9 +3,8 @@ package org.nem.nis.service;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +13,12 @@ import java.util.MissingResourceException;
 @Service
 public class DbBlockIoAdapter implements BlockIo {
 	private final ReadOnlyBlockDao blockDao;
-	private final AccountLookup accountLookup;
+	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
-	public DbBlockIoAdapter(final ReadOnlyBlockDao blockDao, final AccountLookup accountLookup) {
+	public DbBlockIoAdapter(final ReadOnlyBlockDao blockDao, final NisDbModelToModelMapper mapper) {
 		this.blockDao = blockDao;
-		this.accountLookup = accountLookup;
+		this.mapper = mapper;
 	}
 
 	@Override
@@ -29,7 +28,7 @@ public class DbBlockIoAdapter implements BlockIo {
 			throw createMissingResourceException(blockHash.toString());
 		}
 
-		return BlockMapper.toModel(dbBlock, this.accountLookup);
+		return this.mapper.map(dbBlock);
 	}
 
 	@Override
@@ -39,7 +38,7 @@ public class DbBlockIoAdapter implements BlockIo {
 			throw createMissingResourceException(blockHeight.toString());
 		}
 
-		return BlockMapper.toModel(dbBlock, this.accountLookup);
+		return this.mapper.map(dbBlock);
 	}
 
 	private static MissingResourceException createMissingResourceException(final String key) {

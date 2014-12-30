@@ -27,7 +27,9 @@ public class BlockChainDelegationContext {
 	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 	private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 	private final NisCache nisCache = Mockito.mock(NisCache.class);
-	private final NisModelToDbModelMapper mapper = new MapperFactory().createModelToDbModelNisMapper(new AccountDaoLookupAdapter(this.accountDao));
+	private final MapperFactory mapperFactory = new MapperFactory();
+	private final NisModelToDbModelMapper mapper = this.mapperFactory.createModelToDbModelNisMapper(new AccountDaoLookupAdapter(this.accountDao));
+	private final NisMapperFactory nisMapperFactory = new NisMapperFactory(this.mapperFactory);
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao, this.mapper);
 	private final BlockChainServices blockChainServices = Mockito.mock(BlockChainServices.class);
 	private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
@@ -52,6 +54,7 @@ public class BlockChainDelegationContext {
 				this.contextFactory,
 				this.unconfirmedTransactions,
 				this.mapper,
+				this.nisMapperFactory,
 				this.nisConfiguration));
 		this.blockChain = new BlockChain(
 				this.blockChainLastBlockLayer,
@@ -188,7 +191,7 @@ public class BlockChainDelegationContext {
 				this.blockDao,
 				this.blockChainServices,
 				this.unconfirmedTransactions,
-				new MapperFactory(),
+				this.mapperFactory,
 				(org.nem.nis.dbmodel.Block)invocation.getArguments()[1],
 				castToBlockCollection(invocation.getArguments()[2]),
 				(BlockChainScore)invocation.getArguments()[3],

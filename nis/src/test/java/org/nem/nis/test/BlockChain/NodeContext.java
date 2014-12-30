@@ -123,12 +123,12 @@ public class NodeContext {
 
 		@Override
 		public Block getLastBlock(final Node node) {
-			return this.checkNull(BlockMapper.toModel(NodeContext.this.blockDao.getLastBlock(), NodeContext.this.nisCache.getAccountCache()));
+			return this.checkNull(MapperUtils.toModel(NodeContext.this.blockDao.getLastBlock(), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
 		public Block getBlockAt(final Node node, final BlockHeight height) {
-			return this.checkNull(BlockMapper.toModel(NodeContext.this.blockDao.findByHeight(height), NodeContext.this.nisCache.getAccountCache()));
+			return this.checkNull(MapperUtils.toModel(NodeContext.this.blockDao.findByHeight(height), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
@@ -140,7 +140,7 @@ public class NodeContext {
 		public Collection<Block> getChainAfter(final Node node, final ChainRequest request) {
 			final List<Block> blocks = new ArrayList<>();
 			final List<org.nem.nis.dbmodel.Block> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
-			dbBlocks.stream().forEach(dbBlock -> blocks.add(BlockMapper.toModel(dbBlock, this.accountLookup)));
+			dbBlocks.stream().forEach(dbBlock -> blocks.add(MapperUtils.toModel(dbBlock, this.accountLookup)));
 			return this.checkNull(blocks);
 		}
 

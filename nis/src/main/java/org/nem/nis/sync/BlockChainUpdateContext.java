@@ -43,7 +43,7 @@ public class BlockChainUpdateContext {
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final MapperFactory mapperFactory,
+			final MapperFactory mapperFactory, // TODO 20141230 J-J: should remove mapper factory
 			final org.nem.nis.dbmodel.Block dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
@@ -59,7 +59,7 @@ public class BlockChainUpdateContext {
 		this.mapperFactory = mapperFactory;
 
 		// do not trust peer, take first block from our db and convert it
-		this.parentBlock = BlockMapper.toModel(dbParentBlock, this.nisCache.getAccountCache());
+		this.parentBlock = this.services.createMapper(this.nisCache.getAccountCache()).map(dbParentBlock);
 
 		this.peerChain = peerChain;
 		this.ourScore = ourScore;

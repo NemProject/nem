@@ -2,10 +2,12 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.validators.*;
@@ -24,16 +26,29 @@ public class BlockChainServices {
 	private final BlockTransactionObserverFactory observerFactory;
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final TransactionValidatorFactory transactionValidatorFactory;
+	private final NisMapperFactory mapperFactory;
 
 	public BlockChainServices(
 			final BlockDao blockDao,
 			final BlockTransactionObserverFactory observerFactory,
 			final BlockValidatorFactory blockValidatorFactory,
-			final TransactionValidatorFactory transactionValidatorFactory) {
+			final TransactionValidatorFactory transactionValidatorFactory,
+			final NisMapperFactory mapperFactory) {
 		this.blockDao = blockDao;
 		this.observerFactory = observerFactory;
 		this.blockValidatorFactory = blockValidatorFactory;
 		this.transactionValidatorFactory = transactionValidatorFactory;
+		this.mapperFactory = mapperFactory;
+	}
+
+	/**
+	 * Creates a NIS db model to model mapper that uses the specified account lookup.
+	 *
+	 * @param accountLookup The account lookup.
+	 * @return The mapper.
+	 */
+	public NisDbModelToModelMapper createMapper(final AccountLookup accountLookup) {
+		return this.mapperFactory.createDbModelToModelNisMapper(accountLookup);
 	}
 
 	/**

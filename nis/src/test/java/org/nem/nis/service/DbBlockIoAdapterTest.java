@@ -8,7 +8,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.util.MissingResourceException;
 
@@ -68,6 +68,8 @@ public class DbBlockIoAdapterTest {
 	private static class TestContext {
 		private final org.nem.nis.dbmodel.Block block = NisUtils.createDbBlockWithTimeStampAtHeight(1, VALID_BLOCK_HEIGHT);
 		private final ReadOnlyBlockDao blockDao = Mockito.mock(ReadOnlyBlockDao.class);
-		private final BlockIo blockIo = new DbBlockIoAdapter(this.blockDao, new MockAccountLookup());
+		private final BlockIo blockIo = new DbBlockIoAdapter(
+				this.blockDao,
+				MapperUtils.createDbModelToModelNisMapper(new MockAccountLookup()));
 	}
 }

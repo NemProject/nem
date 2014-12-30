@@ -16,7 +16,7 @@ import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.peer.PeerNetwork;
 import org.nem.peer.node.*;
 
@@ -333,10 +333,10 @@ public class ChainControllerTest {
 
 			this.controller = new ChainController(
 					this.blockDao,
-					this.accountLookup,
 					this.blockChainLastBlockLayer,
 					this.blockChainScoreManager,
-					this.host);
+					this.host,
+					MapperUtils.createDbModelToModelNisMapper(this.accountLookup));
 		}
 	}
 }

@@ -59,7 +59,7 @@ public class BlockChainSyncContext {
 	public BlockLookup createLocalBlockLookup() {
 		return new LocalBlockLookupAdapter(
 				this.blockDao,
-				this.nisCache.getAccountCache(),
+				this.services.createMapper(this.nisCache.getAccountCache()),
 				this.blockChainLastBlockLayer.getLastDbBlock(),
 				this.ourScore,
 				BlockChainConstants.BLOCKS_LIMIT);

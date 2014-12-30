@@ -67,18 +67,21 @@ public class BlockChainContext {
 			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
 			final UnconfirmedTransactions unconfirmedTransactions =
 					Mockito.spy(new UnconfirmedTransactions(this.transactionValidatorFactory, nisCache, new SystemTimeProvider()));
+			final MapperFactory mapperFactory = new MapperFactory();
+			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(
 					blockDao,
 					this.blockTransactionObserverFactory,
 					this.blockValidatorFactory,
-					this.transactionValidatorFactory));
+					this.transactionValidatorFactory,
+					nisMapperFactory));
 			final BlockChainContextFactory contextFactory = Mockito.spy(new BlockChainContextFactory(
 					nisCache,
 					blockChainLastBlockLayer,
 					blockDao,
 					services,
 					unconfirmedTransactions,
-					new MapperFactory()));
+					mapperFactory));
 			final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(
 					nisCache,
 					blockChainLastBlockLayer,
@@ -86,6 +89,7 @@ public class BlockChainContext {
 					contextFactory,
 					unconfirmedTransactions,
 					mapper,
+					nisMapperFactory,
 					new NisConfiguration());
 			final BlockChain blockChain = new BlockChain(
 					blockChainLastBlockLayer,

@@ -8,7 +8,7 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.*;
 import org.nem.nis.state.AccountState;
@@ -29,6 +29,7 @@ public class BlockAnalyzer {
 	private final BlockDao blockDao;
 	private final BlockChainScoreManager blockChainScoreManager;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
+	private final NisMapperFactory mapperFactory;
 
 	/**
 	 * Creates a new block analyzer.
@@ -41,10 +42,12 @@ public class BlockAnalyzer {
 	public BlockAnalyzer(
 			final BlockDao blockDao,
 			final BlockChainScoreManager blockChainScoreManager,
-			final BlockChainLastBlockLayer blockChainLastBlockLayer) {
+			final BlockChainLastBlockLayer blockChainLastBlockLayer,
+			final NisMapperFactory mapperFactory) {
 		this.blockDao = blockDao;
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
+		this.mapperFactory = mapperFactory;
 	}
 
 	/**
@@ -93,8 +96,10 @@ public class BlockAnalyzer {
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = new BlockTransactionObserverFactory()
 				.createExecuteCommitObserver(nisCache, EnumSet.of(ObserverOption.NoIncrementalPoi));
+		final NisDbModelToModelMapper mapper = this.mapperFactory.createDbModelToModelNisMapper(accountCache);
+
 		do {
-			final Block block = BlockMapper.toModel(dbBlock, accountCache);
+			final Block block = mapper.map(dbBlock);
 
 			if ((block.getHeight().getRaw() % 5000) == 0) {
 				LOGGER.info(String.format("%d", block.getHeight().getRaw()));

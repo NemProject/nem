@@ -8,7 +8,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -178,10 +178,10 @@ public class HarvesterTest {
 		final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		final BlockGenerator generator = Mockito.mock(BlockGenerator.class);
 		final Harvester harvester = new Harvester(
-				this.accountLookup,
 				this.timeProvider,
 				this.blockChainLastBlockLayer,
 				this.unlockedAccounts,
+				MapperUtils.createDbModelToModelNisMapper(this.accountLookup),
 				this.generator);
 
 		private TestContext() {

@@ -351,7 +351,7 @@ public class BlockMapperTest {
 			mockAccountLookup.setMockAccount(this.account1);
 			mockAccountLookup.setMockAccount(this.account2);
 			mockAccountLookup.setMockAccount(this.account3);
-			return BlockMapper.toModel(dbBlock, mockAccountLookup);
+			return MapperUtils.toModel(dbBlock, mockAccountLookup);
 		}
 
 		public void addTransactions() {

@@ -32,6 +32,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final NisModelToDbModelMapper mapper;
+	private final NisMapperFactory nisMapperFactory;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
@@ -42,6 +43,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions,
 			final NisModelToDbModelMapper mapper,
+			final NisMapperFactory nisMapperFactory,
 			final NisConfiguration configuration) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
@@ -49,6 +51,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
 		this.mapper = mapper;
+		this.nisMapperFactory = nisMapperFactory;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
 	}
@@ -223,8 +226,9 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	}
 
 	private Block remapBlock(final Block block, final AccountCache accountCache) {
+		// TODO 20141230 J-B,G: do we still need to remap blocks?
 		final org.nem.nis.dbmodel.Block dbBlock = this.mapper.map(block);
-		return BlockMapper.toModel(dbBlock, accountCache);
+		return this.nisMapperFactory.createDbModelToModelNisMapper(accountCache).map(dbBlock);
 	}
 
 	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {

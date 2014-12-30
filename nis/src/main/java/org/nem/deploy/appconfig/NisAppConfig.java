@@ -135,7 +135,8 @@ public class NisAppConfig {
 				this.blockDao,
 				this.blockTransactionObserverFactory(),
 				this.blockValidatorFactory(),
-				this.transactionValidatorFactory());
+				this.transactionValidatorFactory(),
+				this.nisMapperFactory());
 	}
 
 	@Bean
@@ -147,6 +148,7 @@ public class NisAppConfig {
 				this.blockChainContextFactory(),
 				this.unconfirmedTransactions(),
 				this.nisModelToDbModelMapper(),
+				this.nisMapperFactory(),
 				this.nisConfiguration());
 	}
 
@@ -161,15 +163,31 @@ public class NisAppConfig {
 				this.mapperFactory());
 	}
 
+	//region mappers
+
 	@Bean
 	public MapperFactory mapperFactory() {
 		return new MapperFactory();
 	}
 
 	@Bean
+	public NisMapperFactory nisMapperFactory() {
+		return new NisMapperFactory(this.mapperFactory());
+	}
+
+	@Bean
 	public NisModelToDbModelMapper nisModelToDbModelMapper() {
 		return this.mapperFactory().createModelToDbModelNisMapper(new AccountDaoLookupAdapter(this.accountDao));
 	}
+
+	@Bean
+	public NisDbModelToModelMapper nisDbModelToModelMapper() {
+		return this.nisMapperFactory().createDbModelToModelNisMapper(this.accountCache());
+	}
+
+	//endregion
+
+	//region observers + validators
 
 	@Bean
 	public BlockTransactionObserverFactory blockTransactionObserverFactory() {
@@ -198,6 +216,8 @@ public class NisAppConfig {
 		return this.transactionValidatorFactory().createBatch(this.transactionHashCache());
 	}
 
+	//endregion
+
 	@Bean
 	public Harvester harvester() {
 		final BlockGenerator generator = new BlockGenerator(
@@ -207,10 +227,10 @@ public class NisAppConfig {
 				new BlockScorer(this.accountStateCache()),
 				this.blockValidatorFactory().create(this.nisCache()));
 		return new Harvester(
-				this.accountCache(),
 				this.timeProvider(),
 				this.blockChainLastBlockLayer,
 				this.unlockedAccounts(),
+				this.nisDbModelToModelMapper(),
 				generator);
 	}
 
@@ -294,7 +314,11 @@ public class NisAppConfig {
 
 	@Bean
 	public BlockAnalyzer blockAnalyzer() {
-		return new BlockAnalyzer(this.blockDao, this.blockChainUpdater(), this.blockChainLastBlockLayer);
+		return new BlockAnalyzer(
+				this.blockDao,
+				this.blockChainUpdater(),
+				this.blockChainLastBlockLayer,
+				this.nisMapperFactory());
 	}
 
 	@Bean
