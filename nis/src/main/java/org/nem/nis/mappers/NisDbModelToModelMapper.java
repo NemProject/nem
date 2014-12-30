@@ -5,6 +5,7 @@ import org.nem.core.model.Block;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -22,15 +23,13 @@ public class NisDbModelToModelMapper {
 		this.mapper = mapper;
 	}
 
-	// TODO 20141230 J-J: test this
-	// TODO 20141230 J-J: add mapTransactionsIf
 	/**
 	 * Maps a db model transfer to a model transfer.
 	 *
 	 * @param transfer The db model transfer.
 	 * @return The model transfer.
 	 */
-	public TransferTransaction map(final Transfer transfer) {
+	public Transaction map(final Transfer transfer) {
 		return this.mapper.map(transfer, TransferTransaction.class);
 	}
 
@@ -45,36 +44,36 @@ public class NisDbModelToModelMapper {
 	}
 
 	/**
-	 * Maps all the transfer transactions in a block to model transactions.
-	 * TODO 20141230 J-G: can we remove this (look at where it is being called)?
-	 *
-	 * @param block The db model block.
-	 * @return The model transactions.
-	 */
-	public Collection<Transaction> mapTransferTransactions(final org.nem.nis.dbmodel.Block block) {
-		final Collection<Transaction> transactions = new ArrayList<>();
-		transactions.addAll(this.mapTransactions(block.getBlockTransfers(), TransferTransaction.class));
-		return transactions;
-	}
-
-	/**
 	 * Maps all the transactions in a block to model transactions.
 	 *
 	 * @param block The db model block.
 	 * @return The model transactions.
 	 */
 	public Collection<Transaction> mapTransactions(final org.nem.nis.dbmodel.Block block) {
+		return this.mapTransactionsIf(block, t -> true);
+	}
+
+	/**
+	 * Maps all the transactions in a block for which a predicate evaluates to true to model transactions.
+	 *
+	 * @param block The db model block.
+	 * @param shouldInclude The predicate used to determine whether or not a transfer should be included in the result.
+	 * @return The model transactions.
+	 */
+	public Collection<Transaction> mapTransactionsIf(final org.nem.nis.dbmodel.Block block, final Predicate<AbstractTransfer> shouldInclude) {
 		final Collection<Transaction> transactions = new ArrayList<>();
-		transactions.addAll(this.mapTransactions(block.getBlockTransfers(), TransferTransaction.class));
-		transactions.addAll(this.mapTransactions(block.getBlockImportanceTransfers(), ImportanceTransferTransaction.class));
+		transactions.addAll(this.mapTransactions(block.getBlockTransfers(), shouldInclude, TransferTransaction.class));
+		transactions.addAll(this.mapTransactions(block.getBlockImportanceTransfers(), shouldInclude, ImportanceTransferTransaction.class));
 		return transactions;
 	}
 
 	// TODO 20141230 J-J: should remove need for transaction type
 	private <TDbModel extends AbstractTransfer, TModel extends Transaction> Collection<Transaction> mapTransactions(
 			final Collection<TDbModel> dbTransactions,
+			final Predicate<AbstractTransfer> shouldInclude,
 			final Class<TModel> transactionType) {
 		return dbTransactions.stream()
+				.filter(shouldInclude::test)
 				.map(t -> this.mapper.map(t, transactionType))
 				.collect(Collectors.toList());
 	}

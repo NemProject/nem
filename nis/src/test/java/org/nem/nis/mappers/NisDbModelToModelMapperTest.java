@@ -10,6 +10,7 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 public class NisDbModelToModelMapperTest {
 
@@ -27,25 +28,19 @@ public class NisDbModelToModelMapperTest {
 	}
 
 	@Test
-	public void mapTransferTransactionsDelegatesToInnerMapper() {
+	public void mapTransferTransactionDelegatesToInnerMapper() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.setTransactions(Transfer::new, context.dbBlock::setBlockTransfers, TransferTransaction.class, 3);
-		final List<AbstractTransfer> dbTransferTransactions = new ArrayList<>(context.dbTransfers);
-		final List<Transaction> transferTransactions = new ArrayList<>(context.transfers);
-		context.setTransactions(ImportanceTransfer::new, context.dbBlock::setBlockImportanceTransfers, ImportanceTransferTransaction.class, 2);
+		final Transfer dbTransfer = new Transfer();
+		final TransferTransaction transfer = Mockito.mock(TransferTransaction.class);
+		Mockito.when(context.mapper.map(dbTransfer, TransferTransaction.class)).thenReturn(transfer);
 
 		// Act:
-		final Collection<Transaction> transfers = context.nisMapper.mapTransferTransactions(context.dbBlock);
+		final Transaction result = context.nisMapper.map(dbTransfer);
 
 		// Assert:
-		final int numExpectedTransfers = 3;
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(numExpectedTransfers));
-		Assert.assertThat(transfers, IsEquivalent.equivalentTo(transferTransactions));
-
-		for (int i = 0; i < numExpectedTransfers; ++i) {
-			Mockito.verify(context.mapper, Mockito.times(1)).map(Mockito.eq(dbTransferTransactions.get(i)), Mockito.any());
-		}
+		Assert.assertThat(result, IsEqual.equalTo(transfer));
+		Mockito.verify(context.mapper, Mockito.only()).map(dbTransfer, TransferTransaction.class);
 	}
 
 	@Test
@@ -59,13 +54,22 @@ public class NisDbModelToModelMapperTest {
 		final Collection<Transaction> transfers = context.nisMapper.mapTransactions(context.dbBlock);
 
 		// Assert:
-		final int numExpectedTransfers = 5;
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(numExpectedTransfers));
-		Assert.assertThat(transfers, IsEquivalent.equivalentTo(context.transfers));
+		context.assertMappedTransfers(transfers, Arrays.asList(0, 1, 2, 3, 4));
+	}
 
-		for (int i = 0; i < numExpectedTransfers; ++i) {
-			Mockito.verify(context.mapper, Mockito.times(1)).map(Mockito.eq(context.dbTransfers.get(i)), Mockito.any());
-		}
+	@Test
+	public void mapTransactionsIfDelegatesToInnerMapper() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setTransactions(Transfer::new, context.dbBlock::setBlockTransfers, TransferTransaction.class, 3);
+		context.setTransactions(ImportanceTransfer::new, context.dbBlock::setBlockImportanceTransfers, ImportanceTransferTransaction.class, 2);
+
+		// Act:
+		final int[] count = { 0 };
+		final Collection<Transaction> transfers = context.nisMapper.mapTransactionsIf(context.dbBlock, t -> 0 == count[0]++ % 2);
+
+		// Assert:
+		context.assertMappedTransfers(transfers, Arrays.asList(0, 2, 4));
 	}
 
 	private static class TestContext {
@@ -105,6 +109,21 @@ public class NisDbModelToModelMapperTest {
 			this.dbTransfers.addAll(dbTransfers);
 			this.transfers.addAll(transfers);
 			return transfers;
+		}
+
+		private void assertMappedTransfers(
+				final Collection<Transaction> transfers,
+				final Collection<Integer> expectedTransferIndexes) {
+			final int numExpectedTransfers = expectedTransferIndexes.size();
+			final Collection<Transaction> expectedTransfers = expectedTransferIndexes.stream().map(this.transfers::get).collect(Collectors.toList());
+			final List<AbstractTransfer> expectedDbTransfers = expectedTransferIndexes.stream().map(this.dbTransfers::get).collect(Collectors.toList());
+
+			Assert.assertThat(transfers.size(), IsEqual.equalTo(numExpectedTransfers));
+			Assert.assertThat(transfers, IsEquivalent.equivalentTo(expectedTransfers));
+
+			for (int i = 0; i < numExpectedTransfers; ++i) {
+				Mockito.verify(this.mapper, Mockito.times(1)).map(Mockito.eq(expectedDbTransfers.get(i)), Mockito.any());
+			}
 		}
 	}
 }

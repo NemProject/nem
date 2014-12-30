@@ -168,8 +168,7 @@ public class BlockChainUpdateContext {
 			// at this point, only "state" (in accountAnalyzer and so on) is reverted.
 			// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
-			mapper.mapTransactions(block).stream()
-					.filter(tr -> !transactionHashes.contains(HashUtils.calculateHash(tr)))
+			mapper.mapTransactionsIf(block, tr -> !transactionHashes.contains(tr.getTransferHash())).stream()
 					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
 
 			currentHeight--;
