@@ -3,8 +3,6 @@ package org.nem.core.model;
 import org.nem.core.serialization.*;
 
 
-// TODO 20141218 J-G what is the point of this entity?
-
 public class MultisigModification implements SerializableEntity {
 	private final MultisigModificationType modificationType;
 	private final Account cosignatoryAccount;

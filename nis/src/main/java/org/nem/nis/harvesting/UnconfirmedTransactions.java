@@ -7,6 +7,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.dbmodel.MultisigSignature;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
@@ -15,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A collection of unconfirmed transactions.
@@ -223,10 +225,9 @@ public class UnconfirmedTransactions {
 
 	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
+		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache(), blockVerification));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
-		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getAccountStateCache(), blockVerification));
 
 		// need to be the last one
 		// that is correct we need this.transactions here
@@ -365,14 +366,13 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-	// TODO G-G 20141215: this needs tests! and
-	private boolean filterMultisigTransactions(final Transaction transaction) {
+	private static boolean filterMultisigTransactions(final ReadOnlyNisCache nisCache, final Transaction transaction) {
 		if (transaction.getType() != TransactionTypes.MULTISIG) {
 			return true;
 		}
 		final MultisigTransaction multisigTransaction = (MultisigTransaction)transaction;
 		final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
-		final ReadOnlyAccountState multisigState = this.nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
+		final ReadOnlyAccountState multisigState = nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
 
 		if (multisigTransaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
 			final MultisigSignerModificationTransaction modification = (MultisigSignerModificationTransaction)multisigTransaction.getOtherTransaction();
@@ -388,6 +388,37 @@ public class UnconfirmedTransactions {
 		return false;
 	}
 
+	private static List<Transaction> multisigSignatureFilter(final ReadOnlyNisCache nisCache, final List<Transaction> transactions) {
+		final Set<Address> multisigModificationSenders = new HashSet<>();
+		final List<Transaction> result = new ArrayList<>(transactions.size());
+		for (final Transaction transaction : transactions) {
+			if (transaction.getType() != TransactionTypes.MULTISIG) {
+				result.add(transaction);
+				continue;
+			}
+
+			final MultisigTransaction multisigTransaction = (MultisigTransaction)transaction;
+			final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
+			final ReadOnlyAccountState multisigState = nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
+
+			if (multisigTransaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
+				final MultisigSignerModificationTransaction modification = (MultisigSignerModificationTransaction)multisigTransaction.getOtherTransaction();
+				// TODO test if there is multisigmodification inside and if it's type is Del
+				// (N-2 cosignatories "exception")
+
+				// we only allow single multisig modification from given block at given height
+				if (! multisigModificationSenders.add(modification.getSigner().getAddress())) {
+					continue;
+				}
+			}
+
+			if (multisigState.getMultisigLinks().getCosignatories().size() - 1 == multisigTransaction.getCosignerSignatures().size()) {
+				result.add(transaction);
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
@@ -399,10 +430,9 @@ public class UnconfirmedTransactions {
 			final List<Transaction> transactions = this.transactions.values().stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-					.filter(tx -> this.filterMultisigTransactions(tx))
 					.collect(Collectors.toList());
 
-			return this.sortTransactions(transactions);
+			return multisigSignatureFilter(this.nisCache, this.sortTransactions(transactions));
 		}
 	}
 

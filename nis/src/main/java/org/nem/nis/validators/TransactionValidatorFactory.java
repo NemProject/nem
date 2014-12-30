@@ -32,12 +32,14 @@ public class TransactionValidatorFactory {
 	 * @param nisCache The NIS cache.
 	 * @return The validator.
 	 */
+	/* TODO: this is used only in one test and nowhere else
 	public SingleTransactionValidator create(final ReadOnlyNisCache nisCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, nisCache.getAccountStateCache());
+		this.visitSingleSubValidators(builder::add, nisCache.getAccountStateCache(), );
 		this.visitBatchSubValidators(builder::add, nisCache.getTransactionHashCache());
 		return builder.build();
 	}
+	*/
 
 	/**
 	 * Creates a transaction validator that only contains single validators.
@@ -45,9 +47,9 @@ public class TransactionValidatorFactory {
 	 * @param accountStateCache The account state cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache) {
+	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache, final boolean blockVerification) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, accountStateCache);
+		this.visitSingleSubValidators(builder::add, accountStateCache, blockVerification);
 		return builder.build();
 	}
 
@@ -71,12 +73,13 @@ public class TransactionValidatorFactory {
 	 */
 	public void visitSingleSubValidators(
 			final Consumer<SingleTransactionValidator> visitor,
-			final ReadOnlyAccountStateCache accountStateCache) {
+			final ReadOnlyAccountStateCache accountStateCache,
+			final boolean blockVerification) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
-		visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache, true));
+		visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache, blockVerification));
 	}
 
 	/**
