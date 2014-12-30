@@ -28,11 +28,12 @@ public class AccountIoAdapter implements AccountIo {
 	public AccountIoAdapter(
 			final ReadOnlyTransferDao transferDao,
 			final ReadOnlyBlockDao blockDao,
-			final ReadOnlyAccountCache accountCache) {
+			final ReadOnlyAccountCache accountCache,
+			final MapperFactory mapperFactory) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
 		this.accountCache = accountCache;
-		this.mapper = MapperFactory.createDbModelToModelMapper(this.accountCache);
+		this.mapper = mapperFactory.createDbModelToModelMapper(this.accountCache);
 	}
 
 	@Override

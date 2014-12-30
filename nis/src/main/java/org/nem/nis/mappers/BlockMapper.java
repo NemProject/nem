@@ -17,7 +17,7 @@ public class BlockMapper {
 	 * @return The Block db-model.
 	 */
 	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
-		return MapperFactory.createModelToDbModelMapper(accountDaoLookup).map(block, org.nem.nis.dbmodel.Block.class);
+		return new MapperFactory().createModelToDbModelMapper(accountDaoLookup).map(block, org.nem.nis.dbmodel.Block.class);
 	}
 
 	/**
@@ -28,6 +28,6 @@ public class BlockMapper {
 	 * @return The Block model.
 	 */
 	public static Block toModel(final org.nem.nis.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
-		return MapperFactory.createDbModelToModelMapper(accountLookup).map(dbBlock, Block.class);
+		return new MapperFactory().createDbModelToModelMapper(accountLookup).map(dbBlock, Block.class);
 	}
 }

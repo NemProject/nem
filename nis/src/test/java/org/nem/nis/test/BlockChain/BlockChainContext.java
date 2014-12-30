@@ -11,6 +11,7 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.mappers.MapperFactory;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -75,7 +76,8 @@ public class BlockChainContext {
 					blockChainLastBlockLayer,
 					blockDao,
 					services,
-					unconfirmedTransactions));
+					unconfirmedTransactions,
+					new MapperFactory()));
 			final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(
 					nisCache,
 					accountDao,
@@ -83,8 +85,7 @@ public class BlockChainContext {
 					blockDao,
 					contextFactory,
 					unconfirmedTransactions,
-					new NisConfiguration()
-			);
+					new NisConfiguration());
 			final BlockChain blockChain = new BlockChain(
 					blockChainLastBlockLayer,
 					blockChainUpdater);

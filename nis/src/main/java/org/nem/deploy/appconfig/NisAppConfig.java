@@ -12,6 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
+import org.nem.nis.mappers.MapperFactory;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
@@ -156,7 +157,13 @@ public class NisAppConfig {
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.blockChainServices(),
-				this.unconfirmedTransactions());
+				this.unconfirmedTransactions(),
+				this.mapperFactory());
+	}
+
+	@Bean
+	public MapperFactory mapperFactory() {
+		return new MapperFactory();
 	}
 
 	@Bean

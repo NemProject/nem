@@ -187,6 +187,7 @@ public class BlockChainDelegationContext {
 				this.blockDao,
 				this.blockChainServices,
 				this.unconfirmedTransactions,
+				new MapperFactory(),
 				(org.nem.nis.dbmodel.Block)invocation.getArguments()[1],
 				castToBlockCollection(invocation.getArguments()[2]),
 				(BlockChainScore)invocation.getArguments()[3],

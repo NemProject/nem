@@ -13,7 +13,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.AccountCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
@@ -50,7 +50,7 @@ public class AccountIoAdapterTest {
 			accounts.add(account);
 			when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		}
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(null, null, accountCache);
+		final AccountIoAdapter accountIoAdapter = createAccountIoAdapter(null, null, accountCache);
 
 		// Assert:
 		for (int i = 0; i < 10; ++i) {
@@ -224,7 +224,7 @@ public class AccountIoAdapterTest {
 		private final AccountCache accountCache = mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = mock(ReadOnlyBlockDao.class);
 		private final ReadOnlyTransferDao transferDao = mock(ReadOnlyTransferDao.class);
-		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(this.transferDao, this.blockDao, this.accountCache);
+		private final AccountIoAdapter accountIoAdapter = createAccountIoAdapter(this.transferDao, this.blockDao, this.accountCache);
 		private final Account account = Utils.generateRandomAccount();
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
@@ -287,7 +287,7 @@ public class AccountIoAdapterTest {
 			this.addAccount(signer);
 			this.addAccount(recipient);
 
-			return MapperFactory.createModelToDbModelMapper(new AccountDaoLookupAdapter(new MockAccountDao()))
+			return new MapperFactory().createModelToDbModelMapper(new AccountDaoLookupAdapter(new MockAccountDao()))
 					.map(transaction, Transfer.class);
 		}
 
@@ -370,6 +370,13 @@ public class AccountIoAdapterTest {
 
 	// endregion
 
+	private static AccountIoAdapter createAccountIoAdapter(
+			final ReadOnlyTransferDao transferDao,
+			final ReadOnlyBlockDao blockDao,
+			final ReadOnlyAccountCache accountCache) {
+		return new AccountIoAdapter(transferDao, blockDao, accountCache, new MapperFactory());
+	}
+
 	// note: it would probably be better to mock blockDao and accountDao,
 	// but I find this much easier (mostly stolen from TransferDaoTest)
 	private AccountIoAdapter prepareAccountIoAdapter(final Account recipient) {
@@ -417,7 +424,7 @@ public class AccountIoAdapterTest {
 			this.blockDao.save(dbBlock);
 		}
 
-		return new AccountIoAdapter(this.transferDao, this.blockDao, accountCache);
+		return createAccountIoAdapter(this.transferDao, this.blockDao, accountCache);
 	}
 
 	private void assertResultGetAccountTransfers(final SerializableList<TransactionMetaDataPair> result) {

@@ -29,6 +29,7 @@ public class BlockChainUpdateContext {
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final MapperFactory mapperFactory;
 	private final Block parentBlock;
 	private final Collection<Block> peerChain;
 	private final BlockChainScore ourScore;
@@ -42,6 +43,7 @@ public class BlockChainUpdateContext {
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final UnconfirmedTransactions unconfirmedTransactions,
+			final MapperFactory mapperFactory,
 			final org.nem.nis.dbmodel.Block dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
@@ -54,6 +56,7 @@ public class BlockChainUpdateContext {
 		this.blockDao = blockDao;
 		this.services = services;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.mapperFactory = mapperFactory;
 
 		// do not trust peer, take first block from our db and convert it
 		this.parentBlock = BlockMapper.toModel(dbParentBlock, this.nisCache.getAccountCache());
@@ -159,7 +162,7 @@ public class BlockChainUpdateContext {
 			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
-		final IMapper mapper = MapperFactory.createDbModelToModelMapper(accountCache);
+		final IMapper mapper = this.mapperFactory.createDbModelToModelMapper(accountCache);
 		while (currentHeight != wantedHeight) {
 			final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 

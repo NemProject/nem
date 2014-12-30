@@ -17,7 +17,7 @@ public class MapperFactory {
 	 * @param accountDaoLookup The account dao lookup object.
 	 * @return The mapper.
 	 */
-	public static IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
+	public IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
 		final MappingRepository mappingRepository = new MappingRepository();
 		mappingRepository.addMapping(TransferTransaction.class, Transfer.class, new TransferModelToDbModelMapping(mappingRepository));
 		mappingRepository.addMapping(ImportanceTransferTransaction.class, ImportanceTransfer.class, new ImportanceTransferModelToDbModelMapping(mappingRepository));
@@ -32,7 +32,7 @@ public class MapperFactory {
 	 * @param accountLookup The account lookup object.
 	 * @return The mapper.
 	 */
-	public static IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
+	public IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
 		final MappingRepository mappingRepository = new MappingRepository();
 		mappingRepository.addMapping(Transfer.class, TransferTransaction.class, new TransferDbModelToModelMapping(mappingRepository));
 		mappingRepository.addMapping(ImportanceTransfer.class, ImportanceTransferTransaction.class, new ImportanceTransferDbModelToModelMapping(mappingRepository));

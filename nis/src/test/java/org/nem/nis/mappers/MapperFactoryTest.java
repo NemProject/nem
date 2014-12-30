@@ -10,7 +10,8 @@ public class MapperFactoryTest {
 	@Test
 	public void canCreateModelToDbModelMapper() {
 		// Act:
-		final IMapper mapper = MapperFactory.createModelToDbModelMapper(Mockito.mock(AccountDaoLookup.class));
+		final MapperFactory factory = new MapperFactory();
+		final IMapper mapper = factory.createModelToDbModelMapper(Mockito.mock(AccountDaoLookup.class));
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
@@ -19,7 +20,8 @@ public class MapperFactoryTest {
 	@Test
 	public void canCreateDbModelToModelMapper() {
 		// Act:
-		final IMapper mapper = MapperFactory.createDbModelToModelMapper(Mockito.mock(AccountLookup.class));
+		final MapperFactory factory = new MapperFactory();
+		final IMapper mapper = factory.createDbModelToModelMapper(Mockito.mock(AccountLookup.class));
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());

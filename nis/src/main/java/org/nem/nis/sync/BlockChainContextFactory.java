@@ -5,6 +5,7 @@ import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.mappers.MapperFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
 import java.util.Collection;
@@ -18,18 +19,21 @@ public class BlockChainContextFactory {
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final MapperFactory mapperFactory;
 
 	public BlockChainContextFactory(
 			final ReadOnlyNisCache nisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
-			final UnconfirmedTransactions unconfirmedTransactions) {
+			final UnconfirmedTransactions unconfirmedTransactions,
+			final MapperFactory mapperFactory) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.mapperFactory = mapperFactory;
 	}
 
 	/**
@@ -69,6 +73,7 @@ public class BlockChainContextFactory {
 				this.blockDao,
 				this.services,
 				this.unconfirmedTransactions,
+				this.mapperFactory,
 				dbParentBlock,
 				peerChain,
 				localScore,
