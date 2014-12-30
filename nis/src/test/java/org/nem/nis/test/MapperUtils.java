@@ -29,7 +29,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static NisModelToDbModelMapper createModelToDbModelNisMapper(final AccountDaoLookup accountDaoLookup) {
-		return new MapperFactory().createModelToDbModelNisMapper(accountDaoLookup);
+		return new NisModelToDbModelMapper(new MapperFactory().createModelToDbModelMapper(accountDaoLookup));
 	}
 
 	/**

@@ -40,14 +40,4 @@ public class MapperFactory {
 		mappingRepository.addMapping(org.nem.nis.dbmodel.Block.class, Block.class, new BlockDbModelToModelMapping(mappingRepository, accountLookup));
 		return mappingRepository;
 	}
-
-	/**
-	 * Creates a NIS mapper facade for mapping model types to db model types.
-	 *
-	 * @param accountDaoLookup The account dao lookup object.
-	 * @return The mapper.
-	 */
-	public NisModelToDbModelMapper createModelToDbModelNisMapper(final AccountDaoLookup accountDaoLookup) {
-		return new NisModelToDbModelMapper(this.createModelToDbModelMapper(accountDaoLookup));
-	}
 }

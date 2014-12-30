@@ -30,7 +30,7 @@ public class BlockChainDelegationContext {
 	private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 	private final NisCache nisCache = Mockito.mock(NisCache.class);
 	private final MapperFactory mapperFactory = new MapperFactory();
-	private final NisModelToDbModelMapper mapper = this.mapperFactory.createModelToDbModelNisMapper(new AccountDaoLookupAdapter(this.accountDao));
+	private final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(this.accountDao);
 	private final NisMapperFactory nisMapperFactory = new NisMapperFactory(this.mapperFactory);
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao, this.mapper);
 	private final BlockChainServices blockChainServices = Mockito.mock(BlockChainServices.class);

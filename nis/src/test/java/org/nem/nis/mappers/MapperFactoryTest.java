@@ -26,14 +26,4 @@ public class MapperFactoryTest {
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
 	}
-
-	@Test
-	public void canCreateModelToDbModelNisMapper() {
-		// Act:
-		final MapperFactory factory = new MapperFactory();
-		final NisModelToDbModelMapper mapper = factory.createModelToDbModelNisMapper(Mockito.mock(AccountDaoLookup.class));
-
-		// Assert:
-		Assert.assertThat(mapper, IsNull.notNullValue());
-	}
 }

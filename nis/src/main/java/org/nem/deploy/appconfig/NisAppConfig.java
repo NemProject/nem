@@ -177,7 +177,7 @@ public class NisAppConfig {
 
 	@Bean
 	public NisModelToDbModelMapper nisModelToDbModelMapper() {
-		return this.mapperFactory().createModelToDbModelNisMapper(new AccountDaoLookupAdapter(this.accountDao));
+		return new NisModelToDbModelMapper(this.mapperFactory().createModelToDbModelMapper(new AccountDaoLookupAdapter(this.accountDao)));
 	}
 
 	@Bean
