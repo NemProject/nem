@@ -4,6 +4,7 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.deploy.NisConfiguration;
@@ -15,6 +16,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.sync.*;
+import org.nem.nis.test.MapperUtils;
 
 import java.util.Collection;
 
@@ -170,6 +172,8 @@ public class BlockChainDelegationContext {
 
 	private void prepareBlockChainServices() {
 		Mockito.when(this.blockChainServices.isPeerChainValid(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(true);
+		Mockito.when(this.blockChainServices.createMapper(Mockito.any()))
+				.thenAnswer(invocation -> MapperUtils.createDbModelToModelNisMapper((AccountLookup)invocation.getArguments()[0]));
 	}
 
 	private void prepareBlockChainContextFactory() {
