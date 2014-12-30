@@ -8,6 +8,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.test.ExceptionAssert;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainValidator;
@@ -77,9 +78,10 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction2);
 		block.sign();
 
-		final boolean result = context.isValid(parentBlock, blocks);
-
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		ExceptionAssert.assertThrows(
+				v -> context.isValid(parentBlock, blocks),
+				IllegalArgumentException.class
+		);
 	}
 
 	private static Block createParentBlock(final Account account, final long height) {
