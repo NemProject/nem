@@ -18,15 +18,15 @@ import java.util.logging.Logger;
 public class BlockChainLastBlockLayer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	final private AccountDao accountDao;
-	final private BlockDao blockDao;
+	private final BlockDao blockDao;
+	private final NisModelToDbModelMapper mapper;
 
 	private org.nem.nis.dbmodel.Block lastBlock;
 
 	@Autowired(required = true)
-	public BlockChainLastBlockLayer(final AccountDao accountDao, final BlockDao blockDao) {
-		this.accountDao = accountDao;
+	public BlockChainLastBlockLayer(final BlockDao blockDao, final NisModelToDbModelMapper mapper) {
 		this.blockDao = blockDao;
+		this.mapper = mapper;
 	}
 
 	/**
@@ -64,14 +64,13 @@ public class BlockChainLastBlockLayer {
 	 * @return always true
 	 */
 	public boolean addBlockToDb(final Block block) {
-		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		final org.nem.nis.dbmodel.Block dbBlock = this.mapper.map(block);
 
 		// hibernate will save both block AND transactions
 		// as there is cascade in Block
 		// mind that there is NO cascade in transaction (near block field)
 		this.blockDao.save(dbBlock);
 		this.lastBlock = dbBlock;
-
 		return true;
 	}
 

@@ -12,8 +12,9 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
 
 public class BlockChainLastBlockLayerTest {
+
 	@Test
-	public void unintializedLastBlockLayerReturnsNull() {
+	public void uninitializedLastBlockLayerReturnsNull() {
 		// Act:
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 
@@ -34,14 +35,16 @@ public class BlockChainLastBlockLayerTest {
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
 	}
 
+	// TODO 20141230 J-B,G: should rename this test!
 	@Test
 	public void foo() {
 		// Arrange:
 		final MockAccountDao accountDao = new MockAccountDao();
 		final MockBlockDao mockBlockDao = new MockBlockDao(null);
-		final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(accountDao, mockBlockDao);
+		final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
+		final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(mockBlockDao, mapper);
 		final org.nem.core.model.Block lastBlock = createBlock();
-		final Block lastDbBlock = BlockMapper.toDbModel(lastBlock, new AccountDaoLookupAdapter(accountDao));
+		final Block lastDbBlock = mapper.map(lastBlock) ;
 
 		// Act:
 		lastBlockLayer.analyzeLastBlock(lastDbBlock);
@@ -83,6 +86,7 @@ public class BlockChainLastBlockLayerTest {
 	private BlockChainLastBlockLayer createBlockChainLastBlockLayer() {
 		final MockAccountDao accountDao = new MockAccountDao();
 		final MockBlockDao mockBlockDao = new MockBlockDao(null);
-		return new BlockChainLastBlockLayer(accountDao, mockBlockDao);
+		final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
+		return new BlockChainLastBlockLayer(mockBlockDao, mapper);
 	}
 }

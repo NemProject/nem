@@ -25,9 +25,10 @@ public class BlockChainDelegationContext {
 	private final AccountDao accountDao = Mockito.mock(AccountDao.class);
 	private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 	private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-	private final PoiFacade poiFacde = Mockito.mock(PoiFacade.class);
+	private final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
 	private final NisCache nisCache = Mockito.mock(NisCache.class);
-	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.accountDao, this.blockDao);
+	private final NisModelToDbModelMapper mapper = new MapperFactory().createModelToDbModelNisMapper(new AccountDaoLookupAdapter(this.accountDao));
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer = new BlockChainLastBlockLayer(this.blockDao, this.mapper);
 	private final BlockChainServices blockChainServices = Mockito.mock(BlockChainServices.class);
 	private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 	private final BlockChainContextFactory contextFactory = Mockito.mock(BlockChainContextFactory.class);
@@ -46,11 +47,11 @@ public class BlockChainDelegationContext {
 	public BlockChainDelegationContext() {
 		this.blockChainUpdater = Mockito.spy(new BlockChainUpdater(
 				this.nisCache,
-				this.accountDao,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.contextFactory,
 				this.unconfirmedTransactions,
+				this.mapper,
 				this.nisConfiguration));
 		this.blockChain = new BlockChain(
 				this.blockChainLastBlockLayer,
@@ -127,8 +128,8 @@ public class BlockChainDelegationContext {
 	private void prepareBlockDao() {
 		final Hash blockHash = HashUtils.calculateHash(this.block);
 		final Hash parentHash = HashUtils.calculateHash(this.parent);
-		this.dbParent = BlockMapper.toDbModel(this.parent, new AccountDaoLookupAdapter(this.accountDao));
-		this.dbBlock = BlockMapper.toDbModel(this.block, new AccountDaoLookupAdapter(this.accountDao));
+		this.dbParent = this.mapper.map(this.parent);
+		this.dbBlock = this.mapper.map(this.block);
 		Mockito.when(this.blockDao.findByHash(blockHash)).thenReturn(null);
 		Mockito.when(this.blockDao.findByHash(parentHash)).thenReturn(this.dbParent);
 		Mockito.when(this.blockDao.findByHeight(Mockito.any())).thenReturn(this.dbParent, this.dbBlock);
@@ -138,7 +139,7 @@ public class BlockChainDelegationContext {
 		Mockito.when(this.nisCache.copy()).thenReturn(this.nisCache);
 		Mockito.when(this.nisCache.getAccountCache()).thenReturn(this.accountCache);
 		Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(this.accountStateCache);
-		Mockito.when(this.nisCache.getPoiFacade()).thenReturn(this.poiFacde);
+		Mockito.when(this.nisCache.getPoiFacade()).thenReturn(this.poiFacade);
 	}
 
 	private void prepareAccountCache() {

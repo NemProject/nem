@@ -26,29 +26,29 @@ import java.util.logging.Logger;
 public class BlockChainUpdater implements BlockChainScoreManager {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdater.class.getName());
 
-	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final ReadOnlyNisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final NisModelToDbModelMapper mapper;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
 			final ReadOnlyNisCache nisCache,
-			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions,
+			final NisModelToDbModelMapper mapper,
 			final NisConfiguration configuration) {
 		this.nisCache = nisCache;
-		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.mapper = mapper;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
 	}
@@ -223,7 +223,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	}
 
 	private Block remapBlock(final Block block, final AccountCache accountCache) {
-		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		final org.nem.nis.dbmodel.Block dbBlock = this.mapper.map(block);
 		return BlockMapper.toModel(dbBlock, accountCache);
 	}
 

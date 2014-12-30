@@ -222,6 +222,7 @@ public class BlockChainUpdaterTest {
 		BlockChainUtils.assertBlockDaoCalls(context.getBlockDao(), 1, 2, 3, 1, 0, 0, 0);
 	}
 
+	// TODO 20141230 J-J,B: seems like i broke this test somehow :/
 	@Test
 	public void updateBlockDelegatesToAccountDao() {
 		// Arrange:

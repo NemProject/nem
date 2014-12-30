@@ -15,7 +15,7 @@ import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.*;
-import org.nem.nis.test.MockBlockDao;
+import org.nem.nis.test.*;
 import org.nem.peer.connect.*;
 
 import java.util.*;
@@ -174,8 +174,7 @@ public class NodeContext {
 	}
 
 	private org.nem.nis.dbmodel.Block mapBlockToDbModel(final Block block, final AccountDao accountDao) {
-		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
-		return BlockMapper.toDbModel(block, accountDaoLookup);
+		return MapperUtils.createModelToDbModelNisMapper(accountDao).map(block);
 	}
 
 	private void incrementBalance(final NisCache nisCache, final Account account, final BlockHeight height, final Amount amount) {

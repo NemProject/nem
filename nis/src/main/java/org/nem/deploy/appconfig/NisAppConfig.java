@@ -12,7 +12,7 @@ import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
-import org.nem.nis.mappers.MapperFactory;
+import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.*;
@@ -142,11 +142,11 @@ public class NisAppConfig {
 	public BlockChainUpdater blockChainUpdater() {
 		return new BlockChainUpdater(
 				this.nisCache(),
-				this.accountDao,
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.blockChainContextFactory(),
 				this.unconfirmedTransactions(),
+				this.nisModelToDbModelMapper(),
 				this.nisConfiguration());
 	}
 
@@ -164,6 +164,11 @@ public class NisAppConfig {
 	@Bean
 	public MapperFactory mapperFactory() {
 		return new MapperFactory();
+	}
+
+	@Bean
+	public NisModelToDbModelMapper nisModelToDbModelMapper() {
+		return this.mapperFactory().createModelToDbModelNisMapper(new AccountDaoLookupAdapter(this.accountDao));
 	}
 
 	@Bean
@@ -279,10 +284,10 @@ public class NisAppConfig {
 	@Bean
 	public NisMain nisMain() {
 		return new NisMain(
-				this.accountDao,
 				this.blockDao,
 				this.nisCache(),
 				this.nisPeerNetworkHost(),
+				this.nisModelToDbModelMapper(),
 				this.nisConfiguration(),
 				this.blockAnalyzer());
 	}

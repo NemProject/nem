@@ -6,19 +6,9 @@ import org.nem.core.serialization.*;
 /**
  * Static class that contains functions for converting to and from
  * db-model Block and model Block.
+ // TODO 20141230 J-J: remove this class! temporary class!
  */
 public class BlockMapper {
-
-	/**
-	 * Converts a Block model to a Block db-model.
-	 *
-	 * @param block The block model.
-	 * @param accountDaoLookup The account dao lookup object.
-	 * @return The Block db-model.
-	 */
-	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
-		return new MapperFactory().createModelToDbModelMapper(accountDaoLookup).map(block, org.nem.nis.dbmodel.Block.class);
-	}
 
 	/**
 	 * Converts a Block db-model to a Block model.

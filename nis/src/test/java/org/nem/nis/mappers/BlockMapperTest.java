@@ -11,7 +11,7 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.MockAccountDao;
+import org.nem.nis.test.*;
 
 public class BlockMapperTest {
 
@@ -342,7 +342,7 @@ public class BlockMapperTest {
 		}
 
 		public org.nem.nis.dbmodel.Block toDbModel() {
-			return BlockMapper.toDbModel(this.model, new AccountDaoLookupAdapter(this.accountDao));
+			return MapperUtils.createModelToDbModelNisMapper(this.accountDao).map(this.model);
 		}
 
 		public Block toModel(final org.nem.nis.dbmodel.Block dbBlock) {

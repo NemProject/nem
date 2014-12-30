@@ -418,7 +418,7 @@ public class AccountIoAdapterTest {
 				dummyBlock.addTransaction(transferTransaction);
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
