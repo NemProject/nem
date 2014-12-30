@@ -80,8 +80,7 @@ public class BlockChainContext {
 					blockChainLastBlockLayer,
 					blockDao,
 					services,
-					unconfirmedTransactions,
-					mapperFactory));
+					unconfirmedTransactions));
 			final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(
 					nisCache,
 					blockChainLastBlockLayer,

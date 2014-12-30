@@ -19,21 +19,18 @@ public class BlockChainContextFactory {
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final MapperFactory mapperFactory;
 
 	public BlockChainContextFactory(
 			final ReadOnlyNisCache nisCache,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainServices services,
-			final UnconfirmedTransactions unconfirmedTransactions,
-			final MapperFactory mapperFactory) {
+			final UnconfirmedTransactions unconfirmedTransactions) {
 		this.nisCache = nisCache;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.services = services;
 		this.unconfirmedTransactions = unconfirmedTransactions;
-		this.mapperFactory = mapperFactory;
 	}
 
 	/**
@@ -73,7 +70,6 @@ public class BlockChainContextFactory {
 				this.blockDao,
 				this.services,
 				this.unconfirmedTransactions,
-				this.mapperFactory,
 				dbParentBlock,
 				peerChain,
 				localScore,

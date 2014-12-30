@@ -22,18 +22,18 @@ public class AccountIoAdapter implements AccountIo {
 	private final ReadOnlyTransferDao transferDao;
 	private final ReadOnlyBlockDao blockDao;
 	private final ReadOnlyAccountCache accountCache;
-	private final IMapper mapper;
+	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	public AccountIoAdapter(
 			final ReadOnlyTransferDao transferDao,
 			final ReadOnlyBlockDao blockDao,
 			final ReadOnlyAccountCache accountCache,
-			final MapperFactory mapperFactory) {
+			final NisDbModelToModelMapper mapper) {
 		this.transferDao = transferDao;
 		this.blockDao = blockDao;
 		this.accountCache = accountCache;
-		this.mapper = mapperFactory.createDbModelToModelMapper(this.accountCache);
+		this.mapper = mapper;
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class AccountIoAdapter implements AccountIo {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		pairs.stream()
 				.map(pair -> new TransactionMetaDataPair(
-						this.mapper.map(pair.getTransfer(), TransferTransaction.class),
+						this.mapper.map(pair.getTransfer()),
 						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
 				))
 				.forEach(transactionList::add);

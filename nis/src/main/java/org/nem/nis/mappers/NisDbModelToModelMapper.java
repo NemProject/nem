@@ -1,7 +1,8 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.AbstractTransfer;
+import org.nem.core.model.Block;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,6 +20,18 @@ public class NisDbModelToModelMapper {
 	 */
 	public NisDbModelToModelMapper(final IMapper mapper) {
 		this.mapper = mapper;
+	}
+
+	// TODO 20141230 J-J: test this
+	// TODO 20141230 J-J: add mapTransactionsIf
+	/**
+	 * Maps a db model transfer to a model transfer.
+	 *
+	 * @param transfer The db model transfer.
+	 * @return The model transfer.
+	 */
+	public TransferTransaction map(final Transfer transfer) {
+		return this.mapper.map(transfer, TransferTransaction.class);
 	}
 
 	/**

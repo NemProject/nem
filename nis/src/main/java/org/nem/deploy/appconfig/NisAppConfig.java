@@ -159,8 +159,7 @@ public class NisAppConfig {
 				this.blockChainLastBlockLayer,
 				this.blockDao,
 				this.blockChainServices(),
-				this.unconfirmedTransactions(),
-				this.mapperFactory());
+				this.unconfirmedTransactions());
 	}
 
 	//region mappers

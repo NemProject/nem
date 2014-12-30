@@ -374,7 +374,7 @@ public class AccountIoAdapterTest {
 			final ReadOnlyTransferDao transferDao,
 			final ReadOnlyBlockDao blockDao,
 			final ReadOnlyAccountCache accountCache) {
-		return new AccountIoAdapter(transferDao, blockDao, accountCache, new MapperFactory());
+		return new AccountIoAdapter(transferDao, blockDao, accountCache, MapperUtils.createDbModelToModelNisMapper(accountCache));
 	}
 
 	// note: it would probably be better to mock blockDao and accountDao,

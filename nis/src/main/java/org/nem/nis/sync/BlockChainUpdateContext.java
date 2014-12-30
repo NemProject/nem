@@ -29,7 +29,6 @@ public class BlockChainUpdateContext {
 	private final BlockDao blockDao;
 	private final BlockChainServices services;
 	private final UnconfirmedTransactions unconfirmedTransactions;
-	private final MapperFactory mapperFactory;
 	private final Block parentBlock;
 	private final Collection<Block> peerChain;
 	private final BlockChainScore ourScore;
@@ -43,7 +42,6 @@ public class BlockChainUpdateContext {
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final MapperFactory mapperFactory, // TODO 20141230 J-J: should remove mapper factory
 			final org.nem.nis.dbmodel.Block dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
@@ -56,7 +54,6 @@ public class BlockChainUpdateContext {
 		this.blockDao = blockDao;
 		this.services = services;
 		this.unconfirmedTransactions = unconfirmedTransactions;
-		this.mapperFactory = mapperFactory;
 
 		// do not trust peer, take first block from our db and convert it
 		this.parentBlock = this.services.createMapper(this.nisCache.getAccountCache()).map(dbParentBlock);
@@ -162,7 +159,7 @@ public class BlockChainUpdateContext {
 			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
-		final IMapper mapper = this.mapperFactory.createDbModelToModelMapper(accountCache);
+		final NisDbModelToModelMapper mapper = this.services.createMapper(accountCache);
 		while (currentHeight != wantedHeight) {
 			final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
@@ -171,14 +168,8 @@ public class BlockChainUpdateContext {
 			// at this point, only "state" (in accountAnalyzer and so on) is reverted.
 			// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
-			// TODO 20141227 J-*: this is fragile code, we should come up with a better way of keeping it up to date
-			block.getBlockTransfers().stream()
-					.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
-					.map(tr -> mapper.map(tr, TransferTransaction.class))
-					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
-			block.getBlockImportanceTransfers().stream()
-					.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
-					.map(tr -> mapper.map(tr, ImportanceTransferTransaction.class))
+			mapper.mapTransactions(block).stream()
+					.filter(tr -> !transactionHashes.contains(HashUtils.calculateHash(tr)))
 					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
 
 			currentHeight--;
