@@ -120,6 +120,35 @@ public class BlockChainServicesTest {
 		);
 	}
 
+	@Test
+	public void chainContainingTransferTransactionMadeFromMultisigAccountIsInvalid() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		parentBlock.sign();
+
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
+		context.recalculateImportances(START_HEIGHT);
+		context.makeCosignatory(cosignatory1, multisigAccount);
+
+		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
+
+		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
+		final Block block = blocks.get(1);
+		block.addTransaction(transfer);
+		block.sign();
+
+		// Assert
+		Assert.assertThat(context.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+//		ExceptionAssert.assertThrows(
+//				v -> context.isValid(parentBlock, blocks),
+//				IllegalArgumentException.class
+//		);
+	}
+
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 	}
@@ -175,7 +204,7 @@ public class BlockChainServicesTest {
 		}
 
 		public void makeCosignatory(final Account cosignatory, final Account multisig) {
-			final BlockHeight blockHeight = new BlockHeight(START_HEIGHT + 123);
+			final BlockHeight blockHeight = new BlockHeight(START_HEIGHT);
 			this.nisCache.getAccountStateCache().findStateByAddress(cosignatory.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
 			this.nisCache.getAccountStateCache().findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosignatory.getAddress(), blockHeight);
 		}
