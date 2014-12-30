@@ -91,7 +91,7 @@ public class MultisigSignatureTransactionTest {
 
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.never()).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class MultisigSignatureTransactionTest {
 
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.never()).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
 	}
 
 	//endregion
