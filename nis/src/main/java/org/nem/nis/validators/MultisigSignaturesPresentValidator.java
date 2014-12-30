@@ -8,11 +8,11 @@ import org.nem.nis.state.ReadOnlyAccountState;
 
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
-	private final boolean blockCreation;
+	private final boolean blockVerification;
 
-	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache, final boolean blockCreation) {
+	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache, final boolean blockVerification) {
 		this.stateCache = stateCache;
-		this.blockCreation = blockCreation;
+		this.blockVerification = blockVerification;
 	}
 
 	@Override
@@ -39,12 +39,9 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		// TODO 20141201 J-G: why?
 		// TODO 20141202 G-J: cause we might not have proper MultisigSignatures YET, and we want to
 		// be able to add MultisigTransaction itself to list of unconfirmed transactions.
-		if (!this.blockCreation) {
+		if (!this.blockVerification) {
 			return ValidationResult.SUCCESS;
 		}
-
-		// TODO 20131204 G-G: if we'll be adding MultisigSignature to MultisigTransaction,
-		// whole piece below probably won't be necessary
 
 		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
 		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {

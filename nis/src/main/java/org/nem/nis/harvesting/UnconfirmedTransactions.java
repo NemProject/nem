@@ -80,11 +80,11 @@ public class UnconfirmedTransactions {
 			final TransactionValidatorFactory validatorFactory,
 			final ReadOnlyNisCache nisCache,
 			final TimeProvider timeProvider,
-			final boolean blockCreation) {
+			final boolean blockVerification) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.timeProvider = timeProvider;
-		this.singleValidator = this.createSingleValidator(blockCreation);
+		this.singleValidator = this.createSingleValidator(blockVerification);
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
@@ -221,16 +221,16 @@ public class UnconfirmedTransactions {
 		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
-	private SingleTransactionValidator createSingleValidator(final boolean blockCreation) {
+	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
-		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getAccountStateCache(), blockCreation));
+		builder.add(new MultisigSignaturesPresentValidator(this.nisCache.getAccountStateCache(), blockVerification));
 
 		// need to be the last one
 		// that is correct we need this.transactions here
-		builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), blockCreation, () -> this.transactions.values()));
+		builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), blockVerification, () -> this.transactions.values()));
 
 		return new ChildAwareSingleTransactionValidator(builder.build());
 	}
