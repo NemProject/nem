@@ -125,7 +125,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a multisig signature was not associated with any known multisig transaction.
 	 */
-	FAILURE_MULTISIG_NO_MATCHING_MULTISIG(32);
+	FAILURE_MULTISIG_NO_MATCHING_MULTISIG(32),
+
+	/**
+	 * Validation failed because multisig account tried to make transaction that is not allowed
+	 */
+	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG(33);
 
 	private final int value;
 

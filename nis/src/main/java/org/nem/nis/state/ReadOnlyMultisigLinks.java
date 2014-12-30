@@ -4,14 +4,30 @@ import org.nem.core.model.Address;
 
 import java.util.Set;
 
-// TODO 20141218 J-G: needs comments
-
 public interface ReadOnlyMultisigLinks {
+	/**
+	 * Gets the addresses of all cosignatories.
+	 *
+	 * @return The addresses of cosignatories.
+	 */
 	public Set<Address> getCosignatories();
 
+	/**
+	 * Checks if account is a multisig account.
+	 * @return true if account is multisig account, false otherwise.
+	 */
 	public boolean isMultisig();
 
+	/**
+	 * Checks if account is cosignatory of any account.
+	 * @return true if account is cosignatory, false otherwise.
+	 */
 	public boolean isCosignatory();
 
-	public boolean isCosignatoryOf(final Address signer);
+	/**
+	 * Checks if account is cosignatory of given account.
+	 * @param multisig address of other account.
+	 * @return true in account is cosignatory of multisig, false otherwise.
+	 */
+	public boolean isCosignatoryOf(final Address multisig);
 }

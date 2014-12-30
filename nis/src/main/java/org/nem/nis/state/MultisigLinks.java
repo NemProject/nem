@@ -46,8 +46,8 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 		return !this.cosignatoryOf.isEmpty();
 	}
 
-	public boolean isCosignatoryOf(final Address signer) {
-		return this.cosignatoryOf.keySet().stream().anyMatch(a -> a.equals(signer));
+	public boolean isCosignatoryOf(final Address multisig) {
+		return this.cosignatoryOf.keySet().stream().anyMatch(a -> a.equals(multisig));
 	}
 
 	public MultisigLinks copy() {
