@@ -11,7 +11,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockChainValidator;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.NisMain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
@@ -25,16 +25,49 @@ import org.nem.nis.validators.TransactionValidatorFactory;
 import java.util.List;
 
 public class BlockChainServicesTest {
+	final static long START_HEIGHT = BlockMarkerConstants.BETA_MULTISIG_FORK;
+
 	@Test
-	public void chainIsValidIfContainsMultisigTransactionsWithInnerTransaction() {
+	public void chainWithMultisigTransactionsIssuedByNotCosignatoryIsInvalid() {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, 11);
+		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(134));
+		context.recalculateImportances(START_HEIGHT);
+
+		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
+		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
+		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
+		transaction1.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
+		final Block block = blocks.get(1);
+		block.addTransaction(transaction1);
+		block.sign();
+
+		final boolean result = context.isValid(parentBlock, blocks);
+
+		// Act+Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void chainWithMultisigTransactionIssuedByCosignatoryIsValid() {
+		final TestContext context = new TestContext();
+
+		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		parentBlock.sign();
+
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(134));
+		context.recalculateImportances(START_HEIGHT);
+		context.makeCosignatory(cosignatory1, multisigAccount);
+
 		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
 		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
@@ -58,11 +91,14 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, 11);
+		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
+		context.recalculateImportances(START_HEIGHT);
+		context.makeCosignatory(cosignatory1, multisigAccount);
+
 		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
 		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
@@ -126,13 +162,22 @@ public class BlockChainServicesTest {
 			final AccountState accountState = this.nisCache.getAccountStateCache().findStateByAddress(account.getAddress());
 			accountState.setHeight(BlockHeight.ONE);
 			accountState.getAccountInfo().incrementBalance(balance);
-			accountState.getImportanceInfo().setImportance(BlockHeight.ONE, 0.1);
 			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
 			return account;
 		}
 
 		public boolean isValid(final Block parentBlock, final List<Block> blocks) {
 			return this.blockChainServices.isPeerChainValid(this.nisCache, parentBlock, blocks);
+		}
+
+		private void recalculateImportances(final long height) {
+			this.nisCache.getPoiFacade().recalculateImportances(new BlockHeight(height), this.nisCache.getAccountStateCache().mutableContents().asCollection());
+		}
+
+		public void makeCosignatory(final Account cosignatory, final Account multisig) {
+			final BlockHeight blockHeight = new BlockHeight(START_HEIGHT + 123);
+			this.nisCache.getAccountStateCache().findStateByAddress(cosignatory.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
+			this.nisCache.getAccountStateCache().findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosignatory.getAddress(), blockHeight);
 		}
 	}
 }
