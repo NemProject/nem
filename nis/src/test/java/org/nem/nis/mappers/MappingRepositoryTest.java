@@ -6,6 +6,8 @@ import org.nem.core.test.ExceptionAssert;
 
 public class MappingRepositoryTest {
 
+	//region add success
+
 	@Test
 	public void canAddSingleMapping() {
 		// Act:
@@ -13,6 +15,7 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, String.class, Object::toString);
 
 		// Assert:
+		Assert.assertThat(repository.size(), IsEqual.equalTo(1));
 		Assert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
 	}
 
@@ -24,6 +27,7 @@ public class MappingRepositoryTest {
 		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
 
 		// Assert:
+		Assert.assertThat(repository.size(), IsEqual.equalTo(2));
 		Assert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
 		Assert.assertThat(repository.map(7, Double.class), IsEqual.equalTo(7.0));
 	}
@@ -36,9 +40,14 @@ public class MappingRepositoryTest {
 		repository.addMapping(Double.class, String.class, Object::toString);
 
 		// Assert:
+		Assert.assertThat(repository.size(), IsEqual.equalTo(2));
 		Assert.assertThat(repository.map(7, String.class), IsEqual.equalTo("7"));
 		Assert.assertThat(repository.map(7.1, String.class), IsEqual.equalTo("7.1"));
 	}
+
+	//endregion
+
+	//region add failure
 
 	@Test
 	public void cannotAddMappingForSameTypePairMoreThanOnce() {
@@ -50,6 +59,7 @@ public class MappingRepositoryTest {
 		ExceptionAssert.assertThrows(
 				v -> repository.addMapping(Integer.class, String.class, Object::toString),
 				MappingException.class);
+		Assert.assertThat(repository.size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -62,5 +72,57 @@ public class MappingRepositoryTest {
 		ExceptionAssert.assertThrows(
 				v -> repository.map(7, Double.class),
 				MappingException.class);
+		Assert.assertThat(repository.size(), IsEqual.equalTo(1));
 	}
+
+	//endregion
+
+	//region size / isSupported
+
+	@Test
+	public void sizeReturnsTotalNumberOfKnownMappings() {
+		// Act:
+		final MappingRepository repository = new MappingRepository();
+		repository.addMapping(Integer.class, String.class, Object::toString);
+		repository.addMapping(Double.class, String.class, Object::toString);
+		repository.addMapping(String.class, String.class, Object::toString);
+		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
+
+		// Assert:
+		Assert.assertThat(repository.size(), IsEqual.equalTo(4));
+	}
+
+	@Test
+	public void isSupportedReturnsTrueForSupportedMappings() {
+		// Act:
+		final MappingRepository repository = new MappingRepository();
+		repository.addMapping(Integer.class, String.class, Object::toString);
+		repository.addMapping(Double.class, String.class, Object::toString);
+		repository.addMapping(String.class, String.class, Object::toString);
+		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
+
+		// Assert:
+		Assert.assertThat(repository.isSupported(Integer.class, String.class), IsEqual.equalTo(true));
+		Assert.assertThat(repository.isSupported(Double.class, String.class), IsEqual.equalTo(true));
+		Assert.assertThat(repository.isSupported(String.class, String.class), IsEqual.equalTo(true));
+		Assert.assertThat(repository.isSupported(Integer.class, Double.class), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isSupportedReturnsFalseForUnsupportedMappings() {
+		// Act:
+		final MappingRepository repository = new MappingRepository();
+		repository.addMapping(Integer.class, String.class, Object::toString);
+		repository.addMapping(Double.class, String.class, Object::toString);
+		repository.addMapping(String.class, String.class, Object::toString);
+		repository.addMapping(Integer.class, Double.class, Integer::doubleValue);
+
+		// Assert:
+		Assert.assertThat(repository.isSupported(Integer.class, Object.class), IsEqual.equalTo(false));
+		Assert.assertThat(repository.isSupported(String.class, Double.class), IsEqual.equalTo(false));
+		Assert.assertThat(repository.isSupported(Object.class, Object.class), IsEqual.equalTo(false));
+		Assert.assertThat(repository.isSupported(Long.class, Double.class), IsEqual.equalTo(false));
+	}
+
+	//endregion
 }

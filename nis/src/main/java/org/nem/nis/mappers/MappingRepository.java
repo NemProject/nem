@@ -27,6 +27,27 @@ public class MappingRepository implements IMapper {
 		}
 	}
 
+	/**
+	 * Gets the number of known mappings.
+	 *
+	 * @return The number of known mappings.
+	 */
+	public int size() {
+		return this.knownMappings.size();
+	}
+
+	/**
+	 * Gets a value indicating whether or not the desired mapping is supported.
+	 *
+	 * @param sourceClass The source class.
+	 * @param targetClass The target class.
+	 * @return true if the mapping is supported.
+	 */
+	public boolean isSupported(final Class<?> sourceClass, final Class<?> targetClass) {
+		final MappingTypePair pair = new MappingTypePair(sourceClass, targetClass);
+		return this.knownMappings.containsKey(pair);
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <TSource, TTarget> TTarget map(final TSource source, final Class<TTarget> target) {
