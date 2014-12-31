@@ -15,9 +15,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Transfer;
 import org.nem.nis.mappers.AccountDaoLookup;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
-import org.nem.nis.mappers.BlockMapper;
-import org.nem.nis.mappers.TransferMapper;
-import org.nem.nis.test.MockAccountDao;
+import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -71,14 +69,16 @@ public class TransferDaoITCase {
 			this.addMapping(mockAccountDao, recipient);
 			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-				final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
+				final Transfer dbTransfer = MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transferTransaction, Transfer.class);
+				dbTransfer.setBlkIndex(12345);
+				dbTransfer.setOrderId(i - 1);
 				hashes.add(dbTransfer.getTransferHash());
 				dummyBlock.addTransaction(transferTransaction);
 			}
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 		}
 
