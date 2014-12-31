@@ -19,13 +19,8 @@ public class MapperFactory {
 	public IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
 		final MappingRepository mappingRepository = new MappingRepository();
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			mappingRepository.addMappingUnchecked(
-					entry.modelClass,
-					entry.dbModelClass,
-					entry.createModelToDbModelMapper.apply(mappingRepository));
+			entry.addModelToDbModelMappers(mappingRepository);
 		}
-
-		// TODO: try to remove unchecked!
 
 		mappingRepository.addMapping(Account.class, org.nem.nis.dbmodel.Account.class, new AccountModelToDbModelMapping(accountDaoLookup));
 		mappingRepository.addMapping(Block.class, org.nem.nis.dbmodel.Block.class, new BlockModelToDbModelMapping(mappingRepository));
@@ -41,14 +36,7 @@ public class MapperFactory {
 	public IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
 		final MappingRepository mappingRepository = new MappingRepository();
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			mappingRepository.addMappingUnchecked(
-					entry.dbModelClass,
-					entry.modelClass,
-					entry.createDbModelToModelMapper.apply(mappingRepository));
-			mappingRepository.addMappingUnchecked(
-					entry.dbModelClass,
-					Transaction.class,
-					entry.createDbModelToModelMapper.apply(mappingRepository));
+			entry.addDbModelToModelMappers(mappingRepository);
 		}
 
 		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new AccountDbModelToModelMapping(accountLookup));

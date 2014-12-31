@@ -28,16 +28,6 @@ public class TransactionRegistry {
 		public final BiConsumer<Block, List<TDbModel>> setInBlock;
 
 		/**
-		 * A function that will create a model to db model transaction mapping given a mapper.
-		 */
-		public final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper;
-
-		/**
-		 * A function that will create a db model to model transaction mapping given a mapper.
-		 */
-		public final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper;
-
-		/**
 		 * The db model transaction class.
 		 */
 		public final Class<TDbModel> dbModelClass;
@@ -46,6 +36,9 @@ public class TransactionRegistry {
 		 * The model transaction class.
 		 */
 		public final Class<TModel> modelClass;
+
+		private final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper;
+		private final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper;
 
 		private Entry(
 				final Function<Block, List<TDbModel>> getFromBlock,
@@ -60,6 +53,25 @@ public class TransactionRegistry {
 			this.createDbModelToModelMapper = createDbModelToModelMapper;
 			this.dbModelClass = dbModelClass;
 			this.modelClass = modelClass;
+		}
+
+		/**
+		 * Adds model to db model mappers to the mapping repository.
+		 *
+		 * @param repository The mapping repository
+		 */
+		public void addModelToDbModelMappers(final MappingRepository repository) {
+			repository.addMapping(this.modelClass, this.dbModelClass, this.createModelToDbModelMapper.apply(repository));
+		}
+
+		/**
+		 * Adds db model to model mappers to the mapping repository.
+		 *
+		 * @param repository The mapping repository
+		 */
+		public void addDbModelToModelMappers(final MappingRepository repository) {
+			repository.addMapping(this.dbModelClass, this.modelClass, this.createDbModelToModelMapper.apply(repository));
+			repository.addMapping(this.dbModelClass, Transaction.class, this.createDbModelToModelMapper.apply(repository));
 		}
 	}
 
