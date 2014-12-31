@@ -55,6 +55,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 		final List<Class<?>> expectedClasses = Arrays.asList(
 				UniversalTransactionValidator.class,
+				MultisigNonOperationalValidator.class,
 				NonFutureEntityValidator.class,
 				TransferTransactionValidator.class,
 				ImportanceTransferTransactionValidator.class,

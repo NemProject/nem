@@ -19,6 +19,12 @@ public class MultisigNonOperationalValidator implements SingleTransactionValidat
 			return ValidationResult.SUCCESS;
 		}
 
+		// TODO 20141231: this is an evil hack to distinguish CHILD transaction from parent transaction
+		// do not check child transaction, parent should be checked
+		if (transaction.getSignature() == null) {
+			return ValidationResult.SUCCESS;
+		}
+
 		if (TransactionTypes.MULTISIG_SIGNER_MODIFY != transaction.getType()) {
 			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
 		}
