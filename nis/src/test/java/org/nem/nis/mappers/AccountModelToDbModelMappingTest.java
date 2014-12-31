@@ -2,8 +2,8 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.*;
-import org.nem.core.model.*;
+import org.mockito.Mockito;
+import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
 
 public class AccountModelToDbModelMappingTest {

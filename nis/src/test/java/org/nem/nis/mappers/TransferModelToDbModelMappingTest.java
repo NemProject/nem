@@ -1,6 +1,5 @@
 package org.nem.nis.mappers;
 
-import junit.framework.TestCase;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;

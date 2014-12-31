@@ -2,12 +2,10 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.AbstractTransfer;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -55,8 +53,8 @@ public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.
 		block.setSignature(new Signature(dbBlock.getForgerProof()));
 
 		final int count = StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
-			.map(e -> e.getFromBlock.apply(dbBlock).size())
-			.reduce(0, Integer::sum);
+				.map(e -> e.getFromBlock.apply(dbBlock).size())
+				.reduce(0, Integer::sum);
 
 		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {

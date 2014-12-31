@@ -9,7 +9,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountCache;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.TransferBlockPair;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -11,7 +11,6 @@ import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.AccountDao;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.*;

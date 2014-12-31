@@ -2,10 +2,9 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.ImportanceTransfer;
 
 /**
  * A mapping that is able to map a db importance transfer to a model importance transfer transaction.

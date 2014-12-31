@@ -3,8 +3,8 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.*;
 import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.dbmodel.*;
 

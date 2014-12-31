@@ -8,7 +8,7 @@ import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.visitors.PartialWeightedScoreVisitor;
 

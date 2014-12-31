@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.crypto.PublicKey;

@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Block;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.test.*;
 
 public class BlockChainLastBlockLayerTest {
@@ -44,7 +44,7 @@ public class BlockChainLastBlockLayerTest {
 		final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
 		final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(mockBlockDao, mapper);
 		final org.nem.core.model.Block lastBlock = createBlock();
-		final Block lastDbBlock = mapper.map(lastBlock) ;
+		final Block lastDbBlock = mapper.map(lastBlock);
 
 		// Act:
 		lastBlockLayer.analyzeLastBlock(lastDbBlock);

@@ -1,7 +1,7 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.*;
 import org.nem.core.model.Block;
+import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
