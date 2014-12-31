@@ -62,19 +62,19 @@ public class NisDbModelToModelMapper {
 	 */
 	public Collection<Transaction> mapTransactionsIf(final org.nem.nis.dbmodel.Block block, final Predicate<AbstractTransfer> shouldInclude) {
 		final Collection<Transaction> transactions = new ArrayList<>();
-		transactions.addAll(this.mapTransactions(block.getBlockTransfers(), shouldInclude, TransferTransaction.class));
-		transactions.addAll(this.mapTransactions(block.getBlockImportanceTransfers(), shouldInclude, ImportanceTransferTransaction.class));
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			transactions.addAll(this.mapTransactions(entry.getFromBlock.apply(block), shouldInclude));
+		}
+
 		return transactions;
 	}
 
-	// TODO 20141230 J-J: should remove need for transaction type
-	private <TDbModel extends AbstractTransfer, TModel extends Transaction> Collection<Transaction> mapTransactions(
+	private <TDbModel extends AbstractTransfer> Collection<Transaction> mapTransactions(
 			final Collection<TDbModel> dbTransactions,
-			final Predicate<AbstractTransfer> shouldInclude,
-			final Class<TModel> transactionType) {
+			final Predicate<AbstractTransfer> shouldInclude) {
 		return dbTransactions.stream()
 				.filter(shouldInclude::test)
-				.map(t -> this.mapper.map(t, transactionType))
+				.map(t -> this.mapper.map(t, Transaction.class))
 				.collect(Collectors.toList());
 	}
 }

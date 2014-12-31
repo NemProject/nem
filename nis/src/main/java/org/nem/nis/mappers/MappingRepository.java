@@ -27,6 +27,27 @@ public class MappingRepository implements IMapper {
 		}
 	}
 
+	//TODO: add test and size
+
+	/**
+	 * Adds a mapping to this mapper.
+	 *
+	 * @param sourceClass The source type.
+	 * @param targetClass The target type.
+	 * @param mapping The mapping
+	 * @param <TSource> The source type.
+	 * @param <TTarget> The target type.
+	 */
+	public <TSource, TTarget> void addMappingUnchecked(
+			final Class<TSource> sourceClass,
+			final Class<TTarget> targetClass,
+			final IMapping mapping) {
+		final MappingTypePair pair = new MappingTypePair(sourceClass, targetClass);
+		if (null != this.knownMappings.putIfAbsent(pair, mapping)) {
+			throw new MappingException(String.format("cannot change mapping for pair: %s", pair));
+		}
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public <TSource, TTarget> TTarget map(final TSource source, final Class<TTarget> target) {

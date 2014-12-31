@@ -4,7 +4,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.dbmodel.*;
 
 /**
  * Factory for creating a mapper.
@@ -19,8 +18,15 @@ public class MapperFactory {
 	 */
 	public IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
 		final MappingRepository mappingRepository = new MappingRepository();
-		mappingRepository.addMapping(TransferTransaction.class, Transfer.class, new TransferModelToDbModelMapping(mappingRepository));
-		mappingRepository.addMapping(ImportanceTransferTransaction.class, ImportanceTransfer.class, new ImportanceTransferModelToDbModelMapping(mappingRepository));
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			mappingRepository.addMappingUnchecked(
+					entry.modelClass,
+					entry.dbModelClass,
+					entry.createModelToDbModelMapper.apply(mappingRepository));
+		}
+
+		// TODO: try to remove unchecked!
+
 		mappingRepository.addMapping(Account.class, org.nem.nis.dbmodel.Account.class, new AccountModelToDbModelMapping(accountDaoLookup));
 		mappingRepository.addMapping(Block.class, org.nem.nis.dbmodel.Block.class, new BlockModelToDbModelMapping(mappingRepository));
 		return mappingRepository;
@@ -34,8 +40,17 @@ public class MapperFactory {
 	 */
 	public IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
 		final MappingRepository mappingRepository = new MappingRepository();
-		mappingRepository.addMapping(Transfer.class, TransferTransaction.class, new TransferDbModelToModelMapping(mappingRepository));
-		mappingRepository.addMapping(ImportanceTransfer.class, ImportanceTransferTransaction.class, new ImportanceTransferDbModelToModelMapping(mappingRepository));
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			mappingRepository.addMappingUnchecked(
+					entry.dbModelClass,
+					entry.modelClass,
+					entry.createDbModelToModelMapper.apply(mappingRepository));
+			mappingRepository.addMappingUnchecked(
+					entry.dbModelClass,
+					Transaction.class,
+					entry.createDbModelToModelMapper.apply(mappingRepository));
+		}
+
 		mappingRepository.addMapping(org.nem.nis.dbmodel.Account.class, Account.class, new AccountDbModelToModelMapping(accountLookup));
 		mappingRepository.addMapping(org.nem.nis.dbmodel.Block.class, Block.class, new BlockDbModelToModelMapping(mappingRepository, accountLookup));
 		return mappingRepository;

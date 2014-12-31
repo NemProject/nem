@@ -10,6 +10,32 @@ import org.nem.core.time.TimeInstant;
 
 public class TransactionFactoryTest {
 
+	//region size / isSupported
+
+	@Test
+	public void allExpectedTransactionTypesAreSupported() {
+		// Assert:
+		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(2));
+	}
+
+	@Test
+	public void isSupportedReturnsTrueForSupportedTypes() {
+		// Assert:
+		Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER), IsEqual.equalTo(true));
+		Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.IMPORTANCE_TRANSFER), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void isSupportedReturnsFalseForUnsupportedTypes() {
+		// Assert:
+		Assert.assertThat(TransactionFactory.isSupported(9999), IsEqual.equalTo(false));
+		Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER | 0x1000), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region Unknown Transaction Type
+
 	@Test(expected = IllegalArgumentException.class)
 	public void cannotDeserializeUnknownTransaction() {
 		// Arrange:
@@ -20,6 +46,8 @@ public class TransactionFactoryTest {
 		// Act:
 		TransactionFactory.VERIFIABLE.deserialize(deserializer);
 	}
+
+	//endregion
 
 	//region TransferTransaction
 

@@ -91,21 +91,16 @@ public class BlockDbModelToModelMappingTest {
 	@Test
 	public void blockWithTransfersCanBeMappedToModel() {
 		// Assert:
-		assertBlockWithTransfersCanBeMappedToModel(
-				TestContext::addTransfer,
-				TransferTransaction.class);	}
+		assertBlockWithTransfersCanBeMappedToModel(TestContext::addTransfer);
+	}
 
 	@Test
 	public void blockWithImportanceTransfersCanBeMappedToModel() {
 		// Assert:
-		assertBlockWithTransfersCanBeMappedToModel(
-				TestContext::addImportanceTransfer,
-				ImportanceTransferTransaction.class);
+		assertBlockWithTransfersCanBeMappedToModel(TestContext::addImportanceTransfer);
 	}
 
-	private static void assertBlockWithTransfersCanBeMappedToModel(
-			final TestContext.TransactionFactory factory,
-			final Class<?> expectedClass) {
+	private static void assertBlockWithTransfersCanBeMappedToModel(final TestContext.TransactionFactory factory) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
@@ -121,7 +116,7 @@ public class BlockDbModelToModelMappingTest {
 		context.assertModel(model);
 		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(3));
 		Assert.assertThat(model.getTransactions(), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(expectedClass));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(Transaction.class));
 	}
 
 	@Test
@@ -145,8 +140,7 @@ public class BlockDbModelToModelMappingTest {
 		Assert.assertThat(
 				model.getTransactions(),
 				IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2, transfer3, transfer4)));
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(TransferTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(ImportanceTransferTransaction.class));
+		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(Transaction.class));
 	}
 
 	//endregion
@@ -224,14 +218,14 @@ public class BlockDbModelToModelMappingTest {
 					ImportanceTransferTransaction.class);
 		}
 
-		private <TDbTransfer extends AbstractTransfer, TModelTransfer> TModelTransfer addTransfer(
+		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(
 				final Consumer<TDbTransfer> addTransaction,
 				final int blockIndex,
 				final TDbTransfer dbTransfer,
 				final Class<TModelTransfer> modelClass) {
 			dbTransfer.setBlkIndex(blockIndex);
 			final TModelTransfer transfer = Mockito.mock(modelClass);
-			Mockito.when(this.mapper.map(dbTransfer, modelClass)).thenReturn(transfer);
+			Mockito.when(this.mapper.map(dbTransfer, Transaction.class)).thenReturn(transfer);
 			addTransaction.accept(dbTransfer);
 			return transfer;
 		}

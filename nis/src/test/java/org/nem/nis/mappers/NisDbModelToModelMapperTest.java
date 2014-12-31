@@ -101,7 +101,7 @@ public class NisDbModelToModelMapperTest {
 				final TModel transfer = Mockito.mock(modelClass);
 				transfers.add(transfer);
 
-				Mockito.when(this.mapper.map(dbTransfer, modelClass)).thenReturn(transfer);
+				Mockito.when(this.mapper.map(dbTransfer, Transaction.class)).thenReturn(transfer);
 			}
 
 			setTransactions.accept(dbTransfers);
