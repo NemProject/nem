@@ -59,7 +59,7 @@ public class AccountIoAdapter implements AccountIo {
 		final Account account = this.accountCache.findByAddress(address);
 		final Integer intTimeStamp = this.intOrMaxInt(timeStamp);
 		final Collection<TransferBlockPair> pairs = this.transferDao.getTransactionsForAccount(account, intTimeStamp, DEFAULT_LIMIT);
-		return toSerializableTransactionMetaDataPairList(pairs);
+		return this.toSerializableTransactionMetaDataPairList(pairs);
 	}
 
 	@Override
