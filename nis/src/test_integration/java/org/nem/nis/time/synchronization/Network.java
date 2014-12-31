@@ -54,7 +54,7 @@ public class Network {
 	private int nodeId = 1;
 	private final int viewSize;
 	private final NodeSettings nodeSettings;
-	private final TimeSynchronizationStrategy syncStrategy;
+	private TimeSynchronizationStrategy syncStrategy;
 	private AccountStateCache accountStateCache;
 	private PoiFacade poiFacade;
 	private long realTime = 0;
@@ -79,7 +79,7 @@ public class Network {
 		this.name = name;
 		this.viewSize = viewSize;
 		this.nodeSettings = nodeSettings;
-		this.accountStateCache = new DefaultAccountStateCache();
+		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
 		this.syncStrategy = this.createSynchronizationStrategy();
 		long cumulativeInaccuracy = 0;
@@ -253,8 +253,9 @@ public class Network {
 	}
 
 	private AccountStateCache resetCache() {
-		this.accountStateCache = new DefaultAccountStateCache();
+		this.accountStateCache = new DefaultAccountStateCache().asAutoCache();
 		this.poiFacade = new DefaultPoiFacade(NisUtils.createImportanceCalculator());
+		this.syncStrategy = this.createSynchronizationStrategy();
 		final Set<TimeAwareNode> oldNodes = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		oldNodes.addAll(this.nodes);
 		this.nodes.clear();
@@ -281,7 +282,7 @@ public class Network {
 
 	private void setFacadeLastPoiVectorSize(final PoiFacade facade, final int lastPoiVectorSize) {
 		try {
-			final Field field = PoiFacade.class.getDeclaredField("lastPoiVectorSize");
+			final Field field = DefaultPoiFacade.class.getDeclaredField("lastPoiVectorSize");
 			field.setAccessible(true);
 			field.set(facade, lastPoiVectorSize);
 		} catch (IllegalAccessException | NoSuchFieldException e) {
@@ -342,7 +343,7 @@ public class Network {
 		while (tries < maxTries && hits < this.viewSize) {
 			final int index = this.random.nextInt(this.nodes.size());
 			final AccountState state = this.accountStateCache.findStateByAddress(nodeArray[index].getNode().getIdentity().getAddress());
-			if (!nodeArray[index].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+			if (!nodeArray[index].equals(node) && this.isEligiblePartner(state)) {
 				hits++;
 				partners.add(nodeArray[index]);
 				if (nodeArray[index].isEvil()) {
@@ -356,7 +357,7 @@ public class Network {
 			// There might be just too many evil nodes. Let's assume we use one pretrusted node if we meet this case in a real environment.
 			for (int i = 0; i < this.nodes.size(); i++) {
 				final AccountState state = this.accountStateCache.findStateByAddress(nodeArray[i].getNode().getIdentity().getAddress());
-				if (!nodeArray[i].equals(node) && TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE < state.getImportanceInfo().getImportance(HEIGHT)) {
+				if (!nodeArray[i].equals(node) && this.isEligiblePartner(state)) {
 					partners.add(nodeArray[i]);
 					break;
 				}
@@ -364,6 +365,11 @@ public class Network {
 		}
 
 		return partners;
+	}
+
+	private boolean isEligiblePartner(final AccountState state) {
+		final double adjustedMinimumImportance = TimeSynchronizationConstants.REQUIRED_MINIMUM_IMPORTANCE * 500 / this.nodes.size();
+		return adjustedMinimumImportance < state.getImportanceInfo().getImportance(HEIGHT);
 	}
 
 	/**

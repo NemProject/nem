@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 public class TimeSynchronizationITCase {
-	private static final int STANDARD_NETWORK_SIZE = 500;
+	private static final int STANDARD_NETWORK_SIZE = 100;
 	private static final int INITIAL_TIME_SPREAD = 50000;
 	private static final boolean REMOTE_RECEIVE_SEND_DELAY = true;
 	private static final boolean ASYMMETRIC_CHANNELS = true;
@@ -107,6 +107,8 @@ public class TimeSynchronizationITCase {
 
 	@Test
 	public void unstableClockWithoutPeriodicClockAdjustmentDoesNotProduceShiftInFriendlyEnvironment() {
+		// this test usually fails for an obvious reason:
+		// without node clocks getting periodically adjusted there will always be a net shift in one or the other direction.
 		final NodeSettings settings = this.createNodeSettings(
 				INITIAL_TIME_SPREAD,
 				!REMOTE_RECEIVE_SEND_DELAY,
@@ -206,7 +208,9 @@ public class TimeSynchronizationITCase {
 		network.updateStatistics();
 		network.logStatistics();
 		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
-		Assert.assertThat(Math.abs(oldMean - network.calculateMean()) < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
+		final double changeInMean = Math.abs(oldMean - network.calculateMean());
+		Network.log(String.format("Change in mean: %fms", changeInMean));
+		Assert.assertThat(changeInMean < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
 	}
 
 	/**
@@ -313,7 +317,7 @@ public class TimeSynchronizationITCase {
 
 	@Test
 	public void insanelyHighPercentageOfAttackersDoesNotInfluenceNetworkTime() {
-		this.assertAttackersDoNotInfluenceNetworkTime(99);
+		this.assertAttackersDoNotInfluenceNetworkTime(98);
 	}
 
 	private void assertAttackersDoNotInfluenceNetworkTime(final int percentageEvilNodes) {
