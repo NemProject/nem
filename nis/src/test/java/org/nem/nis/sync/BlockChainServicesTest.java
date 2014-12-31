@@ -149,6 +149,41 @@ public class BlockChainServicesTest {
 //		);
 	}
 
+	@Test
+		 public void chainWithMultipleMultisigTransactionIsIsValid() {
+		final TestContext context = new TestContext();
+
+		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		parentBlock.sign();
+
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(100 + 10 + 7 + 9));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
+		context.recalculateImportances(START_HEIGHT);
+		context.makeCosignatory(cosignatory1, multisigAccount);
+
+		final Transaction transfer1 = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
+		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer1);
+		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
+		transaction1.sign();
+
+		final Transaction transfer2 = createTransfer(multisigAccount, Amount.fromNem(100), Amount.fromNem(9));
+		final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer2);
+		transaction2.setDeadline(transaction2.getTimeStamp().addSeconds(10));
+		transaction2.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
+		final Block block = blocks.get(1);
+		block.addTransaction(transaction1);
+		block.addTransaction(transaction2);
+		block.sign();
+
+		final boolean result = context.isValid(parentBlock, blocks);
+
+		// Act+Assert:
+		Assert.assertThat(result, IsEqual.equalTo(true));
+	}
+
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 	}
