@@ -5,12 +5,12 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.serialization.AccountLookup;
 
-public class MapperFactoryTest {
+public class DefaultMapperFactoryTest {
 
 	@Test
 	public void canCreateModelToDbModelMapper() {
 		// Act:
-		final MapperFactory factory = new MapperFactory();
+		final DefaultMapperFactory factory = new DefaultMapperFactory();
 		final IMapper mapper = factory.createModelToDbModelMapper(Mockito.mock(AccountDaoLookup.class));
 
 		// Assert:
@@ -20,7 +20,7 @@ public class MapperFactoryTest {
 	@Test
 	public void canCreateDbModelToModelMapper() {
 		// Act:
-		final MapperFactory factory = new MapperFactory();
+		final DefaultMapperFactory factory = new DefaultMapperFactory();
 		final IMapper mapper = factory.createDbModelToModelMapper(Mockito.mock(AccountLookup.class));
 
 		// Assert:

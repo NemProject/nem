@@ -166,7 +166,7 @@ public class NisAppConfig {
 
 	@Bean
 	public MapperFactory mapperFactory() {
-		return new MapperFactory();
+		return new DefaultMapperFactory();
 	}
 
 	@Bean

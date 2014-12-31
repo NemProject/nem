@@ -929,6 +929,6 @@ public class TransferDaoTest {
 	}
 
 	private static Transfer mapToTransfer(final TransferTransaction transaction, final AccountDaoLookup accountDaoLookup) {
-		return new MapperFactory().createModelToDbModelMapper(accountDaoLookup).map(transaction, Transfer.class);
+		return MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transaction, Transfer.class);
 	}
 }

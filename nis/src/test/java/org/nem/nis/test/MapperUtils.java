@@ -13,6 +13,26 @@ public class MapperUtils {
 	//region create mappers
 
 	/**
+	 * Creates a mapper for mapping model types to db model types.
+	 *
+	 * @param accountDao The account dao.
+	 * @return The mapper.
+	 */
+	public static IMapper createModelToDbModelMapper(final AccountDao accountDao) {
+		return createModelToDbModelMapper(new AccountDaoLookupAdapter(accountDao));
+	}
+
+	/**
+	 * Creates a mapper for mapping model types to db model types.
+	 *
+	 * @param accountDaoLookup The account dao lookup.
+	 * @return The mapper.
+	 */
+	public static IMapper createModelToDbModelMapper(final AccountDaoLookup accountDaoLookup) {
+		return new DefaultMapperFactory().createModelToDbModelMapper(accountDaoLookup);
+	}
+
+	/**
 	 * Creates a NIS mapper facade for mapping model types to db model types.
 	 *
 	 * @param accountDao The account dao.
@@ -29,7 +49,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static NisModelToDbModelMapper createModelToDbModelNisMapper(final AccountDaoLookup accountDaoLookup) {
-		return new NisModelToDbModelMapper(new MapperFactory().createModelToDbModelMapper(accountDaoLookup));
+		return new NisModelToDbModelMapper(new DefaultMapperFactory().createModelToDbModelMapper(accountDaoLookup));
 	}
 
 	/**
@@ -39,7 +59,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static NisDbModelToModelMapper createDbModelToModelNisMapper(final AccountLookup accountLookup) {
-		return new NisMapperFactory(new MapperFactory()).createDbModelToModelNisMapper(accountLookup);
+		return new NisMapperFactory(new DefaultMapperFactory()).createDbModelToModelNisMapper(accountLookup);
 	}
 
 	//endregion

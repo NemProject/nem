@@ -10,7 +10,7 @@ public class NisMapperFactoryTest {
 	@Test
 	public void canCreateDbModelToModelNisMapper() {
 		// Act:
-		final NisMapperFactory factory = new NisMapperFactory(new MapperFactory());
+		final NisMapperFactory factory = new NisMapperFactory(new DefaultMapperFactory());
 		final NisDbModelToModelMapper mapper = factory.createDbModelToModelNisMapper(Mockito.mock(AccountLookup.class));
 
 		// Assert:
