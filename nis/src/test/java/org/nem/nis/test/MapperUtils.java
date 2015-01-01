@@ -10,6 +10,19 @@ import org.nem.nis.mappers.*;
  */
 public class MapperUtils {
 
+	//region create mapper factories
+
+	/**
+	 * Creates a NIS mapper factory.
+	 *
+	 * @return The NIS mapper factory.
+	 */
+	public static NisMapperFactory createNisMapperFactory() {
+		return new NisMapperFactory(new DefaultMapperFactory());
+	}
+
+	//endregion
+
 	//region create mappers
 
 	/**
@@ -59,7 +72,7 @@ public class MapperUtils {
 	 * @return The mapper.
 	 */
 	public static NisDbModelToModelMapper createDbModelToModelNisMapper(final AccountLookup accountLookup) {
-		return new NisMapperFactory(new DefaultMapperFactory()).createDbModelToModelNisMapper(accountLookup);
+		return createNisMapperFactory().createDbModelToModelNisMapper(accountLookup);
 	}
 
 	//endregion

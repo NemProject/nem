@@ -18,7 +18,7 @@ import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.NisUtils;
+import org.nem.nis.test.*;
 import org.nem.nis.validators.BlockValidatorFactory;
 import org.nem.nis.validators.TransactionValidatorFactory;
 
@@ -346,8 +346,8 @@ public class BlockChainServicesTest {
 					this.blockDao,
 					this.observerFactory,
 					this.blockValidatorFactory,
-					this.transactionValidatorFactory
-			);
+					this.transactionValidatorFactory,
+					MapperUtils.createNisMapperFactory());
 		}
 
 		private Account createAccountWithBalance(final Amount balance) {

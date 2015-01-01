@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 public class BlockMapper {
 
 	private static class BlockTransactionDbMapper {
+
+
 		private final AccountDaoLookup accountDao;
 		private final org.nem.nis.dbmodel.Block dbBlock;
 
@@ -63,12 +65,12 @@ public class BlockMapper {
 		private void handleTransaction(final Transaction transaction, final MultisigTransaction multisig) {
 			switch (transaction.getType()) {
 				case TransactionTypes.TRANSFER: {
-					final Transfer dbTransfer = TransferMapper.toDbModel(
+					final Transfer dbTransfer = null; /*TransferMapper.toDbModel(
 							(TransferTransaction)transaction,
 							this.i,
 							this.importanceTransferIndex++,
 							this.accountDao);
-					dbTransfer.setBlock(this.dbBlock);
+					dbTransfer.setBlock(this.dbBlock);*/
 					this.transferTransactions.add(dbTransfer);
 
 					if (multisig != null) {
@@ -77,11 +79,12 @@ public class BlockMapper {
 				}
 				break;
 				case TransactionTypes.IMPORTANCE_TRANSFER: {
-					final ImportanceTransfer dbTransfer = ImportanceTransferMapper.toDbModel(
+					final ImportanceTransfer dbTransfer = /*ImportanceTransferMapper.toDbModel(
 							(ImportanceTransferTransaction)transaction,
 							this.i,
 							this.transferIndex++,
-							this.accountDao);
+							this.accountDao);*/
+							null;
 					dbTransfer.setBlock(this.dbBlock);
 					this.importanceTransferTransactions.add(dbTransfer);
 
@@ -140,7 +143,8 @@ public class BlockMapper {
 	 * @return The Block db-model.
 	 */
 	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDao) {
-		final org.nem.nis.dbmodel.Account harvester = accountDao.findByAddress(block.getSigner().getAddress());
+		return null;
+		/*final org.nem.nis.dbmodel.Account harvester = accountDao.findByAddress(block.getSigner().getAddress());
 		final org.nem.nis.dbmodel.Account lessor = block.getLessor() != null ? accountDao.findByAddress(block.getLessor().getAddress()) : null;
 
 		final Hash blockHash = HashUtils.calculateHash(block);
@@ -164,7 +168,7 @@ public class BlockMapper {
 		}
 
 		blockTransactionDbMapper.saveTransfers();
-		return dbBlock;
+		return dbBlock;*/
 	}
 
 	/**
@@ -175,7 +179,8 @@ public class BlockMapper {
 	 * @return The Block model.
 	 */
 	public static Block toModel(final org.nem.nis.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
-		if (1 == dbBlock.getHeight()) {
+		return null;
+		/*if (1 == dbBlock.getHeight()) {
 			return NemesisBlock.fromResource(new DeserializationContext(accountLookup));
 		}
 
@@ -236,6 +241,6 @@ public class BlockMapper {
 		}
 
 		block.addTransactions(transactions);
-		return block;
+		return block;*/
 	}
 }

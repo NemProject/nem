@@ -43,9 +43,9 @@ public class MultisigTransactionMapper {
 	public static org.nem.core.model.MultisigTransaction toModel(final MultisigTransaction dbTransfer, final AccountLookup accountLookup) {
 		final Transaction otherTransaction;
 		if (dbTransfer.getTransfer() != null) {
-			otherTransaction = TransferMapper.toModel(dbTransfer.getTransfer(), accountLookup);
+			otherTransaction = null; //TransferMapper.toModel(dbTransfer.getTransfer(), accountLookup);
 		} else if (dbTransfer.getImportanceTransfer() != null) {
-			otherTransaction = ImportanceTransferMapper.toModel(dbTransfer.getImportanceTransfer(), accountLookup);
+			otherTransaction = null; // TODO ImportanceTransferMapper.toModel(dbTransfer.getImportanceTransfer(), accountLookup);
 		} else if (dbTransfer.getMultisigSignerModification() != null) {
 			otherTransaction = MultisigSignerModificationMapper.toModel(dbTransfer.getMultisigSignerModification(), accountLookup);
 		} else {
