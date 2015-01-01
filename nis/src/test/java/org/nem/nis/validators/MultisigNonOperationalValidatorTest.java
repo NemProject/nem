@@ -112,7 +112,7 @@ public class MultisigNonOperationalValidatorTest {
 		final Transaction transaction = new MultisigSignerModificationTransaction(
 				TimeInstant.ZERO,
 				multisig,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Unknown, newCosignatory)));
+				Arrays.asList(new MultisigModification(MultisigModificationType.Del, newCosignatory)));
 		transaction.sign();
 
 		// Act:
