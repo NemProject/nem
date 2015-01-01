@@ -81,6 +81,7 @@ public class TransactionValidatorFactory {
 		visitor.accept(new TransferTransactionValidator());
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
 		visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache, blockVerification));
+		visitor.accept(new MultisigSignerModificationTransactionValidator(accountStateCache));
 	}
 
 	/**

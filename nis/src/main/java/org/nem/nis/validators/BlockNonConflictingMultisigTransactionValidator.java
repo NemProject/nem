@@ -35,6 +35,11 @@ public class BlockNonConflictingMultisigTransactionValidator implements BlockVal
 			final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
 			final ReadOnlyAccountState multisigState = this.nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
 
+			if (multisigState.getMultisigLinks().getCosignatories().size() == 1) {
+				return true;
+			}
+
+			int expectedNumberOfCosignatories = multisigState.getMultisigLinks().getCosignatories().size() - 1;
 			if (multisigTransaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
 				final MultisigSignerModificationTransaction modification = (MultisigSignerModificationTransaction)multisigTransaction.getOtherTransaction();
 				// TODO test if there is multisigmodification inside and if it's type is Del
@@ -51,9 +56,13 @@ public class BlockNonConflictingMultisigTransactionValidator implements BlockVal
 				if (deletions > 1) {
 					return false;
 				}
+
+				if (deletions == 1) {
+					expectedNumberOfCosignatories -= 1;
+				}
 			}
 
-			if (multisigState.getMultisigLinks().getCosignatories().size() - 1 == multisigTransaction.getCosignerSignatures().size()) {
+			if (expectedNumberOfCosignatories == multisigTransaction.getCosignerSignatures().size()) {
 				return true;
 			}
 

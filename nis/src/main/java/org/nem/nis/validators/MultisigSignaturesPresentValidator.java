@@ -6,6 +6,9 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
 	private final boolean blockVerification;
@@ -48,6 +51,18 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 			return ValidationResult.SUCCESS;
 		}
 
+		Address accountForRemoval = null;
+		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
+			final MultisigSignerModificationTransaction modificationTransaction = (MultisigSignerModificationTransaction)transaction.getOtherTransaction();
+			final List<Address> removal = modificationTransaction.getModifications().stream()
+					.filter(m -> m.getModificationType() == MultisigModificationType.Del)
+					.map(m -> m.getCosignatory().getAddress())
+					.collect(Collectors.toList());
+			if (removal.size() == 1) {
+				accountForRemoval = removal.get(0);
+			}
+		}
+
 		final Hash transactionHash = transaction.getOtherTransactionHash();
 		// this loop could be done using reduce, but I'm leaving it like this for readability
 		// TODO: this probably should be done differently, as right now it allows more MultisigSignatures, than there are actual cosigners
@@ -55,6 +70,11 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
 			}
+
+			if (accountForRemoval != null && cosignerAddress.equals(accountForRemoval)) {
+				continue;
+			}
+			
 			final boolean hasCosigner = transaction.getCosignerSignatures().stream()
 					.anyMatch(
 							t -> t.getOtherTransactionHash().equals(transactionHash) &&

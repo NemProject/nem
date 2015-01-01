@@ -59,7 +59,8 @@ public class TransactionValidatorFactoryTest {
 				NonFutureEntityValidator.class,
 				TransferTransactionValidator.class,
 				ImportanceTransferTransactionValidator.class,
-				MultisigSignaturesPresentValidator.class);
+				MultisigSignaturesPresentValidator.class,
+				MultisigSignerModificationTransactionValidator.class);
 
 		// Act:
 		final List<SingleTransactionValidator> validators = new ArrayList<>();

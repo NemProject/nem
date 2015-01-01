@@ -229,7 +229,6 @@ public class BlockChainServicesTest {
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
-	// TODO: this test shouldn't pass as cosignatoryDel1 is not cosignatory, check it
 	@Test
 	public void chainWithMultisigModificationsWithSingleDelIsIsValid() {
 		final TestContext context = new TestContext();
@@ -244,6 +243,7 @@ public class BlockChainServicesTest {
 
 		context.recalculateImportances(START_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
+		context.makeCosignatory(cosignatoryDel1, multisigAccount);
 
 		final MultisigSignerModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1));
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);

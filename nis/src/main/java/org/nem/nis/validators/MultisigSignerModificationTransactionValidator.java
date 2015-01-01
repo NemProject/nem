@@ -1,15 +1,14 @@
 package org.nem.nis.validators;
 
-import com.sun.xml.internal.ws.developer.MemberSubmissionAddressing;
 import org.nem.core.model.*;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.state.ReadOnlyAccountState;
 
 public class MultisigSignerModificationTransactionValidator implements SingleTransactionValidator {
-	private final AccountStateCache stateCache;
+	private final ReadOnlyAccountStateCache stateCache;
 
-	public MultisigSignerModificationTransactionValidator(final AccountStateCache stateCache) {
+	public MultisigSignerModificationTransactionValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
 
@@ -32,7 +31,7 @@ public class MultisigSignerModificationTransactionValidator implements SingleTra
 	}
 
 	private ValidationResult validate(final Address multisigAddress, final MultisigModification modification) {
-		final AccountState cosignerState = this.stateCache.findStateByAddress(modification.getCosignatory().getAddress());
+		final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(modification.getCosignatory().getAddress());
 
 		if (MultisigModificationType.Add == modification.getModificationType() && cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress)) {
 			return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
