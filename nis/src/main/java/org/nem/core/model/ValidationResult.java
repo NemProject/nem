@@ -130,7 +130,13 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because multisig account tried to make transaction that is not allowed
 	 */
-	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG(33);
+	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG(33),
+
+	/**
+	 * Validation failed because signer is already a cosigner of given multisig account.
+	 */
+	FAILURE_MULTISIG_ALREADY_A_COSIGNER(34);
+
 
 	private final int value;
 

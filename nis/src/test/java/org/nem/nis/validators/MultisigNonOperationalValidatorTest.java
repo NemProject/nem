@@ -13,7 +13,6 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MultisigNonOperationalValidatorTest {
