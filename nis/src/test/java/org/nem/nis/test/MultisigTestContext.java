@@ -12,10 +12,12 @@ import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MultisigTestContext {
 	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
+	private final MultisigSignerModificationTransactionValidator multisigSignerModificationTransactionValidator = new MultisigSignerModificationTransactionValidator(this.accountCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
 	private final MultisigTransactionValidator multisigTransactionValidator = new MultisigTransactionValidator(this.accountCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
@@ -38,6 +40,17 @@ public class MultisigTestContext {
 
 	public MultisigTestContext() {
 		this(false);
+	}
+
+	public MultisigSignerModificationTransaction createMultisigSignerModificationTransaction(final MultisigModificationType modificationType) {
+		final MultisigSignerModificationTransaction transaction = new MultisigSignerModificationTransaction(
+				TimeInstant.ZERO,
+				this.multisig,
+				Arrays.asList(new MultisigModification(modificationType, this.signer))
+				);
+		transaction.sign();
+
+		return transaction;
 	}
 
 	public MultisigTransaction createMultisigTransferTransaction() {
@@ -96,5 +109,8 @@ public class MultisigTestContext {
 
 	public ValidationResult validateMultisigTransaction(final Transaction transaction, final BlockHeight height) {
 		return this.multisigTransactionValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
+	}
+	public ValidationResult validateSignerModification(final Transaction transaction) {
+		return multisigSignerModificationTransactionValidator.validate(transaction, new ValidationContext((final Account account, final Amount amount) -> true));
 	}
 }
