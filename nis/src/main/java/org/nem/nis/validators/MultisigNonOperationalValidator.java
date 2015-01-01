@@ -26,6 +26,10 @@ public class MultisigNonOperationalValidator implements SingleTransactionValidat
 		}
 
 		if (TransactionTypes.MULTISIG_SIGNER_MODIFY != transaction.getType()) {
+			if (senderState.getMultisigLinks().isCosignatory() && TransactionTypes.MULTISIG_SIGNATURE == transaction.getType()) {
+				return ValidationResult.SUCCESS;
+			}
+
 			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
 		}
 
