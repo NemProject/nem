@@ -32,20 +32,18 @@ public class MultisigAccountObserverTest {
 		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
-	// TODO: This test is wrong, it should use MultisigModificationType.Del
 	@Test
 	public void notifyTransferExecuteDelRemovedMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Execute);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Del, NotificationTrigger.Execute);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
 		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
-	// TODO: This test is wrong, it should use MultisigModificationType.Del
 	@Test
 	public void notifyTransferUndoDelAddsMultisigLinks() {
-		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Unknown, NotificationTrigger.Undo);
+		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Del, NotificationTrigger.Undo);
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
