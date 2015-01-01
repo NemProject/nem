@@ -3,15 +3,12 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.test.MultisigTestContext;
 
 import java.util.Arrays;
 
@@ -20,13 +17,13 @@ public class MultisigNonOperationalValidatorTest {
 	@Test
 	public void nonMultisigAccountCanValidateAnyTransaction() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final MultisigTestContext context = new MultisigTestContext();
 		final Account account = Utils.generateRandomAccount();
 		final Transaction transaction = new MockTransaction(account);
 		context.addState(account);
 
 		// Act:
-		final ValidationResult result = context.validate(transaction);
+		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -35,7 +32,7 @@ public class MultisigNonOperationalValidatorTest {
 	@Test
 	public void canValidateChildTransaction() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final MultisigTestContext context = new MultisigTestContext();
 		final Account multisig = Utils.generateRandomAccount();
 		final Transaction transaction = new MockTransaction(multisig);
 		final Account cosignatory = Utils.generateRandomAccount();
@@ -46,7 +43,7 @@ public class MultisigNonOperationalValidatorTest {
 		// note, we're not signing transaction which means it's a child transaction
 
 		// Act:
-		final ValidationResult result = context.validate(transaction);
+		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -55,7 +52,7 @@ public class MultisigNonOperationalValidatorTest {
 	@Test
 	public void multisigAccountCannotMakeMostTransactions() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final MultisigTestContext context = new MultisigTestContext();
 		final Account multisig = Utils.generateRandomAccount();
 		final Transaction transaction = new MockTransaction(multisig);
 		final Account cosignatory = Utils.generateRandomAccount();
@@ -66,7 +63,7 @@ public class MultisigNonOperationalValidatorTest {
 		transaction.sign();
 
 		// Act:
-		final ValidationResult result = context.validate(transaction);
+		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
@@ -75,7 +72,7 @@ public class MultisigNonOperationalValidatorTest {
 	@Test
 	public void multisigAccountCanIssueMultisigModification() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final MultisigTestContext context = new MultisigTestContext();
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final Account newCosignatory = Utils.generateRandomAccount();
@@ -90,7 +87,7 @@ public class MultisigNonOperationalValidatorTest {
 		transaction.sign();
 
 		// Act:
-		final ValidationResult result = context.validate(transaction);
+		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -99,7 +96,7 @@ public class MultisigNonOperationalValidatorTest {
 	@Test
 	public void multisigAccountCannotIssueMultisigDelModification() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final MultisigTestContext context = new MultisigTestContext();
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final Account newCosignatory = Utils.generateRandomAccount();
@@ -115,7 +112,7 @@ public class MultisigNonOperationalValidatorTest {
 		transaction.sign();
 
 		// Act:
-		final ValidationResult result = context.validate(transaction);
+		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
@@ -124,7 +121,7 @@ public class MultisigNonOperationalValidatorTest {
 	@Test
 	public void multisigAccountCanIssueMultisigSignatureIfAlsoIsCosignatory() {
 		// Arrange:
-		final TestContext context = new TestContext();
+		final MultisigTestContext context = new MultisigTestContext();
 		final Account deepMultisig = Utils.generateRandomAccount();
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
@@ -141,30 +138,10 @@ public class MultisigNonOperationalValidatorTest {
 		transaction.sign();
 
 		// Act:
-		final ValidationResult result = context.validate(transaction);
+		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	class TestContext {
-		private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
-		private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(accountCache);
-
-		public ValidationResult validate(final Transaction transaction) {
-			return validator.validate(transaction, new ValidationContext((final Account account, final Amount amount) -> true));
-		}
-
-		private AccountState addState(final Account account) {
-			final Address address = account.getAddress();
-			final AccountState state = new AccountState(address);
-			Mockito.when(this.accountCache.findStateByAddress(address)).thenReturn(state);
-			return state;
-		}
-
-		public void makeCosignatory(final Account signer, final Account multisig, final BlockHeight blockHeight) {
-			this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
-			this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
-		}
-	}
 }

@@ -10,6 +10,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
+import org.nem.nis.test.MultisigTestContext;
 
 import java.util.function.BiConsumer;
 
@@ -26,11 +27,11 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	private static void assertCanValidateOtherTransactions(final BlockHeight blockHeight) {
 		// Arrange:
-		final TestContext context = new TestContext(true);
+		final MultisigTestContext context = new MultisigTestContext(true);
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight, context::debitPredicate));
+		final ValidationResult result = context.validateSignaturePresent(blockHeight, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -50,12 +51,12 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	private static void assertProperTransaction(final BlockHeight blockHeight, final ValidationResult validationResult) {
 		// Arrange:
-		final TestContext context = new TestContext(true);
-		final Transaction transaction = context.createTransaction();
+		final MultisigTestContext context = new MultisigTestContext(true);
+		final Transaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight, context::debitPredicate));
+		final ValidationResult result = context.validateSignaturePresent(blockHeight, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -78,17 +79,17 @@ public class MultisigSignaturesPresentValidatorTest {
 		this.assertProperTransactionMultiple(this.FORK_HEIGHT, ValidationResult.SUCCESS, (ctx, t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction)t));
 	}
 
-	private void assertProperTransactionMultiple(final BlockHeight blockHeight, final ValidationResult validationResult, final BiConsumer<TestContext, Transaction> addSignature) {
+	private void assertProperTransactionMultiple(final BlockHeight blockHeight, final ValidationResult validationResult, final BiConsumer<MultisigTestContext, Transaction> addSignature) {
 		// Arrange:
-		final TestContext context = new TestContext(true);
-		final MultisigTransaction transaction = context.createTransaction();
+		final MultisigTestContext context = new MultisigTestContext(true);
+		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 		context.makeCosignatory(context.dummy, context.multisig, blockHeight);
 
 		addSignature.accept(context, transaction);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(blockHeight, context::debitPredicate));
+		final ValidationResult result = context.validateSignaturePresent(blockHeight, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -97,67 +98,21 @@ public class MultisigSignaturesPresentValidatorTest {
 	@Test
 	public void signaturesOfAllCosignatoriesAreRequired() {
 		// Arrange:
-		final TestContext context = new TestContext(true);
-		final Transaction transaction = context.createTransaction();
+		final MultisigTestContext context = new MultisigTestContext(true);
+		final Transaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
 		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
 		context.addSignature(context.dummy, (MultisigTransaction)transaction);
 
 		final Account thirdAccount = Utils.generateRandomAccount();
-		context.addPoiState(thirdAccount);
+		context.addState(thirdAccount);
 		context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
 
 		// Act:
-		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(this.FORK_HEIGHT, context::debitPredicate));
+		final ValidationResult result = context.validateSignaturePresent(this.FORK_HEIGHT, transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS));
 	}
 	//endregion
-
-	private static class TestContext {
-		private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
-		private final MultisigSignaturesPresentValidator validator;
-		private final Account signer = Utils.generateRandomAccount();
-		private final Account multisig = Utils.generateRandomAccount();
-		private final Account recipient = Utils.generateRandomAccount();
-		private final Account dummy = Utils.generateRandomAccount();
-
-		private TestContext(final boolean blockCreation) {
-			this.validator = new MultisigSignaturesPresentValidator(this.accountCache, blockCreation);
-			this.addPoiState(this.signer);
-			this.addPoiState(this.multisig);
-			this.addPoiState(this.dummy);
-		}
-
-		public MultisigTransaction createTransaction() {
-			final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, this.multisig, this.recipient, Amount.fromNem(123), null);
-			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);
-			transaction.sign();
-			return transaction;
-		}
-
-		private void addPoiState(final Account account) {
-			final Address address = account.getAddress();
-			final AccountState state = new AccountState(address);
-			Mockito.when(this.accountCache.findStateByAddress(address))
-					.thenReturn(state);
-		}
-
-		public void makeCosignatory(final Account signer, final Account multisig, final BlockHeight blockHeight) {
-			this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
-			this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
-		}
-
-		private void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
-			multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO,
-					signatureSigner,
-					HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
-		}
-
-		public boolean debitPredicate(final Account account, final Amount amount) {
-			final Amount balance = this.accountCache.findStateByAddress(account.getAddress()).getAccountInfo().getBalance();
-			return balance.compareTo(amount) >= 0;
-		}
-	}
 }
