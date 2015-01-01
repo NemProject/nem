@@ -60,7 +60,8 @@ public class BlockChainServices {
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
-				this.transactionValidatorFactory.createSingle(accountStateCache, true),
+				// TODO 20150101 G-J: I think this was missing from here, can you confirm?
+				new ChildAwareSingleTransactionValidator(this.transactionValidatorFactory.createSingle(accountStateCache, true)),
 				new DefaultDebitPredicate(accountStateCache));
 		return validator.isValid(parentBlock, peerChain);
 	}
