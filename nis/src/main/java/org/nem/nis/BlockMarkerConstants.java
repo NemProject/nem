@@ -36,4 +36,9 @@ public class BlockMarkerConstants {
 	 * Targeting Monday 8 Dec.
 	 */
 	public static final long BETA_TX_DEADLINE_FORK = 71000;
+
+	/**
+	 * Beta hard fork due to multisig.
+	 */
+	public static long BETA_MULTISIG_FORK = 70000;
 }

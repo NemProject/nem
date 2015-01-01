@@ -26,6 +26,18 @@ public class TransactionFactory {
 				{
 					this.put(TransactionTypes.TRANSFER, TransferTransaction::new);
 					this.put(TransactionTypes.IMPORTANCE_TRANSFER, ImportanceTransferTransaction::new);
+
+					// TODO 20150101 MERGE!!
+					/*
+					case TransactionTypes.MULTISIG_SIGNER_MODIFY:
+						return new MultisigSignerModificationTransaction(options, deserializer);
+
+					case TransactionTypes.MULTISIG:
+						return new MultisigTransaction(options, deserializer);
+
+					case TransactionTypes.MULTISIG_SIGNATURE:
+						return new MultisigSignatureTransaction(options, deserializer);/*
+
 				}
 			};
 

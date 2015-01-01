@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service for executing blocks.
@@ -92,7 +93,9 @@ public class BlockExecutor {
 	}
 
 	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
-		final List<HashMetaDataPair> pairs = block.getTransactions().stream()
+		// TODO: not sure yet if we should take all the child transactions
+		final List<HashMetaDataPair> pairs =
+				Stream.concat(block.getTransactions().stream(), block.getTransactions().stream().flatMap(t -> t.getChildTransactions().stream()))
 				.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
 				.collect(Collectors.toList());
 		observer.notify(new TransactionHashesNotification(pairs));

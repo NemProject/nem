@@ -7,6 +7,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
 
@@ -69,7 +70,8 @@ public class UnconfirmedTransactions {
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
 				validatorFactory,
 				nisCache,
-				timeProvider);
+				timeProvider,
+				false);
 	}
 
 	private UnconfirmedTransactions(
@@ -77,11 +79,12 @@ public class UnconfirmedTransactions {
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
 			final ReadOnlyNisCache nisCache,
-			final TimeProvider timeProvider) {
+			final TimeProvider timeProvider,
+			final boolean blockVerification) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.timeProvider = timeProvider;
-		this.singleValidator = this.createSingleValidator();
+		this.singleValidator = this.createSingleValidator(blockVerification);
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 		for (final Transaction transaction : transactions) {
@@ -98,7 +101,8 @@ public class UnconfirmedTransactions {
 					options,
 					this.validatorFactory,
 					this.nisCache,
-					this.timeProvider);
+					this.timeProvider,
+					true);
 		}
 	}
 
@@ -217,12 +221,17 @@ public class UnconfirmedTransactions {
 		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
-	private SingleTransactionValidator createSingleValidator() {
+	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
+		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache(), blockVerification));
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
-		return builder.build();
+
+		// need to be the last one
+		// that is correct we need this.transactions here
+		builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), blockVerification, () -> this.transactions.values()));
+
+		return new ChildAwareSingleTransactionValidator(builder.build());
 	}
 
 	/**
@@ -355,6 +364,28 @@ public class UnconfirmedTransactions {
 		}
 	}
 
+	private static boolean filterMultisigTransactions(final ReadOnlyNisCache nisCache, final Transaction transaction) {
+		if (transaction.getType() != TransactionTypes.MULTISIG) {
+			return true;
+		}
+		final MultisigTransaction multisigTransaction = (MultisigTransaction)transaction;
+		final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
+		final ReadOnlyAccountState multisigState = nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
+
+		if (multisigTransaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
+			final MultisigSignerModificationTransaction modification = (MultisigSignerModificationTransaction)multisigTransaction.getOtherTransaction();
+			// TODO test if there is multisigmodification inside and if it's type is Del
+			// (N-2 cosignatories "exception")
+		}
+
+		// we require N-1 signatures
+		if (multisigState.getMultisigLinks().getCosignatories().size() - 1 == multisigTransaction.getCosignerSignatures().size()) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
@@ -365,9 +396,10 @@ public class UnconfirmedTransactions {
 		synchronized (this.lock) {
 			final List<Transaction> transactions = this.transactions.values().stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.collect(Collectors.toList());
 
-			return this.sortTransactions(transactions);
+			return BlockNonConflictingMultisigTransactionValidator.multisigSignatureFilter(this.nisCache, this.sortTransactions(transactions));
 		}
 	}
 

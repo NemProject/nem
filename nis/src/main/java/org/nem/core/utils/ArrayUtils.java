@@ -118,6 +118,27 @@ public class ArrayUtils {
 	}
 
 	/**
+	 * NON constant-time lexicographical byte[] comparison.
+	 *
+	 * @param b first of arrays to compare.
+	 * @param c second of arrays to compare.
+	 *
+	 */
+	public static int compare(final byte[] b, final byte[] c) {
+		int result = b.length - c.length;
+		if (0 != result) {
+			return result;
+		}
+		for (int i = 0; i < b.length; i++) {
+			result = b[i] - c[i];
+			if (0 != result) {
+				return result;
+			}
+		}
+		return 0;
+	}
+
+	/**
 	 * Gets the i'th bit of a byte array.
 	 *
 	 * @param h The byte array.

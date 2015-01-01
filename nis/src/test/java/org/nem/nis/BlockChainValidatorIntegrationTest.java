@@ -291,15 +291,6 @@ public class BlockChainValidatorIntegrationTest {
 				IllegalArgumentException.class);
 	}
 
-	private static Transaction createTransfer(final Account signer, final Amount amount, final Amount fee) {
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		final Transaction transaction = new TransferTransaction(currentTime, signer, Utils.generateRandomAccount(), amount, null);
-		transaction.setFee(fee);
-		transaction.setDeadline(currentTime.addSeconds(10));
-		transaction.sign();
-		return transaction;
-	}
-
 	//endregion
 
 	//region helper functions
@@ -333,6 +324,15 @@ public class BlockChainValidatorIntegrationTest {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 		final Transaction transaction = new TransferTransaction(currentTime.addSeconds(1), sender, recipient, amount, null);
 		transaction.setDeadline(currentTime.addHours(1));
+		transaction.sign();
+		return transaction;
+	}
+
+	private static Transaction createTransfer(final Account signer, final Amount amount, final Amount fee) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Transaction transaction = new TransferTransaction(currentTime, signer, Utils.generateRandomAccount(), amount, null);
+		transaction.setFee(fee);
+		transaction.setDeadline(currentTime.addSeconds(10));
 		transaction.sign();
 		return transaction;
 	}
@@ -380,7 +380,7 @@ public class BlockChainValidatorIntegrationTest {
 
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
-			this.transactionValidator = transactionValidatorFactory.createSingle(this.accountStateCache);
+			this.transactionValidator = new ChildAwareSingleTransactionValidator(transactionValidatorFactory.createSingle(this.accountStateCache, true));
 
 			Mockito.when(this.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(false);
 			Mockito.when(this.scorer.calculateHit(Mockito.any())).thenReturn(BigInteger.ZERO);

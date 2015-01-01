@@ -7,6 +7,7 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 
 import java.util.Collection;
+import java.util.*;
 
 /**
  * Static class providing helper functions for validating notifications.
@@ -117,5 +118,22 @@ public class NotificationUtils {
 		final TransactionHashesNotification n = (TransactionHashesNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.TransactionHashes));
 		Assert.assertThat(n.getPairs(), IsEquivalent.equivalentTo(pairs));
+	}
+
+	/**
+	 * Asserts that the specified notification is a cosignatory modification notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedMultisig The expected multisig account.
+	 * @param multisigModificationList The list of expected multisig modifications.
+	 */
+	public static void assertCosignatoryModificationNotification(
+			final Notification notification,
+			final Account expectedMultisig,
+			final List<MultisigModification> multisigModificationList) {
+		final MultisigModificationNotification n = (MultisigModificationNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
+		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
+		Assert.assertThat(n.getModifications(), IsEqual.equalTo(multisigModificationList));
 	}
 }

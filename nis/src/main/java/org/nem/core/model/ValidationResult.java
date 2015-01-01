@@ -110,7 +110,33 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because importance transfer deactivation was attempted while already deactivated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20);
+	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20),
+
+	/**
+	 * Validation failed because signer is not a cosigner of given multisig account.
+	 */
+	FAILURE_MULTISIG_NOT_A_COSIGNER(30),
+
+	/**
+	 * Validation failed because not enough cosignatories were present.
+	 */
+	FAILURE_MULTISIG_MISSING_COSIGNERS(31),
+
+	/**
+	 * Validation failed because a multisig signature was not associated with any known multisig transaction.
+	 */
+	FAILURE_MULTISIG_NO_MATCHING_MULTISIG(32),
+
+	/**
+	 * Validation failed because multisig account tried to make transaction that is not allowed
+	 */
+	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG(33),
+
+	/**
+	 * Validation failed because signer is already a cosigner of given multisig account.
+	 */
+	FAILURE_MULTISIG_ALREADY_A_COSIGNER(34);
+
 
 	private final int value;
 

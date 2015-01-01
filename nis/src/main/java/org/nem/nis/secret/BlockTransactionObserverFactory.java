@@ -64,6 +64,7 @@ public class BlockTransactionObserverFactory {
 		builder.add(new BalanceCommitTransferObserver(accountStateCache));
 		builder.add(new HarvestRewardCommitObserver(accountStateCache));
 		builder.add(new RemoteObserver(accountStateCache));
+		builder.add(new MultisigAccountObserver(accountStateCache));
 		builder.add(new OutlinkObserver(accountStateCache));
 		builder.add(new PruningObserver(accountStateCache, nisCache.getTransactionHashCache()));
 		builder.add(new TransactionHashesObserver(nisCache.getTransactionHashCache()));

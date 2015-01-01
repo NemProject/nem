@@ -38,5 +38,10 @@ public enum NotificationType {
 	/**
 	 * The notification represents appearance/disappearance of transaction hashes.
 	 */
-	TransactionHashes
+	TransactionHashes,
+
+	/**
+	 * The notification represents a cosigner change.
+	 */
+	CosignatoryModification
 }

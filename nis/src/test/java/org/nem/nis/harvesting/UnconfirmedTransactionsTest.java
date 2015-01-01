@@ -1,13 +1,13 @@
 package org.nem.nis.harvesting;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChainConstants;
+import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
@@ -1132,7 +1132,6 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
 	}
-
 	//endregion
 
 	//region tests with real validator
@@ -1237,13 +1236,109 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
+	@Test
+	public void getTransactionsForNewBlockDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
+		// Arrange:
+		final AccountStateCache poiFacade = Mockito.mock(AccountStateCache.class);
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(poiFacade);
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		final Account multisig = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Account cosigner1 = Utils.generateRandomAccount();
+		final Account cosigner2 = Utils.generateRandomAccount();
+		final Transaction t1 = createTransferTransaction(currentTime, multisig, recipient, Amount.fromNem(7));
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
+		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
+		multisigTransaction.sign();
+
+		addPoiState(poiFacade, multisig).getAccountInfo().incrementBalance(Amount.fromNem(10));
+		addPoiState(poiFacade, cosigner1).getAccountInfo().incrementBalance(Amount.fromNem(101));
+		addPoiState(poiFacade, cosigner2);
+		makeCosignatory(poiFacade, cosigner1, multisig);
+		makeCosignatory(poiFacade, cosigner2, multisig);
+
+		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction);
+
+		// Act:
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(),
+				currentTime.addMinutes(10));
+
+		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(0));
+	}
+
+	// note: this test actually tests few things, which means it's most likely ugly
+	// * adding multisig signature adds it to PRESENT MultisigTransaction
+	// * multisig signatures are NOT returned by getTransactionsForNewBlock
+	// * multisig transaction is returned only if (number of cosignatories-1) == number of sigs
+	@Test
+	public void addingMultisigSignatureAddsItToMultisigTransaction() {
+		// Arrange:
+		final AccountStateCache poiFacade = Mockito.mock(AccountStateCache.class);
+		final TestContext context = createUnconfirmedTransactionsWithRealValidator(poiFacade);
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		final Account multisig = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final Account cosigner1 = Utils.generateRandomAccount();
+		final Account cosigner2 = Utils.generateRandomAccount();
+		final Transaction t1 = createTransferTransaction(currentTime, multisig, recipient, Amount.fromNem(7));
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(currentTime, cosigner1, t1);
+		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
+		multisigTransaction.sign();
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner2, HashUtils.calculateHash(t1));
+		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
+		signatureTransaction.sign();
+
+		addPoiState(poiFacade, multisig).getAccountInfo().incrementBalance(Amount.fromNem(10));
+		addPoiState(poiFacade, cosigner1).getAccountInfo().incrementBalance(Amount.fromNem(101));
+		addPoiState(poiFacade, cosigner2).getAccountInfo().incrementBalance(Amount.fromNem(101));
+		makeCosignatory(poiFacade, cosigner1, multisig);
+		makeCosignatory(poiFacade, cosigner2, multisig);
+
+		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction);
+		final ValidationResult result2 = context.transactions.addExisting(signatureTransaction);
+
+		// Act:
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(Utils.generateRandomAddress(),
+				currentTime.addMinutes(10));
+
+		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+		final MultisigTransaction transaction = (MultisigTransaction)blockTransactions.getAll().get(0);
+		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getCosignerSignatures().first(), IsSame.sameInstance(signatureTransaction));
+	}
+
+	private static AccountState addPoiState(final AccountStateCache poiFacade, final Account account) {
+		final Address address = account.getAddress();
+		final AccountState state = new AccountState(address);
+		Mockito.when(poiFacade.findStateByAddress(address))
+				.thenReturn(state);
+
+		return state;
+	}
+
+	public static void makeCosignatory(final AccountStateCache stateCache, final Account signer, final Account multisig) {
+		final BlockHeight blockHeight = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK);
+		stateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
+		stateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
+	}
+
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
+		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class));
+	}
+
+	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
-				factory.createSingle(accountStateCache),
+				factory.createSingle(stateCache, false),
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
-				accountStateCache);
+				stateCache);
 	}
 
 	//endregion
@@ -1252,6 +1347,35 @@ public class UnconfirmedTransactionsTest {
 		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
 		transferTransaction.setDeadline(timeStamp.addSeconds(1));
 		return transferTransaction;
+	}
+
+	private static List<MockTransaction> createMockTransactions(final int startCustomField, final int endCustomField) {
+		final List<MockTransaction> transactions = new ArrayList<>();
+
+		for (int i = startCustomField; i <= endCustomField; ++i) {
+			final MockTransaction transaction = new MockTransaction(
+					Utils.generateRandomAccount(), //Amount.fromNem(1000)),
+					i,
+					new TimeInstant(i));
+			transaction.setFee(Amount.fromNem(i));
+			transactions.add(transaction);
+		}
+
+		return transactions;
+	}
+
+	private static Collection<Transaction> createMockTransactionsAsBatch(final int startCustomField, final int endCustomField) {
+		return createMockTransactions(startCustomField, endCustomField).stream().collect(Collectors.toList());
+	}
+
+	private static List<MockTransaction> addMockTransactions(
+			final UnconfirmedTransactions unconfirmedTransactions,
+			final int startCustomField,
+			final int endCustomField) {
+		final List<MockTransaction> transactions = createMockTransactions(startCustomField, endCustomField);
+		transactions.forEach(Transaction::sign);
+		transactions.forEach(unconfirmedTransactions::addExisting);
+		return transactions;
 	}
 
 	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
@@ -1299,7 +1423,7 @@ public class UnconfirmedTransactionsTest {
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
+			Mockito.when(validatorFactory.createSingle(Mockito.any(), Mockito.anyBoolean())).thenReturn(this.singleValidator);
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,

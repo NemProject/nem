@@ -3,10 +3,13 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+
+import java.util.*;
 
 public class TransactionFactoryTest {
 
@@ -105,6 +108,102 @@ public class TransactionFactoryTest {
 				sender,
 				ImportanceTransferTransaction.Mode.Activate,
 				recipient);
+	}
+
+	//endregion
+
+	//region MultisigSignerModificationTransaction
+
+	@Test
+	public void canDeserializeVerifiableMultisigSignerModificationTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMultisigSignerModificationTransaction();
+
+		// Assert:
+		assertCanDeserializeVerifiable(originalTransaction, MultisigSignerModificationTransaction.class, TransactionTypes.MULTISIG_SIGNER_MODIFY);
+	}
+
+	@Test
+	public void canDeserializeNonVerifiableMultisigSignerModificationTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMultisigSignerModificationTransaction();
+
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, MultisigSignerModificationTransaction.class, TransactionTypes.MULTISIG_SIGNER_MODIFY);
+	}
+
+	private static Transaction createMultisigSignerModificationTransaction() {
+		final Account sender = Utils.generateRandomAccount();
+		final Account cosignatory = Utils.generateRandomAccount();
+		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
+		return new MultisigSignerModificationTransaction(
+				TimeInstant.ZERO,
+				sender,
+				modifications);
+	}
+
+	//endregion
+
+	//region MultisigSignerModificationTransaction
+
+	@Test
+	public void canDeserializeVerifiableMultisigTransaction() {
+		// Arrange:
+		final Transaction otherTransaction = createTransferTransaction();
+		final Transaction originalTransaction = createMultisigTransaction(otherTransaction);
+
+		// Assert:
+		assertCanDeserializeVerifiable(originalTransaction, MultisigTransaction.class, TransactionTypes.MULTISIG);
+	}
+
+	// TODO 20141220 G-J: could you take a look at this test? it fails, cause multisig transaction
+	// does not have "signatures", and deserialization fails
+	@Test
+	public void canDeserializeNonVerifiableMultisigTransaction() {
+		// Arrange:
+		final Transaction otherTransaction = createTransferTransaction();
+		final Transaction originalTransaction = createMultisigTransaction(otherTransaction);
+
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, MultisigTransaction.class, TransactionTypes.MULTISIG);
+	}
+
+	private static Transaction createMultisigTransaction(final Transaction transaction) {
+		final Account sender = Utils.generateRandomAccount();
+		return new MultisigTransaction(
+				TimeInstant.ZERO,
+				sender,
+				transaction);
+	}
+
+	//endregion
+
+	//region MultisigSignatureTransaction
+
+	@Test
+	public void canDeserializeVerifiableMultisigSignatureTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMultisigSignatureTransaction();
+
+		// Assert:
+		assertCanDeserializeVerifiable(originalTransaction, MultisigSignatureTransaction.class, TransactionTypes.MULTISIG_SIGNATURE);
+	}
+
+	@Test
+	public void canDeserializeNonVerifiableMultisigSignatureTransaction() {
+		// Arrange:
+		final Transaction originalTransaction = createMultisigSignatureTransaction();
+
+		// Assert:
+		assertCanDeserializeNonVerifiable(originalTransaction, MultisigSignatureTransaction.class, TransactionTypes.MULTISIG_SIGNATURE);
+	}
+
+	private static Transaction createMultisigSignatureTransaction() {
+		final Account sender = Utils.generateRandomAccount();
+		return new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				sender,
+				Hash.ZERO);
 	}
 
 	//endregion

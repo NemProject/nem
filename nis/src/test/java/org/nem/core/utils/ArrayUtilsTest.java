@@ -313,6 +313,39 @@ public class ArrayUtilsTest {
 
 	//endregion
 
+	//region compare
+
+	@Test
+	public void emptyArraysAreEqual() {
+		Assert.assertThat(ArrayUtils.compare(new byte[]{}, new byte[]{}), IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void shorterArrayIsSmaller() {
+		Assert.assertThat(ArrayUtils.compare(new byte[]{}, new byte[]{1}), IsEqual.equalTo(-1));
+	}
+
+	@Test
+	public void longerArrayIsBigger() {
+		Assert.assertThat(ArrayUtils.compare(new byte[]{1}, new byte[]{}), IsEqual.equalTo(1));
+	}
+
+	@Test
+	public void smallerPositiveValuesYieldSmallerResult() {
+		Assert.assertThat(ArrayUtils.compare(new byte[]{1}, new byte[]{3}), IsEqual.equalTo(-2));
+	}
+
+	@Test
+	public void smallerNegativeValuesYieldSmallerResult() {
+		Assert.assertThat(ArrayUtils.compare(new byte[]{-3}, new byte[]{-1}), IsEqual.equalTo(-2));
+	}
+
+	@Test
+	public void equalArraysAreEqual() {
+		Assert.assertThat(ArrayUtils.compare(new byte[]{1,2,3,4,5}, new byte[]{1,2,3,4,5}), IsEqual.equalTo(0));
+	}
+	//endregion
+
 	//region getBit
 
 	@Test

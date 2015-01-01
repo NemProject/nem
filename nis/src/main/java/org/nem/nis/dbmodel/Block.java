@@ -62,8 +62,17 @@ public class Block {
 	@OrderColumn(name = "orderId")
 	private List<ImportanceTransfer> blockImportanceTransfers;
 
-	public Block() {
-	}
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
+	@OrderBy("orderId")
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@OrderColumn(name = "orderId")
+	private List<MultisigSignerModification> blockMultisigSignerModifications;
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
+	@OrderBy("orderId")
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@OrderColumn(name = "orderId")
+	private List<MultisigTransaction> blockMultisigTransactions;
 
 	public Long getId() {
 		return this.id;
@@ -192,5 +201,23 @@ public class Block {
 
 	public void setBlockImportanceTransfers(final List<ImportanceTransfer> blockImportanceTransfers) {
 		this.blockImportanceTransfers = blockImportanceTransfers;
+	}
+
+	public List<MultisigSignerModification> getBlockMultisigSignerModifications()
+	{
+		return this.blockMultisigSignerModifications;
+	}
+
+	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModifications)
+	{
+		this.blockMultisigSignerModifications = blockMultisigSignerModifications;
+	}
+
+	public List<MultisigTransaction> getBlockMultisigTransactions() {
+		return blockMultisigTransactions;
+	}
+
+	public void setBlockMultisigTransactions(final List<MultisigTransaction> blockMultisigTransactions) {
+		this.blockMultisigTransactions = blockMultisigTransactions;
 	}
 }

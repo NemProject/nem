@@ -108,6 +108,10 @@ public class NisAppConfig {
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignerModification.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigModification.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigTransaction.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 
@@ -207,7 +211,12 @@ public class NisAppConfig {
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
 		// which doesn't require a hash check, so createSingle is used
-		return this.transactionValidatorFactory().createSingle(this.accountStateCache());
+		final SingleTransactionValidator validator = this.transactionValidatorFactory().createSingle(this.accountStateCache(), false);
+
+		// TODO 20141203 J-J,G: i would prefer to have the builder return ChildAwareSingleTransactionValidator,
+		// but that doesn't work because unconfirmed transactions would have to wrap it again, and there should only
+		// be a single one of these decorators or bad things could happen
+		return new ChildAwareSingleTransactionValidator(validator);
 	}
 
 	@Bean
