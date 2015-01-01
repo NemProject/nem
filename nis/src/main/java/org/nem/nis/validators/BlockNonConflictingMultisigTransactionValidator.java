@@ -44,6 +44,13 @@ public class BlockNonConflictingMultisigTransactionValidator implements BlockVal
 				if (! this.multisigModificationSenders.add(modification.getSigner().getAddress())) {
 					return false;
 				}
+
+				long deletions = modification.getModifications().stream()
+						.filter(m -> m.getModificationType() == MultisigModificationType.Del)
+						.count();
+				if (deletions > 1) {
+					return false;
+				}
 			}
 
 			if (multisigState.getMultisigLinks().getCosignatories().size() - 1 == multisigTransaction.getCosignerSignatures().size()) {

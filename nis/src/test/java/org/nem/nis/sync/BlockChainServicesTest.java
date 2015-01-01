@@ -24,6 +24,7 @@ import org.nem.nis.validators.TransactionValidatorFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
 	final static long START_HEIGHT = BlockMarkerConstants.BETA_MULTISIG_FORK;
@@ -152,7 +153,7 @@ public class BlockChainServicesTest {
 	}
 
 	@Test
-	public void chainWithMultipleMultisigTransactionIsIsValid() {
+	public void chainWithMultipleMultisigTransactionIsValid() {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
@@ -187,7 +188,7 @@ public class BlockChainServicesTest {
 	}
 
 	@Test
-	public void chainWithMultipleMultisigModificationsIsIsInvalidFromSingleAccount() {
+	public void chainWithMultipleMultisigModificationsFromSingleAccountIsIsInvalid() {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
@@ -228,6 +229,70 @@ public class BlockChainServicesTest {
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
+	// TODO: this test shouldn't pass as cosignatoryDel1 is not cosignatory, check it
+	@Test
+	public void chainWithMultisigModificationsWithSingleDelIsIsValid() {
+		final TestContext context = new TestContext();
+
+		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		parentBlock.sign();
+
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(1000 + 1000));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
+		final Account cosignatoryDel1 = context.createAccountWithBalance(Amount.fromNem(10));
+
+		context.recalculateImportances(START_HEIGHT);
+		context.makeCosignatory(cosignatory1, multisigAccount);
+
+		final MultisigSignerModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1));
+		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
+		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
+		transaction1.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
+		final Block block = blocks.get(1);
+		block.addTransaction(transaction1);
+		block.sign();
+
+		final boolean result = context.isValid(parentBlock, blocks);
+
+		// Act+Assert:
+		Assert.assertThat(result, IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void chainWithMultisigModificationsWithMultipleDelIsIsInvalid() {
+		final TestContext context = new TestContext();
+
+		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		parentBlock.sign();
+
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(1000 + 1000));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
+		final Account cosignatoryDel1 = context.createAccountWithBalance(Amount.fromNem(10));
+		final Account cosignatoryDel2 = context.createAccountWithBalance(Amount.fromNem(10));
+
+		context.recalculateImportances(START_HEIGHT);
+		context.makeCosignatory(cosignatory1, multisigAccount);
+
+		final MultisigSignerModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1, cosignatoryDel2));
+		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
+		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
+		transaction1.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
+		final Block block = blocks.get(1);
+		block.addTransaction(transaction1);
+		block.sign();
+
+		final boolean result = context.isValid(parentBlock, blocks);
+
+		// Act+Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
+	}
+
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
 	}
@@ -245,6 +310,16 @@ public class BlockChainServicesTest {
 				NisMain.TIME_PROVIDER.getCurrentTime(),
 				multisigAccount,
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatoryNew1))
+		);
+		result.setDeadline(result.getTimeStamp().addSeconds(10));
+		return result;
+	}
+
+	private static MultisigSignerModificationTransaction createDelModifications(final Account multisigAccount, final List<Account> cosignatories) {
+		final MultisigSignerModificationTransaction result = new MultisigSignerModificationTransaction(
+				NisMain.TIME_PROVIDER.getCurrentTime(),
+				multisigAccount,
+				cosignatories.stream().map(a -> new MultisigModification(MultisigModificationType.Del, a)).collect(Collectors.toList())
 		);
 		result.setDeadline(result.getTimeStamp().addSeconds(10));
 		return result;
