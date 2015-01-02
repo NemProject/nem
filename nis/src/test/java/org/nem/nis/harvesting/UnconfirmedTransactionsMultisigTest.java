@@ -24,6 +24,25 @@ import org.nem.nis.validators.TransactionValidatorFactory;
 
 public class UnconfirmedTransactionsMultisigTest {
 	@Test
+	public void multisigTransactionIssuedNotByCosignatoryIsRejected() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
+		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
+
+		context.setBalance(context.multisig, Amount.fromNem(10));
+		context.setBalance(context.cosigner1, Amount.fromNem(101));
+
+		// Act:
+		final ValidationResult result = context.transactions.addExisting(multisigTransaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
+	}
+
+	@Test
 	public void getTransactionsForNewBlockDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -31,8 +50,6 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
-		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
-		multisigTransaction.sign();
 
 		context.setBalance(context.multisig, Amount.fromNem(10));
 		context.setBalance(context.cosigner1, Amount.fromNem(101));
@@ -62,8 +79,6 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
-		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
-		multisigTransaction.sign();
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, context.cosigner2, HashUtils.calculateHash(t1));
 		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
 		signatureTransaction.sign();
@@ -91,24 +106,32 @@ public class UnconfirmedTransactionsMultisigTest {
 	}
 
 	@Test
-	public void multisigTransactionIssuedNotByCosignatoryIsRejected() {
+	public void filterRemovesMultisigTransactionThatHasSameInnerTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final TimeInstant currentTime = new TimeInstant(11);
+		context.makeCosignatory(context.cosigner1, context.multisig);
 
 		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
-		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
-		multisigTransaction.setDeadline(multisigTransaction.getTimeStamp().addHours(2));
-		multisigTransaction.sign();
+		final MultisigTransaction multisigTransaction1 = context.createMultisigTransaction(currentTime, t1);
+		final MultisigTransaction multisigTransaction2 = context.createMultisigTransaction(currentTime.addSeconds(1), t1);
 
-		context.setBalance(context.multisig, Amount.fromNem(10));
-		context.setBalance(context.cosigner1, Amount.fromNem(101));
+		context.setBalance(context.multisig, Amount.fromNem(16));
+		context.setBalance(context.cosigner1, Amount.fromNem(200));
+
+		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction1);
+		final ValidationResult result2 = context.transactions.addExisting(multisigTransaction2);
 
 		// Act:
-		final ValidationResult result = context.transactions.addExisting(multisigTransaction);
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(
+				Utils.generateRandomAddress(), currentTime.addMinutes(10));
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		// TODO 2050102 G-* : should this actually succeed?
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
 
 	private static class TestContext {
@@ -149,7 +172,10 @@ public class UnconfirmedTransactionsMultisigTest {
 
 
 		public MultisigTransaction createMultisigTransaction(final TimeInstant currentTime, final Transaction t1) {
-			return new MultisigTransaction(currentTime, this.cosigner1, t1);
+			final MultisigTransaction transaction = new MultisigTransaction(currentTime, this.cosigner1, t1);
+			transaction.setDeadline(transaction.getTimeStamp().addHours(2));
+			transaction.sign();
+			return transaction;
 		}
 
 		public TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Amount amount) {

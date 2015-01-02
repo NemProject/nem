@@ -364,28 +364,6 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-	private static boolean filterMultisigTransactions(final ReadOnlyNisCache nisCache, final Transaction transaction) {
-		if (transaction.getType() != TransactionTypes.MULTISIG) {
-			return true;
-		}
-		final MultisigTransaction multisigTransaction = (MultisigTransaction)transaction;
-		final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
-		final ReadOnlyAccountState multisigState = nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
-
-		if (multisigTransaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
-			final MultisigSignerModificationTransaction modification = (MultisigSignerModificationTransaction)multisigTransaction.getOtherTransaction();
-			// TODO test if there is multisigmodification inside and if it's type is Del
-			// (N-2 cosignatories "exception")
-		}
-
-		// we require N-1 signatures
-		if (multisigState.getMultisigLinks().getCosignatories().size() - 1 == multisigTransaction.getCosignerSignatures().size()) {
-			return true;
-		}
-
-		return false;
-	}
-
 	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
