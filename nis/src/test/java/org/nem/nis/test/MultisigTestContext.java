@@ -19,7 +19,6 @@ public class MultisigTestContext {
 	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
 	private final MultisigSignerModificationTransactionValidator multisigSignerModificationTransactionValidator = new MultisigSignerModificationTransactionValidator(this.accountCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
-	private final MultisigTransactionValidator multisigTransactionValidator = new MultisigTransactionValidator(this.accountCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
 	private final MultisigSignatureValidator multisigSignatureValidator;
 
@@ -95,7 +94,7 @@ public class MultisigTestContext {
 	}
 
 	// forward to validators
-	public ValidationResult validateSignaturePresent(final BlockHeight blockHeight, final Transaction transaction) {
+	public ValidationResult validateSignaturePresent(final Transaction transaction, final BlockHeight blockHeight) {
 		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(blockHeight, this::debitPredicate));
 	}
 
@@ -107,9 +106,6 @@ public class MultisigTestContext {
 		return this.multisigSignatureValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
 	}
 
-	public ValidationResult validateMultisigTransaction(final Transaction transaction, final BlockHeight height) {
-		return this.multisigTransactionValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
-	}
 	public ValidationResult validateSignerModification(final Transaction transaction) {
 		return multisigSignerModificationTransactionValidator.validate(transaction, new ValidationContext((final Account account, final Amount amount) -> true));
 	}

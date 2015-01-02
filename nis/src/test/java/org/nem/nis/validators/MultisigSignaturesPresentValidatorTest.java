@@ -6,10 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
 import org.nem.nis.test.MultisigTestContext;
 
 import java.util.function.BiConsumer;
@@ -31,7 +28,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(blockHeight, transaction);
+		final ValidationResult result = context.validateSignaturePresent(transaction, blockHeight);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -56,7 +53,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(blockHeight, transaction);
+		final ValidationResult result = context.validateSignaturePresent(transaction, blockHeight);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -89,7 +86,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		addSignature.accept(context, transaction);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(blockHeight, transaction);
+		final ValidationResult result = context.validateSignaturePresent(transaction, blockHeight);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -109,7 +106,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(this.FORK_HEIGHT, transaction);
+		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS));
