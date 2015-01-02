@@ -22,6 +22,9 @@ import org.nem.nis.validators.BatchTransactionValidator;
 import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.nis.validators.TransactionValidatorFactory;
 
+import java.sql.Time;
+import java.util.Arrays;
+
 public class UnconfirmedTransactionsMultisigTest {
 	@Test
 	public void multisigTransactionIssuedNotByCosignatoryIsRejected() {
@@ -40,6 +43,26 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
+	}
+
+	@Test
+	public void transferTransactionIssuedByMultisigIsRejected() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TimeInstant currentTime = new TimeInstant(11);
+
+		final Transaction transaction = new TransferTransaction(currentTime, context.multisig, context.recipient, Amount.fromNem(7), null);
+		transaction.setDeadline(currentTime.addSeconds(1));
+		transaction.sign();
+
+		context.setBalance(context.multisig, Amount.fromNem(10));
+		context.makeCosignatory(context.cosigner1, context.multisig);
+
+		// Act:
+		final ValidationResult result = context.transactions.addExisting(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
 	@Test
@@ -134,6 +157,35 @@ public class UnconfirmedTransactionsMultisigTest {
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
 
+	@Test
+	public void filterRemovesMultisigModificationTransactionThatHasSameInnerTransaction() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final TimeInstant currentTime = new TimeInstant(11);
+		context.makeCosignatory(context.cosigner1, context.multisig);
+
+		final Transaction t1 = context.createMultisigAddTransaction(currentTime, context.cosigner2);
+		final MultisigTransaction multisigTransaction1 = context.createMultisigTransaction(currentTime, t1);
+		final Transaction t2 = context.createMultisigAddTransaction(currentTime, context.recipient);
+		final MultisigTransaction multisigTransaction2 = context.createMultisigTransaction(currentTime, t2);
+
+		context.setBalance(context.multisig, Amount.fromNem(2000));
+		context.setBalance(context.cosigner1, Amount.fromNem(200));
+
+		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction1);
+		final ValidationResult result2 = context.transactions.addExisting(multisigTransaction2);
+
+		// Act:
+		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(
+				Utils.generateRandomAddress(), currentTime.addMinutes(10));
+
+		// Assert:
+		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+	}
+
 	private static class TestContext {
 		private final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		private final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
@@ -182,6 +234,13 @@ public class UnconfirmedTransactionsMultisigTest {
 			final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, this.multisig, this.recipient, amount, null);
 			transferTransaction.setDeadline(timeStamp.addSeconds(1));
 			return transferTransaction;
+		}
+
+		public Transaction createMultisigAddTransaction(final TimeInstant timeStamp, final Account account) {
+			final Transaction transaction = new MultisigSignerModificationTransaction(timeStamp, this.multisig,
+					Arrays.asList(new MultisigModification(MultisigModificationType.Add, account)));
+			transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
+			return transaction;
 		}
 
 		public void makeCosignatory(final Account signer, final Account multisig) {
