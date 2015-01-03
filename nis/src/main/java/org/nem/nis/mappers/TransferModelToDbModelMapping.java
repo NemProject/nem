@@ -6,8 +6,7 @@ import org.nem.nis.dbmodel.Transfer;
 /**
  * A mapping that is able to map a model transfer transaction to a db transfer.
  */
-public class TransferModelToDbModelMapping implements IMapping<TransferTransaction, Transfer> {
-	private final IMapper mapper;
+public class TransferModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<TransferTransaction, Transfer> {
 
 	/**
 	 * Creates a new mapping.
@@ -15,17 +14,14 @@ public class TransferModelToDbModelMapping implements IMapping<TransferTransacti
 	 * @param mapper The mapper.
 	 */
 	public TransferModelToDbModelMapping(final IMapper mapper) {
-		this.mapper = mapper;
+		super(mapper);
 	}
 
 	@Override
-	public Transfer map(final TransferTransaction source) {
-		final org.nem.nis.dbmodel.Account sender = this.mapper.map(source.getSigner(), org.nem.nis.dbmodel.Account.class);
-		final org.nem.nis.dbmodel.Account recipient = this.mapper.map(source.getRecipient(), org.nem.nis.dbmodel.Account.class);
+	public Transfer mapImpl(final TransferTransaction source) {
+		final org.nem.nis.dbmodel.Account recipient = this.mapAccount(source.getRecipient());
 
 		final Transfer dbTransfer = new Transfer();
-		AbstractTransferMapper.toDbModel(source, sender, -1, -1, dbTransfer);
-
 		dbTransfer.setRecipient(recipient);
 		dbTransfer.setAmount(source.getAmount().getNumMicroNem());
 
