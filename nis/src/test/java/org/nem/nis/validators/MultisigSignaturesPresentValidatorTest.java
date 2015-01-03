@@ -24,7 +24,7 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	private static void assertCanValidateOtherTransactions(final BlockHeight blockHeight) {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(true);
+		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
@@ -48,7 +48,7 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	private static void assertProperTransaction(final BlockHeight blockHeight, final ValidationResult validationResult) {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(true);
+		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 
@@ -78,7 +78,7 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	private void assertProperTransactionMultiple(final BlockHeight blockHeight, final ValidationResult validationResult, final BiConsumer<MultisigTestContext, Transaction> addSignature) {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(true);
+		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 		context.makeCosignatory(context.dummy, context.multisig, blockHeight);
@@ -95,7 +95,7 @@ public class MultisigSignaturesPresentValidatorTest {
 	@Test
 	public void signaturesOfAllCosignatoriesAreRequired() {
 		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext(true);
+		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
 		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);

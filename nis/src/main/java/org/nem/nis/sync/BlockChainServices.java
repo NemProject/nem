@@ -55,13 +55,16 @@ public class BlockChainServices {
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
+
+		final AggregateSingleTransactionValidatorBuilder builder = this.transactionValidatorFactory.createSingleBuilder(accountStateCache);
+		builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
+
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
-				// TODO 20150101 G-J: I think this was missing from here, can you confirm?
-				new ChildAwareSingleTransactionValidator(this.transactionValidatorFactory.createSingle(accountStateCache, true)),
+				builder.build(),
 				new DefaultDebitPredicate(accountStateCache));
 		return validator.isValid(parentBlock, peerChain);
 	}

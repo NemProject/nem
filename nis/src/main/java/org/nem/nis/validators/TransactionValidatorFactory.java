@@ -27,30 +27,25 @@ public class TransactionValidatorFactory {
 	}
 
 	/**
-	 * Creates a transaction validator that contains both single and batch validators.
-	 *
-	 * @param nisCache The NIS cache.
-	 * @return The validator.
-	 */
-	/* TODO: this is used only in one test and nowhere else
-	public SingleTransactionValidator create(final ReadOnlyNisCache nisCache) {
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, nisCache.getAccountStateCache(), );
-		this.visitBatchSubValidators(builder::add, nisCache.getTransactionHashCache());
-		return builder.build();
-	}
-	*/
-
-	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
 	 * @param accountStateCache The account state cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache, final boolean blockVerification) {
+	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache) {
+		return this.createSingleBuilder(accountStateCache).build();
+	}
+
+	/**
+	 * Creates a transaction validator builder only that is initialized with single validators.
+	 *
+	 * @param accountStateCache The account state cache.
+	 * @return The builder.
+	 */
+	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, accountStateCache, blockVerification);
-		return builder.build();
+		this.visitSingleSubValidators(builder::add, accountStateCache);
+		return builder;
 	}
 
 	/**
@@ -67,20 +62,19 @@ public class TransactionValidatorFactory {
 
 	/**
 	 * Visits all sub validators that comprise the validator returned by createSingle.
-	 *
-	 * @param visitor The visitor.
+	 *  @param visitor The visitor.
 	 * @param accountStateCache The account state cache.
 	 */
 	public void visitSingleSubValidators(
 			final Consumer<SingleTransactionValidator> visitor,
-			final ReadOnlyAccountStateCache accountStateCache,
-			final boolean blockVerification) {
+			final ReadOnlyAccountStateCache accountStateCache) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new MultisigNonOperationalValidator(accountStateCache));
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransferTransactionValidator());
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
-		visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache, blockVerification));
+
+		visitor.accept(new MultisigTransactionSignerValidator(accountStateCache));
 		visitor.accept(new MultisigSignerModificationTransactionValidator(accountStateCache));
 	}
 

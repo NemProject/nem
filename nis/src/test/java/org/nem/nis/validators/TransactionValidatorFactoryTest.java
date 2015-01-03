@@ -31,7 +31,7 @@ public class TransactionValidatorFactoryTest {
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final SingleTransactionValidator validator = factory.createSingle(Mockito.mock(ReadOnlyAccountStateCache.class), false);
+		final SingleTransactionValidator validator = factory.createSingle(Mockito.mock(ReadOnlyAccountStateCache.class));
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
@@ -59,12 +59,12 @@ public class TransactionValidatorFactoryTest {
 				NonFutureEntityValidator.class,
 				TransferTransactionValidator.class,
 				ImportanceTransferTransactionValidator.class,
-				MultisigSignaturesPresentValidator.class,
+				MultisigTransactionSignerValidator.class,
 				MultisigSignerModificationTransactionValidator.class);
 
 		// Act:
 		final List<SingleTransactionValidator> validators = new ArrayList<>();
-		factory.visitSingleSubValidators(validators::add, Mockito.mock(ReadOnlyAccountStateCache.class), false);
+		factory.visitSingleSubValidators(validators::add, Mockito.mock(ReadOnlyAccountStateCache.class));
 
 		// Assert:
 		Assert.assertThat(

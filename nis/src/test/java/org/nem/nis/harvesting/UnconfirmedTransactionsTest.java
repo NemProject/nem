@@ -1245,7 +1245,7 @@ public class UnconfirmedTransactionsTest {
 	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
-				factory.createSingle(stateCache, false),
+				factory.createSingle(stateCache),
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
 				stateCache);
 	}
@@ -1301,7 +1301,11 @@ public class UnconfirmedTransactionsTest {
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(Mockito.any(), Mockito.anyBoolean())).thenReturn(this.singleValidator);
+
+			final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
+			builder.add(this.singleValidator);
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(builder);
+
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,

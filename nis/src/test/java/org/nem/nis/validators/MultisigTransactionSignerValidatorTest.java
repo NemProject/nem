@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
 
-public class MultisigTransactionValidatorTest {
+public class MultisigTransactionSignerValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK);
 
 	@Test
@@ -18,7 +18,7 @@ public class MultisigTransactionValidatorTest {
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, BlockHeight.ONE);
+		final ValidationResult result = context.validateTransaction(transaction, BlockHeight.ONE);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -31,7 +31,7 @@ public class MultisigTransactionValidatorTest {
 		final Transaction transaction = context.createMultisigTransferTransaction();
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, TEST_HEIGHT);
+		final ValidationResult result = context.validateTransaction(transaction, TEST_HEIGHT);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
@@ -45,7 +45,7 @@ public class MultisigTransactionValidatorTest {
 		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, TEST_HEIGHT);
+		final ValidationResult result = context.validateTransaction(transaction, TEST_HEIGHT);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -59,7 +59,7 @@ public class MultisigTransactionValidatorTest {
 		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, TEST_HEIGHT.prev());
+		final ValidationResult result = context.validateTransaction(transaction, TEST_HEIGHT.prev());
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));

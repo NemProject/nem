@@ -9,13 +9,12 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// NOTE: this validator is used only during block creation, or when receiving block
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
-	private final boolean blockVerification;
 
-	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache, final boolean blockVerification) {
+	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
-		this.blockVerification = blockVerification;
 	}
 
 	@Override
@@ -32,20 +31,6 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	}
 
 	private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
-		final ReadOnlyAccountState senderState = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
-
-		if (!senderState.getMultisigLinks().isCosignatoryOf(transaction.getOtherTransaction().getSigner().getAddress())) {
-			return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
-		}
-
-		// if this is not block creation, we don't want to check if signature of all cosignatories are present
-		// TODO 20141201 J-G: why?
-		// TODO 20141202 G-J: cause we might not have proper MultisigSignatures YET, and we want to
-		// be able to add MultisigTransaction itself to list of unconfirmed transactions.
-		if (!this.blockVerification) {
-			return ValidationResult.SUCCESS;
-		}
-
 		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
 		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {
 			return ValidationResult.SUCCESS;
