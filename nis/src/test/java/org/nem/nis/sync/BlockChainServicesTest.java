@@ -276,6 +276,8 @@ public class BlockChainServicesTest {
 
 		context.recalculateImportances(START_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
+		context.makeCosignatory(cosignatoryDel1, multisigAccount);
+		context.makeCosignatory(cosignatoryDel2, multisigAccount);
 
 		final MultisigSignerModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1, cosignatoryDel2));
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);

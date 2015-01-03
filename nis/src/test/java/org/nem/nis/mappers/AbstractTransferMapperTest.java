@@ -44,7 +44,6 @@ public class AbstractTransferMapperTest {
 		// Assert:
 		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));
 		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getType(), IsEqual.equalTo(0x0101));
 		Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(11000000L));
 		Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 

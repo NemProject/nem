@@ -18,8 +18,8 @@ import java.util.List;
 public class MultisigTestContext {
 	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
 	private final MultisigSignerModificationTransactionValidator multisigSignerModificationTransactionValidator = new MultisigSignerModificationTransactionValidator(this.accountCache);
+	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
-	private final MultisigTransactionValidator multisigTransactionValidator = new MultisigTransactionValidator(this.accountCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
 	private final MultisigSignatureValidator multisigSignatureValidator;
 
@@ -30,16 +30,12 @@ public class MultisigTestContext {
 	private final Account recipient = Utils.generateRandomAccount();
 	public final Account dummy = Utils.generateRandomAccount();
 
-	public MultisigTestContext(final boolean blockCreation) {
-		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache, blockCreation);
-		this.multisigSignatureValidator = new MultisigSignatureValidator(this.accountCache, false, () -> this.transactionList);
+	public MultisigTestContext() {
+		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache);
+		this.multisigSignatureValidator = new MultisigSignatureValidator(this.accountCache, () -> this.transactionList);
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
-	}
-
-	public MultisigTestContext() {
-		this(false);
 	}
 
 	public MultisigSignerModificationTransaction createMultisigSignerModificationTransaction(final MultisigModificationType modificationType) {
@@ -95,7 +91,7 @@ public class MultisigTestContext {
 	}
 
 	// forward to validators
-	public ValidationResult validateSignaturePresent(final BlockHeight blockHeight, final Transaction transaction) {
+	public ValidationResult validateSignaturePresent(final Transaction transaction, final BlockHeight blockHeight) {
 		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(blockHeight, this::debitPredicate));
 	}
 
@@ -107,10 +103,11 @@ public class MultisigTestContext {
 		return this.multisigSignatureValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
 	}
 
-	public ValidationResult validateMultisigTransaction(final Transaction transaction, final BlockHeight height) {
-		return this.multisigTransactionValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
-	}
 	public ValidationResult validateSignerModification(final Transaction transaction) {
 		return multisigSignerModificationTransactionValidator.validate(transaction, new ValidationContext((final Account account, final Amount amount) -> true));
+	}
+
+	public ValidationResult validateTransaction(final Transaction transaction, final BlockHeight blockHeight) {
+		return multisigTransactionSignerValidator.validate(transaction, new ValidationContext(blockHeight, (final Account account, final Amount amount) -> true));
 	}
 }

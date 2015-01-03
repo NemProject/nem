@@ -6,8 +6,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
 
@@ -222,16 +222,20 @@ public class UnconfirmedTransactions {
 	}
 
 	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache(), blockVerification));
+		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
+		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createSingleBuilder(accountStateCache);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 
-		// need to be the last one
-		// that is correct we need this.transactions here
-		builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), blockVerification, () -> this.transactions.values()));
+		if (! blockVerification) {
+			// need to be the last one
+			builder.add(new MultisigSignatureValidator(accountStateCache, () -> this.transactions.values()));
 
-		return new ChildAwareSingleTransactionValidator(builder.build());
+		} else {
+			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
+		}
+
+		return builder.build();
 	}
 
 	/**
@@ -362,28 +366,6 @@ public class UnconfirmedTransactions {
 					.limit(maxTransactions)
 					.collect(Collectors.toList());
 		}
-	}
-
-	private static boolean filterMultisigTransactions(final ReadOnlyNisCache nisCache, final Transaction transaction) {
-		if (transaction.getType() != TransactionTypes.MULTISIG) {
-			return true;
-		}
-		final MultisigTransaction multisigTransaction = (MultisigTransaction)transaction;
-		final Account multisigAccount = multisigTransaction.getOtherTransaction().getSigner();
-		final ReadOnlyAccountState multisigState = nisCache.getAccountStateCache().findStateByAddress(multisigAccount.getAddress());
-
-		if (multisigTransaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
-			final MultisigSignerModificationTransaction modification = (MultisigSignerModificationTransaction)multisigTransaction.getOtherTransaction();
-			// TODO test if there is multisigmodification inside and if it's type is Del
-			// (N-2 cosignatories "exception")
-		}
-
-		// we require N-1 signatures
-		if (multisigState.getMultisigLinks().getCosignatories().size() - 1 == multisigTransaction.getCosignerSignatures().size()) {
-			return true;
-		}
-
-		return false;
 	}
 
 	/**

@@ -10,12 +10,10 @@ import java.util.function.Supplier;
 
 public class MultisigSignatureValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
-	private final boolean blockCreation;
 	private final Supplier<Collection<Transaction>> transactionsSupplier;
 
-	public MultisigSignatureValidator(final ReadOnlyAccountStateCache stateCache, final boolean blockCreation, final Supplier<Collection<Transaction>> transactionsSupplier) {
+	public MultisigSignatureValidator(final ReadOnlyAccountStateCache stateCache, final Supplier<Collection<Transaction>> transactionsSupplier) {
 		this.stateCache = stateCache;
-		this.blockCreation = blockCreation;
 		this.transactionsSupplier = transactionsSupplier;
 	}
 
@@ -33,10 +31,6 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 	}
 
 	private ValidationResult validate(final MultisigSignatureTransaction signatureTransaction, final ValidationContext context) {
-		if (this.blockCreation) {
-			throw new RuntimeException("MultisigSignature not allowed during block creation");
-		}
-
 		final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(signatureTransaction.getSigner().getAddress());
 
 		// iterate over "waiting"/current transactions, if there's no proper MultisigTransaction, validation fails

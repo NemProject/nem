@@ -2,13 +2,13 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.state.ReadOnlyAccountState;
 
-public class MultisigTransactionValidator implements SingleTransactionValidator {
-	private final AccountStateCache stateCache;
+public class MultisigTransactionSignerValidator implements SingleTransactionValidator {
+	private final ReadOnlyAccountStateCache stateCache;
 
-	public MultisigTransactionValidator(final AccountStateCache stateCache) {
+	public MultisigTransactionSignerValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
 
@@ -26,7 +26,7 @@ public class MultisigTransactionValidator implements SingleTransactionValidator 
 	}
 
 	private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
-		final AccountState cosignerState = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
+		final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
 
 		if (!cosignerState.getMultisigLinks().isCosignatoryOf(transaction.getOtherTransaction().getSigner().getAddress())) {
 			return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
