@@ -22,7 +22,6 @@ import org.nem.nis.validators.BatchTransactionValidator;
 import org.nem.nis.validators.SingleTransactionValidator;
 import org.nem.nis.validators.TransactionValidatorFactory;
 
-import java.sql.Time;
 import java.util.Arrays;
 
 public class UnconfirmedTransactionsMultisigTest {
@@ -201,14 +200,14 @@ public class UnconfirmedTransactionsMultisigTest {
 		private final Account cosigner2 = Utils.generateRandomAccount();
 
 		private TestContext() {
-			this.singleValidator = this.factory.createSingle(this.stateCache, false);
+			this.singleValidator = this.factory.createSingle(this.stateCache);
 			this.batchValidator = this.factory.createBatch(Mockito.mock(DefaultHashCache.class));
 			this.accountStateCache = this.stateCache;
 			this.timeProvider = Mockito.mock(TimeProvider.class);
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(Mockito.any(), Mockito.anyBoolean())).thenReturn(this.singleValidator);
+			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 
 			this.addState(this.multisig);

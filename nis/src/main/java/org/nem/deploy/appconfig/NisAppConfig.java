@@ -182,7 +182,7 @@ public class NisAppConfig {
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
 		// which doesn't require a hash check, so createSingle is used
-		return this.transactionValidatorFactory().createSingle(this.accountStateCache(), false);
+		return this.transactionValidatorFactory().createSingle(this.accountStateCache());
 	}
 
 	@Bean

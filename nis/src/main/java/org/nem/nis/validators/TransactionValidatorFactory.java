@@ -32,8 +32,8 @@ public class TransactionValidatorFactory {
 	 * @param accountStateCache The account state cache.
 	 * @return The validator.
 	 */
-	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache, final boolean blockVerification) {
-		return this.createSingleBuilder(accountStateCache, blockVerification).build();
+	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache) {
+		return this.createSingleBuilder(accountStateCache).build();
 	}
 
 	/**
@@ -42,9 +42,9 @@ public class TransactionValidatorFactory {
 	 * @param accountStateCache The account state cache.
 	 * @return The builder.
 	 */
-	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyAccountStateCache accountStateCache, final boolean blockVerification) {
+	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, accountStateCache, blockVerification);
+		this.visitSingleSubValidators(builder::add, accountStateCache);
 		return builder;
 	}
 
@@ -62,14 +62,12 @@ public class TransactionValidatorFactory {
 
 	/**
 	 * Visits all sub validators that comprise the validator returned by createSingle.
-	 *
-	 * @param visitor The visitor.
+	 *  @param visitor The visitor.
 	 * @param accountStateCache The account state cache.
 	 */
 	public void visitSingleSubValidators(
 			final Consumer<SingleTransactionValidator> visitor,
-			final ReadOnlyAccountStateCache accountStateCache,
-			final boolean blockVerification) {
+			final ReadOnlyAccountStateCache accountStateCache) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new MultisigNonOperationalValidator(accountStateCache));
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
@@ -77,11 +75,6 @@ public class TransactionValidatorFactory {
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
 
 		visitor.accept(new MultisigTransactionValidator(accountStateCache));
-
-		if (blockVerification) {
-			visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache));
-		}
-
 		visitor.accept(new MultisigSignerModificationTransactionValidator(accountStateCache));
 	}
 
