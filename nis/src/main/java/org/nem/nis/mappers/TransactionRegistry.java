@@ -15,7 +15,7 @@ public class TransactionRegistry {
 	/**
 	 * A registry entry.
 	 */
-	public static class Entry<TDbModel extends AbstractTransfer, TModel extends Transaction> {
+	public static class Entry<TDbModel extends AbstractBlockTransfer, TModel extends Transaction> {
 
 		/**
 		 * A function that will return db model transactions given a block

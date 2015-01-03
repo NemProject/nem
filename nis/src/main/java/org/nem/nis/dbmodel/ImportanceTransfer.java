@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "importancetransfers")
-public class ImportanceTransfer extends AbstractTransfer<ImportanceTransfer> {
+public class ImportanceTransfer extends AbstractBlockTransfer<ImportanceTransfer> {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "remoteId")

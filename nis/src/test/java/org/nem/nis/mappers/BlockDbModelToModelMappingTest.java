@@ -218,7 +218,7 @@ public class BlockDbModelToModelMappingTest {
 					ImportanceTransferTransaction.class);
 		}
 
-		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(
+		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(
 				final Consumer<TDbTransfer> addTransaction,
 				final int blockIndex,
 				final TDbTransfer dbTransfer,

@@ -1,5 +1,6 @@
 package org.nem.nis.mappers;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.nis.dbmodel.*;
@@ -24,7 +25,16 @@ public abstract class AbstractTransferModelToDbModelMapping<TModel extends Trans
 	public final TDbModel map(final TModel source) {
 		final TDbModel dbModel = this.mapImpl(source);
 		final org.nem.nis.dbmodel.Account sender = this.mapAccount(source.getSigner());
-		AbstractTransferMapper.toDbModel(source, sender, -1, -1, dbModel);
+
+		final Hash txHash = HashUtils.calculateHash(source);
+		dbModel.setTransferHash(txHash);
+		dbModel.setVersion(source.getVersion());
+		dbModel.setFee(source.getFee().getNumMicroNem());
+		dbModel.setTimeStamp(source.getTimeStamp().getRawTime());
+		dbModel.setDeadline(source.getDeadline().getRawTime());
+		dbModel.setSender(sender);
+		dbModel.setSenderProof(null == source.getSignature() ? null : source.getSignature().getBytes());
+		dbModel.setReferencedTransaction(0L);
 		return dbModel;
 	}
 

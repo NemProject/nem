@@ -17,7 +17,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "transfers")
-public class Transfer extends AbstractTransfer<Transfer> {
+public class Transfer extends AbstractBlockTransfer<Transfer> {
 	@ManyToOne
 	@Cascade({ CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "recipientId")

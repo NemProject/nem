@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "multisigsignermodifications")
-public class MultisigSignerModification extends AbstractTransfer<MultisigSignerModification> {
+public class MultisigSignerModification extends AbstractBlockTransfer<MultisigSignerModification> {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigSignerModification", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<MultisigModification> multisigModifications;

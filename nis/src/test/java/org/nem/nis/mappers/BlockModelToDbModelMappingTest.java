@@ -72,7 +72,7 @@ public class BlockModelToDbModelMappingTest {
 
 	private static void assertBlockWithTransfersCanBeMappedToDbModel(
 			final BiFunction<TestContext, Block, AbstractTransfer> factory,
-			final Function<org.nem.nis.dbmodel.Block, Collection<? extends AbstractTransfer>> getMatchingTransactions,
+			final Function<org.nem.nis.dbmodel.Block, Collection<? extends AbstractBlockTransfer>> getMatchingTransactions,
 			final Class<?> expectedClass) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -84,7 +84,7 @@ public class BlockModelToDbModelMappingTest {
 
 		// Act:
 		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
-		final Collection<? extends AbstractTransfer> dbTransfers = getMatchingTransactions.apply(dbModel);
+		final Collection<? extends AbstractBlockTransfer> dbTransfers = getMatchingTransactions.apply(dbModel);
 
 		// Assert:
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
@@ -119,7 +119,7 @@ public class BlockModelToDbModelMappingTest {
 
 		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(5));
 
-		Collection<? extends AbstractTransfer> transfers = dbModel.getBlockTransfers();
+		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransfers();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2, transfer3)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 3)));
@@ -141,12 +141,12 @@ public class BlockModelToDbModelMappingTest {
 		return block.getBlockTransfers().size() + block.getBlockImportanceTransfers().size();
 	}
 
-	private static Collection<Integer> getBlockIndexes(final Collection<? extends AbstractTransfer> transfers) {
-		return transfers.stream().map(AbstractTransfer::getBlkIndex).collect(Collectors.toList());
+	private static Collection<Integer> getBlockIndexes(final Collection<? extends AbstractBlockTransfer> transfers) {
+		return transfers.stream().map(AbstractBlockTransfer::getBlkIndex).collect(Collectors.toList());
 	}
 
-	private static Collection<Integer> getOrderIndexes(final Collection<? extends AbstractTransfer> transfers) {
-		return transfers.stream().map(AbstractTransfer::getOrderId).collect(Collectors.toList());
+	private static Collection<Integer> getOrderIndexes(final Collection<? extends AbstractBlockTransfer> transfers) {
+		return transfers.stream().map(AbstractBlockTransfer::getOrderId).collect(Collectors.toList());
 	}
 
 	private static class TestContext {

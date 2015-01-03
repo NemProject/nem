@@ -60,7 +60,6 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 
 		// Act:
 		final AbstractTransfer dbModel = this.map(model, mapper);
-		dbModel.setBlock(NisUtils.createDbBlockWithTimeStamp(1234));
 
 		// Assert:
 		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));
@@ -77,8 +76,6 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 			Assert.assertThat(dbModel.getSenderProof(), IsNull.nullValue());
 		}
 
-		Assert.assertThat(dbModel.getOrderId(), IsEqual.equalTo(-1));
-		Assert.assertThat(dbModel.getBlkIndex(), IsEqual.equalTo(-1));
 		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 	}
 }

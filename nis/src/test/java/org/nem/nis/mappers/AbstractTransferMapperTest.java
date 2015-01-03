@@ -32,7 +32,7 @@ public class AbstractTransferMapperTest {
 
 		// Act:
 		final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account();
-		final AbstractTransfer dbModel = new ImportanceTransfer();
+		final AbstractBlockTransfer dbModel = new ImportanceTransfer();
 		dbModel.setBlock(NisUtils.createDbBlockWithTimeStamp(100));
 		AbstractTransferMapper.toDbModel(
 				model,

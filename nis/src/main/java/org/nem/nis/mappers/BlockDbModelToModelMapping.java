@@ -2,10 +2,12 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.AbstractTransfer;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -58,7 +60,7 @@ public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.
 
 		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			for (final AbstractTransfer dbTransfer : entry.getFromBlock.apply(dbBlock)) {
+			for (final AbstractBlockTransfer dbTransfer : entry.getFromBlock.apply(dbBlock)) {
 				final Transaction transaction = this.mapper.map(dbTransfer, Transaction.class);
 				transactions.set(dbTransfer.getBlkIndex(), transaction);
 			}

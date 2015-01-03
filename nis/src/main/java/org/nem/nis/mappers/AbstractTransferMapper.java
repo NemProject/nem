@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.AbstractTransfer;
+import org.nem.nis.dbmodel.*;
 
 /**
  * Mapper for mapping generic transfer properties to and from db and model entities.
@@ -26,7 +26,7 @@ public class AbstractTransferMapper {
 			final org.nem.nis.dbmodel.Account sender,
 			final int blockIndex,
 			final int orderIndex,
-			final AbstractTransfer dbModel) {
+			final AbstractBlockTransfer dbModel) {
 		final Hash txHash = HashUtils.calculateHash(model);
 		dbModel.setTransferHash(txHash);
 		dbModel.setVersion(model.getVersion());

@@ -9,11 +9,9 @@ import java.util.function.Function;
 
 /**
  * Base class for all transfer db entities.
- *
- * @param <TDerived> The derived transfer type.
  */
 @MappedSuperclass
-public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
+public abstract class AbstractTransfer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -31,21 +29,7 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 	private Account sender;
 	private byte[] senderProof;
 
-	private Integer blkIndex; // index inside block
-	private Integer orderId; // index inside list
-
 	private Long referencedTransaction;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "blockId")
-	private Block block;
-
-	@Transient
-	private final Function<Block, List<TDerived>> getListFromBlock;
-
-	protected AbstractTransfer(final Function<Block, List<TDerived>> getListFromBlock) {
-		this.getListFromBlock = getListFromBlock;
-	}
 
 	public Long getId() {
 		return this.id;
@@ -120,22 +104,6 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 		this.senderProof = senderProof;
 	}
 
-	public Integer getBlkIndex() {
-		return this.blkIndex;
-	}
-
-	public void setBlkIndex(final Integer blkIndex) {
-		this.blkIndex = blkIndex;
-	}
-
-	public Integer getOrderId() {
-		return this.getListFromBlock.apply(this.block).indexOf(this);
-	}
-
-	public void setOrderId(final Integer orderId) {
-		this.orderId = orderId;
-	}
-
 	public Long getReferencedTransaction() {
 		return this.referencedTransaction;
 	}
@@ -144,11 +112,4 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 		this.referencedTransaction = referencedTransaction;
 	}
 
-	public Block getBlock() {
-		return this.block;
-	}
-
-	public void setBlock(final Block block) {
-		this.block = block;
-	}
 }
