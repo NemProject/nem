@@ -30,16 +30,12 @@ public class MultisigTestContext {
 	private final Account recipient = Utils.generateRandomAccount();
 	public final Account dummy = Utils.generateRandomAccount();
 
-	public MultisigTestContext(final boolean blockCreation) {
-		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache, blockCreation);
+	public MultisigTestContext() {
+		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache);
 		this.multisigSignatureValidator = new MultisigSignatureValidator(this.accountCache, false, () -> this.transactionList);
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
-	}
-
-	public MultisigTestContext() {
-		this(false);
 	}
 
 	public MultisigSignerModificationTransaction createMultisigSignerModificationTransaction(final MultisigModificationType modificationType) {

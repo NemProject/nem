@@ -60,7 +60,6 @@ public class TransactionValidatorFactoryTest {
 				TransferTransactionValidator.class,
 				ImportanceTransferTransactionValidator.class,
 				MultisigTransactionValidator.class,
-				MultisigSignaturesPresentValidator.class,
 				MultisigSignerModificationTransactionValidator.class);
 
 		// Act:

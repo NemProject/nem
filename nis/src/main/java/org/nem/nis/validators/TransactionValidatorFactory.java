@@ -84,7 +84,7 @@ public class TransactionValidatorFactory {
 		visitor.accept(new MultisigTransactionValidator(accountStateCache));
 
 		if (blockVerification) {
-			visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache, blockVerification));
+			visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache));
 		}
 
 		visitor.accept(new MultisigSignerModificationTransactionValidator(accountStateCache));

@@ -9,13 +9,12 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// NOTE: this validator is used only during block creation, or when receiving block
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
-	private final boolean blockVerification;
 
-	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache, final boolean blockVerification) {
+	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
-		this.blockVerification = blockVerification;
 	}
 
 	@Override
