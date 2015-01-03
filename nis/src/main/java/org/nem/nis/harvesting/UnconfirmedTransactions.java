@@ -7,7 +7,6 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.ReadOnlyNisCache;
-import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
 
@@ -227,9 +226,11 @@ public class UnconfirmedTransactions {
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 
-		// need to be the last one
-		// that is correct we need this.transactions here
-		builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), blockVerification, () -> this.transactions.values()));
+		if (! blockVerification) {
+			// need to be the last one
+			// that is correct we need this.transactions here
+			builder.add(new MultisigSignatureValidator(this.nisCache.getAccountStateCache(), () -> this.transactions.values()));
+		}
 
 		return new ChildAwareSingleTransactionValidator(builder.build());
 	}

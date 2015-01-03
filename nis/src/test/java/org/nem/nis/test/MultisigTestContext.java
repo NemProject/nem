@@ -32,7 +32,7 @@ public class MultisigTestContext {
 
 	public MultisigTestContext() {
 		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache);
-		this.multisigSignatureValidator = new MultisigSignatureValidator(this.accountCache, false, () -> this.transactionList);
+		this.multisigSignatureValidator = new MultisigSignatureValidator(this.accountCache, () -> this.transactionList);
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
