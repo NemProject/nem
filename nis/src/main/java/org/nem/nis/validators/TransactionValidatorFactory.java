@@ -27,21 +27,6 @@ public class TransactionValidatorFactory {
 	}
 
 	/**
-	 * Creates a transaction validator that contains both single and batch validators.
-	 *
-	 * @param nisCache The NIS cache.
-	 * @return The validator.
-	 */
-	/* TODO: this is used only in one test and nowhere else
-	public SingleTransactionValidator create(final ReadOnlyNisCache nisCache) {
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, nisCache.getAccountStateCache(), );
-		this.visitBatchSubValidators(builder::add, nisCache.getTransactionHashCache());
-		return builder.build();
-	}
-	*/
-
-	/**
 	 * Creates a transaction validator that only contains single validators.
 	 *
 	 * @param accountStateCache The account state cache.

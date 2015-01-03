@@ -182,12 +182,7 @@ public class NisAppConfig {
 	public SingleTransactionValidator transactionValidator() {
 		// this is only consumed by the TransactionController and used in transaction/prepare,
 		// which doesn't require a hash check, so createSingle is used
-		final SingleTransactionValidator validator = this.transactionValidatorFactory().createSingle(this.accountStateCache(), false);
-
-		// TODO 20141203 J-J,G: i would prefer to have the builder return ChildAwareSingleTransactionValidator,
-		// but that doesn't work because unconfirmed transactions would have to wrap it again, and there should only
-		// be a single one of these decorators or bad things could happen
-		return new ChildAwareSingleTransactionValidator(validator);
+		return this.transactionValidatorFactory().createSingle(this.accountStateCache(), false);
 	}
 
 	@Bean

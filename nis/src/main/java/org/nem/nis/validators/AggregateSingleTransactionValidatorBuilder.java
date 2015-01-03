@@ -34,7 +34,7 @@ public class AggregateSingleTransactionValidatorBuilder {
 	 * @return the aggregate validator.
 	 */
 	public SingleTransactionValidator build() {
-		return new AggregateSingleTransactionValidator(this.validators);
+		return new ChildAwareSingleTransactionValidator(new AggregateSingleTransactionValidator(this.validators));
 	}
 
 	private static class AggregateSingleTransactionValidator implements SingleTransactionValidator {
