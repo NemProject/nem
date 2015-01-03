@@ -90,7 +90,6 @@ public class TransferModelToDbModelMappingTest {
 
 		public void assertDbModel(final Transfer dbModel, final Hash expectedHash) {
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
-			Assert.assertThat(dbModel.getType(), IsEqual.equalTo(TransactionTypes.TRANSFER));
 
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(4444));
 			Assert.assertThat(dbModel.getSender(), IsEqual.equalTo(this.dbSender));
