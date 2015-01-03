@@ -46,8 +46,8 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 	}
 
 	@Override
-	protected ImportanceTransfer map(final ImportanceTransferTransaction model, final IMapper mapper) {
-		return new ImportanceTransferModelToDbModelMapping(mapper).map(model);
+	protected ImportanceTransferModelToDbModelMapping createMapping(final IMapper mapper) {
+		return new ImportanceTransferModelToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {

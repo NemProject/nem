@@ -71,8 +71,8 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 	}
 
 	@Override
-	protected Transfer map(final TransferTransaction model, final IMapper mapper) {
-		return new TransferModelToDbModelMapping(mapper).map(model);
+	protected TransferModelToDbModelMapping createMapping(final IMapper mapper) {
+		return new TransferModelToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {

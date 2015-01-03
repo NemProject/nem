@@ -9,7 +9,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.AbstractTransfer;
-import org.nem.nis.test.NisUtils;
 
 public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends Transaction, TDbModel extends AbstractTransfer> {
 
@@ -22,13 +21,12 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 	protected abstract TModel createModel(final TimeInstant timeStamp, final Account sender);
 
 	/**
-	 * Maps a model to a db model.
+	 * Creates a mapping that can map a model to a db model.
 	 *
-	 * @param model The model.
 	 * @param mapper The mapper.
-	 * @return The db model.
+	 * @return The mapping.
 	 */
-	protected abstract TDbModel map(final TModel model, final IMapper mapper);
+	protected abstract IMapping<TModel, TDbModel> createMapping(final IMapper mapper);
 
 	@Test
 	public void modelCanBeMappedToDbModelWithSignature() {
@@ -59,7 +57,7 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 		Mockito.when(mapper.map(sender, org.nem.nis.dbmodel.Account.class)).thenReturn(dbAccount);
 
 		// Act:
-		final AbstractTransfer dbModel = this.map(model, mapper);
+		final AbstractTransfer dbModel = this.createMapping(mapper).map(model);
 
 		// Assert:
 		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));

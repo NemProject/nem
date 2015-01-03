@@ -31,8 +31,8 @@ public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransfer
 	}
 
 	@Override
-	protected MultisigSignature map(final MultisigSignatureTransaction model, final IMapper mapper) {
-		return new MultisigSignatureModelToDbModelMapping(mapper).map(model);
+	protected MultisigSignatureModelToDbModelMapping createMapping(final IMapper mapper) {
+		return new MultisigSignatureModelToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {
