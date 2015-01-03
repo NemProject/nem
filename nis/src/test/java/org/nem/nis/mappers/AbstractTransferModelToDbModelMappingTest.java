@@ -17,6 +17,7 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 	 *
 	 * @param timeStamp The time stamp.
 	 * @param sender The sender.
+	 * @return The model.
 	 */
 	protected abstract TModel createModel(final TimeInstant timeStamp, final Account sender);
 
@@ -29,12 +30,12 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 	protected abstract IMapping<TModel, TDbModel> createMapping(final IMapper mapper);
 
 	@Test
-	public void modelCanBeMappedToDbModelWithSignature() {
+	public void abstractModelCanBeMappedToDbModelWithSignature() {
 		this.assertModelCanBeMapped(true);
 	}
 
 	@Test
-	public void modelCanBeMappedToDbModelWithoutSignature() {
+	public void abstractModelCanBeMappedToDbModelWithoutSignature() {
 		this.assertModelCanBeMapped(false);
 	}
 

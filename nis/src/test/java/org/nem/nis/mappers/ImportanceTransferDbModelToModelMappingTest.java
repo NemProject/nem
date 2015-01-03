@@ -5,12 +5,13 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
+import org.nem.nis.dbmodel.*;
 
-public class ImportanceTransferDbModelToModelMappingTest {
+public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<ImportanceTransfer, ImportanceTransferTransaction> {
 
 	@Test
 	public void transferWithActivateModeCanBeMappedToModel() {
@@ -50,13 +51,24 @@ public class ImportanceTransferDbModelToModelMappingTest {
 				IllegalArgumentException.class);
 	}
 
+	@Override
+	protected ImportanceTransfer createDbModel() {
+		final ImportanceTransfer transfer = new ImportanceTransfer();
+		transfer.setMode(1);
+		return transfer;
+	}
+
+	@Override
+	protected IMapping<ImportanceTransfer, ImportanceTransferTransaction> createMapping(final IMapper mapper) {
+		return new ImportanceTransferDbModelToModelMapping(mapper);
+	}
+
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
 		private final org.nem.nis.dbmodel.Account dbRemote = Mockito.mock(org.nem.nis.dbmodel.Account.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account remote = Utils.generateRandomAccount();
-		private final Signature signature = Utils.generateRandomSignature();
 		private final ImportanceTransferDbModelToModelMapping mapping = new ImportanceTransferDbModelToModelMapping(this.mapper);
 
 		public TestContext() {
@@ -69,11 +81,10 @@ public class ImportanceTransferDbModelToModelMappingTest {
 			dbTransfer.setSender(this.dbSender);
 			dbTransfer.setRemote(this.dbRemote);
 			dbTransfer.setMode(mode);
-
-			dbTransfer.setFee(98765432L);
 			dbTransfer.setTimeStamp(4444);
-			dbTransfer.setDeadline(123);
-			dbTransfer.setSenderProof(this.signature.getBytes());
+
+			dbTransfer.setFee(0L);
+			dbTransfer.setDeadline(0);
 			return dbTransfer;
 		}
 
@@ -84,10 +95,6 @@ public class ImportanceTransferDbModelToModelMappingTest {
 			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
 			Assert.assertThat(model.getRemote(), IsEqual.equalTo(this.remote));
 			Assert.assertThat(model.getMode(), IsEqual.equalTo(expectedMode));
-
-			Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(98765432)));
-			Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(123)));
-			Assert.assertThat(model.getSignature(), IsEqual.equalTo(this.signature));
 		}
 	}
 }

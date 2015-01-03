@@ -1,6 +1,5 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.Signature;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
@@ -10,7 +9,7 @@ import org.nem.nis.dbmodel.Transfer;
 /**
  * A mapping that is able to map a db transfer to a model transfer transaction.
  */
-public class TransferDbModelToModelMapping implements IMapping<Transfer, TransferTransaction> {
+public class TransferDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<Transfer, TransferTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -23,7 +22,7 @@ public class TransferDbModelToModelMapping implements IMapping<Transfer, Transfe
 	}
 
 	@Override
-	public TransferTransaction map(final Transfer source) {
+	public TransferTransaction mapImpl(final Transfer source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 		final Account recipient = this.mapper.map(source.getRecipient(), Account.class);
 
@@ -33,17 +32,12 @@ public class TransferDbModelToModelMapping implements IMapping<Transfer, Transfe
 				sender,
 				recipient);
 
-		final TransferTransaction transfer = new TransferTransaction(
+		return new TransferTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				recipient,
 				new Amount(source.getAmount()),
 				message);
-
-		transfer.setFee(new Amount(source.getFee()));
-		transfer.setDeadline(new TimeInstant(source.getDeadline()));
-		transfer.setSignature(new Signature(source.getSenderProof()));
-		return transfer;
 	}
 
 	private static Message messagePayloadToModel(final byte[] payload, final Integer messageType, final Account sender, final Account recipient) {

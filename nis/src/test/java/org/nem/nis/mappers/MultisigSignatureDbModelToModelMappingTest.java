@@ -12,7 +12,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
-public class MultisigSignatureDbModelToModelMappingTest {
+public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<MultisigSignature, MultisigSignatureTransaction> {
 
 	@Test
 	public void signatureCanBeMappedToModel() {
@@ -27,11 +27,22 @@ public class MultisigSignatureDbModelToModelMappingTest {
 		context.assertModel(model);
 	}
 
+	@Override
+	protected MultisigSignature createDbModel() {
+		final MultisigSignature dbSignature = new MultisigSignature();
+		dbSignature.setMultisigTransaction(new MultisigTransaction());
+		return dbSignature;
+	}
+
+	@Override
+	protected IMapping<MultisigSignature, MultisigSignatureTransaction> createMapping(final IMapper mapper) {
+		return new MultisigSignatureDbModelToModelMapping(mapper);
+	}
+
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
 		private final Account sender = Utils.generateRandomAccount();
-		private final Signature signature = Utils.generateRandomSignature();
 		private final Hash otherTransactionHash = Utils.generateRandomHash();
 		private final MultisigSignatureDbModelToModelMapping mapping = new MultisigSignatureDbModelToModelMapping(this.mapper);
 
@@ -41,15 +52,13 @@ public class MultisigSignatureDbModelToModelMappingTest {
 
 		public MultisigSignature createDbSignature() {
 			final MultisigSignature dbSignature = new MultisigSignature();
-			dbSignature.setSender(this.dbSender);
-
-			dbSignature.setFee(98765432L);
 			dbSignature.setTimeStamp(4444);
-			dbSignature.setDeadline(123);
-			dbSignature.setSenderProof(this.signature.getBytes());
-
+			dbSignature.setSender(this.dbSender);
 			dbSignature.setMultisigTransaction(new MultisigTransaction());
 			dbSignature.getMultisigTransaction().setTransferHash(this.otherTransactionHash);
+
+			dbSignature.setFee(0L);
+			dbSignature.setDeadline(0);
 			return dbSignature;
 		}
 
@@ -57,10 +66,6 @@ public class MultisigSignatureDbModelToModelMappingTest {
 			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
 			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
 			Assert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
-
-			Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(98765432)));
-			Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(123)));
-			Assert.assertThat(model.getSignature(), IsEqual.equalTo(this.signature));
 		}
 	}
 }

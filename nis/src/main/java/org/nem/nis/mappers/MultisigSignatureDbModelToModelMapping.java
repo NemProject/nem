@@ -1,15 +1,13 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.MultisigSignature;
 
 /**
  * A mapping that is able to map a db multisig signature transfer to a model multisig signature.
  */
-public class MultisigSignatureDbModelToModelMapping implements IMapping<MultisigSignature, MultisigSignatureTransaction> {
+public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<MultisigSignature, MultisigSignatureTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -22,17 +20,11 @@ public class MultisigSignatureDbModelToModelMapping implements IMapping<Multisig
 	}
 
 	@Override
-	public MultisigSignatureTransaction map(final MultisigSignature source) {
+	public MultisigSignatureTransaction mapImpl(final MultisigSignature source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
-
-		final MultisigSignatureTransaction transfer = new MultisigSignatureTransaction(
+		return new MultisigSignatureTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				source.getMultisigTransaction().getTransferHash()); // TODO 20140103: this is probably wrong
-
-		transfer.setFee(new Amount(source.getFee()));
-		transfer.setDeadline(new TimeInstant(source.getDeadline()));
-		transfer.setSignature(new Signature(source.getSenderProof()));
-		return transfer;
 	}
 }
