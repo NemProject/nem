@@ -1301,7 +1301,11 @@ public class UnconfirmedTransactionsTest {
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
+
+			final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
+			builder.add(this.singleValidator);
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(builder);
+
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
