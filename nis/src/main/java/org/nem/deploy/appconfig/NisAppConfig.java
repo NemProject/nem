@@ -112,6 +112,9 @@ public class NisAppConfig {
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigTransaction.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
+
+		// TODO 20150103: consider looping over the TransactionRegistry
+
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 

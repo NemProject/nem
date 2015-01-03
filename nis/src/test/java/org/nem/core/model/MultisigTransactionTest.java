@@ -9,7 +9,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.MultisigSignature;
 
 import java.util.*;
 
@@ -58,6 +57,7 @@ public class MultisigTransactionTest {
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
+		// TODO 20150103 - should assert the hash of the deserialized inner transaction
 	}
 
 	@Test
@@ -78,11 +78,11 @@ public class MultisigTransactionTest {
 		final MultisigTransaction transaction = createRoundTrippedTransaction(originalTransaction);
 
 		// Assert:
-		Assert.assertThat(originalTransaction.getSigners().size(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getSigners().get(0), IsEqual.equalTo(originalTransaction.getSigners().get(0)));
 	}
 
+	// TODO 20150103 J-G: what is the significance of this one vs the one above?
 	@Test
 	public void canBinaryRoundtripTransactionWithSignatures() {
 		// Arrange:
@@ -105,6 +105,8 @@ public class MultisigTransactionTest {
 		Assert.assertThat(transaction.getSigners().size(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getSigners().get(0), IsEqual.equalTo(originalTransaction.getSigners().get(0)));
 	}
+
+	// TODO 20140103 J-G: we need to test VERIFIABLE deserialization too
 
 	private static TransferTransaction createDefaultTransferTransaction() {
 		return new TransferTransaction(
@@ -148,9 +150,8 @@ public class MultisigTransactionTest {
 		signature.sign();
 		originalTransaction.addSignature(signature);
 
-		final Hash actualHash = HashUtils.calculateHash(originalTransaction);
-
 		// Assert:
+		final Hash actualHash = HashUtils.calculateHash(originalTransaction);
 		Assert.assertThat(actualHash, IsEqual.equalTo(expectedHash));
 	}
 	//endregion
@@ -262,6 +263,7 @@ public class MultisigTransactionTest {
 		Assert.assertThat(signers, IsEquivalent.equivalentTo(Arrays.asList(sigTransaction.getSigner())));
 	}
 
+	// TODO 20150103 - what is this actually testing?
 	@Test
 	public void addingSameSignatureDoesNotOverwritePreviousOne() {
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
@@ -319,6 +321,7 @@ public class MultisigTransactionTest {
 	}
 
 	// TODO 20141213 G-J this currently throws exception, not sure if that's expected
+	// TODO 20150103 J-G probably should add another test for the other case checked in verify
 	@Test
 	public void cannotVerifyMultisigTransactionWithAtLeastOneIncorrectCosignerSignature() {
 		// Arrange:
@@ -348,7 +351,7 @@ public class MultisigTransactionTest {
 
 	// TODO 20141203 J-G: i'm not sure i follow how the multisig transaction gets signed? is there a separate multisig account?
 	@Test
-	public void canVerifyMultisigTransactionIfMultisigSignatureIsUnverifiable() {
+	public void cannotVerifyMultisigTransactionIfMultisigSignatureIsUnverifiable() {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();

@@ -7,6 +7,13 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO 20150103 J-G: please comment
+// TODO 20150103 J-G: so, what is the thinking / there is an initial multisig_signer_modify to make an account multisig /
+// > and then all others are inside of a multisig?
+// > seems like two separate types?
+// TODO 20150103 J-G: also not sure why you have an inner class BlockNonConflictingMultisigTransactionValidator?
+// TODO 20150103 J-G: are there tests for this?
+
 public class BlockNonConflictingMultisigTransactionValidator implements BlockValidator {
 	final ReadOnlyNisCache nisCache;
 
@@ -77,8 +84,7 @@ public class BlockNonConflictingMultisigTransactionValidator implements BlockVal
 	@Override
 	public ValidationResult validate(final Block block) {
 		final NonConflictingMultisigTransactionValidator validator = new NonConflictingMultisigTransactionValidator(this.nisCache);
-		boolean result = block.getTransactions().stream()
-				.anyMatch(t -> ! validator.validate(t));
+		boolean result = block.getTransactions().stream().anyMatch(t -> ! validator.validate(t));
 		return result ? ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG : ValidationResult.SUCCESS;
 	}
 }

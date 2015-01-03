@@ -11,12 +11,16 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 
+// TODO 20150103 - should this be called MultisigSignerModificationTransactionTest ?
+
 public abstract class AbstractMultisigSignerModificationTransactionTest {
 	public static final TimeInstant TIME = new TimeInstant(123);
 
 	protected abstract MultisigModificationType getModification();
 
 	//region constructor
+
+	// TODO 20150103 at least assert the list size
 
 	@Test
 	public void ctorCanCreateMultisigSignerModification() {

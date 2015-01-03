@@ -82,6 +82,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 		context.makeCosignatory(context.dummy, context.multisig, blockHeight);
+		// TODO 20150103 J-G: so, by default, there is a cosignatory added for multisig (signer)
 
 		addSignature.accept(context, transaction);
 
@@ -112,4 +113,5 @@ public class MultisigSignaturesPresentValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS));
 	}
 	//endregion
+	// TODO 20150103 J-G: definitely need tests around delete
 }

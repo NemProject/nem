@@ -25,7 +25,7 @@ public class MultisigSignerModificationTransactionValidatorTest {
 	}
 
 	@Test
-	public void addingNewCosingatoryIsValid() {
+	public void addingNewCosignatoryIsValid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Add);
@@ -38,9 +38,10 @@ public class MultisigSignerModificationTransactionValidatorTest {
 	}
 
 	@Test
-	public void addingExistingCosingatoryIsInvalid() {
+	public void addingExistingCosignatoryIsInvalid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
+		// TODO 20150103 J-G: so i understand, the context is returning a transaction that will make context.signer a cosignatory of context.multisig?
 		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Add);
 		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
 
@@ -52,7 +53,7 @@ public class MultisigSignerModificationTransactionValidatorTest {
 	}
 
 	@Test
-	public void removingNonExistingCosingatoryIsInvalid() {
+	public void removingNonExistingCosignatoryIsInvalid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Del);
@@ -65,7 +66,7 @@ public class MultisigSignerModificationTransactionValidatorTest {
 	}
 
 	@Test
-	public void removingExistingCosingatoryIsValid() {
+	public void removingExistingCosignatoryIsValid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Del);

@@ -28,9 +28,6 @@ public class MultisigModification {
 	@JoinColumn(name = "multisigSignerModificationId")
 	private MultisigSignerModification multisigSignerModification;
 
-	public MultisigModification() {
-	}
-
 	public MultisigSignerModification getMultisigSignerModification() {
 		return this.multisigSignerModification;
 	}

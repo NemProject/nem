@@ -166,19 +166,19 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new list of blocks.
+	 * Creates a new list of blocks that are 10 minutes apart.
 	 *
 	 * @param signer The block signer.
 	 * @param parent The parent block.
-	 * @param numBlocks  The number of blocks.
-	 * @param timeStamp
+	 * @param numBlocks The number of blocks.
+	 * @param timeStamp The timestamp of the first block.
 	 * @return The block list.
 	 */
 	public static List<Block> createBlockList(final Account signer, Block parent, final int numBlocks, final TimeInstant timeStamp) {
 		final List<Block> blocks = new ArrayList<>();
 		for (int i = 0; i < numBlocks; ++i) {
 			// 10 minutes between blocks
-			final Block block = new Block(signer, parent, timeStamp.addMinutes((i+1)*10));
+			final Block block = new Block(signer, parent, timeStamp.addMinutes(i * 10));
 			blocks.add(block);
 			parent = block;
 		}

@@ -13,6 +13,9 @@ import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 
+// TODO 20150103 J-G: can you have one test that validates nothing is called for a different notification type
+// TODO 20150103 J-G: you might also want to test what happens when there is more than on modification
+
 public class MultisigAccountObserverTest {
 	@Test
 	public void notifyTransferExecuteAddAddsMultisigLinks() {

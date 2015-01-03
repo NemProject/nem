@@ -119,6 +119,7 @@ public class ArrayUtils {
 
 	/**
 	 * NON constant-time lexicographical byte[] comparison.
+	 * TODO 20150103 J-J: what's wrong with Arrays.equals ?
 	 *
 	 * @param b first of arrays to compare.
 	 * @param c second of arrays to compare.

@@ -227,6 +227,12 @@ public class UnconfirmedTransactions {
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 
+		// TODO 20150103 J-G: what i didn't like before was having the validators know about verification type,
+		// > it made more sense to me to only add the appropriate validators upstream vs having the validators
+		// > know how they were being called
+		// TODO 20150103 J-J: probably should add another function to the factory for blockVerification validators
+		// > e.g., (that adds MultisigSignaturesPresentValidator)
+
 		if (! blockVerification) {
 			// need to be the last one
 			builder.add(new MultisigSignatureValidator(accountStateCache, () -> this.transactions.values()));
@@ -378,6 +384,7 @@ public class UnconfirmedTransactions {
 		synchronized (this.lock) {
 			final List<Transaction> transactions = this.transactions.values().stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+					// TODO 20150103 J-G: why are multisig transactions being treated specially here?
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.collect(Collectors.toList());
 

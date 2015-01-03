@@ -9,6 +9,8 @@ import org.nem.nis.state.MultisigLinks;
 
 public class MultisigLinksTest {
 
+	// TODO 20150103 J-G: these tests are in the wrong package!
+
 	//region MultisigLinks
 	@Test
 	public void emptyMultisigLinksIsNeitherCosignatoryNorMultisig() {
@@ -16,6 +18,7 @@ public class MultisigLinksTest {
 		final TestContext context = new TestContext();
 
 		// Assert:
+		// TODO 20150103 J-G: assertThat
 		Assert.assertFalse(context.multisigLinks.isCosignatory());
 		Assert.assertFalse(context.multisigLinks.isMultisig());
 	}
@@ -33,6 +36,8 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
+	// TODO 20150103 J-G: consider renaming addMultisig to something like makeConsignatory[Of]()
+
 	@Test
 	public void addingToAccountMakesCosignatory() {
 		// Arrange:
@@ -47,6 +52,7 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
+	// TODO 20150103 J-G: is this allowed?
 	@Test
 	public void addingBothMakesMultisigAndCosignatory() {
 		// Arrange:
@@ -78,6 +84,7 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
+	// TODO 20150103 J-G: is this allowed?
 	@Test
 	public void canRemoveMultisig() {
 		// Arrange:

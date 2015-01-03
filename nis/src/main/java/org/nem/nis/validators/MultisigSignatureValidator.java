@@ -39,6 +39,7 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 				continue;
 			}
 
+			// TODO 20150103 J-G: why is this check needed?
 			final MultisigTransaction multisigTransaction = (MultisigTransaction)parentTransaction;
 			if (signatureTransaction.getSigner().equals(multisigTransaction.getSigner())) {
 				continue;
@@ -58,6 +59,8 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 				// c) yet it should be removed from UTs, when MultisigTransaction itself is removed
 				//    not yet sure where
 				multisigTransaction.addSignature(signatureTransaction);
+				// TODO 20150103 J-G: when a multisig transaction is removed, can't we remove all of its related signature transactions?
+				// TODO 20150103 J-G: you should also test tthat the signature was added in the tests
 
 				return ValidationResult.SUCCESS;
 			}

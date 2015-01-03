@@ -20,7 +20,6 @@ public class MultisigSignatureTransactionTest {
 		// Act:
 		final Account account = Utils.generateRandomAccount();
 		final Hash hash = Utils.generateRandomHash();
-		final Signature signature = Utils.generateRandomSignature();
 		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				account,
@@ -39,7 +38,6 @@ public class MultisigSignatureTransactionTest {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final Hash hash = Utils.generateRandomHash();
-		final Signature signature = Utils.generateRandomSignature();
 		final MultisigSignatureTransaction originalTransaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				account,
@@ -79,6 +77,8 @@ public class MultisigSignatureTransactionTest {
 	//endregion
 
 	//region execute / undo
+
+	// TODO 20140103 J-G - these tests aren't actually validating the notification!
 
 	@Test
 	public void executeRaisesAppropriateNotifications() {
@@ -233,6 +233,8 @@ public class MultisigSignatureTransactionTest {
 		final Transaction rhs = Mockito.mock(MultisigSignatureTransaction.class);
 
 		// dunno how to test it with mockito
+		// TODO 20150103 J-G: you can't really test this delegation directly only indirectly;
+		// > it's probably easiest just to test equals and compareTo in the same test
 		Assert.assertThat(true, IsEqual.equalTo(false));
 	}
 	//endregion

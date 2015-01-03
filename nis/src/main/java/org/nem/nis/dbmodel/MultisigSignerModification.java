@@ -13,6 +13,10 @@ import java.util.Set;
  * <p>
  * Holds information about Transactions having type TransactionTypes.MULTISIG_SIGNER_MODIFY
  * <p>
+ *
+ * TODO 20150103 J-G can you remind me why we need both MultisigSignerModification and MultisigModification?
+ * > is it so that we can make multiple modifications in one transaction;
+ * > if so, i think the naming is a little misleading
  */
 @Entity
 @Table(name = "multisigsignermodifications")

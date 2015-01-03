@@ -51,9 +51,10 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction1);
 		block.sign();
 
+		// Act:
 		final boolean result = context.isValid(parentBlock, blocks);
 
-		// Act+Assert:
+		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
@@ -68,6 +69,7 @@ public class BlockChainServicesTest {
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(134));
 		context.recalculateImportances(START_HEIGHT);
+		// TODO 20150103 J-G: consider refactoring as this seems to be the only difference with the previous
 		context.makeCosignatory(cosignatory1, multisigAccount);
 
 		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
@@ -80,13 +82,15 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction1);
 		block.sign();
 
+		// Act:
 		final boolean result = context.isValid(parentBlock, blocks);
 
-		// Act+Assert:
+		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
 	// The idea is to check if inner transaction gets to the hash transaction cache
+	// TODO 20150103 J-G: do we care in the inner transactions are the same if the outer transaction is different?
 	@Test
 	public void chainIsInvalidIfContainsMultipleMultisigTransactionsWithSameInnerTransaction() {
 		// Arrange:
@@ -116,10 +120,11 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction2);
 		block.sign();
 
+		// Act:
+		// TODO 20150103 J-G: out of curiosity, what throws this?
 		ExceptionAssert.assertThrows(
 				v -> context.isValid(parentBlock, blocks),
-				IllegalArgumentException.class
-		);
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -144,12 +149,11 @@ public class BlockChainServicesTest {
 		block.addTransaction(transfer);
 		block.sign();
 
-		// Assert
-		Assert.assertThat(context.isValid(parentBlock, blocks), IsEqual.equalTo(false));
-//		ExceptionAssert.assertThrows(
-//				v -> context.isValid(parentBlock, blocks),
-//				IllegalArgumentException.class
-//		);
+		// Act:
+		final boolean result = context.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -181,12 +185,14 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction2);
 		block.sign();
 
+		// Act:
 		final boolean result = context.isValid(parentBlock, blocks);
 
-		// Act+Assert:
+		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
+	// TODO 20150103 J-G: why is this invalid?
 	@Test
 	public void chainWithMultipleMultisigModificationsFromSingleAccountIsIsInvalid() {
 		final TestContext context = new TestContext();
@@ -223,9 +229,10 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction2);
 		block.sign();
 
+		// Act:
 		final boolean result = context.isValid(parentBlock, blocks);
 
-		// Act+Assert:
+		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
@@ -255,12 +262,14 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction1);
 		block.sign();
 
+		// Act:
 		final boolean result = context.isValid(parentBlock, blocks);
 
-		// Act+Assert:
+		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
+	// TODO 20150103 J-G: why is this invalid? because there is a single modification containing multiple Dels?
 	@Test
 	public void chainWithMultisigModificationsWithMultipleDelIsIsInvalid() {
 		final TestContext context = new TestContext();
@@ -289,11 +298,15 @@ public class BlockChainServicesTest {
 		block.addTransaction(transaction1);
 		block.sign();
 
+		// Act:
 		final boolean result = context.isValid(parentBlock, blocks);
 
-		// Act+Assert:
+		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
+
+	// TODO 20150103 J-G: consider a test with mixed Del and Add modifications
+	// TODO 20150103 J-G: is there a reason these tests are testing at the BlockChainServices level instead of the BlockChainValidator level?
 
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));

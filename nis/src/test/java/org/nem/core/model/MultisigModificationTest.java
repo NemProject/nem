@@ -18,7 +18,7 @@ public class MultisigModificationTest {
 
 	@Test
 	public void createMultisigModificationWithUnknownTypeThrows() {
-		final Account account = Mockito.mock(Account.class);
+		final Account account = Utils.generateRandomAccount();
 		ExceptionAssert.assertThrows(v -> new MultisigModification(MultisigModificationType.Unknown, account), RuntimeException.class);
 	}
 
@@ -29,7 +29,7 @@ public class MultisigModificationTest {
 
 	private void assertCreateMultisigModification(final MultisigModificationType type) {
 		// Arrange:
-		final Account account = Mockito.mock(Account.class);
+		final Account account = Utils.generateRandomAccount();
 
 		// Act
 		final MultisigModification modification = new MultisigModification(type, account);

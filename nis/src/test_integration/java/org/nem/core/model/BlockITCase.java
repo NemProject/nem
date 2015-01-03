@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
-
+// TODO 20150103 J-G: peobably should move this out of integration since it runs fast
 public class BlockITCase {
 	@Test
 	public void orderOfAddingOfMultisigSignaturesShouldntAffectBlockHash() {

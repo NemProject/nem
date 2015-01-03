@@ -9,6 +9,8 @@ import java.util.*;
 
 public class MultisigModificationNotificationTest {
 
+	// TODO 20140103 - we should probably add a test for a single notification with multiple modifications too
+
 	@Test
 	public void canCreateNotification() {
 		// Act:

@@ -1132,6 +1132,7 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
 	}
+
 	//endregion
 
 	//region tests with real validator

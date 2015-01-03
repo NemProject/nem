@@ -64,7 +64,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		// TODO 20141220 J-G: should review / test this
+		// TODO 20141220 J-G: should test this
 		return new ArrayList<>();
 	}
 
@@ -87,10 +87,11 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	@Override
 	public int compareTo(final Transaction rhs) {
 		if (!(rhs instanceof  MultisigSignatureTransaction)) {
+			// TODO 20140103 J-G: i think this is wrong, why are you always prioritizing multisig transactions?
 			return -1;
 		}
 
-		// first sort by fees (lowest first) and then timestamps (newest first)
+		// first sort by fees (lowest first) and then hashes
 		int result = this.getSigner().getAddress().getEncoded().compareTo(rhs.getSigner().getAddress().getEncoded());
 		if (result != 0) {
 			return result;

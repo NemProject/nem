@@ -5,7 +5,9 @@ import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
-// TODO 20141218 J-G needs comments
+// TODO 20141218 J-G needs comments; please comment
+
+// TODO 20150103 J-G: are you actually / do you plan to do anything with the height?
 
 public class MultisigLinks implements ReadOnlyMultisigLinks {
 	private final Map<Address, BlockHeight> cosignatories;
@@ -34,6 +36,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 		this.cosignatoryOf.remove(multisigAddress);
 	}
 
+	// TODO 20150103 J-G: should test this (and that it makes a copy)
 	public Set<Address> getCosignatories() {
 		return this.cosignatories.keySet();
 	}

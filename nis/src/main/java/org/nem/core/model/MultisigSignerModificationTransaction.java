@@ -32,6 +32,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 		validateModifications(this.modifications);
 	}
 
+	// TODO 20150103 add validation tests; should you also validate after deserialization?
 	private static void validateModifications(final List<MultisigModification> modifications) {
 		if (modifications == null || modifications.isEmpty()) {
 			throw new IllegalArgumentException("no modifications on the list");
@@ -50,6 +51,12 @@ public class MultisigSignerModificationTransaction extends Transaction {
 		this.modifications = deserializer.readObjectArray("modifications", obj -> new MultisigModification(obj));
 	}
 
+	/**
+	 * Gets the modifications.
+	 * TODO 20150103 J-G: might want to return something other than a list.
+	 *
+	 * @return The modifications.
+	 */
 	public List<MultisigModification> getModifications() {
 		return this.modifications;
 	}
@@ -65,6 +72,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 		for (final MultisigModification modification : this.modifications) {
 			observer.notify(new AccountNotification(modification.getCosignatory()));
 		}
+
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 		observer.notify(new MultisigModificationNotification(this.getSigner(), this.modifications));
 	}
@@ -77,7 +85,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		// TODO 20141220 J-G: should review / test this
+		// TODO 20141220 J-G: should review / test this; this should really have all of the accounts in the modifications i think
 		return new ArrayList<>();
 	}
 }

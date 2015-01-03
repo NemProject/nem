@@ -21,6 +21,7 @@ import java.util.Set;
  * a) it would require serious changes (but I was actually ready to do them), but
  * b) take a look at the link above... especially this sentence:
  * " it retrieves the union of all properties in the entire hierarchy into the result set. "
+ * TODO 20150103 J-G: i guess clean up this comments and remove the todos.
  */
 
 @Entity

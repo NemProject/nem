@@ -5,7 +5,6 @@ import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.MultisigSignature;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,8 +45,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		this.otherTransactionHash = HashUtils.calculateHash(this.otherTransaction.asNonVerifiable());
 
 		final Collection<Transaction> signatures = DeserializationOptions.VERIFIABLE == options
-				?
-				deserializer.readObjectArray("signatures", TransactionFactory.VERIFIABLE)
+				? deserializer.readObjectArray("signatures", TransactionFactory.VERIFIABLE)
 				: new ArrayList<>();
 
 		signatures.forEach(o -> this.addSignature((MultisigSignatureTransaction)o));
@@ -89,6 +87,8 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		this.signatureTransactions.add(transaction);
 	}
 
+	// TODO 20150103 J-G: should test this where getSigners is tested
+
 	/**
 	 * Gets list of signature transactions.
 	 *
@@ -105,7 +105,6 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	 * @return All signers.
 	 */
 	public List<Account> getSigners() {
-		// removed "+1" to keep it consistent with getCosignerSignatures
 		return this.signatureTransactions.stream().map(t -> t.getSigner()).collect(Collectors.toList());
 	}
 
@@ -159,6 +158,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			return false;
 		}
 
+		// TODO 20150103 J-G: consider simplifying since you are looping twice
 		return
 				this.signatureTransactions.stream().allMatch(signatureTransactions -> signatureTransactions.getOtherTransactionHash().equals(this.getOtherTransactionHash())) &&
 						this.signatureTransactions.stream().allMatch(signatureTransaction -> signatureTransaction.verify());

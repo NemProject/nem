@@ -4,9 +4,14 @@ import org.nem.core.model.Address;
 
 import java.util.Set;
 
+/**
+ * Container of readonly multisig state information.
+ */
 public interface ReadOnlyMultisigLinks {
 	/**
 	 * Gets the addresses of all cosignatories.
+	 * TODO 20150103 J-G: can we return collection; actually shouldn't return that either since someone could add to them
+	 * > unless the impl makes a copy of the addresses, probably the better solution
 	 *
 	 * @return The addresses of cosignatories.
 	 */

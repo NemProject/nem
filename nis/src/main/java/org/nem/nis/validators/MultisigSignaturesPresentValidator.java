@@ -32,10 +32,14 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 
 	private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
 		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
+		// TODO 20150103 J-G: why are you special casing this (unlikely) case?
 		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {
 			return ValidationResult.SUCCESS;
 		}
 
+		// TODO 20150103 J-G: do you have a validator that prevents all cosigner accounts from being removed?
+
+		// TODO 20150103 J-G: consider refactoring this block into a separate function
 		Address accountForRemoval = null;
 		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
 			final MultisigSignerModificationTransaction modificationTransaction = (MultisigSignerModificationTransaction)transaction.getOtherTransaction();
@@ -52,14 +56,17 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		// this loop could be done using reduce, but I'm leaving it like this for readability
 		// TODO: this probably should be done differently, as right now it allows more MultisigSignatures, than there are actual cosigners
 		for (final Address cosignerAddress : multisigAddress.getMultisigLinks().getCosignatories()) {
+			// TODO 20150103 J-G: what is the purpose of this check
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
 			}
 
+			// TODO 20150103 J-G: you can probably just use equals
 			if (accountForRemoval != null && cosignerAddress.equals(accountForRemoval)) {
 				continue;
 			}
-			
+
+			// TODO 20150103 J-G: you can probably check t.getOtherTransactionHash().equals(transactionHash) outside of this loop
 			final boolean hasCosigner = transaction.getCosignerSignatures().stream()
 					.anyMatch(
 							t -> t.getOtherTransactionHash().equals(transactionHash) &&

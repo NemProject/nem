@@ -42,6 +42,8 @@ public class BlockDaoTest {
 	@Autowired
 	BlockDao blockDao;
 
+	// TODO 20150103 J-G: we'll need to replace BlockMapper -> MapperUtils once the mapping changes are ported
+
 	//region save
 	@Test
 	public void savingBlockSavesAccounts() {
@@ -830,7 +832,6 @@ public class BlockDaoTest {
 	}
 
 	private void createBlocksInDatabaseWithTransactions() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-		final List<Hash> hashes = new ArrayList<>();
 		final Account sender = Utils.generateRandomAccount();
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
@@ -852,8 +853,7 @@ public class BlockDaoTest {
 
 			final ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
 			scanner.addIncludeFilter(new AnnotationTypeFilter(Entity.class));
-			// I wanted to make a generic test, that would create a dbBlock
-			// with all possible transaction types, but idk how to do that
+			// TODO I wanted to make a generic test, that would create a dbBlock with all possible transaction types, but idk how to do that
 			/*
 			for (final BeanDefinition beanDefinition : scanner.findCandidateComponents("org.nem.nis.dbmodel")) {
 				final Class clazz = Class.forName(beanDefinition.getBeanClassName());

@@ -41,6 +41,7 @@ public class MultisigNonOperationalValidatorTest {
 		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
 
 		// note, we're not signing transaction which means it's a child transaction
+		// TODO 20150103 J-B don't like this
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(transaction);
@@ -69,6 +70,7 @@ public class MultisigNonOperationalValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
+	// TODO 20150103 J-G: why do we want to allow this?
 	@Test
 	public void multisigAccountCanIssueMultisigModification() {
 		// Arrange:
@@ -104,10 +106,10 @@ public class MultisigNonOperationalValidatorTest {
 		context.addState(cosignatory);
 		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
 
-		// TODO: change this to del
 		final Transaction transaction = new MultisigSignerModificationTransaction(
 				TimeInstant.ZERO,
 				multisig,
+				// TODO 20150103 J-G: consider refactoring as the type and expected reslt are only differences
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, newCosignatory)));
 		transaction.sign();
 
@@ -118,6 +120,7 @@ public class MultisigNonOperationalValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
+	// TODO 20150103 J-G: is there a good reason for supporting this?
 	@Test
 	public void multisigAccountCanIssueMultisigSignatureIfAlsoIsCosignatory() {
 		// Arrange:
@@ -143,5 +146,4 @@ public class MultisigNonOperationalValidatorTest {
 		// Assert
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
-
 }

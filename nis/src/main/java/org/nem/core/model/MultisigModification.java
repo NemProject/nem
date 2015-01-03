@@ -2,11 +2,19 @@ package org.nem.core.model;
 
 import org.nem.core.serialization.*;
 
-
+/**
+ * Represents a multisig modification.
+ */
 public class MultisigModification implements SerializableEntity {
 	private final MultisigModificationType modificationType;
 	private final Account cosignatoryAccount;
 
+	/**
+	 * Creates a multisig modification.
+	 *
+	 * @param modificationType The modification type.
+	 * @param cosignatoryAccount The cosignatory account.
+	 */
 	public MultisigModification(final MultisigModificationType modificationType, final Account cosignatoryAccount) {
 		this.modificationType = modificationType;
 		this.cosignatoryAccount = cosignatoryAccount;
@@ -14,6 +22,11 @@ public class MultisigModification implements SerializableEntity {
 		this.validate();
 	}
 
+	/**
+	 * Deserializes a multisig modification.
+	 *
+	 * @param deserializer The deserializer.
+	 */
 	public MultisigModification(final Deserializer deserializer) {
 		this.modificationType = MultisigModificationType.fromValueOrDefault(deserializer.readInt("modificationType"));
 		this.cosignatoryAccount = Account.readFrom(deserializer, "cosignatoryAccount", AddressEncoding.PUBLIC_KEY);
@@ -45,7 +58,7 @@ public class MultisigModification implements SerializableEntity {
 		return this.modificationType;
 	}
 
-	public void validate() {
+	private void validate() {
 		if (null == this.cosignatoryAccount) {
 			throw new IllegalArgumentException("cosignatoryAccount is required");
 		}
