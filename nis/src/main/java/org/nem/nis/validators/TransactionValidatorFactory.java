@@ -33,9 +33,19 @@ public class TransactionValidatorFactory {
 	 * @return The validator.
 	 */
 	public SingleTransactionValidator createSingle(final ReadOnlyAccountStateCache accountStateCache, final boolean blockVerification) {
+		return this.createSingleBuilder(accountStateCache, blockVerification).build();
+	}
+
+	/**
+	 * Creates a transaction validator builder only that is initialized with single validators.
+	 *
+	 * @param accountStateCache The account state cache.
+	 * @return The builder.
+	 */
+	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyAccountStateCache accountStateCache, final boolean blockVerification) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 		this.visitSingleSubValidators(builder::add, accountStateCache, blockVerification);
-		return builder.build();
+		return builder;
 	}
 
 	/**

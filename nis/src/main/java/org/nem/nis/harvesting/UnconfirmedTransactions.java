@@ -223,8 +223,7 @@ public class UnconfirmedTransactions {
 
 	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
 		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(accountStateCache, blockVerification));
+		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createSingleBuilder(accountStateCache, blockVerification);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 
