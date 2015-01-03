@@ -8,7 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
 
-public class MultisigTransactionValidatorTest {
+public class MultisigTransactionSignerValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK);
 
 	@Test

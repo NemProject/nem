@@ -59,7 +59,7 @@ public class TransactionValidatorFactoryTest {
 				NonFutureEntityValidator.class,
 				TransferTransactionValidator.class,
 				ImportanceTransferTransactionValidator.class,
-				MultisigTransactionValidator.class,
+				MultisigTransactionSignerValidator.class,
 				MultisigSignerModificationTransactionValidator.class);
 
 		// Act:
