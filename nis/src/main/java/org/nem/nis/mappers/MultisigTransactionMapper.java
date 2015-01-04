@@ -47,7 +47,7 @@ public class MultisigTransactionMapper {
 		} else if (dbTransfer.getImportanceTransfer() != null) {
 			otherTransaction = null; // TODO ImportanceTransferMapper.toModel(dbTransfer.getImportanceTransfer(), accountLookup);
 		} else if (dbTransfer.getMultisigSignerModification() != null) {
-			otherTransaction = MultisigSignerModificationMapper.toModel(dbTransfer.getMultisigSignerModification(), accountLookup);
+			otherTransaction = null; // MultisigSignerModificationMapper.toModel(dbTransfer.getMultisigSignerModification(), accountLookup);
 		} else {
 			throw new RuntimeException("dbmodel has invalid multisig transaction");
 		}

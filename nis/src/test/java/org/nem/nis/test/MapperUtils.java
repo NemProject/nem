@@ -26,6 +26,16 @@ public class MapperUtils {
 	//region create mappers
 
 	/**
+	 * Creates a mapper for mapping db model types to model types.
+	 *
+	 * @param accountLookup The account lookup.
+	 * @return The mapper.
+	 */
+	public static IMapper createDbModelToModelMapper(final AccountLookup accountLookup) {
+		return new DefaultMapperFactory().createDbModelToModelMapper(accountLookup);
+	}
+
+	/**
 	 * Creates a mapper for mapping model types to db model types.
 	 *
 	 * @param accountDao The account dao.
