@@ -224,6 +224,7 @@ public class BlockDbModelToModelMappingTest {
 				final TDbTransfer dbTransfer,
 				final Class<TModelTransfer> modelClass) {
 			dbTransfer.setBlkIndex(blockIndex);
+			dbTransfer.setReferencedTransaction(0L);
 			final TModelTransfer transfer = Mockito.mock(modelClass);
 			Mockito.when(this.mapper.map(dbTransfer, Transaction.class)).thenReturn(transfer);
 			addTransaction.accept(dbTransfer);

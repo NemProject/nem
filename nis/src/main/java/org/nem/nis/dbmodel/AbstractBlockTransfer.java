@@ -14,6 +14,8 @@ public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransf
 	private Integer blkIndex; // index inside block
 	private Integer orderId; // index inside list
 
+	private Long referencedTransaction;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "blockId")
 	private Block block;
@@ -39,6 +41,15 @@ public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransf
 
 	public void setOrderId(final Integer orderId) {
 		this.orderId = orderId;
+	}
+
+
+	public Long getReferencedTransaction() {
+		return this.referencedTransaction;
+	}
+
+	public void setReferencedTransaction(final Long referencedTransaction) {
+		this.referencedTransaction = referencedTransaction;
 	}
 
 	public Block getBlock() {

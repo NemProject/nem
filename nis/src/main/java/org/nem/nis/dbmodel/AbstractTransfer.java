@@ -29,8 +29,6 @@ public abstract class AbstractTransfer {
 	private Account sender;
 	private byte[] senderProof;
 
-	private Long referencedTransaction;
-
 	public Long getId() {
 		return this.id;
 	}
@@ -103,13 +101,4 @@ public abstract class AbstractTransfer {
 	public void setSenderProof(final byte[] senderProof) {
 		this.senderProof = senderProof;
 	}
-
-	public Long getReferencedTransaction() {
-		return this.referencedTransaction;
-	}
-
-	public void setReferencedTransaction(final Long referencedTransaction) {
-		this.referencedTransaction = referencedTransaction;
-	}
-
 }

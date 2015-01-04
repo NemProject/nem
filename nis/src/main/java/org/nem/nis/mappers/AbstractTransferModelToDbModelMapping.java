@@ -37,7 +37,6 @@ public abstract class AbstractTransferModelToDbModelMapping<TModel extends Trans
 		dbModel.setDeadline(source.getDeadline().getRawTime());
 		dbModel.setSender(sender);
 		dbModel.setSenderProof(null == source.getSignature() ? null : source.getSignature().getBytes());
-		dbModel.setReferencedTransaction(0L);
 		return dbModel;
 	}
 

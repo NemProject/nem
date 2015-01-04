@@ -74,7 +74,5 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 		} else {
 			Assert.assertThat(dbModel.getSenderProof(), IsNull.nullValue());
 		}
-
-		Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 	}
 }
