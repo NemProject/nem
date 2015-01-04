@@ -592,7 +592,6 @@ public class BlockMapperTest {
 			mockAccountLookup.setMockAccount(this.account1);
 			mockAccountLookup.setMockAccount(this.account2);
 			mockAccountLookup.setMockAccount(this.account3);
-
 			return MapperUtils.createDbModelToModelNisMapper(mockAccountLookup).map(dbBlock);
 		}
 

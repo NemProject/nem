@@ -100,8 +100,7 @@ public class TransactionRegistry {
 					MultisigSignerModificationModelToDbModelMapping::new,
 					MultisigSignerModificationDbModelToModelMapping::new,
 					MultisigSignerModification.class,
-					MultisigSignerModificationTransaction.class
-			));
+					MultisigSignerModificationTransaction.class));
 
 			this.add(new Entry<>(
 					Block::getBlockMultisigTransactions,
@@ -109,8 +108,7 @@ public class TransactionRegistry {
 					MultisigTransactionModelToDbModelMapping::new,
 					MultisigTransactionDbModelToModelMapping::new,
 					MultisigTransaction.class,
-					org.nem.core.model.MultisigTransaction.class
-			));
+					org.nem.core.model.MultisigTransaction.class));
 
 //			this.add(new Entry<>(
 //					null,

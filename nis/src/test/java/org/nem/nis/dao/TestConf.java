@@ -46,6 +46,8 @@ public class TestConf {
 
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
+
+		// TODO: 20140104 J-G: see if we can use TransactionRegistry for this
 		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignerModification.class);

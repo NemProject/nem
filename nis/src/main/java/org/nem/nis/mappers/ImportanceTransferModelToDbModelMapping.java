@@ -24,9 +24,7 @@ public class ImportanceTransferModelToDbModelMapping extends AbstractTransferMod
 		final ImportanceTransfer dbTransfer = new ImportanceTransfer();
 		dbTransfer.setRemote(remote);
 		dbTransfer.setMode(source.getMode().value());
-
 		dbTransfer.setReferencedTransaction(0L);
-
 		return dbTransfer;
 	}
 }
