@@ -98,7 +98,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		public void assertDbModel(final Transfer dbModel, final TransferTransaction model) {
 			Assert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(this.dbRecipient));
 			Assert.assertThat(dbModel.getAmount(), IsEqual.equalTo(111111L));
-			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0));
+			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}
