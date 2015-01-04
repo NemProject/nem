@@ -92,7 +92,6 @@ public class BlockMapperTest {
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
 	}
 
-	/*
 	@Test
 	public void blockModelWithMultisigSignerModificationTransactionCanBeMappedToDbModel() {
 		// Arrange:
@@ -114,8 +113,8 @@ public class BlockMapperTest {
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 	}
-	*/
 
+	// this test currently fails due to fee calculation
 	@Test
 	public void blockModelWithMultisigTransactionCanBeMappedToDbModel() {
 		// Arrange:
@@ -141,6 +140,7 @@ public class BlockMapperTest {
 		}
 	}
 
+	// this test currently fails due to fee calculation
 	@Test
 	public void blockModelWithMultisigTransactionWithSignaturesCanBeMappedToDbModel() {
 		// Arrange:
@@ -422,6 +422,7 @@ public class BlockMapperTest {
 		}
 	}
 
+	// this test is currently expected to fail
 	@Test
 	public void blockModelWithTransactionsMixedWithMultisigTransactionsCanBeRoundTripped() {
 		// Arrange:
