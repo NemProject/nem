@@ -30,9 +30,13 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 		final MultisigTransaction multisigTransaction = new MultisigTransaction();
 		multisigTransaction.setReferencedTransaction(0L);
 
+		final MultisigSignatureModelToDbModelMapping multisigSignatureMapper = new MultisigSignatureModelToDbModelMapping(
+				this.mapper
+		);
 		final Set<MultisigSignature> multisigSignatures = source.getCosignerSignatures().stream()
-				.map(model -> this.mapper.map(model, MultisigSignature.class))
+				.map(model -> multisigSignatureMapper.map(model))
 				.collect(Collectors.toSet());
+
 		multisigTransaction.setMultisigSignatures(multisigSignatures);
 		return multisigTransaction;
 	}
