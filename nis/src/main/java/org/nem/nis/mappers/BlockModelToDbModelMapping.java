@@ -3,7 +3,9 @@ package org.nem.nis.mappers;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;
 
@@ -44,36 +46,115 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setLessor(lessor);
 
+		final BlockTransactionDbMapper blockTransactionDbMapper = new BlockTransactionDbMapper(mapper, dbBlock, block.getTransactions().size());
+		for (final Transaction transaction : block.getTransactions()) {
+			blockTransactionDbMapper.handleTransaction(transaction);
+		}
+		blockTransactionDbMapper.saveTransfers();
+
+		return dbBlock;
+	}
+
+
+	private static class BlockTransactionDbMapper {
+		private final org.nem.nis.dbmodel.Block dbBlock;
+		private final IMapper mapper;
+
+		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<MultisigSignerModification> multisigSignerModificationsTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<MultisigTransaction> multisigTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
+		final List<Transfer> transferTransactions;
+
 		int i = 0;
+		int multisigSignerModificationsIndex = 0;
+		int multisigTransactionsIndex = 0;
 		int importanceTransferIndex = 0;
 		int transferIndex = 0;
-		final int numTransactions = block.getTransactions().size();
-		final List<Transfer> transferTransactions = new ArrayList<>(numTransactions);
-		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(numTransactions);
-		for (final Transaction transaction : block.getTransactions()) {
+
+		private BlockTransactionDbMapper(final IMapper mapper, final org.nem.nis.dbmodel.Block dbBlock, final int initialCapacity) {
+			this.mapper = mapper;
+			this.dbBlock = dbBlock;
+			this.transferTransactions = new ArrayList<>(initialCapacity);
+		}
+
+		private MultisigTransaction handleMultisig(final Transaction transaction) {
+			final MultisigTransaction dbTransfer = this.mapper.map(transaction, MultisigTransaction.class);
+			dbTransfer.setOrderId(this.multisigTransactionsIndex++);
+			dbTransfer.setBlkIndex(this.i);
+			dbTransfer.setBlock(this.dbBlock);
+			this.multisigTransactions.add(dbTransfer);
+
+			return dbTransfer;
+		}
+
+		private void handleTransaction(final Transaction transaction) {
+			this.handleTransaction(transaction, null);
+		}
+
+		private void handleTransaction(final Transaction transaction, final MultisigTransaction multisig) {
 			switch (transaction.getType()) {
 				case TransactionTypes.TRANSFER: {
 					final Transfer dbTransfer = this.mapper.map(transaction, Transfer.class);
-					dbTransfer.setOrderId(transferIndex++);
-					dbTransfer.setBlkIndex(i++);
-					dbTransfer.setBlock(dbBlock);
-					transferTransactions.add(dbTransfer);
+					dbTransfer.setOrderId(this.transferIndex++);
+					dbTransfer.setBlkIndex(this.i);
+					dbTransfer.setBlock(this.dbBlock);
+					this.transferTransactions.add(dbTransfer);
+
+					if (multisig != null) {
+						multisig.setTransfer(dbTransfer);
+					}
 				}
 				break;
 
 				case TransactionTypes.IMPORTANCE_TRANSFER: {
 					final ImportanceTransfer dbTransfer = this.mapper.map(transaction, ImportanceTransfer.class);
-					dbTransfer.setOrderId(importanceTransferIndex++);
-					dbTransfer.setBlkIndex(i++);
-					dbTransfer.setBlock(dbBlock);
-					importanceTransferTransactions.add(dbTransfer);
+					dbTransfer.setOrderId(this.importanceTransferIndex++);
+					dbTransfer.setBlkIndex(this.i);
+					dbTransfer.setBlock(this.dbBlock);
+					this.importanceTransferTransactions.add(dbTransfer);
+
+					if (multisig != null) {
+						multisig.setImportanceTransfer(dbTransfer);
+					}
 				}
 				break;
+				case TransactionTypes.MULTISIG_SIGNER_MODIFY: {
+					final MultisigSignerModification dbTransfer = this.mapper.map(transaction, MultisigSignerModification.class);
+					dbTransfer.setOrderId(this.multisigSignerModificationsIndex++);
+					dbTransfer.setBlkIndex(this.i);
+					dbTransfer.setBlock(this.dbBlock);
+					this.multisigSignerModificationsTransactions.add(dbTransfer);
+
+					if (multisig != null) {
+						multisig.setMultisigSignerModification(dbTransfer);
+					}
+				}
+				break;
+				case TransactionTypes.MULTISIG: {
+					if (multisig != null) {
+						throw new RuntimeException("multisig inside multisig");
+					}
+
+					final MultisigTransaction multisigTransaction = this.handleMultisig(transaction);
+					// recursive call
+					this.handleTransaction(((org.nem.core.model.MultisigTransaction) transaction).getOtherTransaction(), multisigTransaction);
+				}
+				break;
+				default:
+					throw new RuntimeException("trying to map block with unknown transaction type");
+			}
+
+			// if current transaction is part of multisig transaction we will NOT increment blockindex
+			if (multisig == null) {
+				this.i++;
 			}
 		}
 
-		dbBlock.setBlockTransfers(transferTransactions);
-		dbBlock.setBlockImportanceTransfers(importanceTransferTransactions);
-		return dbBlock;
+		public void saveTransfers() {
+			this.dbBlock.setBlockTransfers(this.transferTransactions);
+			this.dbBlock.setBlockImportanceTransfers(this.importanceTransferTransactions);
+			this.dbBlock.setBlockMultisigSignerModifications(this.multisigSignerModificationsTransactions);
+			this.dbBlock.setBlockMultisigTransactions(this.multisigTransactions);
+		}
 	}
 }
