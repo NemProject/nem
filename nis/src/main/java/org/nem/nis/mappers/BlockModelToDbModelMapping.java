@@ -3,11 +3,11 @@ package org.nem.nis.mappers;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 
 /**
  * A mapping that is able to map a model block to a db block.
@@ -46,115 +46,98 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setLessor(lessor);
 
-		final BlockTransactionDbMapper blockTransactionDbMapper = new BlockTransactionDbMapper(mapper, dbBlock, block.getTransactions().size());
-		for (final Transaction transaction : block.getTransactions()) {
-			blockTransactionDbMapper.handleTransaction(transaction);
-		}
-		blockTransactionDbMapper.saveTransfers();
-
+		final BlockTransactionProcessor processor = new BlockTransactionProcessor(mapper, dbBlock);
+		block.getTransactions().forEach(processor::process);
+		processor.commit();
 		return dbBlock;
 	}
 
+	private static class BlockTransactionContext<T extends AbstractBlockTransfer> {
+		public final int type;
+		private final BiConsumer<org.nem.nis.dbmodel.Block, List<T>> setInBlock;
+		private final Class<T> dbModelType;
+		private final List<T> transactions = new ArrayList<>();
+		public int nextIndex;
 
-	private static class BlockTransactionDbMapper {
-		private final org.nem.nis.dbmodel.Block dbBlock;
-		private final IMapper mapper;
-
-		final List<ImportanceTransfer> importanceTransferTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
-		final List<MultisigSignerModification> multisigSignerModificationsTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
-		final List<MultisigTransaction> multisigTransactions = new ArrayList<>(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 10);
-		final List<Transfer> transferTransactions;
-
-		int i = 0;
-		int multisigSignerModificationsIndex = 0;
-		int multisigTransactionsIndex = 0;
-		int importanceTransferIndex = 0;
-		int transferIndex = 0;
-
-		private BlockTransactionDbMapper(final IMapper mapper, final org.nem.nis.dbmodel.Block dbBlock, final int initialCapacity) {
-			this.mapper = mapper;
-			this.dbBlock = dbBlock;
-			this.transferTransactions = new ArrayList<>(initialCapacity);
+		public BlockTransactionContext(
+				final int type,
+				final BiConsumer<org.nem.nis.dbmodel.Block, List<T>> setInBlock,
+				final Class<T> dbModelType) {
+			this.type = type;
+			this.setInBlock = setInBlock;
+			this.dbModelType = dbModelType;
 		}
 
-		private MultisigTransaction handleMultisig(final Transaction transaction) {
-			final MultisigTransaction dbTransfer = this.mapper.map(transaction, MultisigTransaction.class);
-			dbTransfer.setOrderId(this.multisigTransactionsIndex++);
-			dbTransfer.setBlkIndex(this.i);
-			dbTransfer.setBlock(this.dbBlock);
-			this.multisigTransactions.add(dbTransfer);
-
+		public T mapAndAdd(final IMapper mapper, final Transaction transaction) {
+			final T dbTransfer = mapper.map(transaction, this.dbModelType);
+			this.transactions.add(dbTransfer);
 			return dbTransfer;
 		}
 
-		private void handleTransaction(final Transaction transaction) {
-			this.handleTransaction(transaction, null);
+		public void commit(final org.nem.nis.dbmodel.Block dbBlock) {
+			this.setInBlock.accept(dbBlock, this.transactions);
+		}
+	}
+
+	private static class BlockTransactionProcessor {
+		private final IMapper mapper;
+		private final org.nem.nis.dbmodel.Block dbBlock;
+		private int blockIndex;
+
+		// TODO 20150104 J-J: move to registry (hopefully)
+		private final Map<Integer, BlockTransactionContext> transactionContexts = new HashMap<Integer, BlockTransactionContext>() {
+			{
+				this.put(
+						TransactionTypes.TRANSFER,
+						new BlockTransactionContext<>(
+								TransactionTypes.TRANSFER,
+								(b, t) -> b.setBlockTransfers(t),
+								Transfer.class));
+				this.put(
+						TransactionTypes.IMPORTANCE_TRANSFER,
+						new BlockTransactionContext<>(
+								TransactionTypes.IMPORTANCE_TRANSFER,
+								(b, t) -> b.setBlockImportanceTransfers(t),
+								ImportanceTransfer.class));
+				this.put(
+						TransactionTypes.MULTISIG_SIGNER_MODIFY,
+						new BlockTransactionContext<>(
+								TransactionTypes.MULTISIG_SIGNER_MODIFY, (b, t) ->
+								b.setBlockMultisigSignerModifications(t),
+								MultisigSignerModification.class));
+				this.put(
+						TransactionTypes.MULTISIG,
+						new BlockTransactionContext<>(
+								TransactionTypes.MULTISIG,
+								(b, t) -> b.setBlockMultisigTransactions(t),
+								MultisigTransaction.class));
+			}
+		};
+
+		public BlockTransactionProcessor(final IMapper mapper, final org.nem.nis.dbmodel.Block dbBlock) {
+			this.mapper = mapper;
+			this.dbBlock = dbBlock;
 		}
 
-		private void handleTransaction(final Transaction transaction, final MultisigTransaction multisig) {
-			switch (transaction.getType()) {
-				case TransactionTypes.TRANSFER: {
-					final Transfer dbTransfer = this.mapper.map(transaction, Transfer.class);
-					dbTransfer.setOrderId(this.transferIndex++);
-					dbTransfer.setBlkIndex(this.i);
-					dbTransfer.setBlock(this.dbBlock);
-					this.transferTransactions.add(dbTransfer);
-
-					if (multisig != null) {
-						multisig.setTransfer(dbTransfer);
-					}
-				}
-				break;
-
-				case TransactionTypes.IMPORTANCE_TRANSFER: {
-					final ImportanceTransfer dbTransfer = this.mapper.map(transaction, ImportanceTransfer.class);
-					dbTransfer.setOrderId(this.importanceTransferIndex++);
-					dbTransfer.setBlkIndex(this.i);
-					dbTransfer.setBlock(this.dbBlock);
-					this.importanceTransferTransactions.add(dbTransfer);
-
-					if (multisig != null) {
-						multisig.setImportanceTransfer(dbTransfer);
-					}
-				}
-				break;
-				case TransactionTypes.MULTISIG_SIGNER_MODIFY: {
-					final MultisigSignerModification dbTransfer = this.mapper.map(transaction, MultisigSignerModification.class);
-					dbTransfer.setOrderId(this.multisigSignerModificationsIndex++);
-					dbTransfer.setBlkIndex(this.i);
-					dbTransfer.setBlock(this.dbBlock);
-					this.multisigSignerModificationsTransactions.add(dbTransfer);
-
-					if (multisig != null) {
-						multisig.setMultisigSignerModification(dbTransfer);
-					}
-				}
-				break;
-				case TransactionTypes.MULTISIG: {
-					if (multisig != null) {
-						throw new RuntimeException("multisig inside multisig");
-					}
-
-					final MultisigTransaction multisigTransaction = this.handleMultisig(transaction);
-					// recursive call
-					this.handleTransaction(((org.nem.core.model.MultisigTransaction) transaction).getOtherTransaction(), multisigTransaction);
-				}
-				break;
-				default:
-					throw new RuntimeException("trying to map block with unknown transaction type");
+		public void process(final Transaction transaction) {
+			final BlockTransactionContext<?> context = this.transactionContexts.getOrDefault(transaction.getType(), null);
+			if (null == context) {
+				// TODO 20150104 J-J: need to test this
+				throw new RuntimeException("trying to map block with unknown transaction type");
 			}
 
-			// if current transaction is part of multisig transaction we will NOT increment blockindex
-			if (multisig == null) {
-				this.i++;
-			}
+			final AbstractBlockTransfer dbTransfer = context.mapAndAdd(this.mapper, transaction);
+			dbTransfer.setOrderId(context.nextIndex++);
+			dbTransfer.setBlkIndex(this.blockIndex++);
+			dbTransfer.setBlock(this.dbBlock);
+
+			// TODO 20150104: need to set same fields on inner transactions!
 		}
 
-		public void saveTransfers() {
-			this.dbBlock.setBlockTransfers(this.transferTransactions);
-			this.dbBlock.setBlockImportanceTransfers(this.importanceTransferTransactions);
-			this.dbBlock.setBlockMultisigSignerModifications(this.multisigSignerModificationsTransactions);
-			this.dbBlock.setBlockMultisigTransactions(this.multisigTransactions);
+		public void commit() {
+			for (final BlockTransactionContext<?> context : this.transactionContexts.values()) {
+				context.commit(this.dbBlock);
+			}
 		}
 	}
 }
