@@ -9,7 +9,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.*;
 import org.nem.core.model.MultisigTransaction;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.test.RandomTransactionFactory;
@@ -123,8 +123,23 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(getMatchingTransactions.apply(dbModel), IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2)));
 		Assert.assertThat(getBlockIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 		Assert.assertThat(getOrderIndexes(dbTransfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
+		assertTransfersHaveBlockSetCorrectly(dbTransfers, dbModel);
 
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(expectedClass));
+	}
+
+	@Test
+	public void blockWithUnsupportedTransfersCannotBeMappedToDbModel() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block block = context.createBlock(null);
+
+		context.addUnsupportedTransfer(block);
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> context.mapping.map(block),
+				IllegalArgumentException.class);
 	}
 
 	@Test
@@ -182,11 +197,63 @@ public class BlockModelToDbModelMappingTest {
 
 		// Sanity:
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
+
 			Assert.assertThat(
 					"not all transaction types are represented",
 					entry.getFromBlock.apply(dbModel).isEmpty(),
 					IsEqual.equalTo(false));
 		}
+	}
+
+	// TODO 20150104 J-G: please look at this test
+	@Test
+	public void innerMultisigTransferBlockRelatedPropertiesAreSetCorrectly() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Block block = context.createBlock(null);
+
+		final Transfer innerTransfer1 = new Transfer();
+		final Transfer innerTransfer2 = new Transfer();
+
+		final AbstractTransfer transfer0 = context.addTransfer(block);
+		final AbstractTransfer transfer1 = context.addMultisigTransfer(block, innerTransfer1);
+		final AbstractTransfer transfer2 = context.addTransfer(block);
+		final AbstractTransfer transfer3 = context.addMultisigTransfer(block, innerTransfer2);
+
+		// Act:
+		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+
+		// Assert: db model properties
+		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
+
+		// Assert: db model transactions
+		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(4));
+
+		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransfers();
+		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
+		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2)));
+		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2)));
+		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
+
+		transfers = dbModel.getBlockMultisigTransactions();
+		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
+		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer3)));
+		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 3)));
+		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
+
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			assertTransfersHaveBlockSetCorrectly(entry.getFromBlock.apply(dbModel), dbModel);
+		}
+
+		// Assert: multisig inner transactions
+		Assert.assertThat(innerTransfer1.getOrderId(), IsEqual.equalTo(-1));
+		Assert.assertThat(innerTransfer1.getBlkIndex(), IsEqual.equalTo(1));
+		Assert.assertThat(innerTransfer1.getBlock(), IsEqual.equalTo(dbModel));
+
+		Assert.assertThat(innerTransfer2.getOrderId(), IsEqual.equalTo(-1));
+		Assert.assertThat(innerTransfer2.getBlkIndex(), IsEqual.equalTo(3));
+		Assert.assertThat(innerTransfer2.getBlock(), IsEqual.equalTo(dbModel));
 	}
 
 	//endregion
@@ -197,12 +264,20 @@ public class BlockModelToDbModelMappingTest {
 				.reduce(0, Integer::sum);
 	}
 
-	private static Collection<Integer> getBlockIndexes(final Collection<? extends AbstractBlockTransfer> transfers) {
-		return transfers.stream().map(AbstractBlockTransfer::getBlkIndex).collect(Collectors.toList());
+	private static Collection<Integer> getBlockIndexes(final Collection<? extends AbstractBlockTransfer> dbTransfers) {
+		return dbTransfers.stream().map(AbstractBlockTransfer::getBlkIndex).collect(Collectors.toList());
 	}
 
-	private static Collection<Integer> getOrderIndexes(final Collection<? extends AbstractBlockTransfer> transfers) {
-		return transfers.stream().map(AbstractBlockTransfer::getOrderId).collect(Collectors.toList());
+	private static Collection<Integer> getOrderIndexes(final Collection<? extends AbstractBlockTransfer> dbTransfers) {
+		return dbTransfers.stream().map(AbstractBlockTransfer::getOrderId).collect(Collectors.toList());
+	}
+
+	private static void assertTransfersHaveBlockSetCorrectly(
+			final Collection<? extends AbstractBlockTransfer> dbTransfers,
+			final org.nem.nis.dbmodel.Block expectedBlock) {
+		for (final AbstractBlockTransfer dbTransfer : dbTransfers) {
+			Assert.assertThat(dbTransfer.getBlock(), IsEqual.equalTo(expectedBlock));
+		}
 	}
 
 	private static class TestContext {
@@ -279,6 +354,20 @@ public class BlockModelToDbModelMappingTest {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
 			return this.addTransfer(block, multisigTransfer, new org.nem.nis.dbmodel.MultisigTransaction(), org.nem.nis.dbmodel.MultisigTransaction.class);
+		}
+
+		public org.nem.nis.dbmodel.MultisigTransaction addMultisigTransfer(final Block block, final Transfer dbInnerTransfer) {
+			final org.nem.nis.dbmodel.MultisigTransaction dbMultisigTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
+			dbMultisigTransfer.setTransfer(dbInnerTransfer);
+
+			final Transaction transfer = RandomTransactionFactory.createTransfer();
+			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
+			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, org.nem.nis.dbmodel.MultisigTransaction.class);
+		}
+
+		public Transfer addUnsupportedTransfer(final Block block) {
+			final Transaction transfer = new MockTransaction();
+			return this.addTransfer(block, transfer, new Transfer(), Transfer.class);
 		}
 
 		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TDbTransfer addTransfer(

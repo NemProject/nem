@@ -94,8 +94,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 		public void process(final Transaction transaction) {
 			final BlockTransactionContext<?> context = this.transactionContexts.getOrDefault(transaction.getType(), null);
 			if (null == context) {
-				// TODO 20150104 J-J: need to test this
-				throw new RuntimeException("trying to map block with unknown transaction type");
+				throw new IllegalArgumentException("trying to map block with unknown transaction type");
 			}
 
 			final AbstractBlockTransfer dbTransfer = context.mapAndAdd(this.mapper, transaction);
@@ -103,7 +102,19 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 			dbTransfer.setBlkIndex(this.blockIndex++);
 			dbTransfer.setBlock(this.dbBlock);
 
-			// TODO 20150104: need to set same fields on inner transactions!
+			if (dbTransfer instanceof MultisigTransaction) {
+				final MultisigTransaction dbMultisigTransfer = (MultisigTransaction)dbTransfer;
+				for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+					final AbstractBlockTransfer dbInnerTransfer = entry.getFromMultisig.apply(dbMultisigTransfer);
+					if (null == dbInnerTransfer) {
+						continue;
+					}
+
+					dbInnerTransfer.setOrderId(-1);
+					dbInnerTransfer.setBlkIndex(this.blockIndex);
+					dbTransfer.setBlock(this.dbBlock);
+				}
+			}
 		}
 
 		public void commit() {
