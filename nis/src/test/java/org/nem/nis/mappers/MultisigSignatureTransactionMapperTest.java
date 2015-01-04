@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.MultisigSignature;
-import org.nem.nis.test.MockAccountDao;
+import org.nem.nis.test.*;
 
 public class MultisigSignatureTransactionMapperTest {
 	@Test
@@ -78,12 +78,11 @@ public class MultisigSignatureTransactionMapperTest {
 		}
 
 		public MultisigSignature toDbModel() {
-			return MultisigSignatureTransactionMapper.toDbModel(this.multisigDbTransaction, new AccountDaoLookupAdapter(this.accountDao), this.model);
+			return MapperUtils.createModelToDbModelMapper(this.accountDao).map(this.multisigDbTransaction, MultisigSignature.class);
 		}
 
 		public MultisigSignatureTransaction toModel(final MultisigSignature dbModel) {
-			final MultisigSignatureTransaction f = MultisigSignatureTransactionMapper.toModel(dbModel, this.mockAccountLookup, this.multisigTransaction);
-			return f;
+			return MapperUtils.createDbModelToModelMapper(this.mockAccountLookup).map(this.multisigTransaction, MultisigSignatureTransaction.class);
 		}
 
 		public void assertDbModel(final MultisigSignature dbModel) {

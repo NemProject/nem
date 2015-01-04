@@ -77,7 +77,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<org.nem.core.model.Account, Integer> expectedModifications = new HashMap<>();
-		final Set<org.nem.nis.dbmodel.MultisigModification> modifications = new HashSet<>();
+		private final Set<org.nem.nis.dbmodel.MultisigModification> modifications = new HashSet<>();
 		private final MultisigSignerModificationDbModelToModelMapping mapping = new MultisigSignerModificationDbModelToModelMapping(this.mapper);
 
 		public TestContext() {

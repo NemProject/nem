@@ -87,6 +87,8 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 		}
 
 		public void assertModel(final MultisigSignerModification dbModel, final int numExpectedModifications) {
+			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
+
 			Assert.assertThat(dbModel.getMultisigModifications().size(), IsEqual.equalTo(numExpectedModifications));
 			final Map<org.nem.nis.dbmodel.Account, Integer> actualModifications = new HashMap<>();
 			for (final org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications()) {

@@ -11,7 +11,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 /**
- * A mapping that is able to map a db transfer to a model transfer transaction.
+ * A mapping that is able to map a db multisig transfer to a model multisig transaction.
  */
 public class MultisigTransactionDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<org.nem.nis.dbmodel.MultisigTransaction, MultisigTransaction> {
 	private final IMapper mapper;
@@ -37,7 +37,7 @@ public class MultisigTransactionDbModelToModelMapping extends AbstractTransferDb
 		} else if (source.getMultisigSignerModification() != null) {
 			otherTransaction = this.mapper.map(source.getMultisigSignerModification(), MultisigSignerModificationTransaction.class);
 		} else {
-			throw new RuntimeException("dbmodel has invalid multisig transaction");
+			throw new IllegalArgumentException("dbmodel has invalid multisig transaction");
 		}
 
 		final org.nem.core.model.MultisigTransaction target = new org.nem.core.model.MultisigTransaction(
@@ -45,12 +45,8 @@ public class MultisigTransactionDbModelToModelMapping extends AbstractTransferDb
 				sender,
 				otherTransaction);
 
-
-		final MultisigSignatureDbModelToModelMapping multisigSignatureMapper = new MultisigSignatureDbModelToModelMapping(
-				this.mapper
-		);
 		for (final MultisigSignature multisigSignature : source.getMultisigSignatures()) {
-			target.addSignature(multisigSignatureMapper.map(multisigSignature));
+			target.addSignature(this.mapper.map(multisigSignature, MultisigSignatureTransaction.class));
 		}
 
 		return target;
