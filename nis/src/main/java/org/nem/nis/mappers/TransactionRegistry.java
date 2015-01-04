@@ -19,6 +19,11 @@ public class TransactionRegistry {
 	public static class Entry<TDbModel extends AbstractBlockTransfer, TModel extends Transaction> {
 
 		/**
+		 * The transaction type.
+		 */
+		public final int type;
+
+		/**
 		 * A function that will return db model transactions given a block
 		 */
 		public final Function<Block, List<TDbModel>> getFromBlock;
@@ -47,6 +52,7 @@ public class TransactionRegistry {
 		private final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper;
 
 		private Entry(
+				final int type,
 				final Function<Block, List<TDbModel>> getFromBlock,
 				final BiConsumer<Block, List<TDbModel>> setInBlock,
 				final Function<MultisigTransaction, TDbModel> getFromMultisig,
@@ -54,6 +60,8 @@ public class TransactionRegistry {
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
 				final Class<TDbModel> dbModelClass,
 				final Class<TModel> modelClass) {
+			this.type = type;
+
 			this.getFromBlock = getFromBlock;
 			this.setInBlock = setInBlock;
 
@@ -88,6 +96,7 @@ public class TransactionRegistry {
 	private static final List<Entry<?, ?>> entries = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(
+					TransactionTypes.TRANSFER,
 					Block::getBlockTransfers,
 					(block, transfers) -> block.setBlockTransfers(transfers),
 					MultisigTransaction::getTransfer,
@@ -97,6 +106,7 @@ public class TransactionRegistry {
 					TransferTransaction.class));
 
 			this.add(new Entry<>(
+					TransactionTypes.IMPORTANCE_TRANSFER,
 					Block::getBlockImportanceTransfers,
 					(block, transfers) -> block.setBlockImportanceTransfers(transfers),
 					MultisigTransaction::getImportanceTransfer,
@@ -106,6 +116,7 @@ public class TransactionRegistry {
 					ImportanceTransferTransaction.class));
 
 			this.add(new Entry<>(
+					TransactionTypes.MULTISIG_SIGNER_MODIFY,
 					Block::getBlockMultisigSignerModifications,
 					(block, transfers) -> block.setBlockMultisigSignerModifications(transfers),
 					MultisigTransaction::getMultisigSignerModification,
@@ -115,6 +126,7 @@ public class TransactionRegistry {
 					MultisigSignerModificationTransaction.class));
 
 			this.add(new Entry<>(
+					TransactionTypes.MULTISIG,
 					Block::getBlockMultisigTransactions,
 					(block, transfers) -> block.setBlockMultisigTransactions(transfers),
 					multisig -> null,
@@ -154,8 +166,26 @@ public class TransactionRegistry {
 
 	/**
 	 * Gets all entries.
+	 *
+	 * @return The entries.
 	 */
 	public static Iterable<Entry<?, ?>> iterate() {
 		return entries;
+	}
+
+	/**
+	 * Finds an entry given a transaction type.
+	 *
+	 * @param type The transaction type.
+	 * @return The entry.
+	 */
+	public static Entry<?, ?> findByType(final Integer type) {
+		for (final Entry<?, ?> entry : entries) {
+			if (entry.type == type) {
+				return entry;
+			}
+		}
+
+		return null;
 	}
 }

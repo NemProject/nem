@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
@@ -42,5 +42,36 @@ public class TransactionRegistryTest {
 				MultisigSignerModificationTransaction.class,
 				MultisigTransaction.class);
 		Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
+		Assert.assertThat(expectedModelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
+	}
+
+	@Test
+	public void findByTypeCanReturnAllRegisteredTypes() {
+		// Arrange:
+		final List<Integer> expectedRegisteredTypes = Arrays.asList(
+				TransactionTypes.TRANSFER,
+				TransactionTypes.IMPORTANCE_TRANSFER,
+				TransactionTypes.MULTISIG_SIGNER_MODIFY,
+				TransactionTypes.MULTISIG);
+
+		// Act:
+		for (final Integer type : expectedRegisteredTypes) {
+			// Act:
+			final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
+
+			// Assert:
+			Assert.assertThat(entry.type, IsEqual.equalTo(type));
+		}
+
+		Assert.assertThat(expectedRegisteredTypes.size(), IsEqual.equalTo(TransactionRegistry.size()));
+	}
+
+	@Test
+	public void findByTypeReturnsNullForUnregisteredType() {
+		// Act:
+		final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(TransactionTypes.ASSET_ASK);
+
+		// Assert:
+		Assert.assertThat(entry, IsNull.nullValue());
 	}
 }

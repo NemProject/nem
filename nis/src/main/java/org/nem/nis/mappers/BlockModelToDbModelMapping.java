@@ -54,69 +54,41 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 
 	private static class BlockTransactionContext<T extends AbstractBlockTransfer> {
 		public final int type;
-		private final BiConsumer<org.nem.nis.dbmodel.Block, List<T>> setInBlock;
-		private final Class<T> dbModelType;
 		private final List<T> transactions = new ArrayList<>();
+		private final TransactionRegistry.Entry<T, ?> entry;
 		public int nextIndex;
 
-		public BlockTransactionContext(
-				final int type,
-				final BiConsumer<org.nem.nis.dbmodel.Block, List<T>> setInBlock,
-				final Class<T> dbModelType) {
+		@SuppressWarnings("unchecked")
+		public BlockTransactionContext(final int type) {
+			this.entry = (TransactionRegistry.Entry<T, ?>)TransactionRegistry.findByType(type);
 			this.type = type;
-			this.setInBlock = setInBlock;
-			this.dbModelType = dbModelType;
 		}
 
 		public T mapAndAdd(final IMapper mapper, final Transaction transaction) {
-			final T dbTransfer = mapper.map(transaction, this.dbModelType);
+			final T dbTransfer = mapper.map(transaction, this.entry.dbModelClass);
 			this.transactions.add(dbTransfer);
 			return dbTransfer;
 		}
 
 		public void commit(final org.nem.nis.dbmodel.Block dbBlock) {
-			this.setInBlock.accept(dbBlock, this.transactions);
+			this.entry.setInBlock.accept(dbBlock, this.transactions);
 		}
 	}
 
 	private static class BlockTransactionProcessor {
 		private final IMapper mapper;
 		private final org.nem.nis.dbmodel.Block dbBlock;
+		private final Map<Integer, BlockTransactionContext> transactionContexts;
 		private int blockIndex;
-
-		// TODO 20150104 J-J: move to registry (hopefully)
-		private final Map<Integer, BlockTransactionContext> transactionContexts = new HashMap<Integer, BlockTransactionContext>() {
-			{
-				this.put(
-						TransactionTypes.TRANSFER,
-						new BlockTransactionContext<>(
-								TransactionTypes.TRANSFER,
-								(b, t) -> b.setBlockTransfers(t),
-								Transfer.class));
-				this.put(
-						TransactionTypes.IMPORTANCE_TRANSFER,
-						new BlockTransactionContext<>(
-								TransactionTypes.IMPORTANCE_TRANSFER,
-								(b, t) -> b.setBlockImportanceTransfers(t),
-								ImportanceTransfer.class));
-				this.put(
-						TransactionTypes.MULTISIG_SIGNER_MODIFY,
-						new BlockTransactionContext<>(
-								TransactionTypes.MULTISIG_SIGNER_MODIFY, (b, t) ->
-								b.setBlockMultisigSignerModifications(t),
-								MultisigSignerModification.class));
-				this.put(
-						TransactionTypes.MULTISIG,
-						new BlockTransactionContext<>(
-								TransactionTypes.MULTISIG,
-								(b, t) -> b.setBlockMultisigTransactions(t),
-								MultisigTransaction.class));
-			}
-		};
 
 		public BlockTransactionProcessor(final IMapper mapper, final org.nem.nis.dbmodel.Block dbBlock) {
 			this.mapper = mapper;
 			this.dbBlock = dbBlock;
+
+			this.transactionContexts = new HashMap<>();
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				this.transactionContexts.put(entry.type, new BlockTransactionContext<>(entry.type));
+			}
 		}
 
 		public void process(final Transaction transaction) {
