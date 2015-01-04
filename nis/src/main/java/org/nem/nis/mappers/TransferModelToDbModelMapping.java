@@ -25,6 +25,8 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 		dbTransfer.setRecipient(recipient);
 		dbTransfer.setAmount(source.getAmount().getNumMicroNem());
 
+		dbTransfer.setReferencedTransaction(0L);
+
 		final Message message = source.getMessage();
 		if (null != message) {
 			dbTransfer.setMessageType(message.getType());
