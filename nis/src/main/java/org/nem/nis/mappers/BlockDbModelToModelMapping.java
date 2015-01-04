@@ -58,6 +58,8 @@ public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.
 				.map(e -> e.getFromBlock.apply(dbBlock).size())
 				.reduce(0, Integer::sum);
 
+		// TODO: there is a bug here, "inner" transactions should not be counted in,
+		// when having MultisigTransaction with some inner transaction, count should be 1, but it is 2
 		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			for (final AbstractBlockTransfer dbTransfer : entry.getFromBlock.apply(dbBlock)) {
