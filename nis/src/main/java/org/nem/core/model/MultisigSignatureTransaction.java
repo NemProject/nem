@@ -69,6 +69,12 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	}
 
 	@Override
+	public int hashCode() {
+		// TODO 20150104 J-G: i think we need this (and need tests for it)
+		return this.getSigner().getAddress().hashCode() ^ this.getOtherTransactionHash().hashCode();
+	}
+
+	@Override
 	public boolean equals(final Object obj) {
 		if (!(obj instanceof MultisigSignatureTransaction)) {
 			return false;

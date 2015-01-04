@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
+import org.nem.core.model.MultisigTransaction;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.dbmodel.*;
 
@@ -47,29 +48,50 @@ public class NisDbModelToModelMapperTest {
 	public void mapTransactionsDelegatesToInnerMapper() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.setTransactions(Transfer::new, context.dbBlock::setBlockTransfers, TransferTransaction.class, 3);
-		context.setTransactions(ImportanceTransfer::new, context.dbBlock::setBlockImportanceTransfers, ImportanceTransferTransaction.class, 2);
+		setTransactionsForMapTransactionsTests(context);
 
 		// Act:
 		final Collection<Transaction> transfers = context.nisMapper.mapTransactions(context.dbBlock);
 
 		// Assert:
-		context.assertMappedTransfers(transfers, Arrays.asList(0, 1, 2, 3, 4));
+		context.assertMappedTransfers(transfers, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7));
 	}
 
 	@Test
 	public void mapTransactionsIfDelegatesToInnerMapper() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.setTransactions(Transfer::new, context.dbBlock::setBlockTransfers, TransferTransaction.class, 3);
-		context.setTransactions(ImportanceTransfer::new, context.dbBlock::setBlockImportanceTransfers, ImportanceTransferTransaction.class, 2);
+		setTransactionsForMapTransactionsTests(context);
 
 		// Act:
 		final int[] count = { 0 };
 		final Collection<Transaction> transfers = context.nisMapper.mapTransactionsIf(context.dbBlock, t -> 0 == count[0]++ % 2);
 
 		// Assert:
-		context.assertMappedTransfers(transfers, Arrays.asList(0, 2, 4));
+		context.assertMappedTransfers(transfers, Arrays.asList(0, 2, 4, 6));
+	}
+
+	private static void setTransactionsForMapTransactionsTests(final TestContext context) {
+		context.setTransactions(
+				Transfer::new,
+				context.dbBlock::setBlockTransfers,
+				TransferTransaction.class,
+				3);
+		context.setTransactions(
+				ImportanceTransfer::new,
+				context.dbBlock::setBlockImportanceTransfers,
+				ImportanceTransferTransaction.class,
+				2);
+		context.setTransactions(
+				MultisigSignerModification::new,
+				context.dbBlock::setBlockMultisigSignerModifications,
+				MultisigSignerModificationTransaction.class,
+				1);
+		context.setTransactions(
+				org.nem.nis.dbmodel.MultisigTransaction::new,
+				context.dbBlock::setBlockMultisigTransactions,
+				MultisigTransaction.class,
+				2);
 	}
 
 	private static class TestContext {

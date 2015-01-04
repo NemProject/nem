@@ -23,9 +23,11 @@ public class TransactionRegistryTest {
 	}
 
 	@Test
-	public void transactionRegistryIsSameSizeAsTransactionFactory() {
+	public void transactionRegistryIsConsistentWithTransactionFactory() {
 		// Assert:
-		Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(TransactionFactory.size()));
+		// (the transaction factory includes transactions that are not stored directly in blocks,
+		// so it is aware of more transactions than the registry)
+		Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(TransactionFactory.size() - 1));
 	}
 
 	@Test

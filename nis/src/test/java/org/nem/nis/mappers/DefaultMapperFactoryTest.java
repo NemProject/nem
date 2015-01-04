@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
+import org.nem.core.model.MultisigTransaction;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dbmodel.*;
 
@@ -27,12 +28,10 @@ public class DefaultMapperFactoryTest {
 
 	private static final List<Entry<?, ?>> entries = new ArrayList<Entry<?, ?>>() {
 		{
-			this.add(new Entry<>(
-					Transfer.class,
-					TransferTransaction.class));
-			this.add(new Entry<>(
-					ImportanceTransfer.class,
-					ImportanceTransferTransaction.class));
+			this.add(new Entry<>(Transfer.class, TransferTransaction.class));
+			this.add(new Entry<>(ImportanceTransfer.class, ImportanceTransferTransaction.class));
+			this.add(new Entry<>(MultisigSignerModification.class, MultisigSignerModificationTransaction.class));
+			this.add(new Entry<>(org.nem.nis.dbmodel.MultisigTransaction.class, MultisigTransaction.class));
 		}
 	};
 
