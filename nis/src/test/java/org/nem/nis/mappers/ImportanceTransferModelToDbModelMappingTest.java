@@ -74,6 +74,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 				final ImportanceTransferTransaction model) {
 			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
 			Assert.assertThat(dbModel.getMode(), IsEqual.equalTo(expectedMode));
+			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0));
 
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}

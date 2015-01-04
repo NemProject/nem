@@ -83,6 +83,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 			dbTransfer.setMode(mode);
 			dbTransfer.setTimeStamp(4444);
 
+			// zero out required fields
 			dbTransfer.setFee(0L);
 			dbTransfer.setDeadline(0);
 			return dbTransfer;

@@ -109,6 +109,7 @@ public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelTo
 			dbTransfer.setRecipient(this.dbRecipient);
 			dbTransfer.setAmount(111111L);
 
+			// zero out required fields
 			dbTransfer.setFee(0L);
 			dbTransfer.setDeadline(0);
 			return dbTransfer;
