@@ -44,7 +44,7 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 		final Account sender = Utils.generateRandomAccount();
 		final TModel model = this.createModel(new TimeInstant(721), sender);
 
-		model.setFee(Amount.fromNem(11));
+		model.setFee(Amount.fromNem(2310));
 		model.setDeadline(new TimeInstant(800));
 
 		if (signModel) {
@@ -63,7 +63,7 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 		// Assert:
 		Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(modelHash));
 		Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(11000000L));
+		Assert.assertThat(dbModel.getFee(), IsEqual.equalTo(2310000000L));
 		Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
 
 		Assert.assertThat(dbModel.getDeadline(), IsEqual.equalTo(800));

@@ -13,7 +13,7 @@ import java.util.*;
  * First such transaction converts account to multisig account.
  */
 public class MultisigSignerModificationTransaction extends Transaction {
-	final List<MultisigModification> modifications;
+	final Collection<MultisigModification> modifications;
 
 	/**
 	 * Creates an multisig signer modification transaction.
@@ -25,7 +25,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	public MultisigSignerModificationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final List<MultisigModification> modifications) {
+			final Collection<MultisigModification> modifications) {
 		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, 1, timeStamp, sender);
 		this.modifications = modifications;
 
@@ -33,7 +33,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	}
 
 	// TODO 20150103 add validation tests; should you also validate after deserialization?
-	private static void validateModifications(final List<MultisigModification> modifications) {
+	private static void validateModifications(final Collection<MultisigModification> modifications) {
 		if (modifications == null || modifications.isEmpty()) {
 			throw new IllegalArgumentException("no modifications on the list");
 		}
@@ -58,7 +58,7 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	 * @return The modifications.
 	 */
 	public List<MultisigModification> getModifications() {
-		return this.modifications;
+		return new ArrayList<>(this.modifications);
 	}
 
 	@Override

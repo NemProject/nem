@@ -29,7 +29,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 	}
 
 	@Test
-	public void transferWithPlainMessageCanBeMappedToModel() {
+	public void transferWithPlainMessageCanBeMappedToDbModel() {
 		// Arrange:
 		final byte[] messagePayload = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();
@@ -45,7 +45,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 	}
 
 	@Test
-	public void transferWithSecureMessageCanBeMappedToModel() {
+	public void transferWithSecureMessageCanBeMappedToDbModel() {
 		// Arrange:
 		final byte[] messagePayload = Utils.generateRandomBytes();
 		final TestContext context = new TestContext();

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A mapping that is able to map a db transfer to a model transfer transaction.
+ * A mapping that is able to map a db multisig signer modification transfer to a model multisig signer modification transaction.
  */
 public class MultisigSignerModificationDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<MultisigSignerModification, MultisigSignerModificationTransaction> {
 	private final IMapper mapper;
@@ -34,7 +34,7 @@ public class MultisigSignerModificationDbModelToModelMapping extends AbstractTra
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 
 		final List<MultisigModification> multisigModifications = source.getMultisigModifications().stream()
-				.map(modification -> this.mapMultisigModification(modification))
+				.map(this::mapMultisigModification)
 				.collect(Collectors.toList());
 
 		return new MultisigSignerModificationTransaction(
@@ -48,7 +48,6 @@ public class MultisigSignerModificationDbModelToModelMapping extends AbstractTra
 
 		return new MultisigModification(
 				MultisigModificationType.fromValueOrDefault(source.getModificationType()),
-				cosignatory
-		);
+				cosignatory);
 	}
 }

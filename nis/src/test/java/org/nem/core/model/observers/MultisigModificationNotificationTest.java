@@ -23,7 +23,7 @@ public class MultisigModificationNotificationTest {
 		Assert.assertThat(notification.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
 		Assert.assertThat(notification.getMultisigAccount(), IsEqual.equalTo(multisig));
 		Assert.assertThat(notification.getModifications().size(), IsEqual.equalTo(1));
-		final MultisigModification modification = notification.getModifications().get(0);
+		final MultisigModification modification = notification.getModifications().iterator().next();
 		Assert.assertThat(modification.getCosignatory(), IsEqual.equalTo(cosigner));
 		Assert.assertThat(modification.getModificationType(), IsEqual.equalTo(MultisigModificationType.Add));
 	}

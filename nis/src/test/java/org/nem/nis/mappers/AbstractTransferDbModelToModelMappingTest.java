@@ -33,7 +33,7 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 		final Signature signature = Utils.generateRandomSignature();
 		final TDbModel dbModel = this.createDbModel();
 		dbModel.setSenderProof(signature.getBytes());
-		dbModel.setFee(11000000L);
+		dbModel.setFee(2310000000L);
 		dbModel.setDeadline(800);
 		dbModel.setTimeStamp(0);
 
@@ -45,7 +45,7 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 
 		// Assert:
 		Assert.assertThat(model.getSignature(), IsEqual.equalTo(signature));
-		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(11000000L)));
+		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
 		Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
 	}
 
@@ -53,7 +53,7 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 	public void abstractDbModelWithoutSignatureCanBeMappedToModel() {
 		// Arrange:
 		final TDbModel dbModel = this.createDbModel();
-		dbModel.setFee(11000000L);
+		dbModel.setFee(2310000000L);
 		dbModel.setDeadline(800);
 		dbModel.setTimeStamp(0);
 
@@ -65,7 +65,7 @@ public abstract class AbstractTransferDbModelToModelMappingTest<TDbModel extends
 
 		// Assert:
 		Assert.assertThat(model.getSignature(), IsNull.nullValue());
-		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(11000000L)));
+		Assert.assertThat(model.getFee(), IsEqual.equalTo(Amount.fromMicroNem(2310000000L)));
 		Assert.assertThat(model.getDeadline(), IsEqual.equalTo(new TimeInstant(800)));
 	}
 }

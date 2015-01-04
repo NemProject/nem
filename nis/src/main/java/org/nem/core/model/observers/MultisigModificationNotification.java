@@ -2,14 +2,14 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.*;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * A notification that cosignatory modification has occured.
  */
 public class MultisigModificationNotification extends Notification {
 	private final Account multisigAccount;
-	private final List<MultisigModification> modifications;
+	private final Collection<MultisigModification> modifications;
 
 	/**
 	 * Creates a new cosignatory modification notification.
@@ -17,7 +17,7 @@ public class MultisigModificationNotification extends Notification {
 	 * @param multisigAccount The multisig account.
 	 * @param modifications The list of modifications.
 	 */
-	public MultisigModificationNotification(final Account multisigAccount, final List<MultisigModification> modifications) {
+	public MultisigModificationNotification(final Account multisigAccount, final Collection<MultisigModification> modifications) {
 		super(NotificationType.CosignatoryModification);
 		this.multisigAccount = multisigAccount;
 		this.modifications = modifications;
@@ -37,7 +37,7 @@ public class MultisigModificationNotification extends Notification {
 	 *
 	 * @return The list of modifications.
 	 */
-	public List<MultisigModification> getModifications() {
+	public Collection<MultisigModification> getModifications() {
 		return this.modifications;
 	}
 }

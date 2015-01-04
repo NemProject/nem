@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A mapping that is able to map a model transfer transaction to a db transfer.
+ * A mapping that is able to map a model multisig signer modification transaction to a db multisig signer modification transfer.
  */
 public class MultisigSignerModificationModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigSignerModificationTransaction, MultisigSignerModification> {
 
@@ -32,7 +32,6 @@ public class MultisigSignerModificationModelToDbModelMapping extends AbstractTra
 		final Set<MultisigModification> multisigModifications = new HashSet<>(source.getModifications().size());
 		for (final org.nem.core.model.MultisigModification multisigModification : source.getModifications()) {
 			final MultisigModification dbModification = this.mapMultisigModification(multisigModification);
-
 			dbModification.setMultisigSignerModification(target);
 			multisigModifications.add(dbModification);
 		}
