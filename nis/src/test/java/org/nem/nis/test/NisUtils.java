@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.mappers.TransactionRegistry;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
 import org.nem.nis.secret.*;
@@ -69,8 +70,10 @@ public class NisUtils {
 		block.setTimeStamp(timeStamp);
 		block.setHeight(height);
 		block.setForgerProof(Utils.generateRandomBytes(64));
-		block.setBlockTransfers(new ArrayList<>());
-		block.setBlockImportanceTransfers(new ArrayList<>());
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			entry.setInBlock.accept(block, new ArrayList<>());
+		}
+
 		return block;
 	}
 

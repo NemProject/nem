@@ -213,10 +213,10 @@ public class BlockDbModelToModelMappingTest {
 			dbBlock.setLessor(lessor);
 			dbBlock.setForgerProof(this.signature.getBytes());
 
-			dbBlock.setBlockTransfers(new ArrayList<>());
-			dbBlock.setBlockImportanceTransfers(new ArrayList<>());
-			dbBlock.setBlockMultisigSignerModifications(new ArrayList<>());
-			dbBlock.setBlockMultisigTransactions(new ArrayList<>());
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				entry.setInBlock.accept(dbBlock, new ArrayList<>());
+			}
+
 			return dbBlock;
 		}
 
