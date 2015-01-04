@@ -432,7 +432,7 @@ public class BlockMapperTest {
 		context.model.addTransaction(new MultisigTransaction(new TimeInstant(200), context.account1, transaction1));
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(300), context.account1, context.account2, new Amount(13), null));
 		final Transaction transaction2 = new TransferTransaction(new TimeInstant(400), context.account3, context.account2, new Amount(15), null);
-		context.model.addTransaction(new MultisigTransaction(new TimeInstant(400), context.account1, transaction1));
+		context.model.addTransaction(new MultisigTransaction(new TimeInstant(400), context.account1, transaction2));
 
 		for (final Transaction transaction : context.model.getTransactions()) {
 			transaction.sign();
