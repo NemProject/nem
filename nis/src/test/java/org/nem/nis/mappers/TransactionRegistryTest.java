@@ -13,7 +13,13 @@ public class TransactionRegistryTest {
 	@Test
 	public void allExpectedTransactionTypesAreSupported() {
 		// Assert:
-		Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(2));
+		Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(4));
+	}
+
+	@Test
+	public void allExpectedMultisigEmbeddableTypesAreSupported() {
+		// Assert:
+		Assert.assertThat(TransactionRegistry.multisigEmbeddableSize(), IsEqual.equalTo(3));
 	}
 
 	@Test
@@ -32,7 +38,9 @@ public class TransactionRegistryTest {
 		// Assert:
 		final Collection<Class> expectedModelClasses = Arrays.asList(
 				TransferTransaction.class,
-				ImportanceTransferTransaction.class);
+				ImportanceTransferTransaction.class,
+				MultisigSignerModificationTransaction.class,
+				MultisigTransaction.class);
 		Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
 	}
 }

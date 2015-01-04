@@ -144,6 +144,15 @@ public class TransactionRegistry {
 	}
 
 	/**
+	 * Gets the number of entries that can be embedded in a multisig transaction.
+	 *
+	 * @return The number of entries.
+	 */
+	public static int multisigEmbeddableSize() {
+		return size() - 1;
+	}
+
+	/**
 	 * Gets all entries.
 	 */
 	public static Iterable<Entry<?, ?>> iterate() {

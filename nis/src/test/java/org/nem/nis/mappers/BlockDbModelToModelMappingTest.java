@@ -90,6 +90,14 @@ public class BlockDbModelToModelMappingTest {
 	//region transaction mapping
 
 	@Test
+	public void oneBlockWithTransfersCanBeMappedToModelTestExistsForEachRegisteredTransactionType() {
+		// Assert:
+		Assert.assertThat(
+				4, // the number of blockWith*CanBeMappedToModel tests
+				IsEqual.equalTo(TransactionRegistry.size()));
+	}
+
+	@Test
 	public void blockWithTransfersCanBeMappedToModel() {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToModel(TestContext::addTransfer);
@@ -159,6 +167,14 @@ public class BlockDbModelToModelMappingTest {
 		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
 		Assert.assertThat(model.getTransactions(), IsEqual.equalTo(orderedTransactions));
 		Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
+
+		// Sanity:
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			Assert.assertThat(
+					"not all transaction types are represented",
+					entry.getFromBlock.apply(dbBlock).isEmpty(),
+					IsEqual.equalTo(false));
+		}
 	}
 
 	//endregion

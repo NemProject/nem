@@ -19,7 +19,13 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 
 	//region supported multisig transfer types
 
-	// TODO add test that everything is tested
+	@Test
+	public void oneCanMapMultisigTransferToDbModelTestExistsForEachRegisteredMultisigEmbeddableTransactionType() {
+		// Assert:
+		Assert.assertThat(
+				3, // the number of canMapMultisig*ToDbModel tests
+				IsEqual.equalTo(TransactionRegistry.multisigEmbeddableSize()));
+	}
 
 	@Test
 	public void canMapMultisigTransferToDbModel() {
