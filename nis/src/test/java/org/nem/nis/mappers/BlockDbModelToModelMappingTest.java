@@ -7,6 +7,7 @@ import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
+import org.nem.core.model.MultisigTransaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.*;
@@ -100,6 +101,18 @@ public class BlockDbModelToModelMappingTest {
 		assertBlockWithTransfersCanBeMappedToModel(TestContext::addImportanceTransfer);
 	}
 
+	@Test
+	public void blockWithMultisigSignerModificationsCanBeMappedToModel() {
+		// Assert:
+		assertBlockWithTransfersCanBeMappedToModel(TestContext::addSignerModification);
+	}
+
+	@Test
+	public void blockWithMultisigTransfersCanBeMappedToModel() {
+		// Assert:
+		assertBlockWithTransfersCanBeMappedToModel(TestContext::addMultisigTransfer);
+	}
+
 	private static void assertBlockWithTransfersCanBeMappedToModel(final TestContext.TransactionFactory factory) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -130,17 +143,22 @@ public class BlockDbModelToModelMappingTest {
 		final Transaction transfer1 = context.addTransfer(dbBlock, 1);
 		final Transaction transfer4 = context.addTransfer(dbBlock, 4);
 		final Transaction transfer3 = context.addImportanceTransfer(dbBlock, 3);
+		final Transaction transfer7 = context.addSignerModification(dbBlock, 7);
+		final Transaction transfer5 = context.addMultisigTransfer(dbBlock, 5);
+		final Transaction transfer6 = context.addSignerModification(dbBlock, 6);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
 
 		// Assert:
+		final int numTransactions = 8;
+		final List<Transaction> orderedTransactions = Arrays.asList(
+				transfer0, transfer1, transfer2, transfer3, transfer4, transfer5, transfer6, transfer7);
+
 		context.assertModel(model);
-		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(5));
-		Assert.assertThat(
-				model.getTransactions(),
-				IsEqual.equalTo(Arrays.asList(transfer0, transfer1, transfer2, transfer3, transfer4)));
-		Mockito.verify(context.mapper, Mockito.times(5)).map(Mockito.any(), Mockito.eq(Transaction.class));
+		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
+		Assert.assertThat(model.getTransactions(), IsEqual.equalTo(orderedTransactions));
+		Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
 	}
 
 	//endregion
@@ -181,6 +199,8 @@ public class BlockDbModelToModelMappingTest {
 
 			dbBlock.setBlockTransfers(new ArrayList<>());
 			dbBlock.setBlockImportanceTransfers(new ArrayList<>());
+			dbBlock.setBlockMultisigSignerModifications(new ArrayList<>());
+			dbBlock.setBlockMultisigTransactions(new ArrayList<>());
 			return dbBlock;
 		}
 
@@ -216,6 +236,22 @@ public class BlockDbModelToModelMappingTest {
 					blockIndex,
 					new ImportanceTransfer(),
 					ImportanceTransferTransaction.class);
+		}
+
+		public MultisigSignerModificationTransaction addSignerModification(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
+			return this.addTransfer(
+					dbTransfer -> block.getBlockMultisigSignerModifications().add(dbTransfer),
+					blockIndex,
+					new MultisigSignerModification(),
+					MultisigSignerModificationTransaction.class);
+		}
+
+		public MultisigTransaction addMultisigTransfer(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
+			return this.addTransfer(
+					dbTransfer -> block.getBlockMultisigTransactions().add(dbTransfer),
+					blockIndex,
+					new org.nem.nis.dbmodel.MultisigTransaction(),
+					org.nem.core.model.MultisigTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(
