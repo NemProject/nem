@@ -13,7 +13,7 @@ import org.nem.nis.dbmodel.*;
  */
 public abstract class AbstractTransferModelToDbModelMapping<TModel extends Transaction, TDbModel extends AbstractTransfer>
 		implements IMapping<TModel, TDbModel> {
-	private final IMapper mapper;
+	protected final IMapper mapper;
 
 	/**
 	 * Creates a mapper.

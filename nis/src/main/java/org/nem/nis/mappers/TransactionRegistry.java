@@ -3,6 +3,7 @@ package org.nem.nis.mappers;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;
 import java.util.function.*;
@@ -84,6 +85,7 @@ public class TransactionRegistry {
 					TransferDbModelToModelMapping::new,
 					Transfer.class,
 					TransferTransaction.class));
+
 			this.add(new Entry<>(
 					Block::getBlockImportanceTransfers,
 					(block, transfers) -> block.setBlockImportanceTransfers(transfers),
@@ -91,6 +93,24 @@ public class TransactionRegistry {
 					ImportanceTransferDbModelToModelMapping::new,
 					ImportanceTransfer.class,
 					ImportanceTransferTransaction.class));
+
+			this.add(new Entry<>(
+					Block::getBlockMultisigSignerModifications,
+					(block, transfers) -> block.setBlockMultisigSignerModifications(transfers),
+					MultisigSignerModificationModelToDbModelMapping::new,
+					MultisigSignerModificationDbModelToModelMapping::new,
+					MultisigSignerModification.class,
+					MultisigSignerModificationTransaction.class
+			));
+
+			this.add(new Entry<>(
+					Block::getBlockMultisigTransactions,
+					(block, transfers) -> block.setBlockMultisigTransactions(transfers),
+					MultisigTransactionModelToDbModelMapping::new,
+					MultisigTransactionDbModelToModelMapping::new,
+					MultisigTransaction.class,
+					org.nem.core.model.MultisigTransaction.class
+			));
 		}
 	};
 
