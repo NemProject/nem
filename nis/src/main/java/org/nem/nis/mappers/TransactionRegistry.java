@@ -29,6 +29,11 @@ public class TransactionRegistry {
 		public final BiConsumer<Block, List<TDbModel>> setInBlock;
 
 		/**
+		 * A function that will get db model transactions given a multisig transfer.
+		 */
+		public final Function<MultisigTransaction, TDbModel> getFromMultisig;
+
+		/**
 		 * The db model transaction class.
 		 */
 		public final Class<TDbModel> dbModelClass;
@@ -44,12 +49,16 @@ public class TransactionRegistry {
 		private Entry(
 				final Function<Block, List<TDbModel>> getFromBlock,
 				final BiConsumer<Block, List<TDbModel>> setInBlock,
+				final Function<MultisigTransaction, TDbModel> getFromMultisig,
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
 				final Class<TDbModel> dbModelClass,
 				final Class<TModel> modelClass) {
 			this.getFromBlock = getFromBlock;
 			this.setInBlock = setInBlock;
+
+			this.getFromMultisig = getFromMultisig;
+
 			this.createModelToDbModelMapper = createModelToDbModelMapper;
 			this.createDbModelToModelMapper = createDbModelToModelMapper;
 			this.dbModelClass = dbModelClass;
@@ -81,6 +90,7 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					Block::getBlockTransfers,
 					(block, transfers) -> block.setBlockTransfers(transfers),
+					MultisigTransaction::getTransfer,
 					TransferModelToDbModelMapping::new,
 					TransferDbModelToModelMapping::new,
 					Transfer.class,
@@ -89,6 +99,7 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					Block::getBlockImportanceTransfers,
 					(block, transfers) -> block.setBlockImportanceTransfers(transfers),
+					MultisigTransaction::getImportanceTransfer,
 					ImportanceTransferModelToDbModelMapping::new,
 					ImportanceTransferDbModelToModelMapping::new,
 					ImportanceTransfer.class,
@@ -97,6 +108,7 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					Block::getBlockMultisigSignerModifications,
 					(block, transfers) -> block.setBlockMultisigSignerModifications(transfers),
+					MultisigTransaction::getMultisigSignerModification,
 					MultisigSignerModificationModelToDbModelMapping::new,
 					MultisigSignerModificationDbModelToModelMapping::new,
 					MultisigSignerModification.class,
@@ -105,6 +117,7 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					Block::getBlockMultisigTransactions,
 					(block, transfers) -> block.setBlockMultisigTransactions(transfers),
+					multisig -> null,
 					MultisigTransactionModelToDbModelMapping::new,
 					MultisigTransactionDbModelToModelMapping::new,
 					MultisigTransaction.class,

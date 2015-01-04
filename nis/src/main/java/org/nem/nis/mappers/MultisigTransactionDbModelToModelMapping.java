@@ -28,17 +28,7 @@ public class MultisigTransactionDbModelToModelMapping extends AbstractTransferDb
 	@Override
 	public MultisigTransaction mapImpl(final org.nem.nis.dbmodel.MultisigTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
-
-		final Transaction otherTransaction;
-		if (source.getTransfer() != null) {
-			otherTransaction = this.mapper.map(source.getTransfer(), TransferTransaction.class);
-		} else if (source.getImportanceTransfer() != null) {
-			otherTransaction = this.mapper.map(source.getImportanceTransfer(), ImportanceTransferTransaction.class);
-		} else if (source.getMultisigSignerModification() != null) {
-			otherTransaction = this.mapper.map(source.getMultisigSignerModification(), MultisigSignerModificationTransaction.class);
-		} else {
-			throw new IllegalArgumentException("dbmodel has invalid multisig transaction");
-		}
+		final Transaction otherTransaction = this.mapper.map(getInnerTransaction(source), Transaction.class);
 
 		final org.nem.core.model.MultisigTransaction target = new org.nem.core.model.MultisigTransaction(
 				new TimeInstant(source.getTimeStamp()),
@@ -50,5 +40,16 @@ public class MultisigTransactionDbModelToModelMapping extends AbstractTransferDb
 		}
 
 		return target;
+	}
+
+	private static AbstractTransfer getInnerTransaction(final org.nem.nis.dbmodel.MultisigTransaction source) {
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			final AbstractTransfer transaction = entry.getFromMultisig.apply(source);
+			if (null != transaction) {
+				return transaction;
+			}
+		}
+
+		throw new IllegalArgumentException("dbmodel has invalid multisig transaction");
 	}
 }

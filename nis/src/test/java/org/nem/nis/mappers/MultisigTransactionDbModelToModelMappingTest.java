@@ -111,12 +111,8 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 	protected IMapping<org.nem.nis.dbmodel.MultisigTransaction, MultisigTransaction> createMapping(final IMapper mapper) {
 		// ugly, but the passed in IMapper is a mock object, and we need to set it up to return a non-null transaction
 		// for the inner transaction
-		final ImportanceTransferTransaction transfer = new ImportanceTransferTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				ImportanceTransferTransaction.Mode.Activate,
-				Utils.generateRandomAccount());
-		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(ImportanceTransferTransaction.class))).thenReturn(transfer);
+		final ImportanceTransferTransaction transfer = RandomTransactionFactory.createImportanceTransfer();
+		Mockito.when(mapper.map(Mockito.any(), Mockito.eq(Transaction.class))).thenReturn(transfer);
 
 		return new MultisigTransactionDbModelToModelMapping(mapper);
 	}
@@ -149,30 +145,24 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		}
 
 		public void addTransfer() {
-			final Transfer dbTransfer = new Transfer();
-			final TransferTransaction transfer = RandomTransactionFactory.createTransfer();
-			Mockito.when(this.mapper.map(dbTransfer, TransferTransaction.class)).thenReturn(transfer);
-
-			this.dbTransfer.setTransfer(dbTransfer);
-			this.expectedOtherTransaction = transfer;
+			this.addTransfer(
+					new Transfer(),
+					RandomTransactionFactory.createTransfer(),
+					org.nem.nis.dbmodel.MultisigTransaction::setTransfer);
 		}
 
 		public void addImportanceTransfer() {
-			final ImportanceTransfer dbTransfer = new ImportanceTransfer();
-			final ImportanceTransferTransaction transfer = RandomTransactionFactory.createImportanceTransfer();
-			Mockito.when(this.mapper.map(dbTransfer, ImportanceTransferTransaction.class)).thenReturn(transfer);
-
-			this.dbTransfer.setImportanceTransfer(dbTransfer);
-			this.expectedOtherTransaction = transfer;
+			this.addTransfer(
+					new ImportanceTransfer(),
+					RandomTransactionFactory.createImportanceTransfer(),
+					org.nem.nis.dbmodel.MultisigTransaction::setImportanceTransfer);
 		}
 
 		public void addSignerModification() {
-			final MultisigSignerModification dbTransfer = new MultisigSignerModification();
-			final MultisigSignerModificationTransaction transfer = RandomTransactionFactory.createSignerModification();
-			Mockito.when(this.mapper.map(dbTransfer, MultisigSignerModificationTransaction.class)).thenReturn(transfer);
-
-			this.dbTransfer.setMultisigSignerModification(dbTransfer);
-			this.expectedOtherTransaction = transfer;
+			this.addTransfer(
+					new MultisigSignerModification(),
+					RandomTransactionFactory.createSignerModification(),
+					org.nem.nis.dbmodel.MultisigTransaction::setMultisigSignerModification);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> void addTransfer(
