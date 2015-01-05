@@ -98,7 +98,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 
 			final AbstractBlockTransfer dbTransfer = context.mapAndAdd(this.mapper, transaction);
 			dbTransfer.setOrderId(context.nextIndex++);
-			dbTransfer.setBlkIndex(this.blockIndex++);
+			dbTransfer.setBlkIndex(this.blockIndex);
 			dbTransfer.setBlock(this.dbBlock);
 
 			if (dbTransfer instanceof MultisigTransaction) {
@@ -111,9 +111,12 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 
 					dbInnerTransfer.setOrderId(-1);
 					dbInnerTransfer.setBlkIndex(this.blockIndex);
-					dbTransfer.setBlock(this.dbBlock);
+					// TODO 20150105 G: probably doesn't make sense to do it
+					dbInnerTransfer.setBlock(this.dbBlock);
 				}
 			}
+
+			this.blockIndex++;
 		}
 
 		public void commit() {
