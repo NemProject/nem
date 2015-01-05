@@ -59,17 +59,15 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 
 	@Override
 	public TTransfer findByHash(final byte[] txHash) {
-		final long txId = ByteUtils.bytesToLong(txHash);
-		final Query query = this.createQuery("from <TABLE_NAME> a where a.shortId = :id")
-				.setParameter("id", txId);
+		final Query query = this.createQuery("from <TABLE_NAME> a where a.transferHash = :hash")
+				.setParameter("hash", txHash);
 		return this.getByHashQuery(txHash, query);
 	}
 
 	@Override
 	public TTransfer findByHash(final byte[] txHash, final long maxBlockHeight) {
-		final long txId = ByteUtils.bytesToLong(txHash);
-		final Query query = this.createQuery("from <TABLE_NAME> t where t.shortId = :id and t.block.height <= :height")
-				.setParameter("id", txId)
+		final Query query = this.createQuery("from <TABLE_NAME> t where t.transferHash = :hash and t.block.height <= :height")
+				.setParameter("hash", txHash)
 				.setParameter("height", maxBlockHeight);
 		return this.getByHashQuery(txHash, query);
 	}
@@ -77,14 +75,7 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 	@SuppressWarnings("unchecked")
 	private TTransfer getByHashQuery(final byte[] txHash, final Query query) {
 		final List<?> userList = query.list();
-		for (final Object transferObject : userList) {
-			final TTransfer transfer = (TTransfer)transferObject;
-			if (Arrays.equals(txHash, this.transferHashAccessor.apply(transfer).getRaw())) {
-				return transfer;
-			}
-		}
-
-		return null;
+		return (userList.size() != 0) ? ((TTransfer)userList.get(0)) : null;
 	}
 
 	@Override
