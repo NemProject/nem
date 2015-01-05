@@ -44,10 +44,7 @@ public class Block {
 	private Account lessor;
 
 	private Long height;
-
-	private Long totalAmount;
 	private Long totalFee;
-
 	private Long difficulty;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
@@ -161,14 +158,6 @@ public class Block {
 
 	public void setHeight(final Long height) {
 		this.height = height;
-	}
-
-	public Long getTotalAmount() {
-		return this.totalAmount;
-	}
-
-	public void setTotalAmount(final Long totalAmount) {
-		this.totalAmount = totalAmount;
 	}
 
 	public Long getTotalFee() {

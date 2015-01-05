@@ -36,7 +36,6 @@ public class NisUtils {
 		dbBlock.setForger(harvester);
 		dbBlock.setForgerProof(Utils.generateRandomSignature().getBytes());
 		dbBlock.setHeight(1L);
-		dbBlock.setTotalAmount(0L);
 		dbBlock.setTotalFee(1L);
 		dbBlock.setDifficulty(1L);
 		return dbBlock;

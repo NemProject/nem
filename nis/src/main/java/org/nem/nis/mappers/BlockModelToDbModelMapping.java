@@ -41,7 +41,6 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 		dbBlock.setForger(harvester);
 		dbBlock.setForgerProof(block.getSignature().getBytes());
 		dbBlock.setHeight(block.getHeight().getRaw());
-		dbBlock.setTotalAmount(0L); // TODO 20141227 J-G: we can probably remove this from the database as well?
 		dbBlock.setTotalFee(block.getTotalFee().getNumMicroNem());
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setLessor(lessor);
