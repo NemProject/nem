@@ -74,8 +74,9 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 
 	@SuppressWarnings("unchecked")
 	private TTransfer getByHashQuery(final byte[] txHash, final Query query) {
+		// TODO 20140105 J-G: txHash isn't being used anymore; not sure if intentional or not
 		final List<?> userList = query.list();
-		return (userList.size() != 0) ? ((TTransfer)userList.get(0)) : null;
+		return userList.isEmpty() ? null : ((TTransfer)userList.get(0));
 	}
 
 	@Override
