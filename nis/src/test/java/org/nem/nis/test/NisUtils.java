@@ -181,7 +181,7 @@ public class NisUtils {
 		final List<Block> blocks = new ArrayList<>();
 		for (int i = 0; i < numBlocks; ++i) {
 			// 10 minutes between blocks
-			final Block block = new Block(signer, parent, timeStamp.addMinutes(i * 10));
+			final Block block = new Block(signer, parent, timeStamp.addMinutes((i+1) * 10));
 			blocks.add(block);
 			parent = block;
 		}

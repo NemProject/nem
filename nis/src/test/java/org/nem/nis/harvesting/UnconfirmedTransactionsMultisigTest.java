@@ -86,9 +86,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addMinutes(10));
+		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(currentTime);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -121,9 +119,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result2 = context.transactions.addExisting(signatureTransaction);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addMinutes(10));
+		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(currentTime);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -152,10 +148,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result2 = context.transactions.addExisting(multisigTransaction2);
 
 		// Act:
-		// TODO 20150103 J-G : can you add context.getTransactionsForNewBlock, since you seem to be passing the same params to it everywhere
-		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addMinutes(10));
+		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(currentTime);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -186,9 +179,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result2 = context.transactions.addExisting(multisigTransaction2);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addMinutes(10));
+		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(currentTime);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -256,6 +247,12 @@ public class UnconfirmedTransactionsMultisigTest {
 					Arrays.asList(new MultisigModification(MultisigModificationType.Add, account)));
 			transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
 			return transaction;
+		}
+
+		private UnconfirmedTransactions getTransactionsForNewBlock(TimeInstant currentTime) {
+			return this.transactions.getTransactionsForNewBlock(
+					Utils.generateRandomAddress(),
+					currentTime.addMinutes(10));
 		}
 
 		public void makeCosignatory(final Account signer, final Account multisig) {
