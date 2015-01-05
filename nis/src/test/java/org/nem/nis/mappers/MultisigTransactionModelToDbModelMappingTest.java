@@ -125,6 +125,8 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		private ImportanceTransfer expectedImportanceTransfer;
 		private MultisigSignerModification expectedSignerModification;
 
+		private long dummyId;
+
 		private final MultisigTransactionModelToDbModelMapping mapping = new MultisigTransactionModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
@@ -134,13 +136,25 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 
 		private void addSignature() {
 			final MultisigSignature dbSignature = new MultisigSignature();
+			dbSignature.setId(this.dummyId++);
 			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
 					Utils.generateRandomAccount(),
 					HashUtils.calculateHash(this.otherTransaction));
+
+			// TODO 20150105 G-J: I'm not sure what's going on, but seems mockito later when making the call
+			// > always returns same object (last one added, that is one with id == 2), see print below
+			// > maybe it's somehow related to the fact that .map() is generic method?
 			Mockito.when(this.mapper.map(signature, MultisigSignature.class)).thenReturn(dbSignature);
 
 			this.signatures.add(signature);
+
+			for (final MultisigSignatureTransaction signatureTransaction : this.signatures) {
+				final MultisigSignature dummy = this.mapper.map(signatureTransaction, MultisigSignature.class);
+				System.err.println("id: " + dummy.getId());
+			}
+			System.err.println("---");
+
 			this.expectedDbSignatures.add(dbSignature);
 		}
 
