@@ -5,7 +5,16 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 
 // TODO 20150103 can you comment this validator , so i can understand what it's doing?
-
+/**
+ * This validator checks if transaction is valid for a Multisig account
+ * a) transaction inside MultisigTransaction, have signature == null, they are OK for multisig account
+ *     (this allows cosignatories to make actual transactions)
+ * b) if signature is != null, that means TX was made DIRECTLY from multisig account, now:
+ * b.1) multisig account can only make MultisigSignerModification,
+ * b.2) or if multisig itself is also cosignatory of some other account, we allow MultisigSignatures too
+ * b.3) if this was MultisigSignerModification we allow only Add
+ *
+ */
 public class MultisigNonOperationalValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
 
