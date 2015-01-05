@@ -3,6 +3,7 @@ package org.nem.nis.dao;
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.*;
@@ -47,13 +48,12 @@ public class TestConf {
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 
-		// TODO: 20140104 J-G: see if we can use TransactionRegistry for this
-		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignerModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigModification.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigTransaction.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
+		}
+
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 

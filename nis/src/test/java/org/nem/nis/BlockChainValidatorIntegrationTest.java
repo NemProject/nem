@@ -103,7 +103,6 @@ public class BlockChainValidatorIntegrationTest {
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_IT_VALIDATION_FORK + 11);
 		parentBlock.sign();
 
-		// TODO 20131210 J-G: this test is failing with FAILURE_CONFLICTING_IMPORTANCE_TRANSFER
 		final Account account1 = Utils.generateRandomAccount();
 		factory.getAccountInfo(account1).incrementBalance(Amount.fromNem(12345));
 		final Account account2 = Utils.generateRandomAccount();

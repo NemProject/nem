@@ -134,15 +134,6 @@ public class TransactionRegistry {
 					MultisigTransactionDbModelToModelMapping::new,
 					MultisigTransaction.class,
 					org.nem.core.model.MultisigTransaction.class));
-
-//			this.add(new Entry<>(
-//					null,
-//					(block, transfers) -> {},
-//					MultisigSignatureModelToDbModelMapping::new,
-//					MultisigSignatureDbModelToModelMapping::new,
-//					MultisigSignature.class
-//					MultisigSignatureTransaction.class
-//			));
 		}
 	};
 

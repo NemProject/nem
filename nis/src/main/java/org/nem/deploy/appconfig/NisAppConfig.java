@@ -106,14 +106,12 @@ public class NisAppConfig {
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignerModification.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigModification.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigTransaction.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
 
-		// TODO 20150103: consider looping over the TransactionRegistry
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigModification.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
+		}
 
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}

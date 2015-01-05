@@ -171,8 +171,6 @@ public class TransactionFactoryTest {
 		assertCanDeserializeVerifiable(originalTransaction, MultisigTransaction.class, TransactionTypes.MULTISIG);
 	}
 
-	// TODO 20141220 G-J: could you take a look at this test? it fails, cause multisig transaction
-	// does not have "signatures", and deserialization fails
 	@Test
 	public void canDeserializeNonVerifiableMultisigTransaction() {
 		// Arrange:
