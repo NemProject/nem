@@ -29,6 +29,10 @@ public class UnconfirmedTransactionsMultisigTest {
 
 	// TODO 20150103 J-G: tests seem fine, but also seems like you're mostly testing the same stuff in blockchainservices; which are getting the validators
 	// > from the same place
+	// TODO 20150105 G-J: that's actually the point, it happend at least few times, that
+	// a) we've generated a block that couldn't pass the validation
+	// b) were checking something only in UnconfirmedTransactions
+	// I'd like to avoid that, that's why I'd like to have end-to-end test in both UT and BCS
 
 	@Test
 	public void multisigTransactionIssuedNotByCosignatoryIsRejected() {
