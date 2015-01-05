@@ -18,10 +18,13 @@ import java.util.Set;
  * > is it so that we can make multiple modifications in one transaction;
  * > if so, i think the naming is a little misleading
  * TODO 20150105 G-J that is why, any proposals for names?
+ * MultisigModification / MultisigModifications
+ * MultisigModification / AggregateMultisigModification
  *
  * TODO 20150105 G-J slightly off-topic, I was thinking about naming all the dbmodel classes exactly like
  * > model classes, but with "Db" prefix, prefix to make code that uses both models and dbmodels (i.e. mappers)
  * > nicer to look at. would you be ok with that?
+ * TODO 20150105 J-G: good suggestion
  */
 @Entity
 @Table(name = "multisigsignermodifications")

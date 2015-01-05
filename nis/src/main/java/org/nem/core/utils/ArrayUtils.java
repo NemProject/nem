@@ -119,8 +119,6 @@ public class ArrayUtils {
 
 	/**
 	 * NON constant-time lexicographical byte[] comparison.
-	 * TODO 20150103 J-J: what's wrong with Arrays.equals ?
-	 * TODO 20150105 G-J: Array.equals returns bool, while we need int to use it in comparator
 	 *
 	 * @param b first of arrays to compare.
 	 * @param c second of arrays to compare.
@@ -131,12 +129,14 @@ public class ArrayUtils {
 		if (0 != result) {
 			return result;
 		}
+
 		for (int i = 0; i < b.length; i++) {
 			result = b[i] - c[i];
 			if (0 != result) {
 				return result;
 			}
 		}
+
 		return 0;
 	}
 

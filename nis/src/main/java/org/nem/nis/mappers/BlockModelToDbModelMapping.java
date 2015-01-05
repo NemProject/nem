@@ -117,7 +117,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 				}
 			}
 
-			this.blockIndex++;
+			++this.blockIndex;
 		}
 
 		public void commit() {

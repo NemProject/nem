@@ -316,34 +316,65 @@ public class ArrayUtilsTest {
 	//region compare
 
 	@Test
-	public void emptyArraysAreEqual() {
-		Assert.assertThat(ArrayUtils.compare(new byte[]{}, new byte[]{}), IsEqual.equalTo(0));
+	public void compareReturnsZeroForEmptyArrays() {
+		// Assert:
+		assertCompareZero(
+				new byte[]{ },
+				new byte[]{ });
 	}
 
 	@Test
-	public void shorterArrayIsSmaller() {
-		Assert.assertThat(ArrayUtils.compare(new byte[]{}, new byte[]{1}), IsEqual.equalTo(-1));
+	public void compareReturnsNonZeroForEmptyAndNonEmptyArrays() {
+		// Assert:
+		assertCompareNonZero(
+				new byte[]{ },
+				new byte[]{ 5 });
 	}
 
 	@Test
-	public void longerArrayIsBigger() {
-		Assert.assertThat(ArrayUtils.compare(new byte[]{1}, new byte[]{}), IsEqual.equalTo(1));
+	public void compareReturnsNonZeroForDifferentSizedArrays() {
+		// Assert:
+		assertCompareNonZero(
+				new byte[]{ 54 },
+				new byte[]{ 5, 4 });
 	}
 
 	@Test
-	public void smallerPositiveValuesYieldSmallerResult() {
-		Assert.assertThat(ArrayUtils.compare(new byte[]{1}, new byte[]{3}), IsEqual.equalTo(-2));
+	public void compareReturnsNonZeroForArraysOfSameLengthWithDifferentPositiveElementValue() {
+		// Assert:
+		assertCompareNonZero(
+				new byte[]{ 1, 2, 3, 4, 5 },
+				new byte[]{ 1, 2, 4, 4, 5 });
 	}
 
 	@Test
-	public void smallerNegativeValuesYieldSmallerResult() {
-		Assert.assertThat(ArrayUtils.compare(new byte[]{-3}, new byte[]{-1}), IsEqual.equalTo(-2));
+	public void compareReturnsNonZeroForArraysOfSameLengthWithDifferentNegativeElementValue() {
+		// Assert:
+		assertCompareNonZero(
+				new byte[]{ 1, 2, -4, 4, 5 },
+				new byte[]{ 1, 2, -3, 4, 5 });
 	}
 
 	@Test
-	public void equalArraysAreEqual() {
-		Assert.assertThat(ArrayUtils.compare(new byte[]{1,2,3,4,5}, new byte[]{1,2,3,4,5}), IsEqual.equalTo(0));
+	public void compareReturnsZeroForArraysOfSameLengthWithEqualElementValues() {
+		// Assert:
+		assertCompareZero(
+				new byte[]{ 1, 2, 3, 4, 5 },
+				new byte[]{ 1, 2, 3, 4, 5 });
 	}
+
+	private static void assertCompareZero(final byte[] a, final byte[] b) {
+		// Assert:
+		Assert.assertThat(ArrayUtils.compare(a, b), IsEqual.equalTo(0));
+		Assert.assertThat(ArrayUtils.compare(b, a), IsEqual.equalTo(0));
+	}
+
+	private static void assertCompareNonZero(final byte[] smaller, final byte[] larger) {
+		// Assert:
+		Assert.assertThat(ArrayUtils.compare(smaller, larger), IsEqual.equalTo(-1));
+		Assert.assertThat(ArrayUtils.compare(larger, smaller), IsEqual.equalTo(1));
+	}
+
 	//endregion
 
 	//region getBit

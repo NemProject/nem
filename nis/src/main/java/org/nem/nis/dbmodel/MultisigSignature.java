@@ -9,9 +9,6 @@ public class MultisigSignature extends AbstractTransfer {
 	@JoinColumn(name = "multisigTransactionId")
 	private MultisigTransaction multisigTransaction;
 
-	// TODO 20150103 J-G: I'm unsure why the signature needs to know the owning multisig transaction, can you elaborate?
-	// TODO 20150105 G-J: erm MultisigTransaction -> MultisigSignature is @OneToMany
-	// > we need to join both tables together
 	public MultisigTransaction getMultisigTransaction() {
 		return this.multisigTransaction;
 	}

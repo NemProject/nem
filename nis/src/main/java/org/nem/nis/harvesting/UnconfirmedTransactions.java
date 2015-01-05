@@ -227,10 +227,6 @@ public class UnconfirmedTransactions {
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 
-		// TODO 20150103 J-G: what i didn't like before was having the validators know about verification type,
-		// > it made more sense to me to only add the appropriate validators upstream vs having the validators
-		// > know how they were being called
-		// TODO 20150105 G-J: y I though so, but I guess it's ok to have this one here
 		// TODO 20150103 J-J: probably should add another function to the factory for blockVerification validators
 		// > e.g., (that adds MultisigSignaturesPresentValidator)
 
@@ -385,13 +381,7 @@ public class UnconfirmedTransactions {
 		synchronized (this.lock) {
 			final List<Transaction> transactions = this.transactions.values().stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-					// TODO 20150103 J-G: why are multisig transactions being treated specially here?
-					// TODO 20150105 G-J: where should they be filtered out?
-					// (that is, we don't want signatures to be directly inside the block, instead they are added
-					//  to MultisigTransaction (in MultisigSignatureValidator), so we must make sure,
-					//  they won't be passed further...)
-					//  but that will complicate other things
-					// (i.e. we'd have to add MultisigSignatures somewhere, to make sure we're not processing same sig many times)
+					// filter out signatures because we don't want them to be directly inside a block
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.collect(Collectors.toList());
 
