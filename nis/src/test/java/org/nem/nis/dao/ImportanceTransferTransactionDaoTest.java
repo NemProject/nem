@@ -97,6 +97,8 @@ public class ImportanceTransferTransactionDaoTest {
 
 		for (final ImportanceTransfer importanceTransfer : dbTransfers) {
 			importanceTransfer.setBlock(block);
+			importanceTransfer.setBlkIndex(-1);
+			importanceTransfer.setOrderId(-1);
 		}
 	}
 

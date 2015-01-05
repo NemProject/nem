@@ -901,6 +901,8 @@ public class TransferDaoTest {
 
 		for (final Transfer transfer : dbTransfers) {
 			transfer.setBlock(block);
+			transfer.setBlkIndex(-1);
+			transfer.setOrderId(-1);
 		}
 	}
 
