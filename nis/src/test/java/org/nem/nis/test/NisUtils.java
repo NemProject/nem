@@ -173,7 +173,7 @@ public class NisUtils {
 	 * @param signer The block signer.
 	 * @param parent The parent block.
 	 * @param numBlocks The number of blocks.
-	 * @param timeStamp The timestamp of the first block.
+	 * @param timeStamp The timestamp ten minutes before the first block.
 	 * @return The block list.
 	 */
 	public static List<Block> createBlockList(final Account signer, Block parent, final int numBlocks, final TimeInstant timeStamp) {

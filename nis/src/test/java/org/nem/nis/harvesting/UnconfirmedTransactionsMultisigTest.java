@@ -33,6 +33,7 @@ public class UnconfirmedTransactionsMultisigTest {
 	// a) we've generated a block that couldn't pass the validation
 	// b) were checking something only in UnconfirmedTransactions
 	// I'd like to avoid that, that's why I'd like to have end-to-end test in both UT and BCS
+	// TODO 20150105 J-G: good point; should we look into merging those tests somehow?
 
 	@Test
 	public void multisigTransactionIssuedNotByCosignatoryIsRejected() {
