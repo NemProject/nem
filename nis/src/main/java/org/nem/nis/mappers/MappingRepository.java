@@ -18,7 +18,7 @@ public class MappingRepository implements IMapper {
 	 * @param <TTarget> The target type.
 	 */
 	public <TSource, TTarget> void addMapping(
-			final Class<TSource> sourceClass,
+			final Class<? extends TSource> sourceClass,
 			final Class<? super TTarget> targetClass,
 			final IMapping<TSource, TTarget> mapping) {
 		final MappingTypePair pair = new MappingTypePair(sourceClass, targetClass);

@@ -71,6 +71,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addModelToDbModelMappers(accountDaoLookup, mappingRepository);
 		}
 
+		mappingRepository.addMapping(NemesisBlock.class, org.nem.nis.dbmodel.Block.class, new BlockModelToDbModelMapping(mappingRepository));
 		return mappingRepository;
 	}
 

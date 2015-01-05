@@ -14,24 +14,36 @@ import java.util.*;
 
 public class DefaultMapperFactoryTest {
 
-	private static class Entry<TDbModel extends AbstractTransfer, TModel extends Transaction> {
+	private static class Entry<TDbModel, TModel> {
 		public final Class<TDbModel> dbModelClass;
 		public final Class<TModel> modelClass;
 
-		private Entry(
-				final Class<TDbModel> dbModelClass,
-				final Class<TModel> modelClass) {
+		private Entry(final Class<TDbModel> dbModelClass, final Class<TModel> modelClass) {
 			this.dbModelClass = dbModelClass;
 			this.modelClass = modelClass;
 		}
 	}
 
-	private static final List<Entry<?, ?>> entries = new ArrayList<Entry<?, ?>>() {
+	private static final List<Entry<?, ?>> otherEntries = new ArrayList<Entry<?, ?>>() {
 		{
-			this.add(new Entry<>(Transfer.class, TransferTransaction.class));
-			this.add(new Entry<>(ImportanceTransfer.class, ImportanceTransferTransaction.class));
-			this.add(new Entry<>(MultisigSignerModification.class, MultisigSignerModificationTransaction.class));
-			this.add(new Entry<>(org.nem.nis.dbmodel.MultisigTransaction.class, MultisigTransaction.class));
+			this.add(new Entry<>(org.nem.nis.dbmodel.Account.class, Account.class));
+			this.add(new Entry<>(org.nem.nis.dbmodel.Block.class, Block.class));
+			this.add(new Entry<>(MultisigSignature.class, MultisigSignatureTransaction.class));
+		}
+	};
+
+	private static class TransactionEntry<TDbModel extends AbstractTransfer, TModel extends Transaction> extends Entry<TDbModel, TModel> {
+		private TransactionEntry(final Class<TDbModel> dbModelClass, final Class<TModel> modelClass) {
+			super(dbModelClass, modelClass);
+		}
+	}
+
+	private static final List<TransactionEntry<?, ?>> transactionEntries = new ArrayList<TransactionEntry<?, ?>>() {
+		{
+			this.add(new TransactionEntry<>(Transfer.class, TransferTransaction.class));
+			this.add(new TransactionEntry<>(ImportanceTransfer.class, ImportanceTransferTransaction.class));
+			this.add(new TransactionEntry<>(MultisigSignerModification.class, MultisigSignerModificationTransaction.class));
+			this.add(new TransactionEntry<>(org.nem.nis.dbmodel.MultisigTransaction.class, MultisigTransaction.class));
 		}
 	};
 
@@ -43,12 +55,17 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(3 + entries.size()));
-		Assert.assertThat(mapper.isSupported(Account.class, org.nem.nis.dbmodel.Account.class), IsEqual.equalTo(true));
-		Assert.assertThat(mapper.isSupported(Block.class, org.nem.nis.dbmodel.Block.class), IsEqual.equalTo(true));
-		for (final Entry<?, ?> entry : entries) {
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + otherEntries.size() + transactionEntries.size()));
+
+		for (final Entry<?, ?> entry : otherEntries) {
 			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
 		}
+
+		for (final TransactionEntry<?, ?> entry : transactionEntries) {
+			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
+		}
+
+		Assert.assertThat(mapper.isSupported(NemesisBlock.class, org.nem.nis.dbmodel.Block.class), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -59,10 +76,13 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(3 + entries.size() * 2));
-		Assert.assertThat(mapper.isSupported(org.nem.nis.dbmodel.Account.class, Account.class), IsEqual.equalTo(true));
-		Assert.assertThat(mapper.isSupported(org.nem.nis.dbmodel.Block.class, Block.class), IsEqual.equalTo(true));
-		for (final Entry<?, ?> entry : entries) {
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(otherEntries.size() + transactionEntries.size() * 2));
+
+		for (final Entry<?, ?> entry : otherEntries) {
+			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
+		}
+
+		for (final TransactionEntry<?, ?> entry : transactionEntries) {
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, Transaction.class), IsEqual.equalTo(true));
 		}
