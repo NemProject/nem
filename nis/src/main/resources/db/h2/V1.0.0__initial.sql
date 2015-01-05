@@ -49,7 +49,6 @@ CREATE TABLE IF NOT EXISTS `transfers` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
-  `shortId` BIGINT NOT NULL,  
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -92,7 +91,6 @@ CREATE TABLE IF NOT EXISTS `importancetransfers` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
-  `shortId` BIGINT NOT NULL,  
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -132,7 +130,6 @@ CREATE TABLE IF NOT EXISTS `multisigsignermodifications` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
-  `shortId` BIGINT NOT NULL,  
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -184,7 +181,6 @@ CREATE TABLE IF NOT EXISTS `multisigtransactions` (
   `blockId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
-  `shortId` BIGINT NOT NULL,  
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -219,7 +215,6 @@ CREATE TABLE IF NOT EXISTS `multisigsignatures` (
   `multisigTransactionId` BIGINT NOT NULL,
 
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
-  `shortId` BIGINT NOT NULL,  
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -253,8 +248,8 @@ CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
 CREATE INDEX IDX_TRANSFERS_TIMESTAMP ON `transfers` (timeStamp);
 CREATE INDEX IDX_TRANSFERS_SENDERID ON `transfers` (senderId);
 CREATE INDEX IDX_TRANSFERS_RECIPIENTID ON `transfers` (recipientId);
-CREATE INDEX IDX_TRANSFERS_SENDERID_ID ON `transfers` (senderId, id desc);
-CREATE INDEX IDX_TRANSFERS_RECIPIENTID_ID ON `transfers` (recipientId, id desc); 
+CREATE INDEX IDX_TRANSFERS_SENDERID_ID ON `transfers` (senderId, id DESC);
+CREATE INDEX IDX_TRANSFERS_RECIPIENTID_ID ON `transfers` (recipientId, id DESC);
 
 CREATE INDEX IDX_IMPORTANCETRANSFERS_TIMESTAMP ON `importancetransfers` (timeStamp);
 CREATE INDEX IDX_IMPORTANCETRANSFERS_SENDERID ON `importancetransfers` (senderId);
@@ -262,13 +257,13 @@ CREATE INDEX IDX_IMPORTANCETRANSFERS_REMOTEID ON `importancetransfers` (remoteId
 
 
 CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_TIMESTAMP ON `multisigsignermodifications` (timeStamp);
-CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID ON `multisigsignermodifications` (senderId, id desc);
+CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID ON `multisigsignermodifications` (senderId, id DESC);
 
 CREATE INDEX IDX_MULTISIGMODIFICATIONS_COSIGNATORYID ON `multisigmodifications` (cosignatoryId);
 
 CREATE INDEX IDX_MULTISIGTRANSACTIONS_TIMESTAMP ON `multisigtransactions` (timeStamp);
-CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID ON `multisigtransactions` (senderId, id);
+CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID ON `multisigtransactions` (senderId, id DESC);
 
 CREATE INDEX IDX_MULTISIGSIGNATURES_TIMESTAMP ON `multisigsignatures` (timeStamp);
-CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID ON `multisigsignatures` (senderId, id);
+CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID ON `multisigsignatures` (senderId, id DESC);
 

@@ -15,7 +15,6 @@ public abstract class AbstractTransfer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long shortId;
 	private byte[] transferHash;
 
 	private Integer version;
@@ -37,20 +36,11 @@ public abstract class AbstractTransfer {
 		this.id = id;
 	}
 
-	public Long getShortId() {
-		return this.shortId;
-	}
-
-	public void setShortId(final Long shortId) {
-		this.shortId = shortId;
-	}
-
 	public Hash getTransferHash() {
 		return new Hash(this.transferHash);
 	}
 
 	public void setTransferHash(final Hash transferHash) {
-		this.shortId = transferHash.getShortId();
 		this.transferHash = transferHash.getRaw();
 	}
 
