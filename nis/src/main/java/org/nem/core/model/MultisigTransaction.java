@@ -128,6 +128,8 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	@Override
 	protected Collection<Account> getOtherAccounts() {
 		// TODO 20141220 J-G: should review / test this
+		// TODO 20150105 G-J: should we add other cosigners here as well?
+		// > I think it's not necessary
 		return this.otherTransaction.getAccounts();
 	}
 

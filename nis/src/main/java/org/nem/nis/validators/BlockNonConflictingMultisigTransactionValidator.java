@@ -11,8 +11,18 @@ import java.util.stream.Collectors;
 // TODO 20150103 J-G: so, what is the thinking / there is an initial multisig_signer_modify to make an account multisig /
 // > and then all others are inside of a multisig?
 // > seems like two separate types?
+//
+// TODO 20150105 G-J:
+// 1) inside one block from given Address there can be only one MultisigSignerModification
+// 2) I guess rest is probably similar (and covered?) by MultisigSignaturesPresentValidator,
+// but I'm using this one also to filter out "invalid/conflicting" txes in unconfirmed transactions
+//
 // TODO 20150103 J-G: also not sure why you have an inner class BlockNonConflictingMultisigTransactionValidator?
+// TODO 20150105 G-J: I could probably move the Set to enclosing class, and clear set upon call to .validate(),
+// but when I was starting writing it, I wasn't sure if that'd be safe
+//
 // TODO 20150103 J-G: are there tests for this?
+// TODO 20150105 G-J: direct, not really :/ some indirect tests are in via UnconfirmedTransactionsMultisigTest
 
 public class BlockNonConflictingMultisigTransactionValidator implements BlockValidator {
 	final ReadOnlyNisCache nisCache;

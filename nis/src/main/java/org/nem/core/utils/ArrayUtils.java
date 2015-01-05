@@ -120,6 +120,7 @@ public class ArrayUtils {
 	/**
 	 * NON constant-time lexicographical byte[] comparison.
 	 * TODO 20150103 J-J: what's wrong with Arrays.equals ?
+	 * TODO 20150105 G-J: Array.equals returns bool, while we need int to use it in comparator
 	 *
 	 * @param b first of arrays to compare.
 	 * @param c second of arrays to compare.

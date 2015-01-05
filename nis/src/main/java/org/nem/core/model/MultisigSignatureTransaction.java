@@ -94,10 +94,15 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	public int compareTo(final Transaction rhs) {
 		if (!(rhs instanceof  MultisigSignatureTransaction)) {
 			// TODO 20140103 J-G: i think this is wrong, why are you always prioritizing multisig transactions?
+			// TODO 20150105 G-J: I wanted MultisigSignatures inside SortedSet in MultisigTransaction
+			// > to be sorted in some sensible manner (they need to be sorted, otherwise we'd need kind of "orderId" field,
+			// > we've discussed that some time ago)
+			// > MultisigSignatures will never be returned from UnconfirmedTransactions, they cannot exist without associated
+			// > MultisigTransaction (getTransactionsBefore() filters them out),
+			// > so I think it should be ok, to override compareTo(), or is there something I'm missing?
 			return -1;
 		}
 
-		// first sort by fees (lowest first) and then hashes
 		int result = this.getSigner().getAddress().getEncoded().compareTo(rhs.getSigner().getAddress().getEncoded());
 		if (result != 0) {
 			return result;
