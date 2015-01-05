@@ -1,8 +1,9 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
+import org.nem.core.model.Account;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.MultisigSignature;
+import org.nem.nis.dbmodel.*;
 
 /**
  * A mapping that is able to map a db multisig signature transfer to a model multisig signature.
@@ -25,6 +26,18 @@ public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbMo
 		return new MultisigSignatureTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
-				source.getMultisigTransaction().getTransferHash()); // TODO 20140103: this is probably wrong
+				getInnerTransaction(source.getMultisigTransaction()).getTransferHash());
+	}
+
+	// TODO 20150104 J-J: should refactor this somewhere
+	private static AbstractTransfer getInnerTransaction(final org.nem.nis.dbmodel.MultisigTransaction source) {
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			final AbstractTransfer transaction = entry.getFromMultisig.apply(source);
+			if (null != transaction) {
+				return transaction;
+			}
+		}
+
+		throw new IllegalArgumentException("dbmodel has invalid multisig transaction");
 	}
 }

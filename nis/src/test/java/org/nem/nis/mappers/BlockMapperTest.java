@@ -18,6 +18,11 @@ import org.nem.nis.test.MockAccountDao;
 
 import java.util.*;
 
+/**
+ * This test has really evolved into a mapper integration test.
+ * The specific mapping tests are the unit tests.
+ * TODO 20150104 J-G: can you please fix the rest of these tests?
+ */
 public class BlockMapperTest {
 
 	//region blocks with single transaction of given type

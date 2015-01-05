@@ -35,8 +35,8 @@ public class MultisigTransactionDbModelToModelMapping extends AbstractTransferDb
 				sender,
 				otherTransaction);
 
-		for (final MultisigSignature multisigSignature : source.getMultisigSignatures()) {
-			target.addSignature(this.mapper.map(multisigSignature, MultisigSignatureTransaction.class));
+		for (final MultisigSignature signature : source.getMultisigSignatures()) {
+			target.addSignature(this.mapper.map(signature, MultisigSignatureTransaction.class));
 		}
 
 		return target;

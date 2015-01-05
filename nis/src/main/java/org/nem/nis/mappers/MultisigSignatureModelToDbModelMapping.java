@@ -19,8 +19,6 @@ public class MultisigSignatureModelToDbModelMapping extends AbstractTransferMode
 
 	@Override
 	protected MultisigSignature mapImpl(final MultisigSignatureTransaction source) {
-		final MultisigSignature dbSignature = new MultisigSignature();
-		dbSignature.setMultisigTransaction(null);
-		return dbSignature;
+		return new MultisigSignature();
 	}
 }

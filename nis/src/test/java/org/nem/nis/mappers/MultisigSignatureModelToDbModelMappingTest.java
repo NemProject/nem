@@ -13,7 +13,7 @@ import org.nem.nis.dbmodel.*;
 public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigSignatureTransaction, MultisigSignature> {
 
 	@Test
-	public void otherTransactionHashCanBeMappedToDbModel() {
+	public void multisigTransactionIsMappedToDbModelAsNull() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MultisigSignatureTransaction signature = context.createModel();
@@ -48,8 +48,7 @@ public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransfer
 		}
 
 		public void assertDbModel(final MultisigSignature dbModel, final MultisigSignatureTransaction model) {
-			Assert.assertThat(dbModel.getMultisigTransaction(), IsNull.notNullValue()); // TODO clearly failing
-
+			Assert.assertThat(dbModel.getMultisigTransaction(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}
 	}

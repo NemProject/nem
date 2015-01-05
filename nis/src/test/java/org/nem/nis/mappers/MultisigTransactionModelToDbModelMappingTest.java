@@ -180,6 +180,10 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 
 			Assert.assertThat(dbModel.getMultisigSignatures().size(), IsEqual.equalTo(numExpectedSignatures));
 			Assert.assertThat(dbModel.getMultisigSignatures(), IsEqual.equalTo(this.expectedDbSignatures));
+
+			for (final MultisigSignature signature : dbModel.getMultisigSignatures()) {
+				Assert.assertThat(signature.getMultisigTransaction(), IsEqual.equalTo(dbModel));
+			}
 		}
 	}
 }

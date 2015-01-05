@@ -43,7 +43,7 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(2 + entries.size()));
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(3 + entries.size()));
 		Assert.assertThat(mapper.isSupported(Account.class, org.nem.nis.dbmodel.Account.class), IsEqual.equalTo(true));
 		Assert.assertThat(mapper.isSupported(Block.class, org.nem.nis.dbmodel.Block.class), IsEqual.equalTo(true));
 		for (final Entry<?, ?> entry : entries) {
@@ -59,7 +59,7 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(2 + entries.size() * 2));
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(3 + entries.size() * 2));
 		Assert.assertThat(mapper.isSupported(org.nem.nis.dbmodel.Account.class, Account.class), IsEqual.equalTo(true));
 		Assert.assertThat(mapper.isSupported(org.nem.nis.dbmodel.Block.class, Block.class), IsEqual.equalTo(true));
 		for (final Entry<?, ?> entry : entries) {
