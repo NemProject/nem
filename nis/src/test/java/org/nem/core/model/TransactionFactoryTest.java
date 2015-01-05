@@ -18,14 +18,29 @@ public class TransactionFactoryTest {
 	@Test
 	public void allExpectedTransactionTypesAreSupported() {
 		// Assert:
-		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(2));
+		Assert.assertThat(TransactionFactory.size(), IsEqual.equalTo(5));
 	}
 
 	@Test
 	public void isSupportedReturnsTrueForSupportedTypes() {
-		// Assert:
-		Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.TRANSFER), IsEqual.equalTo(true));
-		Assert.assertThat(TransactionFactory.isSupported(TransactionTypes.IMPORTANCE_TRANSFER), IsEqual.equalTo(true));
+		// Arrange:
+		final List<Integer> expectedRegisteredTypes = Arrays.asList(
+				TransactionTypes.TRANSFER,
+				TransactionTypes.IMPORTANCE_TRANSFER,
+				TransactionTypes.MULTISIG_SIGNER_MODIFY,
+				TransactionTypes.MULTISIG,
+				TransactionTypes.MULTISIG_SIGNATURE);
+
+		// Act:
+		for (final Integer type : expectedRegisteredTypes) {
+			// Act:
+			final boolean isSupported = TransactionFactory.isSupported(type);
+
+			// Assert:
+			Assert.assertThat(isSupported, IsEqual.equalTo(true));
+		}
+
+		Assert.assertThat(expectedRegisteredTypes.size(), IsEqual.equalTo(TransactionFactory.size()));
 	}
 
 	@Test
