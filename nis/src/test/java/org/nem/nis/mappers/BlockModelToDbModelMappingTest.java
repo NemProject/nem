@@ -333,11 +333,6 @@ public class BlockModelToDbModelMappingTest {
 
 		//region add*
 
-		public Transfer createTransfer() {
-			final Transaction transfer = RandomTransactionFactory.createTransfer();
-			return this.createTransfer(transfer, new Transfer(), Transfer.class);
-		}
-
 		public Transfer addTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			return this.addTransfer(block, transfer, new Transfer(), Transfer.class);
@@ -378,14 +373,10 @@ public class BlockModelToDbModelMappingTest {
 				final TModelTransfer transfer,
 				final TDbTransfer dbTransfer,
 				final Class<TDbTransfer> dbTransferClass) {
-			createTransfer(transfer, dbTransfer, dbTransferClass);
-			block.addTransaction(transfer);
-			return dbTransfer;
-		}
-
-		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TDbTransfer createTransfer(TModelTransfer transfer, TDbTransfer dbTransfer, Class<TDbTransfer> dbTransferClass) {
 			transfer.sign();
+
 			Mockito.when(this.mapper.map(transfer, dbTransferClass)).thenReturn(dbTransfer);
+			block.addTransaction(transfer);
 			return dbTransfer;
 		}
 

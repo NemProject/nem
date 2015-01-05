@@ -112,6 +112,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 					dbInnerTransfer.setOrderId(-1);
 					dbInnerTransfer.setBlkIndex(this.blockIndex);
 					// TODO 20150105 G: probably doesn't make sense to do it
+					// TODO 20150105 J-G: you mean don't set the block on the inner transfer?
 					dbInnerTransfer.setBlock(this.dbBlock);
 				}
 			}
