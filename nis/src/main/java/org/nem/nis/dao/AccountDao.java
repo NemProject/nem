@@ -10,7 +10,7 @@ public interface AccountDao {
 	 * Retrieves DbAccount from db given its id in the database.
 	 *
 	 * @param id id of a record.
-	 * @return associated DbAccount or null if there isn't DbAccount with such id.
+	 * @return DbAccount associated with given id or null.
 	 */
 	public DbAccount getAccount(Long id);
 

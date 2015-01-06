@@ -41,12 +41,11 @@ public class RandomTransactionFactory {
 	}
 
 	/**
-	 * TODO 20140106 J-G: please rename
-	 * Creates a multisig signer modification.
+	 * Creates a multisig aggregate modification.
 	 *
-	 * @return The multisig signer modification.
+	 * @return The multisig aggregate modification.
 	 */
-	public static MultisigAggregateModificationTransaction createSignerModification() {
+	public static MultisigAggregateModificationTransaction createMultisigModification() {
 		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),

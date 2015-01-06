@@ -38,9 +38,9 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 	}
 
 	@Test
-	public void canMapMultisigSignerModificationTransferToModel() {
+	public void canMapMultisigModificationToModel() {
 		// Assert:
-		assertCanMapMultisigWithInnerTransaction(TestContext::addSignerModification);
+		assertCanMapMultisigWithInnerTransaction(TestContext::addMultisigModification);
 	}
 
 	private static void assertCanMapMultisigWithInnerTransaction(final Consumer<TestContext> addInnerTransaction) {
@@ -164,10 +164,10 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 					DbMultisigTransaction::setImportanceTransferTransaction);
 		}
 
-		public void addSignerModification() {
+		public void addMultisigModification() {
 			this.addTransfer(
 					new DbMultisigAggregateModificationTransaction(),
-					RandomTransactionFactory.createSignerModification(),
+					RandomTransactionFactory.createMultisigModification(),
 					DbMultisigTransaction::setMultisigAggregateModificationTransaction);
 		}
 

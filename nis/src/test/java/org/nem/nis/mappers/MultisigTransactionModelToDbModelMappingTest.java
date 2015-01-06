@@ -39,9 +39,9 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 	}
 
 	@Test
-	public void canMapMultisigSignerModificationTransferToDbModel() {
+	public void canMapMultisigModificationToDbModel() {
 		// Assert:
-		assertCanMapMultisigWithInnerTransaction(TestContext::addSignerModification);
+		assertCanMapMultisigWithInnerTransaction(TestContext::addMultisigModification);
 	}
 
 	private static void assertCanMapMultisigWithInnerTransaction(final Consumer<TestContext> addInnerTransaction) {
@@ -120,9 +120,9 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		private final Set<MultisigSignatureTransaction> signatures = new HashSet<>();
 		private final Set<DbMultisigSignatureTransaction> expectedDbSignatures = new HashSet<>();
 		private Transaction otherTransaction;
-		private DbTransferTransaction expectedDbTransferTransaction;
-		private DbImportanceTransferTransaction expectedImportanceTransferTransaction;
-		private DbMultisigAggregateModificationTransaction expectedSignerModification;
+		private DbTransferTransaction expectedTransfer;
+		private DbImportanceTransferTransaction expectedImportanceTransfer;
+		private DbMultisigAggregateModificationTransaction expectedMultisigModification;
 
 		private final MultisigTransactionModelToDbModelMapping mapping = new MultisigTransactionModelToDbModelMapping(this.mapper);
 
@@ -145,20 +145,20 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 
 		public void addTransfer() {
 			this.otherTransaction = RandomTransactionFactory.createTransfer();
-			this.expectedDbTransferTransaction = new DbTransferTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbTransferTransaction.class)).thenReturn(this.expectedDbTransferTransaction);
+			this.expectedTransfer = new DbTransferTransaction();
+			Mockito.when(this.mapper.map(this.otherTransaction, DbTransferTransaction.class)).thenReturn(this.expectedTransfer);
 		}
 
 		public void addImportanceTransfer() {
 			this.otherTransaction = RandomTransactionFactory.createImportanceTransfer();
-			this.expectedImportanceTransferTransaction = new DbImportanceTransferTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbImportanceTransferTransaction.class)).thenReturn(this.expectedImportanceTransferTransaction);
+			this.expectedImportanceTransfer = new DbImportanceTransferTransaction();
+			Mockito.when(this.mapper.map(this.otherTransaction, DbImportanceTransferTransaction.class)).thenReturn(this.expectedImportanceTransfer);
 		}
 
-		public void addSignerModification() {
-			this.otherTransaction = RandomTransactionFactory.createSignerModification();
-			this.expectedSignerModification = new DbMultisigAggregateModificationTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbMultisigAggregateModificationTransaction.class)).thenReturn(this.expectedSignerModification);
+		public void addMultisigModification() {
+			this.otherTransaction = RandomTransactionFactory.createMultisigModification();
+			this.expectedMultisigModification = new DbMultisigAggregateModificationTransaction();
+			Mockito.when(this.mapper.map(this.otherTransaction, DbMultisigAggregateModificationTransaction.class)).thenReturn(this.expectedMultisigModification);
 		}
 
 		public MultisigTransaction createModel() {
@@ -173,9 +173,9 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		public void assertDbModel(final DbMultisigTransaction dbModel, final int numExpectedSignatures) {
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
-			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedDbTransferTransaction));
-			Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsEqual.equalTo(this.expectedImportanceTransferTransaction));
-			Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(this.expectedSignerModification));
+			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedTransfer));
+			Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsEqual.equalTo(this.expectedImportanceTransfer));
+			Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(this.expectedMultisigModification));
 
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));

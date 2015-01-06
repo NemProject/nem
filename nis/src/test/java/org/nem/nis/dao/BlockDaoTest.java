@@ -30,11 +30,9 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 
-// TODO 20140106 J-G: i wouldn't rename the test class since you didn't rename the dao class
-
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class DbBlockDaoTest {
+public class BlockDaoTest {
 	@Autowired
 	AccountDao accountDao;
 
@@ -43,8 +41,6 @@ public class DbBlockDaoTest {
 
 	@Autowired
 	BlockDao blockDao;
-
-	// TODO 20150103 J-G: we'll need to replace BlockMapper -> MapperUtils once the mapping changes are ported
 
 	//region save
 	@Test
@@ -115,7 +111,7 @@ public class DbBlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote);
-		final MultisigAggregateModificationTransaction multisigAggregateModificationTransaction = this.prepareMultisigSignerModificationTransaction(signer, remote);
+		final MultisigAggregateModificationTransaction multisigAggregateModificationTransaction = this.prepareMultisigModificationTransaction(signer, remote);
 		final ImportanceTransferTransaction importanceTransfer = this.prepareImportanceTransferTransaction(signer, remote, true);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(signer, remote, 10);
 		final org.nem.core.model.Block block = this.createTestEmptyBlock(signer, 133, 0);
@@ -794,7 +790,7 @@ public class DbBlockDaoTest {
 		return importanceTransferTransaction;
 	}
 
-	private MultisigAggregateModificationTransaction prepareMultisigSignerModificationTransaction(
+	private MultisigAggregateModificationTransaction prepareMultisigModificationTransaction(
 			final Account sender,
 			final Account cosignatory) {
 		// Arrange:

@@ -110,9 +110,9 @@ public class BlockDbModelToModelMappingTest {
 	}
 
 	@Test
-	public void blockWithMultisigSignerModificationsCanBeMappedToModel() {
+	public void blockWithMultisigModificationsCanBeMappedToModel() {
 		// Assert:
-		assertBlockWithTransfersCanBeMappedToModel(TestContext::addSignerModification);
+		assertBlockWithTransfersCanBeMappedToModel(TestContext::addMultisigModification);
 	}
 
 	@Test
@@ -151,9 +151,9 @@ public class BlockDbModelToModelMappingTest {
 		final Transaction transfer1 = context.addTransfer(dbBlock, 1);
 		final Transaction transfer4 = context.addTransfer(dbBlock, 4);
 		final Transaction transfer3 = context.addImportanceTransfer(dbBlock, 3);
-		final Transaction transfer7 = context.addSignerModification(dbBlock, 7);
+		final Transaction transfer7 = context.addMultisigModification(dbBlock, 7);
 		final Transaction transfer5 = context.addMultisigTransfer(dbBlock, 5);
-		final Transaction transfer6 = context.addSignerModification(dbBlock, 6);
+		final Transaction transfer6 = context.addMultisigModification(dbBlock, 6);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
@@ -187,7 +187,7 @@ public class BlockDbModelToModelMappingTest {
 		}
 
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
+		private final DbAccount dbHarvester = Mockito.mock(DbAccount.class);
 		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private final Account harvester = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
@@ -197,13 +197,13 @@ public class BlockDbModelToModelMappingTest {
 		private final BlockDbModelToModelMapping mapping = new BlockDbModelToModelMapping(this.mapper, new MockAccountLookup());
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.dbForger, Account.class)).thenReturn(this.harvester);
+			Mockito.when(this.mapper.map(this.dbHarvester, Account.class)).thenReturn(this.harvester);
 			Mockito.when(this.mapper.map(this.dbLessor, Account.class)).thenReturn(this.lessor);
 		}
 
 		public DbBlock createDbBlock(final Long difficulty, final DbAccount lessor) {
 			final DbBlock dbBlock = new DbBlock();
-			dbBlock.setHarvester(this.dbForger);
+			dbBlock.setHarvester(this.dbHarvester);
 			dbBlock.setPrevBlockHash(this.prevBlockHash);
 			dbBlock.setGenerationHash(this.generationBlockHash);
 			dbBlock.setTimeStamp(4444);
@@ -254,7 +254,7 @@ public class BlockDbModelToModelMappingTest {
 					ImportanceTransferTransaction.class);
 		}
 
-		public MultisigAggregateModificationTransaction addSignerModification(final DbBlock block, final int blockIndex) {
+		public MultisigAggregateModificationTransaction addMultisigModification(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
 					dbTransfer -> block.getBlockMultisigAggregateModificationTransactions().add(dbTransfer),
 					blockIndex,

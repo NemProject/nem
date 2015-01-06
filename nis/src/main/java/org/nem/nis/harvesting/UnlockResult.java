@@ -16,9 +16,8 @@ public enum UnlockResult {
 
 	/**
 	 * The account could not be unlocked because it is ineligible for harvesting.
-	 * TODO 20140106 J-G: guess we should change FAILURE_FORAGING_INELIGIBLE too?
 	 */
-	FAILURE_FORAGING_INELIGIBLE,
+	FAILURE_HARVESTING_INELIGIBLE,
 
 	/**
 	 * The account could not be unlocked because limit on the server has been hit.

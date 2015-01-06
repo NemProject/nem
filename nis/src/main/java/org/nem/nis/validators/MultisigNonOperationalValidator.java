@@ -11,9 +11,9 @@ import org.nem.nis.state.ReadOnlyAccountState;
  * TODO 20150103 J-G: I just worry we're making this too complicated ... why allow any of the following?
  * > do you have time to come up with a list of multisig-related operations we want to support?
  * b) if signature is != null, that means TX was made DIRECTLY from multisig account, now:
- * b.1) multisig account can only make MultisigSignerModification,
+ * b.1) multisig account can only make MultisigAggregateModificationTransaction,
  * b.2) or if multisig itself is also cosignatory of some other account, we allow MultisigSignatures too
- * b.3) if this was MultisigSignerModification we allow only Add
+ * b.3) if this was MultisigAggregateModificationTransaction we allow only Add
  */
 public class MultisigNonOperationalValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;

@@ -20,7 +20,7 @@ public interface SimpleReadOnlyTransferDao<TTransfer> {
 	Long count();
 
 	/**
-	 * Retrieves a transfer from the db given it's hash.
+	 * Retrieves a transfer from the db given its hash.
 	 *
 	 * @param txHash Hash of the transfer to retrieve.
 	 * @return DbTransferTransaction having given hash or null.

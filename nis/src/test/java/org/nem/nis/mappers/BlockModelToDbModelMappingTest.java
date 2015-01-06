@@ -81,10 +81,10 @@ public class BlockModelToDbModelMappingTest {
 	}
 
 	@Test
-	public void blockWithSignerModificationsCanBeMappedToDbModel() {
+	public void blockWithMultisigModificationsCanBeMappedToDbModel() {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
-				TestContext::addSignerModification,
+				TestContext::addMultisigModification,
 				DbBlock::getBlockMultisigAggregateModificationTransactions,
 				DbMultisigAggregateModificationTransaction.class);
 	}
@@ -153,9 +153,9 @@ public class BlockModelToDbModelMappingTest {
 		final AbstractTransfer transfer2 = context.addTransfer(block);
 		final AbstractTransfer transfer3 = context.addTransfer(block);
 		final AbstractTransfer transfer4 = context.addImportanceTransfer(block);
-		final AbstractTransfer transfer5 = context.addSignerModification(block);
+		final AbstractTransfer transfer5 = context.addMultisigModification(block);
 		final AbstractTransfer transfer6 = context.addMultisigTransfer(block);
-		final AbstractTransfer transfer7 = context.addSignerModification(block);
+		final AbstractTransfer transfer7 = context.addMultisigModification(block);
 		final AbstractTransfer transfer8 = context.addMultisigTransfer(block);
 
 		// Act:
@@ -343,9 +343,8 @@ public class BlockModelToDbModelMappingTest {
 			return this.addTransfer(block, transfer, new DbImportanceTransferTransaction(), DbImportanceTransferTransaction.class);
 		}
 
-		// TODO 20150106 J-G: can you rename "SignerModification" in project
-		public DbMultisigAggregateModificationTransaction addSignerModification(final Block block) {
-			final Transaction transfer = RandomTransactionFactory.createSignerModification();
+		public DbMultisigAggregateModificationTransaction addMultisigModification(final Block block) {
+			final Transaction transfer = RandomTransactionFactory.createMultisigModification();
 			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);
 		}
 

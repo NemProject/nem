@@ -8,7 +8,7 @@ import javax.persistence.*;
 import javax.persistence.Table;
 
 /**
- * DbTransferTransaction Db entity.
+ * Transfer Db entity.
  * <p>
  * Holds information about Transactions having type TransactionTypes.TRANSFER_TYPE
  * <p>

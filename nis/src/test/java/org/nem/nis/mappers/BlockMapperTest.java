@@ -98,11 +98,11 @@ public class BlockMapperTest {
 	}
 
 	@Test
-	public void blockModelWithMultisigSignerModificationTransactionCanBeMappedToDbModel() {
+	public void blockModelWithMultisigModificationTransactionCanBeMappedToDbModel() {
 		// Arrange:
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
-		context.addMultisigSignerModificationTransactions();
+		context.addMultisigModificationTransactions();
 
 		// Act:
 		final DbBlock dbModel = context.toDbModel();
@@ -253,11 +253,11 @@ public class BlockMapperTest {
 	}
 
 	@Test
-	public void blockModelWithMultisigSignerModificationTransactionCanBeRoundTripped() {
+	public void blockModelWithMultisigModificationTransactionCanBeRoundTripped() {
 		// Arrange:
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
-		context.addMultisigSignerModificationTransactions();
+		context.addMultisigModificationTransactions();
 		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
@@ -332,7 +332,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS_C = 3;
 		final TestContext context = new TestContext();
 		// order matters, as harvesting will create block in that order
-		context.addMultisigSignerModificationTransactions();
+		context.addMultisigModificationTransactions();
 		context.addImportanceTransferTransactions();
 		context.addTransactions();
 
@@ -628,7 +628,7 @@ public class BlockMapperTest {
 			this.signModel();
 		}
 
-		public void addMultisigSignerModificationTransactions() {
+		public void addMultisigModificationTransactions() {
 			final List<MultisigModification> modifications1 = Arrays.asList(new MultisigModification(MultisigModificationType.Add, this.account2));
 			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(150), this.account1, modifications1));
 			final List<MultisigModification> modifications2 = Arrays.asList(new MultisigModification(MultisigModificationType.Add, this.account3));

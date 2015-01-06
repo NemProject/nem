@@ -129,27 +129,25 @@ public class TransactionFactoryTest {
 
 	//region MultisigAggregateModificationTransaction
 
-	// TODO 20150106 J-G: please rename tests
-
 	@Test
-	public void canDeserializeVerifiableMultisigSignerModificationTransaction() {
+	public void canDeserializeVerifiableMultisigAggregateModificationTransaction() {
 		// Arrange:
-		final Transaction originalTransaction = createMultisigSignerModificationTransaction();
+		final Transaction originalTransaction = createMultisigAggregateModificationTransaction();
 
 		// Assert:
 		assertCanDeserializeVerifiable(originalTransaction, MultisigAggregateModificationTransaction.class, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 	}
 
 	@Test
-	public void canDeserializeNonVerifiableMultisigSignerModificationTransaction() {
+	public void canDeserializeNonVerifiableMultisigAggregateModificationTransaction() {
 		// Arrange:
-		final Transaction originalTransaction = createMultisigSignerModificationTransaction();
+		final Transaction originalTransaction = createMultisigAggregateModificationTransaction();
 
 		// Assert:
 		assertCanDeserializeNonVerifiable(originalTransaction, MultisigAggregateModificationTransaction.class, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 	}
 
-	private static Transaction createMultisigSignerModificationTransaction() {
+	private static Transaction createMultisigAggregateModificationTransaction() {
 		final Account sender = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));

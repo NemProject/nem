@@ -36,7 +36,7 @@ public class MultisigAggregateModificationTransactionTest {
 	public static class MultisigAggregateModificationTransactionMainTest {
 		//region ctor
 		@Test
-		public void cannotCreateMultisigSignerModificationWithNullModifications() {
+		public void cannotCreateMultisigAggregateModificationWithNullModifications() {
 			// Arrange:
 			final Account signer = Mockito.mock(Account.class);
 
@@ -47,7 +47,7 @@ public class MultisigAggregateModificationTransactionTest {
 		}
 
 		@Test
-		public void cannotCreateMultisigSignerModificationWithEmptyModifications() {
+		public void cannotCreateMultisigAggregateModificationWithEmptyModifications() {
 			// Arrange:
 			final Account signer = Mockito.mock(Account.class);
 
@@ -69,7 +69,7 @@ public class MultisigAggregateModificationTransactionTest {
 					new MultisigModification(MultisigModificationType.Del, cosignatory2));
 
 			final MultisigAggregateModificationTransaction transaction =
-					AbstractMultisigSignerModificationTransactionTest.createMultisigSignerModificationTransaction(signer, modifications);
+					AbstractMultisigSignerModificationTransactionTest.createTransaction(signer, modifications);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:

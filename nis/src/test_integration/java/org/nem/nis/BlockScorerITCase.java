@@ -114,10 +114,8 @@ public class BlockScorerITCase {
 				45 < OneHarvesterPercentageBlocks && OneHarvesterPercentageBlocks < 55);
 	}
 
-	// TODO 20150106 J-G: still some "Forage" references here
-
 	@Test
-	public void selfishHarvesterCannotForageBetterChain() {
+	public void selfishHarvesterCannotHarvestBetterChain() {
 		int selfishHarvesterWins = 0;
 		//  1% attack: 10 rounds with approximately 100 blocks each
 		// NOTE: Since the attacker has a balance considerably lower than 200 million,
@@ -162,12 +160,12 @@ public class BlockScorerITCase {
 	@Test
 	public void manyOldNormalHarvestersVersusManyFreshSelfishHarvestersTime() {
 		// The selfish harvester waits till the normal harvesters have harvested harvestedBlocksPerNormalHarvester blocks in average.
-		// (Assuming 5000 normal forgagers in a real NEM network each harvester has harvested about 100 blocks after a year.)
+		// (Assuming 5000 normal harvesters in a real NEM network each harvester has harvested about 100 blocks after a year.)
 		// Then the selfish harvester creates brand-new accounts and harvests with them.
 		long selfishHarvesterWins = 0;
 
-		selfishHarvesterWins += this.normalForgersOldVersusSelfishNew(GenerateStrategy.Time_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
-		//selfishHarvesterWins += normalForgersOldVersusSelfishNew(GenerateStrategy.Score_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
+		selfishHarvesterWins += this.normalHarvestersOldVersusSelfishNew(GenerateStrategy.Time_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
+		//selfishHarvesterWins += normalHarvestersOldVersusSelfishNew(GenerateStrategy.Score_Matters, 10, 50 * 60, 100, 10, 1_000_000_000L, 1, 1_000_000_000);
 
 		// Assert
 		Assert.assertTrue("(multiple) Selfish harvester vs vs multiple normal: created better chain!", selfishHarvesterWins == 0);
@@ -256,7 +254,7 @@ public class BlockScorerITCase {
 		Assert.assertThat(scoreA, IsNot.not(IsEqual.equalTo(scoreB)));
 	}
 
-	public int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalForgerBalance, final long selfishForgerBalance) {
+	public int normalHarvesterVersusSelfishHarvester(final int numRounds, final int maxTime, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
 		final BlockScorer scorer = createBlockScorer();
 		final List<Block> blocks = new LinkedList<>();
@@ -272,8 +270,8 @@ public class BlockScorerITCase {
 		// Act: normal harvester vs. selfish harvester
 		for (int i = 0; i < numRounds; i++) {
 			// create here to reset number of harvested blocks
-			final AccountWithInfo normalHarvester = new AccountWithInfo(normalForgerBalance);
-			final AccountWithInfo selfishHarvester = new AccountWithInfo(selfishForgerBalance);
+			final AccountWithInfo normalHarvester = new AccountWithInfo(normalHarvesterBalance);
+			final AccountWithInfo selfishHarvester = new AccountWithInfo(selfishHarvesterBalance);
 
 			sr.nextBytes(rndBytes);
 			firstBlock = this.createFirstBlock(normalHarvester, new Hash(rndBytes));
@@ -307,12 +305,12 @@ public class BlockScorerITCase {
 			//LOGGER.info("score " + selfishHarvesterScore + " vs " + normalHarvesterScore);
 		}
 
-		LOGGER.info("selfish harvester (" + (selfishForgerBalance * 100L) / (normalForgerBalance + selfishForgerBalance) + "% of all nem) wins in:   " +
+		LOGGER.info("selfish harvester (" + (selfishHarvesterBalance * 100L) / (normalHarvesterBalance + selfishHarvesterBalance) + "% of all nem) wins in:   " +
 				(selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvesterWins) + "%.");
 		return selfishHarvesterWins;
 	}
 
-	public int normalForgersOldVersusSelfishNew(final GenerateStrategy strategy, final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalForgerBalance, final int selfishCount, final long selfishForgerBalance) {
+	public int normalHarvestersOldVersusSelfishNew(final GenerateStrategy strategy, final int numRounds, final int maxTime, final long harvestedBlocksPerNormalHarvester, final int count, final long normalHarvesterBalance, final int selfishCount, final long selfishHarvesterBalance) {
 		// Arrange:
 
 		final BlockScorer scorer = createBlockScorer();
@@ -332,13 +330,13 @@ public class BlockScorerITCase {
 			final AccountWithInfo[] selfishHarvesterAccounts = new AccountWithInfo[selfishCount];
 			final AccountWithInfo[] harvesters = new AccountWithInfo[count];
 			for (int j = 0; j < count; j++) {
-				harvesters[j] = new AccountWithInfo(normalForgerBalance);
+				harvesters[j] = new AccountWithInfo(normalHarvesterBalance);
 				for (int k = 0; k < harvestedBlocksPerNormalHarvester; k++) {
 					harvesters[j].getInfo().incrementHarvestedBlocks();
 				}
 			}
 			for (int j = 0; j < selfishCount; ++j) {
-				selfishHarvesterAccounts[j] = new AccountWithInfo(selfishForgerBalance);
+				selfishHarvesterAccounts[j] = new AccountWithInfo(selfishHarvesterBalance);
 			}
 
 			sr.nextBytes(rndBytes);
@@ -372,12 +370,12 @@ public class BlockScorerITCase {
 		}
 
 		LOGGER.info(selfishCount + " selfish harvester vs " + count + " (" +
-				(selfishCount * selfishForgerBalance * 100L) / (count * normalForgerBalance + selfishCount * selfishForgerBalance) +
+				(selfishCount * selfishHarvesterBalance * 100L) / (count * normalHarvesterBalance + selfishCount * selfishHarvesterBalance) +
 				"% of all nem) wins in:   " + (selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
 		return selfishHarvesterWins;
 	}
 
-	public int normalXHarvesterVersusSelfishHarvester(final GenerateStrategy strategy, final int numRounds, final int maxTime, final int count, final long normalForgerBalance, final long selfishForgerBalance) {
+	public int normalXHarvesterVersusSelfishHarvester(final GenerateStrategy strategy, final int numRounds, final int maxTime, final int count, final long normalHarvesterBalance, final long selfishHarvesterBalance) {
 		// Arrange:
 
 		final BlockScorer scorer = createBlockScorer();
@@ -394,19 +392,19 @@ public class BlockScorerITCase {
 		// Act: normal harvester duo vs. selfish harvester
 		for (int i = 0; i < numRounds; i++) {
 			// create here to reset number of harvested blocks
-			final AccountWithInfo selfishHarvester = new AccountWithInfo(selfishForgerBalance);
-			final AccountWithInfo[] forargers = new AccountWithInfo[count];
+			final AccountWithInfo selfishHarvester = new AccountWithInfo(selfishHarvesterBalance);
+			final AccountWithInfo[] harvesters = new AccountWithInfo[count];
 			for (int j = 0; j < count; j++) {
-				forargers[j] = new AccountWithInfo(normalForgerBalance / count);
+				harvesters[j] = new AccountWithInfo(normalHarvesterBalance / count);
 			}
 
 			sr.nextBytes(rndBytes);
-			firstBlock = this.createFirstBlock(forargers[i % count], new Hash(rndBytes));
+			firstBlock = this.createFirstBlock(harvesters[i % count], new Hash(rndBytes));
 
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				final Block block = this.generateNextBlockMultiple(strategy, forargers, blocks, scorer, false);
+				final Block block = this.generateNextBlockMultiple(strategy, harvesters, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);
@@ -432,12 +430,12 @@ public class BlockScorerITCase {
 		}
 
 		LOGGER.info((strategy == GenerateStrategy.Time_Matters ? "(time)" : "(score)") + " selfish harvester vs " + count + " (" +
-				(selfishForgerBalance * 100L) / (count * normalForgerBalance + selfishForgerBalance) + "% of all nem) wins in:   " +
+				(selfishHarvesterBalance * 100L) / (count * normalHarvesterBalance + selfishHarvesterBalance) + "% of all nem) wins in:   " +
 				(selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvestersWins) + "%.");
 		return selfishHarvesterWins;
 	}
 
-	public int normalXRandomHarvesterVersusSelfishHarvester(final GenerateStrategy strategy, final int numRounds, final int maxTime, final int percentage, final int count, final long normalForgerBalance) {
+	public int normalXRandomHarvesterVersusSelfishHarvester(final GenerateStrategy strategy, final int numRounds, final int maxTime, final int percentage, final int count, final long normalHarvesterBalance) {
 		// Arrange:
 
 		final BlockScorer scorer = createBlockScorer();
@@ -454,21 +452,21 @@ public class BlockScorerITCase {
 		// Act: normal harvester duo vs. selfish harvester
 		for (int i = 0; i < numRounds; i++) {
 			// create here to reset number of harvested blocks
-			final AccountWithInfo[] forargers = new AccountWithInfo[count];
-			long selfishForgerBalance = 0L;
+			final AccountWithInfo[] harvesters = new AccountWithInfo[count];
+			long selfishHarvesterBalance = 0L;
 			for (int j = 0; j < count; j++) {
-				forargers[j] = new AccountWithInfo(Math.abs(sr.nextLong() % normalForgerBalance));
-				selfishForgerBalance += forargers[j].getInfo().getBalance().getNumNem();
+				harvesters[j] = new AccountWithInfo(Math.abs(sr.nextLong() % normalHarvesterBalance));
+				selfishHarvesterBalance += harvesters[j].getInfo().getBalance().getNumNem();
 			}
-			final AccountWithInfo selfishHarvester = new AccountWithInfo(selfishForgerBalance * percentage * 2 / 100);
+			final AccountWithInfo selfishHarvester = new AccountWithInfo(selfishHarvesterBalance * percentage * 2 / 100);
 
 			sr.nextBytes(rndBytes);
-			firstBlock = this.createFirstBlock(forargers[i % count], new Hash(rndBytes));
+			firstBlock = this.createFirstBlock(harvesters[i % count], new Hash(rndBytes));
 
 			blocks.clear();
 			blocks.add(firstBlock);
 			do {
-				final Block block = this.generateNextBlockMultiple(strategy, forargers, blocks, scorer, false);
+				final Block block = this.generateNextBlockMultiple(strategy, harvesters, blocks, scorer, false);
 				blocks.add(block);
 				lastBlock = block;
 			} while (lastBlock.getTimeStamp().getRawTime() < maxTime);

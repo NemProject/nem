@@ -15,7 +15,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validateSignerModification(transaction);
+		final ValidationResult result = context.validateMultisigModification(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -25,10 +25,10 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void addingNewCosignatoryIsValid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Add);
+		final Transaction transaction = context.createMultisigModificationTransaction(MultisigModificationType.Add);
 
 		// Act:
-		final ValidationResult result = context.validateSignerModification(transaction);
+		final ValidationResult result = context.validateMultisigModification(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -39,11 +39,11 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		// TODO 20150103 J-G: so i understand, the context is returning a transaction that will make context.signer a cosignatory of context.multisig?
-		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Add);
+		final Transaction transaction = context.createMultisigModificationTransaction(MultisigModificationType.Add);
 		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
 
 		// Act:
-		final ValidationResult result = context.validateSignerModification(transaction);
+		final ValidationResult result = context.validateMultisigModification(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER));
@@ -53,10 +53,10 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void removingNonExistingCosignatoryIsInvalid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Del);
+		final Transaction transaction = context.createMultisigModificationTransaction(MultisigModificationType.Del);
 
 		// Act:
-		final ValidationResult result = context.validateSignerModification(transaction);
+		final ValidationResult result = context.validateMultisigModification(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
@@ -66,11 +66,11 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 	public void removingExistingCosignatoryIsValid() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigSignerModificationTransaction(MultisigModificationType.Del);
+		final Transaction transaction = context.createMultisigModificationTransaction(MultisigModificationType.Del);
 		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
 
 		// Act:
-		final ValidationResult result = context.validateSignerModification(transaction);
+		final ValidationResult result = context.validateMultisigModification(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));

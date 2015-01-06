@@ -36,7 +36,7 @@ public class MultisigTestContext {
 		this.addState(this.dummy);
 	}
 
-	public MultisigAggregateModificationTransaction createMultisigSignerModificationTransaction(final MultisigModificationType modificationType) {
+	public MultisigAggregateModificationTransaction createMultisigModificationTransaction(final MultisigModificationType modificationType) {
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				this.multisig,
@@ -113,7 +113,7 @@ public class MultisigTestContext {
 		return this.multisigSignatureValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
 	}
 
-	public ValidationResult validateSignerModification(final Transaction transaction) {
+	public ValidationResult validateMultisigModification(final Transaction transaction) {
 		return multisigAggregateModificationTransactionValidator.validate(
 				transaction,
 				new ValidationContext((final Account account, final Amount amount) -> true));

@@ -55,7 +55,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
 		final ReadOnlyAccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress());
 		if (!this.canHarvestPredicate.canHarvest(accountState, currentHeight)) {
-			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
+			return UnlockResult.FAILURE_HARVESTING_INELIGIBLE;
 		}
 
 		this.unlocked.add(account);

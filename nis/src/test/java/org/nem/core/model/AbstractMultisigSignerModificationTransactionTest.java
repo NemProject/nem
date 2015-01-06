@@ -11,7 +11,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 
-// TODO 20150103 - should this be called MultisigSignerModificationTransactionTest ?
+// TODO 20150106 J-G - this class should be renamed!
 
 public abstract class AbstractMultisigSignerModificationTransactionTest {
 	public static final TimeInstant TIME = new TimeInstant(123);
@@ -23,7 +23,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	// TODO 20150103 at least assert the list size
 
 	@Test
-	public void ctorCanCreateMultisigSignerModification() {
+	public void ctorCanCreateMultisigAggregateModificationTransaction() {
 		// Arrange:
 		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
@@ -31,7 +31,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
 
 		// Act:
-		final MultisigAggregateModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
+		final MultisigAggregateModificationTransaction transaction = createTransaction(signer, modifications);
 
 		// Assert:
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
@@ -52,7 +52,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
-		final MultisigAggregateModificationTransaction originalTransaction = createMultisigSignerModificationTransaction(signer,
+		final MultisigAggregateModificationTransaction originalTransaction = createTransaction(signer,
 				createModificationList(modificationType, cosignatory));
 
 		// Act:
@@ -86,7 +86,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		final MultisigAggregateModificationTransaction transaction = createMultisigSignerModificationTransaction(signer,
+		final MultisigAggregateModificationTransaction transaction = createTransaction(signer,
 				createModificationList(modificationType, cosignatory));
 
 		// Act + Assert:
@@ -105,7 +105,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
-		final MultisigAggregateModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
+		final MultisigAggregateModificationTransaction transaction = createTransaction(signer, modifications);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -127,7 +127,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
-		final MultisigAggregateModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
+		final MultisigAggregateModificationTransaction transaction = createTransaction(signer, modifications);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -153,7 +153,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 				new MultisigModification(modificationType, cosignatory1),
 				new MultisigModification(modificationType, cosignatory2));
 
-		final MultisigAggregateModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
+		final MultisigAggregateModificationTransaction transaction = createTransaction(signer, modifications);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -181,7 +181,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 				new MultisigModification(modificationType, cosignatory1),
 				new MultisigModification(modificationType, cosignatory2));
 
-		final MultisigAggregateModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
+		final MultisigAggregateModificationTransaction transaction = createTransaction(signer, modifications);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -205,8 +205,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		return Arrays.asList(multisigModification);
 	}
 
-	public static MultisigAggregateModificationTransaction createMultisigSignerModificationTransaction(
-			final Account sender, final List<MultisigModification> modifications) {
+	public static MultisigAggregateModificationTransaction createTransaction(final Account sender, final List<MultisigModification> modifications) {
 		return new MultisigAggregateModificationTransaction(TIME, sender, modifications);
 	}
 }
