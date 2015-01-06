@@ -186,7 +186,7 @@ public class UnconfirmedTransactionsMultisigTest {
 	private static class TestContext {
 		private final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		private final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
-		private final SingleTransactionValidator singleValidator;
+		private final AggregateSingleTransactionValidatorBuilder singleTransactionValidatorBuilder;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyAccountStateCache accountStateCache;
@@ -198,7 +198,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		private final Account cosigner2 = Utils.generateRandomAccount();
 
 		private TestContext() {
-			this.singleValidator = this.factory.createSingle(this.stateCache);
+			this.singleTransactionValidatorBuilder = this.factory.createSingleBuilder(this.stateCache);
 			this.batchValidator = this.factory.createBatch(Mockito.mock(DefaultHashCache.class));
 			this.accountStateCache = this.stateCache;
 			this.timeProvider = Mockito.mock(TimeProvider.class);
@@ -206,9 +206,7 @@ public class UnconfirmedTransactionsMultisigTest {
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
-			final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-			builder.add(this.singleValidator);
-			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(builder);
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(this.singleTransactionValidatorBuilder);
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 
