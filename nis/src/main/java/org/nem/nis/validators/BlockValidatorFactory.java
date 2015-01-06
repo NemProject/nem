@@ -47,6 +47,5 @@ public class BlockValidatorFactory {
 		visitor.accept(new BlockImportanceTransferValidator());
 		visitor.accept(new BlockImportanceTransferBalanceValidator());
 		visitor.accept(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
-		visitor.accept(new BlockNonConflictingMultisigTransactionValidator(nisCache));
 	}
 }

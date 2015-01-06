@@ -383,7 +383,7 @@ public class UnconfirmedTransactions {
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.collect(Collectors.toList());
 
-			return BlockNonConflictingMultisigTransactionValidator.multisigSignatureFilter(this.nisCache, this.sortTransactions(transactions));
+			return this.sortTransactions(transactions);
 		}
 	}
 
