@@ -121,7 +121,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		private final Set<DbMultisigSignatureTransaction> expectedDbSignatures = new HashSet<>();
 		private Transaction otherTransaction;
 		private DbTransferTransaction expectedDbTransferTransaction;
-		private ImportanceTransfer expectedImportanceTransfer;
+		private DbImportanceTransferTransaction expectedImportanceTransferTransaction;
 		private DbMultisigAggregateModificationTransaction expectedSignerModification;
 
 		private final MultisigTransactionModelToDbModelMapping mapping = new MultisigTransactionModelToDbModelMapping(this.mapper);
@@ -151,8 +151,8 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 
 		public void addImportanceTransfer() {
 			this.otherTransaction = RandomTransactionFactory.createImportanceTransfer();
-			this.expectedImportanceTransfer = new ImportanceTransfer();
-			Mockito.when(this.mapper.map(this.otherTransaction, ImportanceTransfer.class)).thenReturn(this.expectedImportanceTransfer);
+			this.expectedImportanceTransferTransaction = new DbImportanceTransferTransaction();
+			Mockito.when(this.mapper.map(this.otherTransaction, DbImportanceTransferTransaction.class)).thenReturn(this.expectedImportanceTransferTransaction);
 		}
 
 		public void addSignerModification() {
@@ -174,7 +174,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(this.expectedDbTransferTransaction));
-			Assert.assertThat(dbModel.getImportanceTransfer(), IsEqual.equalTo(this.expectedImportanceTransfer));
+			Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsEqual.equalTo(this.expectedImportanceTransferTransaction));
 			Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(this.expectedSignerModification));
 
 			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));

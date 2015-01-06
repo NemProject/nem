@@ -58,7 +58,7 @@ public class BlockDaoImpl implements BlockDao {
 	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
 		return criteria
 				.setFetchMode("blockTransferTransactions", fetchMode)
-				.setFetchMode("blockImportanceTransfers", fetchMode)
+				.setFetchMode("blockImportanceTransferTransactions", fetchMode)
 				.setFetchMode("blockMultisigAggregateModificationTransactions", fetchMode)
 				.setFetchMode("blockMultisigTransactions", fetchMode);
 	}
@@ -181,7 +181,7 @@ public class BlockDaoImpl implements BlockDao {
 		//  It does not cascade to related entities."
 
 		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", (v) -> {});
-		this.dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
+		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", (v) -> {});
 		this.dropTransfers(blockHeight, "DbMultisigAggregateModificationTransaction", "blockMultisigAggregateModificationTransactions", (transactionsToDelete) -> {
 			final Query preQuery = this.getCurrentSession()
 					.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")

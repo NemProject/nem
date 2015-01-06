@@ -31,7 +31,7 @@ public class ImportanceTransferTransactionDaoTest {
 	public void savingTransferSavesAccounts() {
 		// Arrange:
 		final TestContext testContext = new TestContext();
-		final ImportanceTransfer dbTransaction = testContext.createDbTransaction();
+		final DbImportanceTransferTransaction dbTransaction = testContext.createDbTransaction();
 
 		final org.nem.nis.dbmodel.Account account = testContext.getSender();
 		this.addToDummyBlock(account, dbTransaction);
@@ -49,14 +49,14 @@ public class ImportanceTransferTransactionDaoTest {
 	public void canReadSavedData() {
 		// Arrange:
 		final TestContext testContext = new TestContext();
-		final ImportanceTransfer dbTransaction = testContext.createDbTransaction();
+		final DbImportanceTransferTransaction dbTransaction = testContext.createDbTransaction();
 
 		final org.nem.nis.dbmodel.Account account = testContext.getSender();
 		this.addToDummyBlock(account, dbTransaction);
 
 		// Act
 		this.importanceTransferDao.save(dbTransaction);
-		final ImportanceTransfer entity = this.importanceTransferDao.findByHash(testContext.getTransactionHash().getRaw());
+		final DbImportanceTransferTransaction entity = this.importanceTransferDao.findByHash(testContext.getTransactionHash().getRaw());
 
 		// Assert:
 		Assert.assertThat(entity, notNullValue());
@@ -69,9 +69,9 @@ public class ImportanceTransferTransactionDaoTest {
 	public void countReturnsProperValue() {
 		// Arrange:
 		final TestContext testContext = new TestContext();
-		final ImportanceTransfer dbTransfer1 = testContext.createDbTransaction();
-		final ImportanceTransfer dbTransfer2 = testContext.createDbTransaction();
-		final ImportanceTransfer dbTransfer3 = testContext.createDbTransaction();
+		final DbImportanceTransferTransaction dbTransfer1 = testContext.createDbTransaction();
+		final DbImportanceTransferTransaction dbTransfer2 = testContext.createDbTransaction();
+		final DbImportanceTransferTransaction dbTransfer3 = testContext.createDbTransaction();
 		final Long initialCount = this.importanceTransferDao.count();
 
 		final org.nem.nis.dbmodel.Account account = testContext.getSender();
@@ -91,11 +91,11 @@ public class ImportanceTransferTransactionDaoTest {
 		Assert.assertThat(count3, equalTo(initialCount + 3));
 	}
 
-	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final ImportanceTransfer... dbTransfers) {
+	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final DbImportanceTransferTransaction... dbTransfers) {
 		final Block block = NisUtils.createDummyDbBlock(account);
 		this.blockDao.save(block);
 
-		for (final ImportanceTransfer importanceTransfer : dbTransfers) {
+		for (final DbImportanceTransferTransaction importanceTransfer : dbTransfers) {
 			importanceTransfer.setBlock(block);
 			importanceTransfer.setBlkIndex(-1);
 			importanceTransfer.setOrderId(-1);
@@ -140,9 +140,9 @@ public class ImportanceTransferTransactionDaoTest {
 			return transferTransaction;
 		}
 
-		public ImportanceTransfer createDbTransaction() {
+		public DbImportanceTransferTransaction createDbTransaction() {
 			return MapperUtils.createModelToDbModelMapper(this.accountDaoLookup)
-					.map(this.transaction, ImportanceTransfer.class);
+					.map(this.transaction, DbImportanceTransferTransaction.class);
 		}
 
 		public org.nem.nis.dbmodel.Account getSender() {
@@ -153,7 +153,7 @@ public class ImportanceTransferTransactionDaoTest {
 			return HashUtils.calculateHash(this.transaction);
 		}
 
-		public void assertTransaction(final ImportanceTransfer entity) {
+		public void assertTransaction(final DbImportanceTransferTransaction entity) {
 			Assert.assertThat(entity.getSender().getPublicKey(), equalTo(this.sender.getAddress().getPublicKey()));
 			Assert.assertThat(entity.getRemote().getPublicKey(), equalTo(this.recipient.getAddress().getPublicKey()));
 			Assert.assertThat(entity.getMode(), equalTo(this.transaction.getMode().value()));

@@ -104,11 +104,11 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 	@Override
 	protected DbMultisigTransaction createDbModel() {
-		final ImportanceTransfer dbTransfer = new ImportanceTransfer();
+		final DbImportanceTransferTransaction dbTransfer = new DbImportanceTransferTransaction();
 		dbTransfer.setMode(1);
 
 		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
-		dbMultisigTransfer.setImportanceTransfer(dbTransfer);
+		dbMultisigTransfer.setImportanceTransferTransaction(dbTransfer);
 		dbMultisigTransfer.setMultisigSignatureTransactions(new HashSet<>());
 		return dbMultisigTransfer;
 	}
@@ -159,9 +159,9 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 		public void addImportanceTransfer() {
 			this.addTransfer(
-					new ImportanceTransfer(),
+					new DbImportanceTransferTransaction(),
 					RandomTransactionFactory.createImportanceTransfer(),
-					DbMultisigTransaction::setImportanceTransfer);
+					DbMultisigTransaction::setImportanceTransferTransaction);
 		}
 
 		public void addSignerModification() {

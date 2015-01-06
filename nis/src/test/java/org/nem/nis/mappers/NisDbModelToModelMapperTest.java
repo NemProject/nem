@@ -78,8 +78,8 @@ public class NisDbModelToModelMapperTest {
 				TransferTransaction.class,
 				3);
 		context.setTransactions(
-				ImportanceTransfer::new,
-				context.dbBlock::setBlockImportanceTransfers,
+				DbImportanceTransferTransaction::new,
+				context.dbBlock::setBlockImportanceTransferTransactions,
 				ImportanceTransferTransaction.class,
 				2);
 		context.setTransactions(

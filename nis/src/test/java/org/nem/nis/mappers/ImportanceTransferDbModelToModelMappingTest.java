@@ -3,21 +3,19 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<ImportanceTransfer, ImportanceTransferTransaction> {
+public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbImportanceTransferTransaction, ImportanceTransferTransaction> {
 
 	@Test
 	public void transferWithActivateModeCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final ImportanceTransfer dbTransfer = context.createDbTransfer(1);
+		final DbImportanceTransferTransaction dbTransfer = context.createDbTransfer(1);
 
 		// Act:
 		final ImportanceTransferTransaction model = context.mapping.map(dbTransfer);
@@ -30,7 +28,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 	public void transferWithDeactivateModeCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final ImportanceTransfer dbTransfer = context.createDbTransfer(2);
+		final DbImportanceTransferTransaction dbTransfer = context.createDbTransfer(2);
 
 		// Act:
 		final ImportanceTransferTransaction model = context.mapping.map(dbTransfer);
@@ -43,7 +41,7 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 	public void transferWithUnknownModeCannotBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final ImportanceTransfer dbTransfer = context.createDbTransfer(3);
+		final DbImportanceTransferTransaction dbTransfer = context.createDbTransfer(3);
 
 		// Act:
 		ExceptionAssert.assertThrows(
@@ -52,14 +50,14 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 	}
 
 	@Override
-	protected ImportanceTransfer createDbModel() {
-		final ImportanceTransfer transfer = new ImportanceTransfer();
+	protected DbImportanceTransferTransaction createDbModel() {
+		final DbImportanceTransferTransaction transfer = new DbImportanceTransferTransaction();
 		transfer.setMode(1);
 		return transfer;
 	}
 
 	@Override
-	protected IMapping<ImportanceTransfer, ImportanceTransferTransaction> createMapping(final IMapper mapper) {
+	protected IMapping<DbImportanceTransferTransaction, ImportanceTransferTransaction> createMapping(final IMapper mapper) {
 		return new ImportanceTransferDbModelToModelMapping(mapper);
 	}
 
@@ -76,8 +74,8 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 			Mockito.when(this.mapper.map(this.dbRemote, Account.class)).thenReturn(this.remote);
 		}
 
-		public ImportanceTransfer createDbTransfer(final Integer mode) {
-			final ImportanceTransfer dbTransfer = new ImportanceTransfer();
+		public DbImportanceTransferTransaction createDbTransfer(final Integer mode) {
+			final DbImportanceTransferTransaction dbTransfer = new DbImportanceTransferTransaction();
 			dbTransfer.setSender(this.dbSender);
 			dbTransfer.setRemote(this.dbRemote);
 			dbTransfer.setMode(mode);

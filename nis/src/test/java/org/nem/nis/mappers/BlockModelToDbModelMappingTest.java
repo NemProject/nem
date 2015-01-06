@@ -76,8 +76,8 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addImportanceTransfer,
-				org.nem.nis.dbmodel.Block::getBlockImportanceTransfers,
-				ImportanceTransfer.class);
+				org.nem.nis.dbmodel.Block::getBlockImportanceTransferTransactions,
+				DbImportanceTransferTransaction.class);
 	}
 
 	@Test
@@ -172,7 +172,7 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 3)));
 		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 
-		transfers = dbModel.getBlockImportanceTransfers();
+		transfers = dbModel.getBlockImportanceTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer4)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 4)));
@@ -191,7 +191,7 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(DbTransferTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(ImportanceTransfer.class));
+		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbImportanceTransferTransaction.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigAggregateModificationTransaction.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigTransaction.class));
 
@@ -338,9 +338,9 @@ public class BlockModelToDbModelMappingTest {
 			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
-		public ImportanceTransfer addImportanceTransfer(final Block block) {
+		public DbImportanceTransferTransaction addImportanceTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createImportanceTransfer();
-			return this.addTransfer(block, transfer, new ImportanceTransfer(), ImportanceTransfer.class);
+			return this.addTransfer(block, transfer, new DbImportanceTransferTransaction(), DbImportanceTransferTransaction.class);
 		}
 
 		public DbMultisigAggregateModificationTransaction addSignerModification(final Block block) {

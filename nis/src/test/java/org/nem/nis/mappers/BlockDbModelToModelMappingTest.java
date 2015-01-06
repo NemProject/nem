@@ -248,9 +248,9 @@ public class BlockDbModelToModelMappingTest {
 
 		public ImportanceTransferTransaction addImportanceTransfer(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockImportanceTransfers().add(dbTransfer),
+					dbTransfer -> block.getBlockImportanceTransferTransactions().add(dbTransfer),
 					blockIndex,
-					new ImportanceTransfer(),
+					new DbImportanceTransferTransaction(),
 					ImportanceTransferTransaction.class);
 		}
 

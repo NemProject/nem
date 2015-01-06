@@ -26,7 +26,7 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "importanceTransferId")
-	private ImportanceTransfer importanceTransfer;
+	private DbImportanceTransferTransaction importanceTransferTransaction;
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "multisigSignerModificationId")
@@ -48,12 +48,12 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 		this.transferTransaction = transferTransaction;
 	}
 
-	public ImportanceTransfer getImportanceTransfer() {
-		return this.importanceTransfer;
+	public DbImportanceTransferTransaction getImportanceTransferTransaction() {
+		return this.importanceTransferTransaction;
 	}
 
-	public void setImportanceTransfer(final ImportanceTransfer importanceTransfer) {
-		this.importanceTransfer = importanceTransfer;
+	public void setImportanceTransferTransaction(final DbImportanceTransferTransaction importanceTransferTransaction) {
+		this.importanceTransferTransaction = importanceTransferTransaction;
 	}
 
 	public DbMultisigAggregateModificationTransaction getMultisigAggregateModificationTransaction() {

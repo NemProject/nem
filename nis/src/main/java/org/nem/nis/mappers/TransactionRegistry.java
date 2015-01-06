@@ -107,12 +107,12 @@ public class TransactionRegistry {
 
 			this.add(new Entry<>(
 					TransactionTypes.IMPORTANCE_TRANSFER,
-					Block::getBlockImportanceTransfers,
-					(block, transfers) -> block.setBlockImportanceTransfers(transfers),
-					DbMultisigTransaction::getImportanceTransfer,
+					Block::getBlockImportanceTransferTransactions,
+					(block, transfers) -> block.setBlockImportanceTransferTransactions(transfers),
+					DbMultisigTransaction::getImportanceTransferTransaction,
 					ImportanceTransferModelToDbModelMapping::new,
 					ImportanceTransferDbModelToModelMapping::new,
-					ImportanceTransfer.class,
+					DbImportanceTransferTransaction.class,
 					ImportanceTransferTransaction.class));
 
 			this.add(new Entry<>(

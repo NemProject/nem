@@ -6,9 +6,9 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
+import org.nem.nis.dbmodel.DbImportanceTransferTransaction;
 
-public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, ImportanceTransfer> {
+public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
 
 	@Test
 	public void transferWithActivateModeCanBeMappedToDbModel() {
@@ -17,7 +17,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferTransaction.Mode.Activate);
 
 		// Act:
-		final ImportanceTransfer dbModel = context.mapping.map(transfer);
+		final DbImportanceTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, 1, transfer);
@@ -30,7 +30,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
-		final ImportanceTransfer dbModel = context.mapping.map(transfer);
+		final DbImportanceTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, 2, transfer);
@@ -69,7 +69,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		}
 
 		public void assertDbModel(
-				final ImportanceTransfer dbModel,
+				final DbImportanceTransferTransaction dbModel,
 				final Integer expectedMode,
 				final ImportanceTransferTransaction model) {
 			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));

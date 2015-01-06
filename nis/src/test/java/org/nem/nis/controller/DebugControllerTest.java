@@ -115,7 +115,7 @@ public class DebugControllerTest {
 		dbBlock.setTimeStamp(block.getTimeStamp().getRawTime());
 		dbBlock.setForgerProof(new byte[64]);
 		dbBlock.setBlockTransferTransactions(new ArrayList<>());
-		dbBlock.setBlockImportanceTransfers(new ArrayList<>());
+		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
 		return dbBlock;
 	}
 

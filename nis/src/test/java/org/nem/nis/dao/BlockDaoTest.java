@@ -81,7 +81,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());
 	}
 
@@ -104,8 +104,8 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), notNullValue());
 	}
 
 	@Test
@@ -133,10 +133,10 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), notNullValue());
 		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().get(0).getId(), notNullValue());
 	}
 
@@ -160,14 +160,14 @@ public class BlockDaoTest {
 		final Block dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
-		dbBlock.getBlockImportanceTransfers().get(0).setBlkIndex(24);
-		dbBlock.getBlockImportanceTransfers().get(1).setBlkIndex(12);
+		dbBlock.getBlockImportanceTransferTransactions().get(0).setBlkIndex(24);
+		dbBlock.getBlockImportanceTransferTransactions().get(1).setBlkIndex(12);
 
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), equalTo(12));
 	}
 
 	@Test
@@ -296,8 +296,8 @@ public class BlockDaoTest {
 		emptyBlock.addTransaction(importanceTransfer2);
 		emptyBlock.sign();
 		final Block dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
-		dbBlock.getBlockImportanceTransfers().get(0).setBlkIndex(24);
-		dbBlock.getBlockImportanceTransfers().get(1).setBlkIndex(12);
+		dbBlock.getBlockImportanceTransferTransactions().get(0).setBlkIndex(24);
+		dbBlock.getBlockImportanceTransferTransactions().get(1).setBlkIndex(12);
 
 		this.blockDao.save(dbBlock);
 		// Act:
@@ -307,12 +307,12 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(2));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(2));
 
-		final Hash h1 = entity.getBlockImportanceTransfers().get(0).getTransferHash();
-		final Hash h2 = entity.getBlockImportanceTransfers().get(1).getTransferHash();
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(entity.getBlockImportanceTransfers().get(1).getBlkIndex(), equalTo(12));
+		final Hash h1 = entity.getBlockImportanceTransferTransactions().get(0).getTransferHash();
+		final Hash h2 = entity.getBlockImportanceTransferTransactions().get(1).getTransferHash();
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), equalTo(12));
 		Assert.assertThat(h1, equalTo(HashUtils.calculateHash(importanceTransfer1)));
 		Assert.assertThat(h2, equalTo(HashUtils.calculateHash(importanceTransfer2)));
 	}

@@ -8,7 +8,7 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a db importance transfer to a model importance transfer transaction.
  */
-public class ImportanceTransferDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<ImportanceTransfer, ImportanceTransferTransaction> {
+public class ImportanceTransferDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbImportanceTransferTransaction, ImportanceTransferTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -21,7 +21,7 @@ public class ImportanceTransferDbModelToModelMapping extends AbstractTransferDbM
 	}
 
 	@Override
-	public ImportanceTransferTransaction mapImpl(final ImportanceTransfer source) {
+	public ImportanceTransferTransaction mapImpl(final DbImportanceTransferTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 		final Account remote = this.mapper.map(source.getRemote(), Account.class);
 
