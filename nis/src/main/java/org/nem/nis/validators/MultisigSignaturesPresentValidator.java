@@ -71,7 +71,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		return ValidationResult.SUCCESS;
 	}
 
-	private static Address getRemovedAddress(MultisigTransaction transaction) {
+	private static Address getRemovedAddress(final MultisigTransaction transaction) {
 		Address accountForRemoval = null;
 		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION) {
 			final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();

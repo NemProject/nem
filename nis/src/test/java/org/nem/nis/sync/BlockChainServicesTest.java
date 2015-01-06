@@ -33,7 +33,7 @@ public class BlockChainServicesTest {
 		assertBasicChainWithMultisig(true, true);
 	}
 
-	private void assertBasicChainWithMultisig(boolean validationResult, boolean issuedByCosignatory) {
+	private static void assertBasicChainWithMultisig(final boolean validationResult, final boolean issuedByCosignatory) {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));

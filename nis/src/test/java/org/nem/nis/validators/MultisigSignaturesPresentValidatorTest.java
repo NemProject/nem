@@ -118,25 +118,25 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void removalOfMultisigDoesNotRequireHisSignatureButRequireAllOthers() {
-		assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.SUCCESS, true, true);
+		this.assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.SUCCESS, true, true);
 	}
 
 	@Test
 	public void removalOfMultisigDoesNotRequireHisSignature() {
-		assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.SUCCESS, false, false);
+		this.assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.SUCCESS, false, false);
 	}
 
 	@Test
 	public void validationOfRemovalFailsIfAdditionalIsNotPresent() {
-		assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS, true, false);
+		this.assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS, true, false);
 	}
 
-	public void assertRemovalOfMultisigDoesNotRequireHisSignature(final ValidationResult validationResult, boolean needThirdCosigner, boolean addSignatureOfThirdCosigner) {
+	public void assertRemovalOfMultisigDoesNotRequireHisSignature(final ValidationResult validationResult, final boolean needThirdCosigner, final boolean addSignatureOfThirdCosigner) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigModificationTransaction(
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy))
-		);
+				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
+
 		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
 		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
 
