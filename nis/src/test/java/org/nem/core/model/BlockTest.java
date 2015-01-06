@@ -358,9 +358,15 @@ public class BlockTest {
 		final Block block = BlockUtils.createBlock();
 
 		final Transaction innerTransaction = BlockUtils.createTransactionWithFee(1_000000);
-		final MultisigSignatureTransaction sig1 = new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction sig1 = new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				HashUtils.calculateHash(innerTransaction));
 		sig1.setFee(Amount.fromNem(3));
-		final MultisigSignatureTransaction sig2 = new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction sig2 = new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				HashUtils.calculateHash(innerTransaction));
 		sig2.setFee(Amount.fromNem(5));
 		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), innerTransaction);
 		transaction.addSignature(sig1);

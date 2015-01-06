@@ -144,7 +144,10 @@ public class TransactionFactoryTest {
 		final Transaction originalTransaction = createMultisigAggregateModificationTransaction();
 
 		// Assert:
-		assertCanDeserializeNonVerifiable(originalTransaction, MultisigAggregateModificationTransaction.class, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
+		assertCanDeserializeNonVerifiable(
+				originalTransaction,
+				MultisigAggregateModificationTransaction.class,
+				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 	}
 
 	private static Transaction createMultisigAggregateModificationTransaction() {

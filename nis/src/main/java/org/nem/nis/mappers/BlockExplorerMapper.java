@@ -5,7 +5,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.controller.viewmodels.*;
-import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.dbmodel.*;
 
 /**

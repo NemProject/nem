@@ -79,7 +79,10 @@ public class BlockScorerITCase {
 				// This will not happen in our network
 				secondsBetweenBlocks[i] = 1;
 			}
-			blocks[i] = new Block(harvesterAccounts[index], blocks[i - 1], new TimeInstant(blocks[i - 1].getTimeStamp().getRawTime() + secondsBetweenBlocks[i]));
+			blocks[i] = new Block(
+					harvesterAccounts[index],
+					blocks[i - 1],
+					new TimeInstant(blocks[i - 1].getTimeStamp().getRawTime() + secondsBetweenBlocks[i]));
 			blocks[i].setDifficulty(block.getDifficulty());
 			historicalBlocks.add(blocks[i]);
 			if (historicalBlocks.size() > BlockScorer.NUM_BLOCKS_FOR_AVERAGE_CALCULATION) {
@@ -305,8 +308,9 @@ public class BlockScorerITCase {
 			//LOGGER.info("score " + selfishHarvesterScore + " vs " + normalHarvesterScore);
 		}
 
-		LOGGER.info("selfish harvester (" + (selfishHarvesterBalance * 100L) / (normalHarvesterBalance + selfishHarvesterBalance) + "% of all nem) wins in:   " +
-				(selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvesterWins) + "%.");
+		final long selfishHarvesterBalancePercent = (selfishHarvesterBalance * 100L) / (normalHarvesterBalance + selfishHarvesterBalance);
+		final int selfishHarvesterWinsPercent = (selfishHarvesterWins * 100) / (selfishHarvesterWins + normalHarvesterWins);
+		LOGGER.info("selfish harvester (" + selfishHarvesterBalancePercent + "% of all nem) wins in:   " + selfishHarvesterWinsPercent + "%.");
 		return selfishHarvesterWins;
 	}
 

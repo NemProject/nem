@@ -1,30 +1,21 @@
 package org.nem.nis.dao;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.TransferTransaction;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.DbAccount;
-import org.nem.nis.dbmodel.DbBlock;
-import org.nem.nis.dbmodel.DbTransferTransaction;
-import org.nem.nis.mappers.AccountDaoLookup;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 @ContextConfiguration(classes = IntegrationTestConf.class)
@@ -71,7 +62,8 @@ public class TransferDaoITCase {
 			this.addMapping(mockAccountDao, recipient);
 			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-				final DbTransferTransaction dbTransfer = MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transferTransaction, DbTransferTransaction.class);
+				final DbTransferTransaction dbTransfer = MapperUtils.createModelToDbModelMapper(accountDaoLookup)
+						.map(transferTransaction, DbTransferTransaction.class);
 				dbTransfer.setBlkIndex(12345);
 				dbTransfer.setOrderId(i - 1);
 				hashes.add(dbTransfer.getTransferHash());

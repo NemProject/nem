@@ -1,10 +1,8 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Block;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.DbMultisigTransaction;
 
 import java.util.*;
 

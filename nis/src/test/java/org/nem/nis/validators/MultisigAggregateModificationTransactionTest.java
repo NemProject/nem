@@ -3,19 +3,13 @@ package org.nem.nis.validators;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.nem.core.model.*;
-import org.nem.core.model.observers.Notification;
-import org.nem.core.model.observers.TransactionObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.ExceptionAssert;
-import org.nem.core.test.NotificationUtils;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @RunWith(Enclosed.class)
 public class MultisigAggregateModificationTransactionTest {

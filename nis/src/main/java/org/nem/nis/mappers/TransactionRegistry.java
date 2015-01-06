@@ -2,8 +2,6 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.DbBlock;
-import org.nem.nis.dbmodel.DbMultisigTransaction;
 
 import java.util.*;
 import java.util.function.*;

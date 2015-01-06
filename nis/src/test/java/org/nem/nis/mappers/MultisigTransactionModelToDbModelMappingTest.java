@@ -3,9 +3,7 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.Account;
 import org.nem.core.model.*;
-import org.nem.core.model.MultisigTransaction;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
@@ -158,7 +156,8 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		public void addMultisigModification() {
 			this.otherTransaction = RandomTransactionFactory.createMultisigModification();
 			this.expectedMultisigModification = new DbMultisigAggregateModificationTransaction();
-			Mockito.when(this.mapper.map(this.otherTransaction, DbMultisigAggregateModificationTransaction.class)).thenReturn(this.expectedMultisigModification);
+			Mockito.when(this.mapper.map(this.otherTransaction, DbMultisigAggregateModificationTransaction.class))
+					.thenReturn(this.expectedMultisigModification);
 		}
 
 		public MultisigTransaction createModel() {

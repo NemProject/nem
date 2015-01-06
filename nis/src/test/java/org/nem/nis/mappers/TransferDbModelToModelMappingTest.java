@@ -7,8 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.DbAccount;
-import org.nem.nis.dbmodel.DbTransferTransaction;
+import org.nem.nis.dbmodel.*;
 
 public class TransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbTransferTransaction, TransferTransaction> {
 

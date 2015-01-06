@@ -5,8 +5,7 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MultisigAggregateModificationTransactionValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
@@ -36,7 +35,7 @@ public class MultisigAggregateModificationTransactionValidator implements Single
 		 * This validator is also used in UnconfirmedTransactions, so multiple AggregateModificationTransaction,
 		 * won't be added to UnconfirmedTransactions.
 		 */
-		if (! this.multisigModificationSenders.add(transaction.getSigner().getAddress())) {
+		if (!this.multisigModificationSenders.add(transaction.getSigner().getAddress())) {
 			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
 		}
 

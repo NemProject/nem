@@ -146,7 +146,7 @@ public class MultisigSignaturesPresentValidatorTest {
 			context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
 
 			if (addSignatureOfThirdCosigner) {
-				context.addSignature(thirdAccount, (MultisigTransaction) transaction);
+				context.addSignature(thirdAccount, (MultisigTransaction)transaction);
 			}
 		}
 
@@ -171,5 +171,4 @@ public class MultisigSignaturesPresentValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
-
 }

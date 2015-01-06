@@ -182,12 +182,16 @@ public class BlockDaoImpl implements BlockDao {
 
 		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", (v) -> {});
 		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", (v) -> {});
-		this.dropTransfers(blockHeight, "DbMultisigAggregateModificationTransaction", "blockMultisigAggregateModificationTransactions", (transactionsToDelete) -> {
-			final Query preQuery = this.getCurrentSession()
-					.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
-					.setParameterList("ids", transactionsToDelete);
-			preQuery.executeUpdate();
-		});
+		this.dropTransfers(
+				blockHeight,
+				"DbMultisigAggregateModificationTransaction",
+				"blockMultisigAggregateModificationTransactions",
+				(transactionsToDelete) -> {
+					final Query preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+				});
 
 		// must be last
 		this.dropTransfers(blockHeight, "DbMultisigTransaction", "blockMultisigTransactions", (v) -> {});

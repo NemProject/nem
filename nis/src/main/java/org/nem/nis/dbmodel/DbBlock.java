@@ -192,13 +192,11 @@ public class DbBlock {
 		this.blockImportanceTransferTransactions = blockImportanceTransferTransactions;
 	}
 
-	public List<DbMultisigAggregateModificationTransaction> getBlockMultisigAggregateModificationTransactions()
-	{
+	public List<DbMultisigAggregateModificationTransaction> getBlockMultisigAggregateModificationTransactions() {
 		return this.blockMultisigAggregateModificationTransactions;
 	}
 
-	public void setBlockMultisigAggregateModificationTransactions(final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions)
-	{
+	public void setBlockMultisigAggregateModificationTransactions(final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions) {
 		this.blockMultisigAggregateModificationTransactions = blockMultisigAggregateModificationTransactions;
 	}
 

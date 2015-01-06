@@ -6,8 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.DbAccount;
-import org.nem.nis.dbmodel.DbImportanceTransferTransaction;
+import org.nem.nis.dbmodel.*;
 
 public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
 

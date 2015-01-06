@@ -1,8 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.DbAccount;
-import org.nem.nis.dbmodel.DbTransferTransaction;
+import org.nem.nis.dbmodel.*;
 
 /**
  * A mapping that is able to map a model transfer transaction to a db transfer.

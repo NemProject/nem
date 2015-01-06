@@ -3,10 +3,7 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.model.*;
-import org.nem.core.model.MultisigTransaction;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dbmodel.*;
 

@@ -1,12 +1,9 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.MultisigAggregateModificationTransaction;
-import org.nem.nis.dbmodel.DbAccount;
-import org.nem.nis.dbmodel.DbMultisigAggregateModificationTransaction;
-import org.nem.nis.dbmodel.DbMultisigModification;
+import org.nem.nis.dbmodel.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A mapping that is able to map a model multisig signer modification transaction to a db multisig signer modification transfer.
