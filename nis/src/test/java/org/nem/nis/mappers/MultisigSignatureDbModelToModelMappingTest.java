@@ -9,7 +9,7 @@ import org.nem.core.model.Account;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.MultisigTransaction;
+import org.nem.nis.dbmodel.DbMultisigTransaction;
 
 public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
 
@@ -41,7 +41,7 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 
 	@Override
 	protected DbMultisigSignatureTransaction createDbModel() {
-		final MultisigTransaction dbMultisigTransfer = new MultisigTransaction();
+		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 		dbMultisigTransfer.setTransfer(new Transfer());
 		final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
 		dbSignature.setMultisigTransaction(dbMultisigTransfer);
@@ -68,7 +68,7 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 			final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
 			dbSignature.setTimeStamp(4444);
 			dbSignature.setSender(this.dbSender);
-			dbSignature.setMultisigTransaction(new MultisigTransaction());
+			dbSignature.setMultisigTransaction(new DbMultisigTransaction());
 
 			final Transfer dbTransfer = new Transfer();
 			dbTransfer.setTransferHash(this.otherTransactionHash);

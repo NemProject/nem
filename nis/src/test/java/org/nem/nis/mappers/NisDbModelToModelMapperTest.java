@@ -88,7 +88,7 @@ public class NisDbModelToModelMapperTest {
 				MultisigAggregateModificationTransaction.class,
 				1);
 		context.setTransactions(
-				org.nem.nis.dbmodel.MultisigTransaction::new,
+				DbMultisigTransaction::new,
 				context.dbBlock::setBlockMultisigTransactions,
 				MultisigTransaction.class,
 				2);

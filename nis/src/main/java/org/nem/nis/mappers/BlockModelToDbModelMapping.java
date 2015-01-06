@@ -4,10 +4,9 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.MultisigTransaction;
+import org.nem.nis.dbmodel.DbMultisigTransaction;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 /**
  * A mapping that is able to map a model block to a db block.
@@ -101,8 +100,8 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 			dbTransfer.setBlkIndex(this.blockIndex);
 			dbTransfer.setBlock(this.dbBlock);
 
-			if (dbTransfer instanceof MultisigTransaction) {
-				final MultisigTransaction dbMultisigTransfer = (MultisigTransaction)dbTransfer;
+			if (dbTransfer instanceof DbMultisigTransaction) {
+				final DbMultisigTransaction dbMultisigTransfer = (DbMultisigTransaction)dbTransfer;
 				for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 					final AbstractBlockTransfer dbInnerTransfer = entry.getFromMultisig.apply(dbMultisigTransfer);
 					if (null == dbInnerTransfer) {

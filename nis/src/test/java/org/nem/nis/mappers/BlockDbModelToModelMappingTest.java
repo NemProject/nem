@@ -266,7 +266,7 @@ public class BlockDbModelToModelMappingTest {
 			return this.addTransfer(
 					dbTransfer -> block.getBlockMultisigTransactions().add(dbTransfer),
 					blockIndex,
-					new org.nem.nis.dbmodel.MultisigTransaction(),
+					new DbMultisigTransaction(),
 					org.nem.core.model.MultisigTransaction.class);
 		}
 

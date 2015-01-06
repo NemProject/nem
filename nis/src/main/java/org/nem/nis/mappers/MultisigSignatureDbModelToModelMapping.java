@@ -30,7 +30,7 @@ public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbMo
 	}
 
 	// TODO 20150104 J-J: should refactor this somewhere
-	private static AbstractTransfer getInnerTransaction(final org.nem.nis.dbmodel.MultisigTransaction source) {
+	private static AbstractTransfer getInnerTransaction(final DbMultisigTransaction source) {
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			final AbstractTransfer transaction = entry.getFromMultisig.apply(source);
 			if (null != transaction) {

@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "multisigtransactions")
-public class MultisigTransaction extends AbstractBlockTransfer<MultisigTransaction> {
+public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTransaction> {
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "transferId")
 	private Transfer transfer;
@@ -36,7 +36,7 @@ public class MultisigTransaction extends AbstractBlockTransfer<MultisigTransacti
 	@LazyCollection(LazyCollectionOption.FALSE)
 	private Set<DbMultisigSignatureTransaction> multisigSignatureTransactions;
 
-	public MultisigTransaction() {
+	public DbMultisigTransaction() {
 		super(b -> b.getBlockMultisigTransactions());
 	}
 

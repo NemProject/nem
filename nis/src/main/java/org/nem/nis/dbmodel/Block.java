@@ -69,7 +69,7 @@ public class Block {
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<MultisigTransaction> blockMultisigTransactions;
+	private List<DbMultisigTransaction> blockMultisigTransactions;
 
 	public Long getId() {
 		return this.id;
@@ -202,11 +202,11 @@ public class Block {
 		this.blockMultisigAggregateModificationTransactions = blockMultisigAggregateModificationTransactions;
 	}
 
-	public List<MultisigTransaction> getBlockMultisigTransactions() {
+	public List<DbMultisigTransaction> getBlockMultisigTransactions() {
 		return blockMultisigTransactions;
 	}
 
-	public void setBlockMultisigTransactions(final List<MultisigTransaction> blockMultisigTransactions) {
+	public void setBlockMultisigTransactions(final List<DbMultisigTransaction> blockMultisigTransactions) {
 		this.blockMultisigTransactions = blockMultisigTransactions;
 	}
 }

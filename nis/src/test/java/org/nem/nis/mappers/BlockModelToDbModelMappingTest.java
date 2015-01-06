@@ -95,7 +95,7 @@ public class BlockModelToDbModelMappingTest {
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addMultisigTransfer,
 				org.nem.nis.dbmodel.Block::getBlockMultisigTransactions,
-				org.nem.nis.dbmodel.MultisigTransaction.class);
+				DbMultisigTransaction.class);
 	}
 
 	private static void assertBlockWithTransfersCanBeMappedToDbModel(
@@ -193,7 +193,7 @@ public class BlockModelToDbModelMappingTest {
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(Transfer.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(ImportanceTransfer.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigAggregateModificationTransaction.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(org.nem.nis.dbmodel.MultisigTransaction.class));
+		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigTransaction.class));
 
 		// Sanity:
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
@@ -348,19 +348,19 @@ public class BlockModelToDbModelMappingTest {
 			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);
 		}
 
-		public org.nem.nis.dbmodel.MultisigTransaction addMultisigTransfer(final Block block) {
+		public DbMultisigTransaction addMultisigTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, new org.nem.nis.dbmodel.MultisigTransaction(), org.nem.nis.dbmodel.MultisigTransaction.class);
+			return this.addTransfer(block, multisigTransfer, new DbMultisigTransaction(), DbMultisigTransaction.class);
 		}
 
-		public org.nem.nis.dbmodel.MultisigTransaction addMultisigTransfer(final Block block, final Transfer dbInnerTransfer) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbMultisigTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
+		public DbMultisigTransaction addMultisigTransfer(final Block block, final Transfer dbInnerTransfer) {
+			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 			dbMultisigTransfer.setTransfer(dbInnerTransfer);
 
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, org.nem.nis.dbmodel.MultisigTransaction.class);
+			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, DbMultisigTransaction.class);
 		}
 
 		public Transfer addUnsupportedTransfer(final Block block) {

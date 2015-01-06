@@ -139,7 +139,7 @@ public class BlockMapperTest {
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
+			final DbMultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -163,7 +163,7 @@ public class BlockMapperTest {
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(1));
 
-		final org.nem.nis.dbmodel.MultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(0);
+		final DbMultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(0);
 		final Transaction transaction = context.getModel().getTransactions().get(0);
 		Assert.assertThat(dbMultisig.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 
@@ -465,14 +465,14 @@ public class BlockMapperTest {
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 		for (int i = 0; i < 2; ++i) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
+			final DbMultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(2 * i + 1);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 
 		// WARNING: if test fails here it means you've changed order of TXes inside the dbModel
 		for (int i = 0; i < 2; ++i) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(i);
+			final DbMultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(i);
 			// transfer that "belongs" to multisig
 			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2 * i + 1);
 

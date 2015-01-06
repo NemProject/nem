@@ -14,7 +14,7 @@ import org.nem.nis.test.RandomTransactionFactory;
 import java.util.*;
 import java.util.function.*;
 
-public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigTransaction, org.nem.nis.dbmodel.MultisigTransaction> {
+public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigTransaction, DbMultisigTransaction> {
 
 	//region supported multisig transfer types
 
@@ -51,7 +51,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		final MultisigTransaction model = context.createModel();
 
 		// Act:
-		final org.nem.nis.dbmodel.MultisigTransaction dbModel = context.mapping.map(model);
+		final DbMultisigTransaction dbModel = context.mapping.map(model);
 
 		// Assert:
 		context.assertDbModel(dbModel, 0);
@@ -80,7 +80,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		final MultisigTransaction model = context.createModel();
 
 		// Act:
-		final org.nem.nis.dbmodel.MultisigTransaction dbModel = context.mapping.map(model);
+		final DbMultisigTransaction dbModel = context.mapping.map(model);
 
 		// Assert:
 		context.assertDbModel(dbModel, 1);
@@ -97,7 +97,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		final MultisigTransaction model = context.createModel();
 
 		// Act:
-		final org.nem.nis.dbmodel.MultisigTransaction dbModel = context.mapping.map(model);
+		final DbMultisigTransaction dbModel = context.mapping.map(model);
 
 		// Assert:
 		context.assertDbModel(dbModel, 3);
@@ -109,7 +109,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 	}
 
 	@Override
-	protected IMapping<MultisigTransaction, org.nem.nis.dbmodel.MultisigTransaction> createMapping(final IMapper mapper) {
+	protected IMapping<MultisigTransaction, DbMultisigTransaction> createMapping(final IMapper mapper) {
 		return new MultisigTransactionModelToDbModelMapping(mapper);
 	}
 
@@ -170,7 +170,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			return model;
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.MultisigTransaction dbModel, final int numExpectedSignatures) {
+		public void assertDbModel(final DbMultisigTransaction dbModel, final int numExpectedSignatures) {
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getTransfer(), IsEqual.equalTo(this.expectedTransfer));

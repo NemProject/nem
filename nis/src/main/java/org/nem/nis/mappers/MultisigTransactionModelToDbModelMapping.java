@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * A mapping that is able to map a multisig transaction to a db multisig transaction.
  */
-public class MultisigTransactionModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigTransaction, org.nem.nis.dbmodel.MultisigTransaction> {
+public class MultisigTransactionModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigTransaction, DbMultisigTransaction> {
 
 	/**
 	 * Creates a new mapping.
@@ -22,8 +22,8 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.MultisigTransaction mapImpl(final MultisigTransaction source) {
-		final org.nem.nis.dbmodel.MultisigTransaction dbMultisigTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
+	public DbMultisigTransaction mapImpl(final MultisigTransaction source) {
+		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 		dbMultisigTransfer.setReferencedTransaction(0L);
 
 		// TODO 20150104 J-J: move to registry (hopefully)

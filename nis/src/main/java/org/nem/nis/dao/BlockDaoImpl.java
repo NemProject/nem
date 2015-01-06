@@ -190,7 +190,7 @@ public class BlockDaoImpl implements BlockDao {
 		});
 
 		// must be last
-		this.dropTransfers(blockHeight, "MultisigTransaction", "blockMultisigTransactions", (v) -> {});
+		this.dropTransfers(blockHeight, "DbMultisigTransaction", "blockMultisigTransactions", (v) -> {});
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from Block a where a.height > :height")
