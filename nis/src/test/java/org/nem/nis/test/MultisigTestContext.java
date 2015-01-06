@@ -46,6 +46,19 @@ public class MultisigTestContext {
 		return transaction;
 	}
 
+	public MultisigTransaction createMultisigModificationTransaction(final Collection<MultisigModification> modifications) {
+		final MultisigAggregateModificationTransaction otherTransaction = new MultisigAggregateModificationTransaction(
+				TimeInstant.ZERO,
+				this.multisig,
+				modifications);
+
+		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);
+		transaction.sign();
+
+		this.transactionList.add(transaction);
+		return transaction;
+	}
+
 	public MultisigTransaction createMultisigTransferTransaction() {
 		final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, this.multisig, this.recipient, Amount.fromNem(123), null);
 		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);

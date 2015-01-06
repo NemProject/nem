@@ -9,6 +9,7 @@ import org.nem.core.test.Utils;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
 
+import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 public class MultisigSignaturesPresentValidatorTest {
@@ -83,6 +84,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(context.signer, context.multisig, blockHeight);
 		context.makeCosignatory(context.dummy, context.multisig, blockHeight);
 		// TODO 20150103 J-G: so, by default, there is a cosignatory added for multisig (signer)
+		// TODO 20150106 G-J: issuer of multisig TX "counts" as one of signatures, not sure if that answers your question
 
 		addSignature.accept(context, transaction);
 
@@ -113,5 +115,61 @@ public class MultisigSignaturesPresentValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS));
 	}
 	//endregion
-	// TODO 20150103 J-G: definitely need tests around delete
+
+	@Test
+	public void removalOfMultisigDoesNotRequireHisSignatureButRequireAllOthers() {
+		assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.SUCCESS, true, true);
+	}
+
+	@Test
+	public void removalOfMultisigDoesNotRequireHisSignature() {
+		assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.SUCCESS, false, false);
+	}
+
+	@Test
+	public void validationOfRemovalFailsIfAdditionalIsNotPresent() {
+		assertRemovalOfMultisigDoesNotRequireHisSignature(ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS, true, false);
+	}
+
+	public void assertRemovalOfMultisigDoesNotRequireHisSignature(final ValidationResult validationResult, boolean needThirdCosigner, boolean addSignatureOfThirdCosigner) {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Transaction transaction = context.createMultisigModificationTransaction(
+				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy))
+		);
+		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+
+		if (needThirdCosigner) {
+			final Account thirdAccount = Utils.generateRandomAccount();
+			context.addState(thirdAccount);
+			context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
+
+			if (addSignatureOfThirdCosigner) {
+				context.addSignature(thirdAccount, (MultisigTransaction) transaction);
+			}
+		}
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(validationResult));
+	}
+
+	@Test
+	public void onlyCosignerCanRemoveHimself() {
+		final MultisigTestContext context = new MultisigTestContext();
+		final Transaction transaction = context.createMultisigModificationTransaction(
+				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.signer))
+		);
+		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
 }

@@ -33,40 +33,36 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
 		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
 		// TODO 20150103 J-G: why are you special casing this (unlikely) case?
+		// TODO 20150106 G-J: to skip all the unneeded processing
 		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {
 			return ValidationResult.SUCCESS;
 		}
 
 		// TODO 20150103 J-G: do you have a validator that prevents all cosigner accounts from being removed?
-
-		// TODO 20150103 J-G: consider refactoring this block into a separate function
-		Address accountForRemoval = null;
-		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION) {
-			final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();
-			final List<Address> removal = modificationTransaction.getModifications().stream()
-					.filter(m -> m.getModificationType() == MultisigModificationType.Del)
-					.map(m -> m.getCosignatory().getAddress())
-					.collect(Collectors.toList());
-			if (removal.size() == 1) {
-				accountForRemoval = removal.get(0);
-			}
-		}
+		// TODO 20150106 G-J: if you mean via single modification (and therefore block) - than yes,
+		// > code below allows only single Del per modification
+		// > if you mean at all (span across many blocks) - than no, but keep in mind Del can only be made
+		// > via multisig transaction. Hopefully after removing all cosignatories, account should become
+		// > operable again...
+		final Address accountForRemoval = getRemovedAddress(transaction);
 
 		final Hash transactionHash = transaction.getOtherTransactionHash();
 		// this loop could be done using reduce, but I'm leaving it like this for readability
 		// TODO: this probably should be done differently, as right now it allows more MultisigSignatures, than there are actual cosigners
 		for (final Address cosignerAddress : multisigAddress.getMultisigLinks().getCosignatories()) {
 			// TODO 20150103 J-G: what is the purpose of this check
+			// TODO 20150106 G-J:MultisigTransaction itself is issued by one of cosigners and therefore it is counted as one of signatures
+			// > it would be dumb to require issuer to attach Signature too...
 			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
 				continue;
 			}
 
-			// TODO 20150103 J-G: you can probably just use equals
-			if (accountForRemoval != null && cosignerAddress.equals(accountForRemoval)) {
+			if (cosignerAddress.equals(accountForRemoval)) {
 				continue;
 			}
 
 			// TODO 20150103 J-G: you can probably check t.getOtherTransactionHash().equals(transactionHash) outside of this loop
+			// TODO 20150106 G-J: o0? this checks if hashes in signatures actually match current TX
 			final boolean hasCosigner = transaction.getCosignerSignatures().stream()
 					.anyMatch(
 							t -> t.getOtherTransactionHash().equals(transactionHash) &&
@@ -79,5 +75,20 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private Address getRemovedAddress(MultisigTransaction transaction) {
+		Address accountForRemoval = null;
+		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION) {
+			final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();
+			final List<Address> removal = modificationTransaction.getModifications().stream()
+					.filter(m -> m.getModificationType() == MultisigModificationType.Del)
+					.map(m -> m.getCosignatory().getAddress())
+					.collect(Collectors.toList());
+			if (removal.size() == 1) {
+				accountForRemoval = removal.get(0);
+			}
+		}
+		return accountForRemoval;
 	}
 }
