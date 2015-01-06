@@ -2,10 +2,8 @@ package org.nem.nis.dao;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.nis.dbmodel.Account;
-import org.nem.nis.dbmodel.Block;
-import org.nem.nis.dbmodel.ImportanceTransfer;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
@@ -53,8 +51,13 @@ public class IntegrationTestConf {
 
 		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(Transfer.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(ImportanceTransfer.class);
+
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
+		}
+		
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 
