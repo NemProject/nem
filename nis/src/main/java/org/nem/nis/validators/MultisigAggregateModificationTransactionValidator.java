@@ -30,6 +30,7 @@ public class MultisigAggregateModificationTransactionValidator implements Single
 	}
 
 	private ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
+		// TODO 20140106 J-G: should add test for this
 		/**
 		 * We don't want to allow multiple AggregateModificationTransaction from single account, this handles it.
 		 * This validator is also used in UnconfirmedTransactions, so multiple AggregateModificationTransaction,

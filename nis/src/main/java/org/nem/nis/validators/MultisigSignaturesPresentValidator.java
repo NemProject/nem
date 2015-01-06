@@ -38,12 +38,6 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 			return ValidationResult.SUCCESS;
 		}
 
-		// TODO 20150103 J-G: do you have a validator that prevents all cosigner accounts from being removed?
-		// TODO 20150106 G-J: if you mean via single modification (and therefore block) - than yes,
-		// > code below allows only single Del per modification
-		// > if you mean at all (span across many blocks) - than no, but keep in mind Del can only be made
-		// > via multisig transaction. Hopefully after removing all cosignatories, account should become
-		// > operable again...
 		final Address accountForRemoval = getRemovedAddress(transaction);
 
 		final Hash transactionHash = transaction.getOtherTransactionHash();
@@ -77,7 +71,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		return ValidationResult.SUCCESS;
 	}
 
-	private Address getRemovedAddress(MultisigTransaction transaction) {
+	private static Address getRemovedAddress(MultisigTransaction transaction) {
 		Address accountForRemoval = null;
 		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION) {
 			final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();

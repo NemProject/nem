@@ -1270,6 +1270,7 @@ public class UnconfirmedTransactionsTest {
 				.collect(Collectors.toList());
 	}
 
+	// TODO 20150106 J-G: should we share the same test context between this class and the multisig variant?
 	private static class TestContext {
 		private final AggregateSingleTransactionValidatorBuilder singleTransactionValidatorBuilder;
 		private final SingleTransactionValidator singleValidator;
