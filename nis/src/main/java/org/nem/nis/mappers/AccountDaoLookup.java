@@ -1,7 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.Address;
-import org.nem.nis.dbmodel.Account;
+import org.nem.nis.dbmodel.DbAccount;
 
 /**
  * An interface for looking up dao accounts.
@@ -14,5 +14,5 @@ public interface AccountDaoLookup {
 	 * @param id The account id.
 	 * @return The account with the specified id.
 	 */
-	public Account findByAddress(final Address id);
+	public DbAccount findByAddress(final Address id);
 }

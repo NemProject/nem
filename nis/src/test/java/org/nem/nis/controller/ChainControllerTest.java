@@ -13,6 +13,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.dbmodel.DbTransferTransaction;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
@@ -297,7 +298,7 @@ public class ChainControllerTest {
 
 	private static DbTransferTransaction createDbTransferWithTimeStamp(final int timeStamp) {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
+		final DbAccount account = new DbAccount();
 		account.setPrintableKey(address.getEncoded());
 		account.setPublicKey(address.getPublicKey());
 		final DbTransferTransaction dbTransfer = new DbTransferTransaction();

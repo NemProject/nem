@@ -14,6 +14,7 @@ import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.state.AccountState;
 import org.nem.peer.PeerNetwork;
@@ -109,7 +110,7 @@ public class DebugControllerTest {
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
 		dbBlock.setPrevBlockHash(block.getPreviousBlockHash());
 		dbBlock.setGenerationHash(block.getGenerationHash());
-		dbBlock.setForger(new org.nem.nis.dbmodel.Account(signerAddress.getEncoded(), signerAddress.getPublicKey()));
+		dbBlock.setForger(new DbAccount(signerAddress.getEncoded(), signerAddress.getPublicKey()));
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setHeight(block.getHeight().getRaw());
 		dbBlock.setTimeStamp(block.getTimeStamp().getRawTime());

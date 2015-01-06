@@ -4,6 +4,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
+import org.nem.nis.dbmodel.DbAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.*;
@@ -15,7 +16,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTests {
+public class DbAccountDaoTest extends AbstractTransactionalJUnit4SpringContextTests {
 
 	@Autowired
 	AccountDao accountDao;
@@ -24,7 +25,7 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 	public void canSaveAccount() {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		final org.nem.nis.dbmodel.Account entity = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount entity = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 
 		// Act:
 		this.accountDao.save(entity);
@@ -37,11 +38,11 @@ public class AccountDaoTest extends AbstractTransactionalJUnit4SpringContextTest
 	public void canRetrieveSavedAccount() {
 		// Arrange
 		final Account account = Utils.generateRandomAccount();
-		final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbAccount = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 
 		// Act:
 		this.accountDao.save(dbAccount);
-		final org.nem.nis.dbmodel.Account entity = this.accountDao.getAccountByPrintableAddress(dbAccount.getPrintableKey());
+		final DbAccount entity = this.accountDao.getAccountByPrintableAddress(dbAccount.getPrintableKey());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());

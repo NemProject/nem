@@ -46,7 +46,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			this.add(new Entry<>(
 					(lookup, mapper) -> new AccountModelToDbModelMapping(lookup),
 					(lookup, mapper) -> new AccountDbModelToModelMapping(lookup),
-					org.nem.nis.dbmodel.Account.class,
+					DbAccount.class,
 					Account.class));
 			this.add(new Entry<>(
 					(lookup, mapper) -> new BlockModelToDbModelMapping(mapper),

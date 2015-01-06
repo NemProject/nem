@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.dbmodel.DbImportanceTransferTransaction;
 
 public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
@@ -52,12 +53,12 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbRemote = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbRemote = Mockito.mock(DbAccount.class);
 		private final Account remote = Utils.generateRandomAccount();
 		private final ImportanceTransferModelToDbModelMapping mapping = new ImportanceTransferModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.remote, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbRemote);
+			Mockito.when(this.mapper.map(this.remote, DbAccount.class)).thenReturn(this.dbRemote);
 		}
 
 		public ImportanceTransferTransaction createModel(final ImportanceTransferTransaction.Mode mode) {

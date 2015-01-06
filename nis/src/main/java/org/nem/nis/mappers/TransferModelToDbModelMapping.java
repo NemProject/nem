@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.dbmodel.DbTransferTransaction;
 
 /**
@@ -19,7 +20,7 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 
 	@Override
 	public DbTransferTransaction mapImpl(final TransferTransaction source) {
-		final org.nem.nis.dbmodel.Account recipient = this.mapAccount(source.getRecipient());
+		final DbAccount recipient = this.mapAccount(source.getRecipient());
 
 		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
 		dbTransfer.setRecipient(recipient);

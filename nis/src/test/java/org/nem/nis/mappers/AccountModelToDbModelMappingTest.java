@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
+import org.nem.nis.dbmodel.DbAccount;
 
 public class AccountModelToDbModelMappingTest {
 
@@ -13,13 +14,13 @@ public class AccountModelToDbModelMappingTest {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
 		final AccountDaoLookup accountLookup = Mockito.mock(AccountDaoLookup.class);
-		final org.nem.nis.dbmodel.Account dbAccountReturnedByAccountLookup = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		final DbAccount dbAccountReturnedByAccountLookup = Mockito.mock(DbAccount.class);
 		Mockito.when(accountLookup.findByAddress(account.getAddress())).thenReturn(dbAccountReturnedByAccountLookup);
 
 		final AccountModelToDbModelMapping mapping = new AccountModelToDbModelMapping(accountLookup);
 
 		// Act:
-		final org.nem.nis.dbmodel.Account dbAccount = mapping.map(account);
+		final DbAccount dbAccount = mapping.map(account);
 
 		// Assert:
 		Assert.assertThat(dbAccount, IsEqual.equalTo(dbAccountReturnedByAccountLookup));

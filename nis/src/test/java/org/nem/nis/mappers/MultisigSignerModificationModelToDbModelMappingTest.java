@@ -59,20 +59,20 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
-		private final Map<org.nem.nis.dbmodel.Account, Integer> expectedModifications = new HashMap<>();
+		private final Map<DbAccount, Integer> expectedModifications = new HashMap<>();
 		final Set<org.nem.core.model.MultisigModification> modifications = new HashSet<>();
 		private final MultisigSignerModificationModelToDbModelMapping mapping = new MultisigSignerModificationModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.sender, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbSender);
+			Mockito.when(this.mapper.map(this.sender, DbAccount.class)).thenReturn(this.dbSender);
 		}
 
 		private void addModification(final int type) {
-			final org.nem.nis.dbmodel.Account dbCosignatory = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+			final DbAccount dbCosignatory = Mockito.mock(DbAccount.class);
 			final org.nem.core.model.Account cosignatory = Utils.generateRandomAccount();
-			Mockito.when(this.mapper.map(cosignatory, org.nem.nis.dbmodel.Account.class)).thenReturn(dbCosignatory);
+			Mockito.when(this.mapper.map(cosignatory, DbAccount.class)).thenReturn(dbCosignatory);
 
 			this.modifications.add(createModification(cosignatory, type));
 			this.expectedModifications.put(dbCosignatory, type);
@@ -89,7 +89,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getMultisigModifications().size(), IsEqual.equalTo(numExpectedModifications));
-			final Map<org.nem.nis.dbmodel.Account, Integer> actualModifications = new HashMap<>();
+			final Map<DbAccount, Integer> actualModifications = new HashMap<>();
 			for (final DbMultisigModification modification : dbModel.getMultisigModifications()) {
 				actualModifications.put(modification.getCosignatory(), modification.getModificationType());
 			}

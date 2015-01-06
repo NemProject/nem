@@ -26,7 +26,7 @@ public class DefaultMapperFactoryTest {
 
 	private static final List<Entry<?, ?>> otherEntries = new ArrayList<Entry<?, ?>>() {
 		{
-			this.add(new Entry<>(org.nem.nis.dbmodel.Account.class, Account.class));
+			this.add(new Entry<>(DbAccount.class, Account.class));
 			this.add(new Entry<>(org.nem.nis.dbmodel.Block.class, Block.class));
 			this.add(new Entry<>(DbMultisigSignatureTransaction.class, MultisigSignatureTransaction.class));
 		}

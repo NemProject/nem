@@ -20,7 +20,7 @@ public class DbMultisigModification {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "cosignatoryId")
-	private Account cosignatory;
+	private DbAccount cosignatory;
 
 	private Integer modificationType;
 
@@ -36,11 +36,11 @@ public class DbMultisigModification {
 		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
 	}
 
-	public Account getCosignatory() {
+	public DbAccount getCosignatory() {
 		return this.cosignatory;
 	}
 
-	public void setCosignatory(final Account cosignatory) {
+	public void setCosignatory(final DbAccount cosignatory) {
 		this.cosignatory = cosignatory;
 	}
 

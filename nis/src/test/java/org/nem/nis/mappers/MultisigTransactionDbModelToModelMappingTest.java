@@ -125,7 +125,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Set<DbMultisigSignatureTransaction> dbSignatures = new HashSet<>();
 		private final Set<MultisigSignatureTransaction> expectedSignatures = new HashSet<>();

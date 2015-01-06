@@ -16,7 +16,7 @@ public class DbImportanceTransferTransaction extends AbstractBlockTransfer<DbImp
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "remoteId")
-	private Account remote;
+	private DbAccount remote;
 
 	private Integer mode;
 
@@ -24,11 +24,11 @@ public class DbImportanceTransferTransaction extends AbstractBlockTransfer<DbImp
 		super(b -> b.getBlockImportanceTransferTransactions());
 	}
 
-	public Account getRemote() {
+	public DbAccount getRemote() {
 		return this.remote;
 	}
 
-	public void setRemote(final Account remote) {
+	public void setRemote(final DbAccount remote) {
 		this.remote = remote;
 	}
 

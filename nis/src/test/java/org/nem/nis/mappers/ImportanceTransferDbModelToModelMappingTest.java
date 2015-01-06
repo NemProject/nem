@@ -63,8 +63,8 @@ public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransfe
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
-		private final org.nem.nis.dbmodel.Account dbRemote = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
+		private final DbAccount dbRemote = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account remote = Utils.generateRandomAccount();
 		private final ImportanceTransferDbModelToModelMapping mapping = new ImportanceTransferDbModelToModelMapping(this.mapper);

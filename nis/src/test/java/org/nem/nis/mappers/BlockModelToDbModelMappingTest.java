@@ -280,8 +280,8 @@ public class BlockModelToDbModelMappingTest {
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbForger = Mockito.mock(org.nem.nis.dbmodel.Account.class);
-		private final org.nem.nis.dbmodel.Account dbLessor = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
+		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private final Account forger = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
 		private final Signature signature = Utils.generateRandomSignature();
@@ -291,8 +291,8 @@ public class BlockModelToDbModelMappingTest {
 		private final BlockModelToDbModelMapping mapping = new BlockModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.forger, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbForger);
-			Mockito.when(this.mapper.map(this.lessor, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbLessor);
+			Mockito.when(this.mapper.map(this.forger, DbAccount.class)).thenReturn(this.dbForger);
+			Mockito.when(this.mapper.map(this.lessor, DbAccount.class)).thenReturn(this.dbLessor);
 		}
 
 		public Block createBlock(final Account lessor) {
@@ -313,7 +313,7 @@ public class BlockModelToDbModelMappingTest {
 			this.assertDbModel(dbModel, expectedHash, null);
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final Hash expectedHash, final org.nem.nis.dbmodel.Account expectedLessor) {
+		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final Hash expectedHash, final DbAccount expectedLessor) {
 			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForger));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.prevBlockHash));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));

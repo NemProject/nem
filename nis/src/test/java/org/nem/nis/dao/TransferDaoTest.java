@@ -72,7 +72,7 @@ public class TransferDaoTest {
 		final DbTransferTransaction entity = mapToTransfer(transferTransaction, accountDaoLookup);
 
 		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
-		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
 		this.addToDummyBlock(dbAccount, entity);
 
 		// Act
@@ -93,7 +93,7 @@ public class TransferDaoTest {
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
 		final DbTransferTransaction dbTransferTransaction = mapToTransfer(transferTransaction, accountDaoLookup);
 
-		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
 		this.addToDummyBlock(dbAccount, dbTransferTransaction);
 
 		// Act
@@ -122,7 +122,7 @@ public class TransferDaoTest {
 		final DbTransferTransaction dbTransferTransaction3 = mapToTransfer(transferTransaction, accountDaoLookup);
 		final Long initialCount = this.transferDao.count();
 
-		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
 		this.addToDummyBlock(dbAccount, dbTransferTransaction1, dbTransferTransaction2, dbTransferTransaction3);
 
 		// Act
@@ -878,15 +878,15 @@ public class TransferDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(
+		final DbAccount dbSender = new DbAccount(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
+		final DbAccount dbRecipient = new DbAccount(
 				recipient.getAddress().getEncoded(),
 				recipient.getAddress().getPublicKey());
 		mockAccountDao.addMapping(sender, dbSender);
@@ -894,8 +894,8 @@ public class TransferDaoTest {
 		return new AccountDaoLookupAdapter(mockAccountDao);
 	}
 
-	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final DbTransferTransaction... dbTransferTransactions) {
-		final org.nem.nis.dbmodel.Block block = NisUtils.createDummyDbBlock(account);
+	private void addToDummyBlock(final DbAccount dbAccount, final DbTransferTransaction... dbTransferTransactions) {
+		final org.nem.nis.dbmodel.Block block = NisUtils.createDummyDbBlock(dbAccount);
 		this.blockDao.save(block);
 
 		for (final DbTransferTransaction dbTransferTransaction : dbTransferTransactions) {

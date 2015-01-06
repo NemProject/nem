@@ -59,7 +59,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 	protected DbMultisigAggregateModificationTransaction createDbModel() {
 		final DbMultisigAggregateModificationTransaction transfer = new DbMultisigAggregateModificationTransaction();
 		final Set<DbMultisigModification> modifications = new HashSet<>();
-		modifications.add(createModification(new org.nem.nis.dbmodel.Account(), 1));
+		modifications.add(createModification(new DbAccount(), 1));
 		transfer.setMultisigModifications(modifications);
 		return transfer;
 	}
@@ -71,7 +71,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<org.nem.core.model.Account, Integer> expectedModifications = new HashMap<>();
 		private final Set<DbMultisigModification> modifications = new HashSet<>();
@@ -82,7 +82,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 		}
 
 		private void addModification(final int type) {
-			final org.nem.nis.dbmodel.Account dbCosignatory = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+			final DbAccount dbCosignatory = Mockito.mock(DbAccount.class);
 			final org.nem.core.model.Account cosignatory = Utils.generateRandomAccount();
 			Mockito.when(this.mapper.map(dbCosignatory, org.nem.core.model.Account.class)).thenReturn(cosignatory);
 
@@ -117,7 +117,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 		}
 	}
 
-	private static DbMultisigModification createModification(final org.nem.nis.dbmodel.Account cosignatory, final int type) {
+	private static DbMultisigModification createModification(final DbAccount cosignatory, final int type) {
 		final DbMultisigModification dbModification = new DbMultisigModification();
 		dbModification.setCosignatory(cosignatory);
 		dbModification.setModificationType(type);

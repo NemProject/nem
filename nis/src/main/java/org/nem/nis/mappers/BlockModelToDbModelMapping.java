@@ -25,9 +25,9 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 
 	@Override
 	public org.nem.nis.dbmodel.Block map(final Block block) {
-		final org.nem.nis.dbmodel.Account harvester = this.mapper.map(block.getSigner(), org.nem.nis.dbmodel.Account.class);
-		final org.nem.nis.dbmodel.Account lessor = null != block.getLessor()
-				? this.mapper.map(block.getLessor(), org.nem.nis.dbmodel.Account.class)
+		final DbAccount harvester = this.mapper.map(block.getSigner(), DbAccount.class);
+		final DbAccount lessor = null != block.getLessor()
+				? this.mapper.map(block.getLessor(), DbAccount.class)
 				: null;
 
 		final Hash blockHash = HashUtils.calculateHash(block);

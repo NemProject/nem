@@ -436,7 +436,7 @@ public class BlockDaoTest {
 		// Act:
 		this.blockDao.save(dbBlock);
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final org.nem.nis.dbmodel.Account entity = this.accountDao.getAccount(dbBlock.getForger().getId());
+		final DbAccount entity = this.accountDao.getAccount(dbBlock.getForger().getId());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
@@ -460,7 +460,7 @@ public class BlockDaoTest {
 		// Act:
 		this.blockDao.save(dbBlock);
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final org.nem.nis.dbmodel.Account entity = this.accountDao.getAccount(dbBlock.getForger().getId());
+		final DbAccount entity = this.accountDao.getAccount(dbBlock.getForger().getId());
 		final DbTransferTransaction dbTransferTransaction1 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(0)).getRaw());
 		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(1)).getRaw());
 		final DbTransferTransaction dbTransferTransaction3 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(2)).getRaw());
@@ -751,7 +751,7 @@ public class BlockDaoTest {
 		for (final Object o : accounts) {
 			final Account a = (Account)o;
 			final Address address = a.getAddress();
-			final org.nem.nis.dbmodel.Account dbA = new org.nem.nis.dbmodel.Account(address.getEncoded(), address.getPublicKey());
+			final DbAccount dbA = new DbAccount(address.getEncoded(), address.getPublicKey());
 			mockAccountDao.addMapping(a, dbA);
 		}
 		return new AccountDaoLookupAdapter(mockAccountDao);
@@ -879,7 +879,7 @@ public class BlockDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 

@@ -21,7 +21,7 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 	@ManyToOne
 	@Cascade({ CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "recipientId")
-	private Account recipient;
+	private DbAccount recipient;
 
 	private Long amount;
 
@@ -32,11 +32,11 @@ public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTrans
 		super(b -> b.getBlockTransferTransactions());
 	}
 
-	public Account getRecipient() {
+	public DbAccount getRecipient() {
 		return this.recipient;
 	}
 
-	public void setRecipient(final Account recipient) {
+	public void setRecipient(final DbAccount recipient) {
 		this.recipient = recipient;
 	}
 

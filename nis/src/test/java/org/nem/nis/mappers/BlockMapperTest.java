@@ -524,18 +524,18 @@ public class BlockMapperTest {
 	private class TestContext {
 
 		private final Block model;
-		private final org.nem.nis.dbmodel.Account dbForager;
+		private final DbAccount dbForager;
 		private final Account account1;
-		private final org.nem.nis.dbmodel.Account dbAccount1;
+		private final DbAccount dbAccount1;
 		private final Account account2;
-		private final org.nem.nis.dbmodel.Account dbAccount2;
+		private final DbAccount dbAccount2;
 		private final Account account3;
-		private final org.nem.nis.dbmodel.Account dbAccount3;
+		private final DbAccount dbAccount3;
 		private final MockAccountDao accountDao;
 		private final Hash blockGenerationHash;
 		private Hash hash;
 		private Account lessor;
-		private org.nem.nis.dbmodel.Account dbLessor;
+		private DbAccount dbLessor;
 
 		public TestContext() {
 			this.blockGenerationHash = Utils.generateRandomHash();
@@ -549,7 +549,7 @@ public class BlockMapperTest {
 			this.model.setDifficulty(new BlockDifficulty(79_876_543_211_237L));
 			this.signModel();
 
-			this.dbForager = new org.nem.nis.dbmodel.Account();
+			this.dbForager = new DbAccount();
 			this.dbForager.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
 			this.dbForager.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
@@ -576,8 +576,8 @@ public class BlockMapperTest {
 			this.model.setLessor(this.lessor);
 		}
 
-		private org.nem.nis.dbmodel.Account createDbAccount(final Account account) {
-			final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account();
+		private DbAccount createDbAccount(final Account account) {
+			final DbAccount dbAccount = new DbAccount();
 			dbAccount.setPublicKey(account.getAddress().getPublicKey());
 			dbAccount.setPrintableKey(account.getAddress().getEncoded());
 			return dbAccount;

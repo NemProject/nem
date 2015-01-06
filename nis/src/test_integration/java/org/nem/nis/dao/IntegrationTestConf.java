@@ -49,7 +49,7 @@ public class IntegrationTestConf {
 		localSessionFactoryBuilder.setProperty("hibernate.use_sql_comments", "false");
 		localSessionFactoryBuilder.setProperty("hibernate.jdbc.batch_size", "20");
 
-		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);

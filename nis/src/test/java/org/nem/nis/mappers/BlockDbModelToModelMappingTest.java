@@ -187,8 +187,8 @@ public class BlockDbModelToModelMappingTest {
 		}
 
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbForger = Mockito.mock(org.nem.nis.dbmodel.Account.class);
-		private final org.nem.nis.dbmodel.Account dbLessor = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
+		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
 		private final Account forger = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
 		private final Signature signature = Utils.generateRandomSignature();
@@ -201,7 +201,7 @@ public class BlockDbModelToModelMappingTest {
 			Mockito.when(this.mapper.map(this.dbLessor, Account.class)).thenReturn(this.lessor);
 		}
 
-		public org.nem.nis.dbmodel.Block createDbBlock(final Long difficulty, final org.nem.nis.dbmodel.Account lessor) {
+		public org.nem.nis.dbmodel.Block createDbBlock(final Long difficulty, final DbAccount lessor) {
 			final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
 			dbBlock.setForger(this.dbForger);
 			dbBlock.setPrevBlockHash(this.prevBlockHash);

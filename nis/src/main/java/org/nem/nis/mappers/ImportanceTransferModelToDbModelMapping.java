@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.ImportanceTransferTransaction;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.dbmodel.DbImportanceTransferTransaction;
 
 /**
@@ -19,7 +20,7 @@ public class ImportanceTransferModelToDbModelMapping extends AbstractTransferMod
 
 	@Override
 	public DbImportanceTransferTransaction mapImpl(final ImportanceTransferTransaction source) {
-		final org.nem.nis.dbmodel.Account remote = this.mapAccount(source.getRemote());
+		final DbAccount remote = this.mapAccount(source.getRemote());
 
 		final DbImportanceTransferTransaction dbTransfer = new DbImportanceTransferTransaction();
 		dbTransfer.setRemote(remote);

@@ -77,13 +77,13 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbRecipient = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbRecipient = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final TransferModelToDbModelMapping mapping = new TransferModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.recipient, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbRecipient);
+			Mockito.when(this.mapper.map(this.recipient, DbAccount.class)).thenReturn(this.dbRecipient);
 		}
 
 		public TransferTransaction createModel(final Message message) {

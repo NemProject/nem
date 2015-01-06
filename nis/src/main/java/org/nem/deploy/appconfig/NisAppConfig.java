@@ -104,7 +104,7 @@ public class NisAppConfig {
 	public SessionFactory sessionFactory() throws IOException {
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
-		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);

@@ -35,13 +35,13 @@ public class Block {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "forgerId")
-	private Account forger;
+	private DbAccount forger;
 	private byte[] forgerProof;
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "harvestedInName")
-	private Account lessor;
+	private DbAccount lessor;
 
 	private Long height;
 	private Long totalFee;
@@ -128,11 +128,11 @@ public class Block {
 		this.timeStamp = timeStamp;
 	}
 
-	public Account getForger() {
+	public DbAccount getForger() {
 		return this.forger;
 	}
 
-	public void setForger(final Account forger) {
+	public void setForger(final DbAccount forger) {
 		this.forger = forger;
 	}
 
@@ -144,11 +144,11 @@ public class Block {
 		this.forgerProof = forgerProof;
 	}
 
-	public Account getLessor() {
+	public DbAccount getLessor() {
 		return this.lessor;
 	}
 
-	public void setLessor(final Account lessor) {
+	public void setLessor(final DbAccount lessor) {
 		this.lessor = lessor;
 	}
 

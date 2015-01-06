@@ -7,6 +7,7 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
+import org.nem.nis.dbmodel.DbAccount;
 
 public class AccountDbModelToModelMappingTest {
 
@@ -30,7 +31,7 @@ public class AccountDbModelToModelMappingTest {
 
 	private static void canMapDbAccountWithoutPublicKeyToAccount(final String encodedAddress, final PublicKey publicKey) {
 		// Arrange:
-		final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account(encodedAddress, publicKey);
+		final DbAccount dbAccount = new DbAccount(encodedAddress, publicKey);
 		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		final Account accountReturnedByAccountLookup = Mockito.mock(Account.class);
 		Mockito.when(accountLookup.findByAddress(Mockito.any())).thenReturn(accountReturnedByAccountLookup);

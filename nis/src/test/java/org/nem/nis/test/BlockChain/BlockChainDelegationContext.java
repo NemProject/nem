@@ -11,6 +11,7 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -125,9 +126,9 @@ public class BlockChainDelegationContext {
 
 	private void prepareAccountDao() {
 		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.blockHarvester.getAddress().getEncoded()))
-				.thenReturn(new org.nem.nis.dbmodel.Account(this.blockHarvester.getAddress().getEncoded(), this.blockHarvester.getAddress().getPublicKey()));
+				.thenReturn(new DbAccount(this.blockHarvester.getAddress().getEncoded(), this.blockHarvester.getAddress().getPublicKey()));
 		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.parentHarvester.getAddress().getEncoded()))
-				.thenReturn(new org.nem.nis.dbmodel.Account(this.parentHarvester.getAddress().getEncoded(), this.parentHarvester.getAddress().getPublicKey()));
+				.thenReturn(new DbAccount(this.parentHarvester.getAddress().getEncoded(), this.parentHarvester.getAddress().getPublicKey()));
 	}
 
 	private void prepareBlockDao() {

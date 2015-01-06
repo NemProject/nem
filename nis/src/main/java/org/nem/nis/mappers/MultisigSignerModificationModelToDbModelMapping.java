@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.MultisigAggregateModificationTransaction;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.dbmodel.DbMultisigAggregateModificationTransaction;
 import org.nem.nis.dbmodel.DbMultisigModification;
 
@@ -38,7 +39,7 @@ public class MultisigSignerModificationModelToDbModelMapping extends AbstractTra
 	}
 
 	private DbMultisigModification mapMultisigModification(final org.nem.core.model.MultisigModification source) {
-		final org.nem.nis.dbmodel.Account cosignatory = this.mapAccount(source.getCosignatory());
+		final DbAccount cosignatory = this.mapAccount(source.getCosignatory());
 		final DbMultisigModification target = new DbMultisigModification();
 		target.setCosignatory(cosignatory);
 		target.setModificationType(source.getModificationType().value());

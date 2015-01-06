@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
@@ -26,7 +27,7 @@ public class NisUtils {
 	 * @param harvester The harvester account.
 	 * @return The db block.
 	 */
-	public static org.nem.nis.dbmodel.Block createDummyDbBlock(final org.nem.nis.dbmodel.Account harvester) {
+	public static org.nem.nis.dbmodel.Block createDummyDbBlock(final DbAccount harvester) {
 		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
 		dbBlock.setBlockHash(Hash.ZERO);
 		dbBlock.setVersion(1);
@@ -60,7 +61,7 @@ public class NisUtils {
 	 */
 	public static org.nem.nis.dbmodel.Block createDbBlockWithTimeStampAtHeight(final int timeStamp, final long height) {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
+		final DbAccount account = new DbAccount();
 		account.setPrintableKey(address.getEncoded());
 		account.setPublicKey(address.getPublicKey());
 

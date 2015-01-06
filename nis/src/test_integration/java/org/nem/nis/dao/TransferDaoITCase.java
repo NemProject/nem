@@ -12,6 +12,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.dbmodel.DbTransferTransaction;
 import org.nem.nis.mappers.AccountDaoLookup;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -86,7 +87,7 @@ public class TransferDaoITCase {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 

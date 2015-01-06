@@ -13,8 +13,8 @@ import java.util.*;
 public class MockAccountDao implements AccountDao {
 
 	private int numGetAccountByPrintableAddressCalls;
-	private final Map<String, Account> knownAccounts = new HashMap<>();
-	private final Map<Account, ReferenceCount> refCounts = new HashMap<>();
+	private final Map<String, DbAccount> knownAccounts = new HashMap<>();
+	private final Map<DbAccount, ReferenceCount> refCounts = new HashMap<>();
 	private Long id = 1L;
 
 	/**
@@ -32,7 +32,7 @@ public class MockAccountDao implements AccountDao {
 	 * @param address The model address
 	 * @param dbAccount The db-model account.
 	 */
-	public void addMapping(final Address address, final org.nem.nis.dbmodel.Account dbAccount) {
+	public void addMapping(final Address address, final DbAccount dbAccount) {
 		if (null == this.knownAccounts.putIfAbsent(address.getEncoded(), dbAccount)) {
 			this.id++;
 			this.refCounts.put(dbAccount, ReferenceCount.ZERO);
@@ -41,13 +41,13 @@ public class MockAccountDao implements AccountDao {
 		this.incrementReferenceCount(this.knownAccounts.get(address.getEncoded()));
 	}
 
-	private ReferenceCount incrementReferenceCount(final org.nem.nis.dbmodel.Account dbAccount) {
+	private ReferenceCount incrementReferenceCount(final DbAccount dbAccount) {
 		final ReferenceCount referenceCount = this.refCounts.get(dbAccount).increment();
 		this.refCounts.put(dbAccount, referenceCount);
 		return referenceCount;
 	}
 
-	private ReferenceCount decrementReferenceCount(final org.nem.nis.dbmodel.Account dbAccount) {
+	private ReferenceCount decrementReferenceCount(final DbAccount dbAccount) {
 		final ReferenceCount referenceCount = this.refCounts.get(dbAccount).decrement();
 		if (ReferenceCount.ZERO.equals(referenceCount)) {
 			this.refCounts.remove(dbAccount);
@@ -67,7 +67,7 @@ public class MockAccountDao implements AccountDao {
 	 * @param account The model account
 	 * @param dbAccount The db-model account.
 	 */
-	public void addMapping(final org.nem.core.model.Account account, final org.nem.nis.dbmodel.Account dbAccount) {
+	public void addMapping(final org.nem.core.model.Account account, final DbAccount dbAccount) {
 		this.addMapping(account.getAddress(), dbAccount);
 	}
 
@@ -88,7 +88,7 @@ public class MockAccountDao implements AccountDao {
 
 		return 0 == this.knownAccounts.values().stream()
 				.mapToInt(a1 -> {
-					final Account a2 = rhs.knownAccounts.get(a1.getPrintableKey());
+					final DbAccount a2 = rhs.knownAccounts.get(a1.getPrintableKey());
 					if (!a1.getPrintableKey().equals(a2.getPrintableKey()) ||
 							(null != a1.getPublicKey() && !a1.getPublicKey().equals(a2.getPublicKey()))) {
 						return 1;
@@ -117,23 +117,23 @@ public class MockAccountDao implements AccountDao {
 				});
 	}
 
-	public Iterator<Account> iterator() {
+	public Iterator<DbAccount> iterator() {
 		return this.knownAccounts.values().iterator();
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.Account getAccount(final Long id) {
+	public DbAccount getAccount(final Long id) {
 		throw new UnsupportedOperationException("not supported");
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.Account getAccountByPrintableAddress(final String printableAddress) {
+	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
 		++this.numGetAccountByPrintableAddressCalls;
 		return this.knownAccounts.get(printableAddress);
 	}
 
 	@Override
-	public void save(final org.nem.nis.dbmodel.Account dbAccount) {
+	public void save(final DbAccount dbAccount) {
 		this.addMapping(Address.fromEncoded(dbAccount.getPrintableKey()), dbAccount);
 	}
 }

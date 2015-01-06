@@ -27,7 +27,7 @@ public abstract class AbstractTransferModelToDbModelMapping<TModel extends Trans
 	@Override
 	public final TDbModel map(final TModel source) {
 		final TDbModel dbModel = this.mapImpl(source);
-		final org.nem.nis.dbmodel.Account sender = this.mapAccount(source.getSigner());
+		final DbAccount sender = this.mapAccount(source.getSigner());
 
 		final Hash txHash = HashUtils.calculateHash(source);
 		dbModel.setTransferHash(txHash);
@@ -54,7 +54,7 @@ public abstract class AbstractTransferModelToDbModelMapping<TModel extends Trans
 	 * @param account The model account.
 	 * @return The db model account.
 	 */
-	protected org.nem.nis.dbmodel.Account mapAccount(final Account account) {
-		return this.mapper.map(account, org.nem.nis.dbmodel.Account.class);
+	protected DbAccount mapAccount(final Account account) {
+		return this.mapper.map(account, DbAccount.class);
 	}
 }

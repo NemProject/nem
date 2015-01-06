@@ -35,7 +35,7 @@ public class BlockExplorerMapperTest {
 
 		final Block block = new Block();
 		block.setHeight(60L);
-		block.setForger(new Account(address.getEncoded(), address.getPublicKey()));
+		block.setForger(new DbAccount(address.getEncoded(), address.getPublicKey()));
 		block.setTimeStamp(1856002);
 		block.setBlockHash(hash);
 		block.setBlockTransferTransactions(new ArrayList<>());
@@ -73,11 +73,11 @@ public class BlockExplorerMapperTest {
 		final DbTransferTransaction transfer = new DbTransferTransaction();
 		transfer.setFee(fee);
 		transfer.setTimeStamp(1856002);
-		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
+		transfer.setSender(new DbAccount(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
 		transfer.setTransferHash(hash);
 
-		transfer.setRecipient(new Account(recipientAddress.getEncoded(), null));
+		transfer.setRecipient(new DbAccount(recipientAddress.getEncoded(), null));
 		transfer.setAmount(888888000000L);
 		transfer.setMessageType(2);
 		transfer.setMessagePayload(messagePayload);
@@ -96,11 +96,11 @@ public class BlockExplorerMapperTest {
 		final DbTransferTransaction transfer = new DbTransferTransaction();
 		transfer.setFee(123000000L);
 		transfer.setTimeStamp(1856002);
-		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
+		transfer.setSender(new DbAccount(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
 		transfer.setTransferHash(hash);
 
-		transfer.setRecipient(new Account(recipientAddress.getEncoded(), null));
+		transfer.setRecipient(new DbAccount(recipientAddress.getEncoded(), null));
 		transfer.setAmount(888888000000L);
 		transfer.setMessageType(2);
 		transfer.setMessagePayload(messagePayload);

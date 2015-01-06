@@ -461,7 +461,7 @@ public class AccountIoAdapterTest {
 	}
 
 	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 		when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 	}
