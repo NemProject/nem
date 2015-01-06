@@ -104,8 +104,8 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final MultisigModificationType modificationType = getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		final List<MultisigModification> modificationList = createModificationList(modificationType, cosignatory);
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationList);
+		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -116,11 +116,8 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), cosignatory);
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(1000));
-		NotificationUtils.assertCosignatoryModificationNotification(
-				notificationCaptor.getAllValues().get(2),
-				signer,
-				modificationList);
+		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(1000));
 	}
 
 	@Test
@@ -129,8 +126,8 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final MultisigModificationType modificationType = getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		final List<MultisigModification> modificationList = createModificationList(modificationType, cosignatory);
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationList);
+		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -141,26 +138,22 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory);
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), signer, Amount.fromNem(1000));
-		NotificationUtils.assertCosignatoryModificationNotification(
-				notificationCaptor.getAllValues().get(0),
-				signer,
-				modificationList);
+		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(1000));
 	}
 
 	@Test
-	public void executeRaisesAccountNotificationForAllModifications() {
+	public void executeRaisesAppropriateNotificationForAllModifications() {
 		// Arrange:
 		final MultisigModificationType modificationType = getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory1 = Utils.generateRandomAccount();
 		final Account cosignatory2 = Utils.generateRandomAccount();
-		final List<MultisigModification> modificationList = Arrays.asList(
+		final List<MultisigModification> modifications = Arrays.asList(
 				new MultisigModification(modificationType, cosignatory1),
-				new MultisigModification(modificationType, cosignatory2)
-		);
+				new MultisigModification(modificationType, cosignatory2));
 
-		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modificationList);
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
 		transaction.setFee(Amount.fromNem(10));
 
 		// Act:
@@ -169,15 +162,42 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 
 		// Assert:
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), cosignatory1);
-		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(1), cosignatory2);
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(1000));
-		NotificationUtils.assertCosignatoryModificationNotification(
-				notificationCaptor.getAllValues().get(3),
-				signer,
-				modificationList);
+		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
+		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(1));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(1000));
 	}
+
+	@Test
+	public void undoRaisesAppropriateNotificationForAllModifications() {
+		// Arrange:
+		final MultisigModificationType modificationType = getModification();
+		final Account signer = Utils.generateRandomAccount();
+		final Account cosignatory1 = Utils.generateRandomAccount();
+		final Account cosignatory2 = Utils.generateRandomAccount();
+		final List<MultisigModification> modifications = Arrays.asList(
+				new MultisigModification(modificationType, cosignatory1),
+				new MultisigModification(modificationType, cosignatory2));
+
+		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer, modifications);
+		transaction.setFee(Amount.fromNem(10));
+
+		// Act:
+		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
+		transaction.undo(observer);
+
+		// Assert:
+		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+		Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(4), cosignatory1);
+		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(0));
+		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
+		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(1));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(1000));
+	}
+
 	// endregion
 
 	private static List<MultisigModification> createModificationList(final MultisigModificationType modificationType, final Account cosignatory) {

@@ -9,18 +9,18 @@ import java.util.*;
  */
 public class MultisigModificationNotification extends Notification {
 	private final Account multisigAccount;
-	private final Collection<MultisigModification> modifications;
+	private final MultisigModification modification;
 
 	/**
 	 * Creates a new cosignatory modification notification.
 	 *
 	 * @param multisigAccount The multisig account.
-	 * @param modifications The list of modifications.
+	 * @param modification The modification.
 	 */
-	public MultisigModificationNotification(final Account multisigAccount, final Collection<MultisigModification> modifications) {
+	public MultisigModificationNotification(final Account multisigAccount, final MultisigModification modification) {
 		super(NotificationType.CosignatoryModification);
 		this.multisigAccount = multisigAccount;
-		this.modifications = modifications;
+		this.modification = modification;
 	}
 
 	/**
@@ -33,11 +33,11 @@ public class MultisigModificationNotification extends Notification {
 	}
 
 	/**
-	 * Gets the list of modifications.
+	 * Gets the modification.
 	 *
-	 * @return The list of modifications.
+	 * @return The modification.
 	 */
-	public Collection<MultisigModification> getModifications() {
-		return this.modifications;
+	public MultisigModification getModification() {
+		return this.modification;
 	}
 }

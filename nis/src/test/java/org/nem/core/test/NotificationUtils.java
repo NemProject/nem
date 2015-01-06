@@ -125,15 +125,15 @@ public class NotificationUtils {
 	 *
 	 * @param notification The notification to test.
 	 * @param expectedMultisig The expected multisig account.
-	 * @param multisigModificationList The list of expected multisig modifications.
+	 * @param expectedModification The expected multisig modification.
 	 */
 	public static void assertCosignatoryModificationNotification(
 			final Notification notification,
 			final Account expectedMultisig,
-			final List<MultisigModification> multisigModificationList) {
+			final MultisigModification expectedModification) {
 		final MultisigModificationNotification n = (MultisigModificationNotification)notification;
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
 		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
-		Assert.assertThat(n.getModifications(), IsEquivalent.equivalentTo(multisigModificationList));
+		Assert.assertThat(n.getModification(), IsEqual.equalTo(expectedModification));
 	}
 }

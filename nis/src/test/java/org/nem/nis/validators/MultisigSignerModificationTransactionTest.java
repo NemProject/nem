@@ -60,12 +60,12 @@ public class MultisigSignerModificationTransactionTest {
 			final Account signer = Utils.generateRandomAccount();
 			final Account cosignatory1 = Utils.generateRandomAccount();
 			final Account cosignatory2 = Utils.generateRandomAccount();
-			final List<MultisigModification> modificationList = Arrays.asList(
+			final List<MultisigModification> modifications = Arrays.asList(
 					new MultisigModification(MultisigModificationType.Add, cosignatory1),
-					new MultisigModification(MultisigModificationType.Del, cosignatory2)
-			);
+					new MultisigModification(MultisigModificationType.Del, cosignatory2));
 
-			final MultisigSignerModificationTransaction transaction = AbstractMultisigSignerModificationTransactionTest.createMultisigSignerModificationTransaction(signer, modificationList);
+			final MultisigSignerModificationTransaction transaction =
+					AbstractMultisigSignerModificationTransactionTest.createMultisigSignerModificationTransaction(signer, modifications);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:
@@ -74,14 +74,12 @@ public class MultisigSignerModificationTransactionTest {
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
+			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
 			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), cosignatory1);
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(1), cosignatory2);
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(1000));
-			NotificationUtils.assertCosignatoryModificationNotification(
-					notificationCaptor.getAllValues().get(3),
-					signer,
-					modificationList);
+			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
+			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
+			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(1));
+			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(1000));
 		}
 	}
 }
