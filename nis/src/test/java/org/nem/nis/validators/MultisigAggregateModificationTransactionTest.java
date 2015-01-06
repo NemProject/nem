@@ -41,7 +41,9 @@ public class MultisigAggregateModificationTransactionTest {
 			final Account signer = Mockito.mock(Account.class);
 
 			// Act:
-			ExceptionAssert.assertThrows(v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, null), IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(
+					v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, null),
+					IllegalArgumentException.class);
 		}
 
 		@Test
@@ -50,7 +52,9 @@ public class MultisigAggregateModificationTransactionTest {
 			final Account signer = Mockito.mock(Account.class);
 
 			// Act:
-			ExceptionAssert.assertThrows(v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, new ArrayList<>()), IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(
+					v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, new ArrayList<>()),
+					IllegalArgumentException.class);
 		}
 		//endregion
 
@@ -60,12 +64,12 @@ public class MultisigAggregateModificationTransactionTest {
 			final Account signer = Utils.generateRandomAccount();
 			final Account cosignatory1 = Utils.generateRandomAccount();
 			final Account cosignatory2 = Utils.generateRandomAccount();
-			final List<MultisigModification> modificationList = Arrays.asList(
+			final List<MultisigModification> modifications = Arrays.asList(
 					new MultisigModification(MultisigModificationType.Add, cosignatory1),
-					new MultisigModification(MultisigModificationType.Del, cosignatory2)
-			);
+					new MultisigModification(MultisigModificationType.Del, cosignatory2));
 
-			final MultisigAggregateModificationTransaction transaction = AbstractMultisigSignerModificationTransactionTest.createMultisigSignerModificationTransaction(signer, modificationList);
+			final MultisigAggregateModificationTransaction transaction =
+					AbstractMultisigSignerModificationTransactionTest.createMultisigSignerModificationTransaction(signer, modifications);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:
@@ -74,14 +78,12 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
+			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
 			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), cosignatory1);
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(1), cosignatory2);
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(1000));
-			NotificationUtils.assertCosignatoryModificationNotification(
-					notificationCaptor.getAllValues().get(3),
-					signer,
-					modificationList);
+			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
+			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
+			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(1));
+			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(1000));
 		}
 	}
 }

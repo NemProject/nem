@@ -114,6 +114,8 @@ public class BlockScorerITCase {
 				45 < OneHarvesterPercentageBlocks && OneHarvesterPercentageBlocks < 55);
 	}
 
+	// TODO 20150106 J-G: still some "Forage" references here
+
 	@Test
 	public void selfishHarvesterCannotForageBetterChain() {
 		int selfishHarvesterWins = 0;

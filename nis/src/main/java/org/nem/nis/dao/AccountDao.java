@@ -7,7 +7,7 @@ import org.nem.nis.dbmodel.DbAccount;
  */
 public interface AccountDao {
 	/**
-	 * Retrieves DbAccount from db given it's id in the database.
+	 * Retrieves DbAccount from db given its id in the database.
 	 *
 	 * @param id id of a record.
 	 * @return associated DbAccount or null if there isn't DbAccount with such id.
@@ -15,7 +15,7 @@ public interface AccountDao {
 	public DbAccount getAccount(Long id);
 
 	/**
-	 * Retrieves DbAccount from db given it's printable (encoded) address.
+	 * Retrieves DbAccount from db given its printable (encoded) address.
 	 *
 	 * @param printableAddress NEM address
 	 * @return DbAccount associated with given printableAddress or null.

@@ -65,13 +65,12 @@ public class BlockUtils {
 	public static Block createBlockWithHeight(final BlockHeight height) {
 		// Arrange:
 		final Account harvester = Utils.generateRandomAccount();
-		final Block block = new Block(
+		return new Block(
 				harvester,
 				DUMMY_PREVIOUS_HASH,
 				DUMMY_GENERATION_HASH,
 				new TimeInstant(7),
 				height);
-		return block;
 	}
 
 	/**

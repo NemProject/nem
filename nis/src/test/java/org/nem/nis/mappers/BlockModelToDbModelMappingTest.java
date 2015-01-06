@@ -343,6 +343,7 @@ public class BlockModelToDbModelMappingTest {
 			return this.addTransfer(block, transfer, new DbImportanceTransferTransaction(), DbImportanceTransferTransaction.class);
 		}
 
+		// TODO 20150106 J-G: can you rename "SignerModification" in project
 		public DbMultisigAggregateModificationTransaction addSignerModification(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createSignerModification();
 			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);

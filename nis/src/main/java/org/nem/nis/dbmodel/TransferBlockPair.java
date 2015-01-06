@@ -1,17 +1,17 @@
 package org.nem.nis.dbmodel;
 
 /**
- * DTO containing a dbTransferTransaction and a dbBlock object.
+ * DTO containing a DbTransferTransaction and a DbBlock object.
  */
 public class TransferBlockPair {
 	private final DbTransferTransaction dbTransferTransaction;
 	private final DbBlock dbBlock;
 
 	/**
-	 * Creates a dbTransferTransaction dbBlock pair.
+	 * Creates a pair.
 	 *
-	 * @param dbTransferTransaction The dbTransferTransaction.
-	 * @param dbBlock The dbBlock.
+	 * @param dbTransferTransaction The DbTransferTransaction.
+	 * @param dbBlock The DbBlock.
 	 */
 	public TransferBlockPair(final DbTransferTransaction dbTransferTransaction, final DbBlock dbBlock) {
 		this.dbTransferTransaction = dbTransferTransaction;
@@ -19,18 +19,18 @@ public class TransferBlockPair {
 	}
 
 	/**
-	 * Gets the dbTransferTransaction:
+	 * Gets the DbTransferTransaction:
 	 *
-	 * @return The dbTransferTransaction.
+	 * @return The DbTransferTransaction.
 	 */
 	public DbTransferTransaction getDbTransferTransaction() {
 		return this.dbTransferTransaction;
 	}
 
 	/**
-	 * Gets the dbBlock:
+	 * Gets the DbBlock:
 	 *
-	 * @return The dbBlock.
+	 * @return The DbBlock.
 	 */
 	public DbBlock getDbBlock() {
 		return this.dbBlock;

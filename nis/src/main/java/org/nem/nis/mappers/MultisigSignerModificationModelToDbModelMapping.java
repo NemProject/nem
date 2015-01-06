@@ -8,6 +8,8 @@ import org.nem.nis.dbmodel.DbMultisigModification;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO 20150106 J-G: please rename mapping and test class name
+
 /**
  * A mapping that is able to map a model multisig signer modification transaction to a db multisig signer modification transfer.
  */

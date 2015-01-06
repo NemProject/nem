@@ -30,6 +30,8 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
 
+// TODO 20140106 J-G: i wouldn't rename the test class since you didn't rename the dao class
+
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DbBlockDaoTest {
@@ -794,8 +796,7 @@ public class DbBlockDaoTest {
 
 	private MultisigAggregateModificationTransaction prepareMultisigSignerModificationTransaction(
 			final Account sender,
-			final Account cosignatory
-	) {
+			final Account cosignatory) {
 		// Arrange:
 		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(

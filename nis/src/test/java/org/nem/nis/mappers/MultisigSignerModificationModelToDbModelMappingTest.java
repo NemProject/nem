@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.MultisigSignerModification;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 

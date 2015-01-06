@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
-import org.nem.nis.dbmodel.MultisigSignature;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.function.BiFunction;

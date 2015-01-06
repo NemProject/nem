@@ -11,10 +11,6 @@ import java.util.*;
  * A transaction which describes association of cosignatory with a multisig account.
  * <br/>
  * First such transaction converts account to multisig account.
- *
- * TODO 20150106 G-J: MultisigAggregateModificationTransaction CANNOT have single modification
- * > otherwise we'd have to allow multiple MultisigAggregateModificationTransaction coming from single
- * > account (per block), and that would complicate validators even further
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
 	final Collection<MultisigModification> modifications;

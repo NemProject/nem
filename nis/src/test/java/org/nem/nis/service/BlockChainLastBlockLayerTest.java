@@ -63,7 +63,8 @@ public class BlockChainLastBlockLayerTest {
 
 	private static org.nem.core.model.Block createBlock(final Account harvester) {
 		// Arrange:
-		final org.nem.core.model.Block block = new org.nem.core.model.Block(harvester,
+		final org.nem.core.model.Block block = new org.nem.core.model.Block(
+				harvester,
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				new TimeInstant(7),

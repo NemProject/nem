@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.AbstractTransfer;
+import org.nem.nis.dbmodel.*;
 
 /**
  * Base class for mappings of transfer model types to transfer db model types.

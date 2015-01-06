@@ -7,7 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.MultisigSignature;
+import org.nem.nis.dbmodel.DbMultisigSignatureTransaction;
 
 public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigSignatureTransaction, DbMultisigSignatureTransaction> {
 

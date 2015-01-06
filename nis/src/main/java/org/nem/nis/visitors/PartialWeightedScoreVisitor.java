@@ -5,7 +5,7 @@ import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.BlockScorer;
 
 /**
- * DbBlock visitor that visits all blocks in a chain and calculates
+ * Block visitor that visits all blocks in a chain and calculates
  * a partial chain score.
  * All blocks are weighted equally.
  */

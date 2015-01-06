@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
+import org.nem.nis.dbmodel.DbImportanceTransferTransaction;
 
 /**
  * A mapping that is able to map a db importance transfer to a model importance transfer transaction.

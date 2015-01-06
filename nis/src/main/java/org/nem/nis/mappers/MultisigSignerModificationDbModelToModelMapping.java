@@ -9,6 +9,8 @@ import org.nem.nis.dbmodel.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO 20150106 J-G: please rename mapping and test class name
+
 /**
  * A mapping that is able to map a db multisig signer modification transfer to a model multisig signer modification transaction.
  */

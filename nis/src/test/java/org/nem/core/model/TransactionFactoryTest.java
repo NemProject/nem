@@ -129,6 +129,8 @@ public class TransactionFactoryTest {
 
 	//region MultisigAggregateModificationTransaction
 
+	// TODO 20150106 J-G: please rename tests
+
 	@Test
 	public void canDeserializeVerifiableMultisigSignerModificationTransaction() {
 		// Arrange:
@@ -159,7 +161,7 @@ public class TransactionFactoryTest {
 
 	//endregion
 
-	//region MultisigAggregateModificationTransaction
+	//region MultisigTransaction
 
 	@Test
 	public void canDeserializeVerifiableMultisigTransaction() {

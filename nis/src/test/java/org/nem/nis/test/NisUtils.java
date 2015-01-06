@@ -44,7 +44,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a DbBlock that can be mapped to a model DbBlock.
+	 * Creates a DbBlock that can be mapped to a model Block.
 	 *
 	 * @param timeStamp The block timestamp.
 	 * @return The db block.
@@ -54,7 +54,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a DbBlock that can be mapped to a model DbBlock.
+	 * Creates a DbBlock that can be mapped to a model Block.
 	 *
 	 * @param timeStamp The block timestamp.
 	 * @param height The block height.
@@ -79,7 +79,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random DbBlock.
+	 * Creates a new random Block.
 	 *
 	 * @return The block.
 	 */
@@ -93,7 +93,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random DbBlock with the specified height.
+	 * Creates a new random Block with the specified height.
 	 *
 	 * @param height The height.
 	 * @return The block.
@@ -103,7 +103,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random DbBlock with the specified height and signer
+	 * Creates a new random Block with the specified height and signer.
 	 *
 	 * @param signer The signer.
 	 * @param height The height.
@@ -119,7 +119,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random DbBlock with the specified timestamp.
+	 * Creates a new random Block with the specified timestamp.
 	 *
 	 * @param timeStamp The time stamp.
 	 * @return The block.
@@ -134,7 +134,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random DbBlock with the specified timestamp and height.
+	 * Creates a new random Block with the specified timestamp and height.
 	 *
 	 * @param timeStamp The time stamp.
 	 * @param height The height.

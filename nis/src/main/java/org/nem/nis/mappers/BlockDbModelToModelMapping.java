@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.AbstractBlockTransfer;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.stream.StreamSupport;

@@ -41,6 +41,7 @@ public class RandomTransactionFactory {
 	}
 
 	/**
+	 * TODO 20140106 J-G: please rename
 	 * Creates a multisig signer modification.
 	 *
 	 * @return The multisig signer modification.

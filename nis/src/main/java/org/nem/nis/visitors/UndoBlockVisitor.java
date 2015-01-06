@@ -5,7 +5,7 @@ import org.nem.nis.secret.BlockTransactionObserver;
 import org.nem.nis.service.BlockExecutor;
 
 /**
- * DbBlock visitor that undoes all blocks.
+ * Block visitor that undoes all blocks.
  */
 public class UndoBlockVisitor implements BlockVisitor {
 	private final BlockTransactionObserver observer;
