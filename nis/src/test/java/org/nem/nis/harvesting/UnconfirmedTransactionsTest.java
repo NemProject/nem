@@ -1246,7 +1246,8 @@ public class UnconfirmedTransactionsTest {
 	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
 		return new TestContext(
-				factory.createSingle(stateCache),
+				factory.createSingleBuilder(stateCache),
+				null,
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
 				stateCache);
 	}
@@ -1270,6 +1271,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static class TestContext {
+		private final AggregateSingleTransactionValidatorBuilder singleTransactionValidatorBuilder;
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
@@ -1288,10 +1290,11 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
-			this(singleValidator, batchValidator, Mockito.mock(ReadOnlyAccountStateCache.class));
+			this(null, singleValidator, batchValidator, Mockito.mock(ReadOnlyAccountStateCache.class));
 		}
 
 		private TestContext(
+				final AggregateSingleTransactionValidatorBuilder singleTransactionBuilder,
 				final SingleTransactionValidator singleValidator,
 				final BatchTransactionValidator batchValidator,
 				final ReadOnlyAccountStateCache accountStateCache) {
@@ -1303,9 +1306,14 @@ public class UnconfirmedTransactionsTest {
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
-			final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-			builder.add(this.singleValidator);
-			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(builder);
+			if (singleTransactionBuilder == null) {
+				this.singleTransactionValidatorBuilder = new AggregateSingleTransactionValidatorBuilder();
+				this.singleTransactionValidatorBuilder.add(this.singleValidator);
+			} else {
+				this.singleTransactionValidatorBuilder = singleTransactionBuilder;
+			}
+
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(this.singleTransactionValidatorBuilder);
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
