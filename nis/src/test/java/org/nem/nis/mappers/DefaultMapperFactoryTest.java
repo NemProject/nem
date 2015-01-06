@@ -42,7 +42,7 @@ public class DefaultMapperFactoryTest {
 		{
 			this.add(new TransactionEntry<>(Transfer.class, TransferTransaction.class));
 			this.add(new TransactionEntry<>(ImportanceTransfer.class, ImportanceTransferTransaction.class));
-			this.add(new TransactionEntry<>(MultisigSignerModification.class, MultisigAggregateModificationTransaction.class));
+			this.add(new TransactionEntry<>(DbMultisigAggregateModificationTransaction.class, MultisigAggregateModificationTransaction.class));
 			this.add(new TransactionEntry<>(org.nem.nis.dbmodel.MultisigTransaction.class, MultisigTransaction.class));
 		}
 	};

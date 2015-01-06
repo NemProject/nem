@@ -12,7 +12,7 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class MultisigSignerModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, MultisigSignerModification> {
+public class MultisigSignerModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
 
 	@Test
 	public void transferWithSingleModificationCanBeMappedToDbModel() {
@@ -22,7 +22,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 		final MultisigAggregateModificationTransaction model = context.createModel();
 
 		// Act:
-		final MultisigSignerModification dbModel = context.mapping.map(model);
+		final DbMultisigAggregateModificationTransaction dbModel = context.mapping.map(model);
 
 		// Assert:
 		context.assertModel(dbModel, 1);
@@ -38,7 +38,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 		final MultisigAggregateModificationTransaction model = context.createModel();
 
 		// Act:
-		final MultisigSignerModification dbModel = context.mapping.map(model);
+		final DbMultisigAggregateModificationTransaction dbModel = context.mapping.map(model);
 
 		// Assert:
 		context.assertModel(dbModel, 3);
@@ -53,7 +53,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 	}
 
 	@Override
-	protected IMapping<MultisigAggregateModificationTransaction, MultisigSignerModification> createMapping(final IMapper mapper) {
+	protected IMapping<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> createMapping(final IMapper mapper) {
 		return new MultisigSignerModificationModelToDbModelMapping(mapper);
 	}
 
@@ -85,7 +85,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 					this.modifications);
 		}
 
-		public void assertModel(final MultisigSignerModification dbModel, final int numExpectedModifications) {
+		public void assertModel(final DbMultisigAggregateModificationTransaction dbModel, final int numExpectedModifications) {
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));
 
 			Assert.assertThat(dbModel.getMultisigModifications().size(), IsEqual.equalTo(numExpectedModifications));
@@ -97,7 +97,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 			Assert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
 
 			for (final DbMultisigModification modification : dbModel.getMultisigModifications()) {
-				Assert.assertThat(modification.getMultisigSignerModification(), IsEqual.equalTo(dbModel));
+				Assert.assertThat(modification.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModel));
 			}
 		}
 	}

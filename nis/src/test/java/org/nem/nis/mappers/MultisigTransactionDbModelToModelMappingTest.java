@@ -166,9 +166,9 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 		public void addSignerModification() {
 			this.addTransfer(
-					new MultisigSignerModification(),
+					new DbMultisigAggregateModificationTransaction(),
 					RandomTransactionFactory.createSignerModification(),
-					org.nem.nis.dbmodel.MultisigTransaction::setMultisigSignerModification);
+					org.nem.nis.dbmodel.MultisigTransaction::setMultisigAggregateModificationTransaction);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> void addTransfer(

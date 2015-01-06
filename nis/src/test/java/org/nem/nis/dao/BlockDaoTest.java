@@ -134,10 +134,10 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockMultisigSignerModifications().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
-		Assert.assertThat(entity.getBlockMultisigSignerModifications().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().get(0).getId(), notNullValue());
 	}
 
 	// TODO 20141005 - since i imagine these tests will apply to all transaction types, it might make sense

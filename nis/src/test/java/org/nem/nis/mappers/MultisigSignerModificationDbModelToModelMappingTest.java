@@ -11,13 +11,13 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class MultisigSignerModificationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<MultisigSignerModification, MultisigAggregateModificationTransaction> {
+public class MultisigSignerModificationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
 
 	@Test
 	public void transferWithNoModificationsCannotBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigSignerModification dbModel = context.createDbModel();
+		final DbMultisigAggregateModificationTransaction dbModel = context.createDbModel();
 
 		// Act:
 		ExceptionAssert.assertThrows(
@@ -30,7 +30,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addModification(1);
-		final MultisigSignerModification dbModel = context.createDbModel();
+		final DbMultisigAggregateModificationTransaction dbModel = context.createDbModel();
 
 		// Act:
 		final MultisigAggregateModificationTransaction model = context.mapping.map(dbModel);
@@ -46,7 +46,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 		context.addModification(1);
 		context.addModification(2);
 		context.addModification(1);
-		final MultisigSignerModification dbModel = context.createDbModel();
+		final DbMultisigAggregateModificationTransaction dbModel = context.createDbModel();
 
 		// Act:
 		final MultisigAggregateModificationTransaction model = context.mapping.map(dbModel);
@@ -56,8 +56,8 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 	}
 
 	@Override
-	protected MultisigSignerModification createDbModel() {
-		final MultisigSignerModification transfer = new MultisigSignerModification();
+	protected DbMultisigAggregateModificationTransaction createDbModel() {
+		final DbMultisigAggregateModificationTransaction transfer = new DbMultisigAggregateModificationTransaction();
 		final Set<DbMultisigModification> modifications = new HashSet<>();
 		modifications.add(createModification(new org.nem.nis.dbmodel.Account(), 1));
 		transfer.setMultisigModifications(modifications);
@@ -65,7 +65,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 	}
 
 	@Override
-	protected IMapping<MultisigSignerModification, MultisigAggregateModificationTransaction> createMapping(final IMapper mapper) {
+	protected IMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> createMapping(final IMapper mapper) {
 		return new MultisigSignerModificationDbModelToModelMapping(mapper);
 	}
 
@@ -90,8 +90,8 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 			this.expectedModifications.put(cosignatory, type);
 		}
 
-		public MultisigSignerModification createDbModel() {
-			final MultisigSignerModification dbModification = new MultisigSignerModification();
+		public DbMultisigAggregateModificationTransaction createDbModel() {
+			final DbMultisigAggregateModificationTransaction dbModification = new DbMultisigAggregateModificationTransaction();
 			dbModification.setTimeStamp(4444);
 			dbModification.setSender(this.dbSender);
 

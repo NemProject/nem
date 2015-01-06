@@ -85,8 +85,8 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addSignerModification,
-				org.nem.nis.dbmodel.Block::getBlockMultisigSignerModifications,
-				MultisigSignerModification.class);
+				org.nem.nis.dbmodel.Block::getBlockMultisigAggregateModificationTransactions,
+				DbMultisigAggregateModificationTransaction.class);
 	}
 
 	@Test
@@ -178,7 +178,7 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 4)));
 		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
-		transfers = dbModel.getBlockMultisigSignerModifications();
+		transfers = dbModel.getBlockMultisigAggregateModificationTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer5, transfer7)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(5, 7)));
@@ -192,7 +192,7 @@ public class BlockModelToDbModelMappingTest {
 
 		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(Transfer.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(ImportanceTransfer.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(MultisigSignerModification.class));
+		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigAggregateModificationTransaction.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(org.nem.nis.dbmodel.MultisigTransaction.class));
 
 		// Sanity:
@@ -343,9 +343,9 @@ public class BlockModelToDbModelMappingTest {
 			return this.addTransfer(block, transfer, new ImportanceTransfer(), ImportanceTransfer.class);
 		}
 
-		public MultisigSignerModification addSignerModification(final Block block) {
+		public DbMultisigAggregateModificationTransaction addSignerModification(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createSignerModification();
-			return this.addTransfer(block, transfer, new MultisigSignerModification(), MultisigSignerModification.class);
+			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);
 		}
 
 		public org.nem.nis.dbmodel.MultisigTransaction addMultisigTransfer(final Block block) {

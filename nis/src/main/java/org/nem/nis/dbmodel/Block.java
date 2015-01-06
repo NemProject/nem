@@ -63,7 +63,7 @@ public class Block {
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<MultisigSignerModification> blockMultisigSignerModifications;
+	private List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
@@ -192,14 +192,14 @@ public class Block {
 		this.blockImportanceTransfers = blockImportanceTransfers;
 	}
 
-	public List<MultisigSignerModification> getBlockMultisigSignerModifications()
+	public List<DbMultisigAggregateModificationTransaction> getBlockMultisigAggregateModificationTransactions()
 	{
-		return this.blockMultisigSignerModifications;
+		return this.blockMultisigAggregateModificationTransactions;
 	}
 
-	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModifications)
+	public void setBlockMultisigAggregateModificationTransactions(final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions)
 	{
-		this.blockMultisigSignerModifications = blockMultisigSignerModifications;
+		this.blockMultisigAggregateModificationTransactions = blockMultisigAggregateModificationTransactions;
 	}
 
 	public List<MultisigTransaction> getBlockMultisigTransactions() {

@@ -83,8 +83,8 @@ public class NisDbModelToModelMapperTest {
 				ImportanceTransferTransaction.class,
 				2);
 		context.setTransactions(
-				MultisigSignerModification::new,
-				context.dbBlock::setBlockMultisigSignerModifications,
+				DbMultisigAggregateModificationTransaction::new,
+				context.dbBlock::setBlockMultisigAggregateModificationTransactions,
 				MultisigAggregateModificationTransaction.class,
 				1);
 		context.setTransactions(

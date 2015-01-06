@@ -256,9 +256,9 @@ public class BlockDbModelToModelMappingTest {
 
 		public MultisigAggregateModificationTransaction addSignerModification(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockMultisigSignerModifications().add(dbTransfer),
+					dbTransfer -> block.getBlockMultisigAggregateModificationTransactions().add(dbTransfer),
 					blockIndex,
-					new MultisigSignerModification(),
+					new DbMultisigAggregateModificationTransaction(),
 					MultisigAggregateModificationTransaction.class);
 		}
 

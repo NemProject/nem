@@ -109,11 +109,11 @@ public class BlockMapperTest {
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS*1000L);
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
-			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final DbMultisigAggregateModificationTransaction dbTransfer = dbModel.getBlockMultisigAggregateModificationTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -134,7 +134,7 @@ public class BlockMapperTest {
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS * (100L + 1));
 		// note: we expect both multisig txes and block transfers
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 
@@ -159,7 +159,7 @@ public class BlockMapperTest {
 		context.assertDbModel(dbModel, 1 * (100L + 1));
 		// note: we expect both multisig txes and block transfers
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(1));
 
@@ -341,11 +341,11 @@ public class BlockMapperTest {
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A * 1000L + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C);
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
 		for (int i = 0; i < NUM_TRANSACTIONS_A; ++i) {
-			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final DbMultisigAggregateModificationTransaction dbTransfer = dbModel.getBlockMultisigAggregateModificationTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -399,11 +399,11 @@ public class BlockMapperTest {
 
 		// Assert:
 		context.assertDbModel(dbModel, 1000L * (NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
 		for (int i = 0; i < NUM_TRANSACTIONS_A; ++i) {
-			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final DbMultisigAggregateModificationTransaction dbTransfer = dbModel.getBlockMultisigAggregateModificationTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(3 * i + 1);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -455,7 +455,7 @@ public class BlockMapperTest {
 		context.assertDbModel(dbModel, (100L + 1) * 2 + 2);
 
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(4));
 		for (int i = 0; i < 2; ++i) {

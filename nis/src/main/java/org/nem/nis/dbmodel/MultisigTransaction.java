@@ -30,7 +30,7 @@ public class MultisigTransaction extends AbstractBlockTransfer<MultisigTransacti
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "multisigSignerModificationId")
-	private MultisigSignerModification multisigSignerModification;
+	private DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
@@ -56,12 +56,12 @@ public class MultisigTransaction extends AbstractBlockTransfer<MultisigTransacti
 		this.importanceTransfer = importanceTransfer;
 	}
 
-	public MultisigSignerModification getMultisigSignerModification() {
-		return this.multisigSignerModification;
+	public DbMultisigAggregateModificationTransaction getMultisigAggregateModificationTransaction() {
+		return this.multisigAggregateModificationTransaction;
 	}
 
-	public void setMultisigSignerModification(final MultisigSignerModification multisigSignerModification) {
-		this.multisigSignerModification = multisigSignerModification;
+	public void setMultisigAggregateModificationTransaction(final DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction) {
+		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
 	}
 
 	public Set<DbMultisigSignatureTransaction> getMultisigSignatureTransactions() {

@@ -117,12 +117,12 @@ public class TransactionRegistry {
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					Block::getBlockMultisigSignerModifications,
-					(block, transfers) -> block.setBlockMultisigSignerModifications(transfers),
-					MultisigTransaction::getMultisigSignerModification,
+					Block::getBlockMultisigAggregateModificationTransactions,
+					(block, transfers) -> block.setBlockMultisigAggregateModificationTransactions(transfers),
+					MultisigTransaction::getMultisigAggregateModificationTransaction,
 					MultisigSignerModificationModelToDbModelMapping::new,
 					MultisigSignerModificationDbModelToModelMapping::new,
-					MultisigSignerModification.class,
+					DbMultisigAggregateModificationTransaction.class,
 					MultisigAggregateModificationTransaction.class));
 
 			this.add(new Entry<>(

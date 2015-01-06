@@ -26,14 +26,14 @@ public class DbMultisigModification {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "multisigSignerModificationId")
-	private MultisigSignerModification multisigSignerModification;
+	private DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction;
 
-	public MultisigSignerModification getMultisigSignerModification() {
-		return this.multisigSignerModification;
+	public DbMultisigAggregateModificationTransaction getMultisigAggregateModificationTransaction() {
+		return this.multisigAggregateModificationTransaction;
 	}
 
-	public void setMultisigSignerModification(final MultisigSignerModification multisigSignerModification) {
-		this.multisigSignerModification = multisigSignerModification;
+	public void setMultisigAggregateModificationTransaction(final DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction) {
+		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
 	}
 
 	public Account getCosignatory() {

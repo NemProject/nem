@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * A mapping that is able to map a db multisig signer modification transfer to a model multisig signer modification transaction.
  */
-public class MultisigSignerModificationDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<MultisigSignerModification, MultisigAggregateModificationTransaction> {
+public class MultisigSignerModificationDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -25,7 +25,7 @@ public class MultisigSignerModificationDbModelToModelMapping extends AbstractTra
 	}
 
 	@Override
-	public MultisigAggregateModificationTransaction mapImpl(final MultisigSignerModification source) {
+	public MultisigAggregateModificationTransaction mapImpl(final DbMultisigAggregateModificationTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 
 		final List<MultisigModification> multisigModifications = source.getMultisigModifications().stream()
