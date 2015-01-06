@@ -184,7 +184,7 @@ public class BlockDaoImpl implements BlockDao {
 		this.dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
 		this.dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications", (transactionsToDelete) -> {
 			final Query preQuery = this.getCurrentSession()
-					.createQuery("delete from MultisigModification m where m.multisigSignerModification.id in (:ids)")
+					.createQuery("delete from DbMultisigModification m where m.multisigSignerModification.id in (:ids)")
 					.setParameterList("ids", transactionsToDelete);
 			preQuery.executeUpdate();
 		});

@@ -1,6 +1,5 @@
 package org.nem.nis.mappers;
 
-import junit.framework.TestCase;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -91,13 +90,13 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 
 			Assert.assertThat(dbModel.getMultisigModifications().size(), IsEqual.equalTo(numExpectedModifications));
 			final Map<org.nem.nis.dbmodel.Account, Integer> actualModifications = new HashMap<>();
-			for (final org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications()) {
+			for (final DbMultisigModification modification : dbModel.getMultisigModifications()) {
 				actualModifications.put(modification.getCosignatory(), modification.getModificationType());
 			}
 
 			Assert.assertThat(actualModifications, IsEqual.equalTo(this.expectedModifications));
 
-			for (final org.nem.nis.dbmodel.MultisigModification modification : dbModel.getMultisigModifications()) {
+			for (final DbMultisigModification modification : dbModel.getMultisigModifications()) {
 				Assert.assertThat(modification.getMultisigSignerModification(), IsEqual.equalTo(dbModel));
 			}
 		}

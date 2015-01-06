@@ -1,11 +1,8 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.Message;
 import org.nem.core.model.MultisigSignerModificationTransaction;
-import org.nem.core.model.TransferTransaction;
-import org.nem.nis.dbmodel.MultisigModification;
+import org.nem.nis.dbmodel.DbMultisigModification;
 import org.nem.nis.dbmodel.MultisigSignerModification;
-import org.nem.nis.dbmodel.Transfer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,9 +26,9 @@ public class MultisigSignerModificationModelToDbModelMapping extends AbstractTra
 		final MultisigSignerModification target = new MultisigSignerModification();
 		target.setReferencedTransaction(0L);
 
-		final Set<MultisigModification> multisigModifications = new HashSet<>(source.getModifications().size());
+		final Set<DbMultisigModification> multisigModifications = new HashSet<>(source.getModifications().size());
 		for (final org.nem.core.model.MultisigModification multisigModification : source.getModifications()) {
-			final MultisigModification dbModification = this.mapMultisigModification(multisigModification);
+			final DbMultisigModification dbModification = this.mapMultisigModification(multisigModification);
 			dbModification.setMultisigSignerModification(target);
 			multisigModifications.add(dbModification);
 		}
@@ -40,9 +37,9 @@ public class MultisigSignerModificationModelToDbModelMapping extends AbstractTra
 		return target;
 	}
 
-	private MultisigModification mapMultisigModification(final org.nem.core.model.MultisigModification source) {
+	private DbMultisigModification mapMultisigModification(final org.nem.core.model.MultisigModification source) {
 		final org.nem.nis.dbmodel.Account cosignatory = this.mapAccount(source.getCosignatory());
-		final org.nem.nis.dbmodel.MultisigModification target = new org.nem.nis.dbmodel.MultisigModification();
+		final DbMultisigModification target = new DbMultisigModification();
 		target.setCosignatory(cosignatory);
 		target.setModificationType(source.getModificationType().value());
 		return target;

@@ -31,17 +31,17 @@ import java.util.Set;
 public class MultisigSignerModification extends AbstractBlockTransfer<MultisigSignerModification> {
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigSignerModification", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private Set<MultisigModification> multisigModifications;
+	private Set<DbMultisigModification> multisigModifications;
 
 	public MultisigSignerModification() {
 		super(b -> b.getBlockMultisigSignerModifications());
 	}
 
-	public Set<MultisigModification> getMultisigModifications() {
+	public Set<DbMultisigModification> getMultisigModifications() {
 		return this.multisigModifications;
 	}
 
-	public void setMultisigModifications(final Set<MultisigModification> multisigModifications) {
+	public void setMultisigModifications(final Set<DbMultisigModification> multisigModifications) {
 		this.multisigModifications = multisigModifications;
 	}
 }

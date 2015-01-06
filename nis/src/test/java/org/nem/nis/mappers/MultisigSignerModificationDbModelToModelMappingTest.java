@@ -5,14 +5,11 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.MultisigModification;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.Account;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MultisigSignerModificationDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<MultisigSignerModification, MultisigSignerModificationTransaction> {
 
@@ -61,7 +58,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 	@Override
 	protected MultisigSignerModification createDbModel() {
 		final MultisigSignerModification transfer = new MultisigSignerModification();
-		final Set<org.nem.nis.dbmodel.MultisigModification> modifications = new HashSet<>();
+		final Set<DbMultisigModification> modifications = new HashSet<>();
 		modifications.add(createModification(new org.nem.nis.dbmodel.Account(), 1));
 		transfer.setMultisigModifications(modifications);
 		return transfer;
@@ -77,7 +74,7 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<org.nem.core.model.Account, Integer> expectedModifications = new HashMap<>();
-		private final Set<org.nem.nis.dbmodel.MultisigModification> modifications = new HashSet<>();
+		private final Set<DbMultisigModification> modifications = new HashSet<>();
 		private final MultisigSignerModificationDbModelToModelMapping mapping = new MultisigSignerModificationDbModelToModelMapping(this.mapper);
 
 		public TestContext() {
@@ -120,8 +117,8 @@ public class MultisigSignerModificationDbModelToModelMappingTest extends Abstrac
 		}
 	}
 
-	private static org.nem.nis.dbmodel.MultisigModification createModification(final org.nem.nis.dbmodel.Account cosignatory, final int type) {
-		final org.nem.nis.dbmodel.MultisigModification dbModification = new org.nem.nis.dbmodel.MultisigModification();
+	private static DbMultisigModification createModification(final org.nem.nis.dbmodel.Account cosignatory, final int type) {
+		final DbMultisigModification dbModification = new DbMultisigModification();
 		dbModification.setCosignatory(cosignatory);
 		dbModification.setModificationType(type);
 		return dbModification;
