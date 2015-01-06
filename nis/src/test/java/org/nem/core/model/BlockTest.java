@@ -352,6 +352,28 @@ public class BlockTest {
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(103L)));
 	}
 
+	@Test
+	public void blockWithMultisigTransactionReturnsCorrectFee() {
+		// Arrange:
+		final Block block = BlockUtils.createBlock();
+
+		final Transaction innerTransaction = BlockUtils.createTransactionWithFee(1_000000);
+		final MultisigSignatureTransaction sig1 = new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		sig1.setFee(Amount.fromNem(3));
+		final MultisigSignatureTransaction sig2 = new MultisigSignatureTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		sig2.setFee(Amount.fromNem(5));
+		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), innerTransaction);
+		transaction.addSignature(sig1);
+		transaction.addSignature(sig2);
+		transaction.setFee(Amount.fromNem(130));
+
+		// Act:
+		block.addTransaction(transaction);
+
+		// Assert:
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(1 + 3 + 5 + 130)));
+	}
+
 	//endregion
 
 	//region equals / hashCode
