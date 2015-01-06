@@ -254,12 +254,12 @@ public class BlockDbModelToModelMappingTest {
 					ImportanceTransferTransaction.class);
 		}
 
-		public MultisigSignerModificationTransaction addSignerModification(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
+		public MultisigAggregateModificationTransaction addSignerModification(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
 			return this.addTransfer(
 					dbTransfer -> block.getBlockMultisigSignerModifications().add(dbTransfer),
 					blockIndex,
 					new MultisigSignerModification(),
-					MultisigSignerModificationTransaction.class);
+					MultisigAggregateModificationTransaction.class);
 		}
 
 		public MultisigTransaction addMultisigTransfer(final org.nem.nis.dbmodel.Block block, final int blockIndex) {

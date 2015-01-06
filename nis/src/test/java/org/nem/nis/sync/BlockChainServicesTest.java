@@ -210,12 +210,12 @@ public class BlockChainServicesTest {
 		context.recalculateImportances(START_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 
-		final MultisigSignerModificationTransaction modification1 = createModification(multisigAccount, cosignatoryNew1);
+		final MultisigAggregateModificationTransaction modification1 = createModification(multisigAccount, cosignatoryNew1);
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
 		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
 		transaction1.sign();
 
-		final MultisigSignerModificationTransaction modification2 = createModification(multisigAccount, cosignatoryNew2);
+		final MultisigAggregateModificationTransaction modification2 = createModification(multisigAccount, cosignatoryNew2);
 		final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification2);
 		final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(transaction2.getTimeStamp(), cosignatoryNew1, HashUtils.calculateHash(modification2));
 		signature.sign();
@@ -252,7 +252,7 @@ public class BlockChainServicesTest {
 		context.makeCosignatory(cosignatory1, multisigAccount);
 		context.makeCosignatory(cosignatoryDel1, multisigAccount);
 
-		final MultisigSignerModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1));
+		final MultisigAggregateModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1));
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
 		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
 		transaction1.sign();
@@ -288,7 +288,7 @@ public class BlockChainServicesTest {
 		context.makeCosignatory(cosignatoryDel1, multisigAccount);
 		context.makeCosignatory(cosignatoryDel2, multisigAccount);
 
-		final MultisigSignerModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1, cosignatoryDel2));
+		final MultisigAggregateModificationTransaction modification1 = createDelModifications(multisigAccount, Arrays.asList(cosignatoryDel1, cosignatoryDel2));
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
 		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
 		transaction1.sign();
@@ -320,8 +320,8 @@ public class BlockChainServicesTest {
 		return transaction;
 	}
 
-	private static MultisigSignerModificationTransaction createModification(final Account multisigAccount, final Account cosignatoryNew1) {
-		final MultisigSignerModificationTransaction result = new MultisigSignerModificationTransaction(
+	private static MultisigAggregateModificationTransaction createModification(final Account multisigAccount, final Account cosignatoryNew1) {
+		final MultisigAggregateModificationTransaction result = new MultisigAggregateModificationTransaction(
 				NisMain.TIME_PROVIDER.getCurrentTime(),
 				multisigAccount,
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatoryNew1))
@@ -330,8 +330,8 @@ public class BlockChainServicesTest {
 		return result;
 	}
 
-	private static MultisigSignerModificationTransaction createDelModifications(final Account multisigAccount, final List<Account> cosignatories) {
-		final MultisigSignerModificationTransaction result = new MultisigSignerModificationTransaction(
+	private static MultisigAggregateModificationTransaction createDelModifications(final Account multisigAccount, final List<Account> cosignatories) {
+		final MultisigAggregateModificationTransaction result = new MultisigAggregateModificationTransaction(
 				NisMain.TIME_PROVIDER.getCurrentTime(),
 				multisigAccount,
 				cosignatories.stream().map(a -> new MultisigModification(MultisigModificationType.Del, a)).collect(Collectors.toList())

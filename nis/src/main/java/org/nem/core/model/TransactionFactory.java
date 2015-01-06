@@ -26,7 +26,7 @@ public class TransactionFactory {
 				{
 					this.put(TransactionTypes.TRANSFER, TransferTransaction::new);
 					this.put(TransactionTypes.IMPORTANCE_TRANSFER, ImportanceTransferTransaction::new);
-					this.put(TransactionTypes.MULTISIG_SIGNER_MODIFY, MultisigSignerModificationTransaction::new);
+					this.put(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, MultisigAggregateModificationTransaction::new);
 					this.put(TransactionTypes.MULTISIG, MultisigTransaction::new);
 					this.put(TransactionTypes.MULTISIG_SIGNATURE, MultisigSignatureTransaction::new);
 				}

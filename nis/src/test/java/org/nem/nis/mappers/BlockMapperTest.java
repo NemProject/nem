@@ -379,11 +379,11 @@ public class BlockMapperTest {
 		// TO
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
 		final List<MultisigModification> modifications1 = Arrays.asList(new MultisigModification(modificationType, context.account2));
-		context.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(200), context.account1, modifications1));
+		context.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(200), context.account1, modifications1));
 		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(300), context.account1, mode, context.account2));
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(400), context.account2, context.account3, new Amount(11), null));
 		final List<MultisigModification> modifications2 = Arrays.asList(new MultisigModification(modificationType, context.account3));
-		context.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(500), context.account1, modifications2));
+		context.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(500), context.account1, modifications2));
 		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(600), context.account3, mode, context.account2));
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(700), context.account3, context.account1, new Amount(4), null));
 		for (final Transaction transaction : context.model.getTransactions()) {
@@ -630,9 +630,9 @@ public class BlockMapperTest {
 
 		public void addMultisigSignerModificationTransactions() {
 			final List<MultisigModification> modifications1 = Arrays.asList(new MultisigModification(MultisigModificationType.Add, this.account2));
-			this.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(150), this.account1, modifications1));
+			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(150), this.account1, modifications1));
 			final List<MultisigModification> modifications2 = Arrays.asList(new MultisigModification(MultisigModificationType.Add, this.account3));
-			this.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(250), this.account1, modifications2));
+			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(250), this.account1, modifications2));
 
 			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();

@@ -18,22 +18,22 @@ import java.util.Arrays;
 import java.util.List;
 
 @RunWith(Enclosed.class)
-public class MultisigSignerModificationTransactionTest {
-	public static class MultisigSignerModificationTransactionAddTest extends AbstractMultisigSignerModificationTransactionTest {
+public class MultisigAggregateModificationTransactionTest {
+	public static class MultisigAggregateModificationTransactionAddTest extends AbstractMultisigSignerModificationTransactionTest {
 		@Override
 		protected MultisigModificationType getModification() {
 			return MultisigModificationType.Add;
 		}
 	}
 
-	public static class MultisigSignerModificationTransactionDelTest extends AbstractMultisigSignerModificationTransactionTest {
+	public static class MultisigAggregateModificationTransactionDelTest extends AbstractMultisigSignerModificationTransactionTest {
 		@Override
 		protected MultisigModificationType getModification() {
 			return MultisigModificationType.Del;
 		}
 	}
 
-	public static class MultisigSignerModificationTransactionMainTest {
+	public static class MultisigAggregateModificationTransactionMainTest {
 		//region ctor
 		@Test
 		public void cannotCreateMultisigSignerModificationWithNullModifications() {
@@ -41,7 +41,7 @@ public class MultisigSignerModificationTransactionTest {
 			final Account signer = Mockito.mock(Account.class);
 
 			// Act:
-			ExceptionAssert.assertThrows(v -> new MultisigSignerModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, null), IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, null), IllegalArgumentException.class);
 		}
 
 		@Test
@@ -50,7 +50,7 @@ public class MultisigSignerModificationTransactionTest {
 			final Account signer = Mockito.mock(Account.class);
 
 			// Act:
-			ExceptionAssert.assertThrows(v -> new MultisigSignerModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, new ArrayList<>()), IllegalArgumentException.class);
+			ExceptionAssert.assertThrows(v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, new ArrayList<>()), IllegalArgumentException.class);
 		}
 		//endregion
 
@@ -65,7 +65,7 @@ public class MultisigSignerModificationTransactionTest {
 					new MultisigModification(MultisigModificationType.Del, cosignatory2)
 			);
 
-			final MultisigSignerModificationTransaction transaction = AbstractMultisigSignerModificationTransactionTest.createMultisigSignerModificationTransaction(signer, modificationList);
+			final MultisigAggregateModificationTransaction transaction = AbstractMultisigSignerModificationTransactionTest.createMultisigSignerModificationTransaction(signer, modificationList);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:

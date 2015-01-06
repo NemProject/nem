@@ -1,6 +1,6 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.MultisigSignerModificationTransaction;
+import org.nem.core.model.MultisigAggregateModificationTransaction;
 import org.nem.nis.dbmodel.DbMultisigModification;
 import org.nem.nis.dbmodel.MultisigSignerModification;
 
@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * A mapping that is able to map a model multisig signer modification transaction to a db multisig signer modification transfer.
  */
-public class MultisigSignerModificationModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigSignerModificationTransaction, MultisigSignerModification> {
+public class MultisigSignerModificationModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigAggregateModificationTransaction, MultisigSignerModification> {
 
 	/**
 	 * Creates a new mapping.
@@ -22,7 +22,7 @@ public class MultisigSignerModificationModelToDbModelMapping extends AbstractTra
 	}
 
 	@Override
-	public MultisigSignerModification mapImpl(final MultisigSignerModificationTransaction source) {
+	public MultisigSignerModification mapImpl(final MultisigAggregateModificationTransaction source) {
 		final MultisigSignerModification target = new MultisigSignerModification();
 		target.setReferencedTransaction(0L);
 

@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Multisig Signer Modification db entity
  * <p>
- * Holds information about Transactions having type TransactionTypes.MULTISIG_SIGNER_MODIFY
+ * Holds information about Transactions having type TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION
  * <p>
  *
  * TODO 20150103 J-G can you remind me why we need both MultisigSignerModification and MultisigModification?

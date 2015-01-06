@@ -37,7 +37,7 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 				dbMultisigTransfer.setImportanceTransfer(this.mapper.map(transaction, ImportanceTransfer.class));
 				break;
 
-			case TransactionTypes.MULTISIG_SIGNER_MODIFY:
+			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
 				dbMultisigTransfer.setMultisigSignerModification(this.mapper.map(transaction, MultisigSignerModification.class));
 				break;
 

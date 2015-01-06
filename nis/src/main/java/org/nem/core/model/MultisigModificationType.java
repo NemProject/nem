@@ -19,7 +19,7 @@ public enum MultisigModificationType {
 	/**
 	 * Removal summary:
 	 * 1. Removal will only be allowed in multisig transactions
-	 * 2. There can be only one Del per MultisigSignerModificationTransaction
+	 * 2. There can be only one Del per MultisigAggregateModificationTransaction
 	 * 3. There will be N-2 signatures required
 	 * (1 that gets removed, and 1 for person issuing MultisigTransaction)
 	 */

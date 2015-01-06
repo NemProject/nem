@@ -114,11 +114,11 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote);
-		final MultisigSignerModificationTransaction multisigSignerModificationTransaction = this.prepareMultisigSignerModificationTransaction(signer, remote);
+		final MultisigAggregateModificationTransaction multisigAggregateModificationTransaction = this.prepareMultisigSignerModificationTransaction(signer, remote);
 		final ImportanceTransferTransaction importanceTransfer = this.prepareImportanceTransferTransaction(signer, remote, true);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(signer, remote, 10);
 		final org.nem.core.model.Block block = this.createTestEmptyBlock(signer, 133, 0);
-		block.addTransaction(multisigSignerModificationTransaction);
+		block.addTransaction(multisigAggregateModificationTransaction);
 		block.addTransaction(importanceTransfer);
 		block.addTransaction(transferTransaction);
 		block.sign();
@@ -793,13 +793,13 @@ public class BlockDaoTest {
 		return importanceTransferTransaction;
 	}
 
-	private MultisigSignerModificationTransaction prepareMultisigSignerModificationTransaction(
+	private MultisigAggregateModificationTransaction prepareMultisigSignerModificationTransaction(
 			final Account sender,
 			final Account cosignatory
 	) {
 		// Arrange:
 		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
-		final MultisigSignerModificationTransaction transaction = new MultisigSignerModificationTransaction(
+		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
 				new TimeInstant(0),
 				sender,
 				modifications

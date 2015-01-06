@@ -12,14 +12,14 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class MultisigSignerModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigSignerModificationTransaction, MultisigSignerModification> {
+public class MultisigSignerModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, MultisigSignerModification> {
 
 	@Test
 	public void transferWithSingleModificationCanBeMappedToDbModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addModification(1);
-		final MultisigSignerModificationTransaction model = context.createModel();
+		final MultisigAggregateModificationTransaction model = context.createModel();
 
 		// Act:
 		final MultisigSignerModification dbModel = context.mapping.map(model);
@@ -35,7 +35,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 		context.addModification(1);
 		context.addModification(2);
 		context.addModification(1);
-		final MultisigSignerModificationTransaction model = context.createModel();
+		final MultisigAggregateModificationTransaction model = context.createModel();
 
 		// Act:
 		final MultisigSignerModification dbModel = context.mapping.map(model);
@@ -45,15 +45,15 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 	}
 
 	@Override
-	protected MultisigSignerModificationTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return new MultisigSignerModificationTransaction(
+	protected MultisigAggregateModificationTransaction createModel(final TimeInstant timeStamp, final Account sender) {
+		return new MultisigAggregateModificationTransaction(
 				timeStamp,
 				sender,
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
 	}
 
 	@Override
-	protected IMapping<MultisigSignerModificationTransaction, MultisigSignerModification> createMapping(final IMapper mapper) {
+	protected IMapping<MultisigAggregateModificationTransaction, MultisigSignerModification> createMapping(final IMapper mapper) {
 		return new MultisigSignerModificationModelToDbModelMapping(mapper);
 	}
 
@@ -78,8 +78,8 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 			this.expectedModifications.put(dbCosignatory, type);
 		}
 
-		public MultisigSignerModificationTransaction createModel() {
-			return new MultisigSignerModificationTransaction(
+		public MultisigAggregateModificationTransaction createModel() {
+			return new MultisigAggregateModificationTransaction(
 					TimeInstant.ZERO,
 					this.sender,
 					this.modifications);

@@ -116,14 +116,14 @@ public class TransactionRegistry {
 					ImportanceTransferTransaction.class));
 
 			this.add(new Entry<>(
-					TransactionTypes.MULTISIG_SIGNER_MODIFY,
+					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 					Block::getBlockMultisigSignerModifications,
 					(block, transfers) -> block.setBlockMultisigSignerModifications(transfers),
 					MultisigTransaction::getMultisigSignerModification,
 					MultisigSignerModificationModelToDbModelMapping::new,
 					MultisigSignerModificationDbModelToModelMapping::new,
 					MultisigSignerModification.class,
-					MultisigSignerModificationTransaction.class));
+					MultisigAggregateModificationTransaction.class));
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG,
