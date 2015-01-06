@@ -27,7 +27,7 @@ public class TransactionFactoryTest {
 		final List<Integer> expectedRegisteredTypes = Arrays.asList(
 				TransactionTypes.TRANSFER,
 				TransactionTypes.IMPORTANCE_TRANSFER,
-				TransactionTypes.MULTISIG_SIGNER_MODIFY,
+				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				TransactionTypes.MULTISIG,
 				TransactionTypes.MULTISIG_SIGNATURE);
 
@@ -127,7 +127,7 @@ public class TransactionFactoryTest {
 
 	//endregion
 
-	//region MultisigSignerModificationTransaction
+	//region MultisigAggregateModificationTransaction
 
 	@Test
 	public void canDeserializeVerifiableMultisigSignerModificationTransaction() {
@@ -135,7 +135,7 @@ public class TransactionFactoryTest {
 		final Transaction originalTransaction = createMultisigSignerModificationTransaction();
 
 		// Assert:
-		assertCanDeserializeVerifiable(originalTransaction, MultisigSignerModificationTransaction.class, TransactionTypes.MULTISIG_SIGNER_MODIFY);
+		assertCanDeserializeVerifiable(originalTransaction, MultisigAggregateModificationTransaction.class, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 	}
 
 	@Test
@@ -144,14 +144,14 @@ public class TransactionFactoryTest {
 		final Transaction originalTransaction = createMultisigSignerModificationTransaction();
 
 		// Assert:
-		assertCanDeserializeNonVerifiable(originalTransaction, MultisigSignerModificationTransaction.class, TransactionTypes.MULTISIG_SIGNER_MODIFY);
+		assertCanDeserializeNonVerifiable(originalTransaction, MultisigAggregateModificationTransaction.class, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 	}
 
 	private static Transaction createMultisigSignerModificationTransaction() {
 		final Account sender = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
-		return new MultisigSignerModificationTransaction(
+		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				sender,
 				modifications);
@@ -159,7 +159,7 @@ public class TransactionFactoryTest {
 
 	//endregion
 
-	//region MultisigSignerModificationTransaction
+	//region MultisigAggregateModificationTransaction
 
 	@Test
 	public void canDeserializeVerifiableMultisigTransaction() {

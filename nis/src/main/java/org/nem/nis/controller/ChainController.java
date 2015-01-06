@@ -9,6 +9,7 @@ import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
@@ -95,20 +96,20 @@ public class ChainController {
 			final int numBlocksToRequest,
 			final int maxTransactions) {
 		int numTransactions = blockList.asCollection().stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
-		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
+		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
 		if (dbBlockList.isEmpty()) {
 			return true;
 		}
 
-		org.nem.nis.dbmodel.Block previousDbBlock = null;
-		for (final org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
+		DbBlock previousDbBlock = null;
+		for (final DbBlock dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
 			if (null != previousDbBlock && (previousDbBlock.getHeight() + 1 != dbBlock.getHeight())) {
 				throw new RuntimeException("Corrupt block list returned from db.");
 			}
 
 			previousDbBlock = dbBlock;
-			numTransactions += dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
+			numTransactions += dbBlock.getBlockImportanceTransferTransactions().size() + dbBlock.getBlockTransferTransactions().size();
 			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}

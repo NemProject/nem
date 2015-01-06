@@ -715,7 +715,7 @@ public class NxtGraphClusteringITCase {
 			final AccountState recipientAccountState = accountStateMap.get(recipient);
 			final long balance = mapPoiAccountStateToBalance(senderAccountState, blockHeight).getNumMicroNem();
 
-			// We need to add some balance sometimes because the transactions don't account for fees earned from forged blocks
+			// We need to add some balance sometimes because the transactions don't account for fees earned from harvested blocks
 			final long remainingBalance = balance - amount.getNumMicroNem();
 			if (remainingBalance < 0) {
 				//System.out.println("balance: " + balance);

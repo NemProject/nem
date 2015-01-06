@@ -1,12 +1,10 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.*;
-import org.nem.core.model.Block;
 import org.nem.core.model.MultisigModification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
 
 import java.util.Arrays;
 
@@ -47,8 +45,8 @@ public class RandomTransactionFactory {
 	 *
 	 * @return The multisig signer modification.
 	 */
-	public static MultisigSignerModificationTransaction createSignerModification() {
-		return new MultisigSignerModificationTransaction(
+	public static MultisigAggregateModificationTransaction createSignerModification() {
+		return new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));

@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 /**
  * A mapping that is able to map a db block to a model block.
  */
-public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.Block, Block> {
+public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 	private final IMapper mapper;
 	private final AccountLookup accountLookup;
 
@@ -33,17 +33,17 @@ public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.
 	}
 
 	@Override
-	public Block map(final org.nem.nis.dbmodel.Block dbBlock) {
+	public Block map(final DbBlock dbBlock) {
 		if (1 == dbBlock.getHeight()) {
 			// TODO 20141226 J-G: do you remember why we have this special case / do we still need it after separating the account and account state?
 			return NemesisBlock.fromResource(new DeserializationContext(this.accountLookup));
 		}
 
-		final Account forager = this.mapper.map(dbBlock.getForger(), Account.class);
+		final Account harvester = this.mapper.map(dbBlock.getHarvester(), Account.class);
 		final Account lessor = dbBlock.getLessor() != null ? this.mapper.map(dbBlock.getLessor(), Account.class) : null;
 
 		final Block block = new org.nem.core.model.Block(
-				forager,
+				harvester,
 				dbBlock.getPrevBlockHash(),
 				dbBlock.getGenerationHash(),
 				new TimeInstant(dbBlock.getTimeStamp()),
@@ -52,7 +52,7 @@ public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.
 		final Long difficulty = dbBlock.getDifficulty();
 		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
 		block.setLessor(lessor);
-		block.setSignature(new Signature(dbBlock.getForgerProof()));
+		block.setSignature(new Signature(dbBlock.getHarvesterProof()));
 
 		final int count = StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
 				.map(e -> e.getFromBlock.apply(dbBlock).size())

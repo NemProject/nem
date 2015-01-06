@@ -5,18 +5,18 @@ import org.nem.core.crypto.PublicKey;
 import javax.persistence.*;
 
 /**
- * Db Account entity.
+ * DbAccount entity.
  * <p>
  * Probably it should be called Address, as it's main purpose is to associate
  * printableKey with publicKey.
  * <p>
- * In future it should probably also two 'heights' of an Account,
+ * In future it should probably also two 'heights' of an DbAccount,
  * marking at what blockchain height has network 'learned' about
- * Account NEM address (printableKey) and public key respectively.
+ * DbAccount NEM address (printableKey) and public key respectively.
  */
 @Entity
 @Table(name = "accounts")
-public class Account {
+public class DbAccount {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -25,10 +25,10 @@ public class Account {
 	// public key, might be null
 	private byte[] publicKey;
 
-	public Account() {
+	public DbAccount() {
 	}
 
-	public Account(final String printableKey, final PublicKey publicKey) {
+	public DbAccount(final String printableKey, final PublicKey publicKey) {
 		this.printableKey = printableKey;
 		this.setPublicKey(publicKey);
 	}

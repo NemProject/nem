@@ -11,16 +11,16 @@ import javax.persistence.Table;
 import java.util.List;
 
 /**
- * Db Block entity.
+ * DbBlock entity.
  * <p>
  * Holds all the important information related to block data.
  * <p>
- * Associated forger and transactions are obtained automatically (by BlockDao)
+ * Associated harvester and transactions are obtained automatically (by BlockDao)
  * thanks to @Cascade annotations.
  */
 @Entity
 @Table(name = "blocks")
-public class Block {
+public class DbBlock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -34,14 +34,14 @@ public class Block {
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-	@JoinColumn(name = "forgerId")
-	private Account forger;
-	private byte[] forgerProof;
+	@JoinColumn(name = "harvesterId")
+	private DbAccount harvester;
+	private byte[] harvesterProof;
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "harvestedInName")
-	private Account lessor;
+	private DbAccount lessor;
 
 	private Long height;
 	private Long totalFee;
@@ -51,25 +51,25 @@ public class Block {
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<Transfer> blockTransfers;
+	private List<DbTransferTransaction> blockTransferTransactions;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<ImportanceTransfer> blockImportanceTransfers;
+	private List<DbImportanceTransferTransaction> blockImportanceTransferTransactions;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<MultisigSignerModification> blockMultisigSignerModifications;
+	private List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<MultisigTransaction> blockMultisigTransactions;
+	private List<DbMultisigTransaction> blockMultisigTransactions;
 
 	public Long getId() {
 		return this.id;
@@ -128,27 +128,27 @@ public class Block {
 		this.timeStamp = timeStamp;
 	}
 
-	public Account getForger() {
-		return this.forger;
+	public DbAccount getHarvester() {
+		return this.harvester;
 	}
 
-	public void setForger(final Account forger) {
-		this.forger = forger;
+	public void setHarvester(final DbAccount harvester) {
+		this.harvester = harvester;
 	}
 
-	public byte[] getForgerProof() {
-		return this.forgerProof;
+	public byte[] getHarvesterProof() {
+		return this.harvesterProof;
 	}
 
-	public void setForgerProof(final byte[] forgerProof) {
-		this.forgerProof = forgerProof;
+	public void setHarvesterProof(final byte[] harvesterProof) {
+		this.harvesterProof = harvesterProof;
 	}
 
-	public Account getLessor() {
+	public DbAccount getLessor() {
 		return this.lessor;
 	}
 
-	public void setLessor(final Account lessor) {
+	public void setLessor(final DbAccount lessor) {
 		this.lessor = lessor;
 	}
 
@@ -176,37 +176,37 @@ public class Block {
 		this.difficulty = difficulty;
 	}
 
-	public List<Transfer> getBlockTransfers() {
-		return this.blockTransfers;
+	public List<DbTransferTransaction> getBlockTransferTransactions() {
+		return this.blockTransferTransactions;
 	}
 
-	public void setBlockTransfers(final List<Transfer> blockTransfers) {
-		this.blockTransfers = blockTransfers;
+	public void setBlockTransferTransactions(final List<DbTransferTransaction> blockTransferTransactions) {
+		this.blockTransferTransactions = blockTransferTransactions;
 	}
 
-	public List<ImportanceTransfer> getBlockImportanceTransfers() {
-		return this.blockImportanceTransfers;
+	public List<DbImportanceTransferTransaction> getBlockImportanceTransferTransactions() {
+		return this.blockImportanceTransferTransactions;
 	}
 
-	public void setBlockImportanceTransfers(final List<ImportanceTransfer> blockImportanceTransfers) {
-		this.blockImportanceTransfers = blockImportanceTransfers;
+	public void setBlockImportanceTransferTransactions(final List<DbImportanceTransferTransaction> blockImportanceTransferTransactions) {
+		this.blockImportanceTransferTransactions = blockImportanceTransferTransactions;
 	}
 
-	public List<MultisigSignerModification> getBlockMultisigSignerModifications()
+	public List<DbMultisigAggregateModificationTransaction> getBlockMultisigAggregateModificationTransactions()
 	{
-		return this.blockMultisigSignerModifications;
+		return this.blockMultisigAggregateModificationTransactions;
 	}
 
-	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModifications)
+	public void setBlockMultisigAggregateModificationTransactions(final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions)
 	{
-		this.blockMultisigSignerModifications = blockMultisigSignerModifications;
+		this.blockMultisigAggregateModificationTransactions = blockMultisigAggregateModificationTransactions;
 	}
 
-	public List<MultisigTransaction> getBlockMultisigTransactions() {
+	public List<DbMultisigTransaction> getBlockMultisigTransactions() {
 		return blockMultisigTransactions;
 	}
 
-	public void setBlockMultisigTransactions(final List<MultisigTransaction> blockMultisigTransactions) {
+	public void setBlockMultisigTransactions(final List<DbMultisigTransaction> blockMultisigTransactions) {
 		this.blockMultisigTransactions = blockMultisigTransactions;
 	}
 }

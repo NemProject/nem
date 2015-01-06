@@ -100,7 +100,7 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
-		// this is delicate and the order matters, first visitor during undo changes amount of foraged blocks
+		// this is delicate and the order matters, first visitor during undo changes amount of harvested blocks
 		// second visitor needs that information
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(

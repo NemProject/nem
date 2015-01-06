@@ -5,7 +5,7 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
 
 /**
- * Block validator that ensures the block signer is valid.
+ * DbBlock validator that ensures the block signer is valid.
  */
 public class EligibleSignerBlockValidator implements BlockValidator {
 	private final ReadOnlyAccountStateCache accountStateCache;

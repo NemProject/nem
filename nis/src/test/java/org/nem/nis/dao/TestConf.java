@@ -45,11 +45,11 @@ public class TestConf {
 		localSessionFactoryBuilder.setProperty("hibernate.use_sql_comments", "false");
 		localSessionFactoryBuilder.setProperty("hibernate.jdbc.batch_size", "20");
 
-		localSessionFactoryBuilder.addAnnotatedClasses(Account.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
 
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigModification.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
 		}

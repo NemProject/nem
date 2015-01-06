@@ -41,8 +41,8 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 
 		// TODO 20150103 J-G: consider refactoring this block into a separate function
 		Address accountForRemoval = null;
-		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_SIGNER_MODIFY) {
-			final MultisigSignerModificationTransaction modificationTransaction = (MultisigSignerModificationTransaction)transaction.getOtherTransaction();
+		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION) {
+			final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();
 			final List<Address> removal = modificationTransaction.getModifications().stream()
 					.filter(m -> m.getModificationType() == MultisigModificationType.Del)
 					.map(m -> m.getCosignatory().getAddress())

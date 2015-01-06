@@ -4,16 +4,16 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "multisigsignatures")
-public class MultisigSignature extends AbstractTransfer {
+public class DbMultisigSignatureTransaction extends AbstractTransfer {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "multisigTransactionId")
-	private MultisigTransaction multisigTransaction;
+	private DbMultisigTransaction multisigTransaction;
 
-	public MultisigTransaction getMultisigTransaction() {
+	public DbMultisigTransaction getMultisigTransaction() {
 		return this.multisigTransaction;
 	}
 
-	public void setMultisigTransaction(final MultisigTransaction multisigTransaction) {
+	public void setMultisigTransaction(final DbMultisigTransaction multisigTransaction) {
 		this.multisigTransaction = multisigTransaction;
 	}
 }

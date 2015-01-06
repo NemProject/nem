@@ -18,16 +18,16 @@ You can think of an address as of bank account number.
 
 [more Addresses](Addresses)
 
-### Confirmations and foraging.
+### Confirmations and harvesting.
 
 Every transaction is confirmed by the network. Multiple transactions are packed together in blocks.
-Creating a block is called **foraging**. In contrast with Proof-of-Work (PoW) coins like bitcoin, litecoin, etc., foraging is **NOT calculation-heavy** process. 
+Creating a block is called **harvesting**. In contrast with Proof-of-Work (PoW) coins like bitcoin, litecoin, etc., harvesting is **NOT calculation-heavy** process.
 
-Every transaction have associated fee. **Forager** is rewarded with the fees from a block.
+Every transaction have associated fee. **Harvester** is rewarded with the fees from a block.
 
 ### Zero-inflation
 
-As in NXT there is no inflation in NEM. The rewards for *foragers* come ONLY from fees.
+As in NXT there is no inflation in NEM. The rewards for *harvesters* come ONLY from fees.
 
 ## Security
 

@@ -14,6 +14,8 @@ import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.cache.NisCache;
 import org.nem.nis.controller.viewmodels.BlockDebugInfo;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.state.AccountState;
 import org.nem.peer.PeerNetwork;
@@ -64,8 +66,8 @@ public class DebugControllerTest {
 			state.hit = scorer.calculateHit(blockDaoBlock);
 			state.target = scorer.calculateTarget(blockDaoParent, blockDaoBlock);
 
-			final org.nem.nis.dbmodel.Block dbBlock = createDbBlock(blockDaoBlock);
-			final org.nem.nis.dbmodel.Block dbParent = createDbBlock(blockDaoParent);
+			final DbBlock dbBlock = createDbBlock(blockDaoBlock);
+			final DbBlock dbParent = createDbBlock(blockDaoParent);
 			Mockito.when(context.blockDao.findByHeight(new BlockHeight(10))).thenReturn(dbBlock);
 			Mockito.when(context.blockDao.findByHeight(new BlockHeight(9))).thenReturn(dbParent);
 			return true;
@@ -76,7 +78,7 @@ public class DebugControllerTest {
 
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(state.signer1.getAddress()));
+		Assert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(state.signer1.getAddress()));
 		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp.addSeconds(60)));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(state.hit));
@@ -104,18 +106,18 @@ public class DebugControllerTest {
 		return block;
 	}
 
-	private static org.nem.nis.dbmodel.Block createDbBlock(final Block block) {
+	private static DbBlock createDbBlock(final Block block) {
 		final Address signerAddress = block.getSigner().getAddress();
-		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
+		final DbBlock dbBlock = new DbBlock();
 		dbBlock.setPrevBlockHash(block.getPreviousBlockHash());
 		dbBlock.setGenerationHash(block.getGenerationHash());
-		dbBlock.setForger(new org.nem.nis.dbmodel.Account(signerAddress.getEncoded(), signerAddress.getPublicKey()));
+		dbBlock.setHarvester(new DbAccount(signerAddress.getEncoded(), signerAddress.getPublicKey()));
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setHeight(block.getHeight().getRaw());
 		dbBlock.setTimeStamp(block.getTimeStamp().getRawTime());
-		dbBlock.setForgerProof(new byte[64]);
-		dbBlock.setBlockTransfers(new ArrayList<>());
-		dbBlock.setBlockImportanceTransfers(new ArrayList<>());
+		dbBlock.setHarvesterProof(new byte[64]);
+		dbBlock.setBlockTransferTransactions(new ArrayList<>());
+		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
 		return dbBlock;
 	}
 

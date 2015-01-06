@@ -4,6 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class DbBlockIoAdapter implements BlockIo {
 
 	@Override
 	public Block getBlock(final Hash blockHash) {
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHash(blockHash);
+		final DbBlock dbBlock = this.blockDao.findByHash(blockHash);
 		if (null == dbBlock) {
 			throw createMissingResourceException(blockHash.toString());
 		}
@@ -33,7 +34,7 @@ public class DbBlockIoAdapter implements BlockIo {
 
 	@Override
 	public Block getBlockAt(final BlockHeight blockHeight) {
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
+		final DbBlock dbBlock = this.blockDao.findByHeight(blockHeight);
 		if (null == dbBlock) {
 			throw createMissingResourceException(blockHeight.toString());
 		}

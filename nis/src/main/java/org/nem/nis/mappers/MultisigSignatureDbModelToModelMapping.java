@@ -8,7 +8,7 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a db multisig signature transfer to a model multisig signature.
  */
-public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<MultisigSignature, MultisigSignatureTransaction> {
+public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -21,7 +21,7 @@ public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbMo
 	}
 
 	@Override
-	public MultisigSignatureTransaction mapImpl(final MultisigSignature source) {
+	public MultisigSignatureTransaction mapImpl(final DbMultisigSignatureTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 		return new MultisigSignatureTransaction(
 				new TimeInstant(source.getTimeStamp()),
@@ -30,7 +30,7 @@ public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbMo
 	}
 
 	// TODO 20150104 J-J: should refactor this somewhere
-	private static AbstractTransfer getInnerTransaction(final org.nem.nis.dbmodel.MultisigTransaction source) {
+	private static AbstractTransfer getInnerTransaction(final DbMultisigTransaction source) {
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			final AbstractTransfer transaction = entry.getFromMultisig.apply(source);
 			if (null != transaction) {

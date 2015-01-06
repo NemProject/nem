@@ -3,7 +3,7 @@ package org.nem.nis.dao;
 import java.util.List;
 
 /**
- * Read-write DAO for accessing db Transfer objects.
+ * Read-write DAO for accessing DbTransferTransaction objects.
  *
  * @param <TTransfer> The transfer type.
  */

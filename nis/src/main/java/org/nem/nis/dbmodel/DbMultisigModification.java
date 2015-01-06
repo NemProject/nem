@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "multisigmodifications")
-public class MultisigModification {
+public class DbMultisigModification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -20,27 +20,27 @@ public class MultisigModification {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "cosignatoryId")
-	private Account cosignatory;
+	private DbAccount cosignatory;
 
 	private Integer modificationType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "multisigSignerModificationId")
-	private MultisigSignerModification multisigSignerModification;
+	private DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction;
 
-	public MultisigSignerModification getMultisigSignerModification() {
-		return this.multisigSignerModification;
+	public DbMultisigAggregateModificationTransaction getMultisigAggregateModificationTransaction() {
+		return this.multisigAggregateModificationTransaction;
 	}
 
-	public void setMultisigSignerModification(final MultisigSignerModification multisigSignerModification) {
-		this.multisigSignerModification = multisigSignerModification;
+	public void setMultisigAggregateModificationTransaction(final DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction) {
+		this.multisigAggregateModificationTransaction = multisigAggregateModificationTransaction;
 	}
 
-	public Account getCosignatory() {
+	public DbAccount getCosignatory() {
 		return this.cosignatory;
 	}
 
-	public void setCosignatory(final Account cosignatory) {
+	public void setCosignatory(final DbAccount cosignatory) {
 		this.cosignatory = cosignatory;
 	}
 

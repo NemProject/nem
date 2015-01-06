@@ -4,6 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Block;
+import org.nem.nis.dbmodel.DbBlock;
 
 public class NisModelToDbModelMapperTest {
 
@@ -14,14 +15,14 @@ public class NisModelToDbModelMapperTest {
 		final NisModelToDbModelMapper nisMapper = new NisModelToDbModelMapper(mapper);
 
 		final Block block = Mockito.mock(Block.class);
-		final org.nem.nis.dbmodel.Block dbBlock = Mockito.mock(org.nem.nis.dbmodel.Block.class);
-		Mockito.when(mapper.map(block, org.nem.nis.dbmodel.Block.class)).thenReturn(dbBlock);
+		final DbBlock dbBlock = Mockito.mock(DbBlock.class);
+		Mockito.when(mapper.map(block, DbBlock.class)).thenReturn(dbBlock);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block result = nisMapper.map(block);
+		final DbBlock result = nisMapper.map(block);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(dbBlock));
-		Mockito.verify(mapper, Mockito.only()).map(block, org.nem.nis.dbmodel.Block.class);
+		Mockito.verify(mapper, Mockito.only()).map(block, DbBlock.class);
 	}
 }

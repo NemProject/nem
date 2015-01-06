@@ -29,7 +29,7 @@ public class BlockModelToDbModelMappingTest {
 		final Block block = context.createBlock(null);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert:
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
@@ -43,7 +43,7 @@ public class BlockModelToDbModelMappingTest {
 		final Block block = context.createBlock(context.lessor);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert:
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block), context.dbLessor);
@@ -67,8 +67,8 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addTransfer,
-				org.nem.nis.dbmodel.Block::getBlockTransfers,
-				Transfer.class);
+				DbBlock::getBlockTransferTransactions,
+				DbTransferTransaction.class);
 	}
 
 	@Test
@@ -76,8 +76,8 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addImportanceTransfer,
-				org.nem.nis.dbmodel.Block::getBlockImportanceTransfers,
-				ImportanceTransfer.class);
+				DbBlock::getBlockImportanceTransferTransactions,
+				DbImportanceTransferTransaction.class);
 	}
 
 	@Test
@@ -85,8 +85,8 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addSignerModification,
-				org.nem.nis.dbmodel.Block::getBlockMultisigSignerModifications,
-				MultisigSignerModification.class);
+				DbBlock::getBlockMultisigAggregateModificationTransactions,
+				DbMultisigAggregateModificationTransaction.class);
 	}
 
 	@Test
@@ -94,13 +94,13 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addMultisigTransfer,
-				org.nem.nis.dbmodel.Block::getBlockMultisigTransactions,
-				org.nem.nis.dbmodel.MultisigTransaction.class);
+				DbBlock::getBlockMultisigTransactions,
+				DbMultisigTransaction.class);
 	}
 
 	private static void assertBlockWithTransfersCanBeMappedToDbModel(
 			final BiFunction<TestContext, Block, AbstractTransfer> factory,
-			final Function<org.nem.nis.dbmodel.Block, Collection<? extends AbstractBlockTransfer>> getMatchingTransactions,
+			final Function<DbBlock, Collection<? extends AbstractBlockTransfer>> getMatchingTransactions,
 			final Class<?> expectedClass) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -111,7 +111,7 @@ public class BlockModelToDbModelMappingTest {
 		final AbstractTransfer transfer2 = factory.apply(context, block);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 		final Collection<? extends AbstractBlockTransfer> dbTransfers = getMatchingTransactions.apply(dbModel);
 
 		// Assert:
@@ -159,26 +159,26 @@ public class BlockModelToDbModelMappingTest {
 		final AbstractTransfer transfer8 = context.addMultisigTransfer(block);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert:
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
 
 		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(9));
 
-		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransfers();
+		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2, transfer3)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 3)));
 		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1, 2)));
 
-		transfers = dbModel.getBlockImportanceTransfers();
+		transfers = dbModel.getBlockImportanceTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer1, transfer4)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(1, 4)));
 		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
-		transfers = dbModel.getBlockMultisigSignerModifications();
+		transfers = dbModel.getBlockMultisigAggregateModificationTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer5, transfer7)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(5, 7)));
@@ -190,10 +190,10 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(6, 8)));
 		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(Transfer.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(ImportanceTransfer.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(MultisigSignerModification.class));
-		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(org.nem.nis.dbmodel.MultisigTransaction.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(DbTransferTransaction.class));
+		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbImportanceTransferTransaction.class));
+		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigAggregateModificationTransaction.class));
+		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigTransaction.class));
 
 		// Sanity:
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
@@ -212,16 +212,16 @@ public class BlockModelToDbModelMappingTest {
 		final TestContext context = new TestContext();
 		final Block block = context.createBlock(null);
 
-		final Transfer innerTransfer1 = new Transfer();
-		final Transfer innerTransfer2 = new Transfer();
+		final DbTransferTransaction innerDbTransferTransaction1 = new DbTransferTransaction();
+		final DbTransferTransaction innerDbTransferTransaction2 = new DbTransferTransaction();
 
 		final AbstractTransfer transfer0 = context.addTransfer(block);
-		final AbstractTransfer transfer1 = context.addMultisigTransfer(block, innerTransfer1);
+		final AbstractTransfer transfer1 = context.addMultisigTransfer(block, innerDbTransferTransaction1);
 		final AbstractTransfer transfer2 = context.addTransfer(block);
-		final AbstractTransfer transfer3 = context.addMultisigTransfer(block, innerTransfer2);
+		final AbstractTransfer transfer3 = context.addMultisigTransfer(block, innerDbTransferTransaction2);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert: db model properties
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
@@ -229,7 +229,7 @@ public class BlockModelToDbModelMappingTest {
 		// Assert: db model transactions
 		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(4));
 
-		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransfers();
+		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2)));
@@ -247,16 +247,16 @@ public class BlockModelToDbModelMappingTest {
 
 		// Assert: multisig inner transactions
 		// inner transaction does not belong to a block, so it won't have order id
-		Assert.assertThat(innerTransfer1.getBlkIndex(), IsEqual.equalTo(1));
-		Assert.assertThat(innerTransfer1.getBlock(), IsEqual.equalTo(dbModel));
+		Assert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(1));
+		Assert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
 
-		Assert.assertThat(innerTransfer2.getBlkIndex(), IsEqual.equalTo(3));
-		Assert.assertThat(innerTransfer2.getBlock(), IsEqual.equalTo(dbModel));
+		Assert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(3));
+		Assert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
 	}
 
 	//endregion
 
-	private static int getNumTransactions(final org.nem.nis.dbmodel.Block dbBlock) {
+	private static int getNumTransactions(final DbBlock dbBlock) {
 		return StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
 				.map(e -> e.getFromBlock.apply(dbBlock).size())
 				.reduce(0, Integer::sum);
@@ -272,7 +272,7 @@ public class BlockModelToDbModelMappingTest {
 
 	private static void assertTransfersHaveBlockSetCorrectly(
 			final Collection<? extends AbstractBlockTransfer> dbTransfers,
-			final org.nem.nis.dbmodel.Block expectedBlock) {
+			final DbBlock expectedBlock) {
 		for (final AbstractBlockTransfer dbTransfer : dbTransfers) {
 			Assert.assertThat(dbTransfer.getBlock(), IsEqual.equalTo(expectedBlock));
 		}
@@ -280,9 +280,9 @@ public class BlockModelToDbModelMappingTest {
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbForger = Mockito.mock(org.nem.nis.dbmodel.Account.class);
-		private final org.nem.nis.dbmodel.Account dbLessor = Mockito.mock(org.nem.nis.dbmodel.Account.class);
-		private final Account forger = Utils.generateRandomAccount();
+		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
+		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
+		private final Account harvester = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
 		private final Signature signature = Utils.generateRandomSignature();
 		private final Hash prevBlockHash = Utils.generateRandomHash();
@@ -291,13 +291,13 @@ public class BlockModelToDbModelMappingTest {
 		private final BlockModelToDbModelMapping mapping = new BlockModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.forger, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbForger);
-			Mockito.when(this.mapper.map(this.lessor, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbLessor);
+			Mockito.when(this.mapper.map(this.harvester, DbAccount.class)).thenReturn(this.dbForger);
+			Mockito.when(this.mapper.map(this.lessor, DbAccount.class)).thenReturn(this.dbLessor);
 		}
 
 		public Block createBlock(final Account lessor) {
 			final Block block = new Block(
-					this.forger,
+					this.harvester,
 					this.prevBlockHash,
 					this.generationBlockHash,
 					new TimeInstant(4444),
@@ -309,12 +309,12 @@ public class BlockModelToDbModelMappingTest {
 			return block;
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final Hash expectedHash) {
+		public void assertDbModel(final DbBlock dbModel, final Hash expectedHash) {
 			this.assertDbModel(dbModel, expectedHash, null);
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final Hash expectedHash, final org.nem.nis.dbmodel.Account expectedLessor) {
-			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForger));
+		public void assertDbModel(final DbBlock dbModel, final Hash expectedHash, final DbAccount expectedLessor) {
+			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbForger));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.prevBlockHash));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(4444));
@@ -322,50 +322,50 @@ public class BlockModelToDbModelMappingTest {
 
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(this.difficulty.getRaw()));
 			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(expectedLessor));
-			Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(this.signature.getBytes()));
+			Assert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.signature.getBytes()));
 
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(expectedHash));
 		}
 
-		public void assertNoTransactions(final org.nem.nis.dbmodel.Block dbModel) {
+		public void assertNoTransactions(final DbBlock dbModel) {
 			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(0));
 		}
 
 		//region add*
 
-		public Transfer addTransfer(final Block block) {
+		public DbTransferTransaction addTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
-			return this.addTransfer(block, transfer, new Transfer(), Transfer.class);
+			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
-		public ImportanceTransfer addImportanceTransfer(final Block block) {
+		public DbImportanceTransferTransaction addImportanceTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createImportanceTransfer();
-			return this.addTransfer(block, transfer, new ImportanceTransfer(), ImportanceTransfer.class);
+			return this.addTransfer(block, transfer, new DbImportanceTransferTransaction(), DbImportanceTransferTransaction.class);
 		}
 
-		public MultisigSignerModification addSignerModification(final Block block) {
+		public DbMultisigAggregateModificationTransaction addSignerModification(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createSignerModification();
-			return this.addTransfer(block, transfer, new MultisigSignerModification(), MultisigSignerModification.class);
+			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);
 		}
 
-		public org.nem.nis.dbmodel.MultisigTransaction addMultisigTransfer(final Block block) {
+		public DbMultisigTransaction addMultisigTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, new org.nem.nis.dbmodel.MultisigTransaction(), org.nem.nis.dbmodel.MultisigTransaction.class);
+			return this.addTransfer(block, multisigTransfer, new DbMultisigTransaction(), DbMultisigTransaction.class);
 		}
 
-		public org.nem.nis.dbmodel.MultisigTransaction addMultisigTransfer(final Block block, final Transfer dbInnerTransfer) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbMultisigTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
-			dbMultisigTransfer.setTransfer(dbInnerTransfer);
+		public DbMultisigTransaction addMultisigTransfer(final Block block, final DbTransferTransaction dbInnerTransferTransaction) {
+			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
+			dbMultisigTransfer.setTransferTransaction(dbInnerTransferTransaction);
 
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, org.nem.nis.dbmodel.MultisigTransaction.class);
+			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, DbMultisigTransaction.class);
 		}
 
-		public Transfer addUnsupportedTransfer(final Block block) {
+		public DbTransferTransaction addUnsupportedTransfer(final Block block) {
 			final Transaction transfer = new MockTransaction();
-			return this.addTransfer(block, transfer, new Transfer(), Transfer.class);
+			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TDbTransfer addTransfer(

@@ -4,6 +4,7 @@ import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 
 /**
@@ -28,7 +29,7 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 	public LocalBlockLookupAdapter(
 			final ReadOnlyBlockDao blockDao,
 			final NisDbModelToModelMapper mapper,
-			final org.nem.nis.dbmodel.Block lastBlock,
+			final DbBlock lastBlock,
 			final BlockChainScore chainScore,
 			final int maxHashesToReturn) {
 		this.blockDao = blockDao;
@@ -50,7 +51,7 @@ public class LocalBlockLookupAdapter implements BlockLookup {
 
 	@Override
 	public Block getBlockAt(final BlockHeight height) {
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(height);
+		final DbBlock dbBlock = this.blockDao.findByHeight(height);
 		return this.mapper.map(dbBlock);
 	}
 

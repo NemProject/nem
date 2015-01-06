@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS `blocks` (
   `generationHash` VARBINARY(34) NOT NULL,
   `timestamp` INT NOT NULL,
 
-  `forgerId` BIGINT NOT NULL, -- reference to account table
-  `forgerProof` VARBINARY(66) NOT NULL,
+  `harvesterId` BIGINT NOT NULL, -- reference to account table
+  `harvesterProof` VARBINARY(66) NOT NULL,
   `harvestedInName` BIGINT,
 
   `height` BIGINT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `blocks` (
 );  
  
 ALTER TABLE public.blocks ADD
-  FOREIGN KEY (forgerId)
+  FOREIGN KEY (harvesterId)
   REFERENCES public.accounts(id);
 
 ALTER TABLE public.blocks ADD
@@ -242,7 +242,7 @@ ALTER TABLE public.multisigsignatures ADD
 
 CREATE INDEX IDX_BLOCKS_SHORT_ID ON `blocks` (shortId);
 CREATE INDEX IDX_BLOCKS_HEIGHT ON `blocks` (height);
-CREATE INDEX IDX_BLOCKS_FORGERID ON `blocks` (forgerId);
+CREATE INDEX IDX_BLOCKS_HARVESTERID ON `blocks` (harvesterId);
 CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
 
 CREATE INDEX IDX_TRANSFERS_TIMESTAMP ON `transfers` (timeStamp);
@@ -254,16 +254,20 @@ CREATE INDEX IDX_TRANSFERS_RECIPIENTID_ID ON `transfers` (recipientId, id DESC);
 CREATE INDEX IDX_IMPORTANCETRANSFERS_TIMESTAMP ON `importancetransfers` (timeStamp);
 CREATE INDEX IDX_IMPORTANCETRANSFERS_SENDERID ON `importancetransfers` (senderId);
 CREATE INDEX IDX_IMPORTANCETRANSFERS_REMOTEID ON `importancetransfers` (remoteId);
-
+CREATE INDEX IDX_IMPORTANCETRANSFERS_SENDERID_ID ON `importancetransfers` (senderId, id DESC);
+CREATE INDEX IDX_IMPORTANCETRANSFERS_REMOTEID_ID ON `importancetransfers` (remoteId, id DESC);
 
 CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_TIMESTAMP ON `multisigsignermodifications` (timeStamp);
-CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID ON `multisigsignermodifications` (senderId, id DESC);
+CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID ON `multisigsignermodifications` (senderId);
+CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID_ID ON `multisigsignermodifications` (senderId, id DESC);
 
 CREATE INDEX IDX_MULTISIGMODIFICATIONS_COSIGNATORYID ON `multisigmodifications` (cosignatoryId);
 
 CREATE INDEX IDX_MULTISIGTRANSACTIONS_TIMESTAMP ON `multisigtransactions` (timeStamp);
-CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID ON `multisigtransactions` (senderId, id DESC);
+CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID ON `multisigtransactions` (senderId);
+CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID_ID ON `multisigtransactions` (senderId, id DESC);
 
 CREATE INDEX IDX_MULTISIGSIGNATURES_TIMESTAMP ON `multisigsignatures` (timeStamp);
-CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID ON `multisigsignatures` (senderId, id DESC);
+CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID ON `multisigsignatures` (senderId);
+CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID_ID ON `multisigsignatures` (senderId, id DESC);
 

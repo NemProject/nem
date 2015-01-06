@@ -12,23 +12,23 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "importancetransfers")
-public class ImportanceTransfer extends AbstractBlockTransfer<ImportanceTransfer> {
+public class DbImportanceTransferTransaction extends AbstractBlockTransfer<DbImportanceTransferTransaction> {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "remoteId")
-	private Account remote;
+	private DbAccount remote;
 
 	private Integer mode;
 
-	public ImportanceTransfer() {
-		super(b -> b.getBlockImportanceTransfers());
+	public DbImportanceTransferTransaction() {
+		super(b -> b.getBlockImportanceTransferTransactions());
 	}
 
-	public Account getRemote() {
+	public DbAccount getRemote() {
 		return this.remote;
 	}
 
-	public void setRemote(final Account remote) {
+	public void setRemote(final DbAccount remote) {
 		this.remote = remote;
 	}
 

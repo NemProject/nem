@@ -6,7 +6,7 @@ import org.nem.nis.dbmodel.*;
 /**
  * A mapping that is able to map a db multisig signature to a model multisig signature.
  */
-public class MultisigSignatureModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigSignatureTransaction, MultisigSignature> {
+public class MultisigSignatureModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigSignatureTransaction, DbMultisigSignatureTransaction> {
 
 	/**
 	 * Creates a new mapping.
@@ -18,7 +18,7 @@ public class MultisigSignatureModelToDbModelMapping extends AbstractTransferMode
 	}
 
 	@Override
-	protected MultisigSignature mapImpl(final MultisigSignatureTransaction source) {
-		return new MultisigSignature();
+	protected DbMultisigSignatureTransaction mapImpl(final MultisigSignatureTransaction source) {
+		return new DbMultisigSignatureTransaction();
 	}
 }

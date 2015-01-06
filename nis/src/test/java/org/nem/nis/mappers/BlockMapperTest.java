@@ -32,12 +32,12 @@ public class BlockMapperTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, 0);
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -48,16 +48,16 @@ public class BlockMapperTest {
 		context.addTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS);
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(i);
+			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
-			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+			Assert.assertThat(dbTransferTransaction.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 	}
 
@@ -69,14 +69,14 @@ public class BlockMapperTest {
 		context.addImportanceTransferTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS);
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
-			final ImportanceTransfer dbTransfer = dbModel.getBlockImportanceTransfers().get(i);
+			final DbImportanceTransferTransaction dbTransfer = dbModel.getBlockImportanceTransferTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -89,12 +89,12 @@ public class BlockMapperTest {
 		context.addLessor();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, 0);
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -105,15 +105,15 @@ public class BlockMapperTest {
 		context.addMultisigSignerModificationTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS*1000L);
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
-			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final DbMultisigAggregateModificationTransaction dbTransfer = dbModel.getBlockMultisigAggregateModificationTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -128,18 +128,18 @@ public class BlockMapperTest {
 		context.addMultisigTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS * (100L + 1));
 		// note: we expect both multisig txes and block transfers
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
+			final DbMultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -153,21 +153,21 @@ public class BlockMapperTest {
 		context.addMultisigTransactionsWithSigners();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, 1 * (100L + 1));
 		// note: we expect both multisig txes and block transfers
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(1));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(1));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(1));
 
-		final org.nem.nis.dbmodel.MultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(0);
+		final DbMultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(0);
 		final Transaction transaction = context.getModel().getTransactions().get(0);
 		Assert.assertThat(dbMultisig.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 
-		Assert.assertThat(dbMultisig.getMultisigSignatures().size(), IsEqual.equalTo(2));
+		Assert.assertThat(dbMultisig.getMultisigSignatureTransactions().size(), IsEqual.equalTo(2));
 	}
 	//endregion
 
@@ -176,7 +176,7 @@ public class BlockMapperTest {
 	public void blockModelWithoutTransactionsCanBeRoundTripped() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -191,7 +191,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 3;
 		final TestContext context = new TestContext();
 		context.addTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -215,7 +215,7 @@ public class BlockMapperTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addLessor();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -232,7 +232,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
 		context.addImportanceTransferTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -258,7 +258,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
 		context.addMultisigSignerModificationTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -284,7 +284,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
 		context.addMultisigTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -309,7 +309,7 @@ public class BlockMapperTest {
 		final TestContext context = new TestContext();
 		context.addMultisigTransactionsWithSigners();
 		context.signModel();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -331,33 +331,33 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS_B = 2;
 		final int NUM_TRANSACTIONS_C = 3;
 		final TestContext context = new TestContext();
-		// order matters, as foraging will create block in that order
+		// order matters, as harvesting will create block in that order
 		context.addMultisigSignerModificationTransactions();
 		context.addImportanceTransferTransactions();
 		context.addTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A * 1000L + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C);
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
 		for (int i = 0; i < NUM_TRANSACTIONS_A; ++i) {
-			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final DbMultisigAggregateModificationTransaction dbTransfer = dbModel.getBlockMultisigAggregateModificationTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 		for (int i = 2; i < 2 + NUM_TRANSACTIONS_B; ++i) {
-			final ImportanceTransfer dbTransfer = dbModel.getBlockImportanceTransfers().get(i - 2);
+			final DbImportanceTransferTransaction dbTransfer = dbModel.getBlockImportanceTransferTransactions().get(i - 2);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 		for (int i = 4; i < 4 + NUM_TRANSACTIONS_C; ++i) {
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(i - 4);
+			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(i - 4);
 			final Transaction transaction = context.getModel().getTransactions().get(i);
-			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+			Assert.assertThat(dbTransferTransaction.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 	}
 
@@ -379,11 +379,11 @@ public class BlockMapperTest {
 		// TO
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(100), context.account1, context.account2, new Amount(7), null));
 		final List<MultisigModification> modifications1 = Arrays.asList(new MultisigModification(modificationType, context.account2));
-		context.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(200), context.account1, modifications1));
+		context.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(200), context.account1, modifications1));
 		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(300), context.account1, mode, context.account2));
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(400), context.account2, context.account3, new Amount(11), null));
 		final List<MultisigModification> modifications2 = Arrays.asList(new MultisigModification(modificationType, context.account3));
-		context.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(500), context.account1, modifications2));
+		context.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(500), context.account1, modifications2));
 		context.model.addTransaction(new ImportanceTransferTransaction(new TimeInstant(600), context.account3, mode, context.account2));
 		context.model.addTransaction(new TransferTransaction(new TimeInstant(700), context.account3, context.account1, new Amount(4), null));
 		for (final Transaction transaction : context.model.getTransactions()) {
@@ -392,30 +392,30 @@ public class BlockMapperTest {
 		}
 
 		context.signModel();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
 
 		// Assert:
 		context.assertDbModel(dbModel, 1000L * (NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
 		for (int i = 0; i < NUM_TRANSACTIONS_A; ++i) {
-			final MultisigSignerModification dbTransfer = dbModel.getBlockMultisigSignerModifications().get(i);
+			final DbMultisigAggregateModificationTransaction dbTransfer = dbModel.getBlockMultisigAggregateModificationTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(3 * i + 1);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 		for (int i = 0; i < NUM_TRANSACTIONS_B; ++i) {
-			final ImportanceTransfer dbTransfer = dbModel.getBlockImportanceTransfers().get(i);
+			final DbImportanceTransferTransaction dbTransfer = dbModel.getBlockImportanceTransferTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(3 * i + 2);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 		for (int i = 0; i < NUM_TRANSACTIONS_C; ++i) {
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(i);
+			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(3 * i);
-			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+			Assert.assertThat(dbTransferTransaction.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 
 		// assert model
@@ -446,7 +446,7 @@ public class BlockMapperTest {
 		}
 		context.signModel();
 
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -455,30 +455,30 @@ public class BlockMapperTest {
 		context.assertDbModel(dbModel, (100L + 1) * 2 + 2);
 
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
-		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(4));
+		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(4));
 		for (int i = 0; i < 2; ++i) {
 			// note: we're skipping in DB too, as those are the ones that "belong" to multisig TXes
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2 * i);
+			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(2 * i);
 			final Transaction transaction = context.getModel().getTransactions().get(2 * i);
-			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
+			Assert.assertThat(dbTransferTransaction.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 		for (int i = 0; i < 2; ++i) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
+			final DbMultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(2 * i + 1);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
 
 		// WARNING: if test fails here it means you've changed order of TXes inside the dbModel
 		for (int i = 0; i < 2; ++i) {
-			final org.nem.nis.dbmodel.MultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(i);
+			final DbMultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(i);
 			// transfer that "belongs" to multisig
-			final Transfer dbTransfer = dbModel.getBlockTransfers().get(2 * i + 1);
+			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(2 * i + 1);
 
 			// YES, they should be equal
 			Assert.assertThat(dbMultisig.getBlkIndex(), IsEqual.equalTo(2 * i + 1));
-			Assert.assertThat(dbTransfer.getBlkIndex(), IsEqual.equalTo(2 * i + 1));
+			Assert.assertThat(dbTransferTransaction.getBlkIndex(), IsEqual.equalTo(2 * i + 1));
 		}
 
 		for (int i = 0; i < 4; ++i) {
@@ -493,7 +493,7 @@ public class BlockMapperTest {
 	public void dbModelWithoutDifficultyCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 		dbModel.setDifficulty(null);
 
 		// Act:
@@ -508,7 +508,7 @@ public class BlockMapperTest {
 		// Arrange:
 		final DeserializationContext deserializationContext = new DeserializationContext(new MockAccountLookup());
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 		dbModel.setHeight(1L);
 
 		// Act:
@@ -524,18 +524,18 @@ public class BlockMapperTest {
 	private class TestContext {
 
 		private final Block model;
-		private final org.nem.nis.dbmodel.Account dbForager;
+		private final DbAccount dbHarvester;
 		private final Account account1;
-		private final org.nem.nis.dbmodel.Account dbAccount1;
+		private final DbAccount dbAccount1;
 		private final Account account2;
-		private final org.nem.nis.dbmodel.Account dbAccount2;
+		private final DbAccount dbAccount2;
 		private final Account account3;
-		private final org.nem.nis.dbmodel.Account dbAccount3;
+		private final DbAccount dbAccount3;
 		private final MockAccountDao accountDao;
 		private final Hash blockGenerationHash;
 		private Hash hash;
 		private Account lessor;
-		private org.nem.nis.dbmodel.Account dbLessor;
+		private DbAccount dbLessor;
 
 		public TestContext() {
 			this.blockGenerationHash = Utils.generateRandomHash();
@@ -549,9 +549,9 @@ public class BlockMapperTest {
 			this.model.setDifficulty(new BlockDifficulty(79_876_543_211_237L));
 			this.signModel();
 
-			this.dbForager = new org.nem.nis.dbmodel.Account();
-			this.dbForager.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbForager.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
+			this.dbHarvester = new DbAccount();
+			this.dbHarvester.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
+			this.dbHarvester.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
 			this.account1 = Utils.generateRandomAccount();
 			this.dbAccount1 = this.createDbAccount(this.account1);
@@ -563,7 +563,7 @@ public class BlockMapperTest {
 			this.dbAccount3 = this.createDbAccount(this.account3);
 
 			this.accountDao = new MockAccountDao();
-			this.accountDao.addMapping(this.model.getSigner(), this.dbForager);
+			this.accountDao.addMapping(this.model.getSigner(), this.dbHarvester);
 			this.accountDao.addMapping(this.account1, this.dbAccount1);
 			this.accountDao.addMapping(this.account2, this.dbAccount2);
 			this.accountDao.addMapping(this.account3, this.dbAccount3);
@@ -576,8 +576,8 @@ public class BlockMapperTest {
 			this.model.setLessor(this.lessor);
 		}
 
-		private org.nem.nis.dbmodel.Account createDbAccount(final Account account) {
-			final org.nem.nis.dbmodel.Account dbAccount = new org.nem.nis.dbmodel.Account();
+		private DbAccount createDbAccount(final Account account) {
+			final DbAccount dbAccount = new DbAccount();
 			dbAccount.setPublicKey(account.getAddress().getPublicKey());
 			dbAccount.setPrintableKey(account.getAddress().getEncoded());
 			return dbAccount;
@@ -587,11 +587,11 @@ public class BlockMapperTest {
 			return this.model;
 		}
 
-		public org.nem.nis.dbmodel.Block toDbModel() {
-			return MapperUtils.createModelToDbModelMapper(this.accountDao).map(this.model, org.nem.nis.dbmodel.Block.class);
+		public DbBlock toDbModel() {
+			return MapperUtils.createModelToDbModelMapper(this.accountDao).map(this.model, DbBlock.class);
 		}
 
-		public Block toModel(final org.nem.nis.dbmodel.Block dbBlock) {
+		public Block toModel(final DbBlock dbBlock) {
 			final MockAccountLookup mockAccountLookup = new MockAccountLookup();
 			mockAccountLookup.setMockAccount(this.model.getSigner());
 			mockAccountLookup.setMockAccount(this.account1);
@@ -630,9 +630,9 @@ public class BlockMapperTest {
 
 		public void addMultisigSignerModificationTransactions() {
 			final List<MultisigModification> modifications1 = Arrays.asList(new MultisigModification(MultisigModificationType.Add, this.account2));
-			this.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(150), this.account1, modifications1));
+			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(150), this.account1, modifications1));
 			final List<MultisigModification> modifications2 = Arrays.asList(new MultisigModification(MultisigModificationType.Add, this.account3));
-			this.model.addTransaction(new MultisigSignerModificationTransaction(new TimeInstant(250), this.account1, modifications2));
+			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(250), this.account1, modifications2));
 
 			for (final Transaction transaction : this.model.getTransactions()) {
 				transaction.sign();
@@ -682,15 +682,15 @@ public class BlockMapperTest {
 			this.hash = HashUtils.calculateHash(this.model);
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final long expectedFee) {
+		public void assertDbModel(final DbBlock dbModel, final long expectedFee) {
 			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
-			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForager));
-			Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
+			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbHarvester));
+			Assert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(Amount.fromNem(expectedFee).getNumMicroNem()));
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(79_876_543_211_237L));
@@ -698,7 +698,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(this.dbLessor));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getAddress().getPublicKey();
-			Assert.assertThat(dbModel.getForger().getPublicKey(), IsEqual.equalTo(signerPublicKey));
+			Assert.assertThat(dbModel.getHarvester().getPublicKey(), IsEqual.equalTo(signerPublicKey));
 		}
 
 		public void assertModel(final Block rhs) {

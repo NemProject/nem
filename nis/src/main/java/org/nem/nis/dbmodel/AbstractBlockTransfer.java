@@ -18,12 +18,12 @@ public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransf
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "blockId")
-	private Block block;
+	private DbBlock block;
 
 	@Transient
-	private final Function<Block, List<TDerived>> getListFromBlock;
+	private final Function<DbBlock, List<TDerived>> getListFromBlock;
 
-	protected AbstractBlockTransfer(final Function<Block, List<TDerived>> getListFromBlock) {
+	protected AbstractBlockTransfer(final Function<DbBlock, List<TDerived>> getListFromBlock) {
 		this.getListFromBlock = getListFromBlock;
 	}
 
@@ -52,11 +52,11 @@ public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransf
 		this.referencedTransaction = referencedTransaction;
 	}
 
-	public Block getBlock() {
+	public DbBlock getBlock() {
 		return this.block;
 	}
 
-	public void setBlock(final Block block) {
-		this.block = block;
+	public void setBlock(final DbBlock dbBlock) {
+		this.block = dbBlock;
 	}
 }

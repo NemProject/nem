@@ -4,8 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.MultisigModification;
 import org.nem.core.model.MultisigTransaction;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -15,7 +13,7 @@ import org.nem.nis.test.RandomTransactionFactory;
 import java.util.*;
 import java.util.function.*;
 
-public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<org.nem.nis.dbmodel.MultisigTransaction, MultisigTransaction> {
+public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigTransaction, MultisigTransaction> {
 
 	//region supported multisig transfer types
 
@@ -49,7 +47,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		// Arrange:
 		final TestContext context = new TestContext();
 		addInnerTransaction.accept(context);
-		final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = context.createDbModel();
+		final DbMultisigTransaction dbTransfer = context.createDbModel();
 
 		// Act:
 		final MultisigTransaction model = context.mapping.map(dbTransfer);
@@ -62,7 +60,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 	public void cannotMapOtherMultisigTransferToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = context.createDbModel();
+		final DbMultisigTransaction dbTransfer = context.createDbModel();
 
 		// Act:
 		ExceptionAssert.assertThrows(
@@ -78,7 +76,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		final TestContext context = new TestContext();
 		context.addTransfer();
 		context.addSignature();
-		final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = context.createDbModel();
+		final DbMultisigTransaction dbTransfer = context.createDbModel();
 
 		// Act:
 		final MultisigTransaction model = context.mapping.map(dbTransfer);
@@ -95,7 +93,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		context.addSignature();
 		context.addSignature();
 		context.addSignature();
-		final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = context.createDbModel();
+		final DbMultisigTransaction dbTransfer = context.createDbModel();
 
 		// Act:
 		final MultisigTransaction model = context.mapping.map(dbTransfer);
@@ -105,18 +103,18 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 	}
 
 	@Override
-	protected org.nem.nis.dbmodel.MultisigTransaction createDbModel() {
-		final ImportanceTransfer dbTransfer = new ImportanceTransfer();
+	protected DbMultisigTransaction createDbModel() {
+		final DbImportanceTransferTransaction dbTransfer = new DbImportanceTransferTransaction();
 		dbTransfer.setMode(1);
 
-		final org.nem.nis.dbmodel.MultisigTransaction dbMultisigTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
-		dbMultisigTransfer.setImportanceTransfer(dbTransfer);
-		dbMultisigTransfer.setMultisigSignatures(new HashSet<>());
+		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
+		dbMultisigTransfer.setImportanceTransferTransaction(dbTransfer);
+		dbMultisigTransfer.setMultisigSignatureTransactions(new HashSet<>());
 		return dbMultisigTransfer;
 	}
 
 	@Override
-	protected IMapping<org.nem.nis.dbmodel.MultisigTransaction, MultisigTransaction> createMapping(final IMapper mapper) {
+	protected IMapping<DbMultisigTransaction, MultisigTransaction> createMapping(final IMapper mapper) {
 		// ugly, but the passed in IMapper is a mock object, and we need to set it up to return a non-null transaction
 		// for the inner transaction
 		final ImportanceTransferTransaction transfer = RandomTransactionFactory.createImportanceTransfer();
@@ -127,11 +125,11 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
-		private final Set<MultisigSignature> dbSignatures = new HashSet<>();
+		private final Set<DbMultisigSignatureTransaction> dbSignatures = new HashSet<>();
 		private final Set<MultisigSignatureTransaction> expectedSignatures = new HashSet<>();
-		private final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
+		private final DbMultisigTransaction dbTransfer = new DbMultisigTransaction();
 		private Transaction expectedOtherTransaction;
 
 		private final MultisigTransactionDbModelToModelMapping mapping = new MultisigTransactionDbModelToModelMapping(this.mapper);
@@ -141,7 +139,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		}
 
 		private void addSignature() {
-			final MultisigSignature dbSignature = Mockito.mock(MultisigSignature.class);
+			final DbMultisigSignatureTransaction dbSignature = Mockito.mock(DbMultisigSignatureTransaction.class);
 			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
 					Utils.generateRandomAccount(),
@@ -154,39 +152,39 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 		public void addTransfer() {
 			this.addTransfer(
-					new Transfer(),
+					new DbTransferTransaction(),
 					RandomTransactionFactory.createTransfer(),
-					org.nem.nis.dbmodel.MultisigTransaction::setTransfer);
+					DbMultisigTransaction::setTransferTransaction);
 		}
 
 		public void addImportanceTransfer() {
 			this.addTransfer(
-					new ImportanceTransfer(),
+					new DbImportanceTransferTransaction(),
 					RandomTransactionFactory.createImportanceTransfer(),
-					org.nem.nis.dbmodel.MultisigTransaction::setImportanceTransfer);
+					DbMultisigTransaction::setImportanceTransferTransaction);
 		}
 
 		public void addSignerModification() {
 			this.addTransfer(
-					new MultisigSignerModification(),
+					new DbMultisigAggregateModificationTransaction(),
 					RandomTransactionFactory.createSignerModification(),
-					org.nem.nis.dbmodel.MultisigTransaction::setMultisigSignerModification);
+					DbMultisigTransaction::setMultisigAggregateModificationTransaction);
 		}
 
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> void addTransfer(
 				final TDbTransfer dbTransfer,
 				final TModelTransfer transfer,
-				final BiConsumer<org.nem.nis.dbmodel.MultisigTransaction, TDbTransfer> setTransferInMultisig) {
+				final BiConsumer<DbMultisigTransaction, TDbTransfer> setTransferInMultisig) {
 			Mockito.when(this.mapper.map(dbTransfer, Transaction.class)).thenReturn(transfer);
 
 			setTransferInMultisig.accept(this.dbTransfer, dbTransfer);
 			this.expectedOtherTransaction = transfer;
 		}
 
-		public org.nem.nis.dbmodel.MultisigTransaction createDbModel() {
+		public DbMultisigTransaction createDbModel() {
 			this.dbTransfer.setTimeStamp(4444);
 			this.dbTransfer.setSender(this.dbSender);
-			this.dbTransfer.setMultisigSignatures(this.dbSignatures);
+			this.dbTransfer.setMultisigSignatureTransactions(this.dbSignatures);
 
 			// zero out required fields
 			dbTransfer.setFee(0L);

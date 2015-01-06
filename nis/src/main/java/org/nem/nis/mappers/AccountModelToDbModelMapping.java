@@ -1,11 +1,12 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.Account;
+import org.nem.nis.dbmodel.DbAccount;
 
 /**
  * A mapping that is able to map a model account to a db account.
  */
-public class AccountModelToDbModelMapping implements IMapping<Account, org.nem.nis.dbmodel.Account> {
+public class AccountModelToDbModelMapping implements IMapping<Account, DbAccount> {
 	private final AccountDaoLookup accountDaoLookup;
 
 	/**
@@ -18,7 +19,7 @@ public class AccountModelToDbModelMapping implements IMapping<Account, org.nem.n
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.Account map(final Account account) {
+	public DbAccount map(final Account account) {
 		return this.accountDaoLookup.findByAddress(account.getAddress());
 	}
 }

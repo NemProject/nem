@@ -1,6 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.Block;
+import org.nem.nis.dbmodel.DbBlock;
 
 /**
  * A NIS mapper facade for mapping model types to db model types.
@@ -23,7 +24,7 @@ public class NisModelToDbModelMapper {
 	 * @param block The model block.
 	 * @return The db model block.
 	 */
-	public org.nem.nis.dbmodel.Block map(final Block block) {
-		return this.mapper.map(block, org.nem.nis.dbmodel.Block.class);
+	public DbBlock map(final Block block) {
+		return this.mapper.map(block, DbBlock.class);
 	}
 }

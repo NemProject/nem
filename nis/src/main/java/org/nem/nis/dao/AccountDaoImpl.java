@@ -1,7 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
-import org.nem.nis.dbmodel.Account;
+import org.nem.nis.dbmodel.DbAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,30 +24,30 @@ public class AccountDaoImpl implements AccountDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Account getAccount(final Long id) {
+	public DbAccount getAccount(final Long id) {
 		final Query query = this.getCurrentSession()
-				.createQuery("from Account a where a.id = :id")
+				.createQuery("from DbAccount a where a.id = :id")
 				.setParameter("id", id);
 		return firstFromQuery(query);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Account getAccountByPrintableAddress(final String printableAddress) {
+	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
 		final Query query = this.getCurrentSession()
-				.createQuery("from Account a where a.printableKey = :key")
+				.createQuery("from DbAccount a where a.printableKey = :key")
 				.setParameter("key", printableAddress);
 		return firstFromQuery(query);
 	}
 
 	@Override
 	@Transactional
-	public void save(final Account account) {
+	public void save(final DbAccount account) {
 		this.getCurrentSession().saveOrUpdate(account);
 	}
 
-	private static Account firstFromQuery(final Query query) {
+	private static DbAccount firstFromQuery(final Query query) {
 		final List<?> userList = query.list();
-		return !userList.isEmpty() ? (Account)userList.get(0) : null;
+		return !userList.isEmpty() ? (DbAccount)userList.get(0) : null;
 	}
 }

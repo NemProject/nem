@@ -248,7 +248,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		}
 
 		public Transaction createMultisigAddTransaction(final TimeInstant timeStamp, final Account account) {
-			final Transaction transaction = new MultisigSignerModificationTransaction(timeStamp, this.multisig,
+			final Transaction transaction = new MultisigAggregateModificationTransaction(timeStamp, this.multisig,
 					Arrays.asList(new MultisigModification(MultisigModificationType.Add, account)));
 			transaction.setDeadline(transaction.getTimeStamp().addSeconds(10));
 			return transaction;

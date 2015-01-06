@@ -26,9 +26,9 @@ public class DefaultMapperFactoryTest {
 
 	private static final List<Entry<?, ?>> otherEntries = new ArrayList<Entry<?, ?>>() {
 		{
-			this.add(new Entry<>(org.nem.nis.dbmodel.Account.class, Account.class));
-			this.add(new Entry<>(org.nem.nis.dbmodel.Block.class, Block.class));
-			this.add(new Entry<>(MultisigSignature.class, MultisigSignatureTransaction.class));
+			this.add(new Entry<>(DbAccount.class, Account.class));
+			this.add(new Entry<>(DbBlock.class, Block.class));
+			this.add(new Entry<>(DbMultisigSignatureTransaction.class, MultisigSignatureTransaction.class));
 		}
 	};
 
@@ -40,10 +40,10 @@ public class DefaultMapperFactoryTest {
 
 	private static final List<TransactionEntry<?, ?>> transactionEntries = new ArrayList<TransactionEntry<?, ?>>() {
 		{
-			this.add(new TransactionEntry<>(Transfer.class, TransferTransaction.class));
-			this.add(new TransactionEntry<>(ImportanceTransfer.class, ImportanceTransferTransaction.class));
-			this.add(new TransactionEntry<>(MultisigSignerModification.class, MultisigSignerModificationTransaction.class));
-			this.add(new TransactionEntry<>(org.nem.nis.dbmodel.MultisigTransaction.class, MultisigTransaction.class));
+			this.add(new TransactionEntry<>(DbTransferTransaction.class, TransferTransaction.class));
+			this.add(new TransactionEntry<>(DbImportanceTransferTransaction.class, ImportanceTransferTransaction.class));
+			this.add(new TransactionEntry<>(DbMultisigAggregateModificationTransaction.class, MultisigAggregateModificationTransaction.class));
+			this.add(new TransactionEntry<>(DbMultisigTransaction.class, MultisigTransaction.class));
 		}
 	};
 
@@ -65,7 +65,7 @@ public class DefaultMapperFactoryTest {
 			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
 		}
 
-		Assert.assertThat(mapper.isSupported(NemesisBlock.class, org.nem.nis.dbmodel.Block.class), IsEqual.equalTo(true));
+		Assert.assertThat(mapper.isSupported(NemesisBlock.class, DbBlock.class), IsEqual.equalTo(true));
 	}
 
 	@Test

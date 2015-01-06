@@ -1,12 +1,13 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.DbTransferTransaction;
 
 /**
  * A mapping that is able to map a model transfer transaction to a db transfer.
  */
-public class TransferModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<TransferTransaction, Transfer> {
+public class TransferModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<TransferTransaction, DbTransferTransaction> {
 
 	/**
 	 * Creates a new mapping.
@@ -18,10 +19,10 @@ public class TransferModelToDbModelMapping extends AbstractTransferModelToDbMode
 	}
 
 	@Override
-	public Transfer mapImpl(final TransferTransaction source) {
-		final org.nem.nis.dbmodel.Account recipient = this.mapAccount(source.getRecipient());
+	public DbTransferTransaction mapImpl(final TransferTransaction source) {
+		final DbAccount recipient = this.mapAccount(source.getRecipient());
 
-		final Transfer dbTransfer = new Transfer();
+		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
 		dbTransfer.setRecipient(recipient);
 		dbTransfer.setAmount(source.getAmount().getNumMicroNem());
 		dbTransfer.setReferencedTransaction(0L);

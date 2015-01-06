@@ -228,7 +228,7 @@ public class AccountIoAdapterTest {
 		private final Account account = Utils.generateRandomAccount();
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
-		private final List<org.nem.nis.dbmodel.Block> blocks = new ArrayList<>();
+		private final List<DbBlock> blocks = new ArrayList<>();
 
 		public TestContext() {
 			Mockito.when(this.accountCache.findByAddress(this.address)).thenReturn(this.account);
@@ -272,13 +272,13 @@ public class AccountIoAdapterTest {
 		}
 
 		public void addTransaction(final int height, final int transactionId, final int amount) {
-			final org.nem.nis.dbmodel.Block block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
-			final Transfer transfer = this.createTransfer(amount);
-			transfer.setId((long)transactionId);
-			this.pairs.add(new TransferBlockPair(transfer, block));
+			final DbBlock block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
+			final DbTransferTransaction dbTransferTransaction = this.createTransfer(amount);
+			dbTransferTransaction.setId((long)transactionId);
+			this.pairs.add(new TransferBlockPair(dbTransferTransaction, block));
 		}
 
-		private Transfer createTransfer(final int amount) {
+		private DbTransferTransaction createTransfer(final int amount) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient, Amount.fromNem(amount), null);
@@ -288,7 +288,7 @@ public class AccountIoAdapterTest {
 			this.addAccount(recipient);
 
 			return MapperUtils.createModelToDbModelMapper(new MockAccountDao())
-					.map(transaction, Transfer.class);
+					.map(transaction, DbTransferTransaction.class);
 		}
 
 		private void addAccount(final Account account) {
@@ -418,7 +418,7 @@ public class AccountIoAdapterTest {
 				dummyBlock.addTransaction(transferTransaction);
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
@@ -461,7 +461,7 @@ public class AccountIoAdapterTest {
 	}
 
 	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 		when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 	}

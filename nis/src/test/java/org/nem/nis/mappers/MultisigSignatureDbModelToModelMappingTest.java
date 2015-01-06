@@ -9,15 +9,15 @@ import org.nem.core.model.Account;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.MultisigTransaction;
+import org.nem.nis.dbmodel.DbMultisigTransaction;
 
-public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<MultisigSignature, MultisigSignatureTransaction> {
+public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<DbMultisigSignatureTransaction, MultisigSignatureTransaction> {
 
 	@Test
 	public void signatureCanBeMappedToModelWhenLinkedMultisigTransactionHasInnerTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigSignature dbSignature = context.createDbSignature();
+		final DbMultisigSignatureTransaction dbSignature = context.createDbSignature();
 
 		// Act:
 		final MultisigSignatureTransaction model = context.mapping.map(dbSignature);
@@ -30,8 +30,8 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 	public void signatureCannotBeMappedToModelWhenLinkedMultisigTransactionDoesNotHaveInnerTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final MultisigSignature dbSignature = context.createDbSignature();
-		dbSignature.getMultisigTransaction().setTransfer(null);
+		final DbMultisigSignatureTransaction dbSignature = context.createDbSignature();
+		dbSignature.getMultisigTransaction().setTransferTransaction(null);
 
 		// Act:
 		ExceptionAssert.assertThrows(
@@ -40,22 +40,22 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 	}
 
 	@Override
-	protected MultisigSignature createDbModel() {
-		final MultisigTransaction dbMultisigTransfer = new MultisigTransaction();
-		dbMultisigTransfer.setTransfer(new Transfer());
-		final MultisigSignature dbSignature = new MultisigSignature();
+	protected DbMultisigSignatureTransaction createDbModel() {
+		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
+		dbMultisigTransfer.setTransferTransaction(new DbTransferTransaction());
+		final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
 		dbSignature.setMultisigTransaction(dbMultisigTransfer);
 		return dbSignature;
 	}
 
 	@Override
-	protected IMapping<MultisigSignature, MultisigSignatureTransaction> createMapping(final IMapper mapper) {
+	protected IMapping<DbMultisigSignatureTransaction, MultisigSignatureTransaction> createMapping(final IMapper mapper) {
 		return new MultisigSignatureDbModelToModelMapping(mapper);
 	}
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Hash otherTransactionHash = Utils.generateRandomHash();
 		private final MultisigSignatureDbModelToModelMapping mapping = new MultisigSignatureDbModelToModelMapping(this.mapper);
@@ -64,15 +64,15 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
 		}
 
-		public MultisigSignature createDbSignature() {
-			final MultisigSignature dbSignature = new MultisigSignature();
+		public DbMultisigSignatureTransaction createDbSignature() {
+			final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
 			dbSignature.setTimeStamp(4444);
 			dbSignature.setSender(this.dbSender);
-			dbSignature.setMultisigTransaction(new MultisigTransaction());
+			dbSignature.setMultisigTransaction(new DbMultisigTransaction());
 
-			final Transfer dbTransfer = new Transfer();
-			dbTransfer.setTransferHash(this.otherTransactionHash);
-			dbSignature.getMultisigTransaction().setTransfer(dbTransfer);
+			final DbTransferTransaction dbTransferTransaction = new DbTransferTransaction();
+			dbTransferTransaction.setTransferHash(this.otherTransactionHash);
+			dbSignature.getMultisigTransaction().setTransferTransaction(dbTransferTransaction);
 
 			dbSignature.setFee(0L);
 			dbSignature.setDeadline(0);

@@ -8,6 +8,7 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountCache;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.dbmodel.TransferBlockPair;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,8 +93,8 @@ public class AccountIoAdapter implements AccountIo {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		pairs.stream()
 				.map(pair -> new TransactionMetaDataPair(
-						this.mapper.map(pair.getTransfer()),
-						new TransactionMetaData(new BlockHeight(pair.getBlock().getHeight()), pair.getTransfer().getId())
+						this.mapper.map(pair.getDbTransferTransaction()),
+						new TransactionMetaData(new BlockHeight(pair.getDbBlock().getHeight()), pair.getDbTransferTransaction().getId())
 				))
 				.forEach(transactionList::add);
 		return transactionList;
@@ -102,7 +103,7 @@ public class AccountIoAdapter implements AccountIo {
 	@Override
 	public SerializableList<HarvestInfo> getAccountHarvests(final Address address, final Hash harvestHash) {
 		final Account account = this.accountCache.findByAddress(address);
-		final Collection<org.nem.nis.dbmodel.Block> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, DEFAULT_LIMIT);
+		final Collection<DbBlock> blocks = this.blockDao.getBlocksForAccount(account, harvestHash, DEFAULT_LIMIT);
 
 		final SerializableList<HarvestInfo> blockList = new SerializableList<>(0);
 

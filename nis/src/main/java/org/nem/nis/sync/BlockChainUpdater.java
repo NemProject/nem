@@ -10,6 +10,7 @@ import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -81,7 +82,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @return The result of the interaction.
 	 */
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
-		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+		final DbBlock expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
@@ -117,7 +118,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				return NodeInteractionResult.NEUTRAL;
 			}
 
-			final org.nem.nis.dbmodel.Block dbParent = this.blockDao.findByHeight(commonBlockHeight);
+			final DbBlock dbParent = this.blockDao.findByHeight(commonBlockHeight);
 
 			// revert TXes inside contemporaryAccountAnalyzer
 			BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -176,7 +177,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
-		final org.nem.nis.dbmodel.Block dbParent;
+		final DbBlock dbParent;
 
 		// receivedBlock already seen
 		if (this.blockDao.findByHash(blockHash) != null) {
@@ -227,11 +228,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private Block remapBlock(final Block block, final AccountCache accountCache) {
 		// TODO 20141230 J-B,G: do we still need to remap blocks?
-		final org.nem.nis.dbmodel.Block dbBlock = this.mapper.map(block);
+		final DbBlock dbBlock = this.mapper.map(block);
 		return this.nisMapperFactory.createDbModelToModelNisMapper(accountCache).map(dbBlock);
 	}
 
-	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
+	private void fixBlock(final Block block, final DbBlock parent) {
 		// blocks that are received via /push/block do not have their generation hashes set
 		// (generation hashes are not serialized), so we need to recalculate it for
 		// each block that we receive
@@ -243,7 +244,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		block.setLessor(lessor);
 	}
 
-	private static void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
+	private static void fixGenerationHash(final Block block, final DbBlock parent) {
 		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
@@ -255,7 +256,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private ValidationResult updateOurChain(
 			final BlockChainSyncContext context,
-			final org.nem.nis.dbmodel.Block dbParentBlock,
+			final DbBlock dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain,

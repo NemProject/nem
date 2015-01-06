@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.ReadOnlyAccountState;
@@ -25,7 +25,7 @@ public class BlockChainUtils {
 			final int getHashesFromCalls,
 			final int getDifficultiesFromCalls,
 			final int getTimeStampsFromCall) {
-		Mockito.verify(blockDao, Mockito.times(saveCalls)).save(Mockito.any(Block.class));
+		Mockito.verify(blockDao, Mockito.times(saveCalls)).save(Mockito.any(DbBlock.class));
 		Mockito.verify(blockDao, Mockito.times(findByHashCalls)).findByHash(Mockito.any());
 		Mockito.verify(blockDao, Mockito.times(findByHeightCalls)).findByHeight(Mockito.any());
 		Mockito.verify(blockDao, Mockito.times(deleteBlocksAfterHeightCalls)).deleteBlocksAfterHeight(Mockito.any());

@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import java.util.Collection;
 
 /**
- * Read-only DAO for accessing db Transfer objects.
+ * Read-only DAO for accessing DbTransferTransaction objects.
  *
  * @param <TTransfer> The transfer type.
  */
@@ -23,7 +23,7 @@ public interface SimpleReadOnlyTransferDao<TTransfer> {
 	 * Retrieves a transfer from the db given it's hash.
 	 *
 	 * @param txHash Hash of the transfer to retrieve.
-	 * @return Transfer having given hash or null.
+	 * @return DbTransferTransaction having given hash or null.
 	 */
 	TTransfer findByHash(final byte[] txHash);
 
@@ -32,7 +32,7 @@ public interface SimpleReadOnlyTransferDao<TTransfer> {
 	 *
 	 * @param txHash hash of a transfer to retrieve.
 	 * @param maxBlockHeight The maximum block height.
-	 * @return Transfer having given hash or null.
+	 * @return DbTransferTransaction having given hash or null.
 	 */
 	TTransfer findByHash(byte[] txHash, long maxBlockHeight);
 

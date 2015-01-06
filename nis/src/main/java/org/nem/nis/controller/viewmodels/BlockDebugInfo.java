@@ -14,7 +14,7 @@ import java.util.*;
 public class BlockDebugInfo implements SerializableEntity {
 
 	private final BlockHeight height;
-	private final Address foragerAddress;
+	private final Address harvesterAddress;
 	private final TimeInstant timeStamp;
 	private final BlockDifficulty difficulty;
 	private final BigInteger hit;
@@ -27,7 +27,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	 *
 	 * @param blockHeight The block height.
 	 * @param timeStamp The block timestamp.
-	 * @param foragerAddress The address of the forager of the block.
+	 * @param harvesterAddress The address of the harvester of the block.
 	 * @param difficulty The block difficulty.
 	 * @param hit The block hit.
 	 * @param target The block target.
@@ -36,13 +36,13 @@ public class BlockDebugInfo implements SerializableEntity {
 	public BlockDebugInfo(
 			final BlockHeight blockHeight,
 			final TimeInstant timeStamp,
-			final Address foragerAddress,
+			final Address harvesterAddress,
 			final BlockDifficulty difficulty,
 			final BigInteger hit,
 			final BigInteger target,
 			final int interBlockTime) {
 		this.height = blockHeight;
-		this.foragerAddress = foragerAddress;
+		this.harvesterAddress = harvesterAddress;
 		this.timeStamp = timeStamp;
 		this.difficulty = difficulty;
 		this.hit = hit;
@@ -59,7 +59,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public BlockDebugInfo(final Deserializer deserializer) {
 		this.height = BlockHeight.readFrom(deserializer, "height");
 		this.timeStamp = readTimeStringAsTimeInstant(deserializer, "timeStamp");
-		this.foragerAddress = Address.readFrom(deserializer, "forager");
+		this.harvesterAddress = Address.readFrom(deserializer, "harvester");
 		this.difficulty = BlockDifficulty.readFrom(deserializer, "difficulty");
 		this.hit = new BigInteger(deserializer.readString("hit"));
 		this.target = new BigInteger(deserializer.readString("target"));
@@ -77,12 +77,12 @@ public class BlockDebugInfo implements SerializableEntity {
 	}
 
 	/**
-	 * Returns the address of the forager of the block.
+	 * Returns the address of the harvester of the block.
 	 *
 	 * @return The address.
 	 */
-	public Address getForagerAddress() {
-		return this.foragerAddress;
+	public Address getHarvesterAddress() {
+		return this.harvesterAddress;
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	}
 
 	/**
-	 * Returns the forager's target for the block
+	 * Returns the harvester's target for the block
 	 *
 	 * @return The target.
 	 */
@@ -152,7 +152,7 @@ public class BlockDebugInfo implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		BlockHeight.writeTo(serializer, "height", this.height);
 		writeTimeInstantAsTimeString(serializer, "timeStamp", this.timeStamp);
-		Address.writeTo(serializer, "forager", this.foragerAddress);
+		Address.writeTo(serializer, "harvester", this.harvesterAddress);
 		BlockDifficulty.writeTo(serializer, "difficulty", this.difficulty);
 		serializer.writeString("hit", this.hit.toString());
 		serializer.writeString("target", this.target.toString());

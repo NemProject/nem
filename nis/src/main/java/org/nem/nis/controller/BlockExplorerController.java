@@ -6,6 +6,7 @@ import org.nem.nis.BlockChainConstants;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dao.ReadOnlyBlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.BlockExplorerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class BlockExplorerController {
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
 		final BlockExplorerMapper mapper = new BlockExplorerMapper();
 		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
-		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(height, BlockChainConstants.BLOCKS_LIMIT);
+		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BlockChainConstants.BLOCKS_LIMIT);
 		dbBlockList.stream()
 				.map(dbBlock -> mapper.toExplorerViewModel(dbBlock))
 				.forEach(viewModel -> blockList.add(viewModel));

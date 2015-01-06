@@ -12,7 +12,9 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.dbmodel.DbTransferTransaction;
 import org.nem.nis.mappers.AccountDaoLookup;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -69,7 +71,7 @@ public class TransferDaoITCase {
 			this.addMapping(mockAccountDao, recipient);
 			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-				final Transfer dbTransfer = MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transferTransaction, Transfer.class);
+				final DbTransferTransaction dbTransfer = MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transferTransaction, DbTransferTransaction.class);
 				dbTransfer.setBlkIndex(12345);
 				dbTransfer.setOrderId(i - 1);
 				hashes.add(dbTransfer.getTransferHash());
@@ -78,7 +80,7 @@ public class TransferDaoITCase {
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 		}
 
@@ -86,7 +88,7 @@ public class TransferDaoITCase {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 

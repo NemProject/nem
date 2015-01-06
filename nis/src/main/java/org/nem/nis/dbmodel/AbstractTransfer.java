@@ -4,8 +4,6 @@ import org.hibernate.annotations.Cascade;
 import org.nem.core.crypto.Hash;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * Base class for all transfer db entities.
@@ -25,7 +23,7 @@ public abstract class AbstractTransfer {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "senderId")
-	private Account sender;
+	private DbAccount sender;
 	private byte[] senderProof;
 
 	public Long getId() {
@@ -76,11 +74,11 @@ public abstract class AbstractTransfer {
 		this.deadline = deadline;
 	}
 
-	public Account getSender() {
+	public DbAccount getSender() {
 		return this.sender;
 	}
 
-	public void setSender(final Account sender) {
+	public void setSender(final DbAccount sender) {
 		this.sender = sender;
 	}
 

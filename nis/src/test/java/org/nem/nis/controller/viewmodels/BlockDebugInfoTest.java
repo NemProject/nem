@@ -30,7 +30,7 @@ public class BlockDebugInfoTest {
 
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));
@@ -70,7 +70,7 @@ public class BlockDebugInfoTest {
 
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(hit));

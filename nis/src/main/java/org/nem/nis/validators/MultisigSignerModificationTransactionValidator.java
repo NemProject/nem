@@ -14,7 +14,7 @@ public class MultisigSignerModificationTransactionValidator implements SingleTra
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.MULTISIG_SIGNER_MODIFY != transaction.getType()) {
+		if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION != transaction.getType()) {
 			return ValidationResult.SUCCESS;
 		}
 
@@ -22,10 +22,10 @@ public class MultisigSignerModificationTransactionValidator implements SingleTra
 			return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 		}
 
-		return this.validate((MultisigSignerModificationTransaction)transaction, context);
+		return this.validate((MultisigAggregateModificationTransaction)transaction, context);
 	}
 
-	private ValidationResult validate(final MultisigSignerModificationTransaction transaction, final ValidationContext context) {
+	private ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
 		return ValidationResult.aggregate(transaction.getModifications().stream()
 				.map(t -> this.validate(transaction.getSigner().getAddress(), t)).iterator());
 	}

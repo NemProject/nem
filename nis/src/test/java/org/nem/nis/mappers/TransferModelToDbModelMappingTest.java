@@ -11,7 +11,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, Transfer> {
+public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, DbTransferTransaction> {
 
 	@Test
 	public void transferWithNoMessageCanBeMappedToDbModel() {
@@ -20,7 +20,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		final TransferTransaction transfer = context.createModel(null);
 
 		// Act:
-		final Transfer dbModel = context.mapping.map(transfer);
+		final DbTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
@@ -36,7 +36,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		final TransferTransaction transfer = context.createModel(new PlainMessage(messagePayload));
 
 		// Act:
-		final Transfer dbModel = context.mapping.map(transfer);
+		final DbTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
@@ -52,7 +52,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		final TransferTransaction transfer = context.createModel(SecureMessage.fromEncodedPayload(context.sender, context.recipient, messagePayload));
 
 		// Act:
-		final Transfer dbModel = context.mapping.map(transfer);
+		final DbTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
@@ -77,13 +77,13 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbRecipient = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbRecipient = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
 		private final TransferModelToDbModelMapping mapping = new TransferModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.recipient, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbRecipient);
+			Mockito.when(this.mapper.map(this.recipient, DbAccount.class)).thenReturn(this.dbRecipient);
 		}
 
 		public TransferTransaction createModel(final Message message) {
@@ -95,7 +95,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 					message);
 		}
 
-		public void assertDbModel(final Transfer dbModel, final TransferTransaction model) {
+		public void assertDbModel(final DbTransferTransaction dbModel, final TransferTransaction model) {
 			Assert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(this.dbRecipient));
 			Assert.assertThat(dbModel.getAmount(), IsEqual.equalTo(111111L));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));

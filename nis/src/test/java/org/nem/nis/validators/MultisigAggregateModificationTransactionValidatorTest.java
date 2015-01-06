@@ -10,7 +10,7 @@ import org.nem.core.model.ValidationResult;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.MultisigTestContext;
 
-public class MultisigSignerModificationTransactionValidatorTest {
+public class MultisigAggregateModificationTransactionValidatorTest {
 	@Test
 	public void canValidateOtherTransactions() {
 		// Arrange:

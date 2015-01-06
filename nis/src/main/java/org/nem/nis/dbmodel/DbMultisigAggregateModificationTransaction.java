@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Multisig Signer Modification db entity
  * <p>
- * Holds information about Transactions having type TransactionTypes.MULTISIG_SIGNER_MODIFY
+ * Holds information about Transactions having type TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION
  * <p>
  *
  * TODO 20150103 J-G can you remind me why we need both MultisigSignerModification and MultisigModification?
@@ -28,20 +28,20 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "multisigsignermodifications")
-public class MultisigSignerModification extends AbstractBlockTransfer<MultisigSignerModification> {
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigSignerModification", orphanRemoval = true)
+public class DbMultisigAggregateModificationTransaction extends AbstractBlockTransfer<DbMultisigAggregateModificationTransaction> {
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigAggregateModificationTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private Set<MultisigModification> multisigModifications;
+	private Set<DbMultisigModification> multisigModifications;
 
-	public MultisigSignerModification() {
-		super(b -> b.getBlockMultisigSignerModifications());
+	public DbMultisigAggregateModificationTransaction() {
+		super(b -> b.getBlockMultisigAggregateModificationTransactions());
 	}
 
-	public Set<MultisigModification> getMultisigModifications() {
+	public Set<DbMultisigModification> getMultisigModifications() {
 		return this.multisigModifications;
 	}
 
-	public void setMultisigModifications(final Set<MultisigModification> multisigModifications) {
+	public void setMultisigModifications(final Set<DbMultisigModification> multisigModifications) {
 		this.multisigModifications = multisigModifications;
 	}
 }

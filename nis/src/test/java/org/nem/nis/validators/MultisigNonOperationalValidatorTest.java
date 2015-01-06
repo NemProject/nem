@@ -82,7 +82,7 @@ public class MultisigNonOperationalValidatorTest {
 		context.addState(cosignatory);
 		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
 
-		final Transaction transaction = new MultisigSignerModificationTransaction(
+		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				multisig,
 				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosignatory)));
@@ -106,7 +106,7 @@ public class MultisigNonOperationalValidatorTest {
 		context.addState(cosignatory);
 		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
 
-		final Transaction transaction = new MultisigSignerModificationTransaction(
+		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				multisig,
 				// TODO 20150103 J-G: consider refactoring as the type and expected reslt are only differences

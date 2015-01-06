@@ -4,14 +4,13 @@ import org.nem.core.model.*;
 import org.nem.core.model.MultisigTransaction;
 import org.nem.nis.dbmodel.*;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * A mapping that is able to map a multisig transaction to a db multisig transaction.
  */
-public class MultisigTransactionModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigTransaction, org.nem.nis.dbmodel.MultisigTransaction> {
+public class MultisigTransactionModelToDbModelMapping extends AbstractTransferModelToDbModelMapping<MultisigTransaction, DbMultisigTransaction> {
 
 	/**
 	 * Creates a new mapping.
@@ -23,38 +22,38 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.MultisigTransaction mapImpl(final MultisigTransaction source) {
-		final org.nem.nis.dbmodel.MultisigTransaction dbMultisigTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
+	public DbMultisigTransaction mapImpl(final MultisigTransaction source) {
+		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
 		dbMultisigTransfer.setReferencedTransaction(0L);
 
 		// TODO 20150104 J-J: move to registry (hopefully)
 		final Transaction transaction = source.getOtherTransaction();
 		switch (source.getOtherTransaction().getType()) {
 			case TransactionTypes.TRANSFER:
-				dbMultisigTransfer.setTransfer(this.mapper.map(transaction, Transfer.class));
+				dbMultisigTransfer.setTransferTransaction(this.mapper.map(transaction, DbTransferTransaction.class));
 				break;
 
 			case TransactionTypes.IMPORTANCE_TRANSFER:
-				dbMultisigTransfer.setImportanceTransfer(this.mapper.map(transaction, ImportanceTransfer.class));
+				dbMultisigTransfer.setImportanceTransferTransaction(this.mapper.map(transaction, DbImportanceTransferTransaction.class));
 				break;
 
-			case TransactionTypes.MULTISIG_SIGNER_MODIFY:
-				dbMultisigTransfer.setMultisigSignerModification(this.mapper.map(transaction, MultisigSignerModification.class));
+			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
+				dbMultisigTransfer.setMultisigAggregateModificationTransaction(this.mapper.map(transaction, DbMultisigAggregateModificationTransaction.class));
 				break;
 
 			default:
 				throw new IllegalArgumentException("trying to map block with unknown transaction type");
 		}
 
-		final Set<MultisigSignature> multisigSignatures = source.getCosignerSignatures().stream()
+		final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions = source.getCosignerSignatures().stream()
 				.map(model -> {
-					final MultisigSignature signature = this.mapper.map(model, MultisigSignature.class);
+					final DbMultisigSignatureTransaction signature = this.mapper.map(model, DbMultisigSignatureTransaction.class);
 					signature.setMultisigTransaction(dbMultisigTransfer);
 					return signature;
 				})
 				.collect(Collectors.toSet());
 
-		dbMultisigTransfer.setMultisigSignatures(multisigSignatures);
+		dbMultisigTransfer.setMultisigSignatureTransactions(multisigSignatureTransactions);
 		return dbMultisigTransfer;
 	}
 }

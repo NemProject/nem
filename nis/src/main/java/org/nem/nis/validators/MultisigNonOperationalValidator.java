@@ -38,7 +38,7 @@ public class MultisigNonOperationalValidator implements SingleTransactionValidat
 			return ValidationResult.SUCCESS;
 		}
 
-		if (TransactionTypes.MULTISIG_SIGNER_MODIFY != transaction.getType()) {
+		if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION != transaction.getType()) {
 			if (senderState.getMultisigLinks().isCosignatory() && TransactionTypes.MULTISIG_SIGNATURE == transaction.getType()) {
 				return ValidationResult.SUCCESS;
 			}
@@ -46,10 +46,10 @@ public class MultisigNonOperationalValidator implements SingleTransactionValidat
 			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
 		}
 
-		return this.validate((MultisigSignerModificationTransaction)transaction, context);
+		return this.validate((MultisigAggregateModificationTransaction)transaction, context);
 	}
 
-	private ValidationResult validate(final MultisigSignerModificationTransaction transaction, final ValidationContext context) {
+	private ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
 		// TODO: actually this should test if there is "Del"
 		// TODO 20150103 J-G: should probably just test type validity
 		boolean invalid = transaction.getModifications().stream().anyMatch(m -> m.getModificationType() == MultisigModificationType.Del);

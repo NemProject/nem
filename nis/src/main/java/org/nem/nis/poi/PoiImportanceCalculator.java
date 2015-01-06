@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * Because a lot of the infrastructure is not yet in place, I am making the
  * following assumptions in this code:
  * 1) This class's calculateImportancesImpl is called with a list of all the accounts.
- * 2) POI is calculated by the forager after processing new transactions.
+ * 2) POI is calculated by the harvester after processing new transactions.
  * This algorithm is not currently iterative, so importances are calculated from scratch every time.
  * I plan to make this iterative so that we update importances only for accounts affected by new transactions and their links.
  */

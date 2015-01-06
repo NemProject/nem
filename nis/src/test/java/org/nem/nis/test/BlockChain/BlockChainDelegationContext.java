@@ -11,6 +11,8 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.BlockChain;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
+import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -41,8 +43,8 @@ public class BlockChainDelegationContext {
 	private final BlockChain blockChain;
 	private final Block parent;
 	private final Block block;
-	private org.nem.nis.dbmodel.Block dbParent;
-	private org.nem.nis.dbmodel.Block dbBlock;
+	private DbBlock dbParent;
+	private DbBlock dbBlock;
 	private final Account blockHarvester = Utils.generateRandomAccount();
 	private final AccountState blockHarvesterState = new AccountState(this.blockHarvester.getAddress());
 	private final Account parentHarvester = Utils.generateRandomAccount();
@@ -125,9 +127,9 @@ public class BlockChainDelegationContext {
 
 	private void prepareAccountDao() {
 		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.blockHarvester.getAddress().getEncoded()))
-				.thenReturn(new org.nem.nis.dbmodel.Account(this.blockHarvester.getAddress().getEncoded(), this.blockHarvester.getAddress().getPublicKey()));
+				.thenReturn(new DbAccount(this.blockHarvester.getAddress().getEncoded(), this.blockHarvester.getAddress().getPublicKey()));
 		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.parentHarvester.getAddress().getEncoded()))
-				.thenReturn(new org.nem.nis.dbmodel.Account(this.parentHarvester.getAddress().getEncoded(), this.parentHarvester.getAddress().getPublicKey()));
+				.thenReturn(new DbAccount(this.parentHarvester.getAddress().getEncoded(), this.parentHarvester.getAddress().getPublicKey()));
 	}
 
 	private void prepareBlockDao() {
@@ -195,7 +197,7 @@ public class BlockChainDelegationContext {
 				this.blockDao,
 				this.blockChainServices,
 				this.unconfirmedTransactions,
-				(org.nem.nis.dbmodel.Block)invocation.getArguments()[1],
+				(DbBlock)invocation.getArguments()[1],
 				castToBlockCollection(invocation.getArguments()[2]),
 				(BlockChainScore)invocation.getArguments()[3],
 				(Boolean)invocation.getArguments()[4]));

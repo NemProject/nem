@@ -12,11 +12,11 @@ import java.util.*;
  * <br/>
  * First such transaction converts account to multisig account.
  *
- * TODO 20150106 G-J: MultisigSignerModificationTransaction CANNOT have single modification
- * > otherwise we'd have to allow multiple MultisigSignerModificationTransaction coming from single
+ * TODO 20150106 G-J: MultisigAggregateModificationTransaction CANNOT have single modification
+ * > otherwise we'd have to allow multiple MultisigAggregateModificationTransaction coming from single
  * > account (per block), and that would complicate validators even further
  */
-public class MultisigSignerModificationTransaction extends Transaction {
+public class MultisigAggregateModificationTransaction extends Transaction {
 	final Collection<MultisigModification> modifications;
 
 	/**
@@ -26,11 +26,11 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	 * @param sender The transaction sender (multisig account).
 	 * @param modifications The list of modifications.
 	 */
-	public MultisigSignerModificationTransaction(
+	public MultisigAggregateModificationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
 			final Collection<MultisigModification> modifications) {
-		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, 1, timeStamp, sender);
+		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 1, timeStamp, sender);
 		this.modifications = modifications;
 
 		validateModifications(this.modifications);
@@ -49,8 +49,8 @@ public class MultisigSignerModificationTransaction extends Transaction {
 	 * @param options The deserialization options.
 	 * @param deserializer The deserializer.
 	 */
-	public MultisigSignerModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
-		super(TransactionTypes.MULTISIG_SIGNER_MODIFY, options, deserializer);
+	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
+		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
 
 		this.modifications = deserializer.readObjectArray("modifications", obj -> new MultisigModification(obj));
 	}

@@ -2,21 +2,21 @@ package org.nem.nis.dao;
 
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 
 import java.util.List;
 
 /**
- * DAO for accessing db Block objects.
+ * DAO for accessing DbBlock objects.
  */
 public interface BlockDao extends ReadOnlyBlockDao {
 
 	/**
 	 * Saves full block in the database, along with associated transactions, signers, etc.
 	 *
-	 * @param block Block to save.
+	 * @param block DbBlock to save.
 	 */
-	public void save(Block block);
+	public void save(DbBlock block);
 
 	/**
 	 * Saves all blocks in the database, along with associated transactions, signers, etc.
@@ -24,7 +24,7 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	 *
 	 * @param blocks Blocks to save.
 	 */
-	public void save(final List<Block> blocks);
+	public void save(final List<DbBlock> blocks);
 
 	/**
 	 * Retrieves list of at most limit difficulties for blocks starting at given height.

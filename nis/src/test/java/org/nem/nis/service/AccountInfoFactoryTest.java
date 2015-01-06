@@ -66,7 +66,7 @@ public class AccountInfoFactoryTest {
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
-		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
+		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));
 	}

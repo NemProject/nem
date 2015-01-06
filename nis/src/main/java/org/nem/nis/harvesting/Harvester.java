@@ -2,6 +2,7 @@ package org.nem.nis.harvesting;
 
 import org.nem.core.model.*;
 import org.nem.core.time.*;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
@@ -46,7 +47,7 @@ public class Harvester {
 			return null;
 		}
 
-		final org.nem.nis.dbmodel.Block dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+		final DbBlock dbLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final Block lastBlock = this.mapper.map(dbLastBlock);
 
 		GeneratedBlock bestGeneratedBlock = null;

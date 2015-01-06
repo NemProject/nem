@@ -36,8 +36,8 @@ public class PoiContextTest {
 		// Arrange:
 		final long multiplier = 1000 * Amount.MICRONEMS_IN_NEM;
 		final List<TestAccountInfo> accountInfos = Arrays.asList(
-				new TestAccountInfo(multiplier - 1, null), // non-foraging account
-				new TestAccountInfo(multiplier - 1, null)); // non-foraging account
+				new TestAccountInfo(multiplier - 1, null), // non-harvesting account
+				new TestAccountInfo(multiplier - 1, null)); // non-harvesting account
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
@@ -406,7 +406,7 @@ public class PoiContextTest {
 				new TestAccountInfo(MIN_HARVESTING_BALANCE),
 				new TestAccountInfo(MIN_HARVESTING_BALANCE),
 				new TestAccountInfo(MIN_HARVESTING_BALANCE),
-				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, null)); // non-foraging account
+				new TestAccountInfo(MIN_HARVESTING_BALANCE - 1, null)); // non-harvesting account
 
 		final BlockHeight height = new BlockHeight(21);
 		final List<AccountState> accountStates = createTestPoiAccountStates(accountInfos, height);
@@ -418,8 +418,8 @@ public class PoiContextTest {
 		addAccountLink(height, accountStates.get(1), accountStates.get(2), 6);
 		addAccountLink(height, accountStates.get(3), accountStates.get(0), 3);
 		addAccountLink(height, accountStates.get(3), accountStates.get(2), 5);
-		addAccountLink(height, accountStates.get(4), accountStates.get(2), 5); // from non-foraging account (ignored)
-		addAccountLink(height, accountStates.get(0), accountStates.get(4), 2); // to non-foraging account (included in scores)
+		addAccountLink(height, accountStates.get(4), accountStates.get(2), 5); // from non-harvesting account (ignored)
+		addAccountLink(height, accountStates.get(0), accountStates.get(4), 2); // to non-harvesting account (included in scores)
 
 		// outlinks
 		// - 0: (8, 4, 2) - (2, 3) -- 9

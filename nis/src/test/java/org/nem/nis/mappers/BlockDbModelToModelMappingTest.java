@@ -26,7 +26,7 @@ public class BlockDbModelToModelMappingTest {
 		// Arrange:
 		final DeserializationContext deserializationContext = new DeserializationContext(new MockAccountLookup());
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock(null, null);
 		dbBlock.setHeight(1L);
 
 		// Act:
@@ -47,7 +47,7 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithMinimalInformationCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock(null, null);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
@@ -61,7 +61,7 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithDifficultyCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(111L, null);
+		final DbBlock dbBlock = context.createDbBlock(111L, null);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
@@ -75,7 +75,7 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithLessorCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, context.dbLessor);
+		final DbBlock dbBlock = context.createDbBlock(null, context.dbLessor);
 
 		// Act:
 		final Block model = context.mapping.map(dbBlock);
@@ -124,7 +124,7 @@ public class BlockDbModelToModelMappingTest {
 	private static void assertBlockWithTransfersCanBeMappedToModel(final TestContext.TransactionFactory factory) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock(null, null);
 
 		final Transaction transfer2 = factory.create(context, dbBlock, 2);
 		final Transaction transfer0 = factory.create(context, dbBlock, 0);
@@ -144,7 +144,7 @@ public class BlockDbModelToModelMappingTest {
 	public void blockWithMixedTransfersCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbBlock = context.createDbBlock(null, null);
+		final DbBlock dbBlock = context.createDbBlock(null, null);
 
 		final Transaction transfer2 = context.addTransfer(dbBlock, 2);
 		final Transaction transfer0 = context.addImportanceTransfer(dbBlock, 0);
@@ -183,13 +183,13 @@ public class BlockDbModelToModelMappingTest {
 
 		@FunctionalInterface
 		private static interface TransactionFactory {
-			public Transaction create(final TestContext context, final org.nem.nis.dbmodel.Block block, final int blockIndex);
+			public Transaction create(final TestContext context, final DbBlock block, final int blockIndex);
 		}
 
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbForger = Mockito.mock(org.nem.nis.dbmodel.Account.class);
-		private final org.nem.nis.dbmodel.Account dbLessor = Mockito.mock(org.nem.nis.dbmodel.Account.class);
-		private final Account forger = Utils.generateRandomAccount();
+		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
+		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
+		private final Account harvester = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
 		private final Signature signature = Utils.generateRandomSignature();
 		private final Hash prevBlockHash = Utils.generateRandomHash();
@@ -197,13 +197,13 @@ public class BlockDbModelToModelMappingTest {
 		private final BlockDbModelToModelMapping mapping = new BlockDbModelToModelMapping(this.mapper, new MockAccountLookup());
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.dbForger, Account.class)).thenReturn(this.forger);
+			Mockito.when(this.mapper.map(this.dbForger, Account.class)).thenReturn(this.harvester);
 			Mockito.when(this.mapper.map(this.dbLessor, Account.class)).thenReturn(this.lessor);
 		}
 
-		public org.nem.nis.dbmodel.Block createDbBlock(final Long difficulty, final org.nem.nis.dbmodel.Account lessor) {
-			final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
-			dbBlock.setForger(this.dbForger);
+		public DbBlock createDbBlock(final Long difficulty, final DbAccount lessor) {
+			final DbBlock dbBlock = new DbBlock();
+			dbBlock.setHarvester(this.dbForger);
 			dbBlock.setPrevBlockHash(this.prevBlockHash);
 			dbBlock.setGenerationHash(this.generationBlockHash);
 			dbBlock.setTimeStamp(4444);
@@ -211,7 +211,7 @@ public class BlockDbModelToModelMappingTest {
 
 			dbBlock.setDifficulty(difficulty);
 			dbBlock.setLessor(lessor);
-			dbBlock.setForgerProof(this.signature.getBytes());
+			dbBlock.setHarvesterProof(this.signature.getBytes());
 
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				entry.setInBlock.accept(dbBlock, new ArrayList<>());
@@ -225,7 +225,7 @@ public class BlockDbModelToModelMappingTest {
 		}
 
 		public void assertModel(final Block model, final long expectedDifficulty, final Account expectedLessor) {
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.forger));
+			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.harvester));
 			Assert.assertThat(model.getPreviousBlockHash(), IsEqual.equalTo(this.prevBlockHash));
 			Assert.assertThat(model.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
 			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
@@ -238,35 +238,35 @@ public class BlockDbModelToModelMappingTest {
 
 		//region add*
 
-		public TransferTransaction addTransfer(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
+		public TransferTransaction addTransfer(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockTransfers().add(dbTransfer),
+					dbTransfer -> block.getBlockTransferTransactions().add(dbTransfer),
 					blockIndex,
-					new Transfer(),
+					new DbTransferTransaction(),
 					TransferTransaction.class);
 		}
 
-		public ImportanceTransferTransaction addImportanceTransfer(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
+		public ImportanceTransferTransaction addImportanceTransfer(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockImportanceTransfers().add(dbTransfer),
+					dbTransfer -> block.getBlockImportanceTransferTransactions().add(dbTransfer),
 					blockIndex,
-					new ImportanceTransfer(),
+					new DbImportanceTransferTransaction(),
 					ImportanceTransferTransaction.class);
 		}
 
-		public MultisigSignerModificationTransaction addSignerModification(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
+		public MultisigAggregateModificationTransaction addSignerModification(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockMultisigSignerModifications().add(dbTransfer),
+					dbTransfer -> block.getBlockMultisigAggregateModificationTransactions().add(dbTransfer),
 					blockIndex,
-					new MultisigSignerModification(),
-					MultisigSignerModificationTransaction.class);
+					new DbMultisigAggregateModificationTransaction(),
+					MultisigAggregateModificationTransaction.class);
 		}
 
-		public MultisigTransaction addMultisigTransfer(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
+		public MultisigTransaction addMultisigTransfer(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
 					dbTransfer -> block.getBlockMultisigTransactions().add(dbTransfer),
 					blockIndex,
-					new org.nem.nis.dbmodel.MultisigTransaction(),
+					new DbMultisigTransaction(),
 					org.nem.core.model.MultisigTransaction.class);
 		}
 

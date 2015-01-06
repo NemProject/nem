@@ -41,7 +41,7 @@ public class TransactionRegistryTest {
 		final Collection<Class> expectedModelClasses = Arrays.asList(
 				TransferTransaction.class,
 				ImportanceTransferTransaction.class,
-				MultisigSignerModificationTransaction.class,
+				MultisigAggregateModificationTransaction.class,
 				MultisigTransaction.class);
 		Assert.assertThat(modelClasses, IsEquivalent.equivalentTo(expectedModelClasses));
 		Assert.assertThat(expectedModelClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
@@ -53,7 +53,7 @@ public class TransactionRegistryTest {
 		final List<Integer> expectedRegisteredTypes = Arrays.asList(
 				TransactionTypes.TRANSFER,
 				TransactionTypes.IMPORTANCE_TRANSFER,
-				TransactionTypes.MULTISIG_SIGNER_MODIFY,
+				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 				TransactionTypes.MULTISIG);
 
 		// Act:

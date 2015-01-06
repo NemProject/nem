@@ -3,12 +3,12 @@ package org.nem.nis.dao;
 import org.nem.core.crypto.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 
 import java.util.Collection;
 
 /**
- * Read-only DAO for accessing db Block objects.
+ * Read-only DAO for accessing DbBlock objects.
  */
 public interface ReadOnlyBlockDao {
 
@@ -20,20 +20,20 @@ public interface ReadOnlyBlockDao {
 	public Long count();
 
 	/**
-	 * Retrieves Block from db given it's hash.
+	 * Retrieves DbBlock from db given it's hash.
 	 *
 	 * @param blockHash hash of a block to retrieve.
-	 * @return Block having given hash or null.
+	 * @return DbBlock having given hash or null.
 	 */
-	public Block findByHash(final Hash blockHash);
+	public DbBlock findByHash(final Hash blockHash);
 
 	/**
-	 * Retrieves Block from db at given height.
+	 * Retrieves DbBlock from db at given height.
 	 *
 	 * @param height height of a block to retrieve.
-	 * @return Block at given height or null.
+	 * @return DbBlock at given height or null.
 	 */
-	public Block findByHeight(final BlockHeight height);
+	public DbBlock findByHeight(final BlockHeight height);
 
 	/**
 	 * Retrieves list of at most limit hashes for blocks starting at given height.
@@ -46,14 +46,14 @@ public interface ReadOnlyBlockDao {
 	public HashChain getHashesFrom(final BlockHeight height, int limit);
 
 	/**
-	 * Retrieves all Blocks from the database that were forged by the specified account.
+	 * Retrieves all Blocks from the database that were harvested by the specified account.
 	 *
 	 * @param account The account.
 	 * @param hash The hash of "top-most" block.
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, int limit);
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, int limit);
 
 	/**
 	 * Gets at most blocksCount blocks after blockHeight.
@@ -62,5 +62,5 @@ public interface ReadOnlyBlockDao {
 	 * @param limit The maximum number of blocks to return.
 	 * @return The blocks.
 	 */
-	public Collection<Block> getBlocksAfter(final BlockHeight height, int limit);
+	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, int limit);
 }

@@ -8,7 +8,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,15 +33,15 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	public void save(final Block block) {
+	public void save(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
 	}
 
 	// TODO 20141206 J-G: does it make sense to add a test for this?
 	@Override
 	@Transactional
-	public void save(final List<Block> blocks) {
-		for (final Block block : blocks) {
+	public void save(final List<DbBlock> dbBlocks) {
+		for (final DbBlock block : dbBlocks) {
 			this.getCurrentSession().saveOrUpdate(block);
 		}
 		this.getCurrentSession().flush();
@@ -51,15 +51,15 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional(readOnly = true)
 	public Long count() {
-		return (Long)this.getCurrentSession().createQuery("select count (*) from Block").uniqueResult();
+		return (Long)this.getCurrentSession().createQuery("select count (*) from DbBlock").uniqueResult();
 	}
 
 	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
 	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
 		return criteria
-				.setFetchMode("blockTransfers", fetchMode)
-				.setFetchMode("blockImportanceTransfers", fetchMode)
-				.setFetchMode("blockMultisigSignerModifications", fetchMode)
+				.setFetchMode("blockTransferTransactions", fetchMode)
+				.setFetchMode("blockImportanceTransferTransactions", fetchMode)
+				.setFetchMode("blockMultisigAggregateModificationTransactions", fetchMode)
 				.setFetchMode("blockMultisigTransactions", fetchMode);
 	}
 
@@ -74,8 +74,8 @@ public class BlockDaoImpl implements BlockDao {
 	//region find*
 	@Override
 	@Transactional(readOnly = true)
-	public Block findByHeight(final BlockHeight height) {
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
+	public DbBlock findByHeight(final BlockHeight height) {
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
 				.add(Restrictions.eq("height", height.getRaw()));
 		return this.executeSingleQuery(criteria);
 	}
@@ -86,16 +86,16 @@ public class BlockDaoImpl implements BlockDao {
 	 */
 	@Override
 	@Transactional(readOnly = true)
-	public Block findByHash(final Hash blockHash) {
+	public DbBlock findByHash(final Hash blockHash) {
 		final byte[] blockHashBytes = blockHash.getRaw();
 		final long blockId = ByteUtils.bytesToLong(blockHashBytes);
 
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
 				.add(Restrictions.eq("shortId", blockId));
-		final List<Block> blockList = listAndCast(criteria);
+		final List<DbBlock> blockList = listAndCast(criteria);
 
 		for (final Object blockObject : blockList) {
-			final Block block = (Block)blockObject;
+			final DbBlock block = (DbBlock)blockObject;
 			if (Arrays.equals(blockHashBytes, block.getBlockHash().getRaw())) {
 				return block;
 			}
@@ -132,23 +132,23 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
 		final long height = null == hash ? Long.MAX_VALUE : this.findByHash(hash).getHeight();
 		return this.getLatestBlocksForAccount(account, height, limit);
 	}
 
-	private Collection<Block> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
+	private Collection<DbBlock> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
 		// NOTE: there was JOIN used for importanceTransfers here, that was a bug
-		final Criteria criteria = setTransfersToSelect(this.getCurrentSession().createCriteria(Block.class))
-				.setFetchMode("forger", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToSelect(this.getCurrentSession().createCriteria(DbBlock.class))
+				.setFetchMode("harvester", FetchMode.JOIN)
 				.setFetchMode("lessor", FetchMode.JOIN)
 				.add(Restrictions.lt("height", height))
 				.addOrder(Order.desc("height"))
 						// setMaxResults limits results, not objects (so in case of join it could be block with
-						// many TXes), but this will work correctly cause blocktransfers is set to select...
+						// many TXes), but this will work correctly cause blockTransferTransactions is set to select...
 				.setMaxResults(limit)
 						// nested criteria
-				.createAlias("forger", "f")
+				.createAlias("harvester", "f")
 				.createAlias("lessor", "l", JoinType.LEFT_OUTER_JOIN)
 				.add(Restrictions.disjunction(
 						Restrictions.eq("f.printableKey", account.getAddress().getEncoded()),
@@ -159,11 +159,11 @@ public class BlockDaoImpl implements BlockDao {
 
 	@Override
 	@Transactional
-	public Collection<Block> getBlocksAfter(final BlockHeight height, final int limit) {
+	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
 		// whatever it takes : DO NOT ADD setMaxResults here!
 		final long blockHeight = height.getRaw();
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(Block.class))
-				.setFetchMode("forger", FetchMode.JOIN)
+		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
+				.setFetchMode("harvester", FetchMode.JOIN)
 				.add(Restrictions.gt("height", blockHeight))
 				.add(Restrictions.le("height", blockHeight + limit))
 				.addOrder(Order.asc("height"));
@@ -180,27 +180,27 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		this.dropTransfers(blockHeight, "Transfer", "blockTransfers", (v) -> {});
-		this.dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
-		this.dropTransfers(blockHeight, "MultisigSignerModification", "blockMultisigSignerModifications", (transactionsToDelete) -> {
+		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", (v) -> {});
+		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", (v) -> {});
+		this.dropTransfers(blockHeight, "DbMultisigAggregateModificationTransaction", "blockMultisigAggregateModificationTransactions", (transactionsToDelete) -> {
 			final Query preQuery = this.getCurrentSession()
-					.createQuery("delete from MultisigModification m where m.multisigSignerModification.id in (:ids)")
+					.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
 					.setParameterList("ids", transactionsToDelete);
 			preQuery.executeUpdate();
 		});
 
 		// must be last
-		this.dropTransfers(blockHeight, "MultisigTransaction", "blockMultisigTransactions", (v) -> {});
+		this.dropTransfers(blockHeight, "DbMultisigTransaction", "blockMultisigTransactions", (v) -> {});
 
 		final Query query = this.getCurrentSession()
-				.createQuery("delete from Block a where a.height > :height")
+				.createQuery("delete from DbBlock a where a.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		query.executeUpdate();
 	}
 
 	private void dropTransfers(final BlockHeight blockHeight, final String tableName, final String transfersName, final Consumer<List<Long>> preQuery) {
 		final Query getTransactionIdsQuery = this.getCurrentSession()
-				.createQuery("select tx.id from Block b join b." + transfersName + " tx where b.height > :height")
+				.createQuery("select tx.id from DbBlock b join b." + transfersName + " tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
 		final List<Long> transactionsToDelete = listAndCast(getTransactionIdsQuery);
 
@@ -220,7 +220,7 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private <T> List<T> prepareCriteriaGetFor(final String name, final BlockHeight height, final int limit) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(Block.class)
+		final Criteria criteria = this.getCurrentSession().createCriteria(DbBlock.class)
 				.setMaxResults(limit)
 				.add(Restrictions.ge("height", height.getRaw())) // >=
 				.setProjection(Projections.property(name))

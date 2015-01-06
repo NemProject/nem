@@ -6,9 +6,10 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.ImportanceTransfer;
+import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.DbImportanceTransferTransaction;
 
-public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, ImportanceTransfer> {
+public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<ImportanceTransferTransaction, DbImportanceTransferTransaction> {
 
 	@Test
 	public void transferWithActivateModeCanBeMappedToDbModel() {
@@ -17,7 +18,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferTransaction.Mode.Activate);
 
 		// Act:
-		final ImportanceTransfer dbModel = context.mapping.map(transfer);
+		final DbImportanceTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, 1, transfer);
@@ -30,7 +31,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		final ImportanceTransferTransaction transfer = context.createModel(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
-		final ImportanceTransfer dbModel = context.mapping.map(transfer);
+		final DbImportanceTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, 2, transfer);
@@ -52,12 +53,12 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
-		private final org.nem.nis.dbmodel.Account dbRemote = Mockito.mock(org.nem.nis.dbmodel.Account.class);
+		private final DbAccount dbRemote = Mockito.mock(DbAccount.class);
 		private final Account remote = Utils.generateRandomAccount();
 		private final ImportanceTransferModelToDbModelMapping mapping = new ImportanceTransferModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.remote, org.nem.nis.dbmodel.Account.class)).thenReturn(this.dbRemote);
+			Mockito.when(this.mapper.map(this.remote, DbAccount.class)).thenReturn(this.dbRemote);
 		}
 
 		public ImportanceTransferTransaction createModel(final ImportanceTransferTransaction.Mode mode) {
@@ -69,7 +70,7 @@ public class ImportanceTransferModelToDbModelMappingTest extends AbstractTransfe
 		}
 
 		public void assertDbModel(
-				final ImportanceTransfer dbModel,
+				final DbImportanceTransferTransaction dbModel,
 				final Integer expectedMode,
 				final ImportanceTransferTransaction model) {
 			Assert.assertThat(dbModel.getRemote(), IsEqual.equalTo(this.dbRemote));
