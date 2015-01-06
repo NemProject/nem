@@ -106,7 +106,7 @@ public class HarvesterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
-		Mockito.when(context.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getForger().getPublicKey())))
+		Mockito.when(context.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())))
 				.thenReturn(Utils.generateRandomAccount());
 
 		Mockito.when(context.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);
@@ -187,7 +187,7 @@ public class HarvesterTest {
 
 		private TestContext() {
 			final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
-			Mockito.when(this.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getForger().getPublicKey())))
+			Mockito.when(this.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())))
 					.thenReturn(Utils.generateRandomAccount());
 
 			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);

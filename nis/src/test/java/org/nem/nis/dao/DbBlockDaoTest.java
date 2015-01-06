@@ -59,7 +59,7 @@ public class DbBlockDaoTest {
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class DbBlockDaoTest {
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());
@@ -102,7 +102,7 @@ public class DbBlockDaoTest {
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), notNullValue());
@@ -131,7 +131,7 @@ public class DbBlockDaoTest {
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(1));
@@ -222,8 +222,8 @@ public class DbBlockDaoTest {
 		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
 		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
-		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
+		Assert.assertThat(entity.getHarvester().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
+		Assert.assertThat(entity.getHarvesterProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
 	@Test
@@ -245,8 +245,8 @@ public class DbBlockDaoTest {
 		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
 		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
-		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
+		Assert.assertThat(entity.getHarvester().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
+		Assert.assertThat(entity.getHarvesterProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
 	@Test
@@ -305,7 +305,7 @@ public class DbBlockDaoTest {
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getForger().getId(), notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
 		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(2));
 
@@ -436,11 +436,11 @@ public class DbBlockDaoTest {
 		// Act:
 		this.blockDao.save(dbBlock);
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final DbAccount entity = this.accountDao.getAccount(dbBlock.getForger().getId());
+		final DbAccount entity = this.accountDao.getAccount(dbBlock.getHarvester().getId());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbBlock.getForger().getId()));
+		Assert.assertThat(entity.getId(), equalTo(dbBlock.getHarvester().getId()));
 		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 	}
 
@@ -460,14 +460,14 @@ public class DbBlockDaoTest {
 		// Act:
 		this.blockDao.save(dbBlock);
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final DbAccount entity = this.accountDao.getAccount(dbBlock.getForger().getId());
+		final DbAccount entity = this.accountDao.getAccount(dbBlock.getHarvester().getId());
 		final DbTransferTransaction dbTransferTransaction1 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(0)).getRaw());
 		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(1)).getRaw());
 		final DbTransferTransaction dbTransferTransaction3 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(2)).getRaw());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbBlock.getForger().getId()));
+		Assert.assertThat(entity.getId(), equalTo(dbBlock.getHarvester().getId()));
 		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 		Assert.assertThat(dbTransferTransaction1, nullValue());
 		Assert.assertThat(dbTransferTransaction2, nullValue());

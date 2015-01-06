@@ -203,7 +203,7 @@ public class BlockDbModelToModelMappingTest {
 
 		public DbBlock createDbBlock(final Long difficulty, final DbAccount lessor) {
 			final DbBlock dbBlock = new DbBlock();
-			dbBlock.setForger(this.dbForger);
+			dbBlock.setHarvester(this.dbForger);
 			dbBlock.setPrevBlockHash(this.prevBlockHash);
 			dbBlock.setGenerationHash(this.generationBlockHash);
 			dbBlock.setTimeStamp(4444);
@@ -211,7 +211,7 @@ public class BlockDbModelToModelMappingTest {
 
 			dbBlock.setDifficulty(difficulty);
 			dbBlock.setLessor(lessor);
-			dbBlock.setForgerProof(this.signature.getBytes());
+			dbBlock.setHarvesterProof(this.signature.getBytes());
 
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				entry.setInBlock.accept(dbBlock, new ArrayList<>());

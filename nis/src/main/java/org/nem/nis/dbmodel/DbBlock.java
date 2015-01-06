@@ -15,7 +15,7 @@ import java.util.List;
  * <p>
  * Holds all the important information related to block data.
  * <p>
- * Associated forger and transactions are obtained automatically (by BlockDao)
+ * Associated harvester and transactions are obtained automatically (by BlockDao)
  * thanks to @Cascade annotations.
  */
 @Entity
@@ -34,9 +34,9 @@ public class DbBlock {
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
-	@JoinColumn(name = "forgerId")
-	private DbAccount forger;
-	private byte[] forgerProof;
+	@JoinColumn(name = "harvesterId")
+	private DbAccount harvester;
+	private byte[] harvesterProof;
 
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
@@ -128,20 +128,20 @@ public class DbBlock {
 		this.timeStamp = timeStamp;
 	}
 
-	public DbAccount getForger() {
-		return this.forger;
+	public DbAccount getHarvester() {
+		return this.harvester;
 	}
 
-	public void setForger(final DbAccount forger) {
-		this.forger = forger;
+	public void setHarvester(final DbAccount harvester) {
+		this.harvester = harvester;
 	}
 
-	public byte[] getForgerProof() {
-		return this.forgerProof;
+	public byte[] getHarvesterProof() {
+		return this.harvesterProof;
 	}
 
-	public void setForgerProof(final byte[] forgerProof) {
-		this.forgerProof = forgerProof;
+	public void setHarvesterProof(final byte[] harvesterProof) {
+		this.harvesterProof = harvesterProof;
 	}
 
 	public DbAccount getLessor() {

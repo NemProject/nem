@@ -39,7 +39,7 @@ public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 			return NemesisBlock.fromResource(new DeserializationContext(this.accountLookup));
 		}
 
-		final Account forager = this.mapper.map(dbBlock.getForger(), Account.class);
+		final Account forager = this.mapper.map(dbBlock.getHarvester(), Account.class);
 		final Account lessor = dbBlock.getLessor() != null ? this.mapper.map(dbBlock.getLessor(), Account.class) : null;
 
 		final Block block = new org.nem.core.model.Block(
@@ -52,7 +52,7 @@ public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 		final Long difficulty = dbBlock.getDifficulty();
 		block.setDifficulty(new BlockDifficulty(null == difficulty ? 0L : difficulty));
 		block.setLessor(lessor);
-		block.setSignature(new Signature(dbBlock.getForgerProof()));
+		block.setSignature(new Signature(dbBlock.getHarvesterProof()));
 
 		final int count = StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
 				.map(e -> e.getFromBlock.apply(dbBlock).size())

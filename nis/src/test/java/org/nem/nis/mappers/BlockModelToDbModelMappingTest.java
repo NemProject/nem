@@ -314,7 +314,7 @@ public class BlockModelToDbModelMappingTest {
 		}
 
 		public void assertDbModel(final DbBlock dbModel, final Hash expectedHash, final DbAccount expectedLessor) {
-			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForger));
+			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbForger));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.prevBlockHash));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(4444));
@@ -322,7 +322,7 @@ public class BlockModelToDbModelMappingTest {
 
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(this.difficulty.getRaw()));
 			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(expectedLessor));
-			Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(this.signature.getBytes()));
+			Assert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.signature.getBytes()));
 
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(expectedHash));
 		}

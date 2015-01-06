@@ -57,7 +57,7 @@ public class BlockChainLastBlockLayerTest {
 		Assert.assertThat(result1, IsSame.sameInstance(lastDbBlock));
 		final DbBlock last = mockBlockDao.getLastSavedBlock();
 		Assert.assertThat(last.getId(), IsEqual.equalTo(1L));
-		Assert.assertThat(new Signature(last.getForgerProof()), IsEqual.equalTo(nextBlock.getSignature()));
+		Assert.assertThat(new Signature(last.getHarvesterProof()), IsEqual.equalTo(nextBlock.getSignature()));
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsEqual.equalTo(last));
 	}
 
