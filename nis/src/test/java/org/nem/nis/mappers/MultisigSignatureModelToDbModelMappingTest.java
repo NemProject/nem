@@ -10,7 +10,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigSignatureTransaction, MultisigSignature> {
+public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigSignatureTransaction, DbMultisigSignatureTransaction> {
 
 	@Test
 	public void multisigTransactionIsMappedToDbModelAsNull() {
@@ -19,7 +19,7 @@ public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransfer
 		final MultisigSignatureTransaction signature = context.createModel();
 
 		// Act:
-		final MultisigSignature dbModel = context.mapping.map(signature);
+		final DbMultisigSignatureTransaction dbModel = context.mapping.map(signature);
 
 		// Assert:
 		context.assertDbModel(dbModel, signature);
@@ -47,7 +47,7 @@ public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransfer
 					this.otherTransactionHash);
 		}
 
-		public void assertDbModel(final MultisigSignature dbModel, final MultisigSignatureTransaction model) {
+		public void assertDbModel(final DbMultisigSignatureTransaction dbModel, final MultisigSignatureTransaction model) {
 			Assert.assertThat(dbModel.getMultisigTransaction(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(model)));
 		}

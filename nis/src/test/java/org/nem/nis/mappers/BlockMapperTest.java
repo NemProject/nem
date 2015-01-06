@@ -167,7 +167,7 @@ public class BlockMapperTest {
 		final Transaction transaction = context.getModel().getTransactions().get(0);
 		Assert.assertThat(dbMultisig.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 
-		Assert.assertThat(dbMultisig.getMultisigSignatures().size(), IsEqual.equalTo(2));
+		Assert.assertThat(dbMultisig.getMultisigSignatureTransactions().size(), IsEqual.equalTo(2));
 	}
 	//endregion
 

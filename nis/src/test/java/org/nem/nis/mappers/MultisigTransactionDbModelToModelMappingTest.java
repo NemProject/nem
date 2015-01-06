@@ -4,8 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.MultisigModification;
 import org.nem.core.model.MultisigTransaction;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -111,7 +109,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 		final org.nem.nis.dbmodel.MultisigTransaction dbMultisigTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
 		dbMultisigTransfer.setImportanceTransfer(dbTransfer);
-		dbMultisigTransfer.setMultisigSignatures(new HashSet<>());
+		dbMultisigTransfer.setMultisigSignatureTransactions(new HashSet<>());
 		return dbMultisigTransfer;
 	}
 
@@ -129,7 +127,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
-		private final Set<MultisigSignature> dbSignatures = new HashSet<>();
+		private final Set<DbMultisigSignatureTransaction> dbSignatures = new HashSet<>();
 		private final Set<MultisigSignatureTransaction> expectedSignatures = new HashSet<>();
 		private final org.nem.nis.dbmodel.MultisigTransaction dbTransfer = new org.nem.nis.dbmodel.MultisigTransaction();
 		private Transaction expectedOtherTransaction;
@@ -141,7 +139,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		}
 
 		private void addSignature() {
-			final MultisigSignature dbSignature = Mockito.mock(MultisigSignature.class);
+			final DbMultisigSignatureTransaction dbSignature = Mockito.mock(DbMultisigSignatureTransaction.class);
 			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
 					Utils.generateRandomAccount(),
@@ -186,7 +184,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 		public org.nem.nis.dbmodel.MultisigTransaction createDbModel() {
 			this.dbTransfer.setTimeStamp(4444);
 			this.dbTransfer.setSender(this.dbSender);
-			this.dbTransfer.setMultisigSignatures(this.dbSignatures);
+			this.dbTransfer.setMultisigSignatureTransactions(this.dbSignatures);
 
 			// zero out required fields
 			dbTransfer.setFee(0L);

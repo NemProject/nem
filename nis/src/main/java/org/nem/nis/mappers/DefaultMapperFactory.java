@@ -56,7 +56,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			this.add(new Entry<>(
 					(lookup, mapper) -> new MultisigSignatureModelToDbModelMapping(mapper),
 					(lookup, mapper) -> new MultisigSignatureDbModelToModelMapping(mapper),
-					MultisigSignature.class,
+					DbMultisigSignatureTransaction.class,
 					MultisigSignatureTransaction.class));
 		}
 	};

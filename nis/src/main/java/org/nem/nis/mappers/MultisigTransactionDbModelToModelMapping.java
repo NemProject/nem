@@ -1,12 +1,8 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.crypto.Signature;
-import org.nem.core.messages.PlainMessage;
-import org.nem.core.messages.SecureMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.Account;
 import org.nem.core.model.MultisigTransaction;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
@@ -35,7 +31,7 @@ public class MultisigTransactionDbModelToModelMapping extends AbstractTransferDb
 				sender,
 				otherTransaction);
 
-		for (final MultisigSignature signature : source.getMultisigSignatures()) {
+		for (final DbMultisigSignatureTransaction signature : source.getMultisigSignatureTransactions()) {
 			target.addSignature(this.mapper.map(signature, MultisigSignatureTransaction.class));
 		}
 

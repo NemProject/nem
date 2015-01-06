@@ -53,11 +53,11 @@ public class IntegrationTestConf {
 		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(MultisigSignature.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
 		}
-		
+
 		return localSessionFactoryBuilder.buildSessionFactory();
 	}
 

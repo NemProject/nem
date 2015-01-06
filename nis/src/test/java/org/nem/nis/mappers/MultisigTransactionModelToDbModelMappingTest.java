@@ -1,6 +1,5 @@
 package org.nem.nis.mappers;
 
-import junit.framework.TestCase;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -119,7 +118,7 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		private final org.nem.nis.dbmodel.Account dbSender = Mockito.mock(org.nem.nis.dbmodel.Account.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Set<MultisigSignatureTransaction> signatures = new HashSet<>();
-		private final Set<MultisigSignature> expectedDbSignatures = new HashSet<>();
+		private final Set<DbMultisigSignatureTransaction> expectedDbSignatures = new HashSet<>();
 		private Transaction otherTransaction;
 		private Transfer expectedTransfer;
 		private ImportanceTransfer expectedImportanceTransfer;
@@ -133,12 +132,12 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 		}
 
 		private void addSignature() {
-			final MultisigSignature dbSignature = new MultisigSignature();
+			final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
 			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
 					Utils.generateRandomAccount(),
 					HashUtils.calculateHash(this.otherTransaction));
-			Mockito.when(this.mapper.map(Mockito.refEq(signature), Mockito.eq(MultisigSignature.class))).thenReturn(dbSignature);
+			Mockito.when(this.mapper.map(Mockito.refEq(signature), Mockito.eq(DbMultisigSignatureTransaction.class))).thenReturn(dbSignature);
 
 			this.signatures.add(signature);
 			this.expectedDbSignatures.add(dbSignature);
@@ -178,10 +177,10 @@ public class MultisigTransactionModelToDbModelMappingTest extends AbstractTransf
 			Assert.assertThat(dbModel.getImportanceTransfer(), IsEqual.equalTo(this.expectedImportanceTransfer));
 			Assert.assertThat(dbModel.getMultisigSignerModification(), IsEqual.equalTo(this.expectedSignerModification));
 
-			Assert.assertThat(dbModel.getMultisigSignatures().size(), IsEqual.equalTo(numExpectedSignatures));
-			Assert.assertThat(dbModel.getMultisigSignatures(), IsEqual.equalTo(this.expectedDbSignatures));
+			Assert.assertThat(dbModel.getMultisigSignatureTransactions().size(), IsEqual.equalTo(numExpectedSignatures));
+			Assert.assertThat(dbModel.getMultisigSignatureTransactions(), IsEqual.equalTo(this.expectedDbSignatures));
 
-			for (final MultisigSignature signature : dbModel.getMultisigSignatures()) {
+			for (final DbMultisigSignatureTransaction signature : dbModel.getMultisigSignatureTransactions()) {
 				Assert.assertThat(signature.getMultisigTransaction(), IsEqual.equalTo(dbModel));
 			}
 		}

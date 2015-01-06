@@ -34,7 +34,7 @@ public class MultisigTransaction extends AbstractBlockTransfer<MultisigTransacti
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "multisigTransaction", orphanRemoval = true)
 	@LazyCollection(LazyCollectionOption.FALSE)
-	private Set<MultisigSignature> multisigSignatures;
+	private Set<DbMultisigSignatureTransaction> multisigSignatureTransactions;
 
 	public MultisigTransaction() {
 		super(b -> b.getBlockMultisigTransactions());
@@ -64,11 +64,11 @@ public class MultisigTransaction extends AbstractBlockTransfer<MultisigTransacti
 		this.multisigSignerModification = multisigSignerModification;
 	}
 
-	public Set<MultisigSignature> getMultisigSignatures() {
-		return this.multisigSignatures;
+	public Set<DbMultisigSignatureTransaction> getMultisigSignatureTransactions() {
+		return this.multisigSignatureTransactions;
 	}
 
-	public void setMultisigSignatures(final Set<MultisigSignature> multisigSignatures) {
-		this.multisigSignatures = multisigSignatures;
+	public void setMultisigSignatureTransactions(final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions) {
+		this.multisigSignatureTransactions = multisigSignatureTransactions;
 	}
 }

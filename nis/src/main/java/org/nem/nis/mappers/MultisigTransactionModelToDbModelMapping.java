@@ -4,7 +4,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.MultisigTransaction;
 import org.nem.nis.dbmodel.*;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,15 +45,15 @@ public class MultisigTransactionModelToDbModelMapping extends AbstractTransferMo
 				throw new IllegalArgumentException("trying to map block with unknown transaction type");
 		}
 
-		final Set<MultisigSignature> multisigSignatures = source.getCosignerSignatures().stream()
+		final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions = source.getCosignerSignatures().stream()
 				.map(model -> {
-					final MultisigSignature signature = this.mapper.map(model, MultisigSignature.class);
+					final DbMultisigSignatureTransaction signature = this.mapper.map(model, DbMultisigSignatureTransaction.class);
 					signature.setMultisigTransaction(dbMultisigTransfer);
 					return signature;
 				})
 				.collect(Collectors.toSet());
 
-		dbMultisigTransfer.setMultisigSignatures(multisigSignatures);
+		dbMultisigTransfer.setMultisigSignatureTransactions(multisigSignatureTransactions);
 		return dbMultisigTransfer;
 	}
 }

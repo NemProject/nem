@@ -28,7 +28,7 @@ public class DefaultMapperFactoryTest {
 		{
 			this.add(new Entry<>(org.nem.nis.dbmodel.Account.class, Account.class));
 			this.add(new Entry<>(org.nem.nis.dbmodel.Block.class, Block.class));
-			this.add(new Entry<>(MultisigSignature.class, MultisigSignatureTransaction.class));
+			this.add(new Entry<>(DbMultisigSignatureTransaction.class, MultisigSignatureTransaction.class));
 		}
 	};
 

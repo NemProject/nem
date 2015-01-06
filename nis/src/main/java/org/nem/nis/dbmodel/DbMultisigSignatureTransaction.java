@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "multisigsignatures")
-public class MultisigSignature extends AbstractTransfer {
+public class DbMultisigSignatureTransaction extends AbstractTransfer {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "multisigTransactionId")
 	private MultisigTransaction multisigTransaction;
