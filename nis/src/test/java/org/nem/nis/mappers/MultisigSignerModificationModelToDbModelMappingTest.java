@@ -1,15 +1,12 @@
 package org.nem.nis.mappers;
 
-import junit.framework.TestCase;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.MultisigModification;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigSignerModification;
 
 import java.util.*;
 

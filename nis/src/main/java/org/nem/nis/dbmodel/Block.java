@@ -192,13 +192,11 @@ public class Block {
 		this.blockImportanceTransfers = blockImportanceTransfers;
 	}
 
-	public List<MultisigSignerModification> getBlockMultisigSignerModifications()
-	{
+	public List<MultisigSignerModification> getBlockMultisigSignerModifications() {
 		return this.blockMultisigSignerModifications;
 	}
 
-	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModifications)
-	{
+	public void setBlockMultisigSignerModifications(final List<MultisigSignerModification> blockMultisigSignerModifications) {
 		this.blockMultisigSignerModifications = blockMultisigSignerModifications;
 	}
 

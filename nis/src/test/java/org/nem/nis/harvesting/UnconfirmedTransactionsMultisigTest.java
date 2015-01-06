@@ -1,27 +1,17 @@
 package org.nem.nis.harvesting;
 
-import org.hamcrest.core.IsEqual;
-import org.hamcrest.core.IsSame;
-import org.junit.Assert;
-import org.junit.Test;
+import org.hamcrest.core.*;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.time.*;
 import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.cache.DefaultHashCache;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.test.NisCacheFactory;
-import org.nem.nis.test.NisUtils;
-import org.nem.nis.validators.AggregateSingleTransactionValidatorBuilder;
-import org.nem.nis.validators.BatchTransactionValidator;
-import org.nem.nis.validators.SingleTransactionValidator;
-import org.nem.nis.validators.TransactionValidatorFactory;
+import org.nem.nis.test.*;
+import org.nem.nis.validators.*;
 
 import java.util.Arrays;
 
@@ -233,7 +223,6 @@ public class UnconfirmedTransactionsMultisigTest {
 					this.timeProvider);
 		}
 
-
 		public MultisigTransaction createMultisigTransaction(final TimeInstant currentTime, final Transaction t1) {
 			final MultisigTransaction transaction = new MultisigTransaction(currentTime, this.cosigner1, t1);
 			transaction.setDeadline(transaction.getTimeStamp().addHours(2));
@@ -277,5 +266,4 @@ public class UnconfirmedTransactionsMultisigTest {
 			this.stateCache.findStateByAddress(multisig.getAddress()).getAccountInfo().incrementBalance(amount);
 		}
 	}
-
 }

@@ -1,10 +1,9 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.*;
 import org.nem.core.model.MultisigTransaction;
+import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 

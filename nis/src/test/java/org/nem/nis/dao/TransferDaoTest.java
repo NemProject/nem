@@ -21,7 +21,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.*;
 
 import static org.hamcrest.core.IsEqual.equalTo;

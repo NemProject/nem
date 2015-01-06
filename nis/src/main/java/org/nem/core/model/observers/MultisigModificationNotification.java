@@ -2,8 +2,6 @@ package org.nem.core.model.observers;
 
 import org.nem.core.model.*;
 
-import java.util.*;
-
 /**
  * A notification that cosignatory modification has occured.
  */

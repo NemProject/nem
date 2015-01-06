@@ -62,7 +62,8 @@ public class TransactionValidatorFactory {
 
 	/**
 	 * Visits all sub validators that comprise the validator returned by createSingle.
-	 *  @param visitor The visitor.
+	 *
+	 * @param visitor The visitor.
 	 * @param accountStateCache The account state cache.
 	 */
 	public void visitSingleSubValidators(

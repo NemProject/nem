@@ -13,8 +13,7 @@ import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.MapperUtils;
-import org.nem.nis.test.MockAccountDao;
+import org.nem.nis.test.*;
 
 import java.util.*;
 
@@ -108,7 +107,7 @@ public class BlockMapperTest {
 		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS*1000L);
+		context.assertDbModel(dbModel, NUM_TRANSACTIONS * 1000L);
 		Assert.assertThat(dbModel.getBlockMultisigSignerModifications().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		Assert.assertThat(dbModel.getBlockImportanceTransfers().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockTransfers().size(), IsEqual.equalTo(0));

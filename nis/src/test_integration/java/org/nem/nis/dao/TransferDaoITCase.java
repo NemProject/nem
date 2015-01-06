@@ -1,28 +1,21 @@
 package org.nem.nis.dao;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.model.TransferTransaction;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.Transfer;
-import org.nem.nis.mappers.AccountDaoLookup;
-import org.nem.nis.mappers.AccountDaoLookupAdapter;
+import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 @ContextConfiguration(classes = IntegrationTestConf.class)

@@ -5,11 +5,10 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.messages.*;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.Transfer;
 
 public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, Transfer> {
 

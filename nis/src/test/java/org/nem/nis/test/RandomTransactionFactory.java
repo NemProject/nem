@@ -1,12 +1,9 @@
 package org.nem.nis.test;
 
 import org.nem.core.model.*;
-import org.nem.core.model.Block;
-import org.nem.core.model.MultisigModification;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
 
 import java.util.Arrays;
 

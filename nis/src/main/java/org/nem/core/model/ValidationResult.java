@@ -137,7 +137,6 @@ public enum ValidationResult {
 	 */
 	FAILURE_MULTISIG_ALREADY_A_COSIGNER(34);
 
-
 	private final int value;
 
 	private ValidationResult(final int value) {

@@ -10,7 +10,7 @@ import java.util.function.Function;
  * @param <TDerived> The derived transfer type.
  */
 @MappedSuperclass
-public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransfer<?>> extends AbstractTransfer{
+public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransfer<?>> extends AbstractTransfer {
 	private Integer blkIndex; // index inside block
 	private Integer orderId; // index inside list
 
@@ -42,7 +42,6 @@ public abstract class AbstractBlockTransfer<TDerived extends AbstractBlockTransf
 	public void setOrderId(final Integer orderId) {
 		this.orderId = orderId;
 	}
-
 
 	public Long getReferencedTransaction() {
 		return this.referencedTransaction;

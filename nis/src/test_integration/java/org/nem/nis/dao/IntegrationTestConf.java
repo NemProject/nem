@@ -2,14 +2,10 @@ package org.nem.nis.dao;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.nis.dbmodel.Account;
-import org.nem.nis.dbmodel.Block;
-import org.nem.nis.dbmodel.ImportanceTransfer;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.*;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
-import org.springframework.orm.hibernate4.LocalSessionFactoryBuilder;
+import org.springframework.orm.hibernate4.*;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;

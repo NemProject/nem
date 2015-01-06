@@ -59,7 +59,7 @@ public class BlockNonConflictingMultisigTransactionValidator implements BlockVal
 				// (N-2 cosignatories "exception")
 
 				// we only allow single multisig modification from given block at given height
-				if (! this.multisigModificationSenders.add(modification.getSigner().getAddress())) {
+				if (!this.multisigModificationSenders.add(modification.getSigner().getAddress())) {
 					return false;
 				}
 
@@ -94,7 +94,7 @@ public class BlockNonConflictingMultisigTransactionValidator implements BlockVal
 	@Override
 	public ValidationResult validate(final Block block) {
 		final NonConflictingMultisigTransactionValidator validator = new NonConflictingMultisigTransactionValidator(this.nisCache);
-		final boolean result = block.getTransactions().stream().anyMatch(t -> ! validator.validate(t));
+		final boolean result = block.getTransactions().stream().anyMatch(t -> !validator.validate(t));
 		return result ? ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG : ValidationResult.SUCCESS;
 	}
 }

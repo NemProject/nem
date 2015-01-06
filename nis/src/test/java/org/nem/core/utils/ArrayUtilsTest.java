@@ -319,48 +319,48 @@ public class ArrayUtilsTest {
 	public void compareReturnsZeroForEmptyArrays() {
 		// Assert:
 		assertCompareZero(
-				new byte[]{ },
-				new byte[]{ });
+				new byte[] { },
+				new byte[] { });
 	}
 
 	@Test
 	public void compareReturnsNonZeroForEmptyAndNonEmptyArrays() {
 		// Assert:
 		assertCompareNonZero(
-				new byte[]{ },
-				new byte[]{ 5 });
+				new byte[] { },
+				new byte[] { 5 });
 	}
 
 	@Test
 	public void compareReturnsNonZeroForDifferentSizedArrays() {
 		// Assert:
 		assertCompareNonZero(
-				new byte[]{ 54 },
-				new byte[]{ 5, 4 });
+				new byte[] { 54 },
+				new byte[] { 5, 4 });
 	}
 
 	@Test
 	public void compareReturnsNonZeroForArraysOfSameLengthWithDifferentPositiveElementValue() {
 		// Assert:
 		assertCompareNonZero(
-				new byte[]{ 1, 2, 3, 4, 5 },
-				new byte[]{ 1, 2, 4, 4, 5 });
+				new byte[] { 1, 2, 3, 4, 5 },
+				new byte[] { 1, 2, 4, 4, 5 });
 	}
 
 	@Test
 	public void compareReturnsNonZeroForArraysOfSameLengthWithDifferentNegativeElementValue() {
 		// Assert:
 		assertCompareNonZero(
-				new byte[]{ 1, 2, -4, 4, 5 },
-				new byte[]{ 1, 2, -3, 4, 5 });
+				new byte[] { 1, 2, -4, 4, 5 },
+				new byte[] { 1, 2, -3, 4, 5 });
 	}
 
 	@Test
 	public void compareReturnsZeroForArraysOfSameLengthWithEqualElementValues() {
 		// Assert:
 		assertCompareZero(
-				new byte[]{ 1, 2, 3, 4, 5 },
-				new byte[]{ 1, 2, 3, 4, 5 });
+				new byte[] { 1, 2, 3, 4, 5 },
+				new byte[] { 1, 2, 3, 4, 5 });
 	}
 
 	private static void assertCompareZero(final byte[] a, final byte[] b) {

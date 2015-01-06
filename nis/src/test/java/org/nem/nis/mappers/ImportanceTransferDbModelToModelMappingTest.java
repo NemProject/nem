@@ -3,13 +3,10 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.Signature;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.ImportanceTransfer;
 
 public class ImportanceTransferDbModelToModelMappingTest extends AbstractTransferDbModelToModelMappingTest<ImportanceTransfer, ImportanceTransferTransaction> {
 

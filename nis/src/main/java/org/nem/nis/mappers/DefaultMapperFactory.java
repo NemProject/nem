@@ -1,13 +1,11 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
-import org.nem.core.serialization.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.dbmodel.MultisigSignature;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiFunction;
 
 /**
  * Factory for creating a mapper.

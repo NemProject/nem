@@ -4,8 +4,6 @@ import org.hibernate.annotations.Cascade;
 import org.nem.core.crypto.Hash;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * Base class for all transfer db entities.

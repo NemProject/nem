@@ -7,7 +7,6 @@ import org.nem.nis.dbmodel.*;
 import org.nem.nis.dbmodel.MultisigTransaction;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 /**
  * A mapping that is able to map a model block to a db block.

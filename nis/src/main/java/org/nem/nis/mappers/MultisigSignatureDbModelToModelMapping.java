@@ -1,7 +1,7 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.*;
 import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 

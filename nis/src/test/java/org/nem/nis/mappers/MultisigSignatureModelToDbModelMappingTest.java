@@ -3,12 +3,11 @@ package org.nem.nis.mappers;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.Account;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.MultisigSignature;
 
 public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigSignatureTransaction, MultisigSignature> {
 

@@ -5,8 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
 
@@ -83,5 +82,4 @@ public class MultisigSignatureValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
 	}
-
 }

@@ -1,13 +1,10 @@
 package org.nem.core.model;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.observers.BalanceAdjustmentNotification;
-import org.nem.core.model.observers.NotificationType;
-import org.nem.core.model.observers.TransactionObserver;
+import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.core.utils.ArrayUtils;
 
 import java.util.*;
 
