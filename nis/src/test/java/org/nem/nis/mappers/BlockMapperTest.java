@@ -689,8 +689,8 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
-			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForager));
-			Assert.assertThat(dbModel.getForgerProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
+			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbForager));
+			Assert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(Amount.fromNem(expectedFee).getNumMicroNem()));
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(79_876_543_211_237L));
@@ -698,7 +698,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(this.dbLessor));
 
 			final PublicKey signerPublicKey = this.model.getSigner().getAddress().getPublicKey();
-			Assert.assertThat(dbModel.getForger().getPublicKey(), IsEqual.equalTo(signerPublicKey));
+			Assert.assertThat(dbModel.getHarvester().getPublicKey(), IsEqual.equalTo(signerPublicKey));
 		}
 
 		public void assertModel(final Block rhs) {

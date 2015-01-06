@@ -35,7 +35,7 @@ public class BlockExplorerMapperTest {
 
 		final DbBlock block = new DbBlock();
 		block.setHeight(60L);
-		block.setForger(new DbAccount(address.getEncoded(), address.getPublicKey()));
+		block.setHarvester(new DbAccount(address.getEncoded(), address.getPublicKey()));
 		block.setTimeStamp(1856002);
 		block.setBlockHash(hash);
 		block.setBlockTransferTransactions(new ArrayList<>());

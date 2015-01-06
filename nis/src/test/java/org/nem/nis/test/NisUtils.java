@@ -35,8 +35,8 @@ public class NisUtils {
 		dbBlock.setGenerationHash(Hash.ZERO);
 		dbBlock.setPrevBlockHash(Hash.ZERO);
 		dbBlock.setTimeStamp(TimeInstant.ZERO.getRawTime());
-		dbBlock.setForger(harvester);
-		dbBlock.setForgerProof(Utils.generateRandomSignature().getBytes());
+		dbBlock.setHarvester(harvester);
+		dbBlock.setHarvesterProof(Utils.generateRandomSignature().getBytes());
 		dbBlock.setHeight(1L);
 		dbBlock.setTotalFee(1L);
 		dbBlock.setDifficulty(1L);
@@ -67,10 +67,10 @@ public class NisUtils {
 		account.setPublicKey(address.getPublicKey());
 
 		final DbBlock block = new DbBlock();
-		block.setForger(account);
+		block.setHarvester(account);
 		block.setTimeStamp(timeStamp);
 		block.setHeight(height);
-		block.setForgerProof(Utils.generateRandomBytes(64));
+		block.setHarvesterProof(Utils.generateRandomBytes(64));
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			entry.setInBlock.accept(block, new ArrayList<>());
 		}

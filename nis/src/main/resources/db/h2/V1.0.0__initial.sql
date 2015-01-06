@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS `blocks` (
   `generationHash` VARBINARY(34) NOT NULL,
   `timestamp` INT NOT NULL,
 
-  `forgerId` BIGINT NOT NULL, -- reference to account table
-  `forgerProof` VARBINARY(66) NOT NULL,
+  `harvesterId` BIGINT NOT NULL, -- reference to account table
+  `harvesterProof` VARBINARY(66) NOT NULL,
   `harvestedInName` BIGINT,
 
   `height` BIGINT NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `blocks` (
 );  
  
 ALTER TABLE public.blocks ADD
-  FOREIGN KEY (forgerId)
+  FOREIGN KEY (harvesterId)
   REFERENCES public.accounts(id);
 
 ALTER TABLE public.blocks ADD
@@ -242,7 +242,7 @@ ALTER TABLE public.multisigsignatures ADD
 
 CREATE INDEX IDX_BLOCKS_SHORT_ID ON `blocks` (shortId);
 CREATE INDEX IDX_BLOCKS_HEIGHT ON `blocks` (height);
-CREATE INDEX IDX_BLOCKS_FORGERID ON `blocks` (forgerId);
+CREATE INDEX IDX_BLOCKS_HARVESTERID ON `blocks` (harvesterId);
 CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
 
 CREATE INDEX IDX_TRANSFERS_TIMESTAMP ON `transfers` (timeStamp);

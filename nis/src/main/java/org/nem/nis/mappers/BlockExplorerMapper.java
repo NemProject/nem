@@ -22,7 +22,7 @@ public class BlockExplorerMapper {
 	public ExplorerBlockViewModel toExplorerViewModel(final DbBlock block) {
 		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(
 				new BlockHeight(block.getHeight()),
-				Address.fromPublicKey(block.getForger().getPublicKey()),
+				Address.fromPublicKey(block.getHarvester().getPublicKey()),
 				UnixTime.fromTimeInstant(new TimeInstant(block.getTimeStamp())),
 				block.getBlockHash());
 

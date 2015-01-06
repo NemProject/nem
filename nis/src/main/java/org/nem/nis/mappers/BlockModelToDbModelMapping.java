@@ -37,8 +37,8 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 		dbBlock.setGenerationHash(block.getGenerationHash());
 		dbBlock.setPrevBlockHash(block.getPreviousBlockHash());
 		dbBlock.setTimeStamp(block.getTimeStamp().getRawTime());
-		dbBlock.setForger(harvester);
-		dbBlock.setForgerProof(block.getSignature().getBytes());
+		dbBlock.setHarvester(harvester);
+		dbBlock.setHarvesterProof(block.getSignature().getBytes());
 		dbBlock.setHeight(block.getHeight().getRaw());
 		dbBlock.setTotalFee(block.getTotalFee().getNumMicroNem());
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());

@@ -111,11 +111,11 @@ public class DebugControllerTest {
 		final DbBlock dbBlock = new DbBlock();
 		dbBlock.setPrevBlockHash(block.getPreviousBlockHash());
 		dbBlock.setGenerationHash(block.getGenerationHash());
-		dbBlock.setForger(new DbAccount(signerAddress.getEncoded(), signerAddress.getPublicKey()));
+		dbBlock.setHarvester(new DbAccount(signerAddress.getEncoded(), signerAddress.getPublicKey()));
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setHeight(block.getHeight().getRaw());
 		dbBlock.setTimeStamp(block.getTimeStamp().getRawTime());
-		dbBlock.setForgerProof(new byte[64]);
+		dbBlock.setHarvesterProof(new byte[64]);
 		dbBlock.setBlockTransferTransactions(new ArrayList<>());
 		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
 		return dbBlock;
