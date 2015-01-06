@@ -25,7 +25,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	@Test
 	public void ctorCanCreateMultisigSignerModification() {
 		// Arrange:
-		final MultisigModificationType modificationType = getModification();
+		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
@@ -48,7 +48,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	@Test
 	public void canRoundtripMultisigModification() {
 		// Arrange:
-		final MultisigModificationType modificationType = getModification();
+		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MockAccountLookup accountLookup = MockAccountLookup.createWithAccounts(signer, cosignatory);
@@ -83,7 +83,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	@Test
 	public void minimumFeeIsOneThousandNem() {
 		// Arrange:
-		final MultisigModificationType modificationType = getModification();
+		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final MultisigSignerModificationTransaction transaction = createMultisigSignerModificationTransaction(signer,
@@ -101,7 +101,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
-		final MultisigModificationType modificationType = getModification();
+		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
@@ -123,7 +123,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
-		final MultisigModificationType modificationType = getModification();
+		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
 		final List<MultisigModification> modifications = createModificationList(modificationType, cosignatory);
@@ -145,7 +145,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	@Test
 	public void executeRaisesAppropriateNotificationForAllModifications() {
 		// Arrange:
-		final MultisigModificationType modificationType = getModification();
+		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory1 = Utils.generateRandomAccount();
 		final Account cosignatory2 = Utils.generateRandomAccount();
@@ -173,7 +173,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 	@Test
 	public void undoRaisesAppropriateNotificationForAllModifications() {
 		// Arrange:
-		final MultisigModificationType modificationType = getModification();
+		final MultisigModificationType modificationType = this.getModification();
 		final Account signer = Utils.generateRandomAccount();
 		final Account cosignatory1 = Utils.generateRandomAccount();
 		final Account cosignatory2 = Utils.generateRandomAccount();

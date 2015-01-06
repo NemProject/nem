@@ -254,7 +254,7 @@ public class UnconfirmedTransactionsMultisigTest {
 			return transaction;
 		}
 
-		private UnconfirmedTransactions getTransactionsForNewBlock(TimeInstant currentTime) {
+		private UnconfirmedTransactions getTransactionsForNewBlock(final TimeInstant currentTime) {
 			return this.transactions.getTransactionsForNewBlock(
 					Utils.generateRandomAddress(),
 					currentTime.addMinutes(10));

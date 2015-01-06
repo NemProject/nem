@@ -52,7 +52,7 @@ public class MultisigNonOperationalValidator implements SingleTransactionValidat
 	private ValidationResult validate(final MultisigSignerModificationTransaction transaction, final ValidationContext context) {
 		// TODO: actually this should test if there is "Del"
 		// TODO 20150103 J-G: should probably just test type validity
-		boolean invalid = transaction.getModifications().stream().anyMatch(m -> m.getModificationType() == MultisigModificationType.Del);
+		final boolean invalid = transaction.getModifications().stream().anyMatch(m -> m.getModificationType() == MultisigModificationType.Del);
 		return invalid ? ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG : ValidationResult.SUCCESS;
 	}
 }
