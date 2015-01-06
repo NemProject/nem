@@ -25,35 +25,15 @@ public class BlockChainServicesTest {
 
 	@Test
 	public void chainWithMultisigTransactionsIssuedByNotCosignatoryIsInvalid() {
-		final TestContext context = new TestContext();
-
-		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
-		parentBlock.sign();
-
-		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
-		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(134));
-		context.recalculateImportances(START_HEIGHT);
-
-		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
-		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
-		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
-		transaction1.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
-		final Block block = blocks.get(1);
-		block.addTransaction(transaction1);
-		block.sign();
-
-		// Act:
-		final boolean result = context.isValid(parentBlock, blocks);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		assertBasicChainWithMultisig(false, false);
 	}
 
 	@Test
 	public void chainWithMultisigTransactionIssuedByCosignatoryIsValid() {
+		assertBasicChainWithMultisig(true, true);
+	}
+
+	private void assertBasicChainWithMultisig(boolean validationResult, boolean issuedByCosignatory) {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
@@ -63,8 +43,10 @@ public class BlockChainServicesTest {
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(134));
 		context.recalculateImportances(START_HEIGHT);
-		// TODO 20150103 J-G: consider refactoring as this seems to be the only difference with the previous
-		context.makeCosignatory(cosignatory1, multisigAccount);
+
+		if (issuedByCosignatory) {
+			context.makeCosignatory(cosignatory1, multisigAccount);
+		}
 
 		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
 		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
@@ -80,11 +62,17 @@ public class BlockChainServicesTest {
 		final boolean result = context.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
 	// The idea is to check if inner transaction gets to the hash transaction cache
 	// TODO 20150103 J-G: do we care in the inner transactions are the same if the outer transaction is different?
+	// TODO 20150106 G-J: we should, and that must be not only in current block, but it must be like with other TXes
+	// > as that would leave us prone to bit more sophisticated version of "replay" attack:
+	// > I'm one of cosigners I generate MT with inner Transfer to my account
+	// > after everyone signed it, I reuse inner transfer but I change outer MT
+	// (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
+	//  but such thing shouldn't be feasible in first place)
 	@Test
 	public void chainIsInvalidIfContainsMultipleMultisigTransactionsWithSameInnerTransaction() {
 		// Arrange:
@@ -116,6 +104,7 @@ public class BlockChainServicesTest {
 
 		// Act:
 		// TODO 20150103 J-G: out of curiosity, what throws this?
+		// TODO 20150106 G-J: this is due to that (Stream.concat) in BlockExecutor.notifyTransactionHashes
 		ExceptionAssert.assertThrows(
 				v -> context.isValid(parentBlock, blocks),
 				IllegalArgumentException.class);
