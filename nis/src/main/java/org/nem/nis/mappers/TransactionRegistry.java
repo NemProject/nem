@@ -120,8 +120,8 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigAggregateModificationTransactions,
 					(block, transfers) -> block.setBlockMultisigAggregateModificationTransactions(transfers),
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
-					MultisigSignerModificationModelToDbModelMapping::new,
-					MultisigSignerModificationDbModelToModelMapping::new,
+					MultisigAggregateModificationModelToDbModelMapping::new,
+					MultisigAggregateModificationDbModelToModelMapping::new,
 					DbMultisigAggregateModificationTransaction.class,
 					MultisigAggregateModificationTransaction.class));
 

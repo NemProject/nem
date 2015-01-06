@@ -14,8 +14,8 @@ import java.util.*;
 
 public class MultisigTestContext {
 	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
-	private final MultisigSignerModificationTransactionValidator multisigSignerModificationTransactionValidator =
-			new MultisigSignerModificationTransactionValidator(this.accountCache);
+	private final MultisigAggregateModificationTransactionValidator multisigAggregateModificationTransactionValidator =
+			new MultisigAggregateModificationTransactionValidator(this.accountCache);
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
@@ -101,7 +101,7 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateSignerModification(final Transaction transaction) {
-		return multisigSignerModificationTransactionValidator.validate(
+		return multisigAggregateModificationTransactionValidator.validate(
 				transaction,
 				new ValidationContext((final Account account, final Amount amount) -> true));
 	}

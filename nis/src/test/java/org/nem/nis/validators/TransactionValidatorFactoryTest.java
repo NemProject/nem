@@ -48,7 +48,7 @@ public class TransactionValidatorFactoryTest {
 				TransferTransactionValidator.class,
 				ImportanceTransferTransactionValidator.class,
 				MultisigTransactionSignerValidator.class,
-				MultisigSignerModificationTransactionValidator.class);
+				MultisigAggregateModificationTransactionValidator.class);
 
 		// Act:
 		final List<SingleTransactionValidator> validators = new ArrayList<>();

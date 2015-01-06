@@ -10,7 +10,7 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 
-public class MultisigSignerModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
+public class MultisigAggregateModificationModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> {
 
 	@Test
 	public void transferWithSingleModificationCanBeMappedToDbModel() {
@@ -52,7 +52,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 
 	@Override
 	protected IMapping<MultisigAggregateModificationTransaction, DbMultisigAggregateModificationTransaction> createMapping(final IMapper mapper) {
-		return new MultisigSignerModificationModelToDbModelMapping(mapper);
+		return new MultisigAggregateModificationModelToDbModelMapping(mapper);
 	}
 
 	private static class TestContext {
@@ -61,7 +61,7 @@ public class MultisigSignerModificationModelToDbModelMappingTest extends Abstrac
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<DbAccount, Integer> expectedModifications = new HashMap<>();
 		final Set<org.nem.core.model.MultisigModification> modifications = new HashSet<>();
-		private final MultisigSignerModificationModelToDbModelMapping mapping = new MultisigSignerModificationModelToDbModelMapping(this.mapper);
+		private final MultisigAggregateModificationModelToDbModelMapping mapping = new MultisigAggregateModificationModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.sender, DbAccount.class)).thenReturn(this.dbSender);

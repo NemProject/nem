@@ -9,12 +9,10 @@ import org.nem.nis.dbmodel.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO 20150106 J-G: please rename mapping and test class name
-
 /**
  * A mapping that is able to map a db multisig signer modification transfer to a model multisig signer modification transaction.
  */
-public class MultisigSignerModificationDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
+public class MultisigAggregateModificationDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbMultisigAggregateModificationTransaction, MultisigAggregateModificationTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -22,7 +20,7 @@ public class MultisigSignerModificationDbModelToModelMapping extends AbstractTra
 	 *
 	 * @param mapper The mapper.
 	 */
-	public MultisigSignerModificationDbModelToModelMapping(final IMapper mapper) {
+	public MultisigAggregateModificationDbModelToModelMapping(final IMapper mapper) {
 		this.mapper = mapper;
 	}
 

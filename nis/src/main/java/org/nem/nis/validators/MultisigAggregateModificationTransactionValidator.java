@@ -5,10 +5,10 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 
-public class MultisigSignerModificationTransactionValidator implements SingleTransactionValidator {
+public class MultisigAggregateModificationTransactionValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
 
-	public MultisigSignerModificationTransactionValidator(final ReadOnlyAccountStateCache stateCache) {
+	public MultisigAggregateModificationTransactionValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
 
