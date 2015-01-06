@@ -13,18 +13,6 @@ import java.util.stream.Collectors;
 
 public class TransactionValidatorFactoryTest {
 
-//	@Test
-//	public void createReturnsValidValidator() {
-//		// Arrange:
-//		final TransactionValidatorFactory factory = createFactory();
-//
-//		// Act:
-//		final SingleTransactionValidator validator = factory.create(Mockito.mock(ReadOnlyNisCache.class));
-//
-//		// Assert:
-//		Assert.assertThat(validator, IsNull.notNullValue());
-//	}
-
 	@Test
 	public void createSingleReturnsValidValidator() {
 		// Arrange:
