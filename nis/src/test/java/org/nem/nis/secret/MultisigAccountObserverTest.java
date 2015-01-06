@@ -3,20 +3,17 @@ package org.nem.nis.secret;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.observers.MultisigModificationNotification;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.observers.*;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.nis.cache.AccountStateCache;
-import org.nem.nis.state.AccountState;
-import org.nem.nis.state.MultisigLinks;
+import org.nem.nis.state.*;
 import org.nem.nis.test.NisUtils;
 
-import java.util.*;
-
-// TODO 20150103 J-G: can you have one test that validates nothing is called for a different notification type
-// TODO 20150103 J-G: you might also want to test what happens when there is more than on modification
-
 public class MultisigAccountObserverTest {
+
+	//region Add
+
 	@Test
 	public void notifyTransferExecuteAddAddsMultisigLinks() {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Execute);
@@ -34,6 +31,10 @@ public class MultisigAccountObserverTest {
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
 		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
+
+	//endregion
+
+	//region Del
 
 	@Test
 	public void notifyTransferExecuteDelRemovedMultisigLinks() {
@@ -53,15 +54,39 @@ public class MultisigAccountObserverTest {
 		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addMultisig(context.account1.getAddress(), new BlockHeight(111));
 	}
 
+	//endregion
+
+	//region other type
+
+	@Test
+	public void otherNotificationTypesAreIgnored() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MultisigAccountObserver observer = context.createObserver();
+
+		// Act:
+		observer.notify(
+				new BalanceAdjustmentNotification(NotificationType.BalanceCredit, context.account1, Amount.fromNem(22)),
+				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
+
+		// Assert:
+		Mockito.verify(context.multisigLinks1, Mockito.never()).addCosignatory(Mockito.any(), Mockito.any());
+		Mockito.verify(context.multisigLinks1, Mockito.never()).addMultisig(Mockito.any(), Mockito.any());
+		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatory(Mockito.any(), Mockito.any());
+		Mockito.verify(context.multisigLinks2, Mockito.never()).addMultisig(Mockito.any(), Mockito.any());
+	}
+
+	//endregion
+
 	private TestContext notifyTransferPrepare(final MultisigModificationType value, final NotificationTrigger notificationTrigger) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final MultisigAccountObserver observer = context.createObserver();
 
 		// Act:
-		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(value, context.account2));
+		final MultisigModification modification = new MultisigModification(value, context.account2);
 		observer.notify(
-				new MultisigModificationNotification(context.account1, modifications),
+				new MultisigModificationNotification(context.account1, modification),
 				NisUtils.createBlockNotificationContext(new BlockHeight(111), notificationTrigger));
 		return context;
 	}

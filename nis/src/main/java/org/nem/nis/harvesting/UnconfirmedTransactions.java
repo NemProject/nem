@@ -6,8 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
-import org.nem.nis.cache.ReadOnlyAccountStateCache;
-import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
 
@@ -230,10 +229,9 @@ public class UnconfirmedTransactions {
 		// TODO 20150103 J-J: probably should add another function to the factory for blockVerification validators
 		// > e.g., (that adds MultisigSignaturesPresentValidator)
 
-		if (! blockVerification) {
+		if (!blockVerification) {
 			// need to be the last one
 			builder.add(new MultisigSignatureValidator(accountStateCache, () -> this.transactions.values()));
-
 		} else {
 			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
 		}
@@ -381,7 +379,7 @@ public class UnconfirmedTransactions {
 		synchronized (this.lock) {
 			final List<Transaction> transactions = this.transactions.values().stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-					// filter out signatures because we don't want them to be directly inside a block
+							// filter out signatures because we don't want them to be directly inside a block
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.collect(Collectors.toList());
 

@@ -122,7 +122,6 @@ public class ArrayUtils {
 	 *
 	 * @param b first of arrays to compare.
 	 * @param c second of arrays to compare.
-	 *
 	 */
 	public static int compare(final byte[] b, final byte[] c) {
 		int result = b.length - c.length;

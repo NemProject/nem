@@ -1,12 +1,9 @@
 package org.nem.nis.validators;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.model.MultisigModificationType;
-import org.nem.core.model.Transaction;
-import org.nem.core.model.ValidationResult;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.MultisigTestContext;
 

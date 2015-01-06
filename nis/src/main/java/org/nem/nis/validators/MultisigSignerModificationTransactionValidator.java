@@ -37,7 +37,7 @@ public class MultisigSignerModificationTransactionValidator implements SingleTra
 			return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
 		}
 
-		if (MultisigModificationType.Del == modification.getModificationType() && ! cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress)) {
+		if (MultisigModificationType.Del == modification.getModificationType() && !cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress)) {
 			return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
 		}
 		return ValidationResult.SUCCESS;

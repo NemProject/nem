@@ -13,14 +13,13 @@ import java.util.Set;
  * <p>
  * Holds information about Transactions having type TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION
  * <p>
- *
  * TODO 20150103 J-G can you remind me why we need both MultisigSignerModification and MultisigModification?
  * > is it so that we can make multiple modifications in one transaction;
  * > if so, i think the naming is a little misleading
  * TODO 20150105 G-J that is why, any proposals for names?
  * MultisigModification / MultisigModifications
  * MultisigModification / AggregateMultisigModification
- *
+ * <p>
  * TODO 20150105 G-J slightly off-topic, I was thinking about naming all the dbmodel classes exactly like
  * > model classes, but with "Db" prefix, prefix to make code that uses both models and dbmodels (i.e. mappers)
  * > nicer to look at. would you be ok with that?

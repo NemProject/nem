@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 /**
  * Service for executing blocks.
@@ -97,8 +96,8 @@ public class BlockExecutor {
 		// TODO: 20150103 - i don;t think we need this since MultisigTransaction is explicitly calling transfer on the other (child) transaction
 		final List<HashMetaDataPair> pairs =
 				Stream.concat(block.getTransactions().stream(), block.getTransactions().stream().flatMap(t -> t.getChildTransactions().stream()))
-				.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
-				.collect(Collectors.toList());
+						.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
+						.collect(Collectors.toList());
 		observer.notify(new TransactionHashesNotification(pairs));
 	}
 

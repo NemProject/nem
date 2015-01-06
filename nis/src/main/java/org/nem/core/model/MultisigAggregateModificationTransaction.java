@@ -75,10 +75,10 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	protected void transfer(final TransactionObserver observer) {
 		for (final MultisigModification modification : this.modifications) {
 			observer.notify(new AccountNotification(modification.getCosignatory()));
+			observer.notify(new MultisigModificationNotification(this.getSigner(), modification));
 		}
 
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
-		observer.notify(new MultisigModificationNotification(this.getSigner(), this.modifications));
 	}
 
 	@Override

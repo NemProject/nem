@@ -1,7 +1,7 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.model.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.core.model.MultisigSignatureTransaction;
+import org.nem.nis.dbmodel.MultisigSignature;
 
 /**
  * A mapping that is able to map a db multisig signature to a model multisig signature.

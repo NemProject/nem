@@ -1,29 +1,23 @@
 package org.nem.nis.sync;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.ExceptionAssert;
-import org.nem.core.test.Utils;
+import org.nem.core.model.primitive.*;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockMarkerConstants;
-import org.nem.nis.NisMain;
+import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
-import org.nem.nis.validators.BlockValidatorFactory;
-import org.nem.nis.validators.TransactionValidatorFactory;
+import org.nem.nis.validators.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
@@ -217,7 +211,10 @@ public class BlockChainServicesTest {
 
 		final MultisigAggregateModificationTransaction modification2 = createModification(multisigAccount, cosignatoryNew2);
 		final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification2);
-		final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(transaction2.getTimeStamp(), cosignatoryNew1, HashUtils.calculateHash(modification2));
+		final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
+				transaction2.getTimeStamp(),
+				cosignatoryNew1,
+				HashUtils.calculateHash(modification2));
 		signature.sign();
 		transaction2.addSignature(signature);
 		transaction2.setDeadline(transaction2.getTimeStamp().addSeconds(10));
@@ -340,13 +337,14 @@ public class BlockChainServicesTest {
 		return result;
 	}
 
-
 	private static class TestContext {
 		private final BlockChainServices blockChainServices;
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final BlockTransactionObserverFactory observerFactory = new BlockTransactionObserverFactory();
 		private final BlockValidatorFactory blockValidatorFactory = new BlockValidatorFactory(NisMain.TIME_PROVIDER);
-		private final TransactionValidatorFactory transactionValidatorFactory = new TransactionValidatorFactory(NisMain.TIME_PROVIDER, new PoiOptionsBuilder().create());
+		private final TransactionValidatorFactory transactionValidatorFactory = new TransactionValidatorFactory(
+				NisMain.TIME_PROVIDER,
+				new PoiOptionsBuilder().create());
 
 		private final NisCache nisCache;
 
@@ -384,8 +382,10 @@ public class BlockChainServicesTest {
 
 		public void makeCosignatory(final Account cosignatory, final Account multisig) {
 			final BlockHeight blockHeight = new BlockHeight(START_HEIGHT);
-			this.nisCache.getAccountStateCache().findStateByAddress(cosignatory.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
-			this.nisCache.getAccountStateCache().findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosignatory.getAddress(), blockHeight);
+			this.nisCache.getAccountStateCache().findStateByAddress(cosignatory.getAddress()).getMultisigLinks()
+					.addMultisig(multisig.getAddress(), blockHeight);
+			this.nisCache.getAccountStateCache().findStateByAddress(multisig.getAddress()).getMultisigLinks()
+					.addCosignatory(cosignatory.getAddress(), blockHeight);
 		}
 	}
 }

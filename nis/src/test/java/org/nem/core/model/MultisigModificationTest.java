@@ -3,7 +3,6 @@ package org.nem.core.model;
 import net.minidev.json.JSONObject;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 

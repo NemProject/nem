@@ -40,5 +40,5 @@ public class BlockMarkerConstants {
 	/**
 	 * Beta hard fork due to multisig.
 	 */
-	public static long BETA_MULTISIG_FORK = 70000;
+	public static final long BETA_MULTISIG_FORK = 70000;
 }

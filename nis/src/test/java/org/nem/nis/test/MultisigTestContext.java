@@ -3,21 +3,19 @@ package org.nem.nis.test;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.validators.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class MultisigTestContext {
 	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
-	private final MultisigSignerModificationTransactionValidator multisigSignerModificationTransactionValidator = new MultisigSignerModificationTransactionValidator(this.accountCache);
+	private final MultisigSignerModificationTransactionValidator multisigSignerModificationTransactionValidator =
+			new MultisigSignerModificationTransactionValidator(this.accountCache);
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
@@ -42,8 +40,7 @@ public class MultisigTestContext {
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				this.multisig,
-				Arrays.asList(new MultisigModification(modificationType, this.signer))
-				);
+				Arrays.asList(new MultisigModification(modificationType, this.signer)));
 		transaction.sign();
 
 		return transaction;
@@ -104,10 +101,14 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateSignerModification(final Transaction transaction) {
-		return multisigSignerModificationTransactionValidator.validate(transaction, new ValidationContext((final Account account, final Amount amount) -> true));
+		return multisigSignerModificationTransactionValidator.validate(
+				transaction,
+				new ValidationContext((final Account account, final Amount amount) -> true));
 	}
 
 	public ValidationResult validateTransaction(final Transaction transaction, final BlockHeight blockHeight) {
-		return multisigTransactionSignerValidator.validate(transaction, new ValidationContext(blockHeight, (final Account account, final Amount amount) -> true));
+		return multisigTransactionSignerValidator.validate(
+				transaction,
+				new ValidationContext(blockHeight, (final Account account, final Amount amount) -> true));
 	}
 }

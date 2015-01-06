@@ -19,18 +19,21 @@ public interface ReadOnlyMultisigLinks {
 
 	/**
 	 * Checks if account is a multisig account.
+	 *
 	 * @return true if account is multisig account, false otherwise.
 	 */
 	public boolean isMultisig();
 
 	/**
 	 * Checks if account is cosignatory of any account.
+	 *
 	 * @return true if account is cosignatory, false otherwise.
 	 */
 	public boolean isCosignatory();
 
 	/**
 	 * Checks if account is cosignatory of given account.
+	 *
 	 * @param multisig address of other account.
 	 * @return true in account is cosignatory of multisig, false otherwise.
 	 */

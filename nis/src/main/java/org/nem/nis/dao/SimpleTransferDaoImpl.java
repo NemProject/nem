@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.utils.ByteUtils;
 
 import java.util.*;
 import java.util.function.Function;
