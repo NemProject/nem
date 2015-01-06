@@ -202,9 +202,8 @@ public class TransferTransactionTest {
 	//region getAccounts
 
 	@Test
-	public void getAccountsReturnsCorrectAccounts() {
+	public void getAccountsIncludesSignerAndRecipientAccounts() {
 		// Arrange:
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);

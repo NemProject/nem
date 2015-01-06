@@ -159,7 +159,7 @@ public class ImportanceTransferTransactionTest {
 	//region getAccounts
 
 	@Test
-	public void getAccountsReturnsCorrectAccounts() {
+	public void getAccountsIncludesSignerAndRemoteAccounts() {
 		// Arrange:
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
