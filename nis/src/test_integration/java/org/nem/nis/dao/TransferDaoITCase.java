@@ -13,6 +13,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.dbmodel.DbTransferTransaction;
 import org.nem.nis.mappers.AccountDaoLookup;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
@@ -79,7 +80,7 @@ public class TransferDaoITCase {
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 		}
 

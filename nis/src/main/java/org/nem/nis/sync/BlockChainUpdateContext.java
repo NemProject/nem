@@ -7,6 +7,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -42,7 +43,7 @@ public class BlockChainUpdateContext {
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final org.nem.nis.dbmodel.Block dbParentBlock,
+			final DbBlock dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain) {
@@ -161,7 +162,7 @@ public class BlockChainUpdateContext {
 
 		final NisDbModelToModelMapper mapper = this.services.createMapper(accountCache);
 		while (currentHeight != wantedHeight) {
-			final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
+			final DbBlock block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
 			// if the transaction is in db, we should add it to unconfirmed transactions without a db check
 			// (otherwise, since it is not removed from the database, the database hash check would fail).

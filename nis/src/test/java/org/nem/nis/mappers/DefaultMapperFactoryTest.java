@@ -27,7 +27,7 @@ public class DefaultMapperFactoryTest {
 	private static final List<Entry<?, ?>> otherEntries = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(DbAccount.class, Account.class));
-			this.add(new Entry<>(org.nem.nis.dbmodel.Block.class, Block.class));
+			this.add(new Entry<>(DbBlock.class, Block.class));
 			this.add(new Entry<>(DbMultisigSignatureTransaction.class, MultisigSignatureTransaction.class));
 		}
 	};
@@ -65,7 +65,7 @@ public class DefaultMapperFactoryTest {
 			Assert.assertThat(mapper.isSupported(entry.modelClass, entry.dbModelClass), IsEqual.equalTo(true));
 		}
 
-		Assert.assertThat(mapper.isSupported(NemesisBlock.class, org.nem.nis.dbmodel.Block.class), IsEqual.equalTo(true));
+		Assert.assertThat(mapper.isSupported(NemesisBlock.class, DbBlock.class), IsEqual.equalTo(true));
 	}
 
 	@Test

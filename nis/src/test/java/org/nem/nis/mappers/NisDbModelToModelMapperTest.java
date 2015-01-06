@@ -96,7 +96,7 @@ public class NisDbModelToModelMapperTest {
 
 	private static class TestContext {
 		private final Block block = Mockito.mock(Block.class);
-		private final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
+		private final DbBlock dbBlock = new DbBlock();
 
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final NisDbModelToModelMapper nisMapper = new NisDbModelToModelMapper(this.mapper);

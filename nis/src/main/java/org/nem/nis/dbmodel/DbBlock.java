@@ -11,7 +11,7 @@ import javax.persistence.Table;
 import java.util.List;
 
 /**
- * Db Block entity.
+ * DbBlock entity.
  * <p>
  * Holds all the important information related to block data.
  * <p>
@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "blocks")
-public class Block {
+public class DbBlock {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

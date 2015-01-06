@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * A mapping that is able to map a model block to a db block.
  */
-public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.dbmodel.Block> {
+public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 	private final IMapper mapper;
 
 	/**
@@ -24,14 +24,14 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 	}
 
 	@Override
-	public org.nem.nis.dbmodel.Block map(final Block block) {
+	public DbBlock map(final Block block) {
 		final DbAccount harvester = this.mapper.map(block.getSigner(), DbAccount.class);
 		final DbAccount lessor = null != block.getLessor()
 				? this.mapper.map(block.getLessor(), DbAccount.class)
 				: null;
 
 		final Hash blockHash = HashUtils.calculateHash(block);
-		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
+		final DbBlock dbBlock = new DbBlock();
 		dbBlock.setBlockHash(blockHash);
 		dbBlock.setVersion(block.getVersion());
 		dbBlock.setGenerationHash(block.getGenerationHash());
@@ -68,18 +68,18 @@ public class BlockModelToDbModelMapping implements IMapping<Block, org.nem.nis.d
 			return dbTransfer;
 		}
 
-		public void commit(final org.nem.nis.dbmodel.Block dbBlock) {
+		public void commit(final DbBlock dbBlock) {
 			this.entry.setInBlock.accept(dbBlock, this.transactions);
 		}
 	}
 
 	private static class BlockTransactionProcessor {
 		private final IMapper mapper;
-		private final org.nem.nis.dbmodel.Block dbBlock;
+		private final DbBlock dbBlock;
 		private final Map<Integer, BlockTransactionContext> transactionContexts;
 		private int blockIndex;
 
-		public BlockTransactionProcessor(final IMapper mapper, final org.nem.nis.dbmodel.Block dbBlock) {
+		public BlockTransactionProcessor(final IMapper mapper, final DbBlock dbBlock) {
 			this.mapper = mapper;
 			this.dbBlock = dbBlock;
 

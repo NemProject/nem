@@ -3,6 +3,7 @@ package org.nem.nis.test;
 import org.nem.core.model.Block;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
 
 /**
@@ -96,7 +97,7 @@ public class MapperUtils {
 	 * @param accountDaoLookup The account dao lookup.
 	 * @return The db model block.
 	 */
-	public static org.nem.nis.dbmodel.Block toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
+	public static DbBlock toDbModel(final Block block, final AccountDaoLookup accountDaoLookup) {
 		return MapperUtils.createModelToDbModelNisMapper(accountDaoLookup).map(block);
 	}
 
@@ -107,7 +108,7 @@ public class MapperUtils {
 	 * @param accountLookup The account dao lookup.
 	 * @return The model block.
 	 */
-	public static Block toModel(final org.nem.nis.dbmodel.Block dbBlock, final AccountLookup accountLookup) {
+	public static Block toModel(final DbBlock dbBlock, final AccountLookup accountLookup) {
 		return MapperUtils.createDbModelToModelNisMapper(accountLookup).map(dbBlock);
 	}
 

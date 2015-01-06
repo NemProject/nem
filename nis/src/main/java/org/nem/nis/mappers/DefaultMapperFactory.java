@@ -51,7 +51,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			this.add(new Entry<>(
 					(lookup, mapper) -> new BlockModelToDbModelMapping(mapper),
 					(lookup, mapper) -> new BlockDbModelToModelMapping(mapper, lookup),
-					org.nem.nis.dbmodel.Block.class,
+					DbBlock.class,
 					Block.class));
 			this.add(new Entry<>(
 					(lookup, mapper) -> new MultisigSignatureModelToDbModelMapping(mapper),
@@ -71,7 +71,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addModelToDbModelMappers(accountDaoLookup, mappingRepository);
 		}
 
-		mappingRepository.addMapping(NemesisBlock.class, org.nem.nis.dbmodel.Block.class, new BlockModelToDbModelMapping(mappingRepository));
+		mappingRepository.addMapping(NemesisBlock.class, DbBlock.class, new BlockModelToDbModelMapping(mappingRepository));
 		return mappingRepository;
 	}
 

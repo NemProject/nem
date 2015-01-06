@@ -99,7 +99,7 @@ public class MockAccountDao implements AccountDao {
 				.sum();
 	}
 
-	public void blockAdded(final Block block) {
+	public void blockAdded(final DbBlock block) {
 		this.save(block.getForger());
 		block.getBlockTransferTransactions().stream()
 				.forEach(t -> {
@@ -108,7 +108,7 @@ public class MockAccountDao implements AccountDao {
 				});
 	}
 
-	public void blockDeleted(final Block block) {
+	public void blockDeleted(final DbBlock block) {
 		this.decrementReferenceCount(block.getForger());
 		block.getBlockTransferTransactions().stream()
 				.forEach(t -> {

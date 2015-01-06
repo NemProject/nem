@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.controller.viewmodels.*;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.dbmodel.*;
 
 /**
@@ -19,7 +19,7 @@ public class BlockExplorerMapper {
 	 * @param block The database block.
 	 * @return The explorer block view model.
 	 */
-	public ExplorerBlockViewModel toExplorerViewModel(final Block block) {
+	public ExplorerBlockViewModel toExplorerViewModel(final DbBlock block) {
 		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(
 				new BlockHeight(block.getHeight()),
 				Address.fromPublicKey(block.getForger().getPublicKey()),

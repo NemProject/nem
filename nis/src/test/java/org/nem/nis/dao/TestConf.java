@@ -46,7 +46,7 @@ public class TestConf {
 		localSessionFactoryBuilder.setProperty("hibernate.jdbc.batch_size", "20");
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);

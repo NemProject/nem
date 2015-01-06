@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
 
@@ -104,7 +105,7 @@ public class HarvesterTest {
 	public void mappedLastBlockIsPassedToGenerator() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
+		final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
 		Mockito.when(context.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getForger().getPublicKey())))
 				.thenReturn(Utils.generateRandomAccount());
 
@@ -185,7 +186,7 @@ public class HarvesterTest {
 				this.generator);
 
 		private TestContext() {
-			final org.nem.nis.dbmodel.Block dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
+			final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
 			Mockito.when(this.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getForger().getPublicKey())))
 					.thenReturn(Utils.generateRandomAccount());
 

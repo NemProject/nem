@@ -39,7 +39,7 @@ public class NisDbModelToModelMapper {
 	 * @param block The db model block.
 	 * @return The model block.
 	 */
-	public Block map(final org.nem.nis.dbmodel.Block block) {
+	public Block map(final DbBlock block) {
 		return this.mapper.map(block, Block.class);
 	}
 
@@ -49,7 +49,7 @@ public class NisDbModelToModelMapper {
 	 * @param block The db model block.
 	 * @return The model transactions.
 	 */
-	public Collection<Transaction> mapTransactions(final org.nem.nis.dbmodel.Block block) {
+	public Collection<Transaction> mapTransactions(final DbBlock block) {
 		return this.mapTransactionsIf(block, t -> true);
 	}
 
@@ -60,7 +60,7 @@ public class NisDbModelToModelMapper {
 	 * @param shouldInclude The predicate used to determine whether or not a transfer should be included in the result.
 	 * @return The model transactions.
 	 */
-	public Collection<Transaction> mapTransactionsIf(final org.nem.nis.dbmodel.Block block, final Predicate<AbstractTransfer> shouldInclude) {
+	public Collection<Transaction> mapTransactionsIf(final DbBlock block, final Predicate<AbstractTransfer> shouldInclude) {
 		final Collection<Transaction> transactions = new ArrayList<>();
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			transactions.addAll(this.mapTransactions(entry.getFromBlock.apply(block), shouldInclude));

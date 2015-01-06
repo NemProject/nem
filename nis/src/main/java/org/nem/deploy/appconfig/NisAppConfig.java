@@ -105,7 +105,7 @@ public class NisAppConfig {
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
 		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(Block.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
 
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);

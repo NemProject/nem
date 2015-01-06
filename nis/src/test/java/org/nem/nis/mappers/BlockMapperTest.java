@@ -32,7 +32,7 @@ public class BlockMapperTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, 0);
@@ -48,7 +48,7 @@ public class BlockMapperTest {
 		context.addTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS);
@@ -69,7 +69,7 @@ public class BlockMapperTest {
 		context.addImportanceTransferTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS);
@@ -89,7 +89,7 @@ public class BlockMapperTest {
 		context.addLessor();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, 0);
@@ -105,7 +105,7 @@ public class BlockMapperTest {
 		context.addMultisigSignerModificationTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS*1000L);
@@ -128,7 +128,7 @@ public class BlockMapperTest {
 		context.addMultisigTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS * (100L + 1));
@@ -153,7 +153,7 @@ public class BlockMapperTest {
 		context.addMultisigTransactionsWithSigners();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, 1 * (100L + 1));
@@ -176,7 +176,7 @@ public class BlockMapperTest {
 	public void blockModelWithoutTransactionsCanBeRoundTripped() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -191,7 +191,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 3;
 		final TestContext context = new TestContext();
 		context.addTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -215,7 +215,7 @@ public class BlockMapperTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addLessor();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -232,7 +232,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
 		context.addImportanceTransferTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -258,7 +258,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
 		context.addMultisigSignerModificationTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -284,7 +284,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS = 2;
 		final TestContext context = new TestContext();
 		context.addMultisigTransactions();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -309,7 +309,7 @@ public class BlockMapperTest {
 		final TestContext context = new TestContext();
 		context.addMultisigTransactionsWithSigners();
 		context.signModel();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -337,7 +337,7 @@ public class BlockMapperTest {
 		context.addTransactions();
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
 		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A * 1000L + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C);
@@ -392,7 +392,7 @@ public class BlockMapperTest {
 		}
 
 		context.signModel();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -446,7 +446,7 @@ public class BlockMapperTest {
 		}
 		context.signModel();
 
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 
 		// Act:
 		final Block model = context.toModel(dbModel);
@@ -493,7 +493,7 @@ public class BlockMapperTest {
 	public void dbModelWithoutDifficultyCanBeMappedToModel() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 		dbModel.setDifficulty(null);
 
 		// Act:
@@ -508,7 +508,7 @@ public class BlockMapperTest {
 		// Arrange:
 		final DeserializationContext deserializationContext = new DeserializationContext(new MockAccountLookup());
 		final TestContext context = new TestContext();
-		final org.nem.nis.dbmodel.Block dbModel = context.toDbModel();
+		final DbBlock dbModel = context.toDbModel();
 		dbModel.setHeight(1L);
 
 		// Act:
@@ -587,11 +587,11 @@ public class BlockMapperTest {
 			return this.model;
 		}
 
-		public org.nem.nis.dbmodel.Block toDbModel() {
-			return MapperUtils.createModelToDbModelMapper(this.accountDao).map(this.model, org.nem.nis.dbmodel.Block.class);
+		public DbBlock toDbModel() {
+			return MapperUtils.createModelToDbModelMapper(this.accountDao).map(this.model, DbBlock.class);
 		}
 
-		public Block toModel(final org.nem.nis.dbmodel.Block dbBlock) {
+		public Block toModel(final DbBlock dbBlock) {
 			final MockAccountLookup mockAccountLookup = new MockAccountLookup();
 			mockAccountLookup.setMockAccount(this.model.getSigner());
 			mockAccountLookup.setMockAccount(this.account1);
@@ -682,7 +682,7 @@ public class BlockMapperTest {
 			this.hash = HashUtils.calculateHash(this.model);
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final long expectedFee) {
+		public void assertDbModel(final DbBlock dbModel, final long expectedFee) {
 			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));

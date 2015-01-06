@@ -7,7 +7,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.test.*;
@@ -92,7 +92,7 @@ public class ImportanceTransferTransactionDaoTest {
 	}
 
 	private void addToDummyBlock(final DbAccount dbAccount, final DbImportanceTransferTransaction... dbTransfers) {
-		final Block block = NisUtils.createDummyDbBlock(dbAccount);
+		final DbBlock block = NisUtils.createDummyDbBlock(dbAccount);
 		this.blockDao.save(block);
 
 		for (final DbImportanceTransferTransaction importanceTransfer : dbTransfers) {

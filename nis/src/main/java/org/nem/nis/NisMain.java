@@ -8,6 +8,7 @@ import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -104,8 +105,8 @@ public class NisMain {
 		this.saveBlock(this.nemesisBlock);
 	}
 
-	private org.nem.nis.dbmodel.Block saveBlock(final Block block) {
-		org.nem.nis.dbmodel.Block dbBlock;
+	private DbBlock saveBlock(final Block block) {
+		DbBlock dbBlock;
 
 		dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
 		if (null != dbBlock) {

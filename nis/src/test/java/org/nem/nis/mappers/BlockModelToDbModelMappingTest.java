@@ -29,7 +29,7 @@ public class BlockModelToDbModelMappingTest {
 		final Block block = context.createBlock(null);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert:
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
@@ -43,7 +43,7 @@ public class BlockModelToDbModelMappingTest {
 		final Block block = context.createBlock(context.lessor);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert:
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block), context.dbLessor);
@@ -67,7 +67,7 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addTransfer,
-				org.nem.nis.dbmodel.Block::getBlockTransferTransactions,
+				DbBlock::getBlockTransferTransactions,
 				DbTransferTransaction.class);
 	}
 
@@ -76,7 +76,7 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addImportanceTransfer,
-				org.nem.nis.dbmodel.Block::getBlockImportanceTransferTransactions,
+				DbBlock::getBlockImportanceTransferTransactions,
 				DbImportanceTransferTransaction.class);
 	}
 
@@ -85,7 +85,7 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addSignerModification,
-				org.nem.nis.dbmodel.Block::getBlockMultisigAggregateModificationTransactions,
+				DbBlock::getBlockMultisigAggregateModificationTransactions,
 				DbMultisigAggregateModificationTransaction.class);
 	}
 
@@ -94,13 +94,13 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addMultisigTransfer,
-				org.nem.nis.dbmodel.Block::getBlockMultisigTransactions,
+				DbBlock::getBlockMultisigTransactions,
 				DbMultisigTransaction.class);
 	}
 
 	private static void assertBlockWithTransfersCanBeMappedToDbModel(
 			final BiFunction<TestContext, Block, AbstractTransfer> factory,
-			final Function<org.nem.nis.dbmodel.Block, Collection<? extends AbstractBlockTransfer>> getMatchingTransactions,
+			final Function<DbBlock, Collection<? extends AbstractBlockTransfer>> getMatchingTransactions,
 			final Class<?> expectedClass) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -111,7 +111,7 @@ public class BlockModelToDbModelMappingTest {
 		final AbstractTransfer transfer2 = factory.apply(context, block);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 		final Collection<? extends AbstractBlockTransfer> dbTransfers = getMatchingTransactions.apply(dbModel);
 
 		// Assert:
@@ -159,7 +159,7 @@ public class BlockModelToDbModelMappingTest {
 		final AbstractTransfer transfer8 = context.addMultisigTransfer(block);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert:
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
@@ -221,7 +221,7 @@ public class BlockModelToDbModelMappingTest {
 		final AbstractTransfer transfer3 = context.addMultisigTransfer(block, innerDbTransferTransaction2);
 
 		// Act:
-		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
+		final DbBlock dbModel = context.mapping.map(block);
 
 		// Assert: db model properties
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
@@ -256,7 +256,7 @@ public class BlockModelToDbModelMappingTest {
 
 	//endregion
 
-	private static int getNumTransactions(final org.nem.nis.dbmodel.Block dbBlock) {
+	private static int getNumTransactions(final DbBlock dbBlock) {
 		return StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
 				.map(e -> e.getFromBlock.apply(dbBlock).size())
 				.reduce(0, Integer::sum);
@@ -272,7 +272,7 @@ public class BlockModelToDbModelMappingTest {
 
 	private static void assertTransfersHaveBlockSetCorrectly(
 			final Collection<? extends AbstractBlockTransfer> dbTransfers,
-			final org.nem.nis.dbmodel.Block expectedBlock) {
+			final DbBlock expectedBlock) {
 		for (final AbstractBlockTransfer dbTransfer : dbTransfers) {
 			Assert.assertThat(dbTransfer.getBlock(), IsEqual.equalTo(expectedBlock));
 		}
@@ -309,11 +309,11 @@ public class BlockModelToDbModelMappingTest {
 			return block;
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final Hash expectedHash) {
+		public void assertDbModel(final DbBlock dbModel, final Hash expectedHash) {
 			this.assertDbModel(dbModel, expectedHash, null);
 		}
 
-		public void assertDbModel(final org.nem.nis.dbmodel.Block dbModel, final Hash expectedHash, final DbAccount expectedLessor) {
+		public void assertDbModel(final DbBlock dbModel, final Hash expectedHash, final DbAccount expectedLessor) {
 			Assert.assertThat(dbModel.getForger(), IsEqual.equalTo(this.dbForger));
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.prevBlockHash));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
@@ -327,7 +327,7 @@ public class BlockModelToDbModelMappingTest {
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(expectedHash));
 		}
 
-		public void assertNoTransactions(final org.nem.nis.dbmodel.Block dbModel) {
+		public void assertNoTransactions(final DbBlock dbModel) {
 			Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(0));
 		}
 

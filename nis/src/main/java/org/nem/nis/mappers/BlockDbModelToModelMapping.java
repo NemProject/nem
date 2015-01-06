@@ -15,7 +15,7 @@ import java.util.stream.StreamSupport;
 /**
  * A mapping that is able to map a db block to a model block.
  */
-public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.Block, Block> {
+public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 	private final IMapper mapper;
 	private final AccountLookup accountLookup;
 
@@ -33,7 +33,7 @@ public class BlockDbModelToModelMapping implements IMapping<org.nem.nis.dbmodel.
 	}
 
 	@Override
-	public Block map(final org.nem.nis.dbmodel.Block dbBlock) {
+	public Block map(final DbBlock dbBlock) {
 		if (1 == dbBlock.getHeight()) {
 			// TODO 20141226 J-G: do you remember why we have this special case / do we still need it after separating the account and account state?
 			return NemesisBlock.fromResource(new DeserializationContext(this.accountLookup));

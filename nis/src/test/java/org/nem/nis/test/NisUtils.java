@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.nem.nis.poi.*;
 import org.nem.nis.poi.graph.*;
@@ -22,13 +23,13 @@ public class NisUtils {
 	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
 
 	/**
-	 * Creates a dummy DB Block.
+	 * Creates a dummy DbBlock.
 	 *
 	 * @param harvester The harvester account.
 	 * @return The db block.
 	 */
-	public static org.nem.nis.dbmodel.Block createDummyDbBlock(final DbAccount harvester) {
-		final org.nem.nis.dbmodel.Block dbBlock = new org.nem.nis.dbmodel.Block();
+	public static DbBlock createDummyDbBlock(final DbAccount harvester) {
+		final DbBlock dbBlock = new DbBlock();
 		dbBlock.setBlockHash(Hash.ZERO);
 		dbBlock.setVersion(1);
 		dbBlock.setGenerationHash(Hash.ZERO);
@@ -43,29 +44,29 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a DB Block that can be mapped to a model Block.
+	 * Creates a DbBlock that can be mapped to a model DbBlock.
 	 *
 	 * @param timeStamp The block timestamp.
 	 * @return The db block.
 	 */
-	public static org.nem.nis.dbmodel.Block createDbBlockWithTimeStamp(final int timeStamp) {
+	public static DbBlock createDbBlockWithTimeStamp(final int timeStamp) {
 		return createDbBlockWithTimeStampAtHeight(timeStamp, 10);
 	}
 
 	/**
-	 * Creates a DB Block that can be mapped to a model Block.
+	 * Creates a DbBlock that can be mapped to a model DbBlock.
 	 *
 	 * @param timeStamp The block timestamp.
 	 * @param height The block height.
 	 * @return The db block.
 	 */
-	public static org.nem.nis.dbmodel.Block createDbBlockWithTimeStampAtHeight(final int timeStamp, final long height) {
+	public static DbBlock createDbBlockWithTimeStampAtHeight(final int timeStamp, final long height) {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final DbAccount account = new DbAccount();
 		account.setPrintableKey(address.getEncoded());
 		account.setPublicKey(address.getPublicKey());
 
-		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block();
+		final DbBlock block = new DbBlock();
 		block.setForger(account);
 		block.setTimeStamp(timeStamp);
 		block.setHeight(height);
@@ -78,7 +79,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random Block.
+	 * Creates a new random DbBlock.
 	 *
 	 * @return The block.
 	 */
@@ -92,7 +93,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random Block with the specified height.
+	 * Creates a new random DbBlock with the specified height.
 	 *
 	 * @param height The height.
 	 * @return The block.
@@ -102,7 +103,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random Block with the specified height and signer
+	 * Creates a new random DbBlock with the specified height and signer
 	 *
 	 * @param signer The signer.
 	 * @param height The height.
@@ -118,7 +119,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random Block with the specified timestamp.
+	 * Creates a new random DbBlock with the specified timestamp.
 	 *
 	 * @param timeStamp The time stamp.
 	 * @return The block.
@@ -133,7 +134,7 @@ public class NisUtils {
 	}
 
 	/**
-	 * Creates a new random Block with the specified timestamp and height.
+	 * Creates a new random DbBlock with the specified timestamp and height.
 	 *
 	 * @param timeStamp The time stamp.
 	 * @param height The height.

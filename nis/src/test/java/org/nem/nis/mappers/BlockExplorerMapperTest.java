@@ -33,7 +33,7 @@ public class BlockExplorerMapperTest {
 		final Address address = Address.fromPublicKey(PublicKey.fromHexString(PUBLIC_KEY_STRING));
 		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
 
-		final Block block = new Block();
+		final DbBlock block = new DbBlock();
 		block.setHeight(60L);
 		block.setForger(new DbAccount(address.getEncoded(), address.getPublicKey()));
 		block.setTimeStamp(1856002);

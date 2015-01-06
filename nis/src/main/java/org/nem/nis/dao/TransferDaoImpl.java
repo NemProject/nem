@@ -6,7 +6,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.Account;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.dbmodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -223,7 +223,7 @@ public class TransferDaoImpl implements TransferDao {
 		query = this.getCurrentSession()
 				.createSQLQuery(queryString)
 				.addEntity(DbTransferTransaction.class)
-				.addEntity(Block.class)
+				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
 		return executeQuery(query);
 	}
@@ -261,7 +261,7 @@ public class TransferDaoImpl implements TransferDao {
 		query = this.getCurrentSession()
 				.createSQLQuery(queryString)
 				.addEntity(DbTransferTransaction.class)
-				.addEntity(Block.class)
+				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
 		return executeQuery(query);
 	}
@@ -269,7 +269,7 @@ public class TransferDaoImpl implements TransferDao {
 	@SuppressWarnings("unchecked")
 	private static List<TransferBlockPair> executeQuery(final Query q) {
 		final List<Object[]> list = q.list();
-		return list.stream().map(o -> new TransferBlockPair((DbTransferTransaction)o[0], (Block)o[1])).collect(Collectors.toList());
+		return list.stream().map(o -> new TransferBlockPair((DbTransferTransaction)o[0], (DbBlock)o[1])).collect(Collectors.toList());
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
@@ -295,9 +295,9 @@ public class TransferDaoImpl implements TransferDao {
 		// TODO 2014 J-B: check with G about if we still need to compare getBlkIndex
 		return -lhs.getDbTransferTransaction().getId().compareTo(rhs.getDbTransferTransaction().getId());
 		/*final DbTransferTransaction lhsTransfer = lhs.getTransferTransaction();
-		final Long lhsHeight = lhs.getBlock().getHeight();
+		final Long lhsHeight = lhs.getDbBlock().getHeight();
 		final DbTransferTransaction rhsTransfer = rhs.getTransferTransaction();
-		final Long rhsHeight = rhs.getBlock().getHeight();
+		final Long rhsHeight = rhs.getDbBlock().getHeight();
 
 		final int heightComparison = -lhsHeight.compareTo(rhsHeight);
 		if (0 != heightComparison) {

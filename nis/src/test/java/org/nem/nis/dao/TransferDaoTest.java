@@ -413,7 +413,7 @@ public class TransferDaoTest {
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
@@ -435,7 +435,7 @@ public class TransferDaoTest {
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
@@ -651,7 +651,7 @@ public class TransferDaoTest {
 				dummyBlock.addTransaction(transferTransaction);
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
@@ -676,7 +676,7 @@ public class TransferDaoTest {
 			dummyBlock.addTransaction(transferTransaction);
 		}
 		dummyBlock.sign();
-		final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+		final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 		// Act
 		this.blockDao.save(dbBlock);
@@ -709,7 +709,7 @@ public class TransferDaoTest {
 			dummyBlock.addTransaction(transferTransaction);
 		}
 		dummyBlock.sign();
-		final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+		final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 		// Act
 		this.blockDao.save(dbBlock);
@@ -858,7 +858,7 @@ public class TransferDaoTest {
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 		}
 
@@ -895,7 +895,7 @@ public class TransferDaoTest {
 	}
 
 	private void addToDummyBlock(final DbAccount dbAccount, final DbTransferTransaction... dbTransferTransactions) {
-		final org.nem.nis.dbmodel.Block block = NisUtils.createDummyDbBlock(dbAccount);
+		final DbBlock block = NisUtils.createDummyDbBlock(dbAccount);
 		this.blockDao.save(block);
 
 		for (final DbTransferTransaction dbTransferTransaction : dbTransferTransactions) {

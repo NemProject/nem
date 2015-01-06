@@ -4,6 +4,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChain;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class BlockChainLastBlockLayer {
 	private final BlockDao blockDao;
 	private final NisModelToDbModelMapper mapper;
 
-	private org.nem.nis.dbmodel.Block lastBlock;
+	private DbBlock lastBlock;
 
 	@Autowired(required = true)
 	public BlockChainLastBlockLayer(final BlockDao blockDao, final NisModelToDbModelMapper mapper) {
@@ -34,7 +35,7 @@ public class BlockChainLastBlockLayer {
 	 *
 	 * @return last block from db.
 	 */
-	public org.nem.nis.dbmodel.Block getLastDbBlock() {
+	public DbBlock getLastDbBlock() {
 		return this.lastBlock;
 	}
 
@@ -52,7 +53,7 @@ public class BlockChainLastBlockLayer {
 	 *
 	 * @param curBlock lastBlock in db.
 	 */
-	public void analyzeLastBlock(final org.nem.nis.dbmodel.Block curBlock) {
+	public void analyzeLastBlock(final DbBlock curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		this.lastBlock = curBlock;
 	}
@@ -64,10 +65,10 @@ public class BlockChainLastBlockLayer {
 	 * @return always true
 	 */
 	public boolean addBlockToDb(final Block block) {
-		final org.nem.nis.dbmodel.Block dbBlock = this.mapper.map(block);
+		final DbBlock dbBlock = this.mapper.map(block);
 
 		// hibernate will save both block AND transactions
-		// as there is cascade in Block
+		// as there is cascade in DbBlock
 		// mind that there is NO cascade in transaction (near block field)
 		this.blockDao.save(dbBlock);
 		this.lastBlock = dbBlock;

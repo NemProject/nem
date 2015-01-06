@@ -228,7 +228,7 @@ public class AccountIoAdapterTest {
 		private final Account account = Utils.generateRandomAccount();
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
-		private final List<org.nem.nis.dbmodel.Block> blocks = new ArrayList<>();
+		private final List<DbBlock> blocks = new ArrayList<>();
 
 		public TestContext() {
 			Mockito.when(this.accountCache.findByAddress(this.address)).thenReturn(this.account);
@@ -272,7 +272,7 @@ public class AccountIoAdapterTest {
 		}
 
 		public void addTransaction(final int height, final int transactionId, final int amount) {
-			final org.nem.nis.dbmodel.Block block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
+			final DbBlock block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
 			final DbTransferTransaction dbTransferTransaction = this.createTransfer(amount);
 			dbTransferTransaction.setId((long)transactionId);
 			this.pairs.add(new TransferBlockPair(dbTransferTransaction, block));
@@ -418,7 +418,7 @@ public class AccountIoAdapterTest {
 				dummyBlock.addTransaction(transferTransaction);
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);

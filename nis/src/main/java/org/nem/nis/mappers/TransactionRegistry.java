@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.dbmodel.DbMultisigTransaction;
 
 import java.util.*;
@@ -26,12 +26,12 @@ public class TransactionRegistry {
 		/**
 		 * A function that will return db model transactions given a block
 		 */
-		public final Function<Block, List<TDbModel>> getFromBlock;
+		public final Function<DbBlock, List<TDbModel>> getFromBlock;
 
 		/**
 		 * A function that will return set db model transactions given a block
 		 */
-		public final BiConsumer<Block, List<TDbModel>> setInBlock;
+		public final BiConsumer<DbBlock, List<TDbModel>> setInBlock;
 
 		/**
 		 * A function that will get db model transactions given a multisig transfer.
@@ -53,8 +53,8 @@ public class TransactionRegistry {
 
 		private Entry(
 				final int type,
-				final Function<Block, List<TDbModel>> getFromBlock,
-				final BiConsumer<Block, List<TDbModel>> setInBlock,
+				final Function<DbBlock, List<TDbModel>> getFromBlock,
+				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
@@ -97,7 +97,7 @@ public class TransactionRegistry {
 		{
 			this.add(new Entry<>(
 					TransactionTypes.TRANSFER,
-					Block::getBlockTransferTransactions,
+					DbBlock::getBlockTransferTransactions,
 					(block, transfers) -> block.setBlockTransferTransactions(transfers),
 					DbMultisigTransaction::getTransferTransaction,
 					TransferModelToDbModelMapping::new,
@@ -107,7 +107,7 @@ public class TransactionRegistry {
 
 			this.add(new Entry<>(
 					TransactionTypes.IMPORTANCE_TRANSFER,
-					Block::getBlockImportanceTransferTransactions,
+					DbBlock::getBlockImportanceTransferTransactions,
 					(block, transfers) -> block.setBlockImportanceTransferTransactions(transfers),
 					DbMultisigTransaction::getImportanceTransferTransaction,
 					ImportanceTransferModelToDbModelMapping::new,
@@ -117,7 +117,7 @@ public class TransactionRegistry {
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-					Block::getBlockMultisigAggregateModificationTransactions,
+					DbBlock::getBlockMultisigAggregateModificationTransactions,
 					(block, transfers) -> block.setBlockMultisigAggregateModificationTransactions(transfers),
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
 					MultisigSignerModificationModelToDbModelMapping::new,
@@ -127,7 +127,7 @@ public class TransactionRegistry {
 
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG,
-					Block::getBlockMultisigTransactions,
+					DbBlock::getBlockMultisigTransactions,
 					(block, transfers) -> block.setBlockMultisigTransactions(transfers),
 					multisig -> null,
 					MultisigTransactionModelToDbModelMapping::new,

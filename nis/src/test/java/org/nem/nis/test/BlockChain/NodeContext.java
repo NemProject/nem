@@ -10,6 +10,7 @@ import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -138,7 +139,7 @@ public class NodeContext {
 		@Override
 		public Collection<Block> getChainAfter(final Node node, final ChainRequest request) {
 			final List<Block> blocks = new ArrayList<>();
-			final List<org.nem.nis.dbmodel.Block> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
+			final List<DbBlock> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
 			dbBlocks.stream().forEach(dbBlock -> blocks.add(MapperUtils.toModel(dbBlock, this.accountLookup)));
 			return this.checkNull(blocks);
 		}
@@ -172,7 +173,7 @@ public class NodeContext {
 		return this.chain.get(this.chain.size() - 1);
 	}
 
-	private org.nem.nis.dbmodel.Block mapBlockToDbModel(final Block block, final AccountDao accountDao) {
+	private DbBlock mapBlockToDbModel(final Block block, final AccountDao accountDao) {
 		return MapperUtils.createModelToDbModelNisMapper(accountDao).map(block);
 	}
 
