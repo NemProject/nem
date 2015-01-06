@@ -331,7 +331,7 @@ public class BlockMapperTest {
 		final int NUM_TRANSACTIONS_B = 2;
 		final int NUM_TRANSACTIONS_C = 3;
 		final TestContext context = new TestContext();
-		// order matters, as foraging will create block in that order
+		// order matters, as harvesting will create block in that order
 		context.addMultisigSignerModificationTransactions();
 		context.addImportanceTransferTransactions();
 		context.addTransactions();
@@ -524,7 +524,7 @@ public class BlockMapperTest {
 	private class TestContext {
 
 		private final Block model;
-		private final DbAccount dbForager;
+		private final DbAccount dbHarvester;
 		private final Account account1;
 		private final DbAccount dbAccount1;
 		private final Account account2;
@@ -549,9 +549,9 @@ public class BlockMapperTest {
 			this.model.setDifficulty(new BlockDifficulty(79_876_543_211_237L));
 			this.signModel();
 
-			this.dbForager = new DbAccount();
-			this.dbForager.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbForager.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
+			this.dbHarvester = new DbAccount();
+			this.dbHarvester.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
+			this.dbHarvester.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
 			this.account1 = Utils.generateRandomAccount();
 			this.dbAccount1 = this.createDbAccount(this.account1);
@@ -563,7 +563,7 @@ public class BlockMapperTest {
 			this.dbAccount3 = this.createDbAccount(this.account3);
 
 			this.accountDao = new MockAccountDao();
-			this.accountDao.addMapping(this.model.getSigner(), this.dbForager);
+			this.accountDao.addMapping(this.model.getSigner(), this.dbHarvester);
 			this.accountDao.addMapping(this.account1, this.dbAccount1);
 			this.accountDao.addMapping(this.account2, this.dbAccount2);
 			this.accountDao.addMapping(this.account3, this.dbAccount3);
@@ -689,7 +689,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getPrevBlockHash(), IsEqual.equalTo(this.model.getPreviousBlockHash()));
 			Assert.assertThat(dbModel.getBlockHash(), IsEqual.equalTo(this.hash));
 			Assert.assertThat(dbModel.getTimeStamp(), IsEqual.equalTo(721));
-			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbForager));
+			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbHarvester));
 			Assert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
 			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(Amount.fromNem(expectedFee).getNumMicroNem()));

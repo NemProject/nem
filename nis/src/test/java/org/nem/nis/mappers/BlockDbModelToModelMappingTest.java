@@ -189,7 +189,7 @@ public class BlockDbModelToModelMappingTest {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
 		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
-		private final Account forger = Utils.generateRandomAccount();
+		private final Account harvester = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
 		private final Signature signature = Utils.generateRandomSignature();
 		private final Hash prevBlockHash = Utils.generateRandomHash();
@@ -197,7 +197,7 @@ public class BlockDbModelToModelMappingTest {
 		private final BlockDbModelToModelMapping mapping = new BlockDbModelToModelMapping(this.mapper, new MockAccountLookup());
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.dbForger, Account.class)).thenReturn(this.forger);
+			Mockito.when(this.mapper.map(this.dbForger, Account.class)).thenReturn(this.harvester);
 			Mockito.when(this.mapper.map(this.dbLessor, Account.class)).thenReturn(this.lessor);
 		}
 
@@ -225,7 +225,7 @@ public class BlockDbModelToModelMappingTest {
 		}
 
 		public void assertModel(final Block model, final long expectedDifficulty, final Account expectedLessor) {
-			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.forger));
+			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.harvester));
 			Assert.assertThat(model.getPreviousBlockHash(), IsEqual.equalTo(this.prevBlockHash));
 			Assert.assertThat(model.getGenerationHash(), IsEqual.equalTo(this.generationBlockHash));
 			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));

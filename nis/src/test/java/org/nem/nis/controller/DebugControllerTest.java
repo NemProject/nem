@@ -78,7 +78,7 @@ public class DebugControllerTest {
 
 		// Assert:
 		Assert.assertThat(blockDebugInfo.getHeight(), IsEqual.equalTo(height));
-		Assert.assertThat(blockDebugInfo.getForagerAddress(), IsEqual.equalTo(state.signer1.getAddress()));
+		Assert.assertThat(blockDebugInfo.getHarvesterAddress(), IsEqual.equalTo(state.signer1.getAddress()));
 		Assert.assertThat(blockDebugInfo.getTimeStamp(), IsEqual.equalTo(timeStamp.addSeconds(60)));
 		Assert.assertThat(blockDebugInfo.getDifficulty(), IsEqual.equalTo(difficulty));
 		Assert.assertThat(blockDebugInfo.getHit(), IsEqual.equalTo(state.hit));

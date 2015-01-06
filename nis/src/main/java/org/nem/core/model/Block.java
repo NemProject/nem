@@ -10,8 +10,8 @@ import java.util.*;
 /**
  * A NEM block.
  * <p/>
- * The forger is an alias for the signer.
- * The forger proof is the signature.
+ * The harvester is an alias for the signer.
+ * The harvester proof is the signature.
  */
 public class Block extends VerifiableEntity {
 	private final static int BLOCK_VERSION = 1;
@@ -30,19 +30,19 @@ public class Block extends VerifiableEntity {
 	/**
 	 * Creates a new block.
 	 *
-	 * @param forger The forger.
+	 * @param harvester The harvester.
 	 * @param prevBlockHash The hash of the previous block.
 	 * @param generationHash The generation hash.
 	 * @param timeStamp The block timestamp.
 	 * @param height The block height.
 	 */
 	public Block(
-			final Account forger,
+			final Account harvester,
 			final Hash prevBlockHash,
 			final Hash generationHash,
 			final TimeInstant timeStamp,
 			final BlockHeight height) {
-		super(BlockTypes.REGULAR, BLOCK_VERSION, timeStamp, forger);
+		super(BlockTypes.REGULAR, BLOCK_VERSION, timeStamp, harvester);
 		this.transactions = new ArrayList<>();
 		this.prevBlockHash = prevBlockHash;
 		this.generationHash = generationHash;
@@ -54,12 +54,12 @@ public class Block extends VerifiableEntity {
 	/**
 	 * Creates a new block.
 	 *
-	 * @param forger The forger.
+	 * @param harvester The harvester.
 	 * @param prevBlock The previous block.
 	 * @param timeStamp The block timestamp.
 	 */
-	public Block(final Account forger, final Block prevBlock, final TimeInstant timeStamp) {
-		this(forger, Hash.ZERO, Hash.ZERO, timeStamp, prevBlock.getHeight().next());
+	public Block(final Account harvester, final Block prevBlock, final TimeInstant timeStamp) {
+		this(harvester, Hash.ZERO, Hash.ZERO, timeStamp, prevBlock.getHeight().next());
 		this.setPrevious(prevBlock);
 	}
 

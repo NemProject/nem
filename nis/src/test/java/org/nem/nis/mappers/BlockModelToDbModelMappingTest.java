@@ -282,7 +282,7 @@ public class BlockModelToDbModelMappingTest {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
 		private final DbAccount dbLessor = Mockito.mock(DbAccount.class);
-		private final Account forger = Utils.generateRandomAccount();
+		private final Account harvester = Utils.generateRandomAccount();
 		private final Account lessor = Utils.generateRandomAccount();
 		private final Signature signature = Utils.generateRandomSignature();
 		private final Hash prevBlockHash = Utils.generateRandomHash();
@@ -291,13 +291,13 @@ public class BlockModelToDbModelMappingTest {
 		private final BlockModelToDbModelMapping mapping = new BlockModelToDbModelMapping(this.mapper);
 
 		public TestContext() {
-			Mockito.when(this.mapper.map(this.forger, DbAccount.class)).thenReturn(this.dbForger);
+			Mockito.when(this.mapper.map(this.harvester, DbAccount.class)).thenReturn(this.dbForger);
 			Mockito.when(this.mapper.map(this.lessor, DbAccount.class)).thenReturn(this.dbLessor);
 		}
 
 		public Block createBlock(final Account lessor) {
 			final Block block = new Block(
-					this.forger,
+					this.harvester,
 					this.prevBlockHash,
 					this.generationBlockHash,
 					new TimeInstant(4444),

@@ -46,7 +46,7 @@ public interface ReadOnlyBlockDao {
 	public HashChain getHashesFrom(final BlockHeight height, int limit);
 
 	/**
-	 * Retrieves all Blocks from the database that were forged by the specified account.
+	 * Retrieves all Blocks from the database that were harvested by the specified account.
 	 *
 	 * @param account The account.
 	 * @param hash The hash of "top-most" block.

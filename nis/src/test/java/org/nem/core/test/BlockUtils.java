@@ -64,9 +64,9 @@ public class BlockUtils {
 	 */
 	public static Block createBlockWithHeight(final BlockHeight height) {
 		// Arrange:
-		final Account forger = Utils.generateRandomAccount();
+		final Account harvester = Utils.generateRandomAccount();
 		final Block block = new Block(
-				forger,
+				harvester,
 				DUMMY_PREVIOUS_HASH,
 				DUMMY_GENERATION_HASH,
 				new TimeInstant(7),

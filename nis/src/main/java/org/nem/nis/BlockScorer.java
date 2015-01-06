@@ -70,18 +70,18 @@ public class BlockScorer {
 			return BigInteger.ZERO;
 		}
 
-		final long forgerBalance = this.calculateHarvesterBalance(block);
+		final long harvesterBalance = this.calculateHarvesterBalance(block);
 		return BigInteger.valueOf(timeStampDifference)
-				.multiply(BigInteger.valueOf(forgerBalance))
+				.multiply(BigInteger.valueOf(harvesterBalance))
 				.multiply(TWO_TO_THE_POWER_OF_64)
 				.divide(block.getDifficulty().asBigInteger());
 	}
 
 	/**
-	 * Calculates forager balance for block.
+	 * Calculates harvester balance for block.
 	 *
 	 * @param block The signed, "hit" block.
-	 * @return The forager balance.
+	 * @return The harvester balance.
 	 */
 	public long calculateHarvesterBalance(final Block block) {
 		final BlockHeight groupedHeight = GroupedHeight.fromHeight(block.getHeight());

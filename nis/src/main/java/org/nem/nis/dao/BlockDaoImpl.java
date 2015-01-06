@@ -140,7 +140,7 @@ public class BlockDaoImpl implements BlockDao {
 	private Collection<DbBlock> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
 		// NOTE: there was JOIN used for importanceTransfers here, that was a bug
 		final Criteria criteria = setTransfersToSelect(this.getCurrentSession().createCriteria(DbBlock.class))
-				.setFetchMode("forger", FetchMode.JOIN)
+				.setFetchMode("harvester", FetchMode.JOIN)
 				.setFetchMode("lessor", FetchMode.JOIN)
 				.add(Restrictions.lt("height", height))
 				.addOrder(Order.desc("height"))
@@ -148,7 +148,7 @@ public class BlockDaoImpl implements BlockDao {
 						// many TXes), but this will work correctly cause blockTransferTransactions is set to select...
 				.setMaxResults(limit)
 						// nested criteria
-				.createAlias("forger", "f")
+				.createAlias("harvester", "f")
 				.createAlias("lessor", "l", JoinType.LEFT_OUTER_JOIN)
 				.add(Restrictions.disjunction(
 						Restrictions.eq("f.printableKey", account.getAddress().getEncoded()),
@@ -163,7 +163,7 @@ public class BlockDaoImpl implements BlockDao {
 		// whatever it takes : DO NOT ADD setMaxResults here!
 		final long blockHeight = height.getRaw();
 		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.setFetchMode("forger", FetchMode.JOIN)
+				.setFetchMode("harvester", FetchMode.JOIN)
 				.add(Restrictions.gt("height", blockHeight))
 				.add(Restrictions.le("height", blockHeight + limit))
 				.addOrder(Order.asc("height"));

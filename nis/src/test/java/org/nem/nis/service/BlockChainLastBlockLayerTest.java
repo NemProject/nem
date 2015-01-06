@@ -61,9 +61,9 @@ public class BlockChainLastBlockLayerTest {
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsEqual.equalTo(last));
 	}
 
-	private static org.nem.core.model.Block createBlock(final Account forger) {
+	private static org.nem.core.model.Block createBlock(final Account harvester) {
 		// Arrange:
-		final org.nem.core.model.Block block = new org.nem.core.model.Block(forger,
+		final org.nem.core.model.Block block = new org.nem.core.model.Block(harvester,
 				Utils.generateRandomHash(),
 				Utils.generateRandomHash(),
 				new TimeInstant(7),

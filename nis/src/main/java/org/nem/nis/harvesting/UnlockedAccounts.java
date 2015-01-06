@@ -38,7 +38,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	}
 
 	/**
-	 * Unlocks the specified account for foraging.
+	 * Unlocks the specified account for harvesting.
 	 *
 	 * @param account The account.
 	 */
@@ -63,7 +63,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	}
 
 	/**
-	 * Removes the specified account from the list of active foraging accounts.
+	 * Removes the specified account from the list of active harvesting accounts.
 	 *
 	 * @param account The account.
 	 */

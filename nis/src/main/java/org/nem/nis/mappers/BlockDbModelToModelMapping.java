@@ -39,11 +39,11 @@ public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 			return NemesisBlock.fromResource(new DeserializationContext(this.accountLookup));
 		}
 
-		final Account forager = this.mapper.map(dbBlock.getHarvester(), Account.class);
+		final Account harvester = this.mapper.map(dbBlock.getHarvester(), Account.class);
 		final Account lessor = dbBlock.getLessor() != null ? this.mapper.map(dbBlock.getLessor(), Account.class) : null;
 
 		final Block block = new org.nem.core.model.Block(
-				forager,
+				harvester,
 				dbBlock.getPrevBlockHash(),
 				dbBlock.getGenerationHash(),
 				new TimeInstant(dbBlock.getTimeStamp()),

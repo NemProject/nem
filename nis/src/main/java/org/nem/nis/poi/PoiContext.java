@@ -135,7 +135,7 @@ public class PoiContext {
 	//endregion
 
 	/**
-	 * Updates the importance information for all foraging-eligible accounts.
+	 * Updates the importance information for all harvesting-eligible accounts.
 	 *
 	 * @param pageRankVector The calculated page ranks.
 	 * @param importanceVector The calculated importances.
