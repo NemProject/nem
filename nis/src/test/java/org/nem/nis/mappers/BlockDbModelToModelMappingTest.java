@@ -240,9 +240,9 @@ public class BlockDbModelToModelMappingTest {
 
 		public TransferTransaction addTransfer(final org.nem.nis.dbmodel.Block block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockTransfers().add(dbTransfer),
+					dbTransfer -> block.getBlockTransferTransactions().add(dbTransfer),
 					blockIndex,
-					new Transfer(),
+					new DbTransferTransaction(),
 					TransferTransaction.class);
 		}
 

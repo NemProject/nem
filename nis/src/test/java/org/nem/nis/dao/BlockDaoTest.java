@@ -80,9 +80,9 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());
 	}
 
 	@Test
@@ -103,7 +103,7 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
 	}
@@ -132,10 +132,10 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockTransfers().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());
 		Assert.assertThat(entity.getBlockImportanceTransfers().get(0).getId(), notNullValue());
 		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().get(0).getId(), notNullValue());
 	}
@@ -188,17 +188,17 @@ public class BlockDaoTest {
 
 		// Act:
 		// TODO 20141010 J-G: i imagine you want to set the order id here
-		dbBlock.getBlockTransfers().get(0).setBlkIndex(24);
-		dbBlock.getBlockTransfers().get(1).setBlkIndex(12);
+		dbBlock.getBlockTransferTransactions().get(0).setBlkIndex(24);
+		dbBlock.getBlockTransferTransactions().get(1).setBlkIndex(12);
 
 		this.blockDao.save(dbBlock);
 
 		// Assert:
 		// TODO 20141010 J-G: you don't need to revalidate getBlkIndex here; do you have a test like this for importance transfer?
-		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getOrderId(), equalTo(0));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getOrderId(), equalTo(1));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getOrderId(), equalTo(0));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getOrderId(), equalTo(1));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), equalTo(12));
 	}
 	//endregion
 
@@ -221,7 +221,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getHeight(), equalTo(emptyBlock.getHeight().getRaw()));
 		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
 		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
-		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
@@ -244,7 +244,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getHeight(), equalTo(emptyBlock.getHeight().getRaw()));
 		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
 		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
-		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getForger().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getForgerProof(), equalTo(emptyBlock.getSignature().getBytes()));
 	}
@@ -266,17 +266,17 @@ public class BlockDaoTest {
 		final Block dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
 		// Act:
-		dbBlock.getBlockTransfers().get(0).setBlkIndex(24);
-		dbBlock.getBlockTransfers().get(1).setBlkIndex(12);
+		dbBlock.getBlockTransferTransactions().get(0).setBlkIndex(24);
+		dbBlock.getBlockTransferTransactions().get(1).setBlkIndex(12);
 
 		this.blockDao.save(dbBlock);
 		final Block entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
-		Assert.assertThat(entity.getBlockTransfers().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(entity.getBlockTransfers().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getBlkIndex(), equalTo(24));
+		Assert.assertThat(entity.getBlockTransferTransactions().get(1).getBlkIndex(), equalTo(12));
 		// TODO 20151005 J-G i guess you're assuming the entity transactions are sorted?
 		// > it might be better to check the hashes like in the following test
 	}
@@ -306,7 +306,7 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getForger().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransfers().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockImportanceTransfers().size(), equalTo(2));
 
 		final Hash h1 = entity.getBlockImportanceTransfers().get(0).getTransferHash();
@@ -336,7 +336,7 @@ public class BlockDaoTest {
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
 
-		ExceptionAssert.assertThrows(v -> entity.getBlockTransfers().size(), LazyInitializationException.class);
+		ExceptionAssert.assertThrows(v -> entity.getBlockTransferTransactions().size(), LazyInitializationException.class);
 	}
 
 	@Test
@@ -461,17 +461,17 @@ public class BlockDaoTest {
 		this.blockDao.save(dbBlock);
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
 		final org.nem.nis.dbmodel.Account entity = this.accountDao.getAccount(dbBlock.getForger().getId());
-		final Transfer transfer1 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(0)).getRaw());
-		final Transfer transfer2 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(1)).getRaw());
-		final Transfer transfer3 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(2)).getRaw());
+		final DbTransferTransaction dbTransferTransaction1 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(0)).getRaw());
+		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(1)).getRaw());
+		final DbTransferTransaction dbTransferTransaction3 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(2)).getRaw());
 
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getId(), equalTo(dbBlock.getForger().getId()));
 		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
-		Assert.assertThat(transfer1, nullValue());
-		Assert.assertThat(transfer2, nullValue());
-		Assert.assertThat(transfer3, nullValue());
+		Assert.assertThat(dbTransferTransaction1, nullValue());
+		Assert.assertThat(dbTransferTransaction2, nullValue());
+		Assert.assertThat(dbTransferTransaction3, nullValue());
 	}
 	//endregion
 

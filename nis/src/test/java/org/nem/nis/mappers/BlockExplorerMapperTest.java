@@ -38,10 +38,10 @@ public class BlockExplorerMapperTest {
 		block.setForger(new Account(address.getEncoded(), address.getPublicKey()));
 		block.setTimeStamp(1856002);
 		block.setBlockHash(hash);
-		block.setBlockTransfers(new ArrayList<>());
+		block.setBlockTransferTransactions(new ArrayList<>());
 
 		for (final long fee : transferFees) {
-			block.getBlockTransfers().add(createTransferWithFee(fee));
+			block.getBlockTransferTransactions().add(createTransferWithFee(fee));
 		}
 
 		// Act:
@@ -63,14 +63,14 @@ public class BlockExplorerMapperTest {
 		}
 	}
 
-	private static Transfer createTransferWithFee(final long fee) {
+	private static DbTransferTransaction createTransferWithFee(final long fee) {
 		final Address senderAddress = Utils.generateRandomAddressWithPublicKey();
 		final Address recipientAddress = Utils.generateRandomAddress();
 		final Hash hash = Utils.generateRandomHash();
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
-		final Transfer transfer = new Transfer();
+		final DbTransferTransaction transfer = new DbTransferTransaction();
 		transfer.setFee(fee);
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
@@ -93,7 +93,7 @@ public class BlockExplorerMapperTest {
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
-		final Transfer transfer = new Transfer();
+		final DbTransferTransaction transfer = new DbTransferTransaction();
 		transfer.setFee(123000000L);
 		transfer.setTimeStamp(1856002);
 		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));

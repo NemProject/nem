@@ -31,7 +31,7 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbMultisigSignatureTransaction dbSignature = context.createDbSignature();
-		dbSignature.getMultisigTransaction().setTransfer(null);
+		dbSignature.getMultisigTransaction().setTransferTransaction(null);
 
 		// Act:
 		ExceptionAssert.assertThrows(
@@ -42,7 +42,7 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 	@Override
 	protected DbMultisigSignatureTransaction createDbModel() {
 		final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
-		dbMultisigTransfer.setTransfer(new Transfer());
+		dbMultisigTransfer.setTransferTransaction(new DbTransferTransaction());
 		final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
 		dbSignature.setMultisigTransaction(dbMultisigTransfer);
 		return dbSignature;
@@ -70,9 +70,9 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 			dbSignature.setSender(this.dbSender);
 			dbSignature.setMultisigTransaction(new DbMultisigTransaction());
 
-			final Transfer dbTransfer = new Transfer();
-			dbTransfer.setTransferHash(this.otherTransactionHash);
-			dbSignature.getMultisigTransaction().setTransfer(dbTransfer);
+			final DbTransferTransaction dbTransferTransaction = new DbTransferTransaction();
+			dbTransferTransaction.setTransferHash(this.otherTransactionHash);
+			dbSignature.getMultisigTransaction().setTransferTransaction(dbTransferTransaction);
 
 			dbSignature.setFee(0L);
 			dbSignature.setDeadline(0);

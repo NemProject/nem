@@ -4,12 +4,12 @@ import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.DbTransferTransaction;
 
 /**
  * A mapping that is able to map a db transfer to a model transfer transaction.
  */
-public class TransferDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<Transfer, TransferTransaction> {
+public class TransferDbModelToModelMapping extends AbstractTransferDbModelToModelMapping<DbTransferTransaction, TransferTransaction> {
 	private final IMapper mapper;
 
 	/**
@@ -22,7 +22,7 @@ public class TransferDbModelToModelMapping extends AbstractTransferDbModelToMode
 	}
 
 	@Override
-	public TransferTransaction mapImpl(final Transfer source) {
+	public TransferTransaction mapImpl(final DbTransferTransaction source) {
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
 		final Account recipient = this.mapper.map(source.getRecipient(), Account.class);
 

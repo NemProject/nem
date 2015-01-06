@@ -12,7 +12,7 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.DbTransferTransaction;
 import org.nem.nis.mappers.AccountDaoLookup;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -69,7 +69,7 @@ public class TransferDaoITCase {
 			this.addMapping(mockAccountDao, recipient);
 			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-				final Transfer dbTransfer = MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transferTransaction, Transfer.class);
+				final DbTransferTransaction dbTransfer = MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transferTransaction, DbTransferTransaction.class);
 				dbTransfer.setBlkIndex(12345);
 				dbTransfer.setOrderId(i - 1);
 				hashes.add(dbTransfer.getTransferHash());

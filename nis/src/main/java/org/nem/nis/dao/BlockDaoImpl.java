@@ -57,7 +57,7 @@ public class BlockDaoImpl implements BlockDao {
 	// NOTE: remember to modify deleteBlocksAfterHeight TOO!
 	private static Criteria setTransfersFetchMode(final Criteria criteria, final FetchMode fetchMode) {
 		return criteria
-				.setFetchMode("blockTransfers", fetchMode)
+				.setFetchMode("blockTransferTransactions", fetchMode)
 				.setFetchMode("blockImportanceTransfers", fetchMode)
 				.setFetchMode("blockMultisigAggregateModificationTransactions", fetchMode)
 				.setFetchMode("blockMultisigTransactions", fetchMode);
@@ -145,7 +145,7 @@ public class BlockDaoImpl implements BlockDao {
 				.add(Restrictions.lt("height", height))
 				.addOrder(Order.desc("height"))
 						// setMaxResults limits results, not objects (so in case of join it could be block with
-						// many TXes), but this will work correctly cause blocktransfers is set to select...
+						// many TXes), but this will work correctly cause blockTransferTransactions is set to select...
 				.setMaxResults(limit)
 						// nested criteria
 				.createAlias("forger", "f")
@@ -180,7 +180,7 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		this.dropTransfers(blockHeight, "Transfer", "blockTransfers", (v) -> {});
+		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", (v) -> {});
 		this.dropTransfers(blockHeight, "ImportanceTransfer", "blockImportanceTransfers", (v) -> {});
 		this.dropTransfers(blockHeight, "DbMultisigAggregateModificationTransaction", "blockMultisigAggregateModificationTransactions", (transactionsToDelete) -> {
 			final Query preQuery = this.getCurrentSession()

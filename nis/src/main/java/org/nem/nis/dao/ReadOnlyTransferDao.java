@@ -8,9 +8,9 @@ import org.nem.nis.dbmodel.*;
 import java.util.Collection;
 
 /**
- * Read-only DAO for accessing db Transfer objects.
+ * Read-only DAO for accessing DbTransferTransaction objects.
  */
-public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<Transfer> {
+public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransferTransaction> {
 	/*
 	 * Types of transfers that can be requested.
 	 */

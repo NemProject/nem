@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 
 @Repository
 public class TransferDaoImpl implements TransferDao {
-	private final SimpleTransferDaoImpl<Transfer> impl;
+	private final SimpleTransferDaoImpl<DbTransferTransaction> impl;
 
 	@Autowired(required = true)
 	public TransferDaoImpl(final SessionFactory sessionFactory) {
-		this.impl = new SimpleTransferDaoImpl<>("Transfer", sessionFactory, Transfer::getTransferHash);
+		this.impl = new SimpleTransferDaoImpl<>("DbTransferTransaction", sessionFactory, DbTransferTransaction::getTransferHash);
 	}
 
 	private Session getCurrentSession() {
@@ -38,13 +38,13 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Transfer findByHash(final byte[] txHash) {
+	public DbTransferTransaction findByHash(final byte[] txHash) {
 		return this.impl.findByHash(txHash);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public Transfer findByHash(final byte[] txHash, final long maxBlockHeight) {
+	public DbTransferTransaction findByHash(final byte[] txHash, final long maxBlockHeight) {
 		return this.impl.findByHash(txHash, maxBlockHeight);
 	}
 
@@ -56,14 +56,14 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Override
 	@Transactional
-	public void save(final Transfer entity) {
+	public void save(final DbTransferTransaction entity) {
 		this.impl.save(entity);
 	}
 
 	@Override
 	@Transactional
-	public void saveMulti(final List<Transfer> transfers) {
-		this.impl.saveMulti(transfers);
+	public void saveMulti(final List<DbTransferTransaction> dbTransferTransactions) {
+		this.impl.saveMulti(dbTransferTransactions);
 	}
 
 	//endregion
@@ -74,7 +74,7 @@ public class TransferDaoImpl implements TransferDao {
 	public Collection<TransferBlockPair> getTransactionsForAccount(final Account address, final Integer timeStamp, final int limit) {
 		// TODO: have no idea how to do it using Criteria...
 		final Query query = this.getCurrentSession()
-				.createQuery("select t, t.block from Transfer t " +
+				.createQuery("select t, t.block from DbTransferTransaction t " +
 						"where t.timeStamp <= :timeStamp AND (t.recipient.printableKey = :pubkey OR t.sender.printableKey = :pubkey) " +
 						"order by t.timeStamp desc")
 				.setParameter("timeStamp", timeStamp)
@@ -121,7 +121,7 @@ public class TransferDaoImpl implements TransferDao {
 			final BlockHeight height,
 			final String addressString) {
 		final Query prequery = this.getCurrentSession()
-				.createQuery("select t, t.block from Transfer t " +
+				.createQuery("select t, t.block from DbTransferTransaction t " +
 						"WHERE " +
 						addressString +
 						" AND t.block.height = :height" +
@@ -134,7 +134,7 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		for (final TransferBlockPair pair : tempList) {
-			if (pair.getTransfer().getTransferHash().equals(hash)) {
+			if (pair.getDbTransferTransaction().getTransferHash().equals(hash)) {
 				return pair;
 			}
 		}
@@ -164,7 +164,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	private TransferBlockPair getTransactionDescriptorUsingId(final Long id) {
 		final Query preQuery = this.getCurrentSession()
-				.createQuery("select t, t.block from Transfer t WHERE t.id=:id")
+				.createQuery("select t, t.block from DbTransferTransaction t WHERE t.id=:id")
 				.setParameter("id", id);
 		final List<TransferBlockPair> tempList = executeQuery(preQuery);
 		if (tempList.size() < 1) {
@@ -208,7 +208,7 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final TransferBlockPair pair) {
 		final Query query;
-		final Transfer topMostTransfer = pair.getTransfer();
+		final DbTransferTransaction topMostTransferTransaction = pair.getDbTransferTransaction();
 
 		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
 		final String preQueryString = "SELECT t.*, b.* " +
@@ -218,11 +218,11 @@ public class TransferDaoImpl implements TransferDao {
 		final String queryString = String.format(preQueryString,
 				senderOrRecipient,
 				accountId,
-				topMostTransfer.getId(),
+				topMostTransferTransaction.getId(),
 				senderOrRecipient);
 		query = this.getCurrentSession()
 				.createSQLQuery(queryString)
-				.addEntity(Transfer.class)
+				.addEntity(DbTransferTransaction.class)
 				.addEntity(Block.class)
 				.setMaxResults(limit);
 		return executeQuery(query);
@@ -260,7 +260,7 @@ public class TransferDaoImpl implements TransferDao {
 				senderOrRecipient);
 		query = this.getCurrentSession()
 				.createSQLQuery(queryString)
-				.addEntity(Transfer.class)
+				.addEntity(DbTransferTransaction.class)
 				.addEntity(Block.class)
 				.setMaxResults(limit);
 		return executeQuery(query);
@@ -269,7 +269,7 @@ public class TransferDaoImpl implements TransferDao {
 	@SuppressWarnings("unchecked")
 	private static List<TransferBlockPair> executeQuery(final Query q) {
 		final List<Object[]> list = q.list();
-		return list.stream().map(o -> new TransferBlockPair((Transfer)o[0], (Block)o[1])).collect(Collectors.toList());
+		return list.stream().map(o -> new TransferBlockPair((DbTransferTransaction)o[0], (Block)o[1])).collect(Collectors.toList());
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
@@ -279,7 +279,7 @@ public class TransferDaoImpl implements TransferDao {
 		TransferBlockPair curPair = null;
 		final Collection<TransferBlockPair> result = new ArrayList<>();
 		for (final TransferBlockPair pair : list) {
-			if (null == curPair || !(curPair.getTransfer().getId().equals(pair.getTransfer().getId()))) {
+			if (null == curPair || !(curPair.getDbTransferTransaction().getId().equals(pair.getDbTransferTransaction().getId()))) {
 				result.add(pair);
 				if (limit == result.size()) {
 					break;
@@ -293,10 +293,10 @@ public class TransferDaoImpl implements TransferDao {
 
 	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
 		// TODO 2014 J-B: check with G about if we still need to compare getBlkIndex
-		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
-		/*final Transfer lhsTransfer = lhs.getTransfer();
+		return -lhs.getDbTransferTransaction().getId().compareTo(rhs.getDbTransferTransaction().getId());
+		/*final DbTransferTransaction lhsTransfer = lhs.getTransferTransaction();
 		final Long lhsHeight = lhs.getBlock().getHeight();
-		final Transfer rhsTransfer = rhs.getTransfer();
+		final DbTransferTransaction rhsTransfer = rhs.getTransferTransaction();
 		final Long rhsHeight = rhs.getBlock().getHeight();
 
 		final int heightComparison = -lhsHeight.compareTo(rhsHeight);

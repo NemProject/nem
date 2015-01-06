@@ -152,9 +152,9 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 
 		public void addTransfer() {
 			this.addTransfer(
-					new Transfer(),
+					new DbTransferTransaction(),
 					RandomTransactionFactory.createTransfer(),
-					DbMultisigTransaction::setTransfer);
+					DbMultisigTransaction::setTransferTransaction);
 		}
 
 		public void addImportanceTransfer() {

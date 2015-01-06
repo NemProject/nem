@@ -40,7 +40,7 @@ public class DefaultMapperFactoryTest {
 
 	private static final List<TransactionEntry<?, ?>> transactionEntries = new ArrayList<TransactionEntry<?, ?>>() {
 		{
-			this.add(new TransactionEntry<>(Transfer.class, TransferTransaction.class));
+			this.add(new TransactionEntry<>(DbTransferTransaction.class, TransferTransaction.class));
 			this.add(new TransactionEntry<>(ImportanceTransfer.class, ImportanceTransferTransaction.class));
 			this.add(new TransactionEntry<>(DbMultisigAggregateModificationTransaction.class, MultisigAggregateModificationTransaction.class));
 			this.add(new TransactionEntry<>(DbMultisigTransaction.class, MultisigTransaction.class));

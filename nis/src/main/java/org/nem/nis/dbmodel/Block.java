@@ -51,7 +51,7 @@ public class Block {
 	@OrderBy("orderId")
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@OrderColumn(name = "orderId")
-	private List<Transfer> blockTransfers;
+	private List<DbTransferTransaction> blockTransferTransactions;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "block", orphanRemoval = true)
 	@OrderBy("orderId")
@@ -176,12 +176,12 @@ public class Block {
 		this.difficulty = difficulty;
 	}
 
-	public List<Transfer> getBlockTransfers() {
-		return this.blockTransfers;
+	public List<DbTransferTransaction> getBlockTransferTransactions() {
+		return this.blockTransferTransactions;
 	}
 
-	public void setBlockTransfers(final List<Transfer> blockTransfers) {
-		this.blockTransfers = blockTransfers;
+	public void setBlockTransferTransactions(final List<DbTransferTransaction> blockTransferTransactions) {
+		this.blockTransferTransactions = blockTransferTransactions;
 	}
 
 	public List<ImportanceTransfer> getBlockImportanceTransfers() {

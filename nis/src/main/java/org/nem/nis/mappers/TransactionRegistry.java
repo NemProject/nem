@@ -97,12 +97,12 @@ public class TransactionRegistry {
 		{
 			this.add(new Entry<>(
 					TransactionTypes.TRANSFER,
-					Block::getBlockTransfers,
-					(block, transfers) -> block.setBlockTransfers(transfers),
-					DbMultisigTransaction::getTransfer,
+					Block::getBlockTransferTransactions,
+					(block, transfers) -> block.setBlockTransferTransactions(transfers),
+					DbMultisigTransaction::getTransferTransaction,
 					TransferModelToDbModelMapping::new,
 					TransferDbModelToModelMapping::new,
-					Transfer.class,
+					DbTransferTransaction.class,
 					TransferTransaction.class));
 
 			this.add(new Entry<>(

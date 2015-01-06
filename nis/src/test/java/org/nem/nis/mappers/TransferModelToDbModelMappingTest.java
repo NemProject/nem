@@ -11,7 +11,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
-public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, Transfer> {
+public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDbModelMappingTest<TransferTransaction, DbTransferTransaction> {
 
 	@Test
 	public void transferWithNoMessageCanBeMappedToDbModel() {
@@ -20,7 +20,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		final TransferTransaction transfer = context.createModel(null);
 
 		// Act:
-		final Transfer dbModel = context.mapping.map(transfer);
+		final DbTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
@@ -36,7 +36,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		final TransferTransaction transfer = context.createModel(new PlainMessage(messagePayload));
 
 		// Act:
-		final Transfer dbModel = context.mapping.map(transfer);
+		final DbTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
@@ -52,7 +52,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 		final TransferTransaction transfer = context.createModel(SecureMessage.fromEncodedPayload(context.sender, context.recipient, messagePayload));
 
 		// Act:
-		final Transfer dbModel = context.mapping.map(transfer);
+		final DbTransferTransaction dbModel = context.mapping.map(transfer);
 
 		// Assert:
 		context.assertDbModel(dbModel, transfer);
@@ -95,7 +95,7 @@ public class TransferModelToDbModelMappingTest extends AbstractTransferModelToDb
 					message);
 		}
 
-		public void assertDbModel(final Transfer dbModel, final TransferTransaction model) {
+		public void assertDbModel(final DbTransferTransaction dbModel, final TransferTransaction model) {
 			Assert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(this.dbRecipient));
 			Assert.assertThat(dbModel.getAmount(), IsEqual.equalTo(111111L));
 			Assert.assertThat(dbModel.getReferencedTransaction(), IsEqual.equalTo(0L));

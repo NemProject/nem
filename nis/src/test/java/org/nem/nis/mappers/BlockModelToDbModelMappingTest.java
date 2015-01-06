@@ -67,8 +67,8 @@ public class BlockModelToDbModelMappingTest {
 		// Assert:
 		assertBlockWithTransfersCanBeMappedToDbModel(
 				TestContext::addTransfer,
-				org.nem.nis.dbmodel.Block::getBlockTransfers,
-				Transfer.class);
+				org.nem.nis.dbmodel.Block::getBlockTransferTransactions,
+				DbTransferTransaction.class);
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class BlockModelToDbModelMappingTest {
 
 		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(9));
 
-		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransfers();
+		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(3));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2, transfer3)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2, 3)));
@@ -190,7 +190,7 @@ public class BlockModelToDbModelMappingTest {
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(6, 8)));
 		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
-		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(Transfer.class));
+		Mockito.verify(context.mapper, Mockito.times(3)).map(Mockito.any(), Mockito.eq(DbTransferTransaction.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(ImportanceTransfer.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigAggregateModificationTransaction.class));
 		Mockito.verify(context.mapper, Mockito.times(2)).map(Mockito.any(), Mockito.eq(DbMultisigTransaction.class));
@@ -212,13 +212,13 @@ public class BlockModelToDbModelMappingTest {
 		final TestContext context = new TestContext();
 		final Block block = context.createBlock(null);
 
-		final Transfer innerTransfer1 = new Transfer();
-		final Transfer innerTransfer2 = new Transfer();
+		final DbTransferTransaction innerDbTransferTransaction1 = new DbTransferTransaction();
+		final DbTransferTransaction innerDbTransferTransaction2 = new DbTransferTransaction();
 
 		final AbstractTransfer transfer0 = context.addTransfer(block);
-		final AbstractTransfer transfer1 = context.addMultisigTransfer(block, innerTransfer1);
+		final AbstractTransfer transfer1 = context.addMultisigTransfer(block, innerDbTransferTransaction1);
 		final AbstractTransfer transfer2 = context.addTransfer(block);
-		final AbstractTransfer transfer3 = context.addMultisigTransfer(block, innerTransfer2);
+		final AbstractTransfer transfer3 = context.addMultisigTransfer(block, innerDbTransferTransaction2);
 
 		// Act:
 		final org.nem.nis.dbmodel.Block dbModel = context.mapping.map(block);
@@ -229,7 +229,7 @@ public class BlockModelToDbModelMappingTest {
 		// Assert: db model transactions
 		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(4));
 
-		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransfers();
+		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
 		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2)));
 		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2)));
@@ -247,11 +247,11 @@ public class BlockModelToDbModelMappingTest {
 
 		// Assert: multisig inner transactions
 		// inner transaction does not belong to a block, so it won't have order id
-		Assert.assertThat(innerTransfer1.getBlkIndex(), IsEqual.equalTo(1));
-		Assert.assertThat(innerTransfer1.getBlock(), IsEqual.equalTo(dbModel));
+		Assert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(1));
+		Assert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
 
-		Assert.assertThat(innerTransfer2.getBlkIndex(), IsEqual.equalTo(3));
-		Assert.assertThat(innerTransfer2.getBlock(), IsEqual.equalTo(dbModel));
+		Assert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(3));
+		Assert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
 	}
 
 	//endregion
@@ -333,9 +333,9 @@ public class BlockModelToDbModelMappingTest {
 
 		//region add*
 
-		public Transfer addTransfer(final Block block) {
+		public DbTransferTransaction addTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
-			return this.addTransfer(block, transfer, new Transfer(), Transfer.class);
+			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
 		public ImportanceTransfer addImportanceTransfer(final Block block) {
@@ -354,18 +354,18 @@ public class BlockModelToDbModelMappingTest {
 			return this.addTransfer(block, multisigTransfer, new DbMultisigTransaction(), DbMultisigTransaction.class);
 		}
 
-		public DbMultisigTransaction addMultisigTransfer(final Block block, final Transfer dbInnerTransfer) {
+		public DbMultisigTransaction addMultisigTransfer(final Block block, final DbTransferTransaction dbInnerTransferTransaction) {
 			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
-			dbMultisigTransfer.setTransfer(dbInnerTransfer);
+			dbMultisigTransfer.setTransferTransaction(dbInnerTransferTransaction);
 
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
 			return this.addTransfer(block, multisigTransfer, dbMultisigTransfer, DbMultisigTransaction.class);
 		}
 
-		public Transfer addUnsupportedTransfer(final Block block) {
+		public DbTransferTransaction addUnsupportedTransfer(final Block block) {
 			final Transaction transfer = new MockTransaction();
-			return this.addTransfer(block, transfer, new Transfer(), Transfer.class);
+			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TDbTransfer addTransfer(

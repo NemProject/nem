@@ -13,7 +13,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.dbmodel.Transfer;
+import org.nem.nis.dbmodel.DbTransferTransaction;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.nis.test.*;
@@ -288,19 +288,19 @@ public class ChainControllerTest {
 		for (int i = 0; i < count; i++) {
 			final org.nem.nis.dbmodel.Block dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
 			dbBlock.setId((long)(height + i));
-			dbBlock.setBlockTransfers(Arrays.asList(createDbTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockTransferTransactions(Arrays.asList(createDbTransferWithTimeStamp(400 + i)));
 			dbBlockList.add(dbBlock);
 		}
 
 		return dbBlockList;
 	}
 
-	private static org.nem.nis.dbmodel.Transfer createDbTransferWithTimeStamp(final int timeStamp) {
+	private static DbTransferTransaction createDbTransferWithTimeStamp(final int timeStamp) {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final org.nem.nis.dbmodel.Account account = new org.nem.nis.dbmodel.Account();
 		account.setPrintableKey(address.getEncoded());
 		account.setPublicKey(address.getPublicKey());
-		final Transfer dbTransfer = new Transfer();
+		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
 		dbTransfer.setTransferHash(Utils.generateRandomHash());
 		dbTransfer.setSender(account);
 		dbTransfer.setSenderProof(Utils.generateRandomBytes(64));

@@ -8,7 +8,7 @@ import javax.persistence.*;
 import javax.persistence.Table;
 
 /**
- * Transfer Db entity.
+ * DbTransferTransaction Db entity.
  * <p>
  * Holds information about Transactions having type TransactionTypes.TRANSFER_TYPE
  * <p>
@@ -17,7 +17,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "transfers")
-public class Transfer extends AbstractBlockTransfer<Transfer> {
+public class DbTransferTransaction extends AbstractBlockTransfer<DbTransferTransaction> {
 	@ManyToOne
 	@Cascade({ CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "recipientId")
@@ -28,8 +28,8 @@ public class Transfer extends AbstractBlockTransfer<Transfer> {
 	private Integer messageType;
 	private byte[] messagePayload;
 
-	public Transfer() {
-		super(b -> b.getBlockTransfers());
+	public DbTransferTransaction() {
+		super(b -> b.getBlockTransferTransactions());
 	}
 
 	public Account getRecipient() {

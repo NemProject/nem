@@ -22,7 +22,7 @@ import java.util.Set;
 public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTransaction> {
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "transferId")
-	private Transfer transfer;
+	private DbTransferTransaction transferTransaction;
 
 	@OneToOne(optional = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "importanceTransferId")
@@ -40,12 +40,12 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 		super(b -> b.getBlockMultisigTransactions());
 	}
 
-	public Transfer getTransfer() {
-		return this.transfer;
+	public DbTransferTransaction getTransferTransaction() {
+		return this.transferTransaction;
 	}
 
-	public void setTransfer(final Transfer transfer) {
-		this.transfer = transfer;
+	public void setTransferTransaction(final DbTransferTransaction transferTransaction) {
+		this.transferTransaction = transferTransaction;
 	}
 
 	public ImportanceTransfer getImportanceTransfer() {

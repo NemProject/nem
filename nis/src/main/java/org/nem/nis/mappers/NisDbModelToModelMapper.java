@@ -24,13 +24,13 @@ public class NisDbModelToModelMapper {
 	}
 
 	/**
-	 * Maps a db model transfer to a model transfer.
+	 * Maps a db model dbTransferTransaction to a model dbTransferTransaction.
 	 *
-	 * @param transfer The db model transfer.
-	 * @return The model transfer.
+	 * @param dbTransferTransaction The db model dbTransferTransaction.
+	 * @return The model dbTransferTransaction.
 	 */
-	public Transaction map(final Transfer transfer) {
-		return this.mapper.map(transfer, TransferTransaction.class);
+	public Transaction map(final DbTransferTransaction dbTransferTransaction) {
+		return this.mapper.map(dbTransferTransaction, TransferTransaction.class);
 	}
 
 	/**

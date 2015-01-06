@@ -26,7 +26,7 @@ public class BlockExplorerMapper {
 				UnixTime.fromTimeInstant(new TimeInstant(block.getTimeStamp())),
 				block.getBlockHash());
 
-		block.getBlockTransfers().stream()
+		block.getBlockTransferTransactions().stream()
 				.map(transfer -> this.toExplorerViewModel(transfer))
 				.forEach(transfer -> viewModel.addTransaction(transfer));
 		return viewModel;
@@ -38,7 +38,7 @@ public class BlockExplorerMapper {
 	 * @param transfer The database transfer.
 	 * @return The explorer transfer view model.
 	 */
-	public ExplorerTransferViewModel toExplorerViewModel(final Transfer transfer) {
+	public ExplorerTransferViewModel toExplorerViewModel(final DbTransferTransaction transfer) {
 		return new ExplorerTransferViewModel(
 				TransactionTypes.TRANSFER,
 				Amount.fromMicroNem(transfer.getFee()),

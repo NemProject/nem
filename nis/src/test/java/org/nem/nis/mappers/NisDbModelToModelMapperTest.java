@@ -32,16 +32,16 @@ public class NisDbModelToModelMapperTest {
 	public void mapTransferTransactionDelegatesToInnerMapper() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transfer dbTransfer = new Transfer();
+		final DbTransferTransaction dbTransferTransaction = new DbTransferTransaction();
 		final TransferTransaction transfer = Mockito.mock(TransferTransaction.class);
-		Mockito.when(context.mapper.map(dbTransfer, TransferTransaction.class)).thenReturn(transfer);
+		Mockito.when(context.mapper.map(dbTransferTransaction, TransferTransaction.class)).thenReturn(transfer);
 
 		// Act:
-		final Transaction result = context.nisMapper.map(dbTransfer);
+		final Transaction result = context.nisMapper.map(dbTransferTransaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(transfer));
-		Mockito.verify(context.mapper, Mockito.only()).map(dbTransfer, TransferTransaction.class);
+		Mockito.verify(context.mapper, Mockito.only()).map(dbTransferTransaction, TransferTransaction.class);
 	}
 
 	@Test
@@ -73,8 +73,8 @@ public class NisDbModelToModelMapperTest {
 
 	private static void setTransactionsForMapTransactionsTests(final TestContext context) {
 		context.setTransactions(
-				Transfer::new,
-				context.dbBlock::setBlockTransfers,
+				DbTransferTransaction::new,
+				context.dbBlock::setBlockTransferTransactions,
 				TransferTransaction.class,
 				3);
 		context.setTransactions(

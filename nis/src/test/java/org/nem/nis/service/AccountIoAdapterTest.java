@@ -273,12 +273,12 @@ public class AccountIoAdapterTest {
 
 		public void addTransaction(final int height, final int transactionId, final int amount) {
 			final org.nem.nis.dbmodel.Block block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
-			final Transfer transfer = this.createTransfer(amount);
-			transfer.setId((long)transactionId);
-			this.pairs.add(new TransferBlockPair(transfer, block));
+			final DbTransferTransaction dbTransferTransaction = this.createTransfer(amount);
+			dbTransferTransaction.setId((long)transactionId);
+			this.pairs.add(new TransferBlockPair(dbTransferTransaction, block));
 		}
 
-		private Transfer createTransfer(final int amount) {
+		private DbTransferTransaction createTransfer(final int amount) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient, Amount.fromNem(amount), null);
@@ -288,7 +288,7 @@ public class AccountIoAdapterTest {
 			this.addAccount(recipient);
 
 			return MapperUtils.createModelToDbModelMapper(new MockAccountDao())
-					.map(transaction, Transfer.class);
+					.map(transaction, DbTransferTransaction.class);
 		}
 
 		private void addAccount(final Account account) {
