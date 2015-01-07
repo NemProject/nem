@@ -15,6 +15,7 @@ import org.nem.nis.validators.*;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
@@ -1246,7 +1247,7 @@ public class UnconfirmedTransactionsTest {
 	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
 		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
 		return new TestContext(
-				factory.createSingleBuilder(stateCache),
+				() -> factory.createSingleBuilder(stateCache),
 				null,
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
 				stateCache);
@@ -1272,7 +1273,6 @@ public class UnconfirmedTransactionsTest {
 
 	// TODO 20150106 J-G: should we share the same test context between this class and the multisig variant?
 	private static class TestContext {
-		private final AggregateSingleTransactionValidatorBuilder singleTransactionValidatorBuilder;
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
@@ -1295,7 +1295,7 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(
-				final AggregateSingleTransactionValidatorBuilder singleTransactionBuilder,
+				final Supplier<AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier,
 				final SingleTransactionValidator singleValidator,
 				final BatchTransactionValidator batchValidator,
 				final ReadOnlyAccountStateCache accountStateCache) {
@@ -1307,14 +1307,17 @@ public class UnconfirmedTransactionsTest {
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
-			if (singleTransactionBuilder == null) {
-				this.singleTransactionValidatorBuilder = new AggregateSingleTransactionValidatorBuilder();
-				this.singleTransactionValidatorBuilder.add(this.singleValidator);
+			if (singleTransactionBuilderSupplier == null) {
+				Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
+						.then((invocationOnMock) -> {
+							final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
+							builder.add(this.singleValidator);
+							return builder;
+						});
 			} else {
-				this.singleTransactionValidatorBuilder = singleTransactionBuilder;
+				Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
+						.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
 			}
-
-			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(this.singleTransactionValidatorBuilder);
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(

@@ -200,16 +200,15 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		// TODO 2050102 G-* : should this actually succeed?
-		// TODO 20150103 J-G : probably not
-		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.NEUTRAL));
 
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
 
 	// TODO 20150103 J-G : how is this different from the previous?
+	// TODO 20150107 G-J : name was invalid
 	@Test
-	public void filterRemovesMultisigModificationTransactionThatHasSameInnerTransaction() {
+	public void filterRemovesMultisigModificationTransactionThatHasMultipleMultisigAggregateModificationTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.makeCosignatory(context.cosigner1, context.multisig);
@@ -230,7 +229,7 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
@@ -239,7 +238,6 @@ public class UnconfirmedTransactionsMultisigTest {
 		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		private final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(this.timeProvider);
 		private final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
-		private final AggregateSingleTransactionValidatorBuilder singleTransactionValidatorBuilder;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyAccountStateCache accountStateCache;
@@ -250,14 +248,14 @@ public class UnconfirmedTransactionsMultisigTest {
 		private final Account cosigner2 = Utils.generateRandomAccount();
 
 		private TestContext() {
-			this.singleTransactionValidatorBuilder = this.factory.createSingleBuilder(this.stateCache);
 			this.batchValidator = this.factory.createBatch(Mockito.mock(DefaultHashCache.class));
 			this.accountStateCache = this.stateCache;
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
-			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(this.singleTransactionValidatorBuilder);
+			// need to actually create for every invocation and not create once
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).then((invocationOnMock) -> this.factory.createSingleBuilder(this.stateCache));
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(CURRENT_SYSTEM_TIME);
 

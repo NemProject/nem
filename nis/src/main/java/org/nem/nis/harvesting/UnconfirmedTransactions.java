@@ -24,6 +24,7 @@ public class UnconfirmedTransactions {
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Transaction> pendingTransactions = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Hash, Boolean> childTransactions = new ConcurrentHashMap<>();
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
@@ -174,7 +175,7 @@ public class UnconfirmedTransactions {
 	private ValidationResult add(final Transaction transaction, final boolean execute) {
 		synchronized (this.lock) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, transaction)) {
+			if (this.hasTransactionInCache(transaction, transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, transaction)) {
 				return ValidationResult.NEUTRAL;
 			}
 
@@ -204,7 +205,7 @@ public class UnconfirmedTransactions {
 			transaction.execute(this.transferObserver);
 		}
 
-		this.transactions.put(transactionHash, transaction);
+		this.addTransactionToCache(transaction, transactionHash);
 		return ValidationResult.SUCCESS;
 	}
 
@@ -252,16 +253,17 @@ public class UnconfirmedTransactions {
 	public boolean remove(final Transaction transaction) {
 		synchronized (this.lock) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			if (!this.transactions.containsKey(transactionHash)) {
+			if (!this.hasTransactionInCache(transaction, transactionHash)) {
 				return false;
 			}
 
 			transaction.undo(this.transferObserver);
 
-			this.transactions.remove(transactionHash);
+			this.removeTransactionFromCache(transaction, transactionHash);
 			return true;
 		}
 	}
+
 
 	/**
 	 * Removes all transactions in the specified block.
@@ -415,9 +417,31 @@ public class UnconfirmedTransactions {
 		}
 	}
 
+
+	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
+		return this.transactions.containsKey(transactionHash) ||
+				transaction.getChildTransactions().stream()
+						.anyMatch(t -> this.childTransactions.containsKey(HashUtils.calculateHash(t)));
+	}
+
+	private void addTransactionToCache(Transaction transaction, Hash transactionHash) {
+		for (final Transaction childTransaction : transaction.getChildTransactions()) {
+			this.childTransactions.put(HashUtils.calculateHash(childTransaction), true);
+		}
+		this.transactions.put(transactionHash, transaction);
+	}
+
+	private void removeTransactionFromCache(Transaction transaction, Hash transactionHash) {
+		for (final Transaction childTransaction : transaction.getChildTransactions()) {
+			this.childTransactions.remove(HashUtils.calculateHash(childTransaction));
+		}
+		this.transactions.remove(transactionHash);
+	}
+
 	private void rebuildCache(final List<Transaction> transactions) {
 		this.transactions.clear();
 		this.pendingTransactions.clear();
+		this.childTransactions.clear();
 		this.unconfirmedBalances.clearCache();
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
