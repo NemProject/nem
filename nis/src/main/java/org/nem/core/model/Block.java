@@ -6,6 +6,7 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * A NEM block.
@@ -99,6 +100,7 @@ public class Block extends VerifiableEntity {
 	 */
 	public Amount getTotalFee() {
 		final long rawTotalFee = this.transactions.stream()
+				.flatMap(t -> Stream.concat(Stream.of(t), t.getChildTransactions().stream()))
 				.map(tx -> tx.getFee().getNumMicroNem())
 				.reduce(0L, Long::sum);
 		return Amount.fromMicroNem(rawTotalFee);
