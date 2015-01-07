@@ -135,8 +135,10 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	public Collection<Transaction> getChildTransactions() {
-		// TODO 20141220 J-G: should review / test this
-		return Arrays.asList(this.otherTransaction);
+		// we want validators to run on both inner transaction and all signatures
+		final List<Transaction> result = new ArrayList<>(this.getCosignerSignatures());
+		result.add(this.otherTransaction);
+		return result;
 	}
 
 	@Override

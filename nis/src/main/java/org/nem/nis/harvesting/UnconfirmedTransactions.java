@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A collection of unconfirmed transactions.
@@ -22,7 +23,7 @@ public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Hash, Transaction> pendingTransactions = new ConcurrentHashMap<>();
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
@@ -173,7 +174,7 @@ public class UnconfirmedTransactions {
 	private ValidationResult add(final Transaction transaction, final boolean execute) {
 		synchronized (this.lock) {
 			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, true)) {
+			if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, transaction)) {
 				return ValidationResult.NEUTRAL;
 			}
 
@@ -231,7 +232,10 @@ public class UnconfirmedTransactions {
 
 		if (!blockVerification) {
 			// need to be the last one
-			builder.add(new MultisigSignatureValidator(accountStateCache, () -> this.transactions.values()));
+			builder.add(new MultisigSignatureValidator(accountStateCache,
+					// we need pendingTransactions see UnconfirmedTransactionsMultisigTest.multisigTransactionWithSignatureIsAccepted
+					// TODO 20150107 G-G,J: any nicer way to do it? maybe supplier could return stream?
+					() -> Stream.concat(this.pendingTransactions.values().stream(), this.transactions.values().stream()).collect(Collectors.toList())));
 		} else {
 			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
 		}

@@ -1244,7 +1244,7 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
-		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
+		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
 		return new TestContext(
 				factory.createSingleBuilder(stateCache),
 				null,

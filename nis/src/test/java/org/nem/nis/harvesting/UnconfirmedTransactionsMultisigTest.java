@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
@@ -15,21 +16,21 @@ import org.nem.nis.validators.*;
 
 import java.util.Arrays;
 
+/**
+ * Those test are similar to those that can be found in BlockChainServices.
+ * The point is to have end-to-end tests, to make sure that:
+ * a) BlockChainServices rejects invalid blocks (that could be generated with altered UT)
+ * b) UT does not let generate invalid blocks (would be bad for harvesters)
+ */
 public class UnconfirmedTransactionsMultisigTest {
+	final static TimeInstant CURRENT_SYSTEM_TIME = new TimeInstant(10_000);
+	final static TimeInstant currentTime = CURRENT_SYSTEM_TIME.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
 
-	// TODO 20150103 J-G: tests seem fine, but also seems like you're mostly testing the same stuff in blockchainservices; which are getting the validators
-	// > from the same place
-	// TODO 20150105 G-J: that's actually the point, it happend at least few times, that
-	// a) we've generated a block that couldn't pass the validation
-	// b) were checking something only in UnconfirmedTransactions
-	// I'd like to avoid that, that's why I'd like to have end-to-end test in both UT and BCS
-	// TODO 20150105 J-G: good point; should we look into merging those tests somehow?
-
+	// TODO 20150105 J-G: should we look into merging those tests somehow?
 	@Test
 	public void multisigTransactionIssuedNotByCosignatoryIsRejected() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TimeInstant currentTime = new TimeInstant(11);
 
 		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
@@ -48,7 +49,6 @@ public class UnconfirmedTransactionsMultisigTest {
 	public void transferTransactionIssuedByMultisigIsRejected() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TimeInstant currentTime = new TimeInstant(11);
 
 		final Transaction transaction = new TransferTransaction(currentTime, context.multisig, context.recipient, Amount.fromNem(7), null);
 		transaction.setDeadline(currentTime.addSeconds(1));
@@ -68,7 +68,6 @@ public class UnconfirmedTransactionsMultisigTest {
 	public void getTransactionsForNewBlockDoesNotReturnMultisigTransactionIfMultisigSignaturesAreNotPresent() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TimeInstant currentTime = new TimeInstant(11);
 
 		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
@@ -96,7 +95,6 @@ public class UnconfirmedTransactionsMultisigTest {
 	public void addingMultisigSignatureAddsItToMultisigTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TimeInstant currentTime = new TimeInstant(11);
 
 		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
@@ -126,10 +124,65 @@ public class UnconfirmedTransactionsMultisigTest {
 	}
 
 	@Test
+	public void properSignatureIsAccepted() {
+		assertSignatureAcceptance(true, false, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void expiredSignatureIsNotAccepted() {
+		assertSignatureAcceptance(false, false, ValidationResult.FAILURE_PAST_DEADLINE);
+	}
+
+	@Test
+	public void multisigTransactionWithSignatureIsAccepted() {
+		assertSignatureAcceptance(true, true, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void multisigTransactionWithExpiredSignatureIsNotAccepted() {
+		assertSignatureAcceptance(false, true, ValidationResult.FAILURE_PAST_DEADLINE);
+	}
+
+	private static void assertSignatureAcceptance(boolean nonExpiredSignature, boolean signatureIsPartOfMultisig, ValidationResult validationResult) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.makeCosignatory(context.cosigner1, context.multisig);
+		context.makeCosignatory(context.cosigner2, context.multisig);
+
+		context.setBalance(context.multisig, Amount.fromNem(10));
+		context.setBalance(context.cosigner1, Amount.fromNem(101));
+		context.setBalance(context.cosigner2, Amount.fromNem(10));
+
+		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
+		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(currentTime, t1);
+
+		final ValidationResult result1 = signatureIsPartOfMultisig ? null : context.transactions.addExisting(multisigTransaction);
+
+		final TimeInstant signatureTime = nonExpiredSignature ? currentTime : CURRENT_SYSTEM_TIME.addSeconds(-2);
+		final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(signatureTime, context.cosigner2, HashUtils.calculateHash(t1));
+		signature.setDeadline(signature.getTimeStamp().addSeconds(1));
+		signature.sign();
+
+		if (signatureIsPartOfMultisig) {
+			multisigTransaction.addSignature(signature);
+		}
+
+		// Act:
+		final ValidationResult result2 = signatureIsPartOfMultisig ?
+				context.transactions.addExisting(multisigTransaction) :
+				context.transactions.addExisting(signature);
+
+		// Assert:
+		if (! signatureIsPartOfMultisig) {
+			Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
+		}
+		Assert.assertThat(result2, IsEqual.equalTo(validationResult));
+	}
+	
+	@Test
 	public void filterRemovesMultisigTransactionThatHasSameInnerTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TimeInstant currentTime = new TimeInstant(11);
 		context.makeCosignatory(context.cosigner1, context.multisig);
 
 		final Transaction t1 = context.createTransferTransaction(currentTime, Amount.fromNem(7));
@@ -159,7 +212,6 @@ public class UnconfirmedTransactionsMultisigTest {
 	public void filterRemovesMultisigModificationTransactionThatHasSameInnerTransaction() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final TimeInstant currentTime = new TimeInstant(11);
 		context.makeCosignatory(context.cosigner1, context.multisig);
 
 		final Transaction t1 = context.createMultisigAddTransaction(currentTime, context.cosigner2);
@@ -184,13 +236,13 @@ public class UnconfirmedTransactionsMultisigTest {
 	}
 
 	private static class TestContext {
-		private final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
+		private final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
+		private final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(this.timeProvider);
 		private final AccountStateCache stateCache = Mockito.mock(AccountStateCache.class);
 		private final AggregateSingleTransactionValidatorBuilder singleTransactionValidatorBuilder;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyAccountStateCache accountStateCache;
-		private final TimeProvider timeProvider;
 
 		private final Account multisig = Utils.generateRandomAccount();
 		private final Account recipient = Utils.generateRandomAccount();
@@ -201,14 +253,13 @@ public class UnconfirmedTransactionsMultisigTest {
 			this.singleTransactionValidatorBuilder = this.factory.createSingleBuilder(this.stateCache);
 			this.batchValidator = this.factory.createBatch(Mockito.mock(DefaultHashCache.class));
 			this.accountStateCache = this.stateCache;
-			this.timeProvider = Mockito.mock(TimeProvider.class);
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
 			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).thenReturn(this.singleTransactionValidatorBuilder);
 
-			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
+			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(CURRENT_SYSTEM_TIME);
 
 			this.addState(this.multisig);
 			this.addState(this.recipient);

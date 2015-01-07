@@ -34,7 +34,7 @@ public class BlockChainContext {
 	private final Account nemesisAccount;
 	private final BlockScorer scorer;
 	private final SecureRandom random;
-	private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
+	private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
 	private final BlockValidatorFactory blockValidatorFactory = NisUtils.createBlockValidatorFactory();
 	private final BlockTransactionObserverFactory blockTransactionObserverFactory = new BlockTransactionObserverFactory();
 
