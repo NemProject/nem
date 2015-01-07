@@ -196,16 +196,6 @@ public class UnconfirmedTransactionsTest {
 
 	@Test
 	public void cannotAddChildTransactionIfParentHasBeenAdded() {
-		assertAddParendAndChild(true);
-	}
-
-	@Test
-	public void cannotAddParentTransactionIfChildHasBeenAdded() {
-		assertAddParendAndChild(false);
-	}
-
-	// TODO 20150107 J-G: should rename this to something else
-	private static void assertAddParendAndChild(boolean firstAddParent) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account sender = context.addAccount(Amount.fromNem(100));
@@ -214,10 +204,29 @@ public class UnconfirmedTransactionsTest {
 		final MockTransaction outer = new MockTransaction(sender, 8);
 		outer.setChildTransactions(Arrays.asList(inner));
 
-		context.signAndAddExisting(firstAddParent ? outer : inner);
+		context.signAndAddExisting(outer);
 
 		// Act
-		final ValidationResult result = context.signAndAddNew(firstAddParent ? inner : outer);
+		final ValidationResult result = context.signAndAddNew(inner);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void cannotAddParentTransactionIfChildHasBeenAdded() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		final Transaction inner = new MockTransaction(sender, 7);
+		final MockTransaction outer = new MockTransaction(sender, 8);
+		outer.setChildTransactions(Arrays.asList(inner));
+
+		context.signAndAddExisting(inner);
+
+		// Act
+		final ValidationResult result = context.signAndAddNew(outer);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
