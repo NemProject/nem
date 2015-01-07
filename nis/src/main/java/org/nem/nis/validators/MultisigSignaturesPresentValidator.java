@@ -6,13 +6,22 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-// NOTE: this validator is used only during block creation, or when receiving block
+/**
+ * A transaction validator that validates that a multisig transaction has all required signatures.
+ * <br/>
+ * This validator should only be used during block creation, or when receiving a block.
+ */
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
 
+	/**
+	 * Creates a new validator.
+	 *
+	 * @param stateCache The account state cache.
+	 */
 	public MultisigSignaturesPresentValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
@@ -27,62 +36,49 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 			return ValidationResult.FAILURE_ENTITY_UNUSABLE;
 		}
 
-		return this.validate((MultisigTransaction)transaction, context);
+		return this.validate((MultisigTransaction)transaction);
 	}
 
-	private ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
+	private ValidationResult validate(final MultisigTransaction transaction) {
 		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
-		// TODO 20150103 J-G: why are you special casing this (unlikely) case?
-		// TODO 20150106 G-J: to skip all the unneeded processing
-		if (multisigAddress.getMultisigLinks().getCosignatories().size() == 1) {
-			return ValidationResult.SUCCESS;
-		}
-
-		final Address accountForRemoval = getRemovedAddress(transaction);
 
 		final Hash transactionHash = transaction.getOtherTransactionHash();
-		// this loop could be done using reduce, but I'm leaving it like this for readability
-		// TODO: this probably should be done differently, as right now it allows more MultisigSignatures, than there are actual cosigners
-		for (final Address cosignerAddress : multisigAddress.getMultisigLinks().getCosignatories()) {
-			// TODO 20150103 J-G: what is the purpose of this check
-			// TODO 20150106 G-J:MultisigTransaction itself is issued by one of cosigners and therefore it is counted as one of signatures
-			// > it would be dumb to require issuer to attach Signature too...
-			if (cosignerAddress.equals(transaction.getSigner().getAddress())) {
-				continue;
+		final HashSet<Address> signerAddresses = new HashSet<>();
+		signerAddresses.add(transaction.getSigner().getAddress());
+		for (final MultisigSignatureTransaction signature : transaction.getCosignerSignatures()) {
+			if (!transactionHash.equals(signature.getOtherTransactionHash())) {
+				return ValidationResult.FAILURE_MULTISIG_MISMATCHED_SIGNATURE;
 			}
 
-			if (cosignerAddress.equals(accountForRemoval)) {
-				continue;
-			}
-
-			// TODO 20150103 J-G: you can probably check t.getOtherTransactionHash().equals(transactionHash) outside of this loop
-			// TODO 20150106 G-J: o0? this checks if hashes in signatures actually match current TX
-			final boolean hasCosigner = transaction.getCosignerSignatures().stream()
-					.anyMatch(
-							t -> t.getOtherTransactionHash().equals(transactionHash) &&
-									t.getSigner().getAddress().equals(cosignerAddress)
-					);
-
-			if (!hasCosigner) {
-				return ValidationResult.FAILURE_MULTISIG_MISSING_COSIGNERS;
-			}
+			signerAddresses.add(signature.getSigner().getAddress());
 		}
 
-		return ValidationResult.SUCCESS;
+		final List<Address> accountsForRemoval = getRemovedAddresses(transaction);
+		if (accountsForRemoval.size() > 1) {
+			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
+		}
+
+		final Address accountForRemoval = accountsForRemoval.isEmpty() ? null : accountsForRemoval.get(0);
+		final Set<Address> expectedSignerAddresses = multisigAddress.getMultisigLinks().getCosignatories();
+		if (null != accountForRemoval && expectedSignerAddresses.size() > 1) {
+			signerAddresses.remove(accountForRemoval);
+			expectedSignerAddresses.remove(accountForRemoval);
+		}
+
+		return signerAddresses.equals(expectedSignerAddresses)
+				? ValidationResult.SUCCESS
+				: ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS;
 	}
 
-	private static Address getRemovedAddress(final MultisigTransaction transaction) {
-		Address accountForRemoval = null;
-		if (transaction.getOtherTransaction().getType() == TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION) {
-			final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();
-			final List<Address> removal = modificationTransaction.getModifications().stream()
-					.filter(m -> m.getModificationType() == MultisigModificationType.Del)
-					.map(m -> m.getCosignatory().getAddress())
-					.collect(Collectors.toList());
-			if (removal.size() == 1) {
-				accountForRemoval = removal.get(0);
-			}
+	private static List<Address> getRemovedAddresses(final MultisigTransaction transaction) {
+		if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION != transaction.getOtherTransaction().getType()) {
+			return Collections.emptyList();
 		}
-		return accountForRemoval;
+
+		final MultisigAggregateModificationTransaction modificationTransaction = (MultisigAggregateModificationTransaction)transaction.getOtherTransaction();
+		return modificationTransaction.getModifications().stream()
+				.filter(m -> m.getModificationType() == MultisigModificationType.Del)
+				.map(m -> m.getCosignatory().getAddress())
+				.collect(Collectors.toList());
 	}
 }

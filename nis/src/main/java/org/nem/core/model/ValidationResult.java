@@ -118,9 +118,9 @@ public enum ValidationResult {
 	FAILURE_MULTISIG_NOT_A_COSIGNER(30),
 
 	/**
-	 * Validation failed because not enough cosignatories were present.
+	 * Validation failed because the cosignatories attached to a multisig transaction were invalid.
 	 */
-	FAILURE_MULTISIG_MISSING_COSIGNERS(31),
+	FAILURE_MULTISIG_INVALID_COSIGNERS(31),
 
 	/**
 	 * Validation failed because a multisig signature was not associated with any known multisig transaction.
@@ -135,7 +135,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because signer is already a cosigner of given multisig account.
 	 */
-	FAILURE_MULTISIG_ALREADY_A_COSIGNER(34);
+	FAILURE_MULTISIG_ALREADY_A_COSIGNER(34),
+
+	/**
+	 * Validation failed because a multisig signature is attached to an incorrect multisig transaction.
+	 */
+	FAILURE_MULTISIG_MISMATCHED_SIGNATURE(35);
 
 	private final int value;
 
