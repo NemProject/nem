@@ -194,6 +194,34 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(2));
 	}
 
+	@Test
+	public void cannotAddChildTransactionIfParentHasBeenAdded() {
+		assertAddParendAndChild(true);
+	}
+
+	@Test
+	public void cannotAddParentTransactionIfChildHasBeenAdded() {
+		assertAddParendAndChild(false);
+	}
+
+	private static void assertAddParendAndChild(boolean firstAddParent) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		final Transaction inner = new MockTransaction(sender, 7);
+		final MockTransaction outer = new MockTransaction(sender, 8);
+		outer.setChildTransactions(Arrays.asList(inner));
+
+		context.signAndAddExisting(firstAddParent ? outer : inner);
+
+		// Act
+		final ValidationResult result = context.signAndAddNew(firstAddParent ? inner : outer);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
 	//region validation
 
 	@Test

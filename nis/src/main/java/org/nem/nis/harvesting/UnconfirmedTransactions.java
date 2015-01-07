@@ -420,8 +420,12 @@ public class UnconfirmedTransactions {
 
 	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
 		return this.transactions.containsKey(transactionHash) ||
+				this.childTransactions.containsKey(transactionHash) ||
 				transaction.getChildTransactions().stream()
-						.anyMatch(t -> this.childTransactions.containsKey(HashUtils.calculateHash(t)));
+						.anyMatch(t -> {
+							final Hash key = HashUtils.calculateHash(t);
+							return this.childTransactions.containsKey(key) || this.transactions.containsKey(key);
+						});
 	}
 
 	private void addTransactionToCache(Transaction transaction, Hash transactionHash) {
