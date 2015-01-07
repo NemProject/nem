@@ -103,15 +103,46 @@ public class BlockDaoTest {
 	}
 
 	@Test
+	public void savingBlockSavesMultisigTransferTransaction() {
+		// Arrange:
+		final Account signer = Utils.generateRandomAccount();
+		final Account cosignatory = Utils.generateRandomAccount();
+		final Account multisig = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, cosignatory, multisig, recipient);
+		final MultisigTransaction transaction = this.prepareMultisigTransferTransaction(signer, multisig, cosignatory, recipient);
+
+		final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 133, 0);
+		emptyBlock.addTransaction(transaction);
+		emptyBlock.sign();
+		final DbBlock entity = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
+
+		// Act:
+		this.blockDao.save(entity);
+
+		Assert.assertThat(entity.getId(), notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
+		// TODO 20150107 G-J : I haven't noticed that you've changed the way mapper works...
+		//Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(0));
+		Assert.assertThat(entity.getBlockMultisigTransactions().size(), equalTo(1));
+	}
+
+	@Test
 	public void savingBlockSavesTransactions() {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final Account remote = Utils.generateRandomAccount();
-		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote);
+		final Account multisig = Utils.generateRandomAccount();
+		final Account dummy = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, remote, multisig, dummy);
+		final MultisigTransaction multisigTransaction = this.prepareMultisigTransferTransaction(signer, multisig, remote, dummy);
 		final MultisigAggregateModificationTransaction multisigAggregateModificationTransaction = this.prepareMultisigModificationTransaction(signer, remote);
 		final ImportanceTransferTransaction importanceTransfer = this.prepareImportanceTransferTransaction(signer, remote, true);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(signer, remote, 10);
 		final org.nem.core.model.Block block = this.createTestEmptyBlock(signer, 133, 0);
+		block.addTransaction(multisigTransaction);
 		block.addTransaction(multisigAggregateModificationTransaction);
 		block.addTransaction(importanceTransfer);
 		block.addTransaction(transferTransaction);
@@ -765,7 +796,7 @@ public class BlockDaoTest {
 	private TransferTransaction prepareTransferTransaction(final Account sender, final Account recipient, final long amount) {
 		// Arrange:
 		final TransferTransaction transferTransaction = new TransferTransaction(
-				new TimeInstant(0),
+				TimeInstant.ZERO,
 				sender,
 				recipient,
 				Amount.fromNem(amount),
@@ -778,7 +809,7 @@ public class BlockDaoTest {
 	private ImportanceTransferTransaction prepareImportanceTransferTransaction(final Account sender, final Account remote, final boolean isTransfer) {
 		// Arrange:
 		final ImportanceTransferTransaction importanceTransferTransaction = new ImportanceTransferTransaction(
-				new TimeInstant(0),
+				TimeInstant.ZERO,
 				sender,
 				isTransfer ? ImportanceTransferTransaction.Mode.Activate : ImportanceTransferTransaction.Mode.Deactivate,
 				remote
@@ -793,12 +824,22 @@ public class BlockDaoTest {
 		// Arrange:
 		final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatory));
 		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
-				new TimeInstant(0),
+				TimeInstant.ZERO,
 				sender,
 				modifications
 		);
 		transaction.sign();
 		return transaction;
+	}
+
+	private MultisigTransaction prepareMultisigTransferTransaction(final Account issuer, final Account multisig, final Account cosignatory, final Account recipient) {
+		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(123), null);
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosignatory, HashUtils.calculateHash(transaction));
+		signatureTransaction.sign();
+		final MultisigTransaction multisigTransaction = new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
+		multisigTransaction.sign();
+		multisigTransaction.addSignature(signatureTransaction);
+		return multisigTransaction;
 	}
 
 	private List<Hash> createBlocksInDatabase(final int numBlocks) {
