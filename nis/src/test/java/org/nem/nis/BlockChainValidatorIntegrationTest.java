@@ -7,7 +7,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.core.time.SystemTimeProvider;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
@@ -379,7 +378,7 @@ public class BlockChainValidatorIntegrationTest {
 		public final SingleTransactionValidator transactionValidator;
 
 		public BlockChainValidatorFactory() {
-			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
+			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			final AggregateSingleTransactionValidatorBuilder builder = transactionValidatorFactory.createSingleBuilder(this.accountStateCache);
 			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
 			this.transactionValidator = builder.build();

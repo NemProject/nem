@@ -24,6 +24,7 @@ import java.util.Arrays;
  */
 public class UnconfirmedTransactionsMultisigTest {
 	final static TimeInstant CURRENT_SYSTEM_TIME = new TimeInstant(10_000);
+	// TODO 20150107 J-G: should rename this to something else
 	final static TimeInstant currentTime = CURRENT_SYSTEM_TIME.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME - 1);
 
 	// TODO 20150105 J-G: should we look into merging those tests somehow?
@@ -143,6 +144,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		assertSignatureAcceptance(false, true, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
+	// TODO 20150107 J-G: should split up into two functions
 	private static void assertSignatureAcceptance(boolean nonExpiredSignature, boolean signatureIsPartOfMultisig, ValidationResult validationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -205,8 +207,6 @@ public class UnconfirmedTransactionsMultisigTest {
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}
 
-	// TODO 20150103 J-G : how is this different from the previous?
-	// TODO 20150107 G-J : name was invalid
 	@Test
 	public void filterRemovesMultisigModificationTransactionThatHasMultipleMultisigAggregateModificationTransactions() {
 		// Arrange:

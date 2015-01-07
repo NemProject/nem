@@ -204,6 +204,7 @@ public class UnconfirmedTransactionsTest {
 		assertAddParendAndChild(false);
 	}
 
+	// TODO 20150107 J-G: should rename this to something else
 	private static void assertAddParendAndChild(boolean firstAddParent) {
 		// Arrange:
 		final TestContext context = new TestContext();

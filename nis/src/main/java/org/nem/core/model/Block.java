@@ -99,6 +99,7 @@ public class Block extends VerifiableEntity {
 	 * @return The total amount of fees of all transactions stored in this block.
 	 */
 	public Amount getTotalFee() {
+		// TODO 20150107 J-G: should add a test for this (includes inner correct total fee)
 		final long rawTotalFee = this.transactions.stream()
 				.flatMap(t -> Stream.concat(Stream.of(t), t.getChildTransactions().stream()))
 				.map(tx -> tx.getFee().getNumMicroNem())

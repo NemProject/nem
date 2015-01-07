@@ -235,7 +235,16 @@ public class NisUtils {
 	 * Creates a (mostly real) transaction validator factory.
 	 *
 	 * @return The factory.
-	 * @param timeProvider
+	 */
+	public static TransactionValidatorFactory createTransactionValidatorFactory() {
+		return createTransactionValidatorFactory(new SystemTimeProvider());
+	}
+
+	/**
+	 * Creates a (mostly real) transaction validator factory.
+	 *
+	 * @param timeProvider The time provider to use.
+	 * @return The factory.
 	 */
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
 		return new TransactionValidatorFactory(
