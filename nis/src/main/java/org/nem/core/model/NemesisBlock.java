@@ -20,16 +20,16 @@ public class NemesisBlock extends Block {
 	/**
 	 * The amount of NEM in the nemesis block.
 	 */
-	public final static Amount AMOUNT = Amount.fromNem(4000000000L);
+	public final static Amount AMOUNT = Amount.fromNem(8000000000L);
 
 	/**
 	 * The nemesis generation hash.
 	 */
 	public final static Hash GENERATION_HASH = Hash.fromHexString(
-			"cd8a687ff49984ccc87f2a22219acb76fe2a3c6cdcf20863bae3252c2a0dc20f");
+			"16ed3d69d3ca67132aace4405aa122e5e041e58741a4364255b15201f5aaf6e4");
 
 	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
-			"8cbaf60f67f35e06dbc1229889fc4629aebbdecaa0e3242cf3a1f612f56f7c16");
+			"e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f");
 
 	private final static String NEMESIS_BLOCK_FILE = "nemesis-block.json";
 
