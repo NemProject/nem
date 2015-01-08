@@ -180,13 +180,13 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", (v) -> {});
-		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", (v) -> {});
+		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
+		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigAggregateModificationTransaction",
 				"blockMultisigAggregateModificationTransactions",
-				(transactionsToDelete) -> {
+				transactionsToDelete -> {
 					final Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
@@ -194,7 +194,16 @@ public class BlockDaoImpl implements BlockDao {
 				});
 
 		// must be last
-		this.dropTransfers(blockHeight, "DbMultisigTransaction", "blockMultisigTransactions", (v) -> {});
+		this.dropTransfers(
+				blockHeight,
+				"DbMultisigTransaction",
+				"blockMultisigTransactions",
+				transactionsToDelete -> {
+					final Query preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransactionId.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+				});
 
 		final Query query = this.getCurrentSession()
 				.createQuery("delete from DbBlock a where a.height > :height")
