@@ -104,6 +104,7 @@ public class TransactionController {
 	private NemRequestResult push(final Transaction transaction) {
 		final ValidationResult result = this.pushService.pushTransaction(transaction, null);
 
+		// TODO 20150108 J-G - i guess this is just for logging?
 		if ((transaction instanceof MultisigTransaction) && (result == ValidationResult.SUCCESS)) {
 			return new NemRequestResult(
 					NemRequestResult.TYPE_VALIDATION_RESULT,

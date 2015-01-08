@@ -90,7 +90,6 @@ public class PruningObserverTest {
 	@Test
 	public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearOutlinkBlockHistory() {
 		// Arrange:
-		// TODO: Replace with new constant when launching.
 		final long outlinkHistory = OUTLINK_BLOCK_HISTORY;
 		final long historyDifference = OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY;
 

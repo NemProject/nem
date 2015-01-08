@@ -13,13 +13,8 @@ public class TransactionDeadlineBlockValidatorTest {
 	private static final TransactionDeadlineBlockValidator VALIDATOR = new TransactionDeadlineBlockValidator();
 
 	@Test
-	public void validateReturnsFailureIfBlockContainsTransactionWithDeadlineEarlierThanBlockTimeStampAtBetaTxDeadlineFork() {
+	public void validateReturnsFailureIfBlockContainsTransactionWithDeadlineEarlierThanBlockTimeStamp() {
 		assertBlockValidationResult(123, TEST_HEIGHT, 122, ValidationResult.FAILURE_PAST_DEADLINE);
-	}
-
-	@Test
-	public void validateReturnsFailureIfBlockContainsTransactionWithDeadlineEarlierThanBlockTimeStampAfterBetaTxDeadlineFork() {
-		assertBlockValidationResult(123, TEST_HEIGHT + 1, 122, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
 	@Test

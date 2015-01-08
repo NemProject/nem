@@ -6,6 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.*;
 
 public class DefaultComparisonContextTest {
+
 	@Test
 	public void contextHasCorrectValues() {
 		assertContextHasCorrectValues(1);

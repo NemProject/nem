@@ -142,6 +142,7 @@ public class BlockDaoImpl implements BlockDao {
 		final String preQueryString = "(SELECT b.* FROM blocks b WHERE height<%d AND harvesterId=%d UNION " +
 				"SELECT b.* FROM blocks b WHERE height<%d AND harvestedInName=%d) " +
 				"ORDER BY height DESC";
+		// TODO 20150108 J-B: any reason you're using String.format instead of setting parameters on the query?
 		final String queryString = String.format(
 				preQueryString,
 				height,

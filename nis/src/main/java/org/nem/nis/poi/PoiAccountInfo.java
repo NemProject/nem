@@ -37,9 +37,6 @@ public class PoiAccountInfo {
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
-
-			// TODO 20150108 G-BR : should it be here ?
-			// previous : if (OUTLINK_HISTORY < heightDifference && BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK <= height.getRaw()) {
 			if (OUTLINK_HISTORY < heightDifference) {
 				continue;
 			}

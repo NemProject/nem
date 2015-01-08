@@ -18,7 +18,6 @@ public class DefaultComparisonContext extends ComparisonContext {
 	}
 
 	private static int getAnalyzeLimitAtHeight(final BlockHeight height) {
-		//final long testHeight = height.getRaw() + BlockChainConstants.BLOCKS_LIMIT;
 		return BlockChainConstants.BLOCKS_LIMIT;
 	}
 }
