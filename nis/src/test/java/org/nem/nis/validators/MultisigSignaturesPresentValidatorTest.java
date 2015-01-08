@@ -14,8 +14,7 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 public class MultisigSignaturesPresentValidatorTest {
-	private final BlockHeight FORK_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK);
-	private final BlockHeight BAD_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK - 1);
+	private final BlockHeight FORK_HEIGHT = new BlockHeight(123);
 
 	//region other transactions
 
@@ -42,11 +41,6 @@ public class MultisigSignaturesPresentValidatorTest {
 	//region single cosigner
 
 	@Test
-	public void properTransactionWithSingleCosignerBelowForkDoesNotValidate() {
-		assertProperTransaction(this.BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE);
-	}
-
-	@Test
 	public void properTransactionWithSingleCosignerValidates() {
 		assertProperTransaction(this.FORK_HEIGHT, ValidationResult.SUCCESS);
 	}
@@ -67,11 +61,6 @@ public class MultisigSignaturesPresentValidatorTest {
 	//endregion
 
 	//region multiple cosigner
-
-	@Test
-	public void properTransactionWithMultipleCosignersBelowForkDoesNotValidate() {
-		this.assertProperTransactionMultiple(this.BAD_HEIGHT, ValidationResult.FAILURE_ENTITY_UNUSABLE, (ctx, t) -> {});
-	}
 
 	@Test
 	public void properTransactionWithMultipleCosignersDoesNotValidateIfSignaturesAreMissing() {

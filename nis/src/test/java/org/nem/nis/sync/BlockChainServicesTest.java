@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
-	final static long START_HEIGHT = BlockMarkerConstants.BETA_MULTISIG_FORK;
+	final static long TEST_HEIGHT = 123;
 
 	@Test
 	public void chainWithMultisigTransactionsIssuedByNotCosignatoryIsInvalid() {
@@ -37,12 +37,12 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(134));
-		context.recalculateImportances(START_HEIGHT);
+		context.recalculateImportances(TEST_HEIGHT);
 
 		if (issuedByCosignatory) {
 			context.makeCosignatory(cosignatory1, multisigAccount);
@@ -79,12 +79,12 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
-		context.recalculateImportances(START_HEIGHT);
+		context.recalculateImportances(TEST_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 
 		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
@@ -116,12 +116,12 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
-		context.recalculateImportances(START_HEIGHT);
+		context.recalculateImportances(TEST_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 
 		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
@@ -144,12 +144,12 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(100 + 10 + 7 + 9));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
-		context.recalculateImportances(START_HEIGHT);
+		context.recalculateImportances(TEST_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 
 		final Transaction transfer1 = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
@@ -181,7 +181,7 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(1000 + 1000));
@@ -190,7 +190,7 @@ public class BlockChainServicesTest {
 		final Account cosignatoryNew1 = context.createAccountWithBalance(Amount.fromNem(10));
 		final Account cosignatoryNew2 = context.createAccountWithBalance(Amount.fromNem(10));
 
-		context.recalculateImportances(START_HEIGHT);
+		context.recalculateImportances(TEST_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 
 		final MultisigAggregateModificationTransaction modification1 = createModification(multisigAccount, cosignatoryNew1);
@@ -227,14 +227,14 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(1000 + 1000));
 		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
 		final Account cosignatoryDel1 = context.createAccountWithBalance(Amount.fromNem(10));
 
-		context.recalculateImportances(START_HEIGHT);
+		context.recalculateImportances(TEST_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 		context.makeCosignatory(cosignatoryDel1, multisigAccount);
 
@@ -261,7 +261,7 @@ public class BlockChainServicesTest {
 		final TestContext context = new TestContext();
 
 		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, START_HEIGHT);
+		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
 		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(1000 + 1000));
@@ -269,7 +269,7 @@ public class BlockChainServicesTest {
 		final Account cosignatoryDel1 = context.createAccountWithBalance(Amount.fromNem(10));
 		final Account cosignatoryDel2 = context.createAccountWithBalance(Amount.fromNem(10));
 
-		context.recalculateImportances(START_HEIGHT);
+		context.recalculateImportances(TEST_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 		context.makeCosignatory(cosignatoryDel1, multisigAccount);
 		context.makeCosignatory(cosignatoryDel2, multisigAccount);
@@ -370,7 +370,7 @@ public class BlockChainServicesTest {
 		}
 
 		public void makeCosignatory(final Account cosignatory, final Account multisig) {
-			final BlockHeight blockHeight = new BlockHeight(START_HEIGHT);
+			final BlockHeight blockHeight = new BlockHeight(TEST_HEIGHT);
 			this.nisCache.getAccountStateCache().findStateByAddress(cosignatory.getAddress()).getMultisigLinks()
 					.addMultisig(multisig.getAddress(), blockHeight);
 			this.nisCache.getAccountStateCache().findStateByAddress(multisig.getAddress()).getMultisigLinks()

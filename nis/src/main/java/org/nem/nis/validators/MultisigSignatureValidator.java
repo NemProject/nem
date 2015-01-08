@@ -23,10 +23,6 @@ public class MultisigSignatureValidator implements SingleTransactionValidator {
 			return ValidationResult.SUCCESS;
 		}
 
-		if (context.getBlockHeight().getRaw() < BlockMarkerConstants.BETA_MULTISIG_FORK) {
-			return ValidationResult.FAILURE_ENTITY_UNUSABLE;
-		}
-
 		return this.validate((MultisigSignatureTransaction)transaction, context);
 	}
 

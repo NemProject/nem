@@ -10,8 +10,7 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
 
 public class MultisigSignatureValidatorTest {
-	private static final BlockHeight BAD_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK - 1);
-	private static final BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_MULTISIG_FORK);
+	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
 
 	@Test
 	public void validatorCanValidateOtherTransactions() {
@@ -68,18 +67,5 @@ public class MultisigSignatureValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	@Test
-	public void multisigSignatureWithSignerBeingCosignatoryBelowForkIsInvalid() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigSignature(Hash.ZERO, context.signer);
-
-		// Act:
-		final ValidationResult result = context.validateMultisigSignature(transaction, BAD_HEIGHT);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
 	}
 }
