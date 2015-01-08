@@ -200,7 +200,7 @@ public class BlockDaoImpl implements BlockDao {
 				"blockMultisigTransactions",
 				transactionsToDelete -> {
 					final Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransactionId.id in (:ids)")
+							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 				});
