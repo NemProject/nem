@@ -10,10 +10,6 @@ public class TransactionDeadlineBlockValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		if (BlockMarkerConstants.BETA_TX_DEADLINE_FORK > block.getHeight().getRaw()) {
-			return ValidationResult.SUCCESS;
-		}
-
 		return ValidationResult.aggregate(block.getTransactions().stream()
 				.map(t -> t.getDeadline().compareTo(block.getTimeStamp()) >= 0 ? ValidationResult.SUCCESS : ValidationResult.FAILURE_PAST_DEADLINE)
 				.iterator());

@@ -9,32 +9,27 @@ import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.NisUtils;
 
 public class TransactionDeadlineBlockValidatorTest {
-	private static final long BETA_TX_DEADLINE_FORK = BlockMarkerConstants.BETA_TX_DEADLINE_FORK;
+	private static final long TEST_HEIGHT = 123;
 	private static final TransactionDeadlineBlockValidator VALIDATOR = new TransactionDeadlineBlockValidator();
 
 	@Test
-	public void validateReturnsSuccessIfBlockContainsTransactionWithDeadlineEarlierThanBlockTimeStampBeforeBetaTxDeadlineFork() {
-		assertBlockValidationResult(123, BETA_TX_DEADLINE_FORK - 1, 122, ValidationResult.SUCCESS);
-	}
-
-	@Test
 	public void validateReturnsFailureIfBlockContainsTransactionWithDeadlineEarlierThanBlockTimeStampAtBetaTxDeadlineFork() {
-		assertBlockValidationResult(123, BETA_TX_DEADLINE_FORK, 122, ValidationResult.FAILURE_PAST_DEADLINE);
+		assertBlockValidationResult(123, TEST_HEIGHT, 122, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
 	@Test
 	public void validateReturnsFailureIfBlockContainsTransactionWithDeadlineEarlierThanBlockTimeStampAfterBetaTxDeadlineFork() {
-		assertBlockValidationResult(123, BETA_TX_DEADLINE_FORK + 1, 122, ValidationResult.FAILURE_PAST_DEADLINE);
+		assertBlockValidationResult(123, TEST_HEIGHT + 1, 122, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
 	@Test
 	public void validateReturnsSuccessIfBlockContainsTransactionWithDeadlineEqualToBlockTimeStamp() {
-		assertBlockValidationResult(123, BETA_TX_DEADLINE_FORK + 1, 123, ValidationResult.SUCCESS);
+		assertBlockValidationResult(123, TEST_HEIGHT + 1, 123, ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void validateReturnsSuccessIfBlockContainsTransactionsWithDeadlineLaterThanBlockTimeStamp() {
-		assertBlockValidationResult(123, BETA_TX_DEADLINE_FORK + 1, 124, ValidationResult.SUCCESS);
+		assertBlockValidationResult(123, TEST_HEIGHT + 1, 124, ValidationResult.SUCCESS);
 	}
 
 	private static void assertBlockValidationResult(
