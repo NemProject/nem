@@ -100,7 +100,7 @@ public class BlockChainValidatorIntegrationTest {
 		// Arrange:
 		final BlockChainValidatorFactory factory = createValidatorFactory();
 		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_IT_VALIDATION_FORK + 11);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
 		parentBlock.sign();
 
 		final Account account1 = Utils.generateRandomAccount();
@@ -132,7 +132,7 @@ public class BlockChainValidatorIntegrationTest {
 	public void chainWithConflictingImportanceTransfersIsInvalid() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_IT_VALIDATION_FORK + 11);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
 		parentBlock.sign();
 
 		final Account account1 = Utils.generateRandomAccount();
