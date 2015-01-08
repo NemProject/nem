@@ -25,18 +25,6 @@ public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbMo
 		return new MultisigSignatureTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
-				getInnerTransaction(source.getMultisigTransaction()).getTransferHash());
-	}
-
-	// TODO 20150104 J-J: should refactor this somewhere
-	private static AbstractTransfer getInnerTransaction(final DbMultisigTransaction source) {
-		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			final AbstractTransfer transaction = entry.getFromMultisig.apply(source);
-			if (null != transaction) {
-				return transaction;
-			}
-		}
-
-		throw new IllegalArgumentException("dbmodel has invalid multisig transaction");
+				DbModelUtils.getInnerTransaction(source.getMultisigTransaction()).getTransferHash());
 	}
 }

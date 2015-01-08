@@ -8,7 +8,7 @@ import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * A mapping that is able to map a db block to a model block.
@@ -52,21 +52,20 @@ public class BlockDbModelToModelMapping implements IMapping<DbBlock, Block> {
 		block.setLessor(lessor);
 		block.setSignature(new Signature(dbBlock.getHarvesterProof()));
 
-		final int count = StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
-				.map(e -> e.getFromBlock.apply(dbBlock).size())
-				.reduce(0, Integer::sum);
-
-		// TODO: there is a bug here, "inner" transactions should not be counted in,
-		// when having MultisigTransaction with some inner transaction, count should be 1, but it is 2
+		final int count = (int)getAllDirectBlockTransfers(dbBlock).count();
 		final ArrayList<Transaction> transactions = new ArrayList<>(Arrays.asList(new Transaction[count]));
-		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			for (final AbstractBlockTransfer dbTransfer : entry.getFromBlock.apply(dbBlock)) {
-				final Transaction transaction = this.mapper.map(dbTransfer, Transaction.class);
-				transactions.set(dbTransfer.getBlkIndex(), transaction);
-			}
-		}
+		getAllDirectBlockTransfers(dbBlock).forEach(dbTransfer -> {
+			final Transaction transaction = this.mapper.map(dbTransfer, Transaction.class);
+			transactions.set(dbTransfer.getBlkIndex(), transaction);
+		});
 
 		block.addTransactions(transactions);
 		return block;
+	}
+
+	private static Stream<AbstractBlockTransfer> getAllDirectBlockTransfers(final DbBlock dbBlock) {
+		return StreamSupport.stream(TransactionRegistry.iterate().spliterator(), false)
+				.flatMap(e -> e.getFromBlock.apply(dbBlock).stream())
+				.filter(t -> !DbModelUtils.isInnerTransaction(t));
 	}
 }

@@ -174,6 +174,36 @@ public class BlockDbModelToModelMappingTest {
 		}
 	}
 
+	@Test
+	public void innerMultisigTransfersAreNotIncludedDirectlyInModelBlock() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final DbBlock dbBlock = context.createDbBlock(null, null);
+
+		final Transaction transfer0 = context.addTransfer(dbBlock, 0);
+		final Transaction transfer1 = context.addMultisigTransferWithInnerTransfer(dbBlock, 1);
+		final Transaction transfer2 = context.addTransfer(dbBlock, 2);
+		final Transaction transfer3 = context.addImportanceTransfer(dbBlock, 3);
+		final Transaction transfer4 = context.addMultisigTransferWithInnerTransfer(dbBlock, 4);
+
+		// Act:
+		final Block model = context.mapping.map(dbBlock);
+
+		// Assert:
+		final int numTransactions = 5;
+		final List<Transaction> orderedTransactions = Arrays.asList(transfer0, transfer1, transfer2, transfer3, transfer4);
+
+		context.assertModel(model);
+		Assert.assertThat(model.getTransactions().size(), IsEqual.equalTo(numTransactions));
+		Assert.assertThat(model.getTransactions(), IsEqual.equalTo(orderedTransactions));
+		Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
+
+		// Sanity:
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().size(), IsEqual.equalTo(4));
+		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(dbBlock.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
+	}
+
 	//endregion
 
 	private static class TestContext {
@@ -267,11 +297,30 @@ public class BlockDbModelToModelMappingTest {
 					org.nem.core.model.MultisigTransaction.class);
 		}
 
+		public MultisigTransaction addMultisigTransferWithInnerTransfer(final DbBlock block, final int blockIndex) {
+			final DbTransferTransaction dbInnerTransfer = new DbTransferTransaction();
+			this.addTransfer(
+					dbTransfer -> block.getBlockTransferTransactions().add(dbTransfer),
+					blockIndex,
+					dbInnerTransfer,
+					TransferTransaction.class);
+			dbInnerTransfer.setSenderProof(null);
+
+			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
+			dbMultisigTransfer.setTransferTransaction(dbInnerTransfer);
+			return this.addTransfer(
+					dbTransfer -> block.getBlockMultisigTransactions().add(dbTransfer),
+					blockIndex,
+					dbMultisigTransfer,
+					org.nem.core.model.MultisigTransaction.class);
+		}
+
 		private <TDbTransfer extends AbstractBlockTransfer, TModelTransfer extends Transaction> TModelTransfer addTransfer(
 				final Consumer<TDbTransfer> addTransaction,
 				final int blockIndex,
 				final TDbTransfer dbTransfer,
 				final Class<TModelTransfer> modelClass) {
+			dbTransfer.setSenderProof(Utils.generateRandomSignature().getBytes());
 			dbTransfer.setBlkIndex(blockIndex);
 			dbTransfer.setReferencedTransaction(0L);
 			final TModelTransfer transfer = Mockito.mock(modelClass);

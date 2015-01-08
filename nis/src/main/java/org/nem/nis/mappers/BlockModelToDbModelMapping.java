@@ -66,6 +66,11 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 			return dbTransfer;
 		}
 
+		@SuppressWarnings("unchecked")
+		public void add(final AbstractBlockTransfer dbTransfer) {
+			this.transactions.add((T)dbTransfer);
+		}
+
 		public void commit(final DbBlock dbBlock) {
 			this.entry.setInBlock.accept(dbBlock, this.transactions);
 		}
@@ -88,10 +93,7 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 		}
 
 		public void process(final Transaction transaction) {
-			final BlockTransactionContext<?> context = this.transactionContexts.getOrDefault(transaction.getType(), null);
-			if (null == context) {
-				throw new IllegalArgumentException("trying to map block with unknown transaction type");
-			}
+			final BlockTransactionContext<?> context = this.getContext(transaction.getType());
 
 			final AbstractBlockTransfer dbTransfer = context.mapAndAdd(this.mapper, transaction);
 			dbTransfer.setOrderId(context.nextIndex++);
@@ -106,15 +108,24 @@ public class BlockModelToDbModelMapping implements IMapping<Block, DbBlock> {
 						continue;
 					}
 
+					final BlockTransactionContext<?> innerContext = this.getContext(entry.type);
 					dbInnerTransfer.setOrderId(-1);
 					dbInnerTransfer.setBlkIndex(this.blockIndex);
-					// TODO 20150105 G: probably doesn't make sense to do it
-					// TODO 20150105 J-G: you mean don't set the block on the inner transfer?
 					dbInnerTransfer.setBlock(this.dbBlock);
+					innerContext.add(dbInnerTransfer);
 				}
 			}
 
 			++this.blockIndex;
+		}
+
+		private BlockTransactionContext<?> getContext(final int transactionType) {
+			final BlockTransactionContext<?> context = this.transactionContexts.getOrDefault(transactionType, null);
+			if (null == context) {
+				throw new IllegalArgumentException("trying to map block with unknown transaction type");
+			}
+
+			return context;
 		}
 
 		public void commit() {
