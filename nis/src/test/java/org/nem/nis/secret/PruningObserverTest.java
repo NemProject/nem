@@ -15,9 +15,7 @@ import java.util.*;
 public class PruningObserverTest {
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = 31 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-	private static final long OUTLINK_BLOCK_HISTORY_OLD = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long PRUNE_INTERVAL = 360;
-	private static final long BETA_OUTLINK_PRUNING_FORK = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK;
 	private static final int RETENTION_HOURS = 42;
 
 	//region no-op
@@ -93,8 +91,8 @@ public class PruningObserverTest {
 	public void blockBasedPruningIsTriggeredWhenBlockHeightIsNearOutlinkBlockHistory() {
 		// Arrange:
 		// TODO: Replace with new constant when launching.
-		final long outlinkHistory = OUTLINK_BLOCK_HISTORY_OLD;
-		final long historyDifference = OUTLINK_BLOCK_HISTORY_OLD - WEIGHTED_BALANCE_BLOCK_HISTORY;
+		final long outlinkHistory = OUTLINK_BLOCK_HISTORY;
+		final long historyDifference = OUTLINK_BLOCK_HISTORY - WEIGHTED_BALANCE_BLOCK_HISTORY;
 
 		// Assert:
 		assertBlockBasedPruning(outlinkHistory, 0, 0);
@@ -119,19 +117,9 @@ public class PruningObserverTest {
 	}
 
 	@Test
-	public void outlinkPruningUsesOutlinkBlockHistoryOldBeforeBetaOutlinkPruningFork() {
+	public void outlinkPruningUsesOutlinkBlockHistory() {
 		// Assert:
-		final long notificationHeight = (BETA_OUTLINK_PRUNING_FORK / 360) * 360 + 1;
-		assertBlockBasedPruning(
-				notificationHeight,
-				notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,
-				notificationHeight - OUTLINK_BLOCK_HISTORY_OLD);
-	}
-
-	@Test
-	public void outlinkPruningUsesOutlinkBlockHistoryAfterBetaOutlinkPruningFork() {
-		// Assert:
-		final long notificationHeight = (BETA_OUTLINK_PRUNING_FORK / 360 + 1) * 360 + 1;
+		final long notificationHeight = 1234 * 360 + 1;
 		assertBlockBasedPruning(
 				notificationHeight,
 				notificationHeight - WEIGHTED_BALANCE_BLOCK_HISTORY,

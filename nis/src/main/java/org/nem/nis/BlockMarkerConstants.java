@@ -24,10 +24,4 @@ public class BlockMarkerConstants {
 	 * Beta hard fork due to adding additional importance transfer validation.
 	 */
 	public static final long BETA_IT_VALIDATION_FORK = 44974;
-
-	/**
-	 * Beta hard fork due to a fix in outlink pruning.
-	 * Targeting Friday 13 Nov, 8am UTC.
-	 */
-	public static final long BETA_OUTLINK_PRUNING_FORK = 51000;
 }

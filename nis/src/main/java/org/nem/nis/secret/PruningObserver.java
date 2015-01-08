@@ -13,7 +13,6 @@ public class PruningObserver implements BlockTransactionObserver {
 	// keep 1 day of weighted balance history, 31 days of outlink history (keep an extra day so that calculations are correct after rollbacks)
 	private static final long WEIGHTED_BALANCE_BLOCK_HISTORY = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 	private static final long OUTLINK_BLOCK_HISTORY = BlockChainConstants.OUTLINK_HISTORY + BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-	private static final long OUTLINK_BLOCK_HISTORY_OLD = BlockChainConstants.OUTLINK_HISTORY;
 	private static final long PRUNE_INTERVAL = 360;
 	private final AccountStateCache accountStateCache;
 	private final HashCache transactionHashCache;
@@ -35,9 +34,7 @@ public class PruningObserver implements BlockTransactionObserver {
 		}
 
 		final BlockHeight weightedBalancePruneHeight = getPruneHeight(context.getHeight(), WEIGHTED_BALANCE_BLOCK_HISTORY);
-		final long outlinkBlockHistory = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK <= context.getHeight().getRaw()
-				? OUTLINK_BLOCK_HISTORY
-				: OUTLINK_BLOCK_HISTORY_OLD;
+		final long outlinkBlockHistory = OUTLINK_BLOCK_HISTORY;
 		final BlockHeight outlinkPruneHeight = getPruneHeight(context.getHeight(), outlinkBlockHistory);
 		for (final AccountState accountState : this.accountStateCache.mutableContents()) {
 			accountState.getWeightedBalances().prune(weightedBalancePruneHeight);

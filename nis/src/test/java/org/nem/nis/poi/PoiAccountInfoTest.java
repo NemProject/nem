@@ -13,7 +13,6 @@ import java.util.*;
 
 public class PoiAccountInfoTest {
 	private static final long OUTLINK_HISTORY = 30 * BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
-	private static final long BETA_OUTLINK_PRUNING_FORK = BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK;
 	private static final double ONE_DAY_DECAY = WeightedBalanceDecayConstants.DECAY_BASE;
 	private static final double TWO_DAY_DECAY = ONE_DAY_DECAY * ONE_DAY_DECAY;
 	private static final double THREE_DAY_DECAY = TWO_DAY_DECAY * ONE_DAY_DECAY;
@@ -87,33 +86,9 @@ public class PoiAccountInfoTest {
 	}
 
 	@Test
-	public void allOutlinksAreProcessedBeforeBetaForkHeight() {
+	public void outlinksOlderThanOutlinkBlockHistoryDoNotGetProcessed() {
 		// Arrange:
-		final PoiAccountInfo info = createAccountInfoForOldOutlinkBlockHistoryTests(BETA_OUTLINK_PRUNING_FORK - 1);
-
-		// Act:
-		final List<WeightedLink> actualLinks = info.getOutlinks();
-
-		// Assert:
-		Assert.assertThat(actualLinks.size(), IsEqual.equalTo(7));
-	}
-
-	@Test
-	public void outlinksOlderThanOutlinkBlockHistoryDoNotGetProcessedAfterBetaForkHeight() {
-		// Arrange:
-		final PoiAccountInfo info = createAccountInfoForOldOutlinkBlockHistoryTests(BETA_OUTLINK_PRUNING_FORK + 1);
-
-		// Act:
-		final List<WeightedLink> actualLinks = info.getOutlinks();
-
-		// Assert:
-		Assert.assertThat(actualLinks.size(), IsEqual.equalTo(5));
-	}
-
-	@Test
-	public void outlinksOlderThanOutlinkBlockHistoryDoNotGetProcessedAtBetaForkHeight() {
-		// Arrange:
-		final PoiAccountInfo info = createAccountInfoForOldOutlinkBlockHistoryTests(BETA_OUTLINK_PRUNING_FORK);
+		final PoiAccountInfo info = createAccountInfoForOldOutlinkBlockHistoryTests(50000);
 
 		// Act:
 		final List<WeightedLink> actualLinks = info.getOutlinks();
