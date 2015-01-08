@@ -9,13 +9,8 @@ public class BlockChainConstantsTest {
 	@Test
 	public void maxAllowedTransactionsPerBlockIsCalculatedCorrectly() {
 		// Assert:
-		assertMaxAllowedTransactions(1, Integer.MAX_VALUE);
-		assertMaxAllowedTransactions(BlockMarkerConstants.BETA_HARD_FORK - 1, Integer.MAX_VALUE);
-		assertMaxAllowedTransactions(BlockMarkerConstants.BETA_HARD_FORK, Integer.MAX_VALUE);
-		assertMaxAllowedTransactions(BlockMarkerConstants.BETA_HARD_FORK + 1, 60);
-		assertMaxAllowedTransactions(BlockMarkerConstants.BETA_TX_COUNT_FORK - 1, 60);
-		assertMaxAllowedTransactions(BlockMarkerConstants.BETA_TX_COUNT_FORK, 60);
-		assertMaxAllowedTransactions(BlockMarkerConstants.BETA_TX_COUNT_FORK + 1, 120);
+		assertMaxAllowedTransactions(1, 120);
+		assertMaxAllowedTransactions(1234, 120);
 		assertMaxAllowedTransactions(1000000, 120);
 	}
 

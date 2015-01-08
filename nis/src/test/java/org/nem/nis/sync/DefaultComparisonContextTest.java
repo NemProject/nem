@@ -6,32 +6,16 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.*;
 
 public class DefaultComparisonContextTest {
-	private static final long EFFECTIVE_FORK_HEIGHT = BlockMarkerConstants.BETA_HARD_FORK - BlockChainConstants.BLOCKS_LIMIT;
-
 	@Test
-	public void contextHasCorrectValuesBeforeForkHeight() {
-		// Act:
-		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(EFFECTIVE_FORK_HEIGHT - 1));
-
-		// Assert:
-		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY));
-		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.REWRITE_LIMIT));
+	public void contextHasCorrectValues() {
+		assertContextHasCorrectValues(1);
+		assertContextHasCorrectValues(1234);
+		assertContextHasCorrectValues(1_000_000);
 	}
 
-	@Test
-	public void contextHasCorrectValuesAtForkHeight() {
+	private static void assertContextHasCorrectValues(long height) {
 		// Act:
-		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(EFFECTIVE_FORK_HEIGHT));
-
-		// Assert:
-		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY));
-		Assert.assertThat(context.getMaxNumBlocksToRewrite(), IsEqual.equalTo(BlockChainConstants.REWRITE_LIMIT));
-	}
-
-	@Test
-	public void contextHasCorrectValuesAfterForkHeight() {
-		// Act:
-		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(EFFECTIVE_FORK_HEIGHT + 1));
+		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(height));
 
 		// Assert:
 		Assert.assertThat(context.getMaxNumBlocksToAnalyze(), IsEqual.equalTo(BlockChainConstants.BLOCKS_LIMIT));
