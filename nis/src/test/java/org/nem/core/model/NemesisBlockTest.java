@@ -11,6 +11,9 @@ import org.nem.core.time.TimeInstant;
 
 import java.io.*;
 
+// TODO 20150108 J-G: it looks like the nemesis block isn't verifiable :/
+// > there is also something wrong in that the nemesis transactions shouldn't have fees
+
 public class NemesisBlockTest {
 
 	private final static MockAccountLookup MOCK_ACCOUNT_LOOKUP = new MockAccountLookup();
@@ -73,8 +76,8 @@ public class NemesisBlockTest {
 
 	@Test
 	public void nemesisDeserializationUsesAccountLookupParameter() {
-		// Assert: (1 signer, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
-		Assert.assertThat(MOCK_ACCOUNT_LOOKUP.getNumFindByIdCalls(), IsEqual.equalTo(3 + 2 * NUM_NEMESIS_TRANSACTIONS));
+		// Assert: (1 signer, 2 multisig senders, NUM_NEMESIS_TRANSACTIONS senders, NUM_NEMESIS_TRANSACTIONS recipients)
+		Assert.assertThat(MOCK_ACCOUNT_LOOKUP.getNumFindByIdCalls(), IsEqual.equalTo(1 + 2 + 2 * NUM_NEMESIS_TRANSACTIONS));
 	}
 
 	@Test
