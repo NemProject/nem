@@ -2,9 +2,9 @@ package org.nem.nis.dao;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
-import org.hibernate.sql.JoinType;
+import org.hibernate.type.LongType;
 import org.nem.core.crypto.*;
-import org.nem.core.model.Account;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
@@ -138,23 +138,30 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Collection<DbBlock> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
-		// NOTE: there was JOIN used for importanceTransfers here, that was a bug
-		final Criteria criteria = setTransfersToSelect(this.getCurrentSession().createCriteria(DbBlock.class))
-				.setFetchMode("harvester", FetchMode.JOIN)
-				.setFetchMode("lessor", FetchMode.JOIN)
-				.add(Restrictions.lt("height", height))
-				.addOrder(Order.desc("height"))
-						// setMaxResults limits results, not objects (so in case of join it could be block with
-						// many TXes), but this will work correctly cause blockTransferTransactions is set to select...
-				.setMaxResults(limit)
-						// nested criteria
-				.createAlias("harvester", "f")
-				.createAlias("lessor", "l", JoinType.LEFT_OUTER_JOIN)
-				.add(Restrictions.disjunction(
-						Restrictions.eq("f.printableKey", account.getAddress().getEncoded()),
-						Restrictions.eq("l.printableKey", account.getAddress().getEncoded())
-				));
-		return listAndCast(criteria);
+		final Long accountId = this.getAccountId(account);
+		final String preQueryString = "(SELECT b.* FROM blocks b WHERE height<%d AND harvesterId=%d UNION " +
+				"SELECT b.* FROM blocks b WHERE height<%d AND harvestedInName=%d) " +
+				"ORDER BY height DESC";
+		final String queryString = String.format(
+				preQueryString,
+				height,
+				accountId,
+				height,
+				accountId);
+		final Query query = this.getCurrentSession()
+				.createSQLQuery(queryString)
+				.addEntity(DbBlock.class)
+				.setMaxResults(limit);
+		return listAndCast(query);
+	}
+
+	private Long getAccountId(final Account account) {
+		final Address address = account.getAddress();
+		final Query query = this.getCurrentSession()
+				.createSQLQuery("SELECT id AS accountId FROM accounts WHERE printableKey=:address")
+				.addScalar("accountId", LongType.INSTANCE)
+				.setParameter("address", address.getEncoded());
+		return (Long)query.uniqueResult();
 	}
 
 	@Override

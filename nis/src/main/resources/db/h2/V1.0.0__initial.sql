@@ -240,10 +240,13 @@ ALTER TABLE public.multisigsignatures ADD
 --- indexes
 --- 
 
+CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
 CREATE INDEX IDX_BLOCKS_SHORT_ID ON `blocks` (shortId);
 CREATE INDEX IDX_BLOCKS_HEIGHT ON `blocks` (height);
 CREATE INDEX IDX_BLOCKS_HARVESTERID ON `blocks` (harvesterId);
-CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
+CREATE INDEX IDX_BLOCKS_HARVESTEDINNAME ON `blocks` (harvestedInName);
+CREATE INDEX IDX_BLOCKS_HARVESTERID_HEIGHT ON `blocks` (harvesterId, height desc);
+CREATE INDEX IDX_BLOCKS_HARVESTEDINNAME_HEIGHT ON `blocks` (harvestedInName, height desc);
 
 CREATE INDEX IDX_TRANSFERS_TIMESTAMP ON `transfers` (timeStamp);
 CREATE INDEX IDX_TRANSFERS_SENDERID ON `transfers` (senderId);
