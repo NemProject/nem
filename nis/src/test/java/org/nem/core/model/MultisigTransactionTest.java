@@ -182,7 +182,15 @@ public class MultisigTransactionTest {
 		// Arrange:
 		final MockTransaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		innerTransaction.setMinimumFee(222);
-		final Transaction transaction = createDefaultTransaction(innerTransaction);
+		final MultisigTransaction transaction = createDefaultTransaction(innerTransaction);
+		final MultisigSignatureTransaction signatureTransaction1 = new MultisigSignatureTransaction(
+				transaction.getTimeStamp(), Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		signatureTransaction1.setFee(Amount.fromNem(123));
+		final MultisigSignatureTransaction signatureTransaction2 = new MultisigSignatureTransaction(
+				transaction.getTimeStamp(), Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		signatureTransaction1.setFee(Amount.fromNem(456));
+		transaction.addSignature(signatureTransaction1);
+		transaction.addSignature(signatureTransaction2);
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -192,9 +200,14 @@ public class MultisigTransactionTest {
 		Assert.assertThat(innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
 
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
 		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(0), transaction.getSigner(), Amount.fromNem(100));
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), innerTransaction.getSigner(), Amount.fromMicroNem(222));
+		// we need to iterate, to have same order
+		int i = 0;
+		for (final Transaction signature : transaction.getChildTransactions()) {
+			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(++i), signature.getSigner(), signature.getFee());
+		}
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(3), innerTransaction.getSigner(), Amount.fromMicroNem(222));
 	}
 
 	@Test
@@ -202,7 +215,15 @@ public class MultisigTransactionTest {
 		// Arrange:
 		final MockTransaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		innerTransaction.setMinimumFee(222);
-		final Transaction transaction = createDefaultTransaction(innerTransaction);
+		final MultisigTransaction transaction = createDefaultTransaction(innerTransaction);
+		final MultisigSignatureTransaction signatureTransaction1 = new MultisigSignatureTransaction(
+				transaction.getTimeStamp(), Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		signatureTransaction1.setFee(Amount.fromNem(123));
+		final MultisigSignatureTransaction signatureTransaction2 = new MultisigSignatureTransaction(
+				transaction.getTimeStamp(), Utils.generateRandomAccount(), HashUtils.calculateHash(innerTransaction));
+		signatureTransaction1.setFee(Amount.fromNem(456));
+		transaction.addSignature(signatureTransaction1);
+		transaction.addSignature(signatureTransaction2);
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -212,9 +233,14 @@ public class MultisigTransactionTest {
 		Assert.assertThat(innerTransaction.getNumTransferCalls(), IsEqual.equalTo(1));
 
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-		Mockito.verify(observer, Mockito.times(2)).notify(notificationCaptor.capture());
+		Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture());
 		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), innerTransaction.getSigner(), Amount.fromMicroNem(222));
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), transaction.getSigner(), Amount.fromNem(100));
+		// we need to iterate, to have same order
+		int i = 3;
+		for (final Transaction signature : transaction.getChildTransactions()) {
+			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(--i), signature.getSigner(), signature.getFee());
+		}
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(3), transaction.getSigner(), Amount.fromNem(100));
 	}
 
 	//endregion
