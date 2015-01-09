@@ -114,7 +114,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		// > 5L * this.getCosignerSignatures().size()
 		// TODO 20150109 G-J: y, I was thinking exactly about it, but due to the fact that we doubled the coins, I'd make it 10
 		// (actually I'd make it even higher, but we'd have to discuss that)
-		return Amount.fromNem(10L * this.getCosignerSignatures().size());
+		// TODO hmm can't do it like this, as FEE is part that is signed... (and should be, any fancy way to solve this?)
+		//return Amount.fromNem(Math.max(10L, 10L * this.getCosignerSignatures().size()));
+		return Amount.fromNem(100L);
 	}
 
 	@Override

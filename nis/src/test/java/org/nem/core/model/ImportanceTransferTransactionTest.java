@@ -41,7 +41,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(2)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -126,7 +126,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(2)));
 	}
 
 	private ImportanceTransferTransaction createRoundTrippedTransaction(
@@ -143,7 +143,7 @@ public class ImportanceTransferTransactionTest {
 	//region fee
 
 	@Test
-	public void minimumFeeIsOneNem() {
+	public void minimumFeeIsTwoNem() {
 		// Arrange:
 		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
@@ -151,7 +151,7 @@ public class ImportanceTransferTransactionTest {
 		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
 
 		// Act + Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(2)));
 	}
 
 	//endregion

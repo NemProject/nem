@@ -128,28 +128,28 @@ public class TransferTransactionTest {
 	@Test
 	public void feeIsCalculatedCorrectlyForEmptyTransaction() {
 		// Assert:
-		Assert.assertThat(this.calculateFee(0, 0), IsEqual.equalTo(Amount.fromNem(1)));
+		Assert.assertThat(this.calculateFee(0, 0), IsEqual.equalTo(Amount.fromNem(2)));
 	}
 
 	@Test
 	public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() {
 		// Assert:
-		Assert.assertThat(this.calculateFee(1, 0), IsEqual.equalTo(Amount.fromNem(1)));
-		Assert.assertThat(this.calculateFee(144, 0), IsEqual.equalTo(Amount.fromNem(1)));
-		Assert.assertThat(this.calculateFee(145, 0), IsEqual.equalTo(Amount.fromNem(2)));
-		Assert.assertThat(this.calculateFee(1024, 0), IsEqual.equalTo(Amount.fromNem(2)));
-		Assert.assertThat(this.calculateFee(32768, 0), IsEqual.equalTo(Amount.fromNem(4)));
-		Assert.assertThat(this.calculateFee(1048576, 0), IsEqual.equalTo(Amount.fromNem(45)));
+		Assert.assertThat(this.calculateFee(1, 0), IsEqual.equalTo(Amount.fromNem(2)));
+		Assert.assertThat(this.calculateFee(72, 0), IsEqual.equalTo(Amount.fromNem(2)));
+		Assert.assertThat(this.calculateFee(73, 0), IsEqual.equalTo(Amount.fromNem(3)));
+		Assert.assertThat(this.calculateFee(512, 0), IsEqual.equalTo(Amount.fromNem(3)));
+		Assert.assertThat(this.calculateFee(16384, 0), IsEqual.equalTo(Amount.fromNem(5)));
+		Assert.assertThat(this.calculateFee(524288, 0), IsEqual.equalTo(Amount.fromNem(46)));
 	}
 
 	@Test
 	public void feeIsCalculatedCorrectlyForTransactionWithMessage() {
 		// Assert:
-		Assert.assertThat(this.calculateFee(1024, 1), IsEqual.equalTo(Amount.fromNem(3)));
-		Assert.assertThat(this.calculateFee(1024, 255), IsEqual.equalTo(Amount.fromNem(6)));
-		Assert.assertThat(this.calculateFee(1024, 256), IsEqual.equalTo(Amount.fromNem(7)));
-		Assert.assertThat(this.calculateFee(1024, 257), IsEqual.equalTo(Amount.fromNem(7)));
-		Assert.assertThat(this.calculateFee(1024, 512), IsEqual.equalTo(Amount.fromNem(12)));
+		Assert.assertThat(this.calculateFee(512, 1), IsEqual.equalTo(Amount.fromNem(13)));
+		Assert.assertThat(this.calculateFee(512, 255), IsEqual.equalTo(Amount.fromNem(82)));
+		Assert.assertThat(this.calculateFee(512, 256), IsEqual.equalTo(Amount.fromNem(83)));
+		Assert.assertThat(this.calculateFee(512, 257), IsEqual.equalTo(Amount.fromNem(83)));
+		Assert.assertThat(this.calculateFee(512, 512), IsEqual.equalTo(Amount.fromNem(163)));
 	}
 
 	@Test
@@ -170,8 +170,8 @@ public class TransferTransactionTest {
 	@Test
 	public void messageFeeIsBasedOnEncodedSize() {
 		// Assert:
-		Assert.assertThat(this.calculateMessageFee(256, 512), IsEqual.equalTo(Amount.fromNem(6)));
-		Assert.assertThat(this.calculateMessageFee(512, 256), IsEqual.equalTo(Amount.fromNem(11)));
+		Assert.assertThat(this.calculateMessageFee(256, 512), IsEqual.equalTo(Amount.fromNem(2 + 10*256/32)));
+		Assert.assertThat(this.calculateMessageFee(512, 256), IsEqual.equalTo(Amount.fromNem(2 + 10*512/32)));
 	}
 
 	private Amount calculateFee(final long amount, final int messageSize) {
