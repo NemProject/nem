@@ -34,6 +34,7 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
+		// TODO 20150109 G-* : should we require this?
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));

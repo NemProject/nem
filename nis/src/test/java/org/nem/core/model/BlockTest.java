@@ -159,8 +159,8 @@ public class BlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
-		// (t1 has a fee of 1 and t2 has a fee of 2)
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(3L)));
+		// (t1 has a fee of 2 and t2 has a fee of 3)
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(5L)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 

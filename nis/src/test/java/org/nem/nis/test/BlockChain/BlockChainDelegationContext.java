@@ -151,6 +151,10 @@ public class BlockChainDelegationContext {
 	private void prepareAccountCache() {
 		Mockito.when(this.accountCache.findByAddress(this.blockHarvester.getAddress())).thenReturn(this.blockHarvester);
 		Mockito.when(this.accountCache.findByAddress(this.parentHarvester.getAddress())).thenReturn(this.parentHarvester);
+
+		// TODO 20150109 G-J : this is probably bit ugly, not sure how to fix it in a nicer way, this is to return some account
+		// > when deserializing MultisigAggregateModification from nemesis block...
+		Mockito.when(this.accountCache.findByAddress(Mockito.any())).then((invocationOnMock) -> Utils.generateRandomAccount());
 	}
 
 	private void prepareAccountStateCache() {
