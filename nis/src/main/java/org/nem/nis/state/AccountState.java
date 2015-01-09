@@ -3,8 +3,6 @@ package org.nem.nis.state;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 
-// TODO 20150103 J-G: please update the account state tests
-
 /**
  * Class containing extrinsic in-memory mutable account information.
  */

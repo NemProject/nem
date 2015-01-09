@@ -2,7 +2,7 @@ package org.nem.nis.state;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
@@ -11,7 +11,7 @@ public class AccountStateTest {
 	//region creation
 
 	@Test
-	public void poiAccountStateCanBeCreated() {
+	public void accountStateCanBeCreated() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final AccountState state = new AccountState(address);
@@ -22,6 +22,7 @@ public class AccountStateTest {
 		Assert.assertThat(state.getImportanceInfo().isSet(), IsEqual.equalTo(false));
 		Assert.assertThat(state.getRemoteLinks(), IsNull.notNullValue());
 		Assert.assertThat(state.getAccountInfo(), IsNull.notNullValue());
+		Assert.assertThat(state.getMultisigLinks(), IsNull.notNullValue());
 		Assert.assertThat(state.getHeight(), IsNull.nullValue());
 	}
 
@@ -120,6 +121,28 @@ public class AccountStateTest {
 		// Assert:
 		Assert.assertThat(state.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
 		Assert.assertThat(copy.getAccountInfo().getBalance(), IsEqual.equalTo(Amount.fromNem(1000)));
+	}
+
+	@Test
+	public void copyCreatesUnlinkedCopyOfMultisigLinks() {
+		// Arrange:
+		final Address multisig1 = Utils.generateRandomAddress();
+		final Address multisig2 = Utils.generateRandomAddress();
+		final AccountState state = new AccountState(Utils.generateRandomAddress());
+		final MultisigLinks stateLinks = state.getMultisigLinks();
+		stateLinks.addMultisig(multisig1, BlockHeight.ONE);
+
+		// Act:
+		final AccountState copy = state.copy();
+		final MultisigLinks copyLinks = copy.getMultisigLinks();
+		copyLinks.addMultisig(multisig2, BlockHeight.ONE);
+
+		// Assert:
+		Assert.assertThat(stateLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));
+		Assert.assertThat(stateLinks.isCosignatoryOf(multisig2), IsEqual.equalTo(false));
+
+		Assert.assertThat(copyLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));
+		Assert.assertThat(copyLinks.isCosignatoryOf(multisig2), IsEqual.equalTo(true));
 	}
 
 	@Test
