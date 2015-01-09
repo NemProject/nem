@@ -1,7 +1,6 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.nis.BlockMarkerConstants;
 
 /**
  * A block transaction validator that ensures all transactions have a valid deadline.

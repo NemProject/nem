@@ -8,7 +8,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
@@ -98,7 +97,10 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		final Transaction t1 = context.createTransferTransaction(CURRENT_TIME, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(CURRENT_TIME, t1);
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(CURRENT_TIME, context.cosigner2, HashUtils.calculateHash(t1));
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
+				CURRENT_TIME,
+				context.cosigner2,
+				HashUtils.calculateHash(t1));
 		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
 		signatureTransaction.sign();
 

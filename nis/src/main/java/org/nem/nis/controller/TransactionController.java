@@ -109,7 +109,7 @@ public class TransactionController {
 			return new NemRequestResult(
 					NemRequestResult.TYPE_VALIDATION_RESULT,
 					result.getValue(),
-					result.toString() + ":" + HashUtils.calculateHash(((MultisigTransaction) transaction).getOtherTransaction()).toString());
+					result.toString() + ":" + HashUtils.calculateHash(((MultisigTransaction)transaction).getOtherTransaction()).toString());
 		}
 		return new NemRequestResult(result);
 	}

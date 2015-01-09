@@ -7,7 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
 
 import java.util.*;
@@ -179,6 +178,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
 	}
+
 	@Test
 	public void validationFailsIfAnyMultisigTransactionIsSignedByNonCosignerInAdditionToAllCosigners() {
 		// Arrange:

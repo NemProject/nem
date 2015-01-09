@@ -833,7 +833,10 @@ public class BlockDaoTest {
 
 	private MultisigTransaction prepareMultisigTransferTransaction(final Account issuer, final Account multisig, final Account cosignatory, final Account recipient) {
 		final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, multisig, recipient, Amount.fromNem(123), null);
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO, cosignatory, HashUtils.calculateHash(transaction));
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				cosignatory,
+				HashUtils.calculateHash(transaction));
 		signatureTransaction.sign();
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
 		multisigTransaction.sign();

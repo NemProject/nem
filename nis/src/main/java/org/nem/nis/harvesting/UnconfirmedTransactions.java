@@ -13,8 +13,7 @@ import org.nem.nis.validators.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 /**
  * A collection of unconfirmed transactions.
@@ -264,7 +263,6 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-
 	/**
 	 * Removes all transactions in the specified block.
 	 *
@@ -416,7 +414,6 @@ public class UnconfirmedTransactions {
 			this.rebuildCache(notExpiredTransactions);
 		}
 	}
-
 
 	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
 		return this.transactions.containsKey(transactionHash) ||

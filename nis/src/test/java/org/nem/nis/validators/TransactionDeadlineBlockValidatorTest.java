@@ -5,7 +5,6 @@ import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.MockTransaction;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.NisUtils;
 
 public class TransactionDeadlineBlockValidatorTest {

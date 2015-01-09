@@ -261,10 +261,11 @@ public class MultisigTransactionTest {
 
 		// Act:
 		final ArgumentCaptor<Notification> notificationCaptor = context.execute(2);
+		final List<Notification> notifications = notificationCaptor.getAllValues();
 
 		// Assert:
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(0), context.transaction.getSigner(), Amount.fromNem(100));
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.innerTransaction.getSigner(), Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceDebitNotification(notifications.get(0), context.transaction.getSigner(), Amount.fromNem(100));
+		NotificationUtils.assertBalanceDebitNotification(notifications.get(1), context.innerTransaction.getSigner(), Amount.fromMicroNem(222));
 	}
 
 	@Test
@@ -297,10 +298,11 @@ public class MultisigTransactionTest {
 
 		// Act:
 		final ArgumentCaptor<Notification> notificationCaptor = context.undo(2);
+		final List<Notification> notifications = notificationCaptor.getAllValues();
 
 		// Assert:
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), context.innerTransaction.getSigner(), Amount.fromMicroNem(222));
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), context.transaction.getSigner(), Amount.fromNem(100));
+		NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.innerTransaction.getSigner(), Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceCreditNotification(notifications.get(1), context.transaction.getSigner(), Amount.fromNem(100));
 	}
 
 	@Test
@@ -631,7 +633,6 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		Assert.assertThat(isVerified, IsEqual.equalTo(false));
-
 	}
 
 	@Test

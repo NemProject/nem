@@ -103,7 +103,7 @@ public class NemesisBlockTest {
 		final Block block = NEMESIS_BLOCK;
 		for (final Transaction transaction : block.getTransactions()) {
 			if (transaction instanceof TransferTransaction) {
-				totalAmount = totalAmount.add(((TransferTransaction) transaction).getAmount());
+				totalAmount = totalAmount.add(((TransferTransaction)transaction).getAmount());
 			}
 		}
 

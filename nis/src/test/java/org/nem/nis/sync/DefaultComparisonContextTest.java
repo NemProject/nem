@@ -3,7 +3,7 @@ package org.nem.nis.sync;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 
 public class DefaultComparisonContextTest {
 

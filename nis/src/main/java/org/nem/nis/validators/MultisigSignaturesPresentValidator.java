@@ -2,7 +2,6 @@ package org.nem.nis.validators;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 

@@ -6,7 +6,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.NisUtils;
 
 public class BlockImportanceTransferBalanceValidatorTest {

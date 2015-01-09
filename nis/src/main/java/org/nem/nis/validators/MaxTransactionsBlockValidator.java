@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 
 /**
  * A block validator that ensures a block does not have more than the maximum number of transactions.

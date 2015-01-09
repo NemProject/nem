@@ -5,7 +5,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.MultisigTestContext;
 
 public class MultisigTransactionSignerValidatorTest {

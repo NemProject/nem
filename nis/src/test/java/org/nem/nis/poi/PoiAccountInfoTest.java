@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.state.*;
 
 import java.util.*;
