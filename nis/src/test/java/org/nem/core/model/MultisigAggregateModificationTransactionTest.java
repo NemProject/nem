@@ -11,9 +11,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.util.*;
 
-// TODO 20150106 J-G - this class should be renamed!
-
-public abstract class AbstractMultisigSignerModificationTransactionTest {
+public abstract class MultisigAggregateModificationTransactionTest {
 	public static final TimeInstant TIME = new TimeInstant(123);
 
 	protected abstract MultisigModificationType getModification();

@@ -12,15 +12,15 @@ import org.nem.core.test.*;
 import java.util.*;
 
 @RunWith(Enclosed.class)
-public class MultisigAggregateModificationTransactionTest {
-	public static class MultisigAggregateModificationTransactionAddTest extends AbstractMultisigSignerModificationTransactionTest {
+public class MultisigAggregateModificationTransactionEnclosingTest {
+	public static class MultisigAggregateModificationTransactionAddTest extends MultisigAggregateModificationTransactionTest {
 		@Override
 		protected MultisigModificationType getModification() {
 			return MultisigModificationType.Add;
 		}
 	}
 
-	public static class MultisigAggregateModificationTransactionDelTest extends AbstractMultisigSignerModificationTransactionTest {
+	public static class MultisigAggregateModificationTransactionDelTest extends MultisigAggregateModificationTransactionTest {
 		@Override
 		protected MultisigModificationType getModification() {
 			return MultisigModificationType.Del;
@@ -36,7 +36,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, null),
+					v -> new MultisigAggregateModificationTransaction(MultisigAggregateModificationTransactionTest.TIME, signer, null),
 					IllegalArgumentException.class);
 		}
 
@@ -47,7 +47,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> new MultisigAggregateModificationTransaction(AbstractMultisigSignerModificationTransactionTest.TIME, signer, new ArrayList<>()),
+					v -> new MultisigAggregateModificationTransaction(MultisigAggregateModificationTransactionTest.TIME, signer, new ArrayList<>()),
 					IllegalArgumentException.class);
 		}
 		//endregion
@@ -63,7 +63,7 @@ public class MultisigAggregateModificationTransactionTest {
 					new MultisigModification(MultisigModificationType.Del, cosignatory2));
 
 			final MultisigAggregateModificationTransaction transaction =
-					AbstractMultisigSignerModificationTransactionTest.createTransaction(signer, modifications);
+					MultisigAggregateModificationTransactionTest.createTransaction(signer, modifications);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:
