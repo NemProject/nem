@@ -71,7 +71,6 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	/**
 	 * Adds a signature to this transaction.
-	 * TODO this should get called by unconfirmed transactions
 	 *
 	 * @param transaction The multisig signature transaction.
 	 */
@@ -80,32 +79,25 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			throw new IllegalArgumentException("trying to add a signature for another transaction to a multisig transaction");
 		}
 
-		// TODO 20141204 G-J: where should we check for duplicate MultisigSignatures ?
-		// TODO 20141221 G-J: after changing to SortedSet, changing compareTo and equals in
-		// MultisigSignatureTransaction could do the trick
-		// Not sure if that's a good idea, but I've changed comparator in such way
 		this.signatureTransactions.add(transaction);
 	}
-
-	// TODO 20150103 J-G: should test this where getSigners is tested
 
 	/**
 	 * Gets list of signature transactions.
 	 *
 	 * @return The list of signature transactions.
 	 */
-	public SortedSet<MultisigSignatureTransaction> getCosignerSignatures() {
-		return this.signatureTransactions;
+	public Set<MultisigSignatureTransaction> getCosignerSignatures() {
+		return Collections.unmodifiableSet(this.signatureTransactions);
 	}
 
 	/**
 	 * Gets all signers.
-	 * TODO this should get called by unconfirmed transactions
 	 *
 	 * @return All signers.
 	 */
 	public List<Account> getSigners() {
-		return this.signatureTransactions.stream().map(t -> t.getSigner()).collect(Collectors.toList());
+		return Collections.unmodifiableList(this.signatureTransactions.stream().map(t -> t.getSigner()).collect(Collectors.toList()));
 	}
 
 	@Override
@@ -117,25 +109,21 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected Amount getMinimumFee() {
-		// TODO 20141201 - i'm not sure if we want to charge people extra for multisig?
-		// TODO 20141202 G-J: 1) it requires a lot of additional processing, so that is a good reason
-		// to require additional fee. Maybe 100 is bit too much, but it should be high.
-		//
 		// MultisigAwareSingleTransactionValidator takes care of validating fee on inner transaction
+		// TODO 20150108 J-G: i think we should come to an agreement on the fee; what do you think about a contingent fee like:
+		// > 5L * this.getCosignerSignatures().size()
 		return Amount.fromNem(100L);
 	}
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		// TODO 20141220 J-G: should review / test this
-		// TODO 20150105 G-J: should we add other cosigners here as well?
-		// > I think it's not necessary
-		return this.otherTransaction.getAccounts();
+		return this.getChildTransactions().stream()
+				.flatMap(t -> t.getAccounts().stream())
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public Collection<Transaction> getChildTransactions() {
-		// TODO 20141220 J-G: should add test for this too
 		// we want validators to run on both inner transaction and all signatures
 		final List<Transaction> result = new ArrayList<>(this.getCosignerSignatures());
 		result.add(this.otherTransaction);
@@ -159,13 +147,10 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	public boolean verify() {
-		if (!super.verify()) {
-			return false;
-		}
+		return super.verify() && this.signatureTransactions.stream().allMatch(this::isSignatureMatch);
+	}
 
-		// TODO 20150103 J-G: consider simplifying since you are looping twice
-		return
-				this.signatureTransactions.stream().allMatch(signatureTransactions -> signatureTransactions.getOtherTransactionHash().equals(this.getOtherTransactionHash())) &&
-						this.signatureTransactions.stream().allMatch(signatureTransaction -> signatureTransaction.verify());
+	private boolean isSignatureMatch(final MultisigSignatureTransaction signatureTransaction) {
+		return signatureTransaction.getOtherTransactionHash().equals(this.getOtherTransactionHash()) && signatureTransaction.verify();
 	}
 }

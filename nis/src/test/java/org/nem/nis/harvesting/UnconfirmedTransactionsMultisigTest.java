@@ -120,7 +120,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 		final MultisigTransaction transaction = (MultisigTransaction)blockTransactions.getAll().get(0);
 		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getCosignerSignatures().first(), IsSame.sameInstance(signatureTransaction));
+		Assert.assertThat(transaction.getCosignerSignatures().iterator().next(), IsSame.sameInstance(signatureTransaction));
 	}
 
 	//region multisig signature
