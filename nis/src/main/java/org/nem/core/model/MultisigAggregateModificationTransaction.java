@@ -80,12 +80,13 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	@Override
 	protected Amount getMinimumFee() {
 		// TODO 20141111 G-J,B: decide, but I believe this should be high
-		return Amount.fromNem(1000);
+		return Amount.fromNem(100 + this.getModifications().size()*100);
 	}
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
 		// TODO 20141220 J-G: should review / test this; this should really have all of the accounts in the modifications i think
+		// TODO 20150109 G-J: you're right
 		return new ArrayList<>();
 	}
 }

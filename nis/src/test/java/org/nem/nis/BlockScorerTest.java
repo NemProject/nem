@@ -107,7 +107,7 @@ public class BlockScorerTest {
 		// Assert:
 		// (time-difference [100] * block-signer-importance [72000^] * multiplier * magic-number / difficulty [60e12])
 		// ^ MockBlockScorerAnalyzer calculates importance as balance / 1000
-		final long multiplier = 8_000_000_000L;
+		final long multiplier = NemesisBlock.AMOUNT.getNumNem();
 		final BigInteger expectedTarget = BigInteger.valueOf(100)
 				.multiply(BigInteger.valueOf(72000 * multiplier))
 				.multiply(BlockScorer.TWO_TO_THE_POWER_OF_64)
@@ -150,7 +150,7 @@ public class BlockScorerTest {
 		final long balance = context.scorer.calculateHarvesterBalance(block);
 
 		// Assert:
-		Assert.assertThat(balance, IsEqual.equalTo(6_000_000_000L)); // 0.75 * NemesisBlock.AMOUNT.getNumNem()
+		Assert.assertThat(balance, IsEqual.equalTo(75 * NemesisBlock.AMOUNT.getNumNem() / 100));
 	}
 
 	@Test
