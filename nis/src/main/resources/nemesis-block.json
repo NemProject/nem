@@ -1,6 +1,6 @@
 {
   "timeStamp": 0,
-  "signature": "4d76e5b698d6fd9e249423bc2439a5625820bd6b9290c474db9f88f326fe68c0cfdb7a79c63d86788bdbe4163701f8ba1ae1c3452f9e06ddd5107c29e331ee0e",
+  "signature": "3f9f42e426e583752d7cd652cdac00aaf0cf0a832bebec1994c03e9a0f0f5814024f446e3fb454828b0b587799dd6f822faa9e0812aa18d897c0be0e68584007",
   "prevBlockHash": {
     "data": "0000000000000000000000000000000000000000000000000000000000000000"
   },
@@ -1928,7 +1928,7 @@
     },
     {
       "timeStamp": 0,
-      "signature": "c972101bede91a8d161f0c8c5d2e7ab68fd6a606919e7b533dd69d627241f4d1b820f079f863a4b7f39c75563a7ea62cbeb812615730a05cd4026b39f1274c0f",
+      "signature": "8bd8b59ceaff3c25e4bbcd2de7543619a4388c22bd393948f52de41d95b5aa0b911fc3b66d5bb17095d2410e964ceb95f4ce8be933081bc69950755b3a407c01",
       "fee": 0,
       "type": 4097,
       "deadline": 0,
@@ -1937,17 +1937,17 @@
       "modifications": [
         {
           "modificationType": 1,
-          "cosignatoryAccount": "7fe0d5c0819e1bfb89c3d8f8145d1229faf307de5bc2163fc0a8e6fae2e104dd"
+          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b"
         },
         {
           "modificationType": 1,
-          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b"
+          "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324"
         }
       ]
     },
     {
       "timeStamp": 0,
-      "signature": "6c4d348fefdaee8e8b1627567430b94e9df290d4f3500dcb5aa73ba091cdb453bea3739105557420a41a08da5c45e568f67b9b6e92f41b20d3cc2be819295e0c",
+      "signature": "776d05c462454a38be1df5162856af3c940e3615c911e5b4cb46bbb94843f1d7202e1611773b1eae406c80554a541a7f4afe07242b9bb20a401fecd84d796302",
       "fee": 0,
       "type": 4097,
       "deadline": 0,
@@ -1956,11 +1956,11 @@
       "modifications": [
         {
           "modificationType": 1,
-          "cosignatoryAccount": "7fe0d5c0819e1bfb89c3d8f8145d1229faf307de5bc2163fc0a8e6fae2e104dd"
+          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b"
         },
         {
           "modificationType": 1,
-          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b"
+          "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324"
         }
       ]
     }

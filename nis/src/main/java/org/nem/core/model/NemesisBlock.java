@@ -1,6 +1,7 @@
 package org.nem.core.model;
 
 import net.minidev.json.*;
+import org.apache.commons.io.IOUtils;
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
@@ -33,7 +34,7 @@ public class NemesisBlock extends Block {
 	private final static PublicKey CREATOR_PUBLIC_KEY = PublicKey.fromHexString(
 			"e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f");
 
-	private final static String NEMESIS_BLOCK_FILE = "nemesis-block.json";
+	private final static String NEMESIS_BLOCK_FILE = "nemesis-block.bin";
 
 	static {
 		final KeyPair nemesisKeyPair = new KeyPair(CREATOR_PUBLIC_KEY);
@@ -83,8 +84,11 @@ public class NemesisBlock extends Block {
 	 */
 	public static NemesisBlock fromStream(final InputStream fin, final DeserializationContext context) {
 		try {
-			return fromJsonObject((JSONObject)JSONValue.parseStrict(fin), context);
-		} catch (IOException | net.minidev.json.parser.ParseException e) {
+			//return fromJsonObject((JSONObject)JSONValue.parseStrict(fin), context);
+			final ByteArrayOutputStream blob = new ByteArrayOutputStream(65536);
+			IOUtils.copy(fin, blob);
+			return fromBlobObject(blob.toByteArray(), context);
+		} catch (IOException e) {
 			throw new IllegalArgumentException("unable to parse nemesis block stream");
 		}
 	}
@@ -98,6 +102,22 @@ public class NemesisBlock extends Block {
 	 */
 	public static NemesisBlock fromJsonObject(final JSONObject jsonObject, final DeserializationContext context) {
 		final Deserializer deserializer = new JsonDeserializer(jsonObject, context);
+		if (BlockTypes.NEMESIS != deserializer.readInt("type")) {
+			throw new IllegalArgumentException("json object does not have correct type set");
+		}
+
+		return new NemesisBlock(deserializer);
+	}
+
+	/**
+	 * Loads the nemesis block from a binaryData.
+	 *
+	 * @param binObject The binary data.
+	 * @param context The deserialization context to use.
+	 * @return The nemesis block.
+	 */
+	public static NemesisBlock fromBlobObject(final byte[] binObject, final DeserializationContext context) {
+		final Deserializer deserializer = new BinaryDeserializer(binObject, context);
 		if (BlockTypes.NEMESIS != deserializer.readInt("type")) {
 			throw new IllegalArgumentException("json object does not have correct type set");
 		}
