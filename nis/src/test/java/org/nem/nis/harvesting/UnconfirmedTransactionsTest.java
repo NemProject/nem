@@ -64,13 +64,13 @@ public class UnconfirmedTransactionsTest {
 		final List<Transaction> transactions = Arrays.asList(
 				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(5), null),
 				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(4), null));
-		setFeeAndDeadline(transactions.get(0), Amount.fromNem(1));
-		setFeeAndDeadline(transactions.get(1), Amount.fromNem(2));
+		setFeeAndDeadline(transactions.get(0), Amount.fromNem(2));
+		setFeeAndDeadline(transactions.get(1), Amount.fromNem(3));
 		transactions.forEach(context::signAndAddExisting);
 
 		// Assert:
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(3)));
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(98)));
+		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(2)));
+		Assert.assertThat(context.transactions.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(97)));
 	}
 
 	@Test
@@ -629,6 +629,7 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext(new TransferTransactionValidator());
 		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(10, 2, 0);
 		context.setBalance(transactions.get(0).getSigner(), Amount.fromNem(5));
+		context.setBalance(transactions.get(2).getSigner(), Amount.fromNem(1 + 2));
 
 		final Block block = NisUtils.createRandomBlock();
 		block.addTransaction(transactions.get(0));
@@ -979,6 +980,7 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final TestContext context = new TestContext(new TransferTransactionValidator());
 		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(10, 2, 0);
+		context.setBalance(transactions.get(2).getSigner(), Amount.fromNem(1 + 2));
 
 		// Act:
 		final int numTransactions = context.transactions.size();
@@ -1198,11 +1200,11 @@ public class UnconfirmedTransactionsTest {
 		// of a block that would get discarded (TXes are validated first, and then executed)
 
 		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
-		t1.setFee(Amount.fromNem(1));
+		t1.setFee(Amount.fromNem(2));
 		t1.sign();
 		transactions.addExisting(t1);
 		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
-		t2.setFee(Amount.fromNem(2));
+		t2.setFee(Amount.fromNem(3));
 		t2.sign();
 		transactions.addExisting(t2);
 
