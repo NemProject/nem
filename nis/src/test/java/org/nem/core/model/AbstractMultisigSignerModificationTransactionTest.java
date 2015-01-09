@@ -90,8 +90,8 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 				createModificationList(modificationType, cosignatory));
 
 		// Act + Assert:
-		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(1000)));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(1000)));
+		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(200)));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(200)));
 	}
 
 	//endregion
@@ -117,7 +117,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), cosignatory);
 		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(1000));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), signer, Amount.fromNem(200));
 	}
 
 	@Test
@@ -139,7 +139,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory);
 		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(1000));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(200));
 	}
 
 	@Test
@@ -167,7 +167,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
 		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(1));
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(1000));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(300));
 	}
 
 	@Test
@@ -195,7 +195,7 @@ public abstract class AbstractMultisigSignerModificationTransactionTest {
 		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(0));
 		NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
 		NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(1));
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(1000));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), signer, Amount.fromNem(300));
 	}
 
 	// endregion

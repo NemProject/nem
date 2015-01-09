@@ -77,7 +77,7 @@ public class MultisigAggregateModificationTransactionTest {
 			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
 			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
 			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(1));
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(1000));
+			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(300));
 		}
 	}
 }
