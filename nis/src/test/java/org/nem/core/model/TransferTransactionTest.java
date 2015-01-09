@@ -157,6 +157,8 @@ public class TransferTransactionTest {
 		// Arrange:
 		final Account nemesisAccount = new Account(NemesisBlock.ADDRESS);
 
+		// TODO: should we fix it?
+
 		// Assert:
 		Assert.assertThat(this.calculateFee(nemesisAccount, 0, 0), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(this.calculateFee(nemesisAccount, 12000, 0), IsEqual.equalTo(Amount.ZERO));

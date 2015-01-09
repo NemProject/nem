@@ -6,6 +6,8 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 
 import java.io.*;
+import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Represents the nemesis block.
@@ -41,6 +43,24 @@ public class NemesisBlock extends Block {
 	private NemesisBlock(final Deserializer deserializer) {
 		super(BlockTypes.NEMESIS, DeserializationOptions.VERIFIABLE, deserializer);
 		this.setGenerationHash(GENERATION_HASH);
+
+		fixTransactions(this.getTransactions());
+	}
+
+	private static void fixTransactions(final List<Transaction> transactions) {
+		for (final Transaction transaction : transactions) {
+			final Field field;
+			try {
+				for (Field x : transaction.getClass().getSuperclass().getDeclaredFields()) {
+					System.out.println(x.getName());
+				}
+				field = transaction.getClass().getSuperclass().getDeclaredField("nemesisTransaction");
+				field.setAccessible(true);
+				field.set(transaction, true);
+			} catch (ReflectiveOperationException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
