@@ -74,6 +74,7 @@ public class BlockImportanceTransferBalanceValidatorTest {
 
 	//region invalid blocks
 
+	// TODO 20141229 J-G: i think this test needs to be updated now ... i think it should fail with FAILURE_CONFLICTING_IMPORTANCE_TRANSFER
 	@Test
 	public void blockWithTransferAndConflictingImportanceTransferDoesNotValidate() {
 		// Arrange:
