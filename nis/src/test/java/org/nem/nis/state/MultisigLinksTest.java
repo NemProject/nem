@@ -1,15 +1,12 @@
-package org.nem.nis.secret;
+package org.nem.nis.state;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
-import org.nem.nis.state.MultisigLinks;
 
 public class MultisigLinksTest {
-
-	// TODO 20150103 J-G: these tests are in the wrong package!
 
 	//region MultisigLinks
 	@Test
@@ -18,9 +15,8 @@ public class MultisigLinksTest {
 		final TestContext context = new TestContext();
 
 		// Assert:
-		// TODO 20150103 J-G: assertThat
-		Assert.assertFalse(context.multisigLinks.isCosignatory());
-		Assert.assertFalse(context.multisigLinks.isMultisig());
+		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
+		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
 	@Test
