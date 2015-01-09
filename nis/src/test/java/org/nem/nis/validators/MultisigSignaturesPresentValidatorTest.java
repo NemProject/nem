@@ -142,7 +142,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
 
 		// ugly but the only way to simulate a mismatched signature (MultisigTransaction does not allow one to be added)
-		final Set<MultisigSignatureTransaction> signatures = transaction.getCosignerSignatures();
+		final Set<MultisigSignatureTransaction> signatures = new HashSet<>();
 		signatures.add(new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				context.dummy,
