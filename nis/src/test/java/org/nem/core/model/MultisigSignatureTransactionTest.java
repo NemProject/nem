@@ -99,12 +99,11 @@ public class MultisigSignatureTransactionTest {
 
 	//region execute / undo
 
-	// TODO 20140103 J-G - these tests aren't actually validating the notification!
-
 	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
 		final Transaction transaction = createDefaultTransaction();
+		transaction.setFee(Amount.fromNem(12));
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -113,12 +112,14 @@ public class MultisigSignatureTransactionTest {
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getValue(), transaction.getSigner(), Amount.fromNem(12));
 	}
 
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
 		final Transaction transaction = createDefaultTransaction();
+		transaction.setFee(Amount.fromNem(12));
 
 		// Act:
 		final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -127,6 +128,7 @@ public class MultisigSignatureTransactionTest {
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getValue(), transaction.getSigner(), Amount.fromNem(12));
 	}
 
 	//endregion
