@@ -14,7 +14,7 @@ public class DefaultComparisonContextTest {
 		assertContextHasCorrectValues(1_000_000);
 	}
 
-	private static void assertContextHasCorrectValues(long height) {
+	private static void assertContextHasCorrectValues(final long height) {
 		// Act:
 		final ComparisonContext context = new DefaultComparisonContext(new BlockHeight(height));
 

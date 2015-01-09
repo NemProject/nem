@@ -428,14 +428,14 @@ public class UnconfirmedTransactions {
 						});
 	}
 
-	private void addTransactionToCache(Transaction transaction, Hash transactionHash) {
+	private void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
 		for (final Transaction childTransaction : transaction.getChildTransactions()) {
 			this.childTransactions.put(HashUtils.calculateHash(childTransaction), true);
 		}
 		this.transactions.put(transactionHash, transaction);
 	}
 
-	private void removeTransactionFromCache(Transaction transaction, Hash transactionHash) {
+	private void removeTransactionFromCache(final Transaction transaction, final Hash transactionHash) {
 		for (final Transaction childTransaction : transaction.getChildTransactions()) {
 			this.childTransactions.remove(HashUtils.calculateHash(childTransaction));
 		}
