@@ -1,7 +1,5 @@
 package org.nem.core.model;
 
-// TODO 20140103 - should add a few tests for this class
-
 /**
  * Enum containing types of multisig modifications.
  */
