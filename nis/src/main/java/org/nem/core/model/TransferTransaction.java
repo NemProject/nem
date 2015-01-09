@@ -102,13 +102,14 @@ public class TransferTransaction extends Transaction {
 
 	private long getMinimumTransferFee() {
 		final double nemAmount = this.amount.getNumNem();
-		return Math.max(1, (long)Math.ceil(nemAmount / 25000 + Math.log(nemAmount) / 5));
+		// TODO 20150109 G-*: this fee is imho too low
+		return Math.max(2, (long)Math.ceil(nemAmount / 12500 + 2*Math.log(nemAmount) / 5));
 	}
 
 	private long getMinimumMessageFee() {
 		return 0 == this.getMessageLength()
 				? 0
-				: Math.max(1, 5 * this.getMessageLength() / 256);
+				: Math.max(10, 10 * this.getMessageLength() / 32);
 	}
 
 	@Override

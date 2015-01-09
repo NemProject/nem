@@ -153,7 +153,7 @@ public class ImportanceTransferTransaction extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
-		return Amount.fromNem(1);
+		return Amount.fromNem(2);
 	}
 
 	@Override

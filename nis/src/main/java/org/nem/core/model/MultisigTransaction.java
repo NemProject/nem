@@ -112,7 +112,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		// MultisigAwareSingleTransactionValidator takes care of validating fee on inner transaction
 		// TODO 20150108 J-G: i think we should come to an agreement on the fee; what do you think about a contingent fee like:
 		// > 5L * this.getCosignerSignatures().size()
-		return Amount.fromNem(100L);
+		// TODO 20150109 G-J: y, I was thinking exactly about it, but due to the fact that we doubled the coins, I'd make it 10
+		// (actually I'd make it even higher, but we'd have to discuss that)
+		return Amount.fromNem(10L * this.getCosignerSignatures().size());
 	}
 
 	@Override

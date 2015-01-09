@@ -70,7 +70,12 @@ public class NemesisBlockTest {
 
 		// Assert:
 		for (final Transaction transaction : block.getTransactions()) {
-			Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+			if (transaction instanceof TransferTransaction) {
+				Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+
+			} else {
+				Assert.assertThat(transaction.getFee(), IsEqual.equalTo(transaction.getMinimumFee()));
+			}
 		}
 	}
 
