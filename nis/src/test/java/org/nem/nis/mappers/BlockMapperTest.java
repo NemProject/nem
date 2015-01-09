@@ -29,7 +29,7 @@ public class BlockMapperTest {
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, 0);
+		context.assertDbModel(dbModel);
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
 	}
@@ -45,7 +45,7 @@ public class BlockMapperTest {
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS);
+		context.assertDbModel(dbModel);
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
@@ -66,7 +66,7 @@ public class BlockMapperTest {
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS);
+		context.assertDbModel(dbModel);
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
@@ -86,7 +86,7 @@ public class BlockMapperTest {
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, 0);
+		context.assertDbModel(dbModel);
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
 	}
@@ -102,7 +102,7 @@ public class BlockMapperTest {
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS * 1000L);
+		context.assertDbModel(dbModel);
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
@@ -125,7 +125,7 @@ public class BlockMapperTest {
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS * (100L + 1));
+		context.assertDbModel(dbModel);
 		// note: we expect both multisig txes and block transfers
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
@@ -150,7 +150,7 @@ public class BlockMapperTest {
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, 1 * (100L + 1));
+		context.assertDbModel(dbModel);
 		// note: we expect both multisig txes and block transfers
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(1));
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
@@ -330,11 +330,15 @@ public class BlockMapperTest {
 		context.addImportanceTransferTransactions();
 		context.addTransactions();
 
+		final long feeA = context.model.getTransactions().get(0).getFee().getNumNem();
+		final long feeB = context.model.getTransactions().get(2).getFee().getNumNem();
+		final long feeC = context.model.getTransactions().get(4).getFee().getNumNem();
+
 		// Act:
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A * 1000L + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C);
+		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A * feeA + NUM_TRANSACTIONS_B*feeB + NUM_TRANSACTIONS_C*feeC);
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
@@ -446,7 +450,7 @@ public class BlockMapperTest {
 		final Block model = context.toModel(dbModel);
 
 		// Assert:
-		context.assertDbModel(dbModel, (100L + 1) * 2 + 2);
+		context.assertDbModel(dbModel, context.model.getTotalFee().getNumNem());
 
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
@@ -676,6 +680,9 @@ public class BlockMapperTest {
 			this.hash = HashUtils.calculateHash(this.model);
 		}
 
+		public void assertDbModel(final DbBlock dbModel) {
+			assertDbModel(dbModel, this.model.getTotalFee().getNumNem());
+		}
 		public void assertDbModel(final DbBlock dbModel, final long expectedFee) {
 			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
