@@ -38,8 +38,6 @@ public class TransferDaoITCase {
 	@Autowired
 	BlockDao blockDao;
 
-	// TODO: Move to integration test?
-	// TODO 20141205 BR: I guess we can delete this since we have the transaction cache
 	@Test
 	public void anyHashExistsIsFastEnough() {
 		// Arrange:

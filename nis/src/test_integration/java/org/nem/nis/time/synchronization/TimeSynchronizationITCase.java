@@ -209,7 +209,7 @@ public class TimeSynchronizationITCase {
 		network.logStatistics();
 		Assert.assertThat(network.hasConverged(), IsEqual.equalTo(true));
 		final double changeInMean = Math.abs(oldMean - network.calculateMean());
-		System.out.println(String.format("Change in mean: %fms", changeInMean));
+		Network.log(String.format("Change in mean: %fms", changeInMean));
 		Assert.assertThat(changeInMean < TOLERABLE_CHANGE_IN_MEAN, IsEqual.equalTo(true));
 	}
 
