@@ -51,9 +51,6 @@ public class NemesisBlock extends Block {
 		for (final Transaction transaction : transactions) {
 			final Field field;
 			try {
-				for (Field x : transaction.getClass().getSuperclass().getDeclaredFields()) {
-					System.out.println(x.getName());
-				}
 				field = transaction.getClass().getSuperclass().getDeclaredField("nemesisTransaction");
 				field.setAccessible(true);
 				field.set(transaction, true);
