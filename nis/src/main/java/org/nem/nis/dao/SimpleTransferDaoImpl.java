@@ -84,6 +84,7 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 			return false;
 		}
 
+		// note: this might look dumb, but doing it this way is 10x faster than usig .setParameterList() on Query
 		final String rawQuery = String.format(
 				"Select count(*) from <TABLE_NAME> t where t.transferHash in (%s) and t.block.height <= :height",
 				StringUtils.join(hashes.stream().map(h -> String.format("'%s'", h)).collect(Collectors.toList()), ","));
