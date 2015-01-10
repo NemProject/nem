@@ -27,11 +27,10 @@ public class PeerNetworkBootstrapper {
 	public PeerNetworkBootstrapper(
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
-			final NodeSelectorFactory selectorFactory,
-			final NodeSelectorFactory importanceAwareSelectorFactory,
+			final PeerNetworkNodeSelectorFactory selectorFactory,
 			final IpDetectionMode ipDetectionMode) {
 		this.ipDetectionMode = ipDetectionMode;
-		this.network = new PeerNetwork(state, servicesFactory, selectorFactory, importanceAwareSelectorFactory);
+		this.network = new PeerNetwork(state, servicesFactory, selectorFactory);
 	}
 
 	/**
