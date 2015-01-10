@@ -24,6 +24,7 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 
 	private final String tableName;
 	private final SessionFactory sessionFactory;
+	// TODO 20150110 G-J: do we still need it here?
 	private final Function<TTransfer, Hash> transferHashAccessor;
 
 	/**
@@ -60,7 +61,7 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 	public TTransfer findByHash(final byte[] txHash) {
 		final Query query = this.createQuery("from <TABLE_NAME> a where a.transferHash = :hash")
 				.setParameter("hash", txHash);
-		return this.getByHashQuery(txHash, query);
+		return this.getByHashQuery(query);
 	}
 
 	@Override
@@ -68,12 +69,11 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 		final Query query = this.createQuery("from <TABLE_NAME> t where t.transferHash = :hash and t.block.height <= :height")
 				.setParameter("hash", txHash)
 				.setParameter("height", maxBlockHeight);
-		return this.getByHashQuery(txHash, query);
+		return this.getByHashQuery(query);
 	}
 
 	@SuppressWarnings("unchecked")
-	private TTransfer getByHashQuery(final byte[] txHash, final Query query) {
-		// TODO 20140105 J-G: txHash isn't being used anymore; not sure if intentional or not
+	private TTransfer getByHashQuery(final Query query) {
 		final List<?> userList = query.list();
 		return userList.isEmpty() ? null : ((TTransfer)userList.get(0));
 	}
