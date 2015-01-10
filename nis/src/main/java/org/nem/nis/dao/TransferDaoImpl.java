@@ -19,7 +19,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	@Autowired(required = true)
 	public TransferDaoImpl(final SessionFactory sessionFactory) {
-		this.impl = new SimpleTransferDaoImpl<>("DbTransferTransaction", sessionFactory, DbTransferTransaction::getTransferHash);
+		this.impl = new SimpleTransferDaoImpl<>("DbTransferTransaction", sessionFactory);
 	}
 
 	private Session getCurrentSession() {

@@ -24,23 +24,18 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 
 	private final String tableName;
 	private final SessionFactory sessionFactory;
-	// TODO 20150110 G-J: do we still need it here?
-	private final Function<TTransfer, Hash> transferHashAccessor;
 
 	/**
 	 * Creates a transfer dao implementation.
 	 *
 	 * @param tableName The transfer table name.
 	 * @param sessionFactory The session factory.
-	 * @param transferHashSupplier A function that can be used to get a transfer hash.
 	 */
 	public SimpleTransferDaoImpl(
 			final String tableName,
-			final SessionFactory sessionFactory,
-			final Function<TTransfer, Hash> transferHashSupplier) {
+			final SessionFactory sessionFactory) {
 		this.tableName = tableName;
 		this.sessionFactory = sessionFactory;
-		this.transferHashAccessor = transferHashSupplier;
 	}
 
 	/**

@@ -16,7 +16,7 @@ public class ImportanceTransferDaoImpl implements ImportanceTransferDao {
 
 	@Autowired(required = true)
 	public ImportanceTransferDaoImpl(final SessionFactory sessionFactory) {
-		this.impl = new SimpleTransferDaoImpl<>("DbImportanceTransferTransaction", sessionFactory, DbImportanceTransferTransaction::getTransferHash);
+		this.impl = new SimpleTransferDaoImpl<>("DbImportanceTransferTransaction", sessionFactory);
 	}
 
 	@Override
