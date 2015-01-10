@@ -13,7 +13,6 @@ import java.util.logging.Logger;
 
 /**
  * This is intermediate layer between blockchain or harvesting and actual Dao.
- * TODO: not sure if other dau functions should be moved here, probably not
  */
 @Service
 public class BlockChainLastBlockLayer {

@@ -8,8 +8,6 @@ import java.util.List;
 
 /**
  * Strategy for calculating block difficulties.
- * TODO-CR: 20140808 - we really should test this class
- * TODO 20150109 G-* : guess we can remove that comment?
  */
 public class BlockDifficultyScorer {
 

@@ -6,10 +6,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 
 /**
- * TODO BIG FAT : fix in ncc foragedBlocks -> harvestedBlocks
- */
-
-/**
  * Represents an external view of an account.
  */
 public class AccountInfo implements SerializableEntity {

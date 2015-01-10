@@ -11,11 +11,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.io.*;
 
-// TODO 20150108 J-G: it looks like the nemesis block isn't verifiable :/
-// > there is also something wrong in that the nemesis transactions shouldn't have fees
-
 public class NemesisBlockTest {
-
 	private final static MockAccountLookup MOCK_ACCOUNT_LOOKUP = new MockAccountLookup();
 	private final static NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource(new DeserializationContext(MOCK_ACCOUNT_LOOKUP));
 	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
@@ -34,7 +30,6 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
-		// TODO 20150109 G-* : should we require this?
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
