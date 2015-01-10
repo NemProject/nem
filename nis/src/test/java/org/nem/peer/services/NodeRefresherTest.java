@@ -53,6 +53,24 @@ public class NodeRefresherTest {
 	}
 
 	@Test
+	public void refreshSuccessCanMoveBusyNodeToActive() {
+		// Arrange: set b as "busy"
+		final TestContext context = new TestContext();
+		context.setBusyGetInfoForNode("b");
+		context.refresher.refresh(context.refreshNodes).join();
+
+		// Arrange: reset b to active
+		context.setActiveGetInfoForNode("b");
+
+		// Act:
+		context.refresher.refresh(context.refreshNodes).join();
+
+		// Assert: all nodes are active
+		NodeCollectionAssert.areNamesEquivalent(context.nodes, new String[] { "a", "b", "c" }, new String[] { });
+		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
+	}
+
+	@Test
 	public void refreshGetInfoTransientFailureMovesNodesToBusy() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -514,6 +532,12 @@ public class NodeRefresherTest {
 
 		public TestContext(final NodeVersionCheck versionCheck) {
 			this.refresher = new NodeRefresher(this.localNode, this.nodes, this.connector, versionCheck);
+		}
+
+		public void setActiveGetInfoForNode(final String name) {
+			final Node node = NodeUtils.createNodeWithName(name);
+			Mockito.when(this.connector.getInfo(node))
+					.thenAnswer(i -> CompletableFuture.completedFuture((Node)i.getArguments()[0]));
 		}
 
 		public void setBusyGetInfoForNode(final String name) {
