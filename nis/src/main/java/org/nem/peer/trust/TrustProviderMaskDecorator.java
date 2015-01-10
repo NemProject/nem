@@ -6,8 +6,7 @@ import org.nem.core.node.*;
 /**
  * TrustProvider decorator that filters out the trust values of inactive and local nodes.
  */
-public class ActiveNodeTrustProvider implements TrustProvider {
-
+public class TrustProviderMaskDecorator implements TrustProvider {
 	private final TrustProvider trustProvider;
 	private final NodeCollection nodeCollection;
 
@@ -17,7 +16,7 @@ public class ActiveNodeTrustProvider implements TrustProvider {
 	 * @param trustProvider The trust provider.
 	 * @param nodeCollection The node collection.
 	 */
-	public ActiveNodeTrustProvider(final TrustProvider trustProvider, final NodeCollection nodeCollection) {
+	public TrustProviderMaskDecorator(final TrustProvider trustProvider, final NodeCollection nodeCollection) {
 		this.trustProvider = trustProvider;
 		this.nodeCollection = nodeCollection;
 	}

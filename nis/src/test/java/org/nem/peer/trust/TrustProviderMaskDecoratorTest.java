@@ -6,7 +6,7 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
 import org.nem.peer.test.*;
 
-public class ActiveNodeTrustProviderTest {
+public class TrustProviderMaskDecoratorTest {
 
 	@Test
 	public void activeNodesAreNotFilteredOut() {
@@ -52,7 +52,7 @@ public class ActiveNodeTrustProviderTest {
 
 		final NodeCollection nodeCollection = createNodeCollection(context.getNodes(), NodeStatus.INACTIVE);
 
-		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
 
 		// Act:
 		final ColumnVector resultVector = provider.computeTrust(context);
@@ -70,7 +70,7 @@ public class ActiveNodeTrustProviderTest {
 		final Node[] nodes = context.getNodes();
 		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
 
-		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
 
 		// Act:
 		final ColumnVector resultVector = provider.computeTrust(context);
@@ -89,7 +89,7 @@ public class ActiveNodeTrustProviderTest {
 		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
 		nodeCollection.update(nodes[1], NodeStatus.INACTIVE);
 
-		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
 
 		// Act:
 		final ColumnVector resultVector = provider.computeTrust(context);
@@ -108,7 +108,7 @@ public class ActiveNodeTrustProviderTest {
 		final NodeCollection nodeCollection = createNodeCollection(nodes, NodeStatus.ACTIVE);
 		nodeCollection.update(nodes[1], NodeStatus.INACTIVE);
 
-		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
 
 		// Act:
 		final ColumnVector resultVector = provider.computeTrust(context);
@@ -125,7 +125,7 @@ public class ActiveNodeTrustProviderTest {
 		final NodeCollection nodeCollection = createNodeCollection(context.getNodes(), NodeStatus.ACTIVE);
 		nodeCollection.update(context.getNodes()[2], status);
 
-		final TrustProvider provider = new ActiveNodeTrustProvider(new MockTrustProvider(inputVector), nodeCollection);
+		final TrustProvider provider = new TrustProviderMaskDecorator(new MockTrustProvider(inputVector), nodeCollection);
 
 		// Act:
 		return provider.computeTrust(context);

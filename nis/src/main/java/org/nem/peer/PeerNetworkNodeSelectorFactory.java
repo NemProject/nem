@@ -90,7 +90,7 @@ public class PeerNetworkNodeSelectorFactory {
 
 	private TrustProvider getTrustProvider(final boolean excludeBusyNodes) {
 		return excludeBusyNodes
-				? new ActiveNodeTrustProvider(this.trustProvider, this.state.getNodes())
+				? new TrustProviderMaskDecorator(this.trustProvider, this.state.getNodes())
 				: this.trustProvider;
 	}
 }
