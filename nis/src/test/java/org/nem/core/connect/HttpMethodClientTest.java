@@ -5,6 +5,8 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.MockSerializableEntity;
@@ -13,14 +15,10 @@ import org.nem.core.utils.ExceptionUtils;
 import java.net.URL;
 import java.util.concurrent.CancellationException;
 
+@RunWith(Enclosed.class)
 public class HttpMethodClientTest {
-
 	private static final HttpDeserializerResponseStrategy DEFAULT_STRATEGY = new HttpJsonResponseStrategy(null);
 	private static final int GOOD_TIMEOUT = 10000;
-
-	private final TestRunner getTestRunner = new TestRunner("GET", HttpMethodClient::get);
-
-	private final TestRunner postTestRunner = new TestRunner("POST", HttpMethodClientTest::sendPost);
 
 	private static <T> HttpMethodClient.AsyncToken<T> sendPost(
 			final HttpMethodClient<T> client,
@@ -29,135 +27,29 @@ public class HttpMethodClientTest {
 		return client.post(url, new HttpJsonPostRequest(new MockSerializableEntity()), responseStrategy);
 	}
 
-	//region get
-
-	@Test
-	public void getReturnsJsonDeserializerOnSuccess() {
-		// Assert:
-		this.getTestRunner.sendReturnsJsonDeserializerOnSuccess();
+	public static class GetMethodTest extends TestRunner {
+		public GetMethodTest() {
+			super("GET", HttpMethodClient::get);
+		}
 	}
 
-	@Test
-	public void getDelegatesToStrategyOnSuccess() {
-		// Assert:
-		this.getTestRunner.sendDelegatesToStrategyOnSuccess();
+	public static class PostMethodTest extends TestRunner {
+		public PostMethodTest() {
+			super("POST", HttpMethodClientTest::sendPost);
+		}
 	}
-
-	@Test
-	public void getSetsRequestHeadersCorrectly() {
-		// Assert:
-		this.getTestRunner.sendSetsRequestHeadersCorrectly();
-	}
-
-	@Test(expected = InactivePeerException.class)
-	public void getThrowsInactivePeerExceptionOnConnectionTimeout() {
-		// Assert:
-		this.getTestRunner.sendThrowsInactivePeerExceptionOnConnectionTimeout();
-	}
-
-	@Test(expected = BusyPeerException.class)
-	public void getThrowsBusyPeerExceptionOnSocketTimeout() {
-		// Assert:
-		this.getTestRunner.sendThrowsInactivePeerExceptionOnSocketTimeout();
-	}
-
-	@Test(expected = CancellationException.class)
-	public void getThrowsCancellationExceptionOnCancel() {
-		// Assert:
-		this.getTestRunner.sendThrowsCancellationExceptionOnCancel();
-	}
-
-	@Test(expected = FatalPeerException.class)
-	public void getThrowsFatalPeerExceptionOnUriError() {
-		// Assert:
-		this.getTestRunner.sendThrowsFatalPeerExceptionOnUriError();
-	}
-
-	@Test(expected = FatalPeerException.class)
-	public void getThrowsFatalPeerExceptionOnClientProtocolError() {
-		// Assert:
-		this.getTestRunner.sendThrowsFatalPeerExceptionOnClientProtocolError();
-	}
-
-	@Test(expected = CancellationException.class, timeout = GOOD_TIMEOUT)
-	public void getIsCancelledIfOperationTakesTooLong() {
-		// Assert:
-		this.getTestRunner.sendIsCancelledIfOperationTakesTooLong();
-	}
-
-	//endregion
-
-	//region post
-
-	@Test
-	public void postReturnsJsonDeserializerOnSuccess() {
-		// Assert:
-		this.postTestRunner.sendReturnsJsonDeserializerOnSuccess();
-	}
-
-	@Test
-	public void postDelegatesToStrategyOnSuccess() {
-		// Assert:
-		this.postTestRunner.sendDelegatesToStrategyOnSuccess();
-	}
-
-	@Test
-	public void postSetsRequestHeadersCorrectly() {
-		// Assert:
-		this.postTestRunner.sendSetsRequestHeadersCorrectly();
-	}
-
-	@Test(expected = InactivePeerException.class)
-	public void postThrowsInactivePeerExceptionOnConnectionTimeout() {
-		// Assert:
-		this.postTestRunner.sendThrowsInactivePeerExceptionOnConnectionTimeout();
-	}
-
-	@Test(expected = BusyPeerException.class)
-	public void postThrowsBusyPeerExceptionOnSocketTimeout() {
-		// Assert:
-		this.postTestRunner.sendThrowsInactivePeerExceptionOnSocketTimeout();
-	}
-
-	@Test(expected = CancellationException.class)
-	public void postThrowsCancellationExceptionOnCancel() {
-		// Assert:
-		this.postTestRunner.sendThrowsCancellationExceptionOnCancel();
-	}
-
-	@Test(expected = FatalPeerException.class)
-	public void postThrowsFatalPeerExceptionOnUriError() {
-		// Assert:
-		this.postTestRunner.sendThrowsFatalPeerExceptionOnUriError();
-	}
-
-	@Test(expected = FatalPeerException.class)
-	public void postThrowsFatalPeerExceptionOnClientProtocolError() {
-		// Assert:
-		this.postTestRunner.sendThrowsFatalPeerExceptionOnClientProtocolError();
-	}
-
-	@Test(expected = CancellationException.class, timeout = GOOD_TIMEOUT)
-	public void postIsCancelledIfOperationTakesTooLong() {
-		// Assert:
-		this.postTestRunner.sendIsCancelledIfOperationTakesTooLong();
-	}
-
-	//endregion
 
 	private static HttpMethodClient<Deserializer> createClient(final int timeout) {
 		return new HttpMethodClient<>(timeout, timeout, 10000);
 	}
 
 	private static class TestRunner {
-
 		private final String GOOD_URL = "http://echo.jsontest.com/key/value/one/two";
 		private final String TIMEOUT_URL = "http://127.0.0.100/";
 		private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
 		private final String HOST_LESS_URI = "file:///~/calendar";
 
 		public interface SendAsyncStrategy {
-
 			<T> HttpMethodClient.AsyncToken<T> send(
 					final HttpMethodClient<T> client,
 					final URL url,
@@ -172,6 +64,7 @@ public class HttpMethodClientTest {
 			this.strategy = strategy;
 		}
 
+		@Test
 		public void sendReturnsJsonDeserializerOnSuccess() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
@@ -185,6 +78,7 @@ public class HttpMethodClientTest {
 			Assert.assertThat(deserializer.readString("key"), IsEqual.equalTo("value"));
 		}
 
+		@Test
 		public void sendDelegatesToStrategyOnSuccess() {
 			// Arrange:
 			final HttpDeserializerResponseStrategy strategy = Mockito.mock(HttpDeserializerResponseStrategy.class);
@@ -197,6 +91,7 @@ public class HttpMethodClientTest {
 			Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
 		}
 
+		@Test
 		public void sendSetsRequestHeadersCorrectly() {
 			// Arrange:
 			final MockHttpResponseStrategy<Object> strategy = new MockHttpResponseStrategy<>();
@@ -211,6 +106,7 @@ public class HttpMethodClientTest {
 			Assert.assertThat(strategy.getRequestAcceptHeader(), IsEqual.equalTo("content-type/supported"));
 		}
 
+		@Test(expected = InactivePeerException.class)
 		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(1, GOOD_TIMEOUT, GOOD_TIMEOUT);
@@ -219,7 +115,8 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl("http://10.0.0.1:9999"), DEFAULT_STRATEGY).get();
 		}
 
-		public void sendThrowsInactivePeerExceptionOnSocketTimeout() {
+		@Test(expected = BusyPeerException.class)
+		public void sendThrowsBusyPeerExceptionOnSocketTimeout() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = createClient(1);
 
@@ -227,6 +124,7 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl(this.TIMEOUT_URL), DEFAULT_STRATEGY).get();
 		}
 
+		@Test(expected = CancellationException.class)
 		public void sendThrowsCancellationExceptionOnCancel() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = createClient(1);
@@ -240,6 +138,7 @@ public class HttpMethodClientTest {
 			token.get();
 		}
 
+		@Test(expected = FatalPeerException.class)
 		public void sendThrowsFatalPeerExceptionOnUriError() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
@@ -248,6 +147,7 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl(this.MALFORMED_URI), DEFAULT_STRATEGY).get();
 		}
 
+		@Test(expected = FatalPeerException.class)
 		public void sendThrowsFatalPeerExceptionOnClientProtocolError() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
@@ -256,6 +156,7 @@ public class HttpMethodClientTest {
 			this.strategy.send(client, this.stringToUrl(this.HOST_LESS_URI), DEFAULT_STRATEGY).get();
 		}
 
+		@Test(expected = CancellationException.class)
 		public void sendIsCancelledIfOperationTakesTooLong() {
 			// Arrange:
 			final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(
@@ -273,7 +174,6 @@ public class HttpMethodClientTest {
 	}
 
 	private static class MockHttpResponseStrategy<T> implements HttpResponseStrategy<T> {
-
 		private String requestMethod;
 		private String requestContentType;
 		private String requestAcceptHeader;
