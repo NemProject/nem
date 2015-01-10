@@ -1,6 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
+import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
@@ -95,7 +96,7 @@ public class AccountController {
 	}
 
 	/**
-	 * Gets information about transactions of a specified account ending at the specified transaction (via hash).
+	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
 	 *
 	 * @param builder The page builder.
 	 * @return Information about the matching transactions.
@@ -103,11 +104,11 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/all", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersAll(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.ALL);
+		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.ALL);
 	}
 
 	/**
-	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash).
+	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
 	 *
 	 * @param builder The page builder.
 	 * @return Information about the matching transactions.
@@ -115,11 +116,11 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/incoming", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersIncoming(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.INCOMING);
+		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	/**
-	 * Gets information about outgoing transactions of a specified account ending at the specified transaction (via hash).
+	 * Gets information about outgoing transactions of a specified account ending at the specified transaction (via hash or id).
 	 *
 	 * @param builder The page builder.
 	 * @return Information about the matching transactions.
@@ -127,7 +128,84 @@ public class AccountController {
 	@RequestMapping(value = "/account/transfers/outgoing", method = RequestMethod.GET)
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsPageBuilder builder) {
-		return this.getAccountTransfersUsingId(builder, ReadOnlyTransferDao.TransferType.OUTGOING);
+		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.OUTGOING);
+	}
+
+	/**
+	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
+	 * Transaction messages are decrypted with the supplied private key.
+	 *
+	 * @param pair The pair.
+	 * @return Information about the matching transactions.
+	 */
+	@RequestMapping(value = "/local/account/transfers/all", method = RequestMethod.POST)
+	@TrustedApi
+	@ClientApi
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersAll(final AccountTransactionsPagePrivateKeyPair pair) {
+		return this.transformPairs(this.getAccountTransfersUsingId(pair.getPage(), ReadOnlyTransferDao.TransferType.ALL));
+	}
+
+	/**
+	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
+	 * Transaction messages are decrypted with the supplied private key.
+	 *
+	 * @param pair The pair.
+	 * @return Information about the matching transactions.
+	 */
+	@RequestMapping(value = "/local/account/transfers/incoming", method = RequestMethod.POST)
+	@TrustedApi
+	@ClientApi
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(final AccountTransactionsPagePrivateKeyPair pair) {
+		return this.transformPairs(this.getAccountTransfersUsingId(pair.getPage(), ReadOnlyTransferDao.TransferType.INCOMING));
+	}
+
+	/**
+	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
+	 * Transaction messages are decrypted with the supplied private key.
+	 *
+	 * @param pair The pair.
+	 * @return Information about the matching transactions.
+	 */
+	@RequestMapping(value = "/local/account/transfers/outgoing", method = RequestMethod.POST)
+	@TrustedApi
+	@ClientApi
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(final AccountTransactionsPagePrivateKeyPair pair) {
+		return this.transformPairs(this.getAccountTransfersUsingId(pair.getPage(), ReadOnlyTransferDao.TransferType.OUTGOING));
+	}
+
+	private SerializableList<TransactionMetaDataPair> transformPairs(final SerializableList<TransactionMetaDataPair> originalPairs) {
+		final Collection<TransactionMetaDataPair> pairs = originalPairs.asCollection().stream()
+				.map(this::tryCreateDecodedPair)
+				.collect(Collectors.toList());
+		return new SerializableList<>(pairs);
+	}
+
+	private TransactionMetaDataPair tryCreateDecodedPair(final TransactionMetaDataPair pair) {
+		final Transaction transaction = pair.getTransaction();
+		if (TransactionTypes.TRANSFER == transaction.getType()) {
+			final TransferTransaction t = (TransferTransaction)transaction;
+			if (null != t.getMessage() &&
+					MessageTypes.SECURE == t.getMessage().getType() &&
+					t.getMessage().canDecode()) {
+				return this.createDecodedPair(t, pair.getMetaData());
+			}
+		}
+
+		return pair;
+	}
+
+	private TransactionMetaDataPair createDecodedPair(final TransferTransaction t, final TransactionMetaData metaData) {
+		final Message plainMessage = new PlainMessage(t.getMessage().getDecodedPayload());
+		final TransferTransaction decodedTransaction = new TransferTransaction(
+				t.getTimeStamp(),
+				t.getSigner(),
+				t.getRecipient(),
+				t.getAmount(),
+				plainMessage);
+		decodedTransaction.setFee(t.getFee());
+		decodedTransaction.setDeadline(t.getDeadline());
+		decodedTransaction.setSignature(t.getSignature());
+		return new TransactionMetaDataPair(decodedTransaction, metaData);
 	}
 
 	// The GUI should never query with a hash as parameter because it is slower. When the GUI starts however it neither has an id
@@ -144,9 +222,8 @@ public class AccountController {
 	// (the two hop solution would be (hop 1) 'find transaction by hash' / get id / (hop 2) 'get account transfers using id')
 	// i suppose i don't have a strong preference if you want to leave the hash-based apis
 	private SerializableList<TransactionMetaDataPair> getAccountTransfersUsingId(
-			final AccountTransactionsPageBuilder builder,
+			final AccountTransactionsPage page,
 			final ReadOnlyTransferDao.TransferType transferType) {
-		final AccountTransactionsPage page = builder.build();
 		if (null != page.getId()) {
 			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), page.getId(), transferType);
 		}
