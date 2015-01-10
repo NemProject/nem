@@ -211,7 +211,7 @@ public class TransferDaoImpl implements TransferDao {
 		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
 		final String preQueryString = "SELECT t.*, b.* " +
 				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-				"WHERE %s = %d AND t.id < %d AND t.blockId = b.id " +
+				"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d AND t.blockId = b.id " +
 				"ORDER BY %s, t.id DESC";
 		final String queryString = String.format(preQueryString,
 				senderOrRecipient,
@@ -250,7 +250,7 @@ public class TransferDaoImpl implements TransferDao {
 		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
 		final String preQueryString = "SELECT t.*, b.* " +
 				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-				"WHERE %s = %d AND t.blockId = b.id " +
+				"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.blockId = b.id " +
 				"ORDER BY %s, t.id DESC";
 		final String queryString = String.format(preQueryString,
 				senderOrRecipient,
