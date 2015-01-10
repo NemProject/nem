@@ -175,7 +175,7 @@ public class PeerNetworkTest {
 		final Collection<Node> selectedNodes = context.network.getPartnerNodes();
 
 		// Assert:
-		Mockito.verify(context.selectorFactory, Mockito.times(2)).createUpdateNodeSelector(); // called one in construction and once in refresh
+		Mockito.verify(context.selectorFactory, Mockito.times(2)).createUpdateNodeSelector(); // called once in construction and once in refresh
 		Mockito.verify(updateSelector, Mockito.only()).selectNodes(); // called in getPartnerNodes
 		Assert.assertThat(selectedNodes, IsSame.sameInstance(nodes));
 	}
