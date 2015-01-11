@@ -330,15 +330,11 @@ public class BlockMapperTest {
 		context.addImportanceTransferTransactions();
 		context.addTransactions();
 
-		final long feeA = context.model.getTransactions().get(0).getFee().getNumNem();
-		final long feeB = context.model.getTransactions().get(2).getFee().getNumNem();
-		final long feeC = context.model.getTransactions().get(4).getFee().getNumNem();
-
 		// Act:
 		final DbBlock dbModel = context.toDbModel();
 
 		// Assert:
-		context.assertDbModel(dbModel, NUM_TRANSACTIONS_A * feeA + NUM_TRANSACTIONS_B*feeB + NUM_TRANSACTIONS_C*feeC);
+		context.assertDbModel(dbModel);
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
@@ -396,7 +392,7 @@ public class BlockMapperTest {
 		final Block model = context.toModel(dbModel);
 
 		// Assert:
-		context.assertDbModel(dbModel, 1000L * (NUM_TRANSACTIONS_A + NUM_TRANSACTIONS_B + NUM_TRANSACTIONS_C));
+		context.assertDbModel(dbModel);
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_A));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_B));
 		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS_C));
@@ -450,7 +446,7 @@ public class BlockMapperTest {
 		final Block model = context.toModel(dbModel);
 
 		// Assert:
-		context.assertDbModel(dbModel, context.model.getTotalFee().getNumNem());
+		context.assertDbModel(dbModel);
 
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
@@ -681,9 +677,6 @@ public class BlockMapperTest {
 		}
 
 		public void assertDbModel(final DbBlock dbModel) {
-			assertDbModel(dbModel, this.model.getTotalFee().getNumNem());
-		}
-		public void assertDbModel(final DbBlock dbModel, final long expectedFee) {
 			Assert.assertThat(dbModel.getId(), IsNull.nullValue());
 			Assert.assertThat(dbModel.getShortId(), IsEqual.equalTo(this.hash.getShortId()));
 			Assert.assertThat(dbModel.getVersion(), IsEqual.equalTo(1));
@@ -693,7 +686,7 @@ public class BlockMapperTest {
 			Assert.assertThat(dbModel.getHarvester(), IsEqual.equalTo(this.dbHarvester));
 			Assert.assertThat(dbModel.getHarvesterProof(), IsEqual.equalTo(this.model.getSignature().getBytes()));
 			Assert.assertThat(dbModel.getHeight(), IsEqual.equalTo(17L));
-			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(Amount.fromNem(expectedFee).getNumMicroNem()));
+			Assert.assertThat(dbModel.getTotalFee(), IsEqual.equalTo(this.model.getTotalFee().getNumMicroNem()));
 			Assert.assertThat(dbModel.getDifficulty(), IsEqual.equalTo(79_876_543_211_237L));
 			Assert.assertThat(dbModel.getGenerationHash(), IsEqual.equalTo(this.blockGenerationHash));
 			Assert.assertThat(dbModel.getLessor(), IsEqual.equalTo(this.dbLessor));

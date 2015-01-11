@@ -639,6 +639,7 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.removeAll(block);
 
 		// Assert:
+		// TODO 20150111 J-G: please update comments:
 		// - removing the first transaction triggers an exception and forces a cache rebuild
 		// - first transaction cannot be added - account1 balance (5) < 8 + 1
 		// - second transaction cannot be added - account2 balance (2) < 5 + 1
@@ -987,6 +988,7 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
 
 		// Assert:
+		// TODO 20150111 J-G: please update comments:
 		// - first transaction was dropped because it expired
 		// - second was dropped because it was dependent on the first - account2 balance (2) < 5 + 1
 		// - third transaction can be added - account2 balance (2) == 1 + 1
@@ -1188,6 +1190,7 @@ public class UnconfirmedTransactionsTest {
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
+		// TODO 20150111 J-G: please update comments:
 		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
 		// 		- initially the balances are: S = 10, R = 0
 		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 4, R = 5, 1 Fee

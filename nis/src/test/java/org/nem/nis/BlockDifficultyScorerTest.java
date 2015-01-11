@@ -104,6 +104,7 @@ public class BlockDifficultyScorerTest {
 			Assert.assertThat(diff.compareTo(prevDifficulty), IsEqual.equalTo(comparisonResult));
 
 			blockDifficulties.add(diff);
+			// TODO 20150111 J-G: why (i+2) here?
 			timeInstants.add(new TimeInstant(time + timeNeededForGeneratingBlock*(i+2)));
 			prevDifficulty = diff;
 		}
@@ -138,6 +139,7 @@ public class BlockDifficultyScorerTest {
 		for (int i = 0; i < 100; ++i) {
 			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
 
+			// TODO 20150111 J-G: why are you breaking out of the loop? i think the test should be more deterministic
 			if (diff.getRaw() >= (10*BASE_DIFF.getRaw()) || diff.getRaw() <= (BASE_DIFF.getRaw() / 10)) {
 				break;
 			}
@@ -172,6 +174,7 @@ public class BlockDifficultyScorerTest {
 			Assert.assertThat(diff, IsEqual.equalTo(prevDifficulty));
 
 			blockDifficulties.add(diff);
+			// TODO 20150111 J-G: why 2 * (i+2)
 			timeInstants.add(new TimeInstant(time + 2*(i+2)));
 			prevDifficulty = diff;
 		}

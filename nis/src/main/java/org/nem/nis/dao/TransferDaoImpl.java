@@ -209,6 +209,7 @@ public class TransferDaoImpl implements TransferDao {
 		final DbTransferTransaction topMostTransferTransaction = pair.getDbTransferTransaction();
 
 		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
+		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
 		final String preQueryString = "SELECT t.*, b.* " +
 				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 				"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d AND t.blockId = b.id " +

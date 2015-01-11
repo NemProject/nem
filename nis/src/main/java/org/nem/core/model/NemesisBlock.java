@@ -116,6 +116,7 @@ public class NemesisBlock extends Block {
 	 * @param context The deserialization context to use.
 	 * @return The nemesis block.
 	 */
+	// TODO 20150111 J-G: if we want to keep this, we should test it
 	public static NemesisBlock fromBlobObject(final byte[] binObject, final DeserializationContext context) {
 		final Deserializer deserializer = new BinaryDeserializer(binObject, context);
 		if (BlockTypes.NEMESIS != deserializer.readInt("type")) {
