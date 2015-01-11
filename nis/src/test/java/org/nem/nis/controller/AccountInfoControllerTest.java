@@ -233,6 +233,7 @@ public class AccountInfoControllerTest {
 
 			final ReadOnlyAccountState accountState = Mockito.mock(AccountState.class);
 			Mockito.when(accountState.getRemoteLinks()).thenReturn(remoteLinks);
+			Mockito.when(accountState.getMultisigLinks()).thenReturn(new MultisigLinks());
 
 			Mockito.when(this.accountStateCache.findStateByAddress(this.address)).thenReturn(accountState);
 		}
