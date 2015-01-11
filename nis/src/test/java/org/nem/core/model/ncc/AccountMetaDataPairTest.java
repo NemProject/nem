@@ -7,6 +7,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
+import java.util.ArrayList;
+
 public class AccountMetaDataPairTest {
 
 	@Test
@@ -24,24 +26,25 @@ public class AccountMetaDataPairTest {
 	@Test
 	public void canRoundTripAccountMetaDataPair() {
 		// Arrange:
-		final AccountMetaDataTest.TestContext context = new AccountMetaDataTest.TestContext(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE);
 		final Address address = Utils.generateRandomAddress();
 
 		// Act:
-		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(address, context.createAccountMetaData());
+		final AccountMetaDataPair metaDataPair = createRoundTrippedPair(address, AccountStatus.LOCKED, AccountRemoteStatus.ACTIVATING);
 
 		// Assert:
 		Assert.assertThat(metaDataPair.getAccount().getAddress(), IsEqual.equalTo(address));
-		context.assertContext(metaDataPair.getMetaData());
+		Assert.assertThat(metaDataPair.getMetaData().getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Assert.assertThat(metaDataPair.getMetaData().getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVATING));
 	}
 
 	private static AccountMetaDataPair createRoundTrippedPair(
 			final Address address,
-			final AccountMetaData metaData) {
+			final AccountStatus status,
+			final AccountRemoteStatus remoteStatus) {
 		// Arrange:
 		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(
 				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
-				metaData);
+				new AccountMetaData(status, remoteStatus, new ArrayList<>()));
 
 		// Act:
 		return new AccountMetaDataPair(Utils.roundtripSerializableEntity(metaDataPair, null));

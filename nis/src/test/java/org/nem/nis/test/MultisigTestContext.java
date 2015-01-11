@@ -8,13 +8,12 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.state.MultisigLinks;
 import org.nem.nis.validators.*;
 
 import java.util.*;
 
 public class MultisigTestContext {
-	public final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
+	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
 	private final MultisigAggregateModificationTransactionValidator multisigAggregateModificationTransactionValidator =
 			new MultisigAggregateModificationTransactionValidator(this.accountCache);
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);

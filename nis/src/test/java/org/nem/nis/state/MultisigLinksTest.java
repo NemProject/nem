@@ -162,6 +162,43 @@ public class MultisigLinksTest {
 
 	//endregion
 
+	// TODO 20150111 J-G: should rename this probably getCosignatoriesOf or getMultisigs
+	//region getCosignatoriesOf
+
+	@Test
+	public void getCosignatoryOfIsReadOnly() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final Collection<Address> multisigAddresses = context.multisigLinks.getCosignatoryOf();
+		ExceptionAssert.assertThrows(
+				v -> multisigAddresses.add(Utils.generateRandomAddress()),
+				UnsupportedOperationException.class);
+	}
+
+	@Test
+	public void getCosignatoryOfReturnsAllMultisigAccounts() {
+		// Arrange:
+		final Address cosignatory1 = Utils.generateRandomAddress();
+		final Address cosignatory2 = Utils.generateRandomAddress();
+		final Address multisig1 = Utils.generateRandomAddress();
+		final Address multisig2 = Utils.generateRandomAddress();
+		final TestContext context = new TestContext();
+		context.addCosignatory(cosignatory1);
+		context.addCosignatory(cosignatory2);
+		context.addCosignatoryOf(multisig1);
+		context.addCosignatoryOf(multisig2);
+
+		// Act:
+		final Collection<Address> multisigAddresses = context.multisigLinks.getCosignatoryOf();
+
+		// Assert:
+		Assert.assertThat(multisigAddresses, IsEquivalent.equivalentTo(multisig1, multisig2));
+	}
+
+	//endregion
+
 	private class TestContext {
 		final MultisigLinks multisigLinks = new MultisigLinks();
 		final Address address = Utils.generateRandomAddress();

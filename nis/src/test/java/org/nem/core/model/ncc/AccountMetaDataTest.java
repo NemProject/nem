@@ -3,93 +3,100 @@ package org.nem.core.model.ncc;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.Amount;
-import org.nem.core.model.primitive.BlockAmount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.Utils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class AccountMetaDataTest {
 
 	@Test
-	public void canCreateAccountMetaData() {
+	public void canCreateAccountMetaDataForNonCosignerAccount() {
 		// Arrange:
-		final TestContext context = new TestContext(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE);
-		final AccountMetaData metaData = context.createAccountMetaData();
+		final AccountMetaData metaData = createAccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE);
 
 		// Assert:
-		context.assertContext(metaData);
+		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVE));
+		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void canRoundTripAccountMetaData() {
+	public void canCreateAccountMetaDataForCosignerAccount() {
 		// Arrange:
-		final TestContext context = new TestContext(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING);
-		final AccountMetaData metaData = context.createRoundTrippedAccountMetaData(true);
+		final List<AccountInfo> multisigAccounts = createAccountInfos();
+		final AccountMetaData metaData = createAccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE, multisigAccounts);
 
 		// Assert:
-		context.assertContext(metaData);
+		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.UNLOCKED));
+		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.ACTIVE));
+		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
+		assertAccountInfos(metaData.getCosignatoryOf(), multisigAccounts);
 	}
 
 	@Test
-	public void canRoundTripAccountWithEmptyCosignatories() {
+	public void canRoundTripAccountMetaDataForNonCosignerAccount() {
 		// Arrange:
-		final TestContext context = new TestContext(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING, Arrays.asList());
-		final AccountMetaData metaData = context.createRoundTrippedAccountMetaData(false);
+		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
+				createAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING));
 
 		// Assert:
-		context.assertContext(metaData);
+		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
+		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(true));
 	}
 
-	public static class TestContext {
-		final AccountStatus status;
-		final AccountRemoteStatus remoteStatus;
-		final private List<AccountInfo> cosignatoryOf;
+	@Test
+	public void canRoundTripAccountMetaDataForCosignerAccount() {
+		// Arrange:
+		final List<AccountInfo> multisigAccounts = createAccountInfos();
+		final AccountMetaData metaData = createRoundTrippedAccountMetaData(
+				createAccountMetaData(AccountStatus.LOCKED, AccountRemoteStatus.DEACTIVATING, multisigAccounts));
 
-		TestContext(final AccountStatus status, final AccountRemoteStatus remoteStatus) {
-			this(status, remoteStatus, Arrays.asList(
-					new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), new BlockAmount(234), "account1", 0.1),
-					new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), new BlockAmount(456), "account2", 0.2)
-			));
+		// Assert:
+		Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(AccountStatus.LOCKED));
+		Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(AccountRemoteStatus.DEACTIVATING));
+		Assert.assertThat(metaData.getCosignatoryOf().isEmpty(), IsEqual.equalTo(false));
+		assertAccountInfos(metaData.getCosignatoryOf(), multisigAccounts);
+	}
+
+
+	private static AccountMetaData createAccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus) {
+		return createAccountMetaData(status, remoteStatus, new ArrayList<>());
+	}
+
+	private static AccountMetaData createAccountMetaData(
+			final AccountStatus status,
+			final AccountRemoteStatus remoteStatus,
+			final List<AccountInfo> multisigAccounts) {
+		return new AccountMetaData(status, remoteStatus, multisigAccounts);
+	}
+
+	private static AccountMetaData createRoundTrippedAccountMetaData(final AccountMetaData metaData) {
+		// Act:
+		final Deserializer deserializer = Utils.roundtripSerializableEntity(metaData, null);
+		return new AccountMetaData(deserializer);
+	}
+
+	private static List<AccountInfo> createAccountInfos() {
+		return Arrays.asList(
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), new BlockAmount(234), "account1", 0.1),
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), new BlockAmount(456), "account2", 0.2));
+	}
+
+	private static void assertAccountInfos(final List<AccountInfo> actual, final List<AccountInfo> expected) {
+		Assert.assertThat(actual.size(), IsEqual.equalTo(expected.size()));;
+		for (int i = 0; i < actual.size(); ++i) {
+			assertAccountInfo(actual.get(i), expected.get(i));
 		}
+	}
 
-		public TestContext(final AccountStatus status, final AccountRemoteStatus remoteStatus, final List<AccountInfo> accountInfoList) {
-			this.status = status;
-			this.remoteStatus = remoteStatus;
-			this.cosignatoryOf = accountInfoList;
-		}
-
-		public AccountMetaData createAccountMetaData() {
-			return new AccountMetaData(this.status, this.remoteStatus, this.cosignatoryOf);
-		}
-
-		private AccountMetaData createRoundTrippedAccountMetaData(boolean b) {
-			// Arrange:
-			final AccountMetaData metaData = this.createAccountMetaData();
-
-			// Act:
-			final Deserializer deserializer = Utils.roundtripSerializableEntity(metaData, null);
-			return new AccountMetaData(deserializer);
-		}
-
-		public void assertContext(final AccountMetaData metaData) {
-			Assert.assertThat(metaData.getStatus(), IsEqual.equalTo(this.status));
-			Assert.assertThat(metaData.getRemoteStatus(), IsEqual.equalTo(this.remoteStatus));
-
-			Assert.assertThat(metaData.getCosignatoryOf().size(), IsEqual.equalTo(this.cosignatoryOf.size()));
-			for (int i = 0; i < this.cosignatoryOf.size(); ++i) {
-				assertAccountInfo(metaData.getCosignatoryOf().get(i), this.cosignatoryOf.get(i));
-			}
-		}
-
-		private static void assertAccountInfo(final AccountInfo actual, final AccountInfo expected) {
-			Assert.assertThat(actual.getAddress(), IsEqual.equalTo(expected.getAddress()));
-			Assert.assertThat(actual.getBalance(), IsEqual.equalTo(expected.getBalance()));
-			Assert.assertThat(actual.getNumHarvestedBlocks(), IsEqual.equalTo(expected.getNumHarvestedBlocks()));
-			Assert.assertThat(actual.getLabel(), IsEqual.equalTo(expected.getLabel()));
-			Assert.assertThat(actual.getImportance(), IsEqual.equalTo(expected.getImportance()));
-		}
+	private static void assertAccountInfo(final AccountInfo actual, final AccountInfo expected) {
+		Assert.assertThat(actual.getAddress(), IsEqual.equalTo(expected.getAddress()));
+		Assert.assertThat(actual.getBalance(), IsEqual.equalTo(expected.getBalance()));
+		Assert.assertThat(actual.getNumHarvestedBlocks(), IsEqual.equalTo(expected.getNumHarvestedBlocks()));
+		Assert.assertThat(actual.getLabel(), IsEqual.equalTo(expected.getLabel()));
+		Assert.assertThat(actual.getImportance(), IsEqual.equalTo(expected.getImportance()));
 	}
 }
