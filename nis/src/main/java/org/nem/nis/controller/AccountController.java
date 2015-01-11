@@ -133,7 +133,8 @@ public class AccountController {
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key.
+	 * Transaction messages are decrypted with the supplied private key. The AccountTransactionsPagePrivateKeyPair constructor
+	 * already has checked that the supplied address can be derived from the private key.
 	 *
 	 * @param pair The pair.
 	 * @return Information about the matching transactions.
@@ -142,12 +143,13 @@ public class AccountController {
 	@TrustedApi
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> localAccountTransfersAll(final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.getAccountTransfersUsingId(pair.getPage(), ReadOnlyTransferDao.TransferType.ALL));
+		return this.transformPairs(this.accountTransfersAll(pair.createPageBuilder()));
 	}
 
 	/**
 	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key.
+	 * Transaction messages are decrypted with the supplied private key. The AccountTransactionsPagePrivateKeyPair constructor
+	 * already has checked that the supplied address can be derived from the private key.
 	 *
 	 * @param pair The pair.
 	 * @return Information about the matching transactions.
@@ -156,12 +158,13 @@ public class AccountController {
 	@TrustedApi
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.getAccountTransfersUsingId(pair.getPage(), ReadOnlyTransferDao.TransferType.INCOMING));
+		return this.transformPairs(this.accountTransfersIncoming(pair.createPageBuilder()));
 	}
 
 	/**
 	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key.
+	 * Transaction messages are decrypted with the supplied private key. The AccountTransactionsPagePrivateKeyPair constructor
+	 * already has checked that the supplied address can be derived from the private key.
 	 *
 	 * @param pair The pair.
 	 * @return Information about the matching transactions.
@@ -170,7 +173,7 @@ public class AccountController {
 	@TrustedApi
 	@ClientApi
 	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.getAccountTransfersUsingId(pair.getPage(), ReadOnlyTransferDao.TransferType.OUTGOING));
+		return this.transformPairs(this.accountTransfersOutgoing(pair.createPageBuilder()));
 	}
 
 	private SerializableList<TransactionMetaDataPair> transformPairs(final SerializableList<TransactionMetaDataPair> originalPairs) {

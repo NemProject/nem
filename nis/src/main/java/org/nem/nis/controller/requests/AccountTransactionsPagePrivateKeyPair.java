@@ -48,6 +48,19 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 	}
 
 	/**
+	 * Creates an AccountTransactionsPageBuilder from the page.
+	 *
+	 * @return The AccountTransactionsPageBuilder.
+	 */
+	public AccountTransactionsPageBuilder createPageBuilder() {
+		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+		pageBuilder.setAddress(page.getAddress().getEncoded());
+		pageBuilder.setHash(null == page.getHash()? null : page.getHash().toString());
+		pageBuilder.setId(null == page.getId()? null : page.getId().toString());
+		return pageBuilder;
+	}
+
+	/**
 	 * Gets the private key.
 	 *
 	 * @return The private key.
