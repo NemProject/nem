@@ -153,23 +153,6 @@ public class TransferTransactionTest {
 	}
 
 	@Test
-	public void feeIsWaivedForNemesisAccount() {
-		// Arrange:
-		final Account nemesisAccount = new Account(NemesisBlock.ADDRESS);
-
-		// TODO: should we fix it?
-
-		// Assert:
-		Assert.assertThat(this.calculateFee(nemesisAccount, 0, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12000, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12001, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 13000, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12000, 1), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12000, 199), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 13000, 200), IsEqual.equalTo(Amount.ZERO));
-	}
-
-	@Test
 	public void messageFeeIsBasedOnEncodedSize() {
 		// Assert:
 		Assert.assertThat(this.calculateMessageFee(256, 512), IsEqual.equalTo(Amount.fromNem(2 + 10 * 256 / 32)));

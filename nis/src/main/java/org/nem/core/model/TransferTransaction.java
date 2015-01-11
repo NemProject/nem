@@ -88,14 +88,6 @@ public class TransferTransaction extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
-		// TODO 20150109 G-* : After some thinking, I guess this is bad, verry bad, if someone
-		// > would find out key to nemesis (and I especially set uber easy priv key in last beta build)
-		// > he'd be able to send transactions without a fee.... (think what VIC would do....)
-		// not needed due to hack in NemesisBlock
-		//		if (NemesisBlock.ADDRESS.equals(this.getSigner().getAddress())) {
-		//			return Amount.ZERO;
-		//		}
-
 		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
 	}
 
