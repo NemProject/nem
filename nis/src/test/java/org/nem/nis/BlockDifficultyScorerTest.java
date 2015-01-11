@@ -85,7 +85,7 @@ public class BlockDifficultyScorerTest {
 		assertDifficultyChangesDependingOnTimeChange(61, -1);
 	}
 
-	private void assertDifficultyChangesDependingOnTimeChange(final int timeNeededForGeneratingBlock, final int comparisonResult) {
+	private static void assertDifficultyChangesDependingOnTimeChange(final int timeNeededForGeneratingBlock, final int comparisonResult) {
 		// Arrange:
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final List<BlockDifficulty> blockDifficulties = new ArrayList<>();
@@ -122,7 +122,7 @@ public class BlockDifficultyScorerTest {
 		percentageChange(-1, 248, -5L);
 	}
 
-	private void  percentageChange(final int adjustment, final int timeNeededToGenerateABlock, final long expectedChange) {
+	private static void percentageChange(final int adjustment, final int timeNeededToGenerateABlock, final long expectedChange) {
 		// Arrange:
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
 		final List<BlockDifficulty> blockDifficulties = new ArrayList<>();

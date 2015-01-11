@@ -86,7 +86,7 @@ public class AccountMetaDataTest {
 	}
 
 	private static void assertAccountInfos(final List<AccountInfo> actual, final List<AccountInfo> expected) {
-		Assert.assertThat(actual.size(), IsEqual.equalTo(expected.size()));;
+		Assert.assertThat(actual.size(), IsEqual.equalTo(expected.size()));
 		for (int i = 0; i < actual.size(); ++i) {
 			assertAccountInfo(actual.get(i), expected.get(i));
 		}

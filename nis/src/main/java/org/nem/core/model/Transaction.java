@@ -13,7 +13,7 @@ import java.util.*;
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
 	private Amount fee = Amount.ZERO;
 	private TimeInstant deadline = TimeInstant.ZERO;
-	private boolean nemesisTransaction;
+	private final boolean nemesisTransaction;
 
 	/**
 	 * Creates a new transaction.

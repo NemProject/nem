@@ -55,7 +55,7 @@ public class NemesisBlock extends Block {
 				field = transaction.getClass().getSuperclass().getDeclaredField("nemesisTransaction");
 				field.setAccessible(true);
 				field.set(transaction, true);
-			} catch (ReflectiveOperationException e) {
+			} catch (final ReflectiveOperationException e) {
 				e.printStackTrace();
 			}
 		}
@@ -88,7 +88,7 @@ public class NemesisBlock extends Block {
 			final ByteArrayOutputStream blob = new ByteArrayOutputStream(65536);
 			IOUtils.copy(fin, blob);
 			return fromBlobObject(blob.toByteArray(), context);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new IllegalArgumentException("unable to parse nemesis block stream");
 		}
 	}
