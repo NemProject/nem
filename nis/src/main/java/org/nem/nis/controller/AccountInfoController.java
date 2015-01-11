@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST API for retrieving account related information
@@ -59,7 +61,8 @@ public class AccountInfoController {
 	public AccountMetaData accountStatus(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
 		final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
-		AccountRemoteStatus remoteStatus = this.getRemoteStatus(address, new BlockHeight(height));
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, new BlockHeight(height));
 		if (this.hasPendingImportanceTransfer(address)) {
 			switch (remoteStatus) {
 				case INACTIVE:
@@ -75,11 +78,13 @@ public class AccountInfoController {
 			}
 		}
 
-		return new AccountMetaData(this.getAccountStatus(address), remoteStatus);
+		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoryOf().stream()
+				.map(multisigAddress -> this.accountInfoFactory.createInfo(multisigAddress))
+				.collect(Collectors.toList());
+		return new AccountMetaData(this.getAccountStatus(address), remoteStatus, cosignatoryOf);
 	}
 
-	private AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
 		return remoteStatus.toAccountRemoteStatus();
 	}
