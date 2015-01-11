@@ -8,6 +8,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
+import org.nem.nis.state.MultisigLinks;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -88,6 +89,10 @@ public class MultisigTestContext {
 		final AccountState state = new AccountState(address);
 		Mockito.when(this.accountCache.findStateByAddress(address)).thenReturn(state);
 		return state;
+	}
+
+	public Set<Address> getCosignatories(final Account multisig) {
+		return Collections.unmodifiableSet(this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories());
 	}
 
 	// TODO 20150110 J-G: should remove blockHeight

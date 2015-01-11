@@ -229,6 +229,24 @@ public class MultisigSignaturesPresentValidatorTest {
 	}
 
 	@Test
+	public void removalOfMultisigDoesNotModifyMultisigLinks() {
+		// Arrange:
+		// - create a multisig transaction signed by signer that attempts to remove dummy
+		final MultisigTestContext context = new MultisigTestContext();
+		final Transaction transaction = context.createMultisigModificationTransaction(
+				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
+
+		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+
+		// Act:
+		context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(context.getCosignatories(context.multisig).size(), IsEqual.equalTo(2));
+	}
+
+	@Test
 	public void removalOfMultisigCanIncludeSignatureFromAccountBeingRemoved() {
 		// Arrange:
 		// - create a multisig transaction signed by signer and dummy that attempts to remove dummy
