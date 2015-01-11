@@ -18,7 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.logging.Logger;
 
-@ContextConfiguration(classes = IntegrationTestConf.class)
+@ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TransferDaoITCase {
 	private static final Logger LOGGER = Logger.getLogger(TransferDaoITCase.class.getName());
