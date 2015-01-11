@@ -15,7 +15,8 @@ public class AccountMetaData implements SerializableEntity {
 
 	/**
 	 * Creates a new meta data.
-	 *  @param status The account status.
+	 *
+	 * @param status The account status.
 	 * @param remoteStatus The remote status.
 	 * @param cosignatoryOf The list of multisig accounts.
 	 */

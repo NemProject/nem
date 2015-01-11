@@ -61,7 +61,6 @@ public class AccountMetaDataTest {
 		assertAccountInfos(metaData.getCosignatoryOf(), multisigAccounts);
 	}
 
-
 	private static AccountMetaData createAccountMetaData(final AccountStatus status, final AccountRemoteStatus remoteStatus) {
 		return createAccountMetaData(status, remoteStatus, new ArrayList<>());
 	}

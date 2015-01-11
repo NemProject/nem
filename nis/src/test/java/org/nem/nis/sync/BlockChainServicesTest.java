@@ -70,10 +70,10 @@ public class BlockChainServicesTest {
 	/**
 	 * A inner transaction should not be "reusable" in different multisig transactions.
 	 * This is important because not checking this would leave us prone to bit more sophisticated version of "replay" attack:
-	 // > I'm one of cosigners I generate MT with inner Transfer to my account
-	 // > after everyone signed it, I reuse inner transfer but I change outer MT
-	 // (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
-	 //  but such thing shouldn't be feasible in first place)
+	 * > I'm one of cosigners I generate MT with inner Transfer to my account
+	 * > after everyone signed it, I reuse inner transfer but I change outer MT
+	 * (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
+	 *  but such thing shouldn't be feasible in first place)
 	 */
 
 	@Test
@@ -165,7 +165,7 @@ public class BlockChainServicesTest {
 			return NisUtils.createBlockList(this.blockSigner, this.parentBlock, 2, this.parentBlock.getTimeStamp());
 		}
 
-		public boolean isValid( final List<Block> blocks) {
+		public boolean isValid(final List<Block> blocks) {
 			return this.context.isValid(this.parentBlock, blocks);
 		}
 	}

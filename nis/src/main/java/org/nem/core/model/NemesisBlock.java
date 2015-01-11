@@ -1,6 +1,6 @@
 package org.nem.core.model;
 
-import net.minidev.json.*;
+import net.minidev.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.Amount;

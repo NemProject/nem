@@ -92,9 +92,9 @@ public class TransferTransaction extends Transaction {
 		// > would find out key to nemesis (and I especially set uber easy priv key in last beta build)
 		// > he'd be able to send transactions without a fee.... (think what VIC would do....)
 		// not needed due to hack in NemesisBlock
-//		if (NemesisBlock.ADDRESS.equals(this.getSigner().getAddress())) {
-//			return Amount.ZERO;
-//		}
+		//		if (NemesisBlock.ADDRESS.equals(this.getSigner().getAddress())) {
+		//			return Amount.ZERO;
+		//		}
 
 		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
 	}
@@ -107,7 +107,7 @@ public class TransferTransaction extends Transaction {
 	private long getMinimumTransferFee() {
 		final double nemAmount = this.amount.getNumNem();
 		// TODO 20150109 G-*: this fee is imho too low
-		return Math.max(2, (long)Math.ceil(nemAmount / 12500 + 1 + Math.log(2*nemAmount) / 5));
+		return Math.max(2, (long)Math.ceil(nemAmount / 12500 + 1 + Math.log(2 * nemAmount) / 5));
 	}
 
 	private long getMinimumMessageFee() {

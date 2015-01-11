@@ -172,8 +172,8 @@ public class TransferTransactionTest {
 	@Test
 	public void messageFeeIsBasedOnEncodedSize() {
 		// Assert:
-		Assert.assertThat(this.calculateMessageFee(256, 512), IsEqual.equalTo(Amount.fromNem(2 + 10*256/32)));
-		Assert.assertThat(this.calculateMessageFee(512, 256), IsEqual.equalTo(Amount.fromNem(2 + 10*512/32)));
+		Assert.assertThat(this.calculateMessageFee(256, 512), IsEqual.equalTo(Amount.fromNem(2 + 10 * 256 / 32)));
+		Assert.assertThat(this.calculateMessageFee(512, 256), IsEqual.equalTo(Amount.fromNem(2 + 10 * 512 / 32)));
 	}
 
 	private Amount calculateFee(final long amount, final int messageSize) {

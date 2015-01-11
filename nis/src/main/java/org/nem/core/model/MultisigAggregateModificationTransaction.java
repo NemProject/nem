@@ -79,7 +79,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 
 	@Override
 	protected Amount getMinimumFee() {
-		return Amount.fromNem(100 + this.getModifications().size()*100);
+		return Amount.fromNem(100 + this.getModifications().size() * 100);
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import org.nem.core.model.Address;
 import org.nem.core.test.*;
 
 import java.util.Collection;
-import java.util.Set;
 
 public class MultisigLinksTest {
 

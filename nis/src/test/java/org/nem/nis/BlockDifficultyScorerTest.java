@@ -105,7 +105,7 @@ public class BlockDifficultyScorerTest {
 
 			blockDifficulties.add(diff);
 			// TODO 20150111 J-G: why (i+2) here?
-			timeInstants.add(new TimeInstant(time + timeNeededForGeneratingBlock*(i+2)));
+			timeInstants.add(new TimeInstant(time + timeNeededForGeneratingBlock * (i + 2)));
 			prevDifficulty = diff;
 		}
 	}
@@ -140,16 +140,16 @@ public class BlockDifficultyScorerTest {
 			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
 
 			// TODO 20150111 J-G: why are you breaking out of the loop? i think the test should be more deterministic
-			if (diff.getRaw() >= (10*BASE_DIFF.getRaw()) || diff.getRaw() <= (BASE_DIFF.getRaw() / 10)) {
+			if (diff.getRaw() >= (10 * BASE_DIFF.getRaw()) || diff.getRaw() <= (BASE_DIFF.getRaw() / 10)) {
 				break;
 			}
 
 			final long percentageChange = (diff.getRaw() - prevDifficulty.getRaw() + adjustment) * 100 / prevDifficulty.getRaw();
-			System.out.println(i + " " + percentageChange + " " + diff + " vs " + (BASE_DIFF.getRaw()/10));
+			System.out.println(i + " " + percentageChange + " " + diff + " vs " + (BASE_DIFF.getRaw() / 10));
 			Assert.assertThat(percentageChange, IsEqual.equalTo(expectedChange));
 
 			blockDifficulties.add(diff);
-			timeInstants.add(new TimeInstant(time + timeNeededToGenerateABlock*(i+2)));
+			timeInstants.add(new TimeInstant(time + timeNeededToGenerateABlock * (i + 2)));
 			prevDifficulty = diff;
 		}
 	}
@@ -162,8 +162,8 @@ public class BlockDifficultyScorerTest {
 		final List<TimeInstant> timeInstants = new ArrayList<>();
 
 		final int time = 100;
-		blockDifficulties.add(new BlockDifficulty(10*BASE_DIFF.getRaw()));
-		blockDifficulties.add(new BlockDifficulty(10*BASE_DIFF.getRaw()));
+		blockDifficulties.add(new BlockDifficulty(10 * BASE_DIFF.getRaw()));
+		blockDifficulties.add(new BlockDifficulty(10 * BASE_DIFF.getRaw()));
 		timeInstants.add(new TimeInstant(time));
 		timeInstants.add(new TimeInstant(time + 2));
 
@@ -175,7 +175,7 @@ public class BlockDifficultyScorerTest {
 
 			blockDifficulties.add(diff);
 			// TODO 20150111 J-G: why 2 * (i+2)
-			timeInstants.add(new TimeInstant(time + 2*(i+2)));
+			timeInstants.add(new TimeInstant(time + 2 * (i + 2)));
 			prevDifficulty = diff;
 		}
 	}
