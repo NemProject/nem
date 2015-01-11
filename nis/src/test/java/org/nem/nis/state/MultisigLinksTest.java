@@ -32,8 +32,6 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(true));
 	}
 
-	// TODO 20150103 J-G: consider renaming addMultisig to something like makeConsignatory[Of]()
-
 	@Test
 	public void addingToAccountMakesCosignatory() {
 		// Arrange:
@@ -141,11 +139,11 @@ public class MultisigLinksTest {
 		}
 
 		public void addMultisig(final Address address) {
-			this.multisigLinks.addMultisig(address, this.blockHeight);
+			this.multisigLinks.addCosignatoryOf(address, this.blockHeight);
 		}
 
 		public void removeMultisig(final Address address) {
-			this.multisigLinks.removeMultisig(address, this.blockHeight);
+			this.multisigLinks.removeCosignatoryOf(address, this.blockHeight);
 		}
 
 		public MultisigLinks makeCopy() {

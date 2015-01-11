@@ -91,7 +91,7 @@ public class MultisigTestContext {
 	}
 
 	public void makeCosignatory(final Account signer, final Account multisig, final BlockHeight blockHeight) {
-		this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addMultisig(multisig.getAddress(), blockHeight);
+		this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress(), blockHeight);
 		this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
 	}
 

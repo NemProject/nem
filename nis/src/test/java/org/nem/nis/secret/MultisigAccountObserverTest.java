@@ -20,7 +20,7 @@ public class MultisigAccountObserverTest {
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	@Test
@@ -29,7 +29,7 @@ public class MultisigAccountObserverTest {
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	//endregion
@@ -42,7 +42,7 @@ public class MultisigAccountObserverTest {
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	@Test
@@ -51,7 +51,7 @@ public class MultisigAccountObserverTest {
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addMultisig(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
 	}
 
 	//endregion
@@ -71,9 +71,9 @@ public class MultisigAccountObserverTest {
 
 		// Assert:
 		Mockito.verify(context.multisigLinks1, Mockito.never()).addCosignatory(Mockito.any(), Mockito.any());
-		Mockito.verify(context.multisigLinks1, Mockito.never()).addMultisig(Mockito.any(), Mockito.any());
+		Mockito.verify(context.multisigLinks1, Mockito.never()).addCosignatoryOf(Mockito.any(), Mockito.any());
 		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatory(Mockito.any(), Mockito.any());
-		Mockito.verify(context.multisigLinks2, Mockito.never()).addMultisig(Mockito.any(), Mockito.any());
+		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatoryOf(Mockito.any(), Mockito.any());
 	}
 
 	//endregion

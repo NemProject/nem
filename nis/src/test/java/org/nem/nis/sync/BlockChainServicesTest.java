@@ -470,7 +470,7 @@ public class BlockChainServicesTest {
 		public void makeCosignatory(final Account cosignatory, final Account multisig) {
 			final BlockHeight blockHeight = new BlockHeight(TEST_HEIGHT);
 			this.nisCache.getAccountStateCache().findStateByAddress(cosignatory.getAddress()).getMultisigLinks()
-					.addMultisig(multisig.getAddress(), blockHeight);
+					.addCosignatoryOf(multisig.getAddress(), blockHeight);
 			this.nisCache.getAccountStateCache().findStateByAddress(multisig.getAddress()).getMultisigLinks()
 					.addCosignatory(cosignatory.getAddress(), blockHeight);
 		}

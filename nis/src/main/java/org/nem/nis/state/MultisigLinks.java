@@ -22,7 +22,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 		this.cosignatories.put(cosignatory, height);
 	}
 
-	public void addMultisig(final Address multisigAddress, final BlockHeight height) {
+	public void addCosignatoryOf(final Address multisigAddress, final BlockHeight height) {
 		this.cosignatoryOf.put(multisigAddress, height);
 	}
 
@@ -32,7 +32,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	}
 
 	// TODO: should this verify height?
-	public void removeMultisig(final Address multisigAddress, final BlockHeight height) {
+	public void removeCosignatoryOf(final Address multisigAddress, final BlockHeight height) {
 		this.cosignatoryOf.remove(multisigAddress);
 	}
 
@@ -56,7 +56,7 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	public MultisigLinks copy() {
 		final MultisigLinks multisigLinks = new MultisigLinks();
 		this.cosignatories.forEach((k, v) -> multisigLinks.addCosignatory(k, v));
-		this.cosignatoryOf.forEach((k, v) -> multisigLinks.addMultisig(k, v));
+		this.cosignatoryOf.forEach((k, v) -> multisigLinks.addCosignatoryOf(k, v));
 		return multisigLinks;
 	}
 }
