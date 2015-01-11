@@ -90,9 +90,10 @@ public class MultisigTestContext {
 		return state;
 	}
 
+	// TODO 20150110 J-G: should remove blockHeight
 	public void makeCosignatory(final Account signer, final Account multisig, final BlockHeight blockHeight) {
-		this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress(), blockHeight);
-		this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
+		this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
+		this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
 	}
 
 	public boolean debitPredicate(final Account account, final Amount amount) {

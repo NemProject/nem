@@ -3,8 +3,9 @@ package org.nem.nis.state;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
+
+import java.util.Set;
 
 public class MultisigLinksTest {
 
@@ -38,7 +39,7 @@ public class MultisigLinksTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.addMultisig(context.address);
+		context.addCosignatoryOf(context.address);
 
 		// Assert:
 		Assert.assertThat(context.multisigLinks.isCosignatoryOf(context.address), IsEqual.equalTo(true));
@@ -46,14 +47,14 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
-	// TODO 20150103 J-G: is this allowed?
+	// TODO 20150103 J-G: we should probably not allow this
 	@Test
 	public void addingBothMakesMultisigAndCosignatory() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
 		// Act:
-		context.addMultisig(context.address);
+		context.addCosignatoryOf(context.address);
 		context.addCosignatory(context.address);
 
 		// Assert:
@@ -78,15 +79,14 @@ public class MultisigLinksTest {
 		Assert.assertThat(context.multisigLinks.isMultisig(), IsEqual.equalTo(false));
 	}
 
-	// TODO 20150103 J-G: is this allowed?
 	@Test
 	public void canRemoveMultisig() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMultisig(context.address);
+		context.addCosignatoryOf(context.address);
 
 		// Act:
-		context.removeMultisig(context.address);
+		context.removeCosignatoryOf(context.address);
 
 		// Assert:
 		Assert.assertThat(context.multisigLinks.isCosignatory(), IsEqual.equalTo(false));
@@ -94,7 +94,7 @@ public class MultisigLinksTest {
 	}
 	//endregion
 
-	//region
+	//region copy
 	@Test
 	public void copyCopiesMultisig() {
 		// Arrange:
@@ -113,7 +113,7 @@ public class MultisigLinksTest {
 	public void copyCopiesCosignatory() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMultisig(context.address);
+		context.addCosignatoryOf(context.address);
 
 		// Act:
 		final MultisigLinks multisigLinks = context.makeCopy();
@@ -125,25 +125,60 @@ public class MultisigLinksTest {
 	}
 	//endregion
 
+	//region getCosignatories
+
+	@Test
+	public void getCosignatoriesIsReadOnly() {
+		// Arrange:
+		final TestContext context = new TestContext();
+
+		// Act:
+		final Set<Address> cosignatories = context.multisigLinks.getCosignatories();
+		ExceptionAssert.assertThrows(
+				v -> cosignatories.add(Utils.generateRandomAddress()),
+				UnsupportedOperationException.class);
+	}
+
+	@Test
+	public void getCosignatoriesReturnsAllCosignatoryAccounts() {
+		// Arrange:
+		final Address cosignatory1 = Utils.generateRandomAddress();
+		final Address cosignatory2 = Utils.generateRandomAddress();
+		final Address multisig1 = Utils.generateRandomAddress();
+		final Address multisig2 = Utils.generateRandomAddress();
+		final TestContext context = new TestContext();
+		context.addCosignatory(cosignatory1);
+		context.addCosignatory(cosignatory2);
+		context.addCosignatoryOf(multisig1);
+		context.addCosignatoryOf(multisig2);
+
+		// Act:
+		final Set<Address> cosignatories = context.multisigLinks.getCosignatories();
+
+		// Assert:
+		Assert.assertThat(cosignatories, IsEquivalent.equivalentTo(cosignatory1, cosignatory2));
+	}
+
+	//endregion
+
 	private class TestContext {
 		final MultisigLinks multisigLinks = new MultisigLinks();
 		final Address address = Utils.generateRandomAddress();
-		final BlockHeight blockHeight = new BlockHeight(1234L);
 
 		public void addCosignatory(final Address address) {
-			this.multisigLinks.addCosignatory(address, this.blockHeight);
+			this.multisigLinks.addCosignatory(address);
 		}
 
 		public void removeCosignatory(final Address address) {
-			this.multisigLinks.removeCosignatory(address, this.blockHeight);
+			this.multisigLinks.removeCosignatory(address);
 		}
 
-		public void addMultisig(final Address address) {
-			this.multisigLinks.addCosignatoryOf(address, this.blockHeight);
+		public void addCosignatoryOf(final Address address) {
+			this.multisigLinks.addCosignatoryOf(address);
 		}
 
-		public void removeMultisig(final Address address) {
-			this.multisigLinks.removeCosignatoryOf(address, this.blockHeight);
+		public void removeCosignatoryOf(final Address address) {
+			this.multisigLinks.removeCosignatoryOf(address);
 		}
 
 		public MultisigLinks makeCopy() {

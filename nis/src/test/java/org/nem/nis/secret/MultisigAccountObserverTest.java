@@ -19,8 +19,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress());
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress());
 	}
 
 	@Test
@@ -28,8 +28,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Add, NotificationTrigger.Undo);
 
 		// Assert:
-		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress());
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeCosignatoryOf(context.account1.getAddress());
 	}
 
 	//endregion
@@ -41,8 +41,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Del, NotificationTrigger.Execute);
 
 		// Assert:
-		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).removeCosignatory(context.account2.getAddress());
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).removeCosignatoryOf(context.account1.getAddress());
 	}
 
 	@Test
@@ -50,8 +50,8 @@ public class MultisigAccountObserverTest {
 		final TestContext context = this.notifyTransferPrepare(MultisigModificationType.Del, NotificationTrigger.Undo);
 
 		// Assert:
-		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress(), new BlockHeight(111));
-		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress(), new BlockHeight(111));
+		Mockito.verify(context.multisigLinks1, Mockito.times(1)).addCosignatory(context.account2.getAddress());
+		Mockito.verify(context.multisigLinks2, Mockito.times(1)).addCosignatoryOf(context.account1.getAddress());
 	}
 
 	//endregion
@@ -70,10 +70,10 @@ public class MultisigAccountObserverTest {
 				NisUtils.createBlockNotificationContext(NotificationTrigger.Execute));
 
 		// Assert:
-		Mockito.verify(context.multisigLinks1, Mockito.never()).addCosignatory(Mockito.any(), Mockito.any());
-		Mockito.verify(context.multisigLinks1, Mockito.never()).addCosignatoryOf(Mockito.any(), Mockito.any());
-		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatory(Mockito.any(), Mockito.any());
-		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatoryOf(Mockito.any(), Mockito.any());
+		Mockito.verify(context.multisigLinks1, Mockito.never()).addCosignatory(Mockito.any());
+		Mockito.verify(context.multisigLinks1, Mockito.never()).addCosignatoryOf(Mockito.any());
+		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatory(Mockito.any());
+		Mockito.verify(context.multisigLinks2, Mockito.never()).addCosignatoryOf(Mockito.any());
 	}
 
 	//endregion

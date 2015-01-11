@@ -1,62 +1,81 @@
 package org.nem.nis.state;
 
 import org.nem.core.model.Address;
-import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
 
-// TODO 20141218 J-G needs comments; please comment
-
-// TODO 20150103 J-G: are you actually / do you plan to do anything with the height?
-
+/**
+ * A collection of multisig information associated with an account.
+ */
 public class MultisigLinks implements ReadOnlyMultisigLinks {
-	private final Map<Address, BlockHeight> cosignatories;
-	private final Map<Address, BlockHeight> cosignatoryOf;
+	private final Set<Address> cosignatories = new HashSet<>();
+	private final Set<Address> cosignatoryOf = new HashSet<>();
 
-	public MultisigLinks() {
-		this.cosignatories = new HashMap<>();
-		this.cosignatoryOf = new HashMap<>();
+	/**
+	 * Adds a cosignatory link.
+	 *
+	 * @param cosignatory The address of the account that is a cosignatory of this (multisig) account.
+	 */
+	public void addCosignatory(final Address cosignatory) {
+		this.cosignatories.add(cosignatory);
 	}
 
-	public void addCosignatory(final Address cosignatory, final BlockHeight height) {
-		this.cosignatories.put(cosignatory, height);
+	/**
+	 * Adds a multisig link.
+	 *
+	 * @param multisig The address of the multisig account for which this account is a cosignatory.
+	 */
+	public void addCosignatoryOf(final Address multisig) {
+		this.cosignatoryOf.add(multisig);
 	}
 
-	public void addCosignatoryOf(final Address multisigAddress, final BlockHeight height) {
-		this.cosignatoryOf.put(multisigAddress, height);
-	}
-
-	// TODO: should this verify height?
-	public void removeCosignatory(final Address cosignatory, final BlockHeight height) {
+	/**
+	 * Removes a cosignatory link.
+	 *
+	 * @param cosignatory The cosignatory to remove.
+	 */
+	public void removeCosignatory(final Address cosignatory) {
 		this.cosignatories.remove(cosignatory);
 	}
 
-	// TODO: should this verify height?
-	public void removeCosignatoryOf(final Address multisigAddress, final BlockHeight height) {
-		this.cosignatoryOf.remove(multisigAddress);
+	/**
+	 * Removes a multisig link.
+	 *
+	 * @param multisig The multisig to remove.
+	 */
+	public void removeCosignatoryOf(final Address multisig) {
+		this.cosignatoryOf.remove(multisig);
 	}
 
-	// TODO 20150103 J-G: should test this (and that it makes a copy)
+	@Override
 	public Set<Address> getCosignatories() {
-		return this.cosignatories.keySet();
+		return Collections.unmodifiableSet(this.cosignatories);
 	}
 
+	@Override
 	public boolean isMultisig() {
 		return !this.cosignatories.isEmpty();
 	}
 
+	@Override
 	public boolean isCosignatory() {
 		return !this.cosignatoryOf.isEmpty();
 	}
 
+	@Override
 	public boolean isCosignatoryOf(final Address multisig) {
-		return this.cosignatoryOf.keySet().stream().anyMatch(a -> a.equals(multisig));
+		return this.cosignatoryOf.stream().anyMatch(a -> a.equals(multisig));
 	}
 
+	/**
+	 * Creates a deep copy of the multisig links.
+	 *
+	 * @return The deep copy.
+	 */
 	public MultisigLinks copy() {
 		final MultisigLinks multisigLinks = new MultisigLinks();
-		this.cosignatories.forEach((k, v) -> multisigLinks.addCosignatory(k, v));
-		this.cosignatoryOf.forEach((k, v) -> multisigLinks.addCosignatoryOf(k, v));
+		this.cosignatories.forEach(v -> multisigLinks.addCosignatory(v));
+		this.cosignatoryOf.forEach(v -> multisigLinks.addCosignatoryOf(v));
 		return multisigLinks;
 	}
 }

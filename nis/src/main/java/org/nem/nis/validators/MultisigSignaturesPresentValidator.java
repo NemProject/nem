@@ -54,7 +54,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 		}
 
 		final Address accountForRemoval = accountsForRemoval.isEmpty() ? null : accountsForRemoval.get(0);
-		final Set<Address> expectedSignerAddresses = multisigAddress.getMultisigLinks().getCosignatories();
+		final Set<Address> expectedSignerAddresses = new HashSet<>(multisigAddress.getMultisigLinks().getCosignatories());
 		if (null != accountForRemoval && expectedSignerAddresses.size() > 1) {
 			signerAddresses.remove(accountForRemoval);
 			expectedSignerAddresses.remove(accountForRemoval);

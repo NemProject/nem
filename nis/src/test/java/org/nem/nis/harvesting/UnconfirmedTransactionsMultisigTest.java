@@ -339,9 +339,8 @@ public class UnconfirmedTransactionsMultisigTest {
 		}
 
 		public void makeCosignatory(final Account signer, final Account multisig) {
-			final BlockHeight blockHeight = new BlockHeight(123);
-			this.stateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress(), blockHeight);
-			this.stateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress(), blockHeight);
+			this.stateCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
+			this.stateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
 		}
 
 		private AccountState addState(final Account account) {

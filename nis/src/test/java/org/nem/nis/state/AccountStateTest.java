@@ -130,12 +130,12 @@ public class AccountStateTest {
 		final Address multisig2 = Utils.generateRandomAddress();
 		final AccountState state = new AccountState(Utils.generateRandomAddress());
 		final MultisigLinks stateLinks = state.getMultisigLinks();
-		stateLinks.addCosignatoryOf(multisig1, BlockHeight.ONE);
+		stateLinks.addCosignatoryOf(multisig1);
 
 		// Act:
 		final AccountState copy = state.copy();
 		final MultisigLinks copyLinks = copy.getMultisigLinks();
-		copyLinks.addCosignatoryOf(multisig2, BlockHeight.ONE);
+		copyLinks.addCosignatoryOf(multisig2);
 
 		// Assert:
 		Assert.assertThat(stateLinks.isCosignatoryOf(multisig1), IsEqual.equalTo(true));

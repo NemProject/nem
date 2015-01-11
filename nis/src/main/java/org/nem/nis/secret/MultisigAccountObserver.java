@@ -40,11 +40,11 @@ public class MultisigAccountObserver implements BlockTransactionObserver {
 		final AccountState cosignatoryState = this.stateCache.findStateByAddress(cosignatoryAddress);
 
 		if (add == execute) {
-			multisigState.getMultisigLinks().addCosignatory(cosignatoryAddress, context.getHeight());
-			cosignatoryState.getMultisigLinks().addCosignatoryOf(multisigAddress, context.getHeight());
+			multisigState.getMultisigLinks().addCosignatory(cosignatoryAddress);
+			cosignatoryState.getMultisigLinks().addCosignatoryOf(multisigAddress);
 		} else {
-			multisigState.getMultisigLinks().removeCosignatory(cosignatoryAddress, context.getHeight());
-			cosignatoryState.getMultisigLinks().removeCosignatoryOf(multisigAddress, context.getHeight());
+			multisigState.getMultisigLinks().removeCosignatory(cosignatoryAddress);
+			cosignatoryState.getMultisigLinks().removeCosignatoryOf(multisigAddress);
 		}
 	}
 }
