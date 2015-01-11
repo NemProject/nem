@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
-	final static long TEST_HEIGHT = 123;
+	private final static long TEST_HEIGHT = 123;
 
 	@Test
 	public void chainWithMultisigTransactionsIssuedByNotCosignatoryIsInvalid() {
@@ -65,50 +65,112 @@ public class BlockChainServicesTest {
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
 	}
 
-	// The idea is to check if inner transaction gets to the hash transaction cache
-	// TODO 20150103 J-G: do we care in the inner transactions are the same if the outer transaction is different?
-	// TODO 20150106 G-J: we should, and that must be not only in current block, but it must be like with other TXes
-	// > as that would leave us prone to bit more sophisticated version of "replay" attack:
-	// > I'm one of cosigners I generate MT with inner Transfer to my account
-	// > after everyone signed it, I reuse inner transfer but I change outer MT
-	// (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
-	//  but such thing shouldn't be feasible in first place)
+	//region MultipleMultisigTransactionsWithSameInnerTransaction
+
+	/**
+	 * A inner transaction should not be "reusable" in different multisig transactions.
+	 * This is important because not checking this would leave us prone to bit more sophisticated version of "replay" attack:
+	 // > I'm one of cosigners I generate MT with inner Transfer to my account
+	 // > after everyone signed it, I reuse inner transfer but I change outer MT
+	 // (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
+	 //  but such thing shouldn't be feasible in first place)
+	 */
+
 	@Test
-	public void chainIsInvalidIfContainsMultipleMultisigTransactionsWithSameInnerTransaction() {
+	public void chainIsInvalidIfContainsMultipleMultisigTransactionsWithSameInnerTransactionInSameBlock() {
 		// Arrange:
-		final TestContext context = new TestContext();
-
-		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
-		parentBlock.sign();
-
-		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
-		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
-		context.recalculateImportances(TEST_HEIGHT);
-		context.makeCosignatory(cosignatory1, multisigAccount);
-
-		final Transaction transfer = createTransfer(multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
-		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
-		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
-		transaction1.sign();
-
-		final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, transfer);
-		transaction2.setDeadline(transaction2.getTimeStamp().addSeconds(11));
-		transaction2.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
+		final SameInnerTransactionTestContext context = new SameInnerTransactionTestContext();
+		final List<Block> blocks = context.createBlockList();
 		final Block block = blocks.get(1);
-		block.addTransaction(transaction1);
-		block.addTransaction(transaction2);
+		block.addTransaction(context.transaction1);
+		block.addTransaction(context.transaction2);
 		block.sign();
 
 		// Act:
-		// TODO 20150103 J-G: out of curiosity, what throws this?
-		// TODO 20150106 G-J: this is due to that (Stream.concat) in BlockExecutor.notifyTransactionHashes
+		// (the HashCache throws when attempting to add the duplicate transaction)
 		ExceptionAssert.assertThrows(
-				v -> context.isValid(parentBlock, blocks),
+				v -> context.isValid(blocks),
 				IllegalArgumentException.class);
 	}
+
+	@Test
+	public void chainIsInvalidIfContainsMultipleMultisigTransactionsWithSameInnerTransactionAcrossBlocks() {
+		// Arrange:
+		final SameInnerTransactionTestContext context = new SameInnerTransactionTestContext();
+		final List<Block> blocks = context.createBlockList();
+		final Block block1 = blocks.get(0);
+		block1.addTransaction(context.transaction1);
+		block1.sign();
+
+		final Block block2 = blocks.get(1);
+		block2.setPrevious(block1);
+		block2.addTransaction(context.transaction2);
+		block2.sign();
+
+		// Act:
+		// (the HashCache throws when attempting to add the duplicate transaction)
+		ExceptionAssert.assertThrows(
+				v -> context.isValid(blocks),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void chainIsInvalidIfContainsSameTransferInAndOutOfMultisigTransaction() {
+		// Arrange:
+		final SameInnerTransactionTestContext context = new SameInnerTransactionTestContext();
+		final List<Block> blocks = context.createBlockList();
+		final Block block = blocks.get(1);
+		block.addTransaction(context.signedTransfer);
+		block.addTransaction(context.transaction2);
+		block.sign();
+
+		// Act:
+		final boolean result = context.isValid(blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
+	}
+
+	private static class SameInnerTransactionTestContext {
+		private final TestContext context = new TestContext();
+
+		private final Account blockSigner = this.context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		private final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
+
+		private final Account multisigAccount = this.context.createAccountWithBalance(Amount.fromNem(34));
+		private final Account cosignatory1 = this.context.createAccountWithBalance(Amount.fromNem(200));
+
+		private final Transaction transfer = createTransfer(this.multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
+		private final Transaction signedTransfer = createTransfer(this.multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
+		private final MultisigTransaction transaction1;
+		private final MultisigTransaction transaction2;
+
+		public SameInnerTransactionTestContext() {
+			this.parentBlock.sign();
+			this.signedTransfer.sign();
+
+			this.context.recalculateImportances(TEST_HEIGHT);
+			this.context.makeCosignatory(this.cosignatory1, this.multisigAccount);
+
+			this.transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), this.cosignatory1, this.transfer);
+			this.transaction1.setDeadline(this.transaction1.getTimeStamp().addSeconds(10));
+			this.transaction1.sign();
+
+			this.transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), this.cosignatory1, this.transfer);
+			this.transaction2.setDeadline(this.transaction2.getTimeStamp().addSeconds(11));
+			this.transaction2.sign();
+		}
+
+		public List<Block> createBlockList() {
+			return NisUtils.createBlockList(this.blockSigner, this.parentBlock, 2, this.parentBlock.getTimeStamp());
+		}
+
+		public boolean isValid( final List<Block> blocks) {
+			return this.context.isValid(this.parentBlock, blocks);
+		}
+	}
+
+	//endregion
 
 	@Test
 	public void chainContainingTransferTransactionMadeFromMultisigAccountIsInvalid() {
@@ -175,52 +237,91 @@ public class BlockChainServicesTest {
 		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
-	// TODO 20150103 J-G: why is this invalid?
+	//region MultipleMultisigModificationsFromSingleAccountIsInvalid
+
+	/**
+	 * Within a block, there cannot be multiple multisig modifications that affect the same multisig account.
+	 * They could possibly conflict, so it's better to allow only one per block.
+	 */
+
 	@Test
-	public void chainWithMultipleMultisigModificationsFromSingleAccountIsIsInvalid() {
-		final TestContext context = new TestContext();
-
-		final Account blockSigner = context.createAccountWithBalance(Amount.fromNem(1_000_000));
-		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
-		parentBlock.sign();
-
-		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(1000 + 1000));
-		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
-
-		final Account cosignatoryNew1 = context.createAccountWithBalance(Amount.fromNem(10));
-		final Account cosignatoryNew2 = context.createAccountWithBalance(Amount.fromNem(10));
-
-		context.recalculateImportances(TEST_HEIGHT);
-		context.makeCosignatory(cosignatory1, multisigAccount);
-
-		final MultisigAggregateModificationTransaction modification1 = createModification(multisigAccount, cosignatoryNew1);
-		final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
-		transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
-		transaction1.sign();
-
-		final MultisigAggregateModificationTransaction modification2 = createModification(multisigAccount, cosignatoryNew2);
-		final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification2);
-		final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-				transaction2.getTimeStamp(),
-				cosignatoryNew1,
-				HashUtils.calculateHash(modification2));
-		signature.sign();
-		transaction2.addSignature(signature);
-		transaction2.setDeadline(transaction2.getTimeStamp().addSeconds(10));
-		transaction2.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(blockSigner, parentBlock, 2, parentBlock.getTimeStamp());
-		final Block block = blocks.get(1);
-		block.addTransaction(transaction1);
-		block.addTransaction(transaction2);
-		block.sign();
+	public void chainWithMultipleMultisigModificationsFromSingleAccountIsInvalidWhenInitiatedBySameCosigner() {
+		// Arrange:
+		final MultipleMultisigModificationsFromSingleAccountTestContext context = new MultipleMultisigModificationsFromSingleAccountTestContext();
+		final List<Block> blocks = context.createBlockChainWithTwoModifications(context.cosignatory1, context.cosignatory1);
 
 		// Act:
-		final boolean result = context.isValid(parentBlock, blocks);
+		final boolean result = context.isValid(blocks);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
+
+	@Test
+	public void chainWithMultipleMultisigModificationsFromSingleAccountIsInvalidWhenInitiatedByDifferentCosigners() {
+		// Arrange:
+		final MultipleMultisigModificationsFromSingleAccountTestContext context = new MultipleMultisigModificationsFromSingleAccountTestContext();
+		final List<Block> blocks = context.createBlockChainWithTwoModifications(context.cosignatory1, context.cosignatory2);
+
+		// Act:
+		final boolean result = context.isValid(blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
+	}
+
+	private static class MultipleMultisigModificationsFromSingleAccountTestContext {
+		private final TestContext context = new TestContext();
+
+		private final Account blockSigner = this.context.createAccountWithBalance(Amount.fromNem(1_000_000));
+		private final Block parentBlock = createParentBlock(this.blockSigner, TEST_HEIGHT);
+
+		private final Account multisigAccount = this.context.createAccountWithBalance(Amount.fromNem(1000 + 1000));
+		private final Account cosignatory1 = this.context.createAccountWithBalance(Amount.fromNem(200));
+		private final Account cosignatory2 = this.context.createAccountWithBalance(Amount.fromNem(200));
+
+		public MultipleMultisigModificationsFromSingleAccountTestContext() {
+			this.parentBlock.sign();
+
+			this.context.recalculateImportances(TEST_HEIGHT);
+			this.context.makeCosignatory(this.cosignatory1, this.multisigAccount);
+			this.context.makeCosignatory(this.cosignatory2, this.multisigAccount);
+		}
+
+		public List<Block> createBlockChainWithTwoModifications(final Account cosignatory1, final Account cosignatory2) {
+			final Account cosignatoryNew1 = this.context.createAccountWithBalance(Amount.fromNem(10));
+			final Account cosignatoryNew2 = this.context.createAccountWithBalance(Amount.fromNem(10));
+
+			final MultisigAggregateModificationTransaction modification1 = createModification(this.multisigAccount, cosignatoryNew1);
+			final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
+			transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
+			transaction1.sign();
+
+			final MultisigAggregateModificationTransaction modification2 = createModification(this.multisigAccount, cosignatoryNew2);
+			final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory2, modification2);
+			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
+					transaction2.getTimeStamp(),
+					cosignatoryNew1,
+					HashUtils.calculateHash(modification2));
+			signature.sign();
+			transaction2.addSignature(signature);
+			transaction2.setDeadline(transaction2.getTimeStamp().addSeconds(10));
+			transaction2.sign();
+
+			final List<Block> blocks = NisUtils.createBlockList(this.blockSigner, this.parentBlock, 2, this.parentBlock.getTimeStamp());
+			final Block block = blocks.get(1);
+			block.addTransaction(transaction1);
+			block.addTransaction(transaction2);
+			block.sign();
+			return blocks;
+		}
+
+		public boolean isValid(final List<Block> blocks) {
+			return this.context.isValid(this.parentBlock, blocks);
+		}
+	}
+
+	//endregion
 
 	@Test
 	public void chainWithMultisigModificationsWithSingleDelIsIsValid() {
@@ -255,7 +356,6 @@ public class BlockChainServicesTest {
 		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
-	// TODO 20150103 J-G: why is this invalid? because there is a single modification containing multiple Dels?
 	@Test
 	public void chainWithMultisigModificationsWithMultipleDelIsIsInvalid() {
 		final TestContext context = new TestContext();
@@ -287,7 +387,7 @@ public class BlockChainServicesTest {
 		// Act:
 		final boolean result = context.isValid(parentBlock, blocks);
 
-		// Assert:
+		// Assert: a single modification cannot contain more than one Del modification
 		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
@@ -310,8 +410,7 @@ public class BlockChainServicesTest {
 		final MultisigAggregateModificationTransaction result = new MultisigAggregateModificationTransaction(
 				NisMain.TIME_PROVIDER.getCurrentTime(),
 				multisigAccount,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatoryNew1))
-		);
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosignatoryNew1)));
 		result.setDeadline(result.getTimeStamp().addSeconds(10));
 		return result;
 	}
@@ -320,8 +419,7 @@ public class BlockChainServicesTest {
 		final MultisigAggregateModificationTransaction result = new MultisigAggregateModificationTransaction(
 				NisMain.TIME_PROVIDER.getCurrentTime(),
 				multisigAccount,
-				cosignatories.stream().map(a -> new MultisigModification(MultisigModificationType.Del, a)).collect(Collectors.toList())
-		);
+				cosignatories.stream().map(a -> new MultisigModification(MultisigModificationType.Del, a)).collect(Collectors.toList()));
 		result.setDeadline(result.getTimeStamp().addSeconds(10));
 		return result;
 	}
