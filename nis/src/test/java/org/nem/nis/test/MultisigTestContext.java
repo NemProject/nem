@@ -14,7 +14,7 @@ import org.nem.nis.validators.*;
 import java.util.*;
 
 public class MultisigTestContext {
-	private final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
+	public final AccountStateCache accountCache = Mockito.mock(AccountStateCache.class);
 	private final MultisigAggregateModificationTransactionValidator multisigAggregateModificationTransactionValidator =
 			new MultisigAggregateModificationTransactionValidator(this.accountCache);
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
@@ -91,8 +91,8 @@ public class MultisigTestContext {
 		return state;
 	}
 
-	public Set<Address> getCosignatories(final Account multisig) {
-		return Collections.unmodifiableSet(this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories());
+	public Collection<Address> getCosignatories(final Account multisig) {
+		return this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories();
 	}
 
 	// TODO 20150110 J-G: should remove blockHeight

@@ -30,6 +30,7 @@ public interface ReadOnlyAccountInfo {
 
 	/**
 	 * Returns the reference count.
+	 * TODO 20150111 G-*: check usages, as this currently is not read-only
 	 *
 	 * @return The reference count.
 	 */

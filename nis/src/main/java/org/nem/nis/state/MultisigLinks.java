@@ -48,8 +48,12 @@ public class MultisigLinks implements ReadOnlyMultisigLinks {
 	}
 
 	@Override
-	public Set<Address> getCosignatories() {
-		return Collections.unmodifiableSet(this.cosignatories);
+	public Collection<Address> getCosignatories() {
+		return Collections.unmodifiableSet(this.cosignatories.keySet());
+	}
+
+	public Collection<Address> getCosignatoryOf() {
+		return Collections.unmodifiableSet(cosignatoryOf.keySet());
 	}
 
 	@Override
