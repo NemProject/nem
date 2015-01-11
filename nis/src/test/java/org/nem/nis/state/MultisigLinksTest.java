@@ -5,6 +5,7 @@ import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.test.*;
 
+import java.util.Collection;
 import java.util.Set;
 
 public class MultisigLinksTest {
@@ -133,7 +134,7 @@ public class MultisigLinksTest {
 		final TestContext context = new TestContext();
 
 		// Act:
-		final Set<Address> cosignatories = context.multisigLinks.getCosignatories();
+		final Collection<Address> cosignatories = context.multisigLinks.getCosignatories();
 		ExceptionAssert.assertThrows(
 				v -> cosignatories.add(Utils.generateRandomAddress()),
 				UnsupportedOperationException.class);
@@ -153,7 +154,7 @@ public class MultisigLinksTest {
 		context.addCosignatoryOf(multisig2);
 
 		// Act:
-		final Set<Address> cosignatories = context.multisigLinks.getCosignatories();
+		final Collection<Address> cosignatories = context.multisigLinks.getCosignatories();
 
 		// Assert:
 		Assert.assertThat(cosignatories, IsEquivalent.equivalentTo(cosignatory1, cosignatory2));
