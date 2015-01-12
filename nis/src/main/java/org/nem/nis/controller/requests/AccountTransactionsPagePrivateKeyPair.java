@@ -22,6 +22,7 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 			final PrivateKey privateKey) {
 		this.page = page;
 		this.privateKey = privateKey;
+		this.checkPrivateKeyAddressMatch();
 	}
 
 	/**
@@ -32,9 +33,12 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 	public AccountTransactionsPagePrivateKeyPair(final Deserializer deserializer) {
 		this.page = new AccountTransactionsPage(deserializer);
 		this.privateKey = new PrivateKey(deserializer);
-		final KeyPair keyPair = new KeyPair(this.privateKey);
-		if (!Address.fromPublicKey(keyPair.getPublicKey()).equals(this.page.getAddress())) {
-			throw new RuntimeException("private key in AccountTransactionsPagePrivateKeyPair must match supplied address");
+		this.checkPrivateKeyAddressMatch();
+	}
+
+	private void checkPrivateKeyAddressMatch() {
+		if (!Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).equals(this.page.getAddress())) {
+			throw new IllegalArgumentException("private key must match supplied address");
 		}
 	}
 
@@ -72,11 +76,8 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 	@Override
 	public void serialize(final Serializer serializer) {
 		Address.writeTo(serializer, "address", this.page.getAddress());
-		if (null != this.page.getHash()) {
-			serializer.writeString("hash", this.page.getHash().toString());
-		}
-		if (null != this.page.getId()) {
-			serializer.writeString("id", this.page.getId().toString());
-		}
+		serializer.writeString("hash", null == this.page.getHash()? "" : this.page.getHash().toString());
+		serializer.writeString("id", null == this.page.getId()? "" : this.page.getId().toString());
+		this.privateKey.serialize(serializer);
 	}
 }

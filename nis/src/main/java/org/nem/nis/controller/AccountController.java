@@ -1,7 +1,7 @@
 package org.nem.nis.controller;
 
 import org.nem.core.crypto.*;
-import org.nem.core.messages.PlainMessage;
+import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.serialization.SerializableList;
@@ -142,8 +142,8 @@ public class AccountController {
 	@RequestMapping(value = "/local/account/transfers/all", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersAll(final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.accountTransfersAll(pair.createPageBuilder()));
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersAll(@RequestBody final AccountTransactionsPagePrivateKeyPair pair) {
+		return this.transformPairs(this.accountTransfersAll(pair.createPageBuilder()), pair.getPrivateKey());
 	}
 
 	/**
@@ -157,8 +157,8 @@ public class AccountController {
 	@RequestMapping(value = "/local/account/transfers/incoming", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.accountTransfersIncoming(pair.createPageBuilder()));
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(@RequestBody final AccountTransactionsPagePrivateKeyPair pair) {
+		return this.transformPairs(this.accountTransfersIncoming(pair.createPageBuilder()), pair.getPrivateKey());
 	}
 
 	/**
@@ -172,43 +172,46 @@ public class AccountController {
 	@RequestMapping(value = "/local/account/transfers/outgoing", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.accountTransfersOutgoing(pair.createPageBuilder()));
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(@RequestBody final AccountTransactionsPagePrivateKeyPair pair) {
+		return this.transformPairs(this.accountTransfersOutgoing(pair.createPageBuilder()), pair.getPrivateKey());
 	}
 
-	private SerializableList<TransactionMetaDataPair> transformPairs(final SerializableList<TransactionMetaDataPair> originalPairs) {
+	private SerializableList<TransactionMetaDataPair> transformPairs(
+			final SerializableList<TransactionMetaDataPair> originalPairs,
+			final PrivateKey privateKey) {
 		final Collection<TransactionMetaDataPair> pairs = originalPairs.asCollection().stream()
-				.map(this::tryCreateDecodedPair)
+				.map(p -> this.tryCreateDecodedPair(p, privateKey))
 				.collect(Collectors.toList());
 		return new SerializableList<>(pairs);
 	}
 
-	private TransactionMetaDataPair tryCreateDecodedPair(final TransactionMetaDataPair pair) {
+	private TransactionMetaDataPair tryCreateDecodedPair(final TransactionMetaDataPair pair, final PrivateKey privateKey) {
 		final Transaction transaction = pair.getTransaction();
 		if (TransactionTypes.TRANSFER == transaction.getType()) {
 			final TransferTransaction t = (TransferTransaction)transaction;
-			if (null != t.getMessage() &&
-					MessageTypes.SECURE == t.getMessage().getType() &&
-					t.getMessage().canDecode()) {
-				return this.createDecodedPair(t, pair.getMetaData());
+			if (null != t.getMessage() && MessageTypes.SECURE == t.getMessage().getType()) {
+				final Account account = new Account(new KeyPair(privateKey));
+				final SecureMessage message = t.getSigner().equals(account)
+						? SecureMessage.fromEncodedPayload(account, t.getRecipient(), t.getMessage().getEncodedPayload())
+						: SecureMessage.fromEncodedPayload(t.getSigner(), account, t.getMessage().getEncodedPayload());
+				if (!message.canDecode()) {
+					return pair;
+				}
+				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
+				final TransferTransaction decodedTransaction = new TransferTransaction(
+						t.getTimeStamp(),
+						t.getSigner(),
+						t.getRecipient(),
+						t.getAmount(),
+						plainMessage);
+				decodedTransaction.setFee(t.getFee());
+				decodedTransaction.setDeadline(t.getDeadline());
+				decodedTransaction.setSignature(t.getSignature());
+				return new TransactionMetaDataPair(decodedTransaction, pair.getMetaData());
 			}
 		}
 
 		return pair;
-	}
-
-	private TransactionMetaDataPair createDecodedPair(final TransferTransaction t, final TransactionMetaData metaData) {
-		final Message plainMessage = new PlainMessage(t.getMessage().getDecodedPayload());
-		final TransferTransaction decodedTransaction = new TransferTransaction(
-				t.getTimeStamp(),
-				t.getSigner(),
-				t.getRecipient(),
-				t.getAmount(),
-				plainMessage);
-		decodedTransaction.setFee(t.getFee());
-		decodedTransaction.setDeadline(t.getDeadline());
-		decodedTransaction.setSignature(t.getSignature());
-		return new TransactionMetaDataPair(decodedTransaction, metaData);
 	}
 
 	// The GUI should never query with a hash as parameter because it is slower. When the GUI starts however it neither has an id

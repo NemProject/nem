@@ -414,7 +414,7 @@ public class AccountControllerTest {
 		final SerializableList<TransactionMetaDataPair> resultList = controllerMethod.apply(context.controller, pagePrivateKeyPair);
 
 		// Assert:
-		Assert.assertThat(resultList.get(0), IsSame.sameInstance(pair));
+		Assert.assertThat(resultList.get(0).getTransaction(), IsSame.sameInstance(pair.getTransaction()));
 	}
 
 	//endregion
