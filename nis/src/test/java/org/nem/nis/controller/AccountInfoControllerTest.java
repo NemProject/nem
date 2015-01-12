@@ -7,10 +7,11 @@ import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
-import org.nem.nis.controller.requests.AccountIdBuilder;
+import org.nem.nis.controller.requests.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
@@ -75,6 +76,66 @@ public class AccountInfoControllerTest {
 
 		// Assert:
 		context.assertUnlocked(metaDataPair.getMetaData(), AccountStatus.LOCKED);
+	}
+
+	//endregion
+
+	//region accountGetBatch
+
+	@Test
+	public void accountGetBatchDelegatesToAccountInfoFactoryForAccountInfo() {
+		// Arrange:
+		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
+		Mockito.when(context.accountInfoFactory.createInfo(context.address)).thenReturn(accountInfo);
+
+		// Act:
+		final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(context.getAccountIdListDeserializer());
+
+		// Assert:
+		Assert.assertThat(pairs.get(0).getAccount(), IsSame.sameInstance(accountInfo));
+		Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(context.address);
+	}
+
+	@Test
+	public void accountGetBatchDelegatesToAccountInfoFactoryForRemoteStatus() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
+
+		// Act:
+		final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(context.getAccountIdListDeserializer());
+
+		// Assert:
+		context.assertRemoteStatus(pairs.get(0).getMetaData(), AccountRemoteStatus.ACTIVATING, 1);
+	}
+
+	@Test
+	public void accountGetBatchDelegatesToUnlockedAccountsForOverriddenRemoteStatus() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setRemoteStatus(AccountRemoteStatus.ACTIVE, 1);
+		context.filteredTransactions.add(createImportanceTransfer(context.address));
+
+		// Act:
+		final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(context.getAccountIdListDeserializer());
+
+		// Assert:
+		context.assertRemoteStatus(pairs.get(0).getMetaData(), AccountRemoteStatus.DEACTIVATING, 1);
+	}
+
+	@Test
+	public void accountGetBatchDelegatesToUnlockedAccountsForAccountStatus() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.setUnlocked(false);
+
+		// Act:
+		final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(context.getAccountIdListDeserializer());
+
+		// Assert:
+		context.assertUnlocked(pairs.get(0).getMetaData(), AccountStatus.LOCKED);
 	}
 
 	//endregion
@@ -222,6 +283,10 @@ public class AccountInfoControllerTest {
 			final AccountIdBuilder builder = new AccountIdBuilder();
 			builder.setAddress(this.address.getEncoded());
 			return builder;
+		}
+
+		private Deserializer getAccountIdListDeserializer() {
+			return Utils.roundtripSerializableEntity(new SerializableList<>(Arrays.asList(new AccountId(this.address.getEncoded()))), null);
 		}
 
 		private void setRemoteStatus(final AccountRemoteStatus accountRemoteStatus, final long blockHeight) {
