@@ -28,7 +28,7 @@ public enum NisApiId {
 	NIS_REST_ACCOUNT_LOOK_UP("/account/get"),
 
 	/**
-	 * The /account/get API
+	 * The /account/get/batch API
 	 */
 	NIS_REST_ACCOUNT_BATCH_LOOK_UP("/account/get/batch"),
 

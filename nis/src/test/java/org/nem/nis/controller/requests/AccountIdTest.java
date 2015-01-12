@@ -26,14 +26,8 @@ public class AccountIdTest {
 		ExceptionAssert.assertThrows(v -> new AccountId("ABC"), IllegalArgumentException.class);
 	}
 
-	@Test(expected = MissingRequiredPropertyException.class)
-	public void requestCannotBeDeserializedGivenNullAccountId() {
-		// Act:
-		this.createAccountIdFromJson(null);
-	}
-
 	@Test
-	public void requestCanBeDeserializedGivenValidAccountId() {
+	public void accountIdCanBeDeserializedFromJsonWithValidAddress() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 
@@ -42,6 +36,13 @@ public class AccountIdTest {
 
 		// Assert:
 		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
+	}
+
+	@Test
+	public void accountIdCannotBeDeserializedFromJsonWithInvalidAddress() {
+		// Assert:
+		ExceptionAssert.assertThrows(v -> this.createAccountIdFromJson(null), MissingRequiredPropertyException.class);
+		ExceptionAssert.assertThrows(v -> this.createAccountIdFromJson("ABC"), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class AccountIdTest {
 		// Act:
 		final AccountId accountId = new AccountId(deserializer);
 
-		// Assert::
+		// Assert:
 		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
 	}
 
