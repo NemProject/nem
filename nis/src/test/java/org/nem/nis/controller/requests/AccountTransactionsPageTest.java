@@ -112,8 +112,15 @@ public class AccountTransactionsPageTest {
 	private Deserializer createDeserializer(final Address address, final Hash hash, final Long id) {
 		final JSONObject jsonObject = new JSONObject();
 		jsonObject.put("address", address.getEncoded());
-		jsonObject.put("hash", null == hash ? null : hash.toString());
-		jsonObject.put("id", null == id ? null : id.toString());
+
+		if (null != hash) {
+			jsonObject.put("hash", hash.toString());
+		}
+
+		if (null != hash) {
+			jsonObject.put("id", id.toString());
+		}
+
 		return Utils.createDeserializer(jsonObject);
 	}
 }

@@ -40,6 +40,7 @@ public class AccountTransactionsPagePrivateKeyPair {
 		// TODO 20150112 J-B: technically, we could just pass in the private key, i suppose
 		// TODO 20150113 BR -> J: yea, I wasn't sure which way to go. We already have AccountTransactionsPage, so it seemed easier to just add the private key.
 		// > Not sure if the decision is good. If you want me to change it I can do that. We should make a decision before I change the api docs.
+		// TODO 20150114 J-B: i think i'd prefer to simplify api so it just takes a private key
 		if (!Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).equals(this.page.getAddress())) {
 			throw new IllegalArgumentException("private key must match supplied address");
 		}
@@ -55,8 +56,6 @@ public class AccountTransactionsPagePrivateKeyPair {
 	}
 
 	/**
-	 * // TODO 20150112 J-B: not sure if you're using this
-	 * // TODO 20150113 BR -> J: i am using it in the account controller class. I am calling the corresponding methods without private key to make testing easier.
 	 * Creates an AccountTransactionsPageBuilder from the page.
 	 *
 	 * @return The AccountTransactionsPageBuilder.

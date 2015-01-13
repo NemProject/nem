@@ -12,9 +12,6 @@ public class AccountTransactionsPagePrivateKeyPairTest {
 
 	// region construction
 
-	// TODO 20150112 J-B: not sure why some functions are testing AccountTransactionsPage (and are not in AccountTransactionsPageTest)
-	// TODO 20150113 BR -> J: not sure which test you mean.
-
 	@Test
 	public void canCreateAccountTransactionsPagePrivateKeyPairFromParameters() {
 		// Arrange:
@@ -69,7 +66,7 @@ public class AccountTransactionsPagePrivateKeyPairTest {
 	// region createPageBuilder
 
 	@Test
-	public void createPageBuilderReturnsExpectedBuilder() {
+	public void createPageBuilderReturnsExpectedBuilderWhenAllOptionalParametersAreSpecified() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final AccountTransactionsPage originalPage = new AccountTransactionsPage(
@@ -88,13 +85,31 @@ public class AccountTransactionsPagePrivateKeyPairTest {
 		Assert.assertThat(page.getId(), IsEqual.equalTo(originalPage.getId()));
 	}
 
+	@Test
+	public void createPageBuilderReturnsExpectedBuilderWhenNoOptionalParametersAreSpecified() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+		final AccountTransactionsPage originalPage = new AccountTransactionsPage(
+				Address.fromPublicKey(keyPair.getPublicKey()).getEncoded(),
+				null,
+				null);
+		final AccountTransactionsPagePrivateKeyPair pair = new AccountTransactionsPagePrivateKeyPair(originalPage, keyPair.getPrivateKey());
+
+		// Act:
+		final AccountTransactionsPageBuilder builder = pair.createPageBuilder();
+		final AccountTransactionsPage page = builder.build();
+
+		// Assert:
+		Assert.assertThat(page.getAddress(), IsEqual.equalTo(originalPage.getAddress()));
+		Assert.assertThat(page.getHash(), IsNull.nullValue());
+		Assert.assertThat(page.getId(), IsNull.nullValue());
+	}
+
 	// endregion
 
 	private Deserializer createDeserializer(final Address address, final PrivateKey privateKey) {
 		final JSONObject jsonObject = new JSONObject();
 		jsonObject.put("address", address.getEncoded());
-		jsonObject.put("hash", "");
-		jsonObject.put("id", "");
 		jsonObject.put("value", privateKey.toString());
 		return Utils.createDeserializer(jsonObject);
 	}

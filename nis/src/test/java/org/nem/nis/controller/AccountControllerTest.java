@@ -576,8 +576,6 @@ public class AccountControllerTest {
 
 	//endregion
 
-	// TODO 20150112 J-B: minor; seems like these can be static and outside the context
-	// TODO 20150113 BR -> J: what is the reasoning/advantage behind placing the methods outside the context and making them static?
 	private static TransactionMetaDataPair createPairWithDecodableSecureMessage(
 			final KeyPair senderKeyPair,
 			final KeyPair recipientKeyPair,
