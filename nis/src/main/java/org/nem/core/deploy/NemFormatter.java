@@ -6,7 +6,7 @@ import java.util.TimeZone;
 import java.util.logging.*;
 
 /**
- * Formatter which formats log entries.
+ * Formatter adds network time to logs.
  */
 public class NemFormatter extends SimpleFormatter {
 	private static final TimeProvider timeProvider = new SystemTimeProvider();

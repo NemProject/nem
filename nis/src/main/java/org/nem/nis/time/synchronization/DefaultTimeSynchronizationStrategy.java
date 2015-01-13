@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationStrategy {
 	private static final Logger LOGGER = Logger.getLogger(DefaultTimeSynchronizationStrategy.class.getName());
 
-
 	private final SynchronizationFilter filter;
 	private final ReadOnlyPoiFacade poiFacade;
 	private final ReadOnlyAccountStateCache accountStateCache;
@@ -78,6 +77,7 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
 		final double sum = filteredSamples.stream()
 				.mapToDouble(s -> {
+					// TODO 20150113 J-B: remind me what units 100 is; also, is there a possibilty of a time drift?
 					final Long offset = s.getTimeOffsetToRemote();
 					final String entry = String.format(
 							"%s: network time offset to local node is %dms",

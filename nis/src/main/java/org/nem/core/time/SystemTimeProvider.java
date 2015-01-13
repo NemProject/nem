@@ -11,6 +11,7 @@ public class SystemTimeProvider implements TimeProvider {
 
 	private static final long EPOCH_TIME;
 	private static final long EPOCH_TIME_PLUS_ROUNDING;
+	// TODO 20150113 J-B: just add one test that offsets are now preserved across instances
 	private static TimeOffset timeOffset = new TimeOffset(0);
 
 	static {

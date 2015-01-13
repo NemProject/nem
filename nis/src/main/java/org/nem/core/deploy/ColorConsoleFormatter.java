@@ -11,6 +11,7 @@ import java.util.logging.*;
 public class ColorConsoleFormatter extends SimpleFormatter {
 
 	private final MessageFormatter impl;
+	// TODO 20150113 J-B: i think you left this here by mistake?
 	private static final TimeProvider timeProvider = new SystemTimeProvider();
 	private static final int timeZoneOffset = TimeZone.getDefault().getRawOffset();
 
