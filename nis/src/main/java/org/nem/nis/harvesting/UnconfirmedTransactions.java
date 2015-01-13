@@ -8,6 +8,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
 
 import java.util.*;
@@ -352,7 +353,7 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
 		synchronized (this.lock) {
 			return this.transactions.values().stream()
-					.filter(tx -> matchAddress(tx, address))
+					.filter(tx -> matchAddress(tx, address) || isCosignatory(tx, address))
 					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
 					.limit(maxSize)
 					.collect(Collectors.toList());
@@ -469,6 +470,15 @@ public class UnconfirmedTransactions {
 		return transaction.getAccounts().stream()
 				.map(account -> account.getAddress())
 				.anyMatch(transactionAddress -> transactionAddress.equals(address));
+	}
+
+
+	private boolean isCosignatory(final Transaction transaction, final Address address) {
+		if (TransactionTypes.MULTISIG != transaction.getType()) {
+			return false;
+		}
+		final ReadOnlyAccountState state = this.nisCache.getAccountStateCache().findStateByAddress(address);
+		return state.getMultisigLinks().isCosignatoryOf(((MultisigTransaction)transaction).getOtherTransaction().getSigner().getAddress());
 	}
 
 	/**
