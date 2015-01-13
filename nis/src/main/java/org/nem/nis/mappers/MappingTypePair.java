@@ -10,7 +10,7 @@ public class MappingTypePair {
 	/**
 	 * Creates a new mapping type pair.
 	 *
-	 * @param sourceClass The source mapping. class.
+	 * @param sourceClass The source mapping class.
 	 * @param targetClass The target mapping class.
 	 */
 	public MappingTypePair(final Class sourceClass, final Class targetClass) {
