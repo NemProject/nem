@@ -163,8 +163,7 @@ public class PeerNetworkBootstrapperTest {
 	private static class TestContext {
 		private final PeerNetworkState state = Mockito.mock(PeerNetworkState.class);
 		private final PeerNetworkServicesFactory servicesFactory = Mockito.mock(PeerNetworkServicesFactory.class);
-		private final NodeSelectorFactory selectorFactory = Mockito.mock(NodeSelectorFactory.class);
-		private final NodeSelectorFactory importanceAwareSelectorFactory = Mockito.mock(NodeSelectorFactory.class);
+		private final PeerNetworkNodeSelectorFactory selectorFactory = Mockito.mock(PeerNetworkNodeSelectorFactory.class);
 		private final PeerNetworkBootstrapper bootstrapper;
 		private final LocalNodeEndpointUpdater updater = Mockito.mock(LocalNodeEndpointUpdater.class);
 
@@ -172,7 +171,7 @@ public class PeerNetworkBootstrapperTest {
 			final NodeSelector selector = Mockito.mock(NodeSelector.class);
 			Mockito.when(selector.selectNodes()).thenReturn(PeerUtils.createNodesWithNames("a", "b", "c"));
 			Mockito.when(selector.selectNode()).thenReturn(NodeUtils.createNodeWithName("d"));
-			Mockito.when(this.selectorFactory.createNodeSelector()).thenReturn(selector);
+			Mockito.when(this.selectorFactory.createUpdateNodeSelector()).thenReturn(selector);
 
 			Mockito.when(this.updater.updateAny(Mockito.any())).thenReturn(CompletableFuture.completedFuture(true));
 			Mockito.when(this.servicesFactory.createLocalNodeEndpointUpdater()).thenReturn(this.updater);
@@ -181,7 +180,6 @@ public class PeerNetworkBootstrapperTest {
 					this.state,
 					this.servicesFactory,
 					this.selectorFactory,
-					this.importanceAwareSelectorFactory,
 					ipDetectionMode);
 		}
 
