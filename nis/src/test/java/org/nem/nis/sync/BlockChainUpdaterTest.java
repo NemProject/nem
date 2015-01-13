@@ -7,7 +7,7 @@ import org.nem.core.connect.FatalPeerException;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.ExceptionAssert;
+import org.nem.core.test.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.DefaultNisCache;
 import org.nem.nis.test.BlockChain.*;
@@ -17,7 +17,7 @@ import org.nem.peer.connect.*;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class BlockChainUpdaterTest {
@@ -222,22 +222,26 @@ public class BlockChainUpdaterTest {
 		BlockChainUtils.assertBlockDaoCalls(context.getBlockDao(), 1, 2, 3, 1, 0, 0, 0);
 	}
 
-	// TODO 20141230 J-J,B: seems like i broke this test somehow :/
-	// > the test is assuming that the dao will always be called, which is not true if the dao lookup caches
-	// > this works in master because a new account dao lookup is used in each block mapping
-	// TODO 20150113 BR -> J: so we got only the two calls during context construction left. Maybe add a transaction to the block to make it more interesting?
-	@Ignore
 	@Test
 	public void updateBlockDelegatesToAccountDao() {
 		// Arrange:
 		final BlockChainDelegationContext context = new BlockChainDelegationContext();
+		final Block block = context.getBlock();
+		for (int i = 0; i < 3; ++i) {
+			final Transaction transaction = RandomTransactionFactory.createTransfer();
+			transaction.sign();
+			block.addTransaction(transaction);
+		}
+
+		block.sign();
 
 		// Act (append new block to current chain, transactions, harvesters are already known):
 		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
 
-		// Assert (2 calls during context construction):
-		// getAccountByPrintableAddressCalls
-		BlockChainUtils.assertAccountDaoCalls(context.getAccountDao(), 2 + 3);
+		// Assert
+		// - 2 calls during context construction
+		// - 2 calls for each of the 3 transactions (1 sender and 1 recipient)
+		BlockChainUtils.assertAccountDaoCalls(context.getAccountDao(), 2 + 2 * 3);
 	}
 
 	@Test
@@ -251,7 +255,7 @@ public class BlockChainUpdaterTest {
 		// Assert:
 		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
 		// no call to copy() since the sync context is mocked
-		BlockChainUtils.assertNisCacheCalls(context.getNisCache(), 5, 2, 0, 0);
+		BlockChainUtils.assertNisCacheCalls(context.getNisCache(), 3, 2, 0, 0);
 	}
 
 	@Test
