@@ -13,6 +13,7 @@ public class AccountTransactionsPagePrivateKeyPairTest {
 	// region construction
 
 	// TODO 20150112 J-B: not sure why some functions are testing AccountTransactionsPage (and are not in AccountTransactionsPageTest)
+	// TODO 20150113 BR -> J: not sure which test you mean.
 
 	@Test
 	public void canCreateAccountTransactionsPagePrivateKeyPairFromParameters() {
@@ -85,31 +86,6 @@ public class AccountTransactionsPagePrivateKeyPairTest {
 		Assert.assertThat(page.getAddress(), IsEqual.equalTo(originalPage.getAddress()));
 		Assert.assertThat(page.getHash(), IsEqual.equalTo(originalPage.getHash()));
 		Assert.assertThat(page.getId(), IsEqual.equalTo(originalPage.getId()));
-	}
-
-	// endregion
-
-	// region serialization
-
-	@Test
-	public void canRoundtripAccountTransactionsPagePrivateKeyPair() {
-		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final AccountTransactionsPage originalPage = new AccountTransactionsPage(
-				Address.fromPublicKey(keyPair.getPublicKey()).getEncoded(),
-				Utils.generateRandomHash().toString(),
-				"123");
-		final AccountTransactionsPagePrivateKeyPair originalPair = new AccountTransactionsPagePrivateKeyPair(originalPage, keyPair.getPrivateKey());
-
-		// Act:
-		final AccountTransactionsPagePrivateKeyPair pair
-				= new AccountTransactionsPagePrivateKeyPair(Utils.roundtripSerializableEntity(originalPair, null));
-
-		// Assert:
-		Assert.assertThat(pair.getPage().getAddress(), IsEqual.equalTo(originalPage.getAddress()));
-		Assert.assertThat(pair.getPage().getHash(), IsEqual.equalTo(originalPage.getHash()));
-		Assert.assertThat(pair.getPage().getId(), IsEqual.equalTo(originalPage.getId()));
-		Assert.assertThat(pair.getPrivateKey(), IsEqual.equalTo(originalPair.getPrivateKey()));
 	}
 
 	// endregion

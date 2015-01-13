@@ -133,6 +133,7 @@ public class AccountController {
 
 	// TODO 20150112 J-B: this is the api that they want vs something like decodeMessage(Message, PrivateKey)
 	// > if it is that's fine; just curious
+	// TODO 20150113 BR -> J: i was asking patmast3r and he said that polling transactions with already decoded messages is what they want.
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
@@ -143,6 +144,7 @@ public class AccountController {
 	 * @return Information about the matching transactions.
 	 */
 	// TODO 20150112 J-B: any reason you made this POST instead of GET? no real preference just curious
+	// TODO 20150113 BR -> J: yes, i don't want the private key to be visible for everyone in the url in a browser.
 	@RequestMapping(value = "/local/account/transfers/all", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
@@ -204,6 +206,7 @@ public class AccountController {
 
 				// this should work as long as the secure message payload size >= the plain message payload size
 				// TODO 20150112 J-B: i'm pretty sure this will be the case
+				// TODO 20150113 BR -> J: why should it fail? There is no validation.
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),

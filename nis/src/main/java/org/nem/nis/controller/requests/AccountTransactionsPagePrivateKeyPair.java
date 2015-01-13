@@ -2,12 +2,12 @@ package org.nem.nis.controller.requests;
 
 import org.nem.core.crypto.*;
 import org.nem.core.model.Address;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 
 /**
  * Class holding information to fetch a batch of transactions and decode the messages.
  */
-public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity {
+public class AccountTransactionsPagePrivateKeyPair {
 	private final AccountTransactionsPage page;
 	private final PrivateKey privateKey;
 
@@ -38,6 +38,8 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 
 	private void checkPrivateKeyAddressMatch() {
 		// TODO 20150112 J-B: technically, we could just pass in the private key, i suppose
+		// TODO 20150113 BR -> J: yea, I wasn't sure which way to go. We already have AccountTransactionsPage, so it seemed easier to just add the private key.
+		// > Not sure if the decision is good. If you want me to change it I can do that. We should make a decision before I change the api docs.
 		if (!Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).equals(this.page.getAddress())) {
 			throw new IllegalArgumentException("private key must match supplied address");
 		}
@@ -54,6 +56,7 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 
 	/**
 	 * // TODO 20150112 J-B: not sure if you're using this
+	 * // TODO 20150113 BR -> J: i am using it in the account controller class. I am calling the corresponding methods without private key to make testing easier.
 	 * Creates an AccountTransactionsPageBuilder from the page.
 	 *
 	 * @return The AccountTransactionsPageBuilder.
@@ -73,14 +76,5 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 	 */
 	public PrivateKey getPrivateKey() {
 		return this.privateKey;
-	}
-
-	// TODO 20150112 J-B: does this need to be serializable vs just deserializable; i.e. do we need to return it?
-	@Override
-	public void serialize(final Serializer serializer) {
-		Address.writeTo(serializer, "address", this.page.getAddress());
-		serializer.writeString("hash", null == this.page.getHash()? "" : this.page.getHash().toString());
-		serializer.writeString("id", null == this.page.getId()? "" : this.page.getId().toString());
-		this.privateKey.serialize(serializer);
 	}
 }

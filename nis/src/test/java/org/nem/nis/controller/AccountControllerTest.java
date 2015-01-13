@@ -353,7 +353,7 @@ public class AccountControllerTest {
 		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
-		final TransactionMetaDataPair pair = context.createPairWithDecodableSecureMessage(
+		final TransactionMetaDataPair pair = createPairWithDecodableSecureMessage(
 				senderKeyPair,
 				recipientKeyPair,
 				"This is a secret message");
@@ -404,7 +404,7 @@ public class AccountControllerTest {
 		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
-		final TransactionMetaDataPair pair = context.createPairWithUndecodableSecureMessage(senderKeyPair);
+		final TransactionMetaDataPair pair = createPairWithUndecodableSecureMessage(senderKeyPair);
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
 		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), null, null);
 		final AccountTransactionsPagePrivateKeyPair pagePrivateKeyPair = new AccountTransactionsPagePrivateKeyPair(page, senderKeyPair.getPrivateKey());
@@ -576,6 +576,44 @@ public class AccountControllerTest {
 
 	//endregion
 
+	// TODO 20150112 J-B: minor; seems like these can be static and outside the context
+	// TODO 20150113 BR -> J: what is the reasoning/advantage behind placing the methods outside the context and making them static?
+	private static TransactionMetaDataPair createPairWithDecodableSecureMessage(
+			final KeyPair senderKeyPair,
+			final KeyPair recipientKeyPair,
+			final String message) {
+		final Account sender = new Account(senderKeyPair);
+		final Account recipient = new Account(recipientKeyPair);
+		final SecureMessage secureMessage = SecureMessage.fromDecodedPayload(
+				sender,
+				recipient,
+				message.getBytes());
+		return createPairWithSecureMessage(sender, recipient, secureMessage);
+	}
+
+	private static TransactionMetaDataPair createPairWithUndecodableSecureMessage(final KeyPair senderKeyPair) {
+		final Account sender = new Account(senderKeyPair);
+		final Account recipient = new Account(Utils.generateRandomAddress());
+		final SecureMessage secureMessage = SecureMessage.fromEncodedPayload(
+				sender,
+				recipient,
+				Utils.generateRandomBytes());
+		return createPairWithSecureMessage(sender, recipient, secureMessage);
+	}
+
+	private static TransactionMetaDataPair createPairWithSecureMessage(
+			final Account sender,
+			final Account recipient,
+			final SecureMessage secureMessage) {
+		final TransferTransaction transaction = new TransferTransaction(
+				new TimeInstant(10),
+				sender,
+				recipient,
+				Amount.fromNem(1),
+				secureMessage);
+		return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L));
+	}
+
 	private static class TestContext {
 		private final AccountController controller;
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
@@ -601,43 +639,6 @@ public class AccountControllerTest {
 			accountState.getAccountInfo().incrementBalance(amount);
 			Mockito.when(this.accountStateCache.findStateByAddress(account.getAddress())).thenReturn(accountState);
 			return account;
-		}
-
-		// TODO 20150112 J-B: minor; seems like these can be static and outside the context
-		private TransactionMetaDataPair createPairWithDecodableSecureMessage(
-				final KeyPair senderKeyPair,
-				final KeyPair recipientKeyPair,
-				final String message) {
-			final Account sender = new Account(senderKeyPair);
-			final Account recipient = new Account(recipientKeyPair);
-			final SecureMessage secureMessage = SecureMessage.fromDecodedPayload(
-					sender,
-					recipient,
-					message.getBytes());
-			return this.createPairWithSecureMessage(sender, recipient, secureMessage);
-		}
-
-		private TransactionMetaDataPair createPairWithUndecodableSecureMessage(final KeyPair senderKeyPair) {
-			final Account sender = new Account(senderKeyPair);
-			final Account recipient = new Account(Utils.generateRandomAddress());
-			final SecureMessage secureMessage = SecureMessage.fromEncodedPayload(
-					sender,
-					recipient,
-					Utils.generateRandomBytes());
-			return this.createPairWithSecureMessage(sender, recipient, secureMessage);
-		}
-
-		private TransactionMetaDataPair createPairWithSecureMessage(
-				final Account sender,
-				final Account recipient,
-				final SecureMessage secureMessage) {
-			final TransferTransaction transaction = new TransferTransaction(
-					new TimeInstant(10),
-					sender,
-					recipient,
-					Amount.fromNem(1),
-					secureMessage);
-			return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L));
 		}
 	}
 }
