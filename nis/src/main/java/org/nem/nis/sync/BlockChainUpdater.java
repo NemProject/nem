@@ -134,6 +134,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				// TODO 20141209 BR -> J: yes, same issue again, we are executing the transaction against an account which is not in the cache.
 				// > A clean fix would be to pass the account cache to the observers so everything gets credited/debited using the accounts in the cache.
 				// TODO 20141219 BR -> J considering all the recent changes, do we still need this?
+				// TODO 20150113 BR -> J since we are acting with the account state cache of the observers I would say we can drop it.
+				// > BlockChainUpdater tests pass if the following line is commented out.
 				peerChain.stream().forEach(b -> this.ensureAllAccountsAreKnown(b, context.nisCache().getAccountCache()));
 			}
 
@@ -228,6 +230,8 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private Block remapBlock(final Block block, final AccountCache accountCache) {
 		// TODO 20141230 J-B,G: do we still need to remap blocks?
+		// TODO 20150113 BR -> J since we are acting with the account state cache of the observers I would say we can drop it.
+		// > BlockChainUpdater tests pass if we return the original block here.
 		final DbBlock dbBlock = this.mapper.map(block);
 		return this.nisMapperFactory.createDbModelToModelNisMapper(accountCache).map(dbBlock);
 	}
