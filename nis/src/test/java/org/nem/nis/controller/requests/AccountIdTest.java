@@ -45,20 +45,6 @@ public class AccountIdTest {
 		ExceptionAssert.assertThrows(v -> this.createAccountIdFromJson("ABC"), IllegalArgumentException.class);
 	}
 
-	@Test
-	public void accountIdCanBeRoundTripped() {
-		// Arrange:
-		final Address address = Utils.generateRandomAddress();
-		final AccountId originalAccountId = new AccountId(address.getEncoded());
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalAccountId, null);
-
-		// Act:
-		final AccountId accountId = new AccountId(deserializer);
-
-		// Assert:
-		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
-	}
-
 	private AccountId createAccountIdFromJson(final String address) {
 		final JSONObject jsonObject = new JSONObject();
 		jsonObject.put("account", address);

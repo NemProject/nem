@@ -144,7 +144,7 @@ public class AccountInfoControllerTest {
 			Mockito.when(context.accountInfoFactory.createInfo(address)).thenReturn(accountInfos.get(i));
 		}
 
-		final Deserializer deserializer = Utils.roundtripSerializableEntity(new SerializableList<>(accountIds), null);
+		final Deserializer deserializer = getAccountIdsDeserializer(accountIds);
 
 		// Act:
 		final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(deserializer);
@@ -305,7 +305,7 @@ public class AccountInfoControllerTest {
 		}
 
 		private Deserializer getAccountIdListDeserializer() {
-			return Utils.roundtripSerializableEntity(new SerializableList<>(Arrays.asList(new AccountId(this.address.getEncoded()))), null);
+			return getAccountIdsDeserializer(Arrays.asList(new AccountId(this.address.getEncoded())));
 		}
 
 		private void setRemoteStatus(final AccountRemoteStatus accountRemoteStatus, final long blockHeight) {
@@ -370,5 +370,14 @@ public class AccountInfoControllerTest {
 			Assert.assertThat(accountMetaData.getStatus(), IsEqual.equalTo(status));
 			Mockito.verify(this.unlockedAccounts, Mockito.times(1)).isAccountUnlocked(this.address);
 		}
+	}
+
+	private static Deserializer getAccountIdsDeserializer(final Collection<AccountId> accountIds) {
+		final List<SerializableEntity> serializableAccountIds = accountIds.stream()
+				.map(aid -> (SerializableEntity)serializer -> Address.writeTo(serializer, "account", aid.getAddress()))
+				.collect(Collectors.toList());
+		return Utils.roundtripSerializableEntity(
+				new SerializableList<>(serializableAccountIds),
+				null);
 	}
 }

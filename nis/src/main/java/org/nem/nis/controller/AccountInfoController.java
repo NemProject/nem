@@ -64,7 +64,7 @@ public class AccountInfoController {
 	@RequestMapping(value = "/account/get/batch", method = RequestMethod.POST)
 	@ClientApi
 	public SerializableList<AccountMetaDataPair> accountGetBatch(@RequestBody final Deserializer deserializer) {
-		final SerializableList<AccountId> accounts = new SerializableList<>(deserializer, AccountId::new);
+		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
 		final Collection<AccountMetaDataPair> pairs = accounts.asCollection().stream()
 				.map(a -> this.getMetaDataPair(a.getAddress()))
 				.collect(Collectors.toList());
