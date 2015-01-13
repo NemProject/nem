@@ -127,27 +127,12 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 						"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
 						this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
-
-				// TODO 20141208 J-B: i guess this is the same issue where we are modifying accounts not in the cache?
-				// > I guess a cleaner fix would be to add something like Transaction.getAffectedAccounts
-				// TODO 20141208 J-B: i In your block chain test branch, we should add a regression test for this
-				// TODO 20141209 BR -> J: yes, same issue again, we are executing the transaction against an account which is not in the cache.
-				// > A clean fix would be to pass the account cache to the observers so everything gets credited/debited using the accounts in the cache.
-				// TODO 20141219 BR -> J considering all the recent changes, do we still need this?
-				// TODO 20150113 BR -> J since we are acting with the account state cache of the observers I would say we can drop it.
-				// > BlockChainUpdater tests pass if the following line is commented out.
-				peerChain.stream().forEach(b -> this.ensureAllAccountsAreKnown(b, context.nisCache().getAccountCache()));
 			}
 
 			// verify peer's chain
 			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 			return NodeInteractionResult.fromValidationResult(validationResult);
 		}
-	}
-
-	private void ensureAllAccountsAreKnown(final Block block, final AccountCache accountCache) {
-		block.getTransactions().stream().flatMap(t -> t.getAccounts().stream()).forEach(
-				a -> accountCache.findByAddress(a.getAddress()));
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
@@ -199,11 +184,6 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final BlockChainSyncContext context = this.createSyncContext();
 		this.fixBlock(receivedBlock, dbParent);
 
-		// EVIL hack, see issue#70
-		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
-		receivedBlock = this.remapBlock(receivedBlock, context.nisCache().getAccountCache());
-		// EVIL hack end
-
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
@@ -213,27 +193,12 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 					this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
-
-			// undo above might remove some accounts from account analyzer,
-			// because receivedBlock has still references to those accounts, AND if competitive
-			// block has transaction addressed to that account, it won't be seen later,
-			// (see canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards test for details)
-			// we remap once more to fix accounts references (and possibly add them to AA)
-			receivedBlock = this.remapBlock(receivedBlock, context.nisCache().getAccountCache());
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
 		peerChain.add(receivedBlock);
 
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
-	}
-
-	private Block remapBlock(final Block block, final AccountCache accountCache) {
-		// TODO 20141230 J-B,G: do we still need to remap blocks?
-		// TODO 20150113 BR -> J since we are acting with the account state cache of the observers I would say we can drop it.
-		// > BlockChainUpdater tests pass if we return the original block here.
-		final DbBlock dbBlock = this.mapper.map(block);
-		return this.nisMapperFactory.createDbModelToModelNisMapper(accountCache).map(dbBlock);
 	}
 
 	private void fixBlock(final Block block, final DbBlock parent) {

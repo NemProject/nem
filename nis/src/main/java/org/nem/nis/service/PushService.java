@@ -137,6 +137,7 @@ public class PushService {
 			// > which you answered; can we rename FAILURE_ENTITY_UNUSABLE to something like FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC ?
 			// TODO 20150113 BR -> J: simple rename does not work since we use FAILURE_ENTITY_UNUSABLE in other contexts too.
 			// > want me to add FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC and use it where it applies?
+			// TODO 20150113 J-B: FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC would be great
 			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);
