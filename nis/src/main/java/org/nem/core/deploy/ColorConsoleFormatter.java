@@ -1,5 +1,7 @@
 package org.nem.core.deploy;
 
+import org.nem.core.time.*;
+
 import java.util.*;
 import java.util.logging.*;
 
@@ -9,6 +11,8 @@ import java.util.logging.*;
 public class ColorConsoleFormatter extends SimpleFormatter {
 
 	private final MessageFormatter impl;
+	private static final TimeProvider timeProvider = new SystemTimeProvider();
+	private static final int timeZoneOffset = TimeZone.getDefault().getRawOffset();
 
 	/**
 	 * Creates a new formatter.
@@ -22,6 +26,12 @@ public class ColorConsoleFormatter extends SimpleFormatter {
 		return null != os && os.startsWith("Windows");
 	}
 
+	@Override
+	public synchronized String format(final LogRecord record) {
+		final UnixTime time = UnixTime.fromTimeInstant(timeProvider.getCurrentTime());
+		record.setMillis(time.getMillis() - timeZoneOffset);
+		return super.format(record);
+	}
 	@Override
 	public String formatMessage(final LogRecord record) {
 		return this.impl.format(record);

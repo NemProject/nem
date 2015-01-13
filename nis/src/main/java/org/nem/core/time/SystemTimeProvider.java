@@ -11,7 +11,7 @@ public class SystemTimeProvider implements TimeProvider {
 
 	private static final long EPOCH_TIME;
 	private static final long EPOCH_TIME_PLUS_ROUNDING;
-	private TimeOffset timeOffset = new TimeOffset(0);
+	private static TimeOffset timeOffset = new TimeOffset(0);
 
 	static {
 		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -34,19 +34,19 @@ public class SystemTimeProvider implements TimeProvider {
 
 	@Override
 	public TimeInstant getCurrentTime() {
-		final long time = System.currentTimeMillis() + this.timeOffset.getRaw();
+		final long time = System.currentTimeMillis() + timeOffset.getRaw();
 		return new TimeInstant(getTime(time));
 	}
 
 	@Override
 	public NetworkTimeStamp getNetworkTime() {
-		return new NetworkTimeStamp(System.currentTimeMillis() - EPOCH_TIME + this.timeOffset.getRaw());
+		return new NetworkTimeStamp(System.currentTimeMillis() - EPOCH_TIME + timeOffset.getRaw());
 	}
 
 	@Override
 	public TimeSynchronizationResult updateTimeOffset(final TimeOffset offset) {
-		this.timeOffset = this.timeOffset.add(offset);
-		return new TimeSynchronizationResult(this.getCurrentTime(), this.timeOffset, offset);
+		timeOffset = timeOffset.add(offset);
+		return new TimeSynchronizationResult(this.getCurrentTime(), timeOffset, offset);
 	}
 
 	/**
