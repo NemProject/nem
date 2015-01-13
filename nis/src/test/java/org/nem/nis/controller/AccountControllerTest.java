@@ -373,7 +373,7 @@ public class AccountControllerTest {
 
 	//endregion
 
-	//region localAccountTransfersMethodsDoesNothingIfMessageIsNotDecodable
+	//region localAccountTransfersMethodsLeavesTransactionsUntouchedIfDecodingIsNotPossible
 
 	@Test
 	public void localAccountTransfersAllLeavesTransactionsUntouchedIfDecodingIsNotPossible() {
@@ -419,14 +419,14 @@ public class AccountControllerTest {
 
 	//endregion
 
-	//region LocalAccountTransfersMethodsDelegateToAccountTransfersMethods
+	//region localAccountTransfersMethodsDelegateToAccountTransfersMethods
 
 	@Test
 	public void localAccountTransfersAllMethodsDelegateToAccountTransfersAllMethods() {
 		this.localAccountTransfersMethodsDelegateToAccountTransfersMethods(
 				ReadOnlyTransferDao.TransferType.ALL,
 				AccountController::localAccountTransfersAll,
-				1);
+				0x01);
 	}
 
 	@Test
@@ -434,15 +434,15 @@ public class AccountControllerTest {
 		this.localAccountTransfersMethodsDelegateToAccountTransfersMethods(
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				AccountController::localAccountTransfersIncoming,
-				2);
+				0x02);
 	}
 
 	@Test
-	public void localAccountTransfersOutgoinglMethodsDelegateToAccountTransfersOutgoingMethods() {
+	public void localAccountTransfersOutgoingMethodsDelegateToAccountTransfersOutgoingMethods() {
 		this.localAccountTransfersMethodsDelegateToAccountTransfersMethods(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				AccountController::localAccountTransfersOutgoing,
-				4);
+				0x04);
 	}
 
 	private void localAccountTransfersMethodsDelegateToAccountTransfersMethods(
@@ -462,9 +462,9 @@ public class AccountControllerTest {
 		controllerMethod.apply(context.controller, pagePrivateKeyPair);
 
 		// Assert:
-		Mockito.verify(context.controller, Mockito.times(callPattern & 1)).accountTransfersAll(Mockito.any());
-		Mockito.verify(context.controller, Mockito.times((callPattern >> 1) & 1)).accountTransfersIncoming(Mockito.any());
-		Mockito.verify(context.controller, Mockito.times((callPattern >> 2) & 1)).accountTransfersOutgoing(Mockito.any());
+		Mockito.verify(context.controller, Mockito.times(callPattern & 0x01)).accountTransfersAll(Mockito.any());
+		Mockito.verify(context.controller, Mockito.times((callPattern & 0x02) >> 1)).accountTransfersIncoming(Mockito.any());
+		Mockito.verify(context.controller, Mockito.times((callPattern & 0x04) >> 2)).accountTransfersOutgoing(Mockito.any());
 	}
 
 	//endregion
@@ -603,6 +603,7 @@ public class AccountControllerTest {
 			return account;
 		}
 
+		// TODO 20150112 J-B: minor; seems like these can be static and outside the context
 		private TransactionMetaDataPair createPairWithDecodableSecureMessage(
 				final KeyPair senderKeyPair,
 				final KeyPair recipientKeyPair,
@@ -616,8 +617,7 @@ public class AccountControllerTest {
 			return this.createPairWithSecureMessage(sender, recipient, secureMessage);
 		}
 
-		private TransactionMetaDataPair createPairWithUndecodableSecureMessage(
-				final KeyPair senderKeyPair) {
+		private TransactionMetaDataPair createPairWithUndecodableSecureMessage(final KeyPair senderKeyPair) {
 			final Account sender = new Account(senderKeyPair);
 			final Account recipient = new Account(Utils.generateRandomAddress());
 			final SecureMessage secureMessage = SecureMessage.fromEncodedPayload(

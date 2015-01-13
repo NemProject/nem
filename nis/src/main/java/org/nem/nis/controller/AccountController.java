@@ -131,6 +131,9 @@ public class AccountController {
 		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
+	// TODO 20150112 J-B: this is the api that they want vs something like decodeMessage(Message, PrivateKey)
+	// > if it is that's fine; just curious
+
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
 	 * Transaction messages are decrypted with the supplied private key. The AccountTransactionsPagePrivateKeyPair constructor
@@ -139,6 +142,7 @@ public class AccountController {
 	 * @param pair The pair.
 	 * @return Information about the matching transactions.
 	 */
+	// TODO 20150112 J-B: any reason you made this POST instead of GET? no real preference just curious
 	@RequestMapping(value = "/local/account/transfers/all", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
@@ -197,6 +201,9 @@ public class AccountController {
 				if (!message.canDecode()) {
 					return pair;
 				}
+
+				// this should work as long as the secure message payload size >= the plain message payload size
+				// TODO 20150112 J-B: i'm pretty sure this will be the case
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),

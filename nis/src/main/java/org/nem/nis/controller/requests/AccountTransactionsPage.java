@@ -21,6 +21,7 @@ public class AccountTransactionsPage extends AccountId {
 		this.id = StringUtils.isNullOrEmpty(id) ? null : Long.parseLong(id);
 	}
 
+	// TODO 20150112 J-B: you should add a test in AccountTransactionsPageTest
 	/**
 	 * Creates an AccountTransactionsPagePrivateKeyPair.
 	 *

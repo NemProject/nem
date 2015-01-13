@@ -37,6 +37,7 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 	}
 
 	private void checkPrivateKeyAddressMatch() {
+		// TODO 20150112 J-B: technically, we could just pass in the private key, i suppose
 		if (!Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).equals(this.page.getAddress())) {
 			throw new IllegalArgumentException("private key must match supplied address");
 		}
@@ -52,6 +53,7 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 	}
 
 	/**
+	 * // TODO 20150112 J-B: not sure if you're using this
 	 * Creates an AccountTransactionsPageBuilder from the page.
 	 *
 	 * @return The AccountTransactionsPageBuilder.
@@ -73,6 +75,7 @@ public class AccountTransactionsPagePrivateKeyPair implements SerializableEntity
 		return this.privateKey;
 	}
 
+	// TODO 20150112 J-B: does this need to be serializable vs just deserializable; i.e. do we need to return it?
 	@Override
 	public void serialize(final Serializer serializer) {
 		Address.writeTo(serializer, "address", this.page.getAddress());

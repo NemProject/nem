@@ -12,6 +12,8 @@ public class AccountTransactionsPagePrivateKeyPairTest {
 
 	// region construction
 
+	// TODO 20150112 J-B: not sure why some functions are testing AccountTransactionsPage (and are not in AccountTransactionsPageTest)
+
 	@Test
 	public void canCreateAccountTransactionsPagePrivateKeyPairFromParameters() {
 		// Arrange:
@@ -110,7 +112,7 @@ public class AccountTransactionsPagePrivateKeyPairTest {
 		Assert.assertThat(pair.getPrivateKey(), IsEqual.equalTo(originalPair.getPrivateKey()));
 	}
 
-	// endrigion
+	// endregion
 
 	private Deserializer createDeserializer(final Address address, final PrivateKey privateKey) {
 		final JSONObject jsonObject = new JSONObject();
