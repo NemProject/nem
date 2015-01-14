@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import net.minidev.json.*;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -7,9 +8,12 @@ import org.mockito.*;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.Amount;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 @RunWith(Enclosed.class)
 public class MultisigAggregateModificationTransactionEnclosingTest {
@@ -31,24 +35,62 @@ public class MultisigAggregateModificationTransactionEnclosingTest {
 		//region ctor
 		@Test
 		public void cannotCreateMultisigAggregateModificationWithNullModifications() {
-			// Arrange:
-			final Account signer = Mockito.mock(Account.class);
-
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> new MultisigAggregateModificationTransaction(MultisigAggregateModificationTransactionTest.TIME, signer, null),
+					v -> createWithModifications(null),
 					IllegalArgumentException.class);
 		}
 
 		@Test
 		public void cannotCreateMultisigAggregateModificationWithEmptyModifications() {
-			// Arrange:
-			final Account signer = Mockito.mock(Account.class);
-
 			// Act:
 			ExceptionAssert.assertThrows(
-					v -> new MultisigAggregateModificationTransaction(MultisigAggregateModificationTransactionTest.TIME, signer, new ArrayList<>()),
+					v -> createWithModifications(new ArrayList<>()),
 					IllegalArgumentException.class);
+		}
+
+		private static void createWithModifications(final Collection<MultisigModification> modifications) {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+
+			// Act:
+			new MultisigAggregateModificationTransaction(MultisigAggregateModificationTransactionTest.TIME, signer, modifications);
+		}
+		//endregion
+
+		//region deserialization
+		@Test
+		public void cannotDeserializeMultisigAggregateModificationWithNullModifications() {
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> createJsonModifications(jsonObject -> jsonObject.remove("modifications")),
+					MissingRequiredPropertyException.class);
+		}
+
+		@Test
+		public void cannotDeserializeMultisigAggregateModificationWithEmptyModifications() {
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> createJsonModifications(jsonObject -> jsonObject.replace("modifications", new JSONArray())),
+					IllegalArgumentException.class);
+		}
+
+		private static void createJsonModifications(final Consumer<JSONObject> invalidateJson) {
+			// Arrange:
+			final Account signer = Utils.generateRandomAccount();
+			final Account cosignatory = Utils.generateRandomAccount();
+			final MultisigModification multisigModification = new MultisigModification(MultisigModificationType.Add, cosignatory);
+			final List<MultisigModification> modifications = Arrays.asList(multisigModification);
+			final Transaction transaction = new MultisigAggregateModificationTransaction(TimeInstant.ZERO, signer, modifications);
+			transaction.sign();
+
+			final JSONObject jsonObject = JsonSerializer.serializeToJson(transaction);
+			invalidateJson.accept(jsonObject);
+
+			// Act:
+			new MultisigAggregateModificationTransaction(
+					VerifiableEntity.DeserializationOptions.NON_VERIFIABLE,
+					Utils.createDeserializer(jsonObject));
 		}
 		//endregion
 
@@ -62,8 +104,7 @@ public class MultisigAggregateModificationTransactionEnclosingTest {
 					new MultisigModification(MultisigModificationType.Add, cosignatory1),
 					new MultisigModification(MultisigModificationType.Del, cosignatory2));
 
-			final MultisigAggregateModificationTransaction transaction =
-					MultisigAggregateModificationTransactionTest.createTransaction(signer, modifications);
+			final Transaction transaction = MultisigAggregateModificationTransactionTest.createTransaction(signer, modifications);
 			transaction.setFee(Amount.fromNem(10));
 
 			// Act:

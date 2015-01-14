@@ -6,9 +6,11 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * A transaction which describes association of cosignatory with a multisig account.
+ * A transaction that describes the addition or removal of one or more cosignatories to or from
+ * a multisig account.
  * <br/>
  * First such transaction converts account to multisig account.
  */
@@ -16,7 +18,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	final Collection<MultisigModification> modifications;
 
 	/**
-	 * Creates an multisig signer modification transaction.
+	 * Creates a multisig aggregate modification transaction.
 	 *
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender (multisig account).
@@ -32,9 +34,8 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 		validateModifications(this.modifications);
 	}
 
-	// TODO 20150103 add validation tests; should you also validate after deserialization?
 	private static void validateModifications(final Collection<MultisigModification> modifications) {
-		if (modifications == null || modifications.isEmpty()) {
+		if (null == modifications || modifications.isEmpty()) {
 			throw new IllegalArgumentException("no modifications on the list");
 		}
 	}
@@ -47,18 +48,18 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 */
 	public MultisigAggregateModificationTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, options, deserializer);
-
 		this.modifications = deserializer.readObjectArray("modifications", obj -> new MultisigModification(obj));
+
+		validateModifications(this.modifications);
 	}
 
 	/**
 	 * Gets the modifications.
-	 * TODO 20150103 J-G: might want to return something other than a list.
 	 *
 	 * @return The modifications.
 	 */
-	public List<MultisigModification> getModifications() {
-		return new ArrayList<>(this.modifications);
+	public Collection<MultisigModification> getModifications() {
+		return Collections.unmodifiableCollection(this.modifications);
 	}
 
 	@Override
@@ -84,8 +85,6 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 
 	@Override
 	protected Collection<Account> getOtherAccounts() {
-		// TODO 20141220 J-G: should review / test this; this should really have all of the accounts in the modifications i think
-		// TODO 20150109 G-J: you're right
-		return new ArrayList<>();
+		return this.getModifications().stream().map(m -> m.getCosignatory()).collect(Collectors.toList());
 	}
 }
