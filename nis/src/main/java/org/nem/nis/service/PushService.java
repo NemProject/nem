@@ -129,16 +129,7 @@ public class PushService {
 
 		final ValidationResult isValidResult = context.isValid.apply(context.entity);
 		if (isValidResult.isFailure()) {
-			// TODO 20141205 J-B: can you remind me why we don't want to mark a node as FAILURE
-			// > when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE
-			// TODO 20141206 BR -> J: we ARE marking the node as FAILURE when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE.
-			// > FAILURE_ENTITY_UNUSABLE is the only exception because that is normal when we are out of sync.
-			// TODO 20141206 J-B: yes, my comment was wrong, i meant to ask about the significance of FAILURE_ENTITY_UNUSABLE,
-			// > which you answered; can we rename FAILURE_ENTITY_UNUSABLE to something like FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC ?
-			// TODO 20150113 BR -> J: simple rename does not work since we use FAILURE_ENTITY_UNUSABLE in other contexts too.
-			// > want me to add FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC and use it where it applies?
-			// TODO 20150113 J-B: FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC would be great
-			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
+			if (ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC != isValidResult) {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);
 			}

@@ -68,49 +68,54 @@ public enum ValidationResult {
 	FAILURE_ENTITY_UNUSABLE(11),
 
 	/**
+	 * Validation failed because the entity cannot be used for some reason.
+	 */
+	FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC(12),
+
+	/**
 	 * Validation failed because the chain score is inferior to our score.
 	 */
-	FAILURE_CHAIN_SCORE_INFERIOR(12),
+	FAILURE_CHAIN_SCORE_INFERIOR(13),
 
 	/**
 	 * Validation failed because the chain could not be validated.
 	 */
-	FAILURE_CHAIN_INVALID(13),
+	FAILURE_CHAIN_INVALID(14),
 
 	/**
 	 * Validation failed because conflicting importance transfer is present
 	 */
-	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14),
+	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(15),
 
 	/**
 	 * Validation failed because there are too many transactions in a block.
 	 */
-	FAILURE_TOO_MANY_TRANSACTIONS(15),
+	FAILURE_TOO_MANY_TRANSACTIONS(16),
 
 	/**
 	 * Validation failed because a block contained a self-signed transaction.
 	 */
-	FAILURE_SELF_SIGNED_TRANSACTION(16),
+	FAILURE_SELF_SIGNED_TRANSACTION(17),
 
 	/**
 	 * Validation failed because remote harvesting account has non-zero balance.
 	 */
-	FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE(17),
+	FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE(18),
 
 	/**
 	 * Validation failed because previous importance transfer change is in progress.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS(18),
+	FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS(19),
 
 	/**
 	 * Validation failed because importance transfer activation was attempted while already activated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED(19),
+	FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED(20),
 
 	/**
 	 * Validation failed because importance transfer deactivation was attempted while already deactivated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20),
+	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(21),
 
 	/**
 	 * Validation failed because signer is not a cosigner of given multisig account.

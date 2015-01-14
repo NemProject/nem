@@ -16,7 +16,7 @@ public class NodeInteractionResultTest {
 			{
 				this.put(ValidationResult.SUCCESS, NodeInteractionResult.SUCCESS);
 				this.put(ValidationResult.NEUTRAL, NodeInteractionResult.NEUTRAL);
-				this.put(ValidationResult.FAILURE_ENTITY_UNUSABLE, NodeInteractionResult.NEUTRAL);
+				this.put(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC, NodeInteractionResult.NEUTRAL);
 			}
 		};
 

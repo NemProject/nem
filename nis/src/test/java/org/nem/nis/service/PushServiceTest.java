@@ -91,7 +91,7 @@ public class PushServiceTest {
 		final Block block = NisUtils.createRandomBlockWithHeight(12);
 		block.sign();
 
-		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC);
 
 		// Act:
 		context.service.pushBlock(block, context.remoteNodeIdentity);
