@@ -17,8 +17,18 @@ public class LocalNodeDeserializer implements ObjectDeserializer<Node> {
 	}
 
 	private static NodeMetaData deserializeLocalNodeMetaData(final Deserializer deserializer) {
-		// the only property we care about is application; platform and version will get populated automatically
-		final String application = deserializer.readOptionalString("application");
+		// TODO 20150113 J-J HACK that should be removed before block chain restart
+		// > also should fix the serialization of NodeMetaData so all required properties are
+		// > serialized before all optional properties
+		String application;
+		try {
+			// the only property we care about is application; platform and version will get populated automatically
+			final NodeMetaData metaData = new NodeMetaData(deserializer);
+			application = metaData.getApplication();
+		} catch (final IllegalArgumentException ex) {
+			application = deserializer.readOptionalString("application");
+		}
+
 		return new NodeMetaData(null, application, null);
 	}
 }
