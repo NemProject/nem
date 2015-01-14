@@ -72,7 +72,7 @@ public class JsonSerializer extends Serializer {
 	@Override
 	public void writeObject(final String label, final SerializableEntity object) {
 		this.pushLabel(label);
-		this.object.put(label, serializeObject(object));
+		this.object.put(label, this.serializeObject(object));
 	}
 
 	@Override
@@ -83,17 +83,19 @@ public class JsonSerializer extends Serializer {
 		}
 
 		final JSONArray jsonObjects = objects.stream()
-				.map(obj -> JsonSerializer.serializeObject(obj))
+				.map(obj -> this.serializeObject(obj))
 				.collect(Collectors.toCollection(() -> new JSONArray()));
 
 		this.object.put(label, jsonObjects);
 	}
 
-	private static JSONObject serializeObject(final SerializableEntity object) {
-		final JsonSerializer serializer = new JsonSerializer();
-		if (null != object) {
-			object.serialize(serializer);
+	private JSONObject serializeObject(final SerializableEntity object) {
+		if (null == object) {
+			return new JSONObject();
 		}
+
+		final JsonSerializer serializer = new JsonSerializer(null != this.propertyOrderArray);
+		object.serialize(serializer);
 		return serializer.getObject();
 	}
 
