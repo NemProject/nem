@@ -12,6 +12,7 @@ public class ColorConsoleFormatter extends SimpleFormatter {
 
 	private final MessageFormatter impl;
 	// TODO 20150113 J-B: i think you left this here by mistake?
+	// TODO 20150114 BR -> J: actually no. You think the console output should be local time?
 	private static final TimeProvider timeProvider = new SystemTimeProvider();
 	private static final int timeZoneOffset = TimeZone.getDefault().getRawOffset();
 
