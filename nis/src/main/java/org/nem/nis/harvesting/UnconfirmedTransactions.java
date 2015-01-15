@@ -355,7 +355,7 @@ public class UnconfirmedTransactions {
 			return this.transactions.values().stream()
 					// TODO 20140115 J-G: should add test for filter
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-					.filter(tx -> matchAddress(tx, address) || isCosignatory(tx, address))
+					.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
 					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
 					.limit(maxSize)
 					.collect(Collectors.toList());

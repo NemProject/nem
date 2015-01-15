@@ -160,7 +160,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @param receivedBlock The receivedBlock.
 	 * @return The result of the interaction.
 	 */
-	public synchronized ValidationResult updateBlock(Block receivedBlock) {
+	public synchronized ValidationResult updateBlock(final Block receivedBlock) {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
