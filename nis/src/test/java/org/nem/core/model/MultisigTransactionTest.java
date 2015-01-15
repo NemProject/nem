@@ -60,7 +60,6 @@ public class MultisigTransactionTest {
 		assertCanRoundtripWithSignatures(Utils::roundtripSerializableEntity);
 	}
 
-	// TODO 20150110 J-J: see why the behavior was different when type wasn't called?
 	@Test
 	public void canBinaryRoundtripTransactionWithSignatures() {
 		// Assert:
