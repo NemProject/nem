@@ -138,7 +138,10 @@ public class SystemTimeProviderTest {
 			info.result = provider.updateTimeOffset(new TimeOffset(111111));
 			info.currentTime = provider.getCurrentTime();
 			info.networkTime = provider.getNetworkTime();
-			info.rounds++;
+
+			// because the time offset adjustment is static across instances,
+			// we need to keep track of how many times adjustments were made
+			++info.rounds;
 		});
 
 		// Assert:
@@ -169,13 +172,14 @@ public class SystemTimeProviderTest {
 	public void timeOffsetIsPreservedAcrossInstances() {
 		// Arrange:
 		final TimeProvider[] providers = { new SystemTimeProvider(), new SystemTimeProvider(), null };
-		final long[] networkTimes = new long[3];
+		final int numProviders = 3;
+		final long[] networkTimes = new long[numProviders];
 
 		// Act:
 		runDeterministicOperation(v -> {
 			providers[0].updateTimeOffset(new TimeOffset(1234L));
 			providers[2] = new SystemTimeProvider();
-			for (int i=0; i<3; i++) {
+			for (int i = 0; i < numProviders; i++) {
 				networkTimes[i] = providers[i].getNetworkTime().getRaw();
 			}
 		});

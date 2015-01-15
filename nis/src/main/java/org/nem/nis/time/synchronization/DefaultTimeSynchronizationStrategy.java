@@ -82,7 +82,9 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 							"%s: network time offset to local node is %dms",
 							s.getNode().getIdentity().getAddress().getEncoded(),
 							offset);
-					if (100 > Math.abs(offset)) {
+
+					final int warningThresholdMillis = 100;
+					if (Math.abs(offset) <= warningThresholdMillis) {
 						LOGGER.info(entry);
 					} else {
 						LOGGER.warning(entry);
