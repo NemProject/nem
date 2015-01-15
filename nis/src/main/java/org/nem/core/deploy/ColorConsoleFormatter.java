@@ -6,7 +6,7 @@ import java.util.logging.*;
 /**
  * A custom formatter that enables colored console output on *nix platforms.
  */
-public class ColorConsoleFormatter extends SimpleFormatter {
+public class ColorConsoleFormatter extends NemFormatter {
 
 	private final MessageFormatter impl;
 
