@@ -89,8 +89,8 @@ public class AccountPrivateKeyTransactionsPage {
 	public AccountTransactionsPageBuilder createPageBuilder() {
 		final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
 		pageBuilder.setAddress(Address.fromPublicKey(new KeyPair(this.privateKey).getPublicKey()).getEncoded());
-		pageBuilder.setHash(null == this.getHash()? null : this.getHash().toString());
-		pageBuilder.setId(null == this.getId()? null : this.getId().toString());
+		pageBuilder.setHash(null == this.getHash() ? null : this.getHash().toString());
+		pageBuilder.setId(null == this.getId() ? null : this.getId().toString());
 		return pageBuilder;
 	}
 }

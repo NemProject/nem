@@ -8,7 +8,6 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.core.time.synchronization.TimeSynchronizer;
 import org.nem.nis.service.ChainServices;
-import org.nem.nis.time.synchronization.ImportanceAwareNodeSelector;
 import org.nem.peer.services.*;
 import org.nem.peer.trust.NodeSelector;
 import org.nem.peer.trust.score.NodeExperiencesPair;

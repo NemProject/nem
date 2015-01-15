@@ -21,7 +21,6 @@ public class SystemTimeProviderTest {
 		} catch (IllegalAccessException | NoSuchFieldException e) {
 			throw new RuntimeException("Failed to reset time offset");
 		}
-
 	}
 
 	//region getEpochTime[Millis]

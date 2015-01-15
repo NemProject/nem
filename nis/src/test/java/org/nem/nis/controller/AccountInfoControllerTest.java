@@ -28,7 +28,7 @@ public class AccountInfoControllerTest {
 			context -> context.controller.accountGet(context.getBuilder());
 
 	private static final Function<TestContext, AccountMetaDataPair> ACCOUNT_GET_BATCH_STRATEGY =
-			context ->  {
+			context -> {
 				final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(context.getAccountIdListDeserializer());
 				Assert.assertThat(pairs.size(), IsEqual.equalTo(1));
 				return pairs.get(0);
@@ -46,7 +46,7 @@ public class AccountInfoControllerTest {
 		assertAccountGetDelegatesToAccountInfoFactoryForAccountInfo(ACCOUNT_GET_BATCH_STRATEGY);
 	}
 
-	private static void assertAccountGetDelegatesToAccountInfoFactoryForAccountInfo(final Function<TestContext, AccountMetaDataPair> getAccountInfo)  {
+	private static void assertAccountGetDelegatesToAccountInfoFactoryForAccountInfo(final Function<TestContext, AccountMetaDataPair> getAccountInfo) {
 		// Arrange:
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 		final TestContext context = new TestContext();

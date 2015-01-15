@@ -124,7 +124,6 @@ public class MultisigAggregateModificationTransactionTest {
 		}
 	}
 
-
 	private static abstract class AbstractMultisigAggregateModificationTransactionTest {
 		protected abstract MultisigModificationType getModification();
 

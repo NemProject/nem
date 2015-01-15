@@ -474,7 +474,6 @@ public class UnconfirmedTransactions {
 				.anyMatch(transactionAddress -> transactionAddress.equals(address));
 	}
 
-
 	// TODO 20140113 J-G: why don't we just include this in matchAddress
 	// > are there cases where we call matchAddress where we don't want to include these transactions?
 	private boolean isCosignatory(final Transaction transaction, final Address address) {

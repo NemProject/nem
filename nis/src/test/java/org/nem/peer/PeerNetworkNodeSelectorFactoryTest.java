@@ -7,10 +7,10 @@ import org.nem.core.math.ColumnVector;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.test.*;
+import org.nem.core.test.NodeUtils;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
+import org.nem.nis.state.AccountState;
 import org.nem.peer.trust.*;
 import org.nem.peer.trust.score.NodeExperiences;
 

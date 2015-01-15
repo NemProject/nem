@@ -1,6 +1,6 @@
 package org.nem.core.serialization;
 
-import java.util.*;
+import java.util.Collection;
 
 /**
  * Helper class for storing lists of serializable entities

@@ -7,7 +7,7 @@ import org.nem.core.connect.FatalPeerException;
 import org.nem.core.crypto.HashChain;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.*;
+import org.nem.core.test.ExceptionAssert;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.DefaultNisCache;
 import org.nem.nis.test.BlockChain.*;
@@ -17,7 +17,7 @@ import org.nem.peer.connect.*;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class BlockChainUpdaterTest {

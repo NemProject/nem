@@ -73,7 +73,7 @@ public class BlockChainServicesTest {
 	 * > I'm one of cosigners I generate MT with inner Transfer to my account
 	 * > after everyone signed it, I reuse inner transfer but I change outer MT
 	 * (ofc I'd probably have limited amount of time (MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)
-	 *  but such thing shouldn't be feasible in first place)
+	 * but such thing shouldn't be feasible in first place)
 	 */
 
 	@Test
