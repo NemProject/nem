@@ -358,8 +358,7 @@ public class AccountControllerTest {
 				recipientKeyPair,
 				"This is a secret message");
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
-		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair
-				= new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey(), null, null);
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
 		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(expectedList);
 
 		// Act:
@@ -367,6 +366,7 @@ public class AccountControllerTest {
 
 		// Assert:
 		final TransferTransaction tx = (TransferTransaction)resultList.get(0).getTransaction();
+		Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getTransaction())));
 		Assert.assertThat(tx.getMessage(), IsInstanceOf.instanceOf(PlainMessage.class));
 		Assert.assertThat(new String(tx.getMessage().getDecodedPayload()), IsEqual.equalTo("This is a secret message"));
 	}
@@ -406,8 +406,7 @@ public class AccountControllerTest {
 		final TestContext context = new TestContext(accountIoAdapter);
 		final TransactionMetaDataPair pair = createPairWithUndecodableSecureMessage(senderKeyPair);
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
-		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair
-				= new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey(), null, null);
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
 		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(expectedList);
 
 		// Act:
@@ -454,8 +453,7 @@ public class AccountControllerTest {
 		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
-		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair
-				= new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey(), null, null);
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
 		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(new SerializableList<>(1));
 
 		// Act:

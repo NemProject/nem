@@ -13,7 +13,21 @@ public class AccountPrivateKeyTransactionsPageTest {
 	// region construction
 
 	@Test
-	public void canCreateAccountPrivateKeyTransactionsPageFromParameters() {
+	public void canCreatePageWithOnlyPrivateKey() {
+		// Arrange:
+		final KeyPair keyPair = new KeyPair();
+
+		// Act:
+		final AccountPrivateKeyTransactionsPage page = new AccountPrivateKeyTransactionsPage(keyPair.getPrivateKey());
+
+		// Assert:
+		Assert.assertThat(page.getPrivateKey(), IsSame.sameInstance(keyPair.getPrivateKey()));
+		Assert.assertThat(page.getHash(), IsNull.nullValue());
+		Assert.assertThat(page.getId(), IsNull.nullValue());
+	}
+
+	@Test
+	public void canCreatePageWithAllOptionalParameters() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Hash hash = Utils.generateRandomHash();
@@ -32,17 +46,19 @@ public class AccountPrivateKeyTransactionsPageTest {
 	}
 
 	@Test
-	public void cannotCreateAccountPrivateKeyTransactionsPageFromParametersIfPrivateKeyIsNull() {
+	public void cannotPageIfPrivateKeyIsNull() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final Long id = 1234L;
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountPrivateKeyTransactionsPage(null, hash.toString(), id.toString()), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(
+				v -> new AccountPrivateKeyTransactionsPage(null, hash.toString(), id.toString()),
+				IllegalArgumentException.class);
 	}
 
 	@Test
-	public void canCreateAccountPrivateKeyTransactionsPageWithoutOptionalParameters() {
+	public void canCreatePageWithoutOptionalParameters() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 
@@ -55,8 +71,12 @@ public class AccountPrivateKeyTransactionsPageTest {
 		Assert.assertThat(null, IsEqual.equalTo(page.getId()));
 	}
 
+	// endregion
+
+	// region deserialization
+
 	@Test
-	public void canCreateAccountPrivateKeyTransactionsPageFromDeserializer() {
+	public void canDeserializePageWithAllOptionalParameters() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Hash hash = Utils.generateRandomHash();
@@ -73,18 +93,20 @@ public class AccountPrivateKeyTransactionsPageTest {
 	}
 
 	@Test
-	public void cannotCreateAccountPrivateKeyTransactionsPageFromDeserializerIfPrivateKeyIsMissing() {
+	public void cannotDeserializePageIfPrivateKeyIsMissing() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final Long id = 1234L;
 		final Deserializer deserializer = this.createDeserializer(null, hash, id);
 
 		// Assert:
-		ExceptionAssert.assertThrows(v -> new AccountPrivateKeyTransactionsPage(deserializer), MissingRequiredPropertyException.class);
+		ExceptionAssert.assertThrows(
+				v -> new AccountPrivateKeyTransactionsPage(deserializer),
+				MissingRequiredPropertyException.class);
 	}
 
 	@Test
-	public void canCreateAccountPrivateKeyTransactionsPageFromDeserializerWithoutOptionalParameters() {
+	public void canDeserializePageWithoutOptionalParameters() {
 		// Arrange:
 		final KeyPair keyPair = new KeyPair();
 		final Deserializer deserializer = this.createDeserializer(keyPair.getPrivateKey(), null, null);

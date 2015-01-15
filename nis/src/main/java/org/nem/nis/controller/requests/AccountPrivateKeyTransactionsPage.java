@@ -14,7 +14,16 @@ public class AccountPrivateKeyTransactionsPage {
 	private final PrivateKey privateKey;
 
 	/**
-	 * Creates an AccountPrivateKeyTransactionsPage.
+	 * Creates an account private key transactions page.
+	 *
+	 * @param privateKey The private key.
+	 */
+	public AccountPrivateKeyTransactionsPage(final PrivateKey privateKey) {
+		this(privateKey, null, null);
+	}
+
+	/**
+	 * Creates an account private key transactions page.
 	 *
 	 * @param privateKey The private key.
 	 * @param hash The (optional) hash.
@@ -34,7 +43,7 @@ public class AccountPrivateKeyTransactionsPage {
 	}
 
 	/**
-	 * Creates an AccountPrivateKeyTransactionsPage.
+	 * Deserializes an account private key transactions page.
 	 *
 	 * @param deserializer The deserializer to use.
 	 */

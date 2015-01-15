@@ -22,7 +22,7 @@ public class AccountTransactionsPage extends AccountId {
 	}
 
 	/**
-	 * Creates an AccountPrivateKeyTransactionsPage.
+	 * Deserializes an account page.
 	 *
 	 * @param deserializer The deserializer to use.
 	 */

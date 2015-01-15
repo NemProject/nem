@@ -5,7 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
-import org.nem.core.serialization.Deserializer;
+import org.nem.core.serialization.*;
 import org.nem.core.test.*;
 
 public class AccountTransactionsPageTest {
@@ -109,9 +109,24 @@ public class AccountTransactionsPageTest {
 		ExceptionAssert.assertThrows(v -> new AccountTransactionsPage(deserializer), IllegalArgumentException.class);
 	}
 
+	@Test
+	public void cannotCreateAccountTransactionsPageFromDeserializerWithNoAddress() {
+		// Arrange:
+		final Hash hash = Utils.generateRandomHash();
+		final Long id = 123L;
+		final Deserializer deserializer = this.createDeserializer(null, hash, id);
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(
+				v -> new AccountTransactionsPage(deserializer),
+				MissingRequiredPropertyException.class);
+	}
+
 	private Deserializer createDeserializer(final Address address, final Hash hash, final Long id) {
 		final JSONObject jsonObject = new JSONObject();
-		jsonObject.put("address", address.getEncoded());
+		if (null != address) {
+			jsonObject.put("address", address.getEncoded());
+		}
 
 		if (null != hash) {
 			jsonObject.put("hash", hash.toString());

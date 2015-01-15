@@ -205,6 +205,7 @@ public class AccountController {
 				// TODO 20150114 BR -> J: do we really need this.getFee() (opposed to this.fee) in Transaction.serializeImpl()? If the transaction was created
 				// > by NIS or NCC then the fee should be valid or the transaction will be rejected during push(). If some third party was pushing the
 				// > transaction into the network we can't rely on the fee field anyway, that's why we got the validation when receiving the transaction.
+				// TODO 20150115 J-J: should rethink how fees work in general
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),
