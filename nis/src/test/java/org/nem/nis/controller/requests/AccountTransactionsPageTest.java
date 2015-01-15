@@ -1,9 +1,11 @@
 package org.nem.nis.controller.requests;
 
+import net.minidev.json.JSONObject;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.Address;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.*;
 
 public class AccountTransactionsPageTest {
@@ -61,5 +63,64 @@ public class AccountTransactionsPageTest {
 		// Assert:
 		ExceptionAssert.assertThrows(v -> new AccountTransactionsPage(null, null, null), IllegalArgumentException.class);
 		ExceptionAssert.assertThrows(v -> new AccountTransactionsPage("ABC", null, null), IllegalArgumentException.class);
+	}
+
+	@Test
+	public void canCreateAccountTransactionsPageFromDeserializer() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final Hash hash = Utils.generateRandomHash();
+		final Long id = 123L;
+		final Deserializer deserializer = this.createDeserializer(address, hash, id);
+
+		// Act:
+		final AccountTransactionsPage page = new AccountTransactionsPage(deserializer);
+
+		// Assert:
+		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(page.getHash(), IsEqual.equalTo(hash));
+		Assert.assertThat(page.getId(), IsEqual.equalTo(123L));
+	}
+
+	@Test
+	public void canCreateAccountTransactionsPageFromDeserializerWithEmptyHashAndId() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final Deserializer deserializer = this.createDeserializer(address, null, null);
+
+		// Act:
+		final AccountTransactionsPage page = new AccountTransactionsPage(deserializer);
+
+		// Assert:
+		Assert.assertThat(page.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(page.getHash(), IsEqual.equalTo(null));
+		Assert.assertThat(page.getId(), IsEqual.equalTo(null));
+	}
+
+	@Test
+	public void cannotCreateAccountTransactionsPageFromDeserializerWithInvalidAddress() {
+		// Arrange:
+		final Address address = Address.fromEncoded("blah");
+		final Hash hash = Utils.generateRandomHash();
+		final Long id = 123L;
+		final Deserializer deserializer = this.createDeserializer(address, hash, id);
+
+		// Act + Assert:
+		ExceptionAssert.assertThrows(v -> new AccountTransactionsPage(deserializer), IllegalArgumentException.class);
+	}
+
+	private Deserializer createDeserializer(final Address address, final Hash hash, final Long id) {
+		final JSONObject jsonObject = new JSONObject();
+		jsonObject.put("address", address.getEncoded());
+
+		if (null != hash) {
+			jsonObject.put("hash", hash.toString());
+		}
+
+		if (null != hash) {
+			jsonObject.put("id", id.toString());
+		}
+
+		return Utils.createDeserializer(jsonObject);
 	}
 }

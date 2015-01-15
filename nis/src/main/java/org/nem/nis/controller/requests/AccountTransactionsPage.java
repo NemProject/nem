@@ -1,6 +1,7 @@
 package org.nem.nis.controller.requests;
 
 import org.nem.core.crypto.Hash;
+import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.StringUtils;
 
 public class AccountTransactionsPage extends AccountId {
@@ -18,6 +19,18 @@ public class AccountTransactionsPage extends AccountId {
 		super(address);
 		this.hash = StringUtils.isNullOrEmpty(hash) ? null : Hash.fromHexString(hash);
 		this.id = StringUtils.isNullOrEmpty(id) ? null : Long.parseLong(id);
+	}
+
+	/**
+	 * Creates an AccountPrivateKeyTransactionsPage.
+	 *
+	 * @param deserializer The deserializer to use.
+	 */
+	public AccountTransactionsPage(final Deserializer deserializer) {
+		this(
+				deserializer.readString("address"),
+				deserializer.readOptionalString("hash"),
+				deserializer.readOptionalString("id"));
 	}
 
 	/**
