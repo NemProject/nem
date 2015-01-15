@@ -133,47 +133,44 @@ public class AccountController {
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key. The AccountTransactionsPagePrivateKeyPair constructor
-	 * already has checked that the supplied address can be derived from the private key.
+	 * Transaction messages are decrypted with the supplied private key.
 	 *
-	 * @param pair The pair.
+	 * @param page The page.
 	 * @return Information about the matching transactions.
 	 */
 	@RequestMapping(value = "/local/account/transfers/all", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersAll(@RequestBody final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.accountTransfersAll(pair.createPageBuilder()), pair.getPrivateKey());
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersAll(@RequestBody final AccountPrivateKeyTransactionsPage page) {
+		return this.transformPairs(this.accountTransfersAll(page.createPageBuilder()), page.getPrivateKey());
 	}
 
 	/**
 	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key. The AccountTransactionsPagePrivateKeyPair constructor
-	 * already has checked that the supplied address can be derived from the private key.
+	 * Transaction messages are decrypted with the supplied private key.
 	 *
-	 * @param pair The pair.
+	 * @param page The page.
 	 * @return Information about the matching transactions.
 	 */
 	@RequestMapping(value = "/local/account/transfers/incoming", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(@RequestBody final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.accountTransfersIncoming(pair.createPageBuilder()), pair.getPrivateKey());
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersIncoming(@RequestBody final AccountPrivateKeyTransactionsPage page) {
+		return this.transformPairs(this.accountTransfersIncoming(page.createPageBuilder()), page.getPrivateKey());
 	}
 
 	/**
 	 * Gets information about incoming transactions of a specified account ending at the specified transaction (via hash or id).
-	 * Transaction messages are decrypted with the supplied private key. The AccountTransactionsPagePrivateKeyPair constructor
-	 * already has checked that the supplied address can be derived from the private key.
+	 * Transaction messages are decrypted with the supplied private key.
 	 *
-	 * @param pair The pair.
+	 * @param page The page.
 	 * @return Information about the matching transactions.
 	 */
 	@RequestMapping(value = "/local/account/transfers/outgoing", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(@RequestBody final AccountTransactionsPagePrivateKeyPair pair) {
-		return this.transformPairs(this.accountTransfersOutgoing(pair.createPageBuilder()), pair.getPrivateKey());
+	public SerializableList<TransactionMetaDataPair> localAccountTransfersOutgoing(@RequestBody final AccountPrivateKeyTransactionsPage page) {
+		return this.transformPairs(this.accountTransfersOutgoing(page.createPageBuilder()), page.getPrivateKey());
 	}
 
 	private SerializableList<TransactionMetaDataPair> transformPairs(
@@ -205,6 +202,9 @@ public class AccountController {
 				// > let's say secure message fee is 1 but plain message fee is 2 for some reason,
 				// > if the fee was set at the minimum, the new transaction (below) will automatically increase it to 2
 				// > even thought it was 1 in the original transaction
+				// TODO 20150114 BR -> J: do we really need this.getFee() (opposed to this.fee) in Transaction.serializeImpl()? If the transaction was created
+				// > by NIS or NCC then the fee should be valid or the transaction will be rejected during push(). If some third party was pushing the
+				// > transaction into the network we can't rely on the fee field anyway, that's why we got the validation when receiving the transaction.
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),

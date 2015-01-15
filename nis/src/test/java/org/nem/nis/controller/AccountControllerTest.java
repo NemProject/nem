@@ -346,7 +346,7 @@ public class AccountControllerTest {
 
 	private void localAccountTransfersReturnsTransactionsWithDecodedMessagesIfPossible(
 			final ReadOnlyTransferDao.TransferType transferType,
-			final BiFunction<AccountController, AccountTransactionsPagePrivateKeyPair, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+			final BiFunction<AccountController, AccountPrivateKeyTransactionsPage, SerializableList<TransactionMetaDataPair>> controllerMethod) {
 		// Arrange:
 		final KeyPair senderKeyPair = new KeyPair();
 		final KeyPair recipientKeyPair = new KeyPair();
@@ -358,8 +358,8 @@ public class AccountControllerTest {
 				recipientKeyPair,
 				"This is a secret message");
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
-		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), null, null);
-		final AccountTransactionsPagePrivateKeyPair pagePrivateKeyPair = new AccountTransactionsPagePrivateKeyPair(page, senderKeyPair.getPrivateKey());
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair
+				= new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey(), null, null);
 		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(expectedList);
 
 		// Act:
@@ -398,7 +398,7 @@ public class AccountControllerTest {
 
 	private void localAccountTransfersLeavesTransactionsUntouchedIfDecodingIsNotPossible(
 			final ReadOnlyTransferDao.TransferType transferType,
-			final BiFunction<AccountController, AccountTransactionsPagePrivateKeyPair, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+			final BiFunction<AccountController, AccountPrivateKeyTransactionsPage, SerializableList<TransactionMetaDataPair>> controllerMethod) {
 		// Arrange:
 		final KeyPair senderKeyPair = new KeyPair();
 		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
@@ -406,8 +406,8 @@ public class AccountControllerTest {
 		final TestContext context = new TestContext(accountIoAdapter);
 		final TransactionMetaDataPair pair = createPairWithUndecodableSecureMessage(senderKeyPair);
 		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
-		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), null, null);
-		final AccountTransactionsPagePrivateKeyPair pagePrivateKeyPair = new AccountTransactionsPagePrivateKeyPair(page, senderKeyPair.getPrivateKey());
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair
+				= new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey(), null, null);
 		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(expectedList);
 
 		// Act:
@@ -447,15 +447,15 @@ public class AccountControllerTest {
 
 	private void localAccountTransfersMethodsDelegateToAccountTransfersMethods(
 			final ReadOnlyTransferDao.TransferType transferType,
-			final BiFunction<AccountController, AccountTransactionsPagePrivateKeyPair, SerializableList<TransactionMetaDataPair>> controllerMethod,
+			final BiFunction<AccountController, AccountPrivateKeyTransactionsPage, SerializableList<TransactionMetaDataPair>> controllerMethod,
 			final int callPattern) {
 		// Arrange:
 		final KeyPair senderKeyPair = new KeyPair();
 		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
 		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 		final TestContext context = new TestContext(accountIoAdapter);
-		final AccountTransactionsPage page = new AccountTransactionsPage(address.getEncoded(), null, null);
-		final AccountTransactionsPagePrivateKeyPair pagePrivateKeyPair = new AccountTransactionsPagePrivateKeyPair(page, senderKeyPair.getPrivateKey());
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair
+				= new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey(), null, null);
 		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(new SerializableList<>(1));
 
 		// Act:
