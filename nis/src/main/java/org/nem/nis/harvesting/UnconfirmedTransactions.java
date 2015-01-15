@@ -353,6 +353,7 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
 		synchronized (this.lock) {
 			return this.transactions.values().stream()
+					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.filter(tx -> matchAddress(tx, address) || isCosignatory(tx, address))
 					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
 					.limit(maxSize)
