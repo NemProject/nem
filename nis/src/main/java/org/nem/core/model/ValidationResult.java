@@ -68,7 +68,7 @@ public enum ValidationResult {
 	FAILURE_ENTITY_UNUSABLE(11),
 
 	/**
-	 * Validation failed because the entity cannot be used for some reason.
+	 * Validation failed because the entity cannot be used because the nodes are out of sync.
 	 */
 	FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC(12),
 
