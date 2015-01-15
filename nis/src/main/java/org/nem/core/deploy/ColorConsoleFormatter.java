@@ -1,20 +1,14 @@
 package org.nem.core.deploy;
 
-import org.nem.core.time.*;
-
 import java.util.*;
 import java.util.logging.*;
 
 /**
  * A custom formatter that enables colored console output on *nix platforms.
  */
-public class ColorConsoleFormatter extends SimpleFormatter {
+public class ColorConsoleFormatter extends NemFormatter {
 
 	private final MessageFormatter impl;
-	// TODO 20150113 J-B: i think you left this here by mistake?
-	// TODO 20150114 BR -> J: actually no. You think the console output should be local time?
-	private static final TimeProvider timeProvider = new SystemTimeProvider();
-	private static final int timeZoneOffset = TimeZone.getDefault().getRawOffset();
 
 	/**
 	 * Creates a new formatter.
@@ -28,12 +22,6 @@ public class ColorConsoleFormatter extends SimpleFormatter {
 		return null != os && os.startsWith("Windows");
 	}
 
-	@Override
-	public synchronized String format(final LogRecord record) {
-		final UnixTime time = UnixTime.fromTimeInstant(timeProvider.getCurrentTime());
-		record.setMillis(time.getMillis() - timeZoneOffset);
-		return super.format(record);
-	}
 	@Override
 	public String formatMessage(final LogRecord record) {
 		return this.impl.format(record);

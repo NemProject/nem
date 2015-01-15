@@ -168,16 +168,21 @@ public class SystemTimeProviderTest {
 	@Test
 	public void timeOffsetIsPreservedAcrossInstances() {
 		// Arrange:
-		final TimeProvider provider1 = new SystemTimeProvider();
-		final TimeProvider provider2 = new SystemTimeProvider();
+		final TimeProvider[] providers = { new SystemTimeProvider(), new SystemTimeProvider(), null };
+		final long[] networkTimes = new long[3];
 
 		// Act:
-		provider1.updateTimeOffset(new TimeOffset(1234L));
-		final TimeProvider provider3 = new SystemTimeProvider();
+		runDeterministicOperation(v -> {
+			providers[0].updateTimeOffset(new TimeOffset(1234L));
+			providers[2] = new SystemTimeProvider();
+			for (int i=0; i<3; i++) {
+				networkTimes[i] = providers[i].getNetworkTime().getRaw();
+			}
+		});
 
 		// Assert:
-		Assert.assertThat(provider1.getNetworkTime(), IsEqual.equalTo(provider2.getNetworkTime()));
-		Assert.assertThat(provider1.getNetworkTime(), IsEqual.equalTo(provider3.getNetworkTime()));
+		Assert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[1]));
+		Assert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[2]));
 	}
 
 	//endregion
