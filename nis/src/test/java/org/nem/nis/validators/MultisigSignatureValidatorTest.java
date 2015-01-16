@@ -24,6 +24,7 @@ public class MultisigSignatureValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
+	// TODO 20150116 BR -> G: this tests succeeds, but rather because there is no corresponding multisig transaction like in the next test.
 	@Test
 	public void multisigSignatureWithSignerNotBeingCosignatoryIsInvalid() {
 		// Arrange:
@@ -66,5 +67,26 @@ public class MultisigSignatureValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		Assert.assertThat(multisigTransaction.getCosignerSignatures().contains(transaction), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void multisigSignatureWithSignerBeingCosignatoryIsValidIfTransactionListContainsMoreThanOneMultiSigTransaction() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		context.addRandomMultisigTransferTransactions(3);
+		final MultisigTransaction multisigTransaction = context.createMultisigTransferTransaction();
+		final Transaction transaction = context.createMultisigSignature(HashUtils.calculateHash(multisigTransaction.getOtherTransaction()), context.dummy);
+
+		context.makeCosignatory(context.dummy, context.multisig, TEST_HEIGHT);
+
+		// Act:
+		final ValidationResult result = context.validateMultisigSignature(transaction, TEST_HEIGHT);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		Assert.assertThat(multisigTransaction.getCosignerSignatures().contains(transaction), IsEqual.equalTo(true));
 	}
 }

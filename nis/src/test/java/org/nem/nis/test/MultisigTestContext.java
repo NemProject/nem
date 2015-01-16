@@ -69,6 +69,21 @@ public class MultisigTestContext {
 		return transaction;
 	}
 
+	public void addRandomMultisigTransferTransactions(final int count) {
+		for (int i = 0; i < count; i++) {
+			final TransferTransaction otherTransaction = new TransferTransaction(
+					TimeInstant.ZERO,
+					this.multisig,
+					Utils.generateRandomAccount(),
+					Amount.fromNem(123),
+					null);
+			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);
+			transaction.sign();
+
+			this.transactionList.add(transaction);
+		}
+	}
+
 	public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
 		multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO,
 				signatureSigner,
