@@ -1,4 +1,4 @@
-package org.nem.nis.controller.requests;
+package org.nem.core.model.ncc;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;

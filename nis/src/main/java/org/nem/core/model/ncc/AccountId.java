@@ -1,4 +1,4 @@
-package org.nem.nis.controller.requests;
+package org.nem.core.model.ncc;
 
 import org.nem.core.model.Address;
 import org.nem.core.serialization.*;
@@ -6,21 +6,29 @@ import org.nem.core.serialization.*;
 /**
  * View model that represents an account id information.
  */
-public class AccountId {
+public class AccountId implements SerializableEntity {
 	private final Address address;
+
+	/**
+	 * Creates a new account id view model.
+	 *
+	 * @param address The account address.
+	 */
+	public AccountId(final Address address) {
+		if (null == address) {
+			throw new IllegalArgumentException("address is required");
+		}
+		this.address = address;
+		this.checkValidity();
+	}
 
 	/**
 	 * Creates a new account id.
 	 *
-	 * @param address The address.
+	 * @param address The encoded address.
 	 */
 	public AccountId(final String address) {
-		if (null == address) {
-			throw new IllegalArgumentException("address is required");
-		}
-
-		this.address = Address.fromEncoded(address);
-		this.checkValidity();
+		this(Address.fromEncoded(address));
 	}
 
 	/**
@@ -51,5 +59,20 @@ public class AccountId {
 	//@Override
 	public void serialize(final Serializer serializer) {
 		Address.writeTo(serializer, "account", this.address);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.address.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof AccountId)) {
+			return false;
+		}
+
+		final AccountId rhs = (AccountId)obj;
+		return this.address.equals(rhs.address);
 	}
 }

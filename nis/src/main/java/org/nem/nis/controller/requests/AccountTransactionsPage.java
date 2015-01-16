@@ -1,6 +1,7 @@
 package org.nem.nis.controller.requests;
 
 import org.nem.core.crypto.Hash;
+import org.nem.core.model.ncc.AccountId;
 import org.nem.core.serialization.Deserializer;
 import org.nem.core.utils.StringUtils;
 

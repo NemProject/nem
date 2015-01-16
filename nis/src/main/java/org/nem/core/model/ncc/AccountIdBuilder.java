@@ -1,4 +1,4 @@
-package org.nem.nis.controller.requests;
+package org.nem.core.model.ncc;
 
 /**
  * Builder that is used by Spring to create an AccountId from a GET request.

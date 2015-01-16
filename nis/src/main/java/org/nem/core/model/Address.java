@@ -44,6 +44,9 @@ public class Address {
 	 * @return An address object.
 	 */
 	public static Address fromEncoded(final String encoded) {
+		if (null == encoded) {
+			throw new IllegalArgumentException("address cannot be null");
+		}
 		return new Address(encoded.toUpperCase());
 	}
 
