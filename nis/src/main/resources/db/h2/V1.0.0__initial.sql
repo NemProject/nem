@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `accounts` (  
+CREATE TABLE IF NOT EXISTS `accounts` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,  
 
   `printableKey` VARCHAR(42) NOT NULL,
@@ -41,14 +41,17 @@ ALTER TABLE public.blocks ADD
   FOREIGN KEY (harvestedInName)
   REFERENCES public.accounts(id);
 
--- 
+-- sequence for the id values in the transaction tables
+CREATE SEQUENCE transaction_id_seq;
+
+--
 -- TRANSFERS
 -- 
 
 CREATE TABLE IF NOT EXISTS `transfers` (  
   `blockId` BIGINT NOT NULL,
 
-  `id` BIGINT NOT NULL AUTO_INCREMENT,  
+  `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -90,7 +93,7 @@ ALTER TABLE transfers ADD
 CREATE TABLE IF NOT EXISTS `importancetransfers` (  
   `blockId` BIGINT NOT NULL,
 
-  `id` BIGINT NOT NULL AUTO_INCREMENT,  
+  `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -129,7 +132,7 @@ ALTER TABLE public.importancetransfers ADD
 CREATE TABLE IF NOT EXISTS `multisigsignermodifications` (  
   `blockId` BIGINT NOT NULL,
 
-  `id` BIGINT NOT NULL AUTO_INCREMENT,  
+  `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -180,7 +183,7 @@ ALTER TABLE public.multisigmodifications ADD
 CREATE TABLE IF NOT EXISTS `multisigtransactions` (  
   `blockId` BIGINT NOT NULL,
 
-  `id` BIGINT NOT NULL AUTO_INCREMENT,  
+  `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -214,7 +217,7 @@ ALTER TABLE public.multisigtransactions ADD
 CREATE TABLE IF NOT EXISTS `multisigsignatures` (  
   `multisigTransactionId` BIGINT NOT NULL,
 
-  `id` BIGINT NOT NULL AUTO_INCREMENT,  
+  `id` BIGINT NOT NULL DEFAULT transaction_id_seq.nextval,
   `transferHash` VARBINARY(34) NOT NULL,
 
   `version` INT NOT NULL,
@@ -237,7 +240,7 @@ ALTER TABLE public.multisigsignatures ADD
   REFERENCES accounts(id);
 
 ---
---- indexes
+--- indices
 --- 
 
 CREATE INDEX IDX_BLOCKS_TIMESTAMP ON `blocks` (timeStamp);
@@ -248,12 +251,14 @@ CREATE INDEX IDX_BLOCKS_HARVESTEDINNAME ON `blocks` (harvestedInName);
 CREATE INDEX IDX_BLOCKS_HARVESTERID_HEIGHT ON `blocks` (harvesterId, height desc);
 CREATE INDEX IDX_BLOCKS_HARVESTEDINNAME_HEIGHT ON `blocks` (harvestedInName, height desc);
 
+CREATE INDEX IDX_TRANSFERS_BLOCKID_ASC ON `transfers` (blockId ASC);
 CREATE INDEX IDX_TRANSFERS_TIMESTAMP ON `transfers` (timeStamp);
 CREATE INDEX IDX_TRANSFERS_SENDERID ON `transfers` (senderId);
 CREATE INDEX IDX_TRANSFERS_RECIPIENTID ON `transfers` (recipientId);
 CREATE INDEX IDX_TRANSFERS_SENDERID_ID ON `transfers` (senderId, id DESC);
 CREATE INDEX IDX_TRANSFERS_RECIPIENTID_ID ON `transfers` (recipientId, id DESC);
 
+CREATE INDEX IDX_IMPORTANCETRANSFERS_BLOCKID_ASC ON `importancetransfers` (blockId ASC);
 CREATE INDEX IDX_IMPORTANCETRANSFERS_TIMESTAMP ON `importancetransfers` (timeStamp);
 CREATE INDEX IDX_IMPORTANCETRANSFERS_SENDERID ON `importancetransfers` (senderId);
 CREATE INDEX IDX_IMPORTANCETRANSFERS_REMOTEID ON `importancetransfers` (remoteId);
@@ -265,7 +270,9 @@ CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID ON `multisigsignermodifica
 CREATE INDEX IDX_MULTISIGSIGNERMODIFICATIONS_SENDERID_ID ON `multisigsignermodifications` (senderId, id DESC);
 
 CREATE INDEX IDX_MULTISIGMODIFICATIONS_COSIGNATORYID ON `multisigmodifications` (cosignatoryId);
+CREATE INDEX IDX_MULTISIGMODIFICATIONS_MULTISIGSIGNERMODIFICATIONID ON `multisigmodifications` (MultisigSignerModificationId DESC);
 
+CREATE INDEX IDX_MULTISIGTRANSACTIONS_BLOCKID_ASC ON `multisigtransactions` (blockId ASC);
 CREATE INDEX IDX_MULTISIGTRANSACTIONS_TIMESTAMP ON `multisigtransactions` (timeStamp);
 CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID ON `multisigtransactions` (senderId);
 CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID_ID ON `multisigtransactions` (senderId, id DESC);

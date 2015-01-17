@@ -11,7 +11,8 @@ import javax.persistence.*;
 @MappedSuperclass
 public abstract class AbstractTransfer {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(generator = "transaction_id_seq", strategy=GenerationType.SEQUENCE)
+	@SequenceGenerator(name="transaction_id_seq", sequenceName="transaction_id_seq", allocationSize=1)
 	private Long id;
 	private byte[] transferHash;
 
