@@ -33,6 +33,16 @@ public class NisDbModelToModelMapper {
 	}
 
 	/**
+	 * Maps a TDbModel to a model transaction.
+	 *
+	 * @param transfer The TDbModel derived from abstract block transfer.
+	 * @return The model transfer transaction.
+	 */
+	public <TDbModel extends AbstractBlockTransfer> Transaction map(final TDbModel transfer) {
+		return this.mapper.map(transfer, Transaction.class);
+	}
+
+	/**
 	 * Maps a db model block to a model block.
 	 *
 	 * @param block The db model block.

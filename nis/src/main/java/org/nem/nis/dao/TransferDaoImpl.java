@@ -132,7 +132,7 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		for (final TransferBlockPair pair : tempList) {
-			if (pair.getDbTransferTransaction().getTransferHash().equals(hash)) {
+			if (pair.getTransfer().getTransferHash().equals(hash)) {
 				return pair;
 			}
 		}
@@ -206,7 +206,7 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType,
 			final TransferBlockPair pair) {
 		final Query query;
-		final DbTransferTransaction topMostTransferTransaction = pair.getDbTransferTransaction();
+		final AbstractBlockTransfer topMostTransferTransaction = pair.getTransfer();
 
 		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
 		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
@@ -278,7 +278,7 @@ public class TransferDaoImpl implements TransferDao {
 		TransferBlockPair curPair = null;
 		final Collection<TransferBlockPair> result = new ArrayList<>();
 		for (final TransferBlockPair pair : list) {
-			if (null == curPair || !(curPair.getDbTransferTransaction().getId().equals(pair.getDbTransferTransaction().getId()))) {
+			if (null == curPair || !(curPair.getTransfer().getId().equals(pair.getTransfer().getId()))) {
 				result.add(pair);
 				if (limit == result.size()) {
 					break;
@@ -292,7 +292,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
 		// TODO 2014 J-B: check with G about if we still need to compare getBlkIndex
-		return -lhs.getDbTransferTransaction().getId().compareTo(rhs.getDbTransferTransaction().getId());
+		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
 		/*final DbTransferTransaction lhsTransfer = lhs.getTransferTransaction();
 		final Long lhsHeight = lhs.getDbBlock().getHeight();
 		final DbTransferTransaction rhsTransfer = rhs.getTransferTransaction();

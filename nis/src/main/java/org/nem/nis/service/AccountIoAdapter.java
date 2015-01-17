@@ -92,8 +92,8 @@ public class AccountIoAdapter implements AccountIo {
 		final SerializableList<TransactionMetaDataPair> transactionList = new SerializableList<>(0);
 		pairs.stream()
 				.map(pair -> new TransactionMetaDataPair(
-						this.mapper.map(pair.getDbTransferTransaction()),
-						new TransactionMetaData(new BlockHeight(pair.getDbBlock().getHeight()), pair.getDbTransferTransaction().getId())
+						this.mapper.map(pair.getTransfer()),
+						new TransactionMetaData(new BlockHeight(pair.getDbBlock().getHeight()), pair.getTransfer().getId())
 				))
 				.forEach(transactionList::add);
 		return transactionList;

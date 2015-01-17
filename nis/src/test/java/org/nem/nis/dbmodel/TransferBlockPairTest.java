@@ -9,14 +9,14 @@ public class TransferBlockPairTest {
 	@Test
 	public void canCreatePair() {
 		// Arrange:
-		final DbTransferTransaction dbTransferTransaction = Mockito.mock(DbTransferTransaction.class);
+		final AbstractBlockTransfer transfer = Mockito.mock(AbstractBlockTransfer.class);
 		final DbBlock block = Mockito.mock(DbBlock.class);
 
 		// Act:
-		final TransferBlockPair pair = new TransferBlockPair(dbTransferTransaction, block);
+		final TransferBlockPair pair = new TransferBlockPair(transfer, block);
 
 		// Assert:
-		Assert.assertThat(pair.getDbTransferTransaction(), IsSame.sameInstance(dbTransferTransaction));
+		Assert.assertThat(pair.getTransfer(), IsSame.sameInstance(transfer));
 		Assert.assertThat(pair.getDbBlock(), IsSame.sameInstance(block));
 	}
 }

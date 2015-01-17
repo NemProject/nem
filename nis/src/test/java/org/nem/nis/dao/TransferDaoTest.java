@@ -49,8 +49,9 @@ public class TransferDaoTest {
 		this.session.createSQLQuery("delete from importancetransfers").executeUpdate();
 		this.session.createSQLQuery("delete from blocks").executeUpdate();
 		this.session.createSQLQuery("delete from accounts").executeUpdate();
-		this.session.createSQLQuery("ALTER TABLE transfers ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		this.session.createSQLQuery("ALTER TABLE importancetransfers ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		this.session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
+		this.session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		this.session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		this.session.flush();
 		this.session.clear();
 	}
@@ -145,9 +146,9 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, 30);
 
 		// Act
-		final Collection<DbTransferTransaction> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
-		final Collection<DbTransferTransaction> entities2 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
-		final Collection<DbTransferTransaction> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
+		final Collection<AbstractBlockTransfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
+		final Collection<AbstractBlockTransfer> entities2 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
+		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -261,9 +262,9 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, 30);
 
 		// Act
-		final Collection<DbTransferTransaction> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
-		final Collection<DbTransferTransaction> entities2 = this.getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
-		final Collection<DbTransferTransaction> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
+		final Collection<AbstractBlockTransfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
+		final Collection<AbstractBlockTransfer> entities2 = this.getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
+		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -444,7 +445,7 @@ public class TransferDaoTest {
 		}
 	}
 
-	private Collection<DbTransferTransaction> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id, final int callType) {
+	private Collection<AbstractBlockTransfer> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id, final int callType) {
 		return this.executeGetTransactionsForAccountUsingAttribute(
 				context.account,
 				hash,
@@ -452,7 +453,7 @@ public class TransferDaoTest {
 				context.height,
 				context.transferType,
 				callType).stream()
-				.map(TransferBlockPair::getDbTransferTransaction)
+				.map(TransferBlockPair::getTransfer)
 				.collect(Collectors.toList());
 	}
 
@@ -464,7 +465,7 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final List<Integer> expectedTimeStamps = context.getTestIntegerList(mapper);
 		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(context, null, null, callType).stream()
-				.map(DbTransferTransaction::getTimeStamp)
+				.map(AbstractBlockTransfer::getTimeStamp)
 				.collect(Collectors.toList());
 
 		// Assert
@@ -484,7 +485,7 @@ public class TransferDaoTest {
 				USE_HASH == callType ? context.hashes.get(mapper.apply(24)) : null,
 				USE_ID == callType ? (long)mapper.apply(24) + 1 : null,
 				callType).stream()
-				.map(DbTransferTransaction::getTimeStamp)
+				.map(AbstractBlockTransfer::getTimeStamp)
 				.collect(Collectors.toList());
 
 		// Assert
@@ -504,7 +505,7 @@ public class TransferDaoTest {
 				USE_HASH == callType ? context.hashes.get(mapper.apply(pos)) : null,
 				USE_ID == callType ? (long)mapper.apply(pos) + 1 : null,
 				callType).stream()
-				.map(DbTransferTransaction::getTimeStamp)
+				.map(AbstractBlockTransfer::getTimeStamp)
 				.collect(Collectors.toList());
 
 		// Assert
@@ -550,7 +551,7 @@ public class TransferDaoTest {
 				ReadOnlyTransferDao.TransferType.ALL,
 				type);
 
-		final List<Long> resultIds = entities1.stream().map(pair -> pair.getDbTransferTransaction().getId()).collect(Collectors.toList());
+		final List<Long> resultIds = entities1.stream().map(pair -> pair.getTransfer().getId()).collect(Collectors.toList());
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(9));
@@ -721,7 +722,7 @@ public class TransferDaoTest {
 		Assert.assertThat(entities2.size(), equalTo(0));
 		int lastTimestamp = 100 + 29;
 		for (final TransferBlockPair pair : entities1) {
-			Assert.assertThat(pair.getDbTransferTransaction().getTimeStamp(), equalTo(lastTimestamp));
+			Assert.assertThat(pair.getTransfer().getTimeStamp(), equalTo(lastTimestamp));
 			lastTimestamp = lastTimestamp - 1;
 		}
 	}
