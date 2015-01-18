@@ -5,6 +5,8 @@ import org.nem.core.serialization.*;
 
 /**
  * View model that represents an account id information.
+ *
+ * TODO 20150118 J-B: remind me why this needs to be serializable?
  */
 public class AccountId implements SerializableEntity {
 	private final Address address;
