@@ -10,7 +10,7 @@ public class AccountId implements SerializableEntity {
 	private final Address address;
 
 	/**
-	 * Creates a new account id view model.
+	 * Creates a new account id.
 	 *
 	 * @param address The account address.
 	 */
@@ -18,6 +18,7 @@ public class AccountId implements SerializableEntity {
 		if (null == address) {
 			throw new IllegalArgumentException("address is required");
 		}
+
 		this.address = address;
 		this.checkValidity();
 	}

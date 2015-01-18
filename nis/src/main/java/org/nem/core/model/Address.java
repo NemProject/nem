@@ -34,6 +34,10 @@ public class Address {
 	 * @return An address object.
 	 */
 	public static Address fromPublicKey(final byte version, final PublicKey publicKey) {
+		if (null == publicKey) {
+			throw new IllegalArgumentException("public key cannot be null");
+		}
+
 		return new Address(version, publicKey);
 	}
 
@@ -45,8 +49,9 @@ public class Address {
 	 */
 	public static Address fromEncoded(final String encoded) {
 		if (null == encoded) {
-			throw new IllegalArgumentException("address cannot be null");
+			throw new IllegalArgumentException("encoded address cannot be null");
 		}
+
 		return new Address(encoded.toUpperCase());
 	}
 

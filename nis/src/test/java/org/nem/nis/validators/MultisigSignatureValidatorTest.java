@@ -72,7 +72,7 @@ public class MultisigSignatureValidatorTest {
 	}
 
 	@Test
-	public void multisigSignatureWithSignerBeingCosignatoryIsValidIfTransactionListContainsMoreThanOneMultiSigTransaction() {
+	public void multisigSignatureWithSignerBeingCosignatoryIsValidIfTransactionListContainsMoreThanOneMultisigTransaction() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		context.addRandomMultisigTransferTransactions(3);
