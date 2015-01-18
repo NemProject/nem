@@ -104,13 +104,13 @@ public class TransferDaoImpl implements TransferDao {
 			return new ArrayList<>();
 		}
 
-		if (hash == null) {
-			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
-		} else {
+		long maxId = Long.MAX_VALUE;
+		if (null != hash) {
 			final String addressString = this.buildAddressQuery(transferType);
-			final TransferBlockPair pair = this.getTransactionDescriptorUsingHash(accountId, hash, height, addressString);
-			return this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, pair);
+			maxId = this.getTransactionDescriptorUsingHash(accountId, hash, height, addressString).getTransfer().getId();
 		}
+
+		return this.getTransactionsForAccountUpToTransaction(accountId, maxId, limit, transferType);
 	}
 
 	private TransferBlockPair getTransactionDescriptorUsingHash(
@@ -152,27 +152,9 @@ public class TransferDaoImpl implements TransferDao {
 			return new ArrayList<>();
 		}
 
-		if (id == null) {
-			return this.getLatestTransactionsForAccount(accountId, limit, transferType);
-		} else {
-			final TransferBlockPair pair = this.getTransactionDescriptorUsingId(id);
-			return this.getTransactionsForAccountUpToTransaction(accountId, limit, transferType, pair);
-		}
-	}
-
-	private TransferBlockPair getTransactionDescriptorUsingId(final Long id) {
-		final Query preQuery = this.getCurrentSession()
-				.createQuery("select t, t.block from DbTransferTransaction t WHERE t.id=:id")
-				.setParameter("id", id);
-		final List<TransferBlockPair> tempList = executeQuery(preQuery);
-		if (tempList.size() < 1) {
-			throw new MissingResourceException(
-					String.format("transaction not found in the db (%s, %s)", Hash.class.toString(), id.toString()),
-					Hash.class.toString(),
-					id.toString());
-		}
-
-		return tempList.get(0);
+		return null == id
+				? this.getTransactionsForAccountUpToTransaction(accountId, Long.MAX_VALUE, limit, transferType)
+				: this.getTransactionsForAccountUpToTransaction(accountId, id, limit, transferType);
 	}
 
 	private Long getAccountId(final Account account) {
@@ -186,42 +168,153 @@ public class TransferDaoImpl implements TransferDao {
 
 	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransaction(
 			final Long accountId,
+			final long maxId,
 			final int limit,
-			final TransferType transferType,
-			final TransferBlockPair pair) {
+			final TransferType transferType) {
 		if (TransferType.ALL == transferType) {
 			final Collection<TransferBlockPair> pairs =
-					this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.INCOMING, pair);
-			pairs.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, TransferType.OUTGOING, pair));
+					this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.INCOMING);
+			pairs.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.OUTGOING));
 			return this.sortAndLimit(pairs, limit);
 		} else {
-			final Collection<TransferBlockPair> pairs = this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, limit, transferType, pair);
+			final Collection<TransferBlockPair> pairs = this.getTransactionsForAccountUpToTransactionWithTransferType(
+					accountId,
+					maxId,
+					limit,
+					transferType);
 			return this.sortAndLimit(pairs, limit);
 		}
 	}
 
-	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransactionWithTransferType(
+	private List<TransferBlockPair> getTransactionsForAccountUpToTransactionWithTransferType(
 			final Long accountId,
+			final long maxId,
 			final int limit,
-			final TransferType transferType,
-			final TransferBlockPair pair) {
-		final Query query;
-		final AbstractBlockTransfer topMostTransferTransaction = pair.getTransfer();
+			final TransferType transferType) {
+		final List<TransferBlockPair> pairs = this.getTransfersForAccount(
+				accountId,
+				maxId,
+				limit,
+				transferType);
+		long minId = pairs.isEmpty()
+				? 0 :
+				pairs.get(pairs.size() - 1).getTransfer().getId();
+		pairs.addAll(this.getImportanceTransfersForAccount(
+				accountId,
+				minId,
+				maxId,
+				limit,
+				transferType));
+		pairs.addAll(this.getMultisigTransfersForAccount(
+				accountId,
+				minId,
+				maxId,
+				limit,
+				transferType));
 
-		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
+		return pairs;
+	}
+
+	private List<TransferBlockPair> getTransfersForAccount(
+			final long accountId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType) {
 		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
-		final String preQueryString = "SELECT t.*, b.* " +
-				"FROM transfers t LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-				"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d AND t.blockId = b.id " +
-				"ORDER BY %s, t.id DESC";
-		final String queryString = String.format(preQueryString,
+		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
+		final String queryString =
+				"SELECT t.*, b.* FROM transfers t " +
+						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d AND t.blockId = b.id " +
+						"ORDER BY %s, t.id DESC";
+		final String transfersQueryString = String.format(queryString,
 				senderOrRecipient,
 				accountId,
-				topMostTransferTransaction.getId(),
+				maxId,
 				senderOrRecipient);
-		query = this.getCurrentSession()
-				.createSQLQuery(queryString)
+		final Query query = this.getCurrentSession()
+				.createSQLQuery(transfersQueryString)
 				.addEntity(DbTransferTransaction.class)
+				.addEntity(DbBlock.class)
+				.setMaxResults(limit);
+		return executeQuery(query);
+	}
+
+	private List<TransferBlockPair> getImportanceTransfersForAccount(
+			final long accountId,
+			final long minId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType) {
+		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
+		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.remoteId";
+		final String queryString =
+				"SELECT t.*, b.* FROM ImportanceTransfers t " +
+						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id > %d AND t.id < %d AND t.blockId = b.id " +
+						"ORDER BY %s, t.id DESC";
+		final String transfersQueryString = String.format(queryString,
+				senderOrRecipient,
+				accountId,
+				minId,
+				maxId,
+				senderOrRecipient);
+		final Query query = this.getCurrentSession()
+				.createSQLQuery(transfersQueryString)
+				.addEntity(DbImportanceTransferTransaction.class)
+				.addEntity(DbBlock.class)
+				.setMaxResults(limit);
+		return executeQuery(query);
+	}
+
+	private List<TransferBlockPair> getMultisigTransfersForAccount(
+			final long accountId,
+			final long minId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType) {
+		String queryString;
+		String transfersQueryString;
+		final String partialQueryString =
+				"(SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
+						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+						"LEFT OUTER JOIN Transfers tr ON t.TransferId = tr.id AND t.TransferId IS NOT NULL " +
+						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";
+		if (TransferType.OUTGOING.equals(transferType)) {
+			queryString =
+					partialQueryString +
+							"WHERE t.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							partialQueryString +
+							"WHERE tr.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							partialQueryString +
+							"WHERE ms.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) " +
+							"ORDER BY id DESC";
+			transfersQueryString = String.format(
+					queryString,
+					accountId,
+					minId,
+					maxId,
+					accountId,
+					minId,
+					maxId,
+					accountId,
+					minId,
+					maxId);
+		} else {
+			queryString =
+					partialQueryString +
+							"WHERE tr.recipientId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) " +
+							"ORDER BY tr.recipientId, t.id DESC";
+			transfersQueryString = String.format(
+					queryString,
+					accountId,
+					minId,
+					maxId);
+		}
+
+		final Query query = this.getCurrentSession()
+				.createSQLQuery(transfersQueryString)
+				.addEntity(DbMultisigTransaction.class)
 				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
 		return executeQuery(query);
