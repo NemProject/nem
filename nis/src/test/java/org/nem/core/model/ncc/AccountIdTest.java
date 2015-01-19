@@ -62,7 +62,7 @@ public class AccountIdTest {
 	public void requestCanBeRoundTripped() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountId originalRequest = new AccountId(address);
+		final SerializableAccountId originalRequest = new SerializableAccountId(address);
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalRequest, null);
 
 		// Act:

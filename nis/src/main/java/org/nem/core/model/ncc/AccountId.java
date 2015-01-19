@@ -5,10 +5,8 @@ import org.nem.core.serialization.*;
 
 /**
  * View model that represents an account id information.
- *
- * TODO 20150118 J-B: remind me why this needs to be serializable?
  */
-public class AccountId implements SerializableEntity {
+public class AccountId {
 	private final Address address;
 
 	/**
@@ -57,11 +55,6 @@ public class AccountId implements SerializableEntity {
 	 */
 	public Address getAddress() {
 		return this.address;
-	}
-
-	//@Override
-	public void serialize(final Serializer serializer) {
-		Address.writeTo(serializer, "account", this.address);
 	}
 
 	@Override
