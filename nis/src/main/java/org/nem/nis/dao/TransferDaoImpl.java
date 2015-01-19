@@ -196,30 +196,23 @@ public class TransferDaoImpl implements TransferDao {
 				maxId,
 				limit,
 				transferType);
-		long minId = pairs.isEmpty()
-				? 0
-				: pairs.get(pairs.size() - 1).getTransfer().getId();
 		pairs.addAll(this.getImportanceTransfersForAccount(
 				accountId,
-				minId,
 				maxId,
 				limit,
 				transferType));
 		pairs.addAll(this.getMultisigTransfersForAccount(
 				accountId,
-				minId,
 				maxId,
 				limit,
 				transferType));
 		pairs.addAll(this.getMultisigImportanceTransfersForAccount(
 				accountId,
-				minId,
 				maxId,
 				limit,
 				transferType));
 		pairs.addAll(this.getMultisigSignerModificationsForAccount(
 				accountId,
-				minId,
 				maxId,
 				limit,
 				transferType));
@@ -254,7 +247,6 @@ public class TransferDaoImpl implements TransferDao {
 
 	private List<TransferBlockPair> getImportanceTransfersForAccount(
 			final long accountId,
-			final long minId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
@@ -263,12 +255,11 @@ public class TransferDaoImpl implements TransferDao {
 		final String queryString =
 				"SELECT t.*, b.* FROM ImportanceTransfers t " +
 						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id > %d AND t.id < %d AND t.blockId = b.id " +
+						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d AND t.blockId = b.id " +
 						"ORDER BY %s, t.id DESC";
 		final String transfersQueryString = String.format(queryString,
 				senderOrRecipient,
 				accountId,
-				minId,
 				maxId,
 				senderOrRecipient);
 		final Query query = this.getCurrentSession()
@@ -281,7 +272,6 @@ public class TransferDaoImpl implements TransferDao {
 
 	private List<TransferBlockPair> getMultisigTransfersForAccount(
 			final long accountId,
-			final long minId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
@@ -295,32 +285,28 @@ public class TransferDaoImpl implements TransferDao {
 		if (TransferType.OUTGOING.equals(transferType)) {
 			queryString =
 					partialQueryString +
-							"WHERE t.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							"WHERE t.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
 							partialQueryString +
-							"WHERE tr.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							"WHERE tr.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
 							partialQueryString +
-							"WHERE ms.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) " +
+							"WHERE ms.senderId = %d AND t.id < %d AND t.blockId = b.id) " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
 					accountId,
-					minId,
 					maxId,
 					accountId,
-					minId,
 					maxId,
 					accountId,
-					minId,
 					maxId);
 		} else {
 			queryString =
 					partialQueryString +
-							"WHERE tr.recipientId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) " +
+							"WHERE tr.recipientId = %d AND t.id < %d AND t.blockId = b.id) " +
 							"ORDER BY tr.recipientId, t.id DESC";
 			transfersQueryString = String.format(
 					queryString,
 					accountId,
-					minId,
 					maxId);
 		}
 
@@ -334,7 +320,6 @@ public class TransferDaoImpl implements TransferDao {
 
 	private List<TransferBlockPair> getMultisigImportanceTransfersForAccount(
 			final long accountId,
-			final long minId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
@@ -348,32 +333,28 @@ public class TransferDaoImpl implements TransferDao {
 		if (TransferType.OUTGOING.equals(transferType)) {
 			queryString =
 					partialQueryString +
-							"WHERE t.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							"WHERE t.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
 							partialQueryString +
-							"WHERE tr.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							"WHERE tr.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
 							partialQueryString +
-							"WHERE ms.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) " +
+							"WHERE ms.senderId = %d AND t.id < %d AND t.blockId = b.id) " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
 					accountId,
-					minId,
 					maxId,
 					accountId,
-					minId,
 					maxId,
 					accountId,
-					minId,
 					maxId);
 		} else {
 			queryString =
 					partialQueryString +
-							"WHERE tr.remoteId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) " +
+							"WHERE tr.remoteId = %d AND t.id < %d AND t.blockId = b.id) " +
 							"ORDER BY tr.remoteId, t.id DESC";
 			transfersQueryString = String.format(
 					queryString,
 					accountId,
-					minId,
 					maxId);
 		}
 
@@ -384,19 +365,9 @@ public class TransferDaoImpl implements TransferDao {
 				.setMaxResults(limit);
 		return executeQuery(query);
 	}
-/*
-SELECT mt.*, b.* FROM MultisigTransactions mt
-LEFT OUTER JOIN Blocks b ON mt.blockId = b.id
-LEFT OUTER JOIN MultisigSignerModifications msm ON mt.MultisigSignerModificationId = msm.id AND mt.MultisigSignerModificationId IS NOT NULL
-LEFT OUTER JOIN MultisigModifications mm ON msm.id = mm.MultisigSignerModificationId
-LEFT OUTER JOIN MultisigSignatures ms ON mt.id = ms.multisigTransactionid
-WHERE mt.senderId = 2 AND mt.id < 999999 AND mt.blockId = b.id
-ORDER BY mt.senderId, mt.id DESC
 
- */
 	private List<TransferBlockPair> getMultisigSignerModificationsForAccount(
 			final long accountId,
-			final long minId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
@@ -411,22 +382,19 @@ ORDER BY mt.senderId, mt.id DESC
 		if (TransferType.OUTGOING.equals(transferType)) {
 			queryString =
 					partialQueryString +
-							"WHERE t.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							"WHERE t.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
 							partialQueryString +
-							"WHERE msm.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) UNION " +
+							"WHERE msm.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
 							partialQueryString +
-							"WHERE ms.senderId = %d AND t.id > %d AND t.id < %d AND t.blockId = b.id) " +
+							"WHERE ms.senderId = %d AND t.id < %d AND t.blockId = b.id) " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
 					accountId,
-					minId,
 					maxId,
 					accountId,
-					minId,
 					maxId,
 					accountId,
-					minId,
 					maxId);
 		} else {
 			return new ArrayList<>();
@@ -443,7 +411,7 @@ ORDER BY mt.senderId, mt.id DESC
 	@SuppressWarnings("unchecked")
 	private static List<TransferBlockPair> executeQuery(final Query q) {
 		final List<Object[]> list = q.list();
-		return list.stream().map(o -> new TransferBlockPair((DbTransferTransaction)o[0], (DbBlock)o[1])).collect(Collectors.toList());
+		return list.stream().map(o -> new TransferBlockPair((AbstractBlockTransfer)o[0], (DbBlock)o[1])).collect(Collectors.toList());
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
