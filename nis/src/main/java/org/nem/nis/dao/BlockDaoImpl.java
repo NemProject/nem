@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
-import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.dbmodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +35,62 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional
 	public void save(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
+		ArrayList<DbSend> list = new ArrayList<>(100);
+		for (final DbTransferTransaction transaction : block.getBlockTransferTransactions()) {
+			final DbSend t = new DbSend();
+			t.setAccountId(transaction.getSender().getId());
+			t.setHeight(block.getHeight());
+			t.setTransactionId(transaction.getId());
+			list.add(t);
+		}
+
+		for (final DbImportanceTransferTransaction transaction : block.getBlockImportanceTransferTransactions()) {
+			final DbSend t = new DbSend();
+			t.setAccountId(transaction.getSender().getId());
+			t.setHeight(block.getHeight());
+			t.setTransactionId(transaction.getId());
+			list.add(t);
+		}
+
+		for (final DbMultisigAggregateModificationTransaction transaction : block.getBlockMultisigAggregateModificationTransactions()) {
+			final DbSend t = new DbSend();
+			t.setAccountId(transaction.getSender().getId());
+			t.setHeight(block.getHeight());
+			t.setTransactionId(transaction.getId());
+			list.add(t);
+
+			for (final DbMultisigModification modification : transaction.getMultisigModifications()) {
+				final DbSend sub = new DbSend();
+				sub.setAccountId(modification.getCosignatory().getId());
+				sub.setHeight(block.getHeight());
+				// we're using transaction id....
+				sub.setTransactionId(transaction.getId());
+				list.add(t);
+			}
+		}
+
+		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
+			final DbSend t = new DbSend();
+			t.setAccountId(transaction.getSender().getId());
+			t.setHeight(block.getHeight());
+			t.setTransactionId(transaction.getId());
+			list.add(t);
+
+			for (final DbMultisigSignatureTransaction signatureTransaction : transaction.getMultisigSignatureTransactions()) {
+				final DbSend sub = new DbSend();
+				sub.setAccountId(signatureTransaction.getSender().getId());
+				sub.setHeight(block.getHeight());
+				sub.setTransactionId(signatureTransaction.getId());
+				list.add(t);
+			}
+		}
+
+		for (final DbSend send : list) {
+			this.getCurrentSession().saveOrUpdate(send);
+		}
+
+		this.getCurrentSession().flush();
+		this.getCurrentSession().clear();
 	}
 
 	// TODO 20141206 J-G: does it make sense to add a test for this?

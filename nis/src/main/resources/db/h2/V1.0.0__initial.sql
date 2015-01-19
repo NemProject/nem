@@ -240,6 +240,22 @@ ALTER TABLE public.multisigsignatures ADD
   REFERENCES accounts(id);
 
 ---
+
+CREATE TABLE IF NOT EXISTS `sends` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+
+  `accountId` BIGINT NOT NULL,
+  `height` BIGINT NOT NULL,
+  `transactionId` BIGINT NOT NULL,
+
+  PRIMARY KEY (`id`)
+);
+
+ALTER TABLE public.sends ADD
+  FOREIGN KEY (accountId)
+  REFERENCES public.accounts(id);
+
+---
 --- indices
 --- 
 
@@ -280,4 +296,3 @@ CREATE INDEX IDX_MULTISIGTRANSACTIONS_SENDERID_ID ON `multisigtransactions` (sen
 CREATE INDEX IDX_MULTISIGSIGNATURES_TIMESTAMP ON `multisigsignatures` (timeStamp);
 CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID ON `multisigsignatures` (senderId);
 CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID_ID ON `multisigsignatures` (senderId, id DESC);
-
