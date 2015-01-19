@@ -20,7 +20,7 @@ import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
 
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class AccountControllerTest {
@@ -86,36 +86,72 @@ public class AccountControllerTest {
 
 	//endregion
 
-	//region accountIsUnlocked
+	//region isAccountUnlocked
 
 	@Test
-	public void accountIsUnlockedReturnsOkWhenAccountIsUnlocked() {
+	public void accountIsUnlockedReturnsOkWhenAccountFromAddressIsUnlocked() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account account = new Account(keyPair);
-		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
-		Mockito.when(context.unlockedAccounts.isAccountUnlocked(account)).thenReturn(true);
+		assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(AccountIsUnlockedTestContext::checkIsUnlockedWithAddress);
+	}
+
+	@Test
+	public void accountIsUnlockedReturnsOkWhenAccountFromPrivateKeyIsUnlocked() {
+		// Assert:
+		assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(AccountIsUnlockedTestContext::checkIsUnlockedWithPrivateKey);
+	}
+
+	private static void assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
+		// Arrange:
+		final AccountIsUnlockedTestContext context = new AccountIsUnlockedTestContext();
+		context.setIsUnlocked(true);
 
 		// Act:
-		final String result = context.controller.accountIsUnlocked(account.getAddress());
+		final String result = isAccountUnlocked.apply(context);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo("ok"));
 	}
 
 	@Test
-	public void accountIsUnlockedReturnsNopeWhenAccountIsLocked() {
+	public void accountIsUnlockedReturnsNopeWhenAccountFromAddressIsLocked() {
+		// Assert:
+		assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(AccountIsUnlockedTestContext::checkIsUnlockedWithAddress);
+	}
+
+	@Test
+	public void accountIsUnlockedReturnsNopeWhenAccountFromPrivateKeyIsLocked() {
+		// Assert:
+		assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(AccountIsUnlockedTestContext::checkIsUnlockedWithPrivateKey);
+	}
+
+	private static void assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account account = new Account(keyPair);
-		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
-		Mockito.when(context.unlockedAccounts.isAccountUnlocked(account)).thenReturn(false);
+		final AccountIsUnlockedTestContext context = new AccountIsUnlockedTestContext();
+		context.setIsUnlocked(false);
 
 		// Act:
-		final String result = context.controller.accountIsUnlocked(account.getAddress());
+		final String result = isAccountUnlocked.apply(context);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo("nope"));
+	}
+
+	private static class AccountIsUnlockedTestContext {
+		private final KeyPair keyPair = new KeyPair();
+		private final Account account = new Account(this.keyPair);
+		private final TestContext context = createContextAroundAccount(this.account, Amount.fromNem(1000));
+
+		public void setIsUnlocked(final boolean result) {
+			Mockito.when(this.context.unlockedAccounts.isAccountUnlocked(this.account)).thenReturn(result);
+		}
+
+		public String checkIsUnlockedWithAddress() {
+			return this.context.controller.isAccountUnlocked(this.account.getAddress());
+		}
+
+		public String checkIsUnlockedWithPrivateKey() {
+			return this.context.controller.isAccountUnlocked(this.keyPair.getPrivateKey());
+		}
 	}
 
 	//endregion
