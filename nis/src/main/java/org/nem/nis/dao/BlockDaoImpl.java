@@ -31,9 +31,7 @@ public class BlockDaoImpl implements BlockDao {
 		return this.sessionFactory.getCurrentSession();
 	}
 
-	@Override
-	@Transactional
-	public void save(final DbBlock block) {
+	private void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
 		ArrayList<DbSend> list = new ArrayList<>(100);
 
@@ -120,6 +118,12 @@ public class BlockDaoImpl implements BlockDao {
 		for (final DbSend send : list) {
 			this.getCurrentSession().saveOrUpdate(send);
 		}
+	}
+
+	@Override
+	@Transactional
+	public void save(final DbBlock block) {
+		this.saveSingleBlock(block);
 
 		this.getCurrentSession().flush();
 		this.getCurrentSession().clear();
@@ -130,7 +134,7 @@ public class BlockDaoImpl implements BlockDao {
 	@Transactional
 	public void save(final List<DbBlock> dbBlocks) {
 		for (final DbBlock block : dbBlocks) {
-			this.getCurrentSession().saveOrUpdate(block);
+			this.saveSingleBlock(block);
 		}
 		this.getCurrentSession().flush();
 		this.getCurrentSession().clear();
