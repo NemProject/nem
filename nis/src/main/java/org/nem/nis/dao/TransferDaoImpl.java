@@ -193,7 +193,7 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		final List<TransferBlockPair> pairs = new ArrayList<>();
-		/*pairs.addAll(this.getTransfersForAccount(
+		pairs.addAll(this.getTransfersForAccount(
 				accountId,
 				maxId,
 				limit,
@@ -202,13 +202,13 @@ public class TransferDaoImpl implements TransferDao {
 				accountId,
 				maxId,
 				limit,
-				transferType));*/
+				transferType));
 		pairs.addAll(this.getMultisigTransfersForAccount(
 				accountId,
 				maxId,
 				limit,
 				transferType));
-		/*pairs.addAll(this.getMultisigImportanceTransfersForAccount(
+		pairs.addAll(this.getMultisigImportanceTransfersForAccount(
 				accountId,
 				maxId,
 				limit,
@@ -217,7 +217,7 @@ public class TransferDaoImpl implements TransferDao {
 				accountId,
 				maxId,
 				limit,
-				transferType));*/
+				transferType));
 
 		return pairs;
 	}
@@ -232,7 +232,7 @@ public class TransferDaoImpl implements TransferDao {
 		final String queryString =
 				"SELECT t.*, b.* FROM transfers t " +
 						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d AND t.blockId = b.id " +
+						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d " +
 						"ORDER BY %s, t.id DESC";
 		final String transfersQueryString = String.format(queryString,
 				senderOrRecipient,
@@ -257,7 +257,7 @@ public class TransferDaoImpl implements TransferDao {
 		final String queryString =
 				"SELECT t.*, b.* FROM ImportanceTransfers t " +
 						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d AND t.blockId = b.id " +
+						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d " +
 						"ORDER BY %s, t.id DESC";
 		final String transfersQueryString = String.format(queryString,
 				senderOrRecipient,
@@ -282,37 +282,15 @@ public class TransferDaoImpl implements TransferDao {
 			return new ArrayList<>();
 		}
 
-		/*String queryString;
-		String transfersQueryString;
-		final String partialQueryString =
-				"(SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
-						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-						"LEFT OUTER JOIN Transfers tr ON t.TransferId = tr.id AND t.TransferId IS NOT NULL " +
-						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";*/
 		if (TransferType.OUTGOING.equals(transferType)) {
-			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "transferTransaction");
+			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "DbTransferTransaction", "transferTransaction");
 			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
 			return IntStream.range(0, transactions.size())
 					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
 					.collect(Collectors.toList());
 		} else {
 			return new ArrayList<>();
-			/*queryString =
-					partialQueryString +
-							"WHERE tr.recipientId = %d AND t.id < %d AND t.blockId = b.id) " +
-							"ORDER BY tr.recipientId, t.id DESC";
-			transfersQueryString = String.format(
-					queryString,
-					accountId,
-					maxId);*/
 		}
-
-		/*final Query query = this.getCurrentSession()
-				.createSQLQuery(transfersQueryString)
-				.addEntity(DbMultisigTransaction.class)
-				.addEntity(DbBlock.class)
-				.setMaxResults(limit);
-		return executeQuery(query);*/
 	}
 
 	private List<TransferBlockPair> getMultisigImportanceTransfersForAccount(
@@ -321,42 +299,20 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 
-		return new ArrayList<>();
-		/*final String listOfIds = getMultisigIds(accountId, maxId, limit);
-		String queryString;
-		String transfersQueryString;
-		final String partialQueryString =
-				"(SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
-						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-						"LEFT OUTER JOIN ImportanceTransfers tr ON t.ImportanceTransferId = tr.id AND t.ImportanceTransferId IS NOT NULL " +
-						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";
-		if (TransferType.OUTGOING.equals(transferType)) {
-			queryString =
-					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
-							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-							"WHERE t.id IN (%s) AND t.blockId = b.id " +
-							"AND t.ImportanceTransferId IS NOT NULL " +
-							"ORDER BY id DESC";
-			transfersQueryString = String.format(
-					queryString,
-					listOfIds);
-		} else {
-			queryString =
-					partialQueryString +
-							"WHERE tr.remoteId = %d AND t.id < %d AND t.blockId = b.id) " +
-							"ORDER BY tr.remoteId, t.id DESC";
-			transfersQueryString = String.format(
-					queryString,
-					accountId,
-					maxId);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, maxId, limit);
+		if (listOfIds.isEmpty()) {
+			return new ArrayList<>();
 		}
 
-		final Query query = this.getCurrentSession()
-				.createSQLQuery(transfersQueryString)
-				.addEntity(DbMultisigTransaction.class)
-				.addEntity(DbBlock.class)
-				.setMaxResults(limit);
-		return executeQuery(query);*/
+		if (TransferType.OUTGOING.equals(transferType)) {
+			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "DbImportanceTransfer", "importanceTransferTransaction");
+			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
+			return IntStream.range(0, transactions.size())
+					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
+					.collect(Collectors.toList());
+		} else {
+			return new ArrayList<>();
+		}
 	}
 
 	private List<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
@@ -365,36 +321,20 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 
-		return new ArrayList<>();
-		/*final String listOfIds = getMultisigIds(accountId, maxId, limit);
-		String queryString;
-		String transfersQueryString;
-		final String partialQueryString =
-				"(SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
-						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-						"LEFT OUTER JOIN MultisigSignerModifications msm ON t.MultisigSignerModificationId = msm.id AND t.MultisigSignerModificationId IS NOT NULL " +
-						"LEFT OUTER JOIN MultisigModifications mm ON msm.id = mm.MultisigSignerModificationId " +
-						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";
-		if (TransferType.OUTGOING.equals(transferType)) {
-			queryString =
-					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
-							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-							"WHERE t.id IN (%s) AND t.blockId = b.id " +
-							"AND t.MultisigSignerModificationId IS NOT NULL " +
-							"ORDER BY id DESC";
-			transfersQueryString = String.format(
-					queryString,
-					listOfIds);
-		} else {
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, maxId, limit);
+		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		final Query query = this.getCurrentSession()
-				.createSQLQuery(transfersQueryString)
-				.addEntity(DbMultisigTransaction.class)
-				.addEntity(DbBlock.class)
-				.setMaxResults(limit);
-		return executeQuery(query);*/
+		if (TransferType.OUTGOING.equals(transferType)) {
+			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "DbMultisigAggregateModificationTransaction", "multisigAggregateModificationTransaction");
+			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
+			return IntStream.range(0, transactions.size())
+					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
+					.collect(Collectors.toList());
+		} else {
+			return new ArrayList<>();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -417,10 +357,11 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<DbMultisigTransaction> getMultisigTransactions(final List<TransactionIdBlockHeightPair> pairs, final String joinEntity) {
+	private List<DbMultisigTransaction> getMultisigTransactions(final List<TransactionIdBlockHeightPair> pairs, final String joinEntity, final String fieldName) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigTransaction.class)
 				.setFetchMode(joinEntity, FetchMode.JOIN)
 				.add(Restrictions.in("id", pairs.stream().map(p -> p.transactionId).collect(Collectors.toList())))
+				.add(Restrictions.isNotNull(fieldName))
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return criteria.list();
