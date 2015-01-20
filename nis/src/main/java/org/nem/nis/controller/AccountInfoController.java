@@ -103,7 +103,7 @@ public class AccountInfoController {
 		}
 
 		// TODO 20150111 J-G: should add a test for this
-		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoryOf().stream()
+		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
 				.map(multisigAddress -> this.accountInfoFactory.createInfo(multisigAddress))
 				.collect(Collectors.toList());
 		return new AccountMetaData(this.getAccountStatus(address), remoteStatus, cosignatoryOf);

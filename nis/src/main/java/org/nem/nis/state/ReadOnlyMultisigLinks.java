@@ -17,11 +17,11 @@ public interface ReadOnlyMultisigLinks {
 	public Collection<Address> getCosignatories();
 
 	/**
-	 * Gets the addresses of all accounts of which this account is a cosignatory.
+	 * Gets the addresses of all accounts for which this account is a cosignatory.
 	 *
 	 * @return The addresses of all accounts that this account can cosign.
 	 */
-	public Collection<Address> getCosignatoryOf();
+	public Collection<Address> getCosignatoriesOf();
 
 	/**
 	 * Checks if account is a multisig account.
