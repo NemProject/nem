@@ -49,7 +49,7 @@ public class TransferDaoITCase {
 	@Test
 	public void getTransactionsForAccountItCase() {
 		// you can force repopulating the database by replacing false with true in the next line
-		boolean populateDatabase = this.databaseFileExists() ? false : true;
+		boolean populateDatabase = ! this.hasDbBlocks();
 		final int numRounds = 10;
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
@@ -80,9 +80,8 @@ public class TransferDaoITCase {
 		LOGGER.warning(String.format("getTransactionsForAccountUsingId needed %dms", (stop - start) / numRounds));
 	}
 
-	private boolean databaseFileExists() {
-		final File file = new File(System.getProperty("user.home") + "\\nem\\nis\\data\\test.h2.db");
-		return file.exists();
+	private boolean hasDbBlocks() {
+		return (this.blockDao.count() != 0);
 	}
 
 	private void populateDatabase(
@@ -92,6 +91,7 @@ public class TransferDaoITCase {
 			final AccountDaoLookup accountDaoLookup) {
 		this.resetDatabase();
 		final List<TransactionAccountSet> accountSets = this.createAccountSets(100, accounts);
+		final List<DbBlock> blocks = new ArrayList<>();
 		for (int i = 0; i < numBlocks; i++) {
 			final DbBlock dbBlock = this.createBlock(
 					i,
@@ -99,10 +99,17 @@ public class TransferDaoITCase {
 					this.getRandomAccount(accounts),
 					accountSets,
 					accountDaoLookup);
-			this.blockDao.save(dbBlock);
+			blocks.add(dbBlock);
 			if ((i + 1) % 100 == 0) {
+				this.blockDao.save(blocks);
 				LOGGER.warning(String.format("Block %d", i + 1));
+				blocks.clear();
 			}
+		}
+
+		if (! blocks.isEmpty()) {
+			this.blockDao.save(blocks);
+			LOGGER.warning(String.format("Block %d", blocks.size()));
 		}
 	}
 
