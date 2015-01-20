@@ -36,38 +36,39 @@ public class BlockDaoImpl implements BlockDao {
 	public void save(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
 		ArrayList<DbSend> list = new ArrayList<>(100);
-		for (final DbTransferTransaction transaction : block.getBlockTransferTransactions()) {
-			final DbSend t = new DbSend();
-			t.setAccountId(transaction.getSender().getId());
-			t.setHeight(block.getHeight());
-			t.setTransactionId(transaction.getId());
-			list.add(t);
-		}
 
-		for (final DbImportanceTransferTransaction transaction : block.getBlockImportanceTransferTransactions()) {
-			final DbSend t = new DbSend();
-			t.setAccountId(transaction.getSender().getId());
-			t.setHeight(block.getHeight());
-			t.setTransactionId(transaction.getId());
-			list.add(t);
-		}
-
-		for (final DbMultisigAggregateModificationTransaction transaction : block.getBlockMultisigAggregateModificationTransactions()) {
-			final DbSend t = new DbSend();
-			t.setAccountId(transaction.getSender().getId());
-			t.setHeight(block.getHeight());
-			t.setTransactionId(transaction.getId());
-			list.add(t);
-
-			for (final DbMultisigModification modification : transaction.getMultisigModifications()) {
-				final DbSend sub = new DbSend();
-				sub.setAccountId(modification.getCosignatory().getId());
-				sub.setHeight(block.getHeight());
-				// we're using transaction id....
-				sub.setTransactionId(transaction.getId());
-				list.add(t);
-			}
-		}
+//		for (final DbTransferTransaction transaction : block.getBlockTransferTransactions()) {
+//			final DbSend t = new DbSend();
+//			t.setAccountId(transaction.getSender().getId());
+//			t.setHeight(block.getHeight());
+//			t.setTransactionId(transaction.getId());
+//			list.add(t);
+//		}
+//
+//		for (final DbImportanceTransferTransaction transaction : block.getBlockImportanceTransferTransactions()) {
+//			final DbSend t = new DbSend();
+//			t.setAccountId(transaction.getSender().getId());
+//			t.setHeight(block.getHeight());
+//			t.setTransactionId(transaction.getId());
+//			list.add(t);
+//		}
+//
+//		for (final DbMultisigAggregateModificationTransaction transaction : block.getBlockMultisigAggregateModificationTransactions()) {
+//			final DbSend t = new DbSend();
+//			t.setAccountId(transaction.getSender().getId());
+//			t.setHeight(block.getHeight());
+//			t.setTransactionId(transaction.getId());
+//			list.add(t);
+//
+//			for (final DbMultisigModification modification : transaction.getMultisigModifications()) {
+//				final DbSend sub = new DbSend();
+//				sub.setAccountId(modification.getCosignatory().getId());
+//				sub.setHeight(block.getHeight());
+//				// we're using transaction id....
+//				sub.setTransactionId(transaction.getId());
+//				list.add(t);
+//			}
+//		}
 
 		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
 			final DbSend t = new DbSend();
@@ -76,11 +77,19 @@ public class BlockDaoImpl implements BlockDao {
 			t.setTransactionId(transaction.getId());
 			list.add(t);
 
+			if (transaction.getTransferTransaction() != null) {
+				final DbSend inner = new DbSend();
+				inner.setAccountId(transaction.getTransferTransaction().getSender().getId());
+				inner.setHeight(block.getHeight());
+				inner.setTransactionId(transaction.getId());
+				list.add(inner);
+			}
+
 			for (final DbMultisigSignatureTransaction signatureTransaction : transaction.getMultisigSignatureTransactions()) {
 				final DbSend sub = new DbSend();
 				sub.setAccountId(signatureTransaction.getSender().getId());
 				sub.setHeight(block.getHeight());
-				sub.setTransactionId(signatureTransaction.getId());
+				sub.setTransactionId(transaction.getId());
 				list.add(t);
 			}
 		}
