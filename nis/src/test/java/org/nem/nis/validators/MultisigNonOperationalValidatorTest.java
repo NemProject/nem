@@ -3,7 +3,6 @@ package org.nem.nis.validators;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
@@ -36,7 +35,7 @@ public class MultisigNonOperationalValidatorTest {
 		final Account cosignatory = Utils.generateRandomAccount();
 		context.addState(multisig);
 		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
+		context.makeCosignatory(cosignatory, multisig);
 
 		// note, we're not signing transaction which means it's a child transaction
 		// TODO 20150103 J-B don't like this
@@ -57,7 +56,7 @@ public class MultisigNonOperationalValidatorTest {
 		final Account cosignatory = Utils.generateRandomAccount();
 		context.addState(multisig);
 		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
+		context.makeCosignatory(cosignatory, multisig);
 
 		transaction.sign();
 
@@ -78,7 +77,7 @@ public class MultisigNonOperationalValidatorTest {
 		final Account newCosignatory = Utils.generateRandomAccount();
 		context.addState(multisig);
 		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
+		context.makeCosignatory(cosignatory, multisig);
 
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
@@ -102,7 +101,7 @@ public class MultisigNonOperationalValidatorTest {
 		final Account newCosignatory = Utils.generateRandomAccount();
 		context.addState(multisig);
 		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
+		context.makeCosignatory(cosignatory, multisig);
 
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
@@ -129,8 +128,8 @@ public class MultisigNonOperationalValidatorTest {
 		context.addState(deepMultisig);
 		context.addState(multisig);
 		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig, BlockHeight.ONE);
-		context.makeCosignatory(multisig, deepMultisig, BlockHeight.ONE);
+		context.makeCosignatory(cosignatory, multisig);
+		context.makeCosignatory(multisig, deepMultisig);
 
 		final Transaction transaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,

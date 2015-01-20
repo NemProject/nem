@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
@@ -13,23 +12,17 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 public class MultisigSignaturesPresentValidatorTest {
-	private final BlockHeight FORK_HEIGHT = new BlockHeight(123);
 
 	//region other transactions
 
 	@Test
 	public void validatorCanValidateOtherTransactions() {
-		assertCanValidateOtherTransactions(BlockHeight.ONE);
-		assertCanValidateOtherTransactions(this.FORK_HEIGHT);
-	}
-
-	private static void assertCanValidateOtherTransactions(final BlockHeight blockHeight) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, blockHeight);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -41,17 +34,17 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void properTransactionWithSingleCosignerValidates() {
-		assertProperTransaction(this.FORK_HEIGHT, ValidationResult.SUCCESS);
+		assertProperTransaction(ValidationResult.SUCCESS);
 	}
 
-	private static void assertProperTransaction(final BlockHeight blockHeight, final ValidationResult validationResult) {
+	private static void assertProperTransaction(final ValidationResult validationResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, blockHeight);
+		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, blockHeight);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -63,24 +56,24 @@ public class MultisigSignaturesPresentValidatorTest {
 
 	@Test
 	public void properTransactionWithMultipleCosignersDoesNotValidateIfSignaturesAreMissing() {
-		this.assertProperTransactionMultiple(this.FORK_HEIGHT, ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS, (ctx, t) -> {});
+		this.assertProperTransactionMultiple(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS, (ctx, t) -> {});
 	}
 
 	@Test
 	public void properTransactionWithMultipleCosignersValidates() {
-		this.assertProperTransactionMultiple(this.FORK_HEIGHT, ValidationResult.SUCCESS, (ctx, t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction)t));
+		this.assertProperTransactionMultiple(ValidationResult.SUCCESS, (ctx, t) -> ctx.addSignature(ctx.dummy, (MultisigTransaction)t));
 	}
 
-	private void assertProperTransactionMultiple(final BlockHeight blockHeight, final ValidationResult validationResult, final BiConsumer<MultisigTestContext, Transaction> addSignature) {
+	private void assertProperTransactionMultiple(final ValidationResult validationResult, final BiConsumer<MultisigTestContext, Transaction> addSignature) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, blockHeight);
-		context.makeCosignatory(context.dummy, context.multisig, blockHeight);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 		addSignature.accept(context, transaction);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, blockHeight);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -91,16 +84,16 @@ public class MultisigSignaturesPresentValidatorTest {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 		context.addSignature(context.dummy, (MultisigTransaction)transaction);
 
 		final Account thirdAccount = Utils.generateRandomAccount();
 		context.addState(thirdAccount);
-		context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(thirdAccount, context.multisig);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
@@ -118,13 +111,13 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - signer and dummy should both explicitly sign the transaction
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 		context.addSignature(context.signer, transaction);
 		context.addSignature(context.dummy, transaction);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -138,8 +131,8 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - dummy should sign the wrong transaction (a random hash)
 		final MultisigTestContext context = new MultisigTestContext();
 		MultisigTransaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		// ugly but the only way to simulate a mismatched signature (MultisigTransaction does not allow one to be added)
 		final Set<MultisigSignatureTransaction> signatures = new HashSet<>();
@@ -152,7 +145,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		Mockito.when(transaction.getCosignerSignatures()).thenReturn(signatures);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISMATCHED_SIGNATURE));
@@ -165,15 +158,15 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - only signer signs the transaction
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		// - have a non-cosigner sign the multisig account
 		final Account nonCosignerAccount = Utils.generateRandomAccount();
 		context.addSignature(nonCosignerAccount, transaction);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
@@ -186,8 +179,8 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - both signer and dummy sign the transaction
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 		context.addSignature(context.dummy, transaction);
 
 		// - have a non-cosigner sign the multisig account
@@ -195,7 +188,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.addSignature(nonCosignerAccount, transaction);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS));
@@ -218,11 +211,11 @@ public class MultisigSignaturesPresentValidatorTest {
 		final Transaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
 
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert: this is allowable
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -236,11 +229,11 @@ public class MultisigSignaturesPresentValidatorTest {
 		final Transaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
 
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		// Act:
-		context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(context.getCosignatories(context.multisig).size(), IsEqual.equalTo(2));
@@ -254,12 +247,12 @@ public class MultisigSignaturesPresentValidatorTest {
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
 
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 		context.addSignature(context.dummy, transaction);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert: this is allowable
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -281,19 +274,19 @@ public class MultisigSignaturesPresentValidatorTest {
 		final Transaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
 
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		final Account thirdAccount = Utils.generateRandomAccount();
 		context.addState(thirdAccount);
-		context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(thirdAccount, context.multisig);
 
 		if (addSignatureOfThirdCosigner) {
 			context.addSignature(thirdAccount, (MultisigTransaction)transaction);
 		}
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(validationResult));
@@ -307,10 +300,10 @@ public class MultisigSignaturesPresentValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.signer)));
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -327,12 +320,12 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - create a transaction to remove dummy and third
 		// - signer implicitly signed the transaction because it created it
 		final MultisigTestContext context = new MultisigTestContext();
-		context.makeCosignatory(context.signer, context.multisig, this.FORK_HEIGHT);
-		context.makeCosignatory(context.dummy, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		final Account thirdAccount = Utils.generateRandomAccount();
 		context.addState(thirdAccount);
-		context.makeCosignatory(thirdAccount, context.multisig, this.FORK_HEIGHT);
+		context.makeCosignatory(thirdAccount, context.multisig);
 
 		final MultisigTransaction transaction = context.createMultisigModificationTransaction(Arrays.asList(
 				new MultisigModification(MultisigModificationType.Del, context.dummy),
@@ -342,7 +335,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		context.addSignature(thirdAccount, transaction);
 
 		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction, this.FORK_HEIGHT);
+		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));

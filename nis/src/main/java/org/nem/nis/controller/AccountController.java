@@ -77,23 +77,35 @@ public class AccountController {
 		this.unlockedAccounts.removeUnlockedAccount(account);
 	}
 
+	//region [/local]/account/isunlocked
+
 	/**
-	 * Checks if given account is unlocked.
+	 * Checks if the given account is unlocked.
 	 *
 	 * @param address The address of the account to check.
 	 */
 	@RequestMapping(value = "/account/isunlocked", method = RequestMethod.POST)
 	@ClientApi
-	public String accountIsUnlocked(@RequestBody final Address address) {
+	public String isAccountUnlocked(@RequestBody final Address address) {
 		final Account account = new Account(address);
-		// TODO 20141222 BR: I guess the attack gimre described is not that severe?
-		// TODO 20141222 J-*: I didn't think it was so severe, as this can still be figured out by which machine
-		// > is originating the block (but harder), and the ecosystem make nicer graphs
-		// TODO 20141229 G-J: but it makes harvesting script more complicated, cause
-		// > if you want turn harvesting on and check if it's actually harvesting you need both
-		// > private key and address...
 		return this.unlockedAccounts.isAccountUnlocked(account) ? "ok" : "nope";
 	}
+
+	/**
+	 * Checks if the given account is unlocked.
+	 *
+	 * @param privateKey The private key of the account to check.
+	 */
+	@RequestMapping(value = "/local/account/isunlocked", method = RequestMethod.POST)
+	@TrustedApi
+	@ClientApi
+	public String isAccountUnlocked(@RequestBody final PrivateKey privateKey) {
+		return this.isAccountUnlocked(Address.fromPublicKey(new KeyPair(privateKey).getPublicKey()));
+	}
+
+	//endregion
+
+	//region /account/transfers/*
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
@@ -130,6 +142,10 @@ public class AccountController {
 	public SerializableList<TransactionMetaDataPair> accountTransfersOutgoing(final AccountTransactionsPageBuilder builder) {
 		return this.getAccountTransfersUsingId(builder.build(), ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
+
+	//endregion
+
+	//region /local/account/transfers/*
 
 	/**
 	 * Gets information about transactions of a specified account ending at the specified transaction (via hash or id).
@@ -260,6 +276,8 @@ public class AccountController {
 			throw new IllegalArgumentException("Neither transaction id was supplied nor hash was found in cache");
 		}
 	}
+
+	//endregion
 
 	/**
 	 * Gets unconfirmed transaction information for the specified account.

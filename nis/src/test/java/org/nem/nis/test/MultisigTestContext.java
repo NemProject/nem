@@ -21,6 +21,7 @@ public class MultisigTestContext {
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
 	private final MultisigSignatureValidator multisigSignatureValidator;
 
+	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private final List<Transaction> transactionList = new ArrayList<>();
 
 	public final Account signer = Utils.generateRandomAccount();
@@ -90,12 +91,11 @@ public class MultisigTestContext {
 				HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
 	}
 
-	public Transaction createMultisigSignature(final Hash otherTransactionHash, final Account signatureIssuer) {
+	public MultisigSignatureTransaction createMultisigSignature(final Hash otherTransactionHash, final Account signatureIssuer) {
 		return new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				signatureIssuer,
-				otherTransactionHash
-		);
+				otherTransactionHash);
 	}
 
 	public AccountState addState(final Account account) {
@@ -109,8 +109,7 @@ public class MultisigTestContext {
 		return this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().getCosignatories();
 	}
 
-	// TODO 20150110 J-G: should remove blockHeight
-	public void makeCosignatory(final Account signer, final Account multisig, final BlockHeight blockHeight) {
+	public void makeCosignatory(final Account signer, final Account multisig) {
 		this.accountCache.findStateByAddress(signer.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
 		this.accountCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(signer.getAddress());
 	}
@@ -121,8 +120,8 @@ public class MultisigTestContext {
 	}
 
 	// forward to validators
-	public ValidationResult validateSignaturePresent(final Transaction transaction, final BlockHeight blockHeight) {
-		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(blockHeight, this::debitPredicate));
+	public ValidationResult validateSignaturePresent(final Transaction transaction) {
+		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(this::debitPredicate));
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {

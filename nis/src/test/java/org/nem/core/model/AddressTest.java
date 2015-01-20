@@ -5,7 +5,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.utils.Base32Encoder;
 
 import java.math.BigInteger;
@@ -23,6 +23,12 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
 		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
+	}
+
+	@Test
+	public void addressCannotBeCreatedAroundNullEncodedAddress() {
+		// Act:
+		ExceptionAssert.assertThrows(v -> Address.fromEncoded(null), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -45,6 +51,13 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+	}
+
+	@Test
+	public void addressCannotBeCreatedAroundNullPublicKey() {
+		// Act:
+		ExceptionAssert.assertThrows(v -> Address.fromPublicKey(null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> Address.fromPublicKey((byte)0x88, null), IllegalArgumentException.class);
 	}
 
 	//endregion

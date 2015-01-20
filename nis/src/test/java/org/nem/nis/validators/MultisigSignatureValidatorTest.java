@@ -44,7 +44,7 @@ public class MultisigSignatureValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigSignature(Hash.ZERO, context.signer);
 
-		context.makeCosignatory(context.signer, context.multisig, TEST_HEIGHT);
+		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
 		final ValidationResult result = context.validateMultisigSignature(transaction, TEST_HEIGHT);
@@ -58,9 +58,9 @@ public class MultisigSignatureValidatorTest {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction multisigTransaction = context.createMultisigTransferTransaction();
-		final Transaction transaction = context.createMultisigSignature(HashUtils.calculateHash(multisigTransaction.getOtherTransaction()), context.dummy);
+		final MultisigSignatureTransaction transaction = context.createMultisigSignature(HashUtils.calculateHash(multisigTransaction.getOtherTransaction()), context.dummy);
 
-		context.makeCosignatory(context.dummy, context.multisig, TEST_HEIGHT);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		// Act:
 		final ValidationResult result = context.validateMultisigSignature(transaction, TEST_HEIGHT);
@@ -72,14 +72,14 @@ public class MultisigSignatureValidatorTest {
 	}
 
 	@Test
-	public void multisigSignatureWithSignerBeingCosignatoryIsValidIfTransactionListContainsMoreThanOneMultiSigTransaction() {
+	public void multisigSignatureWithSignerBeingCosignatoryIsValidIfTransactionListContainsMoreThanOneMultisigTransaction() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		context.addRandomMultisigTransferTransactions(3);
 		final MultisigTransaction multisigTransaction = context.createMultisigTransferTransaction();
-		final Transaction transaction = context.createMultisigSignature(HashUtils.calculateHash(multisigTransaction.getOtherTransaction()), context.dummy);
+		final MultisigSignatureTransaction transaction = context.createMultisigSignature(HashUtils.calculateHash(multisigTransaction.getOtherTransaction()), context.dummy);
 
-		context.makeCosignatory(context.dummy, context.multisig, TEST_HEIGHT);
+		context.makeCosignatory(context.dummy, context.multisig);
 
 		// Act:
 		final ValidationResult result = context.validateMultisigSignature(transaction, TEST_HEIGHT);

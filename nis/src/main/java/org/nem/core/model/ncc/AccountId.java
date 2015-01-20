@@ -6,11 +6,11 @@ import org.nem.core.serialization.*;
 /**
  * View model that represents an account id information.
  */
-public class AccountId implements SerializableEntity {
+public class AccountId {
 	private final Address address;
 
 	/**
-	 * Creates a new account id view model.
+	 * Creates a new account id.
 	 *
 	 * @param address The account address.
 	 */
@@ -18,6 +18,7 @@ public class AccountId implements SerializableEntity {
 		if (null == address) {
 			throw new IllegalArgumentException("address is required");
 		}
+
 		this.address = address;
 		this.checkValidity();
 	}
@@ -54,11 +55,6 @@ public class AccountId implements SerializableEntity {
 	 */
 	public Address getAddress() {
 		return this.address;
-	}
-
-	//@Override
-	public void serialize(final Serializer serializer) {
-		Address.writeTo(serializer, "account", this.address);
 	}
 
 	@Override

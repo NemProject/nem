@@ -12,15 +12,23 @@ import java.math.BigInteger;
 public class AccountIdTest {
 
 	@Test
-	public void accountIdCanBeCreatedAroundValidAddress() {
+	public void accountIdCanBeCreatedAroundValidEncodedAddressString() {
 		// Act:
 		final Address address = Utils.generateRandomAddress();
 		final AccountId accountId = new AccountId(address.getEncoded());
-		final AccountId accountId2 = new AccountId(address);
 
 		// Assert:
 		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(accountId2.getAddress(), IsEqual.equalTo(address));
+	}
+
+	@Test
+	public void accountIdCanBeCreatedAroundValidAddress() {
+		// Act:
+		final Address address = Utils.generateRandomAddress();
+		final AccountId accountId = new AccountId(address);
+
+		// Assert:
+		Assert.assertThat(accountId.getAddress(), IsEqual.equalTo(address));
 	}
 
 	@Test
@@ -54,13 +62,13 @@ public class AccountIdTest {
 	public void requestCanBeRoundTripped() {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
-		final AccountId originalRequest = new AccountId(address);
+		final SerializableAccountId originalRequest = new SerializableAccountId(address);
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalRequest, null);
 
 		// Act:
 		final AccountId request = new AccountId(deserializer);
 
-		// Assert::
+		// Assert:
 		Assert.assertThat(request.getAddress(), IsEqual.equalTo(address));
 	}
 
@@ -74,6 +82,7 @@ public class AccountIdTest {
 
 		// Assert:
 		Assert.assertThat(request, IsEqual.equalTo(new AccountId(address)));
+		Assert.assertThat(request, IsEqual.equalTo(new AccountId(address.getEncoded())));
 		Assert.assertThat(request, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded()))));
 		Assert.assertThat(request, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()))));
 		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(request)));
@@ -89,7 +98,8 @@ public class AccountIdTest {
 
 		// Assert:
 		Assert.assertThat(hashCode, IsEqual.equalTo(new AccountId(address).hashCode()));
-		Assert.assertThat(hashCode, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded())).hashCode()));
+		Assert.assertThat(hashCode, IsEqual.equalTo(new AccountId(address.getEncoded()).hashCode()));
+		Assert.assertThat(request, IsEqual.equalTo(new AccountId(Address.fromEncoded(address.getEncoded()))));
 		Assert.assertThat(hashCode, IsNot.not(IsEqual.equalTo(new AccountId(Utils.generateRandomAddress()).hashCode())));
 	}
 
