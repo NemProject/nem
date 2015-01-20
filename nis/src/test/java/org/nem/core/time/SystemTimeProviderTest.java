@@ -118,10 +118,14 @@ public class SystemTimeProviderTest {
 			info.result = provider.updateTimeOffset(new TimeOffset(123000));
 			info.currentTime = provider.getCurrentTime();
 			info.networkTime = provider.getNetworkTime();
+
+			// because the time offset adjustment is static across instances,
+			// we need to keep track of how many times adjustments were made
+			++info.rounds;
 		});
 
 		// Assert:
-		info.assertSystemTimeOffset(systemTime, 123000, 123000);
+		info.assertSystemTimeOffset(systemTime, 123000, 123000 * info.rounds);
 	}
 
 	@Test
