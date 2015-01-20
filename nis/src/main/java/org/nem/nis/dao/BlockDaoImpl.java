@@ -71,11 +71,13 @@ public class BlockDaoImpl implements BlockDao {
 //		}
 
 		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
-			final DbSend t = new DbSend();
-			t.setAccountId(transaction.getSender().getId());
-			t.setHeight(block.getHeight());
-			t.setTransactionId(transaction.getId());
-			list.add(t);
+			{
+				final DbSend t = new DbSend();
+				t.setAccountId(transaction.getSender().getId());
+				t.setHeight(block.getHeight());
+				t.setTransactionId(transaction.getId());
+				list.add(t);
+			}
 
 			if (transaction.getTransferTransaction() != null) {
 				final DbSend inner = new DbSend();
@@ -111,7 +113,7 @@ public class BlockDaoImpl implements BlockDao {
 				sub.setAccountId(signatureTransaction.getSender().getId());
 				sub.setHeight(block.getHeight());
 				sub.setTransactionId(transaction.getId());
-				list.add(t);
+				list.add(sub);
 			}
 		}
 
