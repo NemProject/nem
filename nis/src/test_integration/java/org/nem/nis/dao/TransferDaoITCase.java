@@ -27,6 +27,9 @@ import java.util.stream.Collectors;
 public class TransferDaoITCase {
 	private static final Logger LOGGER = Logger.getLogger(TransferDaoITCase.class.getName());
 
+	// you can force repopulating the database by replacing false with true in the next line
+	private static final boolean populateDatabase = databaseFileExists() ? false : true;
+
 	static
 	{
 		try {
@@ -48,8 +51,6 @@ public class TransferDaoITCase {
 
 	@Test
 	public void getTransactionsForAccountItCase() {
-		// you can force repopulating the database by replacing false with true in the next line
-		boolean populateDatabase = ! this.hasDbBlocks();
 		final int numRounds = 10;
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
@@ -80,8 +81,9 @@ public class TransferDaoITCase {
 		LOGGER.warning(String.format("getTransactionsForAccountUsingId needed %dms", (stop - start) / numRounds));
 	}
 
-	private boolean hasDbBlocks() {
-		return (this.blockDao.count() != 0);
+	private static boolean databaseFileExists() {
+		final File file = new File(System.getProperty("user.home") + "\\nem\\nis\\data\\test.h2.db");
+		return file.exists();
 	}
 
 	private void populateDatabase(
