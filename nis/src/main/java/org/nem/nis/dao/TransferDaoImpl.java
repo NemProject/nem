@@ -283,7 +283,7 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		if (TransferType.OUTGOING.equals(transferType)) {
-			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "DbTransferTransaction", "transferTransaction");
+			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "transferTransaction");
 			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
 			return IntStream.range(0, transactions.size())
 					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
@@ -305,7 +305,7 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		if (TransferType.OUTGOING.equals(transferType)) {
-			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "DbImportanceTransfer", "importanceTransferTransaction");
+			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "importanceTransferTransaction");
 			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
 			return IntStream.range(0, transactions.size())
 					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
@@ -327,7 +327,7 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		if (TransferType.OUTGOING.equals(transferType)) {
-			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "DbMultisigAggregateModificationTransaction", "multisigAggregateModificationTransaction");
+			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "multisigAggregateModificationTransaction");
 			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
 			return IntStream.range(0, transactions.size())
 					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
@@ -357,11 +357,11 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<DbMultisigTransaction> getMultisigTransactions(final List<TransactionIdBlockHeightPair> pairs, final String joinEntity, final String fieldName) {
+	private List<DbMultisigTransaction> getMultisigTransactions(final List<TransactionIdBlockHeightPair> pairs, final String joinEntity) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigTransaction.class)
 				.setFetchMode(joinEntity, FetchMode.JOIN)
 				.add(Restrictions.in("id", pairs.stream().map(p -> p.transactionId).collect(Collectors.toList())))
-				.add(Restrictions.isNotNull(fieldName))
+				.add(Restrictions.isNotNull(joinEntity))
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		return criteria.list();
