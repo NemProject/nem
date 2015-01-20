@@ -1,6 +1,7 @@
 package org.nem.nis.dao;
 
 import org.hibernate.*;
+import org.hibernate.criterion.*;
 import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
@@ -10,9 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 @Repository
 public class TransferDaoImpl implements TransferDao {
@@ -192,27 +192,23 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final List<TransferBlockPair> pairs = this.getTransfersForAccount(
-				accountId,
-				maxId,
-				limit,
-				transferType);
-		pairs.addAll(this.getImportanceTransfersForAccount(
+		final List<TransferBlockPair> pairs = new ArrayList<>();
+		/*pairs.addAll(this.getTransfersForAccount(
 				accountId,
 				maxId,
 				limit,
 				transferType));
-//		pairs.addAll(this.getMultisigSignerModificationsForAccount(
-//				accountId,
-//				maxId,
-//				limit,
-//				transferType));
+		pairs.addAll(this.getImportanceTransfersForAccount(
+				accountId,
+				maxId,
+				limit,
+				transferType));*/
 		pairs.addAll(this.getMultisigTransfersForAccount(
 				accountId,
 				maxId,
 				limit,
 				transferType));
-		pairs.addAll(this.getMultisigImportanceTransfersForAccount(
+		/*pairs.addAll(this.getMultisigImportanceTransfersForAccount(
 				accountId,
 				maxId,
 				limit,
@@ -221,7 +217,7 @@ public class TransferDaoImpl implements TransferDao {
 				accountId,
 				maxId,
 				limit,
-				transferType));
+				transferType));*/
 
 		return pairs;
 	}
@@ -281,42 +277,42 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final String listOfIds = getMultisigIds(accountId, maxId, limit);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, maxId, limit);
+		if (listOfIds.isEmpty()) {
+			return new ArrayList<>();
+		}
 
-		String queryString;
+		/*String queryString;
 		String transfersQueryString;
 		final String partialQueryString =
 				"(SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
 						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 						"LEFT OUTER JOIN Transfers tr ON t.TransferId = tr.id AND t.TransferId IS NOT NULL " +
-						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";
+						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";*/
 		if (TransferType.OUTGOING.equals(transferType)) {
-			queryString =
-					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
-							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
-							"WHERE t.id IN (%s) AND t.blockId = b.id " +
-							"AND t.TransferId IS NOT NULL " +
-							"ORDER BY id DESC";
-			transfersQueryString = String.format(
-					queryString,
-					listOfIds);
+			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "transferTransaction");
+			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
+			return IntStream.range(0, transactions.size())
+					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
+					.collect(Collectors.toList());
 		} else {
-			queryString =
+			return new ArrayList<>();
+			/*queryString =
 					partialQueryString +
 							"WHERE tr.recipientId = %d AND t.id < %d AND t.blockId = b.id) " +
 							"ORDER BY tr.recipientId, t.id DESC";
 			transfersQueryString = String.format(
 					queryString,
 					accountId,
-					maxId);
+					maxId);*/
 		}
 
-		final Query query = this.getCurrentSession()
+		/*final Query query = this.getCurrentSession()
 				.createSQLQuery(transfersQueryString)
 				.addEntity(DbMultisigTransaction.class)
 				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
-		return executeQuery(query);
+		return executeQuery(query);*/
 	}
 
 	private List<TransferBlockPair> getMultisigImportanceTransfersForAccount(
@@ -325,7 +321,8 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 
-		final String listOfIds = getMultisigIds(accountId, maxId, limit);
+		return new ArrayList<>();
+		/*final String listOfIds = getMultisigIds(accountId, maxId, limit);
 		String queryString;
 		String transfersQueryString;
 		final String partialQueryString =
@@ -359,7 +356,7 @@ public class TransferDaoImpl implements TransferDao {
 				.addEntity(DbMultisigTransaction.class)
 				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
-		return executeQuery(query);
+		return executeQuery(query);*/
 	}
 
 	private List<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
@@ -368,7 +365,8 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 
-		final String listOfIds = getMultisigIds(accountId, maxId, limit);
+		return new ArrayList<>();
+		/*final String listOfIds = getMultisigIds(accountId, maxId, limit);
 		String queryString;
 		String transfersQueryString;
 		final String partialQueryString =
@@ -396,24 +394,47 @@ public class TransferDaoImpl implements TransferDao {
 				.addEntity(DbMultisigTransaction.class)
 				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
-		return executeQuery(query);
+		return executeQuery(query);*/
 	}
 
-	private String getMultisigIds(long accountId, long maxId, int limit) {
-		final String preQueryTemplate = "SELECT transactionId FROM Sends s WHERE accountId=%d AND transactionId < %d ORDER BY transactionId DESC";
+	@SuppressWarnings("unchecked")
+	private List<TransactionIdBlockHeightPair> getMultisigIds(long accountId, long maxId, int limit) {
+		final String preQueryTemplate = "SELECT transactionId, height FROM Sends s WHERE accountId=%d AND transactionId < %d ORDER BY transactionId DESC";
 		final String preQueryString = String.format(preQueryTemplate, accountId, maxId);
 		final Query preQuery = this.getCurrentSession()
 				.createSQLQuery(preQueryString)
-				.addScalar("transactionId")
+				.addScalar("transactionId", LongType.INSTANCE)
+				.addScalar("height", LongType.INSTANCE)
 				.setMaxResults(limit);
-		final List<BigInteger> list = preQuery.list();
-		return String.join(",", list.stream().map(t -> t.toString()).collect(Collectors.toList()));
+		final List<Object[]> list = preQuery.list();
+		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long)o[0], (Long)o[1])).collect(Collectors.toList());
 	}
 
 	@SuppressWarnings("unchecked")
 	private static List<TransferBlockPair> executeQuery(final Query q) {
 		final List<Object[]> list = q.list();
 		return list.stream().map(o -> new TransferBlockPair((AbstractBlockTransfer)o[0], (DbBlock)o[1])).collect(Collectors.toList());
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<DbMultisigTransaction> getMultisigTransactions(final List<TransactionIdBlockHeightPair> pairs, final String joinEntity) {
+		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigTransaction.class)
+				.setFetchMode(joinEntity, FetchMode.JOIN)
+				.add(Restrictions.in("id", pairs.stream().map(p -> p.transactionId).collect(Collectors.toList())))
+				.addOrder(Order.desc("id"));
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		return criteria.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	private HashMap<Long, DbBlock> getBlockMap(final List<TransactionIdBlockHeightPair> pairs) {
+		final HashMap<Long, DbBlock> blockMap = new HashMap<>();
+		final Criteria criteria = this.getCurrentSession().createCriteria(DbBlock.class)
+				.add(Restrictions.in("height", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList())))
+				.addOrder(Order.desc("height"));
+		final List<DbBlock> blocks = criteria.list();
+		blocks.stream().forEach(b -> blockMap.put(b.getHeight(), b));
+		return blockMap;
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
@@ -438,5 +459,15 @@ public class TransferDaoImpl implements TransferDao {
 	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
 		// TODO 2014 J-B: check with G about if we still need to compare getBlkIndex
 		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
+	}
+
+	private class TransactionIdBlockHeightPair {
+		private final Long transactionId;
+		private final Long blockHeight;
+
+		private TransactionIdBlockHeightPair(final Long transactionId, final Long blockHeight) {
+			this.transactionId = transactionId;
+			this.blockHeight = blockHeight;
+		}
 	}
 }

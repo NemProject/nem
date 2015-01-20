@@ -51,12 +51,12 @@ public class TransferDaoITCase {
 
 	@Test
 	public void getTransactionsForAccountItCase() {
-		final int numRounds = 10;
+		final int numRounds = 1;
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		List<Account> accounts;
 		if (populateDatabase) {
-			final int numBlocks = 5000;
+			final int numBlocks = 50000;
 			final int numTransactionPerBlock = 100;
 			final int numAccounts = 100;
 			accounts = this.createAccounts(numAccounts, mockAccountDao);
