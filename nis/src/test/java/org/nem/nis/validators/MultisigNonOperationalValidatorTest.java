@@ -11,13 +11,15 @@ import java.util.Arrays;
 
 public class MultisigNonOperationalValidatorTest {
 
+	//region non-multisig account
+
 	@Test
-	public void nonMultisigAccountCanValidateAnyTransaction() {
+	public void nonMultisigAccountCanIssueAnyTransaction() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Account account = Utils.generateRandomAccount();
-		final Transaction transaction = new MockTransaction(account);
 		context.addState(account);
+		final Transaction transaction = createMockTransaction(account);
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(transaction);
@@ -27,37 +29,49 @@ public class MultisigNonOperationalValidatorTest {
 	}
 
 	@Test
-	public void canValidateChildTransaction() {
+	public void nonMultisigAccountCannotIssueUnsignedChildTransaction() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Account multisig = Utils.generateRandomAccount();
-		final Transaction transaction = new MockTransaction(multisig);
-		final Account cosignatory = Utils.generateRandomAccount();
-		context.addState(multisig);
-		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig);
-
-		// note, we're not signing transaction which means it's a child transaction
-		// TODO 20150103 J-B don't like this
+		final Account account = Utils.generateRandomAccount();
+		context.addState(account);
+		final Transaction transaction = createMockTransaction(account);
+		transaction.setSignature(null); // note, we're not signing transaction which means it's a child transaction
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+	}
+
+	//endregion
+
+	//region multisig account
+
+	@Test
+	public void multisigAccountCannotIssueAnyTransaction() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Account multisig = createMultisigAccount(context);
+		final Transaction transaction = createMockTransaction(multisig);
+
+		// Act:
+		final ValidationResult result = context.validateNonOperational(transaction);
+
+		// Assert
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
 	@Test
-	public void multisigAccountCannotMakeMostTransactions() {
+	public void multisigAccountCannotIssueMultisigModification() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Account multisig = Utils.generateRandomAccount();
-		final Transaction transaction = new MockTransaction(multisig);
-		final Account cosignatory = Utils.generateRandomAccount();
-		context.addState(multisig);
-		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig);
+		final Account multisig = createMultisigAccount(context);
 
+		final Transaction transaction = new MultisigAggregateModificationTransaction(
+				TimeInstant.ZERO,
+				multisig,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
 		transaction.sign();
 
 		// Act:
@@ -67,23 +81,13 @@ public class MultisigNonOperationalValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
 	}
 
-	// TODO 20150103 J-G: why do we want to allow this?
 	@Test
-	public void multisigAccountCanIssueMultisigModification() {
+	public void multisigAccountCanIssueUnsignedChildTransaction() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Account multisig = Utils.generateRandomAccount();
-		final Account cosignatory = Utils.generateRandomAccount();
-		final Account newCosignatory = Utils.generateRandomAccount();
-		context.addState(multisig);
-		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig);
-
-		final Transaction transaction = new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				multisig,
-				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosignatory)));
-		transaction.sign();
+		final Account multisig = createMultisigAccount(context);
+		final Transaction transaction = createMockTransaction(multisig);
+		transaction.setSignature(null); // note, we're not signing transaction which means it's a child transaction
 
 		// Act:
 		final ValidationResult result = context.validateNonOperational(transaction);
@@ -92,55 +96,20 @@ public class MultisigNonOperationalValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	@Test
-	public void multisigAccountCannotIssueMultisigDelModification() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Account multisig = Utils.generateRandomAccount();
-		final Account cosignatory = Utils.generateRandomAccount();
-		final Account newCosignatory = Utils.generateRandomAccount();
-		context.addState(multisig);
-		context.addState(cosignatory);
-		context.makeCosignatory(cosignatory, multisig);
+	//endregion
 
-		final Transaction transaction = new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				multisig,
-				// TODO 20150103 J-G: consider refactoring as the type and expected reslt are only differences
-				Arrays.asList(new MultisigModification(MultisigModificationType.Del, newCosignatory)));
+	private static Transaction createMockTransaction(final Account account) {
+		final Transaction transaction = new MockTransaction(account);
 		transaction.sign();
-
-		// Act:
-		final ValidationResult result = context.validateNonOperational(transaction);
-
-		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		return transaction;
 	}
 
-	// TODO 20150103 J-G: is there a good reason for supporting this?
-	@Test
-	public void multisigAccountCanIssueMultisigSignatureIfAlsoIsCosignatory() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Account deepMultisig = Utils.generateRandomAccount();
+	private static Account createMultisigAccount(final MultisigTestContext context) {
 		final Account multisig = Utils.generateRandomAccount();
 		final Account cosignatory = Utils.generateRandomAccount();
-		context.addState(deepMultisig);
 		context.addState(multisig);
 		context.addState(cosignatory);
 		context.makeCosignatory(cosignatory, multisig);
-		context.makeCosignatory(multisig, deepMultisig);
-
-		final Transaction transaction = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				multisig,
-				Utils.generateRandomHash());
-		transaction.sign();
-
-		// Act:
-		final ValidationResult result = context.validateNonOperational(transaction);
-
-		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		return multisig;
 	}
 }
