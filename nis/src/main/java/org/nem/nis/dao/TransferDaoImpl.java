@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -211,11 +212,14 @@ public class TransferDaoImpl implements TransferDao {
 				maxId,
 				limit,
 				transferType));
+		/*
+		need to turn it off from the test as it's not added yet...
 		pairs.addAll(this.getMultisigSignerModificationsForAccount(
 				accountId,
 				maxId,
 				limit,
 				transferType));
+				*/
 
 		return pairs;
 	}
@@ -275,6 +279,8 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
+		final String listOfIds = getMultisigIds(accountId, maxId, limit);
+
 		String queryString;
 		String transfersQueryString;
 		final String partialQueryString =
@@ -284,21 +290,13 @@ public class TransferDaoImpl implements TransferDao {
 						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";
 		if (TransferType.OUTGOING.equals(transferType)) {
 			queryString =
-					partialQueryString +
-							"WHERE t.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
-							partialQueryString +
-							"WHERE tr.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
-							partialQueryString +
-							"WHERE ms.senderId = %d AND t.id < %d AND t.blockId = b.id) " +
+					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
+							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+							"WHERE t.id IN (%s) AND t.blockId = b.id " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
-					accountId,
-					maxId,
-					accountId,
-					maxId,
-					accountId,
-					maxId);
+					listOfIds);
 		} else {
 			queryString =
 					partialQueryString +
@@ -323,6 +321,8 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
+
+		final String listOfIds = getMultisigIds(accountId, maxId, limit);
 		String queryString;
 		String transfersQueryString;
 		final String partialQueryString =
@@ -332,21 +332,13 @@ public class TransferDaoImpl implements TransferDao {
 						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";
 		if (TransferType.OUTGOING.equals(transferType)) {
 			queryString =
-					partialQueryString +
-							"WHERE t.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
-							partialQueryString +
-							"WHERE tr.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
-							partialQueryString +
-							"WHERE ms.senderId = %d AND t.id < %d AND t.blockId = b.id) " +
+					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
+							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+							"WHERE t.id IN (%s) AND t.blockId = b.id " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
-					accountId,
-					maxId,
-					accountId,
-					maxId,
-					accountId,
-					maxId);
+					listOfIds);
 		} else {
 			queryString =
 					partialQueryString +
@@ -406,6 +398,17 @@ public class TransferDaoImpl implements TransferDao {
 				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
 		return executeQuery(query);
+	}
+
+	private String getMultisigIds(long accountId, long maxId, int limit) {
+		final String preQueryTemplate = "SELECT transactionId FROM Sends s WHERE accountId=%d AND transactionId < %d ORDER BY transactionId DESC";
+		final String preQueryString = String.format(preQueryTemplate, accountId, maxId);
+		final Query preQuery = this.getCurrentSession()
+				.createSQLQuery(preQueryString)
+				.addScalar("transactionId")
+				.setMaxResults(limit);
+		final List<BigInteger> list = preQuery.list();
+		return String.join(",", list.stream().map(t -> t.toString()).collect(Collectors.toList()));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -37,6 +37,8 @@ public class BlockDaoImpl implements BlockDao {
 		this.getCurrentSession().saveOrUpdate(block);
 		ArrayList<DbSend> list = new ArrayList<>(100);
 
+// We'll be able to use it for other queries too... just need to filter out txes with null sig
+//
 //		for (final DbTransferTransaction transaction : block.getBlockTransferTransactions()) {
 //			final DbSend t = new DbSend();
 //			t.setAccountId(transaction.getSender().getId());
@@ -80,6 +82,18 @@ public class BlockDaoImpl implements BlockDao {
 			if (transaction.getTransferTransaction() != null) {
 				final DbSend inner = new DbSend();
 				inner.setAccountId(transaction.getTransferTransaction().getSender().getId());
+				inner.setHeight(block.getHeight());
+				inner.setTransactionId(transaction.getId());
+				list.add(inner);
+			} else if (transaction.getImportanceTransferTransaction() != null) {
+				final DbSend inner = new DbSend();
+				inner.setAccountId(transaction.getImportanceTransferTransaction().getSender().getId());
+				inner.setHeight(block.getHeight());
+				inner.setTransactionId(transaction.getId());
+				list.add(inner);
+			} else if (transaction.getMultisigAggregateModificationTransaction() != null) {
+				final DbSend inner = new DbSend();
+				inner.setAccountId(transaction.getMultisigAggregateModificationTransaction().getSender().getId());
 				inner.setHeight(block.getHeight());
 				inner.setTransactionId(transaction.getId());
 				list.add(inner);
