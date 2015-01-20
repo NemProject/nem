@@ -83,7 +83,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 				// again this cuts off X from harvesting
 				final Amount remoteBalance = this.accountStateCache.findStateByAddress(transaction.getRemote().getAddress()).getAccountInfo().getBalance();
 				if (0 != remoteBalance.compareTo(Amount.ZERO)) {
-					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE;
+					return ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER;
 				}
 
 				// if a remote is already activated, it needs to be deactivated first

@@ -82,7 +82,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
 		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(
 				TEST_HEIGHT.getRaw(),
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
 	}
 
 	private static void assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(final long height, final ValidationResult validationResult) {
