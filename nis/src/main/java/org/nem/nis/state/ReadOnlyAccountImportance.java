@@ -8,7 +8,8 @@ import java.util.Iterator;
 public interface ReadOnlyAccountImportance extends SerializableEntity {
 	/**
 	 * Gets an iterator that returns all outlinks at or before the (inclusive) given height.
-	 * TODO 20150111 G-*: check usages, as this currently is not read-only
+	 * <br />
+	 * Note that this is readonly because AccountLink is immutable.
 	 *
 	 * @param blockHeight The block height.
 	 * @return The matching links.

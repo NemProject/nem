@@ -5,6 +5,8 @@ import org.nem.core.model.primitive.*;
 
 /**
  * A link between a source account and another account.
+ * <br/>
+ * This class is immutable.
  */
 public class AccountLink implements Comparable<AccountLink> {
 
