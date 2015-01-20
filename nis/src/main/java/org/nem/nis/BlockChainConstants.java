@@ -45,18 +45,9 @@ public class BlockChainConstants {
 	public static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
 
 	/**
-	 * The maximum number of transactions in a block.
+	 * The maximum number of transactions in a block at the specified height.
 	 */
 	public static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
-
-	/**
-	 * The maximum number of transactions in a block at the specified height.
-	 *
-	 * @param height The height.
-	 */
-	public static int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK(final BlockHeight height) {
-		return MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
-	}
 
 	/**
 	 * The maximum age (in blocks) of outlinks to use in POI calculations.
