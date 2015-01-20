@@ -202,6 +202,11 @@ public class TransferDaoImpl implements TransferDao {
 				maxId,
 				limit,
 				transferType));
+//		pairs.addAll(this.getMultisigSignerModificationsForAccount(
+//				accountId,
+//				maxId,
+//				limit,
+//				transferType));
 		pairs.addAll(this.getMultisigTransfersForAccount(
 				accountId,
 				maxId,
@@ -212,14 +217,11 @@ public class TransferDaoImpl implements TransferDao {
 				maxId,
 				limit,
 				transferType));
-		/*
-		need to turn it off from the test as it's not added yet...
-		pairs.addAll(this.getMultisigSignerModificationsForAccount(
+		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(
 				accountId,
 				maxId,
 				limit,
 				transferType));
-				*/
 
 		return pairs;
 	}
@@ -293,6 +295,7 @@ public class TransferDaoImpl implements TransferDao {
 					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
 							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 							"WHERE t.id IN (%s) AND t.blockId = b.id " +
+							"AND t.TransferId IS NOT NULL " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
@@ -335,6 +338,7 @@ public class TransferDaoImpl implements TransferDao {
 					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
 							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 							"WHERE t.id IN (%s) AND t.blockId = b.id " +
+							"AND t.ImportanceTransferId IS NOT NULL " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
@@ -358,11 +362,13 @@ public class TransferDaoImpl implements TransferDao {
 		return executeQuery(query);
 	}
 
-	private List<TransferBlockPair> getMultisigSignerModificationsForAccount(
+	private List<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
+
+		final String listOfIds = getMultisigIds(accountId, maxId, limit);
 		String queryString;
 		String transfersQueryString;
 		final String partialQueryString =
@@ -373,21 +379,14 @@ public class TransferDaoImpl implements TransferDao {
 						"LEFT OUTER JOIN MultisigSignatures ms ON t.id = ms.multisigTransactionId ";
 		if (TransferType.OUTGOING.equals(transferType)) {
 			queryString =
-					partialQueryString +
-							"WHERE t.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
-							partialQueryString +
-							"WHERE msm.senderId = %d AND t.id < %d AND t.blockId = b.id) UNION " +
-							partialQueryString +
-							"WHERE ms.senderId = %d AND t.id < %d AND t.blockId = b.id) " +
+					"SELECT t.*, b.*, t.id as id FROM MultisigTransactions t " +
+							"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
+							"WHERE t.id IN (%s) AND t.blockId = b.id " +
+							"AND t.MultisigSignerModificationId IS NOT NULL " +
 							"ORDER BY id DESC";
 			transfersQueryString = String.format(
 					queryString,
-					accountId,
-					maxId,
-					accountId,
-					maxId,
-					accountId,
-					maxId);
+					listOfIds);
 		} else {
 			return new ArrayList<>();
 		}

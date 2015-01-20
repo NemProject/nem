@@ -92,11 +92,20 @@ public class BlockDaoImpl implements BlockDao {
 				inner.setTransactionId(transaction.getId());
 				list.add(inner);
 			} else if (transaction.getMultisigAggregateModificationTransaction() != null) {
+				final DbMultisigAggregateModificationTransaction aggregate = transaction.getMultisigAggregateModificationTransaction();
 				final DbSend inner = new DbSend();
-				inner.setAccountId(transaction.getMultisigAggregateModificationTransaction().getSender().getId());
+				inner.setAccountId(aggregate.getSender().getId());
 				inner.setHeight(block.getHeight());
 				inner.setTransactionId(transaction.getId());
 				list.add(inner);
+
+				for (final DbMultisigModification modification : aggregate.getMultisigModifications()) {
+					final DbSend modificationSender = new DbSend();
+					modificationSender.setAccountId(modification.getCosignatory().getId());
+					modificationSender.setHeight(block.getHeight());
+					modificationSender.setTransactionId(transaction.getId());
+					list.add(modificationSender);
+				}
 			}
 
 			for (final DbMultisigSignatureTransaction signatureTransaction : transaction.getMultisigSignatureTransactions()) {
