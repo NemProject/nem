@@ -41,7 +41,7 @@ public class MultisigTransactionSignerValidatorTest {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
+		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
 		final ValidationResult result = context.validateTransaction(transaction, TEST_HEIGHT);

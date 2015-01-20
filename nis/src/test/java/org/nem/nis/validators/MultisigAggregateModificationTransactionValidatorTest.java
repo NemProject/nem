@@ -4,7 +4,6 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.MultisigTestContext;
 
 public class MultisigAggregateModificationTransactionValidatorTest {
@@ -40,7 +39,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		final MultisigTestContext context = new MultisigTestContext();
 		// TODO 20150103 J-G: so i understand, the context is returning a transaction that will make context.signer a cosignatory of context.multisig?
 		final Transaction transaction = context.createMultisigModificationTransaction(MultisigModificationType.Add);
-		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
+		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
 		final ValidationResult result = context.validateMultisigModification(transaction);
@@ -67,7 +66,7 @@ public class MultisigAggregateModificationTransactionValidatorTest {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigModificationTransaction(MultisigModificationType.Del);
-		context.makeCosignatory(context.signer, context.multisig, BlockHeight.ONE);
+		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
 		final ValidationResult result = context.validateMultisigModification(transaction);
