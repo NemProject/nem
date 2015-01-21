@@ -317,4 +317,4 @@ CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID_ID ON `multisigsignatures` (senderI
 
 CREATE Unique INDEX IDX_MULTISIGSENDS_ACCOUNTID_TRANSACTIONID_TYPE_HEIGHT ON `multisigsends` (accountId, transactionId DESC, type, height);
 
-CREATE Unique INDEX IDX_MULTISIGRECEIVES_ACCOUNTID_TRANSACTIONID_TYPE_HEIGHT ON `multisigreceives` (accountId, transactionId DESC, type, transactionId DESC, height);
+CREATE Unique INDEX IDX_MULTISIGRECEIVES_ACCOUNTID_TRANSACTIONID_TYPE_HEIGHT ON `multisigreceives` (accountId, transactionId DESC, type, height);
