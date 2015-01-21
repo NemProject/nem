@@ -5,11 +5,14 @@ import javax.persistence.*;
 @Entity
 @Table(name = "sends")
 public class DbSend {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private Long accountId;
+
+	private Integer type;
 
 	private Long height;
 
@@ -23,8 +26,16 @@ public class DbSend {
 		this.accountId = accountId;
 	}
 
+	public Integer getType() {
+		return this.type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
 	public Long getHeight() {
-		return height;
+		return this.height;
 	}
 
 	public void setHeight(Long height) {
@@ -32,7 +43,7 @@ public class DbSend {
 	}
 
 	public Long getTransactionId() {
-		return transactionId;
+		return this.transactionId;
 	}
 
 	public void setTransactionId(Long transactionId) {

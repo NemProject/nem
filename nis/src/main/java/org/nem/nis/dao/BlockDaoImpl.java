@@ -70,47 +70,55 @@ public class BlockDaoImpl implements BlockDao {
 //			}
 //		}
 
+		int txType = 0;
 		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
-			{
-				final DbSend t = new DbSend();
-				t.setAccountId(transaction.getSender().getId());
-				t.setHeight(block.getHeight());
-				t.setTransactionId(transaction.getId());
-				list.add(t);
-			}
-
 			if (transaction.getTransferTransaction() != null) {
 				final DbSend inner = new DbSend();
 				inner.setAccountId(transaction.getTransferTransaction().getSender().getId());
+				inner.setType(TransactionTypes.TRANSFER);
 				inner.setHeight(block.getHeight());
 				inner.setTransactionId(transaction.getId());
 				list.add(inner);
+				txType = TransactionTypes.TRANSFER;
 			} else if (transaction.getImportanceTransferTransaction() != null) {
 				final DbSend inner = new DbSend();
 				inner.setAccountId(transaction.getImportanceTransferTransaction().getSender().getId());
+				inner.setType(TransactionTypes.IMPORTANCE_TRANSFER);
 				inner.setHeight(block.getHeight());
 				inner.setTransactionId(transaction.getId());
 				list.add(inner);
+				txType = TransactionTypes.IMPORTANCE_TRANSFER;
 			} else if (transaction.getMultisigAggregateModificationTransaction() != null) {
 				final DbMultisigAggregateModificationTransaction aggregate = transaction.getMultisigAggregateModificationTransaction();
 				final DbSend inner = new DbSend();
 				inner.setAccountId(aggregate.getSender().getId());
+				inner.setType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 				inner.setHeight(block.getHeight());
 				inner.setTransactionId(transaction.getId());
 				list.add(inner);
+				txType = TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION;
 
 				for (final DbMultisigModification modification : aggregate.getMultisigModifications()) {
 					final DbSend modificationSender = new DbSend();
 					modificationSender.setAccountId(modification.getCosignatory().getId());
+					modificationSender.setType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 					modificationSender.setHeight(block.getHeight());
 					modificationSender.setTransactionId(transaction.getId());
 					list.add(modificationSender);
 				}
 			}
 
+			final DbSend t = new DbSend();
+			t.setAccountId(transaction.getSender().getId());
+			t.setType(txType);
+			t.setHeight(block.getHeight());
+			t.setTransactionId(transaction.getId());
+			list.add(0, t);
+
 			for (final DbMultisigSignatureTransaction signatureTransaction : transaction.getMultisigSignatureTransactions()) {
 				final DbSend sub = new DbSend();
 				sub.setAccountId(signatureTransaction.getSender().getId());
+				sub.setType(txType);
 				sub.setHeight(block.getHeight());
 				sub.setTransactionId(transaction.getId());
 				list.add(sub);

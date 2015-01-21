@@ -245,6 +245,7 @@ CREATE TABLE IF NOT EXISTS `sends` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
 
   `accountId` BIGINT NOT NULL,
+  `type` INT NOT NULL,
   `height` BIGINT NOT NULL,
   `transactionId` BIGINT NOT NULL,
 
@@ -297,4 +298,4 @@ CREATE INDEX IDX_MULTISIGSIGNATURES_TIMESTAMP ON `multisigsignatures` (timeStamp
 CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID ON `multisigsignatures` (senderId);
 CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID_ID ON `multisigsignatures` (senderId, id DESC);
 
-CREATE Unique INDEX IDX_SENDS_ACCOUNTID_TRANSACTIONID ON `sends` (accountId, transactionId DESC);
+CREATE Unique INDEX IDX_SENDS_ACCOUNTID_TYPE_TRANSACTIONID_HEIGHT ON `sends` (accountId, type, transactionId DESC, height);

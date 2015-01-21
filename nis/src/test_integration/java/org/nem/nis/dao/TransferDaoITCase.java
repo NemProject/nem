@@ -51,12 +51,12 @@ public class TransferDaoITCase {
 
 	@Test
 	public void getTransactionsForAccountItCase() {
-		final int numRounds = 1;
+		final int numRounds = 100;
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		List<Account> accounts;
 		if (populateDatabase) {
-			final int numBlocks = 50000;
+			final int numBlocks = 5000;
 			final int numTransactionPerBlock = 100;
 			final int numAccounts = 100;
 			accounts = this.createAccounts(numAccounts, mockAccountDao);
@@ -101,16 +101,17 @@ public class TransferDaoITCase {
 					this.getRandomAccount(accounts),
 					accountSets,
 					accountDaoLookup);
-			blocks.add(dbBlock);
+			this.blockDao.save(dbBlock);
+			//blocks.add(dbBlock);
 			if ((i + 1) % 100 == 0) {
-				this.blockDao.save(blocks);
+				//this.blockDao.save(blocks);
 				LOGGER.warning(String.format("Block %d", i + 1));
-				blocks.clear();
+				//blocks.clear();
 			}
 		}
 
 		if (! blocks.isEmpty()) {
-			this.blockDao.save(blocks);
+			//this.blockDao.save(blocks);
 			LOGGER.warning(String.format("Block %d", blocks.size()));
 		}
 	}
@@ -123,14 +124,17 @@ public class TransferDaoITCase {
 		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
 		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
 		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
+		session.createSQLQuery("delete from sends").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();
 		session.createSQLQuery("delete from accounts").executeUpdate();
 		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE sends ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.flush();
 		session.clear();
+		session.close();
 	}
 
 	private DbBlock createBlock(
@@ -191,6 +195,7 @@ public class TransferDaoITCase {
 		final List<DbAccount> dbAccounts = query.list();
 		session.flush();
 		session.clear();
+		session.close();
 		final List<Account> accounts = dbAccounts.stream()
 				.map(dbAccount -> {
 					final Account account = new Account(new KeyPair(dbAccount.getPublicKey()));

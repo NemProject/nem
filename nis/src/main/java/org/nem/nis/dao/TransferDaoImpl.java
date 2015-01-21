@@ -277,7 +277,7 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, maxId, limit);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, TransactionTypes.TRANSFER, maxId, limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
@@ -299,7 +299,7 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, maxId, limit);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, TransactionTypes.IMPORTANCE_TRANSFER, maxId, limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
@@ -321,7 +321,7 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, maxId, limit);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, maxId, limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
@@ -338,9 +338,9 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<TransactionIdBlockHeightPair> getMultisigIds(long accountId, long maxId, int limit) {
-		final String preQueryTemplate = "SELECT transactionId, height FROM Sends s WHERE accountId=%d AND transactionId < %d ORDER BY transactionId DESC";
-		final String preQueryString = String.format(preQueryTemplate, accountId, maxId);
+	private List<TransactionIdBlockHeightPair> getMultisigIds(final long accountId, final int type, final long maxId, final int limit) {
+		final String preQueryTemplate = "SELECT transactionId, height FROM Sends s WHERE accountId=%d AND type=%d AND transactionId < %d ORDER BY transactionId DESC";
+		final String preQueryString = String.format(preQueryTemplate, accountId, type, maxId);
 		final Query preQuery = this.getCurrentSession()
 				.createSQLQuery(preQueryString)
 				.addScalar("transactionId", LongType.INSTANCE)
