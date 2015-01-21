@@ -96,7 +96,7 @@ public class BlockGenerator {
 
 		final Collection<Transaction> transactions = this.unconfirmedTransactions
 				.getTransactionsForNewBlock(ownerAccount.getAddress(), blockTime)
-				.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK(harvestedBlockHeight));
+				.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 		final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock.getHeight());
 
 		// it's the remote harvester that generates a block NOT owner, we won't have owner's key here!

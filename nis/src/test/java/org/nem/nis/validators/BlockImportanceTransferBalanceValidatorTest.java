@@ -73,33 +73,29 @@ public class BlockImportanceTransferBalanceValidatorTest {
 
 	//region invalid blocks
 
-	// TODO 20141229 J-G: i think this test needs to be updated now ... i think it should fail with FAILURE_CONFLICTING_IMPORTANCE_TRANSFER
 	@Test
 	public void blockWithTransferAndConflictingImportanceTransferDoesNotValidate() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addImportanceTransaction(Utils.generateRandomAccount(), context.commonAccount);
-		context.addTransferTransaction(context.commonAccount, Amount.fromNem(10));
-
-		// Act:
-		final ValidationResult result = context.validator.validate(context.block);
-
-		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE));
+		// Assert:
+		assertBlockWithBalanceTransferAndConflictingImportanceTransferDoesNotValidate(10);
 	}
 
 	@Test
 	public void blockWithZeroBalanceTransferAndConflictingImportanceTransferDoesNotValidate() {
+		// Assert:
+		assertBlockWithBalanceTransferAndConflictingImportanceTransferDoesNotValidate(0);
+	}
+
+	private static void assertBlockWithBalanceTransferAndConflictingImportanceTransferDoesNotValidate(final int amount) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addImportanceTransaction(Utils.generateRandomAccount(), context.commonAccount);
-		context.addTransferTransaction(context.commonAccount, Amount.fromNem(0));
+		context.addTransferTransaction(context.commonAccount, Amount.fromNem(amount));
 
 		// Act:
 		final ValidationResult result = context.validator.validate(context.block);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER));
 	}
 
 	//endregion

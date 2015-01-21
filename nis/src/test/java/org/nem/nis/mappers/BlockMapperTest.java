@@ -357,9 +357,6 @@ public class BlockMapperTest {
 
 	@Test
 	public void blockModelWithSortedTransactionsCanBeRoundTripped() {
-		// TODO 20141010 J-G: do we also need a test that the transactions are saved sorted or do the dao tests cover that?
-		// > actually, it looks like the previous test (blockModelWithTransactionsCanBeMappedToDbModel) is validating that, right?
-		// TODO 20141119 G-J: not exactly sure what you mean, but I believe the answer is yes ;)
 		// Arrange:
 		final int NUM_TRANSACTIONS_A = 2;
 		final int NUM_TRANSACTIONS_B = 2;

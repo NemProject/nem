@@ -98,9 +98,9 @@ public enum ValidationResult {
 	FAILURE_SELF_SIGNED_TRANSACTION(17),
 
 	/**
-	 * Validation failed because remote harvesting account has non-zero balance.
+	 * Validation failed because remote harvesting account has a pre-existing balance transfer.
 	 */
-	FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE(18),
+	FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER(18),
 
 	/**
 	 * Validation failed because previous importance transfer change is in progress.
