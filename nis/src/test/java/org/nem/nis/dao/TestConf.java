@@ -49,6 +49,7 @@ public class TestConf {
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSend.class);
+		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigReceive.class);
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
 		}

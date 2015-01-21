@@ -33,7 +33,8 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
-		ArrayList<DbMultisigSend> list = new ArrayList<>(100);
+		ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
+		ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
 // We'll be able to use it for other queries too... just need to filter out txes with null sig
 //
@@ -73,21 +74,33 @@ public class BlockDaoImpl implements BlockDao {
 		int txType = 0;
 		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
 			if (transaction.getTransferTransaction() != null) {
-				final DbMultisigSend inner = new DbMultisigSend();
-				inner.setAccountId(transaction.getTransferTransaction().getSender().getId());
-				inner.setType(TransactionTypes.TRANSFER);
-				inner.setHeight(block.getHeight());
-				inner.setTransactionId(transaction.getId());
-				list.add(inner);
 				txType = TransactionTypes.TRANSFER;
+				final DbMultisigSend innerSend = new DbMultisigSend();
+				innerSend.setAccountId(transaction.getTransferTransaction().getSender().getId());
+				innerSend.setType(txType);
+				innerSend.setHeight(block.getHeight());
+				innerSend.setTransactionId(transaction.getId());
+				sendList.add(innerSend);
+				final DbMultisigReceive innerReceive = new DbMultisigReceive();
+				innerReceive.setAccountId(transaction.getTransferTransaction().getRecipient().getId());
+				innerReceive.setType(txType);
+				innerReceive.setHeight(block.getHeight());
+				innerReceive.setTransactionId(transaction.getId());
+				receiveList.add(innerReceive);
 			} else if (transaction.getImportanceTransferTransaction() != null) {
+				txType = TransactionTypes.IMPORTANCE_TRANSFER;
 				final DbMultisigSend inner = new DbMultisigSend();
 				inner.setAccountId(transaction.getImportanceTransferTransaction().getSender().getId());
-				inner.setType(TransactionTypes.IMPORTANCE_TRANSFER);
+				inner.setType(txType);
 				inner.setHeight(block.getHeight());
 				inner.setTransactionId(transaction.getId());
-				list.add(inner);
-				txType = TransactionTypes.IMPORTANCE_TRANSFER;
+				sendList.add(inner);
+				final DbMultisigReceive innerReceive = new DbMultisigReceive();
+				innerReceive.setAccountId(transaction.getImportanceTransferTransaction().getRemote().getId());
+				innerReceive.setType(txType);
+				innerReceive.setHeight(block.getHeight());
+				innerReceive.setTransactionId(transaction.getId());
+				receiveList.add(innerReceive);
 			} else if (transaction.getMultisigAggregateModificationTransaction() != null) {
 				final DbMultisigAggregateModificationTransaction aggregate = transaction.getMultisigAggregateModificationTransaction();
 				final DbMultisigSend inner = new DbMultisigSend();
@@ -95,16 +108,16 @@ public class BlockDaoImpl implements BlockDao {
 				inner.setType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 				inner.setHeight(block.getHeight());
 				inner.setTransactionId(transaction.getId());
-				list.add(inner);
+				sendList.add(inner);
 				txType = TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION;
 
 				for (final DbMultisigModification modification : aggregate.getMultisigModifications()) {
-					final DbMultisigSend modificationSender = new DbMultisigSend();
-					modificationSender.setAccountId(modification.getCosignatory().getId());
-					modificationSender.setType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
-					modificationSender.setHeight(block.getHeight());
-					modificationSender.setTransactionId(transaction.getId());
-					list.add(modificationSender);
+					final DbMultisigReceive modificationReceive = new DbMultisigReceive();
+					modificationReceive.setAccountId(modification.getCosignatory().getId());
+					modificationReceive.setType(txType);
+					modificationReceive.setHeight(block.getHeight());
+					modificationReceive.setTransactionId(transaction.getId());
+					receiveList.add(modificationReceive);
 				}
 			}
 
@@ -113,7 +126,7 @@ public class BlockDaoImpl implements BlockDao {
 			t.setType(txType);
 			t.setHeight(block.getHeight());
 			t.setTransactionId(transaction.getId());
-			list.add(0, t);
+			sendList.add(0, t);
 
 			for (final DbMultisigSignatureTransaction signatureTransaction : transaction.getMultisigSignatureTransactions()) {
 				final DbMultisigSend sub = new DbMultisigSend();
@@ -121,12 +134,16 @@ public class BlockDaoImpl implements BlockDao {
 				sub.setType(txType);
 				sub.setHeight(block.getHeight());
 				sub.setTransactionId(transaction.getId());
-				list.add(sub);
+				sendList.add(sub);
 			}
 		}
 
-		for (final DbMultisigSend send : list) {
+		for (final DbMultisigSend send : sendList) {
 			this.getCurrentSession().saveOrUpdate(send);
+		}
+
+		for (final DbMultisigReceive receive : receiveList) {
+			this.getCurrentSession().saveOrUpdate(receive);
 		}
 	}
 

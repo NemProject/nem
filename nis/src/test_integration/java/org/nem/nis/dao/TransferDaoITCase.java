@@ -51,7 +51,7 @@ public class TransferDaoITCase {
 
 	@Test
 	public void getTransactionsForAccountItCase() {
-		final int numRounds = 100;
+		final int numRounds = 10;
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		List<Account> accounts;
@@ -74,7 +74,7 @@ public class TransferDaoITCase {
 			this.transferDao.getTransactionsForAccountUsingId(
 					this.getRandomAccount(accounts),
 					null,
-					ReadOnlyTransferDao.TransferType.OUTGOING,
+					ReadOnlyTransferDao.TransferType.ALL,
 					25);
 		}
 		final long stop = System.currentTimeMillis();

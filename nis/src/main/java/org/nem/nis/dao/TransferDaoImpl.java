@@ -277,20 +277,21 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, TransactionTypes.TRANSFER, maxId, limit);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(
+				transferType,
+				accountId,
+				TransactionTypes.TRANSFER,
+				maxId,
+				limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		if (TransferType.OUTGOING.equals(transferType)) {
-			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "transferTransaction");
-			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
-			return IntStream.range(0, transactions.size())
-					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
-					.collect(Collectors.toList());
-		} else {
-			return new ArrayList<>();
-		}
+		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "transferTransaction");
+		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
+		return IntStream.range(0, transactions.size())
+				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
+				.collect(Collectors.toList());
 	}
 
 	private List<TransferBlockPair> getMultisigImportanceTransfersForAccount(
@@ -298,21 +299,21 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, TransactionTypes.IMPORTANCE_TRANSFER, maxId, limit);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(
+				transferType,
+				accountId,
+				TransactionTypes.IMPORTANCE_TRANSFER,
+				maxId,
+				limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		if (TransferType.OUTGOING.equals(transferType)) {
-			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "importanceTransferTransaction");
-			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
-			return IntStream.range(0, transactions.size())
-					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
-					.collect(Collectors.toList());
-		} else {
-			return new ArrayList<>();
-		}
+		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "importanceTransferTransaction");
+		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
+		return IntStream.range(0, transactions.size())
+				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
+				.collect(Collectors.toList());
 	}
 
 	private List<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
@@ -320,26 +321,32 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(accountId, TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, maxId, limit);
+		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(
+				transferType,
+				accountId,
+				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+				maxId,
+				limit);
 		if (listOfIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		if (TransferType.OUTGOING.equals(transferType)) {
-			final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "multisigAggregateModificationTransaction");
-			final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
-			return IntStream.range(0, transactions.size())
-					.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
-					.collect(Collectors.toList());
-		} else {
-			return new ArrayList<>();
-		}
+		final List<DbMultisigTransaction> transactions = this.getMultisigTransactions(listOfIds, "multisigAggregateModificationTransaction");
+		final HashMap<Long, DbBlock> blockMap = this.getBlockMap(listOfIds);
+		return IntStream.range(0, transactions.size())
+				.mapToObj(i -> new TransferBlockPair(transactions.get(i), blockMap.get(listOfIds.get(i).blockHeight)))
+				.collect(Collectors.toList());
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<TransactionIdBlockHeightPair> getMultisigIds(final long accountId, final int type, final long maxId, final int limit) {
-		final String preQueryTemplate = "SELECT transactionId, height FROM multisigsends s WHERE accountId=%d AND type=%d AND transactionId < %d ORDER BY transactionId DESC";
+	private List<TransactionIdBlockHeightPair> getMultisigIds(
+			final TransferType transferType,
+			final long accountId,
+			final int type,
+			final long maxId,
+			final int limit) {
+		final String table = TransferType.OUTGOING.equals(transferType) ? "multisigsends" : "multisigreceives";
+		final String preQueryTemplate = "SELECT transactionId, height FROM " + table + " WHERE accountId=%d AND type=%d AND transactionId < %d ORDER BY transactionId DESC";
 		final String preQueryString = String.format(preQueryTemplate, accountId, type, maxId);
 		final Query preQuery = this.getCurrentSession()
 				.createSQLQuery(preQueryString)
