@@ -339,7 +339,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	@SuppressWarnings("unchecked")
 	private List<TransactionIdBlockHeightPair> getMultisigIds(final long accountId, final int type, final long maxId, final int limit) {
-		final String preQueryTemplate = "SELECT transactionId, height FROM Sends s WHERE accountId=%d AND type=%d AND transactionId < %d ORDER BY transactionId DESC";
+		final String preQueryTemplate = "SELECT transactionId, height FROM multisigsends s WHERE accountId=%d AND type=%d AND transactionId < %d ORDER BY transactionId DESC";
 		final String preQueryString = String.format(preQueryTemplate, accountId, type, maxId);
 		final Query preQuery = this.getCurrentSession()
 				.createSQLQuery(preQueryString)

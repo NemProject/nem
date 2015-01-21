@@ -56,7 +56,7 @@ public class TransferDaoITCase {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		List<Account> accounts;
 		if (populateDatabase) {
-			final int numBlocks = 5000;
+			final int numBlocks = 500;
 			final int numTransactionPerBlock = 100;
 			final int numAccounts = 100;
 			accounts = this.createAccounts(numAccounts, mockAccountDao);
@@ -124,12 +124,12 @@ public class TransferDaoITCase {
 		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
 		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
 		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
-		session.createSQLQuery("delete from sends").executeUpdate();
+		session.createSQLQuery("delete from multisigsends").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();
 		session.createSQLQuery("delete from accounts").executeUpdate();
 		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE sends ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		session.flush();

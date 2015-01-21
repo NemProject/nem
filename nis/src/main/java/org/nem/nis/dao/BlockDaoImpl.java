@@ -33,12 +33,12 @@ public class BlockDaoImpl implements BlockDao {
 
 	private void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
-		ArrayList<DbSend> list = new ArrayList<>(100);
+		ArrayList<DbMultisigSend> list = new ArrayList<>(100);
 
 // We'll be able to use it for other queries too... just need to filter out txes with null sig
 //
 //		for (final DbTransferTransaction transaction : block.getBlockTransferTransactions()) {
-//			final DbSend t = new DbSend();
+//			final DbMultisigSend t = new DbMultisigSend();
 //			t.setAccountId(transaction.getSender().getId());
 //			t.setHeight(block.getHeight());
 //			t.setTransactionId(transaction.getId());
@@ -46,7 +46,7 @@ public class BlockDaoImpl implements BlockDao {
 //		}
 //
 //		for (final DbImportanceTransferTransaction transaction : block.getBlockImportanceTransferTransactions()) {
-//			final DbSend t = new DbSend();
+//			final DbMultisigSend t = new DbMultisigSend();
 //			t.setAccountId(transaction.getSender().getId());
 //			t.setHeight(block.getHeight());
 //			t.setTransactionId(transaction.getId());
@@ -54,14 +54,14 @@ public class BlockDaoImpl implements BlockDao {
 //		}
 //
 //		for (final DbMultisigAggregateModificationTransaction transaction : block.getBlockMultisigAggregateModificationTransactions()) {
-//			final DbSend t = new DbSend();
+//			final DbMultisigSend t = new DbMultisigSend();
 //			t.setAccountId(transaction.getSender().getId());
 //			t.setHeight(block.getHeight());
 //			t.setTransactionId(transaction.getId());
 //			list.add(t);
 //
 //			for (final DbMultisigModification modification : transaction.getMultisigModifications()) {
-//				final DbSend sub = new DbSend();
+//				final DbMultisigSend sub = new DbMultisigSend();
 //				sub.setAccountId(modification.getCosignatory().getId());
 //				sub.setHeight(block.getHeight());
 //				// we're using transaction id....
@@ -73,7 +73,7 @@ public class BlockDaoImpl implements BlockDao {
 		int txType = 0;
 		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
 			if (transaction.getTransferTransaction() != null) {
-				final DbSend inner = new DbSend();
+				final DbMultisigSend inner = new DbMultisigSend();
 				inner.setAccountId(transaction.getTransferTransaction().getSender().getId());
 				inner.setType(TransactionTypes.TRANSFER);
 				inner.setHeight(block.getHeight());
@@ -81,7 +81,7 @@ public class BlockDaoImpl implements BlockDao {
 				list.add(inner);
 				txType = TransactionTypes.TRANSFER;
 			} else if (transaction.getImportanceTransferTransaction() != null) {
-				final DbSend inner = new DbSend();
+				final DbMultisigSend inner = new DbMultisigSend();
 				inner.setAccountId(transaction.getImportanceTransferTransaction().getSender().getId());
 				inner.setType(TransactionTypes.IMPORTANCE_TRANSFER);
 				inner.setHeight(block.getHeight());
@@ -90,7 +90,7 @@ public class BlockDaoImpl implements BlockDao {
 				txType = TransactionTypes.IMPORTANCE_TRANSFER;
 			} else if (transaction.getMultisigAggregateModificationTransaction() != null) {
 				final DbMultisigAggregateModificationTransaction aggregate = transaction.getMultisigAggregateModificationTransaction();
-				final DbSend inner = new DbSend();
+				final DbMultisigSend inner = new DbMultisigSend();
 				inner.setAccountId(aggregate.getSender().getId());
 				inner.setType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 				inner.setHeight(block.getHeight());
@@ -99,7 +99,7 @@ public class BlockDaoImpl implements BlockDao {
 				txType = TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION;
 
 				for (final DbMultisigModification modification : aggregate.getMultisigModifications()) {
-					final DbSend modificationSender = new DbSend();
+					final DbMultisigSend modificationSender = new DbMultisigSend();
 					modificationSender.setAccountId(modification.getCosignatory().getId());
 					modificationSender.setType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 					modificationSender.setHeight(block.getHeight());
@@ -108,7 +108,7 @@ public class BlockDaoImpl implements BlockDao {
 				}
 			}
 
-			final DbSend t = new DbSend();
+			final DbMultisigSend t = new DbMultisigSend();
 			t.setAccountId(transaction.getSender().getId());
 			t.setType(txType);
 			t.setHeight(block.getHeight());
@@ -116,7 +116,7 @@ public class BlockDaoImpl implements BlockDao {
 			list.add(0, t);
 
 			for (final DbMultisigSignatureTransaction signatureTransaction : transaction.getMultisigSignatureTransactions()) {
-				final DbSend sub = new DbSend();
+				final DbMultisigSend sub = new DbMultisigSend();
 				sub.setAccountId(signatureTransaction.getSender().getId());
 				sub.setType(txType);
 				sub.setHeight(block.getHeight());
@@ -125,7 +125,7 @@ public class BlockDaoImpl implements BlockDao {
 			}
 		}
 
-		for (final DbSend send : list) {
+		for (final DbMultisigSend send : list) {
 			this.getCurrentSession().saveOrUpdate(send);
 		}
 	}
