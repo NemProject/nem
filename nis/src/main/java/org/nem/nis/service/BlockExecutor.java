@@ -93,7 +93,7 @@ public class BlockExecutor {
 
 	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
 		final List<HashMetaDataPair> pairs =
-				Stream.concat(block.getTransactions().stream(), block.getTransactions().stream().flatMap(t -> t.getChildTransactions().stream()))
+				BlockExtensions.streamDefault(block)
 						.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
 						.collect(Collectors.toList());
 		observer.notify(new TransactionHashesNotification(pairs));
