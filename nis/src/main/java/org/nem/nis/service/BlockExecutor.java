@@ -92,10 +92,6 @@ public class BlockExecutor {
 	}
 
 	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
-		// TODO: not sure yet if we should take all the child transactions
-		// TODO: 20150103 - i don;t think we need this since MultisigTransaction is explicitly calling transfer on the other (child) transaction
-		// TODO 20150106 G-J: keep in mind this is called for a block, so the fact that MultisigTransaction.transfer calls transfer
-		// > on child transaction, won't add childs hash to cache
 		final List<HashMetaDataPair> pairs =
 				Stream.concat(block.getTransactions().stream(), block.getTransactions().stream().flatMap(t -> t.getChildTransactions().stream()))
 						.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
