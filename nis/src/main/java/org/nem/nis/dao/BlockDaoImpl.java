@@ -71,6 +71,11 @@ public class BlockDaoImpl implements BlockDao {
 //			}
 //		}
 
+		// TODO 20150122 BR -> G, J: should the DbBlock create empty lists for the different transaction types or is that a problem for hibernate?
+		if (null == block.getBlockMultisigTransactions()) {
+			return;
+		}
+
 		int txType = 0;
 		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
 			if (transaction.getTransferTransaction() != null) {

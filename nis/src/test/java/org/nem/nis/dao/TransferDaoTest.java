@@ -45,13 +45,22 @@ public class TransferDaoTest {
 	@Before
 	public void before() {
 		this.session = this.sessionFactory.openSession();
-		this.session.createSQLQuery("delete from transfers").executeUpdate();
-		this.session.createSQLQuery("delete from importancetransfers").executeUpdate();
-		this.session.createSQLQuery("delete from blocks").executeUpdate();
-		this.session.createSQLQuery("delete from accounts").executeUpdate();
-		this.session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
-		this.session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		this.session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("delete from transfers").executeUpdate();
+		session.createSQLQuery("delete from importancetransfers").executeUpdate();
+		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
+		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
+		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
+		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
+		session.createSQLQuery("delete from multisigsends").executeUpdate();
+		session.createSQLQuery("delete from multisigreceives").executeUpdate();
+		session.createSQLQuery("delete from blocks").executeUpdate();
+		session.createSQLQuery("delete from accounts").executeUpdate();
+		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		this.session.flush();
 		this.session.clear();
 	}
@@ -272,6 +281,8 @@ public class TransferDaoTest {
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 
+	// TODO 20150122 BR -> G,J: does this test make sense? (we would have to check in the transfer dao for the id in serveral tables).
+	// > Same applies for hash which currently is only checked for in the transfers table.
 	@Test
 	public void getTransactionsForAccountUsingIdThrowsWhenIdNotFound() {
 		// Arrange:
