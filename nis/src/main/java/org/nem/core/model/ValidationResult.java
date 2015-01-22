@@ -155,7 +155,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a multisig modification contained redundant modifications.
 	 */
-	FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS(37);
+	FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS(37),
+
+	/**
+	 * Validation failed because conflicting multisig modification is present.
+	 */
+	FAILURE_CONFLICTING_MULTISIG_MODIFICATION(38);
 
 	private final int value;
 
