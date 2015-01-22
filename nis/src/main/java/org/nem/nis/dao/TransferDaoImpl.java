@@ -93,7 +93,7 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Collection<TransferBlockPair> getTransactionsForAccountUsingHash(
 			final Account address,
 			final Hash hash,
@@ -142,7 +142,7 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Collection<TransferBlockPair> getTransactionsForAccountUsingId(
 			final Account address,
 			final Long id,
@@ -198,11 +198,11 @@ public class TransferDaoImpl implements TransferDao {
 				maxId,
 				limit,
 				transferType));
-		pairs.addAll(this.getImportanceTransfersForAccount(
+		/*pairs.addAll(this.getImportanceTransfersForAccount(
 				accountId,
 				maxId,
 				limit,
-				transferType));
+				transferType));*/
 		pairs.addAll(this.getMultisigTransfersForAccount(
 				accountId,
 				maxId,
@@ -228,8 +228,27 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
-		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
-		final String queryString =
+		//final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "t.senderId" : "t.recipientId";
+		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "sender.id" : "recipient.id";
+		final Criteria criteria = this.getCurrentSession().createCriteria(DbTransferTransaction.class)
+				.setFetchMode("blockId", FetchMode.JOIN)
+				.setFetchMode("sender", FetchMode.JOIN)
+				.setFetchMode("recipient", FetchMode.JOIN)
+				.add(Restrictions.eq(senderOrRecipient, accountId))
+				.add(Restrictions.isNotNull("senderProof"))
+				.add(Restrictions.lt("id", maxId))
+				.addOrder(Order.desc("id"))
+				.setMaxResults(limit);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		final List<DbTransferTransaction> list = criteria.list();
+		return list.stream()
+				.map(t -> {
+					// force lazy initialization
+					t.getBlock().getId();
+					return new TransferBlockPair(t, t.getBlock());
+				})
+				.collect(Collectors.toList());
+		/*final String queryString =
 				"SELECT t.*, b.* FROM transfers t " +
 						"LEFT OUTER JOIN Blocks b ON t.blockId = b.id " +
 						"WHERE %s = %d AND t.senderProof IS NOT NULL AND t.id < %d " +
@@ -244,7 +263,7 @@ public class TransferDaoImpl implements TransferDao {
 				.addEntity(DbTransferTransaction.class)
 				.addEntity(DbBlock.class)
 				.setMaxResults(limit);
-		return executeQuery(query);
+		return executeQuery(query);*/
 	}
 
 	private List<TransferBlockPair> getImportanceTransfersForAccount(
