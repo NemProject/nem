@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
  * - A non-delete aggregate modification (or any other supported transaction) is signed by all cosigners.
  * - A delete aggregate modification is signed by all cosigners except the cosigner being deleted (when at least one cosigner remains).
  * - A delete aggregate modification of the last cosigner is signed by that cosigner.
+ * - A delete aggregate modification can delete at most one account.
  * <br/>
  * This validator should only be used during block creation, or when receiving a block.
  */
@@ -53,7 +54,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 
 		final List<Address> accountsForRemoval = getRemovedAddresses(transaction);
 		if (accountsForRemoval.size() > 1) {
-			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
+			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES;
 		}
 
 		final Address accountForRemoval = accountsForRemoval.isEmpty() ? null : accountsForRemoval.get(0);

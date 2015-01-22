@@ -6,10 +6,21 @@ import org.nem.nis.state.ReadOnlyAccountState;
 
 import java.util.*;
 
+/**
+ * Single transaction validator that validates a multisig aggregate modification:
+ * - Only adds accounts that are not already cosigners.
+ * - Only deletes accounts that are cosigners.
+ * - There are no duplicate add or delete modifications.
+ * - A delete aggregate modification can delete at most one account.
+ */
 public class MultisigAggregateModificationTransactionValidator implements SingleTransactionValidator {
 	private final ReadOnlyAccountStateCache stateCache;
-	private final Set<Address> multisigModificationSenders = new HashSet<>();
 
+	/**
+	 * Creates a new validator.
+	 *
+	 * @param stateCache The account state cache.
+	 */
 	public MultisigAggregateModificationTransactionValidator(final ReadOnlyAccountStateCache stateCache) {
 		this.stateCache = stateCache;
 	}
@@ -20,34 +31,47 @@ public class MultisigAggregateModificationTransactionValidator implements Single
 			return ValidationResult.SUCCESS;
 		}
 
-		return this.validate((MultisigAggregateModificationTransaction)transaction, context);
+		return this.validate((MultisigAggregateModificationTransaction)transaction);
 	}
 
-	private ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
-		// TODO 20140106 J-G: should add test for this
-		/**
-		 * We don't want to allow multiple AggregateModificationTransaction from single account, this handles it.
-		 * This validator is also used in UnconfirmedTransactions, so multiple AggregateModificationTransaction,
-		 * won't be added to UnconfirmedTransactions.
-		 */
-		if (!this.multisigModificationSenders.add(transaction.getSigner().getAddress())) {
-			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG;
+	private ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {
+		final Address multisigAddress = transaction.getSigner().getAddress();
+
+		final HashSet<Address> accountsToAdd = new HashSet<>();
+		final HashSet<Address> accountsToRemove = new HashSet<>();
+		for (final MultisigModification modification : transaction.getModifications()) {
+			final Address cosignerAddress = modification.getCosignatory().getAddress();
+			final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(cosignerAddress);
+			final boolean isCosigner = cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
+
+			switch (modification.getModificationType()) {
+				case Add:
+					if (isCosigner) {
+						return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
+					}
+
+					accountsToAdd.add(cosignerAddress);
+					break;
+
+				case Del:
+					if (!isCosigner) {
+						return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
+					}
+
+					// TODO 20150122 J-G: now this is being checked in two validators (this one and MultisigSignaturesPresentValidator)
+					if (!accountsToRemove.isEmpty()) {
+						return ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES;
+					}
+
+					accountsToRemove.add(cosignerAddress);
+					break;
+			}
 		}
 
-		return ValidationResult.aggregate(transaction.getModifications().stream()
-				.map(t -> this.validate(transaction.getSigner().getAddress(), t)).iterator());
-	}
-
-	private ValidationResult validate(final Address multisigAddress, final MultisigModification modification) {
-		final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(modification.getCosignatory().getAddress());
-
-		if (MultisigModificationType.Add == modification.getModificationType() && cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress)) {
-			return ValidationResult.FAILURE_MULTISIG_ALREADY_A_COSIGNER;
+		if (transaction.getModifications().size() != accountsToAdd.size() + accountsToRemove.size()) {
+			return ValidationResult.FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS;
 		}
 
-		if (MultisigModificationType.Del == modification.getModificationType() && !cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress)) {
-			return ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER;
-		}
 		return ValidationResult.SUCCESS;
 	}
 }

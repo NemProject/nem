@@ -348,7 +348,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
 	}
 
 	//endregion

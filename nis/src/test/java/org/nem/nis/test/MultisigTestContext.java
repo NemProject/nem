@@ -37,16 +37,6 @@ public class MultisigTestContext {
 		this.addState(this.dummy);
 	}
 
-	public MultisigAggregateModificationTransaction createMultisigModificationTransaction(final MultisigModificationType modificationType) {
-		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				this.multisig,
-				Arrays.asList(new MultisigModification(modificationType, this.signer)));
-		transaction.sign();
-
-		return transaction;
-	}
-
 	public MultisigTransaction createMultisigModificationTransaction(final Collection<MultisigModification> modifications) {
 		final MultisigAggregateModificationTransaction otherTransaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,

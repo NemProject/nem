@@ -30,7 +30,7 @@ public class MultisigTransactionSignerValidatorTest {
 
 	private static void assertValidationResult(
 			final Function<MultisigTestContext, Account> getMultisigSigner,
-			final ValidationResult expected) {
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Transaction transaction = context.createMultisigTransferTransaction(getMultisigSigner.apply(context));
@@ -40,7 +40,7 @@ public class MultisigTransactionSignerValidatorTest {
 		final ValidationResult result = context.validateTransaction(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(expected));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//region other transactions
