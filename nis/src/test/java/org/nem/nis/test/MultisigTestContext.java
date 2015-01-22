@@ -61,8 +61,12 @@ public class MultisigTestContext {
 	}
 
 	public MultisigTransaction createMultisigTransferTransaction() {
+		return this.createMultisigTransferTransaction(this.signer);
+	}
+
+	public MultisigTransaction createMultisigTransferTransaction(final Account multisigSigner) {
 		final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, this.multisig, this.recipient, Amount.fromNem(123), null);
-		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);
+		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, multisigSigner, otherTransaction);
 		transaction.sign();
 
 		this.transactionList.add(transaction);
@@ -125,7 +129,7 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return validator.validate(transaction, new ValidationContext((final Account account, final Amount amount) -> true));
+		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
 	public ValidationResult validateMultisigSignature(final Transaction transaction, final BlockHeight height) {
@@ -133,14 +137,10 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateMultisigModification(final Transaction transaction) {
-		return multisigAggregateModificationTransactionValidator.validate(
-				transaction,
-				new ValidationContext((final Account account, final Amount amount) -> true));
+		return this.multisigAggregateModificationTransactionValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
-	public ValidationResult validateTransaction(final Transaction transaction, final BlockHeight blockHeight) {
-		return multisigTransactionSignerValidator.validate(
-				transaction,
-				new ValidationContext(blockHeight, (final Account account, final Amount amount) -> true));
+	public ValidationResult validateTransaction(final Transaction transaction) {
+		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 }

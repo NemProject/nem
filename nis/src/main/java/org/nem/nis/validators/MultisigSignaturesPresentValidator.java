@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 
 /**
  * A transaction validator that validates that a multisig transaction has all required signatures.
+ * - A non-delete aggregate modification (or any other supported transaction) is signed by all cosigners.
+ * - A delete aggregate modification is signed by all cosigners except the cosigner being deleted (when at least one cosigner remains).
+ * - A delete aggregate modification of the last cosigner is signed by that cosigner.
  * <br/>
  * This validator should only be used during block creation, or when receiving a block.
  */
