@@ -20,6 +20,7 @@ public class TransactionDeadlineValidator implements SingleTransactionValidator 
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
+		// TODO 20150123 BR -> J,G: I think we should reject a transaction if any child has expired too.
 		return transaction.getDeadline().compareTo(this.timeProvider.getCurrentTime()) >= 0
 				? ValidationResult.SUCCESS
 				: ValidationResult.FAILURE_PAST_DEADLINE;
