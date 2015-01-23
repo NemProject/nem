@@ -19,7 +19,6 @@ public class MultisigTestContext {
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
-	private final MultisigSignatureValidator multisigSignatureValidator;
 
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private final List<Transaction> transactionList = new ArrayList<>();
@@ -31,7 +30,6 @@ public class MultisigTestContext {
 
 	public MultisigTestContext() {
 		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache);
-		this.multisigSignatureValidator = new MultisigSignatureValidator(this.accountCache, () -> this.transactionList);
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
@@ -120,10 +118,6 @@ public class MultisigTestContext {
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
 		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.True));
-	}
-
-	public ValidationResult validateMultisigSignature(final Transaction transaction, final BlockHeight height) {
-		return this.multisigSignatureValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
 	}
 
 	public ValidationResult validateMultisigModification(final Transaction transaction) {

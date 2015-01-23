@@ -222,13 +222,7 @@ public class UnconfirmedTransactions {
 		// TODO 20150103 J-J: probably should add another function to the factory for blockVerification validators
 		// > e.g., (that adds MultisigSignaturesPresentValidator)
 
-		if (!blockVerification) {
-//			// need to be the last one
-//			builder.add(new MultisigSignatureValidator(accountStateCache,
-//					// we need pendingTransactions see UnconfirmedTransactionsMultisigTest.multisigTransactionWithSignatureIsAccepted
-//					// TODO 20150107 G-G,J: any nicer way to do it? maybe supplier could return stream?
-//					() -> this.transactions.stream().collect(Collectors.toList())));
-		} else {
+		if (blockVerification) {
 			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
 		}
 
