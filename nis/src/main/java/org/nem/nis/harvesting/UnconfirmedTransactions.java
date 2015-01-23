@@ -22,7 +22,7 @@ import java.util.stream.*;
 public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
-	private final UnconfirmedTransactionsCache transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate);
+	private final UnconfirmedTransactionsCache transactions;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
@@ -86,6 +86,10 @@ public class UnconfirmedTransactions {
 		this.singleValidator = this.createSingleValidator(blockVerification);
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
+
+		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
+		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
+
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -219,11 +223,11 @@ public class UnconfirmedTransactions {
 		// > e.g., (that adds MultisigSignaturesPresentValidator)
 
 		if (!blockVerification) {
-			// need to be the last one
-			builder.add(new MultisigSignatureValidator(accountStateCache,
-					// we need pendingTransactions see UnconfirmedTransactionsMultisigTest.multisigTransactionWithSignatureIsAccepted
-					// TODO 20150107 G-G,J: any nicer way to do it? maybe supplier could return stream?
-					() -> this.transactions.stream().collect(Collectors.toList())));
+//			// need to be the last one
+//			builder.add(new MultisigSignatureValidator(accountStateCache,
+//					// we need pendingTransactions see UnconfirmedTransactionsMultisigTest.multisigTransactionWithSignatureIsAccepted
+//					// TODO 20150107 G-G,J: any nicer way to do it? maybe supplier could return stream?
+//					() -> this.transactions.stream().collect(Collectors.toList())));
 		} else {
 			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
 		}

@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 /**
@@ -13,6 +13,7 @@ import java.util.stream.Stream;
  */
 public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;
+	private final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch;
 	private final Map<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final Set<Hash> childTransactions = new HashSet<>();
 
@@ -20,16 +21,20 @@ public class UnconfirmedTransactionsCache {
 	 * Creates a new cache with no transaction validation.
 	 */
 	public UnconfirmedTransactionsCache() {
-		this(t -> ValidationResult.SUCCESS);
+		this(t -> ValidationResult.SUCCESS, (mst, mt) -> false);
 	}
 
 	/**
 	 * Creates a new cache with transaction validation.
 	 *
 	 * @param validate The validation function.
+	 * @param isMatch A predicate that returns true if a multisig signature transaction matches a multisig transaction.
 	 */
-	public UnconfirmedTransactionsCache(final Function<Transaction, ValidationResult> validate) {
+	public UnconfirmedTransactionsCache(
+			final Function<Transaction, ValidationResult> validate,
+			final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch) {
 		this.validate = validate;
+		this.isMatch = isMatch;
 	}
 
 	/**
@@ -95,7 +100,29 @@ public class UnconfirmedTransactionsCache {
 			return result;
 		}
 
+		if (TransactionTypes.MULTISIG_SIGNATURE == transaction.getType()) {
+			return this.handleMultisigSignature((MultisigSignatureTransaction)transaction, transactionHash);
+		}
+
 		this.addTransactionToCache(transaction, transactionHash);
+		return ValidationResult.SUCCESS;
+	}
+
+	private ValidationResult handleMultisigSignature(
+			final MultisigSignatureTransaction signatureTransaction,
+			final Hash signatureTransactionHash) {
+		final Optional<MultisigTransaction> multisigTransaction = this.transactions.values().stream()
+				.filter(t -> TransactionTypes.MULTISIG == t.getType())
+				.map(t -> (MultisigTransaction)t)
+				.filter(mt -> this.isMatch.test(signatureTransaction, mt))
+				.findAny();
+
+		if (!multisigTransaction.isPresent()) {
+			return ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG;
+		}
+
+		this.childTransactions.add(signatureTransactionHash);
+		multisigTransaction.get().addSignature(signatureTransaction);
 		return ValidationResult.SUCCESS;
 	}
 

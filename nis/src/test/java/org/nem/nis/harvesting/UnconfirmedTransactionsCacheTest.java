@@ -4,8 +4,9 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 
-import java.util.Arrays;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsCacheTest {
@@ -148,7 +149,7 @@ public class UnconfirmedTransactionsCacheTest {
 	@Test
 	public void canAddNewTransactionWithSuccessValidation() {
 		// Arrange:
-		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS);
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS, (mst, mt) -> true);
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 
 		// Act:
@@ -164,7 +165,7 @@ public class UnconfirmedTransactionsCacheTest {
 	@Test
 	public void cannotAddNewTransactionWithNeutralValidation() {
 		// Arrange:
-		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.NEUTRAL);
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.NEUTRAL, (mst, mt) -> true);
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 
 		// Act:
@@ -180,7 +181,7 @@ public class UnconfirmedTransactionsCacheTest {
 	@Test
 	public void cannotAddNewTransactionWithFailureValidation() {
 		// Arrange:
-		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER, (mst, mt) -> true);
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 
 		// Act:
@@ -191,6 +192,139 @@ public class UnconfirmedTransactionsCacheTest {
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region add (multisig signature)
+
+	@Test
+	public void cannotAddMultisigSignatureWithNoExistingTransactions() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS, (mst, mt) -> true);
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1);
+
+		// Act:
+		final ValidationResult result = cache.add(signatureTransaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void cannotAddMultisigSignatureWithNonMatchingNonMultisigTransaction() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS, (mst, mt) -> true);
+		cache.add(new MockTransaction(context.cosigner2));
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1);
+
+		// Act:
+		final ValidationResult result = cache.add(signatureTransaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void cannotAddMultisigSignatureWithNonMatchingMultisigTransaction() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS, (mst, mt) -> false);
+		cache.add(context.createMultisigTransaction(context.cosigner2));
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1);
+
+		// Act:
+		final ValidationResult result = cache.add(signatureTransaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NO_MATCHING_MULTISIG));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2)); // the multisig transaction has an inner transaction
+		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void canAddMultisigSignatureWithMatchingMultisigTransaction() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS, (mst, mt) -> true);
+		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(context.cosigner2);
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1);
+		cache.add(multisigTransaction);
+
+		// Act:
+		final ValidationResult result = cache.add(signatureTransaction);
+
+		// Assert:
+		// - check the cache state
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2 + 1)); // the multisig transaction has an inner transaction and a signature
+		Assert.assertThat(cache.contains(multisigTransaction), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(multisigTransaction.getOtherTransaction()), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(true));
+
+		// - check the cache multisig transaction signatures
+		Assert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		Assert.assertThat(multisigTransaction.getCosignerSignatures(), IsEquivalent.equivalentTo(signatureTransaction));
+	}
+
+	@Test
+	public void canAddMultisigSignatureWithMatchingMultisigTransactionAndNonMatchingMultisigTransactions() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(context.cosigner2);
+
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS, (mst, mt) -> mt.equals(multisigTransaction));
+		cache.add(context.createRandomMultisigTransaction());
+		cache.add(context.createRandomMultisigTransaction());
+		cache.add(multisigTransaction);
+		cache.add(context.createRandomMultisigTransaction());
+
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransaction(context.cosigner1);
+
+		// Act:
+		final ValidationResult result = cache.add(signatureTransaction);
+
+		// Assert:
+		// - check the cache state
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(4));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(4 * 2 + 1)); // each multisig transaction has an inner transaction
+		Assert.assertThat(cache.contains(multisigTransaction), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(multisigTransaction.getOtherTransaction()), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(signatureTransaction), IsEqual.equalTo(true));
+
+		// - check the cache multisig transaction signatures
+		Assert.assertThat(multisigTransaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		Assert.assertThat(multisigTransaction.getCosignerSignatures(), IsEquivalent.equivalentTo(signatureTransaction));
+	}
+
+	private static class MultisigTestContext {
+		private final Account cosigner1 = Utils.generateRandomAccount();
+		private final Account cosigner2 = Utils.generateRandomAccount();
+		private final Account multisig = Utils.generateRandomAccount();
+		private final Transaction otherTransaction = new MockTransaction(this.multisig);
+
+		public MultisigSignatureTransaction createSignatureTransaction(final Account signer) {
+			return new MultisigSignatureTransaction(TimeInstant.ZERO, signer, HashUtils.calculateHash(this.otherTransaction));
+		}
+
+		public MultisigTransaction createMultisigTransaction(final Account signer) {
+			return new MultisigTransaction(TimeInstant.ZERO, signer, this.otherTransaction);
+		}
+
+		private MultisigTransaction createRandomMultisigTransaction() {
+			return new MultisigTransaction(TimeInstant.ZERO, this.cosigner1, new MockTransaction(this.multisig, new Random().nextInt()));
+		}
 	}
 
 	//endregion
