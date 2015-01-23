@@ -82,7 +82,7 @@ public class NonConflictingMultisigAggregateModificationValidatorTest {
 			final Transaction newTransaction,
 			final ValidationResult expectedResult) {
 		// Arrange:
-		final SingleTransactionValidator validator = new NonConflictingMultisigAggregateModificationValidator(() -> existingTransactions);
+		final SingleTransactionValidator validator = new NonConflictingMultisigAggregateModificationValidator(() -> existingTransactions.stream());
 
 		// Act:
 		final ValidationResult result = validator.validate(newTransaction, new ValidationContext(DebitPredicates.True));

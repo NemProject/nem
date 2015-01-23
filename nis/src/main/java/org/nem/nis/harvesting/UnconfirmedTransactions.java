@@ -246,11 +246,10 @@ public class UnconfirmedTransactions {
 		return builder.build();
 	}
 
-	private Supplier<Collection<Transaction>> getTransactionsSupplier() {
+	private Supplier<Stream<Transaction>> getTransactionsSupplier() {
 		return () -> Stream.concat(
 				this.transactions.values().stream(),
-				this.transactions.values().stream().flatMap(t -> t.getChildTransactions().stream()))
-				.collect(Collectors.toList());
+				this.transactions.values().stream().flatMap(t -> t.getChildTransactions().stream()));
 	}
 
 	/**

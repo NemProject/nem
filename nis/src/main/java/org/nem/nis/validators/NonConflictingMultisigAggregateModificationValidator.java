@@ -4,21 +4,21 @@ import org.nem.core.model.*;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 /**
  * A single transaction used (only) by unconfirmed transactions that validates:
  * - a multisig modification does not conflict with any known pending transactions
  */
 public class NonConflictingMultisigAggregateModificationValidator implements SingleTransactionValidator {
-	private final Supplier<Collection<Transaction>> transactionsSupplier;
+	private final Supplier<Stream<Transaction>> transactionsSupplier;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param transactionsSupplier A supplier that returns the known transactions.
 	 */
-	public NonConflictingMultisigAggregateModificationValidator(final Supplier<Collection<Transaction>> transactionsSupplier) {
+	public NonConflictingMultisigAggregateModificationValidator(final Supplier<Stream<Transaction>> transactionsSupplier) {
 		this.transactionsSupplier = transactionsSupplier;
 	}
 
@@ -28,7 +28,7 @@ public class NonConflictingMultisigAggregateModificationValidator implements Sin
 			return ValidationResult.SUCCESS;
 		}
 
-		final Set<Account> modificationSigners = this.transactionsSupplier.get().stream()
+		final Set<Account> modificationSigners = this.transactionsSupplier.get()
 				.filter(t -> TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION == t.getType())
 				.map(t -> t.getSigner())
 				.collect(Collectors.toSet());
