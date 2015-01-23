@@ -12,7 +12,6 @@ import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
 
 import java.util.*;
-import java.util.concurrent.*;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.*;
@@ -23,9 +22,7 @@ import java.util.stream.*;
 public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
-	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Hash, Transaction> pendingTransactions = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Hash, Boolean> childTransactions = new ConcurrentHashMap<>();
+	private final UnconfirmedTransactionsCache transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate);
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
@@ -173,41 +170,29 @@ public class UnconfirmedTransactions {
 		return this.add(transaction, true);
 	}
 
-	private ValidationResult add(final Transaction transaction, final boolean execute) {
-		synchronized (this.lock) {
-			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			if (this.hasTransactionInCache(transaction, transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, transaction)) {
-				return ValidationResult.NEUTRAL;
-			}
-
-			if (!transaction.verify()) {
-				return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
-			}
-
-			try {
-				return this.addInternal(transaction, transactionHash, execute);
-			} finally {
-				this.pendingTransactions.remove(transactionHash);
-			}
+	private ValidationResult verifyAndValidate(final Transaction transaction) {
+		if (!transaction.verify()) {
+			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
 		}
-	}
 
-	private ValidationResult addInternal(
-			final Transaction transaction,
-			final Hash transactionHash,
-			final boolean execute) {
 		final ValidationResult validationResult = this.validateSingle(transaction);
 		if (!validationResult.isSuccess()) {
 			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
 			return validationResult;
 		}
 
-		if (execute) {
-			transaction.execute(this.transferObserver);
-		}
-
-		this.addTransactionToCache(transaction, transactionHash);
 		return ValidationResult.SUCCESS;
+	}
+
+	private ValidationResult add(final Transaction transaction, final boolean execute) {
+		synchronized (this.lock) {
+			final ValidationResult validationResult = this.transactions.add(transaction);
+			if (validationResult.isSuccess() && execute) {
+				transaction.execute(this.transferObserver);
+			}
+
+			return validationResult;
+		}
 	}
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
@@ -238,7 +223,7 @@ public class UnconfirmedTransactions {
 			builder.add(new MultisigSignatureValidator(accountStateCache,
 					// we need pendingTransactions see UnconfirmedTransactionsMultisigTest.multisigTransactionWithSignatureIsAccepted
 					// TODO 20150107 G-G,J: any nicer way to do it? maybe supplier could return stream?
-					() -> Stream.concat(this.pendingTransactions.values().stream(), this.transactions.values().stream()).collect(Collectors.toList())));
+					() -> this.transactions.stream().collect(Collectors.toList())));
 		} else {
 			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
 		}
@@ -247,9 +232,7 @@ public class UnconfirmedTransactions {
 	}
 
 	private Supplier<Stream<Transaction>> getTransactionsSupplier() {
-		return () -> Stream.concat(
-				this.transactions.values().stream(),
-				this.transactions.values().stream().flatMap(t -> t.getChildTransactions().stream()));
+		return () -> this.transactions.streamFlat();
 	}
 
 	/**
@@ -260,15 +243,12 @@ public class UnconfirmedTransactions {
 	 */
 	public boolean remove(final Transaction transaction) {
 		synchronized (this.lock) {
-			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			if (!this.hasTransactionInCache(transaction, transactionHash)) {
-				return false;
+			final boolean isRemoved = this.transactions.remove(transaction);
+			if (isRemoved) {
+				transaction.undo(this.transferObserver);
 			}
 
-			transaction.undo(this.transferObserver);
-
-			this.removeTransactionFromCache(transaction, transactionHash);
-			return true;
+			return isRemoved;
 		}
 	}
 
@@ -331,7 +311,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getAll() {
 		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.values().stream()
+			final List<Transaction> transactions = this.transactions.stream()
 					.collect(Collectors.toList());
 			return this.sortTransactions(transactions);
 		}
@@ -346,7 +326,7 @@ public class UnconfirmedTransactions {
 		// probably faster to use hash map than collection
 		synchronized (this.lock) {
 			final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
-			this.transactions.values().stream()
+			this.transactions.stream()
 					.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 			knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
 			return unknownHashShortIds.values().stream().collect(Collectors.toList());
@@ -360,7 +340,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
 		synchronized (this.lock) {
-			return this.transactions.values().stream()
+			return this.transactions.stream()
 					// TODO 20140115 J-G: should add test for filter
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
@@ -377,7 +357,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
 		synchronized (this.lock) {
-			return this.transactions.values().stream()
+			return this.transactions.stream()
 					.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
 					.limit(maxTransactions)
 					.collect(Collectors.toList());
@@ -392,7 +372,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.values().stream()
+			final List<Transaction> transactions = this.transactions.stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
 							// filter out signatures because we don't want them to be directly inside a block
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
@@ -414,7 +394,7 @@ public class UnconfirmedTransactions {
 	 */
 	public void dropExpiredTransactions(final TimeInstant time) {
 		synchronized (this.lock) {
-			final List<Transaction> notExpiredTransactions = this.transactions.values().stream()
+			final List<Transaction> notExpiredTransactions = this.transactions.stream()
 					.filter(tx -> tx.getDeadline().compareTo(time) >= 0)
 					.collect(Collectors.toList());
 			if (notExpiredTransactions.size() == this.transactions.size()) {
@@ -426,34 +406,8 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
-		return this.transactions.containsKey(transactionHash) ||
-				this.childTransactions.containsKey(transactionHash) ||
-				transaction.getChildTransactions().stream()
-						.anyMatch(t -> {
-							final Hash key = HashUtils.calculateHash(t);
-							return this.childTransactions.containsKey(key) || this.transactions.containsKey(key);
-						});
-	}
-
-	private void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
-		for (final Transaction childTransaction : transaction.getChildTransactions()) {
-			this.childTransactions.put(HashUtils.calculateHash(childTransaction), true);
-		}
-		this.transactions.put(transactionHash, transaction);
-	}
-
-	private void removeTransactionFromCache(final Transaction transaction, final Hash transactionHash) {
-		for (final Transaction childTransaction : transaction.getChildTransactions()) {
-			this.childTransactions.remove(HashUtils.calculateHash(childTransaction));
-		}
-		this.transactions.remove(transactionHash);
-	}
-
 	private void rebuildCache(final List<Transaction> transactions) {
 		this.transactions.clear();
-		this.pendingTransactions.clear();
-		this.childTransactions.clear();
 		this.unconfirmedBalances.clearCache();
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.

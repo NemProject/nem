@@ -4,15 +4,33 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 
 import java.util.concurrent.*;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
  * A cache of all unconfirmed transactions.
  */
 public class UnconfirmedTransactionsCache {
+	private final Function<Transaction, ValidationResult> validate;
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Transaction> pendingTransactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Boolean> childTransactions = new ConcurrentHashMap<>();
+
+	/**
+	 * Creates a new cache with no transaction validation.
+	 */
+	public UnconfirmedTransactionsCache() {
+		this(t -> ValidationResult.SUCCESS);
+	}
+
+	/**
+	 * Creates a new cache with transaction validation.
+	 *
+	 * @param validate The validation function.
+	 */
+	public UnconfirmedTransactionsCache(final Function<Transaction, ValidationResult> validate) {
+		this.validate = validate;
+	}
 
 	/**
 	 * Gets the number of root transactions.
@@ -31,7 +49,6 @@ public class UnconfirmedTransactionsCache {
 	public int flatSize() {
 		return this.transactions.size() + this.childTransactions.size();
 	}
-
 
 	/**
 	 * Removes all transactions from this cache.
@@ -66,16 +83,21 @@ public class UnconfirmedTransactionsCache {
 	 * Adds a transaction to the cache.
 	 *
 	 * @param transaction The transaction to add.
-	 * @return true if the transaction was added.
+	 * @return SUCCESS if the transaction was added.
 	 */
-	public boolean add(final Transaction transaction) {
+	public ValidationResult add(final Transaction transaction) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
 		if (this.hasTransactionInCache(transaction, transactionHash)) {
-			return false;
+			return ValidationResult.NEUTRAL;
+		}
+
+		final ValidationResult result = this.validate.apply(transaction);
+		if (!result.isSuccess()) {
+			return result;
 		}
 
 		this.addTransactionToCache(transaction, transactionHash);
-		return true;
+		return ValidationResult.SUCCESS;
 	}
 
 	/**

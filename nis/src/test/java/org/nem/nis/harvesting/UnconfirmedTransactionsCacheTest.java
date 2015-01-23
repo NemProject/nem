@@ -33,10 +33,10 @@ public class UnconfirmedTransactionsCacheTest {
 		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 
 		// Act:
-		final boolean result = cache.add(transaction);
+		final ValidationResult result = cache.add(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
@@ -52,10 +52,10 @@ public class UnconfirmedTransactionsCacheTest {
 		transaction.setChildTransactions(Arrays.asList(innerTransaction1, innerTransaction2));
 
 		// Act:
-		final boolean result = cache.add(transaction);
+		final ValidationResult result = cache.add(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(3));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
@@ -71,10 +71,10 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(transaction);
 
 		// Act:
-		final boolean result = cache.add(transaction);
+		final ValidationResult result = cache.add(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
@@ -91,10 +91,10 @@ public class UnconfirmedTransactionsCacheTest {
 		transaction2.setChildTransactions(Arrays.asList(transaction));
 
 		// Act:
-		final boolean result = cache.add(transaction2);
+		final ValidationResult result = cache.add(transaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
@@ -113,10 +113,10 @@ public class UnconfirmedTransactionsCacheTest {
 		transaction2.setChildTransactions(Arrays.asList(innerTransaction));
 
 		// Act:
-		final boolean result = cache.add(transaction2);
+		final ValidationResult result = cache.add(transaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
@@ -132,13 +132,65 @@ public class UnconfirmedTransactionsCacheTest {
 		cache.add(transaction);
 
 		// Act:
-		final boolean result = cache.add(innerTransaction);
+		final ValidationResult result = cache.add(innerTransaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+	}
+
+	//endregion
+
+	//region add (with validation)
+
+	@Test
+	public void canAddNewTransactionWithSuccessValidation() {
+		// Arrange:
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.SUCCESS);
+		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
+
+		// Act:
+		final ValidationResult result = cache.add(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(1));
+		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void cannotAddNewTransactionWithNeutralValidation() {
+		// Arrange:
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.NEUTRAL);
+		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
+
+		// Act:
+		final ValidationResult result = cache.add(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(false));
+	}
+
+	@Test
+	public void cannotAddNewTransactionWithFailureValidation() {
+		// Arrange:
+		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache(t -> ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
+		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
+
+		// Act:
+		final ValidationResult result = cache.add(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(0));
+		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(false));
 	}
 
 	//endregion
