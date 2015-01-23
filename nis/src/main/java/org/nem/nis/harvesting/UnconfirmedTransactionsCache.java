@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;
 	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Hash, Transaction> pendingTransactions = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Hash, Boolean> childTransactions = new ConcurrentHashMap<>();
 
 	/**
@@ -55,7 +54,6 @@ public class UnconfirmedTransactionsCache {
 	 */
 	public void clear() {
 		this.transactions.clear();
-		this.pendingTransactions.clear();
 		this.childTransactions.clear();
 	}
 
