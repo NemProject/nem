@@ -3,6 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -12,8 +13,8 @@ import java.util.stream.Stream;
  */
 public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;
-	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Hash, Boolean> childTransactions = new ConcurrentHashMap<>();
+	private final Map<Hash, Transaction> transactions = new ConcurrentHashMap<>();
+	private final Set<Hash> childTransactions = new HashSet<>();
 
 	/**
 	 * Creates a new cache with no transaction validation.
@@ -127,17 +128,17 @@ public class UnconfirmedTransactionsCache {
 
 	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
 		return this.transactions.containsKey(transactionHash) ||
-				this.childTransactions.containsKey(transactionHash) ||
+				this.childTransactions.contains(transactionHash) ||
 				transaction.getChildTransactions().stream()
 						.anyMatch(t -> {
 							final Hash key = HashUtils.calculateHash(t);
-							return this.childTransactions.containsKey(key) || this.transactions.containsKey(key);
+							return this.childTransactions.contains(key) || this.transactions.containsKey(key);
 						});
 	}
 
 	private void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
 		for (final Transaction childTransaction : transaction.getChildTransactions()) {
-			this.childTransactions.put(HashUtils.calculateHash(childTransaction), true);
+			this.childTransactions.add(HashUtils.calculateHash(childTransaction));
 		}
 
 		this.transactions.put(transactionHash, transaction);
