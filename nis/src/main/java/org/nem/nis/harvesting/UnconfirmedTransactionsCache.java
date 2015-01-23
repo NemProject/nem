@@ -125,7 +125,7 @@ public class UnconfirmedTransactionsCache {
 		return true;
 	}
 
-	public boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
+	private boolean hasTransactionInCache(final Transaction transaction, final Hash transactionHash) {
 		return this.transactions.containsKey(transactionHash) ||
 				this.childTransactions.containsKey(transactionHash) ||
 				transaction.getChildTransactions().stream()
@@ -135,7 +135,7 @@ public class UnconfirmedTransactionsCache {
 						});
 	}
 
-	public void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
+	private void addTransactionToCache(final Transaction transaction, final Hash transactionHash) {
 		for (final Transaction childTransaction : transaction.getChildTransactions()) {
 			this.childTransactions.put(HashUtils.calculateHash(childTransaction), true);
 		}
@@ -143,7 +143,7 @@ public class UnconfirmedTransactionsCache {
 		this.transactions.put(transactionHash, transaction);
 	}
 
-	public void removeTransactionFromCache(final Transaction transaction, final Hash transactionHash) {
+	private void removeTransactionFromCache(final Transaction transaction, final Hash transactionHash) {
 		for (final Transaction childTransaction : transaction.getChildTransactions()) {
 			this.childTransactions.remove(HashUtils.calculateHash(childTransaction));
 		}
