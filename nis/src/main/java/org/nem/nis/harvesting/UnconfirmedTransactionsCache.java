@@ -15,6 +15,9 @@ public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;
 	private final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch;
 	private final Map<Hash, Transaction> transactions = new ConcurrentHashMap<>();
+	// TODO 20150123 G-J: since this isn't concurrent anymore, we rely on the
+	// > fact that .remove is called within synchronized() block, right? (add comment somewhere?)
+	// > 2. shouldn't call to clear() also be synchronized?
 	private final Set<Hash> childTransactions = new HashSet<>();
 
 	/**
