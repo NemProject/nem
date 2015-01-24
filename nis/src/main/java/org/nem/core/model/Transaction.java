@@ -11,7 +11,7 @@ import java.util.*;
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
-	private Amount fee = Amount.ZERO;
+	private Optional<Amount> fee = Optional.empty();
 	private TimeInstant deadline = TimeInstant.ZERO;
 	private final boolean nemesisTransaction;
 
@@ -37,7 +37,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
-		this.fee = Amount.readFrom(deserializer, "fee");
+		this.fee = Optional.of(Amount.readFrom(deserializer, "fee"));
 		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
 		this.nemesisTransaction = false;
 	}
@@ -51,10 +51,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Amount getFee() {
 		return nemesisTransaction
-				? Amount.ZERO :
-				this.fee.compareTo(this.getMinimumFee()) < 0
-						? this.getMinimumFee()
-						: this.fee;
+				? Amount.ZERO
+				: this.fee.orElse(this.getMinimumFee());
 	}
 
 	/**
@@ -63,7 +61,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param fee The desired fee.
 	 */
 	public void setFee(final Amount fee) {
-		this.fee = fee;
+		this.fee = null == fee ? Optional.empty() : Optional.of(fee);
 	}
 
 	/**

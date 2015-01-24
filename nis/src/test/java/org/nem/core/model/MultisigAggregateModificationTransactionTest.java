@@ -107,7 +107,6 @@ public class MultisigAggregateModificationTransactionTest {
 					new MultisigModification(MultisigModificationType.Del, cosignatory2));
 
 			final Transaction transaction = createTransaction(signer, modifications);
-			transaction.setFee(Amount.fromNem(10));
 
 			// Act:
 			final TransactionObserver observer = Mockito.mock(TransactionObserver.class);
@@ -364,10 +363,7 @@ public class MultisigAggregateModificationTransactionTest {
 				this.modification2 = new MultisigModification(modificationType, this.cosignatory2);
 
 				this.transactionWithOneModification = createTransaction(this.signer, Arrays.asList(this.modification1));
-				this.transactionWithOneModification.setFee(Amount.fromNem(10));
-
 				this.transactionWithTwoModifications = createTransaction(this.signer, Arrays.asList(this.modification1, this.modification2));
-				this.transactionWithTwoModifications.setFee(Amount.fromNem(10));
 			}
 		}
 

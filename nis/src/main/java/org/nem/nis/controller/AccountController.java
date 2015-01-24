@@ -211,17 +211,6 @@ public class AccountController {
 					return pair;
 				}
 
-				// this should work as long as the secure message payload size >= the plain message payload size
-				// TODO 20150112 J-B: i'm pretty sure this will be the case
-				// TODO 20150113 BR -> J: why should it fail? There is no validation.
-				// TODO 20150114 J-B: due to the way getFee is set to automatically return the minimum would be undesirable in this case
-				// > let's say secure message fee is 1 but plain message fee is 2 for some reason,
-				// > if the fee was set at the minimum, the new transaction (below) will automatically increase it to 2
-				// > even thought it was 1 in the original transaction
-				// TODO 20150114 BR -> J: do we really need this.getFee() (opposed to this.fee) in Transaction.serializeImpl()? If the transaction was created
-				// > by NIS or NCC then the fee should be valid or the transaction will be rejected during push(). If some third party was pushing the
-				// > transaction into the network we can't rely on the fee field anyway, that's why we got the validation when receiving the transaction.
-				// TODO 20150115 J-J: should rethink how fees work in general
 				final Message plainMessage = new PlainMessage(message.getDecodedPayload());
 				final TransferTransaction decodedTransaction = new TransferTransaction(
 						t.getTimeStamp(),

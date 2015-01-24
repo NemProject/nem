@@ -77,6 +77,29 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	@Test
+	public void chainWithTransactionWithInsufficientFeeIsValid() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		parentBlock.sign();
+
+		final Transaction invalidTransaction = createValidSignedTransaction();
+		invalidTransaction.setFee(Amount.ZERO);
+		invalidTransaction.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(invalidTransaction);
+		block.addTransaction(createValidSignedTransaction());
+		block.sign();
+
+		// Assert:
+		final boolean isValid = validator.isValid(parentBlock, blocks);
+		Assert.assertThat(isValid, IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void chainWithValidTransactionsIsValid() {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
