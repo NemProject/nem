@@ -271,7 +271,7 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION));
 
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
 	}

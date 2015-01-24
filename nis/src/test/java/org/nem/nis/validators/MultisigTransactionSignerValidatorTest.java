@@ -4,11 +4,46 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.test.MultisigTestContext;
 
+import java.util.function.Function;
+
 public class MultisigTransactionSignerValidatorTest {
-	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
+
+	@Test
+	public void multisigTransactionDoesNotValidateIfSignerIsNotCosignatory() {
+		// Assert:
+		assertValidationResult(context -> context.dummy, ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
+	}
+
+	@Test
+	public void multisigTransactionDoesNotValidateIfSignerIsMultisigAccountCosignatory() {
+		// Assert:
+		assertValidationResult(context -> context.multisig, ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER);
+	}
+
+	@Test
+	public void multisigTransactionValidatesIfSignerIsCosignatory() {
+		// Assert:
+		assertValidationResult(context -> context.signer, ValidationResult.SUCCESS);
+	}
+
+	private static void assertValidationResult(
+			final Function<MultisigTestContext, Account> getMultisigSigner,
+			final ValidationResult expectedResult) {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Transaction transaction = context.createMultisigTransferTransaction(getMultisigSigner.apply(context));
+		context.makeCosignatory(context.signer, context.multisig);
+
+		// Act:
+		final ValidationResult result = context.validateTransaction(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	//region other transactions
 
 	@Test
 	public void validatorCanValidateOtherTransactions() {
@@ -17,36 +52,11 @@ public class MultisigTransactionSignerValidatorTest {
 		final Transaction transaction = Mockito.mock(Transaction.class);
 
 		// Act:
-		final ValidationResult result = context.validateTransaction(transaction, BlockHeight.ONE);
+		final ValidationResult result = context.validateTransaction(transaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
-	@Test
-	public void multisigTransactionDoesNotValidateIfSignerIsNotCosignatory() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigTransferTransaction();
-
-		// Act:
-		final ValidationResult result = context.validateTransaction(transaction, TEST_HEIGHT);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_NOT_A_COSIGNER));
-	}
-
-	@Test
-	public void multisigTransactionValidatesIfSignerIsCosignatory() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig);
-
-		// Act:
-		final ValidationResult result = context.validateTransaction(transaction, TEST_HEIGHT);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
+	//endregion
 }

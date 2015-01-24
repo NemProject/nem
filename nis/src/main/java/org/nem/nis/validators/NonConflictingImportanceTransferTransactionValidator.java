@@ -2,8 +2,8 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 
-import java.util.Collection;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * A TransferTransactionValidator implementation that ensures that a new importance transfer transactions
@@ -11,14 +11,14 @@ import java.util.function.Supplier;
  * This is used by UnconfirmedTransactions and is not a default validator.
  */
 public class NonConflictingImportanceTransferTransactionValidator implements SingleTransactionValidator {
-	private final Supplier<Collection<Transaction>> transactionsSupplier;
+	private final Supplier<Stream<Transaction>> transactionsSupplier;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param transactionsSupplier A supplier that returns the known transactions.
 	 */
-	public NonConflictingImportanceTransferTransactionValidator(final Supplier<Collection<Transaction>> transactionsSupplier) {
+	public NonConflictingImportanceTransferTransactionValidator(final Supplier<Stream<Transaction>> transactionsSupplier) {
 		this.transactionsSupplier = transactionsSupplier;
 	}
 
@@ -32,21 +32,14 @@ public class NonConflictingImportanceTransferTransactionValidator implements Sin
 	}
 
 	private ValidationResult validate(final ImportanceTransferTransaction transaction) {
-		for (final Transaction existingTransaction : this.transactionsSupplier.get()) {
-			if (existingTransaction.getType() != TransactionTypes.IMPORTANCE_TRANSFER) {
-				continue;
-			}
+		final boolean anyTransactionConflicts = this.transactionsSupplier.get()
+				.filter(t -> TransactionTypes.IMPORTANCE_TRANSFER == t.getType())
+				.filter(t -> t != transaction)
+				.anyMatch(t -> areConflicting(transaction, (ImportanceTransferTransaction)t));
 
-			if (transaction == existingTransaction) {
-				continue;
-			}
-
-			if (areConflicting(transaction, (ImportanceTransferTransaction)existingTransaction)) {
-				return ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER;
-			}
-		}
-
-		return ValidationResult.SUCCESS;
+		return anyTransactionConflicts
+				? ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER
+				: ValidationResult.SUCCESS;
 	}
 
 	private static boolean areConflicting(final ImportanceTransferTransaction lhs, final ImportanceTransferTransaction rhs) {

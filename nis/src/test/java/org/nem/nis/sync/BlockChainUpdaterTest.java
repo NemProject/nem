@@ -643,7 +643,7 @@ public class BlockChainUpdaterTest {
 
 		// Assert (12 calls to getAccountStateCache and copy during context construction):
 		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
-		BlockChainUtils.assertNisCacheCalls(context.getNodeContexts().get(0).getNisCache(), 0, 12, 0, 12 + 1);
+		BlockChainUtils.assertNisCacheCalls(context.getNodeContexts().get(0).getNisCache(), 0, 13, 0, 13);
 	}
 
 	@Test

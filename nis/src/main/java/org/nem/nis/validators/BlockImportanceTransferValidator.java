@@ -25,7 +25,7 @@ public class BlockImportanceTransferValidator implements BlockValidator {
 		// NonConflictingImportanceTransferTransactionValidator does not require debit checks
 		// and doing so avoids a dependency on the poi facade
 		final ValidationContext validationContext = new ValidationContext(null);
-		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> importanceTransfers);
+		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> importanceTransfers.stream());
 		return ValidationResult.aggregate(importanceTransfers.stream().map(t -> validator.validate(t, validationContext)).iterator());
 	}
 }
