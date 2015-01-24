@@ -34,9 +34,9 @@ public class NodeMetaData implements SerializableEntity {
 	 * @param deserializer The deserializer.
 	 */
 	public NodeMetaData(final Deserializer deserializer) {
+		this.version = NodeVersion.readFrom(deserializer, "version");
 		this.platform = deserializer.readOptionalString("platform");
 		this.application = deserializer.readOptionalString("application");
-		this.version = NodeVersion.readFrom(deserializer, "version");
 	}
 
 	/**
@@ -68,9 +68,9 @@ public class NodeMetaData implements SerializableEntity {
 
 	@Override
 	public void serialize(final Serializer serializer) {
+		NodeVersion.writeTo(serializer, "version", this.version);
 		serializer.writeString("platform", this.platform);
 		serializer.writeString("application", this.application);
-		NodeVersion.writeTo(serializer, "version", this.version);
 	}
 
 	@Override

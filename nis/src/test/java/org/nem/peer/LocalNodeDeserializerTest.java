@@ -49,29 +49,12 @@ public class LocalNodeDeserializerTest {
 
 	@Test
 	public void canDeserializeNodeMetaDataApplication() {
-		// Arrange:
-		final NodeMetaData metaData = new NodeMetaData("p", "a", new NodeVersion(3, 2, 1));
-
-		final TestDeserializerBuilder builder = new TestDeserializerBuilder();
-		builder.writeIdentity();
-		builder.writeEndpoint();
-		builder.writeMetaData(metaData);
-
-		// Act:
-		final Node node = new LocalNodeDeserializer().deserialize(builder.getDeserializer());
-
-		// Assert:
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, "a", null)));
-	}
-
-	@Test
-	public void localNodeDeserializerCanDeserializeNodeMetaDataWithOnlyApplication() {
 		// Assert:
 		assertRoundTripOfMetaDataApplication("app");
 	}
 
 	@Test
-	public void localNodeDeserializerCanDeserializeNodeMetaDataWithoutApplication() {
+	public void canDeserializeNodeMetaDataWithoutApplication() {
 		// Assert:
 		assertRoundTripOfMetaDataApplication(null);
 	}
@@ -113,11 +96,7 @@ public class LocalNodeDeserializerTest {
 		}
 
 		private void writeMetaData() {
-			this.writeMetaData(new NodeMetaData("p", "a", new NodeVersion(3, 2, 1)));
-		}
-
-		private void writeMetaData(final NodeMetaData metaData) {
-			this.serializer.writeObject("metaData", metaData);
+			this.writeMetaDataApplicationOnly("app");
 		}
 
 		private void writeMetaDataApplicationOnly(final String application) {
