@@ -19,7 +19,6 @@ public class MultisigTestContext {
 	private final MultisigTransactionSignerValidator multisigTransactionSignerValidator = new MultisigTransactionSignerValidator(this.accountCache);
 	private final MultisigNonOperationalValidator validator = new MultisigNonOperationalValidator(this.accountCache);
 	private final MultisigSignaturesPresentValidator multisigSignaturesPresentValidator;
-	private final MultisigSignatureValidator multisigSignatureValidator;
 
 	@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 	private final List<Transaction> transactionList = new ArrayList<>();
@@ -31,20 +30,9 @@ public class MultisigTestContext {
 
 	public MultisigTestContext() {
 		this.multisigSignaturesPresentValidator = new MultisigSignaturesPresentValidator(this.accountCache);
-		this.multisigSignatureValidator = new MultisigSignatureValidator(this.accountCache, () -> this.transactionList);
 		this.addState(this.signer);
 		this.addState(this.multisig);
 		this.addState(this.dummy);
-	}
-
-	public MultisigAggregateModificationTransaction createMultisigModificationTransaction(final MultisigModificationType modificationType) {
-		final MultisigAggregateModificationTransaction transaction = new MultisigAggregateModificationTransaction(
-				TimeInstant.ZERO,
-				this.multisig,
-				Arrays.asList(new MultisigModification(modificationType, this.signer)));
-		transaction.sign();
-
-		return transaction;
 	}
 
 	public MultisigTransaction createMultisigModificationTransaction(final Collection<MultisigModification> modifications) {
@@ -61,8 +49,12 @@ public class MultisigTestContext {
 	}
 
 	public MultisigTransaction createMultisigTransferTransaction() {
+		return this.createMultisigTransferTransaction(this.signer);
+	}
+
+	public MultisigTransaction createMultisigTransferTransaction(final Account multisigSigner) {
 		final TransferTransaction otherTransaction = new TransferTransaction(TimeInstant.ZERO, this.multisig, this.recipient, Amount.fromNem(123), null);
-		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);
+		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, multisigSigner, otherTransaction);
 		transaction.sign();
 
 		this.transactionList.add(transaction);
@@ -125,22 +117,14 @@ public class MultisigTestContext {
 	}
 
 	public ValidationResult validateNonOperational(final Transaction transaction) {
-		return validator.validate(transaction, new ValidationContext((final Account account, final Amount amount) -> true));
-	}
-
-	public ValidationResult validateMultisigSignature(final Transaction transaction, final BlockHeight height) {
-		return this.multisigSignatureValidator.validate(transaction, new ValidationContext(height, this::debitPredicate));
+		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
 	public ValidationResult validateMultisigModification(final Transaction transaction) {
-		return multisigAggregateModificationTransactionValidator.validate(
-				transaction,
-				new ValidationContext((final Account account, final Amount amount) -> true));
+		return this.multisigAggregateModificationTransactionValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
-	public ValidationResult validateTransaction(final Transaction transaction, final BlockHeight blockHeight) {
-		return multisigTransactionSignerValidator.validate(
-				transaction,
-				new ValidationContext(blockHeight, (final Account account, final Amount amount) -> true));
+	public ValidationResult validateTransaction(final Transaction transaction) {
+		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 }

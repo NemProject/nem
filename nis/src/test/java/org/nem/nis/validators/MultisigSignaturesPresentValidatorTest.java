@@ -13,23 +13,6 @@ import java.util.function.BiConsumer;
 
 public class MultisigSignaturesPresentValidatorTest {
 
-	//region other transactions
-
-	@Test
-	public void validatorCanValidateOtherTransactions() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = Mockito.mock(Transaction.class);
-
-		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	//endregion
-
 	//region single cosigner
 
 	@Test
@@ -121,6 +104,33 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+
+		// Sanity:
+		// TODO 20150122 J-G: not sure if this makes sense?
+		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(2));
+	}
+
+	@Test
+	public void validationSucceedsIfCosignerSignsTransactionMultipleTimes() {
+		// Arrange:
+		// - create a multisig account with two cosigners (signer, dummy)
+		// - signer signature is automatically added because it signed transaction
+		// - dummy should sign the transaction twice
+		final MultisigTestContext context = new MultisigTestContext();
+		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
+		context.makeCosignatory(context.signer, context.multisig);
+		context.makeCosignatory(context.dummy, context.multisig);
+		context.addSignature(context.dummy, transaction);
+		context.addSignature(context.dummy, transaction);
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+
+		// Sanity:
+		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -338,7 +348,24 @@ public class MultisigSignaturesPresentValidatorTest {
 		final ValidationResult result = context.validateSignaturePresent(transaction);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
+	}
+
+	//endregion
+
+	//region other transactions
+
+	@Test
+	public void validatorCanValidateOtherTransactions() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Transaction transaction = Mockito.mock(Transaction.class);
+
+		// Act:
+		final ValidationResult result = context.validateSignaturePresent(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
