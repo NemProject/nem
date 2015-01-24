@@ -161,7 +161,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @return The minimum fee.
 	 */
-	protected abstract Amount getMinimumFee();
+	public abstract Amount getMinimumFee();
 
 	/**
 	 * Gets all accounts (excluding the signer) that are affected by this transaction.
