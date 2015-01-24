@@ -145,7 +145,9 @@ public class UnconfirmedTransactionsCache {
 	 */
 	public boolean remove(final Transaction transaction) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (!this.hasTransactionInCache(transaction, transactionHash)) {
+
+		// do not call hasTransactionInCache here because only root transactions can be removed
+		if (!this.transactions.containsKey(transactionHash)) {
 			return false;
 		}
 
