@@ -214,18 +214,12 @@ public class UnconfirmedTransactions {
 
 	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
 		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
-		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createSingleBuilder(accountStateCache);
+		final AggregateSingleTransactionValidatorBuilder builder = blockVerification
+				? this.validatorFactory.createSingleBuilder(accountStateCache)
+				: this.validatorFactory.createIncompleteSingleBuilder(accountStateCache);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(this.getTransactionsSupplier()));
 		builder.add(new NonConflictingMultisigAggregateModificationValidator(this.getTransactionsSupplier()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
-
-		// TODO 20150103 J-J: probably should add another function to the factory for blockVerification validators
-		// > e.g., (that adds MultisigSignaturesPresentValidator)
-
-		if (blockVerification) {
-			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
-		}
-
 		return builder.build();
 	}
 

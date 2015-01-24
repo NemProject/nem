@@ -71,15 +71,12 @@ public class BlockChainServices {
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
 
-		final AggregateSingleTransactionValidatorBuilder builder = this.transactionValidatorFactory.createSingleBuilder(accountStateCache);
-		builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
-
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, observer),
 				scorer,
 				comparisonContext.getMaxNumBlocksToAnalyze(),
 				this.blockValidatorFactory.create(nisCache),
-				builder.build(),
+				this.transactionValidatorFactory.createSingle(accountStateCache),
 				new DefaultDebitPredicate(accountStateCache));
 		return validator.isValid(parentBlock, peerChain);
 	}

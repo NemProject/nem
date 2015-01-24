@@ -297,7 +297,10 @@ public class UnconfirmedTransactionsMultisigTest {
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
 			// need to actually create for every invocation and not create once
-			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any())).then((invocationOnMock) -> this.factory.createSingleBuilder(this.stateCache));
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
+					.then((invocationOnMock) -> this.factory.createSingleBuilder(this.stateCache));
+			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))
+					.then((invocationOnMock) -> this.factory.createIncompleteSingleBuilder(this.stateCache));
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(CURRENT_TIME);
 
