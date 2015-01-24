@@ -315,6 +315,6 @@ CREATE INDEX IDX_MULTISIGSIGNATURES_TIMESTAMP ON `multisigsignatures` (timeStamp
 CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID ON `multisigsignatures` (senderId);
 CREATE INDEX IDX_MULTISIGSIGNATURES_SENDERID_ID ON `multisigsignatures` (senderId, id DESC);
 
-CREATE Unique INDEX IDX_MULTISIGSENDS_ACCOUNTID_TRANSACTIONID_TYPE_HEIGHT ON `multisigsends` (accountId, transactionId DESC, type, height);
+CREATE Unique INDEX IDX_MULTISIGSENDS_ACCOUNTID_TYPE_TRANSACTIONID ON `multisigsends` (accountId asc, type asc, transactionId DESC);
 
-CREATE Unique INDEX IDX_MULTISIGRECEIVES_ACCOUNTID_TRANSACTIONID_TYPE_HEIGHT ON `multisigreceives` (accountId, transactionId DESC, type, height);
+CREATE Unique INDEX IDX_MULTISIGRECEIVES_ACCOUNTID_TYPE_TRANSACTIONID ON `multisigreceives` (accountId asc, type asc, transactionId DESC);

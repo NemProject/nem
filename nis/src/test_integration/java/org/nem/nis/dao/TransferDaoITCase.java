@@ -56,7 +56,7 @@ public class TransferDaoITCase {
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
 		List<Account> accounts;
 		if (populateDatabase) {
-			final int numBlocks = 500;
+			final int numBlocks = 5000;
 			final int numTransactionPerBlock = 100;
 			final int numAccounts = 100;
 			accounts = this.createAccounts(numAccounts, mockAccountDao);
