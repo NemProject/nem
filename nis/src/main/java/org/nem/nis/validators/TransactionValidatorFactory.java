@@ -86,11 +86,12 @@ public class TransactionValidatorFactory {
 			final ReadOnlyAccountStateCache accountStateCache,
 			final boolean includeAllValidators) {
 		visitor.accept(new UniversalTransactionValidator());
-		visitor.accept(new MultisigNonOperationalValidator(accountStateCache));
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
+
 		visitor.accept(new TransferTransactionValidator());
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
 
+		visitor.accept(new MultisigNonOperationalValidator(accountStateCache));
 		visitor.accept(new MultisigTransactionSignerValidator(accountStateCache));
 		visitor.accept(new MultisigAggregateModificationTransactionValidator(accountStateCache));
 		visitor.accept(new MaxCosignatoryValidator(accountStateCache));

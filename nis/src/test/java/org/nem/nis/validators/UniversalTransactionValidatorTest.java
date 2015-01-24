@@ -6,60 +6,63 @@ import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.MockTransaction;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.DebitPredicates;
+
+import java.util.function.Function;
 
 public class UniversalTransactionValidatorTest {
 	private static final SingleTransactionValidator VALIDATOR = new UniversalTransactionValidator();
 
+	//region timestamp < deadline <= timestamp + 1 day
+
 	@Test
 	public void transactionWithDeadlineInRangeIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
-
 		// Assert:
-		Assert.assertThat(validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertTimeStampDeadlineValidation(ts -> ts.addSeconds(726), ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void transactionWithLessThanMinimumDeadlineIsInvalid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp());
-
 		// Assert:
-		Assert.assertThat(validate(transaction), IsEqual.equalTo(ValidationResult.FAILURE_PAST_DEADLINE));
+		assertTimeStampDeadlineValidation(ts -> ts, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
 	@Test
 	public void transactionWithMinimumDeadlineIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addSeconds(1));
-
 		// Assert:
-		Assert.assertThat(validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertTimeStampDeadlineValidation(ts -> ts.addSeconds(1), ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void transactionWithMaximumDeadlineIsValid() {
-		// Arrange:
-		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1));
-
 		// Assert:
-		Assert.assertThat(validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
+		assertTimeStampDeadlineValidation(ts -> ts.addDays(1), ValidationResult.SUCCESS);
 	}
 
 	@Test
 	public void transactionWithGreaterThanMaximumDeadlineIsInvalid() {
+		// Assert:
+		assertTimeStampDeadlineValidation(ts -> ts.addDays(1).addSeconds(1), ValidationResult.FAILURE_FUTURE_DEADLINE);
+	}
+
+	private static void assertTimeStampDeadlineValidation(
+			final Function<TimeInstant, TimeInstant> getDeadlineFromTimeStamp,
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
-		transaction.setDeadline(transaction.getTimeStamp().addDays(1).addSeconds(1));
+		transaction.setDeadline(getDeadlineFromTimeStamp.apply(transaction.getTimeStamp()));
+
+		// Act:
+		final ValidationResult result = validate(transaction);
 
 		// Assert:
-		Assert.assertThat(validate(transaction), IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
+
+	//endregion
+
+	//region debit predicate delegation
 
 	@Test
 	public void validatorDelegatesToDebitPredicateWithFeeAndUsesResultWhenDebitPredicateSucceeds() {
@@ -89,6 +92,43 @@ public class UniversalTransactionValidatorTest {
 		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), Amount.fromNem(120));
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
+
+	//endregion
+
+	//region minimum fee validation
+
+	@Test
+	public void transactionWithFeeLessThanMinimumValidates() {
+		// Assert:
+		assertValidationResult(999, 1000, ValidationResult.FAILURE_INSUFFICIENT_FEE);
+	}
+
+	@Test
+	public void transactionWithFeeEqualToMinimumValidates() {
+		// Assert:
+		assertValidationResult(1000, 1000, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionWithFeeGreaterThanMinimumValidates() {
+		// Assert:
+		assertValidationResult(1001, 1000, ValidationResult.SUCCESS);
+	}
+
+	private static void assertValidationResult(final int fee, final int minimumFee, final ValidationResult expectedResult) {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction();
+		transaction.setFee(Amount.fromNem(fee));
+		transaction.setMinimumFee(Amount.fromNem(minimumFee).getNumMicroNem());
+
+		// Act:
+		final ValidationResult result = validate(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	//endregion
 
 	private static ValidationResult validate(final Transaction transaction) {
 		return validate(transaction, DebitPredicates.True);
