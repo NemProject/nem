@@ -160,7 +160,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because conflicting multisig modification is present.
 	 */
-	FAILURE_CONFLICTING_MULTISIG_MODIFICATION(38);
+	FAILURE_CONFLICTING_MULTISIG_MODIFICATION(38),
+
+	/**
+	 * Validation failed because a multisig modification would result in a multisig account having too many cosigners.
+	 */
+	FAILURE_TOO_MANY_MULTISIG_COSIGNERS(39);
 
 	private final int value;
 
