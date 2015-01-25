@@ -89,7 +89,7 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected Amount getMinimumFee() {
+	public Amount getMinimumFee() {
 		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
 	}
 

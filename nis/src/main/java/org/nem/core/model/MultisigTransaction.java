@@ -108,7 +108,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	}
 
 	@Override
-	protected Amount getMinimumFee() {
+	public Amount getMinimumFee() {
 		// MultisigAwareSingleTransactionValidator takes care of validating fee on inner transaction
 		// TODO 20150108 J-G: i think we should come to an agreement on the fee; what do you think about a contingent fee like:
 		// > 5L * this.getCosignerSignatures().size()

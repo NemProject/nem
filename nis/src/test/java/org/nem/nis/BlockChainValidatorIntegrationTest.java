@@ -42,24 +42,29 @@ public class BlockChainValidatorIntegrationTest {
 
 	@Test
 	public void allTransactionsInChainMustBeValid() {
-		// Arrange:
-		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
-		final Block block = blocks.get(1);
-		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(createInvalidSignedTransaction());
-		block.addTransaction(createValidSignedTransaction());
-		block.sign();
-
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		assertChainWithSingleInvalidTransactionIsInvalid(createInvalidSignedTransaction());
 	}
 
 	@Test
 	public void allTransactionsInChainMustHaveValidTimestamp() {
+		// Assert:
+		assertChainWithSingleInvalidTransactionIsInvalid(createSignedFutureTransaction());
+	}
+
+	@Test
+	public void chainWithTransactionWithInsufficientFeeIsValid() {
+		// Arrange:
+		final MockTransaction invalidTransaction = createValidSignedTransaction();
+		invalidTransaction.setMinimumFee(Amount.fromNem(10).getNumMicroNem());
+		invalidTransaction.setFee(Amount.fromNem(9));
+		invalidTransaction.sign();
+
+		// Assert:
+		assertChainWithSingleInvalidTransactionIsInvalid(invalidTransaction);
+	}
+
+	private static void assertChainWithSingleInvalidTransactionIsInvalid(final Transaction invalidTransaction) {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
@@ -68,12 +73,15 @@ public class BlockChainValidatorIntegrationTest {
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
 		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(createSignedFutureTransaction());
+		block.addTransaction(invalidTransaction);
 		block.addTransaction(createValidSignedTransaction());
 		block.sign();
 
+		// Act:
+		final boolean isValid = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(isValid, IsEqual.equalTo(false));
 	}
 
 	@Test
