@@ -98,7 +98,7 @@ public class UniversalTransactionValidatorTest {
 	//region minimum fee validation
 
 	@Test
-	public void transactionWithFeeLessThanMinimumValidates() {
+	public void transactionWithFeeLessThanMinimumFailsValidation() {
 		// Assert:
 		assertValidationResult(999, 1000, ValidationResult.FAILURE_INSUFFICIENT_FEE);
 	}

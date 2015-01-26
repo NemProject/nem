@@ -53,7 +53,7 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	@Test
-	public void chainWithTransactionWithInsufficientFeeIsValid() {
+	public void chainWithTransactionWithInsufficientFeeIsInvalid() {
 		// Arrange:
 		final MockTransaction invalidTransaction = createValidSignedTransaction();
 		invalidTransaction.setMinimumFee(Amount.fromNem(10).getNumMicroNem());
