@@ -204,6 +204,11 @@ public class TransferDaoImpl implements TransferDao {
 				maxId,
 				limit,
 				transferType));
+		pairs.addAll(this.getMultisigSignerModificationsForAccount(
+				accountId,
+				maxId,
+				limit,
+				transferType));
 		pairs.addAll(this.getMultisigTransfersForAccount(
 				accountId,
 				maxId,
@@ -270,6 +275,31 @@ public class TransferDaoImpl implements TransferDao {
 				.setMaxResults(limit);
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		final List<DbImportanceTransferTransaction> list = criteria.list();
+		return list.stream()
+				.map(t -> {
+					// force lazy initialization
+					Hibernate.initialize(t.getBlock());
+					return new TransferBlockPair(t, t.getBlock());
+				})
+				.collect(Collectors.toList());
+	}
+
+	private List<TransferBlockPair> getMultisigSignerModificationsForAccount(
+			final long accountId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType) {
+		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigAggregateModificationTransaction.class)
+				.setFetchMode("blockId", FetchMode.JOIN)
+				.setFetchMode("sender", FetchMode.JOIN)
+				.add(Restrictions.eq("sender.id", accountId))
+				.add(Restrictions.isNotNull("senderProof"))
+				.add(Restrictions.lt("id", maxId))
+				.addOrder(Order.asc("sender"))
+				.addOrder(Order.desc("id"))
+				.setMaxResults(limit);
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		final List<DbMultisigAggregateModificationTransaction> list = criteria.list();
 		return list.stream()
 				.map(t -> {
 					// force lazy initialization
