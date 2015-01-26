@@ -79,6 +79,13 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			throw new IllegalArgumentException("trying to add a signature for another transaction to a multisig transaction");
 		}
 
+		// if the original cosigner is attempting to add an (explicit) signature, ignore it
+		// in order to be consistent with how multiple (explicit) signatures from other cosigners
+		// are handled (the first one is used and all others are ignored)
+		if (this.getSigner().equals(transaction.getSigner())) {
+			return;
+		}
+
 		this.signatureTransactions.add(transaction);
 	}
 

@@ -30,8 +30,6 @@ public class MultisigSignatureMatchPredicate {
 		final ReadOnlyAccountState cosignerState = this.accountStateCache.findStateByAddress(signatureTransaction.getSigner().getAddress());
 		final Address multisigAddress = multisigTransaction.getOtherTransaction().getSigner().getAddress();
 		return
-				// TODO 20150122 J-G: i guess we don't want to allow the signer to explicitly sign via a signature transaction too?
-				// > if so, we should probably update another one of our validators to disallow this
 				!signatureTransaction.getSigner().equals(multisigTransaction.getSigner())
 						&& signatureTransaction.getOtherTransactionHash().equals(multisigTransaction.getOtherTransactionHash())
 						&& cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
