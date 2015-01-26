@@ -244,7 +244,7 @@ public class TransferDaoImpl implements TransferDao {
 		return list.stream()
 				.map(t -> {
 					// force lazy initialization
-					t.getBlock().getId();
+					Hibernate.initialize(t.getBlock());
 					return new TransferBlockPair(t, t.getBlock());
 				})
 				.collect(Collectors.toList());
@@ -272,7 +272,7 @@ public class TransferDaoImpl implements TransferDao {
 		return list.stream()
 				.map(t -> {
 					// force lazy initialization
-					t.getBlock().getId();
+					Hibernate.initialize(t.getBlock());
 					return new TransferBlockPair(t, t.getBlock());
 				})
 				.collect(Collectors.toList());
