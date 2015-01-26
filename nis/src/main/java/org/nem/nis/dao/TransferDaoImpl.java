@@ -111,9 +111,10 @@ public class TransferDaoImpl implements TransferDao {
 			maxId = this.getTransactionDescriptorUsingHash(accountId, hash, height, addressString).getTransfer().getId();
 		}
 
-		return this.getTransactionsForAccountUpToTransaction(accountId, maxId, limit, transferType);
+		return this.getTransactionsForAccountUsingId(address, maxId, transferType, limit);
 	}
 
+	// TODO 20150126 BR -> BR: have to think how to do this in a smart way. We are not using it right now.
 	private TransferBlockPair getTransactionDescriptorUsingHash(
 			final Long accountId,
 			final Hash hash,

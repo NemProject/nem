@@ -6,6 +6,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
+import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -455,6 +456,267 @@ public class TransferDaoTest {
 			return IntStream.range(0, 50).map(mapper::apply).boxed().collect(Collectors.toList());
 		}
 	}
+
+	// region multisig transactions
+
+	@Test
+	public void getTransactionsForAccountUsingIdReturnsExpectedOutgoingMultisigTransactions() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao);
+		context.prepareBlockWithMultisigTransactions();
+		final List<MultisigTransaction> expectedTransactions = Arrays.asList(
+				context.multisigTransferTransaction,
+				context.multisigImportanceTransferTransaction,
+				context.multisigAggregateModificationTransaction);
+
+		// Assert:
+		// 1) signer of multisig transaction sees his own transactions as outgoing
+		assertExpectedMultisigTransactions(
+				context.multisigSigner,
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				expectedTransactions);
+
+		// 2) multisig account sees the multisig transactions as outgoing (because inner transaction involves the multisig account)
+		assertExpectedMultisigTransactions(
+				context.multisig,
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				expectedTransactions);
+
+		// 3) cosignatories of the multisig transaction see the transactions as outgoing
+		context.cosignatories.stream()
+				.forEach(c -> assertExpectedMultisigTransactions(
+						c,
+						ReadOnlyTransferDao.TransferType.OUTGOING,
+						expectedTransactions));
+
+		// 4) recipient (if any) of the inner transaction does not see the transaction as outgoing
+		assertExpectedMultisigTransactions(
+				context.recipient,
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				new ArrayList<>());
+
+		// 5) other accounts do not see any transaction as outgoing
+		assertExpectedMultisigTransactions(
+				Utils.generateRandomAccount(),
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				new ArrayList<>());
+	}
+
+	@Test
+	public void getTransactionsForAccountUsingIdReturnsExpectedIncomingMultisigTransactions() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao);
+		context.prepareBlockWithMultisigTransactions();
+
+		// Assert:
+		// 1) signer of multisig transaction does not any the transaction as incoming
+		assertExpectedMultisigTransactions(
+				context.multisigSigner,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				new ArrayList<>());
+
+		// 2) multisig account does not see any transaction as incoming
+		assertExpectedMultisigTransactions(
+				context.multisig,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				new ArrayList<>());
+
+		// 3) cosignatories of the multisig transaction do not see any transaction as incoming
+		context.cosignatories.stream()
+				.forEach(c -> assertExpectedMultisigTransactions(
+						c,
+						ReadOnlyTransferDao.TransferType.INCOMING,
+						new ArrayList<>()));
+
+		// 4) recipient (if any) of inner transaction sees the transaction as incoming
+		assertExpectedMultisigTransactions(
+				context.recipient,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				Arrays.asList(context.multisigTransferTransaction, context.multisigImportanceTransferTransaction));
+
+		// 5) the new cosignatory of the inner transaction (in case of modification) sees the transaction as incoming
+		assertExpectedMultisigTransactions(
+				context.newCosignatory,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				Arrays.asList(context.multisigAggregateModificationTransaction));
+
+		// 6) other accounts do not see any transaction as incoming
+		assertExpectedMultisigTransactions(
+				Utils.generateRandomAccount(),
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				new ArrayList<>());
+	}
+
+	private void assertExpectedMultisigTransactions(
+			final Account account,
+			final ReadOnlyTransferDao.TransferType transferType,
+			final Collection<MultisigTransaction> multisigTransactions) {
+
+		// Act:
+		final Collection<Hash> transactions = this.transferDao.getTransactionsForAccountUsingId(
+				account,
+				null,
+				transferType,
+				DEFAULT_LIMIT)
+				.stream()
+				.map(p -> p.getTransfer().getTransferHash())
+				.collect(Collectors.toList());
+		final Collection<Hash> expectedTransactions = multisigTransactions.stream()
+				.map(HashUtils::calculateHash)
+				.collect(Collectors.toList());
+
+
+		// Assert:
+		Assert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
+	}
+
+	private class MultisigTestContext {
+		private final BlockDao blockDao;
+		private final Account harvester;
+		private final Account multisigSigner;
+		private final Account multisig;
+		private final Account recipient;
+		private final List<Account> cosignatories;
+		private final Account newCosignatory;
+		private Collection<Transaction> transactions;
+		private MultisigTransaction multisigTransferTransaction;
+		private MultisigTransaction multisigImportanceTransferTransaction;
+		private MultisigTransaction multisigAggregateModificationTransaction;
+
+		private MultisigTestContext(final BlockDao blockDao) {
+			this.blockDao = blockDao;
+			this.multisigSigner = Utils.generateRandomAccount();
+			this.harvester = Utils.generateRandomAccount();
+			this.multisig = Utils.generateRandomAccount();
+			this.recipient = Utils.generateRandomAccount();
+			this.cosignatories = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount());
+			this.newCosignatory = Utils.generateRandomAccount();
+			this.transactions = new ArrayList<>();
+		}
+
+		private void prepareBlockWithMultisigTransactions() {
+			final MockAccountDao mockAccountDao = new MockAccountDao();
+			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.harvester);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.multisigSigner);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.multisig);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.recipient);
+			this.cosignatories.forEach(c -> TransferDaoTest.this.addMapping(mockAccountDao, c));
+			final Block block = new Block(this.harvester, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
+
+			// multisig transfer transactions
+			this.addMultisigTransferTransactions();
+
+			// multisig importance transfer transactions
+			this.addMultisigImportanceTransferTransactions();
+
+			// multisig aggregate modification transactions
+			this.addMultisigAggregateModificationTransactions();
+
+			block.addTransactions(this.transactions);
+			block.sign();
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
+
+			// Act
+			this.blockDao.save(dbBlock);
+		}
+
+		private void addMultisigTransferTransactions() {
+			this.multisigTransferTransaction = this.prepareMultisigTransaction(
+					this.createTransferTransaction(this.multisig, this.recipient),
+					this.multisigSigner,
+					this.cosignatories);
+			this.transactions.add(this.multisigTransferTransaction);
+			for (int i = 0; i < 3; i++) {
+				final MultisigTransaction tx = this.prepareMultisigTransaction(
+						this.createTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()),
+						Utils.generateRandomAccount(),
+						Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount()));
+				this.transactions.add(tx);
+			}
+		}
+
+		private void addMultisigImportanceTransferTransactions() {
+			this.multisigImportanceTransferTransaction = this.prepareMultisigTransaction(
+					this.createImportanceTransferTransaction(this.multisig, this.recipient),
+					this.multisigSigner,
+					this.cosignatories);
+			this.transactions.add(this.multisigImportanceTransferTransaction);
+			for (int i = 0; i < 3; i++) {
+				final MultisigTransaction tx = this.prepareMultisigTransaction(
+						this.createImportanceTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()),
+						Utils.generateRandomAccount(),
+						Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount()));
+				this.transactions.add(tx);
+			}
+		}
+
+		private void addMultisigAggregateModificationTransactions() {
+			this.multisigAggregateModificationTransaction = this.prepareMultisigTransaction(
+					this.createMultisigAggregateModificationTransaction(this.multisig, this.newCosignatory),
+					this.multisigSigner,
+					this.cosignatories);
+			this.transactions.add(this.multisigAggregateModificationTransaction);
+			for (int i = 0; i < 3; i++) {
+				final MultisigTransaction tx = this.prepareMultisigTransaction(
+						this.createMultisigAggregateModificationTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()),
+						Utils.generateRandomAccount(),
+						Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount()));
+				this.transactions.add(tx);
+			}
+		}
+
+		private MultisigTransaction prepareMultisigTransaction(
+				final Transaction otherTransaction,
+				final Account multisigSigner,
+				final List<Account> cosignatories) {
+			final MultisigTransaction transaction = new MultisigTransaction(
+					TimeInstant.ZERO,
+					multisigSigner,
+					otherTransaction);
+			cosignatories.forEach(c -> this.addSignature(c, transaction));
+			transaction.sign();
+
+			return transaction;
+		}
+
+		private TransferTransaction createTransferTransaction(final Account transferSender,	final Account transferRecipient) {
+			return new TransferTransaction(
+					TimeInstant.ZERO,
+					transferSender,
+					transferRecipient,
+					Amount.fromNem(123),
+					null);
+		}
+
+		private ImportanceTransferTransaction createImportanceTransferTransaction(final Account transferSender,	final Account transferRecipient) {
+			return new ImportanceTransferTransaction(
+					TimeInstant.ZERO,
+					transferSender,
+					ImportanceTransferTransaction.Mode.Activate,
+					transferRecipient);
+		}
+
+		private MultisigAggregateModificationTransaction createMultisigAggregateModificationTransaction(
+				final Account multisig,
+				final Account newCosignatory) {
+			final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosignatory));
+			return new MultisigAggregateModificationTransaction(
+					TimeInstant.ZERO,
+					multisig,
+					modifications);
+		}
+
+		public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO,
+					signatureSigner,
+					HashUtils.calculateHash(multisigTransaction.getOtherTransaction()));
+			signatureTransaction.sign();
+			multisigTransaction.addSignature(signatureTransaction);
+		}
+	}
+
+	// endregion
 
 	private Collection<AbstractBlockTransfer> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id, final int callType) {
 		return this.executeGetTransactionsForAccountUsingAttribute(
