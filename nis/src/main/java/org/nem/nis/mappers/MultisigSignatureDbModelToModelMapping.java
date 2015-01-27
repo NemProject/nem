@@ -21,13 +21,13 @@ public class MultisigSignatureDbModelToModelMapping extends AbstractTransferDbMo
 
 	@Override
 	public MultisigSignatureTransaction mapImpl(final DbMultisigSignatureTransaction source) {
-		final DbMultisigTransaction dbMultisig = source.getMultisigTransaction();
+		final AbstractTransfer dbOtherTransfer = DbModelUtils.getInnerTransaction(source.getMultisigTransaction());
 		final Account sender = this.mapper.map(source.getSender(), Account.class);
-		final Account multisig = this.mapper.map(dbMultisig.getSender(), Account.class);
+		final Account multisig = this.mapper.map(dbOtherTransfer.getSender(), Account.class);
 		return new MultisigSignatureTransaction(
 				new TimeInstant(source.getTimeStamp()),
 				sender,
 				multisig,
-				DbModelUtils.getInnerTransaction(dbMultisig).getTransferHash());
+				dbOtherTransfer.getTransferHash());
 	}
 }
