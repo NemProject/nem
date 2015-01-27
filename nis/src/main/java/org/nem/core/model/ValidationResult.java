@@ -102,6 +102,7 @@ public enum ValidationResult {
 	 */
 	FAILURE_INSUFFICIENT_FEE(18),
 
+	// TODO 20150126 J-G: looks like this and the previous are both 18; what's the best way to change them without breaking NCC?
 	/**
 	 * Validation failed because remote harvesting account has a pre-existing balance transfer.
 	 */
@@ -170,7 +171,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a multisig modification would result in a multisig account having too many cosigners.
 	 */
-	FAILURE_TOO_MANY_MULTISIG_COSIGNERS(39);
+	FAILURE_TOO_MANY_MULTISIG_COSIGNERS(39),
+
+	/**
+	 * Validation failed because a transaction originated from the nemesis account after the nemesis block.
+	 */
+	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(39);
 
 	private final int value;
 
