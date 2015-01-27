@@ -73,16 +73,8 @@ public class TransactionValidatorFactoryTest {
 	@Test
 	public void createSingleAddsDesiredSingleValidators() {
 		// Arrange:
-		final List<Class<?>> expectedClasses = Arrays.asList(
-				UniversalTransactionValidator.class,
-				MultisigNonOperationalValidator.class,
-				NonFutureEntityValidator.class,
-				TransferTransactionValidator.class,
-				ImportanceTransferTransactionValidator.class,
-				MultisigTransactionSignerValidator.class,
-				MultisigAggregateModificationTransactionValidator.class,
-				MaxCosignatoryValidator.class,
-				MultisigSignaturesPresentValidator.class);
+		final List<Class<?>> expectedClasses = getCommonSingleValidators();
+		expectedClasses.add(MultisigSignaturesPresentValidator.class);
 
 		// Act:
 		final Collection<Class<?>> classes = getVisitedSingleSubValidators(true);
@@ -94,21 +86,31 @@ public class TransactionValidatorFactoryTest {
 	@Test
 	public void createIncompleteSingleAddsDesiredSingleValidators() {
 		// Arrange:
-		final List<Class<?>> expectedClasses = Arrays.asList(
-				UniversalTransactionValidator.class,
-				MultisigNonOperationalValidator.class,
-				NonFutureEntityValidator.class,
-				TransferTransactionValidator.class,
-				ImportanceTransferTransactionValidator.class,
-				MultisigTransactionSignerValidator.class,
-				MaxCosignatoryValidator.class,
-				MultisigAggregateModificationTransactionValidator.class);
+		final List<Class<?>> expectedClasses = getCommonSingleValidators();
 
 		// Act:
 		final Collection<Class<?>> classes = getVisitedSingleSubValidators(false);
 
 		// Assert:
 		Assert.assertThat(classes, IsEquivalent.equivalentTo(expectedClasses));
+	}
+
+	private static List<Class<?>> getCommonSingleValidators() {
+		return new ArrayList<Class<?>>() {
+			{
+				this.add(UniversalTransactionValidator.class);
+				this.add(NonFutureEntityValidator.class);
+				this.add(NemesisSinkValidator.class);
+
+				this.add(TransferTransactionValidator.class);
+				this.add(ImportanceTransferTransactionValidator.class);
+
+				this.add(MultisigNonOperationalValidator.class);
+				this.add(MultisigTransactionSignerValidator.class);
+				this.add(MaxCosignatoryValidator.class);
+				this.add(MultisigAggregateModificationTransactionValidator.class);
+			}
+		};
 	}
 
 	private static Collection<Class<?>> getVisitedSingleSubValidators(final boolean includeAllValidators) {

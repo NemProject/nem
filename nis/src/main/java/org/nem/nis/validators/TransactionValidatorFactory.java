@@ -87,6 +87,7 @@ public class TransactionValidatorFactory {
 			final boolean includeAllValidators) {
 		visitor.accept(new UniversalTransactionValidator());
 		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
+		visitor.accept(new NemesisSinkValidator());
 
 		visitor.accept(new TransferTransactionValidator());
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
