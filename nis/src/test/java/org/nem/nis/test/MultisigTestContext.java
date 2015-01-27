@@ -1,7 +1,6 @@
 package org.nem.nis.test;
 
 import org.mockito.Mockito;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
@@ -62,32 +61,12 @@ public class MultisigTestContext {
 		return transaction;
 	}
 
-	public void addRandomMultisigTransferTransactions(final int count) {
-		for (int i = 0; i < count; i++) {
-			final TransferTransaction otherTransaction = new TransferTransaction(
-					TimeInstant.ZERO,
-					this.multisig,
-					Utils.generateRandomAccount(),
-					Amount.fromNem(123),
-					null);
-			final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, this.signer, otherTransaction);
-			transaction.sign();
-
-			this.transactionList.add(transaction);
-		}
-	}
-
 	public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
-		multisigTransaction.addSignature(new MultisigSignatureTransaction(TimeInstant.ZERO,
-				signatureSigner,
-				HashUtils.calculateHash(multisigTransaction.getOtherTransaction())));
-	}
-
-	public MultisigSignatureTransaction createMultisigSignature(final Hash otherTransactionHash, final Account signatureIssuer) {
-		return new MultisigSignatureTransaction(
+		multisigTransaction.addSignature(new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
-				signatureIssuer,
-				otherTransactionHash);
+				signatureSigner,
+				this.multisig,
+				multisigTransaction.getOtherTransaction()));
 	}
 
 	public AccountState addState(final Account account) {

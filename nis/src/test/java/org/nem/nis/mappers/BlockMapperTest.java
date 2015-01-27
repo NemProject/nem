@@ -653,18 +653,23 @@ public class BlockMapperTest {
 			final MultisigTransaction multisigTransaction = new MultisigTransaction(new TimeInstant(100), this.account3, transfer1);
 			this.model.addTransaction(multisigTransaction);
 
-			final MultisigSignatureTransaction multisigSignature1 = new MultisigSignatureTransaction(new TimeInstant(123), this.account1, transferHash);
+			final MultisigSignatureTransaction multisigSignature1 = new MultisigSignatureTransaction(
+					new TimeInstant(123),
+					this.account1,
+					this.account3,
+					transferHash);
 			multisigSignature1.sign();
 			multisigTransaction.addSignature(multisigSignature1);
 
-			final MultisigSignatureTransaction multisigSignature2 = new MultisigSignatureTransaction(new TimeInstant(132), this.account2, transferHash);
+			final MultisigSignatureTransaction multisigSignature2 = new MultisigSignatureTransaction(
+					new TimeInstant(132),
+					this.account2,
+					this.account3,
+					transferHash);
 			multisigSignature2.sign();
 			multisigTransaction.addSignature(multisigSignature2);
 
-			for (final Transaction transaction : this.model.getTransactions()) {
-				transaction.sign();
-			}
-
+			this.model.getTransactions().forEach(org.nem.core.model.Transaction::sign);
 			this.signModel();
 		}
 

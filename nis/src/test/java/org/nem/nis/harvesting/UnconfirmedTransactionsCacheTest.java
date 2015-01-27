@@ -315,7 +315,7 @@ public class UnconfirmedTransactionsCacheTest {
 		private final Transaction otherTransaction = new MockTransaction(this.multisig);
 
 		public MultisigSignatureTransaction createSignatureTransaction(final Account signer) {
-			return new MultisigSignatureTransaction(TimeInstant.ZERO, signer, HashUtils.calculateHash(this.otherTransaction));
+			return new MultisigSignatureTransaction(TimeInstant.ZERO, signer, this.multisig, this.otherTransaction);
 		}
 
 		public MultisigTransaction createMultisigTransaction(final Account signer) {

@@ -339,6 +339,7 @@ public class MultisigTransactionTest {
 			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 					this.transaction.getTimeStamp(),
 					Utils.generateRandomAccount(),
+					this.innerTransaction.getSigner(),
 					HashUtils.calculateHash(this.innerTransaction));
 			signatureTransaction.setFee(amount);
 			this.transaction.addSignature(signatureTransaction);
@@ -400,7 +401,8 @@ public class MultisigTransactionTest {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 				transaction.getTimeStamp(),
 				cosigner,
-				HashUtils.calculateHash(innerTransaction));
+				innerTransaction.getSigner(),
+				innerTransaction);
 		transaction.addSignature(signatureTransaction);
 
 		// Act:
@@ -420,7 +422,8 @@ public class MultisigTransactionTest {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 				transaction.getTimeStamp(),
 				Utils.generateRandomAccount(),
-				HashUtils.calculateHash(innerTransaction));
+				innerTransaction.getSigner(),
+				innerTransaction);
 		transaction.addSignature(signatureTransaction);
 
 		// Act:
@@ -683,11 +686,14 @@ public class MultisigTransactionTest {
 		return createSignatureTransaction(Utils.generateRandomAccount(), transaction);
 	}
 
+	// TODO 20150126 J-J: should double check this here
+
 	private static MultisigSignatureTransaction createSignatureTransaction(final Account account, final Transaction transaction) {
 		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				account,
-				HashUtils.calculateHash(transaction.asNonVerifiable()));
+				Utils.generateRandomAccount(),
+				transaction);
 		multisigSignatureTransaction.sign();
 		return multisigSignatureTransaction;
 	}
@@ -695,6 +701,7 @@ public class MultisigTransactionTest {
 	private static MultisigSignatureTransaction createSignatureTransactionWithHash(final Hash hash) {
 		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				hash);
 		multisigSignatureTransaction.sign();

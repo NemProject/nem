@@ -150,6 +150,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		signatures.add(new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				context.dummy,
+				context.multisig,
 				Utils.generateRandomHash()));
 
 		transaction = Mockito.spy(transaction);

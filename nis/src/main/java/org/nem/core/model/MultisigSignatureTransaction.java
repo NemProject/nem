@@ -19,14 +19,36 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	 *
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender.
+	 * @param sender The multisig account.
 	 * @param otherTransactionHash The hash of the other transaction.
 	 */
 	public MultisigSignatureTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
+			final Account multisig,
 			final Hash otherTransactionHash) {
 		super(TransactionTypes.MULTISIG_SIGNATURE, 1, timeStamp, sender);
 		this.otherTransactionHash = otherTransactionHash;
+	}
+
+	// TODO 20140126 J-J: need to add tests for this constructor
+	// TODO 20140126 J-J: need to expose multisig
+	// TODO 20140126 J-J: need to add validation
+	/**
+	 * Creates a multisig signature transaction.
+	 *
+	 * @param timeStamp The transaction timestamp.
+	 * @param sender The transaction sender.
+	 * @param sender The multisig account.
+	 * @param otherTransaction The other transaction.
+	 */
+	public MultisigSignatureTransaction(
+			final TimeInstant timeStamp,
+			final Account sender,
+			final Account multisig,
+			final Transaction otherTransaction) {
+		super(TransactionTypes.MULTISIG_SIGNATURE, 1, timeStamp, sender);
+		this.otherTransactionHash = null;
 	}
 
 	/**

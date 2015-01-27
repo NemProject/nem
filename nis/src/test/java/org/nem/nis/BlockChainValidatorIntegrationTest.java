@@ -359,7 +359,7 @@ public class BlockChainValidatorIntegrationTest {
 		transfer = prepareTransaction(transfer);
 		transfer.setSignature(null);
 
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner, HashUtils.calculateHash(transfer));
+		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner, multisig, transfer);
 
 		final MultisigTransaction msTransaction = new MultisigTransaction(currentTime, cosigner, transfer);
 		msTransaction.setFee(Amount.fromNem(200));

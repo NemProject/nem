@@ -215,10 +215,10 @@ public class TransactionFactoryTest {
 	}
 
 	private static Transaction createMultisigSignatureTransaction() {
-		final Account sender = Utils.generateRandomAccount();
 		return new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
-				sender,
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
 				Hash.ZERO);
 	}
 

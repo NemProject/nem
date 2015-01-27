@@ -836,7 +836,8 @@ public class BlockDaoTest {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				cosignatory,
-				HashUtils.calculateHash(transaction));
+				multisig,
+				transaction);
 		signatureTransaction.sign();
 		final MultisigTransaction multisigTransaction = new MultisigTransaction(TimeInstant.ZERO, issuer, transaction);
 		multisigTransaction.sign();

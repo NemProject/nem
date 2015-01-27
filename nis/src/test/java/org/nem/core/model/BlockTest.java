@@ -358,15 +358,9 @@ public class BlockTest {
 		final Block block = BlockUtils.createBlock();
 
 		final Transaction innerTransaction = BlockUtils.createTransactionWithFee(1_000000);
-		final MultisigSignatureTransaction sig1 = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction sig1 = createSignatureTransaction(innerTransaction);
 		sig1.setFee(Amount.fromNem(3));
-		final MultisigSignatureTransaction sig2 = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction sig2 = createSignatureTransaction(innerTransaction);
 		sig2.setFee(Amount.fromNem(5));
 		final MultisigTransaction transaction = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), innerTransaction);
 		transaction.addSignature(sig1);
@@ -378,6 +372,14 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(1 + 3 + 5 + 130)));
+	}
+
+	private static MultisigSignatureTransaction createSignatureTransaction(final Transaction innerTransaction) {
+		return new MultisigSignatureTransaction(
+				TimeInstant.ZERO,
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				innerTransaction);
 	}
 
 	//endregion

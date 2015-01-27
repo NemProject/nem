@@ -292,20 +292,22 @@ public class BlockChainServicesTest {
 			final Account cosignatoryNew1 = this.context.createAccountWithBalance(Amount.fromNem(10));
 			final Account cosignatoryNew2 = this.context.createAccountWithBalance(Amount.fromNem(10));
 
+			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
 			final MultisigAggregateModificationTransaction modification1 = createModification(this.multisigAccount, cosignatoryNew1);
-			final MultisigTransaction transaction1 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory1, modification1);
-			transaction1.setDeadline(transaction1.getTimeStamp().addSeconds(10));
+			final MultisigTransaction transaction1 = new MultisigTransaction(currentTime, cosignatory1, modification1);
+			transaction1.setDeadline(currentTime.addSeconds(10));
 			transaction1.sign();
 
 			final MultisigAggregateModificationTransaction modification2 = createModification(this.multisigAccount, cosignatoryNew2);
-			final MultisigTransaction transaction2 = new MultisigTransaction(NisMain.TIME_PROVIDER.getCurrentTime(), cosignatory2, modification2);
+			final MultisigTransaction transaction2 = new MultisigTransaction(currentTime, cosignatory2, modification2);
 			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
-					transaction2.getTimeStamp(),
+					currentTime,
 					cosignatoryNew1,
-					HashUtils.calculateHash(modification2));
+					this.multisigAccount,
+					modification2);
 			signature.sign();
 			transaction2.addSignature(signature);
-			transaction2.setDeadline(transaction2.getTimeStamp().addSeconds(10));
+			transaction2.setDeadline(currentTime.addSeconds(10));
 			transaction2.sign();
 
 			final List<Block> blocks = NisUtils.createBlockList(this.blockSigner, this.parentBlock, 2, this.parentBlock.getTimeStamp());
