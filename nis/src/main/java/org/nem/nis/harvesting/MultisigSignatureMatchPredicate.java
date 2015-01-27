@@ -32,6 +32,7 @@ public class MultisigSignatureMatchPredicate {
 		return
 				!signatureTransaction.getSigner().equals(multisigTransaction.getSigner())
 						&& signatureTransaction.getOtherTransactionHash().equals(multisigTransaction.getOtherTransactionHash())
+						&& signatureTransaction.getDebtor().equals(multisigTransaction.getOtherTransaction().getSigner())
 						&& cosignerState.getMultisigLinks().isCosignatoryOf(multisigAddress);
 	}
 }
