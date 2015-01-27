@@ -297,6 +297,7 @@ public class TransferDaoITCase {
 	public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO,
 				signatureSigner,
+				multisigTransaction.getSigner(),
 				HashUtils.calculateHash(multisigTransaction.getOtherTransaction()));
 		signatureTransaction.sign();
 		multisigTransaction.addSignature(signatureTransaction);
