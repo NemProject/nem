@@ -109,8 +109,12 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
-		this.signatureTransactions.stream().forEach(t -> t.transfer(observer));
+		Amount totalFee[] = new Amount[] { this.getFee() };
+		this.signatureTransactions.stream().forEach(t -> {
+			totalFee[0] = totalFee[0].add(this.otherTransaction.getFee());
+		});
+
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.otherTransaction.getSigner(), totalFee[0]));
 		this.otherTransaction.transfer(observer);
 	}
 
@@ -124,6 +128,12 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		// TODO hmm can't do it like this, as FEE is part that is signed... (and should be, any fancy way to solve this?)
 		//return Amount.fromNem(Math.max(10L, 10L * this.getCosignerSignatures().size()));
 		return Amount.fromNem(100L);
+	}
+
+	@Override
+	public Account getDebtor() {
+		// the multisig account should pay the fee
+		return this.otherTransaction.getSigner();
 	}
 
 	@Override

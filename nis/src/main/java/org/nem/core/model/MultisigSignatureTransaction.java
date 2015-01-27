@@ -13,13 +13,14 @@ import java.util.*;
  */
 public class MultisigSignatureTransaction extends Transaction implements SerializableEntity {
 	private final Hash otherTransactionHash;
+	private final Account multisig;
 
 	/**
 	 * Creates a multisig signature transaction.
 	 *
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender.
-	 * @param sender The multisig account.
+	 * @param multisig The multisig account.
 	 * @param otherTransactionHash The hash of the other transaction.
 	 */
 	public MultisigSignatureTransaction(
@@ -29,6 +30,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 			final Hash otherTransactionHash) {
 		super(TransactionTypes.MULTISIG_SIGNATURE, 1, timeStamp, sender);
 		this.otherTransactionHash = otherTransactionHash;
+		this.multisig = multisig;
 	}
 
 	// TODO 20140126 J-J: need to add tests for this constructor
@@ -39,7 +41,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	 *
 	 * @param timeStamp The transaction timestamp.
 	 * @param sender The transaction sender.
-	 * @param sender The multisig account.
+	 * @param multisig The multisig account.
 	 * @param otherTransaction The other transaction.
 	 */
 	public MultisigSignatureTransaction(
@@ -47,8 +49,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 			final Account sender,
 			final Account multisig,
 			final Transaction otherTransaction) {
-		super(TransactionTypes.MULTISIG_SIGNATURE, 1, timeStamp, sender);
-		this.otherTransactionHash = null;
+		this(timeStamp, sender, multisig, HashUtils.calculateHash(otherTransaction));
 	}
 
 	/**
@@ -60,6 +61,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	public MultisigSignatureTransaction(final DeserializationOptions options, final Deserializer deserializer) {
 		super(TransactionTypes.MULTISIG_SIGNATURE, options, deserializer);
 		this.otherTransactionHash = deserializer.readObject("otherHash", Hash::new);
+		this.multisig = Account.readFrom(deserializer, "otherAccount");
 	}
 
 	/**
@@ -73,12 +75,18 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
+		//observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 	}
 
 	@Override
 	public Amount getMinimumFee() {
 		return Amount.ZERO;
+	}
+
+	@Override
+	public Account getDebtor() {
+		// the multisig account should pay the fee
+		return this.multisig;
 	}
 
 	@Override
@@ -90,5 +98,6 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	protected void serializeImpl(final Serializer serializer) {
 		super.serializeImpl(serializer);
 		serializer.writeObject("otherHash", this.getOtherTransactionHash());
+		Account.writeTo(serializer, "otherAccount", this.multisig);
 	}
 }
