@@ -415,12 +415,8 @@ public class UnconfirmedTransactionsCacheTest {
 		Assert.assertThat(cache.contains(transaction0), IsEqual.equalTo(true));
 	}
 
-	// TODO 20150122 J-G: i'm not sure what this test should do?
-	// TODO 20150123 BR -> J,G: remove for a transaction will only be called if the transaction has expired or it was included in a block.
-	// > I don't think it makes sense to keep the outer transaction (and thus all other inner transactions) if a child is removed.
-	// > Which brings up another thing we have to update: the transaction deadline validator.
 	@Test
-	public void canRemoveTransactionFirstSeenAsChildTransaction() {
+	public void cannotRemoveTransactionFirstSeenAsChildTransaction() {
 		// Arrange:
 		final UnconfirmedTransactionsCache cache = new UnconfirmedTransactionsCache();
 		final Transaction innerTransaction1 = new MockTransaction(Utils.generateRandomAccount());
@@ -433,10 +429,11 @@ public class UnconfirmedTransactionsCacheTest {
 		final boolean result = cache.remove(innerTransaction2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(false));
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(2));
+		Assert.assertThat(cache.flatSize(), IsEqual.equalTo(3));
 		Assert.assertThat(cache.contains(innerTransaction1), IsEqual.equalTo(true));
+		Assert.assertThat(cache.contains(innerTransaction2), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(transaction), IsEqual.equalTo(true));
 	}
 

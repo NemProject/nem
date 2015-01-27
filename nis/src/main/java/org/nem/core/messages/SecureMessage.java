@@ -49,12 +49,13 @@ public class SecureMessage extends Message {
 	 * Deserializes a secure message.
 	 *
 	 * @param deserializer The deserializer.
+	 * @param sender The message sender.
+	 * @param recipient The message recipient.
 	 */
-	public SecureMessage(final Deserializer deserializer) {
+	public SecureMessage(final Deserializer deserializer, final Account sender, final Account recipient) {
 		super(MessageTypes.SECURE);
 		final byte[] payload = deserializer.readBytes("payload");
-		final Deserializer payloadDeserializer = new BinaryDeserializer(payload, deserializer.getContext());
-		this.payload = new DeserializedSecureMessagePayload(payloadDeserializer);
+		this.payload = new AccountBasedSecureMessagePayload(sender, recipient, payload);
 	}
 
 	@Override
@@ -75,7 +76,7 @@ public class SecureMessage extends Message {
 	@Override
 	public void serialize(final Serializer serializer) {
 		super.serialize(serializer);
-		serializer.writeBytes("payload", BinarySerializer.serializeToBytes(this.payload));
+		serializer.writeBytes("payload", this.payload.getEncoded());
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class SecureMessage extends Message {
 
 	//region SecureMessagePayload
 
-	private static abstract class SecureMessagePayload implements SerializableEntity {
+	private static abstract class SecureMessagePayload {
 		private final Address senderAddress;
 		private final Address recipientAddress;
 		private final byte[] payload;
@@ -104,12 +105,6 @@ public class SecureMessage extends Message {
 			this.senderAddress = senderAddress;
 			this.recipientAddress = recipientAddress;
 			this.payload = payload;
-		}
-
-		protected SecureMessagePayload(final Deserializer deserializer) {
-			this.senderAddress = Address.readFrom(deserializer, "sender");
-			this.recipientAddress = Address.readFrom(deserializer, "recipient");
-			this.payload = deserializer.readBytes("payload");
 		}
 
 		public boolean canDecode() {
@@ -128,21 +123,6 @@ public class SecureMessage extends Message {
 
 			final Cipher cipher = this.getSender().createCipher(this.getRecipient(), false);
 			return cipher.decrypt(this.payload);
-		}
-
-		@Override
-		public void serialize(final Serializer serializer) {
-			Address.writeTo(serializer, "sender", this.senderAddress);
-			Address.writeTo(serializer, "recipient", this.recipientAddress);
-			serializer.writeBytes("payload", this.payload);
-		}
-
-		protected Address getSenderAddress() {
-			return this.senderAddress;
-		}
-
-		protected Address getRecipientAddress() {
-			return this.recipientAddress;
 		}
 
 		protected abstract Account getSender();
@@ -164,25 +144,6 @@ public class SecureMessage extends Message {
 			return Arrays.equals(this.payload, rhs.payload)
 					&& this.senderAddress.equals(rhs.senderAddress)
 					&& this.recipientAddress.equals(rhs.recipientAddress);
-		}
-	}
-
-	private static class DeserializedSecureMessagePayload extends SecureMessagePayload {
-		private final DeserializationContext deserializationContext;
-
-		public DeserializedSecureMessagePayload(final Deserializer deserializer) {
-			super(deserializer);
-			this.deserializationContext = deserializer.getContext();
-		}
-
-		@Override
-		protected Account getSender() {
-			return this.deserializationContext.findAccountByAddress(this.getSenderAddress());
-		}
-
-		@Override
-		protected Account getRecipient() {
-			return this.deserializationContext.findAccountByAddress(this.getRecipientAddress());
 		}
 	}
 

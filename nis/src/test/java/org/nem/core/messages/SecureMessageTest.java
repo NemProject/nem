@@ -290,6 +290,6 @@ public class SecureMessageTest {
 		// Act:
 		final Deserializer deserializer = Utils.roundtripSerializableEntity(originalMessage, accountLookup);
 		deserializer.readInt("type");
-		return new SecureMessage(deserializer);
+		return new SecureMessage(deserializer, sender, recipient);
 	}
 }

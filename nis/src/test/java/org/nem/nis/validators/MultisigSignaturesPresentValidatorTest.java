@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
 
@@ -92,6 +92,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - create a multisig account with two cosigners (signer, dummy)
 		// - signer signature is automatically added because it signed transaction
 		// - signer and dummy should both explicitly sign the transaction
+		// - (note that this is more of an integration test since the MultisigTransaction is doing the filtering)
 		final MultisigTestContext context = new MultisigTestContext();
 		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig);
@@ -106,8 +107,8 @@ public class MultisigSignaturesPresentValidatorTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		// Sanity:
-		// TODO 20150122 J-G: not sure if this makes sense?
-		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(2));
+		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getSigners(),  IsEquivalent.equivalentTo(context.dummy));
 	}
 
 	@Test

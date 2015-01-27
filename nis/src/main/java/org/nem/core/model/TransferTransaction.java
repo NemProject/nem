@@ -47,7 +47,9 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
-		this.message = deserializer.readOptionalObject("message", MessageFactory.DESERIALIZER);
+		this.message = deserializer.readOptionalObject(
+				"message",
+				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
 	}
 
 	/**
@@ -87,7 +89,7 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected Amount getMinimumFee() {
+	public Amount getMinimumFee() {
 		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
 	}
 

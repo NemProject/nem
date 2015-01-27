@@ -129,40 +129,60 @@ public class TransactionTest {
 	//region Fees
 
 	@Test
-	public void feeIsMaximumOfMinimumFeeAndCurrentFee() {
+	public void nemesisTransactionFeeIsAlwaysZero() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(new Account(NemesisBlock.ADDRESS));
+		transaction.setMinimumFee(123L);
+		transaction.setFee(Amount.fromNem(200));
+
+		// Assert:
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+	}
+
+	@Test
+	public void feeIsMinimumFeeIfUnset() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
+		transaction.setMinimumFee(123L);
+
+		// Assert:
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromMicroNem(123L)));
+	}
+
+	@Test
+	public void feeCanBeSetAboveMinimumFee() {
 		// Assert:
 		Assert.assertThat(this.getFee(15L, 50L), IsEqual.equalTo(50L));
-		Assert.assertThat(this.getFee(130L, 50L), IsEqual.equalTo(130L));
+	}
+
+	@Test
+	public void feeCanBeSetBelowMinimumFee() {
+		// Assert:
+		Assert.assertThat(this.getFee(130L, 50L), IsEqual.equalTo(50L));
 	}
 
 	private long getFee(final long minimumFee, final long fee) {
 		// Arrange:
-		final KeyPair publicPrivateKeyPair = new KeyPair();
-		final Account signer = new Account(publicPrivateKeyPair);
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
 
 		// Act:
-		final MockTransaction transaction = new MockTransaction(signer);
 		transaction.setMinimumFee(minimumFee);
-		transaction.setFee(new Amount(fee));
+		transaction.setFee(Amount.fromMicroNem(fee));
 		return transaction.getFee().getNumMicroNem();
 	}
 
 	@Test
-	public void feeCannotBeSetBelowMinimum() {
-		// Arrange (category spam attack):
-		final Account signer = Utils.generateRandomAccount();
-		final MockTransaction transaction = new MockTransaction(signer, 6);
-		transaction.setDeadline(new TimeInstant(60));
-		transaction.setMinimumFee(Amount.fromNem(100).getNumMicroNem());
-		transaction.setFee(Amount.fromNem(200));
+	public void feeCanBeResetToMinimum() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
+		transaction.setMinimumFee(123L);
+		transaction.setFee(Amount.fromMicroNem(4444));
 
-		// Bob prefers a more user friendly fee structure
-		transaction.setFee(Amount.fromMicroNem(0));
-		transaction.sign();
+		// Act:
+		transaction.setFee(null);
 
-		// Assert: the fee is set to the minimum fee
-		Assert.assertThat(transaction.verify(), IsEqual.equalTo(true));
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(100)));
+		// Assert:
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromMicroNem(123L)));
 	}
 
 	//endregion

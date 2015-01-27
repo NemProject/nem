@@ -74,7 +74,7 @@ public class MultisigTransactionTest {
 				new TimeInstant(123),
 				account,
 				innerTransaction);
-		final MultisigSignatureTransaction signature = createUnverifiableSignatureTransaction(HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
 		signature.sign();
 		originalTransaction.addSignature(signature);
 		originalTransaction.sign();
@@ -99,7 +99,7 @@ public class MultisigTransactionTest {
 				new TimeInstant(123),
 				account,
 				innerTransaction);
-		final MultisigSignatureTransaction signature = createUnverifiableSignatureTransaction(HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
 		signature.sign();
 		originalTransaction.addSignature(signature);
 		originalTransaction.sign();
@@ -138,7 +138,7 @@ public class MultisigTransactionTest {
 				new TimeInstant(123),
 				account,
 				innerTransaction);
-		final MultisigSignatureTransaction signature = createUnverifiableSignatureTransaction(HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
 		signature.sign();
 		originalTransaction.addSignature(signature);
 		originalTransaction.sign();
@@ -221,7 +221,7 @@ public class MultisigTransactionTest {
 
 		// Act:
 		final Hash expectedHash = HashUtils.calculateHash(originalTransaction);
-		final MultisigSignatureTransaction signature = createUnverifiableSignatureTransaction(HashUtils.calculateHash(innerTransaction));
+		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
 		signature.sign();
 		originalTransaction.addSignature(signature);
 
@@ -438,7 +438,7 @@ public class MultisigTransactionTest {
 	@Test
 	public void cannotAddSignatureForDifferentTransaction() {
 		// Arrange:
-		final MultisigSignatureTransaction sigTransaction = createUnverifiableSignatureTransaction(Utils.generateRandomHash());
+		final MultisigSignatureTransaction sigTransaction = createSignatureTransactionWithHash(Utils.generateRandomHash());
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
 		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
 
@@ -467,8 +467,7 @@ public class MultisigTransactionTest {
 	public void canAddSignatureForMatchingTransaction() {
 		// Arrange:
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
-		final MultisigSignatureTransaction sigTransaction = createUnverifiableSignatureTransaction(innerTransactionHash);
+		final MultisigSignatureTransaction sigTransaction = createSignatureTransaction(innerTransaction);
 		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
 
 		// Act:
@@ -485,9 +484,8 @@ public class MultisigTransactionTest {
 	public void canAddMultipleSignaturesForMatchingTransaction() {
 		// Arrange:
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
-		final MultisigSignatureTransaction sigTransaction1 = createUnverifiableSignatureTransaction(innerTransactionHash);
-		final MultisigSignatureTransaction sigTransaction2 = createUnverifiableSignatureTransaction(innerTransactionHash);
+		final MultisigSignatureTransaction sigTransaction1 = createSignatureTransaction(innerTransaction);
+		final MultisigSignatureTransaction sigTransaction2 = createSignatureTransaction(innerTransaction);
 		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
 
 		// Act:
@@ -504,15 +502,11 @@ public class MultisigTransactionTest {
 	@Test
 	public void addingSameSignatureDoesNotOverwritePreviousOne() {
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
-		final MultisigSignatureTransaction sigTransaction = createUnverifiableSignatureTransaction(innerTransactionHash);
+		final MultisigSignatureTransaction sigTransaction = createSignatureTransaction(innerTransaction);
 		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
 		sigTransaction.setFee(Amount.fromNem(6));
 
-		final MultisigSignatureTransaction nextSignature = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				sigTransaction.getSigner(),
-				innerTransactionHash);
+		final MultisigSignatureTransaction nextSignature = createSignatureTransaction(sigTransaction.getSigner(), innerTransaction);
 		nextSignature.setSignature(Utils.generateRandomSignature());
 		nextSignature.setFee(Amount.fromNem(12345));
 
@@ -524,6 +518,23 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		Assert.assertThat(result.getFee(), IsEqual.equalTo(Amount.fromNem(6)));
+	}
+
+	@Test
+	public void addingExplicitSignatureForOriginalCosignerHasNoEffect() {
+		// Arrange:
+		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
+		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
+		final MultisigSignatureTransaction sigTransaction = createSignatureTransaction(msTransaction.getSigner(), innerTransaction);
+
+		// Act:
+		msTransaction.addSignature(sigTransaction);
+		final List<Account> signers = msTransaction.getSigners();
+		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
+
+		// Assert:
+		Assert.assertThat(signers.size(), IsEqual.equalTo(0));
+		Assert.assertThat(signatures.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -548,7 +559,7 @@ public class MultisigTransactionTest {
 		// Act:
 		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
 		ExceptionAssert.assertThrows(
-				v -> signatures.add(createUnverifiableSignatureTransaction(Utils.generateRandomHash())),
+				v -> signatures.add(createSignatureTransaction(innerTransaction)),
 				UnsupportedOperationException.class);
 	}
 
@@ -588,7 +599,11 @@ public class MultisigTransactionTest {
 	public void cannotVerifyMultisigTransactionWithAtLeastOneNonVerifiableCosignerSignature() {
 		// Assert:
 		assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
-				MultisigTransactionTest::createUnverifiableSignatureTransaction);
+				hash -> {
+					final MultisigSignatureTransaction multisigSignatureTransaction = createSignatureTransactionWithHash(hash);
+					multisigSignatureTransaction.setSignature(Utils.generateRandomSignature());
+					return multisigSignatureTransaction;
+				});
 	}
 
 	@Test
@@ -664,6 +679,10 @@ public class MultisigTransactionTest {
 
 	//endregion
 
+	private static MultisigSignatureTransaction createSignatureTransaction(final Transaction transaction) {
+		return createSignatureTransaction(Utils.generateRandomAccount(), transaction);
+	}
+
 	private static MultisigSignatureTransaction createSignatureTransaction(final Account account, final Transaction transaction) {
 		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
@@ -673,12 +692,12 @@ public class MultisigTransactionTest {
 		return multisigSignatureTransaction;
 	}
 
-	private static MultisigSignatureTransaction createUnverifiableSignatureTransaction(final Hash hash) {
+	private static MultisigSignatureTransaction createSignatureTransactionWithHash(final Hash hash) {
 		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				Utils.generateRandomAccount(),
 				hash);
-		multisigSignatureTransaction.setSignature(Utils.generateRandomSignature());
+		multisigSignatureTransaction.sign();
 		return multisigSignatureTransaction;
 	}
 

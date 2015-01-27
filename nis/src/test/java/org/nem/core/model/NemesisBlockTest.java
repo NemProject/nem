@@ -3,7 +3,7 @@ package org.nem.core.model;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.test.MockAccountLookup;
@@ -111,9 +111,17 @@ public class NemesisBlockTest {
 	public void addressConstantIsConsistentWithNemesisBlock() {
 		// Arrange:
 		final Block block = NEMESIS_BLOCK;
+		final Address blockAddress = block.getSigner().getAddress();
 
 		// Assert:
-		Assert.assertThat(block.getSigner().getAddress(), IsEqual.equalTo(NemesisBlock.ADDRESS));
+		Assert.assertThat(blockAddress, IsEqual.equalTo(NemesisBlock.ADDRESS));
+		Assert.assertThat(blockAddress.getPublicKey(), IsEqual.equalTo(NemesisBlock.ADDRESS.getPublicKey()));
+	}
+
+	@Test
+	public void addressConstantHasNemesisBlockPublicKeySet() {
+		// Assert:
+		Assert.assertThat(NemesisBlock.ADDRESS.getPublicKey(), IsNull.notNullValue());
 	}
 
 	@Test

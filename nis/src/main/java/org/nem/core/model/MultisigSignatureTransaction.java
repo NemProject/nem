@@ -55,7 +55,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	}
 
 	@Override
-	protected Amount getMinimumFee() {
+	public Amount getMinimumFee() {
 		return Amount.ZERO;
 	}
 

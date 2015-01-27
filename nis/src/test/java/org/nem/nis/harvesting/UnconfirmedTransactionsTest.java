@@ -1350,16 +1350,14 @@ public class UnconfirmedTransactionsTest {
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
 
-			if (singleTransactionBuilderSupplier == null) {
-				Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
-						.then((invocationOnMock) -> {
-							final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-							builder.add(this.singleValidator);
-							return builder;
-						});
+			if (null != singleTransactionBuilderSupplier) {
+				setSingleTransactionBuilderSupplier(validatorFactory, singleTransactionBuilderSupplier);
 			} else {
-				Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
-						.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
+				setSingleTransactionBuilderSupplier(validatorFactory, () -> {
+					final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
+					builder.add(this.singleValidator);
+					return builder;
+				});
 			}
 
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
@@ -1367,6 +1365,15 @@ public class UnconfirmedTransactionsTest {
 					validatorFactory,
 					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
 					this.timeProvider);
+		}
+
+		private static void setSingleTransactionBuilderSupplier(
+				final TransactionValidatorFactory validatorFactory,
+				final Supplier<AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier) {
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
+					.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
+			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))
+					.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {

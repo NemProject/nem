@@ -11,9 +11,8 @@ import java.util.*;
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
-	private Amount fee = Amount.ZERO;
+	private Optional<Amount> fee = Optional.empty();
 	private TimeInstant deadline = TimeInstant.ZERO;
-	private final boolean nemesisTransaction;
 
 	/**
 	 * Creates a new transaction.
@@ -25,7 +24,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Transaction(final int type, final int version, final TimeInstant timeStamp, final Account sender) {
 		super(type, version, timeStamp, sender);
-		this.nemesisTransaction = false;
 	}
 
 	/**
@@ -37,9 +35,8 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
-		this.fee = Amount.readFrom(deserializer, "fee");
+		this.fee = Optional.of(Amount.readFrom(deserializer, "fee"));
 		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
-		this.nemesisTransaction = false;
 	}
 
 	//region Setters and Getters
@@ -50,11 +47,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The fee.
 	 */
 	public Amount getFee() {
-		return nemesisTransaction
-				? Amount.ZERO :
-				this.fee.compareTo(this.getMinimumFee()) < 0
-						? this.getMinimumFee()
-						: this.fee;
+		return this.getSigner().getAddress().equals(NemesisBlock.ADDRESS)
+				? Amount.ZERO
+				: this.fee.orElse(this.getMinimumFee());
 	}
 
 	/**
@@ -63,7 +58,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param fee The desired fee.
 	 */
 	public void setFee(final Amount fee) {
-		this.fee = fee;
+		this.fee = null == fee ? Optional.empty() : Optional.of(fee);
 	}
 
 	/**
@@ -163,7 +158,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @return The minimum fee.
 	 */
-	protected abstract Amount getMinimumFee();
+	public abstract Amount getMinimumFee();
 
 	/**
 	 * Gets all accounts (excluding the signer) that are affected by this transaction.

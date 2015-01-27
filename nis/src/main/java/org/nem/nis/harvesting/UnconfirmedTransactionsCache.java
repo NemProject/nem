@@ -15,10 +15,7 @@ public class UnconfirmedTransactionsCache {
 	private final Function<Transaction, ValidationResult> validate;
 	private final BiPredicate<MultisigSignatureTransaction, MultisigTransaction> isMatch;
 	private final Map<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	// TODO 20150123 G-J: since this isn't concurrent anymore, we rely on the
-	// > fact that .remove is called within synchronized() block, right? (add comment somewhere?)
-	// > 2. shouldn't call to clear() also be synchronized?
-	private final Set<Hash> childTransactions = new HashSet<>();
+	private final Set<Hash> childTransactions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
 	/**
 	 * Creates a new cache with no transaction validation.
@@ -148,7 +145,9 @@ public class UnconfirmedTransactionsCache {
 	 */
 	public boolean remove(final Transaction transaction) {
 		final Hash transactionHash = HashUtils.calculateHash(transaction);
-		if (!this.hasTransactionInCache(transaction, transactionHash)) {
+
+		// do not call hasTransactionInCache here because only root transactions can be removed
+		if (!this.transactions.containsKey(transactionHash)) {
 			return false;
 		}
 

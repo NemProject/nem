@@ -79,6 +79,13 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			throw new IllegalArgumentException("trying to add a signature for another transaction to a multisig transaction");
 		}
 
+		// if the original cosigner is attempting to add an (explicit) signature, ignore it
+		// in order to be consistent with how multiple (explicit) signatures from other cosigners
+		// are handled (the first one is used and all others are ignored)
+		if (this.getSigner().equals(transaction.getSigner())) {
+			return;
+		}
+
 		this.signatureTransactions.add(transaction);
 	}
 
@@ -108,7 +115,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	}
 
 	@Override
-	protected Amount getMinimumFee() {
+	public Amount getMinimumFee() {
 		// MultisigAwareSingleTransactionValidator takes care of validating fee on inner transaction
 		// TODO 20150108 J-G: i think we should come to an agreement on the fee; what do you think about a contingent fee like:
 		// > 5L * this.getCosignerSignatures().size()
