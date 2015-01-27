@@ -23,7 +23,8 @@ public class MultisigTransactionTest {
 	public void canCreateTransaction() {
 		// Act:
 		final Account account = Utils.generateRandomAccount();
-		final Transaction innerTransaction = createDefaultTransferTransaction();
+		final Account multisig = Utils.generateRandomAccount();
+		final Transaction innerTransaction = createDefaultTransferTransaction(multisig);
 		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
 		final MultisigTransaction transaction = new MultisigTransaction(
 				new TimeInstant(123),
@@ -35,6 +36,7 @@ public class MultisigTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
 		Assert.assertThat(transaction.getOtherTransaction(), IsEqual.equalTo(innerTransaction));
 	}
@@ -68,13 +70,10 @@ public class MultisigTransactionTest {
 
 	private static void assertCanRoundtripWithSignatures(final BiFunction<Transaction, AccountLookup, Deserializer> roundTripEntity) {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
 		final Transaction innerTransaction = createDefaultTransferTransaction();
-		final MultisigTransaction originalTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				account,
-				innerTransaction);
-		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction originalTransaction = context.createMultisig();
+		final MultisigSignatureTransaction signature = context.createSignature();
 		signature.sign();
 		originalTransaction.addSignature(signature);
 		originalTransaction.sign();
@@ -93,13 +92,10 @@ public class MultisigTransactionTest {
 	@Test
 	public void cannotDeserializeMultisigTransactionWithMismatchedSignatures() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
 		final Transaction innerTransaction = createDefaultTransferTransaction();
-		final MultisigTransaction originalTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				account,
-				innerTransaction);
-		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction originalTransaction = context.createMultisig();
+		final MultisigSignatureTransaction signature = context.createSignature();
 		signature.sign();
 		originalTransaction.addSignature(signature);
 		originalTransaction.sign();
@@ -132,13 +128,10 @@ public class MultisigTransactionTest {
 	@Test
 	public void canRoundtripNonVerifiableTransactionWithSignatures() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
 		final Transaction innerTransaction = createDefaultTransferTransaction();
-		final MultisigTransaction originalTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				account,
-				innerTransaction);
-		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction originalTransaction = context.createMultisig();
+		final MultisigSignatureTransaction signature = context.createSignature();
 		signature.sign();
 		originalTransaction.addSignature(signature);
 		originalTransaction.sign();
@@ -157,7 +150,8 @@ public class MultisigTransactionTest {
 			final Function<Transaction, MultisigTransaction> roundTripEntity) {
 		// Arrange:
 		final Account account = Utils.generateRandomAccount();
-		final Transaction innerTransaction = createDefaultTransferTransaction();
+		final Account multisig = Utils.generateRandomAccount();
+		final Transaction innerTransaction = createDefaultTransferTransaction(multisig);
 		innerTransaction.sign();
 		final Hash innerTransactionHash = HashUtils.calculateHash(innerTransaction.asNonVerifiable());
 		final MultisigTransaction originalTransaction = new MultisigTransaction(
@@ -174,6 +168,7 @@ public class MultisigTransactionTest {
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(innerTransactionHash));
 
 		// - the other transaction excluding is preserved, excluding its signature
@@ -183,9 +178,13 @@ public class MultisigTransactionTest {
 	}
 
 	private static TransferTransaction createDefaultTransferTransaction() {
+		return createDefaultTransferTransaction(Utils.generateRandomAccount());
+	}
+
+	private static TransferTransaction createDefaultTransferTransaction(final Account signer) {
 		return new TransferTransaction(
 				new TimeInstant(111),
-				Utils.generateRandomAccount(),
+				signer,
 				Utils.generateRandomAccount(),
 				Amount.fromNem(789),
 				null);
@@ -212,16 +211,13 @@ public class MultisigTransactionTest {
 	@Test
 	public void addingCosignersDoesNotAffectHash() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
 		final Transaction innerTransaction = createDefaultTransferTransaction();
-		final MultisigTransaction originalTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				account,
-				innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction originalTransaction = context.createMultisig();
 
 		// Act:
 		final Hash expectedHash = HashUtils.calculateHash(originalTransaction);
-		final MultisigSignatureTransaction signature = createSignatureTransaction(innerTransaction);
+		final MultisigSignatureTransaction signature = context.createSignature();
 		signature.sign();
 		originalTransaction.addSignature(signature);
 
@@ -263,8 +259,8 @@ public class MultisigTransactionTest {
 		final List<Notification> notifications = notificationCaptor.getAllValues();
 
 		// Assert:
-		NotificationUtils.assertBalanceDebitNotification(notifications.get(0), context.transaction.getSigner(), Amount.fromNem(100));
-		NotificationUtils.assertBalanceDebitNotification(notifications.get(1), context.innerTransaction.getSigner(), Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceDebitNotification(notifications.get(0), context.multisig, Amount.fromNem(100));
+		NotificationUtils.assertBalanceDebitNotification(notifications.get(1), context.multisig, Amount.fromMicroNem(222));
 	}
 
 	@Test
@@ -279,12 +275,11 @@ public class MultisigTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = context.execute(4);
 
 		// Assert:
-		final List<Account> expectedSigners = context.getOrderedSigners();
 		final List<Amount> expectedAmounts = context.getOrderedFees();
 		for (int i = 0; i < 4; ++i) {
 			NotificationUtils.assertBalanceDebitNotification(
 					notificationCaptor.getAllValues().get(i),
-					expectedSigners.get(i),
+					context.multisig,
 					expectedAmounts.get(i));
 		}
 	}
@@ -300,8 +295,8 @@ public class MultisigTransactionTest {
 		final List<Notification> notifications = notificationCaptor.getAllValues();
 
 		// Assert:
-		NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.innerTransaction.getSigner(), Amount.fromMicroNem(222));
-		NotificationUtils.assertBalanceCreditNotification(notifications.get(1), context.transaction.getSigner(), Amount.fromNem(100));
+		NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.multisig, Amount.fromMicroNem(222));
+		NotificationUtils.assertBalanceCreditNotification(notifications.get(1), context.multisig, Amount.fromNem(100));
 	}
 
 	@Test
@@ -316,18 +311,18 @@ public class MultisigTransactionTest {
 		final ArgumentCaptor<Notification> notificationCaptor = context.undo(4);
 
 		// Assert:
-		final List<Account> expectedSigners = context.getOrderedSigners();
 		final List<Amount> expectedAmounts = context.getOrderedFees();
 		for (int i = 0; i < 4; ++i) {
 			NotificationUtils.assertBalanceCreditNotification(
 					notificationCaptor.getAllValues().get(i),
-					expectedSigners.get(3 - i),
+					context.multisig,
 					expectedAmounts.get(3 - i));
 		}
 	}
 
 	private static class UndoExecuteTestContext {
 		private final MockTransaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
+		private final Account multisig = innerTransaction.getSigner();
 		private MultisigTransaction transaction;
 
 		public void setInnerTransactionFee(final Amount amount) {
@@ -369,13 +364,6 @@ public class MultisigTransactionTest {
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(expectedNotifications)).notify(notificationCaptor.capture());
 			return notificationCaptor;
-		}
-
-		public List<Account> getOrderedSigners() {
-			final List<Account> signers = new ArrayList<>();
-			signers.add(this.transaction.getSigner());
-			signers.addAll(this.transaction.getChildTransactions().stream().map(VerifiableEntity::getSigner).collect(Collectors.toList()));
-			return signers;
 		}
 
 		public List<Amount> getOrderedFees() {
@@ -441,9 +429,24 @@ public class MultisigTransactionTest {
 	@Test
 	public void cannotAddSignatureForDifferentTransaction() {
 		// Arrange:
-		final MultisigSignatureTransaction sigTransaction = createSignatureTransactionWithHash(Utils.generateRandomHash());
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction msTransaction = context.createMultisig();
+		final MultisigSignatureTransaction sigTransaction = context.createSignatureWithHash(Utils.generateRandomHash());
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> msTransaction.addSignature(sigTransaction),
+				IllegalArgumentException.class);
+	}
+
+	@Test
+	public void cannotAddSignatureWithInvalidDebtor() {
+		// Arrange:
+		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction msTransaction = context.createMultisig();
+		final MultisigSignatureTransaction sigTransaction = context.createSignatureWithMultisig(Utils.generateRandomAccount());
 
 		// Act:
 		ExceptionAssert.assertThrows(
@@ -470,8 +473,9 @@ public class MultisigTransactionTest {
 	public void canAddSignatureForMatchingTransaction() {
 		// Arrange:
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final MultisigSignatureTransaction sigTransaction = createSignatureTransaction(innerTransaction);
-		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction msTransaction = context.createMultisig();
+		final MultisigSignatureTransaction sigTransaction = context.createSignature();
 
 		// Act:
 		msTransaction.addSignature(sigTransaction);
@@ -487,9 +491,10 @@ public class MultisigTransactionTest {
 	public void canAddMultipleSignaturesForMatchingTransaction() {
 		// Arrange:
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final MultisigSignatureTransaction sigTransaction1 = createSignatureTransaction(innerTransaction);
-		final MultisigSignatureTransaction sigTransaction2 = createSignatureTransaction(innerTransaction);
-		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigSignatureTransaction sigTransaction1 = context.createSignature();
+		final MultisigSignatureTransaction sigTransaction2 = context.createSignature();
+		final MultisigTransaction msTransaction = context.createMultisig();
 
 		// Act:
 		msTransaction.addSignature(sigTransaction1);
@@ -505,15 +510,15 @@ public class MultisigTransactionTest {
 	@Test
 	public void addingSameSignatureDoesNotOverwritePreviousOne() {
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final MultisigSignatureTransaction sigTransaction = createSignatureTransaction(innerTransaction);
-		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction msTransaction = context.createMultisig();
+
+		final MultisigSignatureTransaction sigTransaction = context.createSignature();
 		sigTransaction.setFee(Amount.fromNem(6));
-
-		final MultisigSignatureTransaction nextSignature = createSignatureTransaction(sigTransaction.getSigner(), innerTransaction);
-		nextSignature.setSignature(Utils.generateRandomSignature());
-		nextSignature.setFee(Amount.fromNem(12345));
-
 		msTransaction.addSignature(sigTransaction);
+
+		final MultisigSignatureTransaction nextSignature = context.createSignature(sigTransaction.getSigner());
+		nextSignature.setFee(Amount.fromNem(12345));
 
 		// Act:
 		msTransaction.addSignature(nextSignature);
@@ -527,8 +532,9 @@ public class MultisigTransactionTest {
 	public void addingExplicitSignatureForOriginalCosignerHasNoEffect() {
 		// Arrange:
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
-		final MultisigSignatureTransaction sigTransaction = createSignatureTransaction(msTransaction.getSigner(), innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction msTransaction = context.createMultisig();
+		final MultisigSignatureTransaction sigTransaction = context.createSignature(msTransaction.getSigner());
 
 		// Act:
 		msTransaction.addSignature(sigTransaction);
@@ -557,12 +563,13 @@ public class MultisigTransactionTest {
 	public void getCosignerSignaturesIsReadOnly() {
 		// Arrange:
 		final Transaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		final MultisigTransaction msTransaction = createDefaultTransaction(innerTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigTransaction msTransaction = context.createMultisig();
 
 		// Act:
 		final Collection<MultisigSignatureTransaction> signatures = msTransaction.getCosignerSignatures();
 		ExceptionAssert.assertThrows(
-				v -> signatures.add(createSignatureTransaction(innerTransaction)),
+				v -> signatures.add(context.createSignature()),
 				UnsupportedOperationException.class);
 	}
 
@@ -578,18 +585,13 @@ public class MultisigTransactionTest {
 		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
 		transferTransaction.sign();
 
-		final Account signer1 = Utils.generateRandomAccount();
-		final Account signer2 = Utils.generateRandomAccount();
-		final Account signer3 = Utils.generateRandomAccount();
-		final MultisigTransaction multisigTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				sender,
-				transferTransaction);
-
+		final SimpleMultisigContext context = new SimpleMultisigContext(transferTransaction);
+		final MultisigTransaction multisigTransaction = context.createMultisig();
 		multisigTransaction.sign();
-		multisigTransaction.addSignature(createSignatureTransaction(signer1, transferTransaction));
-		multisigTransaction.addSignature(createSignatureTransaction(signer2, transferTransaction));
-		multisigTransaction.addSignature(createSignatureTransaction(signer3, transferTransaction));
+
+		multisigTransaction.addSignature(context.createSignature());
+		multisigTransaction.addSignature(context.createSignature());
+		multisigTransaction.addSignature(context.createSignature());
 
 		// Act:
 		final boolean isVerified = multisigTransaction.verify();
@@ -602,10 +604,9 @@ public class MultisigTransactionTest {
 	public void cannotVerifyMultisigTransactionWithAtLeastOneNonVerifiableCosignerSignature() {
 		// Assert:
 		assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
-				hash -> {
-					final MultisigSignatureTransaction multisigSignatureTransaction = createSignatureTransactionWithHash(hash);
-					multisigSignatureTransaction.setSignature(Utils.generateRandomSignature());
-					return multisigSignatureTransaction;
+				signature -> {
+					signature.setSignature(Utils.generateRandomSignature());
+					return signature;
 				});
 	}
 
@@ -613,37 +614,31 @@ public class MultisigTransactionTest {
 	public void cannotVerifyMultisigTransactionWithAtLeastOneMismatchedCosignerSignature() {
 		// Assert:
 		assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
-				hash -> {
+				signature -> {
 					// quite contrived and probably impossible to happen in the real world
-					final Account account = Utils.generateRandomAccount();
-					final MultisigSignatureTransaction mismatchedSignatureTransaction = Mockito.mock(MultisigSignatureTransaction.class);
-					Mockito.when(mismatchedSignatureTransaction.verify()).thenReturn(true);
-					Mockito.when(mismatchedSignatureTransaction.getSigner()).thenReturn(account);
-					Mockito.when(mismatchedSignatureTransaction.getOtherTransactionHash())
-							.thenReturn(hash, Utils.generateRandomHash());
-					return mismatchedSignatureTransaction;
+					final Hash otherTransactionHash = signature.getOtherTransactionHash();
+					signature = Mockito.spy(signature);
+					Mockito.when(signature.getOtherTransactionHash())
+							.thenReturn(otherTransactionHash, Utils.generateRandomHash());
+					return signature;
 				});
 	}
 
 	private static void assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
-			final Function<Hash, MultisigSignatureTransaction> createBadSignature) {
+			final Function<MultisigSignatureTransaction, MultisigSignatureTransaction> createBadSignature) {
 		// Arrange:
 		final Account sender = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
 		transferTransaction.sign();
 
-		final Account signer1 = Utils.generateRandomAccount();
-		final Account signer3 = Utils.generateRandomAccount();
-		final MultisigTransaction multisigTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				sender,
-				transferTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(transferTransaction);
+		final MultisigTransaction multisigTransaction = context.createMultisig();
 
 		multisigTransaction.sign();
-		multisigTransaction.addSignature(createSignatureTransaction(signer1, transferTransaction));
-		multisigTransaction.addSignature(createBadSignature.apply(HashUtils.calculateHash(transferTransaction)));
-		multisigTransaction.addSignature(createSignatureTransaction(signer3, transferTransaction));
+		multisigTransaction.addSignature(context.createSignature());
+		multisigTransaction.addSignature(createBadSignature.apply(context.createSignature()));
+		multisigTransaction.addSignature(context.createSignature());
 
 		// Act:
 		final boolean isVerified = multisigTransaction.verify();
@@ -660,18 +655,13 @@ public class MultisigTransactionTest {
 		final TransferTransaction transferTransaction = new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(100), null);
 		transferTransaction.sign();
 
-		final Account signer1 = Utils.generateRandomAccount();
-		final Account signer2 = Utils.generateRandomAccount();
-		final Account signer3 = Utils.generateRandomAccount();
-		final MultisigTransaction multisigTransaction = new MultisigTransaction(
-				new TimeInstant(123),
-				sender,
-				transferTransaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(transferTransaction);
+		final MultisigTransaction multisigTransaction = context.createMultisig();
 
 		multisigTransaction.setSignature(Utils.generateRandomSignature());
-		multisigTransaction.addSignature(createSignatureTransaction(signer1, transferTransaction));
-		multisigTransaction.addSignature(createSignatureTransaction(signer2, transferTransaction));
-		multisigTransaction.addSignature(createSignatureTransaction(signer3, transferTransaction));
+		multisigTransaction.addSignature(context.createSignature());
+		multisigTransaction.addSignature(context.createSignature());
+		multisigTransaction.addSignature(context.createSignature());
 
 		// Act:
 		final boolean isVerified = multisigTransaction.verify();
@@ -681,32 +671,6 @@ public class MultisigTransactionTest {
 	}
 
 	//endregion
-
-	private static MultisigSignatureTransaction createSignatureTransaction(final Transaction transaction) {
-		return createSignatureTransaction(Utils.generateRandomAccount(), transaction);
-	}
-
-	// TODO 20150126 J-J: should double check this here
-
-	private static MultisigSignatureTransaction createSignatureTransaction(final Account account, final Transaction transaction) {
-		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				account,
-				Utils.generateRandomAccount(),
-				transaction);
-		multisigSignatureTransaction.sign();
-		return multisigSignatureTransaction;
-	}
-
-	private static MultisigSignatureTransaction createSignatureTransactionWithHash(final Hash hash) {
-		final MultisigSignatureTransaction multisigSignatureTransaction = new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
-				hash);
-		multisigSignatureTransaction.sign();
-		return multisigSignatureTransaction;
-	}
 
 	private static MultisigTransaction createDefaultTransaction(final Transaction innerTransaction) {
 		return new MultisigTransaction(

@@ -19,31 +19,56 @@ public class MultisigSignatureTransactionTest {
 	@Test
 	public void canCreateTransaction() {
 		// Act:
-		final Account account = Utils.generateRandomAccount();
+		final Account cosigner = Utils.generateRandomAccount();
+		final Account multisig = Utils.generateRandomAccount();
 		final Hash hash = Utils.generateRandomHash();
 		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
-				account,
-				Utils.generateRandomAccount(),
+				cosigner,
+				multisig,
 				hash);
 
 		// Assert:
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
+		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
+	}
+
+	@Test
+	public void canCreateTransactionAroundOtherTransaction() {
+		// Act:
+		final Account cosigner = Utils.generateRandomAccount();
+		final Account multisig = Utils.generateRandomAccount();
+		final Transaction otherTransaction = new MockTransaction(Utils.generateRandomAccount());
+		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
+				new TimeInstant(123),
+				cosigner,
+				multisig,
+				otherTransaction);
+
+		// Assert:
+		final Hash hash = HashUtils.calculateHash(otherTransaction);
+		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
+		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
+		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
 	}
 
 	@Test
 	public void canRoundtripTransaction() {
 		// Arrange:
-		final Account account = Utils.generateRandomAccount();
+		final Account cosigner = Utils.generateRandomAccount();
+		final Account multisig = Utils.generateRandomAccount();
 		final Hash hash = Utils.generateRandomHash();
 		final MultisigSignatureTransaction originalTransaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
-				account,
-				Utils.generateRandomAccount(),
+				cosigner,
+				multisig,
 				hash);
 
 		// Act:
@@ -53,7 +78,8 @@ public class MultisigSignatureTransactionTest {
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_SIGNATURE));
 		Assert.assertThat(transaction.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(new TimeInstant(123)));
-		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(account));
+		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(cosigner));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(multisig));
 		Assert.assertThat(transaction.getOtherTransactionHash(), IsEqual.equalTo(hash));
 	}
 
@@ -105,7 +131,8 @@ public class MultisigSignatureTransactionTest {
 	@Test
 	public void executeRaisesAppropriateNotifications() {
 		// Arrange:
-		final Transaction transaction = createDefaultTransaction();
+		final Account multisig = Utils.generateRandomAccount();
+		final Transaction transaction = createTransactionWithMultisig(multisig);
 		transaction.setFee(Amount.fromNem(12));
 
 		// Act:
@@ -115,13 +142,14 @@ public class MultisigSignatureTransactionTest {
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
-		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getValue(), transaction.getSigner(), Amount.fromNem(12));
+		NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getValue(), multisig, Amount.fromNem(12));
 	}
 
 	@Test
 	public void undoRaisesAppropriateNotifications() {
 		// Arrange:
-		final Transaction transaction = createDefaultTransaction();
+		final Account multisig = Utils.generateRandomAccount();
+		final Transaction transaction = createTransactionWithMultisig(multisig);
 		transaction.setFee(Amount.fromNem(12));
 
 		// Act:
@@ -131,16 +159,20 @@ public class MultisigSignatureTransactionTest {
 		// Assert: no notifications
 		final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 		Mockito.verify(observer, Mockito.only()).notify(notificationCaptor.capture());
-		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getValue(), transaction.getSigner(), Amount.fromNem(12));
+		NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getValue(), multisig, Amount.fromNem(12));
 	}
 
 	//endregion
 
 	private static MultisigSignatureTransaction createDefaultTransaction() {
+		return createTransactionWithMultisig(Utils.generateRandomAccount());
+	}
+
+	private static MultisigSignatureTransaction createTransactionWithMultisig(final Account multisig) {
 		return new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				Utils.generateRandomAccount(),
-				Utils.generateRandomAccount(),
+				multisig,
 				Utils.generateRandomHash());
 	}
 }

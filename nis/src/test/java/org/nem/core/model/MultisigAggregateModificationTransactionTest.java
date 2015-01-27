@@ -154,6 +154,7 @@ public class MultisigAggregateModificationTransactionTest {
 			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
 			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 			Assert.assertThat(transaction.getModifications().size(), IsEqual.equalTo(numModifications));
 			Assert.assertThat(transaction.getModifications(), IsEquivalent.equivalentTo(modifications));
 		}
@@ -190,6 +191,7 @@ public class MultisigAggregateModificationTransactionTest {
 			Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
 			Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 			Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+			Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 			Assert.assertThat(transaction.getModifications().size(), IsEqual.equalTo(numModifications));
 
 			final List<MultisigModification> originalModifications = new ArrayList<>(originalTransaction.getModifications());

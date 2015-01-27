@@ -79,6 +79,10 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 			throw new IllegalArgumentException("trying to add a signature for another transaction to a multisig transaction");
 		}
 
+		if (!this.otherTransaction.getSigner().equals(transaction.getDebtor())) {
+			throw new IllegalArgumentException("trying to add a signature with an unexpected debtor");
+		}
+
 		// if the original cosigner is attempting to add an (explicit) signature, ignore it
 		// in order to be consistent with how multiple (explicit) signatures from other cosigners
 		// are handled (the first one is used and all others are ignored)
@@ -109,12 +113,8 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		final Amount totalFee[] = new Amount[] { this.getFee() };
-		this.signatureTransactions.stream().forEach(t -> {
-			totalFee[0] = totalFee[0].add(t.getFee());
-		});
-
-		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.otherTransaction.getSigner(), totalFee[0]));
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
+		this.signatureTransactions.stream().forEach(t -> t.transfer(observer));
 		this.otherTransaction.transfer(observer);
 	}
 
@@ -174,6 +174,7 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 	}
 
 	private boolean isSignatureMatch(final MultisigSignatureTransaction signatureTransaction) {
+		// TODO 20150127 J-G: do we really need this check 'signatureTransaction.getOtherTransactionHash().equals(this.getOtherTransactionHash())' ?
 		return signatureTransaction.getOtherTransactionHash().equals(this.getOtherTransactionHash()) && signatureTransaction.verify();
 	}
 }
