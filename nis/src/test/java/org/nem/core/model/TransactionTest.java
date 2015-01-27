@@ -129,6 +129,17 @@ public class TransactionTest {
 	//region Fees
 
 	@Test
+	public void nemesisTransactionFeeIsAlwaysZero() {
+		// Arrange:
+		final MockTransaction transaction = new MockTransaction(new Account(NemesisBlock.ADDRESS));
+		transaction.setMinimumFee(123L);
+		transaction.setFee(Amount.fromNem(200));
+
+		// Assert:
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+	}
+
+	@Test
 	public void feeIsMinimumFeeIfUnset() {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());

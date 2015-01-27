@@ -13,7 +13,6 @@ import java.util.*;
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
 	private Optional<Amount> fee = Optional.empty();
 	private TimeInstant deadline = TimeInstant.ZERO;
-	private final boolean nemesisTransaction;
 
 	/**
 	 * Creates a new transaction.
@@ -25,7 +24,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Transaction(final int type, final int version, final TimeInstant timeStamp, final Account sender) {
 		super(type, version, timeStamp, sender);
-		this.nemesisTransaction = false;
 	}
 
 	/**
@@ -39,7 +37,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 		super(type, options, deserializer);
 		this.fee = Optional.of(Amount.readFrom(deserializer, "fee"));
 		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
-		this.nemesisTransaction = false;
 	}
 
 	//region Setters and Getters
@@ -50,7 +47,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The fee.
 	 */
 	public Amount getFee() {
-		return nemesisTransaction
+		return this.getSigner().getAddress().equals(NemesisBlock.ADDRESS)
 				? Amount.ZERO
 				: this.fee.orElse(this.getMinimumFee());
 	}
