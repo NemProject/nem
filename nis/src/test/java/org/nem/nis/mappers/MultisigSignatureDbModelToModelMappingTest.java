@@ -55,23 +55,28 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final Account sender = Utils.generateRandomAccount();
+		private final DbAccount dbMultisigSender = Mockito.mock(DbAccount.class);
+		private final Account multisigSender = Utils.generateRandomAccount();
 		private final Hash otherTransactionHash = Utils.generateRandomHash();
 		private final MultisigSignatureDbModelToModelMapping mapping = new MultisigSignatureDbModelToModelMapping(this.mapper);
 
 		public TestContext() {
 			Mockito.when(this.mapper.map(this.dbSender, Account.class)).thenReturn(this.sender);
+			Mockito.when(this.mapper.map(this.dbMultisigSender, Account.class)).thenReturn(this.multisigSender);
 		}
 
 		public DbMultisigSignatureTransaction createDbSignature() {
+			final DbTransferTransaction dbTransfer = new DbTransferTransaction();
+			dbTransfer.setTransferHash(this.otherTransactionHash);
+
+			final DbMultisigTransaction dbMultisig = new DbMultisigTransaction();
+			dbMultisig.setSender(this.dbMultisigSender);
+			dbMultisig.setTransferTransaction(dbTransfer);
+
 			final DbMultisigSignatureTransaction dbSignature = new DbMultisigSignatureTransaction();
 			dbSignature.setTimeStamp(4444);
 			dbSignature.setSender(this.dbSender);
-			dbSignature.setMultisigTransaction(new DbMultisigTransaction());
-
-			final DbTransferTransaction dbTransferTransaction = new DbTransferTransaction();
-			dbTransferTransaction.setTransferHash(this.otherTransactionHash);
-			dbSignature.getMultisigTransaction().setTransferTransaction(dbTransferTransaction);
-
+			dbSignature.setMultisigTransaction(dbMultisig);
 			dbSignature.setFee(0L);
 			dbSignature.setDeadline(0);
 			return dbSignature;
@@ -80,6 +85,7 @@ public class MultisigSignatureDbModelToModelMappingTest extends AbstractTransfer
 		public void assertModel(final MultisigSignatureTransaction model) {
 			Assert.assertThat(model.getTimeStamp(), IsEqual.equalTo(new TimeInstant(4444)));
 			Assert.assertThat(model.getSigner(), IsEqual.equalTo(this.sender));
+			Assert.assertThat(model.getDebtor(), IsEqual.equalTo(this.multisigSender));
 			Assert.assertThat(model.getOtherTransactionHash(), IsEqual.equalTo(this.otherTransactionHash));
 		}
 	}
