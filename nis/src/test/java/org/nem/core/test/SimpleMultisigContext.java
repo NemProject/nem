@@ -52,6 +52,17 @@ public class SimpleMultisigContext {
 	}
 
 	/**
+	 * Creates a default (compatible) multisig transaction with the specified cosigner.
+	 *
+	 * @param cosigner The cosigner account.
+	 * @return The multisig transaction.
+	 */
+	public MultisigTransaction createMultisig(final Account cosigner) {
+		return new MultisigTransaction(TimeInstant.ZERO, cosigner, this.innerTransaction);
+	}
+
+
+	/**
 	 * Creates a signature transaction with the specified hash.
 	 *
 	 * @param hash The desired hash.
