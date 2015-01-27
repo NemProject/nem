@@ -94,7 +94,7 @@ public class MultisigSignatureMatchPredicateTest {
 		}
 
 		public MultisigSignatureTransaction createSignatureTransaction(final Account signer, final Hash hash) {
-			return new MultisigSignatureTransaction(TimeInstant.ZERO, signer, hash);
+			return new MultisigSignatureTransaction(TimeInstant.ZERO, signer, this.multisig, hash);
 		}
 
 		public MultisigTransaction createMultisigTransaction(final Account signer) {

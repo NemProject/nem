@@ -24,6 +24,7 @@ public class MultisigSignatureTransactionTest {
 		final MultisigSignatureTransaction transaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				account,
+				Utils.generateRandomAccount(),
 				hash);
 
 		// Assert:
@@ -42,6 +43,7 @@ public class MultisigSignatureTransactionTest {
 		final MultisigSignatureTransaction originalTransaction = new MultisigSignatureTransaction(
 				new TimeInstant(123),
 				account,
+				Utils.generateRandomAccount(),
 				hash);
 
 		// Act:
@@ -86,6 +88,7 @@ public class MultisigSignatureTransactionTest {
 		final Transaction transaction = new MultisigSignatureTransaction(
 				TimeInstant.ZERO,
 				signer,
+				Utils.generateRandomAccount(),
 				Utils.generateRandomHash());
 
 		// Act:
@@ -136,6 +139,7 @@ public class MultisigSignatureTransactionTest {
 	private static MultisigSignatureTransaction createDefaultTransaction() {
 		return new MultisigSignatureTransaction(
 				new TimeInstant(123),
+				Utils.generateRandomAccount(),
 				Utils.generateRandomAccount(),
 				Utils.generateRandomHash());
 	}

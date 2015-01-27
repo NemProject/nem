@@ -100,7 +100,8 @@ public class UnconfirmedTransactionsMultisigTest {
 		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
 				CURRENT_TIME,
 				context.cosigner2,
-				HashUtils.calculateHash(t1));
+				context.multisig,
+				t1);
 		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
 		signatureTransaction.sign();
 
@@ -201,7 +202,11 @@ public class UnconfirmedTransactionsMultisigTest {
 		}
 
 		public MultisigSignatureTransaction createSignatureTransaction(final TimeInstant signatureTime) {
-			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(signatureTime, context.cosigner2, HashUtils.calculateHash(t1));
+			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
+					signatureTime,
+					context.cosigner2,
+					context.multisig,
+					t1);
 			signature.setDeadline(signature.getTimeStamp().addSeconds(1));
 			signature.sign();
 			return signature;

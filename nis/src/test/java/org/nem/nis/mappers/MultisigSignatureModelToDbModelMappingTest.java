@@ -26,7 +26,7 @@ public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransfer
 
 	@Override
 	protected MultisigSignatureTransaction createModel(final TimeInstant timeStamp, final Account sender) {
-		return new MultisigSignatureTransaction(timeStamp, sender, Utils.generateRandomHash());
+		return new MultisigSignatureTransaction(timeStamp, sender, Utils.generateRandomAccount(), Utils.generateRandomHash());
 	}
 
 	@Override
@@ -42,6 +42,7 @@ public class MultisigSignatureModelToDbModelMappingTest extends AbstractTransfer
 		public MultisigSignatureTransaction createModel() {
 			return new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
+					Utils.generateRandomAccount(),
 					Utils.generateRandomAccount(),
 					this.otherTransactionHash);
 		}

@@ -24,10 +24,10 @@ public class BlockITCase {
 		final MultisigTransaction multisigTransaction2 = new MultisigTransaction(TimeInstant.ZERO, sender, transaction);
 		multisigTransaction2.sign();
 
-		final MultisigSignatureTransaction signature1 = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner1, HashUtils.calculateHash(transaction));
+		final MultisigSignatureTransaction signature1 = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner1, multisigAccount, transaction);
 		signature1.sign();
 
-		final MultisigSignatureTransaction signature2 = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner2, HashUtils.calculateHash(transaction));
+		final MultisigSignatureTransaction signature2 = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner2, multisigAccount, transaction);
 		signature2.sign();
 
 		multisigTransaction1.addSignature(signature1);

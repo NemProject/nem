@@ -17,7 +17,7 @@ import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
-import java.util.List;
+import java.util.*;
 
 /**
  * This suite is different from BlockChainValidatorTest because it uses REAL validators
@@ -309,6 +309,7 @@ public class BlockChainValidatorIntegrationTest {
 	// MultisigTransaction against issuer,
 	// INNER transaction against multisig account,
 	// signature against cosignatory account
+	// > J-G: i wouldn't say i'm "surprised"; i just wanted to make sure we all agree how the tests should pass
 	@Test
 	public void canValidateMultisigTransferFromCosignerAccountWithZeroBalance() {
 		// Arrange:
@@ -324,7 +325,7 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	@Test
-	public void multisigTransferFeesAndAmountsAreNotDeductedFromCosignerAccounts() {
+	public void multisigTransferHasFeesAndAmountsDeductedFromMultisigAccount() {
 		// Arrange:
 		final BlockChainValidatorFactory factory = createValidatorFactory();
 		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
@@ -335,9 +336,55 @@ public class BlockChainValidatorIntegrationTest {
 		final boolean isValid = runMultisigTransferTest(factory, multisig, cosigner, recipient);
 
 		// Assert:
+		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) = 690
+		// - C 200 - 0 (No Change) = 200
+		// - R 0 + 100 (Inner T amount) = 100
 		Assert.assertThat(isValid, IsEqual.equalTo(true));
-		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(890)));
+		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(690)));
 		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(200)));
+		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
+	}
+
+	@Test
+	public void canValidateMultisigTransferWithMultipleSignaturesFromCosignerAccountWithZeroBalance() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
+		final Account cosigner = factory.createAccountWithBalance(Amount.ZERO);
+		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+		final Account cosigner3 = factory.createAccountWithBalance(Amount.ZERO);
+		final Account recipient = factory.createAccountWithBalance(Amount.ZERO);
+
+		// Act:
+		final boolean isValid = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
+
+		// Assert:
+		Assert.assertThat(isValid, IsEqual.equalTo(true));
+	}
+
+	@Test
+	public void multisigTransferWithMultipleSignaturesHasFeesAndAmountsDeductedFromMultisigAccount() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
+		final Account cosigner = factory.createAccountWithBalance(Amount.fromNem(201));
+		final Account cosigner2 = factory.createAccountWithBalance(Amount.fromNem(202));
+		final Account cosigner3 = factory.createAccountWithBalance(Amount.fromNem(203));
+		final Account recipient = factory.createAccountWithBalance(Amount.ZERO);
+		// Act:
+		final boolean isValid = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
+
+		// Assert:
+		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 21 (Signature fee) = 648
+		// - C1 201 - 0 (No Change) = 201
+		// - C2 202 - 0 (No Change) = 202
+		// - C3 203 - 0 (No Change) = 203
+		// - R 0 + 100 (Inner T amount) = 100
+		Assert.assertThat(isValid, IsEqual.equalTo(true));
+		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(648)));
+		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
+		Assert.assertThat(factory.getAccountInfo(cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
+		Assert.assertThat(factory.getAccountInfo(cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
 		Assert.assertThat(factory.getAccountInfo(recipient).getBalance(), IsEqual.equalTo(Amount.fromNem(100)));
 	}
 
@@ -346,9 +393,27 @@ public class BlockChainValidatorIntegrationTest {
 			final Account multisig,
 			final Account cosigner,
 			final Account recipient) {
+		return runMultisigTransferTest(
+				factory,
+				multisig,
+				cosigner,
+				Arrays.asList(),
+				recipient);
+	}
+
+	private static boolean runMultisigTransferTest(
+			final BlockChainValidatorFactory factory,
+			final Account multisig,
+			final Account cosigner,
+			final List<Account> otherCosigners,
+			final Account recipient) {
 		// Arrange:
 		final BlockChainValidator validator = factory.create();
+
 		factory.setCosigner(multisig, cosigner);
+		for (final Account otherCosigner : otherCosigners) {
+			factory.setCosigner(multisig, otherCosigner);
+		}
 
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
 		parentBlock.sign();
@@ -359,11 +424,14 @@ public class BlockChainValidatorIntegrationTest {
 		transfer = prepareTransaction(transfer);
 		transfer.setSignature(null);
 
-		final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, cosigner, HashUtils.calculateHash(transfer));
-
 		final MultisigTransaction msTransaction = new MultisigTransaction(currentTime, cosigner, transfer);
 		msTransaction.setFee(Amount.fromNem(200));
-		msTransaction.addSignature(prepareTransaction(signatureTransaction));
+
+		for (final Account otherCosigner : otherCosigners) {
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, otherCosigner, multisig, transfer);
+			signatureTransaction.setFee(Amount.fromNem(21));
+			msTransaction.addSignature(prepareTransaction(signatureTransaction));
+		}
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
 		blocks.get(0).addTransaction(prepareTransaction(msTransaction));
