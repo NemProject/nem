@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * First such transaction converts account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
-	final Collection<MultisigModification> modifications;
+	final List<MultisigModification> modifications;
 
 	/**
 	 * Creates a multisig aggregate modification transaction.
@@ -27,11 +27,12 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	public MultisigAggregateModificationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final Collection<MultisigModification> modifications) {
+			final List<MultisigModification> modifications) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 1, timeStamp, sender);
 		this.modifications = modifications;
 
 		validateModifications(this.modifications);
+		Collections.sort(this.modifications);
 	}
 
 	private static void validateModifications(final Collection<MultisigModification> modifications) {
@@ -51,6 +52,7 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 		this.modifications = deserializer.readObjectArray("modifications", obj -> new MultisigModification(obj));
 
 		validateModifications(this.modifications);
+		Collections.sort(this.modifications);
 	}
 
 	/**
@@ -58,8 +60,8 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 *
 	 * @return The modifications.
 	 */
-	public Collection<MultisigModification> getModifications() {
-		return Collections.unmodifiableCollection(this.modifications);
+	public List<MultisigModification> getModifications() {
+		return Collections.unmodifiableList(this.modifications);
 	}
 
 	@Override

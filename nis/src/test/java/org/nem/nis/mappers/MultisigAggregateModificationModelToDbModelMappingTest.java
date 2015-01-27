@@ -60,7 +60,7 @@ public class MultisigAggregateModificationModelToDbModelMappingTest extends Abst
 		private final DbAccount dbSender = Mockito.mock(DbAccount.class);
 		private final org.nem.core.model.Account sender = Utils.generateRandomAccount();
 		private final Map<DbAccount, Integer> expectedModifications = new HashMap<>();
-		final Set<org.nem.core.model.MultisigModification> modifications = new HashSet<>();
+		final List<org.nem.core.model.MultisigModification> modifications = new ArrayList<>();
 		private final MultisigAggregateModificationModelToDbModelMapping mapping = new MultisigAggregateModificationModelToDbModelMapping(this.mapper);
 
 		public TestContext() {

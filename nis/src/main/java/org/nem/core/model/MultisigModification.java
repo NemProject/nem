@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 /**
  * Represents a multisig modification.
  */
-public class MultisigModification implements SerializableEntity {
+public class MultisigModification implements SerializableEntity, Comparable<MultisigModification> {
 	private final MultisigModificationType modificationType;
 	private final Account cosignatoryAccount;
 
@@ -66,5 +66,13 @@ public class MultisigModification implements SerializableEntity {
 		if (!this.modificationType.isValid()) {
 			throw new IllegalArgumentException("invalid mode");
 		}
+	}
+
+	@Override
+	public int compareTo(final MultisigModification rhs) {
+		final int typeCompareResult = Integer.compare(this.modificationType.value(), rhs.modificationType.value());
+		return 0 != typeCompareResult
+				? typeCompareResult
+				: this.cosignatoryAccount.getAddress().getEncoded().compareTo(rhs.cosignatoryAccount.getAddress().getEncoded());
 	}
 }

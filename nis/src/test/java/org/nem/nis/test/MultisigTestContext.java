@@ -3,7 +3,7 @@ package org.nem.nis.test;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
@@ -35,7 +35,7 @@ public class MultisigTestContext {
 		this.addState(this.dummy);
 	}
 
-	public MultisigTransaction createMultisigModificationTransaction(final Collection<MultisigModification> modifications) {
+	public MultisigTransaction createMultisigModificationTransaction(final List<MultisigModification> modifications) {
 		final MultisigAggregateModificationTransaction otherTransaction = new MultisigAggregateModificationTransaction(
 				TimeInstant.ZERO,
 				this.multisig,
