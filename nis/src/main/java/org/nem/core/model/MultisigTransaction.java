@@ -109,9 +109,9 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		Amount totalFee[] = new Amount[] { this.getFee() };
+		final Amount totalFee[] = new Amount[] { this.getFee() };
 		this.signatureTransactions.stream().forEach(t -> {
-			totalFee[0] = totalFee[0].add(this.otherTransaction.getFee());
+			totalFee[0] = totalFee[0].add(t.getFee());
 		});
 
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.otherTransaction.getSigner(), totalFee[0]));
