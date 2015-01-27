@@ -21,6 +21,7 @@ public class MockTransaction extends Transaction {
 	private int customField;
 	private long minimumFee;
 
+	private final Account debtor = Utils.generateRandomAccount();
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
 
@@ -177,6 +178,11 @@ public class MockTransaction extends Transaction {
 	@Override
 	public Amount getMinimumFee() {
 		return new Amount(this.minimumFee);
+	}
+
+	@Override
+	public Account getDebtor() {
+		return this.debtor;
 	}
 
 	/**

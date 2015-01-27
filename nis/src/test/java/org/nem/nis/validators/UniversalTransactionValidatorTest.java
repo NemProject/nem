@@ -89,7 +89,7 @@ public class UniversalTransactionValidatorTest {
 		final ValidationResult result = validate(transaction, debitPredicate);
 
 		// Assert:
-		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), Amount.fromNem(120));
+		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getDebtor(), Amount.fromNem(120));
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
