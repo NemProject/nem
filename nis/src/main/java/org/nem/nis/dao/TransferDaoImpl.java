@@ -316,7 +316,7 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(
+		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
 				transferType,
 				accountId,
 				TransactionTypes.TRANSFER,
@@ -338,7 +338,7 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(
+		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
 				transferType,
 				accountId,
 				TransactionTypes.IMPORTANCE_TRANSFER,
@@ -360,7 +360,7 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final List<TransactionIdBlockHeightPair> listOfIds = getMultisigIds(
+		final List<TransactionIdBlockHeightPair> listOfIds = this.getMultisigIds(
 				transferType,
 				accountId,
 				TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,

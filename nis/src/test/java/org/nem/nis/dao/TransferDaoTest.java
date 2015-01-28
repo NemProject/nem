@@ -471,32 +471,32 @@ public class TransferDaoTest {
 
 		// Assert:
 		// 1) signer of multisig transaction sees his own transactions as outgoing
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				context.multisigSigner,
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				expectedTransactions);
 
 		// 2) multisig account sees the multisig transactions as outgoing (because inner transaction involves the multisig account)
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				context.multisig,
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				expectedTransactions);
 
 		// 3) cosignatories of the multisig transaction see the transactions as outgoing
 		context.cosignatories.stream()
-				.forEach(c -> assertExpectedMultisigTransactions(
+				.forEach(c -> this.assertExpectedMultisigTransactions(
 						c,
 						ReadOnlyTransferDao.TransferType.OUTGOING,
 						expectedTransactions));
 
 		// 4) recipient (if any) of the inner transaction does not see the transaction as outgoing
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				context.recipient,
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				new ArrayList<>());
 
 		// 5) other accounts do not see any transaction as outgoing
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				Utils.generateRandomAccount(),
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				new ArrayList<>());
@@ -510,38 +510,38 @@ public class TransferDaoTest {
 
 		// Assert:
 		// 1) signer of multisig transaction does not any the transaction as incoming
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				context.multisigSigner,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				new ArrayList<>());
 
 		// 2) multisig account does not see any transaction as incoming
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				context.multisig,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				new ArrayList<>());
 
 		// 3) cosignatories of the multisig transaction do not see any transaction as incoming
 		context.cosignatories.stream()
-				.forEach(c -> assertExpectedMultisigTransactions(
+				.forEach(c -> this.assertExpectedMultisigTransactions(
 						c,
 						ReadOnlyTransferDao.TransferType.INCOMING,
 						new ArrayList<>()));
 
 		// 4) recipient (if any) of inner transaction sees the transaction as incoming
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				context.recipient,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				Arrays.asList(context.multisigTransferTransaction, context.multisigImportanceTransferTransaction));
 
 		// 5) the new cosignatory of the inner transaction (in case of modification) sees the transaction as incoming
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				context.newCosignatory,
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				Arrays.asList(context.multisigAggregateModificationTransaction));
 
 		// 6) other accounts do not see any transaction as incoming
-		assertExpectedMultisigTransactions(
+		this.assertExpectedMultisigTransactions(
 				Utils.generateRandomAccount(),
 				ReadOnlyTransferDao.TransferType.INCOMING,
 				new ArrayList<>());
@@ -578,7 +578,7 @@ public class TransferDaoTest {
 		private final Account recipient;
 		private final List<Account> cosignatories;
 		private final Account newCosignatory;
-		private Collection<Transaction> transactions;
+		private final Collection<Transaction> transactions;
 		private MultisigTransaction multisigTransferTransaction;
 		private MultisigTransaction multisigImportanceTransferTransaction;
 		private MultisigTransaction multisigAggregateModificationTransaction;

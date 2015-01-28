@@ -34,8 +34,8 @@ public class BlockDaoImpl implements BlockDao {
 
 	private <TDbModel extends AbstractBlockTransfer> void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
-		ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
-		ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
+		final ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
+		final ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
 		// TODO 20150122 BR -> G, J: should the DbBlock create empty lists for the different transaction types or is that a problem for hibernate?
 		if (null == block.getBlockMultisigTransactions()) {
@@ -69,7 +69,7 @@ public class BlockDaoImpl implements BlockDao {
 			}
 
 			sendList.add(0, this.createSend(transaction.getSender().getId(), txType, height, id));
-			for (DbAccount account : multisigEntry.getOtherAccounts.apply(transaction)) {
+			for (final DbAccount account : multisigEntry.getOtherAccounts.apply(transaction)) {
 				sendList.add(this.createSend(account.getId(), txType, height, id));
 			}
 		}

@@ -23,7 +23,7 @@ public class DbMultisigAccountAction {
 		return accountId;
 	}
 
-	public void setAccountId(Long accountId) {
+	public void setAccountId(final Long accountId) {
 		this.accountId = accountId;
 	}
 
@@ -31,7 +31,7 @@ public class DbMultisigAccountAction {
 		return this.type;
 	}
 
-	public void setType(Integer type) {
+	public void setType(final Integer type) {
 		this.type = type;
 	}
 
@@ -39,7 +39,7 @@ public class DbMultisigAccountAction {
 		return this.height;
 	}
 
-	public void setHeight(Long height) {
+	public void setHeight(final Long height) {
 		this.height = height;
 	}
 
@@ -47,7 +47,7 @@ public class DbMultisigAccountAction {
 		return this.transactionId;
 	}
 
-	public void setTransactionId(Long transactionId) {
+	public void setTransactionId(final Long transactionId) {
 		this.transactionId = transactionId;
 	}
 }

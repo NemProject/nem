@@ -71,7 +71,7 @@ public class LocalController {
 			return this.host.isNetworkBooting() ? NemStatus.BOOTING : NemStatus.RUNNING;
 		}
 
-		if (0 == this.host.getNetwork().getNodes().getActiveNodes().size()) {
+		if (this.host.getNetwork().getNodes().getActiveNodes().isEmpty()) {
 			return NemStatus.NO_REMOTE_NIS_AVAILABLE;
 		}
 

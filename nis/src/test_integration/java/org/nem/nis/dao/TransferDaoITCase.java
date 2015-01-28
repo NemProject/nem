@@ -35,7 +35,7 @@ public class TransferDaoITCase {
 		try {
 			final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties");
 			LogManager.getLogManager().readConfiguration(inputStream);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -54,7 +54,7 @@ public class TransferDaoITCase {
 		final int numRounds = 10;
 		final MockAccountDao mockAccountDao = new MockAccountDao();
 		final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
-		List<Account> accounts;
+		final List<Account> accounts;
 		if (populateDatabase) {
 			final int numBlocks = 5000;
 			final int numTransactionPerBlock = 100;
