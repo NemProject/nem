@@ -6,7 +6,8 @@ import org.mockito.Mockito;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
-import org.nem.core.node.NodeCollection;
+import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
@@ -138,6 +139,10 @@ public class LocalControllerTest {
 		private TestContext() {
 			this.controller = new LocalController(this.host, this.starter);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
+
+			final NodeCollection nodes = new NodeCollection();
+			nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
+			Mockito.when(this.network.getNodes()).thenReturn(nodes);
 		}
 	}
 }

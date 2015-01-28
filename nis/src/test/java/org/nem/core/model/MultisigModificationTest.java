@@ -93,31 +93,6 @@ public class MultisigModificationTest {
 		Assert.assertThat(modification6.compareTo(modification2) == 0, IsEqual.equalTo(true));
 	}
 
-	// TODO 20150127 J-B: this test seems wrong
-	@Test
-	public void addingMultisigModificationsToListSortsList() {
-		// Act:
-		final List<MultisigModification> modifications = new ArrayList<>();
-		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "C"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Del, "D"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "A"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Del, "F"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "B"));
-		modifications.add(this.createMultisigModification(MultisigModificationType.Del, "E"));
-
-		// Assert:
-		for (int i = 0; i < 3; i++) {
-			Assert.assertThat(modifications.get(i).getModificationType(), IsEqual.equalTo(MultisigModificationType.Add));
-			Assert.assertThat(
-					modifications.get(i).getCosignatory().getAddress().getEncoded(),
-					IsEqual.equalTo(Character.toString((char)(i + (int)'A'))));
-			Assert.assertThat(modifications.get(i + 3).getModificationType(), IsEqual.equalTo(MultisigModificationType.Del));
-			Assert.assertThat(
-					modifications.get(i + 3).getCosignatory().getAddress().getEncoded(),
-					IsEqual.equalTo(Character.toString((char)(i + (int)'D'))));
-		}
-	}
-
 	private MultisigModification createMultisigModification(final MultisigModificationType modificationType, final String encodedAddress) {
 		return new MultisigModification(modificationType, new Account(Address.fromEncoded(encodedAddress)));
 	}

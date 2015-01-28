@@ -708,10 +708,12 @@ public class TransferDaoTest {
 		}
 
 		public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
-			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(TimeInstant.ZERO,
+			final Transaction otherTransaction = multisigTransaction.getOtherTransaction();
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
+					TimeInstant.ZERO,
 					signatureSigner,
-					multisigTransaction.getSigner(),
-					HashUtils.calculateHash(multisigTransaction.getOtherTransaction()));
+					otherTransaction.getSigner(),
+					otherTransaction);
 			signatureTransaction.sign();
 			multisigTransaction.addSignature(signatureTransaction);
 		}
