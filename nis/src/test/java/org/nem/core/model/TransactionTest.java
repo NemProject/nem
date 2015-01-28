@@ -28,6 +28,7 @@ public class TransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
 		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));
@@ -45,6 +46,7 @@ public class TransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signerPublicKeyOnly));
 		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(new Amount(130L)));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(MockTransaction.TIMESTAMP));
 		Assert.assertThat(transaction.getDeadline(), IsEqual.equalTo(MockTransaction.DEADLINE));

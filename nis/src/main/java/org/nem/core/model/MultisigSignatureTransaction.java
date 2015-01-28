@@ -33,9 +33,6 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 		this.multisig = multisig;
 	}
 
-	// TODO 20140126 J-J: need to add tests for this constructor
-	// TODO 20140126 J-J: need to expose multisig
-	// TODO 20140126 J-J: need to add validation
 	/**
 	 * Creates a multisig signature transaction.
 	 *
@@ -75,7 +72,7 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 
 	@Override
 	protected void transfer(final TransactionObserver observer) {
-		//observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
+		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
 	}
 
 	@Override

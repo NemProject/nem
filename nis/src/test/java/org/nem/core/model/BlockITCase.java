@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 
 public class BlockITCase {
@@ -19,15 +19,16 @@ public class BlockITCase {
 		final Account cosigner2 = Utils.generateRandomAccount();
 
 		final Transaction transaction = new TransferTransaction(TimeInstant.ZERO, multisigAccount, recipient, Amount.fromNem(123), null);
-		final MultisigTransaction multisigTransaction1 = new MultisigTransaction(TimeInstant.ZERO, sender, transaction);
+		final SimpleMultisigContext context = new SimpleMultisigContext(transaction);
+		final MultisigTransaction multisigTransaction1 = context.createMultisig(sender);
 		multisigTransaction1.sign();
-		final MultisigTransaction multisigTransaction2 = new MultisigTransaction(TimeInstant.ZERO, sender, transaction);
+		final MultisigTransaction multisigTransaction2 = context.createMultisig(sender);
 		multisigTransaction2.sign();
 
-		final MultisigSignatureTransaction signature1 = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner1, multisigAccount, transaction);
+		final MultisigSignatureTransaction signature1 = context.createSignature(cosigner1);
 		signature1.sign();
 
-		final MultisigSignatureTransaction signature2 = new MultisigSignatureTransaction(TimeInstant.ZERO, cosigner2, multisigAccount, transaction);
+		final MultisigSignatureTransaction signature2 = context.createSignature(cosigner2);
 		signature2.sign();
 
 		multisigTransaction1.addSignature(signature1);

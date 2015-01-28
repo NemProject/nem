@@ -39,6 +39,7 @@ public class ImportanceTransferTransactionTest {
 		// Assert:
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
 		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(2)));
@@ -124,6 +125,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(transaction.getType(), IsEqual.equalTo(TransactionTypes.IMPORTANCE_TRANSFER));
 		Assert.assertThat(transaction.getTimeStamp(), IsEqual.equalTo(TIME));
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
 		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(2)));

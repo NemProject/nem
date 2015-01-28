@@ -38,6 +38,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
@@ -55,6 +56,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
@@ -74,6 +76,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
@@ -93,6 +96,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());

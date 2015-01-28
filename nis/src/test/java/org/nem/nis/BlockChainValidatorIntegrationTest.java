@@ -302,14 +302,6 @@ public class BlockChainValidatorIntegrationTest {
 
 	//region multisig tests
 
-	// TODO 20150125 J-G,B: this is currently failing because the other transaction fee is being validated
-	// > against the originating cosigner balance AND the multisig fee is being deducted from the cosigner account
-	// G-J: truly saying I'm not sure, why you are surprised.
-	// Unless you've changed something, and I've missed that, validation of fees always was/is as follows:
-	// MultisigTransaction against issuer,
-	// INNER transaction against multisig account,
-	// signature against cosignatory account
-	// > J-G: i wouldn't say i'm "surprised"; i just wanted to make sure we all agree how the tests should pass
 	@Test
 	public void canValidateMultisigTransferFromCosignerAccountWithZeroBalance() {
 		// Arrange:

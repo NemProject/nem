@@ -5,7 +5,6 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
-import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.MultisigTestContext;
 
 import java.util.*;
@@ -132,35 +131,6 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		// Sanity:
 		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
-	}
-
-	@Test
-	public void validationFailsIfAnySignatureContainsMismatchedHash() {
-		// Arrange:
-		// - create a multisig account with two cosigners (signer, dummy)
-		// - signer signature is automatically added because it signed transaction
-		// - dummy should sign the wrong transaction (a random hash)
-		final MultisigTestContext context = new MultisigTestContext();
-		MultisigTransaction transaction = context.createMultisigTransferTransaction();
-		context.makeCosignatory(context.signer, context.multisig);
-		context.makeCosignatory(context.dummy, context.multisig);
-
-		// ugly but the only way to simulate a mismatched signature (MultisigTransaction does not allow one to be added)
-		final Set<MultisigSignatureTransaction> signatures = new HashSet<>();
-		signatures.add(new MultisigSignatureTransaction(
-				TimeInstant.ZERO,
-				context.dummy,
-				context.multisig,
-				Utils.generateRandomHash()));
-
-		transaction = Mockito.spy(transaction);
-		Mockito.when(transaction.getCosignerSignatures()).thenReturn(signatures);
-
-		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MISMATCHED_SIGNATURE));
 	}
 
 	@Test

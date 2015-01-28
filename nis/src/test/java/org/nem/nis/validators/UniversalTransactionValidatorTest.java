@@ -79,6 +79,7 @@ public class UniversalTransactionValidatorTest {
 	private static void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
+		transaction.setUseRandomDebtor(true);
 		transaction.setFee(Amount.fromNem(120));
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
 
@@ -89,7 +90,7 @@ public class UniversalTransactionValidatorTest {
 		final ValidationResult result = validate(transaction, debitPredicate);
 
 		// Assert:
-		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), Amount.fromNem(120));
+		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getDebtor(), Amount.fromNem(120));
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 

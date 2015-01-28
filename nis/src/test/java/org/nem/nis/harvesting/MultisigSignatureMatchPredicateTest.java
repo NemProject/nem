@@ -43,6 +43,22 @@ public class MultisigSignatureMatchPredicateTest {
 	}
 
 	@Test
+	public void isNotMatchIfSignatureAndMultisigTransactionsHaveDifferentMultisigAccounts() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final MultisigSignatureTransaction signatureTransaction = context.createSignatureTransactionWithMultisig(
+				context.cosigner1,
+				Utils.generateRandomAccount());
+		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(context.cosigner2);
+
+		// Act:
+		final boolean isMatch = context.predicate.isMatch(signatureTransaction, multisigTransaction);
+
+		// Assert:
+		Assert.assertThat(isMatch, IsEqual.equalTo(false));
+	}
+
+	@Test
 	public void isNotMatchIfSignatureIsSignedByNonCosigner() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -78,6 +94,7 @@ public class MultisigSignatureMatchPredicateTest {
 		private final Account cosigner2 = Utils.generateRandomAccount();
 		private final Account multisig = Utils.generateRandomAccount();
 		private final Transaction otherTransaction = new MockTransaction(this.multisig);
+		private final Hash otherTransactionHash = HashUtils.calculateHash(this.otherTransaction);
 
 		public TestContext() {
 			Mockito.when(this.accountStateCache.findStateByAddress(Mockito.any()))
@@ -90,7 +107,11 @@ public class MultisigSignatureMatchPredicateTest {
 		}
 
 		public MultisigSignatureTransaction createSignatureTransaction(final Account signer) {
-			return createSignatureTransaction(signer, HashUtils.calculateHash(this.otherTransaction));
+			return this.createSignatureTransaction(signer, this.otherTransactionHash);
+		}
+
+		public MultisigSignatureTransaction createSignatureTransactionWithMultisig(final Account signer, final Account multisig) {
+			return new MultisigSignatureTransaction(TimeInstant.ZERO, signer, multisig, this.otherTransactionHash);
 		}
 
 		public MultisigSignatureTransaction createSignatureTransaction(final Account signer, final Hash hash) {

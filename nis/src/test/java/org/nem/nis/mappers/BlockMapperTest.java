@@ -432,9 +432,6 @@ public class BlockMapperTest {
 		final Transaction transaction2 = new TransferTransaction(new TimeInstant(400), context.account3, context.account2, new Amount(15), null);
 		context.model.addTransaction(new MultisigTransaction(new TimeInstant(400), context.account1, transaction2));
 
-		for (final Transaction transaction : context.model.getTransactions()) {
-			transaction.sign();
-		}
 		context.signModel();
 
 		final DbBlock dbModel = context.toDbModel();
@@ -513,15 +510,13 @@ public class BlockMapperTest {
 	}
 
 	private class TestContext {
-
 		private final Block model;
 		private final DbAccount dbHarvester;
 		private final Account account1;
-		private final DbAccount dbAccount1;
 		private final Account account2;
-		private final DbAccount dbAccount2;
 		private final Account account3;
-		private final DbAccount dbAccount3;
+		private final Account account4;
+		private final List<Account> accounts = new ArrayList<>();
 		private final MockAccountDao accountDao;
 		private final Hash blockGenerationHash;
 		private Hash hash;
@@ -544,20 +539,19 @@ public class BlockMapperTest {
 			this.dbHarvester.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
 			this.dbHarvester.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
 
-			this.account1 = Utils.generateRandomAccount();
-			this.dbAccount1 = this.createDbAccount(this.account1);
-
-			this.account2 = Utils.generateRandomAccount();
-			this.dbAccount2 = this.createDbAccount(this.account2);
-
-			this.account3 = Utils.generateRandomAccount();
-			this.dbAccount3 = this.createDbAccount(this.account3);
-
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbHarvester);
-			this.accountDao.addMapping(this.account1, this.dbAccount1);
-			this.accountDao.addMapping(this.account2, this.dbAccount2);
-			this.accountDao.addMapping(this.account3, this.dbAccount3);
+
+			for (int i = 0; i < 4; ++i) {
+				final Account account = Utils.generateRandomAccount();
+				this.accounts.add(account);
+				this.accountDao.addMapping(account, this.createDbAccount(account));
+			}
+
+			this.account1 = this.accounts.get(0);
+			this.account2 = this.accounts.get(1);
+			this.account3 = this.accounts.get(2);
+			this.account4 = this.accounts.get(3);
 		}
 
 		public void addLessor() {
@@ -585,9 +579,7 @@ public class BlockMapperTest {
 		public Block toModel(final DbBlock dbBlock) {
 			final MockAccountLookup mockAccountLookup = new MockAccountLookup();
 			mockAccountLookup.setMockAccount(this.model.getSigner());
-			mockAccountLookup.setMockAccount(this.account1);
-			mockAccountLookup.setMockAccount(this.account2);
-			mockAccountLookup.setMockAccount(this.account3);
+			this.accounts.forEach(mockAccountLookup::setMockAccount);
 			return MapperUtils.createDbModelToModelNisMapper(mockAccountLookup).map(dbBlock);
 		}
 
@@ -599,10 +591,6 @@ public class BlockMapperTest {
 			this.model.addTransaction(new TransferTransaction(
 					new TimeInstant(300), this.account3, this.account1, new Amount(4), null));
 
-			for (final Transaction transaction : this.model.getTransactions()) {
-				transaction.sign();
-			}
-
 			this.signModel();
 		}
 
@@ -611,10 +599,6 @@ public class BlockMapperTest {
 					new TimeInstant(150), this.account1, ImportanceTransferTransaction.Mode.Activate, this.account2));
 			this.model.addTransaction(new ImportanceTransferTransaction(
 					new TimeInstant(250), this.account3, ImportanceTransferTransaction.Mode.Activate, this.account2));
-
-			for (final Transaction transaction : this.model.getTransactions()) {
-				transaction.sign();
-			}
 
 			this.signModel();
 		}
@@ -625,10 +609,6 @@ public class BlockMapperTest {
 			final List<MultisigModification> modifications2 = Arrays.asList(new MultisigModification(MultisigModificationType.Add, this.account3));
 			this.model.addTransaction(new MultisigAggregateModificationTransaction(new TimeInstant(250), this.account1, modifications2));
 
-			for (final Transaction transaction : this.model.getTransactions()) {
-				transaction.sign();
-			}
-
 			this.signModel();
 		}
 
@@ -638,10 +618,6 @@ public class BlockMapperTest {
 
 			this.model.addTransaction(new MultisigTransaction(new TimeInstant(100), this.account3, transfer1));
 			this.model.addTransaction(new MultisigTransaction(new TimeInstant(200), this.account3, transfer2));
-
-			for (final Transaction transaction : this.model.getTransactions()) {
-				transaction.sign();
-			}
 
 			this.signModel();
 		}
@@ -655,8 +631,8 @@ public class BlockMapperTest {
 
 			final MultisigSignatureTransaction multisigSignature1 = new MultisigSignatureTransaction(
 					new TimeInstant(123),
+					this.account4,
 					this.account1,
-					this.account3,
 					transferHash);
 			multisigSignature1.sign();
 			multisigTransaction.addSignature(multisigSignature1);
@@ -664,16 +640,16 @@ public class BlockMapperTest {
 			final MultisigSignatureTransaction multisigSignature2 = new MultisigSignatureTransaction(
 					new TimeInstant(132),
 					this.account2,
-					this.account3,
+					this.account1,
 					transferHash);
 			multisigSignature2.sign();
 			multisigTransaction.addSignature(multisigSignature2);
 
-			this.model.getTransactions().forEach(org.nem.core.model.Transaction::sign);
 			this.signModel();
 		}
 
 		private void signModel() {
+			this.model.getTransactions().forEach(org.nem.core.model.Transaction::sign);
 			this.model.sign();
 			this.hash = HashUtils.calculateHash(this.model);
 		}

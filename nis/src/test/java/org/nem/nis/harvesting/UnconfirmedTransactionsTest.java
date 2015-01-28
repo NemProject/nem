@@ -326,12 +326,12 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext(new UniversalTransactionValidator());
 		final Account sender = context.addAccount(Amount.fromNem(10));
 
-		final Transaction t1 = new MockTransaction(sender);
+		final MockTransaction t1 = new MockTransaction(sender);
 		t1.setFee(Amount.fromNem(6));
 		context.signAndAddExisting(t1);
 
 		// Act:
-		final Transaction t2 = new MockTransaction(sender);
+		final MockTransaction t2 = new MockTransaction(sender);
 		t2.setFee(Amount.fromNem(5));
 		final ValidationResult result = context.signAndAddExisting(t2);
 

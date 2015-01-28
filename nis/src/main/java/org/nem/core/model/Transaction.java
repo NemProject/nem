@@ -167,8 +167,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	protected abstract Collection<Account> getOtherAccounts();
 
-	// TODO 20150126 J-J add tests for this field
-
 	/**
 	 * Gets the debtor that is responsible for paying the fee.
 	 *

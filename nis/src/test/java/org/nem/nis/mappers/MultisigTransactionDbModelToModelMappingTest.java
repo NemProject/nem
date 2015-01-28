@@ -142,7 +142,7 @@ public class MultisigTransactionDbModelToModelMappingTest extends AbstractTransf
 			final MultisigSignatureTransaction signature = new MultisigSignatureTransaction(
 					TimeInstant.ZERO,
 					Utils.generateRandomAccount(),
-					Utils.generateRandomAccount(),
+					this.expectedOtherTransaction.getSigner(),
 					HashUtils.calculateHash(this.expectedOtherTransaction));
 			Mockito.when(this.mapper.map(dbSignature, MultisigSignatureTransaction.class)).thenReturn(signature);
 

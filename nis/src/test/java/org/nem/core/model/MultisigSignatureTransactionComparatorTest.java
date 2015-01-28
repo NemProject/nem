@@ -8,19 +8,16 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 
 public class MultisigSignatureTransactionComparatorTest {
-
-	// TODO 20140126 J-J: should use defaults
-	// TODO 20140126 J-J: check behavior when multisig is different
+	private static final TimeInstant TIME_INSTANT = new TimeInstant(123);
+	private static final Account SENDER = Utils.generateRandomAccount();
+	private static final Account MULTISIG = Utils.generateRandomAccount();
+	private static final Hash HASH = Utils.generateRandomHash();
 
 	@Test
 	public void comparingEqualTransactionsYieldsEqual() {
 		// Arrange:
-		final TimeInstant timeInstant = new TimeInstant(123);
-		final Account sender = Utils.generateRandomAccount();
-		final Account multisig = Utils.generateRandomAccount();
-		final Hash hash = Utils.generateRandomHash();
-		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(timeInstant, sender, multisig, hash);
-		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(timeInstant, sender, multisig, hash);
+		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, MULTISIG, HASH);
+		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, MULTISIG, HASH);
 
 		// Act
 		final int result = compare(lhs, rhs);
@@ -32,14 +29,10 @@ public class MultisigSignatureTransactionComparatorTest {
 	@Test
 	public void comparingTransactionsWithDifferentFeeYieldsEqual() {
 		// Arrange:
-		final TimeInstant timeInstant = new TimeInstant(123);
-		final Account sender = Utils.generateRandomAccount();
-		final Account multisig = Utils.generateRandomAccount();
-		final Hash hash = Utils.generateRandomHash();
-		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(timeInstant, sender, multisig, hash);
-		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(timeInstant, sender, multisig, hash);
-
+		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, MULTISIG, HASH);
+		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, MULTISIG, HASH);
 		lhs.setFee(Amount.fromNem(12345));
+		rhs.setFee(Amount.fromNem(44444));
 
 		// Act
 		final int result = compare(lhs, rhs);
@@ -51,11 +44,21 @@ public class MultisigSignatureTransactionComparatorTest {
 	@Test
 	public void comparingTransactionsWithDifferentTimeStampYieldsEqual() {
 		// Arrange:
-		final Account sender = Utils.generateRandomAccount();
-		final Account multisig = Utils.generateRandomAccount();
-		final Hash hash = Utils.generateRandomHash();
-		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(new TimeInstant(123), sender, multisig, hash);
-		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(new TimeInstant(987), sender, multisig, hash);
+		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(new TimeInstant(123), SENDER, MULTISIG, HASH);
+		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(new TimeInstant(987), SENDER, MULTISIG, HASH);
+
+		// Act
+		final int result = compare(lhs, rhs);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(0));
+	}
+
+	@Test
+	public void comparingTransactionsWithDifferentMultisigYieldsEqual() {
+		// Arrange:
+		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, Utils.generateRandomAccount(), HASH);
+		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, Utils.generateRandomAccount(), HASH);
 
 		// Act
 		final int result = compare(lhs, rhs);
@@ -67,13 +70,10 @@ public class MultisigSignatureTransactionComparatorTest {
 	@Test
 	public void comparingTransactionsWithDifferentSenderYieldsDifferent() {
 		// Arrange:
-		final TimeInstant timeInstant = new TimeInstant(123);
 		final Account sender1 = Utils.generateRandomAccount();
 		final Account sender2 = Utils.generateRandomAccount();
-		final Account multisig = Utils.generateRandomAccount();
-		final Hash hash = Utils.generateRandomHash();
-		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(timeInstant, sender1, multisig, hash);
-		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(timeInstant, sender2, multisig, hash);
+		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(TIME_INSTANT, sender1, MULTISIG, HASH);
+		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(TIME_INSTANT, sender2, MULTISIG, HASH);
 
 		// Act
 		final int result = compare(lhs, rhs);
@@ -85,13 +85,10 @@ public class MultisigSignatureTransactionComparatorTest {
 	@Test
 	public void comparingTransactionsWithDifferentHashYieldsDifferent() {
 		// Arrange:
-		final TimeInstant timeInstant = new TimeInstant(123);
-		final Account sender = Utils.generateRandomAccount();
-		final Account multisig = Utils.generateRandomAccount();
 		final Hash hash1 = Utils.generateRandomHash();
 		final Hash hash2 = Utils.generateRandomHash();
-		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(timeInstant, sender, multisig, hash1);
-		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(timeInstant, sender, multisig, hash2);
+		final MultisigSignatureTransaction lhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, MULTISIG, hash1);
+		final MultisigSignatureTransaction rhs = new MultisigSignatureTransaction(TIME_INSTANT, SENDER, MULTISIG, hash2);
 
 		// Act
 		final int result = compare(lhs, rhs);

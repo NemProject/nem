@@ -1,6 +1,5 @@
 package org.nem.nis.validators;
 
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
@@ -41,16 +40,12 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	private ValidationResult validate(final MultisigTransaction transaction) {
 		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
 
-		final Hash transactionHash = transaction.getOtherTransactionHash();
 		final HashSet<Address> signerAddresses = new HashSet<>();
 		signerAddresses.add(transaction.getSigner().getAddress());
-		for (final MultisigSignatureTransaction signature : transaction.getCosignerSignatures()) {
-			if (!transactionHash.equals(signature.getOtherTransactionHash())) {
-				return ValidationResult.FAILURE_MULTISIG_MISMATCHED_SIGNATURE;
-			}
 
-			signerAddresses.add(signature.getSigner().getAddress());
-		}
+		// note that we don't need to revalidate signatures here because a multisig signature transaction
+		// does not allow the addition of invalid signatures
+		signerAddresses.addAll(transaction.getCosignerSignatures().stream().map(s -> s.getSigner().getAddress()).collect(Collectors.toList()));
 
 		final List<Address> accountsForRemoval = getRemovedAddresses(transaction);
 		if (accountsForRemoval.size() > 1) {
