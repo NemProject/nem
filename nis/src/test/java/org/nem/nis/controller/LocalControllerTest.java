@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
+import org.nem.core.node.NodeCollection;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
@@ -103,6 +104,20 @@ public class LocalControllerTest {
 
 		// Assert:
 		assertStatus(result, NemStatus.SYNCHRONIZED);
+	}
+
+	@Test
+	public void statusReturnsStatusNoRemoteNisWhenNetworkIsBootedAndNoRemoteNisIsAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.host.isNetworkBooted()).thenReturn(true);
+		Mockito.when(context.network.getNodes()).thenReturn(new NodeCollection());
+
+		// Act:
+		final NemRequestResult result = context.controller.status();
+
+		// Assert:
+		assertStatus(result, NemStatus.NO_REMOTE_NIS_AVAILABLE);
 	}
 
 	private static void assertStatus(final NemRequestResult result, final NemStatus expectedStatus) {
