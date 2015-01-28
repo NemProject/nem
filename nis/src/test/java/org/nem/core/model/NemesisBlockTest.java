@@ -48,6 +48,8 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
 
+	// TODO 20150127 J-G: this test seems to be failing because there are transactions in the nemesis block not signed
+	// > by the nemesis account; is that intentional? if so, the changes i made won't work...
 	@Test
 	public void nemesisTransactionsAreVerifiable() {
 		// Arrange:
