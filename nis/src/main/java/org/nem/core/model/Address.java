@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * A NEM address.
  */
-public class Address {
+public class Address implements Comparable<Address> {
 	private static final int NUM_CHECKSUM_BYTES = 4;
 	private static final int NUM_DECODED_BYTES_LENGTH = 40;
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
@@ -172,6 +172,11 @@ public class Address {
 	@Override
 	public String toString() {
 		return this.encoded;
+	}
+
+	@Override
+	public int compareTo(final Address rhs) {
+		return this.getEncoded().compareTo(rhs.getEncoded());
 	}
 
 	/**

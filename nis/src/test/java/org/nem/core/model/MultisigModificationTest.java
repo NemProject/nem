@@ -73,24 +73,23 @@ public class MultisigModificationTest {
 	public void compareToReturnsExpectedResult() {
 		// Arrange:
 		// TODO 20150127 J-B: can you add these to a list / array in sorted order and loop over the array to compare all pairs?
-		final MultisigModification modification1 = this.createMultisigModification(MultisigModificationType.Add, "C");
-		final MultisigModification modification2 = this.createMultisigModification(MultisigModificationType.Del, "C");
-		final MultisigModification modification3 = this.createMultisigModification(MultisigModificationType.Add, "D");
-		final MultisigModification modification4 = this.createMultisigModification(MultisigModificationType.Del, "G");
-		final MultisigModification modification5 = this.createMultisigModification(MultisigModificationType.Add, "C");
-		final MultisigModification modification6 = this.createMultisigModification(MultisigModificationType.Del, "C");
+		// TODO 20150128 BR -> J: sure.
+		final List<MultisigModification> modifications = new ArrayList<>();
+		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "C"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "D"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "E"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.Del, "C"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.Del, "D"));
+		modifications.add(this.createMultisigModification(MultisigModificationType.Del, "E"));
 
 		// Assert:
-		Assert.assertThat(modification1.compareTo(modification2) < 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification2.compareTo(modification1) > 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification1.compareTo(modification3) < 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification3.compareTo(modification1) > 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification2.compareTo(modification4) < 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification4.compareTo(modification2) > 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification1.compareTo(modification5) == 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification5.compareTo(modification1) == 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification2.compareTo(modification6) == 0, IsEqual.equalTo(true));
-		Assert.assertThat(modification6.compareTo(modification2) == 0, IsEqual.equalTo(true));
+		for (int i = 0; i < modifications.size(); i++) {
+			for (int j = 0; j < modifications.size(); j++) {
+				Assert.assertThat(modifications.get(i).compareTo(modifications.get(j)) > 0, IsEqual.equalTo(i > j));
+				Assert.assertThat(modifications.get(i).compareTo(modifications.get(j)) == 0, IsEqual.equalTo(i == j));
+				Assert.assertThat(modifications.get(i).compareTo(modifications.get(j)) < 0, IsEqual.equalTo(i < j));
+			}
+		}
 	}
 
 	private MultisigModification createMultisigModification(final MultisigModificationType modificationType, final String encodedAddress) {

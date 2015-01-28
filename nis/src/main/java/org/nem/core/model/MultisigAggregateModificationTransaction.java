@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class MultisigAggregateModificationTransaction extends Transaction {
 	// TODO 20150127 J-B: can we change this back to a collection? just sort the list before assigning
 	// > (i don't care about this private field, but for the public api i'd rather expose collection)
+	// TODO 20150128 BR -> J: changed public methods to use collection.
 	private final List<MultisigModification> modifications;
 
 	/**
@@ -29,11 +30,11 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	public MultisigAggregateModificationTransaction(
 			final TimeInstant timeStamp,
 			final Account sender,
-			final List<MultisigModification> modifications) {
+			final Collection<MultisigModification> modifications) {
 		super(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 1, timeStamp, sender);
-		this.modifications = modifications;
 
-		validateModifications(this.modifications);
+		validateModifications(modifications);
+		this.modifications = new ArrayList<>(modifications);
 		Collections.sort(this.modifications);
 	}
 
@@ -62,8 +63,8 @@ public class MultisigAggregateModificationTransaction extends Transaction {
 	 *
 	 * @return The modifications.
 	 */
-	public List<MultisigModification> getModifications() {
-		return Collections.unmodifiableList(this.modifications);
+	public Collection<MultisigModification> getModifications() {
+		return Collections.unmodifiableCollection(this.modifications);
 	}
 
 	@Override

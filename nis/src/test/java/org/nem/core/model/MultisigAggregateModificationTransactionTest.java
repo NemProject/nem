@@ -172,7 +172,7 @@ public class MultisigAggregateModificationTransactionTest {
 
 			// Act:
 			final MultisigAggregateModificationTransaction transaction = createTransaction(Utils.generateRandomAccount(), original);
-			final List<MultisigModification> modifications = transaction.getModifications();
+			final List<MultisigModification> modifications = new ArrayList<>(transaction.getModifications());
 
 			// Assert:
 			for (int i = 0; i < 3; i++) {
