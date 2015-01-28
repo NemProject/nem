@@ -34,8 +34,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final Transaction t1 = context.createTransferTransaction(CURRENT_TIME, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(CURRENT_TIME, t1);
 
-		context.setBalance(context.multisig, Amount.fromNem(10));
-		context.setBalance(context.cosigner1, Amount.fromNem(101));
+		context.setBalance(context.multisig, Amount.fromNem(111));
 
 		// Act:
 		final ValidationResult result = context.transactions.addExisting(multisigTransaction);
@@ -71,8 +70,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final Transaction t1 = context.createTransferTransaction(CURRENT_TIME, Amount.fromNem(7));
 		final MultisigTransaction multisigTransaction = context.createMultisigTransaction(CURRENT_TIME, t1);
 
-		context.setBalance(context.multisig, Amount.fromNem(10));
-		context.setBalance(context.cosigner1, Amount.fromNem(101));
+		context.setBalance(context.multisig, Amount.fromNem(111));
 		context.makeCosignatory(context.cosigner1, context.multisig);
 		context.makeCosignatory(context.cosigner2, context.multisig);
 
@@ -105,9 +103,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		signatureTransaction.setDeadline(signatureTransaction.getTimeStamp().addHours(2));
 		signatureTransaction.sign();
 
-		context.setBalance(context.multisig, Amount.fromNem(10));
-		context.setBalance(context.cosigner1, Amount.fromNem(101));
-		context.setBalance(context.cosigner2, Amount.fromNem(101));
+		context.setBalance(context.multisig, Amount.fromNem(212));
 		context.makeCosignatory(context.cosigner1, context.multisig);
 		context.makeCosignatory(context.cosigner2, context.multisig);
 
@@ -193,9 +189,9 @@ public class UnconfirmedTransactionsMultisigTest {
 			this.context.makeCosignatory(this.context.cosigner1, this.context.multisig);
 			this.context.makeCosignatory(this.context.cosigner2, this.context.multisig);
 
-			this.context.setBalance(this.context.multisig, Amount.fromNem(10));
-			this.context.setBalance(this.context.cosigner1, Amount.fromNem(101));
-			this.context.setBalance(this.context.cosigner2, Amount.fromNem(10));
+			this.context.setBalance(this.context.multisig, Amount.fromNem(121));
+			this.context.setBalance(this.context.cosigner1, Amount.ZERO);
+			this.context.setBalance(this.context.cosigner2, Amount.ZERO);
 
 			this.t1 = context.createTransferTransaction(CURRENT_TIME, Amount.fromNem(7));
 			this.multisigTransaction = context.createMultisigTransaction(CURRENT_TIME, t1);
@@ -238,8 +234,8 @@ public class UnconfirmedTransactionsMultisigTest {
 		final MultisigTransaction multisigTransaction1 = context.createMultisigTransaction(CURRENT_TIME, t1);
 		final MultisigTransaction multisigTransaction2 = context.createMultisigTransaction(CURRENT_TIME.addSeconds(1), t1);
 
-		context.setBalance(context.multisig, Amount.fromNem(16));
-		context.setBalance(context.cosigner1, Amount.fromNem(200));
+		context.setBalance(context.multisig, Amount.fromNem(216));
+		context.setBalance(context.cosigner1, Amount.ZERO);
 
 		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction1);
 		final ValidationResult result2 = context.transactions.addExisting(multisigTransaction2);

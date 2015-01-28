@@ -40,8 +40,8 @@ public class BlockChainServicesTest {
 		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
-		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(34));
-		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(134));
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(168));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.ZERO);
 		context.recalculateImportances(TEST_HEIGHT);
 
 		if (issuedByCosignatory) {
@@ -137,8 +137,8 @@ public class BlockChainServicesTest {
 		private final Account blockSigner = this.context.createAccountWithBalance(Amount.fromNem(1_000_000));
 		private final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 
-		private final Account multisigAccount = this.context.createAccountWithBalance(Amount.fromNem(34));
-		private final Account cosignatory1 = this.context.createAccountWithBalance(Amount.fromNem(200));
+		private final Account multisigAccount = this.context.createAccountWithBalance(Amount.fromNem(234));
+		private final Account cosignatory1 = this.context.createAccountWithBalance(Amount.ZERO);
 
 		private final Transaction transfer = createTransfer(this.multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
 		private final Transaction signedTransfer = createTransfer(this.multisigAccount, Amount.fromNem(10), Amount.fromNem(7));
@@ -209,8 +209,8 @@ public class BlockChainServicesTest {
 		final Block parentBlock = createParentBlock(blockSigner, TEST_HEIGHT);
 		parentBlock.sign();
 
-		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(100 + 10 + 7 + 9));
-		final Account cosignatory1 = context.createAccountWithBalance(Amount.fromNem(200));
+		final Account multisigAccount = context.createAccountWithBalance(Amount.fromNem(100 + 10 + 7 + 9 + 200));
+		final Account cosignatory1 = context.createAccountWithBalance(Amount.ZERO);
 		context.recalculateImportances(TEST_HEIGHT);
 		context.makeCosignatory(cosignatory1, multisigAccount);
 
