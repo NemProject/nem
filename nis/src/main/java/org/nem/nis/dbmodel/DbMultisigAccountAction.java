@@ -1,6 +1,7 @@
 package org.nem.nis.dbmodel;
 
 import javax.persistence.*;
+
 /**
  * Base class holding information about the multisig action of an account
  */

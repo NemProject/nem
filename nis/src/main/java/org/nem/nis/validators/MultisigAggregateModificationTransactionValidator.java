@@ -4,7 +4,7 @@ import org.nem.core.model.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 
-import java.util.*;
+import java.util.HashSet;
 
 /**
  * Single transaction validator that validates a multisig aggregate modification:

@@ -1,6 +1,7 @@
 package org.nem.nis.controller.requests;
 
 import org.nem.core.model.ncc.AccountId;
+
 /**
  * View model that represents a page of account-related information.
  */

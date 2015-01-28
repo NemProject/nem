@@ -65,7 +65,7 @@ public class BlockDaoImpl implements BlockDao {
 				}
 
 				theEntry.getOtherAccounts.apply(transfer).stream()
-						.forEach(a -> receiveList.add(this.createReceive(a.getId(),	theEntry.type, height, id)));
+						.forEach(a -> receiveList.add(this.createReceive(a.getId(), theEntry.type, height, id)));
 			}
 
 			sendList.add(0, this.createSend(transaction.getSender().getId(), txType, height, id));

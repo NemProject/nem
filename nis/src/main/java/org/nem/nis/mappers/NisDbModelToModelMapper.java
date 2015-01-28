@@ -24,6 +24,7 @@ public class NisDbModelToModelMapper {
 
 	// TODO 20150127 J-G: we can probably remove this function
 	// > (and then the tests should automatically use the generic one)
+
 	/**
 	 * Maps a db model transfer transaction to a model transfer transaction.
 	 *

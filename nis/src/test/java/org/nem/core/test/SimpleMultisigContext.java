@@ -61,7 +61,6 @@ public class SimpleMultisigContext {
 		return new MultisigTransaction(TimeInstant.ZERO, cosigner, this.innerTransaction);
 	}
 
-
 	/**
 	 * Creates a signature transaction with the specified hash.
 	 *

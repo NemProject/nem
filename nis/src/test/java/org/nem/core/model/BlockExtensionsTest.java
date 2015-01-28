@@ -64,7 +64,7 @@ public class BlockExtensionsTest {
 		Assert.assertThat(
 				customFields,
 				IsEquivalent.equivalentTo(
-						50,   60,  61,  62,  70,  80,  81,  82,
+						50, 60, 61, 62, 70, 80, 81, 82,
 						100, 110, 111, 112, 120, 130, 131, 132,
 						150, 160, 161, 162, 170, 180, 181, 182));
 	}

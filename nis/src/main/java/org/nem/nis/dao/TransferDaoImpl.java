@@ -387,8 +387,8 @@ public class TransferDaoImpl implements TransferDao {
 		final String table = TransferType.OUTGOING.equals(transferType) ? "multisigsends" : "multisigreceives";
 		final String preQueryTemplate =
 				"SELECT transactionId, height FROM " + table +
-				" WHERE accountId=%d AND type=%d AND transactionId < %d " +
-				"ORDER BY accountId asc, type asc, transactionId DESC";
+						" WHERE accountId=%d AND type=%d AND transactionId < %d " +
+						"ORDER BY accountId asc, type asc, transactionId DESC";
 		final String preQueryString = String.format(preQueryTemplate, accountId, type, maxId);
 		final Query preQuery = this.getCurrentSession()
 				.createSQLQuery(preQueryString)

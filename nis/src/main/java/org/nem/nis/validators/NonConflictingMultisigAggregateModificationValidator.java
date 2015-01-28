@@ -2,7 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 
-import java.util.*;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.*;
 

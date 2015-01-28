@@ -1,7 +1,7 @@
 package org.nem.core.messages;
 
 import org.nem.core.model.*;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.Deserializer;
 
 /**
  * Factory class that can deserialize all known messages.

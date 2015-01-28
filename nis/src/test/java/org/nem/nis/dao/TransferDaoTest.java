@@ -565,7 +565,6 @@ public class TransferDaoTest {
 				.map(HashUtils::calculateHash)
 				.collect(Collectors.toList());
 
-
 		// Assert:
 		Assert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
 	}
@@ -680,7 +679,7 @@ public class TransferDaoTest {
 			return transaction;
 		}
 
-		private TransferTransaction createTransferTransaction(final Account transferSender,	final Account transferRecipient) {
+		private TransferTransaction createTransferTransaction(final Account transferSender, final Account transferRecipient) {
 			return new TransferTransaction(
 					TimeInstant.ZERO,
 					transferSender,
@@ -689,7 +688,7 @@ public class TransferDaoTest {
 					null);
 		}
 
-		private ImportanceTransferTransaction createImportanceTransferTransaction(final Account transferSender,	final Account transferRecipient) {
+		private ImportanceTransferTransaction createImportanceTransferTransaction(final Account transferSender, final Account transferRecipient) {
 			return new ImportanceTransferTransaction(
 					TimeInstant.ZERO,
 					transferSender,

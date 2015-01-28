@@ -489,7 +489,6 @@ public class UnconfirmedTransactionsCacheTest {
 		// Assert:
 		Assert.assertThat(cache.contains(transaction1), IsEqual.equalTo(true));
 		Assert.assertThat(cache.contains(transaction2), IsEqual.equalTo(true));
-
 	}
 
 	@Test

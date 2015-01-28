@@ -1,7 +1,5 @@
 package org.nem.nis;
 
-import org.nem.core.model.primitive.BlockHeight;
-
 /**
  * Common place to have BlockChain-related constants accessible
  * from both org.nem.nis and org.nem.core packages

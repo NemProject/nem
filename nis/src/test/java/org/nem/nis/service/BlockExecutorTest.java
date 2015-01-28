@@ -385,7 +385,7 @@ public class BlockExecutorTest {
 		final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
 
 		// Act:
-		final TransactionHashesNotification notification =  context.undo(observer);
+		final TransactionHashesNotification notification = context.undo(observer);
 
 		// check notification
 		Assert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));

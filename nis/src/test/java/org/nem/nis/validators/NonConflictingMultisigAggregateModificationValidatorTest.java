@@ -1,12 +1,11 @@
 package org.nem.nis.validators;
 
-import junit.framework.TestCase;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.test.*;
+import org.nem.nis.test.DebitPredicates;
 
 import java.util.*;
 import java.util.stream.*;

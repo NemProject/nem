@@ -7,7 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 import org.nem.nis.test.MultisigTestContext;
 
-import java.util.*;
+import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 public class MultisigSignaturesPresentValidatorTest {
@@ -107,7 +107,7 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		// Sanity:
 		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
-		Assert.assertThat(transaction.getSigners(),  IsEquivalent.equivalentTo(context.dummy));
+		Assert.assertThat(transaction.getSigners(), IsEquivalent.equivalentTo(context.dummy));
 	}
 
 	@Test

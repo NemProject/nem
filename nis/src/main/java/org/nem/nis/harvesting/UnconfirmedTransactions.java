@@ -1,7 +1,6 @@
 package org.nem.nis.harvesting;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;

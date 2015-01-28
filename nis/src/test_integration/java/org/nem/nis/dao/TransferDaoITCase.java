@@ -30,8 +30,7 @@ public class TransferDaoITCase {
 	// you can force repopulating the database by replacing false with true in the next line
 	private static final boolean populateDatabase = databaseFileExists() ? false : true;
 
-	static
-	{
+	static {
 		try {
 			final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties");
 			LogManager.getLogManager().readConfiguration(inputStream);
@@ -88,7 +87,7 @@ public class TransferDaoITCase {
 
 	private void populateDatabase(
 			final int numBlocks,
-			final int  numTransactionsPerBlock,
+			final int numTransactionsPerBlock,
 			final List<Account> accounts,
 			final AccountDaoLookup accountDaoLookup) {
 		this.resetDatabase();
@@ -110,7 +109,7 @@ public class TransferDaoITCase {
 			}
 		}
 
-		if (! blocks.isEmpty()) {
+		if (!blocks.isEmpty()) {
 			//this.blockDao.save(blocks);
 			LOGGER.warning(String.format("Block %d", blocks.size()));
 		}
@@ -163,7 +162,7 @@ public class TransferDaoITCase {
 						accountSet.transferRecipient,
 						numTransactions * round + j);
 				block.addTransaction(transferTransaction);
-			} else if(95 > type) {
+			} else if (95 > type) {
 				block.addTransaction(this.createMultisigTransferTransaction(
 						accountSet.transferSender,
 						accountSet.transferRecipient,
