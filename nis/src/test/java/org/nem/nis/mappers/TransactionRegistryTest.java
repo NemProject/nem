@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
+import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.stream.*;
@@ -76,4 +77,161 @@ public class TransactionRegistryTest {
 		// Assert:
 		Assert.assertThat(entry, IsNull.nullValue());
 	}
+
+	// region getRecipient
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getRecipientReturnsRecipientForTransfer() {
+		// Arrange:
+		final DbAccount original = new DbAccount();
+		final DbTransferTransaction t = new DbTransferTransaction();
+		t.setRecipient(original);
+		final TransactionRegistry.Entry<DbTransferTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.TRANSFER);
+
+		// Act:
+		final DbAccount account = entry.getRecipient.apply(t);
+
+		// Assert:
+		Assert.assertThat(account, IsSame.sameInstance(original));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getRecipientReturnsRemoteForImportanceTransfer() {
+		// Arrange:
+		final DbAccount original = new DbAccount();
+		final DbImportanceTransferTransaction t = new DbImportanceTransferTransaction();
+		t.setRemote(original);
+		final TransactionRegistry.Entry<DbImportanceTransferTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbImportanceTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.IMPORTANCE_TRANSFER);
+
+		// Act:
+		final DbAccount account = entry.getRecipient.apply(t);
+
+		// Assert:
+		Assert.assertThat(account, IsSame.sameInstance(original));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getRecipientReturnsNullForMultisigAggregateModificationTransaction() {
+		// Arrange:
+		final DbMultisigAggregateModificationTransaction t = new DbMultisigAggregateModificationTransaction();
+		final TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
+
+		// Act:
+		final DbAccount account = entry.getRecipient.apply(t);
+
+		// Assert:
+		Assert.assertThat(account, IsNull.nullValue());
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getRecipientReturnsNullForMultisigTransaction() {
+		// Arrange:
+		final DbMultisigTransaction t = new DbMultisigTransaction();
+		final TransactionRegistry.Entry<DbMultisigTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
+
+		// Act:
+		final DbAccount account = entry.getRecipient.apply(t);
+
+		// Assert:
+		Assert.assertThat(account, IsNull.nullValue());
+	}
+
+	// endregion
+
+	// region gerRecipient
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getOtherAccountsReturnsEmptyListForTransfer() {
+		// Arrange:
+		final DbTransferTransaction t = new DbTransferTransaction();
+		final TransactionRegistry.Entry<DbTransferTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.TRANSFER);
+
+		// Act:
+		final List<DbAccount> accounts = entry.getOtherAccounts.apply(t);
+
+		// Assert:
+		Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getOtherAccountsReturnsEmptyListForImportanceTransfer() {
+		// Arrange:
+		final DbImportanceTransferTransaction t = new DbImportanceTransferTransaction();
+		final TransactionRegistry.Entry<DbImportanceTransferTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbImportanceTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.IMPORTANCE_TRANSFER);
+
+		// Act:
+		final List<DbAccount> accounts = entry.getOtherAccounts.apply(t);
+
+		// Assert:
+		Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getOtherAccountsReturnsAffectedCosignatoriesForMultisigAggregateModificationTransaction() {
+		// Arrange:
+		final DbMultisigAggregateModificationTransaction t = new DbMultisigAggregateModificationTransaction();
+		final DbAccount cosignatory1 = new DbAccount();
+		final DbAccount cosignatory2 = new DbAccount();
+		final Set<DbMultisigModification> modifications = new HashSet<>();
+		modifications.add(this.createMultisigModification(cosignatory1));
+		modifications.add(this.createMultisigModification(cosignatory2));
+		t.setMultisigModifications(modifications);
+		final TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
+
+		// Act:
+		final List<DbAccount> account = entry.getOtherAccounts.apply(t);
+
+		// Assert:
+		Assert.assertThat(account, IsEquivalent.equivalentTo(Arrays.asList(cosignatory1, cosignatory2)));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getOtherAccountsReturnsMultisigSignatureTransactionSignersForMultisigTransaction() {
+		// Arrange:
+		final DbMultisigTransaction t = new DbMultisigTransaction();
+		final DbAccount signer1 = new DbAccount();
+		final DbAccount signer2 = new DbAccount();
+		final Set<DbMultisigSignatureTransaction> signatureTransactions = new HashSet<>();
+		signatureTransactions.add(this.createMultisigSignatureTransaction(signer1));
+		signatureTransactions.add(this.createMultisigSignatureTransaction(signer2));
+		t.setMultisigSignatureTransactions(signatureTransactions);
+		final TransactionRegistry.Entry<DbMultisigTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
+
+		// Act:
+		final List<DbAccount> account = entry.getOtherAccounts.apply(t);
+
+		// Assert:
+		Assert.assertThat(account, IsEquivalent.equivalentTo(Arrays.asList(signer1, signer2)));
+	}
+
+	private DbMultisigModification createMultisigModification(final DbAccount cosignatory) {
+		final DbMultisigModification modifications = new DbMultisigModification();
+		modifications.setCosignatory(cosignatory);
+		modifications.setModificationType(MultisigModificationType.Add.value());
+		return modifications;
+	}
+
+	private DbMultisigSignatureTransaction createMultisigSignatureTransaction(final DbAccount account) {
+		final DbMultisigSignatureTransaction transaction = new DbMultisigSignatureTransaction();
+		transaction.setSender(account);
+		return transaction;
+	}
+
+	// endregion
 }

@@ -9,6 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,118 +32,48 @@ public class BlockDaoImpl implements BlockDao {
 		return this.sessionFactory.getCurrentSession();
 	}
 
-	private void saveSingleBlock(final DbBlock block) {
+	private <TDbModel extends AbstractBlockTransfer> void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
 		ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
-		// TODO 20150127 J-B: can we delete this commented out code?
 		// TODO 20150127 J-B: can you possibly refactor some of this to use the TransactionRegistry?
 		// > (or your own dao registry?)
-// We'll be able to use it for other queries too... just need to filter out txes with null sig
-//
-//		for (final DbTransferTransaction transaction : block.getBlockTransferTransactions()) {
-//			final DbMultisigSend t = new DbMultisigSend();
-//			t.setAccountId(transaction.getSender().getId());
-//			t.setHeight(block.getHeight());
-//			t.setTransactionId(transaction.getId());
-//			list.add(t);
-//		}
-//
-//		for (final DbImportanceTransferTransaction transaction : block.getBlockImportanceTransferTransactions()) {
-//			final DbMultisigSend t = new DbMultisigSend();
-//			t.setAccountId(transaction.getSender().getId());
-//			t.setHeight(block.getHeight());
-//			t.setTransactionId(transaction.getId());
-//			list.add(t);
-//		}
-//
-//		for (final DbMultisigAggregateModificationTransaction transaction : block.getBlockMultisigAggregateModificationTransactions()) {
-//			final DbMultisigSend t = new DbMultisigSend();
-//			t.setAccountId(transaction.getSender().getId());
-//			t.setHeight(block.getHeight());
-//			t.setTransactionId(transaction.getId());
-//			list.add(t);
-//
-//			for (final DbMultisigModification modification : transaction.getMultisigModifications()) {
-//				final DbMultisigSend sub = new DbMultisigSend();
-//				sub.setAccountId(modification.getCosignatory().getId());
-//				sub.setHeight(block.getHeight());
-//				// we're using transaction id....
-//				sub.setTransactionId(transaction.getId());
-//				list.add(t);
-//			}
-//		}
 
 		// TODO 20150122 BR -> G, J: should the DbBlock create empty lists for the different transaction types or is that a problem for hibernate?
 		if (null == block.getBlockMultisigTransactions()) {
 			return;
 		}
 
-		int txType = 0;
-		for (final DbMultisigTransaction transaction : block.getBlockMultisigTransactions()) {
-			if (transaction.getTransferTransaction() != null) {
-				txType = TransactionTypes.TRANSFER;
-				final DbMultisigSend innerSend = new DbMultisigSend();
-				innerSend.setAccountId(transaction.getTransferTransaction().getSender().getId());
-				innerSend.setType(txType);
-				innerSend.setHeight(block.getHeight());
-				innerSend.setTransactionId(transaction.getId());
-				sendList.add(innerSend);
-				final DbMultisigReceive innerReceive = new DbMultisigReceive();
-				innerReceive.setAccountId(transaction.getTransferTransaction().getRecipient().getId());
-				innerReceive.setType(txType);
-				innerReceive.setHeight(block.getHeight());
-				innerReceive.setTransactionId(transaction.getId());
-				receiveList.add(innerReceive);
-			} else if (transaction.getImportanceTransferTransaction() != null) {
-				txType = TransactionTypes.IMPORTANCE_TRANSFER;
-				final DbMultisigSend inner = new DbMultisigSend();
-				inner.setAccountId(transaction.getImportanceTransferTransaction().getSender().getId());
-				inner.setType(txType);
-				inner.setHeight(block.getHeight());
-				inner.setTransactionId(transaction.getId());
-				sendList.add(inner);
-				final DbMultisigReceive innerReceive = new DbMultisigReceive();
-				innerReceive.setAccountId(transaction.getImportanceTransferTransaction().getRemote().getId());
-				innerReceive.setType(txType);
-				innerReceive.setHeight(block.getHeight());
-				innerReceive.setTransactionId(transaction.getId());
-				receiveList.add(innerReceive);
-			} else if (transaction.getMultisigAggregateModificationTransaction() != null) {
-				final DbMultisigAggregateModificationTransaction aggregate = transaction.getMultisigAggregateModificationTransaction();
-				final DbMultisigSend inner = new DbMultisigSend();
-				inner.setAccountId(aggregate.getSender().getId());
-				inner.setType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
-				inner.setHeight(block.getHeight());
-				inner.setTransactionId(transaction.getId());
-				sendList.add(inner);
-				txType = TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION;
-
-				for (final DbMultisigModification modification : aggregate.getMultisigModifications()) {
-					final DbMultisigReceive modificationReceive = new DbMultisigReceive();
-					modificationReceive.setAccountId(modification.getCosignatory().getId());
-					modificationReceive.setType(txType);
-					modificationReceive.setHeight(block.getHeight());
-					modificationReceive.setTransactionId(transaction.getId());
-					receiveList.add(modificationReceive);
+		final TransactionRegistry.Entry<DbMultisigTransaction, ?> multisigEntry
+				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
+		final List<DbMultisigTransaction> multisigTransactions = multisigEntry.getFromBlock.apply(block);
+		for (final DbMultisigTransaction transaction : multisigTransactions) {
+			final Long height = block.getHeight();
+			final Long id = transaction.getId();
+			int txType = 0;
+			for (final TransactionRegistry.Entry<?, ?> entry : (TransactionRegistry.iterate())) {
+				final TransactionRegistry.Entry<TDbModel, ?> theEntry = (TransactionRegistry.Entry<TDbModel, ?>)entry;
+				final TDbModel transfer = theEntry.getFromMultisig.apply(transaction);
+				if (null == transfer) {
+					continue;
 				}
+
+				txType = theEntry.type;
+				sendList.add(this.createSend(transfer.getSender().getId(), theEntry.type, height, id));
+
+				final DbAccount recipient = theEntry.getRecipient.apply(transfer);
+				if (null != recipient) {
+					receiveList.add(this.createReceive(recipient.getId(), theEntry.type, height, id));
+				}
+
+				theEntry.getOtherAccounts.apply(transfer).stream()
+						.forEach(a -> receiveList.add(this.createReceive(a.getId(),	theEntry.type, height, id)));
 			}
 
-			final DbMultisigSend t = new DbMultisigSend();
-			t.setAccountId(transaction.getSender().getId());
-			t.setType(txType);
-			t.setHeight(block.getHeight());
-			t.setTransactionId(transaction.getId());
-			sendList.add(0, t);
-
-			for (final DbMultisigSignatureTransaction signatureTransaction : transaction.getMultisigSignatureTransactions()) {
-				final DbMultisigSend sub = new DbMultisigSend();
-				sub.setAccountId(signatureTransaction.getSender().getId());
-				sub.setType(txType);
-				sub.setHeight(block.getHeight());
-				sub.setTransactionId(transaction.getId());
-				sendList.add(sub);
+			sendList.add(0, this.createSend(transaction.getSender().getId(), txType, height, id));
+			for (DbAccount account : multisigEntry.getOtherAccounts.apply(transaction)) {
+				sendList.add(this.createSend(account.getId(), txType, height, id));
 			}
 		}
 
@@ -153,6 +84,34 @@ public class BlockDaoImpl implements BlockDao {
 		for (final DbMultisigReceive receive : receiveList) {
 			this.getCurrentSession().saveOrUpdate(receive);
 		}
+	}
+
+	private DbMultisigSend createSend(
+			final Long accountId,
+			final Integer type,
+			final Long height,
+			final Long transactionId) {
+		final DbMultisigSend send = new DbMultisigSend();
+		send.setAccountId(accountId);
+		send.setType(type);
+		send.setHeight(height);
+		send.setTransactionId(transactionId);
+
+		return send;
+	}
+
+	private DbMultisigReceive createReceive(
+			final Long accountId,
+			final Integer type,
+			final Long height,
+			final Long transactionId) {
+		final DbMultisigReceive receive = new DbMultisigReceive();
+		receive.setAccountId(accountId);
+		receive.setType(type);
+		receive.setHeight(height);
+		receive.setTransactionId(transactionId);
+
+		return receive;
 	}
 
 	@Override

@@ -37,6 +37,16 @@ public class TransactionRegistry {
 		public final Function<DbMultisigTransaction, TDbModel> getFromMultisig;
 
 		/**
+		 * A function that will get the recipient (if any) given an abstract block transfer.
+		 */
+		public final Function<TDbModel, DbAccount> getRecipient;
+
+		/**
+		 * A function that will get a list of db accounts (if any) given an abstract block transfer.
+		 */
+		public final Function<TDbModel, List<DbAccount>> getOtherAccounts;
+
+		/**
 		 * The db model transaction class.
 		 */
 		public final Class<TDbModel> dbModelClass;
@@ -54,6 +64,8 @@ public class TransactionRegistry {
 				final Function<DbBlock, List<TDbModel>> getFromBlock,
 				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
+				final Function<TDbModel, DbAccount> getRecipient,
+				final Function<TDbModel, List<DbAccount>> getOtherAccounts,
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
 				final Class<TDbModel> dbModelClass,
@@ -64,6 +76,9 @@ public class TransactionRegistry {
 			this.setInBlock = setInBlock;
 
 			this.getFromMultisig = getFromMultisig;
+
+			this.getRecipient = getRecipient;
+			this.getOtherAccounts = getOtherAccounts;
 
 			this.createModelToDbModelMapper = createModelToDbModelMapper;
 			this.createDbModelToModelMapper = createDbModelToModelMapper;
@@ -98,6 +113,8 @@ public class TransactionRegistry {
 					DbBlock::getBlockTransferTransactions,
 					(block, transfers) -> block.setBlockTransferTransactions(transfers),
 					DbMultisigTransaction::getTransferTransaction,
+					DbTransferTransaction::getRecipient,
+					transfer -> new ArrayList<>(),
 					TransferModelToDbModelMapping::new,
 					TransferDbModelToModelMapping::new,
 					DbTransferTransaction.class,
@@ -108,6 +125,8 @@ public class TransactionRegistry {
 					DbBlock::getBlockImportanceTransferTransactions,
 					(block, transfers) -> block.setBlockImportanceTransferTransactions(transfers),
 					DbMultisigTransaction::getImportanceTransferTransaction,
+					DbImportanceTransferTransaction::getRemote,
+					transfer -> new ArrayList<>(),
 					ImportanceTransferModelToDbModelMapping::new,
 					ImportanceTransferDbModelToModelMapping::new,
 					DbImportanceTransferTransaction.class,
@@ -118,6 +137,8 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigAggregateModificationTransactions,
 					(block, transfers) -> block.setBlockMultisigAggregateModificationTransactions(transfers),
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
+					transfer -> null,
+					DbMultisigAggregateModificationTransaction::getOtherAccounts,
 					MultisigAggregateModificationModelToDbModelMapping::new,
 					MultisigAggregateModificationDbModelToModelMapping::new,
 					DbMultisigAggregateModificationTransaction.class,
@@ -128,6 +149,8 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigTransactions,
 					(block, transfers) -> block.setBlockMultisigTransactions(transfers),
 					multisig -> null,
+					multisig -> null,
+					DbMultisigTransaction::getOtherAccounts,
 					MultisigTransactionModelToDbModelMapping::new,
 					MultisigTransactionDbModelToModelMapping::new,
 					DbMultisigTransaction.class,

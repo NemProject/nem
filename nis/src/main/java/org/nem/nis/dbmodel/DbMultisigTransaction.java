@@ -6,7 +6,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.*;
 import javax.persistence.Table;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * It is unfortunate that we couldn't use "table per subclass", which would allow this class to have a single
@@ -70,5 +71,9 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 
 	public void setMultisigSignatureTransactions(final Set<DbMultisigSignatureTransaction> multisigSignatureTransactions) {
 		this.multisigSignatureTransactions = multisigSignatureTransactions;
+	}
+
+	public List<DbAccount> getOtherAccounts() {
+		return this.multisigSignatureTransactions.stream().map(DbMultisigSignatureTransaction::getSender).collect(Collectors.toList());
 	}
 }

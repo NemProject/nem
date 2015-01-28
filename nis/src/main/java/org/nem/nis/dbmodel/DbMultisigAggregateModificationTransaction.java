@@ -6,7 +6,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.*;
 import javax.persistence.Table;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Multisig Signer Modification db entity
@@ -30,5 +31,9 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 
 	public void setMultisigModifications(final Set<DbMultisigModification> multisigModifications) {
 		this.multisigModifications = multisigModifications;
+	}
+
+	public List<DbAccount> getOtherAccounts() {
+		return this.multisigModifications.stream().map(DbMultisigModification::getCosignatory).collect(Collectors.toList());
 	}
 }
