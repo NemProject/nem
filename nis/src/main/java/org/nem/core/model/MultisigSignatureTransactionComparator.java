@@ -15,7 +15,7 @@ public class MultisigSignatureTransactionComparator implements Comparator<Multis
 	public int compare(final MultisigSignatureTransaction lhs, final MultisigSignatureTransaction rhs) {
 		final Address lhsAddress = lhs.getSigner().getAddress();
 		final Address rhsAddress = rhs.getSigner().getAddress();
-		final int addressCompareResult = lhsAddress.getEncoded().compareTo(rhsAddress.getEncoded());
+		final int addressCompareResult = lhsAddress.compareTo(rhsAddress);
 		if (addressCompareResult != 0) {
 			return addressCompareResult;
 		}

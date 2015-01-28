@@ -396,7 +396,7 @@ public class MultisigAggregateModificationTransactionTest {
 				// need to order cosignatories because tests rely on special list indices.
 				final Account account1 = Utils.generateRandomAccount();
 				final Account account2 = Utils.generateRandomAccount();
-				final int compareResult = account1.getAddress().getEncoded().compareTo(account2.getAddress().getEncoded());
+				final int compareResult = account1.getAddress().compareTo(account2.getAddress());
 				this.cosignatory1 = compareResult < 0 ? account1 : account2;
 				this.cosignatory2 = compareResult < 0 ? account2 : account1;
 				this.modification1 = new MultisigModification(modificationType, this.cosignatory1);
