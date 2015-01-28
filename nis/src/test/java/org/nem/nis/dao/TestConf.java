@@ -43,6 +43,9 @@ public class TestConf {
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
 		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
 
+		// TODO 20150127 J-G: can you add a list of the db classes somewhere, so we don't have to repeat them everywhere
+		// > (in all of the test configs too i mean)
+		// > you can add a simple registry or whatever
 		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
 		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
 

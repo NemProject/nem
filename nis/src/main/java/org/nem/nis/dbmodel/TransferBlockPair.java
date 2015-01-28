@@ -1,38 +1,38 @@
 package org.nem.nis.dbmodel;
 
 /**
- * DTO containing a DbTransferTransaction and a DbBlock object.
+ * DTO containing an abstract block transfer and a block.
  */
 public class TransferBlockPair {
 	private final AbstractBlockTransfer transfer;
-	private final DbBlock dbBlock;
+	private final DbBlock block;
 
 	/**
 	 * Creates a pair.
 	 *
-	 * @param transfer The AbstractBlockTransfer.
-	 * @param dbBlock The DbBlock.
+	 * @param transfer The abstract block transfer.
+	 * @param block The block.
 	 */
-	public TransferBlockPair(final AbstractBlockTransfer transfer, final DbBlock dbBlock) {
+	public TransferBlockPair(final AbstractBlockTransfer transfer, final DbBlock block) {
 		this.transfer = transfer;
-		this.dbBlock = dbBlock;
+		this.block = block;
 	}
 
 	/**
-	 * Gets the DbTransferTransaction:
+	 * Gets the abstract block transfer.
 	 *
-	 * @return The DbTransferTransaction.
+	 * @return The abstract block transfer.
 	 */
 	public AbstractBlockTransfer getTransfer() {
 		return this.transfer;
 	}
 
 	/**
-	 * Gets the DbBlock:
+	 * Gets the block.
 	 *
-	 * @return The DbBlock.
+	 * @return The block.
 	 */
 	public DbBlock getDbBlock() {
-		return this.dbBlock;
+		return this.block;
 	}
 }

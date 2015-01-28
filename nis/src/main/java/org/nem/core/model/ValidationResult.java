@@ -176,7 +176,7 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a transaction originated from the nemesis account after the nemesis block.
 	 */
-	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(39);
+	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(40);
 
 	private final int value;
 

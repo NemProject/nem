@@ -154,9 +154,8 @@ public class TransferDaoImpl implements TransferDao {
 			return new ArrayList<>();
 		}
 
-		return null == id
-				? this.getTransactionsForAccountUpToTransaction(accountId, Long.MAX_VALUE, limit, transferType)
-				: this.getTransactionsForAccountUpToTransaction(accountId, id, limit, transferType);
+		final long maxId = null == id ? Long.MAX_VALUE : id;
+		return this.getTransactionsForAccountUpToTransaction(accountId, maxId, limit, transferType);
 	}
 
 	private Long getAccountId(final Account account) {
@@ -174,6 +173,7 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		if (TransferType.ALL == transferType) {
+			// TODO 20150127 J-G: this was the issue of hibernate doing a bad join from incoming and outcoming, right? can we add a comment to that effect?
 			final Collection<TransferBlockPair> pairs =
 					this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.INCOMING);
 			pairs.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.OUTGOING));
@@ -194,6 +194,7 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		final List<TransferBlockPair> pairs = new ArrayList<>();
+		// TODO 20150127 J-G: can we have a registry of sorts for this?
 		pairs.addAll(this.getTransfersForAccount(
 				accountId,
 				maxId,
@@ -288,6 +289,7 @@ public class TransferDaoImpl implements TransferDao {
 			final long accountId,
 			final long maxId,
 			final int limit,
+			// TODO 20150127 J-G: transfer type is not being used?
 			final TransferType transferType) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigAggregateModificationTransaction.class)
 				.setFetchMode("blockId", FetchMode.JOIN)
@@ -446,6 +448,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
 		// TODO 2014 J-B: check with G about if we still need to compare getBlkIndex
+		// TODO 20150127 J-G: i guess this is ok?
 		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
 	}
 

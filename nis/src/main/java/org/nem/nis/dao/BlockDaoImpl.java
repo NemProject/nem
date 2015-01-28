@@ -36,6 +36,9 @@ public class BlockDaoImpl implements BlockDao {
 		ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
+		// TODO 20150127 J-B: can we delete this commented out code?
+		// TODO 20150127 J-B: can you possibly refactor some of this to use the TransactionRegistry?
+		// > (or your own dao registry?)
 // We'll be able to use it for other queries too... just need to filter out txes with null sig
 //
 //		for (final DbTransferTransaction transaction : block.getBlockTransferTransactions()) {

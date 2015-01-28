@@ -72,6 +72,7 @@ public class MultisigModificationTest {
 	@Test
 	public void compareToReturnsExpectedResult() {
 		// Arrange:
+		// TODO 20150127 J-B: can you add these to a list / array in sorted order and loop over the array to compare all pairs?
 		final MultisigModification modification1 = this.createMultisigModification(MultisigModificationType.Add, "C");
 		final MultisigModification modification2 = this.createMultisigModification(MultisigModificationType.Del, "C");
 		final MultisigModification modification3 = this.createMultisigModification(MultisigModificationType.Add, "D");
@@ -92,6 +93,7 @@ public class MultisigModificationTest {
 		Assert.assertThat(modification6.compareTo(modification2) == 0, IsEqual.equalTo(true));
 	}
 
+	// TODO 20150127 J-B: this test seems wrong
 	@Test
 	public void addingMultisigModificationsToListSortsList() {
 		// Act:

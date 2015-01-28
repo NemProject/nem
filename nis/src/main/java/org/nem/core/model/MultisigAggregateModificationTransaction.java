@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
  * First such transaction converts account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {
-	final List<MultisigModification> modifications;
+	// TODO 20150127 J-B: can we change this back to a collection? just sort the list before assigning
+	// > (i don't care about this private field, but for the public api i'd rather expose collection)
+	private final List<MultisigModification> modifications;
 
 	/**
 	 * Creates a multisig aggregate modification transaction.

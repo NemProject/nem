@@ -73,6 +73,7 @@ public class MultisigModification implements SerializableEntity, Comparable<Mult
 		final int typeCompareResult = Integer.compare(this.modificationType.value(), rhs.modificationType.value());
 		return 0 != typeCompareResult
 				? typeCompareResult
+				// TODO 20150127 J-B: slightly unrelated, but can we add compareTo to Address?
 				: this.cosignatoryAccount.getAddress().getEncoded().compareTo(rhs.cosignatoryAccount.getAddress().getEncoded());
 	}
 }
