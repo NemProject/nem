@@ -33,7 +33,7 @@ public class DbMultisigAggregateModificationTransaction extends AbstractBlockTra
 		this.multisigModifications = multisigModifications;
 	}
 
-	public List<DbAccount> getOtherAccounts() {
+	public Collection<DbAccount> getOtherAccounts() {
 		return this.multisigModifications.stream().map(DbMultisigModification::getCosignatory).collect(Collectors.toList());
 	}
 }

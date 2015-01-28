@@ -73,7 +73,7 @@ public class DbMultisigTransaction extends AbstractBlockTransfer<DbMultisigTrans
 		this.multisigSignatureTransactions = multisigSignatureTransactions;
 	}
 
-	public List<DbAccount> getOtherAccounts() {
+	public Collection<DbAccount> getOtherAccounts() {
 		return this.multisigSignatureTransactions.stream().map(DbMultisigSignatureTransaction::getSender).collect(Collectors.toList());
 	}
 }

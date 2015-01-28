@@ -37,9 +37,6 @@ public class BlockDaoImpl implements BlockDao {
 		ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
 
-		// TODO 20150127 J-B: can you possibly refactor some of this to use the TransactionRegistry?
-		// > (or your own dao registry?)
-
 		// TODO 20150122 BR -> G, J: should the DbBlock create empty lists for the different transaction types or is that a problem for hibernate?
 		if (null == block.getBlockMultisigTransactions()) {
 			return;
@@ -52,7 +49,7 @@ public class BlockDaoImpl implements BlockDao {
 			final Long height = block.getHeight();
 			final Long id = transaction.getId();
 			int txType = 0;
-			for (final TransactionRegistry.Entry<?, ?> entry : (TransactionRegistry.iterate())) {
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				final TransactionRegistry.Entry<TDbModel, ?> theEntry = (TransactionRegistry.Entry<TDbModel, ?>)entry;
 				final TDbModel transfer = theEntry.getFromMultisig.apply(transaction);
 				if (null == transfer) {
@@ -96,7 +93,6 @@ public class BlockDaoImpl implements BlockDao {
 		send.setType(type);
 		send.setHeight(height);
 		send.setTransactionId(transactionId);
-
 		return send;
 	}
 
@@ -110,7 +106,6 @@ public class BlockDaoImpl implements BlockDao {
 		receive.setType(type);
 		receive.setHeight(height);
 		receive.setTransactionId(transactionId);
-
 		return receive;
 	}
 

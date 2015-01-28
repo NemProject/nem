@@ -72,8 +72,6 @@ public class MultisigModificationTest {
 	@Test
 	public void compareToReturnsExpectedResult() {
 		// Arrange:
-		// TODO 20150127 J-B: can you add these to a list / array in sorted order and loop over the array to compare all pairs?
-		// TODO 20150128 BR -> J: sure.
 		final List<MultisigModification> modifications = new ArrayList<>();
 		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "C"));
 		modifications.add(this.createMultisigModification(MultisigModificationType.Add, "D"));
