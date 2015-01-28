@@ -157,7 +157,7 @@ public class TransactionRegistryTest {
 				= (TransactionRegistry.Entry<DbTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.TRANSFER);
 
 		// Act:
-		final List<DbAccount> accounts = entry.getOtherAccounts.apply(t);
+		final Collection<DbAccount> accounts = entry.getOtherAccounts.apply(t);
 
 		// Assert:
 		Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
@@ -172,7 +172,7 @@ public class TransactionRegistryTest {
 				= (TransactionRegistry.Entry<DbImportanceTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.IMPORTANCE_TRANSFER);
 
 		// Act:
-		final List<DbAccount> accounts = entry.getOtherAccounts.apply(t);
+		final Collection<DbAccount> accounts = entry.getOtherAccounts.apply(t);
 
 		// Assert:
 		Assert.assertThat(accounts, IsEqual.equalTo(new ArrayList<>()));
@@ -193,7 +193,7 @@ public class TransactionRegistryTest {
 				= (TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
 
 		// Act:
-		final List<DbAccount> account = entry.getOtherAccounts.apply(t);
+		final Collection<DbAccount> account = entry.getOtherAccounts.apply(t);
 
 		// Assert:
 		Assert.assertThat(account, IsEquivalent.equivalentTo(Arrays.asList(cosignatory1, cosignatory2)));
@@ -214,7 +214,7 @@ public class TransactionRegistryTest {
 				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
 
 		// Act:
-		final List<DbAccount> account = entry.getOtherAccounts.apply(t);
+		final Collection<DbAccount> account = entry.getOtherAccounts.apply(t);
 
 		// Assert:
 		Assert.assertThat(account, IsEquivalent.equivalentTo(Arrays.asList(signer1, signer2)));

@@ -44,7 +44,7 @@ public class TransactionRegistry {
 		/**
 		 * A function that will get a list of db accounts (if any) given an abstract block transfer.
 		 */
-		public final Function<TDbModel, List<DbAccount>> getOtherAccounts;
+		public final Function<TDbModel, Collection<DbAccount>> getOtherAccounts;
 
 		/**
 		 * The db model transaction class.
@@ -65,7 +65,7 @@ public class TransactionRegistry {
 				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
 				final Function<TDbModel, DbAccount> getRecipient,
-				final Function<TDbModel, List<DbAccount>> getOtherAccounts,
+				final Function<TDbModel, Collection<DbAccount>> getOtherAccounts,
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
 				final Class<TDbModel> dbModelClass,
