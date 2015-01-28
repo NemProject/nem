@@ -79,6 +79,7 @@ public class UniversalTransactionValidatorTest {
 	private static void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
+		transaction.setUseRandomDebtor(true);
 		transaction.setFee(Amount.fromNem(120));
 		transaction.setDeadline(transaction.getTimeStamp().addSeconds(726));
 

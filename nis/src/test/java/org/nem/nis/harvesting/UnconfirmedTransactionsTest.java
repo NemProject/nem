@@ -327,14 +327,12 @@ public class UnconfirmedTransactionsTest {
 		final Account sender = context.addAccount(Amount.fromNem(10));
 
 		final MockTransaction t1 = new MockTransaction(sender);
-		t1.setUseRandomDebtor(false);
 		t1.setFee(Amount.fromNem(6));
 		context.signAndAddExisting(t1);
 
 		// Act:
 		final MockTransaction t2 = new MockTransaction(sender);
 		t2.setFee(Amount.fromNem(5));
-		t2.setUseRandomDebtor(false);
 		final ValidationResult result = context.signAndAddExisting(t2);
 
 		// Assert:

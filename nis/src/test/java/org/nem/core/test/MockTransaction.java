@@ -21,7 +21,7 @@ public class MockTransaction extends Transaction {
 	private int customField;
 	private long minimumFee;
 
-	private boolean useRandomDebtor = true;
+	private boolean useRandomDebtor;
 	private final Account debtor = Utils.generateRandomAccount();
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
@@ -189,7 +189,7 @@ public class MockTransaction extends Transaction {
 	/**
 	 * Sets a flag indicating whether or not a random debtor should be used.
 	 *
-	 * @param useRandomDebtor true to use a random debtor (the default).
+	 * @param useRandomDebtor true to use a random debtor.
 	 */
 	public void setUseRandomDebtor(final boolean useRandomDebtor) {
 		this.useRandomDebtor = useRandomDebtor;

@@ -25,7 +25,6 @@ public class TransactionTest {
 
 		// Act:
 		final MockTransaction transaction = new MockTransaction(signer, 6);
-		transaction.setUseRandomDebtor(false);
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
@@ -44,7 +43,6 @@ public class TransactionTest {
 		final MockTransaction originalTransaction = new MockTransaction(signer, 7);
 		originalTransaction.setFee(new Amount(130));
 		final MockTransaction transaction = this.createRoundTrippedTransaction(originalTransaction, signerPublicKeyOnly);
-		transaction.setUseRandomDebtor(false);
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signerPublicKeyOnly));
