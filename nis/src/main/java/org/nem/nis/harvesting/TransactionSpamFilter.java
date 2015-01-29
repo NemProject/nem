@@ -12,9 +12,12 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * A filter that filters unconfirmed transactions depending on sender and fill level of the unconfirmed transaction cache.
+ * The class limits the number of transaction in the cache to MAX_CACHE_SIZE.
+ * For MAX_CACHE_SIZE = 1000 the max allowed transactions graph looks like
+ * http://www.wolframalpha.com/input/?i=plot+x+*+1000+*+exp%28-y%2F300%29+*+%281000+-+y%29%2F10%3D1%2C+x%3D0..0.01
  */
 public class TransactionSpamFilter {
-	private static final int MAX_CACHE_SIZE = 1000;
+	private static final double MAX_CACHE_SIZE = 1000.0;
 	private final ReadOnlyNisCache nisCache;
 	private final ConcurrentMap<Hash, Transaction> transactions; // use UnconfirmedTransactionsCache in multisig branch
 
@@ -60,7 +63,7 @@ public class TransactionSpamFilter {
 	}
 
 	private int getMaxAllowedTransactions(final double importance, final int numApprovedTransactions) {
-		final int cacheSize = this.transactions.size() + numApprovedTransactions;
+		final double cacheSize = this.transactions.size() + numApprovedTransactions;
 		final int maxAllowed = (int)(importance * Math.exp(-cacheSize / 300) * MAX_CACHE_SIZE * (MAX_CACHE_SIZE - cacheSize) / 10);
 		return maxAllowed;
 	}

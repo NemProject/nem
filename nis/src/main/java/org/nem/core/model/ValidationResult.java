@@ -110,7 +110,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because importance transfer deactivation was attempted while already deactivated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20);
+	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20),
+
+	/**
+	 * Transaction was rejected because the debitor is not allowed to put a transaction into the cache.
+	 */
+	FAILURE_TRANSACION_CACHE_TOO_FULL(21);
 
 	private final int value;
 

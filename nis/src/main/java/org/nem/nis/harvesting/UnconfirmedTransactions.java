@@ -153,7 +153,11 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
 		synchronized (this.lock) {
-			final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
+			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(Arrays.asList(transaction));
+			if (filteredTransactions.isEmpty()) {
+				return ValidationResult.FAILURE_TRANSACION_CACHE_TOO_FULL;
+			}
+			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			return transactionValidationResult.isSuccess()
 					? this.add(transaction, true)
 					: transactionValidationResult;
