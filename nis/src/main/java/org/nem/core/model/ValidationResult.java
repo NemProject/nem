@@ -176,7 +176,41 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a transaction originated from the nemesis account after the nemesis block.
 	 */
-	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(40);
+	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(40),
+
+	//region BlockChainValidator 1xx
+
+	/**
+	 * Validation failed because received chain has too many blocks.
+	 */
+	FAILURE_MAX_CHAIN_SIZE_EXCEEDED(101),
+
+	/**
+	 * Validation failed because a block was received with an unexpected height.
+	 */
+	FAILURE_BLOCK_UNEXPECTED_HEIGHT(102),
+
+	/**
+	 * Validation failed because an unverifiable block was received.
+	 */
+	FAILURE_BLOCK_UNVERIFIABLE(103),
+
+	/**
+	 * Validation failed because a block was received that is not a hit.
+	 */
+	FAILURE_BLOCK_NOT_HIT(104),
+
+	/**
+	 * Validation failed because an unverifiable transaction was received.
+	 */
+	FAILURE_TRANSACTION_UNVERIFIABLE(105),
+
+	/**
+	 * Validation failed because an incoming chain contained a transaction more than once.
+	 */
+	FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN(106);
+
+	//endregion
 
 	private final int value;
 

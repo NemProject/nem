@@ -53,12 +53,12 @@ public class BlockChainValidator {
 	 *
 	 * @param parentBlock The parent block.
 	 * @param blocks The block chain.
-	 * @return true if the blocks are valid.
+	 * @return The validation result.
 	 */
-	public boolean isValid(Block parentBlock, final Collection<Block> blocks) {
+	public ValidationResult isValid(Block parentBlock, final Collection<Block> blocks) {
 		if (blocks.size() > this.maxChainSize) {
 			LOGGER.info("received chain with too many blocks");
-			return false;
+			return ValidationResult.FAILURE_MAX_CHAIN_SIZE_EXCEEDED;
 		}
 
 		final BlockHeight confirmedBlockHeight = parentBlock.getHeight();
@@ -68,42 +68,42 @@ public class BlockChainValidator {
 			block.setPrevious(parentBlock);
 			if (!expectedHeight.equals(block.getHeight())) {
 				LOGGER.info("received block with unexpected height");
-				return false;
+				return ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT;
 			}
 
 			if (!block.verify()) {
 				LOGGER.info("received unverifiable block");
-				return false;
+				return ValidationResult.FAILURE_BLOCK_UNVERIFIABLE;
 			}
 
 			if (!this.isBlockHit(parentBlock, block)) {
 				LOGGER.info(String.format("hit failed on block %s gen %s", block.getHeight(), block.getGenerationHash()));
-				return false;
+				return ValidationResult.FAILURE_BLOCK_NOT_HIT;
 			}
 
 			final ValidationResult blockValidationResult = this.blockValidator.validate(block);
 			if (!blockValidationResult.isSuccess()) {
 				LOGGER.info(String.format("received block that failed validation: %s", blockValidationResult));
-				return false;
+				return blockValidationResult;
 			}
 
 			final ValidationContext context = new ValidationContext(block.getHeight(), confirmedBlockHeight, this.debitPredicate);
 			for (final Transaction transaction : block.getTransactions()) {
 				if (!transaction.verify()) {
 					LOGGER.info("received block with unverifiable transaction");
-					return false;
+					return ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE;
 				}
 
 				final Hash hash = HashUtils.calculateHash(transaction);
 				if (chainHashes.contains(hash)) {
 					LOGGER.info("received block with duplicate transaction");
-					return false;
+					return ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN;
 				}
 
 				final ValidationResult transactionValidationResult = this.transactionValidator.validate(transaction, context);
 				if (!transactionValidationResult.isSuccess()) {
 					LOGGER.info(String.format("received transaction that failed validation: %s", transactionValidationResult));
-					return false;
+					return transactionValidationResult;
 				}
 
 				chainHashes.add(hash);
@@ -115,7 +115,7 @@ public class BlockChainValidator {
 			expectedHeight = expectedHeight.next();
 		}
 
-		return true;
+		return ValidationResult.SUCCESS;
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
