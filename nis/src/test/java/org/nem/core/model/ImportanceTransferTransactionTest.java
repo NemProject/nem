@@ -15,10 +15,8 @@ import java.util.function.Consumer;
 
 public class ImportanceTransferTransactionTest {
 	private static final TimeInstant TIME = new TimeInstant(123);
+	private static final Amount EXPECTED_FEE = Amount.fromNem(6);
 
-	//region constructor
-
-	@Test
 	public void ctorCanCreateImportanceTransfer() {
 		this.assertCtorCanCreateImportanceTransfer(ImportanceTransferTransaction.Mode.Activate);
 	}
@@ -42,7 +40,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(2)));
+		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(EXPECTED_FEE));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -128,7 +126,7 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(Amount.fromNem(2)));
+		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(EXPECTED_FEE));
 	}
 
 	private ImportanceTransferTransaction createRoundTrippedTransaction(
@@ -138,22 +136,6 @@ public class ImportanceTransferTransactionTest {
 		final Deserializer deserializer = Utils.roundtripVerifiableEntity(originalTransaction, accountLookup);
 		deserializer.readInt("type");
 		return new ImportanceTransferTransaction(VerifiableEntity.DeserializationOptions.VERIFIABLE, deserializer);
-	}
-
-	// endregion
-
-	//region fee
-
-	@Test
-	public void minimumFeeIsTwoNem() {
-		// Arrange:
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
-		final Account signer = Utils.generateRandomAccount();
-		final Account remote = Utils.generateRandomAccount();
-		final ImportanceTransferTransaction transaction = createImportanceTransferTransaction(signer, mode, remote);
-
-		// Act + Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.fromNem(2)));
 	}
 
 	//endregion

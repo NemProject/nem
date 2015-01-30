@@ -67,6 +67,15 @@ public class TransactionFeeCalculatorTest {
 		}
 
 		@Test
+		public void feeIsCalculatedCorrectlyForLargeTransfersWithMessages() {
+			// Assert:
+			assertFee(10000, 96, Amount.fromNem(2 + 12));
+			assertFee(100000, 128, Amount.fromNem(2 + 16));
+			assertFee(1000000, 96, Amount.fromNem(4 + 12));
+			assertFee(2000000, 128, Amount.fromNem(4 + 16));
+		}
+
+		@Test
 		public void feeIsCalculatedCorrectlyForTransferWithSmallestMessage() {
 			// Assert:
 			assertFee(1200, 1, Amount.fromNem(MIN_TRANSFER_FEE + 2));

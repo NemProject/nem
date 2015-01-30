@@ -16,6 +16,7 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class MultisigTransactionTest {
+	private static final Amount EXPECTED_FEE = Amount.fromNem(6);
 
 	//region constructor
 
@@ -228,24 +229,6 @@ public class MultisigTransactionTest {
 
 	//endregion
 
-	//region getFee
-
-	@Test
-	public void minimumFeeDoesNotIncludeInnerTransactionFee() {
-		// Arrange:
-		final MockTransaction innerTransaction = new MockTransaction(Utils.generateRandomAccount());
-		innerTransaction.setMinimumFee(444);
-		final Transaction transaction = createDefaultTransaction(innerTransaction);
-
-		// Act:
-		final Amount fee = transaction.getFee();
-
-		// Assert:
-		Assert.assertThat(fee, IsEqual.equalTo(Amount.fromNem(100)));
-	}
-
-	//endregion
-
 	//region execute / undo
 
 	@Test
@@ -259,7 +242,7 @@ public class MultisigTransactionTest {
 		final List<Notification> notifications = notificationCaptor.getAllValues();
 
 		// Assert:
-		NotificationUtils.assertBalanceDebitNotification(notifications.get(0), context.multisig, Amount.fromNem(100));
+		NotificationUtils.assertBalanceDebitNotification(notifications.get(0), context.multisig, EXPECTED_FEE);
 		NotificationUtils.assertBalanceDebitNotification(notifications.get(1), context.multisig, Amount.fromMicroNem(222));
 	}
 
@@ -296,7 +279,7 @@ public class MultisigTransactionTest {
 
 		// Assert:
 		NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.multisig, Amount.fromMicroNem(222));
-		NotificationUtils.assertBalanceCreditNotification(notifications.get(1), context.multisig, Amount.fromNem(100));
+		NotificationUtils.assertBalanceCreditNotification(notifications.get(1), context.multisig, EXPECTED_FEE);
 	}
 
 	@Test
@@ -326,7 +309,7 @@ public class MultisigTransactionTest {
 		private MultisigTransaction transaction;
 
 		public void setInnerTransactionFee(final Amount amount) {
-			this.innerTransaction.setMinimumFee(amount.getNumMicroNem());
+			this.innerTransaction.setFee(amount);
 			this.transaction = createDefaultTransaction(this.innerTransaction);
 		}
 

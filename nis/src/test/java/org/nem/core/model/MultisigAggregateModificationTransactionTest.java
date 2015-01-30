@@ -17,7 +17,9 @@ import java.util.function.Consumer;
 
 @RunWith(Enclosed.class)
 public class MultisigAggregateModificationTransactionTest {
-	public static final TimeInstant TIME = new TimeInstant(123);
+	private static final TimeInstant TIME = new TimeInstant(123);
+	private static final Amount EXPECTED_ONE_MOD_FEE = Amount.fromNem(2 * (5 + 3));
+	private static final Amount EXPECTED_TWO_MOD_FEE = Amount.fromNem(2 * (5 + 2 * 3));
 
 	public static class MultisigAggregateModificationTransactionAddTest extends AbstractMultisigAggregateModificationTransactionTest {
 		@Override
@@ -115,11 +117,12 @@ public class MultisigAggregateModificationTransactionTest {
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), signer, modifications.get(0));
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), cosignatory2);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), signer, modifications.get(1));
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), signer, Amount.fromNem(300));
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+			NotificationUtils.assertAccountNotification(notifications.get(0), cosignatory1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), signer, modifications.get(0));
+			NotificationUtils.assertAccountNotification(notifications.get(2), cosignatory2);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(3), signer, modifications.get(1));
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), signer, EXPECTED_TWO_MOD_FEE);
 		}
 	}
 
@@ -267,32 +270,6 @@ public class MultisigAggregateModificationTransactionTest {
 
 		//endregion
 
-		//region fee
-
-		@Test
-		public void minimumFeeIsDependentOnNumberOfModifications() {
-			// Assert:
-			this.assertMinimumFee(1, 200);
-			this.assertMinimumFee(2, 300);
-			this.assertMinimumFee(10, 1100);
-		}
-
-		private void assertMinimumFee(final int numModifications, final int expectedFee) {
-			// Arrange:
-			final MultisigModificationType modificationType = this.getModification();
-			final Account signer = Utils.generateRandomAccount();
-			final Account cosignatory = Utils.generateRandomAccount();
-			final Transaction transaction = createTransaction(signer, createModificationList(modificationType, cosignatory, numModifications));
-
-			// Act:
-			final Amount fee = transaction.getMinimumFee();
-
-			// Assert:
-			Assert.assertThat(fee, IsEqual.equalTo(Amount.fromNem(expectedFee)));
-		}
-
-		//endregion
-
 		//region getAccounts
 
 		@Test
@@ -323,9 +300,10 @@ public class MultisigAggregateModificationTransactionTest {
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), context.signer, context.modification1);
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(2), context.signer, Amount.fromNem(200));
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+			NotificationUtils.assertAccountNotification(notifications.get(0), context.cosignatory1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification1);
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(2), context.signer, EXPECTED_ONE_MOD_FEE);
 		}
 
 		@Test
@@ -340,9 +318,10 @@ public class MultisigAggregateModificationTransactionTest {
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(3)).notify(notificationCaptor.capture());
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), context.signer, context.modification1);
-			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), context.signer, Amount.fromNem(200));
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+			NotificationUtils.assertAccountNotification(notifications.get(2), context.cosignatory1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification1);
+			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.signer, EXPECTED_ONE_MOD_FEE);
 		}
 
 		@Test
@@ -357,11 +336,12 @@ public class MultisigAggregateModificationTransactionTest {
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(0), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), context.signer, context.modification1);
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), context.cosignatory2);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), context.signer, context.modification2);
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(4), context.signer, Amount.fromNem(300));
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+			NotificationUtils.assertAccountNotification(notifications.get(0), context.cosignatory1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification1);
+			NotificationUtils.assertAccountNotification(notifications.get(2), context.cosignatory2);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(3), context.signer, context.modification2);
+			NotificationUtils.assertBalanceDebitNotification(notifications.get(4), context.signer, EXPECTED_TWO_MOD_FEE);
 		}
 
 		@Test
@@ -376,11 +356,12 @@ public class MultisigAggregateModificationTransactionTest {
 			// Assert:
 			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
 			Mockito.verify(observer, Mockito.times(5)).notify(notificationCaptor.capture());
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(4), context.cosignatory1);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(3), context.signer, context.modification1);
-			NotificationUtils.assertAccountNotification(notificationCaptor.getAllValues().get(2), context.cosignatory2);
-			NotificationUtils.assertCosignatoryModificationNotification(notificationCaptor.getAllValues().get(1), context.signer, context.modification2);
-			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(0), context.signer, Amount.fromNem(300));
+			final List<Notification> notifications = notificationCaptor.getAllValues();
+			NotificationUtils.assertAccountNotification(notifications.get(4), context.cosignatory1);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(3), context.signer, context.modification1);
+			NotificationUtils.assertAccountNotification(notifications.get(2), context.cosignatory2);
+			NotificationUtils.assertCosignatoryModificationNotification(notifications.get(1), context.signer, context.modification2);
+			NotificationUtils.assertBalanceCreditNotification(notifications.get(0), context.signer, EXPECTED_TWO_MOD_FEE);
 		}
 
 		private static class TestContextForUndoExecuteTests {
