@@ -345,7 +345,7 @@ public class BlockExecutorTest {
 			// Arrange: create a block signed by the remote (remoteSigner) and have remoteSigner forward to realAccount
 			this.block = new Block(this.remoteSigner, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, this.height);
 			final MockTransaction transaction = new MockTransaction(this.transactionSigner, 1);
-			transaction.setMinimumFee(Amount.fromNem(5).getNumMicroNem());
+			transaction.setFee(Amount.fromNem(5));
 			this.block.addTransaction(transaction);
 
 			this.context.setForwardingAccount(this.remoteSigner, this.realAccount);

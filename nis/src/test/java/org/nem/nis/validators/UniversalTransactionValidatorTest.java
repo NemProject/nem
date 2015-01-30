@@ -98,29 +98,28 @@ public class UniversalTransactionValidatorTest {
 
 	//region minimum fee validation
 
+	// TODO 20150129 J-*: consider using PowerMock
+
 	@Test
-	public void transactionWithFeeLessThanMinimumFailsValidation() {
+	public void transactionWithInvalidFeeFailsValidation() {
 		// Assert:
-		assertValidationResult(999, 1000, ValidationResult.FAILURE_INSUFFICIENT_FEE);
+		assertValidationResult(
+				MockTransaction.DEFAULT_FEE.subtract(Amount.fromNem(1)),
+				ValidationResult.FAILURE_INSUFFICIENT_FEE);
 	}
 
 	@Test
-	public void transactionWithFeeEqualToMinimumValidates() {
+	public void transactionWithValidFeePassesValidates() {
 		// Assert:
-		assertValidationResult(1000, 1000, ValidationResult.SUCCESS);
+		assertValidationResult(
+				MockTransaction.DEFAULT_FEE,
+				ValidationResult.SUCCESS);
 	}
 
-	@Test
-	public void transactionWithFeeGreaterThanMinimumValidates() {
-		// Assert:
-		assertValidationResult(1001, 1000, ValidationResult.SUCCESS);
-	}
-
-	private static void assertValidationResult(final int fee, final int minimumFee, final ValidationResult expectedResult) {
+	private static void assertValidationResult(final Amount fee, final ValidationResult expectedResult) {
 		// Arrange:
 		final MockTransaction transaction = new MockTransaction();
-		transaction.setFee(Amount.fromNem(fee));
-		transaction.setMinimumFee(Amount.fromNem(minimumFee).getNumMicroNem());
+		transaction.setFee(fee);
 
 		// Act:
 		final ValidationResult result = validate(transaction);

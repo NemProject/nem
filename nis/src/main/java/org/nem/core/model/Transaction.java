@@ -154,15 +154,6 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	protected abstract void transfer(final TransactionObserver observer);
 
 	/**
-	 * Gets the minimum fee for this transaction.
-	 *
-	 * @return The minimum fee.
-	 */
-	public Amount getMinimumFee() {
-		return TransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
-	}
-
-	/**
 	 * Gets all accounts (excluding the signer) that are affected by this transaction.
 	 *
 	 * @return The accounts.
@@ -176,5 +167,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Account getDebtor() {
 		return this.getSigner();
+	}
+
+	private Amount getMinimumFee() {
+		return TransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
 	}
 }

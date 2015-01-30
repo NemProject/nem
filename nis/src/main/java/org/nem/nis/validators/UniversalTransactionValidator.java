@@ -29,7 +29,7 @@ public class UniversalTransactionValidator implements SingleTransactionValidator
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
 
-		if (transaction.getMinimumFee().compareTo(transaction.getFee()) > 0) {
+		if (!TransactionFeeCalculator.isFeeValid(transaction, context.getBlockHeight())) {
 			return ValidationResult.FAILURE_INSUFFICIENT_FEE;
 		}
 

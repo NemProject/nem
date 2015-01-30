@@ -40,7 +40,6 @@ public class ImportanceTransferTransactionTest {
 		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRemote(), IsEqual.equalTo(remote));
 		Assert.assertThat(transaction.getMode(), IsEqual.equalTo(mode));
-		Assert.assertThat(transaction.getMinimumFee(), IsEqual.equalTo(EXPECTED_FEE));
 	}
 
 	@Test(expected = IllegalArgumentException.class)

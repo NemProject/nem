@@ -18,10 +18,12 @@ import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * This suite is different from BlockChainValidatorTest because it uses REAL validators
  * (or at least very close to real)
+ * TODO 20140129 J-*: we might want to consider having the validator to return a validation result instead of boolean
  */
 public class BlockChainValidatorIntegrationTest {
 
@@ -43,38 +45,38 @@ public class BlockChainValidatorIntegrationTest {
 	@Test
 	public void allTransactionsInChainMustBeValid() {
 		// Assert:
-		assertChainWithSingleInvalidTransactionIsInvalid(createInvalidSignedTransaction());
+		assertChainWithSingleInvalidTransactionIsInvalid(BlockChainValidatorFactory::createInvalidSignedTransaction);
 	}
 
 	@Test
 	public void allTransactionsInChainMustHaveValidTimestamp() {
 		// Assert:
-		assertChainWithSingleInvalidTransactionIsInvalid(createSignedFutureTransaction());
+		assertChainWithSingleInvalidTransactionIsInvalid(BlockChainValidatorFactory::createSignedFutureTransaction);
 	}
 
 	@Test
 	public void chainWithTransactionWithInsufficientFeeIsInvalid() {
-		// Arrange:
-		final MockTransaction invalidTransaction = createValidSignedTransaction();
-		invalidTransaction.setMinimumFee(Amount.fromNem(10).getNumMicroNem());
-		invalidTransaction.setFee(Amount.fromNem(9));
-		invalidTransaction.sign();
-
 		// Assert:
-		assertChainWithSingleInvalidTransactionIsInvalid(invalidTransaction);
+		assertChainWithSingleInvalidTransactionIsInvalid(factory -> {
+			final Transaction transaction = factory.createValidSignedTransaction();
+			transaction.setFee(Amount.fromNem(1));
+			transaction.sign();
+			return transaction;
+		});
 	}
 
-	private static void assertChainWithSingleInvalidTransactionIsInvalid(final Transaction invalidTransaction) {
+	private static void assertChainWithSingleInvalidTransactionIsInvalid(final Function<BlockChainValidatorFactory, Transaction> creteInvalidTransaction) {
 		// Arrange:
-		final BlockChainValidator validator = createValidator();
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
-		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(invalidTransaction);
-		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(factory.createValidSignedTransaction());
+		block.addTransaction(creteInvalidTransaction.apply(factory));
+		block.addTransaction(factory.createValidSignedTransaction());
 		block.sign();
 
 		// Act:
@@ -87,15 +89,16 @@ public class BlockChainValidatorIntegrationTest {
 	@Test
 	public void chainWithValidTransactionsIsValid() {
 		// Arrange:
-		final BlockChainValidator validator = createValidator();
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
-		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(factory.createValidSignedTransaction());
+		block.addTransaction(factory.createValidSignedTransaction());
+		block.addTransaction(factory.createValidSignedTransaction());
 		block.sign();
 
 		// Assert:
@@ -177,8 +180,8 @@ public class BlockChainValidatorIntegrationTest {
 	public void chainIsInvalidIfTransactionHashAlreadyExistInHashCache() {
 		// Arrange:
 		final long confirmedBlockHeight = 10;
-		final Transaction transaction = createValidSignedTransaction();
 		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
+		final Transaction transaction = factory.createValidSignedTransaction();
 		Mockito.when(factory.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(true);
 		final BlockChainValidator validator = factory.create();
 
@@ -198,15 +201,16 @@ public class BlockChainValidatorIntegrationTest {
 	@Test
 	public void chainIsInvalidIfAnyTransactionInABlockIsSignedByBlockHarvester() {
 		// Arrange:
-		final BlockChainValidator validator = createValidator();
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
-		block.addTransaction(createValidSignedTransaction());
-		block.addTransaction(createSignedTransactionWithGivenSender(block.getSigner()));
-		block.addTransaction(createValidSignedTransaction());
+		block.addTransaction(factory.createValidSignedTransaction());
+		block.addTransaction(factory.createSignedTransactionWithGivenSender(block.getSigner()));
+		block.addTransaction(factory.createValidSignedTransaction());
 		block.sign();
 
 		// Assert:
@@ -266,8 +270,8 @@ public class BlockChainValidatorIntegrationTest {
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
 
-		final Account signer = factory.createAccountWithBalance(Amount.fromNem(9));
-		block.addTransaction(createTransfer(signer, Amount.fromNem(5), Amount.fromNem(4)));
+		final Account signer = factory.createAccountWithBalance(Amount.fromNem(20));
+		block.addTransaction(createTransfer(signer, Amount.fromNem(15), Amount.fromNem(5)));
 		block.sign();
 
 		// Assert:
@@ -285,8 +289,8 @@ public class BlockChainValidatorIntegrationTest {
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
 
-		final Account signer = factory.createAccountWithBalance(Amount.fromNem(34));
-		block.addTransaction(createTransfer(signer, Amount.fromNem(5), Amount.fromNem(4)));
+		final Account signer = factory.createAccountWithBalance(Amount.fromNem(36));
+		block.addTransaction(createTransfer(signer, Amount.fromNem(6), Amount.fromNem(5)));
 		block.addTransaction(createTransfer(signer, Amount.fromNem(8), Amount.fromNem(2)));
 		block.addTransaction(createTransfer(signer, Amount.fromNem(11), Amount.fromNem(5)));
 		block.sign();
@@ -367,13 +371,13 @@ public class BlockChainValidatorIntegrationTest {
 		final boolean isValid = runMultisigTransferTest(factory, multisig, cosigner, Arrays.asList(cosigner2, cosigner3), recipient);
 
 		// Assert:
-		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 21 (Signature fee) = 648
+		// - M 1000 - 200 (Outer MT fee) - 10 (Inner T fee) - 100 (Inner T amount) - 2 * 6 (Signature fee) = 678
 		// - C1 201 - 0 (No Change) = 201
 		// - C2 202 - 0 (No Change) = 202
 		// - C3 203 - 0 (No Change) = 203
 		// - R 0 + 100 (Inner T amount) = 100
 		Assert.assertThat(isValid, IsEqual.equalTo(true));
-		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(648)));
+		Assert.assertThat(factory.getAccountInfo(multisig).getBalance(), IsEqual.equalTo(Amount.fromNem(678)));
 		Assert.assertThat(factory.getAccountInfo(cosigner).getBalance(), IsEqual.equalTo(Amount.fromNem(201)));
 		Assert.assertThat(factory.getAccountInfo(cosigner2).getBalance(), IsEqual.equalTo(Amount.fromNem(202)));
 		Assert.assertThat(factory.getAccountInfo(cosigner3).getBalance(), IsEqual.equalTo(Amount.fromNem(203)));
@@ -421,7 +425,7 @@ public class BlockChainValidatorIntegrationTest {
 
 		for (final Account otherCosigner : otherCosigners) {
 			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(currentTime, otherCosigner, multisig, transfer);
-			signatureTransaction.setFee(Amount.fromNem(21));
+			signatureTransaction.setFee(Amount.fromNem(6));
 			msTransaction.addSignature(prepareTransaction(signatureTransaction));
 		}
 
@@ -438,53 +442,6 @@ public class BlockChainValidatorIntegrationTest {
 	//region helper functions
 
 	//region transactions / blocks
-
-	private static MockTransaction createValidSignedTransaction() {
-		final TimeInstant timeInstant = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
-		final MockTransaction transaction = new MockTransaction(12, timeInstant);
-		return prepareTransaction(transaction);
-	}
-
-	private static Transaction createSignedFutureTransaction() {
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		final Transaction transaction = new MockTransaction(0, currentTime.addMinutes(2));
-		transaction.setDeadline(currentTime.addHours(2));
-		transaction.sign();
-		return transaction;
-	}
-
-	private static Transaction createInvalidSignedTransaction() {
-		final Transaction transaction = new MockTransaction();
-		transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() - 1));
-		transaction.sign();
-		return transaction;
-	}
-
-	private static Transaction createTransfer(final Account sender, final Account recipient, final Amount amount) {
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		final Transaction transaction = new TransferTransaction(currentTime.addSeconds(1), sender, recipient, amount, null);
-		return prepareTransaction(transaction);
-	}
-
-	private static Transaction createTransfer(final Account signer, final Amount amount, final Amount fee) {
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		final Transaction transaction = new TransferTransaction(currentTime, signer, Utils.generateRandomAccount(), amount, null);
-		transaction.setFee(fee);
-		return prepareTransaction(transaction);
-	}
-
-	private static <T extends Transaction> T prepareTransaction(final T transaction) {
-		// set the deadline appropriately and sign
-		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		transaction.setDeadline(currentTime.addSeconds(10));
-		transaction.sign();
-		return transaction;
-	}
-
-	private static Transaction createSignedTransactionWithGivenSender(final Account account) {
-		final Transaction transaction = new MockTransaction(account);
-		return prepareTransaction(transaction);
-	}
 
 	private static Block createParentBlock(final Account account, final long height) {
 		return new Block(account, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, new BlockHeight(height));
@@ -550,6 +507,10 @@ public class BlockChainValidatorIntegrationTest {
 
 		private Account createAccountWithBalance(final Amount balance) {
 			final Account account = Utils.generateRandomAccount();
+			return this.setAccountBalance(account, balance);
+		}
+
+		private Account setAccountBalance(final Account account, final Amount balance) {
 			final AccountState accountState = this.accountStateCache.findStateByAddress(account.getAddress());
 			accountState.getAccountInfo().incrementBalance(balance);
 			accountState.getWeightedBalances().addFullyVested(BlockHeight.ONE, balance);
@@ -560,6 +521,58 @@ public class BlockChainValidatorIntegrationTest {
 			this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosigner.getAddress());
 			this.accountStateCache.findStateByAddress(cosigner.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
 		}
+
+		private MockTransaction createValidSignedTransaction() {
+			final TimeInstant timeInstant = NisMain.TIME_PROVIDER.getCurrentTime().addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME / 2);
+			final MockTransaction transaction = new MockTransaction(12, timeInstant);
+			return this.prepareMockTransaction(transaction);
+		}
+
+		private Transaction createSignedFutureTransaction() {
+			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+			final MockTransaction transaction = new MockTransaction(0, currentTime.addMinutes(2));
+			transaction.setDeadline(currentTime.addHours(2));
+			transaction.sign();
+			return this.prepareMockTransaction(transaction);
+		}
+
+		private Transaction createInvalidSignedTransaction() {
+			final MockTransaction transaction = new MockTransaction();
+			transaction.setDeadline(new TimeInstant(MockTransaction.TIMESTAMP.getRawTime() - 1));
+			transaction.sign();
+			return this.prepareMockTransaction(transaction);
+		}
+
+		private Transaction createSignedTransactionWithGivenSender(final Account account) {
+			final MockTransaction transaction = new MockTransaction(account);
+			return this.prepareMockTransaction(transaction);
+		}
+
+		private MockTransaction prepareMockTransaction(final MockTransaction transaction) {
+			this.setAccountBalance(transaction.getSigner(), Amount.fromNem(1000));
+			return prepareTransaction(transaction);
+		}
+	}
+
+	private static Transaction createTransfer(final Account sender, final Account recipient, final Amount amount) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Transaction transaction = new TransferTransaction(currentTime.addSeconds(1), sender, recipient, amount, null);
+		return prepareTransaction(transaction);
+	}
+
+	private static Transaction createTransfer(final Account signer, final Amount amount, final Amount fee) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Transaction transaction = new TransferTransaction(currentTime, signer, Utils.generateRandomAccount(), amount, null);
+		transaction.setFee(fee);
+		return prepareTransaction(transaction);
+	}
+
+	private static <T extends Transaction> T prepareTransaction(final T transaction) {
+		// set the deadline appropriately and sign
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		transaction.setDeadline(currentTime.addSeconds(10));
+		transaction.sign();
+		return transaction;
 	}
 
 	private static BlockChainValidatorFactory createValidatorFactory() {
