@@ -176,7 +176,12 @@ public enum ValidationResult {
 	/**
 	 * Validation failed because a transaction originated from the nemesis account after the nemesis block.
 	 */
-	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(40);
+	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(40),
+
+	/**
+	 * Transaction was rejected because the debtor is not allowed to put another transaction into the cache.
+	 */
+	FAILURE_TRANSACTION_CACHE_TOO_FULL(41);
 
 	private final int value;
 

@@ -85,11 +85,11 @@ public class UnconfirmedTransactions {
 		this.timeProvider = timeProvider;
 		this.singleValidator = this.createSingleValidator(blockVerification);
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
-		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
+		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -159,9 +159,14 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
 		synchronized (this.lock) {
+			// check is needed to distinguish between NEUTRAL and FAILURE_TRANSACTION_CACHE_TOO_FULL
+			if (this.transactions.contains(transaction)) {
+				return ValidationResult.NEUTRAL;
+			}
+
 			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(Arrays.asList(transaction));
 			if (filteredTransactions.isEmpty()) {
-				return ValidationResult.FAILURE_TRANSACION_CACHE_TOO_FULL;
+				return ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL;
 			}
 			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			return transactionValidationResult.isSuccess()

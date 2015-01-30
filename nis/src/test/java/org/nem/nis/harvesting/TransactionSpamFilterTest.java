@@ -4,34 +4,36 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.Transaction;
-import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.*;
 
 public class TransactionSpamFilterTest {
+
+	// region filter
 
 	@Test
 	public void anyTransactionIsPermissibleIfCacheHasLessTransactionsThanMaxAllowedTransactionPerBlock() {
 		// Arrange:
 		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE);
 		context.setImportance(0.0);
-		final Collection<Transaction> transactions = createTransactions(1);
+		final Transaction transaction =  new MockTransaction(Utils.generateRandomAccount());
+		transaction.setFee(Amount.fromNem(0));
 
 		// Act:
-		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
+		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Arrays.asList(transaction));
 
 		// Assert:
-		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(transactions));
+		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transaction)));
 	}
 
 	@Test
-	public void transactionIsNotPermissibleIfCacheAtLeastMaxAllowedTransactionPerBlockAndDebitorHasZeroImportance() {
+	public void transactionIsNotPermissibleIfCacheAtLeastMaxAllowedTransactionPerBlockAndDebtorHasZeroImportance() {
 		// Arrange:
 		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
 		context.setImportance(0.0);
@@ -45,7 +47,7 @@ public class TransactionSpamFilterTest {
 	}
 
 	@Test
-	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToMaxAllowedTransactionPerBlockIfAllDebitorsHaveZeroImportance() {
+	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToMaxAllowedTransactionPerBlockIfAllDebtorsHaveZeroImportance() {
 		// Arrange:
 		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE);
 		context.setImportance(0.0);
@@ -74,6 +76,45 @@ public class TransactionSpamFilterTest {
 		Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(838));
 	}
 
+	@Test
+	public void highFeeHelpsToPlaceTransactionIntoCache() {
+		// Arrange:
+		final TestContext context = new TestContext(800, BlockHeight.ONE);
+		context.setImportance(0.0);
+		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
+		transaction.setFee(Amount.fromNem(100));
+
+		// Act:
+		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Arrays.asList(transaction));
+
+		// Assert:
+		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+	}
+
+	// endregion
+
+	// region delegation
+
+	@Test
+	public void filterDelegatesToUnderlyingCaches() {
+		// Arrange:
+		final TestContext context = new TestContext(200, BlockHeight.ONE);
+		context.setImportance(0.0);
+		final Collection<Transaction> transactions = createTransactions(1);
+
+		// Act:
+		context.spamFilter.filter(transactions);
+
+		// Assert:
+		Mockito.verify(context.nisCache, Mockito.times(1)).getAccountStateCache();
+		Mockito.verify(context.nisCache, Mockito.times(2)).getPoiFacade();
+		Mockito.verify(context.transactions, Mockito.times(1)).contains(Mockito.any());
+		Mockito.verify(context.transactions, Mockito.times(2)).flatSize();
+		Mockito.verify(context.transactions, Mockito.times(1)).stream();
+	}
+
+	// endregion
+
 	private static Collection<Transaction> createTransactions(final int count) {
 		return IntStream.range(0, count)
 				.mapToObj(i -> new MockTransaction(Utils.generateRandomAccount()))
@@ -82,25 +123,31 @@ public class TransactionSpamFilterTest {
 
 	private class TestContext {
 		private final ReadOnlyNisCache nisCache = Mockito.mock(ReadOnlyNisCache.class);
-		private final ConcurrentMap transactions = Mockito.mock(ConcurrentMap.class);
+		private final UnconfirmedTransactionsCache transactions = Mockito.spy(new UnconfirmedTransactionsCache());
 		private final TransactionSpamFilter spamFilter = new TransactionSpamFilter(nisCache, transactions);
 		private final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
 
 		private TestContext(final int transactionsSize, final BlockHeight lastPoiRecalculationHeight) {
 			final PoiFacade poiFacade = Mockito.mock(PoiFacade.class);
-			final AccountStateCache accounStateCache = Mockito.mock(AccountStateCache.class);
+			final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 			final AccountState state = Mockito.mock(AccountState.class);
 			Mockito.when(this.nisCache.getPoiFacade()).thenReturn(poiFacade);
 			Mockito.when(poiFacade.getLastPoiRecalculationHeight()).thenReturn(lastPoiRecalculationHeight);
-			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(accounStateCache);
-			Mockito.when(accounStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
+			Mockito.when(this.nisCache.getAccountStateCache()).thenReturn(accountStateCache);
+			Mockito.when(accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
 			Mockito.when(state.getImportanceInfo()).thenReturn(this.accountImportance);
 			Mockito.when(this.accountImportance.getHeight()).thenReturn(BlockHeight.ONE);
-			Mockito.when(this.transactions.size()).thenReturn(transactionsSize);
+			this.fillCache(transactionsSize);
 		}
 
 		private void setImportance(final double importance) {
 			Mockito.when(this.accountImportance.getImportance(BlockHeight.ONE)).thenReturn(importance);
+		}
+
+		private void fillCache(final int count) {
+			for (int i = 0; i < count; i++) {
+				this.transactions.add(new MockTransaction(Utils.generateRandomAccount()));
+			}
 		}
 	}
 }
