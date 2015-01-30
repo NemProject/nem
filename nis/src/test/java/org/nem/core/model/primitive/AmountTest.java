@@ -126,6 +126,22 @@ public class AmountTest {
 
 	//endregion
 
+	//region multiply
+
+	@Test
+	public void amountCanBeMultipliedByScalar() {
+		// Arrange:
+		final Amount amount = new Amount(65);
+
+		// Act:
+		final Amount result = amount.multiply(3);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(new Amount(195)));
+	}
+
+	//endregion
+
 	//region inline serialization
 
 	@Test
