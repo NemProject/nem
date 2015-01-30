@@ -7,7 +7,7 @@ import org.nem.core.model.primitive.Amount;
  * A TransferTransactionValidator implementation that applies to transfer transactions.
  */
 public class TransferTransactionValidator implements SingleTransactionValidator {
-	private static final int MAX_MESSAGE_SIZE = 512;
+	private static final int MAX_MESSAGE_SIZE = 96;
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
