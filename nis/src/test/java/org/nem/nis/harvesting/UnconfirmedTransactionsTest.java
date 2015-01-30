@@ -27,7 +27,7 @@ public class UnconfirmedTransactionsTest {
 	public void sizeReturnsTheNumberOfTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account account = context.addAccount(Amount.fromNem(100));
+		final Account account = context.addAccount(Amount.fromNem(1000));
 
 		// Act:
 		for (int i = 0; i < 17; ++i) {
@@ -58,19 +58,19 @@ public class UnconfirmedTransactionsTest {
 	public void getUnconfirmedBalanceReturnsConfirmedBalanceAdjustedByAllPendingTransferTransactionsImpactingAccount() {
 		// Arrange:
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final Account account1 = context.addAccount(Amount.fromNem(4));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final Account account1 = context.addAccount(Amount.fromNem(14));
+		final Account account2 = context.addAccount(Amount.fromNem(110));
 		final TimeInstant currentTime = new TimeInstant(11);
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(5), null),
-				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(4), null));
+				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(15), null),
+				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(14), null));
 		setFeeAndDeadline(transactions.get(0), Amount.fromNem(2));
 		setFeeAndDeadline(transactions.get(1), Amount.fromNem(3));
 		transactions.forEach(context::signAndAddExisting);
 
 		// Assert:
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(2)));
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(97)));
+		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(12)));
+		Assert.assertThat(context.transactions.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(107)));
 	}
 
 	@Test
@@ -1068,11 +1068,11 @@ public class UnconfirmedTransactionsTest {
 	public void getTransactionsForAccountIncludesConflictingTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext(new TransferTransactionValidator());
-		final Account account1 = context.addAccount(Amount.fromNem(5));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final Account account1 = context.addAccount(Amount.fromNem(15));
+		final Account account2 = context.addAccount(Amount.fromNem(110));
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(10), null),
-				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(6), null));
+				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(20), null),
+				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(16), null));
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
@@ -1184,17 +1184,16 @@ public class UnconfirmedTransactionsTest {
 	public void getTransactionsForNewBlockFiltersOutConflictingTransactions() {
 		// Arrange:
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final Account sender = context.addAccount(Amount.fromNem(10));
-		final Account recipient = context.addAccount();
+		final Account sender = context.addAccount(Amount.fromNem(20));
+		final Account recipient = context.addAccount(Amount.fromNem(10));
 		final UnconfirmedTransactions transactions = context.transactions;
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
-		// TODO 20150111 J-G: please update comments:
 		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 10, R = 0
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 4, R = 5, 1 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 6, R = 1, 3 Fee
+		// 		- initially the balances are: S = 20, R = 10
+		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 3, R = 25, 2 Fee
+		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 15, R = 10, 5 Fee
 		//   - getTransactionsBefore() returns SORTED transactions, so R->S is ordered before S->R because it has a greater fee
 		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough balance
 		//
@@ -1202,11 +1201,11 @@ public class UnconfirmedTransactionsTest {
 		// R doesn't have funds on the account, we don't want such TX because this would lead to creation
 		// of a block that would get discarded (TXes are validated first, and then executed)
 
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
+		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
 		t1.setFee(Amount.fromNem(2));
 		t1.sign();
 		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
+		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(12));
 		t2.setFee(Amount.fromNem(3));
 		t2.sign();
 		transactions.addExisting(t2);
@@ -1227,22 +1226,22 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
 		final UnconfirmedTransactions transactions = context.transactions;
-		final Account sender = context.addAccount(Amount.fromNem(10));
-		final Account recipient = context.addAccount();
+		final Account sender = context.addAccount(Amount.fromNem(20));
+		final Account recipient = context.addAccount(Amount.fromNem(10));
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
 		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 10, R = 0
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 5, 3 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 4, R = 1, 5 Fee
+		// 		- initially the balances are: S = 20, R = 10
+		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 25, 3 Fee
+		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 24, R = 1, 5 Fee
 		//   - getTransactionsBefore() returns SORTED transactions, so S->R is ordered before R->S because it has a greater fee
 		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough *confirmed* balance
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
+		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
 		t1.setFee(Amount.fromNem(3));
 		t1.sign();
 		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
+		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(22));
 		t2.setFee(Amount.fromNem(2));
 		t2.sign();
 		transactions.addExisting(t2);
