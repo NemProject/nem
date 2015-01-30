@@ -1,8 +1,11 @@
 {
   "timeStamp": 0,
-  "signature": "3f9f42e426e583752d7cd652cdac00aaf0cf0a832bebec1994c03e9a0f0f5814024f446e3fb454828b0b587799dd6f822faa9e0812aa18d897c0be0e68584007",
+  "signature": "4cd992ff32cc97f7c1bf6ee3fb44cf7ab37a73e1b6d6415a6e76135bd61f63c2d8c61278671854e8ab042d63fc1ca5d5874d22ea3ada1ae8fc211c74c2073507",
   "prevBlockHash": {
-    "data": "0000000000000000000000000000000000000000000000000000000000000000"
+    "data": "0000000000000000000000000000000000000000000000000000000000000000",
+    "_propertyOrderArray": [
+      "data"
+    ]
   },
   "type": -1,
   "transactions": [
@@ -16,7 +19,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -28,7 +43,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -40,7 +67,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -52,7 +91,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -64,7 +115,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -76,7 +139,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -88,7 +163,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -100,7 +187,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -112,7 +211,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -124,7 +235,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -136,7 +259,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -148,7 +283,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -160,7 +307,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -172,7 +331,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -184,7 +355,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -196,7 +379,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -208,7 +403,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -220,7 +427,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -232,7 +451,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -244,7 +475,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -256,7 +499,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -268,7 +523,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -280,7 +547,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -292,7 +571,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -304,7 +595,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -316,7 +619,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -328,7 +643,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -340,7 +667,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -352,7 +691,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -364,7 +715,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -376,7 +739,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -388,7 +763,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -400,7 +787,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -412,7 +811,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -424,7 +835,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -436,7 +859,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -448,7 +883,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -460,7 +907,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -472,7 +931,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -484,7 +955,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -496,7 +979,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -508,7 +1003,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -520,7 +1027,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -532,7 +1051,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -544,7 +1075,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -556,7 +1099,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -568,7 +1123,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -580,7 +1147,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -592,7 +1171,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -604,7 +1195,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -616,7 +1219,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -628,7 +1243,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -640,7 +1267,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -652,7 +1291,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -664,7 +1315,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -676,7 +1339,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -688,7 +1363,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -700,7 +1387,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -712,7 +1411,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -724,7 +1435,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -736,7 +1459,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -748,7 +1483,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -760,7 +1507,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -772,7 +1531,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -784,7 +1555,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -796,7 +1579,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -808,7 +1603,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -820,7 +1627,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -832,7 +1651,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -844,7 +1675,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -856,7 +1699,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -868,7 +1723,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -880,7 +1747,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -892,7 +1771,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -904,7 +1795,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -916,7 +1819,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -928,7 +1843,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -940,7 +1867,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -952,7 +1891,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -964,7 +1915,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -976,7 +1939,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -988,7 +1963,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1000,7 +1987,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1012,7 +2011,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1024,7 +2035,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1036,7 +2059,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1048,7 +2083,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1060,7 +2107,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1072,7 +2131,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1084,7 +2155,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1096,7 +2179,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1108,7 +2203,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1120,7 +2227,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1132,7 +2251,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1144,7 +2275,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1156,7 +2299,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1168,7 +2323,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1180,7 +2347,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1192,7 +2371,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1204,7 +2395,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1216,7 +2419,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1228,7 +2443,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1240,7 +2467,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1252,7 +2491,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1264,7 +2515,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1276,7 +2539,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1288,7 +2563,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1300,7 +2587,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1312,7 +2611,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1324,7 +2635,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1336,7 +2659,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1348,7 +2683,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1360,7 +2707,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1372,7 +2731,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1384,7 +2755,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1396,7 +2779,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1408,7 +2803,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1420,7 +2827,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1432,7 +2851,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1444,7 +2875,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1456,7 +2899,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1468,7 +2923,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1480,7 +2947,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1492,7 +2971,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1504,7 +2995,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1516,7 +3019,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1528,7 +3043,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1540,7 +3067,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1552,7 +3091,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1564,7 +3115,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1576,7 +3139,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1588,7 +3163,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1600,7 +3187,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1612,7 +3211,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1624,7 +3235,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1636,7 +3259,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1648,7 +3283,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1660,7 +3307,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1672,7 +3331,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1684,7 +3355,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1696,7 +3379,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1708,7 +3403,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1720,7 +3427,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1732,7 +3451,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1744,7 +3475,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1756,7 +3499,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1768,7 +3523,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1780,7 +3547,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1792,7 +3571,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1804,7 +3595,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1816,7 +3619,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1828,7 +3643,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1840,7 +3667,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1852,7 +3691,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1864,7 +3715,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1876,7 +3739,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1888,7 +3763,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1900,7 +3787,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1912,7 +3811,19 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
@@ -1924,12 +3835,24 @@
       "deadline": 0,
       "message": {},
       "version": 1,
-      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f"
+      "signer": "e59ef184a612d4c3c4d89b5950eb57262c69862b2f96e59c5043bf41765c482f",
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "recipient",
+        "amount",
+        "message"
+      ]
     },
     {
       "timeStamp": 0,
-      "signature": "8bd8b59ceaff3c25e4bbcd2de7543619a4388c22bd393948f52de41d95b5aa0b911fc3b66d5bb17095d2410e964ceb95f4ce8be933081bc69950755b3a407c01",
-      "fee": 0,
+      "signature": "d75f26903d6882da42219e73eea16b0682a1e0baf6241e4c586068f6924e4618a3c16471b181d2498657f2fa98afae8e0eadd4242e1dab493f81a0dd3573d60d",
+      "fee": 300000000,
       "type": 4097,
       "deadline": 0,
       "version": 1,
@@ -1937,18 +3860,36 @@
       "modifications": [
         {
           "modificationType": 1,
-          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b"
+          "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324",
+          "_propertyOrderArray": [
+            "modificationType",
+            "cosignatoryAccount"
+          ]
         },
         {
           "modificationType": 1,
-          "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324"
+          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b",
+          "_propertyOrderArray": [
+            "modificationType",
+            "cosignatoryAccount"
+          ]
         }
+      ],
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "modifications"
       ]
     },
     {
       "timeStamp": 0,
-      "signature": "776d05c462454a38be1df5162856af3c940e3615c911e5b4cb46bbb94843f1d7202e1611773b1eae406c80554a541a7f4afe07242b9bb20a401fecd84d796302",
-      "fee": 0,
+      "signature": "83d12f66b1987ef7333119e3db4d2762c278d3a9f6650ea53bcb6e8e34da3f6e8d918955c2ced60a311520140da48670e7118406229f36e7340b0bef83b34407",
+      "fee": 300000000,
       "type": 4097,
       "deadline": 0,
       "version": 1,
@@ -1956,12 +3897,30 @@
       "modifications": [
         {
           "modificationType": 1,
-          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b"
+          "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324",
+          "_propertyOrderArray": [
+            "modificationType",
+            "cosignatoryAccount"
+          ]
         },
         {
           "modificationType": 1,
-          "cosignatoryAccount": "994793ba1c789fa9bdea918afc9b06e2d0309beb1081ac5b6952991e4defd324"
+          "cosignatoryAccount": "c54d6e33ed1446eedd7f7a80a588dd01857f723687a09200c1917d5524752f8b",
+          "_propertyOrderArray": [
+            "modificationType",
+            "cosignatoryAccount"
+          ]
         }
+      ],
+      "_propertyOrderArray": [
+        "type",
+        "version",
+        "timeStamp",
+        "signer",
+        "signature",
+        "fee",
+        "deadline",
+        "modifications"
       ]
     }
   ],
