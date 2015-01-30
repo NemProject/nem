@@ -128,7 +128,8 @@ public class BlockAnalyzer {
 			}
 		} while (dbBlock != null);
 
-		recalculateImportancesAtHeight(nisCache, new BlockHeight(curBlockHeight));
+		// note that curBlockHeight is one greater than the height of our last block
+		recalculateImportancesAtHeight(nisCache, new BlockHeight(curBlockHeight - 1));
 		return true;
 	}
 
