@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -158,7 +158,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 *
 	 * @return The minimum fee.
 	 */
-	public abstract Amount getMinimumFee();
+	public Amount getMinimumFee() {
+		return TransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
+	}
 
 	/**
 	 * Gets all accounts (excluding the signer) that are affected by this transaction.

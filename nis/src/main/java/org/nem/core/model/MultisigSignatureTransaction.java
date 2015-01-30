@@ -2,7 +2,6 @@ package org.nem.core.model;
 
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -73,11 +72,6 @@ public class MultisigSignatureTransaction extends Transaction implements Seriali
 	@Override
 	protected void transfer(final TransactionObserver observer) {
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getDebtor(), this.getFee()));
-	}
-
-	@Override
-	public Amount getMinimumFee() {
-		return Amount.ZERO;
 	}
 
 	@Override
