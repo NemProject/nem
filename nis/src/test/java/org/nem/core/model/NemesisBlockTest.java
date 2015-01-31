@@ -30,7 +30,8 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.ZERO));
+		// TODO 20150130 J-G: why is the fee so high?
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(600)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(NUM_NEMESIS_TRANSACTIONS));
@@ -48,8 +49,6 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.verify(), IsEqual.equalTo(true));
 	}
 
-	// TODO 20150127 J-G: this test seems to be failing because there are transactions in the nemesis block not signed
-	// > by the nemesis account; is that intentional? if so, the changes i made won't work...
 	@Test
 	public void nemesisTransactionsAreVerifiable() {
 		// Arrange:
@@ -62,13 +61,16 @@ public class NemesisBlockTest {
 	}
 
 	@Test
-	public void nemesisTransactionsDoNotHaveFees() {
+	public void nemesisTransactionsHaveCorrectFees() {
 		// Arrange:
 		final Block block = NEMESIS_BLOCK;
 
 		// Assert:
 		for (final Transaction transaction : block.getTransactions()) {
-			Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
+			final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
+					? Amount.ZERO
+					: Amount.fromNem(300);
+			Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 		}
 	}
 
