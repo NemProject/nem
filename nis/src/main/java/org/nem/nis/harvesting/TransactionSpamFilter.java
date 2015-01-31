@@ -18,27 +18,29 @@ import java.util.stream.Stream;
 public class TransactionSpamFilter {
 	private static final double MAX_CACHE_SIZE = 1000.0;
 	private final ReadOnlyNisCache nisCache;
-	private final UnconfirmedTransactionsCache transactions; // use UnconfirmedTransactionsCache in multisig branch
+	private final UnconfirmedTransactionsCache transactions;
 
 	/**
 	 * Creates a transaction spam filter.
 	 *
 	 * @param nisCache The (read only) NIS cache.
+	 * @param transactions The unconfirmed transactions cache.
 	 */
 	public TransactionSpamFilter(final ReadOnlyNisCache nisCache,final UnconfirmedTransactionsCache transactions) {
 		this.nisCache = nisCache;
 		this.transactions = transactions;
 	}
 
+	/**
+	 * * Filters out all transactions that are considered spam.
+	 * @param transactions The transactions.
+	 * @return The non-spam transactions.
+	 */
 	public Collection<Transaction> filter(final Collection<Transaction> transactions) {
 		final List<Transaction> filteredTransactions = new ArrayList<>();
 		transactions.stream()
-				.filter(t -> !this.transactions.contains(t))
-				.forEach(t -> {
-					if (this.isPermissible(t, filteredTransactions)) {
-						filteredTransactions.add(t);
-					}
-				});
+				.filter(t -> !this.transactions.contains(t) && this.isPermissible(t, filteredTransactions))
+				.forEach(filteredTransactions::add);
 		return filteredTransactions;
 	}
 
@@ -53,15 +55,15 @@ public class TransactionSpamFilter {
 				.getAccountStateCache()
 				.findStateByAddress(debtor.getAddress())
 				.getImportanceInfo();
-		if (!this.nisCache.getPoiFacade().getLastPoiRecalculationHeight().equals(importanceInfo.getHeight())) {
+		final BlockHeight importanceHeight = this.nisCache.getPoiFacade().getLastPoiRecalculationHeight();
+		if (!importanceHeight.equals(importanceInfo.getHeight())) {
 			return false;
 		}
 
 		final long count = Stream.concat(this.transactions.stream(), filteredTransactions.stream())
 						.filter(t -> t.getDebtor().getAddress().equals(debtor.getAddress()))
 						.count();
-		final BlockHeight height = this.nisCache.getPoiFacade().getLastPoiRecalculationHeight();
-		final double effectiveImportance = importanceInfo.getImportance(height) + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
+		final double effectiveImportance = importanceInfo.getImportance(importanceHeight) + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
 		return count < getMaxAllowedTransactions(effectiveImportance, numApprovedTransactions);
 	}
 
@@ -71,6 +73,7 @@ public class TransactionSpamFilter {
 		return maxAllowed;
 	}
 
+	// TODO 20150130 J-J: consider refactoring
 	private int flatSize(final List<Transaction> filteredTransactions) {
 		return (int)Stream.concat(
 				filteredTransactions.stream(),

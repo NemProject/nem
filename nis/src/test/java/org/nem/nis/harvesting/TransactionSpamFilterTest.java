@@ -32,6 +32,8 @@ public class TransactionSpamFilterTest {
 		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transaction)));
 	}
 
+	// TODO 20150130 J-B: i think the name is misleading as "permission" is a function of both importance and fee (below a zero importance transaction is
+	// > allowed because it has a high fee)
 	@Test
 	public void transactionIsNotPermissibleIfCacheAtLeastMaxAllowedTransactionPerBlockAndDebtorHasZeroImportance() {
 		// Arrange:
@@ -60,8 +62,12 @@ public class TransactionSpamFilterTest {
 		Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(5));
 	}
 
+	// TODO 20150130 J-B: consider a few variations of this test, i.e.
+	// > assertNumPermissibleTransactions(0.01, ???);
+	// > assertNumPermissibleTransactions(0.001, 838);
+	// > assertNumPermissibleTransactions(0.0001, ???);
 	@Test
-	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebitor() {
+	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebtor() {
 		// Arrange:
 		final TestContext context = new TestContext(0, BlockHeight.ONE);
 
@@ -76,6 +82,8 @@ public class TransactionSpamFilterTest {
 		Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(838));
 	}
 
+	// TODO 20150130 J-B: consider four variations of this test, i.e.
+	// > [high|low] fee + [high|low] importance
 	@Test
 	public void highFeeHelpsToPlaceTransactionIntoCache() {
 		// Arrange:
@@ -107,7 +115,7 @@ public class TransactionSpamFilterTest {
 
 		// Assert:
 		Mockito.verify(context.nisCache, Mockito.times(1)).getAccountStateCache();
-		Mockito.verify(context.nisCache, Mockito.times(2)).getPoiFacade();
+		Mockito.verify(context.nisCache, Mockito.times(1)).getPoiFacade();
 		Mockito.verify(context.transactions, Mockito.times(1)).contains(Mockito.any());
 		Mockito.verify(context.transactions, Mockito.times(2)).flatSize();
 		Mockito.verify(context.transactions, Mockito.times(1)).stream();
