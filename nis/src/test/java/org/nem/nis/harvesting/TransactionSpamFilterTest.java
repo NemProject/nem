@@ -125,7 +125,11 @@ public class TransactionSpamFilterTest {
 
 	private static Collection<Transaction> createTransactions(final int count) {
 		return IntStream.range(0, count)
-				.mapToObj(i -> new MockTransaction(Utils.generateRandomAccount()))
+				.mapToObj(i -> {
+					final Transaction transaction = new MockTransaction (Utils.generateRandomAccount());
+					transaction.setFee(Amount.ZERO);
+					return transaction;
+				})
 				.collect(Collectors.toList());
 	}
 
