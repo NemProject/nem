@@ -9,7 +9,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
@@ -230,6 +230,26 @@ public class UnconfirmedTransactionsTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void addNewReturnsFailureIfCacheIsTooFull() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final AccountState state = Mockito.mock(AccountState.class);
+		final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
+		Mockito.when(context.poiFacade.getLastPoiRecalculationHeight()).thenReturn(BlockHeight.ONE);
+		Mockito.when(context.accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
+		Mockito.when(state.getImportanceInfo()).thenReturn(accountImportance);
+		Mockito.when(accountImportance.getHeight()).thenReturn(BlockHeight.ONE);
+		Mockito.when(accountImportance.getImportance(BlockHeight.ONE)).thenReturn(0.0);
+		context.addMockTransactions(context.transactions, 1, 900);
+
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
+		final ValidationResult result = context.signAndAddNew(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL));
 	}
 
 	//region validation
@@ -1292,7 +1312,8 @@ public class UnconfirmedTransactionsTest {
 				() -> factory.createSingleBuilder(stateCache),
 				null,
 				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
-				stateCache);
+				stateCache,
+				Mockito.mock(ReadOnlyPoiFacade.class));
 	}
 
 	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
@@ -1319,6 +1340,7 @@ public class UnconfirmedTransactionsTest {
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyAccountStateCache accountStateCache;
+		private final ReadOnlyPoiFacade poiFacade;
 		private final TimeProvider timeProvider;
 
 		private TestContext() {
@@ -1333,17 +1355,24 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
-			this(null, singleValidator, batchValidator, Mockito.mock(ReadOnlyAccountStateCache.class));
+			this(
+					null,
+					singleValidator,
+					batchValidator,
+					Mockito.mock(ReadOnlyAccountStateCache.class),
+					Mockito.mock(ReadOnlyPoiFacade.class));
 		}
 
 		private TestContext(
 				final Supplier<AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier,
 				final SingleTransactionValidator singleValidator,
 				final BatchTransactionValidator batchValidator,
-				final ReadOnlyAccountStateCache accountStateCache) {
+				final ReadOnlyAccountStateCache accountStateCache,
+				final ReadOnlyPoiFacade poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			this.accountStateCache = accountStateCache;
+			this.poiFacade = poiFacade;
 			this.timeProvider = Mockito.mock(TimeProvider.class);
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
@@ -1362,7 +1391,7 @@ public class UnconfirmedTransactionsTest {
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
+					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache, this.poiFacade),
 					this.timeProvider);
 		}
 
