@@ -153,15 +153,10 @@ public class MultisigTransaction extends Transaction implements SerializableEnti
 		}
 	}
 
-	// WARNING: do not alter following two methods. Changing them might have
-	// disastrous effect on verification of multisig signature transactions
+	// WARNING: do not alter the following method. Changing it might have
+	// disastrous effect on verification of multisig signature transactions.
 	@Override
 	public boolean verify() {
-		return super.verify() && this.signatureTransactions.stream().allMatch(this::isSignatureMatch);
-	}
-
-	private boolean isSignatureMatch(final MultisigSignatureTransaction signatureTransaction) {
-		// TODO 20150127 J-G: do we really need this check 'signatureTransaction.getOtherTransactionHash().equals(this.getOtherTransactionHash())' ?
-		return signatureTransaction.getOtherTransactionHash().equals(this.getOtherTransactionHash()) && signatureTransaction.verify();
+		return super.verify() && this.signatureTransactions.stream().allMatch(VerifiableEntity::verify);
 	}
 }
