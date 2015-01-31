@@ -284,6 +284,8 @@ public class TransferDaoTest {
 
 	// TODO 20150122 BR -> G,J: does this test make sense? (we would have to check in the transfer dao for the id in serveral tables).
 	// > Same applies for hash which currently is only checked for in the transfers table.
+	// TODO 20150130 J-B: it seems like this test is returning a matching transaction, which is wrong
+	// > I don't have a big problem if it throws or returns an empty collection as long as the id and hash lookups are consistent
 	@Test
 	public void getTransactionsForAccountUsingIdThrowsWhenIdNotFound() {
 		// Arrange:
