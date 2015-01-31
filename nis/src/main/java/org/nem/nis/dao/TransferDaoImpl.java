@@ -447,8 +447,6 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
-		// TODO 2014 J-B: check with G about if we still need to compare getBlkIndex
-		// TODO 20150127 J-G: i guess this is ok?
 		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
 	}
 

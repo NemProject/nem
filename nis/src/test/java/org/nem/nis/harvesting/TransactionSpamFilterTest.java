@@ -14,16 +14,8 @@ import java.util.*;
 import java.util.stream.*;
 
 public class TransactionSpamFilterTest {
-	// importances for the tests
-	private static final double[] importanceArray = { 1, 0.1, 0.01, 0.001, 0.0001, 0.00001 };
-
-	// Different accounts fills the cache: rounded solutions for equation importance * e^(-y/300) * 1000 * (1000 - y) / 10 = 1
-	private static final int[] expectedCacheSizeDifferentAccounts = { 1000, 998, 975, 838, 490, 120 };
-
-	// Single account fills the cache: rounded solutions for equation importance * e^(-y/300) * 1000 * (1000 - y) / 10 = y
-	private static final int[] expectedCacheSizeSingleAccount = { 854, 587, 281, 120, 120, 120 };
-
-	private static boolean USE_SINGLE_ACCOUNT = true;
+	private static final boolean USE_SINGLE_ACCOUNT = true;
+	private static final boolean USE_DIFFERENT_ACCOUNTS = false;
 
 	// region filter
 
@@ -42,9 +34,6 @@ public class TransactionSpamFilterTest {
 		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transaction)));
 	}
 
-	// TODO 20150130 J-B: i think the name is misleading as "permission" is a function of both importance and fee (below a zero importance transaction is
-	// > allowed because it has a high fee)
-	// TODO 20150131 BR -> J: changed name
 	@Test
 	public void transactionWithZeroFeeIsNotPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasZeroImportance() {
 		// Arrange:
@@ -64,7 +53,7 @@ public class TransactionSpamFilterTest {
 		// Arrange:
 		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE);
 		context.setImportance(0.0);
-		final Collection<Transaction> transactions = createTransactions(!USE_SINGLE_ACCOUNT, 100); // all transactions have zero fee
+		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 100); // all transactions have zero fee
 
 		// Act:
 		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(transactions);
@@ -73,14 +62,23 @@ public class TransactionSpamFilterTest {
 		Assert.assertThat(filteredTransactions.size(), IsEqual.equalTo(5));
 	}
 
-	// TODO 20150130 J-B: consider a few variations of this test, i.e.
-	// > assertNumPermissibleTransactions(0.01, ???);
-	// > assertNumPermissibleTransactions(0.001, 838);
-	// > assertNumPermissibleTransactions(0.0001, ???);
-	// TODO 20150131 BR -> J: ok
+	@Test
+	public void filterNeverAllowsMoreThanMaxCacheSizeTransactions() {
+		// Arrange:
+		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 1200);
+
+		// Assert:
+		this.assertFilteredTransactionsSize(transactions, 1, 1000);
+	}
+
 	@Test
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebtorForDifferentAccounts() {
-		final Collection<Transaction> transactions = createTransactions(!USE_SINGLE_ACCOUNT, 1000);
+		// Arrange:
+		// - different accounts fill the cache
+		// - rounded solutions for equation importance * e^(-y/300) * 1000 * (1000 - y) / 10 = 1
+		final double[] importanceArray = { 1, 0.1, 0.01, 0.001, 0.0001, 0.00001 };
+		final int[] expectedCacheSizeDifferentAccounts = { 1000, 998, 975, 838, 490, 120 };
+		final Collection<Transaction> transactions = createTransactions(USE_DIFFERENT_ACCOUNTS, 1000);
 
 		for (int i = 0; i < importanceArray.length; i++) {
 			// Assert:
@@ -90,6 +88,11 @@ public class TransactionSpamFilterTest {
 
 	@Test
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToFairShareOfDebtorForSingleAccount() {
+		// Arrange:
+		// - single account fills the cache
+		// - rounded solutions for equation importance * e^(-y/300) * 1000 * (1000 - y) / 10 = y
+		final double[] importanceArray = { 1, 0.1, 0.01, 0.001, 0.0001, 0.00001 };
+		final int[] expectedCacheSizeSingleAccount = { 854, 587, 281, 120, 120, 120 };
 		final Collection<Transaction> transactions = createTransactions(USE_SINGLE_ACCOUNT, 1000);
 
 		for (int i = 0; i < importanceArray.length; i++) {
@@ -98,28 +101,49 @@ public class TransactionSpamFilterTest {
 		}
 	}
 
-	// TODO 20150130 J-B: consider four variations of this test, i.e.
-	// > [high|low] fee + [high|low] importance
-	// TODO 20150131 BR -> J: ok (btw. the approach is not exact science, the filter function used is a proposal)
 	@Test
-	public void filterResultDependsOnImportanceAndFeeAndCurrentCacheSize() {
+	public void filterResultDependsOnImportanceAndFeeWhenCacheHasHighFillLevel() {
 		// Assert: boolean parameter says whether transaction is filtered or not.
-		// cache with high fill level
-		this.assertFilterResult(800, 0.0, 100, false);		// no importance, high fee
-		this.assertFilterResult(800, 0.0, 10, true);		// no importance, fee not high enough
-		this.assertFilterResult(800, 0.01, 0, false);		// high importance, no fee
-		this.assertFilterResult(800, 0.0001, 0, true);		// importance not high enough, no fee
-		this.assertFilterResult(800, 0.01, 100, false);		// high importance and fee
-		this.assertFilterResult(800, 0.0, 0, true);			// no importance and fee
+		final int cacheSize = 800;
+		this.assertFilterResult(cacheSize, 0.0, 0, true);      // no importance and fee
+		this.assertFilterResult(cacheSize, 0.0, 10, true);     // no importance, fee not high enough
+		this.assertFilterResult(cacheSize, 0.0, 100, false);   // no importance, high fee
 
-		// cache with medium fill level
-		this.assertFilterResult(250, 0.0, 10, false);		// no importance, medium fee
-		this.assertFilterResult(250, 0.0001, 0, false);		// medium importance, no fee
-		this.assertFilterResult(250, 0.0001, 10, false);	// medium importance, medium fee
-		this.assertFilterResult(250, 0.0, 0, true);			// no importance and fee
+		this.assertFilterResult(cacheSize, 0.0001, 0, true);   // medium importance, no fee
+		this.assertFilterResult(cacheSize, 0.0001, 10, true);  // medium importance, medium fee
 
-		// cache with low fill level
-		this.assertFilterResult(100, 0.0, 0, false);		// no importance and fee
+		this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
+		this.assertFilterResult(cacheSize, 0.01, 100, false);  // high importance and fee
+	}
+
+	@Test
+	public void filterResultDependsOnImportanceAndFeeWhenCacheHasHighMediumLevel() {
+		// Assert: boolean parameter says whether transaction is filtered or not.
+		final int cacheSize = 250;
+		this.assertFilterResult(cacheSize, 0.0, 0, true);      // no importance and fee
+		this.assertFilterResult(cacheSize, 0.0, 10, false);    // no importance, fee not high enough
+		this.assertFilterResult(cacheSize, 0.0, 100, false);   // no importance, high fee
+
+		this.assertFilterResult(cacheSize, 0.0001, 0, false);  // medium importance, no fee
+		this.assertFilterResult(cacheSize, 0.0001, 10, false); // medium importance, medium fee
+
+		this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
+		this.assertFilterResult(cacheSize, 0.01, 100, false);  // high importance and fee
+	}
+
+	@Test
+	public void filterResultDependsOnImportanceAndFeeWhenCacheHasLowFillLevel() {
+		// Assert: boolean parameter says whether transaction is filtered or not.
+		final int cacheSize = 100;
+		this.assertFilterResult(cacheSize, 0.0, 0, false);     // no importance and fee
+		this.assertFilterResult(cacheSize, 0.0, 10, false);    // no importance, fee not high enough
+		this.assertFilterResult(cacheSize, 0.0, 100, false);   // no importance, high fee
+
+		this.assertFilterResult(cacheSize, 0.0001, 0, false);  // medium importance, no fee
+		this.assertFilterResult(cacheSize, 0.0001, 10, false); // medium importance, medium fee
+
+		this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
+		this.assertFilterResult(cacheSize, 0.01, 100, false);  // high importance and fee
 	}
 
 	private void assertFilteredTransactionsSize(
@@ -128,7 +152,6 @@ public class TransactionSpamFilterTest {
 			final int expectedFilteredTransactionsSize) {
 		// Arrange:
 		final TestContext context = new TestContext(0, BlockHeight.ONE);
-
 		context.setImportance(importance);
 
 		// Act:
