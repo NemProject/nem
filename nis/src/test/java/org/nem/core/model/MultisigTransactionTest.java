@@ -593,20 +593,6 @@ public class MultisigTransactionTest {
 				});
 	}
 
-	@Test
-	public void cannotVerifyMultisigTransactionWithAtLeastOneMismatchedCosignerSignature() {
-		// Assert:
-		assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
-				signature -> {
-					// quite contrived and probably impossible to happen in the real world
-					final Hash otherTransactionHash = signature.getOtherTransactionHash();
-					signature = Mockito.spy(signature);
-					Mockito.when(signature.getOtherTransactionHash())
-							.thenReturn(otherTransactionHash, Utils.generateRandomHash());
-					return signature;
-				});
-	}
-
 	private static void assertCannotVerifyMultisigTransactionWithAtLeastOneBadCosignerSignature(
 			final Function<MultisigSignatureTransaction, MultisigSignatureTransaction> createBadSignature) {
 		// Arrange:
