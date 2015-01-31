@@ -159,7 +159,6 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
 		synchronized (this.lock) {
-			// TODO 20150130 J-B: can you add a test for the add new changes?
 			// check is needed to distinguish between NEUTRAL and FAILURE_TRANSACTION_CACHE_TOO_FULL
 			if (this.transactions.contains(transaction)) {
 				return ValidationResult.NEUTRAL;
@@ -169,6 +168,7 @@ public class UnconfirmedTransactions {
 			if (filteredTransactions.isEmpty()) {
 				return ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL;
 			}
+
 			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			return transactionValidationResult.isSuccess()
 					? this.add(transaction, true)
