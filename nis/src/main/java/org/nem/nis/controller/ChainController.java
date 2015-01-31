@@ -4,12 +4,13 @@ import org.nem.core.crypto.HashChain;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
 import org.nem.core.node.Node;
-import org.nem.core.serialization.*;
+import org.nem.core.serialization.SerializableList;
 import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.mappers.BlockMapper;
+import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.peer.node.*;
@@ -23,24 +24,24 @@ import java.util.logging.Logger;
 public class ChainController {
 	private static final Logger LOGGER = Logger.getLogger(ChainController.class.getName());
 
-	private final AccountLookup accountLookup;
 	private final ReadOnlyBlockDao blockDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockChainScoreManager blockChainScoreManager;
 	private final NisPeerNetworkHost host;
+	private final NisDbModelToModelMapper mapper;
 
 	@Autowired(required = true)
 	public ChainController(
 			final ReadOnlyBlockDao blockDao,
-			final AccountLookup accountLookup,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockChainScoreManager blockChainScoreManager,
-			final NisPeerNetworkHost host) {
+			final NisPeerNetworkHost host,
+			final NisDbModelToModelMapper mapper) {
 		this.blockDao = blockDao;
-		this.accountLookup = accountLookup;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockChainScoreManager = blockChainScoreManager;
 		this.host = host;
+		this.mapper = mapper;
 	}
 
 	//region blockLast
@@ -48,7 +49,7 @@ public class ChainController {
 	@RequestMapping(value = "/chain/last-block", method = RequestMethod.GET)
 	@ClientApi
 	public Block blockLast() {
-		final Block block = BlockMapper.toModel(this.blockChainLastBlockLayer.getLastDbBlock(), this.accountLookup);
+		final Block block = this.mapper.map(this.blockChainLastBlockLayer.getLastDbBlock());
 		LOGGER.info("/chain/last-block height:" + block.getHeight() + " signer:" + block.getSigner());
 		return block;
 	}
@@ -95,25 +96,25 @@ public class ChainController {
 			final int numBlocksToRequest,
 			final int maxTransactions) {
 		int numTransactions = blockList.asCollection().stream().map(b -> b.getTransactions().size()).reduce(0, Integer::sum);
-		final Collection<org.nem.nis.dbmodel.Block> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
+		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, numBlocksToRequest);
 		if (dbBlockList.isEmpty()) {
 			return true;
 		}
 
-		org.nem.nis.dbmodel.Block previousDbBlock = null;
-		for (final org.nem.nis.dbmodel.Block dbBlock : dbBlockList) {
+		DbBlock previousDbBlock = null;
+		for (final DbBlock dbBlock : dbBlockList) {
 			// There should be only one block per height. Just to be sure everything is fine we make this check.
 			if (null != previousDbBlock && (previousDbBlock.getHeight() + 1 != dbBlock.getHeight())) {
 				throw new RuntimeException("Corrupt block list returned from db.");
 			}
 
 			previousDbBlock = dbBlock;
-			numTransactions += dbBlock.getBlockImportanceTransfers().size() + dbBlock.getBlockTransfers().size();
+			numTransactions += dbBlock.getBlockImportanceTransferTransactions().size() + dbBlock.getBlockTransferTransactions().size();
 			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}
 
-			blockList.add(BlockMapper.toModel(dbBlock, this.accountLookup));
+			blockList.add(this.mapper.map(dbBlock));
 		}
 
 		return false;

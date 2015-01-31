@@ -16,6 +16,7 @@ import org.nem.nis.test.NisUtils;
 import org.nem.peer.*;
 
 public class PushServiceTest {
+	private static final int BASE_TIME = 1122448;
 
 	//region pushTransaction
 
@@ -91,7 +92,7 @@ public class PushServiceTest {
 		final Block block = NisUtils.createRandomBlockWithHeight(12);
 		block.sign();
 
-		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE);
+		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC);
 
 		// Act:
 		context.service.pushBlock(block, context.remoteNodeIdentity);
@@ -243,12 +244,13 @@ public class PushServiceTest {
 		final TestContext context = new TestContext();
 		final Transaction transaction = createMockTransaction();
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(transactionValidationResult);
+		context.setAddTimeStamps(500, 2700);
 
 		// Act:
 		// initial push (cached validation result should NOT be used)
 		context.service.pushTransaction(transaction, null);
 
-		// time provider supplies time stamp 5 seconds later than first one --> first transaction not pruned
+		// time provider supplies time stamp 500 seconds later than first one --> first transaction not pruned
 		// (cached validation result should be used)
 		final ValidationResult result = context.service.pushTransaction(transaction, null);
 
@@ -264,16 +266,17 @@ public class PushServiceTest {
 		final TestContext context = new TestContext();
 		final Transaction transaction = createMockTransaction();
 		Mockito.when(context.unconfirmedTransactions.addNew(transaction)).thenReturn(ValidationResult.SUCCESS);
+		context.setAddTimeStamps(500, 2700);
 
 		// Act:
 		// initial push (cached validation result should NOT be used)
 		context.service.pushTransaction(transaction, null);
 
-		// time provider supplies time stamp 5 seconds later than first one --> first transaction not pruned.
+		// time provider supplies time stamp 500 seconds later than first one --> first transaction not pruned.
 		// (cached validation result should be used)
 		context.service.pushTransaction(transaction, null);
 
-		// time provider supplies time stamp 64 seconds later than second one --> first and second transaction pruned.
+		// time provider supplies time stamp 2200 seconds later than second one --> first and second transaction pruned.
 		// (cached validation result should NOT be used)
 		context.service.pushTransaction(transaction, null);
 
@@ -287,7 +290,7 @@ public class PushServiceTest {
 	}
 
 	private static Transaction createMockTransaction() {
-		final MockTransaction mockTransaction = new MockTransaction(12, new TimeInstant(1122448));
+		final MockTransaction mockTransaction = new MockTransaction(12, new TimeInstant(BASE_TIME));
 		mockTransaction.sign();
 		return mockTransaction;
 	}
@@ -315,12 +318,13 @@ public class PushServiceTest {
 		block.sign();
 		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(blockValidationResult);
 		Mockito.when(context.blockChain.processBlock(block)).thenReturn(ValidationResult.SUCCESS);
+		context.setAddTimeStamps(5000, 16000);
 
 		// Act:
 		// initial push (cached validation result should NOT be used)
 		context.service.pushBlock(block, null);
 
-		// time provider supplies time stamp 5 seconds later than first one --> first block not pruned
+		// time provider supplies time stamp 5000 seconds later than first one --> first block not pruned
 		// (cached validation result should be used)
 		context.service.pushBlock(block, null);
 
@@ -332,27 +336,20 @@ public class PushServiceTest {
 	public void pushBlockPrunesBlockHashCache() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Block block = NisUtils.createRandomBlockWithTimeStamp(1122448);
+		final Block block = NisUtils.createRandomBlockWithTimeStamp(BASE_TIME);
 		block.sign();
 		Mockito.when(context.blockChain.checkPushedBlock(block)).thenReturn(ValidationResult.SUCCESS);
 		Mockito.when(context.blockChain.processBlock(block)).thenReturn(ValidationResult.SUCCESS);
-
-		Mockito.when(context.timeProvider.getCurrentTime())
-				.thenReturn(
-						new TimeInstant(1122448),
-						new TimeInstant(1122448),
-						new TimeInstant(1122448),
-						new TimeInstant(1122448 + 500),
-						new TimeInstant(1122448 + 1600));
+		context.setAddTimeStamps(5000, 14000);
 
 		// Act:
 		// initial push (cached validation result should NOT be used)
 		context.service.pushBlock(block, null);
 
-		// time provider supplies time stamp 500 seconds later than first one --> first block not pruned.
+		// time provider supplies time stamp 5000 seconds later than first one --> first block not pruned.
 		context.service.pushBlock(block, null);
 
-		// time provider supplies time stamp 900 seconds later than second one --> first and second block pruned.
+		// time provider supplies time stamp 9000 seconds later than second one --> first and second block pruned.
 		context.service.pushBlock(block, null);
 
 		// time provider supplies time stamp same as third one --> third block not pruned.
@@ -392,13 +389,7 @@ public class PushServiceTest {
 			this.unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			this.blockChain = Mockito.mock(BlockChain.class);
 			this.timeProvider = Mockito.mock(TimeProvider.class);
-			Mockito.when(this.timeProvider.getCurrentTime())
-					.thenReturn(
-							new TimeInstant(1122448),
-							new TimeInstant(1122448),
-							new TimeInstant(1122448),
-							new TimeInstant(1122448 + 5),
-							new TimeInstant(1122448 + 64));
+			this.setAddTimeStamps(0, 0);
 
 			final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(host.getNetwork()).thenReturn(this.network);
@@ -408,6 +399,16 @@ public class PushServiceTest {
 					this.blockChain,
 					host,
 					this.timeProvider);
+		}
+
+		public void setAddTimeStamps(final int delta1, final int delta2) {
+			Mockito.when(this.timeProvider.getCurrentTime())
+					.thenReturn(
+							new TimeInstant(BASE_TIME),
+							new TimeInstant(BASE_TIME),
+							new TimeInstant(BASE_TIME),
+							new TimeInstant(BASE_TIME + delta1),
+							new TimeInstant(BASE_TIME + delta2));
 		}
 
 		public void assertNoUpdateExperience() {

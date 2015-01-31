@@ -8,6 +8,7 @@ import org.nem.nis.state.ReadOnlyAccountImportance;
 import org.nem.nis.time.synchronization.filter.SynchronizationFilter;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * The default implementation for the synchronization strategy based on the thesis
@@ -15,6 +16,7 @@ import java.util.List;
  * http://www.dis.uniroma1.it/~dottoratoii/media/students/documents/thesis_scipioni.pdf
  */
 public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationStrategy {
+	private static final Logger LOGGER = Logger.getLogger(DefaultTimeSynchronizationStrategy.class.getName());
 
 	private final SynchronizationFilter filter;
 	private final ReadOnlyPoiFacade poiFacade;
@@ -75,8 +77,21 @@ public class DefaultTimeSynchronizationStrategy implements TimeSynchronizationSt
 		final double scaling = cumulativeImportance > viewSizePercentage ? 1 / cumulativeImportance : 1 / viewSizePercentage;
 		final double sum = filteredSamples.stream()
 				.mapToDouble(s -> {
+					final Long offset = s.getTimeOffsetToRemote();
+					final String entry = String.format(
+							"%s: network time offset to local node is %dms",
+							s.getNode().getIdentity().getAddress().getEncoded(),
+							offset);
+
+					final int warningThresholdMillis = 100;
+					if (Math.abs(offset) <= warningThresholdMillis) {
+						LOGGER.info(entry);
+					} else {
+						LOGGER.warning(entry);
+					}
+
 					final double importance = this.getAccountImportance(s.getNode().getIdentity().getAddress());
-					return s.getTimeOffsetToRemote() * importance * scaling;
+					return offset * importance * scaling;
 				})
 				.sum();
 

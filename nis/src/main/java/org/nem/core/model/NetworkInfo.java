@@ -115,7 +115,7 @@ public class NetworkInfo {
 		final NetworkInfo info = new NetworkInfo();
 		info.version = (byte)0x98;
 		info.addressStartChar = 'T';
-		info.nemesisAccountId = "TANEMWISEEPBJ2BU5OZO6AUCSEHSZZBPTY5VNXRM";
+		info.nemesisAccountId = "TBULEAUG2CZQISUR442HWA6UAKGWIXHDABJVIPS4";
 		return info;
 	}
 }

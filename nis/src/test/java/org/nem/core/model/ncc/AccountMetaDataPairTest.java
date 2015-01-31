@@ -7,13 +7,15 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 
+import java.util.ArrayList;
+
 public class AccountMetaDataPairTest {
 
 	@Test
 	public void canCreateAccountMetaDataPair() {
 		// Arrange:
 		final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
-		final AccountMetaData metaData = new AccountMetaData(AccountStatus.UNLOCKED, AccountRemoteStatus.ACTIVE);
+		final AccountMetaData metaData = Mockito.mock(AccountMetaData.class);
 		final AccountMetaDataPair entity = new AccountMetaDataPair(accountInfo, metaData);
 
 		// Assert:
@@ -40,10 +42,9 @@ public class AccountMetaDataPairTest {
 			final AccountStatus status,
 			final AccountRemoteStatus remoteStatus) {
 		// Arrange:
-		final AccountMetaData metaData = new AccountMetaData(status, remoteStatus);
 		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(
 				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
-				metaData);
+				new AccountMetaData(status, remoteStatus, new ArrayList<>()));
 
 		// Act:
 		return new AccountMetaDataPair(Utils.roundtripSerializableEntity(metaDataPair, null));

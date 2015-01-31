@@ -9,13 +9,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * Represents a collection of nodes.
  */
 public class NodeCollection implements SerializableEntity {
-	private static final ObjectDeserializer<Node> NODE_DESERIALIZER = obj -> new Node(obj);
 	private static final Collection<NodeStatus> NODE_STATUSES = Arrays.asList(
 			NodeStatus.ACTIVE,
 			NodeStatus.BUSY,
 			NodeStatus.INACTIVE,
 			NodeStatus.FAILURE);
-	private static final Collection<NodeStatus> BLACKLIST_NODE_STATUSES = Arrays.asList(NodeStatus.INACTIVE, NodeStatus.FAILURE);
+	private static final Collection<NodeStatus> PRUNE_NODE_STATUSES = Arrays.asList(
+			NodeStatus.BUSY, // if a node is busy for an entire prune cycle, there is probably something wrong with it
+			NodeStatus.INACTIVE,
+			NodeStatus.FAILURE);
+	private static final Collection<NodeStatus> BLACKLIST_NODE_STATUSES = Arrays.asList(
+			NodeStatus.INACTIVE,
+			NodeStatus.FAILURE);
 
 	private final Map<NodeStatus, Set<Node>> statusNodesMap = new HashMap<NodeStatus, Set<Node>>() {
 		{
@@ -41,7 +46,7 @@ public class NodeCollection implements SerializableEntity {
 	public NodeCollection(final Deserializer deserializer) {
 		for (final NodeStatus value : NODE_STATUSES) {
 			final String key = value.toString().toLowerCase();
-			this.statusNodesMap.get(value).addAll(deserializer.readObjectArray(key, NODE_DESERIALIZER));
+			this.statusNodesMap.get(value).addAll(deserializer.readObjectArray(key, Node::new));
 		}
 	}
 
@@ -144,7 +149,15 @@ public class NodeCollection implements SerializableEntity {
 	 * @return True if the node is blacklisted.
 	 */
 	public boolean isNodeBlacklisted(final Node node) {
-		for (final NodeStatus status : BLACKLIST_NODE_STATUSES) {
+		return this.isNodeStatusMatching(node, BLACKLIST_NODE_STATUSES);
+	}
+
+	private boolean isPruneCandidate(final Node node) {
+		return this.isNodeStatusMatching(node, PRUNE_NODE_STATUSES);
+	}
+
+	private boolean isNodeStatusMatching(final Node node, final Collection<NodeStatus> statuses) {
+		for (final NodeStatus status : statuses) {
 			if (this.statusNodesMap.get(status).contains(node)) {
 				return true;
 			}
@@ -190,7 +203,7 @@ public class NodeCollection implements SerializableEntity {
 			this.statusNodesMap.get(status).add(node);
 		}
 
-		if (!this.isNodeBlacklisted(node)) {
+		if (!this.isPruneCandidate(node)) {
 			this.pruneCandidates.remove(node);
 		}
 	}
@@ -201,11 +214,11 @@ public class NodeCollection implements SerializableEntity {
 	 */
 	public void prune() {
 		this.pruneCandidates.stream()
-				.filter(node -> this.isNodeBlacklisted(node))
+				.filter(node -> this.isPruneCandidate(node))
 				.forEach(node -> this.update(node, NodeStatus.UNKNOWN));
 
 		this.pruneCandidates.clear();
-		for (final NodeStatus status : BLACKLIST_NODE_STATUSES) {
+		for (final NodeStatus status : PRUNE_NODE_STATUSES) {
 			this.pruneCandidates.addAll(this.statusNodesMap.get(status));
 		}
 	}

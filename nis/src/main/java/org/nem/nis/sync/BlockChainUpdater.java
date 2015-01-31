@@ -9,7 +9,8 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
@@ -26,29 +27,32 @@ import java.util.logging.Logger;
 public class BlockChainUpdater implements BlockChainScoreManager {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainUpdater.class.getName());
 
-	private final AccountDao accountDao;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final BlockDao blockDao;
 	private final ReadOnlyNisCache nisCache;
 	private final BlockChainContextFactory blockChainContextFactory;
 	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final NisModelToDbModelMapper mapper;
+	private final NisMapperFactory nisMapperFactory;
 	private final NisConfiguration configuration;
 	private BlockChainScore score;
 
 	public BlockChainUpdater(
 			final ReadOnlyNisCache nisCache,
-			final AccountDao accountDao,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final BlockDao blockDao,
 			final BlockChainContextFactory blockChainContextFactory,
 			final UnconfirmedTransactions unconfirmedTransactions,
+			final NisModelToDbModelMapper mapper,
+			final NisMapperFactory nisMapperFactory,
 			final NisConfiguration configuration) {
 		this.nisCache = nisCache;
-		this.accountDao = accountDao;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 		this.blockDao = blockDao;
 		this.blockChainContextFactory = blockChainContextFactory;
 		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.mapper = mapper;
+		this.nisMapperFactory = nisMapperFactory;
 		this.configuration = configuration;
 		this.score = BlockChainScore.ZERO;
 	}
@@ -78,7 +82,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @return The result of the interaction.
 	 */
 	public NodeInteractionResult updateChain(final SyncConnectorPool connectorPool, final Node node) {
-		final org.nem.nis.dbmodel.Block expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
+		final DbBlock expectedLastBlock = this.blockChainLastBlockLayer.getLastDbBlock();
 		final BlockChainSyncContext context = this.createSyncContext();
 		// IMPORTANT: autoCached here
 		final SyncConnector connector = connectorPool.getSyncConnector(context.nisCache().getAccountCache());
@@ -114,7 +118,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 				return NodeInteractionResult.NEUTRAL;
 			}
 
-			final org.nem.nis.dbmodel.Block dbParent = this.blockDao.findByHeight(commonBlockHeight);
+			final DbBlock dbParent = this.blockDao.findByHeight(commonBlockHeight);
 
 			// revert TXes inside contemporaryAccountAnalyzer
 			BlockChainScore ourScore = BlockChainScore.ZERO;
@@ -123,25 +127,12 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 						"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
 						this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
-
-				// TODO 20141208 J-B: i guess this is the same issue where we are modifying accounts not in the cache?
-				// > I guess a cleaner fix would be to add something like Transaction.getAffectedAccounts
-				// TODO 20141208 J-B: i In your block chain test branch, we should add a regression test for this
-				// TODO 20141209 BR -> J: yes, same issue again, we are executing the transaction against an account which is not in the cache.
-				// > A clean fix would be to pass the account cache to the observers so everything gets credited/debited using the accounts in the cache.
-				// TODO 20141219 BR -> J considering all the recent changes, do we still need this?
-				peerChain.stream().forEach(b -> this.ensureAllAccountsAreKnown(b, context.nisCache().getAccountCache()));
 			}
 
 			// verify peer's chain
 			final ValidationResult validationResult = this.updateOurChain(context, dbParent, peerChain, ourScore, !result.areChainsConsistent(), true);
 			return NodeInteractionResult.fromValidationResult(validationResult);
 		}
-	}
-
-	private void ensureAllAccountsAreKnown(final Block block, final AccountCache accountCache) {
-		block.getTransactions().stream().flatMap(t -> t.getAccounts().stream()).forEach(
-				a -> accountCache.findByAddress(a.getAddress()));
 	}
 
 	private ComparisonResult compareChains(final SyncConnector connector, final BlockLookup localLookup, final Node node) {
@@ -169,11 +160,11 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 	 * @param receivedBlock The receivedBlock.
 	 * @return The result of the interaction.
 	 */
-	public synchronized ValidationResult updateBlock(Block receivedBlock) {
+	public synchronized ValidationResult updateBlock(final Block receivedBlock) {
 		final Hash blockHash = HashUtils.calculateHash(receivedBlock);
 		final Hash parentHash = receivedBlock.getPreviousBlockHash();
 
-		final org.nem.nis.dbmodel.Block dbParent;
+		final DbBlock dbParent;
 
 		// receivedBlock already seen
 		if (this.blockDao.findByHash(blockHash) != null) {
@@ -193,11 +184,6 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		final BlockChainSyncContext context = this.createSyncContext();
 		this.fixBlock(receivedBlock, dbParent);
 
-		// EVIL hack, see issue#70
-		// this evil hack also has side effect, that calling toModel, calculates proper totalFee inside the block
-		receivedBlock = this.remapBlock(receivedBlock, context.nisCache().getAccountCache());
-		// EVIL hack end
-
 		BlockChainScore ourScore = BlockChainScore.ZERO;
 		boolean hasOwnChain = false;
 		// we have parent, check if it has child
@@ -207,13 +193,6 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 					this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
-
-			// undo above might remove some accounts from account analyzer,
-			// because receivedBlock has still references to those accounts, AND if competitive
-			// block has transaction addressed to that account, it won't be seen later,
-			// (see canSuccessfullyProcessBlockAndSiblingWithBetterScoreIsAcceptedAfterwards test for details)
-			// we remap once more to fix accounts references (and possibly add them to AA)
-			receivedBlock = this.remapBlock(receivedBlock, context.nisCache().getAccountCache());
 		}
 
 		final ArrayList<Block> peerChain = new ArrayList<>(1);
@@ -222,12 +201,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		return this.updateOurChain(context, dbParent, peerChain, ourScore, hasOwnChain, false);
 	}
 
-	private Block remapBlock(final Block block, final AccountCache accountCache) {
-		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
-		return BlockMapper.toModel(dbBlock, accountCache);
-	}
-
-	private void fixBlock(final Block block, final org.nem.nis.dbmodel.Block parent) {
+	private void fixBlock(final Block block, final DbBlock parent) {
 		// blocks that are received via /push/block do not have their generation hashes set
 		// (generation hashes are not serialized), so we need to recalculate it for
 		// each block that we receive
@@ -239,7 +213,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		block.setLessor(lessor);
 	}
 
-	private static void fixGenerationHash(final Block block, final org.nem.nis.dbmodel.Block parent) {
+	private static void fixGenerationHash(final Block block, final DbBlock parent) {
 		block.setPreviousGenerationHash(parent.getGenerationHash());
 	}
 
@@ -251,7 +225,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 
 	private ValidationResult updateOurChain(
 			final BlockChainSyncContext context,
-			final org.nem.nis.dbmodel.Block dbParentBlock,
+			final DbBlock dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain,

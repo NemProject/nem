@@ -9,12 +9,13 @@ import org.nem.core.test.*;
 import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.AccountState;
+import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
@@ -26,7 +27,7 @@ public class UnconfirmedTransactionsTest {
 	public void sizeReturnsTheNumberOfTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account account = context.addAccount(Amount.fromNem(100));
+		final Account account = context.addAccount(Amount.fromNem(1000));
 
 		// Act:
 		for (int i = 0; i < 17; ++i) {
@@ -57,19 +58,19 @@ public class UnconfirmedTransactionsTest {
 	public void getUnconfirmedBalanceReturnsConfirmedBalanceAdjustedByAllPendingTransferTransactionsImpactingAccount() {
 		// Arrange:
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final Account account1 = context.addAccount(Amount.fromNem(4));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final Account account1 = context.addAccount(Amount.fromNem(14));
+		final Account account2 = context.addAccount(Amount.fromNem(110));
 		final TimeInstant currentTime = new TimeInstant(11);
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(5), null),
-				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(4), null));
-		setFeeAndDeadline(transactions.get(0), Amount.fromNem(1));
-		setFeeAndDeadline(transactions.get(1), Amount.fromNem(2));
+				new TransferTransaction(currentTime, account2, account1, Amount.fromNem(15), null),
+				new TransferTransaction(currentTime, account1, account2, Amount.fromNem(14), null));
+		setFeeAndDeadline(transactions.get(0), Amount.fromNem(2));
+		setFeeAndDeadline(transactions.get(1), Amount.fromNem(3));
 		transactions.forEach(context::signAndAddExisting);
 
 		// Assert:
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(3)));
-		Assert.assertThat(context.transactions.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(98)));
+		Assert.assertThat(context.transactions.getUnconfirmedBalance(account1), IsEqual.equalTo(Amount.fromNem(12)));
+		Assert.assertThat(context.transactions.getUnconfirmedBalance(account2), IsEqual.equalTo(Amount.fromNem(107)));
 	}
 
 	@Test
@@ -193,6 +194,64 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(2));
 	}
 
+	@Test
+	public void cannotAddChildTransactionIfParentHasBeenAdded() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		final Transaction inner = new MockTransaction(sender, 7);
+		final MockTransaction outer = new MockTransaction(sender, 8);
+		outer.setChildTransactions(Arrays.asList(inner));
+
+		context.signAndAddExisting(outer);
+
+		// Act
+		final ValidationResult result = context.signAndAddNew(inner);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void cannotAddParentTransactionIfChildHasBeenAdded() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(100));
+
+		final Transaction inner = new MockTransaction(sender, 7);
+		final MockTransaction outer = new MockTransaction(sender, 8);
+		outer.setChildTransactions(Arrays.asList(inner));
+
+		context.signAndAddExisting(inner);
+
+		// Act
+		final ValidationResult result = context.signAndAddNew(outer);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
+	}
+
+	@Test
+	public void addNewReturnsFailureIfCacheIsTooFull() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final AccountState state = Mockito.mock(AccountState.class);
+		final AccountImportance accountImportance = Mockito.mock(AccountImportance.class);
+		Mockito.when(context.poiFacade.getLastPoiRecalculationHeight()).thenReturn(BlockHeight.ONE);
+		Mockito.when(context.accountStateCache.findStateByAddress(Mockito.any())).thenReturn(state);
+		Mockito.when(state.getImportanceInfo()).thenReturn(accountImportance);
+		Mockito.when(accountImportance.getHeight()).thenReturn(BlockHeight.ONE);
+		Mockito.when(accountImportance.getImportance(BlockHeight.ONE)).thenReturn(0.0);
+		context.addMockTransactions(context.transactions, 1, 900);
+
+		final MockTransaction transaction = new MockTransaction(Utils.generateRandomAccount());
+		final ValidationResult result = context.signAndAddNew(transaction);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL));
+	}
+
 	//region validation
 
 	@Test
@@ -287,12 +346,12 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext(new UniversalTransactionValidator());
 		final Account sender = context.addAccount(Amount.fromNem(10));
 
-		final Transaction t1 = new MockTransaction(sender);
+		final MockTransaction t1 = new MockTransaction(sender);
 		t1.setFee(Amount.fromNem(6));
 		context.signAndAddExisting(t1);
 
 		// Act:
-		final Transaction t2 = new MockTransaction(sender);
+		final MockTransaction t2 = new MockTransaction(sender);
 		t2.setFee(Amount.fromNem(5));
 		final ValidationResult result = context.signAndAddExisting(t2);
 
@@ -590,6 +649,7 @@ public class UnconfirmedTransactionsTest {
 		final TestContext context = new TestContext(new TransferTransactionValidator());
 		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(10, 2, 0);
 		context.setBalance(transactions.get(0).getSigner(), Amount.fromNem(5));
+		context.setBalance(transactions.get(2).getSigner(), Amount.fromNem(1 + 2));
 
 		final Block block = NisUtils.createRandomBlock();
 		block.addTransaction(transactions.get(0));
@@ -599,6 +659,7 @@ public class UnconfirmedTransactionsTest {
 		context.transactions.removeAll(block);
 
 		// Assert:
+		// TODO 20150111 J-G: please update comments:
 		// - removing the first transaction triggers an exception and forces a cache rebuild
 		// - first transaction cannot be added - account1 balance (5) < 8 + 1
 		// - second transaction cannot be added - account2 balance (2) < 5 + 1
@@ -940,12 +1001,14 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final TestContext context = new TestContext(new TransferTransactionValidator());
 		final List<TransferTransaction> transactions = context.createThreeTransferTransactions(10, 2, 0);
+		context.setBalance(transactions.get(2).getSigner(), Amount.fromNem(1 + 2));
 
 		// Act:
 		final int numTransactions = context.transactions.size();
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
 
 		// Assert:
+		// TODO 20150111 J-G: please update comments:
 		// - first transaction was dropped because it expired
 		// - second was dropped because it was dependent on the first - account2 balance (2) < 5 + 1
 		// - third transaction can be added - account2 balance (2) == 1 + 1
@@ -1025,11 +1088,11 @@ public class UnconfirmedTransactionsTest {
 	public void getTransactionsForAccountIncludesConflictingTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext(new TransferTransactionValidator());
-		final Account account1 = context.addAccount(Amount.fromNem(5));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
+		final Account account1 = context.addAccount(Amount.fromNem(15));
+		final Account account2 = context.addAccount(Amount.fromNem(110));
 		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(10), null),
-				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(6), null));
+				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(20), null),
+				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(16), null));
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
@@ -1141,16 +1204,16 @@ public class UnconfirmedTransactionsTest {
 	public void getTransactionsForNewBlockFiltersOutConflictingTransactions() {
 		// Arrange:
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final Account sender = context.addAccount(Amount.fromNem(10));
-		final Account recipient = context.addAccount();
+		final Account sender = context.addAccount(Amount.fromNem(20));
+		final Account recipient = context.addAccount(Amount.fromNem(10));
 		final UnconfirmedTransactions transactions = context.transactions;
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
 		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 10, R = 0
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 4, R = 5, 1 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 6, R = 1, 3 Fee
+		// 		- initially the balances are: S = 20, R = 10
+		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 3, R = 25, 2 Fee
+		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 15, R = 10, 5 Fee
 		//   - getTransactionsBefore() returns SORTED transactions, so R->S is ordered before S->R because it has a greater fee
 		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough balance
 		//
@@ -1158,12 +1221,12 @@ public class UnconfirmedTransactionsTest {
 		// R doesn't have funds on the account, we don't want such TX because this would lead to creation
 		// of a block that would get discarded (TXes are validated first, and then executed)
 
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
-		t1.setFee(Amount.fromNem(1));
+		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
+		t1.setFee(Amount.fromNem(2));
 		t1.sign();
 		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
-		t2.setFee(Amount.fromNem(2));
+		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(12));
+		t2.setFee(Amount.fromNem(3));
 		t2.sign();
 		transactions.addExisting(t2);
 
@@ -1183,22 +1246,22 @@ public class UnconfirmedTransactionsTest {
 		// Arrange:
 		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
 		final UnconfirmedTransactions transactions = context.transactions;
-		final Account sender = context.addAccount(Amount.fromNem(10));
-		final Account recipient = context.addAccount();
+		final Account sender = context.addAccount(Amount.fromNem(20));
+		final Account recipient = context.addAccount(Amount.fromNem(10));
 		final TimeInstant currentTime = new TimeInstant(11);
 
 		// Act:
 		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 10, R = 0
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 5, 3 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 4, R = 1, 5 Fee
+		// 		- initially the balances are: S = 20, R = 10
+		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 25, 3 Fee
+		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 24, R = 1, 5 Fee
 		//   - getTransactionsBefore() returns SORTED transactions, so S->R is ordered before R->S because it has a greater fee
 		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough *confirmed* balance
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(5));
+		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
 		t1.setFee(Amount.fromNem(3));
 		t1.sign();
 		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(2));
+		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(22));
 		t2.setFee(Amount.fromNem(2));
 		t2.sign();
 		transactions.addExisting(t2);
@@ -1237,16 +1300,21 @@ public class UnconfirmedTransactionsTest {
 		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1)));
 	}
 
+	//endregion
+
 	private static TestContext createUnconfirmedTransactionsWithRealValidator() {
-		final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory();
-		return new TestContext(
-				factory.createSingle(accountStateCache),
-				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
-				accountStateCache);
+		return createUnconfirmedTransactionsWithRealValidator(Mockito.mock(AccountStateCache.class));
 	}
 
-	//endregion
+	private static TestContext createUnconfirmedTransactionsWithRealValidator(final AccountStateCache stateCache) {
+		final TransactionValidatorFactory factory = NisUtils.createTransactionValidatorFactory(new SystemTimeProvider());
+		return new TestContext(
+				() -> factory.createSingleBuilder(stateCache),
+				null,
+				factory.createBatch(Mockito.mock(DefaultHashCache.class)),
+				stateCache,
+				Mockito.mock(ReadOnlyPoiFacade.class));
+	}
 
 	public static TransferTransaction createTransferTransaction(final TimeInstant timeStamp, final Account sender, final Account recipient, final Amount amount) {
 		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
@@ -1266,11 +1334,13 @@ public class UnconfirmedTransactionsTest {
 				.collect(Collectors.toList());
 	}
 
+	// TODO 20150106 J-G: should we share the same test context between this class and the multisig variant?
 	private static class TestContext {
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
 		private final UnconfirmedTransactions transactions;
 		private final ReadOnlyAccountStateCache accountStateCache;
+		private final ReadOnlyPoiFacade poiFacade;
 		private final TimeProvider timeProvider;
 
 		private TestContext() {
@@ -1285,26 +1355,53 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator, final BatchTransactionValidator batchValidator) {
-			this(singleValidator, batchValidator, Mockito.mock(ReadOnlyAccountStateCache.class));
+			this(
+					null,
+					singleValidator,
+					batchValidator,
+					Mockito.mock(ReadOnlyAccountStateCache.class),
+					Mockito.mock(ReadOnlyPoiFacade.class));
 		}
 
 		private TestContext(
+				final Supplier<AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier,
 				final SingleTransactionValidator singleValidator,
 				final BatchTransactionValidator batchValidator,
-				final ReadOnlyAccountStateCache accountStateCache) {
+				final ReadOnlyAccountStateCache accountStateCache,
+				final ReadOnlyPoiFacade poiFacade) {
 			this.singleValidator = singleValidator;
 			this.batchValidator = batchValidator;
 			this.accountStateCache = accountStateCache;
+			this.poiFacade = poiFacade;
 			this.timeProvider = Mockito.mock(TimeProvider.class);
 			final TransactionValidatorFactory validatorFactory = Mockito.mock(TransactionValidatorFactory.class);
 			final DefaultHashCache transactionHashCache = Mockito.mock(DefaultHashCache.class);
 			Mockito.when(validatorFactory.createBatch(transactionHashCache)).thenReturn(this.batchValidator);
-			Mockito.when(validatorFactory.createSingle(Mockito.any())).thenReturn(this.singleValidator);
+
+			if (null != singleTransactionBuilderSupplier) {
+				setSingleTransactionBuilderSupplier(validatorFactory, singleTransactionBuilderSupplier);
+			} else {
+				setSingleTransactionBuilderSupplier(validatorFactory, () -> {
+					final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
+					builder.add(this.singleValidator);
+					return builder;
+				});
+			}
+
 			Mockito.when(this.timeProvider.getCurrentTime()).thenReturn(TimeInstant.ZERO);
 			this.transactions = new UnconfirmedTransactions(
 					validatorFactory,
-					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache),
+					NisCacheFactory.createReadOnly(this.accountStateCache, transactionHashCache, this.poiFacade),
 					this.timeProvider);
+		}
+
+		private static void setSingleTransactionBuilderSupplier(
+				final TransactionValidatorFactory validatorFactory,
+				final Supplier<AggregateSingleTransactionValidatorBuilder> singleTransactionBuilderSupplier) {
+			Mockito.when(validatorFactory.createSingleBuilder(Mockito.any()))
+					.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
+			Mockito.when(validatorFactory.createIncompleteSingleBuilder(Mockito.any()))
+					.then((invocationOnMock) -> singleTransactionBuilderSupplier.get());
 		}
 
 		private void setSingleValidationResult(final ValidationResult result) {

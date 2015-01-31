@@ -4,10 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.utils.ByteUtils;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -25,22 +23,18 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 
 	private final String tableName;
 	private final SessionFactory sessionFactory;
-	private final Function<TTransfer, Hash> transferHashAccessor;
 
 	/**
 	 * Creates a transfer dao implementation.
 	 *
 	 * @param tableName The transfer table name.
 	 * @param sessionFactory The session factory.
-	 * @param transferHashSupplier A function that can be used to get a transfer hash.
 	 */
 	public SimpleTransferDaoImpl(
 			final String tableName,
-			final SessionFactory sessionFactory,
-			final Function<TTransfer, Hash> transferHashSupplier) {
+			final SessionFactory sessionFactory) {
 		this.tableName = tableName;
 		this.sessionFactory = sessionFactory;
-		this.transferHashAccessor = transferHashSupplier;
 	}
 
 	/**
@@ -59,32 +53,23 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 
 	@Override
 	public TTransfer findByHash(final byte[] txHash) {
-		final long txId = ByteUtils.bytesToLong(txHash);
-		final Query query = this.createQuery("from <TABLE_NAME> a where a.shortId = :id")
-				.setParameter("id", txId);
-		return this.getByHashQuery(txHash, query);
+		final Query query = this.createQuery("from <TABLE_NAME> a where a.transferHash = :hash")
+				.setParameter("hash", txHash);
+		return this.getByHashQuery(query);
 	}
 
 	@Override
 	public TTransfer findByHash(final byte[] txHash, final long maxBlockHeight) {
-		final long txId = ByteUtils.bytesToLong(txHash);
-		final Query query = this.createQuery("from <TABLE_NAME> t where t.shortId = :id and t.block.height <= :height")
-				.setParameter("id", txId)
+		final Query query = this.createQuery("from <TABLE_NAME> t where t.transferHash = :hash and t.block.height <= :height")
+				.setParameter("hash", txHash)
 				.setParameter("height", maxBlockHeight);
-		return this.getByHashQuery(txHash, query);
+		return this.getByHashQuery(query);
 	}
 
 	@SuppressWarnings("unchecked")
-	private TTransfer getByHashQuery(final byte[] txHash, final Query query) {
+	private TTransfer getByHashQuery(final Query query) {
 		final List<?> userList = query.list();
-		for (final Object transferObject : userList) {
-			final TTransfer transfer = (TTransfer)transferObject;
-			if (Arrays.equals(txHash, this.transferHashAccessor.apply(transfer).getRaw())) {
-				return transfer;
-			}
-		}
-
-		return null;
+		return userList.isEmpty() ? null : ((TTransfer)userList.get(0));
 	}
 
 	@Override
@@ -93,6 +78,7 @@ public class SimpleTransferDaoImpl<TTransfer> implements SimpleReadOnlyTransferD
 			return false;
 		}
 
+		// note: this might look dumb, but doing it this way is 10x faster than using .setParameterList() on Query
 		final String rawQuery = String.format(
 				"Select count(*) from <TABLE_NAME> t where t.transferHash in (%s) and t.block.height <= :height",
 				StringUtils.join(hashes.stream().map(h -> String.format("'%s'", h)).collect(Collectors.toList()), ","));

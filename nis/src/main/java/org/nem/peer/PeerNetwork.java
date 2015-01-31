@@ -17,8 +17,7 @@ import java.util.concurrent.CompletableFuture;
 public class PeerNetwork {
 	private final PeerNetworkState state;
 	private final PeerNetworkServicesFactory servicesFactory;
-	private final NodeSelectorFactory selectorFactory;
-	private final NodeSelectorFactory importanceAwareSelectorFactory;
+	private final PeerNetworkNodeSelectorFactory selectorFactory;
 	private NodeSelector selector;
 
 	/**
@@ -31,13 +30,11 @@ public class PeerNetwork {
 	public PeerNetwork(
 			final PeerNetworkState state,
 			final PeerNetworkServicesFactory servicesFactory,
-			final NodeSelectorFactory selectorFactory,
-			final NodeSelectorFactory importanceAwareSelectorFactory) {
+			final PeerNetworkNodeSelectorFactory selectorFactory) {
 		this.state = state;
 		this.servicesFactory = servicesFactory;
 		this.selectorFactory = selectorFactory;
-		this.importanceAwareSelectorFactory = importanceAwareSelectorFactory;
-		this.selector = this.selectorFactory.createNodeSelector();
+		this.selector = this.selectorFactory.createUpdateNodeSelector();
 	}
 
 	//region PeerNetworkState delegation
@@ -120,8 +117,9 @@ public class PeerNetwork {
 	 * @return The future.
 	 */
 	public CompletableFuture<Void> refresh() {
-		return this.servicesFactory.createNodeRefresher().refresh(this.getPartnerNodes())
-				.whenComplete((v, e) -> this.selector = this.selectorFactory.createNodeSelector());
+		final Collection<Node> refreshNodes = this.selectorFactory.createRefreshNodeSelector().selectNodes();
+		return this.servicesFactory.createNodeRefresher().refresh(refreshNodes)
+				.whenComplete((v, e) -> this.selector = this.selectorFactory.createUpdateNodeSelector());
 	}
 
 	/**
@@ -131,7 +129,8 @@ public class PeerNetwork {
 	 * @return The future.
 	 */
 	public CompletableFuture<Void> synchronizeTime(final TimeProvider timeProvider) {
-		return this.servicesFactory.createTimeSynchronizer(this.importanceAwareSelectorFactory.createNodeSelector(), timeProvider).synchronizeTime();
+		final NodeSelector selector = this.selectorFactory.createTimeSyncNodeSelector();
+		return this.servicesFactory.createTimeSynchronizer(selector, timeProvider).synchronizeTime();
 	}
 
 	/**

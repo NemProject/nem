@@ -1,13 +1,12 @@
 package org.nem.nis.sync;
 
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 
 /**
  * A default comparison context that is populated with block chain constants.
  */
 public class DefaultComparisonContext extends ComparisonContext {
-	private static final int OLD_ANALYZE_LIMIT = BlockChainConstants.ESTIMATED_BLOCKS_PER_DAY;
 
 	/**
 	 * Creates a default comparison context.
@@ -19,9 +18,6 @@ public class DefaultComparisonContext extends ComparisonContext {
 	}
 
 	private static int getAnalyzeLimitAtHeight(final BlockHeight height) {
-		final long testHeight = height.getRaw() + BlockChainConstants.BLOCKS_LIMIT;
-		return testHeight > BlockMarkerConstants.BETA_HARD_FORK
-				? BlockChainConstants.BLOCKS_LIMIT
-				: OLD_ANALYZE_LIMIT;
+		return BlockChainConstants.BLOCKS_LIMIT;
 	}
 }

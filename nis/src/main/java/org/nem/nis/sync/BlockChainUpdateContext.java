@@ -7,8 +7,9 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.visitors.PartialWeightedScoreVisitor;
 
@@ -42,7 +43,7 @@ public class BlockChainUpdateContext {
 			final BlockDao blockDao,
 			final BlockChainServices services,
 			final UnconfirmedTransactions unconfirmedTransactions,
-			final org.nem.nis.dbmodel.Block dbParentBlock,
+			final DbBlock dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore ourScore,
 			final boolean hasOwnChain) {
@@ -56,7 +57,7 @@ public class BlockChainUpdateContext {
 		this.unconfirmedTransactions = unconfirmedTransactions;
 
 		// do not trust peer, take first block from our db and convert it
-		this.parentBlock = BlockMapper.toModel(dbParentBlock, this.nisCache.getAccountCache());
+		this.parentBlock = this.services.createMapper(this.nisCache.getAccountCache()).map(dbParentBlock);
 
 		this.peerChain = peerChain;
 		this.ourScore = ourScore;
@@ -159,18 +160,18 @@ public class BlockChainUpdateContext {
 			final AccountLookup accountCache) {
 		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 
+		final NisDbModelToModelMapper mapper = this.services.createMapper(accountCache);
 		while (currentHeight != wantedHeight) {
-			final org.nem.nis.dbmodel.Block block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
+			final DbBlock block = this.blockDao.findByHeight(new BlockHeight(currentHeight));
 
 			// if the transaction is in db, we should add it to unconfirmed transactions without a db check
 			// (otherwise, since it is not removed from the database, the database hash check would fail).
 			// at this point, only "state" (in accountAnalyzer and so on) is reverted.
 			// removing (our) transactions from the db, is one of the last steps, mainly because that I/O is expensive, so someone
 			// could try to spam us with "fake" responses during synchronization (and therefore force us to drop our blocks).
-			block.getBlockTransfers().stream()
-					.filter(tr -> !transactionHashes.contains(tr.getTransferHash()))
-					.map(tr -> TransferMapper.toModel(tr, accountCache))
+			mapper.mapTransactionsIf(block, tr -> !transactionHashes.contains(tr.getTransferHash())).stream()
 					.forEach(tr -> this.unconfirmedTransactions.addExisting(tr));
+
 			currentHeight--;
 		}
 	}

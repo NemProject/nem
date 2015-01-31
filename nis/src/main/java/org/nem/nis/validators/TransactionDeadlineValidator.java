@@ -1,7 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.core.time.TimeProvider;
+import org.nem.core.time.*;
 
 /**
  * A transaction validator that ensures the transaction has a valid deadline.
@@ -20,8 +20,18 @@ public class TransactionDeadlineValidator implements SingleTransactionValidator 
 
 	@Override
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		return transaction.getDeadline().compareTo(this.timeProvider.getCurrentTime()) >= 0
-				? ValidationResult.SUCCESS
-				: ValidationResult.FAILURE_PAST_DEADLINE;
+		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
+
+		for (final Transaction childTransaction : transaction.getChildTransactions()) {
+			if (isExpired(childTransaction, currentTime)) {
+				return ValidationResult.FAILURE_PAST_DEADLINE;
+			}
+		}
+
+		return isExpired(transaction, currentTime) ? ValidationResult.FAILURE_PAST_DEADLINE : ValidationResult.SUCCESS;
+	}
+
+	private static boolean isExpired(final Transaction transaction, final TimeInstant currentTime) {
+		return transaction.getDeadline().compareTo(currentTime) < 0;
 	}
 }

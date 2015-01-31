@@ -7,6 +7,8 @@ import java.util.Iterator;
  */
 public enum ValidationResult {
 
+	//region general
+
 	/**
 	 * Validation is neutral.
 	 */
@@ -68,19 +70,19 @@ public enum ValidationResult {
 	FAILURE_ENTITY_UNUSABLE(11),
 
 	/**
+	 * Validation failed because the entity cannot be used because the nodes are out of sync.
+	 */
+	FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC(12),
+
+	/**
 	 * Validation failed because the chain score is inferior to our score.
 	 */
-	FAILURE_CHAIN_SCORE_INFERIOR(12),
+	FAILURE_CHAIN_SCORE_INFERIOR(13),
 
 	/**
 	 * Validation failed because the chain could not be validated.
 	 */
-	FAILURE_CHAIN_INVALID(13),
-
-	/**
-	 * Validation failed because conflicting importance transfer is present
-	 */
-	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(14),
+	FAILURE_CHAIN_INVALID(14),
 
 	/**
 	 * Validation failed because there are too many transactions in a block.
@@ -93,24 +95,138 @@ public enum ValidationResult {
 	FAILURE_SELF_SIGNED_TRANSACTION(16),
 
 	/**
-	 * Validation failed because remote harvesting account has non-zero balance.
+	 * Validation failed because a transaction has an insufficient fee.
 	 */
-	FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE(17),
+	FAILURE_INSUFFICIENT_FEE(17),
+
+	/**
+	 * Validation failed because a transaction originated from the nemesis account after the nemesis block.
+	 */
+	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(18),
+
+	/**
+	 * Transaction was rejected because the debtor is not allowed to put another transaction into the cache.
+	 */
+	FAILURE_TRANSACTION_CACHE_TOO_FULL(19),
+
+	//endregion
+
+	//region importance 6x
+
+	/**
+	 * Validation failed because conflicting importance transfer is present
+	 */
+	FAILURE_CONFLICTING_IMPORTANCE_TRANSFER(61),
+
+	/**
+	 * Validation failed because remote harvesting account has a pre-existing balance transfer.
+	 */
+	FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER(62),
 
 	/**
 	 * Validation failed because previous importance transfer change is in progress.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS(18),
+	FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS(63),
 
 	/**
 	 * Validation failed because importance transfer activation was attempted while already activated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED(19),
+	FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED(64),
 
 	/**
 	 * Validation failed because importance transfer deactivation was attempted while already deactivated.
 	 */
-	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(20);
+	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(65),
+
+	//endregion
+
+	//region multisig 7x 8x
+
+	/**
+	 * Validation failed because signer is not a cosigner of given multisig account.
+	 */
+	FAILURE_MULTISIG_NOT_A_COSIGNER(71),
+
+	/**
+	 * Validation failed because the cosignatories attached to a multisig transaction were invalid.
+	 */
+	FAILURE_MULTISIG_INVALID_COSIGNERS(72),
+
+	/**
+	 * Validation failed because a multisig signature was not associated with any known multisig transaction.
+	 */
+	FAILURE_MULTISIG_NO_MATCHING_MULTISIG(73),
+
+	/**
+	 * Validation failed because multisig account tried to make transaction that is not allowed
+	 */
+	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG(74),
+
+	/**
+	 * Validation failed because signer is already a cosigner of given multisig account.
+	 */
+	FAILURE_MULTISIG_ALREADY_A_COSIGNER(75),
+
+	/**
+	 * Validation failed because a multisig signature is attached to an incorrect multisig transaction.
+	 */
+	FAILURE_MULTISIG_MISMATCHED_SIGNATURE(76),
+
+	/**
+	 * Validation failed because a multisig modification contained multiple deletes.
+	 */
+	FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES(77),
+
+	/**
+	 * Validation failed because a multisig modification contained redundant modifications.
+	 */
+	FAILURE_MULTISIG_MODIFICATION_REDUNDANT_MODIFICATIONS(78),
+
+	/**
+	 * Validation failed because conflicting multisig modification is present.
+	 */
+	FAILURE_CONFLICTING_MULTISIG_MODIFICATION(79),
+
+	/**
+	 * Validation failed because a multisig modification would result in a multisig account having too many cosigners.
+	 */
+	FAILURE_TOO_MANY_MULTISIG_COSIGNERS(80),
+
+	//endregion
+
+	//region block chain validator 1xx
+
+	/**
+	 * Validation failed because received chain has too many blocks.
+	 */
+	FAILURE_MAX_CHAIN_SIZE_EXCEEDED(101),
+
+	/**
+	 * Validation failed because a block was received with an unexpected height.
+	 */
+	FAILURE_BLOCK_UNEXPECTED_HEIGHT(102),
+
+	/**
+	 * Validation failed because an unverifiable block was received.
+	 */
+	FAILURE_BLOCK_UNVERIFIABLE(103),
+
+	/**
+	 * Validation failed because a block was received that is not a hit.
+	 */
+	FAILURE_BLOCK_NOT_HIT(104),
+
+	/**
+	 * Validation failed because an unverifiable transaction was received.
+	 */
+	FAILURE_TRANSACTION_UNVERIFIABLE(105),
+
+	/**
+	 * Validation failed because an incoming chain contained a transaction more than once.
+	 */
+	FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN(106);
+
+	//endregion
 
 	private final int value;
 

@@ -4,7 +4,6 @@ import org.nem.core.node.NodeEndpoint;
 import org.nem.core.utils.ExceptionUtils;
 
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 /**

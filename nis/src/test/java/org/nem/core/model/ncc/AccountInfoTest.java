@@ -27,7 +27,7 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(Address.fromEncoded("test")));
 		Assert.assertThat(info.getKeyPair(), IsNull.nullValue());
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
-		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
+		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
@@ -49,7 +49,7 @@ public class AccountInfoTest {
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(1234)));
-		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
+		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(7)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("my account"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
 	}
@@ -119,7 +119,7 @@ public class AccountInfoTest {
 		}
 
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromNem(747L)));
-		Assert.assertThat(info.getNumForagedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
+		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3L)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(2.3));
@@ -138,7 +138,7 @@ public class AccountInfoTest {
 		Assert.assertThat(deserializer.readString("address"), IsEqual.equalTo(originalInfo.getAddress().getEncoded()));
 		Assert.assertThat(deserializer.readOptionalBytes("publicKey"), IsEqual.equalTo(expectedPublicKey));
 		Assert.assertThat(deserializer.readLong("balance"), IsEqual.equalTo(747000000L));
-		Assert.assertThat(deserializer.readLong("foragedBlocks"), IsEqual.equalTo(3L));
+		Assert.assertThat(deserializer.readLong("harvestedBlocks"), IsEqual.equalTo(3L));
 		Assert.assertThat(deserializer.readString("label"), IsEqual.equalTo("alpha gamma"));
 		Assert.assertThat(deserializer.readDouble("importance"), IsEqual.equalTo(2.3));
 

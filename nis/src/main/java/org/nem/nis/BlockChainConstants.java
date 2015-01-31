@@ -1,7 +1,5 @@
 package org.nem.nis;
 
-import org.nem.core.model.primitive.BlockHeight;
-
 /**
  * Common place to have BlockChain-related constants accessible
  * from both org.nem.nis and org.nem.core packages
@@ -45,24 +43,14 @@ public class BlockChainConstants {
 	public static final int MAX_ALLOWED_SECONDS_AHEAD_OF_TIME = 10;
 
 	/**
-	 * The maximum number of transactions in a block.
+	 * The maximum number of transactions in a block at the specified height.
 	 */
 	public static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
 
 	/**
-	 * The maximum number of transactions in a block at the specified height.
-	 *
-	 * @param height The height.
+	 * The maximum number of cosignatories that a multisig account can have.
 	 */
-	public static int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK(final BlockHeight height) {
-		if (height.getRaw() > BlockMarkerConstants.BETA_TX_COUNT_FORK) {
-			return MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
-		} else if (height.getRaw() > BlockMarkerConstants.BETA_HARD_FORK) {
-			return 60;
-		} else {
-			return Integer.MAX_VALUE;
-		}
-	}
+	public static final int MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT = 32;
 
 	/**
 	 * The maximum age (in blocks) of outlinks to use in POI calculations.

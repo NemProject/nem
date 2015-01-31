@@ -38,6 +38,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
@@ -55,6 +56,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
@@ -74,6 +76,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage().getDecodedPayload(), IsEqual.equalTo(new byte[] { 12, 50, 21 }));
@@ -93,6 +96,7 @@ public class TransferTransactionTest {
 
 		// Assert:
 		Assert.assertThat(transaction.getSigner(), IsEqual.equalTo(signer));
+		Assert.assertThat(transaction.getDebtor(), IsEqual.equalTo(signer));
 		Assert.assertThat(transaction.getRecipient(), IsEqual.equalTo(recipient));
 		Assert.assertThat(transaction.getAmount(), IsEqual.equalTo(Amount.fromNem(123L)));
 		Assert.assertThat(transaction.getMessage(), IsNull.nullValue());
@@ -123,88 +127,11 @@ public class TransferTransactionTest {
 
 	//endregion
 
-	//region Fee
-
-	@Test
-	public void feeIsCalculatedCorrectlyForEmptyTransaction() {
-		// Assert:
-		Assert.assertThat(this.calculateFee(0, 0), IsEqual.equalTo(Amount.fromNem(1)));
-	}
-
-	@Test
-	public void feeIsCalculatedCorrectlyForTransactionWithoutMessage() {
-		// Assert:
-		Assert.assertThat(this.calculateFee(1, 0), IsEqual.equalTo(Amount.fromNem(1)));
-		Assert.assertThat(this.calculateFee(144, 0), IsEqual.equalTo(Amount.fromNem(1)));
-		Assert.assertThat(this.calculateFee(145, 0), IsEqual.equalTo(Amount.fromNem(2)));
-		Assert.assertThat(this.calculateFee(1024, 0), IsEqual.equalTo(Amount.fromNem(2)));
-		Assert.assertThat(this.calculateFee(32768, 0), IsEqual.equalTo(Amount.fromNem(4)));
-		Assert.assertThat(this.calculateFee(1048576, 0), IsEqual.equalTo(Amount.fromNem(45)));
-	}
-
-	@Test
-	public void feeIsCalculatedCorrectlyForTransactionWithMessage() {
-		// Assert:
-		Assert.assertThat(this.calculateFee(1024, 1), IsEqual.equalTo(Amount.fromNem(3)));
-		Assert.assertThat(this.calculateFee(1024, 255), IsEqual.equalTo(Amount.fromNem(6)));
-		Assert.assertThat(this.calculateFee(1024, 256), IsEqual.equalTo(Amount.fromNem(7)));
-		Assert.assertThat(this.calculateFee(1024, 257), IsEqual.equalTo(Amount.fromNem(7)));
-		Assert.assertThat(this.calculateFee(1024, 512), IsEqual.equalTo(Amount.fromNem(12)));
-	}
-
-	@Test
-	public void feeIsWaivedForNemesisAccount() {
-		// Arrange:
-		final Account nemesisAccount = new Account(NemesisBlock.ADDRESS);
-
-		// Assert:
-		Assert.assertThat(this.calculateFee(nemesisAccount, 0, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12000, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12001, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 13000, 0), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12000, 1), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 12000, 199), IsEqual.equalTo(Amount.ZERO));
-		Assert.assertThat(this.calculateFee(nemesisAccount, 13000, 200), IsEqual.equalTo(Amount.ZERO));
-	}
-
-	@Test
-	public void messageFeeIsBasedOnEncodedSize() {
-		// Assert:
-		Assert.assertThat(this.calculateMessageFee(256, 512), IsEqual.equalTo(Amount.fromNem(6)));
-		Assert.assertThat(this.calculateMessageFee(512, 256), IsEqual.equalTo(Amount.fromNem(11)));
-	}
-
-	private Amount calculateFee(final long amount, final int messageSize) {
-		// Act:
-		return this.calculateFee(Utils.generateRandomAccount(), amount, messageSize);
-	}
-
-	private Amount calculateFee(final Account signer, final long amount, final int messageSize) {
-		// Arrange:
-		final Account recipient = Utils.generateRandomAccount();
-		final PlainMessage message = new PlainMessage(new byte[messageSize]);
-		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, amount, message);
-
-		// Act:
-		return transaction.getFee();
-	}
-
-	private Amount calculateMessageFee(final int encodedMessageSize, final int decodedMessageSize) {
-		// Arrange:
-		final TransferTransaction transaction = this.createTransactionWithMockMessage(encodedMessageSize, decodedMessageSize);
-
-		// Act:
-		return transaction.getFee();
-	}
-
-	//endregion
-
 	//region getAccounts
 
 	@Test
-	public void getAccountsReturnsCorrectAccounts() {
+	public void getAccountsIncludesSignerAndRecipientAccounts() {
 		// Arrange:
-		final ImportanceTransferTransaction.Mode mode = ImportanceTransferTransaction.Mode.Activate;
 		final Account signer = Utils.generateRandomAccount();
 		final Account recipient = Utils.generateRandomAccount();
 		final TransferTransaction transaction = this.createTransferTransaction(signer, recipient, 99, null);

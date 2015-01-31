@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * A NEM address.
  */
-public class Address {
+public class Address implements Comparable<Address> {
 	private static final int NUM_CHECKSUM_BYTES = 4;
 	private static final int NUM_DECODED_BYTES_LENGTH = 40;
 	private static final int NUM_ENCODED_BYTES_LENGTH = 25;
@@ -34,6 +34,10 @@ public class Address {
 	 * @return An address object.
 	 */
 	public static Address fromPublicKey(final byte version, final PublicKey publicKey) {
+		if (null == publicKey) {
+			throw new IllegalArgumentException("public key cannot be null");
+		}
+
 		return new Address(version, publicKey);
 	}
 
@@ -44,6 +48,10 @@ public class Address {
 	 * @return An address object.
 	 */
 	public static Address fromEncoded(final String encoded) {
+		if (null == encoded) {
+			throw new IllegalArgumentException("encoded address cannot be null");
+		}
+
 		return new Address(encoded.toUpperCase());
 	}
 
@@ -164,6 +172,11 @@ public class Address {
 	@Override
 	public String toString() {
 		return this.encoded;
+	}
+
+	@Override
+	public int compareTo(final Address rhs) {
+		return this.getEncoded().compareTo(rhs.getEncoded());
 	}
 
 	/**

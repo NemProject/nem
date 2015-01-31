@@ -4,24 +4,19 @@ import org.hibernate.annotations.Cascade;
 import org.nem.core.crypto.Hash;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * Base class for all transfer db entities.
- *
- * @param <TDerived> The derived transfer type.
  */
 @MappedSuperclass
-public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
+public abstract class AbstractTransfer {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(generator = "transaction_id_seq", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "transaction_id_seq", sequenceName = "transaction_id_seq", allocationSize = 1)
 	private Long id;
-	private Long shortId;
 	private byte[] transferHash;
 
 	private Integer version;
-	private Integer type; // candidate for removal
 	private Long fee;
 	private Integer timeStamp;
 	private Integer deadline;
@@ -29,24 +24,8 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 	@ManyToOne
 	@Cascade({ org.hibernate.annotations.CascadeType.SAVE_UPDATE })
 	@JoinColumn(name = "senderId")
-	private Account sender;
+	private DbAccount sender;
 	private byte[] senderProof;
-
-	private Integer blkIndex; // index inside block
-	private Integer orderId; // index inside list
-
-	private Long referencedTransaction;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "blockId")
-	private Block block;
-
-	@Transient
-	private final Function<Block, List<TDerived>> getListFromBlock;
-
-	protected AbstractTransfer(final Function<Block, List<TDerived>> getListFromBlock) {
-		this.getListFromBlock = getListFromBlock;
-	}
 
 	public Long getId() {
 		return this.id;
@@ -56,20 +35,11 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 		this.id = id;
 	}
 
-	public Long getShortId() {
-		return this.shortId;
-	}
-
-	public void setShortId(final Long shortId) {
-		this.shortId = shortId;
-	}
-
 	public Hash getTransferHash() {
 		return new Hash(this.transferHash);
 	}
 
 	public void setTransferHash(final Hash transferHash) {
-		this.shortId = transferHash.getShortId();
 		this.transferHash = transferHash.getRaw();
 	}
 
@@ -79,14 +49,6 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 
 	public void setVersion(final Integer version) {
 		this.version = version;
-	}
-
-	public Integer getType() {
-		return this.type;
-	}
-
-	public void setType(final Integer type) {
-		this.type = type;
 	}
 
 	public Long getFee() {
@@ -113,11 +75,11 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 		this.deadline = deadline;
 	}
 
-	public Account getSender() {
+	public DbAccount getSender() {
 		return this.sender;
 	}
 
-	public void setSender(final Account sender) {
+	public void setSender(final DbAccount sender) {
 		this.sender = sender;
 	}
 
@@ -127,37 +89,5 @@ public abstract class AbstractTransfer<TDerived extends AbstractTransfer<?>> {
 
 	public void setSenderProof(final byte[] senderProof) {
 		this.senderProof = senderProof;
-	}
-
-	public Integer getBlkIndex() {
-		return this.blkIndex;
-	}
-
-	public void setBlkIndex(final Integer blkIndex) {
-		this.blkIndex = blkIndex;
-	}
-
-	public Integer getOrderId() {
-		return this.getListFromBlock.apply(this.block).indexOf(this);
-	}
-
-	public void setOrderId(final Integer orderId) {
-		this.orderId = orderId;
-	}
-
-	public Long getReferencedTransaction() {
-		return this.referencedTransaction;
-	}
-
-	public void setReferencedTransaction(final Long referencedTransaction) {
-		this.referencedTransaction = referencedTransaction;
-	}
-
-	public Block getBlock() {
-		return this.block;
-	}
-
-	public void setBlock(final Block block) {
-		this.block = block;
 	}
 }

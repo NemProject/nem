@@ -1,159 +1,159 @@
 {
-    "_info": "this file contains a list of all trusted peers and can be shared",
-    "knownPeers": [
-        {
-            "endpoint": {
-                "host": "85.25.36.97",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "alice2",
-                "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "85.25.36.92",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "alice3",
-                "public-key": "708fbae6f7dc43b19e18a783d99535650504b60abd27b12137d17227ee3d5e84"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "199.217.112.135",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "alice4",
-                "public-key": "c7e68c147fe246caaf6f09d3a1b54a5744b1d3f55a22a8557c3a063d70669262"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "108.61.182.27",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "alice5",
-                "public-key": "c1d806564c3dda901c46e1dd4b533aae28eac148672afd69c91e7b51fe930948"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "108.61.168.86",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "alice6",
-                "public-key": "266c29aefaa4dbd3c206ea235c079d791dbb9808c428d4b3b206a088523ed1c8"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "san.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "san",
-                "public-key": "8fe59fe88b25b9b202843755200974a0509057c0ed3f8684fad91a0da6549d76"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "go.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "go",
-                "public-key": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "hachi.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "hachi",
-                "public-key": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "jusan.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "jusan",
-                "public-key": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "nijuichi.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "nijuichi",
-                "public-key": "f8a02001a36b0ffa8fd8f753cab0e513b76d4e9ceea45536493fc2df83af5f65"
-            }
-        },
-        {
-            "endpoint": {
-                "host": "chain.nem.ninja",
-                "port": 7890,
-                "protocol": "http"
-            },
-            "identity": {
-                "name": "pat",
-                "public-key": "b13e6fde0178dd7d32017ee4f932b329d8bcaf3f2cf186b3bb10a43182c417b1"
-            }
-        },
-        {
-            "endpoint": {
-                "protocol": "http",
-                "port": 7890,
-                "host": "46.28.202.213"
-            },
-            "identity": {
-                "name": "rigel3",
-                "public-key": "9a59c94e8fe73dbe4bca79deb9b11476e65c4ccf944155a3d9ea8ed2022d800e"
-            }
-        },
-        {
-            "endpoint": {
-                "protocol": "http",
-                "port": 7890,
-                "host": "222.104.228.16"
-            },
-            "identity": {
-                "name": "jabo38",
-                "public-key": "3800de1304f392369fe21d7e5e3747c55976be4760aae65dae561c60967bd3ed"
-            }
-        },
-        {
-            "endpoint": {
-                "protocol": "http",
-                "port": 7890,
-                "host": "5.79.193.164"
-            },
-            "identity": {
-                "name": "Elena82",
-                "public-key": "5c0797a67c59c91ab2f73b99c7eaed4df760bf8c9099b6b6f564cec5571da3fb"
-            }
-        },
-    ]
+  "_info": "this file contains a list of all trusted peers and can be shared",
+  "knownPeers": [
+    {
+      "endpoint": {
+        "host": "85.25.36.97",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice2",
+        "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "85.25.36.92",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice3",
+        "public-key": "708fbae6f7dc43b19e18a783d99535650504b60abd27b12137d17227ee3d5e84"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "199.217.112.135",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice4",
+        "public-key": "c7e68c147fe246caaf6f09d3a1b54a5744b1d3f55a22a8557c3a063d70669262"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "108.61.182.27",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice5",
+        "public-key": "c1d806564c3dda901c46e1dd4b533aae28eac148672afd69c91e7b51fe930948"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "108.61.168.86",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "alice6",
+        "public-key": "266c29aefaa4dbd3c206ea235c079d791dbb9808c428d4b3b206a088523ed1c8"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "san.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "san",
+        "public-key": "8fe59fe88b25b9b202843755200974a0509057c0ed3f8684fad91a0da6549d76"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "go.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "go",
+        "public-key": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "hachi.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "hachi",
+        "public-key": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "jusan.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "jusan",
+        "public-key": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "nijuichi.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "nijuichi",
+        "public-key": "f8a02001a36b0ffa8fd8f753cab0e513b76d4e9ceea45536493fc2df83af5f65"
+      }
+    },
+    {
+      "endpoint": {
+        "host": "chain.nem.ninja",
+        "port": 7890,
+        "protocol": "http"
+      },
+      "identity": {
+        "name": "pat",
+        "public-key": "b13e6fde0178dd7d32017ee4f932b329d8bcaf3f2cf186b3bb10a43182c417b1"
+      }
+    },
+    {
+      "endpoint": {
+        "protocol": "http",
+        "port": 7890,
+        "host": "46.28.202.213"
+      },
+      "identity": {
+        "name": "rigel3",
+        "public-key": "9a59c94e8fe73dbe4bca79deb9b11476e65c4ccf944155a3d9ea8ed2022d800e"
+      }
+    },
+    {
+      "endpoint": {
+        "protocol": "http",
+        "port": 7890,
+        "host": "222.104.228.16"
+      },
+      "identity": {
+        "name": "jabo38",
+        "public-key": "3800de1304f392369fe21d7e5e3747c55976be4760aae65dae561c60967bd3ed"
+      }
+    },
+    {
+      "endpoint": {
+        "protocol": "http",
+        "port": 7890,
+        "host": "5.79.193.164"
+      },
+      "identity": {
+        "name": "Elena82",
+        "public-key": "5c0797a67c59c91ab2f73b99c7eaed4df760bf8c9099b6b6f564cec5571da3fb"
+      }
+    },
+  ]
 }

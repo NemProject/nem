@@ -61,7 +61,7 @@ public class BlockChain implements BlockSynchronizer {
 	public ValidationResult checkPushedBlock(final Block block) {
 		if (!this.isLastBlockParent(block)) {
 			// if peer tried to send us block that we also generated, there is no sense to punish him
-			return this.isLastBlockSibling(block) ? ValidationResult.NEUTRAL : ValidationResult.FAILURE_ENTITY_UNUSABLE;
+			return this.isLastBlockSibling(block) ? ValidationResult.NEUTRAL : ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC;
 		}
 
 		// the peer returned a block that can be added to our chain

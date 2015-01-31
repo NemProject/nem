@@ -33,15 +33,15 @@ public class BlockExplorerMapperTest {
 		final Address address = Address.fromPublicKey(PublicKey.fromHexString(PUBLIC_KEY_STRING));
 		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
 
-		final Block block = new Block();
+		final DbBlock block = new DbBlock();
 		block.setHeight(60L);
-		block.setForger(new Account(address.getEncoded(), address.getPublicKey()));
+		block.setHarvester(new DbAccount(address.getEncoded(), address.getPublicKey()));
 		block.setTimeStamp(1856002);
-		block.setBlockHash(hash.getRaw());
-		block.setBlockTransfers(new ArrayList<>());
+		block.setBlockHash(hash);
+		block.setBlockTransferTransactions(new ArrayList<>());
 
 		for (final long fee : transferFees) {
-			block.getBlockTransfers().add(createTransferWithFee(fee));
+			block.getBlockTransferTransactions().add(createTransferWithFee(fee));
 		}
 
 		// Act:
@@ -63,22 +63,21 @@ public class BlockExplorerMapperTest {
 		}
 	}
 
-	private static Transfer createTransferWithFee(final long fee) {
+	private static DbTransferTransaction createTransferWithFee(final long fee) {
 		final Address senderAddress = Utils.generateRandomAddressWithPublicKey();
 		final Address recipientAddress = Utils.generateRandomAddress();
 		final Hash hash = Utils.generateRandomHash();
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
-		final Transfer transfer = new Transfer();
-		transfer.setType(1337);
+		final DbTransferTransaction transfer = new DbTransferTransaction();
 		transfer.setFee(fee);
 		transfer.setTimeStamp(1856002);
-		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
+		transfer.setSender(new DbAccount(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
 		transfer.setTransferHash(hash);
 
-		transfer.setRecipient(new Account(recipientAddress.getEncoded(), null));
+		transfer.setRecipient(new DbAccount(recipientAddress.getEncoded(), null));
 		transfer.setAmount(888888000000L);
 		transfer.setMessageType(2);
 		transfer.setMessagePayload(messagePayload);
@@ -94,15 +93,14 @@ public class BlockExplorerMapperTest {
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
 		final byte[] messagePayload = Utils.generateRandomBytes(16);
 
-		final Transfer transfer = new Transfer();
-		transfer.setType(1337);
+		final DbTransferTransaction transfer = new DbTransferTransaction();
 		transfer.setFee(123000000L);
 		transfer.setTimeStamp(1856002);
-		transfer.setSender(new Account(senderAddress.getEncoded(), senderAddress.getPublicKey()));
+		transfer.setSender(new DbAccount(senderAddress.getEncoded(), senderAddress.getPublicKey()));
 		transfer.setSenderProof(signature.getBytes());
 		transfer.setTransferHash(hash);
 
-		transfer.setRecipient(new Account(recipientAddress.getEncoded(), null));
+		transfer.setRecipient(new DbAccount(recipientAddress.getEncoded(), null));
 		transfer.setAmount(888888000000L);
 		transfer.setMessageType(2);
 		transfer.setMessagePayload(messagePayload);
@@ -113,7 +111,6 @@ public class BlockExplorerMapperTest {
 
 		// Assert:
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(11));
-		Assert.assertThat(jsonObject.get("type"), IsEqual.equalTo(1337));
 		Assert.assertThat(jsonObject.get("fee"), IsEqual.equalTo(123000000L));
 		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1408966402000L));
 		Assert.assertThat(jsonObject.get("sender"), IsEqual.equalTo(senderAddress.getEncoded()));

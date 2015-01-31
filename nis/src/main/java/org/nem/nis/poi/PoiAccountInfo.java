@@ -2,7 +2,7 @@ package org.nem.nis.poi;
 
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.state.*;
 
 import java.util.*;
@@ -37,7 +37,7 @@ public class PoiAccountInfo {
 		while (outlinks.hasNext()) {
 			final AccountLink outlink = outlinks.next();
 			final long heightDifference = height.subtract(outlink.getHeight());
-			if (OUTLINK_HISTORY < heightDifference && BlockMarkerConstants.BETA_OUTLINK_PRUNING_FORK <= height.getRaw()) {
+			if (OUTLINK_HISTORY < heightDifference) {
 				continue;
 			}
 

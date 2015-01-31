@@ -4,10 +4,24 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.primitive.TimeOffset;
 
+import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 public class SystemTimeProviderTest {
 	private static final long EPOCH_TIME = 1407110400000L;
+
+	@Before
+	public void resetTimeOffset() {
+		final SystemTimeProvider provider = new SystemTimeProvider();
+		final Field field;
+		try {
+			field = SystemTimeProvider.class.getDeclaredField("timeOffset");
+			field.setAccessible(true);
+			field.set(provider, new TimeOffset(0));
+		} catch (IllegalAccessException | NoSuchFieldException e) {
+			throw new RuntimeException("Failed to reset time offset");
+		}
+	}
 
 	//region getEpochTime[Millis]
 
@@ -104,10 +118,14 @@ public class SystemTimeProviderTest {
 			info.result = provider.updateTimeOffset(new TimeOffset(123000));
 			info.currentTime = provider.getCurrentTime();
 			info.networkTime = provider.getNetworkTime();
+
+			// because the time offset adjustment is static across instances,
+			// we need to keep track of how many times adjustments were made
+			++info.rounds;
 		});
 
 		// Assert:
-		info.assertSystemTimeOffset(systemTime, 123000, 123000);
+		info.assertSystemTimeOffset(systemTime, 123000, 123000 * info.rounds);
 	}
 
 	@Test
@@ -123,16 +141,21 @@ public class SystemTimeProviderTest {
 			info.result = provider.updateTimeOffset(new TimeOffset(111111));
 			info.currentTime = provider.getCurrentTime();
 			info.networkTime = provider.getNetworkTime();
+
+			// because the time offset adjustment is static across instances,
+			// we need to keep track of how many times adjustments were made
+			++info.rounds;
 		});
 
 		// Assert:
-		info.assertSystemTimeOffset(systemTime, 111111, 211111);
+		info.assertSystemTimeOffset(systemTime, 111111, 211111 * info.rounds);
 	}
 
 	private static class NetworkTimeInfo {
 		public TimeSynchronizationResult result;
 		public TimeInstant currentTime;
 		public NetworkTimeStamp networkTime;
+		public int rounds = 0;
 
 		private void assertSystemTimeOffset(final long systemTime, final int offset, final int cumulativeOffset) {
 			Assert.assertThat(this.result.getChange(), IsEqual.equalTo(new TimeOffset(offset)));
@@ -142,6 +165,31 @@ public class SystemTimeProviderTest {
 			Assert.assertThat(this.currentTime, IsEqual.equalTo(convertSystemTimeToCurrentTime(systemTime, cumulativeOffset)));
 			Assert.assertThat(this.networkTime, IsEqual.equalTo(convertSystemTimeToNetworkTime(systemTime, cumulativeOffset)));
 		}
+	}
+
+	//endregion
+
+	//region timeOffset preservation across instances
+
+	@Test
+	public void timeOffsetIsPreservedAcrossInstances() {
+		// Arrange:
+		final TimeProvider[] providers = { new SystemTimeProvider(), new SystemTimeProvider(), null };
+		final int numProviders = 3;
+		final long[] networkTimes = new long[numProviders];
+
+		// Act:
+		runDeterministicOperation(v -> {
+			providers[0].updateTimeOffset(new TimeOffset(1234L));
+			providers[2] = new SystemTimeProvider();
+			for (int i = 0; i < numProviders; i++) {
+				networkTimes[i] = providers[i].getNetworkTime().getRaw();
+			}
+		});
+
+		// Assert:
+		Assert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[1]));
+		Assert.assertThat(networkTimes[0], IsEqual.equalTo(networkTimes[2]));
 	}
 
 	//endregion

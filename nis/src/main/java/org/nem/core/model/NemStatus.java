@@ -35,9 +35,14 @@ public enum NemStatus {
 	BOOTED(5),
 
 	/**
-	 * NIS local node is synchronized (implies RUNNING and BOOTED)
+	 * NIS local node is synchronized (implies RUNNING and BOOTED).
 	 */
-	SYNCHRONIZED(6);
+	SYNCHRONIZED(6),
+
+	/**
+	 * NIS local node does not see any remote NIS node (implies RUNNING and BOOTED).
+	 */
+	NO_REMOTE_NIS_AVAILABLE(7);
 
 	private final int value;
 

@@ -2,10 +2,12 @@ package org.nem.nis.sync;
 
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.*;
+import org.nem.core.serialization.AccountLookup;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.validators.*;
@@ -24,16 +26,29 @@ public class BlockChainServices {
 	private final BlockTransactionObserverFactory observerFactory;
 	private final BlockValidatorFactory blockValidatorFactory;
 	private final TransactionValidatorFactory transactionValidatorFactory;
+	private final NisMapperFactory mapperFactory;
 
 	public BlockChainServices(
 			final BlockDao blockDao,
 			final BlockTransactionObserverFactory observerFactory,
 			final BlockValidatorFactory blockValidatorFactory,
-			final TransactionValidatorFactory transactionValidatorFactory) {
+			final TransactionValidatorFactory transactionValidatorFactory,
+			final NisMapperFactory mapperFactory) {
 		this.blockDao = blockDao;
 		this.observerFactory = observerFactory;
 		this.blockValidatorFactory = blockValidatorFactory;
 		this.transactionValidatorFactory = transactionValidatorFactory;
+		this.mapperFactory = mapperFactory;
+	}
+
+	/**
+	 * Creates a NIS db model to model mapper that uses the specified account lookup.
+	 *
+	 * @param accountLookup The account lookup.
+	 * @return The mapper.
+	 */
+	public NisDbModelToModelMapper createMapper(final AccountLookup accountLookup) {
+		return this.mapperFactory.createDbModelToModelNisMapper(accountLookup);
 	}
 
 	/**
@@ -55,6 +70,7 @@ public class BlockChainServices {
 		final ComparisonContext comparisonContext = new DefaultComparisonContext(parentBlock.getHeight());
 		final BlockExecutor executor = new BlockExecutor(nisCache);
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
+
 		final BlockChainValidator validator = new BlockChainValidator(
 				block -> executor.execute(block, observer),
 				scorer,
@@ -62,7 +78,7 @@ public class BlockChainServices {
 				this.blockValidatorFactory.create(nisCache),
 				this.transactionValidatorFactory.createSingle(accountStateCache),
 				new DefaultDebitPredicate(accountStateCache));
-		return validator.isValid(parentBlock, peerChain);
+		return validator.isValid(parentBlock, peerChain).isSuccess();
 	}
 
 	/**
@@ -81,7 +97,7 @@ public class BlockChainServices {
 		final BlockScorer scorer = new BlockScorer(accountStateCache);
 		final PartialWeightedScoreVisitor scoreVisitor = new PartialWeightedScoreVisitor(scorer);
 
-		// this is delicate and the order matters, first visitor during undo changes amount of foraged blocks
+		// this is delicate and the order matters, first visitor during undo changes amount of harvested blocks
 		// second visitor needs that information
 		final List<BlockVisitor> visitors = new ArrayList<>();
 		visitors.add(new UndoBlockVisitor(

@@ -118,4 +118,21 @@ public class NotificationUtils {
 		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.TransactionHashes));
 		Assert.assertThat(n.getPairs(), IsEquivalent.equivalentTo(pairs));
 	}
+
+	/**
+	 * Asserts that the specified notification is a cosignatory modification notification.
+	 *
+	 * @param notification The notification to test.
+	 * @param expectedMultisig The expected multisig account.
+	 * @param expectedModification The expected multisig modification.
+	 */
+	public static void assertCosignatoryModificationNotification(
+			final Notification notification,
+			final Account expectedMultisig,
+			final MultisigModification expectedModification) {
+		final MultisigModificationNotification n = (MultisigModificationNotification)notification;
+		Assert.assertThat(n.getType(), IsEqual.equalTo(NotificationType.CosignatoryModification));
+		Assert.assertThat(n.getMultisigAccount(), IsEqual.equalTo(expectedMultisig));
+		Assert.assertThat(n.getModification(), IsEqual.equalTo(expectedModification));
+	}
 }

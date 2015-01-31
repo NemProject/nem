@@ -12,7 +12,7 @@ public class AccountInfo implements SerializableEntity {
 	private final Address address;
 	private final KeyPair keyPair;
 	private final Amount balance;
-	private final BlockAmount numForagedBlocks;
+	private final BlockAmount numHarvestedBlocks;
 	private final String label;
 
 	private final double importance;
@@ -22,20 +22,20 @@ public class AccountInfo implements SerializableEntity {
 	 *
 	 * @param address The address.
 	 * @param balance The balance.
-	 * @param numForagedBlocks The number of foraged blocks.
+	 * @param numHarvestedBlocks The number of harvested blocks.
 	 * @param label The label.
 	 * @param importance The importance.
 	 */
 	public AccountInfo(
 			final Address address,
 			final Amount balance,
-			final BlockAmount numForagedBlocks,
+			final BlockAmount numHarvestedBlocks,
 			final String label,
 			final double importance) {
 		this.address = address;
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = balance;
-		this.numForagedBlocks = numForagedBlocks;
+		this.numHarvestedBlocks = numHarvestedBlocks;
 		this.label = label;
 		this.importance = importance;
 	}
@@ -49,7 +49,7 @@ public class AccountInfo implements SerializableEntity {
 		this.address = deserializeAddress(deserializer);
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = Amount.readFrom(deserializer, "balance");
-		this.numForagedBlocks = BlockAmount.readFrom(deserializer, "foragedBlocks");
+		this.numHarvestedBlocks = BlockAmount.readFrom(deserializer, "harvestedBlocks");
 		this.label = deserializer.readOptionalString("label");
 		this.importance = deserializer.readDouble("importance");
 	}
@@ -88,12 +88,12 @@ public class AccountInfo implements SerializableEntity {
 	}
 
 	/**
-	 * Gets number of foraged blocks.
+	 * Gets number of harvested blocks.
 	 *
-	 * @return Number of blocks foraged by this account.
+	 * @return Number of blocks harvested by this account.
 	 */
-	public BlockAmount getNumForagedBlocks() {
-		return this.numForagedBlocks;
+	public BlockAmount getNumHarvestedBlocks() {
+		return this.numHarvestedBlocks;
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class AccountInfo implements SerializableEntity {
 		Address.writeTo(serializer, "publicKey", this.getAddress(), AddressEncoding.PUBLIC_KEY);
 
 		Amount.writeTo(serializer, "balance", this.getBalance());
-		BlockAmount.writeTo(serializer, "foragedBlocks", this.getNumForagedBlocks());
+		BlockAmount.writeTo(serializer, "harvestedBlocks", this.getNumHarvestedBlocks());
 		serializer.writeString("label", this.getLabel());
 
 		serializer.writeDouble("importance", this.getImportance());

@@ -3,30 +3,30 @@ package org.nem.nis.service;
 import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.BlockChain;
-import org.nem.nis.dao.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.logging.Logger;
 
 /**
- * This is intermediate layer between blocchain or foraging and actual Dao
- * TODO: not sure if other dau functions should be moved here, probably not
+ * This is intermediate layer between blockchain or harvesting and actual Dao.
  */
 @Service
 public class BlockChainLastBlockLayer {
 	private static final Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
 
-	final private AccountDao accountDao;
-	final private BlockDao blockDao;
+	private final BlockDao blockDao;
+	private final NisModelToDbModelMapper mapper;
 
-	private org.nem.nis.dbmodel.Block lastBlock;
+	private DbBlock lastBlock;
 
 	@Autowired(required = true)
-	public BlockChainLastBlockLayer(final AccountDao accountDao, final BlockDao blockDao) {
-		this.accountDao = accountDao;
+	public BlockChainLastBlockLayer(final BlockDao blockDao, final NisModelToDbModelMapper mapper) {
 		this.blockDao = blockDao;
+		this.mapper = mapper;
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class BlockChainLastBlockLayer {
 	 *
 	 * @return last block from db.
 	 */
-	public org.nem.nis.dbmodel.Block getLastDbBlock() {
+	public DbBlock getLastDbBlock() {
 		return this.lastBlock;
 	}
 
@@ -52,7 +52,7 @@ public class BlockChainLastBlockLayer {
 	 *
 	 * @param curBlock lastBlock in db.
 	 */
-	public void analyzeLastBlock(final org.nem.nis.dbmodel.Block curBlock) {
+	public void analyzeLastBlock(final DbBlock curBlock) {
 		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
 		this.lastBlock = curBlock;
 	}
@@ -64,14 +64,13 @@ public class BlockChainLastBlockLayer {
 	 * @return always true
 	 */
 	public boolean addBlockToDb(final Block block) {
-		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		final DbBlock dbBlock = this.mapper.map(block);
 
 		// hibernate will save both block AND transactions
-		// as there is cascade in Block
+		// as there is cascade in DbBlock
 		// mind that there is NO cascade in transaction (near block field)
 		this.blockDao.save(dbBlock);
 		this.lastBlock = dbBlock;
-
 		return true;
 	}
 

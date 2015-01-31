@@ -4,122 +4,114 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.model.*;
 import org.nem.core.test.MockTransaction;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.test.NisUtils;
 
-public class MaxTransactionsBlockValidatorTest {
-	private static final long BETA_HARD_FORK = BlockMarkerConstants.BETA_HARD_FORK;
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 60;
-	private static final long BETA_TX_HARD_FORK = BlockMarkerConstants.BETA_TX_COUNT_FORK;
-	private static final int NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
+import java.util.*;
 
-	// region first hard fork
+public class MaxTransactionsBlockValidatorTest {
+	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
+	private static final long TEST_HEIGHT = 123;
+
+	// region no child transactions
 
 	@Test
-	public void validateReturnsSuccessWhenBlockHasLessThanMaximumTransactionsAfterForkHeight() {
+	public void validateReturnsSuccessWhenBlockHasLessThanMaximumTransactions() {
 		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
 				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1,
-				BETA_HARD_FORK + 1,
+				TEST_HEIGHT,
 				ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void validateReturnsSuccessWhenBlockHasExactlyMaximumTransactionsAfterForkHeight() {
+	public void validateReturnsSuccessWhenBlockHasExactlyMaximumTransactions() {
 		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
 				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK,
-				BETA_HARD_FORK + 1,
+				TEST_HEIGHT,
 				ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void validateReturnsFailureWhenBlockHasMoreThanMaximumTransactionsAfterForkHeight() {
+	public void validateReturnsFailureWhenBlockHasMoreThanMaximumTransactions() {
 		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
 				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK + 1,
-				BETA_HARD_FORK + 1,
+				TEST_HEIGHT,
 				ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS);
 	}
-
-	@Test
-	public void validateReturnsSuccessWhenBlockHasMoreThanMaximumTransactionsAtForkHeight() {
-		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK + 1,
-				BETA_HARD_FORK,
-				ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void validateReturnsSuccessWhenBlockHasMoreThanMaximumTransactionsBeforeForkHeight() {
-		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK + 1,
-				BETA_HARD_FORK - 1,
-				ValidationResult.SUCCESS);
-	}
-
-	// endregion
-
-	// region second hard fork
-
-	@Test
-	public void validateReturnsSuccessWhenBlockHasLessThanMaximumTransactionsAfterSecondForkHeight() {
-		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-				NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1,
-				BETA_TX_HARD_FORK + 1,
-				ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void validateReturnsSuccessWhenBlockHasExactlyMaximumTransactionsAfterSecondForkHeight() {
-		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-				NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK,
-				BETA_TX_HARD_FORK + 1,
-				ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void validateReturnsFailureWhenBlockHasMoreThanMaximumTransactionsAfterSecondForkHeight() {
-		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-				NEW_MAX_ALLOWED_TRANSACTIONS_PER_BLOCK + 1,
-				BETA_TX_HARD_FORK + 1,
-				ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS);
-	}
-
-	@Test
-	public void validateReturnsSuccessWhenBlockHasExactlyFirstForkMaximumTransactionsAtSecondForkHeight() {
-		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK,
-				BETA_TX_HARD_FORK,
-				ValidationResult.SUCCESS);
-	}
-
-	@Test
-	public void validateReturnsFailureWhenBlockHasMoreThanFirstForkMaximumTransactionsAtSecondForkHeight() {
-		assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK + 1,
-				BETA_TX_HARD_FORK,
-				ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS);
-	}
-
-	// endregion
 
 	private static void assertValidationResultWhenBlockHasAGivenNumberOfTransactionsAtHeight(
-			final int maxAllowedTransactions,
+			final int numTransactions,
 			final long forkHeight,
-			final ValidationResult result) {
-		// Assert:
-		Assert.assertThat(
-				validateBlockWithTransactions(maxAllowedTransactions, forkHeight),
-				IsEqual.equalTo(result));
-	}
-
-	private static ValidationResult validateBlockWithTransactions(final int numTransactions, final long height) {
+			final ValidationResult expectedResult) {
 		// Arrange:
 		final BlockValidator validator = new MaxTransactionsBlockValidator();
-		final Block block = NisUtils.createRandomBlockWithHeight(height);
+		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
 		for (int i = 0; i < numTransactions; i++) {
 			block.addTransaction(new MockTransaction());
 		}
 
 		// Act:
-		return validator.validate(block);
+		final ValidationResult result = validator.validate(block);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
+
+	// endregion
+
+	// region child transactions
+
+	@Test
+	public void validateReturnsSuccessWhenBlockHasLessThanMaximumTransactionsIncludingChildTransactions() {
+		assertValidationResultWhenBlockHasAGivenNumberOfChildTransactionsAtHeight(
+				1,
+				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 2,
+				TEST_HEIGHT,
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void validateReturnsSuccessWhenBlockHasExactlyMaximumTransactionsIncludingChildTransactions() {
+		assertValidationResultWhenBlockHasAGivenNumberOfChildTransactionsAtHeight(
+				1,
+				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1,
+				TEST_HEIGHT,
+				ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void validateReturnsFailureWhenBlockHasMoreThanMaximumTransactionsIncludingChildTransactions() {
+		assertValidationResultWhenBlockHasAGivenNumberOfChildTransactionsAtHeight(
+				1,
+				MAX_ALLOWED_TRANSACTIONS_PER_BLOCK,
+				TEST_HEIGHT,
+				ValidationResult.FAILURE_TOO_MANY_TRANSACTIONS);
+	}
+
+	private static void assertValidationResultWhenBlockHasAGivenNumberOfChildTransactionsAtHeight(
+			final int numTransactions,
+			final int numChildTransactions,
+			final long forkHeight,
+			final ValidationResult expectedResult) {
+		// Arrange:
+		final BlockValidator validator = new MaxTransactionsBlockValidator();
+		final Block block = NisUtils.createRandomBlockWithHeight(forkHeight);
+		for (int i = 0; i < numTransactions; i++) {
+			final List<Transaction> childTransactions = new ArrayList<>();
+			for (int j = 0; j < numChildTransactions; ++j) {
+				childTransactions.add(new MockTransaction());
+			}
+
+			final MockTransaction transaction = new MockTransaction();
+			transaction.setChildTransactions(childTransactions);
+			block.addTransaction(transaction);
+		}
+
+		// Act:
+		final ValidationResult result = validator.validate(block);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
+	}
+
+	// endregion
 }

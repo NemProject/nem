@@ -71,6 +71,10 @@ public class LocalController {
 			return this.host.isNetworkBooting() ? NemStatus.BOOTING : NemStatus.RUNNING;
 		}
 
+		if (this.host.getNetwork().getNodes().getActiveNodes().isEmpty()) {
+			return NemStatus.NO_REMOTE_NIS_AVAILABLE;
+		}
+
 		return this.host.getNetwork().isChainSynchronized() ? NemStatus.SYNCHRONIZED : NemStatus.BOOTED;
 	}
 }

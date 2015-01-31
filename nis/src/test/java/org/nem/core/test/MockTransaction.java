@@ -17,10 +17,12 @@ public class MockTransaction extends Transaction {
 	public static final int VERSION = 758;
 	public static final TimeInstant TIMESTAMP = new TimeInstant(1122448);
 	public static final TimeInstant DEADLINE = TIMESTAMP.addHours(2);
+	public static final Amount DEFAULT_FEE = Amount.fromNem(6);
 
 	private int customField;
-	private long minimumFee;
 
+	private boolean useRandomDebtor;
+	private final Account debtor = Utils.generateRandomAccount();
 	private Collection<Account> otherAccounts = new ArrayList<>();
 	private Collection<Transaction> childTransactions = new ArrayList<>();
 
@@ -148,15 +150,6 @@ public class MockTransaction extends Transaction {
 	}
 
 	/**
-	 * Sets the minimum fee.
-	 *
-	 * @param minimumFee The desired minimum fee.
-	 */
-	public void setMinimumFee(final long minimumFee) {
-		this.minimumFee = minimumFee;
-	}
-
-	/**
 	 * Sets an action that should be executed when transfer is called.
 	 *
 	 * @param transferAction The action.
@@ -175,8 +168,17 @@ public class MockTransaction extends Transaction {
 	}
 
 	@Override
-	protected Amount getMinimumFee() {
-		return new Amount(this.minimumFee);
+	public Account getDebtor() {
+		return this.useRandomDebtor ? this.debtor : super.getDebtor();
+	}
+
+	/**
+	 * Sets a flag indicating whether or not a random debtor should be used.
+	 *
+	 * @param useRandomDebtor true to use a random debtor.
+	 */
+	public void setUseRandomDebtor(final boolean useRandomDebtor) {
+		this.useRandomDebtor = useRandomDebtor;
 	}
 
 	/**

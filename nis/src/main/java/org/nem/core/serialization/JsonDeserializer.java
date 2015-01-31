@@ -144,7 +144,7 @@ public class JsonDeserializer extends Deserializer {
 	}
 
 	private void checkLabel(final String label) {
-		if (null == this.propertyOrderArray) {
+		if (null == this.propertyOrderArray || this.propertyOrderArray.size() <= this.propertyOrderArrayIndex) {
 			return;
 		}
 

@@ -8,7 +8,8 @@ import org.nem.core.time.UnixTime;
 
 /**
  * A transfer view model that is used by NIS services like the block explorer.
- * TODO 20141115 J-G: is there a reason this only works for transfers?
+ * <br/>
+ * This currently only supports transfer transactions.
  */
 public class ExplorerTransferViewModel implements SerializableEntity {
 	private final int type;

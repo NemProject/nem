@@ -1,7 +1,6 @@
 package org.nem.core.model;
 
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -149,11 +148,6 @@ public class ImportanceTransferTransaction extends Transaction {
 		observer.notify(new AccountNotification(this.getRemote()));
 		observer.notify(new BalanceAdjustmentNotification(NotificationType.BalanceDebit, this.getSigner(), this.getFee()));
 		observer.notify(new ImportanceTransferNotification(this.getSigner(), this.getRemote(), this.mode.value()));
-	}
-
-	@Override
-	protected Amount getMinimumFee() {
-		return Amount.fromNem(1);
 	}
 
 	@Override

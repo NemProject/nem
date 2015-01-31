@@ -11,6 +11,7 @@ public class AccountState implements ReadOnlyAccountState {
 	private final AccountImportance importance;
 	private final WeightedBalances weightedBalances;
 	private final RemoteLinks remoteLinks;
+	private final MultisigLinks multisigLinks;
 	private final AccountInfo accountInfo;
 	private BlockHeight height;
 
@@ -18,7 +19,7 @@ public class AccountState implements ReadOnlyAccountState {
 	 * Creates a new NIS account state.
 	 */
 	public AccountState(final Address address) {
-		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new AccountInfo(), null);
+		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new MultisigLinks(), new AccountInfo(), null);
 	}
 
 	private AccountState(
@@ -26,12 +27,14 @@ public class AccountState implements ReadOnlyAccountState {
 			final AccountImportance importance,
 			final WeightedBalances weightedBalances,
 			final RemoteLinks remoteLinks,
+			final MultisigLinks multisigLinks,
 			final AccountInfo accountInfo,
 			final BlockHeight height) {
 		this.address = address;
 		this.importance = importance;
 		this.weightedBalances = weightedBalances;
 		this.remoteLinks = remoteLinks;
+		this.multisigLinks = multisigLinks;
 		this.accountInfo = accountInfo;
 		this.height = height;
 	}
@@ -70,6 +73,15 @@ public class AccountState implements ReadOnlyAccountState {
 	 */
 	public RemoteLinks getRemoteLinks() {
 		return this.remoteLinks;
+	}
+
+	/**
+	 * Gets multisig link information.
+	 *
+	 * @return The multisig link information.
+	 */
+	public MultisigLinks getMultisigLinks() {
+		return this.multisigLinks;
 	}
 
 	/**
@@ -112,6 +124,7 @@ public class AccountState implements ReadOnlyAccountState {
 				this.importance.copy(),
 				this.weightedBalances.copy(),
 				this.remoteLinks.copy(),
+				this.multisigLinks.copy(),
 				this.accountInfo.copy(),
 				this.height);
 	}

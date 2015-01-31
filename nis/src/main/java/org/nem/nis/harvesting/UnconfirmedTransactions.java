@@ -1,19 +1,19 @@
 package org.nem.nis.harvesting;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
-import org.nem.nis.cache.ReadOnlyNisCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
+import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 /**
  * A collection of unconfirmed transactions.
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
-	private final ConcurrentMap<Hash, Transaction> transactions = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Hash, Boolean> pendingTransactions = new ConcurrentHashMap<>();
+	private final UnconfirmedTransactionsCache transactions;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
+	private final TransactionSpamFilter spamFilter;
 	private final ReadOnlyNisCache nisCache;
 	private final TimeProvider timeProvider;
 	private final Object lock = new Object();
@@ -69,7 +69,8 @@ public class UnconfirmedTransactions {
 				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
 				validatorFactory,
 				nisCache,
-				timeProvider);
+				timeProvider,
+				false);
 	}
 
 	private UnconfirmedTransactions(
@@ -77,13 +78,19 @@ public class UnconfirmedTransactions {
 			final BalanceValidationOptions options,
 			final TransactionValidatorFactory validatorFactory,
 			final ReadOnlyNisCache nisCache,
-			final TimeProvider timeProvider) {
+			final TimeProvider timeProvider,
+			final boolean blockVerification) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.timeProvider = timeProvider;
-		this.singleValidator = this.createSingleValidator();
+		this.singleValidator = this.createSingleValidator(blockVerification);
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
+
+		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
+		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
+		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
+
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
 		}
@@ -98,7 +105,8 @@ public class UnconfirmedTransactions {
 					options,
 					this.validatorFactory,
 					this.nisCache,
-					this.timeProvider);
+					this.timeProvider,
+					true);
 		}
 	}
 
@@ -133,12 +141,13 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		synchronized (this.lock) {
-			final ValidationResult transactionValidationResult = this.validateBatch(transactions);
+			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(transactions);
+			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			if (!transactionValidationResult.isSuccess()) {
 				return transactionValidationResult;
 			}
 
-			return ValidationResult.aggregate(transactions.stream().map(transaction -> this.add(transaction, true)).iterator());
+			return ValidationResult.aggregate(filteredTransactions.stream().map(transaction -> this.add(transaction, true)).iterator());
 		}
 	}
 
@@ -150,7 +159,17 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
 		synchronized (this.lock) {
-			final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
+			// check is needed to distinguish between NEUTRAL and FAILURE_TRANSACTION_CACHE_TOO_FULL
+			if (this.transactions.contains(transaction)) {
+				return ValidationResult.NEUTRAL;
+			}
+
+			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(Arrays.asList(transaction));
+			if (filteredTransactions.isEmpty()) {
+				return ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL;
+			}
+
+			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			return transactionValidationResult.isSuccess()
 					? this.add(transaction, true)
 					: transactionValidationResult;
@@ -167,41 +186,29 @@ public class UnconfirmedTransactions {
 		return this.add(transaction, true);
 	}
 
-	private ValidationResult add(final Transaction transaction, final boolean execute) {
-		synchronized (this.lock) {
-			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			if (this.transactions.containsKey(transactionHash) || null != this.pendingTransactions.putIfAbsent(transactionHash, true)) {
-				return ValidationResult.NEUTRAL;
-			}
-
-			if (!transaction.verify()) {
-				return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
-			}
-
-			try {
-				return this.addInternal(transaction, transactionHash, execute);
-			} finally {
-				this.pendingTransactions.remove(transactionHash);
-			}
+	private ValidationResult verifyAndValidate(final Transaction transaction) {
+		if (!transaction.verify()) {
+			return ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE;
 		}
-	}
 
-	private ValidationResult addInternal(
-			final Transaction transaction,
-			final Hash transactionHash,
-			final boolean execute) {
 		final ValidationResult validationResult = this.validateSingle(transaction);
 		if (!validationResult.isSuccess()) {
 			LOGGER.warning(String.format("Transaction from %s rejected (%s)", transaction.getSigner().getAddress(), validationResult));
 			return validationResult;
 		}
 
-		if (execute) {
-			transaction.execute(this.transferObserver);
-		}
-
-		this.transactions.put(transactionHash, transaction);
 		return ValidationResult.SUCCESS;
+	}
+
+	private ValidationResult add(final Transaction transaction, final boolean execute) {
+		synchronized (this.lock) {
+			final ValidationResult validationResult = this.transactions.add(transaction);
+			if (validationResult.isSuccess() && execute) {
+				transaction.execute(this.transferObserver);
+			}
+
+			return validationResult;
+		}
 	}
 
 	private ValidationResult validateBatch(final Collection<Transaction> transactions) {
@@ -217,12 +224,19 @@ public class UnconfirmedTransactions {
 		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
-	private SingleTransactionValidator createSingleValidator() {
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		builder.add(this.validatorFactory.createSingle(this.nisCache.getAccountStateCache()));
-		builder.add(new NonConflictingImportanceTransferTransactionValidator(() -> this.transactions.values()));
+	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
+		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
+		final AggregateSingleTransactionValidatorBuilder builder = blockVerification
+				? this.validatorFactory.createSingleBuilder(accountStateCache)
+				: this.validatorFactory.createIncompleteSingleBuilder(accountStateCache);
+		builder.add(new NonConflictingImportanceTransferTransactionValidator(this.getTransactionsSupplier()));
+		builder.add(new NonConflictingMultisigAggregateModificationValidator(this.getTransactionsSupplier()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 		return builder.build();
+	}
+
+	private Supplier<Stream<Transaction>> getTransactionsSupplier() {
+		return () -> this.transactions.streamFlat();
 	}
 
 	/**
@@ -233,15 +247,12 @@ public class UnconfirmedTransactions {
 	 */
 	public boolean remove(final Transaction transaction) {
 		synchronized (this.lock) {
-			final Hash transactionHash = HashUtils.calculateHash(transaction);
-			if (!this.transactions.containsKey(transactionHash)) {
-				return false;
+			final boolean isRemoved = this.transactions.remove(transaction);
+			if (isRemoved) {
+				transaction.undo(this.transferObserver);
 			}
 
-			transaction.undo(this.transferObserver);
-
-			this.transactions.remove(transactionHash);
-			return true;
+			return isRemoved;
 		}
 	}
 
@@ -304,7 +315,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getAll() {
 		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.values().stream()
+			final List<Transaction> transactions = this.transactions.stream()
 					.collect(Collectors.toList());
 			return this.sortTransactions(transactions);
 		}
@@ -319,7 +330,7 @@ public class UnconfirmedTransactions {
 		// probably faster to use hash map than collection
 		synchronized (this.lock) {
 			final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
-			this.transactions.values().stream()
+			this.transactions.stream()
 					.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
 			knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
 			return unknownHashShortIds.values().stream().collect(Collectors.toList());
@@ -333,8 +344,10 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
 		synchronized (this.lock) {
-			return this.transactions.values().stream()
-					.filter(tx -> matchAddress(tx, address))
+			return this.transactions.stream()
+					// TODO 20140115 J-G: should add test for filter
+					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
+					.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
 					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
 					.limit(maxSize)
 					.collect(Collectors.toList());
@@ -348,7 +361,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
 		synchronized (this.lock) {
-			return this.transactions.values().stream()
+			return this.transactions.stream()
 					.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
 					.limit(maxTransactions)
 					.collect(Collectors.toList());
@@ -363,8 +376,10 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.values().stream()
+			final List<Transaction> transactions = this.transactions.stream()
 					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
+							// filter out signatures because we don't want them to be directly inside a block
+					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.collect(Collectors.toList());
 
 			return this.sortTransactions(transactions);
@@ -383,7 +398,7 @@ public class UnconfirmedTransactions {
 	 */
 	public void dropExpiredTransactions(final TimeInstant time) {
 		synchronized (this.lock) {
-			final List<Transaction> notExpiredTransactions = this.transactions.values().stream()
+			final List<Transaction> notExpiredTransactions = this.transactions.stream()
 					.filter(tx -> tx.getDeadline().compareTo(time) >= 0)
 					.collect(Collectors.toList());
 			if (notExpiredTransactions.size() == this.transactions.size()) {
@@ -397,7 +412,6 @@ public class UnconfirmedTransactions {
 
 	private void rebuildCache(final List<Transaction> transactions) {
 		this.transactions.clear();
-		this.pendingTransactions.clear();
 		this.unconfirmedBalances.clearCache();
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
@@ -424,6 +438,16 @@ public class UnconfirmedTransactions {
 		return transaction.getAccounts().stream()
 				.map(account -> account.getAddress())
 				.anyMatch(transactionAddress -> transactionAddress.equals(address));
+	}
+
+	// TODO 20140113 J-G: why don't we just include this in matchAddress
+	// > are there cases where we call matchAddress where we don't want to include these transactions?
+	private boolean isCosignatory(final Transaction transaction, final Address address) {
+		if (TransactionTypes.MULTISIG != transaction.getType()) {
+			return false;
+		}
+		final ReadOnlyAccountState state = this.nisCache.getAccountStateCache().findStateByAddress(address);
+		return state.getMultisigLinks().isCosignatoryOf(((MultisigTransaction)transaction).getOtherTransaction().getSigner().getAddress());
 	}
 
 	/**

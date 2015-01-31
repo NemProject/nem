@@ -282,7 +282,8 @@ public class CommonStarter implements ServletContextListener {
 
 	private void createDosFilter(final ServletContext context) {
 		javax.servlet.FilterRegistration.Dynamic dosFilter = context.addFilter("DoSFilter", "org.eclipse.jetty.servlets.DoSFilter");
-		dosFilter.setInitParameter("delayMs", "1000");
+		dosFilter.setInitParameter("maxRequestsPerSec", "50");
+		dosFilter.setInitParameter("delayMs", "-1");
 		dosFilter.setInitParameter("trackSessions", "false");
 		dosFilter.setInitParameter("maxRequestMs", "120000");
 		dosFilter.setInitParameter("ipWhitelist", "127.0.0.1");

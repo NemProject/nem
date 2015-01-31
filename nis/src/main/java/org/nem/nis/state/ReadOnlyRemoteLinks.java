@@ -13,7 +13,7 @@ public interface ReadOnlyRemoteLinks {
 
 	/**
 	 * Gets a value indicating whether or the owning account has enabled remote harvesting
-	 * and is forwarding its foraging power to a remote account.
+	 * and is forwarding its harvesting power to a remote account.
 	 *
 	 * @return true if the owning account has enabled remote harvesting.
 	 */

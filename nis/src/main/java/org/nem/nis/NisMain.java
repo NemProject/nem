@@ -7,8 +7,9 @@ import org.nem.core.node.*;
 import org.nem.core.time.TimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.*;
-import org.nem.nis.dao.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -27,25 +28,25 @@ public class NisMain {
 	private Block nemesisBlock;
 	private Hash nemesisBlockHash;
 
-	private final AccountDao accountDao;
 	private final BlockDao blockDao;
 	private final ReadOnlyNisCache nisCache;
 	private final NisPeerNetworkHost networkHost;
 	private final NisConfiguration nisConfiguration;
+	private final NisModelToDbModelMapper mapper;
 	private final BlockAnalyzer blockAnalyzer;
 
 	@Autowired(required = true)
 	public NisMain(
-			final AccountDao accountDao,
 			final BlockDao blockDao,
 			final ReadOnlyNisCache nisCache,
 			final NisPeerNetworkHost networkHost,
+			final NisModelToDbModelMapper mapper,
 			final NisConfiguration nisConfiguration,
 			final BlockAnalyzer blockAnalyzer) {
-		this.accountDao = accountDao;
 		this.blockDao = blockDao;
 		this.nisCache = nisCache;
 		this.networkHost = networkHost;
+		this.mapper = mapper;
 		this.nisConfiguration = nisConfiguration;
 		this.blockAnalyzer = blockAnalyzer;
 	}
@@ -104,15 +105,15 @@ public class NisMain {
 		this.saveBlock(this.nemesisBlock);
 	}
 
-	private org.nem.nis.dbmodel.Block saveBlock(final Block block) {
-		org.nem.nis.dbmodel.Block dbBlock;
+	private DbBlock saveBlock(final Block block) {
+		DbBlock dbBlock;
 
 		dbBlock = this.blockDao.findByHash(this.nemesisBlockHash);
 		if (null != dbBlock) {
 			return dbBlock;
 		}
 
-		dbBlock = BlockMapper.toDbModel(block, new AccountDaoLookupAdapter(this.accountDao));
+		dbBlock = this.mapper.map(block);
 		this.blockDao.save(dbBlock);
 		return dbBlock;
 	}

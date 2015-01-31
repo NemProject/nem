@@ -38,7 +38,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	}
 
 	/**
-	 * Unlocks the specified account for foraging.
+	 * Unlocks the specified account for harvesting.
 	 *
 	 * @param account The account.
 	 */
@@ -55,7 +55,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
 		final ReadOnlyAccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress());
 		if (!this.canHarvestPredicate.canHarvest(accountState, currentHeight)) {
-			return UnlockResult.FAILURE_FORAGING_INELIGIBLE;
+			return UnlockResult.FAILURE_HARVESTING_INELIGIBLE;
 		}
 
 		this.unlocked.add(account);
@@ -63,7 +63,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	}
 
 	/**
-	 * Removes the specified account from the list of active foraging accounts.
+	 * Removes the specified account from the list of active harvesting accounts.
 	 *
 	 * @param account The account.
 	 */

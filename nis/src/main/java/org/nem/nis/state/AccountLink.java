@@ -5,6 +5,8 @@ import org.nem.core.model.primitive.*;
 
 /**
  * A link between a source account and another account.
+ * <br/>
+ * This class is immutable.
  */
 public class AccountLink implements Comparable<AccountLink> {
 
@@ -57,7 +59,7 @@ public class AccountLink implements Comparable<AccountLink> {
 		final int[] comparisonResults = new int[] {
 				this.getHeight().compareTo(rhs.getHeight()),
 				this.getAmount().compareTo(rhs.getAmount()),
-				this.otherAccountAddress.getEncoded().compareTo(rhs.otherAccountAddress.getEncoded()),
+				this.otherAccountAddress.compareTo(rhs.otherAccountAddress),
 		};
 
 		for (final int result : comparisonResults) {

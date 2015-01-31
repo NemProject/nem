@@ -575,20 +575,20 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
 
 		// Assert:
 		assertMultipleNodesCollection(nodes);
 	}
 
 	@Test
-	public void pruneRemovesNodesThatHaveStayedInactiveSinceLastCall() {
+	public void pruneRemovesNodesThatHaveNotBeenActiveSinceLastCall() {
 		// Arrange:
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
-		nodes.prune(); // removed: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
+		nodes.prune(); // removed: { B1, B2, I1, F1, F2 }
 
 		// Assert:
 		assertMultipleNodesCollectionAfterPruning(nodes);
@@ -600,36 +600,32 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
+		nodes.update(NodeUtils.createNodeWithName("B2"), NodeStatus.ACTIVE);
 		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
-		nodes.prune(); // removed: { I1, F2 }
+		nodes.prune(); // removed: { B1, I1, F2 }
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3", "F1")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2")));
+		Assert.assertThat(nodes.size(), IsEqual.equalTo(5));
+		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3", "B2", "F1")));
+		Assert.assertThat(nodes.getNodes(NodeStatus.BUSY).size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
 	@Test
-	public void pruneDoesNotRemovePruneCandidateNodesThatBecomeBusySinceLastCall() {
+	public void pruneDoesRemovePruneCandidateNodesThatBecomeBusySinceLastCall() {
 		// Arrange:
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
 		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.BUSY);
-		nodes.prune(); // removed: { I1, F2 }
+		nodes.prune(); // removed: { B1, B2, I1, F1, F2 }
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2", "F1")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
+		assertMultipleNodesCollectionAfterPruning(nodes);
 	}
 
 	@Test
@@ -638,9 +634,9 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
 		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
-		nodes.prune(); // removed: { I1, F1 F2 }
+		nodes.prune(); // removed: { B1, B2, I1, F1, F2 }
 
 		// Assert:
 		assertMultipleNodesCollectionAfterPruning(nodes);
@@ -652,51 +648,37 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
 		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
-		nodes.prune(); // removed: { I1, F1, F2 }
+		nodes.prune(); // removed: { B1, B2, I1, F1, F2 }
 
 		// Assert:
 		assertMultipleNodesCollectionAfterPruning(nodes);
 	}
 
 	@Test
-	public void pruneDoesNotRemoveNodesThatHaveCycledBetweenActiveAndInactiveSinceLastCall() {
+	public void pruneDoesNotRemoveNodesThatHaveCycledBetweenActiveAndNonActiveSinceLastCall() {
 		// Arrange:
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
 		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.ACTIVE);
 		nodes.update(NodeUtils.createNodeWithName("F1"), NodeStatus.INACTIVE);
-		nodes.prune(); // removed: { I1, F2 }
 
-		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("F1")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
-	}
+		nodes.update(NodeUtils.createNodeWithName("B2"), NodeStatus.ACTIVE);
+		nodes.update(NodeUtils.createNodeWithName("B2"), NodeStatus.FAILURE);
 
-	@Test
-	public void pruneDoesNotRemoveNodesThatHaveCycledBetweenBusyAndFailureSinceLastCall() {
-		// Arrange:
-		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
-
-		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.ACTIVE);
 		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.BUSY);
-		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.FAILURE);
-		nodes.prune(); // removed: { F1, F2 }
+		nodes.prune(); // removed: { B1, F2 }
 
 		// Assert:
 		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
 		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2")));
-		Assert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Arrays.asList("I1")));
+		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("I1")));
+		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("F1")));
+		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Arrays.asList("B2")));
 		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
 	}
 
@@ -706,18 +688,20 @@ public class NodeCollectionTest {
 		final NodeCollection nodes = createNodeCollectionWithMultipleNodes();
 
 		// Act:
-		nodes.prune(); // candidate: { I1, F1, F2 }
+		nodes.prune(); // candidate: { B1, B2, I1, F1, F2 }
+		nodes.update(NodeUtils.createNodeWithName("B1"), NodeStatus.ACTIVE);
 		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.ACTIVE);
-		nodes.update(NodeUtils.createNodeWithName("F2"), NodeStatus.BUSY);
-		nodes.prune(); // candidate: { F1 }
+		nodes.update(NodeUtils.createNodeWithName("F2"), NodeStatus.ACTIVE);
+		nodes.prune(); // candidate: { B2, F1 }
+		nodes.update(NodeUtils.createNodeWithName("B1"), NodeStatus.BUSY);
 		nodes.update(NodeUtils.createNodeWithName("I1"), NodeStatus.INACTIVE);
 		nodes.update(NodeUtils.createNodeWithName("F2"), NodeStatus.FAILURE);
-		nodes.prune(); // candidate: { I1, F2 }, pruned: { F1 }
+		nodes.prune(); // candidate: { B1, I1, F2 }, pruned: { B2, F1 }
 
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(7));
+		Assert.assertThat(nodes.size(), IsEqual.equalTo(6));
 		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2")));
+		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1")));
 		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.INACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("I1")));
 		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.FAILURE)), IsEquivalent.equivalentTo(Arrays.asList("F2")));
 		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));
@@ -814,9 +798,9 @@ public class NodeCollectionTest {
 
 	private static void assertMultipleNodesCollectionAfterPruning(final NodeCollection nodes) {
 		// Assert:
-		Assert.assertThat(nodes.size(), IsEqual.equalTo(5));
+		Assert.assertThat(nodes.size(), IsEqual.equalTo(3));
 		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.ACTIVE)), IsEquivalent.equivalentTo(Arrays.asList("A1", "A2", "A3")));
-		Assert.assertThat(getNames(nodes.getNodes(NodeStatus.BUSY)), IsEquivalent.equivalentTo(Arrays.asList("B1", "B2")));
+		Assert.assertThat(nodes.getNodes(NodeStatus.BUSY).size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getNodes(NodeStatus.INACTIVE).size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getNodes(NodeStatus.FAILURE).size(), IsEqual.equalTo(0));
 		Assert.assertThat(nodes.getNodes(NodeStatus.UNKNOWN).size(), IsEqual.equalTo(0));

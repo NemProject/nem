@@ -1,7 +1,7 @@
 package org.nem.nis.mappers;
 
 import org.nem.core.crypto.Signature;
-import org.nem.core.model.Address;
+import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
 import org.nem.nis.controller.viewmodels.*;
@@ -18,14 +18,14 @@ public class BlockExplorerMapper {
 	 * @param block The database block.
 	 * @return The explorer block view model.
 	 */
-	public ExplorerBlockViewModel toExplorerViewModel(final Block block) {
+	public ExplorerBlockViewModel toExplorerViewModel(final DbBlock block) {
 		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(
 				new BlockHeight(block.getHeight()),
-				Address.fromPublicKey(block.getForger().getPublicKey()),
+				Address.fromPublicKey(block.getHarvester().getPublicKey()),
 				UnixTime.fromTimeInstant(new TimeInstant(block.getTimeStamp())),
 				block.getBlockHash());
 
-		block.getBlockTransfers().stream()
+		block.getBlockTransferTransactions().stream()
 				.map(transfer -> this.toExplorerViewModel(transfer))
 				.forEach(transfer -> viewModel.addTransaction(transfer));
 		return viewModel;
@@ -37,9 +37,9 @@ public class BlockExplorerMapper {
 	 * @param transfer The database transfer.
 	 * @return The explorer transfer view model.
 	 */
-	public ExplorerTransferViewModel toExplorerViewModel(final Transfer transfer) {
+	public ExplorerTransferViewModel toExplorerViewModel(final DbTransferTransaction transfer) {
 		return new ExplorerTransferViewModel(
-				transfer.getType(),
+				TransactionTypes.TRANSFER,
 				Amount.fromMicroNem(transfer.getFee()),
 				UnixTime.fromTimeInstant(new TimeInstant(transfer.getTimeStamp())),
 				Address.fromPublicKey(transfer.getSender().getPublicKey()),

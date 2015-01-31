@@ -187,12 +187,8 @@ public class NisPeerNetworkHost implements AutoCloseable {
 
 	private PeerNetworkBootstrapper createPeerNetworkBootstrapper(final Config config) {
 		final PeerNetworkState networkState = new PeerNetworkState(config, new NodeExperiences(), new NodeCollection());
-		final NisNodeSelectorFactory selectorFactory = new NisNodeSelectorFactory(
-				this.nisConfiguration.getNodeLimit(),
-				config.getTrustProvider(),
-				networkState);
-		final ImportanceAwareNodeSelectorFactory importanceAwareSelectorFactory = new ImportanceAwareNodeSelectorFactory(
-				this.nisConfiguration.getTimeSyncNodeLimit(),
+		final PeerNetworkNodeSelectorFactory selectorFactory = new PeerNetworkNodeSelectorFactory(
+				this.nisConfiguration,
 				config.getTrustProvider(),
 				networkState,
 				this.nisCache.getPoiFacade(),
@@ -201,7 +197,6 @@ public class NisPeerNetworkHost implements AutoCloseable {
 				networkState,
 				this.createNetworkServicesFactory(networkState),
 				selectorFactory,
-				importanceAwareSelectorFactory,
 				this.nisConfiguration.getIpDetectionMode());
 	}
 }

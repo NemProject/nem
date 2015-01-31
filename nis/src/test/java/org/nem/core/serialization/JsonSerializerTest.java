@@ -311,6 +311,8 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 
 	//region Order Enforcement
 
+	//region default (off)
+
 	@Test
 	public void defaultSerializerDoesNotPublishPropertyOrderMetadata() {
 		// Arrange:
@@ -341,35 +343,167 @@ public class JsonSerializerTest extends SerializerTest<JsonSerializer, JsonDeser
 		Assert.assertThat(deserializer.readInt("Foo"), IsEqual.equalTo(17));
 	}
 
+	//endregion
+
+	//region order serialization (on)
+
+	//region top-level object
+
 	@Test
 	public void serializerCanOptionallyPublishPropertyOrderMetadata() {
 		// Arrange:
-		final JsonSerializer serializer = new JsonSerializer(true);
+		final JsonSerializer serializer = createSerializerForFlatObjectWithOrderedReadsEnabled();
 
 		// Act:
-		serializer.writeInt("Foo", 17);
-		serializer.writeInt("Bar", 11);
 		final JSONObject object = serializer.getObject();
 		final JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
 
 		// Assert:
 		Assert.assertThat(orderArray, IsNull.notNullValue());
-		Assert.assertThat(orderArray.size(), IsEqual.equalTo(2));
-		Assert.assertThat(orderArray.get(0), IsEqual.equalTo("Foo"));
-		Assert.assertThat(orderArray.get(1), IsEqual.equalTo("Bar"));
+		Assert.assertThat(orderArray, IsEqual.equalTo(Arrays.asList("Foo", "Bar")));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void deserializerCanOptionallyEnforceOrderedReads() {
+	@Test
+	public void deserializerFailsIfOutOfOrderReadIsAttemptedWhenEnforcingOrderedReads() {
 		// Arrange:
+		final JsonSerializer serializer = createSerializerForFlatObjectWithOrderedReadsEnabled();
+
+		// Act:
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+		ExceptionAssert.assertThrows(
+				v -> deserializer.readInt("Bar"),
+				IllegalArgumentException.class);
+	}
+
+	private static JsonSerializer createSerializerForFlatObjectWithOrderedReadsEnabled() {
+		final JsonSerializer serializer = new JsonSerializer(true);
+		serializer.writeInt("Foo", 17);
+		serializer.writeInt("Bar", 11);
+		return serializer;
+	}
+
+	//endregion
+
+	//region nested object
+
+	@Test
+	public void serializerCanOptionallyPublishPropertyOrderMetadataForNestedObjects() {
+		// Arrange:
+		final JsonSerializer serializer = createSerializerForObjectContainingNestedObjectWithOrderedReadsEnabled();
+
+		// Act:
+		final JSONObject object = serializer.getObject();
+		final JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray innerOrderArray = (JSONArray)((JSONObject)object.get("Obj")).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+
+		// Assert:
+		Assert.assertThat(orderArray, IsNull.notNullValue());
+		Assert.assertThat(orderArray, IsEqual.equalTo(Arrays.asList("Foo", "Bar", "Obj")));
+		Assert.assertThat(innerOrderArray, IsEqual.equalTo(Arrays.asList("Foo2", "Bar2")));
+	}
+
+	@Test
+	public void deserializerFailsIfOutOfOrderNestedObjectReadIsAttemptedWhenEnforcingOrderedReads() {
+		// Arrange:
+		final JsonSerializer serializer = createSerializerForObjectContainingNestedObjectWithOrderedReadsEnabled();
+
+		// Act:
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+		deserializer.readInt("Foo");
+		deserializer.readInt("Bar");
+		deserializer.readObject("Obj", d1 -> {
+			ExceptionAssert.assertThrows(
+					v -> d1.readInt("Bar2"),
+					IllegalArgumentException.class);
+			return new Object();
+		});
+	}
+
+	private static JsonSerializer createSerializerForObjectContainingNestedObjectWithOrderedReadsEnabled() {
+		final JsonSerializer serializer = new JsonSerializer(true);
+		serializer.writeInt("Foo", 17);
+		serializer.writeInt("Bar", 11);
+		serializer.writeObject("Obj", s1 -> {
+			s1.writeInt("Foo2", 9);
+			s1.writeInt("Bar2", 3);
+		});
+
+		return serializer;
+	}
+
+	//endregion
+
+	@Test
+	public void serializerCanOptionallyPublishPropertyOrderMetadataForNestedArrays() {
+		// Arrange:
+		final JsonSerializer serializer = createSerializerForObjectContainingNestedArrayWithOrderedReadsEnabled();
+
+		final JSONObject object = serializer.getObject();
+		final JSONArray orderArray = (JSONArray)object.get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray objArray = ((JSONArray)object.get("Arr"));
+		final JSONArray innerOrderArray1 = (JSONArray)((JSONObject)objArray.get(0)).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+		final JSONArray innerOrderArray2 = (JSONArray)((JSONObject)objArray.get(1)).get(JsonSerializer.PROPERTY_ORDER_ARRAY_NAME);
+
+		// Assert:
+		Assert.assertThat(orderArray, IsNull.notNullValue());
+		Assert.assertThat(orderArray, IsEqual.equalTo(Arrays.asList("Foo", "Bar", "Arr")));
+		Assert.assertThat(innerOrderArray1, IsEqual.equalTo(Arrays.asList("Foo2", "Bar2")));
+		Assert.assertThat(innerOrderArray2, IsEqual.equalTo(Arrays.asList("Foo3")));
+	}
+
+	@Test
+	public void deserializerFailsIfOutOfOrderNestedArrayObjectReadIsAttemptedWhenEnforcingOrderedReads() {
+		// Arrange:
+		final JsonSerializer serializer = createSerializerForObjectContainingNestedArrayWithOrderedReadsEnabled();
+
+		// Act:
+		final JsonDeserializer deserializer = this.createDeserializer(serializer);
+		deserializer.readInt("Foo");
+		deserializer.readInt("Bar");
+		deserializer.readObjectArray("Arr", d1 -> {
+			ExceptionAssert.assertThrows(
+					v -> d1.readInt("Bar2"),
+					IllegalArgumentException.class);
+			return new Object();
+		});
+	}
+
+	private static JsonSerializer createSerializerForObjectContainingNestedArrayWithOrderedReadsEnabled() {
 		final JsonSerializer serializer = new JsonSerializer(true);
 
 		// Act:
 		serializer.writeInt("Foo", 17);
 		serializer.writeInt("Bar", 11);
 
+		final SerializableEntity entity1 = s1 -> {
+			s1.writeInt("Foo2", 9);
+			s1.writeInt("Bar2", 3);
+		};
+
+		final SerializableEntity entity2 = s2 -> {
+			s2.writeInt("Foo3", 9);
+		};
+
+		serializer.writeObjectArray("Arr", Arrays.asList(entity1, entity2));
+		return serializer;
+	}
+
+	//endregion
+
+	@Test
+	public void deserializerCanDeserializeOptionalValuesSuccessfullyWhenEnforcingOrderedReads() {
+		// Arrange:
+		final JsonSerializer serializer = new JsonSerializer(true);
+		serializer.writeInt("Foo", 17);
+
+		// Act:
 		final JsonDeserializer deserializer = this.createDeserializer(serializer);
-		deserializer.readInt("Bar");
+		final Integer value1 = deserializer.readInt("Foo");
+		final Integer value2 = deserializer.readOptionalInt("Bar");
+
+		// Assert:
+		Assert.assertThat(value1, IsEqual.equalTo(17));
+		Assert.assertThat(value2, IsNull.nullValue());
 	}
 
 	//endregion

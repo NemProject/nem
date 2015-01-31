@@ -1,7 +1,7 @@
 package org.nem.core.model;
 
 import org.nem.core.model.observers.*;
-import org.nem.core.model.primitive.Amount;
+import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
@@ -11,7 +11,7 @@ import java.util.*;
  * An abstract transaction class that serves as the base class of all NEM transactions.
  */
 public abstract class Transaction extends VerifiableEntity implements Comparable<Transaction> {
-	private Amount fee = Amount.ZERO;
+	private Optional<Amount> fee = Optional.empty();
 	private TimeInstant deadline = TimeInstant.ZERO;
 
 	/**
@@ -35,7 +35,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 */
 	public Transaction(final int type, final DeserializationOptions options, final Deserializer deserializer) {
 		super(type, options, deserializer);
-		this.fee = Amount.readFrom(deserializer, "fee");
+		this.fee = Optional.of(Amount.readFrom(deserializer, "fee"));
 		this.deadline = TimeInstant.readFrom(deserializer, "deadline");
 	}
 
@@ -47,9 +47,9 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @return The fee.
 	 */
 	public Amount getFee() {
-		return this.fee.compareTo(this.getMinimumFee()) < 0
-				? this.getMinimumFee()
-				: this.fee;
+		return this.getSigner().getAddress().equals(NemesisBlock.ADDRESS)
+				? Amount.ZERO
+				: this.fee.orElse(this.getMinimumFee());
 	}
 
 	/**
@@ -58,7 +58,7 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	 * @param fee The desired fee.
 	 */
 	public void setFee(final Amount fee) {
-		this.fee = fee;
+		this.fee = null == fee ? Optional.empty() : Optional.of(fee);
 	}
 
 	/**
@@ -154,16 +154,22 @@ public abstract class Transaction extends VerifiableEntity implements Comparable
 	protected abstract void transfer(final TransactionObserver observer);
 
 	/**
-	 * Gets the minimum fee for this transaction.
-	 *
-	 * @return The minimum fee.
-	 */
-	protected abstract Amount getMinimumFee();
-
-	/**
 	 * Gets all accounts (excluding the signer) that are affected by this transaction.
 	 *
 	 * @return The accounts.
 	 */
 	protected abstract Collection<Account> getOtherAccounts();
+
+	/**
+	 * Gets the debtor that is responsible for paying the fee.
+	 *
+	 * @return The debtor account.
+	 */
+	public Account getDebtor() {
+		return this.getSigner();
+	}
+
+	private Amount getMinimumFee() {
+		return TransactionFeeCalculator.calculateMinimumFee(this, BlockHeight.MAX);
+	}
 }

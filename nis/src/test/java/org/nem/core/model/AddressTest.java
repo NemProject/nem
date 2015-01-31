@@ -5,10 +5,11 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.serialization.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.utils.Base32Encoder;
 
 import java.math.BigInteger;
+import java.util.*;
 import java.util.function.*;
 
 public class AddressTest {
@@ -23,6 +24,12 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(address.getEncoded(), IsEqual.equalTo("SIGMA GAMMA"));
 		Assert.assertThat(address.getPublicKey(), IsNull.nullValue());
+	}
+
+	@Test
+	public void addressCannotBeCreatedAroundNullEncodedAddress() {
+		// Act:
+		ExceptionAssert.assertThrows(v -> Address.fromEncoded(null), IllegalArgumentException.class);
 	}
 
 	@Test
@@ -45,6 +52,13 @@ public class AddressTest {
 		// Assert:
 		Assert.assertThat(Base32Encoder.getBytes(address.getEncoded())[0], IsEqual.equalTo((byte)0x88));
 		Assert.assertThat(address.getPublicKey(), IsEqual.equalTo(publicKey));
+	}
+
+	@Test
+	public void addressCannotBeCreatedAroundNullPublicKey() {
+		// Act:
+		ExceptionAssert.assertThrows(v -> Address.fromPublicKey(null), IllegalArgumentException.class);
+		ExceptionAssert.assertThrows(v -> Address.fromPublicKey((byte)0x88, null), IllegalArgumentException.class);
 	}
 
 	//endregion
@@ -245,6 +259,31 @@ public class AddressTest {
 		Assert.assertThat(addressAsMixed(address).hashCode(), IsEqual.equalTo(hashCode));
 		Assert.assertThat(Address.fromPublicKey(Utils.mutate(publicKey)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
 		Assert.assertThat(Address.fromEncoded(Utils.incrementAtIndex(address.getEncoded(), 0)).hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
+
+	//endregion
+
+	//region compareTo
+
+	@Test
+	public void compareToReturnsExpectedResult() {
+		// Arrange:
+		final List<Address> addresses = new ArrayList<>();
+		addresses.add(Address.fromEncoded("A"));
+		addresses.add(Address.fromEncoded("B"));
+		addresses.add(Address.fromEncoded("C"));
+		addresses.add(Address.fromEncoded("D"));
+		addresses.add(Address.fromEncoded("E"));
+		addresses.add(Address.fromEncoded("F"));
+
+		// Assert:
+		for (int i = 0; i < addresses.size(); i++) {
+			for (int j = 0; j < addresses.size(); j++) {
+				Assert.assertThat(addresses.get(i).compareTo(addresses.get(j)) > 0, IsEqual.equalTo(i > j));
+				Assert.assertThat(addresses.get(i).compareTo(addresses.get(j)) == 0, IsEqual.equalTo(i == j));
+				Assert.assertThat(addresses.get(i).compareTo(addresses.get(j)) < 0, IsEqual.equalTo(i < j));
+			}
+		}
 	}
 
 	//endregion

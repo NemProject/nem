@@ -5,15 +5,13 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Account;
 import org.nem.core.model.*;
-import org.nem.core.model.Block;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.cache.AccountCache;
+import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
@@ -50,7 +48,7 @@ public class AccountIoAdapterTest {
 			accounts.add(account);
 			when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 		}
-		final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(null, null, accountCache);
+		final AccountIoAdapter accountIoAdapter = createAccountIoAdapter(null, null, accountCache);
 
 		// Assert:
 		for (int i = 0; i < 10; ++i) {
@@ -224,11 +222,11 @@ public class AccountIoAdapterTest {
 		private final AccountCache accountCache = mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = mock(ReadOnlyBlockDao.class);
 		private final ReadOnlyTransferDao transferDao = mock(ReadOnlyTransferDao.class);
-		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(this.transferDao, this.blockDao, this.accountCache);
+		private final AccountIoAdapter accountIoAdapter = createAccountIoAdapter(this.transferDao, this.blockDao, this.accountCache);
 		private final Account account = Utils.generateRandomAccount();
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
-		private final List<org.nem.nis.dbmodel.Block> blocks = new ArrayList<>();
+		private final List<DbBlock> blocks = new ArrayList<>();
 
 		public TestContext() {
 			Mockito.when(this.accountCache.findByAddress(this.address)).thenReturn(this.account);
@@ -272,13 +270,13 @@ public class AccountIoAdapterTest {
 		}
 
 		public void addTransaction(final int height, final int transactionId, final int amount) {
-			final org.nem.nis.dbmodel.Block block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
-			final Transfer transfer = this.createTransfer(amount);
-			transfer.setId((long)transactionId);
-			this.pairs.add(new TransferBlockPair(transfer, block));
+			final DbBlock block = NisUtils.createDbBlockWithTimeStampAtHeight(123, height);
+			final DbTransferTransaction dbTransferTransaction = this.createTransfer(amount);
+			dbTransferTransaction.setId((long)transactionId);
+			this.pairs.add(new TransferBlockPair(dbTransferTransaction, block));
 		}
 
-		private Transfer createTransfer(final int amount) {
+		private DbTransferTransaction createTransfer(final int amount) {
 			final Account signer = Utils.generateRandomAccount();
 			final Account recipient = Utils.generateRandomAccount();
 			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient, Amount.fromNem(amount), null);
@@ -287,7 +285,8 @@ public class AccountIoAdapterTest {
 			this.addAccount(signer);
 			this.addAccount(recipient);
 
-			return TransferMapper.toDbModel(transaction, 1, 2, new AccountDaoLookupAdapter(new MockAccountDao()));
+			return MapperUtils.createModelToDbModelMapper(new MockAccountDao())
+					.map(transaction, DbTransferTransaction.class);
 		}
 
 		private void addAccount(final Account account) {
@@ -333,13 +332,13 @@ public class AccountIoAdapterTest {
 		public void seedDefaultBlocks() {
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(897, 444));
 			this.blocks.get(0).setTotalFee(8L);
-			this.blocks.get(0).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.get(0).setBlockHash(Utils.generateRandomHash());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(123, 777));
 			this.blocks.get(1).setTotalFee(9L);
-			this.blocks.get(1).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.get(1).setBlockHash(Utils.generateRandomHash());
 			this.blocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(345, 222));
 			this.blocks.get(2).setTotalFee(7L);
-			this.blocks.get(2).setBlockHash(Utils.generateRandomHash().getRaw());
+			this.blocks.get(2).setBlockHash(Utils.generateRandomHash());
 		}
 
 		public void assertDefaultBlocks(final SerializableList<HarvestInfo> harvestInfos) {
@@ -368,6 +367,13 @@ public class AccountIoAdapterTest {
 	}
 
 	// endregion
+
+	private static AccountIoAdapter createAccountIoAdapter(
+			final ReadOnlyTransferDao transferDao,
+			final ReadOnlyBlockDao blockDao,
+			final ReadOnlyAccountCache accountCache) {
+		return new AccountIoAdapter(transferDao, blockDao, accountCache, MapperUtils.createDbModelToModelNisMapper(accountCache));
+	}
 
 	// note: it would probably be better to mock blockDao and accountDao,
 	// but I find this much easier (mostly stolen from TransferDaoTest)
@@ -410,13 +416,13 @@ public class AccountIoAdapterTest {
 				dummyBlock.addTransaction(transferTransaction);
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
 		}
 
-		return new AccountIoAdapter(this.transferDao, this.blockDao, accountCache);
+		return createAccountIoAdapter(this.transferDao, this.blockDao, accountCache);
 	}
 
 	private void assertResultGetAccountTransfers(final SerializableList<TransactionMetaDataPair> result) {
@@ -453,7 +459,7 @@ public class AccountIoAdapterTest {
 	}
 
 	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 		when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 	}

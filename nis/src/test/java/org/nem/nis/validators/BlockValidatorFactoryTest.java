@@ -36,7 +36,8 @@ public class BlockValidatorFactoryTest {
 				NoSelfSignedTransactionsBlockValidator.class,
 				BlockImportanceTransferValidator.class,
 				BlockImportanceTransferBalanceValidator.class,
-				BlockUniqueHashTransactionValidator.class);
+				BlockUniqueHashTransactionValidator.class,
+				BlockMultisigAggregateModificationValidator.class);
 
 		// Act:
 		final List<BlockValidator> validators = new ArrayList<>();

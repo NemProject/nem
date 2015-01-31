@@ -11,6 +11,7 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.mappers.*;
 import org.nem.nis.secret.BlockTransactionObserverFactory;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
@@ -62,14 +63,18 @@ public class BlockChainContext {
 			final DefaultNisCache nisCache = Mockito.spy(((DefaultNisCache)commonNisCache).deepCopy());
 			final MockAccountDao accountDao = Mockito.spy(new MockAccountDao());
 			final MockBlockDao blockDao = Mockito.spy(new MockBlockDao(MockBlockDao.MockBlockDaoMode.MultipleBlocks, accountDao));
-			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(accountDao, blockDao));
+			final NisModelToDbModelMapper mapper = MapperUtils.createModelToDbModelNisMapper(accountDao);
+			final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.spy(new BlockChainLastBlockLayer(blockDao, mapper));
 			final UnconfirmedTransactions unconfirmedTransactions =
 					Mockito.spy(new UnconfirmedTransactions(this.transactionValidatorFactory, nisCache, new SystemTimeProvider()));
+			final MapperFactory mapperFactory = new DefaultMapperFactory();
+			final NisMapperFactory nisMapperFactory = new NisMapperFactory(mapperFactory);
 			final BlockChainServices services = Mockito.spy(new BlockChainServices(
 					blockDao,
 					this.blockTransactionObserverFactory,
 					this.blockValidatorFactory,
-					this.transactionValidatorFactory));
+					this.transactionValidatorFactory,
+					nisMapperFactory));
 			final BlockChainContextFactory contextFactory = Mockito.spy(new BlockChainContextFactory(
 					nisCache,
 					blockChainLastBlockLayer,
@@ -78,13 +83,13 @@ public class BlockChainContext {
 					unconfirmedTransactions));
 			final BlockChainUpdater blockChainUpdater = new BlockChainUpdater(
 					nisCache,
-					accountDao,
 					blockChainLastBlockLayer,
 					blockDao,
 					contextFactory,
 					unconfirmedTransactions,
-					new NisConfiguration()
-			);
+					mapper,
+					nisMapperFactory,
+					new NisConfiguration());
 			final BlockChain blockChain = new BlockChain(
 					blockChainLastBlockLayer,
 					blockChainUpdater);

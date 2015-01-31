@@ -11,7 +11,7 @@ public class AccountControllerTest {
 
 	private static final String ACCOUNT_UNLOCK_PATH = "account/unlock";
 
-	// TODO: this test needs the private key to a foraging eligible account
+	// TODO: this test needs the private key to a harvesting eligible account
 	@Ignore
 	public void unlockSuccessReturnsOk() {
 		// Arrange:

@@ -48,7 +48,7 @@ public class UnlockedAccountsTest {
 		final UnlockResult result = context.unlockedAccounts.addUnlockedAccount(account);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_FORAGING_INELIGIBLE));
+		Assert.assertThat(result, IsEqual.equalTo(UnlockResult.FAILURE_HARVESTING_INELIGIBLE));
 		context.assertAccountIsLocked(account);
 		context.assertIsKnownAddressDelegation(account);
 		context.assertCanForageDelegation(account);

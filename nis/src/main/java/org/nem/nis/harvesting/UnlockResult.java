@@ -15,9 +15,9 @@ public enum UnlockResult {
 	FAILURE_UNKNOWN_ACCOUNT,
 
 	/**
-	 * The account could not be unlocked because it is ineligible for foraging.
+	 * The account could not be unlocked because it is ineligible for harvesting.
 	 */
-	FAILURE_FORAGING_INELIGIBLE,
+	FAILURE_HARVESTING_INELIGIBLE,
 
 	/**
 	 * The account could not be unlocked because limit on the server has been hit.

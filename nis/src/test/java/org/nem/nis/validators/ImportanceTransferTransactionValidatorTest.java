@@ -7,13 +7,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.DebitPredicates;
 
 public class ImportanceTransferTransactionValidatorTest {
-	private static final BlockHeight TEST_HEIGHT = new BlockHeight(BlockMarkerConstants.BETA_IT_VALIDATION_FORK);
+	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
 
 	//region signer balance
 
@@ -83,12 +82,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	public void activateImportanceTransferIsInvalidWhenRecipientHasBalance() {
 		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(
 				TEST_HEIGHT.getRaw(),
-				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE);
-	}
-
-	@Test
-	public void activateImportanceTransferIsValidWhenRecipientHasBalanceBeforeForkBlock() {
-		assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(TEST_HEIGHT.getRaw() - 1, ValidationResult.SUCCESS);
+				ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER);
 	}
 
 	private static void assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(final long height, final ValidationResult validationResult) {

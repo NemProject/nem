@@ -9,64 +9,118 @@ import org.nem.nis.cache.*;
 import org.nem.nis.poi.PoiOptions;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TransactionValidatorFactoryTest {
 
-	@Test
-	public void createReturnsValidValidator() {
-		// Arrange:
-		final TransactionValidatorFactory factory = createFactory();
-
-		// Act:
-		final SingleTransactionValidator validator = factory.create(Mockito.mock(ReadOnlyNisCache.class));
-
-		// Assert:
-		Assert.assertThat(validator, IsNull.notNullValue());
-	}
+	//region create validator
 
 	@Test
 	public void createSingleReturnsValidValidator() {
-		// Arrange:
-		final TransactionValidatorFactory factory = createFactory();
-
-		// Act:
-		final SingleTransactionValidator validator = factory.createSingle(Mockito.mock(ReadOnlyAccountStateCache.class));
-
 		// Assert:
-		Assert.assertThat(validator, IsNull.notNullValue());
+		assertNonNullValidator(factory -> factory.createSingle(Mockito.mock(ReadOnlyAccountStateCache.class)));
 	}
 
 	@Test
 	public void createBatchReturnsValidValidator() {
+		// Assert:
+		assertNonNullValidator(factory -> factory.createBatch(Mockito.mock(DefaultHashCache.class)));
+	}
+
+	private static void assertNonNullValidator(final Function<TransactionValidatorFactory, Object> createValidator) {
 		// Arrange:
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
-		final BatchTransactionValidator validator = factory.createBatch(Mockito.mock(DefaultHashCache.class));
+		final Object validator = createValidator.apply(factory);
 
 		// Assert:
 		Assert.assertThat(validator, IsNull.notNullValue());
 	}
 
+	//endregion
+
+	//region create validator builder
+
+	@Test
+	public void createSingleBuilderReturnsValidBuilder() {
+		// Assert:
+		assertNonNullBuilder(factory -> factory.createSingleBuilder(Mockito.mock(ReadOnlyAccountStateCache.class)));
+	}
+
+	@Test
+	public void createIncompleteSingleBuilderReturnsValidBuilder() {
+		// Assert:
+		assertNonNullBuilder(factory -> factory.createIncompleteSingleBuilder(Mockito.mock(ReadOnlyAccountStateCache.class)));
+	}
+
+	private static void assertNonNullBuilder(final Function<TransactionValidatorFactory, AggregateSingleTransactionValidatorBuilder> createBuilder) {
+		// Arrange:
+		final TransactionValidatorFactory factory = createFactory();
+
+		// Act:
+		final Object validator = createBuilder.apply(factory);
+
+		// Assert:
+		Assert.assertThat(validator, IsNull.notNullValue());
+	}
+
+	//endregion
+
+	//region visitors
+
 	@Test
 	public void createSingleAddsDesiredSingleValidators() {
 		// Arrange:
+		final List<Class<?>> expectedClasses = getCommonSingleValidators();
+		expectedClasses.add(MultisigSignaturesPresentValidator.class);
+
+		// Act:
+		final Collection<Class<?>> classes = getVisitedSingleSubValidators(true);
+
+		// Assert:
+		Assert.assertThat(classes, IsEquivalent.equivalentTo(expectedClasses));
+	}
+
+	@Test
+	public void createIncompleteSingleAddsDesiredSingleValidators() {
+		// Arrange:
+		final List<Class<?>> expectedClasses = getCommonSingleValidators();
+
+		// Act:
+		final Collection<Class<?>> classes = getVisitedSingleSubValidators(false);
+
+		// Assert:
+		Assert.assertThat(classes, IsEquivalent.equivalentTo(expectedClasses));
+	}
+
+	private static List<Class<?>> getCommonSingleValidators() {
+		return new ArrayList<Class<?>>() {
+			{
+				this.add(UniversalTransactionValidator.class);
+				this.add(NonFutureEntityValidator.class);
+				this.add(NemesisSinkValidator.class);
+
+				this.add(TransferTransactionValidator.class);
+				this.add(ImportanceTransferTransactionValidator.class);
+
+				this.add(MultisigNonOperationalValidator.class);
+				this.add(MultisigTransactionSignerValidator.class);
+				this.add(MaxCosignatoryValidator.class);
+				this.add(MultisigAggregateModificationTransactionValidator.class);
+			}
+		};
+	}
+
+	private static Collection<Class<?>> getVisitedSingleSubValidators(final boolean includeAllValidators) {
+		// Arrange:
 		final TransactionValidatorFactory factory = createFactory();
-		final List<Class<?>> expectedClasses = Arrays.asList(
-				UniversalTransactionValidator.class,
-				NonFutureEntityValidator.class,
-				TransferTransactionValidator.class,
-				ImportanceTransferTransactionValidator.class);
 
 		// Act:
 		final List<SingleTransactionValidator> validators = new ArrayList<>();
-		factory.visitSingleSubValidators(validators::add, Mockito.mock(ReadOnlyAccountStateCache.class));
-
-		// Assert:
-		Assert.assertThat(
-				validators.stream().map(Object::getClass).collect(Collectors.toList()),
-				IsEquivalent.equivalentTo(expectedClasses));
+		factory.visitSingleSubValidators(validators::add, Mockito.mock(ReadOnlyAccountStateCache.class), includeAllValidators);
+		return validators.stream().map(Object::getClass).collect(Collectors.toList());
 	}
 
 	@Test

@@ -99,10 +99,10 @@ public class DebugController {
 		// because we want the returned importances to be relative to the requested height
 		final BlockScorer scorer = new BlockScorer(accountAnalyzer.getPoiFacade());
 
-		final org.nem.nis.dbmodel.Block dbBlock = this.blockDao.findByHeight(blockHeight);
+		final DbBlock dbBlock = this.blockDao.findByHeight(blockHeight);
 		final Block block = BlockMapper.toModel(dbBlock, accountLookup);
 
-		final org.nem.nis.dbmodel.Block dbParent = 1 == blockHeight.getRaw() ? null : this.blockDao.findByHeight(blockHeight.prev());
+		final DbBlock dbParent = 1 == blockHeight.getRaw() ? null : this.blockDao.findByHeight(blockHeight.prev());
 		final Block parent = null == dbParent ? null : BlockMapper.toModel(dbParent, accountLookup);
 
 		final BigInteger hit = scorer.calculateHit(block);

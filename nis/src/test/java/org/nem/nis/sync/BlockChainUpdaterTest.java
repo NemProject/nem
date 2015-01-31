@@ -226,13 +226,22 @@ public class BlockChainUpdaterTest {
 	public void updateBlockDelegatesToAccountDao() {
 		// Arrange:
 		final BlockChainDelegationContext context = new BlockChainDelegationContext();
+		final Block block = context.getBlock();
+		for (int i = 0; i < 3; ++i) {
+			final Transaction transaction = RandomTransactionFactory.createTransfer();
+			transaction.sign();
+			block.addTransaction(transaction);
+		}
+
+		block.sign();
 
 		// Act (append new block to current chain, transactions, harvesters are already known):
 		Assert.assertThat(context.getBlockChainUpdater().updateBlock(context.getBlock()), IsEqual.equalTo(ValidationResult.SUCCESS));
 
-		// Assert (2 calls during context construction):
-		// getAccountByPrintableAddressCalls
-		BlockChainUtils.assertAccountDaoCalls(context.getAccountDao(), 2 + 3);
+		// Assert
+		// - 2 calls during context construction
+		// - 2 calls for each of the 3 transactions (1 sender and 1 recipient)
+		BlockChainUtils.assertAccountDaoCalls(context.getAccountDao(), 2 + 2 * 3);
 	}
 
 	@Test
@@ -246,7 +255,7 @@ public class BlockChainUpdaterTest {
 		// Assert:
 		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
 		// no call to copy() since the sync context is mocked
-		BlockChainUtils.assertNisCacheCalls(context.getNisCache(), 5, 2, 0, 0);
+		BlockChainUtils.assertNisCacheCalls(context.getNisCache(), 3, 2, 0, 0);
 	}
 
 	@Test
@@ -634,7 +643,7 @@ public class BlockChainUpdaterTest {
 
 		// Assert (12 calls to getAccountStateCache and copy during context construction):
 		// getAccountCacheCalls, getAccountStateCacheCalls, getPoiFacadeCalls, copyCalls
-		BlockChainUtils.assertNisCacheCalls(context.getNodeContexts().get(0).getNisCache(), 0, 12, 0, 12 + 1);
+		BlockChainUtils.assertNisCacheCalls(context.getNodeContexts().get(0).getNisCache(), 0, 13, 0, 13);
 	}
 
 	@Test

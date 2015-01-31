@@ -10,12 +10,12 @@ import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.AccountDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
-import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.*;
-import org.nem.nis.test.MockBlockDao;
+import org.nem.nis.test.*;
 import org.nem.peer.connect.*;
 
 import java.util.*;
@@ -123,12 +123,12 @@ public class NodeContext {
 
 		@Override
 		public Block getLastBlock(final Node node) {
-			return this.checkNull(BlockMapper.toModel(NodeContext.this.blockDao.getLastBlock(), NodeContext.this.nisCache.getAccountCache()));
+			return this.checkNull(MapperUtils.toModel(NodeContext.this.blockDao.getLastBlock(), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
 		public Block getBlockAt(final Node node, final BlockHeight height) {
-			return this.checkNull(BlockMapper.toModel(NodeContext.this.blockDao.findByHeight(height), NodeContext.this.nisCache.getAccountCache()));
+			return this.checkNull(MapperUtils.toModel(NodeContext.this.blockDao.findByHeight(height), NodeContext.this.nisCache.getAccountCache()));
 		}
 
 		@Override
@@ -139,8 +139,8 @@ public class NodeContext {
 		@Override
 		public Collection<Block> getChainAfter(final Node node, final ChainRequest request) {
 			final List<Block> blocks = new ArrayList<>();
-			final List<org.nem.nis.dbmodel.Block> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
-			dbBlocks.stream().forEach(dbBlock -> blocks.add(BlockMapper.toModel(dbBlock, this.accountLookup)));
+			final List<DbBlock> dbBlocks = NodeContext.this.blockDao.getBlocksAfter(request.getHeight(), BlockChainConstants.BLOCKS_LIMIT);
+			dbBlocks.stream().forEach(dbBlock -> blocks.add(MapperUtils.toModel(dbBlock, this.accountLookup)));
 			return this.checkNull(blocks);
 		}
 
@@ -173,9 +173,8 @@ public class NodeContext {
 		return this.chain.get(this.chain.size() - 1);
 	}
 
-	private org.nem.nis.dbmodel.Block mapBlockToDbModel(final Block block, final AccountDao accountDao) {
-		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
-		return BlockMapper.toDbModel(block, accountDaoLookup);
+	private DbBlock mapBlockToDbModel(final Block block, final AccountDao accountDao) {
+		return MapperUtils.createModelToDbModelNisMapper(accountDao).map(block);
 	}
 
 	private void incrementBalance(final NisCache nisCache, final Account account, final BlockHeight height, final Amount amount) {

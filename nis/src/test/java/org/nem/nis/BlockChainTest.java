@@ -47,7 +47,7 @@ public class BlockChainTest {
 		child.setPrevious(nodeContext.getChain().get(0));
 
 		// Assert:
-		Assert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE));
+		Assert.assertThat(nodeContext.getBlockChain().checkPushedBlock(child), IsEqual.equalTo(ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC));
 	}
 
 	@Test

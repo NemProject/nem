@@ -33,7 +33,8 @@ public enum NodeInteractionResult {
 			case SUCCESS:
 				return NodeInteractionResult.SUCCESS;
 			case NEUTRAL:
-			case FAILURE_ENTITY_UNUSABLE: // happens during initial sync or when one of the partners is on a fork
+			case FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC: // happens during initial sync or when one of the partners is on a fork
+			case FAILURE_TRANSACTION_CACHE_TOO_FULL: // happens when an account tries to place more transactions into the cache than its fair share
 				return NodeInteractionResult.NEUTRAL;
 			default:
 				return NodeInteractionResult.FAILURE;

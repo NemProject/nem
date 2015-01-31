@@ -159,8 +159,8 @@ public class BlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(new TimeInstant(7)));
 
-		// (t1 has a fee of 1 and t2 has a fee of 2)
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(3L)));
+		// (t1 has a fee of 2 and t2 has a fee of 4)
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(2 + 4)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(BlockUtils.DUMMY_PREVIOUS_HASH));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(new BlockHeight(3)));
 
@@ -171,7 +171,7 @@ public class BlockTest {
 		Assert.assertThat(transaction1.getAmount(), IsEqual.equalTo(Amount.fromNem(17)));
 
 		final TransferTransaction transaction2 = (TransferTransaction)transactions.get(1);
-		Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(Amount.fromNem(290)));
+		Assert.assertThat(transaction2.getAmount(), IsEqual.equalTo(Amount.fromNem(1_000_000)));
 	}
 
 	@Test
@@ -266,7 +266,7 @@ public class BlockTest {
 		final TransferTransaction transaction1 = this.createSignedTransactionWithAmount(17);
 		originalBlock.addTransaction(transaction1);
 
-		final TransferTransaction transaction2 = this.createSignedTransactionWithAmount(290);
+		final TransferTransaction transaction2 = this.createSignedTransactionWithAmount(1_000_000);
 		originalBlock.addTransaction(transaction2);
 		originalBlock.setDifficulty(new BlockDifficulty(22_222_222_222L));
 		originalBlock.sign();
@@ -350,6 +350,29 @@ public class BlockTest {
 
 		// Assert:
 		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(new Amount(103L)));
+	}
+
+	@Test
+	public void blockWithMultisigTransactionReturnsCorrectFee() {
+		// Arrange:
+		final Block block = BlockUtils.createBlock();
+
+		final Transaction innerTransaction = BlockUtils.createTransactionWithFee(1_000000);
+		final SimpleMultisigContext context = new SimpleMultisigContext(innerTransaction);
+		final MultisigSignatureTransaction sig1 = context.createSignature();
+		sig1.setFee(Amount.fromNem(3));
+		final MultisigSignatureTransaction sig2 = context.createSignature();
+		sig2.setFee(Amount.fromNem(5));
+		final MultisigTransaction transaction = context.createMultisig();
+		transaction.addSignature(sig1);
+		transaction.addSignature(sig2);
+		transaction.setFee(Amount.fromNem(130));
+
+		// Act:
+		block.addTransaction(transaction);
+
+		// Assert:
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(1 + 3 + 5 + 130)));
 	}
 
 	//endregion

@@ -4,6 +4,7 @@ import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.crypto.*;
+import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
@@ -19,7 +20,7 @@ import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
 
 import java.util.*;
-import java.util.function.BiFunction;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public class AccountControllerTest {
@@ -85,36 +86,72 @@ public class AccountControllerTest {
 
 	//endregion
 
-	//region accountIsUnlocked
+	//region isAccountUnlocked
 
 	@Test
-	public void accountIsUnlockedReturnsOkWhenAccountIsUnlocked() {
+	public void accountIsUnlockedReturnsOkWhenAccountFromAddressIsUnlocked() {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account account = new Account(keyPair);
-		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
-		Mockito.when(context.unlockedAccounts.isAccountUnlocked(account)).thenReturn(true);
+		assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(AccountIsUnlockedTestContext::checkIsUnlockedWithAddress);
+	}
+
+	@Test
+	public void accountIsUnlockedReturnsOkWhenAccountFromPrivateKeyIsUnlocked() {
+		// Assert:
+		assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(AccountIsUnlockedTestContext::checkIsUnlockedWithPrivateKey);
+	}
+
+	private static void assertAccountIsUnlockedReturnsOkWhenAccountIsUnlocked(final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
+		// Arrange:
+		final AccountIsUnlockedTestContext context = new AccountIsUnlockedTestContext();
+		context.setIsUnlocked(true);
 
 		// Act:
-		final String result = context.controller.accountIsUnlocked(account.getAddress());
+		final String result = isAccountUnlocked.apply(context);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo("ok"));
 	}
 
 	@Test
-	public void accountIsUnlockedReturnsNopeWhenAccountIsLocked() {
+	public void accountIsUnlockedReturnsNopeWhenAccountFromAddressIsLocked() {
+		// Assert:
+		assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(AccountIsUnlockedTestContext::checkIsUnlockedWithAddress);
+	}
+
+	@Test
+	public void accountIsUnlockedReturnsNopeWhenAccountFromPrivateKeyIsLocked() {
+		// Assert:
+		assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(AccountIsUnlockedTestContext::checkIsUnlockedWithPrivateKey);
+	}
+
+	private static void assertAccountIsUnlockedReturnsNopeWhenAccountIsLocked(final Function<AccountIsUnlockedTestContext, String> isAccountUnlocked) {
 		// Arrange:
-		final KeyPair keyPair = new KeyPair();
-		final Account account = new Account(keyPair);
-		final TestContext context = createContextAroundAccount(account, Amount.fromNem(1000));
-		Mockito.when(context.unlockedAccounts.isAccountUnlocked(account)).thenReturn(false);
+		final AccountIsUnlockedTestContext context = new AccountIsUnlockedTestContext();
+		context.setIsUnlocked(false);
 
 		// Act:
-		final String result = context.controller.accountIsUnlocked(account.getAddress());
+		final String result = isAccountUnlocked.apply(context);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo("nope"));
+	}
+
+	private static class AccountIsUnlockedTestContext {
+		private final KeyPair keyPair = new KeyPair();
+		private final Account account = new Account(this.keyPair);
+		private final TestContext context = createContextAroundAccount(this.account, Amount.fromNem(1000));
+
+		public void setIsUnlocked(final boolean result) {
+			Mockito.when(this.context.unlockedAccounts.isAccountUnlocked(this.account)).thenReturn(result);
+		}
+
+		public String checkIsUnlockedWithAddress() {
+			return this.context.controller.isAccountUnlocked(this.account.getAddress());
+		}
+
+		public String checkIsUnlockedWithPrivateKey() {
+			return this.context.controller.isAccountUnlocked(this.keyPair.getPrivateKey());
+		}
 	}
 
 	//endregion
@@ -320,6 +357,152 @@ public class AccountControllerTest {
 
 	//endregion
 
+	//region localAccountTransfersMethodsDecodeMessages
+
+	@Test
+	public void localAccountTransfersAllReturnsTransactionsWithDecodedMessagesIfPossible() {
+		this.localAccountTransfersReturnsTransactionsWithDecodedMessagesIfPossible(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::localAccountTransfersAll);
+	}
+
+	@Test
+	public void localAccountTransfersIncomingReturnsTransactionsWithDecodedMessagesIfPossible() {
+		this.localAccountTransfersReturnsTransactionsWithDecodedMessagesIfPossible(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::localAccountTransfersIncoming);
+	}
+
+	@Test
+	public void localAccountTransfersOutgoingReturnsTransactionsWithDecodedMessagesIfPossible() {
+		this.localAccountTransfersReturnsTransactionsWithDecodedMessagesIfPossible(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::localAccountTransfersOutgoing);
+	}
+
+	private void localAccountTransfersReturnsTransactionsWithDecodedMessagesIfPossible(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountPrivateKeyTransactionsPage, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
+		final KeyPair senderKeyPair = new KeyPair();
+		final KeyPair recipientKeyPair = new KeyPair();
+		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+		final TransactionMetaDataPair pair = createPairWithDecodableSecureMessage(
+				senderKeyPair,
+				recipientKeyPair,
+				"This is a secret message");
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = controllerMethod.apply(context.controller, pagePrivateKeyPair);
+
+		// Assert:
+		final TransferTransaction tx = (TransferTransaction)resultList.get(0).getTransaction();
+		Assert.assertThat(tx, IsNot.not(IsSame.sameInstance(pair.getTransaction())));
+		Assert.assertThat(tx.getMessage(), IsInstanceOf.instanceOf(PlainMessage.class));
+		Assert.assertThat(new String(tx.getMessage().getDecodedPayload()), IsEqual.equalTo("This is a secret message"));
+	}
+
+	//endregion
+
+	//region localAccountTransfersMethodsLeavesTransactionsUntouchedIfDecodingIsNotPossible
+
+	@Test
+	public void localAccountTransfersAllLeavesTransactionsUntouchedIfDecodingIsNotPossible() {
+		this.localAccountTransfersLeavesTransactionsUntouchedIfDecodingIsNotPossible(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::localAccountTransfersAll);
+	}
+
+	@Test
+	public void localAccountTransfersIncomingAllLeavesTransactionsUntouchedIfDecodingIsNotPossible() {
+		this.localAccountTransfersLeavesTransactionsUntouchedIfDecodingIsNotPossible(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::localAccountTransfersIncoming);
+	}
+
+	@Test
+	public void localAccountTransfersOutgoingAllLeavesTransactionsUntouchedIfDecodingIsNotPossible() {
+		this.localAccountTransfersLeavesTransactionsUntouchedIfDecodingIsNotPossible(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::localAccountTransfersOutgoing);
+	}
+
+	private void localAccountTransfersLeavesTransactionsUntouchedIfDecodingIsNotPossible(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountPrivateKeyTransactionsPage, SerializableList<TransactionMetaDataPair>> controllerMethod) {
+		// Arrange:
+		final KeyPair senderKeyPair = new KeyPair();
+		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+		final TransactionMetaDataPair pair = createPairWithUndecodableSecureMessage(senderKeyPair);
+		final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(Arrays.asList(pair));
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(expectedList);
+
+		// Act:
+		final SerializableList<TransactionMetaDataPair> resultList = controllerMethod.apply(context.controller, pagePrivateKeyPair);
+
+		// Assert:
+		Assert.assertThat(resultList.get(0).getTransaction(), IsSame.sameInstance(pair.getTransaction()));
+	}
+
+	//endregion
+
+	//region localAccountTransfersMethodsDelegateToAccountTransfersMethods
+
+	@Test
+	public void localAccountTransfersAllMethodsDelegateToAccountTransfersAllMethods() {
+		this.localAccountTransfersMethodsDelegateToAccountTransfersMethods(
+				ReadOnlyTransferDao.TransferType.ALL,
+				AccountController::localAccountTransfersAll,
+				0x01);
+	}
+
+	@Test
+	public void localAccountTransfersIncomingMethodsDelegateToAccountTransfersIncomingMethods() {
+		this.localAccountTransfersMethodsDelegateToAccountTransfersMethods(
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				AccountController::localAccountTransfersIncoming,
+				0x02);
+	}
+
+	@Test
+	public void localAccountTransfersOutgoingMethodsDelegateToAccountTransfersOutgoingMethods() {
+		this.localAccountTransfersMethodsDelegateToAccountTransfersMethods(
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				AccountController::localAccountTransfersOutgoing,
+				0x04);
+	}
+
+	private void localAccountTransfersMethodsDelegateToAccountTransfersMethods(
+			final ReadOnlyTransferDao.TransferType transferType,
+			final BiFunction<AccountController, AccountPrivateKeyTransactionsPage, SerializableList<TransactionMetaDataPair>> controllerMethod,
+			final int callPattern) {
+		// Arrange:
+		final KeyPair senderKeyPair = new KeyPair();
+		final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
+		final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+		final TestContext context = new TestContext(accountIoAdapter);
+		final AccountPrivateKeyTransactionsPage pagePrivateKeyPair = new AccountPrivateKeyTransactionsPage(senderKeyPair.getPrivateKey());
+		Mockito.when(accountIoAdapter.getAccountTransfersUsingId(address, null, transferType)).thenReturn(new SerializableList<>(1));
+
+		// Act:
+		controllerMethod.apply(context.controller, pagePrivateKeyPair);
+
+		// Assert:
+		Mockito.verify(context.controller, Mockito.times(callPattern & 0x01)).accountTransfersAll(Mockito.any());
+		Mockito.verify(context.controller, Mockito.times((callPattern & 0x02) >> 1)).accountTransfersIncoming(Mockito.any());
+		Mockito.verify(context.controller, Mockito.times((callPattern & 0x04) >> 2)).accountTransfersOutgoing(Mockito.any());
+	}
+
+	//endregion
+
 	//region transactionsUnconfirmed
 
 	@Test
@@ -427,6 +610,42 @@ public class AccountControllerTest {
 
 	//endregion
 
+	private static TransactionMetaDataPair createPairWithDecodableSecureMessage(
+			final KeyPair senderKeyPair,
+			final KeyPair recipientKeyPair,
+			final String message) {
+		final Account sender = new Account(senderKeyPair);
+		final Account recipient = new Account(recipientKeyPair);
+		final SecureMessage secureMessage = SecureMessage.fromDecodedPayload(
+				sender,
+				recipient,
+				message.getBytes());
+		return createPairWithSecureMessage(sender, recipient, secureMessage);
+	}
+
+	private static TransactionMetaDataPair createPairWithUndecodableSecureMessage(final KeyPair senderKeyPair) {
+		final Account sender = new Account(senderKeyPair);
+		final Account recipient = new Account(Utils.generateRandomAddress());
+		final SecureMessage secureMessage = SecureMessage.fromEncodedPayload(
+				sender,
+				recipient,
+				Utils.generateRandomBytes());
+		return createPairWithSecureMessage(sender, recipient, secureMessage);
+	}
+
+	private static TransactionMetaDataPair createPairWithSecureMessage(
+			final Account sender,
+			final Account recipient,
+			final SecureMessage secureMessage) {
+		final TransferTransaction transaction = new TransferTransaction(
+				new TimeInstant(10),
+				sender,
+				recipient,
+				Amount.fromNem(1),
+				secureMessage);
+		return new TransactionMetaDataPair(transaction, new TransactionMetaData(BlockHeight.ONE, 1L));
+	}
+
 	private static class TestContext {
 		private final AccountController controller;
 		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
@@ -439,12 +658,12 @@ public class AccountControllerTest {
 		}
 
 		public TestContext(final AccountIoAdapter accountIoAdapter) {
-			this.controller = new AccountController(
+			this.controller = Mockito.spy(new AccountController(
 					this.unconfirmedTransactions,
 					this.unlockedAccounts,
 					accountIoAdapter,
 					this.accountStateCache,
-					this.transactionHashCache);
+					this.transactionHashCache));
 		}
 
 		private Account addAccount(final Account account, final Amount amount) {

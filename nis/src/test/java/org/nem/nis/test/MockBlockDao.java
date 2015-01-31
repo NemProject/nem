@@ -5,7 +5,7 @@ import org.nem.core.model.Account;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.BlockDao;
-import org.nem.nis.dbmodel.Block;
+import org.nem.nis.dbmodel.DbBlock;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -29,9 +29,9 @@ public class MockBlockDao implements BlockDao {
 	private int lastGetHashesFromLimit;
 	private long lastId;
 
-	private final List<Block> blocks;
+	private final List<DbBlock> blocks;
 	private final MockBlockDaoMode mockMode;
-	private Block lastSavedBlock;
+	private DbBlock lastSavedBlock;
 
 	// In order to simulate the db we need to update the mock account dao.
 	private final MockAccountDao accountDao;
@@ -69,7 +69,7 @@ public class MockBlockDao implements BlockDao {
 	 *
 	 * @param block The block to return from findBy* methods.
 	 */
-	public MockBlockDao(final Block block) {
+	public MockBlockDao(final DbBlock block) {
 		this(block, null);
 	}
 
@@ -79,7 +79,7 @@ public class MockBlockDao implements BlockDao {
 	 * @param block The block to return from findBy* methods.
 	 * @param chain The hash chain to return from getHashesFrom.
 	 */
-	public MockBlockDao(final Block block, final HashChain chain) {
+	public MockBlockDao(final DbBlock block, final HashChain chain) {
 		this(block, chain, MockBlockDaoMode.SingleBlock);
 	}
 
@@ -90,7 +90,7 @@ public class MockBlockDao implements BlockDao {
 	 * @param chain The hash chain to return from getHashesFrom.
 	 * @param mode The mocking mode.
 	 */
-	public MockBlockDao(final Block block, final HashChain chain, final MockBlockDaoMode mode) {
+	public MockBlockDao(final DbBlock block, final HashChain chain, final MockBlockDaoMode mode) {
 		this.chain = chain;
 		this.blocks = new ArrayList<>();
 		this.addBlock(block);
@@ -99,16 +99,16 @@ public class MockBlockDao implements BlockDao {
 		this.accountDao = new MockAccountDao();
 	}
 
-	public void addBlock(final Block block) {
+	public void addBlock(final DbBlock block) {
 		this.blocks.add(block);
 	}
 
-	public Block getLastBlock() {
+	public DbBlock getLastBlock() {
 		return this.blocks.get(this.blocks.size() - 1);
 	}
 
 	@Override
-	public void save(final Block block) {
+	public void save(final DbBlock block) {
 		if (null == block.getId()) {
 			block.setId(this.lastId);
 			this.lastId++;
@@ -119,7 +119,7 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public void save(final List<Block> blocks) {
+	public void save(final List<DbBlock> blocks) {
 		throw new RuntimeException("unsupported MockBlockDao.save(...List...)");
 	}
 
@@ -129,20 +129,20 @@ public class MockBlockDao implements BlockDao {
 	}
 
 	@Override
-	public Block findByHash(final Hash blockHash) {
+	public DbBlock findByHash(final Hash blockHash) {
 		++this.numFindByHashCalls;
 		this.lastFindByHashHash = blockHash;
 		return this.find(block -> block.getBlockHash().equals(blockHash));
 	}
 
 	@Override
-	public Block findByHeight(final BlockHeight height) {
+	public DbBlock findByHeight(final BlockHeight height) {
 		++this.numFindByHeightCalls;
 		this.lastFindByHeightHeight = height;
 		return this.find(block -> block.getHeight() == height.getRaw());
 	}
 
-	private Block find(final Predicate<Block> findPredicate) {
+	private DbBlock find(final Predicate<DbBlock> findPredicate) {
 		try {
 			return MockBlockDaoMode.SingleBlock == this.mockMode
 					? this.blocks.get(0)
@@ -152,7 +152,7 @@ public class MockBlockDao implements BlockDao {
 		}
 	}
 
-	private static Predicate<Block> heightFilter(final BlockHeight height, final int limit) {
+	private static Predicate<DbBlock> heightFilter(final BlockHeight height, final int limit) {
 		return (block -> block.getHeight().compareTo(height.getRaw()) >= 0 && block.getHeight().compareTo(height.getRaw() + limit) < 0);
 	}
 
@@ -164,17 +164,17 @@ public class MockBlockDao implements BlockDao {
 		return new HashChain(
 				this.blocks.stream()
 						.filter(heightFilter(height, limit))
-						.map(Block::getBlockHash)
+						.map(DbBlock::getBlockHash)
 						.collect(Collectors.toList()));
 	}
 
 	@Override
-	public Collection<Block> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
+	public Collection<DbBlock> getBlocksForAccount(final Account account, final Hash hash, final int limit) {
 		return null;
 	}
 
 	@Override
-	public List<Block> getBlocksAfter(final BlockHeight height, final int limit) {
+	public List<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
 		return this.blocks.stream()
 				.filter(heightFilter(height.next(), limit))
 				.collect(Collectors.toList());
@@ -200,9 +200,9 @@ public class MockBlockDao implements BlockDao {
 
 	@Override
 	public void deleteBlocksAfterHeight(final BlockHeight height) {
-		final Iterator<Block> iterator = this.blocks.iterator();
+		final Iterator<DbBlock> iterator = this.blocks.iterator();
 		while (iterator.hasNext()) {
-			final Block block = iterator.next();
+			final DbBlock block = iterator.next();
 			if (block.getHeight().compareTo(height.getRaw()) > 0) {
 				this.accountDao.blockDeleted(block);
 				iterator.remove();
@@ -341,7 +341,7 @@ public class MockBlockDao implements BlockDao {
 	 *
 	 * @return last saved block.
 	 */
-	public Block getLastSavedBlock() {
+	public DbBlock getLastSavedBlock() {
 		return this.lastSavedBlock;
 	}
 }

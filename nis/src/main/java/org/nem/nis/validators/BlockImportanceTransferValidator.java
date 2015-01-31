@@ -1,7 +1,6 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
-import org.nem.nis.BlockMarkerConstants;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,10 +12,6 @@ public class BlockImportanceTransferValidator implements BlockValidator {
 
 	@Override
 	public ValidationResult validate(final Block block) {
-		if (block.getHeight().getRaw() < BlockMarkerConstants.BETA_IT_VALIDATION_FORK) {
-			return ValidationResult.SUCCESS;
-		}
-
 		final List<Transaction> importanceTransfers = block.getTransactions().stream()
 				.filter(t -> t.getType() == TransactionTypes.IMPORTANCE_TRANSFER)
 				.collect(Collectors.toList());
@@ -30,7 +25,7 @@ public class BlockImportanceTransferValidator implements BlockValidator {
 		// NonConflictingImportanceTransferTransactionValidator does not require debit checks
 		// and doing so avoids a dependency on the poi facade
 		final ValidationContext validationContext = new ValidationContext(null);
-		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> importanceTransfers);
+		final SingleTransactionValidator validator = new NonConflictingImportanceTransferTransactionValidator(() -> importanceTransfers.stream());
 		return ValidationResult.aggregate(importanceTransfers.stream().map(t -> validator.validate(t, validationContext)).iterator());
 	}
 }

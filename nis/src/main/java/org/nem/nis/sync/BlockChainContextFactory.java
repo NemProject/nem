@@ -4,6 +4,7 @@ import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockChainScore;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.harvesting.UnconfirmedTransactions;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 
@@ -58,7 +59,7 @@ public class BlockChainContextFactory {
 	 */
 	public BlockChainUpdateContext createUpdateContext(
 			final BlockChainSyncContext syncContext,
-			final org.nem.nis.dbmodel.Block dbParentBlock,
+			final DbBlock dbParentBlock,
 			final Collection<Block> peerChain,
 			final BlockChainScore localScore,
 			final boolean hasOwnChain) {

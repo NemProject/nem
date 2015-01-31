@@ -47,7 +47,9 @@ public class TransferTransaction extends Transaction {
 		super(TransactionTypes.TRANSFER, options, deserializer);
 		this.recipient = Account.readFrom(deserializer, "recipient");
 		this.amount = Amount.readFrom(deserializer, "amount");
-		this.message = deserializer.readOptionalObject("message", MessageFactory.DESERIALIZER);
+		this.message = deserializer.readOptionalObject(
+				"message",
+				messageDeserializer -> MessageFactory.deserialize(messageDeserializer, this.getSigner(), this.getRecipient()));
 	}
 
 	/**
@@ -87,28 +89,8 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	protected Amount getMinimumFee() {
-		if (NemesisBlock.ADDRESS.equals(this.getSigner().getAddress())) {
-			return Amount.ZERO;
-		}
-
-		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
-	}
-
-	@Override
 	protected Collection<Account> getOtherAccounts() {
 		return Arrays.asList(this.recipient);
-	}
-
-	private long getMinimumTransferFee() {
-		final double nemAmount = this.amount.getNumNem();
-		return Math.max(1, (long)Math.ceil(nemAmount / 25000 + Math.log(nemAmount) / 5));
-	}
-
-	private long getMinimumMessageFee() {
-		return 0 == this.getMessageLength()
-				? 0
-				: Math.max(1, 5 * this.getMessageLength() / 256);
 	}
 
 	@Override

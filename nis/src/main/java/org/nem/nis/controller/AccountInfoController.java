@@ -2,17 +2,19 @@ package org.nem.nis.controller;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
+import org.nem.core.model.ncc.AccountInfo;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.core.serialization.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.annotations.ClientApi;
-import org.nem.nis.controller.requests.AccountIdBuilder;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.*;
 import org.nem.nis.state.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * REST API for retrieving account related information
@@ -49,17 +51,42 @@ public class AccountInfoController {
 	@ClientApi
 	public AccountMetaDataPair accountGet(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
-		final org.nem.core.model.ncc.AccountInfo account = this.accountInfoFactory.createInfo(address);
-		final AccountMetaData metaData = this.accountStatus(builder);
-		return new AccountMetaDataPair(account, metaData);
+		return this.getMetaDataPair(address);
+	}
+
+	/**
+	 * Gets a list of account information.
+	 *
+	 * @param deserializer The deserializer.
+	 * @return The list of account information.
+	 */
+	@RequestMapping(value = "/account/get/batch", method = RequestMethod.POST)
+	@ClientApi
+	public SerializableList<AccountMetaDataPair> accountGetBatch(@RequestBody final Deserializer deserializer) {
+		final DeserializableList<AccountId> accounts = new DeserializableList<>(deserializer, AccountId::new);
+		final Collection<AccountMetaDataPair> pairs = accounts.asCollection().stream()
+				.map(a -> this.getMetaDataPair(a.getAddress()))
+				.collect(Collectors.toList());
+		return new SerializableList<>(pairs);
 	}
 
 	@RequestMapping(value = "/account/status", method = RequestMethod.GET)
 	@ClientApi
 	public AccountMetaData accountStatus(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
+		return this.getMetaData(address);
+	}
+
+	private AccountMetaDataPair getMetaDataPair(final Address address) {
+		final org.nem.core.model.ncc.AccountInfo account = this.accountInfoFactory.createInfo(address);
+		final AccountMetaData metaData = this.getMetaData(address);
+		return new AccountMetaDataPair(account, metaData);
+	}
+
+	private AccountMetaData getMetaData(final Address address) {
 		final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
-		AccountRemoteStatus remoteStatus = this.getRemoteStatus(address, new BlockHeight(height));
+		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, new BlockHeight(height));
 		if (this.hasPendingImportanceTransfer(address)) {
 			switch (remoteStatus) {
 				case INACTIVE:
@@ -75,11 +102,14 @@ public class AccountInfoController {
 			}
 		}
 
-		return new AccountMetaData(this.getAccountStatus(address), remoteStatus);
+		// TODO 20150111 J-G: should add a test for this
+		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
+				.map(multisigAddress -> this.accountInfoFactory.createInfo(multisigAddress))
+				.collect(Collectors.toList());
+		return new AccountMetaData(this.getAccountStatus(address), remoteStatus, cosignatoryOf);
 	}
 
-	private AccountRemoteStatus getRemoteStatus(final Address address, final BlockHeight height) {
-		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
+	private AccountRemoteStatus getRemoteStatus(final ReadOnlyAccountState accountState, final BlockHeight height) {
 		final RemoteStatus remoteStatus = accountState.getRemoteLinks().getRemoteStatus(height);
 		return remoteStatus.toAccountRemoteStatus();
 	}

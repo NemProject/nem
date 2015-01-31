@@ -30,6 +30,8 @@ public interface ReadOnlyAccountInfo {
 
 	/**
 	 * Returns the reference count.
+	 * <br />
+	 * Note that this is readonly because ReferenceCount is immutable.
 	 *
 	 * @return The reference count.
 	 */

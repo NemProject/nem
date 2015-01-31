@@ -73,7 +73,7 @@ public class BlockExecutor {
 	//endregion undo
 
 	private void notifyBlockHarvested(final TransactionObserver observer, final Block block, final NotificationTrigger trigger) {
-		// in order for all the downstream observers to behave correctly (without needing to know about remote foraging)
+		// in order for all the downstream observers to behave correctly (without needing to know about remote harvesting)
 		// trigger harvest notifications with the forwarded account (where available) instead of the remote account
 		final Address address = block.getSigner().getAddress();
 		final ReadOnlyAccountState accountState = this.nisCache.getAccountStateCache().findForwardedStateByAddress(address, block.getHeight());
@@ -92,9 +92,10 @@ public class BlockExecutor {
 	}
 
 	private void notifyTransactionHashes(final TransactionObserver observer, final Block block) {
-		final List<HashMetaDataPair> pairs = block.getTransactions().stream()
-				.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
-				.collect(Collectors.toList());
+		final List<HashMetaDataPair> pairs =
+				BlockExtensions.streamDefault(block)
+						.map(t -> new HashMetaDataPair(HashUtils.calculateHash(t), new HashMetaData(block.getHeight(), t.getTimeStamp())))
+						.collect(Collectors.toList());
 		observer.notify(new TransactionHashesNotification(pairs));
 	}
 

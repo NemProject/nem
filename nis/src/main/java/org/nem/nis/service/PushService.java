@@ -21,8 +21,8 @@ import java.util.logging.Logger;
 @Service
 public class PushService {
 	private static final Logger LOGGER = Logger.getLogger(PushService.class.getName());
-	private static final int BLOCK_CACHE_SECONDS = 600;
-	private static final int TX_CACHE_SECONDS = 60;
+	private static final int BLOCK_CACHE_SECONDS = 6000;
+	private static final int TX_CACHE_SECONDS = 1800;
 
 	private final UnconfirmedTransactions unconfirmedTransactions;
 	private final BlockChain blockChain;
@@ -129,13 +129,7 @@ public class PushService {
 
 		final ValidationResult isValidResult = context.isValid.apply(context.entity);
 		if (isValidResult.isFailure()) {
-			// TODO 20141205 J-B: can you remind me why we don't want to mark a node as FAILURE
-			// > when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE
-			// TODO 20141206 BR -> J: we ARE marking the node as FAILURE when isValid fails with anything other than FAILURE_ENTITY_UNUSABLE.
-			// > FAILURE_ENTITY_UNUSABLE is the only exception because that is normal when we are out of sync.
-			// TODO 20141206 J-B: yes, my comment was wrong, i meant to ask about the significance of FAILURE_ENTITY_UNUSABLE,
-			// > which you answered; can we rename FAILURE_ENTITY_UNUSABLE to something like FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC ?
-			if (ValidationResult.FAILURE_ENTITY_UNUSABLE != isValidResult) {
+			if (ValidationResult.FAILURE_ENTITY_UNUSABLE_OUT_OF_SYNC != isValidResult) {
 				// Bad experience with the remote node.
 				updateStatus.accept(NodeInteractionResult.FAILURE);
 			}

@@ -5,15 +5,14 @@ import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Account;
-import org.nem.core.model.Block;
 import org.nem.core.model.*;
+import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
-import org.nem.nis.test.MockAccountDao;
+import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,7 +20,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.*;
 
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -48,12 +46,22 @@ public class TransferDaoTest {
 	@Before
 	public void before() {
 		this.session = this.sessionFactory.openSession();
-		this.session.createSQLQuery("delete from transfers").executeUpdate();
-		this.session.createSQLQuery("delete from importancetransfers").executeUpdate();
-		this.session.createSQLQuery("delete from blocks").executeUpdate();
-		this.session.createSQLQuery("delete from accounts").executeUpdate();
-		this.session.createSQLQuery("ALTER TABLE transfers ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		this.session.createSQLQuery("ALTER TABLE importancetransfers ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("delete from transfers").executeUpdate();
+		session.createSQLQuery("delete from importancetransfers").executeUpdate();
+		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
+		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
+		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
+		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
+		session.createSQLQuery("delete from multisigsends").executeUpdate();
+		session.createSQLQuery("delete from multisigreceives").executeUpdate();
+		session.createSQLQuery("delete from blocks").executeUpdate();
+		session.createSQLQuery("delete from accounts").executeUpdate();
+		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		this.session.flush();
 		this.session.clear();
 	}
@@ -70,10 +78,10 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final Transfer entity = TransferMapper.toDbModel(transferTransaction, 0, 0, accountDaoLookup);
+		final DbTransferTransaction entity = mapToTransfer(transferTransaction, accountDaoLookup);
 
 		// TODO 20141005 J-G since you are doing this everywhere, you might want to consider a TestContext class
-		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
 		this.addToDummyBlock(dbAccount, entity);
 
 		// Act
@@ -92,18 +100,18 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 0);
-		final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
+		final DbTransferTransaction dbTransferTransaction = mapToTransfer(transferTransaction, accountDaoLookup);
 
-		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		this.addToDummyBlock(dbAccount, dbTransfer);
+		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		this.addToDummyBlock(dbAccount, dbTransferTransaction);
 
 		// Act
-		this.transferDao.save(dbTransfer);
-		final Transfer entity = this.transferDao.findByHash(HashUtils.calculateHash(transferTransaction).getRaw());
+		this.transferDao.save(dbTransferTransaction);
+		final DbTransferTransaction entity = this.transferDao.findByHash(HashUtils.calculateHash(transferTransaction).getRaw());
 
 		// Assert:
 		Assert.assertThat(entity, notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbTransfer.getId()));
+		Assert.assertThat(entity.getId(), equalTo(dbTransferTransaction.getId()));
 		Assert.assertThat(entity.getSender().getPublicKey(), equalTo(sender.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getRecipient().getPublicKey(), equalTo(recipient.getAddress().getPublicKey()));
 		Assert.assertThat(entity.getAmount(), equalTo(transferTransaction.getAmount().getNumMicroNem()));
@@ -118,20 +126,20 @@ public class TransferDaoTest {
 		final Account recipient = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(sender, recipient);
 		final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, 123);
-		final Transfer dbTransfer1 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
-		final Transfer dbTransfer2 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
-		final Transfer dbTransfer3 = TransferMapper.toDbModel(transferTransaction, 12345, 0, accountDaoLookup);
+		final DbTransferTransaction dbTransferTransaction1 = mapToTransfer(transferTransaction, accountDaoLookup);
+		final DbTransferTransaction dbTransferTransaction2 = mapToTransfer(transferTransaction, accountDaoLookup);
+		final DbTransferTransaction dbTransferTransaction3 = mapToTransfer(transferTransaction, accountDaoLookup);
 		final Long initialCount = this.transferDao.count();
 
-		final org.nem.nis.dbmodel.Account dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
-		this.addToDummyBlock(dbAccount, dbTransfer1, dbTransfer2, dbTransfer3);
+		final DbAccount dbAccount = accountDaoLookup.findByAddress(sender.getAddress());
+		this.addToDummyBlock(dbAccount, dbTransferTransaction1, dbTransferTransaction2, dbTransferTransaction3);
 
 		// Act
-		this.transferDao.save(dbTransfer1);
+		this.transferDao.save(dbTransferTransaction1);
 		final Long count1 = this.transferDao.count();
-		this.transferDao.save(dbTransfer2);
+		this.transferDao.save(dbTransferTransaction2);
 		final Long count2 = this.transferDao.count();
-		this.transferDao.save(dbTransfer3);
+		this.transferDao.save(dbTransferTransaction3);
 		final Long count3 = this.transferDao.count();
 
 		// Assert:
@@ -148,9 +156,9 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, 30);
 
 		// Act
-		final Collection<Transfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
-		final Collection<Transfer> entities2 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
-		final Collection<Transfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
+		final Collection<AbstractBlockTransfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_HASH);
+		final Collection<AbstractBlockTransfer> entities2 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(5), null, USE_HASH);
+		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, context.hashes.get(0), null, USE_HASH);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -264,9 +272,9 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, 30);
 
 		// Act
-		final Collection<Transfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
-		final Collection<Transfer> entities2 = this.getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
-		final Collection<Transfer> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
+		final Collection<AbstractBlockTransfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
+		final Collection<AbstractBlockTransfer> entities2 = this.getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
+		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -274,6 +282,10 @@ public class TransferDaoTest {
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 
+	// TODO 20150122 BR -> G,J: does this test make sense? (we would have to check in the transfer dao for the id in serveral tables).
+	// > Same applies for hash which currently is only checked for in the transfers table.
+	// TODO 20150130 J-B: it seems like this test is returning a matching transaction, which is wrong
+	// > I don't have a big problem if it throws or returns an empty collection as long as the id and hash lookups are consistent
 	@Test
 	public void getTransactionsForAccountUsingIdThrowsWhenIdNotFound() {
 		// Arrange:
@@ -414,7 +426,7 @@ public class TransferDaoTest {
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
@@ -436,7 +448,7 @@ public class TransferDaoTest {
 				this.hashes.add(HashUtils.calculateHash(transferTransaction));
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
@@ -447,7 +459,270 @@ public class TransferDaoTest {
 		}
 	}
 
-	private Collection<Transfer> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id, final int callType) {
+	// region multisig transactions
+
+	@Test
+	public void getTransactionsForAccountUsingIdReturnsExpectedOutgoingMultisigTransactions() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao);
+		context.prepareBlockWithMultisigTransactions();
+		final List<MultisigTransaction> expectedTransactions = Arrays.asList(
+				context.multisigTransferTransaction,
+				context.multisigImportanceTransferTransaction,
+				context.multisigAggregateModificationTransaction);
+
+		// Assert:
+		// 1) signer of multisig transaction sees his own transactions as outgoing
+		this.assertExpectedMultisigTransactions(
+				context.multisigSigner,
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				expectedTransactions);
+
+		// 2) multisig account sees the multisig transactions as outgoing (because inner transaction involves the multisig account)
+		this.assertExpectedMultisigTransactions(
+				context.multisig,
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				expectedTransactions);
+
+		// 3) cosignatories of the multisig transaction see the transactions as outgoing
+		context.cosignatories.stream()
+				.forEach(c -> this.assertExpectedMultisigTransactions(
+						c,
+						ReadOnlyTransferDao.TransferType.OUTGOING,
+						expectedTransactions));
+
+		// 4) recipient (if any) of the inner transaction does not see the transaction as outgoing
+		this.assertExpectedMultisigTransactions(
+				context.recipient,
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				new ArrayList<>());
+
+		// 5) other accounts do not see any transaction as outgoing
+		this.assertExpectedMultisigTransactions(
+				Utils.generateRandomAccount(),
+				ReadOnlyTransferDao.TransferType.OUTGOING,
+				new ArrayList<>());
+	}
+
+	@Test
+	public void getTransactionsForAccountUsingIdReturnsExpectedIncomingMultisigTransactions() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext(this.blockDao);
+		context.prepareBlockWithMultisigTransactions();
+
+		// Assert:
+		// 1) signer of multisig transaction does not any the transaction as incoming
+		this.assertExpectedMultisigTransactions(
+				context.multisigSigner,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				new ArrayList<>());
+
+		// 2) multisig account does not see any transaction as incoming
+		this.assertExpectedMultisigTransactions(
+				context.multisig,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				new ArrayList<>());
+
+		// 3) cosignatories of the multisig transaction do not see any transaction as incoming
+		context.cosignatories.stream()
+				.forEach(c -> this.assertExpectedMultisigTransactions(
+						c,
+						ReadOnlyTransferDao.TransferType.INCOMING,
+						new ArrayList<>()));
+
+		// 4) recipient (if any) of inner transaction sees the transaction as incoming
+		this.assertExpectedMultisigTransactions(
+				context.recipient,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				Arrays.asList(context.multisigTransferTransaction, context.multisigImportanceTransferTransaction));
+
+		// 5) the new cosignatory of the inner transaction (in case of modification) sees the transaction as incoming
+		this.assertExpectedMultisigTransactions(
+				context.newCosignatory,
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				Arrays.asList(context.multisigAggregateModificationTransaction));
+
+		// 6) other accounts do not see any transaction as incoming
+		this.assertExpectedMultisigTransactions(
+				Utils.generateRandomAccount(),
+				ReadOnlyTransferDao.TransferType.INCOMING,
+				new ArrayList<>());
+	}
+
+	private void assertExpectedMultisigTransactions(
+			final Account account,
+			final ReadOnlyTransferDao.TransferType transferType,
+			final Collection<MultisigTransaction> multisigTransactions) {
+
+		// Act:
+		final Collection<Hash> transactions = this.transferDao.getTransactionsForAccountUsingId(
+				account,
+				null,
+				transferType,
+				DEFAULT_LIMIT)
+				.stream()
+				.map(p -> p.getTransfer().getTransferHash())
+				.collect(Collectors.toList());
+		final Collection<Hash> expectedTransactions = multisigTransactions.stream()
+				.map(HashUtils::calculateHash)
+				.collect(Collectors.toList());
+
+		// Assert:
+		Assert.assertThat(transactions, IsEquivalent.equivalentTo(expectedTransactions));
+	}
+
+	private class MultisigTestContext {
+		private final BlockDao blockDao;
+		private final Account harvester;
+		private final Account multisigSigner;
+		private final Account multisig;
+		private final Account recipient;
+		private final List<Account> cosignatories;
+		private final Account newCosignatory;
+		private final Collection<Transaction> transactions;
+		private MultisigTransaction multisigTransferTransaction;
+		private MultisigTransaction multisigImportanceTransferTransaction;
+		private MultisigTransaction multisigAggregateModificationTransaction;
+
+		private MultisigTestContext(final BlockDao blockDao) {
+			this.blockDao = blockDao;
+			this.multisigSigner = Utils.generateRandomAccount();
+			this.harvester = Utils.generateRandomAccount();
+			this.multisig = Utils.generateRandomAccount();
+			this.recipient = Utils.generateRandomAccount();
+			this.cosignatories = Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount());
+			this.newCosignatory = Utils.generateRandomAccount();
+			this.transactions = new ArrayList<>();
+		}
+
+		private void prepareBlockWithMultisigTransactions() {
+			final MockAccountDao mockAccountDao = new MockAccountDao();
+			final AccountDaoLookup accountDaoLookup = new AccountDaoLookupAdapter(mockAccountDao);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.harvester);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.multisigSigner);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.multisig);
+			TransferDaoTest.this.addMapping(mockAccountDao, this.recipient);
+			this.cosignatories.forEach(c -> TransferDaoTest.this.addMapping(mockAccountDao, c));
+			final Block block = new Block(this.harvester, Hash.ZERO, Hash.ZERO, new TimeInstant(123), BlockHeight.ONE);
+
+			// multisig transfer transactions
+			this.addMultisigTransferTransactions();
+
+			// multisig importance transfer transactions
+			this.addMultisigImportanceTransferTransactions();
+
+			// multisig aggregate modification transactions
+			this.addMultisigAggregateModificationTransactions();
+
+			block.addTransactions(this.transactions);
+			block.sign();
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
+
+			// Act
+			this.blockDao.save(dbBlock);
+		}
+
+		private void addMultisigTransferTransactions() {
+			this.multisigTransferTransaction = this.prepareMultisigTransaction(
+					this.createTransferTransaction(this.multisig, this.recipient),
+					this.multisigSigner,
+					this.cosignatories);
+			this.transactions.add(this.multisigTransferTransaction);
+			for (int i = 0; i < 3; i++) {
+				final MultisigTransaction tx = this.prepareMultisigTransaction(
+						this.createTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()),
+						Utils.generateRandomAccount(),
+						Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount()));
+				this.transactions.add(tx);
+			}
+		}
+
+		private void addMultisigImportanceTransferTransactions() {
+			this.multisigImportanceTransferTransaction = this.prepareMultisigTransaction(
+					this.createImportanceTransferTransaction(this.multisig, this.recipient),
+					this.multisigSigner,
+					this.cosignatories);
+			this.transactions.add(this.multisigImportanceTransferTransaction);
+			for (int i = 0; i < 3; i++) {
+				final MultisigTransaction tx = this.prepareMultisigTransaction(
+						this.createImportanceTransferTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()),
+						Utils.generateRandomAccount(),
+						Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount()));
+				this.transactions.add(tx);
+			}
+		}
+
+		private void addMultisigAggregateModificationTransactions() {
+			this.multisigAggregateModificationTransaction = this.prepareMultisigTransaction(
+					this.createMultisigAggregateModificationTransaction(this.multisig, this.newCosignatory),
+					this.multisigSigner,
+					this.cosignatories);
+			this.transactions.add(this.multisigAggregateModificationTransaction);
+			for (int i = 0; i < 3; i++) {
+				final MultisigTransaction tx = this.prepareMultisigTransaction(
+						this.createMultisigAggregateModificationTransaction(Utils.generateRandomAccount(), Utils.generateRandomAccount()),
+						Utils.generateRandomAccount(),
+						Arrays.asList(Utils.generateRandomAccount(), Utils.generateRandomAccount(), Utils.generateRandomAccount()));
+				this.transactions.add(tx);
+			}
+		}
+
+		private MultisigTransaction prepareMultisigTransaction(
+				final Transaction otherTransaction,
+				final Account multisigSigner,
+				final List<Account> cosignatories) {
+			final MultisigTransaction transaction = new MultisigTransaction(
+					TimeInstant.ZERO,
+					multisigSigner,
+					otherTransaction);
+			cosignatories.forEach(c -> this.addSignature(c, transaction));
+			transaction.sign();
+
+			return transaction;
+		}
+
+		private TransferTransaction createTransferTransaction(final Account transferSender, final Account transferRecipient) {
+			return new TransferTransaction(
+					TimeInstant.ZERO,
+					transferSender,
+					transferRecipient,
+					Amount.fromNem(123),
+					null);
+		}
+
+		private ImportanceTransferTransaction createImportanceTransferTransaction(final Account transferSender, final Account transferRecipient) {
+			return new ImportanceTransferTransaction(
+					TimeInstant.ZERO,
+					transferSender,
+					ImportanceTransferTransaction.Mode.Activate,
+					transferRecipient);
+		}
+
+		private MultisigAggregateModificationTransaction createMultisigAggregateModificationTransaction(
+				final Account multisig,
+				final Account newCosignatory) {
+			final List<MultisigModification> modifications = Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosignatory));
+			return new MultisigAggregateModificationTransaction(
+					TimeInstant.ZERO,
+					multisig,
+					modifications);
+		}
+
+		public void addSignature(final Account signatureSigner, final MultisigTransaction multisigTransaction) {
+			final Transaction otherTransaction = multisigTransaction.getOtherTransaction();
+			final MultisigSignatureTransaction signatureTransaction = new MultisigSignatureTransaction(
+					TimeInstant.ZERO,
+					signatureSigner,
+					otherTransaction.getSigner(),
+					otherTransaction);
+			signatureTransaction.sign();
+			multisigTransaction.addSignature(signatureTransaction);
+		}
+	}
+
+	// endregion
+
+	private Collection<AbstractBlockTransfer> getTransfersFromDbUsingAttribute(final TestContext context, final Hash hash, final Long id, final int callType) {
 		return this.executeGetTransactionsForAccountUsingAttribute(
 				context.account,
 				hash,
@@ -467,7 +742,7 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, transferType);
 		final List<Integer> expectedTimeStamps = context.getTestIntegerList(mapper);
 		final List<Integer> timeStamps = this.getTransfersFromDbUsingAttribute(context, null, null, callType).stream()
-				.map(Transfer::getTimeStamp)
+				.map(AbstractBlockTransfer::getTimeStamp)
 				.collect(Collectors.toList());
 
 		// Assert
@@ -487,7 +762,7 @@ public class TransferDaoTest {
 				USE_HASH == callType ? context.hashes.get(mapper.apply(24)) : null,
 				USE_ID == callType ? (long)mapper.apply(24) + 1 : null,
 				callType).stream()
-				.map(Transfer::getTimeStamp)
+				.map(AbstractBlockTransfer::getTimeStamp)
 				.collect(Collectors.toList());
 
 		// Assert
@@ -507,7 +782,7 @@ public class TransferDaoTest {
 				USE_HASH == callType ? context.hashes.get(mapper.apply(pos)) : null,
 				USE_ID == callType ? (long)mapper.apply(pos) + 1 : null,
 				callType).stream()
-				.map(Transfer::getTimeStamp)
+				.map(AbstractBlockTransfer::getTimeStamp)
 				.collect(Collectors.toList());
 
 		// Assert
@@ -652,7 +927,7 @@ public class TransferDaoTest {
 				dummyBlock.addTransaction(transferTransaction);
 			}
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 			// Act
 			this.blockDao.save(dbBlock);
@@ -677,7 +952,7 @@ public class TransferDaoTest {
 			dummyBlock.addTransaction(transferTransaction);
 		}
 		dummyBlock.sign();
-		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+		final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 		// Act
 		this.blockDao.save(dbBlock);
@@ -710,7 +985,7 @@ public class TransferDaoTest {
 			dummyBlock.addTransaction(transferTransaction);
 		}
 		dummyBlock.sign();
-		final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+		final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 
 		// Act
 		this.blockDao.save(dbBlock);
@@ -735,18 +1010,18 @@ public class TransferDaoTest {
 		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase(1);
 
 		// Act: second parameter is maximum block height
-		final Transfer transfer1_1 = this.transferDao.findByHash(hashes.get(0).getRaw(), 1);
-		final Transfer transfer1_2 = this.transferDao.findByHash(hashes.get(0).getRaw(), 2);
-		final Transfer transfer1_3 = this.transferDao.findByHash(hashes.get(0).getRaw(), 3);
-		final Transfer transfer2 = this.transferDao.findByHash(hashes.get(1).getRaw(), 2);
-		final Transfer transfer3 = this.transferDao.findByHash(hashes.get(2).getRaw(), 3);
+		final DbTransferTransaction dbTransferTransaction1_1 = this.transferDao.findByHash(hashes.get(0).getRaw(), 1);
+		final DbTransferTransaction dbTransferTransaction1_2 = this.transferDao.findByHash(hashes.get(0).getRaw(), 2);
+		final DbTransferTransaction dbTransferTransaction1_3 = this.transferDao.findByHash(hashes.get(0).getRaw(), 3);
+		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(hashes.get(1).getRaw(), 2);
+		final DbTransferTransaction dbTransferTransaction3 = this.transferDao.findByHash(hashes.get(2).getRaw(), 3);
 
 		// Assert:
-		Assert.assertThat(transfer1_1, IsNull.notNullValue());
-		Assert.assertThat(transfer1_2, IsNull.notNullValue());
-		Assert.assertThat(transfer1_3, IsNull.notNullValue());
-		Assert.assertThat(transfer2, IsNull.notNullValue());
-		Assert.assertThat(transfer3, IsNull.notNullValue());
+		Assert.assertThat(dbTransferTransaction1_1, IsNull.notNullValue());
+		Assert.assertThat(dbTransferTransaction1_2, IsNull.notNullValue());
+		Assert.assertThat(dbTransferTransaction1_3, IsNull.notNullValue());
+		Assert.assertThat(dbTransferTransaction2, IsNull.notNullValue());
+		Assert.assertThat(dbTransferTransaction3, IsNull.notNullValue());
 	}
 
 	@Test
@@ -755,12 +1030,12 @@ public class TransferDaoTest {
 		final List<Hash> hashes = this.saveThreeBlocksWithTransactionsInDatabase(1);
 
 		// Act: second parameter is maximum block height
-		final Transfer transfer1 = this.transferDao.findByHash(hashes.get(1).getRaw(), 1);
-		final Transfer transfer2 = this.transferDao.findByHash(hashes.get(2).getRaw(), 2);
+		final DbTransferTransaction dbTransferTransaction1 = this.transferDao.findByHash(hashes.get(1).getRaw(), 1);
+		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(hashes.get(2).getRaw(), 2);
 
 		// Assert:
-		Assert.assertThat(transfer1, IsNull.nullValue());
-		Assert.assertThat(transfer2, IsNull.nullValue());
+		Assert.assertThat(dbTransferTransaction1, IsNull.nullValue());
+		Assert.assertThat(dbTransferTransaction2, IsNull.nullValue());
 	}
 
 	@Test
@@ -769,10 +1044,10 @@ public class TransferDaoTest {
 		this.saveThreeBlocksWithTransactionsInDatabase(1);
 
 		// Act: second parameter is maximum block height
-		final Transfer transfer = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);
+		final DbTransferTransaction dbTransferTransaction = this.transferDao.findByHash(Utils.generateRandomHash().getRaw(), 3);
 
 		// Assert:
-		Assert.assertThat(transfer, IsNull.nullValue());
+		Assert.assertThat(dbTransferTransaction, IsNull.nullValue());
 	}
 
 	// TODO 20141029 BR -> J: you want the same tests for importance transfer dao
@@ -852,14 +1127,14 @@ public class TransferDaoTest {
 			this.addMapping(mockAccountDao, recipient);
 			for (int j = 0; j < transactionsPerBlock; j++) {
 				final TransferTransaction transferTransaction = this.prepareTransferTransaction(sender, recipient, 10, i * 123);
-				final Transfer dbTransfer = TransferMapper.toDbModel(transferTransaction, 12345, i - 1, accountDaoLookup);
-				hashes.add(dbTransfer.getTransferHash());
+				final DbTransferTransaction dbTransferTransaction = mapToTransfer(transferTransaction, accountDaoLookup);
+				hashes.add(dbTransferTransaction.getTransferHash());
 				dummyBlock.addTransaction(transferTransaction);
 			}
 
 			// need to wrap it in block, cause getTransactionsForAccount returns also "owning" block's height
 			dummyBlock.sign();
-			final org.nem.nis.dbmodel.Block dbBlock = BlockMapper.toDbModel(dummyBlock, accountDaoLookup);
+			final DbBlock dbBlock = MapperUtils.toDbModel(dummyBlock, accountDaoLookup);
 			this.blockDao.save(dbBlock);
 		}
 
@@ -879,15 +1154,15 @@ public class TransferDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final org.nem.nis.dbmodel.Account dbSender = new org.nem.nis.dbmodel.Account(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
-		final org.nem.nis.dbmodel.Account dbRecipient = new org.nem.nis.dbmodel.Account(
+		final DbAccount dbSender = new DbAccount(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
+		final DbAccount dbRecipient = new DbAccount(
 				recipient.getAddress().getEncoded(),
 				recipient.getAddress().getPublicKey());
 		mockAccountDao.addMapping(sender, dbSender);
@@ -895,14 +1170,18 @@ public class TransferDaoTest {
 		return new AccountDaoLookupAdapter(mockAccountDao);
 	}
 
-	private void addToDummyBlock(final org.nem.nis.dbmodel.Account account, final Transfer... dbTransfers) {
-		final org.nem.nis.dbmodel.Block block = new org.nem.nis.dbmodel.Block(Hash.ZERO, 1, Hash.ZERO, Hash.ZERO, 1,
-				account, new byte[] { 1, 2, 3, 4 },
-				1L, 1L, 1L, 123L, null);
+	private void addToDummyBlock(final DbAccount dbAccount, final DbTransferTransaction... dbTransferTransactions) {
+		final DbBlock block = NisUtils.createDummyDbBlock(dbAccount);
 		this.blockDao.save(block);
 
-		for (final Transfer transfer : dbTransfers) {
-			transfer.setBlock(block);
+		for (final DbTransferTransaction dbTransferTransaction : dbTransferTransactions) {
+			dbTransferTransaction.setBlock(block);
+			dbTransferTransaction.setBlkIndex(-1);
+			dbTransferTransaction.setOrderId(-1);
 		}
+	}
+
+	private static DbTransferTransaction mapToTransfer(final TransferTransaction transaction, final AccountDaoLookup accountDaoLookup) {
+		return MapperUtils.createModelToDbModelMapper(accountDaoLookup).map(transaction, DbTransferTransaction.class);
 	}
 }

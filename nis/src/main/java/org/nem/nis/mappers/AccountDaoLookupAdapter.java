@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.Address;
 import org.nem.nis.dao.AccountDao;
-import org.nem.nis.dbmodel.Account;
+import org.nem.nis.dbmodel.DbAccount;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ import java.util.*;
 public class AccountDaoLookupAdapter implements AccountDaoLookup {
 
 	private final AccountDao accountDao;
-	private final Map<String, Account> accountCache;
+	private final Map<String, DbAccount> accountCache;
 
 	/**
 	 * Creates a new adapter that wraps an AccountDao.
@@ -25,9 +25,9 @@ public class AccountDaoLookupAdapter implements AccountDaoLookup {
 	}
 
 	@Override
-	public Account findByAddress(final Address id) {
+	public DbAccount findByAddress(final Address id) {
 		final String encodedAddress = id.getEncoded();
-		Account dbAccount = this.accountCache.get(encodedAddress);
+		DbAccount dbAccount = this.accountCache.get(encodedAddress);
 		final boolean isInCache = null != dbAccount;
 
 		if (!isInCache) {
@@ -35,7 +35,7 @@ public class AccountDaoLookupAdapter implements AccountDaoLookup {
 		}
 
 		if (null == dbAccount) {
-			dbAccount = new Account(encodedAddress, null);
+			dbAccount = new DbAccount(encodedAddress, null);
 		}
 
 		if (null == dbAccount.getPublicKey()) {

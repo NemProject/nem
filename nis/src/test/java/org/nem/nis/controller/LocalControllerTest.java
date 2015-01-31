@@ -6,6 +6,8 @@ import org.mockito.Mockito;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
+import org.nem.core.node.*;
+import org.nem.core.test.NodeUtils;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
@@ -105,6 +107,20 @@ public class LocalControllerTest {
 		assertStatus(result, NemStatus.SYNCHRONIZED);
 	}
 
+	@Test
+	public void statusReturnsStatusNoRemoteNisWhenNetworkIsBootedAndNoRemoteNisIsAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.host.isNetworkBooted()).thenReturn(true);
+		Mockito.when(context.network.getNodes()).thenReturn(new NodeCollection());
+
+		// Act:
+		final NemRequestResult result = context.controller.status();
+
+		// Assert:
+		assertStatus(result, NemStatus.NO_REMOTE_NIS_AVAILABLE);
+	}
+
 	private static void assertStatus(final NemRequestResult result, final NemStatus expectedStatus) {
 		// Assert:
 		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_STATUS));
@@ -123,6 +139,10 @@ public class LocalControllerTest {
 		private TestContext() {
 			this.controller = new LocalController(this.host, this.starter);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
+
+			final NodeCollection nodes = new NodeCollection();
+			nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
+			Mockito.when(this.network.getNodes()).thenReturn(nodes);
 		}
 	}
 }
