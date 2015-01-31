@@ -1,5 +1,7 @@
 package org.nem.core.connect;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.*;
 import org.apache.http.*;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ContentType;
@@ -12,8 +14,9 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.net.URL;
+import java.net.*;
 import java.util.concurrent.CancellationException;
+import java.util.function.*;
 
 @RunWith(Enclosed.class)
 public class HttpMethodClientTest {
@@ -44,10 +47,9 @@ public class HttpMethodClientTest {
 	}
 
 	private static class TestRunner {
-		private final String GOOD_URL = "http://echo.jsontest.com/key/value/one/two";
-		private final String TIMEOUT_URL = "http://127.0.0.100/";
-		private final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
-		private final String HOST_LESS_URI = "file:///~/calendar";
+		private static final String GOOD_URL = "http://echo.jsontest.com/key/value/one/two";
+		private static final String MALFORMED_URI = "http://www.example.com/customers/[12345]";
+		private static final String HOST_LESS_URI = "file:///~/calendar";
 
 		public interface SendAsyncStrategy {
 			<T> HttpMethodClient.AsyncToken<T> send(
@@ -70,7 +72,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 			// Act:
-			final Deserializer deserializer = this.strategy.send(client, this.stringToUrl(this.GOOD_URL), DEFAULT_STRATEGY).get();
+			final Deserializer deserializer = this.strategy.send(client, this.stringToUrl(GOOD_URL), DEFAULT_STRATEGY).get();
 
 			// Assert:
 			Assert.assertThat(deserializer, IsNull.notNullValue());
@@ -85,7 +87,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 			// Act:
-			this.strategy.send(client, this.stringToUrl(this.GOOD_URL), strategy).get();
+			this.strategy.send(client, this.stringToUrl(GOOD_URL), strategy).get();
 
 			// Assert:
 			Mockito.verify(strategy, Mockito.times(1)).coerce(Mockito.any(HttpRequestBase.class), Mockito.any(HttpResponse.class));
@@ -98,7 +100,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<Object> client = new HttpMethodClient<>(GOOD_TIMEOUT, GOOD_TIMEOUT, GOOD_TIMEOUT);
 
 			// Act:
-			this.strategy.send(client, this.stringToUrl(this.GOOD_URL), strategy).get();
+			this.strategy.send(client, this.stringToUrl(GOOD_URL), strategy).get();
 
 			// Assert:
 			Assert.assertThat(strategy.getRequestMethod(), IsEqual.equalTo(this.httpMethod));
@@ -109,19 +111,48 @@ public class HttpMethodClientTest {
 		@Test(expected = InactivePeerException.class)
 		public void sendThrowsInactivePeerExceptionOnConnectionTimeout() {
 			// Arrange:
-			final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(1, GOOD_TIMEOUT, GOOD_TIMEOUT);
+			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
+				// - stop the service so that it's no longer running and will reject connections
+				mockService.stop();
+				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(500, GOOD_TIMEOUT, GOOD_TIMEOUT);
 
-			// Act:
-			this.strategy.send(client, this.stringToUrl("http://10.0.0.1:9999"), DEFAULT_STRATEGY).get();
+				// Act:
+				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
+			});
 		}
 
 		@Test(expected = BusyPeerException.class)
 		public void sendThrowsBusyPeerExceptionOnSocketTimeout() {
 			// Arrange:
-			final HttpMethodClient<Deserializer> client = createClient(1);
+			this.runTestWithTimeoutService((mockService, timeoutUrl) -> {
+				// Arrange:
+				// - set a delay in request processing to simulate a socket timeout
+				mockService.addRequestProcessingDelay(1000);
+				final HttpMethodClient<Deserializer> client = new HttpMethodClient<>(GOOD_TIMEOUT, 500, GOOD_TIMEOUT);
 
-			// Act:
-			this.strategy.send(client, this.stringToUrl(this.TIMEOUT_URL), DEFAULT_STRATEGY).get();
+				// Act:
+				this.strategy.send(client, this.stringToUrl(timeoutUrl), DEFAULT_STRATEGY).get();
+			});
+		}
+
+		private void runTestWithTimeoutService(final BiConsumer<WireMockServer, String> action) {
+			WireMockServer mockService = null;
+			try {
+				mockService = new WireMockServer(8890);
+				mockService.start();
+				mockService.stubFor(createTimeoutStub(WireMock::get));
+				mockService.stubFor(createTimeoutStub(WireMock::post));
+				action.accept(mockService, "http://localhost:" + mockService.port() + "/timeout");
+			} finally {
+				if (null != mockService) {
+					mockService.stop();
+				}
+			}
+		}
+
+		private static MappingBuilder createTimeoutStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder)  {
+			return createBuilder.apply(WireMock.urlEqualTo("/timeout")).willReturn(
+					WireMock.aResponse().withStatus(200));
 		}
 
 		@Test(expected = CancellationException.class)
@@ -132,7 +163,7 @@ public class HttpMethodClientTest {
 			// Act:
 			final HttpMethodClient.AsyncToken<Deserializer> token = this.strategy.send(
 					client,
-					this.stringToUrl(this.TIMEOUT_URL),
+					this.stringToUrl(GOOD_URL),
 					DEFAULT_STRATEGY);
 			token.abort();
 			token.get();
@@ -144,7 +175,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 			// Act:
-			this.strategy.send(client, this.stringToUrl(this.MALFORMED_URI), DEFAULT_STRATEGY).get();
+			this.strategy.send(client, this.stringToUrl(MALFORMED_URI), DEFAULT_STRATEGY).get();
 		}
 
 		@Test(expected = FatalPeerException.class)
@@ -153,7 +184,7 @@ public class HttpMethodClientTest {
 			final HttpMethodClient<Deserializer> client = createClient(GOOD_TIMEOUT);
 
 			// Act:
-			this.strategy.send(client, this.stringToUrl(this.HOST_LESS_URI), DEFAULT_STRATEGY).get();
+			this.strategy.send(client, this.stringToUrl(HOST_LESS_URI), DEFAULT_STRATEGY).get();
 		}
 
 		@Test(expected = CancellationException.class)
