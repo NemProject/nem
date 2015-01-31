@@ -48,37 +48,35 @@ public class BlockChainValidatorIntegrationTest {
 	public void allTransactionsInChainMustBeValid() {
 		// Assert:
 		assertChainWithSingleInvalidTransactionIsInvalid(factory -> {
-					final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime().addHours(2);
-					final MockTransaction transaction = factory.prepareMockTransaction(new MockTransaction(0, currentTime));
-				transaction.setDeadline(currentTime.addHours(-1));
-				transaction.sign();
-				return factory.prepareMockTransaction(transaction);
-			},
-			ValidationResult.FAILURE_PAST_DEADLINE);
+			final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime().addHours(2);
+			final MockTransaction transaction = factory.prepareMockTransaction(new MockTransaction(0, currentTime));
+			transaction.setDeadline(currentTime.addHours(-1));
+			transaction.sign();
+			return factory.prepareMockTransaction(transaction);
+		}, ValidationResult.FAILURE_PAST_DEADLINE);
 	}
 
 	@Test
 	public void allTransactionsInChainMustHaveValidTimestamp() {
 		// Assert:
 		assertChainWithSingleInvalidTransactionIsInvalid(factory -> {
-				final TimeInstant futureTime = NisMain.TIME_PROVIDER.getCurrentTime().addHours(2);
-				final MockTransaction transaction = factory.prepareMockTransaction(new MockTransaction(0, futureTime));
-				transaction.setDeadline(futureTime.addSeconds(10));
-					transaction.sign();
-				return transaction;
-			},
-			ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
+			final TimeInstant futureTime = NisMain.TIME_PROVIDER.getCurrentTime().addHours(2);
+			final MockTransaction transaction = factory.prepareMockTransaction(new MockTransaction(0, futureTime));
+			transaction.setDeadline(futureTime.addSeconds(10));
+			transaction.sign();
+			return transaction;
+		}, ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE);
 	}
 
 	@Test
 	public void chainWithTransactionWithInsufficientFeeIsInvalid() {
 		// Assert:
 		assertChainWithSingleInvalidTransactionIsInvalid(factory -> {
-				final Transaction transaction = factory.createValidSignedTransaction();
-				transaction.setFee(Amount.fromNem(1));
-				transaction.sign();
-				return transaction;
-			}, ValidationResult.FAILURE_INSUFFICIENT_FEE);
+			final Transaction transaction = factory.createValidSignedTransaction();
+			transaction.setFee(Amount.fromNem(1));
+			transaction.sign();
+			return transaction;
+		}, ValidationResult.FAILURE_INSUFFICIENT_FEE);
 	}
 
 	private static void assertChainWithSingleInvalidTransactionIsInvalid(

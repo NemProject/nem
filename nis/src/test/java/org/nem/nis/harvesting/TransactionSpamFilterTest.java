@@ -22,7 +22,7 @@ public class TransactionSpamFilterTest {
 		// Arrange:
 		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1, BlockHeight.ONE);
 		context.setImportance(0.0);
-		final Transaction transaction =  new MockTransaction(Utils.generateRandomAccount());
+		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 		transaction.setFee(Amount.fromNem(0));
 
 		// Act:
@@ -126,7 +126,7 @@ public class TransactionSpamFilterTest {
 	private static Collection<Transaction> createTransactions(final int count) {
 		return IntStream.range(0, count)
 				.mapToObj(i -> {
-					final Transaction transaction = new MockTransaction (Utils.generateRandomAccount());
+					final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
 					transaction.setFee(Amount.ZERO);
 					return transaction;
 				})

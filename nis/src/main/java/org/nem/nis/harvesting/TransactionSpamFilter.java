@@ -26,13 +26,14 @@ public class TransactionSpamFilter {
 	 * @param nisCache The (read only) NIS cache.
 	 * @param transactions The unconfirmed transactions cache.
 	 */
-	public TransactionSpamFilter(final ReadOnlyNisCache nisCache,final UnconfirmedTransactionsCache transactions) {
+	public TransactionSpamFilter(final ReadOnlyNisCache nisCache, final UnconfirmedTransactionsCache transactions) {
 		this.nisCache = nisCache;
 		this.transactions = transactions;
 	}
 
 	/**
-	 * * Filters out all transactions that are considered spam.
+	 * Filters out all transactions that are considered spam.
+	 *
 	 * @param transactions The transactions.
 	 * @return The non-spam transactions.
 	 */
@@ -61,8 +62,8 @@ public class TransactionSpamFilter {
 		}
 
 		final long count = Stream.concat(this.transactions.stream(), filteredTransactions.stream())
-						.filter(t -> t.getDebtor().getAddress().equals(debtor.getAddress()))
-						.count();
+				.filter(t -> t.getDebtor().getAddress().equals(debtor.getAddress()))
+				.count();
 		final double effectiveImportance = importanceInfo.getImportance(importanceHeight) + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
 		return count < this.getMaxAllowedTransactions(effectiveImportance, numApprovedTransactions);
 	}

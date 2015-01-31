@@ -98,7 +98,7 @@ public class TransactionFeeCalculatorTest {
 			// Assert:
 			assertFee(1200, 96, Amount.fromNem(MIN_TRANSFER_FEE + 12));
 			assertFee(1200, 128, Amount.fromNem(MIN_TRANSFER_FEE + 16));
-			assertFee(1200, 256, Amount.fromNem(MIN_TRANSFER_FEE +32));
+			assertFee(1200, 256, Amount.fromNem(MIN_TRANSFER_FEE + 32));
 		}
 
 		@Test
@@ -321,7 +321,6 @@ public class TransactionFeeCalculatorTest {
 	//endregion
 
 	//region transfer
-
 
 	//endregion
 
