@@ -26,6 +26,7 @@ public class UnconfirmedTransactions {
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
 	private final SingleTransactionValidator singleValidator;
+	private final TransactionSpamFilter spamFilter;
 	private final ReadOnlyNisCache nisCache;
 	private final TimeProvider timeProvider;
 	private final Object lock = new Object();
@@ -88,6 +89,7 @@ public class UnconfirmedTransactions {
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
+		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 
 		for (final Transaction transaction : transactions) {
 			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
@@ -139,12 +141,13 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNewBatch(final Collection<Transaction> transactions) {
 		synchronized (this.lock) {
-			final ValidationResult transactionValidationResult = this.validateBatch(transactions);
+			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(transactions);
+			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			if (!transactionValidationResult.isSuccess()) {
 				return transactionValidationResult;
 			}
 
-			return ValidationResult.aggregate(transactions.stream().map(transaction -> this.add(transaction, true)).iterator());
+			return ValidationResult.aggregate(filteredTransactions.stream().map(transaction -> this.add(transaction, true)).iterator());
 		}
 	}
 
@@ -156,7 +159,17 @@ public class UnconfirmedTransactions {
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
 		synchronized (this.lock) {
-			final ValidationResult transactionValidationResult = this.validateBatch(Arrays.asList(transaction));
+			// TODO 20150130 J-B: can you add a test for the add new changes?
+			// check is needed to distinguish between NEUTRAL and FAILURE_TRANSACTION_CACHE_TOO_FULL
+			if (this.transactions.contains(transaction)) {
+				return ValidationResult.NEUTRAL;
+			}
+
+			final Collection<Transaction> filteredTransactions = this.spamFilter.filter(Arrays.asList(transaction));
+			if (filteredTransactions.isEmpty()) {
+				return ValidationResult.FAILURE_TRANSACTION_CACHE_TOO_FULL;
+			}
+			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			return transactionValidationResult.isSuccess()
 					? this.add(transaction, true)
 					: transactionValidationResult;

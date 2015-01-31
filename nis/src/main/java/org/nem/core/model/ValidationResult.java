@@ -178,6 +178,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_NEMESIS_ACCOUNT_TRANSACTION_AFTER_NEMESIS_BLOCK(40),
 
+	/**
+	 * Transaction was rejected because the debtor is not allowed to put another transaction into the cache.
+	 */
+	FAILURE_TRANSACTION_CACHE_TOO_FULL(41),
+
 	//region BlockChainValidator 1xx
 
 	/**
