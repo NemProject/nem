@@ -3,6 +3,7 @@ package org.nem.core.model;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
@@ -30,8 +31,8 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
-		// TODO 20150130 J-G: why is the fee so high?
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(600)));
+		// 2 multisig aggregate transactions, each with two cosignatories
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(2 * 2*(5 + 3*2))));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(NUM_NEMESIS_TRANSACTIONS));
@@ -69,7 +70,7 @@ public class NemesisBlockTest {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
 					? Amount.ZERO
-					: Amount.fromNem(300);
+					: Amount.fromNem(2*(5 + 3*2));
 			Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 		}
 	}
