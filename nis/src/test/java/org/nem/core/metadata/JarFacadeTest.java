@@ -127,7 +127,7 @@ public class JarFacadeTest {
 
 	private static void assertFacadeHasDefaultProperties(final JarFacade facade) {
 		// Assert:
-		Assert.assertThat(facade.getVersion(), IsEqual.equalTo("0.4.0-DEVELOPER BUILD"));
+		Assert.assertThat(facade.getVersion(), IsEqual.equalTo("0.5.0-DEVELOPER BUILD"));
 		Assert.assertThat(facade.getTitle(), IsEqual.equalTo("NEM"));
 	}
 }
