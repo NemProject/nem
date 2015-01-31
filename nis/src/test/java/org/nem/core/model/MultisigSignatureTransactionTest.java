@@ -92,19 +92,6 @@ public class MultisigSignatureTransactionTest {
 
 	//endregion
 
-	//region getFee
-
-	@Test
-	public void minimumFeeIsZero() {
-		// Arrange:
-		final Transaction transaction = createDefaultTransaction();
-
-		// Assert:
-		Assert.assertThat(transaction.getFee(), IsEqual.equalTo(Amount.ZERO));
-	}
-
-	//endregion
-
 	//region getAccounts
 
 	@Test

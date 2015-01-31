@@ -78,7 +78,7 @@ public class BlockChainServices {
 				this.blockValidatorFactory.create(nisCache),
 				this.transactionValidatorFactory.createSingle(accountStateCache),
 				new DefaultDebitPredicate(accountStateCache));
-		return validator.isValid(parentBlock, peerChain);
+		return validator.isValid(parentBlock, peerChain).isSuccess();
 	}
 
 	/**

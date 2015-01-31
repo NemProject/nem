@@ -68,6 +68,16 @@ public class Amount extends AbstractPrimitive<Amount, Long> {
 	}
 
 	/**
+	 * Creates a new Amount by multiplying this amount by the specified scalar
+	 *
+	 * @param scalar The specified scalar.
+	 * @return The new amount.
+	 */
+	public Amount multiply(final int scalar) {
+		return new Amount(this.getNumMicroNem() * scalar);
+	}
+
+	/**
 	 * Returns the number of micro NEM.
 	 *
 	 * @return The number of micro NEM.

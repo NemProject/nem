@@ -89,25 +89,8 @@ public class TransferTransaction extends Transaction {
 	}
 
 	@Override
-	public Amount getMinimumFee() {
-		return Amount.fromNem(this.getMinimumTransferFee() + this.getMinimumMessageFee());
-	}
-
-	@Override
 	protected Collection<Account> getOtherAccounts() {
 		return Arrays.asList(this.recipient);
-	}
-
-	private long getMinimumTransferFee() {
-		final double nemAmount = this.amount.getNumNem();
-		// TODO 20150109 G-*: this fee is imho too low
-		return Math.max(2, (long)Math.ceil(nemAmount / 12500 + 1 + Math.log(2 * nemAmount) / 5));
-	}
-
-	private long getMinimumMessageFee() {
-		return 0 == this.getMessageLength()
-				? 0
-				: Math.max(10, 10 * this.getMessageLength() / 32);
 	}
 
 	@Override

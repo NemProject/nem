@@ -20,16 +20,34 @@ public class BlockChainValidatorTest {
 	//region block chain size
 
 	@Test
-	public void blockChainMustBeNoGreaterThanBlockLimit() {
+	public void blockChainSizeCanBeLessThanBlockLimit() {
+		// Assert:
+		assertBlockChainSizeValidationResult(20, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void blockChainSizeCanBeEqualToBlockLimit() {
+		// Assert:
+		assertBlockChainSizeValidationResult(21, ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void blockChainSizeCannotBeGreaterThanBlockLimit() {
+		// Assert:
+		assertBlockChainSizeValidationResult(22, ValidationResult.FAILURE_MAX_CHAIN_SIZE_EXCEEDED);
+	}
+
+	private static void assertBlockChainSizeValidationResult(final int size, final ValidationResult expectedResult) {
 		// Arrange:
 		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
 		parentBlock.sign();
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, size));
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, 20)), IsEqual.equalTo(true));
-		Assert.assertThat(validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, 21)), IsEqual.equalTo(true));
-		Assert.assertThat(validator.isValid(parentBlock, NisUtils.createBlockList(parentBlock, 22)), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
 
 	//endregion
@@ -49,8 +67,11 @@ public class BlockChainValidatorTest {
 		blocks.add(createBlock(Utils.generateRandomAccount(), block));
 		NisUtils.signAllBlocks(blocks);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	@Test
@@ -68,8 +89,11 @@ public class BlockChainValidatorTest {
 		blocks.get(blocks.size() - 1).setPrevious(dummyPrevious);
 		NisUtils.signAllBlocks(blocks);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNVERIFIABLE));
 	}
 
 	@Test
@@ -84,8 +108,11 @@ public class BlockChainValidatorTest {
 		blocks.add(createBlock(Utils.generateRandomAccount(), blocks.get(0), 15));
 		NisUtils.signAllBlocks(blocks);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT));
 	}
 
 	@Test
@@ -101,8 +128,11 @@ public class BlockChainValidatorTest {
 		blocks.add(createBlock(Utils.generateRandomAccount(), blocks.get(1), 13));
 		NisUtils.signAllBlocks(blocks);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNEXPECTED_HEIGHT));
 	}
 
 	@Test
@@ -116,8 +146,11 @@ public class BlockChainValidatorTest {
 
 		blocks.get(1).setSignature(new Signature(Utils.generateRandomBytes(64)));
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_UNVERIFIABLE));
 	}
 
 	@Test
@@ -134,8 +167,11 @@ public class BlockChainValidatorTest {
 		Mockito.when(blockValidator.validate(Mockito.any())).thenReturn(ValidationResult.SUCCESS);
 		Mockito.when(blockValidator.validate(Mockito.eq(blocks.get(1)))).thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		Mockito.verify(blockValidator, Mockito.times(2)).validate(Mockito.any());
 	}
 
@@ -157,8 +193,11 @@ public class BlockChainValidatorTest {
 		lastBlock.setPrevious(middleBlock);
 		lastBlock.sign();
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
 	}
 
 	@Test
@@ -175,8 +214,11 @@ public class BlockChainValidatorTest {
 
 		scorer.setZeroTargetBlock(blocks.get(1));
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_BLOCK_NOT_HIT));
 	}
 
 	@Test
@@ -188,8 +230,11 @@ public class BlockChainValidatorTest {
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -210,8 +255,11 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(createValidSignedTransaction());
 		middleBlock.sign();
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE));
 	}
 
 	@Test
@@ -231,8 +279,11 @@ public class BlockChainValidatorTest {
 		Mockito.when(transactionValidator.validate(Mockito.eq(blocks.get(1).getTransactions().get(1)), Mockito.any()))
 				.thenReturn(ValidationResult.FAILURE_FUTURE_DEADLINE);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert: (validation should short circuit after the first failure even though there are three transactions)
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
 		Mockito.verify(transactionValidator, Mockito.times(2)).validate(Mockito.any(), Mockito.any());
 	}
 
@@ -248,6 +299,7 @@ public class BlockChainValidatorTest {
 
 	@Test
 	public void chainIsInvalidIfOneBlockContainsTheSameTransactionTwice() {
+		// Arrange:
 		final BlockChainValidator validator = createValidator();
 		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
 		parentBlock.sign();
@@ -259,7 +311,11 @@ public class BlockChainValidatorTest {
 		middleBlock.addTransaction(tx);
 		middleBlock.sign();
 
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(false));
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
 	}
 
 	@Test
@@ -279,10 +335,10 @@ public class BlockChainValidatorTest {
 		NisUtils.signAllBlocks(blocks);
 
 		// Act:
-		final boolean isValid = validator.isValid(parentBlock, blocks);
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(isValid, IsEqual.equalTo(false));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
 	}
 
 	@Test
@@ -305,8 +361,11 @@ public class BlockChainValidatorTest {
 		final List<Block> blocks = Arrays.asList(block, middleBlock, lastBlock);
 		NisUtils.signAllBlocks(blocks);
 
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
 		// Assert:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -330,9 +389,10 @@ public class BlockChainValidatorTest {
 		NisUtils.signAllBlocks(blocks);
 
 		// Act:
-		Assert.assertThat(validator.isValid(parentBlock, blocks), IsEqual.equalTo(true));
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Mockito.verify(executor, Mockito.times(1)).accept(block1);
 		Mockito.verify(executor, Mockito.times(1)).accept(block2);
 	}
@@ -400,10 +460,10 @@ public class BlockChainValidatorTest {
 		final List<Block> blocks = createBlocksForValidationContextCaptureTests(parentBlock);
 
 		// Act:
-		final boolean result = validator.isValid(parentBlock, blocks);
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(true));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 
 		final ArgumentCaptor<ValidationContext> contextCaptor = ArgumentCaptor.forClass(ValidationContext.class);
 		Mockito.verify(transactionValidator, Mockito.times(6)).validate(Mockito.any(), contextCaptor.capture());
