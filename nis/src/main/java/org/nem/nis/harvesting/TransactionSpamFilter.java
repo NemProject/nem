@@ -64,13 +64,12 @@ public class TransactionSpamFilter {
 						.filter(t -> t.getDebtor().getAddress().equals(debtor.getAddress()))
 						.count();
 		final double effectiveImportance = importanceInfo.getImportance(importanceHeight) + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
-		return count < getMaxAllowedTransactions(effectiveImportance, numApprovedTransactions);
+		return count < this.getMaxAllowedTransactions(effectiveImportance, numApprovedTransactions);
 	}
 
 	private int getMaxAllowedTransactions(final double importance, final int numApprovedTransactions) {
 		final double cacheSize = this.transactions.flatSize() + numApprovedTransactions;
-		final int maxAllowed = (int)(importance * Math.exp(-cacheSize / 300) * MAX_CACHE_SIZE * (MAX_CACHE_SIZE - cacheSize) / 10);
-		return maxAllowed;
+		return (int)(importance * Math.exp(-cacheSize / 300) * MAX_CACHE_SIZE * (MAX_CACHE_SIZE - cacheSize) / 10);
 	}
 
 	// TODO 20150130 J-J: consider refactoring
