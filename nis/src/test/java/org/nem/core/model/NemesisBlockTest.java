@@ -3,7 +3,6 @@ package org.nem.core.model;
 import net.minidev.json.*;
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
@@ -17,6 +16,7 @@ public class NemesisBlockTest {
 	private final static NemesisBlock NEMESIS_BLOCK = NemesisBlock.fromResource(new DeserializationContext(MOCK_ACCOUNT_LOOKUP));
 	private final static String NEMESIS_ACCOUNT = NetworkInfo.getDefault().getNemesisAccountId();
 	private final static int NUM_NEMESIS_TRANSACTIONS = 162;
+	private final static Amount EXPECTED_MULTISIG_AGGREGATE_FEE = Amount.fromNem(2 * (5 + 3 * 2)); // each with two cosignatories
 
 	//region basic
 
@@ -31,8 +31,8 @@ public class NemesisBlockTest {
 		Assert.assertThat(block.getVersion(), IsEqual.equalTo(1));
 		Assert.assertThat(block.getTimeStamp(), IsEqual.equalTo(TimeInstant.ZERO));
 
-		// 2 multisig aggregate transactions, each with two cosignatories
-		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(Amount.fromNem(2 * 2*(5 + 3*2))));
+		// 2 multisig aggregate transactions
+		Assert.assertThat(block.getTotalFee(), IsEqual.equalTo(EXPECTED_MULTISIG_AGGREGATE_FEE.multiply(2)));
 		Assert.assertThat(block.getPreviousBlockHash(), IsEqual.equalTo(Hash.ZERO));
 		Assert.assertThat(block.getHeight(), IsEqual.equalTo(BlockHeight.ONE));
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(NUM_NEMESIS_TRANSACTIONS));
@@ -70,7 +70,7 @@ public class NemesisBlockTest {
 		for (final Transaction transaction : block.getTransactions()) {
 			final Amount expectedFee = TransactionTypes.TRANSFER == transaction.getType()
 					? Amount.ZERO
-					: Amount.fromNem(2*(5 + 3*2));
+					: EXPECTED_MULTISIG_AGGREGATE_FEE;
 			Assert.assertThat(transaction.getFee(), IsEqual.equalTo(expectedFee));
 		}
 	}

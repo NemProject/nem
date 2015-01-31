@@ -115,6 +115,7 @@ public class TransactionSpamFilterTest {
 		this.assertFilterResult(cacheSize, 0.01, 0, false);    // high importance and no fee
 		this.assertFilterResult(cacheSize, 0.01, 100, false);  // high importance and fee
 	}
+
 	@Test
 	public void filterResultDependsOnImportanceAndFeeWhenCacheHasHighMediumLevel() {
 		// Assert: boolean parameter says whether transaction is filtered or not.
