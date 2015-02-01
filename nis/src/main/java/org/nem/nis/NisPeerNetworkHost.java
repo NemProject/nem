@@ -38,11 +38,11 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private PeerNetwork network;
 
 	/**
-	 * creates NIS PeerNetworkHost.
+	 * Creates a NIS peer network host.
 	 *
 	 * @param nisCache The nis cache.
 	 * @param synchronizer The block synchronizer.
-	 * @param scheduler The network scheduler
+	 * @param scheduler The network scheduler.
 	 * @param chainServices The remote block chain service.
 	 * @param nisConfiguration The nis configuration.
 	 * @param httpConnectorPool The factory of http connectors.

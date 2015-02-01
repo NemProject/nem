@@ -59,7 +59,7 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param validatorFactory The transaction validator factory to use.
 	 * @param nisCache The NIS cache to use.
-	 * @param timeProvider The TimeProvider.
+	 * @param timeProvider The time provider.
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,

@@ -67,7 +67,7 @@ public class ArrayUtils {
 	 * Converts a BigInteger to a little endian byte array.
 	 *
 	 * @param value The value to convert.
-	 * @param numBytes The number of bytes of destination array.
+	 * @param numBytes The number of bytes in the destination array.
 	 * @return The resulting little endian byte array.
 	 */
 	public static byte[] toByteArray(final BigInteger value, final int numBytes) {
@@ -125,7 +125,7 @@ public class ArrayUtils {
 	 *
 	 * @param b first of arrays to compare.
 	 * @param c second of arrays to compare.
-	 * @return 1,-1 or 0 depending on comparison result.
+	 * @return 1, -1, or 0 depending on comparison result.
 	 */
 	public static int compare(final byte[] b, final byte[] c) {
 		int result = b.length - c.length;

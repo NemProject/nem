@@ -13,6 +13,7 @@ import org.nem.core.utils.HexEncoder;
 
 public class ExplorerTransferViewModelTest {
 	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";
+	private static final long UNIX_TIME = 1424604802000L;
 
 	@Test
 	public void canSerializeViewModel() {
@@ -27,7 +28,7 @@ public class ExplorerTransferViewModelTest {
 		final ExplorerTransferViewModel viewModel = new ExplorerTransferViewModel(
 				7,
 				Amount.fromNem(123),
-				UnixTime.fromUnixTimeInMillis(1424604802000L),
+				UnixTime.fromUnixTimeInMillis(UNIX_TIME),
 				senderAddress,
 				signature,
 				hash,
@@ -41,7 +42,7 @@ public class ExplorerTransferViewModelTest {
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(11));
 		Assert.assertThat(jsonObject.get("type"), IsEqual.equalTo(7));
 		Assert.assertThat(jsonObject.get("fee"), IsEqual.equalTo(123000000L));
-		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1424604802000L));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(UNIX_TIME));
 		Assert.assertThat(jsonObject.get("sender"), IsEqual.equalTo(senderAddress.getEncoded()));
 		Assert.assertThat(jsonObject.get("senderPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
 		Assert.assertThat(jsonObject.get("signature"), IsEqual.equalTo(signature.toString()));

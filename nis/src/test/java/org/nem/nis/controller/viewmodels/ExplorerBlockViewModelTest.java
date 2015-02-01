@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 public class ExplorerBlockViewModelTest {
 	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";
+	private static final long UNIX_TIME = 1424604802000L;
 
 	@Test
 	public void canSerializeViewModelWithoutTransactions() {
@@ -44,7 +45,7 @@ public class ExplorerBlockViewModelTest {
 		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(
 				new BlockHeight(60),
 				address,
-				UnixTime.fromUnixTimeInMillis(1424604802000L),
+				UnixTime.fromUnixTimeInMillis(UNIX_TIME),
 				hash);
 		addTransactions.accept(viewModel);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
@@ -54,7 +55,7 @@ public class ExplorerBlockViewModelTest {
 		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(60L));
 		Assert.assertThat(jsonObject.get("harvester"), IsEqual.equalTo(address.getEncoded()));
 		Assert.assertThat(jsonObject.get("harvesterPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
-		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1424604802000L));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(UNIX_TIME));
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
 		Assert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(numExpectedTransactions));
 	}
@@ -63,7 +64,7 @@ public class ExplorerBlockViewModelTest {
 		return new ExplorerTransferViewModel(
 				7,
 				Amount.fromNem(123),
-				UnixTime.fromUnixTimeInMillis(1424604802000L),
+				UnixTime.fromUnixTimeInMillis(UNIX_TIME),
 				Utils.generateRandomAddressWithPublicKey(),
 				new Signature(Utils.generateRandomBytes(64)),
 				Utils.generateRandomHash(),

@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * A collection of historical out-links.
+ * A collection of historical outlinks.
  */
 public class HistoricalOutlinks {
 
@@ -85,9 +85,9 @@ public class HistoricalOutlinks {
 	}
 
 	/**
-	 * Gets the last historical out-link.
+	 * Gets the last historical outlink.
 	 *
-	 * @return The last historical out-link.
+	 * @return The last historical outlink.
 	 */
 	public HistoricalOutlink getLastHistoricalOutlink() {
 		return this.outlinks.getLast();
@@ -103,9 +103,9 @@ public class HistoricalOutlinks {
 	}
 
 	/**
-	 * Creates a new copy of these out-links.
+	 * Creates a new copy of these outlinks.
 	 *
-	 * @return A copy of this historical outlinks.
+	 * @return A copy of these historical outlinks.
 	 */
 	public HistoricalOutlinks copy() {
 		final HistoricalOutlinks copy = new HistoricalOutlinks();

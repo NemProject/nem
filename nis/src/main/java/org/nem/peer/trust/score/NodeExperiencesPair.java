@@ -6,7 +6,7 @@ import org.nem.core.serialization.*;
 import java.util.List;
 
 /**
- * A Node and List &lt;NodeExperiencePair&gt; pair
+ * A Node and List &lt;NodeExperiencePair&gt; pair.
  */
 public class NodeExperiencesPair implements SerializableEntity {
 

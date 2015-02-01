@@ -5,7 +5,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import java.util.LinkedList;
 
 /**
- * Represents a historical out-link
+ * Represents a historical outlink.
  */
 public class HistoricalOutlink {
 
@@ -13,7 +13,7 @@ public class HistoricalOutlink {
 	private final LinkedList<AccountLink> outlinks;
 
 	/**
-	 * Creates a new historical out-link.
+	 * Creates a new historical outlink.
 	 *
 	 * @param height The block height.
 	 */
@@ -24,7 +24,7 @@ public class HistoricalOutlink {
 	}
 
 	/**
-	 * Returns height of current out-link.
+	 * Returns height of current outlink.
 	 *
 	 * @return The height.
 	 */
@@ -33,36 +33,36 @@ public class HistoricalOutlink {
 	}
 
 	/**
-	 * Returns all out-links.
+	 * Returns all outlinks.
 	 *
-	 * @return All out-links.
+	 * @return All outlinks.
 	 */
 	public LinkedList<AccountLink> getOutlinks() {
 		return this.outlinks;
 	}
 
 	/**
-	 * Returns the number of out-links.
+	 * Returns the number of outlinks.
 	 *
-	 * @return The number of out-links.
+	 * @return The number of outlinks.
 	 */
 	public int size() {
 		return this.outlinks.size();
 	}
 
 	/**
-	 * Adds an out-link.
+	 * Adds an outlink.
 	 *
-	 * @param accountLink The out-link to add.
+	 * @param accountLink The outlink to add.
 	 */
 	public void add(final AccountLink accountLink) {
 		this.outlinks.addLast(accountLink);
 	}
 
 	/**
-	 * Removes an out-link.
+	 * Removes an outlink.
 	 *
-	 * @param accountLink The out-link to remove.
+	 * @param accountLink The outlink to remove.
 	 */
 	public void remove(final AccountLink accountLink) {
 		if (this.outlinks.getLast().compareTo(accountLink) != 0) {
@@ -73,7 +73,7 @@ public class HistoricalOutlink {
 	}
 
 	/**
-	 * Creates a new copy of this out-link.
+	 * Creates a new copy of this outlink.
 	 *
 	 * @return A copy of this historical outlink.
 	 */

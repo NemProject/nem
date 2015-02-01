@@ -34,7 +34,7 @@ public class SecureSerializableEntity<T extends SerializableEntity> implements S
 	 * Deserializes a secure entity.
 	 *
 	 * @param deserializer The deserializer.
-	 * @param entityDeserializer The deserializer for underlying entity.
+	 * @param entityDeserializer The deserializer for the underlying entity.
 	 */
 	public SecureSerializableEntity(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
 		this.entity = deserializer.readObject("entity", entityDeserializer);

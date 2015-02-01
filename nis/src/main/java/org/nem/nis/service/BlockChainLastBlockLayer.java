@@ -75,7 +75,7 @@ public class BlockChainLastBlockLayer {
 	}
 
 	/**
-	 * Removes block from the db after specified height
+	 * Removes block from the db after specified height.
 	 *
 	 * @param height The height.
 	 */

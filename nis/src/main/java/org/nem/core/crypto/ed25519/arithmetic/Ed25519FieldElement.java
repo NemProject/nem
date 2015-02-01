@@ -818,9 +818,9 @@ public class Ed25519FieldElement {
 	 * p = 2^255 - 19
 	 * h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 <= |hi| < 2^27 for all i=0,...,9.
 	 * h congruent r modulo p, i.e. h = r + q * p for some suitable 0 <= r < p and an integer q.
-	 *
+	 * <br>
 	 * Then q = [2^-255 * (h + 19 * 2^-25 * h9 + 1/2)] where [x] = floor(x).
-	 *
+	 * <br>
 	 * Proof:
 	 * We begin with some very raw estimation for the bounds of some expressions:
 	 *     |h| < 2^230 * 2^30 = 2^260 ==> |r + q * p| < 2^260 ==> |q| < 2^10.

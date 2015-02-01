@@ -108,7 +108,7 @@ public class PeerNetworkServicesFactory {
 	 * Creates a time synchronizer.
 	 *
 	 * @param selector The node selector.
-	 * @param timeProvider The time provider
+	 * @param timeProvider The time provider.
 	 * @return A time synchronizer.
 	 */
 	public TimeSynchronizer createTimeSynchronizer(final NodeSelector selector, final TimeProvider timeProvider) {

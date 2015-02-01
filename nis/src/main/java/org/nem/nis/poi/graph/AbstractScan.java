@@ -135,7 +135,6 @@ public abstract class AbstractScan {
 	 * Gets the state for the specified node id.
 	 *
 	 * @param id The node id.
-	 *
 	 * @return The cluster id.
 	 */
 	protected Integer getNodeState(final NodeId id) {

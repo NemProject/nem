@@ -49,7 +49,7 @@ public class BlockIterator {
 	 * Calls the visitor for all blocks.
 	 *
 	 * @param parentBlock The parent block.
-	 * @param blocks Collection of blocks.
+	 * @param blocks The collection of blocks.
 	 * @param visitor The visitor.
 	 */
 	public static void all(Block parentBlock, final Collection<Block> blocks, final BlockVisitor visitor) {

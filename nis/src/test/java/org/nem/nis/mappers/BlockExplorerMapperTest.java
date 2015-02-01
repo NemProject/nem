@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class BlockExplorerMapperTest {
 	private static final BlockExplorerMapper MAPPER = new BlockExplorerMapper();
 	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";
+	private static final long UNIX_TIME = 1424604802000L;
 
 	@Test
 	public void canMapBlockToExplorerBlockViewModelWithoutTransactions() {
@@ -53,7 +54,7 @@ public class BlockExplorerMapperTest {
 		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(60L));
 		Assert.assertThat(jsonObject.get("harvester"), IsEqual.equalTo(address.getEncoded()));
 		Assert.assertThat(jsonObject.get("harvesterPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
-		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1424604802000L));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(UNIX_TIME));
 		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
 
 		final JSONArray jsonTransactions = ((JSONArray)jsonObject.get("txes"));
@@ -112,7 +113,7 @@ public class BlockExplorerMapperTest {
 		// Assert:
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(11));
 		Assert.assertThat(jsonObject.get("fee"), IsEqual.equalTo(123000000L));
-		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1424604802000L));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(UNIX_TIME));
 		Assert.assertThat(jsonObject.get("sender"), IsEqual.equalTo(senderAddress.getEncoded()));
 		Assert.assertThat(jsonObject.get("senderPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
 		Assert.assertThat(jsonObject.get("signature"), IsEqual.equalTo(signature.toString()));

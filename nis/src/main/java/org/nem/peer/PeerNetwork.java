@@ -179,9 +179,9 @@ public class PeerNetwork {
 	}
 
 	/**
-	 * Updates the endpoint of the local node as seen by other nodes.
+	 * Boots the local node.
 	 *
-	 * @return True if the node was updated by at least one node; false otherwise.
+	 * @return True if the node was booted; false otherwise.
 	 */
 	public CompletableFuture<Boolean> boot() {
 		// it is safe to use partner nodes before a refresh cycle

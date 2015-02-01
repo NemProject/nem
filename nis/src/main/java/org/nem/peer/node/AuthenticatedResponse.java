@@ -33,7 +33,7 @@ public class AuthenticatedResponse<T extends SerializableEntity> implements Seri
 	 * Deserializes a response.
 	 *
 	 * @param deserializer The deserializer.
-	 * @param entityDeserializer The deserializer for underlying entity.
+	 * @param entityDeserializer The deserializer for the underlying entity.
 	 */
 	public AuthenticatedResponse(final Deserializer deserializer, final ObjectDeserializer<T> entityDeserializer) {
 		this.entity = deserializer.readObject("entity", entityDeserializer);
