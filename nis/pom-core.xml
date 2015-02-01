@@ -189,7 +189,6 @@
 			<resource>
 				<directory>src/main/resources</directory>
                 <includes>
-                    <include>config.properties</include>
                     <include>nemesis-block.bin</include>
                     <include>nemesis-block.json</include>
                 </includes>
