@@ -27,7 +27,7 @@ public class ExplorerTransferViewModelTest {
 		final ExplorerTransferViewModel viewModel = new ExplorerTransferViewModel(
 				7,
 				Amount.fromNem(123),
-				UnixTime.fromUnixTimeInMillis(1408966402000L),
+				UnixTime.fromUnixTimeInMillis(1424604802000L),
 				senderAddress,
 				signature,
 				hash,
@@ -41,7 +41,7 @@ public class ExplorerTransferViewModelTest {
 		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(11));
 		Assert.assertThat(jsonObject.get("type"), IsEqual.equalTo(7));
 		Assert.assertThat(jsonObject.get("fee"), IsEqual.equalTo(123000000L));
-		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1408966402000L));
+		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(1424604802000L));
 		Assert.assertThat(jsonObject.get("sender"), IsEqual.equalTo(senderAddress.getEncoded()));
 		Assert.assertThat(jsonObject.get("senderPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
 		Assert.assertThat(jsonObject.get("signature"), IsEqual.equalTo(signature.toString()));
