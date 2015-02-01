@@ -27,6 +27,8 @@ public class LoggingBootstrapper {
 			if (!logDirectory.exists() && !logDirectory.mkdirs()) {
 				throw new IOException(String.format("unable to create log directory %s", logDirectory));
 			}
+
+			LOGGER.info("NEM logging has been bootstrapped!");
 		} catch (final IOException e) {
 			LOGGER.severe("Could not load default logging properties file");
 			LOGGER.severe(e.toString());
