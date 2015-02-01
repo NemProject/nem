@@ -5,6 +5,8 @@ import org.junit.*;
 import org.nem.core.crypto.*;
 import org.nem.core.test.*;
 
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 
 public class NisConfigurationTest {
@@ -151,6 +153,33 @@ public class NisConfigurationTest {
 
 		// Assert:
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
+	}
+
+	@Test
+	public void configPropertiesCopiesAreConsistent() throws Exception {
+		// Arrange:
+		// - this is more complicated than it seems in order to make sure that the right config.properties is loaded
+		// - use db.properties as a proxy to the production config.properties
+		// - use test.properties as a proxy to the test config.properties
+		final byte[] sourceConfigBytes = readAllBytes("db.properties", "config.properties");
+		final byte[] testConfigBytes = readAllBytes("test.properties", "config.properties");
+
+		// Act:
+		final boolean areBuffersEqual = Arrays.equals(sourceConfigBytes, testConfigBytes);
+
+		// Assert:
+		Assert.assertThat(areBuffersEqual, IsEqual.equalTo(true));
+	}
+
+	private static byte[] readAllBytes(final String proxyResource, final String desiredResource) throws Exception {
+		final URL proxyUrl = NisConfigurationTest.class.getClassLoader().getResource(proxyResource);
+		if (null == proxyUrl) {
+			throw new IllegalArgumentException(String.format("could not find: '%s'", proxyResource));
+		}
+
+		final URL url = new URL(proxyUrl.toString().replace(proxyResource, desiredResource));
+		final Path resPath = java.nio.file.Paths.get(url.toURI());
+		return java.nio.file.Files.readAllBytes(resPath);
 	}
 
 	private static Properties getCommonProperties() {

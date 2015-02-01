@@ -18,7 +18,7 @@ public class LoggingBootstrapper {
 	 * @param nemFolder The NEM folder location.
 	 */
 	public static void bootstrap(final String nemFolder) {
-		try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("logalpha.properties");
+		try (final InputStream inputStream = LoggingBootstrapper.class.getClassLoader().getResourceAsStream("logalpha.properties");
 			 final InputStream inputStringStream = adaptFileLocation(inputStream, nemFolder)) {
 			final LogManager logManager = LogManager.getLogManager();
 			logManager.readConfiguration(inputStringStream);

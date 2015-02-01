@@ -34,7 +34,7 @@ public class CommonConfiguration {
 
 	protected static Properties loadDefaultProperties() {
 		return ExceptionUtils.propagate(() -> {
-			try (final InputStream inputStream = CommonStarter.class.getClassLoader().getResourceAsStream("config.properties")) {
+			try (final InputStream inputStream = CommonConfiguration.class.getClassLoader().getResourceAsStream("config.properties")) {
 				final Properties properties = new Properties();
 				properties.load(inputStream);
 				return properties;
