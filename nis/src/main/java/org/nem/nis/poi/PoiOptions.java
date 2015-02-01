@@ -58,7 +58,7 @@ public interface PoiOptions {
 
 	/**
 	 * Gets the mu clustering variable.
-	 * <br/>
+	 * <br>
 	 * The minimum number of neighbors with high structural similarity that
 	 * a node must have to be considered core.
 	 * A node itself is considered as neighbor of itself (it is in its set of similar neighbors).
@@ -69,7 +69,7 @@ public interface PoiOptions {
 
 	/**
 	 * Gets the epsilon clustering variable.
-	 * <br/>
+	 * <br>
 	 * The structural similarity threshold that will cause nodes to be considered
 	 * highly similar (if they have a similarity greater than this value).
 	 *

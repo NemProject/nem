@@ -16,6 +16,7 @@ public interface TimeSynchronizationStrategy {
 	 * based on the list of synchronization samples.
 	 *
 	 * @param samples The list of synchronization samples.
+	 * @param age The age of the node.
 	 * @return The time offset in ms.
 	 */
 	public TimeOffset calculateTimeOffset(final List<TimeSynchronizationSample> samples, final NodeAge age);

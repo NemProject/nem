@@ -22,15 +22,15 @@ public interface AccountStateCache extends ReadOnlyAccountStateCache {
 	 * Finds the latest poi account state given an address following all forwards.
 	 * - When passed a remote harvester, it will return the state for the "owner" (the account harvesting remotely)
 	 * - Otherwise, it will return the state for the passed in address
-	 * <br/>
+	 * <br>
 	 * Let's say we have account A and remote account B,
 	 * A has link (B, height, HarvestingRemotely)
 	 * B has link (A, height, RemoteHarvester)
-	 * <br/>
+	 * <br>
 	 * findForwardedStateByAddress(A *) should return A
 	 * findForwardedStateByAddress(B, h+1439) should return B
 	 * findForwardedStateByAddress(B, h+1440) should return B
-	 * <br/>
+	 * <br>
 	 *
 	 * @param address The address.
 	 * @return The poi account state.
@@ -41,15 +41,15 @@ public interface AccountStateCache extends ReadOnlyAccountStateCache {
 	 * Finds a poi account state given an address following all forwards at a height.
 	 * - When passed a remote harvester, it will return the state for the "owner" (the account harvesting remotely)
 	 * - Otherwise, it will return the state for the passed in address
-	 * <br/>
+	 * <br>
 	 * Let's say we have account A and remote account B,
 	 * A has link (B, height, HarvestingRemotely)
 	 * B has link (A, height, RemoteHarvester)
-	 * <br/>
+	 * <br>
 	 * findForwardedStateByAddress(A *) should return A
 	 * findForwardedStateByAddress(B, h+1439) should return B
 	 * findForwardedStateByAddress(B, h+1440) should return A
-	 * <br/>
+	 * <br>
 	 *
 	 * @param address The address.
 	 * @param height Height at which check should be performed.

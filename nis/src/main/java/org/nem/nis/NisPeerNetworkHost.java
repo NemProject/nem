@@ -37,6 +37,18 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	private final AtomicReference<PeerNetworkBootstrapper> peerNetworkBootstrapper = new AtomicReference<>();
 	private PeerNetwork network;
 
+	/**
+	 * creates NIS PeerNetworkHost.
+	 *
+	 * @param nisCache The nis cache.
+	 * @param synchronizer The block synchronizer.
+	 * @param scheduler The network scheduler
+	 * @param chainServices The remote block chain service.
+	 * @param nisConfiguration The nis configuration.
+	 * @param httpConnectorPool The factory of http connectors.
+	 * @param incomingAudits The incoming audits
+	 * @param outgoingAudits The outgoing audits.
+	 */
 	@Autowired(required = true)
 	public NisPeerNetworkHost(
 			final ReadOnlyNisCache nisCache,
@@ -61,6 +73,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 * Boots the network.
 	 *
 	 * @param localNode The local node.
+	 * @return Void future.
 	 */
 	public CompletableFuture boot(final Node localNode) {
 		final Config config = new Config(

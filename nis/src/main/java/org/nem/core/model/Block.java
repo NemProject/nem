@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 /**
  * A NEM block.
- * <p/>
+ * <br>
  * The harvester is an alias for the signer.
  * The harvester proof is the signature.
  */

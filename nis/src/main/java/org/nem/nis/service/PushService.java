@@ -48,6 +48,7 @@ public class PushService {
 	 *
 	 * @param entity The transaction.
 	 * @param identity The identity of the pushing node.
+	 * @return The result of transaction validation
 	 */
 	public ValidationResult pushTransaction(final Transaction entity, final NodeIdentity identity) {
 		final PushContext<Transaction> context = new PushContext<>(entity, identity, NisPeerId.REST_PUSH_TRANSACTION);

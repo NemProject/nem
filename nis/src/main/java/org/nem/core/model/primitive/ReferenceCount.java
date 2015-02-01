@@ -2,7 +2,7 @@ package org.nem.core.model.primitive;
 
 /**
  * Represents a referencer counter.
- * <br/>
+ * <br>
  * This class is immutable.
  */
 public class ReferenceCount extends AbstractPrimitive<ReferenceCount, Long> {

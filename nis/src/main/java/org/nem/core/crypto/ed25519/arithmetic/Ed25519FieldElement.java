@@ -7,7 +7,7 @@ import java.util.Arrays;
  * values[0] ... values[9], represent the integer
  * values[0] + 2^26 * values[1] + 2^51 * values[2] + 2^77 * values[3] + 2^102 * values[4] + ... + 2^230 * values[9].
  * Bounds on each values[i] vary depending on context.
- * <br/>
+ * <br>
  * This implementation is based on the ref10 implementation of SUPERCOP.
  */
 public class Ed25519FieldElement {
@@ -124,21 +124,21 @@ public class Ed25519FieldElement {
 	 *        |h| bounded by 1.01*2^25,1.01*2^24,1.01*2^25,1.01*2^24,etc.
 	 * </pre>
 	 * Notes on implementation strategy:
-	 * <br/>
+	 * <br>
 	 * Using schoolbook multiplication. Karatsuba would save a little in some
 	 * cost models.
-	 * <br/>
+	 * <br>
 	 * Most multiplications by 2 and 19 are 32-bit precomputations; cheaper than
 	 * 64-bit postcomputations.
-	 * <br/>
+	 * <br>
 	 * There is one remaining multiplication by 19 in the carry chain; one *19
 	 * precomputation can be merged into this, but the resulting data flow is
 	 * considerably less clean.
-	 * <br/>
+	 * <br>
 	 * There are 12 carries below. 10 of them are 2-way parallelizable and
 	 * vectorizable. Can get away with 11 carries, but then data flow is much
 	 * deeper.
-	 * <br/>
+	 * <br>
 	 * With tighter constraints on inputs can squeeze carries into int32.
 	 *
 	 * @param g The field element to multiply.
@@ -818,9 +818,9 @@ public class Ed25519FieldElement {
 	 * p = 2^255 - 19
 	 * h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 <= |hi| < 2^27 for all i=0,...,9.
 	 * h congruent r modulo p, i.e. h = r + q * p for some suitable 0 <= r < p and an integer q.
-	 * <br/>
+	 *
 	 * Then q = [2^-255 * (h + 19 * 2^-25 * h9 + 1/2)] where [x] = floor(x).
-	 * <br/>
+	 *
 	 * Proof:
 	 * We begin with some very raw estimation for the bounds of some expressions:
 	 *     |h| < 2^230 * 2^30 = 2^260 ==> |r + q * p| < 2^260 ==> |q| < 2^10.

@@ -25,12 +25,16 @@ public interface DsaSigner {
 	/**
 	 * Determines if the signature is canonical.
 	 *
+	 * @param signature The signature.
 	 * @return true if the signature is canonical.
 	 */
 	public boolean isCanonicalSignature(final Signature signature);
 
 	/**
 	 * Makes this signature canonical.
+	 *
+	 * @param signature The signature.
+	 * @return Signature in canonical form.
 	 */
 	public Signature makeSignatureCanonical(final Signature signature);
 }

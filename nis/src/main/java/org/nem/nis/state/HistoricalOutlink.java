@@ -74,6 +74,8 @@ public class HistoricalOutlink {
 
 	/**
 	 * Creates a new copy of this out-link.
+	 *
+	 * @return A copy of this historical outlink.
 	 */
 	public HistoricalOutlink copy() {
 		final HistoricalOutlink copy = new HistoricalOutlink(this.height);

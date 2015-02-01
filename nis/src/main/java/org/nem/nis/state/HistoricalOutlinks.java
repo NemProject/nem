@@ -104,6 +104,8 @@ public class HistoricalOutlinks {
 
 	/**
 	 * Creates a new copy of these out-links.
+	 *
+	 * @return A copy of this historical outlinks.
 	 */
 	public HistoricalOutlinks copy() {
 		final HistoricalOutlinks copy = new HistoricalOutlinks();

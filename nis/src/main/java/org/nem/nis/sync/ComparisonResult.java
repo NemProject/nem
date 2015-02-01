@@ -107,6 +107,7 @@ public class ComparisonResult {
 	 * @param code The result code.
 	 * @param commonBlockHeight The height of the last common block between two chains.
 	 * @param areChainsConsistent true if the two chains are consistent.
+	 * @param remoteHeight Height of remote chain (can be null).
 	 */
 	public ComparisonResult(
 			final Code code,

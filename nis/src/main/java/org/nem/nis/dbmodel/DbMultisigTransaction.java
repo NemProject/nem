@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * It is unfortunate that we couldn't use "table per subclass", which would allow this class to have a single
  * transferId field that could be correctly joined across multiple tables.
- * <br />
+ * <br>
  * The reason is that db performance could be bad because of the way it is implemented. Specifically,
  * "it retrieves the union of all properties in the entire hierarchy into the result set"
  * - http://chriswongdevblog.blogspot.fr/2009/10/polymorphic-one-to-many-relationships.html

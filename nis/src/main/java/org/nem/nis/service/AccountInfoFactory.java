@@ -20,6 +20,7 @@ public class AccountInfoFactory {
 	 * Creates a new account info factory.
 	 *
 	 * @param accountLookup The account lookup.
+	 * @param accountStateCache The account state cache.
 	 */
 	@Autowired(required = true)
 	public AccountInfoFactory(

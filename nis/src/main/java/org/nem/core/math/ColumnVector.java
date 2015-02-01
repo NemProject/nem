@@ -103,7 +103,7 @@ public class ColumnVector {
 	/**
 	 * Normalizes this vector's elements so that the absolute value of all
 	 * elements sums to 1.0.
-	 * <br/>
+	 * <br>
 	 * This method has the side effect of modifying the implicit context
 	 * object, so be careful.
 	 */

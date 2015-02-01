@@ -76,6 +76,8 @@ public class BlockChainLastBlockLayer {
 
 	/**
 	 * Removes block from the db after specified height
+	 *
+	 * @param height The height.
 	 */
 	public void dropDbBlocksAfter(final BlockHeight height) {
 		this.blockDao.deleteBlocksAfterHeight(height);

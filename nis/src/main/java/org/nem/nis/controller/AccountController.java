@@ -83,6 +83,7 @@ public class AccountController {
 	 * Checks if the given account is unlocked.
 	 *
 	 * @param address The address of the account to check.
+	 * @return "ok" if account is unlocked.
 	 */
 	@RequestMapping(value = "/account/isunlocked", method = RequestMethod.POST)
 	@ClientApi
@@ -95,6 +96,7 @@ public class AccountController {
 	 * Checks if the given account is unlocked.
 	 *
 	 * @param privateKey The private key of the account to check.
+	 * @return "ok" if account is unlocked.
 	 */
 	@RequestMapping(value = "/local/account/isunlocked", method = RequestMethod.POST)
 	@TrustedApi

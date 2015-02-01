@@ -20,6 +20,7 @@ public class ChainServices {
 	 * Creates a new chain service instance.
 	 *
 	 * @param blockChainLastBlockLayer The block chain last block layer.
+	 * @param connectorPool The factory of http connectors.
 	 */
 	@Autowired(required = true)
 	public ChainServices(final BlockChainLastBlockLayer blockChainLastBlockLayer, final HttpConnectorPool connectorPool) {

@@ -17,6 +17,8 @@ public class AccountState implements ReadOnlyAccountState {
 
 	/**
 	 * Creates a new NIS account state.
+	 *
+	 * @param address The address of an account.
 	 */
 	public AccountState(final Address address) {
 		this(address, new AccountImportance(), new WeightedBalances(), new RemoteLinks(), new MultisigLinks(), new AccountInfo(), null);

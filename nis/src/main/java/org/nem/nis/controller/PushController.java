@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * This controller will handle data propagation:
  * * /push/transaction - for what is now model.Transaction
  * * /push/block - for model.Block
- * <p>
+ * <br>
  * It would probably fit better in TransferController, but this is
  * part of p2p API, so I think it should be kept separated.
  * (I think it might pay off in future, if we'd like to add restrictions to client APIs)

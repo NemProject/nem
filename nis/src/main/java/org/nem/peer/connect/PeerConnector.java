@@ -45,6 +45,7 @@ public interface PeerConnector {
 	 * @param node The remote node.
 	 * @param announceId The type of announcement.
 	 * @param entity The entity to announce.
+	 * @return Void future.
 	 */
 	public CompletableFuture announce(
 			final Node node,

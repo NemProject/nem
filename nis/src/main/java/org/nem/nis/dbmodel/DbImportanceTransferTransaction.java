@@ -6,9 +6,8 @@ import javax.persistence.*;
 
 /**
  * Importance transfer db entity
- * <p>
+ * <br>
  * Holds information about Transactions having type TransactionTypes.IMPORTANCE_TYPE
- * <p>
  */
 @Entity
 @Table(name = "importancetransfers")

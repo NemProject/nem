@@ -5,7 +5,7 @@ import java.util.function.*;
 
 /**
  * Abstract matrix class.
- * <br/>
+ * <br>
  * This class provides default implementations of most matrix functions
  * but they should be optimized in derived classes when performance is important.
  */

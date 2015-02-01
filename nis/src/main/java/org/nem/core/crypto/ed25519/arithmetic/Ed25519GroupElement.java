@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * A point on the ED25519 curve which represents a group element.
  * This implementation is based on the ref10 implementation of SUPERCOP.
- * <br/>
+ * <br>
  * Literature:
  * [1] Daniel J. Bernstein, Niels Duif, Tanja Lange, Peter Schwabe and Bo-Yin Yang : High-speed high-security signatures
  * [2] Huseyin Hisil, Kenneth Koon-Ho Wong, Gary Carter, Ed Dawson: Twisted Edwards Curves Revisited
@@ -287,7 +287,7 @@ public class Ed25519GroupElement implements Serializable {
 
 	/**
 	 * Convert a Ed25519GroupElement from one coordinate system to another.
-	 * <br/>
+	 * <br>
 	 * Supported conversions:
 	 * - P3 -> P2
 	 * - P3 -> CACHED (1 multiply, 1 add, 1 subtract)
@@ -395,25 +395,25 @@ public class Ed25519GroupElement implements Serializable {
 	/**
 	 * Doubles a given group element p in P^2 or P^3 coordinate system and returns the result in P x P coordinate system.
 	 * r = 2 * p where p = (X : Y : Z) or p = (X : Y : Z : T)
-	 * <br/>
+	 * <br>
 	 * r in P x P coordinate system:
-	 * <br/>
+	 * <br>
 	 * r = ((X' : Z'), (Y' : T')) where
 	 * X' = (X + Y)^2 - (Y^2 + X^2)
 	 * Y' = Y^2 + X^2
 	 * Z' = y^2 - X^2
 	 * T' = 2 * Z^2 - (y^2 - X^2)
-	 * <br/>
+	 * <br>
 	 * r converted from P x P to P^2 coordinate system:
-	 * <br/>
+	 * <br>
 	 * r = (X'' : Y'' : Z'') where
 	 * X'' = X' * Z' = ((X + Y)^2 - Y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
 	 * Y'' = Y' * T' = (Y^2 + X^2) * (2 * Z^2 - (y^2 - X^2))
 	 * Z'' = Z' * T' = (y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
-	 * <br/>
+	 * <br>
 	 * Formula for the P^2 coordinate system is in agreement with the formula given in [4] page 12 (with a = -1)
 	 * up to a common factor -1 which does not matter:
-	 * <br/>
+	 * <br>
 	 * B = (X + Y)^2; C = X^2; D = Y^2; E = -C = -X^2; F := E + D = Y^2 - X^2; H = Z^2; J = F − 2 * H;
 	 * X3 = (B − C − D) · J = X' * (-T');
 	 * Y3 = F · (E − D) = Z' * (-Y');
@@ -449,15 +449,15 @@ public class Ed25519GroupElement implements Serializable {
 	 * Ed25519GroupElement addition using the twisted Edwards addition law for extended coordinates.
 	 * this must be given in P^3 coordinate system and g in PRECOMPUTED coordinate system.
 	 * r = this + g where this = (X1 : Y1 : Z1 : T1), g = (g.X, g.Y, g.Z) = (Y2/Z2 + X2/Z2, Y2/Z2 - X2/Z2, 2 * d * X2/Z2 * Y2/Z2)
-	 * <br/>
+	 * <br>
 	 * r in P x P coordinate system:
-	 * <br/>
+	 * <br>
 	 * r = ((X' : Z'), (Y' : T')) where
 	 * X' = (Y1 + X1) * g.X - (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)) * 1/Z2
 	 * Y' = (Y1 + X1) * g.X + (Y1 - X1) * q.Y = ((Y1 + X1) * (Y2 + X2) + (Y1 - X1) * (Y2 - X2)) * 1/Z2
 	 * Z' = 2 * Z1 + T1 * g.Z = 2 * Z1 + T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 + 2 * d * T1 * T2) * 1/Z2
 	 * T' = 2 * Z1 - T1 * g.Z = 2 * Z1 - T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 - 2 * d * T1 * T2) * 1/Z2
-	 * <br/>
+	 * <br>
 	 * TODO-CR BR: Formula for the P x P coordinate system is in agreement with the formula given in
 	 * TODO-CR BR: file ge25519.c method add_p1p1() in ref implementation.
 	 * Setting A = (Y1 - X1) * (Y2 - X2), B = (Y1 + X1) * (Y2 + X2), C = 2 * d * T1 * T2, D = 2 * Z1 * Z2 we get
@@ -465,15 +465,15 @@ public class Ed25519GroupElement implements Serializable {
 	 * Y' = (B + A) * 1/Z2
 	 * Z' = (D + C) * 1/Z2
 	 * T' = (D - C) * 1/Z2
-	 * <br/>
+	 * <br>
 	 * r converted from P x P to P^2 coordinate system:
-	 * <br/>
+	 * <br>
 	 * r = (X'' : Y'' : Z'' : T'') where
 	 * X'' = X' * Z' = (B - A) * (D + C) * 1/Z2^2
 	 * Y'' = Y' * T' = (B + A) * (D - C) * 1/Z2^2
 	 * Z'' = Z' * T' = (D + C) * (D - C) * 1/Z2^2
 	 * T'' = X' * Y' = (B - A) * (B + A) * 1/Z2^2
-	 * <br/>
+	 * <br>
 	 * TODO-CR BR: Formula above for the P^2 coordinate system is not in agreement with the formula given in [2] page 6
 	 * TODO-CR BR: (the common factor 1/Z2^2 does not matter)
 	 * TODO-CR BR: where is my mistake?
@@ -514,7 +514,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * Ed25519GroupElement subtraction using the twisted Edwards addition law for extended coordinates.
 	 * this must be given in P^3 coordinate system and g in PRECOMPUTED coordinate system.
 	 * r = this - g where this = (X1 : Y1 : Z1 : T1), g = (g.X, g.Y, g.Z) = (Y2/Z2 + X2/Z2, Y2/Z2 - X2/Z2, 2 * d * X2/Z2 * Y2/Z2)
-	 * <br/>
+	 * <br>
 	 * Negating g means negating the value of X2 and T2 (the latter is irrelevant here).
 	 * The formula is in accordance to the above addition.
 	 *
@@ -549,19 +549,19 @@ public class Ed25519GroupElement implements Serializable {
 	 * Ed25519GroupElement addition using the twisted Edwards addition law for extended coordinates.
 	 * this must be given in P^3 coordinate system and g in CACHED coordinate system.
 	 * r = this + g where this = (X1 : Y1 : Z1 : T1), g = (g.X, g.Y, g.Z, g.T) = (Y2 + X2, Y2 - X2, Z2, 2 * d * T2)
-	 * <br/>
+	 * <br>
 	 * r in P x P coordinate system.:
 	 * X' = (Y1 + X1) * (Y2 + X2) - (Y1 - X1) * (Y2 - X2)
 	 * Y' = (Y1 + X1) * (Y2 + X2) + (Y1 - X1) * (Y2 - X2)
 	 * Z' = 2 * Z1 * Z2 + 2 * d * T1 * T2
 	 * T' = 2 * Z1 * T2 - 2 * d * T1 * T2
-	 * <br/>
+	 * <br>
 	 * Setting A = (Y1 - X1) * (Y2 - X2), B = (Y1 + X1) * (Y2 + X2), C = 2 * d * T1 * T2, D = 2 * Z1 * Z2 we get
 	 * X' = (B - A)
 	 * Y' = (B + A)
 	 * Z' = (D + C)
 	 * T' = (D - C)
-	 * <br/>
+	 * <br>
 	 * Same result as in madd() (up to a common factor which does not matter).
 	 *
 	 * @param g The group element to add.
@@ -595,7 +595,7 @@ public class Ed25519GroupElement implements Serializable {
 
 	/**
 	 * Ed25519GroupElement subtraction using the twisted Edwards addition law for extended coordinates.
-	 * <br/>
+	 * <br>
 	 * Negating g means negating the value of the coordinate X2 and T2.
 	 * The formula is in accordance to the above addition.
 	 *
@@ -749,7 +749,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * Look up 16^i r_i B in the precomputed table.
 	 * No secret array indices, no secret branching.
 	 * Constant time.
-	 * <br/>
+	 * <br>
 	 * Must have previously precomputed.
 	 *
 	 * @param pos = i/2 for i in {0, 2, 4,..., 62}
@@ -812,10 +812,10 @@ public class Ed25519GroupElement implements Serializable {
 	/**
 	 * Calculates a sliding-windows base 2 representation for a given encoded field element a.
 	 * To learn more about it see [6] page 8.
-	 * <br/>
+	 * <br>
 	 * Output: r which satisfies
 	 * a = r0 * 2^0 + r1 * 2^1 + ... + r255 * 2^255 with ri in {-15, -13, -11, -9, -7, -5, -3, -1, 0, 1, 3, 5, 7, 9, 11, 13, 15}
-	 * <br/>
+	 * <br>
 	 * Method is package private only so that tests run.
 	 *
 	 * @param encoded The encoded field element.

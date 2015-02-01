@@ -5,7 +5,7 @@ import org.nem.peer.node.*;
 
 /**
  * An authenticated request that has a chain request parameter.
- * <br/>
+ * <br>
  * This is glue code that allows automatic deserialization to work
  * without needing to hydrate multiple constructor parameters.
  * This class is required because the base class (AuthenticatedRequest) doesn't

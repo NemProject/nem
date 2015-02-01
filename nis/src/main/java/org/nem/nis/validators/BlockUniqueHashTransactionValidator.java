@@ -16,7 +16,7 @@ public class BlockUniqueHashTransactionValidator implements BlockValidator {
 	/**
 	 * Creates a new validator.
 	 *
-	 * @param transactionHashCache The transaction hash cache.
+	 * @param transactionHashCache The cache of transaction hashes.
 	 */
 	public BlockUniqueHashTransactionValidator(final ReadOnlyHashCache transactionHashCache) {
 		this.transactionHashCache = transactionHashCache;

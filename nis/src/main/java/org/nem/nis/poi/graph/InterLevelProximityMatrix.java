@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Container for the R and A sparse matrices that make up the inter-level proximity matrix.
  * From the NCDawareRank paper by Nikolakopoulos (WSDM 2013).
- * <br/>
+ * <br>
  * The R and A matricies here are actually R(T) and A(T) in the paper.
  * They are transposed because we use left stochastic matrices but the paper uses right stochastic matrices.
  */

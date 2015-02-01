@@ -45,7 +45,7 @@ public class TransactionController {
 
 	/**
 	 * A request for NIS to serialize unsigned transaction data into binary for signing by the client.
-	 * <br/>
+	 * <br>
 	 * This is insecure if an attacker modifies the binary payload in-between NIS and the client.
 	 *
 	 * @param deserializer The deserializer that is expected to contain transaction data.
@@ -70,7 +70,7 @@ public class TransactionController {
 
 	/**
 	 * A request for NIS to sign unsigned transaction data and announce it given a private key.
-	 * <br/>
+	 * <br>
 	 * This is insecure if an attacker modifies the binary payload in-between NIS and the client
 	 * (not to mention it exposes the private key).
 	 *

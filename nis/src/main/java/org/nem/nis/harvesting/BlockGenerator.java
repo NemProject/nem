@@ -30,6 +30,8 @@ public class BlockGenerator {
 	 * @param nisCache The NIS cache.
 	 * @param unconfirmedTransactions The unconfirmed transactions.
 	 * @param blockDao The block dao.
+	 * @param blockScorer The block scorer.
+	 * @param blockValidator The block validator.
 	 */
 	public BlockGenerator(
 			final ReadOnlyNisCache nisCache,

@@ -37,6 +37,7 @@ public class BlockChainContextFactory {
 	 * Creates a sync context.
 	 *
 	 * @param localScore The local chain score.
+	 * @return The sync context.
 	 */
 	public BlockChainSyncContext createSyncContext(final BlockChainScore localScore) {
 		return new BlockChainSyncContext(
@@ -56,6 +57,7 @@ public class BlockChainContextFactory {
 	 * @param localScore The local chain score.
 	 * @param hasOwnChain true if the peer chain is inconsistent with the local chain
 	 * (i.e. if the peer chain is accepted, parts of the local chain will need to be rolled back).
+	 * @return The update context.
 	 */
 	public BlockChainUpdateContext createUpdateContext(
 			final BlockChainSyncContext syncContext,

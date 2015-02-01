@@ -84,7 +84,7 @@ public class FastScanClusteringStrategy implements GraphClusteringStrategy {
 		 * - then merge the community into that cluster,
 		 * - else create a new cluster,
 		 * else mark community as non member.
-		 * <br/>
+		 * <br>
 		 * <em>This function should only be called by processCommunity.</em>
 		 *
 		 * @param community The community to add.

@@ -12,9 +12,9 @@ import java.util.List;
 
 /**
  * DbBlock entity.
- * <p>
+ * <br>
  * Holds all the important information related to block data.
- * <p>
+ * <br>
  * Associated harvester and transactions are obtained automatically (by BlockDao)
  * thanks to @Cascade annotations.
  */

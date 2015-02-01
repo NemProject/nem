@@ -9,9 +9,9 @@ import javax.persistence.Table;
 
 /**
  * Transfer Db entity.
- * <p>
+ * <br>
  * Holds information about Transactions having type TransactionTypes.TRANSFER_TYPE
- * <p>
+ * <br>
  * Associated sender and recipient are obtained automatically (by TransferDao)
  * thanks to @Cascade annotations.
  */

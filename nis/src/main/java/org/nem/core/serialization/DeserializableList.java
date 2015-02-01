@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * Helper class for deserializing lists of serializable entities.
- * <br/>
+ * <br>
  * This class is tested indirectly by the tests for SerializableList.
  */
 public class DeserializableList<T> {

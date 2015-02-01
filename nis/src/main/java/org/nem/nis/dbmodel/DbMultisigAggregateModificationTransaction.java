@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * Multisig Signer Modification db entity
- * <p>
+ * <br>
  * Holds information about Transactions having type TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION
  */
 @Entity

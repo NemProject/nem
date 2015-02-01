@@ -21,6 +21,7 @@ public class PruningObserver implements BlockTransactionObserver {
 	 * Creates a new observer.
 	 *
 	 * @param accountStateCache The account state cache.
+	 * @param transactionHashCache The cache of transaction hashes.
 	 */
 	public PruningObserver(final AccountStateCache accountStateCache, final HashCache transactionHashCache) {
 		this.accountStateCache = accountStateCache;

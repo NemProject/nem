@@ -14,6 +14,10 @@ public class BlockIterator {
 
 	/**
 	 * Unwinds the block chain until the desired height is reached and calls the visitor.
+	 *
+	 * @param lookup The block lookup.
+	 * @param desiredHeight The height.
+	 * @param visitor The visitor.
 	 */
 	public static void unwindUntil(
 			final BlockLookup lookup,
@@ -43,6 +47,10 @@ public class BlockIterator {
 
 	/**
 	 * Calls the visitor for all blocks.
+	 *
+	 * @param parentBlock The parent block.
+	 * @param blocks Collection of blocks.
+	 * @param visitor The visitor.
 	 */
 	public static void all(Block parentBlock, final Collection<Block> blocks, final BlockVisitor visitor) {
 		for (final Block block : blocks) {

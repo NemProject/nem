@@ -180,6 +180,7 @@ public class NodeController {
 	 *
 	 * @param localEndpoint The local endpoint (what the local node knows about itself).
 	 * @param request The http servlet request.
+	 * @return The endpoint.
 	 */
 	@RequestMapping(value = "/node/cysm", method = RequestMethod.POST)
 	@P2PApi

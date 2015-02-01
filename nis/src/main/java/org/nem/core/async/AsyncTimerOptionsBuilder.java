@@ -17,6 +17,7 @@ public class AsyncTimerOptionsBuilder {
 	 * Sets the recurring future supplier.
 	 *
 	 * @param recurringFutureSupplier The recurring future supplier.
+	 * @return This builder.
 	 */
 	public AsyncTimerOptionsBuilder setRecurringFutureSupplier(final Supplier<CompletableFuture<?>> recurringFutureSupplier) {
 		this.recurringFutureSupplier = recurringFutureSupplier;
@@ -27,6 +28,7 @@ public class AsyncTimerOptionsBuilder {
 	 * Sets the initial delay.
 	 *
 	 * @param initialDelay The initial delay.
+	 * @return This builder.
 	 */
 	public AsyncTimerOptionsBuilder setInitialDelay(final int initialDelay) {
 		this.initialDelay = initialDelay;
@@ -37,6 +39,7 @@ public class AsyncTimerOptionsBuilder {
 	 * Sets the trigger.
 	 *
 	 * @param trigger The trigger.
+	 * @return This builder.
 	 */
 	public AsyncTimerOptionsBuilder setTrigger(final CompletableFuture<?> trigger) {
 		this.trigger = trigger;
@@ -47,6 +50,7 @@ public class AsyncTimerOptionsBuilder {
 	 * Sets the delay strategy.
 	 *
 	 * @param delayStrategy The delay strategy.
+	 * @return This builder.
 	 */
 	public AsyncTimerOptionsBuilder setDelayStrategy(final AbstractDelayStrategy delayStrategy) {
 		this.delayStrategy = delayStrategy;
@@ -57,6 +61,7 @@ public class AsyncTimerOptionsBuilder {
 	 * Sets the visitor.
 	 *
 	 * @param visitor The visitor.
+	 * @return This builder.
 	 */
 	public AsyncTimerOptionsBuilder setVisitor(final AsyncTimerVisitor visitor) {
 		this.visitor = visitor;

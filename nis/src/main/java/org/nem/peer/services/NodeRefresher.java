@@ -30,6 +30,7 @@ public class NodeRefresher {
 	 * @param localNode The local node.
 	 * @param nodes The network nodes.
 	 * @param connector The peer connector.
+	 * @param versionCheck The node version checker.
 	 */
 	public NodeRefresher(
 			final Node localNode,

@@ -33,6 +33,7 @@ public class ValidationContext {
 	 * Creates a validation context with a custom block height and debit predicate.
 	 *
 	 * @param blockHeight The block height.
+	 * @param confirmedBlockHeight The block height of common parent.
 	 * @param debitPredicate The debit predicate.
 	 */
 	public ValidationContext(

@@ -45,7 +45,7 @@ public class Ed25519EncodedFieldElement {
 	/**
 	 * Return true if this is in {1,3,5,...,q-2}
 	 * Return false if this is in {0,2,4,...,q-1}
-	 * <br/>
+	 * <br>
 	 * Preconditions:
 	 * |x| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
 	 *
@@ -499,7 +499,7 @@ public class Ed25519EncodedFieldElement {
 	 * Multiplies this encoded field element with another and adds a third.
 	 * The result is reduced modulo the group order.
 	 * The output is a 32 byte encoded filed element.
-	 * <br/>
+	 * <br>
 	 * See the comments in the method modQ() for an explanation of the algorithm.
 	 *
 	 * @param b The encoded field element which is multiplied with this.

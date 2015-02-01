@@ -6,9 +6,8 @@ import javax.persistence.*;
 
 /**
  * Multisig Modification db entity
- * <p>
+ * <br>
  * Holds information about single multisig modification
- * <p>
  */
 @Entity
 @Table(name = "multisigmodifications")

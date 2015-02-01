@@ -14,6 +14,7 @@ public interface SynchronizationFilter {
 	 * Filters a list of synchronization samples.
 	 *
 	 * @param samples The list of samples.
+	 * @param age The age of a Node.
 	 * @return The filtered list of samples.
 	 */
 	public List<TimeSynchronizationSample> filter(final List<TimeSynchronizationSample> samples, final NodeAge age);

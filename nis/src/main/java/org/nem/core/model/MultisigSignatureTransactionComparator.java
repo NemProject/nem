@@ -6,7 +6,7 @@ import java.util.Comparator;
 
 /**
  * A custom comparator for comparing MultisigSignatureTransaction objects.
- * <br />
+ * <br>
  * This comparator only looks at the transaction signer and other hash.
  */
 public class MultisigSignatureTransactionComparator implements Comparator<MultisigSignatureTransaction> {

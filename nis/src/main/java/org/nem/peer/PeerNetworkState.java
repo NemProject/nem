@@ -193,6 +193,8 @@ public class PeerNetworkState {
 	/**
 	 * Adds a time synchronization result to the list.
 	 * Removes the oldest result if the size of the is exceeding 100.
+	 *
+	 * @param result The time result to be added.
 	 */
 	public void updateTimeSynchronizationResults(final TimeSynchronizationResult result) {
 		this.incrementAge();

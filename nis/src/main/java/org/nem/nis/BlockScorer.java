@@ -96,6 +96,7 @@ public class BlockScorer {
 	/**
 	 * Calculates the block score for the specified block.
 	 *
+	 * @param parentBlock The parent block.
 	 * @param currentBlock The currently analyzed block.
 	 * @return The block score.
 	 */

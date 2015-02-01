@@ -15,6 +15,7 @@ public class BlockNotificationContext {
 	 * Creates a new context.
 	 *
 	 * @param height The block height.
+	 * @param timeStamp The block timestamp.
 	 * @param trigger The trigger.
 	 */
 	public BlockNotificationContext(

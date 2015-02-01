@@ -106,7 +106,7 @@ public class TransactionValidatorFactory {
 	 * Visits all sub validators that comprise the validator returned by createBatch.
 	 *
 	 * @param visitor The visitor.
-	 * @param transactionHashCache The transaction hash cache.
+	 * @param transactionHashCache The cache of transaction hashes.
 	 */
 	public void visitBatchSubValidators(
 			final Consumer<BatchTransactionValidator> visitor,

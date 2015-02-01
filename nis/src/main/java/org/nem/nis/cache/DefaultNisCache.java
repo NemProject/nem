@@ -15,7 +15,7 @@ public class DefaultNisCache implements ReadOnlyNisCache {
 	 * @param accountCache The account cache.
 	 * @param accountStateCache The account state cache.
 	 * @param poiFacade The poi facade.
-	 * @param transactionHashCache the transaction hash cache.
+	 * @param transactionHashCache The cache of transaction hashes.
 	 */
 	public DefaultNisCache(
 			final SynchronizedAccountCache accountCache,

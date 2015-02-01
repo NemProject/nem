@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * - A delete aggregate modification is signed by all cosigners except the cosigner being deleted (when at least one cosigner remains).
  * - A delete aggregate modification of the last cosigner is signed by that cosigner.
  * - A delete aggregate modification can delete at most one account.
- * <br/>
+ * <br>
  * This validator should only be used during block creation, or when receiving a block.
  */
 public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {

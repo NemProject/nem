@@ -41,6 +41,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 	 * Unlocks the specified account for harvesting.
 	 *
 	 * @param account The account.
+	 * @return The unlocking result.
 	 */
 	public UnlockResult addUnlockedAccount(final Account account) {
 		if (this.unlocked.size() == this.maxUnlockedAccounts) {

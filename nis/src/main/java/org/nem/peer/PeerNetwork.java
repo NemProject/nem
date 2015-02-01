@@ -153,6 +153,8 @@ public class PeerNetwork {
 
 	/**
 	 * Checks if the local chain is synchronized with the rest of the network and updates the network's state.
+	 *
+	 * @return Void future.
 	 */
 	public CompletableFuture<Void> checkChainSynchronization() {
 		final ChainServices chainServices = this.servicesFactory.getChainServices();
@@ -169,6 +171,8 @@ public class PeerNetwork {
 
 	/**
 	 * Updates the endpoint of the local node as seen by other nodes.
+	 *
+	 * @return True if the node was updated; false otherwise.
 	 */
 	public CompletableFuture<Boolean> updateLocalNodeEndpoint() {
 		return this.servicesFactory.createLocalNodeEndpointUpdater().updatePlurality(this.getPartnerNodes());
@@ -176,6 +180,8 @@ public class PeerNetwork {
 
 	/**
 	 * Updates the endpoint of the local node as seen by other nodes.
+	 *
+	 * @return True if the node was updated by at least one node; false otherwise.
 	 */
 	public CompletableFuture<Boolean> boot() {
 		// it is safe to use partner nodes before a refresh cycle

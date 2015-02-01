@@ -44,7 +44,7 @@ public class Ed25519EncodedGroupElement {
 	/**
 	 * Gets the affine x-coordinate.
 	 * x is recovered in the following way (p = field size):
-	 * <br/>
+	 * <br>
 	 * x = sign(x) * sqrt((y^2 - 1) / (d * y^2 + 1)) = sign(x) * sqrt(u / v) with u = y^2 - 1 and v = d * y^2 + 1.
 	 * Setting β = (u * v^3) * (u * v^7)^((p - 5) / 8) one has β^2 = +-(u / v).
 	 * If v * β = -u multiply β with i=sqrt(-1).

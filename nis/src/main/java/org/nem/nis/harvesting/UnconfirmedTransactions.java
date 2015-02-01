@@ -44,7 +44,7 @@ public class UnconfirmedTransactions {
 		 * The unconfirmed balance check occurs as part of the execution of the UnconfirmedBalancesObserver.
 		 * This is the default setting and is used when adding new transactions and
 		 * when getting the unconfirmed transactions for an account.
-		 * <br/>
+		 * <br>
 		 * This improves the user experience:
 		 * A user complained that if the GUI shows a balance of 1k NEM he can initiate many
 		 * transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
@@ -59,6 +59,7 @@ public class UnconfirmedTransactions {
 	 *
 	 * @param validatorFactory The transaction validator factory to use.
 	 * @param nisCache The NIS cache to use.
+	 * @param timeProvider The TimeProvider.
 	 */
 	public UnconfirmedTransactions(
 			final TransactionValidatorFactory validatorFactory,
@@ -155,7 +156,7 @@ public class UnconfirmedTransactions {
 	 * Adds a new unconfirmed transaction.
 	 *
 	 * @param transaction The transaction.
-	 * @return true if the transaction was added.
+	 * @return The result of transaction validation.
 	 */
 	public ValidationResult addNew(final Transaction transaction) {
 		synchronized (this.lock) {
@@ -324,6 +325,7 @@ public class UnconfirmedTransactions {
 	/**
 	 * Gets the transactions for which the hash short id is not in the given collection.
 	 *
+	 * @param knownHashShortIds The collection of known hashes.
 	 * @return The unknown transactions.
 	 */
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
@@ -338,18 +340,20 @@ public class UnconfirmedTransactions {
 	}
 
 	/**
-	 * Gets the most recent transactions up to a given limit.
+	 * Gets the most recent transactions of an account up to a given limit.
 	 *
+	 * @param address The address of an account.
+	 * @param maxTransactions The maximum number of transactions.
 	 * @return The most recent transactions from this unconfirmed transactions.
 	 */
-	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxSize) {
+	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		synchronized (this.lock) {
 			return this.transactions.stream()
 					// TODO 20140115 J-G: should add test for filter
 					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
 					.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
 					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
-					.limit(maxSize)
+					.limit(maxTransactions)
 					.collect(Collectors.toList());
 		}
 	}
@@ -357,6 +361,7 @@ public class UnconfirmedTransactions {
 	/**
 	 * Gets all transactions up to a given limit of transactions.
 	 *
+	 * @param maxTransactions The maximum number of transactions.
 	 * @return The list of unconfirmed transactions.
 	 */
 	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {

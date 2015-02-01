@@ -38,6 +38,7 @@ public class BlockAnalyzer {
 	 * @param blockDao The block dao.
 	 * @param blockChainScoreManager The block chain score manager.
 	 * @param blockChainLastBlockLayer The block chain last block layer.
+	 * @param mapperFactory The mapper factory.
 	 */
 	@Autowired(required = true)
 	public BlockAnalyzer(

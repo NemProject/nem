@@ -5,7 +5,7 @@ import org.nem.core.serialization.*;
 
 /**
  * A serializable account id.
- * <br/>
+ * <br>
  * This is done purposefully (instead of having AccountId directly implement SerializableEntity)
  * to make it explicit that derived classes of AccountId will most likely not serialize completely.
  */

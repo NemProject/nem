@@ -24,6 +24,7 @@ public class FormatUtils {
 	/**
 	 * Gets a decimal format that with the desired number of decimal places.
 	 *
+	 * @param decimalPlaces The number of decimal places.
 	 * @return The desired decimal format.
 	 */
 	public static DecimalFormat getDecimalFormat(final int decimalPlaces) {

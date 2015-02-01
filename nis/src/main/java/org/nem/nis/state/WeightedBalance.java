@@ -75,8 +75,8 @@ public class WeightedBalance implements Comparable<WeightedBalance> {
 	 *
 	 * @param blockHeight The block height.
 	 * @param amount The unvested balance.
+	 * @return The new weighted balance.
 	 */
-
 	public WeightedBalance createSend(final BlockHeight blockHeight, final Amount amount) {
 		final Amount balance = this.balance.subtract(amount);
 		final double ratio = (double)this.unvestedBalance / (this.unvestedBalance + this.vestedBalance);

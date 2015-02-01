@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A two-level map of items.
- * <br/>
+ * <br>
  * Items are automatically created on access.
  * Item associations are order-dependent.
  */

@@ -67,6 +67,7 @@ public class ArrayUtils {
 	 * Converts a BigInteger to a little endian byte array.
 	 *
 	 * @param value The value to convert.
+	 * @param numBytes The number of bytes of destination array.
 	 * @return The resulting little endian byte array.
 	 */
 	public static byte[] toByteArray(final BigInteger value, final int numBytes) {
@@ -105,6 +106,8 @@ public class ArrayUtils {
 	/**
 	 * Constant-time byte[] comparison. The constant time behavior eliminates side channel attacks.
 	 *
+	 * @param b An array.
+	 * @param c An array.
 	 * @return 1 if b and c are equal, 0 otherwise.
 	 */
 	public static int isEqualConstantTime(final byte[] b, final byte[] c) {
@@ -122,6 +125,7 @@ public class ArrayUtils {
 	 *
 	 * @param b first of arrays to compare.
 	 * @param c second of arrays to compare.
+	 * @return 1,-1 or 0 depending on comparison result.
 	 */
 	public static int compare(final byte[] b, final byte[] c) {
 		int result = b.length - c.length;

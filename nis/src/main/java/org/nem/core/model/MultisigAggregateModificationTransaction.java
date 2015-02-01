@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 /**
  * A transaction that describes the addition or removal of one or more cosignatories to or from
  * a multisig account.
- * <br/>
+ * <br>
  * First such transaction converts account to multisig account.
  */
 public class MultisigAggregateModificationTransaction extends Transaction {

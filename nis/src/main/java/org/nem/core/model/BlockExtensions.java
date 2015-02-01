@@ -42,7 +42,7 @@ public class BlockExtensions {
 
 	/**
 	 * Streams all direct block transactions, first level child transactions, and nth level child transactions.
-	 * <br/>
+	 * <br>
 	 * This function is not needed currently.
 	 *
 	 * @param block The block.

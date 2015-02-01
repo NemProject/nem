@@ -38,6 +38,7 @@ public class NisDbModelToModelMapper {
 	/**
 	 * Maps a TDbModel to a model transaction.
 	 *
+	 * @param <TDbModel> The DbModel type.
 	 * @param transfer The TDbModel derived from abstract block transfer.
 	 * @return The model transfer transaction.
 	 */
