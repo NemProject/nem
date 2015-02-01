@@ -14,8 +14,7 @@ public class NemFormatter extends SimpleFormatter {
 
 	@Override
 	public synchronized String format(final LogRecord record) {
-		final UnixTime time = UnixTime.fromTimeInstant(timeProvider.getCurrentTime());
-		record.setMillis(time.getMillis() - timeZoneOffset);
+		record.setMillis(timeProvider.getNetworkTime().getRaw() + SystemTimeProvider.getEpochTimeMillis() - timeZoneOffset);
 		return super.format(record);
 	}
 }

@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 public class SystemTimeProviderTest {
-	private static final long EPOCH_TIME = 1407110400000L;
+	private static final long EPOCH_TIME = 1422748800000L;
 
 	@Before
 	public void resetTimeOffset() {
