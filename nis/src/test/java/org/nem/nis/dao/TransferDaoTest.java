@@ -272,9 +272,9 @@ public class TransferDaoTest {
 		final TestContext context = new TestContext(this.blockDao, 30);
 
 		// Act
-		final Collection<AbstractBlockTransfer> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
-		final Collection<AbstractBlockTransfer> entities2 = this.getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
-		final Collection<AbstractBlockTransfer> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
+		final Collection<?> entities1 = this.getTransfersFromDbUsingAttribute(context, null, null, USE_ID);
+		final Collection<?> entities2 = this.getTransfersFromDbUsingAttribute(context, null, 6L, USE_ID);
+		final Collection<?> entities3 = this.getTransfersFromDbUsingAttribute(context, null, 1L, USE_ID);
 
 		// Assert:
 		Assert.assertThat(entities1.size(), equalTo(25));
@@ -282,14 +282,16 @@ public class TransferDaoTest {
 		Assert.assertThat(entities3.size(), equalTo(0));
 	}
 
-	// TODO 20150122 BR -> G,J: does this test make sense? (we would have to check in the transfer dao for the id in serveral tables).
-	// > Same applies for hash which currently is only checked for in the transfers table.
-	// TODO 20150130 J-B: it seems like this test is returning a matching transaction, which is wrong
-	// > I don't have a big problem if it throws or returns an empty collection as long as the id and hash lookups are consistent
 	@Test
-	public void getTransactionsForAccountUsingIdThrowsWhenIdNotFound() {
+	public void getTransactionsForAccountUsingIdSucceedsWhenIdNotFound() {
 		// Arrange:
-		this.assertGetTransactionsForAccountUsingAttributeThrowsWhenAttributeNotFound(USE_ID);
+		final TestContext context = new TestContext(this.blockDao, 30);
+
+		// Act
+		final Collection<?> entities = this.getTransfersFromDbUsingAttribute(context, null, 1234L, USE_ID);
+
+		// Assert:
+		Assert.assertThat(entities.size(), equalTo(25));
 	}
 
 	@Test
@@ -325,7 +327,7 @@ public class TransferDaoTest {
 	}
 
 	@Test
-	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromMiddle() throws Exception {
+	public void getTransactionsForAccountUsingIdReturnsCorrectTransfersWhenQueryingOutgoingTransfersFromMiddle() {
 		this.assertGetTransactionsForAccountUsingAttributeReturnsCorrectTransfersWhenQueryingFromMiddle(
 				ReadOnlyTransferDao.TransferType.OUTGOING,
 				o -> 2 * (49 - o),
