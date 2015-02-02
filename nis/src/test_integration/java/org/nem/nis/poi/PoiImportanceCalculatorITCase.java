@@ -45,16 +45,16 @@ public class PoiImportanceCalculatorITCase {
 	private static final double LOW_TOLERANCE = 0.05;
 
 	/**
-	 * Four nodes (A, B, C, D) are owned by one person with 400 NEM who
+	 * Four nodes (A, B, C, D) are owned by one person with 400000 NEM who
 	 * distributed the NEM
 	 * between the nodes and cycled the NEM around. The other three nodes are
-	 * independent and have 400 NEM each.
+	 * independent and have 400000 NEM each.
 	 * The following transactions occur (transaction fees are assumed to be 0):
-	 * A, E, F, G all start with 400 NEM; ABCD are all controlled by actor A.
-	 * A sends all 400 NEM to B, who sends 300 NEM to C, who sends 200 NEM to D,
-	 * who sends 100 to A.
-	 * E starts with 400 NEM and sends 100 to G.
-	 * G starts with 400 NEM, gets 100 from E, and sends 100 to F.
+	 * A, E, F, G all start with 400000 NEM; ABCD are all controlled by actor A.
+	 * A sends all 400 NEM to B, who sends 300000 NEM to C, who sends 200000 NEM to D,
+	 * who sends 100000 to A.
+	 * E starts with 400000 NEM and sends 100000 to G.
+	 * G starts with 400000 NEM, gets 100000 from E, and sends 100000 to F.
 	 */
 	@Test
 	public void fourNodeSimpleLoopAttack() {
