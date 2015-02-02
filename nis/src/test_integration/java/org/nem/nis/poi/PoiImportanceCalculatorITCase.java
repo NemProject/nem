@@ -148,10 +148,8 @@ public class PoiImportanceCalculatorITCase {
 
 		// Arrange 1 vs many:
 		// Splitting of one account into many small accounts should have no influence on the importance distribution.
-		// TODO-CR 20140916 BR: test fails because weight on page rank was increased from 5% to 13.37%.
-		// TODO: 20141024 M-M: see if there are any effects of clustering here
 		final List<AccountState> accounts = new ArrayList<>();
-		for (int i = 2; i < 10; ++i) {
+		for (int i = 2; i < 30; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 4000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
@@ -162,9 +160,9 @@ public class PoiImportanceCalculatorITCase {
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double cumulativeImportanceOtherAccounts = importances.sum() - importances.getAt(0) - importances.getAt(1);
 			final double ratio = importances.getAt(1) / cumulativeImportanceOtherAccounts;
-			System.out.print("1 vs. " + i + ": User 1 importance is " + format.format(importances.getAt(1)));
-			System.out.print(", User 2 cumulative importance is " + cumulativeImportanceOtherAccounts);
-			System.out.println(", ratio is " + format.format(ratio));
+			LOGGER.info("1 vs. " + i + ": User 1 importance is " + format.format(importances.getAt(1)));
+			LOGGER.info(", User 2 cumulative importance is " + cumulativeImportanceOtherAccounts);
+			LOGGER.info(", ratio is " + format.format(ratio));
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, SUPER_HIGH_TOLERANCE);
