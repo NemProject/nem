@@ -14,6 +14,7 @@ import java.util.Arrays;
 
 public class BlockExplorerControllerTest {
 
+	/*
 	@Test
 	public void localBlocksAfterDelegatesToBlockDao() {
 		// Arrange:
@@ -57,4 +58,5 @@ public class BlockExplorerControllerTest {
 	private static long getHeight(final ExplorerBlockViewModel viewModel) {
 		return (Long)JsonSerializer.serializeToJson(viewModel).get("height");
 	}
+	*/
 }

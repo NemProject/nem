@@ -13,6 +13,7 @@ import org.nem.core.time.UnixTime;
 import java.util.function.Consumer;
 
 public class ExplorerBlockViewModelTest {
+	/*
 	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";
 	private static final long UNIX_TIME = 1424604802000L;
 
@@ -73,4 +74,5 @@ public class ExplorerBlockViewModelTest {
 				7,
 				Utils.generateRandomBytes(16));
 	}
+	*/
 }
