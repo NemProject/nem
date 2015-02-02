@@ -5,9 +5,7 @@ import com.googlecode.javaewah.EWAHCompressedBitmap;
 import java.util.*;
 
 /**
- * This is a wrapper for the EWAHCompressedBitmap. The reason we are wrapping it is
- * because EWAHCompressedBitmap requires that bits be set in strictly increasing order
- * and silent, hard to find bugs can be created if this constraint is not followed.
+ * This is a wrapper for the EWAHCompressedBitmap.
  */
 public class SparseBitmap implements java.lang.Iterable<Integer> {
 	private final EWAHCompressedBitmap bitmap;
@@ -66,8 +64,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 
 	/**
 	 * For speed, this method sets bits at the given index, without checking that the bits
-	 * are set in strictly ascending order. If used incorrectly, this will fail silently, producing
-	 * subtle and destructive errors, so caution is advised.
+	 * are set in strictly ascending order. If the bits are not in ascending order, performance could be adversely affected.
 	 *
 	 * @param bitToSet index of the bit to set
 	 */
@@ -77,6 +74,7 @@ public class SparseBitmap implements java.lang.Iterable<Integer> {
 
 	/**
 	 * Set the bit at the given index. Throws an exception if bits are not set in strictly ascending order.
+	 * For performance reasons, bits must be set in ascending order.
 	 *
 	 * @param bitToSet The index of the bit to set.
 	 */
