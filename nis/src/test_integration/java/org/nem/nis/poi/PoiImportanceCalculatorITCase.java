@@ -361,8 +361,8 @@ public class PoiImportanceCalculatorITCase {
 		// Accounts should not just be able to transfer all their balance to another account to boost their score
 		final List<AccountState> accounts = new ArrayList<>();
 		accounts.add(GENERAL_RECEIVER);
-		accounts.addAll(this.createUserAccounts(1, 2, 20000, 2, 100, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-		accounts.addAll(this.createUserAccounts(1, 2, 20000, 2, 9900, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+		accounts.addAll(this.createUserAccounts(1, 2, 2000000, 2, 10000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+		accounts.addAll(this.createUserAccounts(1, 2, 2000000, 2, 990000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
