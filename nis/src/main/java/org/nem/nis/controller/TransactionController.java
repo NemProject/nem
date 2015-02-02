@@ -60,8 +60,14 @@ public class TransactionController {
 
 		final ValidationContext context = new ValidationContext(this.debitPredicate);
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
+		// TODO 20150202 G-J: Transaction received here does not have signature
+		// and MultisigNonOperationalValidator causes validation to fail here...
+		// since this api is (was?) supposed to be for scripts only, I was thinking of following
+		// commented out, ugly hack below:
 		if (!validationResult.isSuccess()) {
-			throw new IllegalArgumentException(validationResult.toString());
+			//if (validationResult != ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE) {
+				throw new IllegalArgumentException(validationResult.toString());
+			//}
 		}
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
