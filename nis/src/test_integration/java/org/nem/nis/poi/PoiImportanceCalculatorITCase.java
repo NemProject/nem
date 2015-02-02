@@ -152,8 +152,8 @@ public class PoiImportanceCalculatorITCase {
 		for (int i = 2; i < 30; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 4000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, i, 8000000, 1, 4000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 1, 80000000, 1, 40000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, i, 80000000, 1, 40000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
@@ -210,18 +210,18 @@ public class PoiImportanceCalculatorITCase {
 		// The presence of a big lazy account should have no influence on the relative importance distribution.
 		// TODO-CR 20140916 BR: test fails because the ratio of balance+outlink weight to page rank weight is about 1:1 for the small accounts.
 		final List<AccountState> accounts = new ArrayList<>();
-		for (int i = 1; i < 2; i++) {
+		for (int i = 1; i < 2; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 80000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, 8, 80000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, i, i * 8000000, 0, 0, OUTLINK_STRATEGY_NONE));
+			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 8, 8000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, i, i * 800000000, 0, 0, OUTLINK_STRATEGY_NONE));
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
-			for (int j = 2; j < 10; j++) {
+			for (int j = 2; j < 10; ++j) {
 				user2Importance += importances.getAt(j);
 			}
 			final double ratio = importances.getAt(1) / user2Importance;
@@ -337,7 +337,7 @@ public class PoiImportanceCalculatorITCase {
 		double highBalanceSum = 0;
 		double lowBalanceSum = 0;
 
-		for (int ndx = 1; ndx <= numAccounts; ndx++) {
+		for (int ndx = 1; ndx <= numAccounts; ++ndx) {
 			highBalanceSum += importances.getAt(ndx);
 			lowBalanceSum += importances.getAt(ndx + numAccounts);
 		}
