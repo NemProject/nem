@@ -416,8 +416,6 @@ public class PoiImportanceCalculatorITCase {
 
 		// Arrange:
 		// The poi calculation should take no more than a second even for MANY accounts (~ million)
-		// TODO: why 1s?
-		// BR: 1s is probably way to high. We will need to address this later.
 		System.out.println("Setting up accounts.");
 		final int numAccounts = 50000;
 		final List<AccountState> accounts = new ArrayList<>();
@@ -440,10 +438,10 @@ public class PoiImportanceCalculatorITCase {
 		final long stop = System.currentTimeMillis();
 		System.out.println("Finished poi calculation.");
 
-		System.out.println("For " + numAccounts + " accounts the poi calculation needed " + (stop - start) / 5 + "ms.");
+		System.out.println("For " + numAccounts + " accounts the poi calculation needed on average " + (stop - start) / 5 + "ms.");
 
 		// Assert
-		Assert.assertTrue(stop - start < 1000);
+		Assert.assertTrue((stop - start) / 5 < 1000);
 	}
 
 	/**
