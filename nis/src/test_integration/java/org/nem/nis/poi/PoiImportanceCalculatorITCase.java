@@ -391,8 +391,8 @@ public class PoiImportanceCalculatorITCase {
 		for (int i = 4; i < 40; i++) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 8000, 1, 400, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, i, 8000, 1, 400, OUTLINK_STRATEGY_ALL_TO_ONE));
+			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, i, 8000000, 1, 40000, OUTLINK_STRATEGY_ALL_TO_ONE));
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
