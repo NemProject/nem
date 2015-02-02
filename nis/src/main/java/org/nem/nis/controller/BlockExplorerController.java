@@ -33,8 +33,8 @@ public class BlockExplorerController {
 	@TrustedApi
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
 		final BlockExplorerMapper mapper = new BlockExplorerMapper(this.mapper);
-		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BlockChainConstants.BLOCKS_LIMIT);
-		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BlockChainConstants.BLOCKS_LIMIT);
+		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(10);
+		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, 10);
 		dbBlockList.stream()
 				.map(dbBlock -> mapper.toExplorerViewModel(dbBlock))
 				.forEach(viewModel -> blockList.add(viewModel));
