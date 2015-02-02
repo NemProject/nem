@@ -190,10 +190,10 @@ public class SparseBitmapTest {
 		sb.setWithoutAscendingCheck(100);
 		sb.setWithoutAscendingCheck(0);
 
-		// Assert: the results are "random"
-		Assert.assertThat(sb.cardinality(), IsEqual.equalTo(1));
-		Assert.assertThat(sb.get(0), IsEqual.equalTo(false));
-		Assert.assertThat(sb.get(100), IsEqual.equalTo(false));
+		// Assert: the correct bits are set
+		Assert.assertThat(sb.cardinality(), IsEqual.equalTo(3));
+		Assert.assertThat(sb.get(0), IsEqual.equalTo(true));
+		Assert.assertThat(sb.get(100), IsEqual.equalTo(true));
 		Assert.assertThat(sb.get(2000000), IsEqual.equalTo(true));
 	}
 
