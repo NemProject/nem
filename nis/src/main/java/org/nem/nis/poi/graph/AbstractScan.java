@@ -146,11 +146,9 @@ public abstract class AbstractScan {
 	 *
 	 * @param id The node id.
 	 * @param clusterId The cluster id.
-	 * @return The cluster id.
-	 * TODO 20150201 G-*: why do we have setter, that returns value?
 	 */
-	protected Integer setNodeState(final NodeId id, final ClusterId clusterId) {
-		return this.nodeStates[id.getRaw()] = clusterId.getRaw();
+	protected void setNodeState(final NodeId id, final ClusterId clusterId) {
+		this.nodeStates[id.getRaw()] = clusterId.getRaw();
 	}
 
 	/**
