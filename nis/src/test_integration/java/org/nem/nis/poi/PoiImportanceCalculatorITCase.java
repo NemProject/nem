@@ -45,6 +45,14 @@ public class PoiImportanceCalculatorITCase {
 	private static final double HIGH_TOLERANCE = 0.1;
 	private static final double LOW_TOLERANCE = 0.05;
 
+	private static final long VESTED_8M = 8_000_000;
+	private static final long VESTED_80M = VESTED_8M * 10;
+	private static final long VESTED_800M = VESTED_80M * 10;
+
+	private static final long TOTAL_OUTLINK_40K = 40_000;
+	private static final long TOTAL_OUTLINK_400K = TOTAL_OUTLINK_40K * 10;
+	private static final long TOTAL_OUTLINK_40M = TOTAL_OUTLINK_400K * 100;
+
 	/**
 	 * Four nodes (A, B, C, D) are owned by one person with 400000 NEM who
 	 * distributed the NEM
@@ -151,8 +159,8 @@ public class PoiImportanceCalculatorITCase {
 		for (int i = 2; i < 30; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 80000000, 1, 40000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, i, 80000000, 1, 40000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 1, VESTED_80M, 1, TOTAL_OUTLINK_40M, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, i, VESTED_80M, 1, TOTAL_OUTLINK_40M, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
@@ -179,8 +187,8 @@ public class PoiImportanceCalculatorITCase {
 		for (int i = 40; i < 400; i = i + 40) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 80000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, 8, 80000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 1, VESTED_80M, 1, TOTAL_OUTLINK_400K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 8, VESTED_80M, 1, TOTAL_OUTLINK_400K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 			accounts.addAll(this.createUserAccounts(1, i, i * 50000, 0, 0, OUTLINK_STRATEGY_NONE));
 
 			// Act: calculate importances
@@ -212,9 +220,9 @@ public class PoiImportanceCalculatorITCase {
 		for (int i = 1; i < 2; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, 8, 8000000, 1, 400000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, i, i * 800000000, 0, 0, OUTLINK_STRATEGY_NONE));
+			accounts.addAll(this.createUserAccounts(1, 1, VESTED_8M, 1, TOTAL_OUTLINK_400K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 8, VESTED_8M, 1, TOTAL_OUTLINK_400K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, i, i * VESTED_800M, 0, 0, OUTLINK_STRATEGY_NONE));
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
@@ -244,8 +252,8 @@ public class PoiImportanceCalculatorITCase {
 		for (int i = 1; i < 10; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, 1, 8000000, i, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 1, VESTED_8M, 1, TOTAL_OUTLINK_40K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, 1, VESTED_8M, i, TOTAL_OUTLINK_40K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
@@ -326,7 +334,7 @@ public class PoiImportanceCalculatorITCase {
 		final List<AccountState> accounts = new ArrayList<>();
 		accounts.add(GENERAL_RECEIVER);
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 110000000, 1, 1, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-		accounts.addAll(this.createUserAccounts(1, numAccounts, 100000000, 1, 40000000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+		accounts.addAll(this.createUserAccounts(1, numAccounts, 100000000, 1, TOTAL_OUTLINK_40M, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
 
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
@@ -389,8 +397,8 @@ public class PoiImportanceCalculatorITCase {
 		for (int i = 4; i < 40; i++) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
-			accounts.addAll(this.createUserAccounts(1, 1, 8000000, 1, 40000, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
-			accounts.addAll(this.createUserAccounts(1, i, 8000000, 1, 40000, OUTLINK_STRATEGY_ALL_TO_ONE));
+			accounts.addAll(this.createUserAccounts(1, 1, VESTED_8M, 1, TOTAL_OUTLINK_40K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
+			accounts.addAll(this.createUserAccounts(1, i, VESTED_8M, 1, TOTAL_OUTLINK_40K, OUTLINK_STRATEGY_ALL_TO_ONE));
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
