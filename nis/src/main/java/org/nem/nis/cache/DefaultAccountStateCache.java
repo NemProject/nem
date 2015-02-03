@@ -16,13 +16,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 	private final Map<Address, AccountState> addressToStateMap = new ConcurrentHashMap<>();
 	private final StateFinder stateFinder = new StateFinder(
 			this.addressToStateMap,
-			address -> new AccountState(address));
-	// TODO 20141215 J-B: not sure what the best default action is; return a temporary state or throw an exception?
-	// TODO 20141222 BR -> J: I think i lost the overview over this cache stuff. We now have 14 interface and 12 classes implementing it.
-	// > I need to go through every findStateByAddress usage to decide if it is ok to throw if the address is unknown. At least in the past
-	// > there were places which relied on the cache to (secretly) create a new object.
-	// TODO 20141223 J-B: 'there were places which relied on the cache to (secretly) create a new object.' -
-	// > this is now happening automatically on all "writable" caches (so NisCache.copy() returns a writable copy that has auto-cache mode turned on)
+			address -> { throw new MissingResourceException("state does not exist for address", AccountState.class.getName(), address.toString()); });
 
 	@Override
 	public AccountState findStateByAddress(final Address address) {
