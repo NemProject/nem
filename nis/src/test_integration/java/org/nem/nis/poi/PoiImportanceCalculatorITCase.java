@@ -94,7 +94,7 @@ public class PoiImportanceCalculatorITCase {
 
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(2), accountStates);
-		System.out.println(importances);
+		LOGGER.info(importances.toString());
 
 		// Assert:
 		// E > G > F
@@ -133,10 +133,10 @@ public class PoiImportanceCalculatorITCase {
 		final double user1Importance = importances.getAt(0) + importances.getAt(1);
 		final double user2Importance = importances.getAt(2) + importances.getAt(3);
 		final double ratio = user1Importance / user2Importance;
-		System.out.print("Self loop vs. normal loop: User 1 importance is " + format.format(user1Importance));
-		System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-		System.out.println(", ratio is " + format.format(ratio));
-		System.out.println("");
+		LOGGER.info("Self loop vs. normal loop: User 1 importance is " + format.format(user1Importance));
+		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
+		LOGGER.info(", ratio is " + format.format(ratio));
+		LOGGER.info("");
 
 		// Assert
 		assertRatioIsWithinTolerance(ratio, LOW_TOLERANCE);
@@ -167,7 +167,7 @@ public class PoiImportanceCalculatorITCase {
 			// Assert
 			assertRatioIsWithinTolerance(ratio, SUPER_HIGH_TOLERANCE);
 		}
-		System.out.println("");
+		LOGGER.info("");
 	}
 
 	@Test
@@ -192,14 +192,14 @@ public class PoiImportanceCalculatorITCase {
 				user2Importance += importances.getAt(j);
 			}
 			final double ratio = importances.getAt(1) / user2Importance;
-			System.out.print("1 vs. 8 with " + i + " small lazy accounts: User 1 importance is " + format.format(importances.getAt(1)));
-			System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-			System.out.println(", ratio is " + format.format(ratio));
+			LOGGER.info("1 vs. 8 with " + i + " small lazy accounts: User 1 importance is " + format.format(importances.getAt(1)));
+			LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
+			LOGGER.info(", ratio is " + format.format(ratio));
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
-		System.out.println("");
+		LOGGER.info("");
 	}
 
 	@Test
@@ -225,14 +225,14 @@ public class PoiImportanceCalculatorITCase {
 				user2Importance += importances.getAt(j);
 			}
 			final double ratio = importances.getAt(1) / user2Importance;
-			System.out.print("1 vs. 8 with " + i + " big lazy account: User 1 importance is " + format.format(importances.getAt(1)));
-			System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-			System.out.println(", ratio is " + format.format(ratio));
+			LOGGER.info("1 vs. 8 with " + i + " big lazy account: User 1 importance is " + format.format(importances.getAt(1)));
+			LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
+			LOGGER.info(", ratio is " + format.format(ratio));
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
-		System.out.println("");
+		LOGGER.info("");
 	}
 
 	@Test
@@ -252,14 +252,14 @@ public class PoiImportanceCalculatorITCase {
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double ratio = importances.getAt(1) / importances.getAt(2);
-			System.out.print("1 outlink vs. " + i + " outlinks: User 1 importance is " + format.format(importances.getAt(1)));
-			System.out.print(", User 2 cumulative importance is " + format.format(importances.getAt(2)));
-			System.out.println(", ratio is " + format.format(ratio));
+			LOGGER.info("1 outlink vs. " + i + " outlinks: User 1 importance is " + format.format(importances.getAt(1)));
+			LOGGER.info(", User 2 cumulative importance is " + format.format(importances.getAt(2)));
+			LOGGER.info(", ratio is " + format.format(ratio));
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, LOW_TOLERANCE);
 		}
-		System.out.println("");
+		LOGGER.info("");
 	}
 
 	@Test
@@ -280,10 +280,10 @@ public class PoiImportanceCalculatorITCase {
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
 		final double user2Importance = importances.getAt(3) + importances.getAt(4);
 		final double ratio = user1Importance / user2Importance;
-		System.out.print("High outlink strength vs. low outlink strength: User 1 importance is " + format.format(user1Importance));
-		System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-		System.out.println(", ratio is " + format.format(ratio));
-		System.out.println("");
+		LOGGER.info("High outlink strength vs. low outlink strength: User 1 importance is " + format.format(user1Importance));
+		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
+		LOGGER.info(", ratio is " + format.format(ratio));
+		LOGGER.info("");
 
 		// Assert
 		Assert.assertTrue(ratio > 1.0);
@@ -307,10 +307,10 @@ public class PoiImportanceCalculatorITCase {
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
 		final double user2Importance = importances.getAt(3) + importances.getAt(4);
 		final double ratio = user1Importance / user2Importance;
-		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(user1Importance));
-		System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-		System.out.println(", ratio is " + format.format(ratio));
-		System.out.println("");
+		LOGGER.info("High balance vs. low balance: User 1 importance is " + format.format(user1Importance));
+		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
+		LOGGER.info(", ratio is " + format.format(ratio));
+		LOGGER.info("");
 
 		// Assert
 		Assert.assertTrue(ratio > 10.0);
@@ -343,11 +343,11 @@ public class PoiImportanceCalculatorITCase {
 		}
 
 		final double ratio = highBalanceSum / lowBalanceSum;
-		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(highBalanceSum));
-		System.out.print(", User 2 cumulative importance is " + format.format(lowBalanceSum));
-		System.out.println(", ratio is " + format.format(ratio));
-		System.out.println("Importances: " + importances);
-		System.out.println("");
+		LOGGER.info("High balance vs. low balance: User 1 importance is " + format.format(highBalanceSum));
+		LOGGER.info(", User 2 cumulative importance is " + format.format(lowBalanceSum));
+		LOGGER.info(", ratio is " + format.format(ratio));
+		LOGGER.info("Importances: " + importances);
+		LOGGER.info("");
 
 		// Assert
 		Assert.assertTrue(ratio < 1.0);
@@ -370,11 +370,11 @@ public class PoiImportanceCalculatorITCase {
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
 		final double user2Importance = importances.getAt(3) + importances.getAt(4);
 		final double ratio = user1Importance / user2Importance;
-		System.out.print("High balance vs. low balance: User 1 importance is " + format.format(user1Importance));
-		System.out.print(", User 2 cumulative importance is " + format.format(user2Importance));
-		System.out.println(", ratio is " + format.format(ratio));
-		System.out.println("Importances: " + importances);
-		System.out.println("");
+		LOGGER.info("High balance vs. low balance: User 1 importance is " + format.format(user1Importance));
+		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
+		LOGGER.info(", ratio is " + format.format(ratio));
+		LOGGER.info("Importances: " + importances);
+		LOGGER.info("");
 
 		// Assert
 		Assert.assertTrue(ratio > .90);
@@ -395,18 +395,18 @@ public class PoiImportanceCalculatorITCase {
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-			//			System.out.println("importances: " + importances);
+			//			LOGGER.info("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double cumulativeImportanceOtherAccounts = importances.sum() - importances.getAt(0) - importances.getAt(1);
 			final double ratio = importances.getAt(1) / cumulativeImportanceOtherAccounts;
-			System.out.print("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(1)));
-			System.out.print(", User 2 cumulative importance is " + format.format(cumulativeImportanceOtherAccounts));
-			System.out.println(", ratio is " + format.format(ratio));
+			LOGGER.info("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(1)));
+			LOGGER.info(", User 2 cumulative importance is " + format.format(cumulativeImportanceOtherAccounts));
+			LOGGER.info(", ratio is " + format.format(ratio));
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
-		System.out.println("");
+		LOGGER.info("");
 	}
 
 	@Test
@@ -415,7 +415,7 @@ public class PoiImportanceCalculatorITCase {
 
 		// Arrange:
 		// The poi calculation should take no more than a second even for MANY accounts (~ million)
-		System.out.println("Setting up accounts.");
+		LOGGER.info("Setting up accounts.");
 		final int numAccounts = 50000;
 		final List<AccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000L * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
@@ -429,15 +429,15 @@ public class PoiImportanceCalculatorITCase {
 		getAccountImportances(new BlockHeight(9999), accounts);
 
 		// Act: calculate importances
-		System.out.println("Starting poi calculation.");
+		LOGGER.info("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < 5; i++) {
 			final ColumnVector importances = getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 		final long stop = System.currentTimeMillis();
-		System.out.println("Finished poi calculation.");
+		LOGGER.info("Finished poi calculation.");
 
-		System.out.println("For " + numAccounts + " accounts the poi calculation needed on average " + (stop - start) / 5 + "ms.");
+		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed on average " + (stop - start) / 5 + "ms.");
 
 		// Assert
 		Assert.assertTrue((stop - start) / 5 < 1000);
@@ -461,20 +461,20 @@ public class PoiImportanceCalculatorITCase {
 			accounts.addAll(this.createUserAccounts(1, numAccounts, 10000000, 1, 500, OUTLINK_STRATEGY_LOOP));
 
 			// Act: calculate importances
-			System.out.println("Starting poi calculation.");
+			LOGGER.info("Starting poi calculation.");
 			final long start = System.currentTimeMillis();
 			getAccountImportances(height, accounts);
 			final long stop = System.currentTimeMillis();
-			System.out.println("Finished poi calculation.");
+			LOGGER.info("Finished poi calculation.");
 
-			System.out.println("For " + numAccounts + " accounts the poi calculation needed " + (stop - start) + "ms.");
+			LOGGER.info("For " + numAccounts + " accounts the poi calculation needed " + (stop - start) + "ms.");
 
 			// Assert
 			final long currTimeDiff = stop - start;
 
 			if (prevTimeDiff > 0) {
 				final double ratio = prevTimeDiff * 10. / currTimeDiff;
-				System.out.println("Prev time: " + prevTimeDiff
+				LOGGER.info("Prev time: " + prevTimeDiff
 						+ "\tCurr Time:" + currTimeDiff + "\tRatio: " + ratio);
 
 				Assert.assertTrue(ratio > .9);
@@ -489,7 +489,7 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("Testing memory usage of the poi calculation");
 
 		// Arrange:
-		System.out.println("Setting up accounts.");
+		LOGGER.info("Setting up accounts.");
 		final int numAccounts = 50000;
 		final List<AccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000l * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
@@ -498,7 +498,7 @@ public class PoiImportanceCalculatorITCase {
 		getAccountImportances(new BlockHeight(9999), accounts);
 
 		// Act: calculate importances
-		System.out.println("Starting poi calculation.");
+		LOGGER.info("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
 		final long startHeapSize = Runtime.getRuntime().totalMemory();
 		for (int i = 0; i < 5; i++) {
@@ -517,7 +517,7 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("NonHeap: " + ManagementFactory.getMemoryMXBean().getNonHeapMemoryUsage());
 		final List<MemoryPoolMXBean> beans = ManagementFactory.getMemoryPoolMXBeans();
 		for (final MemoryPoolMXBean bean : beans) {
-			System.out.println(bean.getName() + " : " + bean.getUsage());
+			LOGGER.info(bean.getName() + " : " + bean.getUsage());
 			if ("PS Eden Space".equals(bean.getName())) {
 				Assert.assertTrue(bean.getUsage().getUsed() < 128000000); // ~128 Mb
 			} else if ("PS Survivor Space".equals(bean.getName())) {
