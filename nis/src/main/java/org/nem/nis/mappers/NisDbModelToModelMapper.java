@@ -22,19 +22,6 @@ public class NisDbModelToModelMapper {
 		this.mapper = mapper;
 	}
 
-	// TODO 20150127 J-G: we can probably remove this function
-	// > (and then the tests should automatically use the generic one)
-
-	/**
-	 * Maps a db model transfer transaction to a model transfer transaction.
-	 *
-	 * @param dbTransferTransaction The db model transfer transaction.
-	 * @return The model transfer transaction.
-	 */
-	public Transaction map(final DbTransferTransaction dbTransferTransaction) {
-		return this.mapper.map(dbTransferTransaction, TransferTransaction.class);
-	}
-
 	/**
 	 * Maps a TDbModel to a model transaction.
 	 *
