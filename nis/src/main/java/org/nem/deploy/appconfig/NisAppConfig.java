@@ -50,9 +50,6 @@ public class NisAppConfig {
 	@Autowired
 	private TransferDao transferDao;
 
-	@Autowired
-	private ImportanceTransferDao importanceTransferDao;
-
 	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
 
 	@Bean
