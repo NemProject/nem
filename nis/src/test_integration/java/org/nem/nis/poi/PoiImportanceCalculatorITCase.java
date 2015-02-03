@@ -136,14 +136,10 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(10000), accountStates);
 
-		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(0) + importances.getAt(1);
 		final double user2Importance = importances.getAt(2) + importances.getAt(3);
 		final double ratio = user1Importance / user2Importance;
-		LOGGER.info("Self loop vs. normal loop: User 1 importance is " + format.format(user1Importance));
-		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
-		LOGGER.info(", ratio is " + format.format(ratio));
-		LOGGER.info("");
+		outputComparison("Self loop vs. normal loop", user1Importance, user2Importance);
 
 		// Assert
 		assertRatioIsWithinTolerance(ratio, LOW_TOLERANCE);
@@ -164,17 +160,13 @@ public class PoiImportanceCalculatorITCase {
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double cumulativeImportanceOtherAccounts = importances.sum() - importances.getAt(0) - importances.getAt(1);
 			final double ratio = importances.getAt(1) / cumulativeImportanceOtherAccounts;
-			LOGGER.info("1 vs. " + i + ": User 1 importance is " + format.format(importances.getAt(1)));
-			LOGGER.info(", User 2 cumulative importance is " + cumulativeImportanceOtherAccounts);
-			LOGGER.info(", ratio is " + format.format(ratio));
+			outputComparison("1 vs. " + i, importances.getAt(1), cumulativeImportanceOtherAccounts);
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, SUPER_HIGH_TOLERANCE);
 		}
-		LOGGER.info("");
 	}
 
 	@Test
@@ -193,20 +185,16 @@ public class PoiImportanceCalculatorITCase {
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
 			for (int j = 2; j < 10; ++j) {
 				user2Importance += importances.getAt(j);
 			}
 			final double ratio = importances.getAt(1) / user2Importance;
-			LOGGER.info("1 vs. 8 with " + i + " small lazy accounts: User 1 importance is " + format.format(importances.getAt(1)));
-			LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
-			LOGGER.info(", ratio is " + format.format(ratio));
+			outputComparison("1 vs. 8 with " + i + " small lazy accounts", importances.getAt(1), user2Importance);
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
-		LOGGER.info("");
 	}
 
 	@Test
@@ -226,20 +214,16 @@ public class PoiImportanceCalculatorITCase {
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			double user2Importance = 0;
 			for (int j = 2; j < 10; ++j) {
 				user2Importance += importances.getAt(j);
 			}
 			final double ratio = importances.getAt(1) / user2Importance;
-			LOGGER.info("1 vs. 8 with " + i + " big lazy account: User 1 importance is " + format.format(importances.getAt(1)));
-			LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
-			LOGGER.info(", ratio is " + format.format(ratio));
+			outputComparison("1 vs. 8 with " + i + " big lazy account", importances.getAt(1), user2Importance);
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
-		LOGGER.info("");
 	}
 
 	@Test
@@ -257,16 +241,12 @@ public class PoiImportanceCalculatorITCase {
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double ratio = importances.getAt(1) / importances.getAt(2);
-			LOGGER.info("1 outlink vs. " + i + " outlinks: User 1 importance is " + format.format(importances.getAt(1)));
-			LOGGER.info(", User 2 cumulative importance is " + format.format(importances.getAt(2)));
-			LOGGER.info(", ratio is " + format.format(ratio));
+			outputComparison("1 outlink vs. " + i + " outlinks", importances.getAt(1), importances.getAt(2));
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, LOW_TOLERANCE);
 		}
-		LOGGER.info("");
 	}
 
 	@Test
@@ -283,14 +263,10 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
-		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
 		final double user2Importance = importances.getAt(3) + importances.getAt(4);
 		final double ratio = user1Importance / user2Importance;
-		LOGGER.info("High outlink strength vs. low outlink strength: User 1 importance is " + format.format(user1Importance));
-		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
-		LOGGER.info(", ratio is " + format.format(ratio));
-		LOGGER.info("");
+		outputComparison("High outlink strength vs. low outlink strength", user1Importance, user2Importance);
 
 		// Assert
 		Assert.assertTrue(ratio > 1.0);
@@ -310,14 +286,10 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
-		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
 		final double user2Importance = importances.getAt(3) + importances.getAt(4);
 		final double ratio = user1Importance / user2Importance;
-		LOGGER.info("High balance vs. low balance: User 1 importance is " + format.format(user1Importance));
-		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
-		LOGGER.info(", ratio is " + format.format(ratio));
-		LOGGER.info("");
+		outputComparison("High balance vs. low balance", user1Importance, user2Importance);
 
 		// Assert
 		Assert.assertTrue(ratio > 10.0);
@@ -339,8 +311,6 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
 
-		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
-
 		double highBalanceSum = 0;
 		double lowBalanceSum = 0;
 
@@ -350,18 +320,15 @@ public class PoiImportanceCalculatorITCase {
 		}
 
 		final double ratio = highBalanceSum / lowBalanceSum;
-		LOGGER.info("High balance vs. low balance: User 1 importance is " + format.format(highBalanceSum));
-		LOGGER.info(", User 2 cumulative importance is " + format.format(lowBalanceSum));
-		LOGGER.info(", ratio is " + format.format(ratio));
+		outputComparison("High balance vs. low balance", highBalanceSum, lowBalanceSum);
 		LOGGER.info("Importances: " + importances);
-		LOGGER.info("");
 
 		// Assert
 		Assert.assertTrue(ratio < 1.0);
 	}
 
 	@Test
-	public void accountCannotBoostPOIWithVeryLowBalance() {
+	public void accountCanSlightlyBoostPoiWithVeryLowBalanceByCreatingLargeOutlinks() {
 		LOGGER.info("Check that an account can't just send most of their balance to another account to boost their score");
 		// Arrange:
 		// Accounts should not just be able to transfer all their balance to another account to boost their score
@@ -372,18 +339,14 @@ public class PoiImportanceCalculatorITCase {
 
 		// Act: calculate importances
 		final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-
-		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 		final double user1Importance = importances.getAt(1) + importances.getAt(2);
 		final double user2Importance = importances.getAt(3) + importances.getAt(4);
 		final double ratio = user1Importance / user2Importance;
-		LOGGER.info("High balance vs. low balance: User 1 importance is " + format.format(user1Importance));
-		LOGGER.info(", User 2 cumulative importance is " + format.format(user2Importance));
-		LOGGER.info(", ratio is " + format.format(ratio));
+		outputComparison("High balance vs. low balance", user1Importance, user2Importance);
 		LOGGER.info("Importances: " + importances);
-		LOGGER.info("");
 
-		// Assert
+		// Assert: outlinks are given more weight than balance, so the low-balance account
+		// should have boosted its poi by a small amount
 		Assert.assertTrue(ratio > .90);
 	}
 
@@ -402,17 +365,13 @@ public class PoiImportanceCalculatorITCase {
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double cumulativeImportanceOtherAccounts = importances.sum() - importances.getAt(0) - importances.getAt(1);
 			final double ratio = importances.getAt(1) / cumulativeImportanceOtherAccounts;
-			LOGGER.info("1 vs. " + i + ", outlink directed to one account: User 1 importance is " + format.format(importances.getAt(1)));
-			LOGGER.info(", User 2 cumulative importance is " + format.format(cumulativeImportanceOtherAccounts));
-			LOGGER.info(", ratio is " + format.format(ratio));
+			outputComparison("1 vs. " + i + ", outlink directed to one account", importances.getAt(1), cumulativeImportanceOtherAccounts);
 
 			// Assert
 			assertRatioIsWithinTolerance(ratio, HIGH_TOLERANCE);
 		}
-		LOGGER.info("");
 	}
 
 	@Test
@@ -433,7 +392,7 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < 5; i++) {
-			final ColumnVector importances = getAccountImportances(new BlockHeight(10000 + i), accounts);
+			getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 		final long stop = System.currentTimeMillis();
 		LOGGER.info("Finished poi calculation.");
@@ -621,5 +580,19 @@ public class PoiImportanceCalculatorITCase {
 		}
 
 		return importancesVector;
+	}
+
+	private static void outputComparison(
+			final String title,
+			final double importance1,
+			final double importance2) {
+		final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
+		final String message = String.format(
+				"%s: User1 importance is %s, User2 importance is %s, ratio is %s",
+				title,
+				format.format(importance1),
+				format.format(importance2),
+				format.format(importance1 / importance2));
+		LOGGER.info(message);
 	}
 }
