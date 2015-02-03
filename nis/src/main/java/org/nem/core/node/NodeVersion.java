@@ -63,7 +63,7 @@ public class NodeVersion {
 	public static NodeVersion parse(final String s) {
 		final Matcher matcher = VERSION_PATTERN.matcher(s);
 		if (!matcher.matches()) {
-			throw new IllegalArgumentException("pattern could not be parsed");
+			throw new IllegalArgumentException(String.format("pattern '%s' could not be parsed", s));
 		}
 
 		return new NodeVersion(
