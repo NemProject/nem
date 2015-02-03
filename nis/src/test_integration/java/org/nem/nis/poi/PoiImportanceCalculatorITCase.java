@@ -121,7 +121,6 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("Self loop vs. normal loop");
 
 		// Arrange:
-		// TODO: Loops should be detected.
 		final List<AccountState> accountStates = new ArrayList<>();
 		accountStates.addAll(this.createUserAccounts(1, 2, 1000000, 1, 500, OUTLINK_STRATEGY_LOOP_SELF));
 		accountStates.addAll(this.createUserAccounts(1, 2, 1000000, 1, 500, OUTLINK_STRATEGY_LOOP));
@@ -171,7 +170,7 @@ public class PoiImportanceCalculatorITCase {
 	}
 
 	@Test
-	public void manySmallLazyAcountsDoNotInfluenceImportanceDistribution() {
+	public void manySmallLazyAccountsDoNotInfluenceImportanceDistribution() {
 		LOGGER.info("1 account vs. 8 accounts with many lazy accounts");
 
 		// Arrange 1 vs 8, with lazy accounts:
@@ -203,7 +202,7 @@ public class PoiImportanceCalculatorITCase {
 	}
 
 	@Test
-	public void oneBigLazyAcountDoesNotInfluencesImportanceDistribution() {
+	public void oneBigLazyAccountDoesNotInfluencesImportanceDistribution() {
 		LOGGER.info("1 account vs. 8 accounts with 0 or 1 big lazy account");
 
 		// Arrange 1 vs 8, with 0 or 1 big lazy account:
@@ -395,7 +394,6 @@ public class PoiImportanceCalculatorITCase {
 
 			// Act: calculate importances
 			final ColumnVector importances = getAccountImportances(new BlockHeight(1), accounts);
-			//			LOGGER.info("importances: " + importances);
 			final DecimalFormat format = FormatUtils.getDefaultDecimalFormat();
 			final double cumulativeImportanceOtherAccounts = importances.sum() - importances.getAt(0) - importances.getAt(1);
 			final double ratio = importances.getAt(1) / cumulativeImportanceOtherAccounts;
@@ -410,7 +408,7 @@ public class PoiImportanceCalculatorITCase {
 	}
 
 	@Test
-	public void poiCalculationIsPerformantEnough() {
+	public void poiCalculationIsFastEnough() {
 		LOGGER.info("Testing performance of the poi calculation");
 
 		// Arrange:
@@ -419,11 +417,6 @@ public class PoiImportanceCalculatorITCase {
 		final int numAccounts = 50000;
 		final List<AccountState> accounts = new ArrayList<>();
 		accounts.addAll(this.createUserAccounts(1, numAccounts, 50000L * numAccounts, 2, 500 * numAccounts, OUTLINK_STRATEGY_RANDOM));
-
-		// TODO 20140929 BR: Why is everything so damn slow in the first round?
-		// TODO 20141003 M-BR: lazy class loading, real-time optimization, and JIT compilation: http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
-		// TODO: 20141024 M-J: Do you think we can speed up Java warm-up? http://stackoverflow.com/questions/1481853/technique-or-utility-to-minimize-java-warm-up-time
-		// -> perhaps we can call some of the poi code in a low priority thread on startup so that things are warmed up?
 
 		// Warm up phase
 		getAccountImportances(new BlockHeight(9999), accounts);
@@ -440,6 +433,7 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("For " + numAccounts + " accounts the poi calculation needed on average " + (stop - start) / 5 + "ms.");
 
 		// Assert
+		// TODO 20150202 J-B: notice that this limit changed
 		Assert.assertTrue((stop - start) / 5 < 1000);
 	}
 
