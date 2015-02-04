@@ -3,19 +3,13 @@ package org.nem.nis.controller;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.logging.Logger;
-
 @RestController
 public class LocalController {
-	private final static Logger LOGGER = Logger.getLogger(LocalController.class.getName());
-
-	private static final long SHUTDOWN_DELAY = 200;
 	private final NisPeerNetworkHost host;
 	private final CommonStarter starter;
 
@@ -29,19 +23,11 @@ public class LocalController {
 
 	/**
 	 * Stops the current NIS server. Afterwards it has to be started via WebStart again.
-	 * TODO-CR: we should refactor since this is similar (the same as whats in NIS);
 	 */
 	@ClientApi
 	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)
 	public void shutdown() {
-		LOGGER.info(String.format("Async shut-down initiated in %d msec.", SHUTDOWN_DELAY));
-		final Runnable r = () -> {
-			ExceptionUtils.propagateVoid(() -> Thread.sleep(SHUTDOWN_DELAY));
-			this.starter.stopServer();
-		};
-
-		final Thread thread = new Thread(r);
-		thread.start();
+		this.starter.stopServerAsync();
 	}
 
 	/**

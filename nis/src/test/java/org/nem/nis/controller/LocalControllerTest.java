@@ -8,7 +8,6 @@ import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.peer.PeerNetwork;
 
@@ -23,10 +22,9 @@ public class LocalControllerTest {
 
 		// Act:
 		context.controller.shutdown();
-		ExceptionUtils.propagateVoid(() -> Thread.sleep(500));
 
 		// Assert:
-		Mockito.verify(context.starter, Mockito.only()).stopServer();
+		Mockito.verify(context.starter, Mockito.only()).stopServerAsync();
 	}
 
 	//endregion

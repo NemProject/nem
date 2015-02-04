@@ -12,7 +12,7 @@ import org.eclipse.jetty.util.thread.*;
 import org.eclipse.jetty.webapp.Configuration;
 import org.nem.core.metadata.*;
 import org.nem.core.time.*;
-import org.nem.core.utils.LockFile;
+import org.nem.core.utils.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -24,6 +24,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.file.Paths;
 import java.util.EnumSet;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.*;
 
 /**
@@ -51,6 +52,7 @@ public class CommonStarter implements ServletContextListener {
 	private static final int IDLE_TIMEOUT = 30000;
 	private static final int HTTPS_HEADER_SIZE = 8192;
 	private static final int HTTPS_BUFFER_SIZE = 32768;
+	private static final long ASYNC_SHUTDOWN_DELAY = 200;
 
 	private static final Closeable fileLockHandle;
 
@@ -180,12 +182,38 @@ public class CommonStarter implements ServletContextListener {
 		LOGGER.info(String.format("%s is ready to serve. URL is \"%s\".", CommonStarter.META_DATA.getAppName(), this.configuration.getBaseUrl()));
 	}
 
+	/**
+	 * Stops the server synchronously on the current thread.
+	 */
 	public void stopServer() {
 		try {
 			this.server.stop();
 		} catch (final Exception e) {
 			LOGGER.log(Level.SEVERE, "Can't stop server.", e);
 		}
+	}
+
+	/**
+	 * Stops the server asynchronously on a different thread.
+	 * TODO 20150203 J-J: NCC should call this once core is republished.
+	 *
+	 * @return A future that will evaluate to true on success and false on failure.
+	 */
+	public CompletableFuture<Boolean> stopServerAsync() {
+		LOGGER.info(String.format("Async shut-down initiated in %d msec.", ASYNC_SHUTDOWN_DELAY));
+
+		final CompletableFuture<Boolean> future = new CompletableFuture<>();
+		final Thread thread = new Thread(() -> {
+			try {
+				ExceptionUtils.propagateVoid(() -> Thread.sleep(ASYNC_SHUTDOWN_DELAY));
+				this.stopServer();
+				future.complete(true);
+			} finally {
+				future.complete(false);
+			}
+		});
+		thread.start();
+		return future;
 	}
 
 	private void stopOtherInstance(final URL stopURL) throws Exception {
