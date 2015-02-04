@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * DbBlock entity.
@@ -177,7 +178,9 @@ public class DbBlock {
 	}
 
 	public List<DbTransferTransaction> getBlockTransferTransactions() {
-		return this.blockTransferTransactions;
+		return this.blockTransferTransactions.stream()
+				.filter(t -> null != t.getSenderProof())
+				.collect(Collectors.toList());
 	}
 
 	public void setBlockTransferTransactions(final List<DbTransferTransaction> blockTransferTransactions) {
@@ -185,7 +188,9 @@ public class DbBlock {
 	}
 
 	public List<DbImportanceTransferTransaction> getBlockImportanceTransferTransactions() {
-		return this.blockImportanceTransferTransactions;
+		return this.blockImportanceTransferTransactions.stream()
+				.filter(t -> null != t.getSenderProof())
+				.collect(Collectors.toList());
 	}
 
 	public void setBlockImportanceTransferTransactions(final List<DbImportanceTransferTransaction> blockImportanceTransferTransactions) {
@@ -193,7 +198,9 @@ public class DbBlock {
 	}
 
 	public List<DbMultisigAggregateModificationTransaction> getBlockMultisigAggregateModificationTransactions() {
-		return this.blockMultisigAggregateModificationTransactions;
+		return this.blockMultisigAggregateModificationTransactions.stream()
+				.filter(t -> null != t.getSenderProof())
+				.collect(Collectors.toList());
 	}
 
 	public void setBlockMultisigAggregateModificationTransactions(final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions) {
