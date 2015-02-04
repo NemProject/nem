@@ -22,13 +22,8 @@ public class TransactionDeadlineValidator implements SingleTransactionValidator 
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
 
-		for (final Transaction childTransaction : transaction.getChildTransactions()) {
-			if (isExpired(childTransaction, currentTime)) {
-				return ValidationResult.FAILURE_PAST_DEADLINE;
-			}
-		}
-
-		return isExpired(transaction, currentTime) ? ValidationResult.FAILURE_PAST_DEADLINE : ValidationResult.SUCCESS;
+		final boolean isExpired = TransactionExtensions.streamDefault(transaction).anyMatch(t -> isExpired(t, currentTime));
+		return isExpired ? ValidationResult.FAILURE_PAST_DEADLINE : ValidationResult.SUCCESS;
 	}
 
 	private static boolean isExpired(final Transaction transaction, final TimeInstant currentTime) {

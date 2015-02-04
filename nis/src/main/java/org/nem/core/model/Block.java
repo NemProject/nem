@@ -100,7 +100,7 @@ public class Block extends VerifiableEntity {
 	 */
 	public Amount getTotalFee() {
 		final long rawTotalFee = this.transactions.stream()
-				.flatMap(t -> Stream.concat(Stream.of(t), t.getChildTransactions().stream()))
+				.flatMap(TransactionExtensions::streamDefault)
 				.map(tx -> tx.getFee().getNumMicroNem())
 				.reduce(0L, Long::sum);
 		return Amount.fromMicroNem(rawTotalFee);

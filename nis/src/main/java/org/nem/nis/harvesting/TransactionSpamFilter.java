@@ -73,11 +73,7 @@ public class TransactionSpamFilter {
 		return (int)(importance * Math.exp(-cacheSize / 300) * MAX_CACHE_SIZE * (MAX_CACHE_SIZE - cacheSize) / 10);
 	}
 
-	// TODO 20150130 J-J: consider refactoring
 	private int flatSize(final List<Transaction> filteredTransactions) {
-		return (int)Stream.concat(
-				filteredTransactions.stream(),
-				filteredTransactions.stream().flatMap(t -> t.getChildTransactions().stream()))
-				.count();
+		return (int)filteredTransactions.stream().flatMap(TransactionExtensions::streamDefault).count();
 	}
 }

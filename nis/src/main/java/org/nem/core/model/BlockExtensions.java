@@ -35,9 +35,7 @@ public class BlockExtensions {
 	 * @return The transactions.
 	 */
 	public static Stream<Transaction> streamDirectAndFirstChildTransactions(final Block block) {
-		return Stream.concat(
-				block.getTransactions().stream(),
-				block.getTransactions().stream().flatMap(t -> t.getChildTransactions().stream()));
+		return block.getTransactions().stream().flatMap(t -> TransactionExtensions.streamSelfAndFirstChildTransactions(t));
 	}
 
 	/**
@@ -49,16 +47,6 @@ public class BlockExtensions {
 	 * @return The transactions.
 	 */
 	public static Stream<Transaction> streamAllTransactions(final Block block) {
-		final List<Transaction> allTransactions = new ArrayList<>();
-		addTransactionsRecursive(allTransactions, block.getTransactions());
-		return allTransactions.stream();
-	}
-
-	private static void addTransactionsRecursive(final List<Transaction> transactions, final Collection<Transaction> source) {
-		transactions.addAll(source);
-
-		for (final Transaction t : source) {
-			addTransactionsRecursive(transactions, t.getChildTransactions());
-		}
+		return block.getTransactions().stream().flatMap(t -> TransactionExtensions.streamSelfAndAllTransactions(t));
 	}
 }

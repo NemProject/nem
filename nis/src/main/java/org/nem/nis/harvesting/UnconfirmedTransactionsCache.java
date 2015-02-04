@@ -78,9 +78,7 @@ public class UnconfirmedTransactionsCache {
 	 * @return The transaction stream.
 	 */
 	public Stream<Transaction> streamFlat() {
-		return Stream.concat(
-				this.transactions.values().stream(),
-				this.transactions.values().stream().flatMap(t -> t.getChildTransactions().stream()));
+		return this.transactions.values().stream().flatMap(t -> TransactionExtensions.streamDefault(t));
 	}
 
 	/**
