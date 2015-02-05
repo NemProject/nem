@@ -45,7 +45,7 @@ public class TransferControllerTest {
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));
-		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("invalid address: "));
+		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("invalid address 'BAD RECIPIENT' (org.nem.core.model.Address)"));
 	}
 
 	@Test

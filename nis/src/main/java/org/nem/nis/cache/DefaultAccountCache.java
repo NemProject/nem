@@ -54,7 +54,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	private Account findByAddress(final Address address, final Supplier<Account> notFoundHandler) {
 		if (!address.isValid()) {
-			throw new MissingResourceException("invalid address: ", Address.class.getName(), address.toString());
+			throw new MissingResourceException("invalid address", Address.class.getName(), address.toString());
 		}
 
 		final Account account = this.findByAddressImpl(address);
