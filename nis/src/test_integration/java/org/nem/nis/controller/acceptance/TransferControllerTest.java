@@ -12,33 +12,24 @@ import org.nem.nis.test.LocalHostConnector;
 // json objects are used directly (on purpose), to make it easier
 // to follow/find/detect changes in /transfer/ API or serializers
 public class TransferControllerTest {
-
 	private static final String TRANSFER_PREPARE_PATH = "transaction/prepare";
+	private static final String RECIPIENT_ADDRESS = AcceptanceTestConstants.ADDRESS2.toString();
+	private static final String SENDER_PUBLIC_KEY = AcceptanceTestConstants.PUBLIC_KEY.toString();
 
 	@Test
 	public void transferIncorrectType() {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 
-		final JSONObject obj = new JSONObject();
+		final JSONObject obj = createValidTransaction();
 		obj.put("type", 123456);
-		obj.put("version", 1);
-		obj.put("recipient", getRecipientAccountId());
-		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("amount", 42L);
-		obj.put("fee", 1L);
-		obj.put("timeStamp", 0);
-		obj.put("deadline", 1);
-		final JSONObject message = new JSONObject();
-		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "48656C6C6F2C20576F726C6421");
-		obj.put("message", message);
 
 		// Act:
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("Unknown transaction type: 123456"));
 	}
 
 	@Test
@@ -46,25 +37,15 @@ public class TransferControllerTest {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 
-		final JSONObject obj = new JSONObject();
-		obj.put("type", TransactionTypes.TRANSFER);
-		obj.put("version", 1);
-		obj.put("recipient", "AAAANBKLYTH6OWWQCQ6OI66HJOPBGLXWVQG6V2UTQEUI");
-		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("amount", 42L);
-		obj.put("fee", 1L);
-		obj.put("timeStamp", 0);
-		obj.put("deadline", 1);
-		final JSONObject message = new JSONObject();
-		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "48656C6C6F2C20576F726C6421");
-		obj.put("message", message);
+		final JSONObject obj = createValidTransaction();
+		obj.put("recipient", "bad recipient");
 
 		// Act:
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(404));
+		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("invalid address: "));
 	}
 
 	@Test
@@ -72,25 +53,15 @@ public class TransferControllerTest {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 
-		final JSONObject obj = new JSONObject();
-		obj.put("type", TransactionTypes.TRANSFER);
-		obj.put("version", 1);
-		obj.put("recipient", getRecipientAccountId());
-		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
+		final JSONObject obj = createValidTransaction();
 		obj.put("amount", -13L);
-		obj.put("fee", 1L);
-		obj.put("timeStamp", 0);
-		obj.put("deadline", 1);
-		final JSONObject message = new JSONObject();
-		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "48656C6C6F2C20576F726C6421");
-		obj.put("message", message);
 
 		// Act:
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("amount (-13) must be non-negative"));
 	}
 
 	@Test
@@ -98,15 +69,7 @@ public class TransferControllerTest {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 
-		final JSONObject obj = new JSONObject();
-		obj.put("type", TransactionTypes.TRANSFER);
-		obj.put("version", 1);
-		obj.put("recipient", getRecipientAccountId());
-		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("amount", 42L);
-		obj.put("fee", 1L);
-		obj.put("timeStamp", 0);
-		obj.put("deadline", 1);
+		final JSONObject obj = createValidTransaction();
 		final JSONObject message = new JSONObject();
 		message.put("type", 66);
 		message.put("payload", "48656C6C6F2C20576F726C6421");
@@ -117,6 +80,7 @@ public class TransferControllerTest {
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		Assert.assertThat(result.getError().getMessage(), IsEqual.equalTo("Unknown message type: 66"));
 	}
 
 	@Test
@@ -124,15 +88,7 @@ public class TransferControllerTest {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 
-		final JSONObject obj = new JSONObject();
-		obj.put("type", TransactionTypes.TRANSFER);
-		obj.put("version", 1);
-		obj.put("recipient", getRecipientAccountId());
-		obj.put("signer", "02a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("amount", 42L);
-		obj.put("fee", 1L);
-		obj.put("timeStamp", 0);
-		obj.put("deadline", 1);
+		final JSONObject obj = createValidTransaction();
 		final JSONObject message = new JSONObject();
 		message.put("type", MessageTypes.PLAIN);
 		message.put("payload", "48656C6C6F2G20576F726C6421");
@@ -143,6 +99,9 @@ public class TransferControllerTest {
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		Assert.assertThat(
+				result.getError().getMessage(),
+				IsEqual.equalTo("org.apache.commons.codec.DecoderException: Illegal hexadecimal character G at index 11"));
 	}
 
 	@Test
@@ -150,25 +109,17 @@ public class TransferControllerTest {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();
 
-		final JSONObject obj = new JSONObject();
-		obj.put("type", TransactionTypes.TRANSFER);
-		obj.put("version", 1);
-		obj.put("recipient", getRecipientAccountId());
-		obj.put("signer", "4202a7ac11bd1163850985f9db69ea23d536f568670bf55ba2e7c9e596260e6dbdfb");
-		obj.put("amount", 42L);
-		obj.put("fee", 1L);
-		obj.put("timeStamp", 0);
-		obj.put("deadline", 1);
-		final JSONObject message = new JSONObject();
-		message.put("type", MessageTypes.PLAIN);
-		message.put("payload", "48656C6C6F2C20576F726C6421");
-		obj.put("message", message);
+		final JSONObject obj = createValidTransaction();
+		obj.put("signer", "bad signer");
 
 		// Act:
 		final ErrorResponseDeserializerUnion result = connector.post(TRANSFER_PREPARE_PATH, obj);
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(400));
+		Assert.assertThat(
+				result.getError().getMessage(),
+				IsEqual.equalTo("org.apache.commons.codec.DecoderException: Illegal hexadecimal character   at index 3"));
 	}
 
 	@Test
@@ -182,6 +133,7 @@ public class TransferControllerTest {
 
 		// Assert:
 		Assert.assertThat(result.getStatus(), IsEqual.equalTo(200));
+		Assert.assertThat(result.hasBody(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -203,10 +155,10 @@ public class TransferControllerTest {
 		final JSONObject obj = new JSONObject();
 		obj.put("type", TransactionTypes.TRANSFER);
 		obj.put("version", 1);
-		obj.put("recipient", getRecipientAccountId());
-		obj.put("signer", "0350f94f8c3a04a4f47356ba749b74418a55511d88a56d180998130d8c26b28bfd");
-		obj.put("amount", 42L);
-		obj.put("fee", 1L);
+		obj.put("recipient", RECIPIENT_ADDRESS);
+		obj.put("signer", SENDER_PUBLIC_KEY);
+		obj.put("amount", 42000000L);
+		obj.put("fee", 4000000L);
 		obj.put("timeStamp", 0);
 		obj.put("deadline", 1);
 		final JSONObject message = new JSONObject();
@@ -214,11 +166,5 @@ public class TransferControllerTest {
 		message.put("payload", "48656C6C6F2C20576F726C6421");
 		obj.put("message", message);
 		return obj;
-	}
-
-	private static String getRecipientAccountId() {
-		// since we should only be testing on test net and not stealing makoto's nem on main net,
-		// it is ok to hard-code this as a test net address
-		return "TDmakotEWZNTXYDSCYKAVGRHFSE6K33BSUATKQBT";
 	}
 }
