@@ -177,6 +177,10 @@ public class DbBlock {
 		this.difficulty = difficulty;
 	}
 
+	// TODO 20150205 J-B: (minor) does it make sense to add a filter function (in case we need additional filtering)
+	// > getBlockTransferTransactions -> return filter(this.blockTransferTransactions);
+	// > ?
+
 	public List<DbTransferTransaction> getBlockTransferTransactions() {
 		return this.blockTransferTransactions.stream()
 				.filter(t -> null != t.getSenderProof())

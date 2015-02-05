@@ -10,8 +10,14 @@ import java.util.stream.*;
 public class DbBlockTest {
 
 	// TODO 20150204 BR -> J: I guess you want me to use the transaction registry instead ? ^^
+	// TODO 20150205 J -> B: i'm not sure if there is an easy way to do this with the registry (to have one test per transaction i mea)
+	// > but consider a function that compares the number of entries in the registry to the current number (so if a new transaction gets
+	// > added to the registry, we kno we need to update these tests
+
 	@Test
 	public void setBlockTransferTransactionsFilterTransactionsWithNullSignature() {
+		// Assert:
+		// TODO 20150205 J -> B: you can create DbBlock in assertTransactionsWithNullSignatureGetFiltered
 		final DbBlock dbBlock = new DbBlock();
 		assertTransactionsWithNullSignatureGetFiltered(
 				dbBlock,
@@ -22,6 +28,7 @@ public class DbBlockTest {
 
 	@Test
 	public void setBlockImportanceTransferTransactionsFilterTransactionsWithNullSignature() {
+		// Assert:
 		final DbBlock dbBlock = new DbBlock();
 		assertTransactionsWithNullSignatureGetFiltered(
 				dbBlock,
@@ -32,6 +39,7 @@ public class DbBlockTest {
 
 	@Test
 	public void setBlockMultisigAggregateModificationTransactions() {
+		// Assert:
 		final DbBlock dbBlock = new DbBlock();
 		assertTransactionsWithNullSignatureGetFiltered(
 				dbBlock,
@@ -40,7 +48,7 @@ public class DbBlockTest {
 				DbMultisigAggregateModificationTransaction::new);
 	}
 
-	private <T extends AbstractBlockTransfer> void assertTransactionsWithNullSignatureGetFiltered(
+	private static <T extends AbstractBlockTransfer> void assertTransactionsWithNullSignatureGetFiltered(
 			final DbBlock block,
 			final Function<DbBlock, List<T>> getFromBlock,
 			final BiConsumer<DbBlock, List<T>> setInBlock,
