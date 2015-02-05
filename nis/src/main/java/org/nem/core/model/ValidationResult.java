@@ -138,6 +138,11 @@ public enum ValidationResult {
 	 */
 	FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE(65),
 
+	/**
+	 * Validation failed because transaction is using remote account in an improper way.
+	 */
+	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE(66),
+
 	//endregion
 
 	//region multisig 7x 8x
@@ -158,7 +163,7 @@ public enum ValidationResult {
 	FAILURE_MULTISIG_NO_MATCHING_MULTISIG(73),
 
 	/**
-	 * Validation failed because multisig account tried to make transaction that is not allowed
+	 * Validation failed because multisig account tried to make transaction that is not allowed.
 	 */
 	FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG(74),
 
