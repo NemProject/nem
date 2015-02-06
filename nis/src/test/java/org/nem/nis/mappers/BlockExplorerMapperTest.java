@@ -13,6 +13,7 @@ import org.nem.nis.dbmodel.*;
 
 import java.util.ArrayList;
 
+// TODO 20150206 J-G: please fix these
 public class BlockExplorerMapperTest {
 	/*
 	private static final BlockExplorerMapper MAPPER = new BlockExplorerMapper();

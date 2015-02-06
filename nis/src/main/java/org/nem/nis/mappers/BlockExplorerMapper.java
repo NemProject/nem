@@ -9,10 +9,17 @@ import org.nem.nis.dbmodel.*;
 
 /**
  * Class that contains functions for converting db-models to block explorer view models.
+ *
+ * TODO 20150206 J-G: why not make this a mapping that we can register with all other mappings?
  */
 public class BlockExplorerMapper {
 	private final NisDbModelToModelMapper mapper;
 
+	/**
+	 * Creates a new mapper.
+	 *
+	 * @param mapper The nis db model to model mapper.
+	 */
 	public BlockExplorerMapper(final NisDbModelToModelMapper mapper) {
 		this.mapper = mapper;
 	}
@@ -33,6 +40,7 @@ public class BlockExplorerMapper {
 				.map(transfer -> this.toExplorerViewModel(transfer))
 				.forEach(transfer -> viewModel.addTransaction(transfer));
 
+		// TODO 20150206 J-G: why are you clearing transactions?
 		// CLEAR
 		block.getTransactions().clear();
 		return viewModel;

@@ -32,6 +32,7 @@ public class BlockExplorerController {
 	@ClientApi
 	@TrustedApi
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
+		// TODO 20150206 J-G: why are you not using BLOCKS_LIMIT or at least a constant instead of 10
 		final BlockExplorerMapper mapper = new BlockExplorerMapper(this.mapper);
 		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(10);
 		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, 10);

@@ -12,6 +12,7 @@ import org.nem.core.time.UnixTime;
 
 import java.util.function.Consumer;
 
+// TODO 20150206 J-G: please fix these
 public class ExplorerBlockViewModelTest {
 	/*
 	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";

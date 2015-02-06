@@ -23,6 +23,12 @@ public class ExplorerTransferViewModel implements SerializableEntity {
 	private final Transaction transaction;
 	private final Hash hash;
 
+	/**
+	 * Creates a new explorer transfer view model.
+	 *
+	 * @param transaction The transaction.
+	 * @param hash The hash.
+	 */
 	public ExplorerTransferViewModel(final Transaction transaction, final Hash hash) {
 		this.transaction = transaction;
 		this.hash = hash;

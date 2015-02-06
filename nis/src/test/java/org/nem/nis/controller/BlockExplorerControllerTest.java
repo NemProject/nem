@@ -12,6 +12,7 @@ import org.nem.nis.test.NisUtils;
 
 import java.util.Arrays;
 
+// TODO 20150206 J-G: please fix these
 public class BlockExplorerControllerTest {
 
 	/*
