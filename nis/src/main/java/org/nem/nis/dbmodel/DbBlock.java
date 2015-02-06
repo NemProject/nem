@@ -180,11 +180,10 @@ public class DbBlock {
 	// TODO 20150205 J-B: (minor) does it make sense to add a filter function (in case we need additional filtering)
 	// > getBlockTransferTransactions -> return filter(this.blockTransferTransactions);
 	// > ?
+	// TODO 20150206 BR -> J: you are right, as usual ;)
 
 	public List<DbTransferTransaction> getBlockTransferTransactions() {
-		return this.blockTransferTransactions.stream()
-				.filter(t -> null != t.getSenderProof())
-				.collect(Collectors.toList());
+		return this.filter(this.blockTransferTransactions);
 	}
 
 	public void setBlockTransferTransactions(final List<DbTransferTransaction> blockTransferTransactions) {
@@ -192,9 +191,7 @@ public class DbBlock {
 	}
 
 	public List<DbImportanceTransferTransaction> getBlockImportanceTransferTransactions() {
-		return this.blockImportanceTransferTransactions.stream()
-				.filter(t -> null != t.getSenderProof())
-				.collect(Collectors.toList());
+		return this.filter(this.blockImportanceTransferTransactions);
 	}
 
 	public void setBlockImportanceTransferTransactions(final List<DbImportanceTransferTransaction> blockImportanceTransferTransactions) {
@@ -202,9 +199,7 @@ public class DbBlock {
 	}
 
 	public List<DbMultisigAggregateModificationTransaction> getBlockMultisigAggregateModificationTransactions() {
-		return this.blockMultisigAggregateModificationTransactions.stream()
-				.filter(t -> null != t.getSenderProof())
-				.collect(Collectors.toList());
+		return this.filter(this.blockMultisigAggregateModificationTransactions);
 	}
 
 	public void setBlockMultisigAggregateModificationTransactions(final List<DbMultisigAggregateModificationTransaction> blockMultisigAggregateModificationTransactions) {
@@ -217,5 +212,11 @@ public class DbBlock {
 
 	public void setBlockMultisigTransactions(final List<DbMultisigTransaction> blockMultisigTransactions) {
 		this.blockMultisigTransactions = blockMultisigTransactions;
+	}
+
+	private <T extends AbstractBlockTransfer> List<T> filter(final List<T> transactions) {
+		return transactions.stream()
+				.filter(t -> null != t.getSenderProof())
+				.collect(Collectors.toList());
 	}
 }
