@@ -247,12 +247,11 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 		final T cache = this.createCacheWithoutAutoCache();
 
 		// Act:
-		ExceptionAssert.assertThrows(
-				v -> findState.apply(address, cache),
-				MissingResourceException.class);
+		final AccountState state = findState.apply(address, cache);
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(state, IsNull.notNullValue());
 	}
 
 	private void assertFunctionSucceedsForKnownAddressInNonAutoCachedMode(final BiFunction<Address, T, AccountState> findState) {
@@ -577,13 +576,13 @@ public abstract class AccountStateCacheTest<T extends ExtendedAccountStateCache<
 	@Test
 	public void contentsReturnsAllAccounts() {
 		// Assert:
-		this.assertContentsReturnsAllAccounts(cache -> cache.contents());
+		this.assertContentsReturnsAllAccounts(ReadOnlyAccountStateCache::contents);
 	}
 
 	@Test
 	public void mutableContentsReturnsAllAccounts() {
 		// Assert:
-		this.assertContentsReturnsAllAccounts(cache -> cache.mutableContents());
+		this.assertContentsReturnsAllAccounts(AccountStateCache::mutableContents);
 	}
 
 	private void assertContentsReturnsAllAccounts(final Function<AccountStateCache, CacheContents<? extends ReadOnlyAccountState>> toContents) {

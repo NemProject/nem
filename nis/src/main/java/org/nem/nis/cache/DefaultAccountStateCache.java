@@ -14,9 +14,10 @@ import java.util.function.Function;
  */
 public class DefaultAccountStateCache implements ExtendedAccountStateCache<DefaultAccountStateCache> {
 	private final Map<Address, AccountState> addressToStateMap = new ConcurrentHashMap<>();
-	private final StateFinder stateFinder = new StateFinder(
-			this.addressToStateMap,
-			address -> { throw new MissingResourceException("state does not exist for address", AccountState.class.getName(), address.toString()); });
+
+	// the default behavior is to return a new (non-cached) AccountState so that validators can inspect
+	// account states of all other accounts in a transaction (even if the other accounts are unknown)
+	private final StateFinder stateFinder = new StateFinder(this.addressToStateMap, AccountState::new);
 
 	@Override
 	public AccountState findStateByAddress(final Address address) {

@@ -104,6 +104,7 @@ public class TransactionValidatorFactoryTest {
 
 				this.add(TransferTransactionValidator.class);
 				this.add(ImportanceTransferTransactionValidator.class);
+				this.add(RemoteNonOperationalValidator.class);
 
 				this.add(MultisigNonOperationalValidator.class);
 				this.add(MultisigTransactionSignerValidator.class);
