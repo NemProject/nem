@@ -9,30 +9,22 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class DbBlockTest {
-
-	// TODO 20150204 BR -> J: I guess you want me to use the transaction registry instead ? ^^
-	// TODO 20150205 J -> B: i'm not sure if there is an easy way to do this with the registry (to have one test per transaction i mea)
-	// > but consider a function that compares the number of entries in the registry to the current number (so if a new transaction gets
-	// > added to the registry, we kno we need to update these tests
-	// TODO 20150206 BR -> J: ok.
-	private static int count = 0;
+	private static int NUM_TESTS = 0;
 
 	@After
 	public void increment() {
-		count++;
+		++NUM_TESTS;
 	}
 
 	@AfterClass
 	public static void assertCount() {
 		// one entry in the registry is for multisig transactions which is not tested.
-		Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(count + 1));
+		Assert.assertThat(TransactionRegistry.size(), IsEqual.equalTo(NUM_TESTS + 1));
 	}
 
 	@Test
 	public void setBlockTransferTransactionsFilterTransactionsWithNullSignature() {
 		// Assert:
-		// TODO 20150205 J -> B: you can create DbBlock in assertTransactionsWithNullSignatureGetFiltered
-		// TODO 20150206 BR -> J: right.
 		assertTransactionsWithNullSignatureGetFiltered(
 				DbBlock::getBlockTransferTransactions,
 				DbBlock::setBlockTransferTransactions,
