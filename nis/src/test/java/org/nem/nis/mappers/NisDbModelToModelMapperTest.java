@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.test.IsEquivalent;
+import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -69,25 +69,19 @@ public class NisDbModelToModelMapperTest {
 		context.assertMappedTransfers(transfers, Arrays.asList(0, 2, 4, 6));
 	}
 
-	private static <TDbModel extends AbstractTransfer> TDbModel createTransferWithSenderProof(final Supplier<TDbModel> activator) {
-		final TDbModel transfer = activator.get();
-		transfer.setSenderProof(new byte[64]);
-		return transfer;
-	}
-
 	private static void setTransactionsForMapTransactionsTests(final TestContext context) {
 		context.setTransactions(
-				() -> createTransferWithSenderProof(DbTransferTransaction::new),
+				DbTransferTransaction::new,
 				context.dbBlock::setBlockTransferTransactions,
 				TransferTransaction.class,
 				3);
 		context.setTransactions(
-				() -> createTransferWithSenderProof(DbImportanceTransferTransaction::new),
+				DbImportanceTransferTransaction::new,
 				context.dbBlock::setBlockImportanceTransferTransactions,
 				ImportanceTransferTransaction.class,
 				2);
 		context.setTransactions(
-				() -> createTransferWithSenderProof(DbMultisigAggregateModificationTransaction::new),
+				DbMultisigAggregateModificationTransaction::new,
 				context.dbBlock::setBlockMultisigAggregateModificationTransactions,
 				MultisigAggregateModificationTransaction.class,
 				1);
@@ -122,6 +116,7 @@ public class NisDbModelToModelMapperTest {
 			final List<TModel> transfers = new ArrayList<>();
 			for (int i = 0; i < num; ++i) {
 				final TDbModel dbTransfer = createDbModel.get();
+				dbTransfer.setSenderProof(Utils.generateRandomSignature().getBytes());
 				dbTransfers.add(dbTransfer);
 
 				final TModel transfer = Mockito.mock(modelClass);
