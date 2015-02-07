@@ -2,6 +2,7 @@ package org.nem.nis.service;
 
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.AccountInfo;
+import org.nem.core.model.primitive.Amount;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
@@ -45,6 +46,8 @@ public class AccountInfoFactory {
 		return new AccountInfo(
 				account.getAddress(),
 				accountInfo.getBalance(),
+				// TODO 20150207 G-J,B: should be ok to pass ai.height, right?
+				ai.isSet() && accountState.getWeightedBalances().size() > 0 ? accountState.getWeightedBalances().getVested(ai.getHeight()) : Amount.ZERO,
 				accountInfo.getHarvestedBlocks(),
 				accountInfo.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));

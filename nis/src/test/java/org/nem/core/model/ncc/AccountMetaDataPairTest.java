@@ -43,7 +43,7 @@ public class AccountMetaDataPairTest {
 			final AccountRemoteStatus remoteStatus) {
 		// Arrange:
 		final AccountMetaDataPair metaDataPair = new AccountMetaDataPair(
-				new AccountInfo(address, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
+				new AccountInfo(address, Amount.ZERO, Amount.ZERO, BlockAmount.ZERO, null, 0.0),
 				new AccountMetaData(status, remoteStatus, new ArrayList<>()));
 
 		// Act:

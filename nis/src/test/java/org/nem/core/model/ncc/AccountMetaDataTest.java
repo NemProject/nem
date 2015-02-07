@@ -80,8 +80,8 @@ public class AccountMetaDataTest {
 
 	private static List<AccountInfo> createAccountInfos() {
 		return Arrays.asList(
-				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), new BlockAmount(234), "account1", 0.1),
-				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), new BlockAmount(456), "account2", 0.2));
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(123), Amount.fromNem(111), new BlockAmount(234), "account1", 0.1),
+				new AccountInfo(Utils.generateRandomAddress(), Amount.fromNem(345), Amount.fromNem(333), new BlockAmount(456), "account2", 0.2));
 	}
 
 	private static void assertAccountInfos(final List<AccountInfo> actual, final List<AccountInfo> expected) {
@@ -94,6 +94,7 @@ public class AccountMetaDataTest {
 	private static void assertAccountInfo(final AccountInfo actual, final AccountInfo expected) {
 		Assert.assertThat(actual.getAddress(), IsEqual.equalTo(expected.getAddress()));
 		Assert.assertThat(actual.getBalance(), IsEqual.equalTo(expected.getBalance()));
+		Assert.assertThat(actual.getVestedBalance(), IsEqual.equalTo(expected.getVestedBalance()));
 		Assert.assertThat(actual.getNumHarvestedBlocks(), IsEqual.equalTo(expected.getNumHarvestedBlocks()));
 		Assert.assertThat(actual.getLabel(), IsEqual.equalTo(expected.getLabel()));
 		Assert.assertThat(actual.getImportance(), IsEqual.equalTo(expected.getImportance()));
