@@ -10,6 +10,7 @@ import org.nem.core.messages.*;
 import org.nem.core.model.*;
 import org.nem.core.model.ncc.*;
 import org.nem.core.model.primitive.*;
+import org.nem.core.node.NodeFeature;
 import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
@@ -38,6 +39,8 @@ public class AccountTransfersControllerTest {
 				final AccountTransfersController controller,
 				final AccountPrivateKeyTransactionsPage page);
 
+		//region accountTransfers
+
 		@Test
 		public void accountTransfersDelegatesToIoAdapterWhenIdIsProvided() {
 			// Arrange:
@@ -62,7 +65,7 @@ public class AccountTransfersControllerTest {
 		}
 
 		@Test
-		public void accountTransfersMethodsUsesIoAdapterWhenHashIsProvided() {
+		public void accountTransfersUsesIoAdapterWhenHashIsProvided() {
 			// Arrange:
 			final Address address = Utils.generateRandomAddress();
 			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
@@ -90,7 +93,7 @@ public class AccountTransfersControllerTest {
 		}
 
 		@Test
-		public void accountTransfersMethodsDelegatesToIoWhenNeitherIdNorHashIsProvided() {
+		public void accountTransfersDelegatesToIoWhenNeitherIdNorHashIsProvided() {
 			// Arrange:
 			final Address address = Utils.generateRandomAddress();
 			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
@@ -111,7 +114,7 @@ public class AccountTransfersControllerTest {
 		}
 
 		@Test
-		public void accountTransfersMethodsFailsWhenUnknownHashIsProvided() {
+		public void accountTransfersFailsWhenUnknownHashIsProvided() {
 			// Arrange:
 			final Address address = Utils.generateRandomAddress();
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
@@ -130,6 +133,10 @@ public class AccountTransfersControllerTest {
 					v -> this.execute(context.controller, pageBuilder),
 					IllegalArgumentException.class);
 		}
+
+		//endregion
+
+		//region localAccountTransfers
 
 		@Test
 		public void localAccountTransfersReturnsTransactionsWithDecodedMessagesIfPossible() {
@@ -177,7 +184,7 @@ public class AccountTransfersControllerTest {
 		}
 
 		@Test
-		public void localAccountTransfersDelegateToAccountTransfersMethods() {
+		public void localAccountTransfersDelegateToAccountTransfers() {
 			// Arrange:
 			final KeyPair senderKeyPair = new KeyPair();
 			final Address address = Address.fromPublicKey(senderKeyPair.getPublicKey());
@@ -195,6 +202,8 @@ public class AccountTransfersControllerTest {
 			Mockito.verify(context.controller, Mockito.times((callPattern & 0x02) >> 1)).accountTransfersIncoming(Mockito.any());
 			Mockito.verify(context.controller, Mockito.times((callPattern & 0x04) >> 2)).accountTransfersOutgoing(Mockito.any());
 		}
+
+		//endregion
 	}
 
 	//region concrete classes
@@ -208,7 +217,7 @@ public class AccountTransfersControllerTest {
 
 		@Override
 		protected int getLocalCallPattern() {
-			return 0x01;
+			return 0x02;
 		}
 
 		@Override
@@ -235,7 +244,7 @@ public class AccountTransfersControllerTest {
 
 		@Override
 		protected int getLocalCallPattern() {
-			return 0x02;
+			return 0x04;
 		}
 
 		@Override
@@ -262,7 +271,7 @@ public class AccountTransfersControllerTest {
 
 		@Override
 		protected int getLocalCallPattern() {
-			return 0x04;
+			return 0x01;
 		}
 
 		@Override
@@ -332,6 +341,7 @@ public class AccountTransfersControllerTest {
 					accountIoAdapter,
 					this.transactionHashCache,
 					this.nisConfiguration));
+			Mockito.when(this.nisConfiguration.getOptionalFeatures()).thenReturn(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP });
 		}
 	}
 }
