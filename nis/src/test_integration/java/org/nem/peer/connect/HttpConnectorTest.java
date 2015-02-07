@@ -67,7 +67,8 @@ public class HttpConnectorTest {
 		final Config config = new Config(
 				new Node(new NodeIdentity(new KeyPair()), NodeEndpoint.fromHost("localhost")),
 				loadJsonObject("peers-config.json"),
-				CommonStarter.META_DATA.getVersion());
+				CommonStarter.META_DATA.getVersion(),
+				new NodeFeature[] { });
 
 		// Act:
 		final boolean result = this.analyzeNodes(config.getPreTrustedNodes().getNodes());

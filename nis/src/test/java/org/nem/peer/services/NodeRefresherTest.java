@@ -134,7 +134,7 @@ public class NodeRefresherTest {
 		Mockito.when(versionCheck.check(Mockito.any(), Mockito.any())).thenReturn(true);
 
 		final Node incompatibleNode = context.refreshNodes.get(1);
-		incompatibleNode.setMetaData(new NodeMetaData("p", "a", new NodeVersion(1, 0, 0)));
+		incompatibleNode.setMetaData(new NodeMetaData("p", "a", new NodeVersion(1, 0, 0), 7));
 		Mockito.when(versionCheck.check(context.localNode.getMetaData().getVersion(), new NodeVersion(1, 0, 0)))
 				.thenReturn(false);
 
@@ -166,12 +166,13 @@ public class NodeRefresherTest {
 	@Test
 	public void refreshGetInfoChangeMetaDataUpdatesNodeMetaData() {
 		// Arrange:
+		final NodeMetaData expectedMetaData = new NodeMetaData("c-plat", "c-app");
 		final TestContext context = new TestContext();
 		Mockito.when(context.connector.getInfo(context.refreshNodes.get(1)))
 				.thenReturn(CompletableFuture.completedFuture(new Node(
 						new WeakNodeIdentity("b"),
 						NodeEndpoint.fromHost("localhost"),
-						new NodeMetaData("c-plat", "c-app", new NodeVersion(2, 1, 3)))));
+						expectedMetaData)));
 
 		// Act:
 		context.refresher.refresh(context.refreshNodes).join();
@@ -179,9 +180,7 @@ public class NodeRefresherTest {
 		final NodeMetaData metaData = updatedNode.getMetaData();
 
 		// Assert:
-		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo("c-plat"));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("c-app"));
-		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(2, 1, 3)));
+		Assert.assertThat(metaData, IsEqual.equalTo(expectedMetaData));
 		Mockito.verify(context.connector, Mockito.times(1)).getKnownPeers(context.refreshNodes.get(1));
 	}
 

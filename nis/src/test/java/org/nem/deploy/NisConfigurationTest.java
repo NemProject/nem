@@ -3,6 +3,7 @@ package org.nem.deploy;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.*;
+import org.nem.core.node.NodeFeature;
 import org.nem.core.test.*;
 
 import java.net.URL;
@@ -36,7 +37,8 @@ public class NisConfigurationTest {
 			"nis.unlockedLimit",
 			"nis.maxTransactions",
 			"nis.transactionHashRetentionTime",
-			"nis.additionalLocalIps");
+			"nis.additionalLocalIps",
+			"nis.optionalFeatures");
 
 	@Test
 	public void canReadDefaultConfiguration() {
@@ -71,9 +73,8 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getUnlockedLimit(), IsEqual.equalTo(1));
 		Assert.assertThat(config.getMaxTransactions(), IsEqual.equalTo(10000));
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
-		Assert.assertThat(
-				config.getAdditionalLocalIps(),
-				IsEqual.equalTo(new String[] { }));
+		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] { }));
+		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
 	}
 
 	@Test
@@ -92,6 +93,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.maxTransactions", "234");
 		properties.setProperty("nis.transactionHashRetentionTime", "567");
 		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
+		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER1");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -110,6 +112,9 @@ public class NisConfigurationTest {
 		Assert.assertThat(
 				config.getAdditionalLocalIps(),
 				IsEqual.equalTo(new String[] { "10.0.0.10", "10.0.0.20" }));
+		Assert.assertThat(
+				config.getOptionalFeatures(),
+				IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER1 }));
 	}
 
 	//endregion
@@ -142,6 +147,8 @@ public class NisConfigurationTest {
 
 	//endregion
 
+	//region specific property tests
+
 	@Test
 	public void autoBootNameIsTrimmedOfLeadingAndTrailingWhitespace() {
 		// Arrange:
@@ -154,6 +161,22 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(config.getAutoBootName(), IsEqual.equalTo("string with spaces"));
 	}
+
+	@Test
+	public void optionalFeaturesCannotBeParsedWithInvalidValue() {
+		// Arrange:
+		final Properties properties = getCommonProperties();
+		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER9");
+
+		// Act:
+		ExceptionAssert.assertThrows(
+				v -> new NisConfiguration(properties),
+				IllegalArgumentException.class);
+	}
+
+	//endregion
+
+	//region sanity
 
 	@Test
 	public void configPropertiesCopiesAreConsistent() throws Exception {
@@ -170,6 +193,8 @@ public class NisConfigurationTest {
 		// Assert:
 		Assert.assertThat(areBuffersEqual, IsEqual.equalTo(true));
 	}
+
+	//endregion
 
 	private static byte[] readAllBytes(final String proxyResource, final String desiredResource) throws Exception {
 		final URL proxyUrl = NisConfigurationTest.class.getClassLoader().getResource(proxyResource);

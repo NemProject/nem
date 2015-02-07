@@ -32,18 +32,15 @@ public class ConfigTest {
 		final Node node = config.getLocalNode();
 
 		// Assert:
-		assertLocalNodeProperties(node, "Mac");
+		assertLocalNodeProperties(node, "default-cf-plat", "default-cf-app");
 	}
 
 	@Test
 	public void localNodeIsGivenDefaultPlatformIfOmitted() {
 		// Arrange:
 		final Node localNode = ConfigFactory.createDefaultLocalNode();
-		final NodeMetaData localNodeMetaData = localNode.getMetaData();
-		localNode.setMetaData(new NodeMetaData(null, localNodeMetaData.getApplication(), localNodeMetaData.getVersion()));
-
-		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
-		final Config config = new Config(localNode, peersConfig, "2.0.0");
+		final NodeMetaData metaData = new NodeMetaData(null, localNode.getMetaData().getApplication());
+		final Config config = createConfigWithCustomLocalNodeMetaData(metaData);
 
 		// Act:
 		final Node node = config.getLocalNode();
@@ -54,17 +51,30 @@ public class ConfigTest {
 				System.getProperty("java.vendor"),
 				System.getProperty("java.version"),
 				System.getProperty("os.name"));
-		assertLocalNodeProperties(node, expectedPlatform);
+		assertLocalNodeProperties(node, expectedPlatform, "default-cf-app");
 	}
 
-	private static void assertLocalNodeProperties(final Node node, final String expectedPlatform) {
+	@Test
+	public void localNodeMetaDataCanOnlyOverridePlatformAndApplication() {
+		final NodeMetaData metaData = new NodeMetaData("local-node-plat", "local-node-app", new NodeVersion(5, 4, 3), 17);
+		final Config config = createConfigWithCustomLocalNodeMetaData(metaData);
+
+		// Act:
+		final Node node = config.getLocalNode();
+
+		// Assert:
+		assertLocalNodeProperties(node, "local-node-plat", "local-node-app");
+	}
+
+	private static void assertLocalNodeProperties(final Node node, final String expectedPlatform, final String expectedApplication) {
 		final NodeMetaData metaData = node.getMetaData();
 		Assert.assertThat(node.getIdentity().getName(), IsEqual.equalTo("local larry"));
 		Assert.assertThat(node.getIdentity().isOwned(), IsEqual.equalTo(true));
 		Assert.assertThat(node.getEndpoint().getBaseUrl().getHost(), IsEqual.equalTo(DEFAULT_LOCAL_NODE_HOST));
 		Assert.assertThat(metaData.getPlatform(), IsEqual.equalTo(expectedPlatform));
 		Assert.assertThat(metaData.getVersion(), IsEqual.equalTo(new NodeVersion(2, 0, 0)));
-		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo("FooBar"));
+		Assert.assertThat(metaData.getApplication(), IsEqual.equalTo(expectedApplication));
+		Assert.assertThat(metaData.getFeaturesBitmask(), IsEqual.equalTo(6));
 	}
 
 	@Test
@@ -73,7 +83,7 @@ public class ConfigTest {
 		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final String[] expectedWellKnownHosts = new String[] { "10.0.0.5", "10.0.0.12", "10.0.0.3" };
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig(expectedWellKnownHosts);
-		final Config config = new Config(localNode, peersConfig, "2.0.0");
+		final Config config = createConfig(localNode, peersConfig, "2.0.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -93,7 +103,7 @@ public class ConfigTest {
 		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
 		peersConfig.remove("knownPeers");
-		final Config config = new Config(localNode, peersConfig, "2.0.0");
+		final Config config = createConfig(localNode, peersConfig, "2.0.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -110,7 +120,7 @@ public class ConfigTest {
 		final Node localNode = ConfigFactory.createDefaultLocalNode();
 		final String[] expectedWellKnownHosts = new String[] { "10.0.0.1" };
 		final JSONObject peersConfig = ConfigFactory.createPeersConfigWithUnresolvableHost(expectedWellKnownHosts);
-		final Config config = new Config(localNode, peersConfig, "2.0.0");
+		final Config config = createConfig(localNode, peersConfig, "2.0.0");
 
 		// Act:
 		final PreTrustedNodes preTrustedNodes = config.getPreTrustedNodes();
@@ -154,6 +164,21 @@ public class ConfigTest {
 
 	private static Config createTestConfig() {
 		return ConfigFactory.createDefaultTestConfig();
+	}
+
+	private static Config createConfig(
+			final Node localNode,
+			final JSONObject peersConfig,
+			final String applicationVersion) {
+		return new Config(localNode, peersConfig, applicationVersion, new NodeFeature[] { });
+	}
+
+	private static Config createConfigWithCustomLocalNodeMetaData(final NodeMetaData metaData) {
+		final Node localNode = ConfigFactory.createDefaultLocalNode();
+		localNode.setMetaData(metaData);
+
+		final JSONObject peersConfig = ConfigFactory.createDefaultPeersConfig();
+		return new Config(localNode, peersConfig, "2.0.0", new NodeFeature[] { NodeFeature.PLACEHOLDER1, NodeFeature.PLACEHOLDER2 });
 	}
 
 	//endregion

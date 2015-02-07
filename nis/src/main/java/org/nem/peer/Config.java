@@ -26,14 +26,20 @@ public class Config {
 	 * @param localNode The local node.
 	 * @param peersConfig A JSON object containing peer settings.
 	 * @param applicationVersion The application version.
+	 * @param localNodeFeatures The features supported by the local node.
 	 */
-	public Config(final Node localNode, final JSONObject peersConfig, final String applicationVersion) {
+	public Config(
+			final Node localNode,
+			final JSONObject peersConfig,
+			final String applicationVersion,
+			final NodeFeature[] localNodeFeatures) {
 		this(
 				localNode,
 				parseWellKnownPeers(new JsonDeserializer(peersConfig, null)),
 				getDefaultTrustParameters(),
 				getDefaultTrustProvider(),
-				applicationVersion);
+				applicationVersion,
+				localNodeFeatures);
 	}
 
 	/**
@@ -44,21 +50,26 @@ public class Config {
 	 * @param trustParameters The trust parameters.
 	 * @param trustProvider The trust provider.
 	 * @param applicationVersion The application version.
+	 * @param localNodeFeatures The features supported by the local node.
 	 */
 	public Config(
 			final Node localNode,
 			final PreTrustedNodes preTrustedNodes,
 			final TrustParameters trustParameters,
 			final TrustProvider trustProvider,
-			final String applicationVersion) {
-		this.updateLocalNodeMetaData(localNode, applicationVersion);
+			final String applicationVersion,
+			final NodeFeature[] localNodeFeatures) {
+		this.updateLocalNodeMetaData(localNode, applicationVersion, localNodeFeatures);
 		this.localNode = localNode;
 		this.preTrustedNodes = preTrustedNodes;
 		this.trustParameters = trustParameters;
 		this.trustProvider = trustProvider;
 	}
 
-	private void updateLocalNodeMetaData(final Node localNode, final String applicationVersion) {
+	private void updateLocalNodeMetaData(
+			final Node localNode,
+			final String applicationVersion,
+			final NodeFeature[] localNodeFeatures) {
 		String platform = localNode.getMetaData().getPlatform();
 		if (null == platform) {
 			platform = String.format(
@@ -71,7 +82,8 @@ public class Config {
 		final NodeMetaData metaData = new NodeMetaData(
 				platform,
 				localNode.getMetaData().getApplication(),
-				NodeVersion.parse(applicationVersion));
+				NodeVersion.parse(applicationVersion),
+				NodeFeature.or(localNodeFeatures));
 		localNode.setMetaData(metaData);
 	}
 
