@@ -225,13 +225,13 @@ public class BlockModelToDbModelMappingTest {
 		context.assertDbModel(dbModel, HashUtils.calculateHash(block));
 
 		// Assert: db model transactions
-		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(7));
+		Assert.assertThat(getNumTransactions(dbModel), IsEqual.equalTo(5));
 
 		Collection<? extends AbstractBlockTransfer> transfers = dbModel.getBlockTransferTransactions();
-		Assert.assertThat(transfers.size(), IsEqual.equalTo(4));
-		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, innerDbTransferTransaction1, transfer2, innerDbTransferTransaction2)));
-		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1, 2, 4)));
-		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1, 2, 3)));
+		Assert.assertThat(transfers.size(), IsEqual.equalTo(2));
+		Assert.assertThat(transfers, IsEqual.equalTo(Arrays.asList(transfer0, transfer2)));
+		Assert.assertThat(getBlockIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 2)));
+		Assert.assertThat(getOrderIndexes(transfers), IsEqual.equalTo(Arrays.asList(0, 1)));
 
 		transfers = dbModel.getBlockImportanceTransferTransactions();
 		Assert.assertThat(transfers.size(), IsEqual.equalTo(1));
@@ -250,13 +250,14 @@ public class BlockModelToDbModelMappingTest {
 		}
 
 		// Assert: multisig inner transactions
+		// TODO 20150207 BR -> J: delete check for orderId?
 		// inner transaction does not belong to a block, so it won't have order id
 		Assert.assertThat(innerDbTransferTransaction1.getBlkIndex(), IsEqual.equalTo(1));
-		Assert.assertThat(innerDbTransferTransaction1.getOrderId(), IsEqual.equalTo(1));
+		Assert.assertThat(innerDbTransferTransaction1.getOrderId(), IsEqual.equalTo(-1));
 		Assert.assertThat(innerDbTransferTransaction1.getBlock(), IsEqual.equalTo(dbModel));
 
 		Assert.assertThat(innerDbTransferTransaction2.getBlkIndex(), IsEqual.equalTo(4));
-		Assert.assertThat(innerDbTransferTransaction2.getOrderId(), IsEqual.equalTo(3));
+		Assert.assertThat(innerDbTransferTransaction2.getOrderId(), IsEqual.equalTo(-1));
 		Assert.assertThat(innerDbTransferTransaction2.getBlock(), IsEqual.equalTo(dbModel));
 	}
 
@@ -282,6 +283,12 @@ public class BlockModelToDbModelMappingTest {
 		for (final AbstractBlockTransfer dbTransfer : dbTransfers) {
 			Assert.assertThat(dbTransfer.getBlock(), IsEqual.equalTo(expectedBlock));
 		}
+	}
+
+	private static <TDbTransfer extends AbstractTransfer> TDbTransfer createTransferWithSenderProof(final Supplier<TDbTransfer> activator) {
+		final TDbTransfer transfer = activator.get();
+		transfer.setSenderProof(new byte[64]);
+		return transfer;
 	}
 
 	private static class TestContext {
@@ -341,27 +348,28 @@ public class BlockModelToDbModelMappingTest {
 
 		public DbTransferTransaction addTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
-			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
+			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbTransferTransaction::new), DbTransferTransaction.class);
 		}
 
 		public DbImportanceTransferTransaction addImportanceTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createImportanceTransfer();
-			return this.addTransfer(block, transfer, new DbImportanceTransferTransaction(), DbImportanceTransferTransaction.class);
+			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbImportanceTransferTransaction::new), DbImportanceTransferTransaction.class);
 		}
 
 		public DbMultisigAggregateModificationTransaction addMultisigModification(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createMultisigModification();
-			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);
+			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbMultisigAggregateModificationTransaction::new), DbMultisigAggregateModificationTransaction.class);
 		}
 
 		public DbMultisigTransaction addMultisigTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, new DbMultisigTransaction(), DbMultisigTransaction.class);
+			return this.addTransfer(block, multisigTransfer, createTransferWithSenderProof(DbMultisigTransaction::new), DbMultisigTransaction.class);
 		}
 
 		public DbMultisigTransaction addMultisigTransfer(final Block block, final DbTransferTransaction dbInnerTransferTransaction) {
 			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
+			dbMultisigTransfer.setSenderProof(new byte[64]);
 			dbMultisigTransfer.setTransferTransaction(dbInnerTransferTransaction);
 
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
@@ -371,7 +379,7 @@ public class BlockModelToDbModelMappingTest {
 
 		public DbTransferTransaction addUnsupportedTransfer(final Block block) {
 			final Transaction transfer = new MockTransaction();
-			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
+			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbTransferTransaction::new), DbTransferTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TDbTransfer addTransfer(

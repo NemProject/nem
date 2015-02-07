@@ -199,7 +199,7 @@ public class BlockDbModelToModelMappingTest {
 		Mockito.verify(context.mapper, Mockito.times(numTransactions)).map(Mockito.any(), Mockito.eq(Transaction.class));
 
 		// Sanity:
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().size(), IsEqual.equalTo(4));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().size(), IsEqual.equalTo(2));
 		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(1));
 		Assert.assertThat(dbBlock.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
 	}
@@ -267,7 +267,11 @@ public class BlockDbModelToModelMappingTest {
 
 		public TransferTransaction addTransfer(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockTransferTransactions().add(dbTransfer),
+					dbTransfer -> {
+						final List<DbTransferTransaction> transactions = block.getBlockTransferTransactions();
+						transactions.add(dbTransfer);
+						block.setBlockTransferTransactions(transactions);
+					},
 					blockIndex,
 					new DbTransferTransaction(),
 					TransferTransaction.class);
@@ -275,7 +279,11 @@ public class BlockDbModelToModelMappingTest {
 
 		public ImportanceTransferTransaction addImportanceTransfer(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockImportanceTransferTransactions().add(dbTransfer),
+					dbTransfer -> {
+						final List<DbImportanceTransferTransaction> transactions = block.getBlockImportanceTransferTransactions();
+						transactions.add(dbTransfer);
+						block.setBlockImportanceTransferTransactions(transactions);
+					},
 					blockIndex,
 					new DbImportanceTransferTransaction(),
 					ImportanceTransferTransaction.class);
@@ -283,7 +291,11 @@ public class BlockDbModelToModelMappingTest {
 
 		public MultisigAggregateModificationTransaction addMultisigModification(final DbBlock block, final int blockIndex) {
 			return this.addTransfer(
-					dbTransfer -> block.getBlockMultisigAggregateModificationTransactions().add(dbTransfer),
+					dbTransfer -> {
+						final List<DbMultisigAggregateModificationTransaction> transactions = block.getBlockMultisigAggregateModificationTransactions();
+						transactions.add(dbTransfer);
+						block.setBlockMultisigAggregateModificationTransactions(transactions);
+					},
 					blockIndex,
 					new DbMultisigAggregateModificationTransaction(),
 					MultisigAggregateModificationTransaction.class);

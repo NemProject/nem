@@ -69,19 +69,25 @@ public class NisDbModelToModelMapperTest {
 		context.assertMappedTransfers(transfers, Arrays.asList(0, 2, 4, 6));
 	}
 
+	private static <TDbModel extends AbstractTransfer> TDbModel createTransferWithSenderProof(final Supplier<TDbModel> activator) {
+		final TDbModel transfer = activator.get();
+		transfer.setSenderProof(new byte[64]);
+		return transfer;
+	}
+
 	private static void setTransactionsForMapTransactionsTests(final TestContext context) {
 		context.setTransactions(
-				DbTransferTransaction::new,
+				() -> createTransferWithSenderProof(DbTransferTransaction::new),
 				context.dbBlock::setBlockTransferTransactions,
 				TransferTransaction.class,
 				3);
 		context.setTransactions(
-				DbImportanceTransferTransaction::new,
+				() -> createTransferWithSenderProof(DbImportanceTransferTransaction::new),
 				context.dbBlock::setBlockImportanceTransferTransactions,
 				ImportanceTransferTransaction.class,
 				2);
 		context.setTransactions(
-				DbMultisigAggregateModificationTransaction::new,
+				() -> createTransferWithSenderProof(DbMultisigAggregateModificationTransaction::new),
 				context.dbBlock::setBlockMultisigAggregateModificationTransactions,
 				MultisigAggregateModificationTransaction.class,
 				1);

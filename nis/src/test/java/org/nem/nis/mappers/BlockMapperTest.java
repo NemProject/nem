@@ -130,7 +130,7 @@ public class BlockMapperTest {
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(NUM_TRANSACTIONS));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 
 		for (int i = 0; i < NUM_TRANSACTIONS; ++i) {
 			final DbMultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
@@ -155,7 +155,7 @@ public class BlockMapperTest {
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(1));
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
 
 		final DbMultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(0);
 		final Transaction transaction = context.getModel().getTransactions().get(0);
@@ -445,10 +445,9 @@ public class BlockMapperTest {
 		Assert.assertThat(dbModel.getBlockMultisigTransactions().size(), IsEqual.equalTo(2));
 		Assert.assertThat(dbModel.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
 		Assert.assertThat(dbModel.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
-		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(4));
+		Assert.assertThat(dbModel.getBlockTransferTransactions().size(), IsEqual.equalTo(2));
 		for (int i = 0; i < 2; ++i) {
-			// note: we're skipping in DB too, as those are the ones that "belong" to multisig TXes
-			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(2 * i);
+			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(2 * i);
 			Assert.assertThat(dbTransferTransaction.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
 		}
@@ -456,17 +455,6 @@ public class BlockMapperTest {
 			final DbMultisigTransaction dbTransfer = dbModel.getBlockMultisigTransactions().get(i);
 			final Transaction transaction = context.getModel().getTransactions().get(2 * i + 1);
 			Assert.assertThat(dbTransfer.getTransferHash(), IsEqual.equalTo(HashUtils.calculateHash(transaction)));
-		}
-
-		// WARNING: if test fails here it means you've changed order of TXes inside the dbModel
-		for (int i = 0; i < 2; ++i) {
-			final DbMultisigTransaction dbMultisig = dbModel.getBlockMultisigTransactions().get(i);
-			// transfer that "belongs" to multisig
-			final DbTransferTransaction dbTransferTransaction = dbModel.getBlockTransferTransactions().get(2 * i + 1);
-
-			// YES, they should be equal
-			Assert.assertThat(dbMultisig.getBlkIndex(), IsEqual.equalTo(2 * i + 1));
-			Assert.assertThat(dbTransferTransaction.getBlkIndex(), IsEqual.equalTo(2 * i + 1));
 		}
 
 		for (int i = 0; i < 4; ++i) {

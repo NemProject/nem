@@ -11,7 +11,7 @@ import org.nem.core.utils.HexEncoder;
 import org.nem.nis.controller.viewmodels.*;
 import org.nem.nis.dbmodel.*;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class BlockExplorerMapperTest {
 	private static final BlockExplorerMapper MAPPER = new BlockExplorerMapper();
@@ -39,11 +39,12 @@ public class BlockExplorerMapperTest {
 		block.setHarvester(new DbAccount(address.getEncoded(), address.getPublicKey()));
 		block.setTimeStamp(1856002);
 		block.setBlockHash(hash);
-		block.setBlockTransferTransactions(new ArrayList<>());
-
+		final List<DbTransferTransaction> transactions = new ArrayList<>();
 		for (final long fee : transferFees) {
-			block.getBlockTransferTransactions().add(createTransferWithFee(fee));
+			transactions.add(createTransferWithFee(fee));
 		}
+
+		block.setBlockTransferTransactions(transactions);
 
 		// Act:
 		final ExplorerBlockViewModel viewModel = MAPPER.toExplorerViewModel(block);
