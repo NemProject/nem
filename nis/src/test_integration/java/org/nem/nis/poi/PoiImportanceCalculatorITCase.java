@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
  * some tests we should consider: - Sybil attack (master node creates a ton of
  * other nodes and transacts with them (and maybe some other nodes) to try to
  * boost score)</br>
- * - infinite loop attack<br/>
- * - closed loop attack<br/>
- * - small transaction spam attack<br/>
+ * - infinite loop attack (sending XEM around in a loop to boost their score)<br/>
+ * - closed loop attack (TODO M-M: explain this)<br/>
+ * - small transaction spam attack (TODO M-M: is this still relevant?)<br/>
  * -
  */
 public class PoiImportanceCalculatorITCase {
@@ -357,7 +357,7 @@ public class PoiImportanceCalculatorITCase {
 		// Arrange 1 vs many, the latter concentrate the strength to one account:
 		// Colluding accounts that try to push one account with many links should have no influence on the importance distribution.
 		final List<AccountState> accounts = new ArrayList<>();
-		for (int i = 4; i < 40; i++) {
+		for (int i = 4; i < 40; ++i) {
 			accounts.clear();
 			accounts.add(GENERAL_RECEIVER);
 			accounts.addAll(this.createUserAccounts(1, 1, VESTED_8M, 1, TOTAL_OUTLINK_40K, OUTLINK_STRATEGY_TO_GENERAL_RECEIVER));
@@ -391,7 +391,7 @@ public class PoiImportanceCalculatorITCase {
 		// Act: calculate importances
 		LOGGER.info("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; ++i) {
 			getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 		final long stop = System.currentTimeMillis();
@@ -462,7 +462,7 @@ public class PoiImportanceCalculatorITCase {
 		LOGGER.info("Starting poi calculation.");
 		final long start = System.currentTimeMillis();
 		final long startHeapSize = Runtime.getRuntime().totalMemory();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; ++i) {
 			getAccountImportances(new BlockHeight(10000 + i), accounts);
 		}
 
@@ -506,7 +506,7 @@ public class PoiImportanceCalculatorITCase {
 			final int outlinkStrategy) {
 		final List<AccountState> accounts = new ArrayList<>();
 
-		for (int i = 0; i < numAccounts; i++) {
+		for (int i = 0; i < numAccounts; ++i) {
 			if (outlinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
 				if (i == 0) {
 					accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight, totalVestedBalance - totalOutlinkStrength - numAccounts + 1));
