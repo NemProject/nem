@@ -20,6 +20,6 @@ public class LocalNodeDeserializer implements ObjectDeserializer<Node> {
 		// the only metadata property we care about is application; platform and version will get populated automatically
 		// (this works because NCC only sends the application metadata when booting)
 		final String application = deserializer.readOptionalString("application");
-		return new NodeMetaData(null, application, null);
+		return new NodeMetaData(null, application);
 	}
 }

@@ -11,7 +11,7 @@ public class NodeTest {
 
 	private final static NodeIdentity DEFAULT_IDENTITY = new WeakNodeIdentity("bob");
 	private final static NodeEndpoint DEFAULT_ENDPOINT = new NodeEndpoint("ftp", "10.8.8.2", 12);
-	private final static NodeMetaData DEFAULT_META_DATA = new NodeMetaData(null, null, null);
+	private final static NodeMetaData DEFAULT_META_DATA = new NodeMetaData(null, null);
 
 	//region construction
 
@@ -27,10 +27,7 @@ public class NodeTest {
 		// Assert:
 		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
 		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
-		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
-		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
-		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
-		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
+		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData("?", "?")));
 	}
 
 	@Test
@@ -38,7 +35,7 @@ public class NodeTest {
 		// Arrange:
 		final NodeIdentity identity = new WeakNodeIdentity("alice");
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
-		final NodeMetaData metaData = new NodeMetaData("p", "a", new NodeVersion(1, 0, 0));
+		final NodeMetaData metaData = new NodeMetaData("p", "a");
 
 		// Act:
 		final Node node = new Node(identity, endpoint, metaData);
@@ -54,7 +51,7 @@ public class NodeTest {
 		// Arrange:
 		final NodeIdentity identity = new WeakNodeIdentity("alice");
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
-		final NodeMetaData metaData = new NodeMetaData("p", "a", new NodeVersion(1, 0, 0));
+		final NodeMetaData metaData = new NodeMetaData("p", "a");
 		final Node originalNode = new Node(identity, endpoint, metaData);
 
 		// Act:
@@ -63,7 +60,7 @@ public class NodeTest {
 		// Assert:
 		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
 		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
-		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("p"));
+		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(metaData));
 	}
 
 	@Test
@@ -83,10 +80,7 @@ public class NodeTest {
 		// Assert:
 		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
 		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
-		Assert.assertThat(node.getMetaData(), IsNull.notNullValue());
-		Assert.assertThat(node.getMetaData().getPlatform(), IsEqual.equalTo("?"));
-		Assert.assertThat(node.getMetaData().getApplication(), IsEqual.equalTo("?"));
-		Assert.assertThat(node.getMetaData().getVersion(), IsEqual.equalTo(NodeVersion.ZERO));
+		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData("?", "?")));
 	}
 
 	@Test
@@ -134,7 +128,7 @@ public class NodeTest {
 	public void canChangeMetaData() {
 		// Arrange:
 		final Node node = new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT);
-		final NodeMetaData metaData = new NodeMetaData("aaa", "ppp", NodeVersion.parse("9.0.0"));
+		final NodeMetaData metaData = new NodeMetaData("aaa", "ppp");
 
 		// Act:
 		node.setMetaData(metaData);
@@ -158,7 +152,7 @@ public class NodeTest {
 			this.put("default", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, DEFAULT_META_DATA));
 			this.put("diff-identity", new Node(new WeakNodeIdentity("alice"), DEFAULT_ENDPOINT, DEFAULT_META_DATA));
 			this.put("diff-endpoint", new Node(DEFAULT_IDENTITY, new NodeEndpoint("http", "localhost", 8080), DEFAULT_META_DATA));
-			this.put("diff-meta-data", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, new NodeMetaData("p", "a", NodeVersion.parse("9.0.0"))));
+			this.put("diff-meta-data", new Node(DEFAULT_IDENTITY, DEFAULT_ENDPOINT, new NodeMetaData("p", "a")));
 		}
 	};
 
@@ -198,7 +192,7 @@ public class NodeTest {
 		// Arrange:
 		final NodeIdentity identity = new WeakNodeIdentity("alice");
 		final NodeEndpoint endpoint = new NodeEndpoint("http", "localhost", 8080);
-		final NodeMetaData metaData = new NodeMetaData("p", "a", new NodeVersion(1, 0, 0));
+		final NodeMetaData metaData = new NodeMetaData("p", "a");
 		final Node node = new Node(identity, endpoint, metaData);
 
 		// Assert:

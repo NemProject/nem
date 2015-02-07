@@ -495,11 +495,11 @@ public class NodeCollectionTest {
 		final Node node1 = new Node(
 				identity,
 				NodeEndpoint.fromHost("10.0.0.1"),
-				new NodeMetaData("plat", "app", new NodeVersion(2, 1, 3)));
+				new NodeMetaData("plat", "app"));
 		final Node node2 = new Node(
 				identity,
 				NodeEndpoint.fromHost("10.0.0.3"),
-				new NodeMetaData("plat2", "app2", new NodeVersion(8, 9, 7)));
+				new NodeMetaData("plat2", "app2"));
 		final NodeCollection nodes = new NodeCollection();
 		nodes.update(node1, originalStatus);
 
