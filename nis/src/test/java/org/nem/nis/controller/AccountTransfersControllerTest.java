@@ -71,6 +71,7 @@ public class AccountTransfersControllerTest {
 			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
+			context.enableHashLookup();
 
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 			final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
@@ -119,6 +120,7 @@ public class AccountTransfersControllerTest {
 			final Address address = Utils.generateRandomAddress();
 			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
 			final TestContext context = new TestContext(accountIoAdapter);
+			context.enableHashLookup();
 
 			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
 
@@ -132,6 +134,31 @@ public class AccountTransfersControllerTest {
 			ExceptionAssert.assertThrows(
 					v -> this.execute(context.controller, pageBuilder),
 					IllegalArgumentException.class);
+		}
+
+		@Test
+		public void accountTransfersFailsWhenHashIsProvidedAndHashLookupIsNotSupported() {
+			// Arrange:
+			final Address address = Utils.generateRandomAddress();
+			final SerializableList<TransactionMetaDataPair> expectedList = new SerializableList<>(10);
+			final AccountIoAdapter accountIoAdapter = Mockito.mock(AccountIoAdapter.class);
+			final TestContext context = new TestContext(accountIoAdapter);
+
+			final Hash hash = Hash.fromHexString("ffeeddccbbaa99887766554433221100");
+			final HashMetaData metaData = new HashMetaData(new BlockHeight(12), new TimeInstant(123));
+
+			final AccountTransactionsPageBuilder pageBuilder = new AccountTransactionsPageBuilder();
+			pageBuilder.setAddress(address.getEncoded());
+			pageBuilder.setHash(hash.toString());
+
+			Mockito.when(context.transactionHashCache.get(hash)).thenReturn(metaData);
+			Mockito.when(accountIoAdapter.getAccountTransfersUsingHash(address, hash, new BlockHeight(12), this.getTransferType()))
+					.thenReturn(expectedList);
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> this.execute(context.controller, pageBuilder),
+					UnsupportedOperationException.class);
 		}
 
 		//endregion
@@ -341,6 +368,10 @@ public class AccountTransfersControllerTest {
 					accountIoAdapter,
 					this.transactionHashCache,
 					this.nisConfiguration));
+			Mockito.when(this.nisConfiguration.getOptionalFeatures()).thenReturn(new NodeFeature[] { });
+		}
+
+		public void enableHashLookup() {
 			Mockito.when(this.nisConfiguration.getOptionalFeatures()).thenReturn(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP });
 		}
 	}

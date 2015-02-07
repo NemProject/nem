@@ -171,12 +171,12 @@ public class AccountTransfersController {
 
 		final Hash hash = page.getHash();
 		if (null == hash) {
-			if (!this.isTransactionHashLookupSupported()) {
-				throw new UnsupportedOperationException("this node does not support transaction hash lookup");
-			}
-
 			// if a hash was not specified, get the latest transactions for the account
 			return this.accountIo.getAccountTransfersUsingId(page.getAddress(), null, transferType);
+		}
+
+		if (!this.isTransactionHashLookupSupported()) {
+			throw new UnsupportedOperationException("this node does not support transaction hash lookup");
 		}
 
 		final HashMetaData metaData = this.transactionHashCache.get(hash);
