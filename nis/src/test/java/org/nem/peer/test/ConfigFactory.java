@@ -32,7 +32,7 @@ public class ConfigFactory {
 		return new Node(
 				new NodeIdentity(new KeyPair(privateKey), "local larry"),
 				new NodeEndpoint("http", DEFAULT_LOCAL_NODE_HOST, 7890),
-				new NodeMetaData("Mac", "FooBar", new NodeVersion(1, 0, 0)));
+				new NodeMetaData("default-cf-plat", "default-cf-app"));
 	}
 
 	/**
@@ -80,7 +80,8 @@ public class ConfigFactory {
 		return new Config(
 				createDefaultLocalNode(),
 				createDefaultPeersConfig(),
-				"2.0.0");
+				"2.0.0",
+				new NodeFeature[] { NodeFeature.PLACEHOLDER1, NodeFeature.PLACEHOLDER2 });
 	}
 
 	private static JSONObject createEndpointJsonObject(final String protocol, final String host, final int port) {
