@@ -285,12 +285,6 @@ public class BlockModelToDbModelMappingTest {
 		}
 	}
 
-	private static <TDbTransfer extends AbstractTransfer> TDbTransfer createTransferWithSenderProof(final Supplier<TDbTransfer> activator) {
-		final TDbTransfer transfer = activator.get();
-		transfer.setSenderProof(new byte[64]);
-		return transfer;
-	}
-
 	private static class TestContext {
 		private final IMapper mapper = Mockito.mock(IMapper.class);
 		private final DbAccount dbForger = Mockito.mock(DbAccount.class);
@@ -348,28 +342,28 @@ public class BlockModelToDbModelMappingTest {
 
 		public DbTransferTransaction addTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
-			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbTransferTransaction::new), DbTransferTransaction.class);
+			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
 		public DbImportanceTransferTransaction addImportanceTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createImportanceTransfer();
-			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbImportanceTransferTransaction::new), DbImportanceTransferTransaction.class);
+			return this.addTransfer(block, transfer, new DbImportanceTransferTransaction(), DbImportanceTransferTransaction.class);
 		}
 
 		public DbMultisigAggregateModificationTransaction addMultisigModification(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createMultisigModification();
-			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbMultisigAggregateModificationTransaction::new), DbMultisigAggregateModificationTransaction.class);
+			return this.addTransfer(block, transfer, new DbMultisigAggregateModificationTransaction(), DbMultisigAggregateModificationTransaction.class);
 		}
 
 		public DbMultisigTransaction addMultisigTransfer(final Block block) {
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
 			final MultisigTransaction multisigTransfer = new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), transfer);
-			return this.addTransfer(block, multisigTransfer, createTransferWithSenderProof(DbMultisigTransaction::new), DbMultisigTransaction.class);
+			return this.addTransfer(block, multisigTransfer, new DbMultisigTransaction(), DbMultisigTransaction.class);
 		}
 
 		public DbMultisigTransaction addMultisigTransfer(final Block block, final DbTransferTransaction dbInnerTransferTransaction) {
 			final DbMultisigTransaction dbMultisigTransfer = new DbMultisigTransaction();
-			dbMultisigTransfer.setSenderProof(new byte[64]);
+			dbMultisigTransfer.setSenderProof(Utils.generateRandomSignature().getBytes());
 			dbMultisigTransfer.setTransferTransaction(dbInnerTransferTransaction);
 
 			final Transaction transfer = RandomTransactionFactory.createTransfer();
@@ -379,7 +373,7 @@ public class BlockModelToDbModelMappingTest {
 
 		public DbTransferTransaction addUnsupportedTransfer(final Block block) {
 			final Transaction transfer = new MockTransaction();
-			return this.addTransfer(block, transfer, createTransferWithSenderProof(DbTransferTransaction::new), DbTransferTransaction.class);
+			return this.addTransfer(block, transfer, new DbTransferTransaction(), DbTransferTransaction.class);
 		}
 
 		private <TDbTransfer extends AbstractTransfer, TModelTransfer extends Transaction> TDbTransfer addTransfer(
@@ -387,6 +381,7 @@ public class BlockModelToDbModelMappingTest {
 				final TModelTransfer transfer,
 				final TDbTransfer dbTransfer,
 				final Class<TDbTransfer> dbTransferClass) {
+			dbTransfer.setSenderProof(Utils.generateRandomSignature().getBytes());
 			transfer.sign();
 
 			Mockito.when(this.mapper.map(transfer, dbTransferClass)).thenReturn(dbTransfer);
