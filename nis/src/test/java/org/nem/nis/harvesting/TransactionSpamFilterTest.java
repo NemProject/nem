@@ -49,6 +49,21 @@ public class TransactionSpamFilterTest {
 	}
 
 	@Test
+	public void transactionWithHighFeeIsPermissibleIfCacheSizeIsAtLeastMaxAllowedTransactionsPerBlockAndDebtorHasImportanceNotSet() {
+		// Arrange:
+		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, BlockHeight.ONE);
+		context.setImportanceHeight(new BlockHeight(2));
+		final Transaction transaction = new MockTransaction(Utils.generateRandomAccount());
+		transaction.setFee(Amount.fromNem(100));
+
+		// Act:
+		final Collection<Transaction> filteredTransactions = context.spamFilter.filter(Arrays.asList(transaction));
+
+		// Assert:
+		Assert.assertThat(filteredTransactions, IsEquivalent.equivalentTo(Arrays.asList(transaction)));
+	}
+
+	@Test
 	public void filterReturnsExactlyEnoughTransactionsToFillTheCacheUpToMaxAllowedTransactionPerBlockIfAllDebtorsHaveZeroImportance() {
 		// Arrange:
 		final TestContext context = new TestContext(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 5, BlockHeight.ONE);
@@ -235,6 +250,10 @@ public class TransactionSpamFilterTest {
 
 		private void setImportance(final double importance) {
 			Mockito.when(this.accountImportance.getImportance(BlockHeight.ONE)).thenReturn(importance);
+		}
+
+		private void setImportanceHeight(final BlockHeight height) {
+			Mockito.when(this.accountImportance.getHeight()).thenReturn(height);
 		}
 
 		private void fillCache(final int count) {
