@@ -195,7 +195,6 @@ public class CommonStarter implements ServletContextListener {
 
 	/**
 	 * Stops the server asynchronously on a different thread.
-	 * TODO 20150203 J-J: NCC should call this once core is republished.
 	 *
 	 * @return A future that will evaluate to true on success and false on failure.
 	 */
