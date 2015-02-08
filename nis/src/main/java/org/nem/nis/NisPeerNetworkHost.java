@@ -113,7 +113,7 @@ public class NisPeerNetworkHost implements AutoCloseable {
 	 */
 	public PeerNetwork getNetwork() {
 		if (null == this.network) {
-			throw new IllegalStateException("network has not been booted yet");
+			throw new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED);
 		}
 
 		return this.network;

@@ -9,7 +9,9 @@ import org.nem.core.node.*;
 import org.nem.core.time.SystemTimeProvider;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.audit.AuditCollection;
+import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.cache.*;
+import org.nem.nis.test.NisUtils;
 import org.nem.peer.connect.*;
 
 import java.util.List;
@@ -41,12 +43,14 @@ public class NisPeerNetworkHostTest {
 		}
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void getNetworkThrowsIfNetworkIsNotBooted() {
 		// Arrange:
 		try (final NisPeerNetworkHost host = createNetwork()) {
 			// Act:
-			host.getNetwork();
+			NisUtils.assertThrowsNisIllegalStateException(
+					v -> host.getNetwork(),
+					NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED);
 		}
 	}
 
@@ -162,7 +166,7 @@ public class NisPeerNetworkHostTest {
 		return new NisPeerNetworkHost(
 				nisCache,
 				null,
-				null,
+				Mockito.mock(PeerNetworkScheduler.class),
 				null,
 				new NisConfiguration(),
 				new HttpConnectorPool(CommunicationMode.JSON, auditCollection),

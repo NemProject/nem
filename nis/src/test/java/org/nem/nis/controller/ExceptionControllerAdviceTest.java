@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.connect.ErrorResponse;
 import org.nem.core.time.*;
+import org.nem.nis.NisIllegalStateException;
 import org.springframework.http.*;
 
 import java.util.MissingResourceException;
@@ -41,6 +42,17 @@ public class ExceptionControllerAdviceTest {
 
 		// Assert:
 		assertEntity(entity, HttpStatus.UNAUTHORIZED);
+	}
+
+	@Test
+	public void handleNisIllegalStateExceptionCreatesAppropriateResponse() {
+		// Arrange:
+		final ExceptionControllerAdvice advice = createAdvice();
+		final ResponseEntity<ErrorResponse> entity = advice.handleNisIllegalStateException(
+				new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_NOT_BOOTED));
+
+		// Assert:
+		assertEntity(entity, HttpStatus.SERVICE_UNAVAILABLE, "NIS_ILLEGAL_STATE_NOT_BOOTED");
 	}
 
 	@Test

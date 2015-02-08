@@ -4,10 +4,11 @@ import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.nem.core.test.ExceptionAssert;
 import org.nem.core.utils.ExceptionUtils;
+import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
+import org.nem.nis.test.NisUtils;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -94,7 +95,9 @@ public class LockDownInterceptorTest {
 
 	private static void assertAccessDenied(final LockDownInterceptor interceptor, final String requestUri) {
 		// Act / Assert:
-		ExceptionAssert.assertThrows(v -> preHandle(interceptor, requestUri), UnauthorizedAccessException.class);
+		NisUtils.assertThrowsNisIllegalStateException(
+				v -> preHandle(interceptor, requestUri),
+				NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_LOADING_CHAIN);
 	}
 
 	public static boolean preHandle(final LockDownInterceptor interceptor, final String requestUri) {

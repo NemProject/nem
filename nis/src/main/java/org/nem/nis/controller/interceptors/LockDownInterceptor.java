@@ -1,6 +1,7 @@
 package org.nem.nis.controller.interceptors;
 
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,10 @@ public class LockDownInterceptor extends HandlerInterceptorAdapter {
 				return true;
 			}
 
-			// TODO 20150208 J-J: shoudld throw a different exception here
 			final DbBlock block = this.lastBlockLayer.getCurrentDbBlock();
 			final String message = String.format("Can't perform any actions until db is fully loaded %s", block == null ? BlockHeight.ONE : block.getHeight());
 			LOGGER.warning(message);
-			throw new UnauthorizedAccessException(message);
+			throw new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_LOADING_CHAIN);
 		}
 
 		return true;
