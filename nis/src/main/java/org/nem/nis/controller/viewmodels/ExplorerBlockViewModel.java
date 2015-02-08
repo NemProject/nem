@@ -1,11 +1,8 @@
 package org.nem.nis.controller.viewmodels;
 
 import org.nem.core.crypto.Hash;
-import org.nem.core.model.Address;
 import org.nem.core.model.Block;
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.serialization.*;
-import org.nem.core.time.UnixTime;
 
 import java.util.*;
 
@@ -17,6 +14,12 @@ public class ExplorerBlockViewModel implements SerializableEntity {
 	private final Hash blockHash;
 	private final List<ExplorerTransferViewModel> transactions;
 
+	/**
+	 * Creates a new explorer block view model.
+	 *
+	 * @param block The block.
+	 * @param blockHash The block hash.
+	 */
 	public ExplorerBlockViewModel(
 			final Block block,
 			final Hash blockHash) {

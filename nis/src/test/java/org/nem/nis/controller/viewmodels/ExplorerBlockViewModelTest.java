@@ -4,19 +4,14 @@ import net.minidev.json.*;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.core.crypto.*;
-import org.nem.core.model.Address;
-import org.nem.core.model.primitive.*;
-import org.nem.core.serialization.JsonSerializer;
-import org.nem.core.test.Utils;
-import org.nem.core.time.UnixTime;
+import org.nem.core.model.*;
+import org.nem.core.serialization.*;
+import org.nem.core.test.*;
+import org.nem.nis.test.*;
 
 import java.util.function.Consumer;
 
-// TODO 20150206 J-G: please fix these
 public class ExplorerBlockViewModelTest {
-	/*
-	private static final String PUBLIC_KEY_STRING = "8888888899999999777777774444444488888888999999997777777744444444";
-	private static final long UNIX_TIME = 1424604802000L;
 
 	@Test
 	public void canSerializeViewModelWithoutTransactions() {
@@ -40,40 +35,35 @@ public class ExplorerBlockViewModelTest {
 			final Consumer<ExplorerBlockViewModel> addTransactions,
 			final int numExpectedTransactions) {
 		// Arrange:
-		final Address address = Address.fromPublicKey(PublicKey.fromHexString(PUBLIC_KEY_STRING));
-		final Hash hash = Hash.fromHexString("00000000111111112222222233333333");
+		final Block block = NisUtils.createRandomBlockWithHeight(101);
+		block.sign();
+		final Hash blockHash = HashUtils.calculateHash(block);
 
 		// Act:
-		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(
-				new BlockHeight(60),
-				address,
-				UnixTime.fromUnixTimeInMillis(UNIX_TIME),
-				hash);
+		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(block, blockHash);
 		addTransactions.accept(viewModel);
 		final JSONObject jsonObject = JsonSerializer.serializeToJson(viewModel);
 
 		// Assert:
-		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(6));
-		Assert.assertThat(jsonObject.get("height"), IsEqual.equalTo(60L));
-		Assert.assertThat(jsonObject.get("harvester"), IsEqual.equalTo(address.getEncoded()));
-		Assert.assertThat(jsonObject.get("harvesterPk"), IsEqual.equalTo(PUBLIC_KEY_STRING));
-		Assert.assertThat(jsonObject.get("timeStamp"), IsEqual.equalTo(UNIX_TIME));
-		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo("00000000111111112222222233333333"));
+		Assert.assertThat(jsonObject.size(), IsEqual.equalTo(3));
+		Assert.assertThat(getDeserializedBlockHash((JSONObject)jsonObject.get("block")), IsEqual.equalTo(blockHash));
+		Assert.assertThat(jsonObject.get("hash"), IsEqual.equalTo(blockHash.toString()));
 		Assert.assertThat(((JSONArray)jsonObject.get("txes")).size(), IsEqual.equalTo(numExpectedTransactions));
 	}
 
 	private static ExplorerTransferViewModel createTransferViewModel() {
+		final Transaction transaction = RandomTransactionFactory.createTransfer();
+		transaction.sign();
 		return new ExplorerTransferViewModel(
-				7,
-				Amount.fromNem(123),
-				UnixTime.fromUnixTimeInMillis(UNIX_TIME),
-				Utils.generateRandomAddressWithPublicKey(),
-				new Signature(Utils.generateRandomBytes(64)),
-				Utils.generateRandomHash(),
-				Utils.generateRandomAddress(),
-				Amount.fromNem(888888),
-				7,
-				Utils.generateRandomBytes(16));
+				transaction,
+				HashUtils.calculateHash(transaction));
 	}
-	*/
+
+	private static Hash getDeserializedBlockHash(final JSONObject jsonObject) {
+		final Block deserializedBlock = new Block(
+				BlockTypes.REGULAR,
+				VerifiableEntity.DeserializationOptions.VERIFIABLE,
+				Utils.createDeserializer(jsonObject));
+		return HashUtils.calculateHash(deserializedBlock);
+	}
 }
