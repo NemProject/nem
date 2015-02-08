@@ -82,6 +82,8 @@ public class BlockAnalyzer {
 			return false;
 		}
 
+		this.blockChainLastBlockLayer.setCurrentBlock(dbBlock);
+
 		LOGGER.info(String.format("first block generation hash: %s", dbBlock.getGenerationHash()));
 		if (!dbBlock.getGenerationHash().equals(NemesisBlock.GENERATION_HASH)) {
 			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
@@ -103,6 +105,9 @@ public class BlockAnalyzer {
 		do {
 			final Block block = mapper.map(dbBlock);
 
+			if ((block.getHeight().getRaw() % 512) == 0) {
+				this.blockChainLastBlockLayer.setCurrentBlock(dbBlock);
+			}
 			if ((block.getHeight().getRaw() % 5000) == 0) {
 				LOGGER.info(String.format("%d", block.getHeight().getRaw()));
 			}

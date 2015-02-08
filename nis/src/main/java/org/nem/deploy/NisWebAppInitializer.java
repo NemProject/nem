@@ -4,6 +4,7 @@ import org.nem.core.deploy.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.interceptors.*;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -28,6 +29,9 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 	@Autowired
 	private NisConfiguration nisConfiguration;
 
+	@Autowired
+	private BlockChainLastBlockLayer lastBlockLayer;
+
 	@Override
 	protected void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
 		addConvertersForPolicy(converters, new JsonSerializationPolicy(this.accountLookup));
@@ -47,6 +51,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 	protected void addInterceptors(final InterceptorRegistry registry) {
 		registry.addInterceptor(new LocalHostInterceptor(this.nisConfiguration.getAdditionalLocalIps()));
 		registry.addInterceptor(this.createAuditInterceptor());
+		registry.addInterceptor(new LockDownInterceptor(this.lastBlockLayer));
 		super.addInterceptors(registry);
 	}
 

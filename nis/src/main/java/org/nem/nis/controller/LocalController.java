@@ -5,6 +5,7 @@ import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +13,15 @@ import org.springframework.web.bind.annotation.*;
 public class LocalController {
 	private final NisPeerNetworkHost host;
 	private final CommonStarter starter;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	@Autowired(required = true)
 	public LocalController(
 			final NisPeerNetworkHost host,
-			final CommonStarter starter) {
+			final CommonStarter starter, BlockChainLastBlockLayer blockChainLastBlockLayer) {
 		this.host = host;
 		this.starter = starter;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 
 	/**
@@ -49,10 +52,16 @@ public class LocalController {
 	@RequestMapping(value = "/status", method = RequestMethod.GET)
 	@ClientApi
 	public NemRequestResult status() {
+
+
 		return new NemRequestResult(NemRequestResult.TYPE_STATUS, this.getStatusFromHost().getValue(), "status");
 	}
 
 	private NemStatus getStatusFromHost() {
+		if (this.blockChainLastBlockLayer.getLastDbBlock() == null) {
+			return NemStatus.LOADING;
+		}
+
 		if (!this.host.isNetworkBooted()) {
 			return this.host.isNetworkBooting() ? NemStatus.BOOTING : NemStatus.RUNNING;
 		}
