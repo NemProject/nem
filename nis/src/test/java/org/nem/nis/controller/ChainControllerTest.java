@@ -147,6 +147,53 @@ public class ChainControllerTest {
 	//region chainHeight
 
 	@Test
+	public void chainHeightReturnsBlockHeightOneWhenNeitherLastBlockNorCurrentBlockIsAvailable() {
+		// Assert:
+		assertChainHeight(null, null, BlockHeight.ONE);
+	}
+
+	@Test
+	public void chainHeightReturnsCurrentBlockHeightWhenLastBlockHeightIsNotAvailable() {
+		// Assert:
+		assertChainHeight(null, 111L, new BlockHeight(111));
+	}
+
+	@Test
+	public void chainHeightReturnsLastBlockHeightWhenLastBlockHeightIsAvailable() {
+		// Assert:
+		assertChainHeight(222L, 111L, new BlockHeight(222));
+	}
+
+	private static void assertChainHeight(
+			final Long currentHeight,
+			final Long lastHeight,
+			final BlockHeight expectedHeight) {
+		// Arrange:
+		final TestContext context = new TestContext();
+		if (null != currentHeight) {
+			final DbBlock currentBlock = new DbBlock();
+			currentBlock.setHeight(currentHeight);
+			Mockito.when(context.blockChainLastBlockLayer.getCurrentDbBlock()).thenReturn(currentBlock);
+		}
+		if (null != lastHeight) {
+			Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(lastHeight);
+		}
+
+		// Act:
+		final BlockHeight height = context.controller.chainHeight();
+
+		// Assert:
+		Assert.assertThat(height, IsEqual.equalTo(expectedHeight));
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastDbBlock();
+		if (null != lastHeight) {
+			Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
+		}
+		else {
+			Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getCurrentDbBlock();
+		}
+	}
+
+	@Test
 	public void chainHeightReturnsHeight() {
 		// Arrange:
 		final TestContext context = new TestContext();

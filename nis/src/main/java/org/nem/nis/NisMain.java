@@ -73,7 +73,6 @@ public class NisMain {
 		this.populateDb();
 
 		// analyze the blocks
-
 		final Thread thread = new Thread(() -> {
 			this.analyzeBlocks();
 

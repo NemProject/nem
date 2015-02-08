@@ -18,7 +18,8 @@ public class LocalController {
 	@Autowired(required = true)
 	public LocalController(
 			final NisPeerNetworkHost host,
-			final CommonStarter starter, BlockChainLastBlockLayer blockChainLastBlockLayer) {
+			final CommonStarter starter,
+			BlockChainLastBlockLayer blockChainLastBlockLayer) {
 		this.host = host;
 		this.starter = starter;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
@@ -52,13 +53,11 @@ public class LocalController {
 	@RequestMapping(value = "/status", method = RequestMethod.GET)
 	@ClientApi
 	public NemRequestResult status() {
-
-
 		return new NemRequestResult(NemRequestResult.TYPE_STATUS, this.getStatusFromHost().getValue(), "status");
 	}
 
 	private NemStatus getStatusFromHost() {
-		if (this.blockChainLastBlockLayer.getLastDbBlock() == null) {
+		if (null == this.blockChainLastBlockLayer.getLastDbBlock()) {
 			return NemStatus.LOADING;
 		}
 

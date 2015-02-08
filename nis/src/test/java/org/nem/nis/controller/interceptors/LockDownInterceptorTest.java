@@ -14,32 +14,75 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class LockDownInterceptorTest {
+
+	//region without last block
+
 	@Test
-	public void interceptorWorksCorrectlyWithoutLastBlock() {
-		// Act:
-		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		final LockDownInterceptor interceptor = new LockDownInterceptor(lastBlockLayer);
+	public void preHandleAllowsIgnoredApiPathRequestsWithoutLastBlock() {
+		// Arrange:
+		final LockDownInterceptor interceptor = createInterceptorWithoutLastBlock();
 
 		// Assert:
 		assertAccessGranted(interceptor, "/status");
 		assertAccessGranted(interceptor, "/chain/height");
+	}
+
+	@Test
+	public void preHandleAllowsCaseInsensitiveIgnoredApiPathRequestsWithoutLastBlock() {
+		// Arrange:
+		final LockDownInterceptor interceptor = createInterceptorWithoutLastBlock();
+
+		// Assert:
+		assertAccessGranted(interceptor, "/StaTus");
+		assertAccessGranted(interceptor, "/Chain/HeiGhT");
+	}
+
+	@Test
+	public void preHandleBlocksNonIgnoredApiPathRequestsWithoutLastBlock() {
+		// Arrange:
+		final LockDownInterceptor interceptor = createInterceptorWithoutLastBlock();
+
+		// Assert:
 		assertAccessDenied(interceptor, "/foobar");
 	}
 
-	@Test
-	public void interceptorWorksCorrectlyWithLastBlock() {
-		// Act:
+	private static LockDownInterceptor createInterceptorWithoutLastBlock() {
+		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		final LockDownInterceptor interceptor = new LockDownInterceptor(lastBlockLayer);
-		final DbBlock dbBlock = Mockito.mock(DbBlock.class);
-		Mockito.when(dbBlock.getHeight()).thenReturn(1234L);
-		Mockito.when(lastBlockLayer.getLastDbBlock()).thenReturn(dbBlock);
+		return new LockDownInterceptor(lastBlockLayer);
+	}
+
+	//endregion
+
+	//region with last block
+
+	@Test
+	public void preHandleAllowsIgnoredApiPathRequestsWithLastBlock() {
+		// Arrange:
+		final LockDownInterceptor interceptor = createInterceptorWithLastBlock();
 
 		// Assert:
 		assertAccessGranted(interceptor, "/status");
 		assertAccessGranted(interceptor, "/chain/height");
+	}
+
+	@Test
+	public void preHandleAllowsNonIgnoredApiPathRequestsWithLastBlock() {
+		// Arrange:
+		final LockDownInterceptor interceptor = createInterceptorWithLastBlock();
+
+		// Assert:
 		assertAccessGranted(interceptor, "/foobar");
 	}
+
+	private static LockDownInterceptor createInterceptorWithLastBlock() {
+		// Arrange:
+		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
+		Mockito.when(lastBlockLayer.getLastDbBlock()).thenReturn(new DbBlock());
+		return new LockDownInterceptor(lastBlockLayer);
+	}
+
+	//endregion
 
 	private static void assertAccessGranted(final LockDownInterceptor interceptor, final String requestUri) {
 		// Act:
