@@ -3,8 +3,8 @@ package org.nem.core.model;
 import org.junit.*;
 import org.nem.core.test.*;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class TransactionExtensionsTest {
 

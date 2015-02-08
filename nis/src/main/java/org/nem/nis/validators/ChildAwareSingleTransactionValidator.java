@@ -2,8 +2,6 @@ package org.nem.nis.validators;
 
 import org.nem.core.model.*;
 
-import java.util.*;
-
 /**
  * SingleTransactionValidator decorator that knows how to validate child transactions.
  */

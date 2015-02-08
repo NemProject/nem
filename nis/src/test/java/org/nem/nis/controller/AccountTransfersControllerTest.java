@@ -15,12 +15,12 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.deploy.NisConfiguration;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.DefaultHashCache;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.service.AccountIoAdapter;
 
-import java.util.*;
+import java.util.Arrays;
 
 @RunWith(Enclosed.class)
 public class AccountTransfersControllerTest {

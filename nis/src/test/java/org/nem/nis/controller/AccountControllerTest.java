@@ -11,14 +11,14 @@ import org.nem.core.serialization.SerializableList;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.controller.requests.*;
+import org.nem.nis.controller.requests.AccountTransactionsPageBuilder;
 import org.nem.nis.controller.viewmodels.AccountImportanceViewModel;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.service.AccountIoAdapter;
 import org.nem.nis.state.*;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AccountControllerTest {

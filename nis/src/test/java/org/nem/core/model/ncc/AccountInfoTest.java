@@ -221,7 +221,8 @@ public class AccountInfoTest {
 			Assert.assertThat(entry.getValue().hashCode(), IsEqual.equalTo(hashCode));
 		}
 
-		Assert.assertThat(DESC_TO_INFO_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));	}
+		Assert.assertThat(DESC_TO_INFO_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
+	}
 
 	private static AccountInfo createAccountInfo(
 			final Address address,

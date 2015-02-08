@@ -6,7 +6,6 @@ import org.nem.core.serialization.*;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * A NEM block.

@@ -229,7 +229,6 @@ public class BlockChainValidatorIntegrationTest {
 		}, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
 	}
 
-
 	//endregion
 
 	@Test

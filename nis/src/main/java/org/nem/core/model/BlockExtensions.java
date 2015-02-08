@@ -1,6 +1,5 @@
 package org.nem.core.model;
 
-import java.util.*;
 import java.util.stream.Stream;
 
 /**

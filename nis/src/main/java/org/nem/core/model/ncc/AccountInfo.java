@@ -20,9 +20,10 @@ public class AccountInfo implements SerializableEntity {
 
 	/**
 	 * Creates a new account view model.
-	 *  @param address The address.
+	 *
+	 * @param address The address.
 	 * @param balance The balance.
-	 * @param vestedBalance
+	 * @param vestedBalance The vested balance.
 	 * @param numHarvestedBlocks The number of harvested blocks.
 	 * @param label The label.
 	 * @param importance The importance.
