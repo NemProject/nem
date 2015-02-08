@@ -9,25 +9,40 @@ import org.nem.nis.dbmodel.*;
 
 /**
  * Class that contains functions for converting db-models to block explorer view models.
+ *
+ * TODO 20150206 J-G: why not make this a mapping that we can register with all other mappings?
  */
 public class BlockExplorerMapper {
+	private final NisDbModelToModelMapper mapper;
+
+	/**
+	 * Creates a new mapper.
+	 *
+	 * @param mapper The nis db model to model mapper.
+	 */
+	public BlockExplorerMapper(final NisDbModelToModelMapper mapper) {
+		this.mapper = mapper;
+	}
 
 	/**
 	 * Maps a database block to an explorer block view model.
 	 *
-	 * @param block The database block.
+	 * @param dbBlock The database block.
 	 * @return The explorer block view model.
 	 */
-	public ExplorerBlockViewModel toExplorerViewModel(final DbBlock block) {
+	public ExplorerBlockViewModel toExplorerViewModel(final DbBlock dbBlock) {
+		final Block block = this.mapper.map(dbBlock);
 		final ExplorerBlockViewModel viewModel = new ExplorerBlockViewModel(
-				new BlockHeight(block.getHeight()),
-				Address.fromPublicKey(block.getHarvester().getPublicKey()),
-				UnixTime.fromTimeInstant(new TimeInstant(block.getTimeStamp())),
-				block.getBlockHash());
+				block,
+				dbBlock.getBlockHash());
 
-		block.getBlockTransferTransactions().stream()
+		block.getTransactions().stream()
 				.map(transfer -> this.toExplorerViewModel(transfer))
 				.forEach(transfer -> viewModel.addTransaction(transfer));
+
+		// TODO 20150206 J-G: why are you clearing transactions?
+		// CLEAR
+		block.getTransactions().clear();
 		return viewModel;
 	}
 
@@ -37,17 +52,7 @@ public class BlockExplorerMapper {
 	 * @param transfer The database transfer.
 	 * @return The explorer transfer view model.
 	 */
-	public ExplorerTransferViewModel toExplorerViewModel(final DbTransferTransaction transfer) {
-		return new ExplorerTransferViewModel(
-				TransactionTypes.TRANSFER,
-				Amount.fromMicroNem(transfer.getFee()),
-				UnixTime.fromTimeInstant(new TimeInstant(transfer.getTimeStamp())),
-				Address.fromPublicKey(transfer.getSender().getPublicKey()),
-				new Signature(transfer.getSenderProof()),
-				transfer.getTransferHash(),
-				Address.fromEncoded(transfer.getRecipient().getPrintableKey()),
-				Amount.fromMicroNem(transfer.getAmount()),
-				transfer.getMessageType(),
-				transfer.getMessagePayload());
+	public ExplorerTransferViewModel toExplorerViewModel(final Transaction transfer) {
+		return new ExplorerTransferViewModel(transfer, HashUtils.calculateHash(transfer));
 	}
 }
