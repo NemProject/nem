@@ -76,7 +76,7 @@ public class AccountInfoFactoryTest {
 		assertAccountInfo(info, context.address, 0.796, 727);
 	}
 
-	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance, long expectedVestedBalance) {
+	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance, final long expectedVestedBalance) {
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
