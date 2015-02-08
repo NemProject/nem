@@ -14,7 +14,7 @@ import org.nem.core.serialization.Deserializer;
 import org.nem.core.test.MockSerializableEntity;
 import org.nem.core.utils.ExceptionUtils;
 
-import java.net.*;
+import java.net.URL;
 import java.util.concurrent.CancellationException;
 import java.util.function.*;
 
@@ -150,7 +150,7 @@ public class HttpMethodClientTest {
 			}
 		}
 
-		private static MappingBuilder createTimeoutStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder)  {
+		private static MappingBuilder createTimeoutStub(final Function<UrlMatchingStrategy, MappingBuilder> createBuilder) {
 			return createBuilder.apply(WireMock.urlEqualTo("/timeout")).willReturn(
 					WireMock.aResponse().withStatus(200));
 		}

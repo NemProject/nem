@@ -29,7 +29,7 @@ public class MultisigNonOperationalValidatorTest {
 	}
 
 	@Test
-	public void nonMultisigAccountCannotIssueUnsignedChildTransaction() {
+	public void nonMultisigAccountCanIssueUnsignedChildTransaction() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
 		final Account account = Utils.generateRandomAccount();
@@ -41,7 +41,7 @@ public class MultisigNonOperationalValidatorTest {
 		final ValidationResult result = context.validateNonOperational(transaction);
 
 		// Assert
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_SIGNATURE_NOT_VERIFIABLE));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion

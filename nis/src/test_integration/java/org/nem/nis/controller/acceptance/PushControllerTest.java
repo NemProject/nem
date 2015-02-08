@@ -13,11 +13,9 @@ import org.nem.core.utils.HexEncoder;
 import org.nem.nis.test.LocalHostConnector;
 
 public class PushControllerTest {
-
 	private static final String PUSH_TRANSACTION_PATH = "push/transaction";
 
 	@Test
-	// TODO: this test is failing now
 	public void transferIncorrectPush() {
 		// Arrange:
 		final LocalHostConnector connector = new LocalHostConnector();

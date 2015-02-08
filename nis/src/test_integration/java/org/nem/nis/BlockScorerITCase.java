@@ -666,23 +666,6 @@ public class BlockScorerITCase {
 		return scoreSum;
 	}
 
-	// TODO: not sure how to make sensible test now...
-	//	@Test
-	//	public void blockScoreIsCalculatedCorrectly() {
-	//		// Arrange:
-	//		final BlockScorer scorer = new BlockScorer();
-	//		final Block block = new Block(Utils.generateRandomAccount(), Hash.ZERO, TimeInstant.ZERO, 11);
-	//		block.setSignature(new Signature(SIGNATURE_BYTES));
-	//
-	//		long blockScoreHashPart = Math.abs(ByteUtils.bytesToInt(Arrays.copyOfRange(HashUtils.calculateHash(block).getRaw(), 10, 14)));
-	//
-	//		// Act:
-	//		final long blockScore = scorer.calculateBlockScore(block);
-	//
-	//		// Assert:
-	//		Assert.assertThat(blockScore, IsEqual.equalTo(Math.abs(0xE2E3E4E5) + blockScoreHashPart));
-	//	}
-
 	private static BlockScorer createBlockScorer() {
 		return new BlockScorer(new DefaultAccountStateCache());
 	}

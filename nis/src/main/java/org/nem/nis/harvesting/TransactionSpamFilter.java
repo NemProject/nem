@@ -56,15 +56,13 @@ public class TransactionSpamFilter {
 				.getAccountStateCache()
 				.findStateByAddress(debtor.getAddress())
 				.getImportanceInfo();
-		final BlockHeight importanceHeight = this.nisCache.getPoiFacade().getLastPoiRecalculationHeight();
-		if (!importanceHeight.equals(importanceInfo.getHeight())) {
-			return false;
-		}
-
 		final long count = Stream.concat(this.transactions.stream(), filteredTransactions.stream())
 				.filter(t -> t.getDebtor().getAddress().equals(debtor.getAddress()))
 				.count();
-		final double effectiveImportance = importanceInfo.getImportance(importanceHeight) + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
+		final BlockHeight importanceHeight = this.nisCache.getPoiFacade().getLastPoiRecalculationHeight();
+		final double importance = importanceHeight.equals(importanceInfo.getHeight()) ? importanceInfo.getImportance(importanceHeight) : 0.0;
+		final double effectiveImportance = importance + Math.min(0.01, transaction.getFee().getNumNem() / 100000.0);
+
 		return count < this.getMaxAllowedTransactions(effectiveImportance, numApprovedTransactions);
 	}
 
@@ -73,11 +71,7 @@ public class TransactionSpamFilter {
 		return (int)(importance * Math.exp(-cacheSize / 300) * MAX_CACHE_SIZE * (MAX_CACHE_SIZE - cacheSize) / 10);
 	}
 
-	// TODO 20150130 J-J: consider refactoring
 	private int flatSize(final List<Transaction> filteredTransactions) {
-		return (int)Stream.concat(
-				filteredTransactions.stream(),
-				filteredTransactions.stream().flatMap(t -> t.getChildTransactions().stream()))
-				.count();
+		return (int)filteredTransactions.stream().flatMap(TransactionExtensions::streamDefault).count();
 	}
 }

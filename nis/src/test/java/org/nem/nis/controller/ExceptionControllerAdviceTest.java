@@ -7,6 +7,8 @@ import org.nem.core.connect.ErrorResponse;
 import org.nem.core.time.*;
 import org.springframework.http.*;
 
+import java.util.MissingResourceException;
+
 public class ExceptionControllerAdviceTest {
 	private static final TimeInstant CURRENT_TIME = new TimeInstant(57);
 
@@ -14,10 +16,11 @@ public class ExceptionControllerAdviceTest {
 	public void handleMissingResourceExceptionCreatesAppropriateResponse() {
 		// Arrange:
 		final ExceptionControllerAdvice advice = createAdvice();
-		final ResponseEntity<ErrorResponse> entity = advice.handleMissingResourceException(new Exception("badness"));
+		final ResponseEntity<ErrorResponse> entity = advice.handleMissingResourceException(
+				new MissingResourceException("badness", "class", "resource"));
 
 		// Assert:
-		assertEntity(entity, HttpStatus.NOT_FOUND);
+		assertEntity(entity, HttpStatus.NOT_FOUND, "badness 'resource' (class)");
 	}
 
 	@Test
@@ -52,10 +55,15 @@ public class ExceptionControllerAdviceTest {
 
 	private static void assertEntity(final ResponseEntity<ErrorResponse> entity, final HttpStatus expectedCode) {
 		// Assert:
+		assertEntity(entity, expectedCode, "badness");
+	}
+
+	private static void assertEntity(final ResponseEntity<ErrorResponse> entity, final HttpStatus expectedCode, final String expectedMessage) {
+		// Assert:
 		Assert.assertThat(entity.getStatusCode(), IsEqual.equalTo(expectedCode));
 		Assert.assertThat(entity.getBody().getTimeStamp(), IsEqual.equalTo(CURRENT_TIME));
 		Assert.assertThat(entity.getBody().getStatus(), IsEqual.equalTo(expectedCode.value()));
-		Assert.assertThat(entity.getBody().getMessage(), IsEqual.equalTo("badness"));
+		Assert.assertThat(entity.getBody().getMessage(), IsEqual.equalTo(expectedMessage));
 	}
 
 	private static ExceptionControllerAdvice createAdvice() {

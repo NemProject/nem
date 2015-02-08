@@ -34,8 +34,10 @@ public class ExceptionControllerAdvice {
 	 * @return The appropriate response entity.
 	 */
 	@ExceptionHandler(MissingResourceException.class)
-	public ResponseEntity<ErrorResponse> handleMissingResourceException(final Exception e) {
-		return this.createResponse(e, HttpStatus.NOT_FOUND);
+	public ResponseEntity<ErrorResponse> handleMissingResourceException(final MissingResourceException e) {
+		return this.createResponse(
+				String.format("%s '%s' (%s)", e.getMessage(), e.getKey(), e.getClassName()),
+				HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -71,7 +73,11 @@ public class ExceptionControllerAdvice {
 		return this.createResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	private ResponseEntity<ErrorResponse> createResponse(final String message, final HttpStatus status) {
+		return new ResponseEntity<>(new ErrorResponse(this.timeProvider.getCurrentTime(), message, status.value()), status);
+	}
+
 	private ResponseEntity<ErrorResponse> createResponse(final Exception e, final HttpStatus status) {
-		return new ResponseEntity<>(new ErrorResponse(this.timeProvider.getCurrentTime(), e, status), status);
+		return this.createResponse(e.getMessage(), status);
 	}
 }

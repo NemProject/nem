@@ -42,7 +42,12 @@ public enum NemStatus {
 	/**
 	 * NIS local node does not see any remote NIS node (implies RUNNING and BOOTED).
 	 */
-	NO_REMOTE_NIS_AVAILABLE(7);
+	NO_REMOTE_NIS_AVAILABLE(7),
+
+	/**
+	 *
+	 */
+	LOADING(8);
 
 	private final int value;
 

@@ -8,8 +8,8 @@ import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.PeerNetwork;
 
 public class LocalControllerTest {
@@ -23,10 +23,9 @@ public class LocalControllerTest {
 
 		// Act:
 		context.controller.shutdown();
-		ExceptionUtils.propagateVoid(() -> Thread.sleep(500));
 
 		// Assert:
-		Mockito.verify(context.starter, Mockito.only()).stopServer();
+		Mockito.verify(context.starter, Mockito.only()).stopServerAsync();
 	}
 
 	//endregion
@@ -134,10 +133,11 @@ public class LocalControllerTest {
 		private final NisPeerNetworkHost host = Mockito.mock(NisPeerNetworkHost.class);
 		private final PeerNetwork network = Mockito.mock(PeerNetwork.class);
 		private final CommonStarter starter = Mockito.mock(CommonStarter.class);
+		private final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		private final LocalController controller;
 
 		private TestContext() {
-			this.controller = new LocalController(this.host, this.starter);
+			this.controller = new LocalController(this.host, this.starter, lastBlockLayer);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
 
 			final NodeCollection nodes = new NodeCollection();

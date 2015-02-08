@@ -3,45 +3,34 @@ package org.nem.nis.controller;
 import org.nem.core.deploy.CommonStarter;
 import org.nem.core.model.NemStatus;
 import org.nem.core.model.ncc.NemRequestResult;
-import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.annotations.ClientApi;
+import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.logging.Logger;
-
 @RestController
 public class LocalController {
-	private final static Logger LOGGER = Logger.getLogger(LocalController.class.getName());
-
-	private static final long SHUTDOWN_DELAY = 200;
 	private final NisPeerNetworkHost host;
 	private final CommonStarter starter;
+	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 
 	@Autowired(required = true)
 	public LocalController(
 			final NisPeerNetworkHost host,
-			final CommonStarter starter) {
+			final CommonStarter starter, BlockChainLastBlockLayer blockChainLastBlockLayer) {
 		this.host = host;
 		this.starter = starter;
+		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
 	}
 
 	/**
 	 * Stops the current NIS server. Afterwards it has to be started via WebStart again.
-	 * TODO-CR: we should refactor since this is similar (the same as whats in NIS);
 	 */
 	@ClientApi
 	@RequestMapping(value = "/shutdown", method = RequestMethod.GET)
 	public void shutdown() {
-		LOGGER.info(String.format("Async shut-down initiated in %d msec.", SHUTDOWN_DELAY));
-		final Runnable r = () -> {
-			ExceptionUtils.propagateVoid(() -> Thread.sleep(SHUTDOWN_DELAY));
-			this.starter.stopServer();
-		};
-
-		final Thread thread = new Thread(r);
-		thread.start();
+		this.starter.stopServerAsync();
 	}
 
 	/**
@@ -63,10 +52,16 @@ public class LocalController {
 	@RequestMapping(value = "/status", method = RequestMethod.GET)
 	@ClientApi
 	public NemRequestResult status() {
+
+
 		return new NemRequestResult(NemRequestResult.TYPE_STATUS, this.getStatusFromHost().getValue(), "status");
 	}
 
 	private NemStatus getStatusFromHost() {
+		if (this.blockChainLastBlockLayer.getLastDbBlock() == null) {
+			return NemStatus.LOADING;
+		}
+
 		if (!this.host.isNetworkBooted()) {
 			return this.host.isNetworkBooting() ? NemStatus.BOOTING : NemStatus.RUNNING;
 		}

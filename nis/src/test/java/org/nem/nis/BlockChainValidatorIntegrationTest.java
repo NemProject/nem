@@ -124,6 +124,8 @@ public class BlockChainValidatorIntegrationTest {
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
+	//region importance transfer
+
 	@Test
 	public void chainWithImportanceTransferToNonZeroBalanceAccountIsInvalid() {
 		// Arrange:
@@ -197,6 +199,37 @@ public class BlockChainValidatorIntegrationTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
 	}
+
+	@Test
+	public void cannotSendTransferToRemoteAccount() {
+		// Assert:
+		assertTransferIsInvalidForRemoteAccount(TransferTransaction::getRecipient);
+	}
+
+	@Test
+	public void cannotSendTransferFromRemoteAccount() {
+		// Assert:
+		assertTransferIsInvalidForRemoteAccount(VerifiableEntity::getSigner);
+	}
+
+	private static void assertTransferIsInvalidForRemoteAccount(final Function<TransferTransaction, Account> getRemoteAccount) {
+		// Assert:
+		assertChainWithSingleInvalidTransactionIsInvalid(factory -> {
+			// Arrange:
+			final Account signer = factory.createAccountWithBalance(Amount.fromNem(100));
+			final TransferTransaction transaction = createTransfer(signer, Amount.fromNem(10), Amount.fromNem(2));
+
+			// - make the transaction signer a remote account
+			final int mode = ImportanceTransferTransaction.Mode.Activate.value();
+			factory.accountStateCache.findStateByAddress(getRemoteAccount.apply(transaction).getAddress())
+					.getRemoteLinks()
+					.addLink(new RemoteLink(Utils.generateRandomAddress(), BlockHeight.ONE, mode, RemoteLink.Owner.RemoteHarvester));
+
+			return transaction;
+		}, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
+	}
+
+	//endregion
 
 	@Test
 	public void chainIsInvalidIfTransactionHashAlreadyExistInHashCache() {
@@ -581,9 +614,9 @@ public class BlockChainValidatorIntegrationTest {
 		return prepareTransaction(transaction);
 	}
 
-	private static Transaction createTransfer(final Account signer, final Amount amount, final Amount fee) {
+	private static TransferTransaction createTransfer(final Account signer, final Amount amount, final Amount fee) {
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
-		final Transaction transaction = new TransferTransaction(currentTime, signer, Utils.generateRandomAccount(), amount, null);
+		final TransferTransaction transaction = new TransferTransaction(currentTime, signer, Utils.generateRandomAccount(), amount, null);
 		transaction.setFee(fee);
 		return prepareTransaction(transaction);
 	}

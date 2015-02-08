@@ -2,18 +2,13 @@ package org.nem.nis.dao;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;
-import org.nem.deploy.appconfig.NisAppConfig;
-import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.*;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.util.Properties;
-import java.util.function.Predicate;
 
 @Configuration
 @ComponentScan(basePackages = "org.nem.nis.dao", excludeFilters = {
@@ -40,35 +35,7 @@ public class TestConf {
 	@Bean
 	@DependsOn("flyway")
 	public SessionFactory sessionFactory() throws IOException {
-		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
-		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
-
-		// TODO 20150127 J-G: can you add a list of the db classes somewhere, so we don't have to repeat them everywhere
-		// > (in all of the test configs too i mean)
-		// > you can add a simple registry or whatever
-		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
-
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSend.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigReceive.class);
-		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
-		}
-
-		return localSessionFactoryBuilder.buildSessionFactory();
-	}
-
-	private Properties getDbProperties(final Predicate<String> filter) throws IOException {
-		final Properties dbProperties = new Properties();
-		final Properties properties = new Properties();
-		dbProperties.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
-		dbProperties.stringPropertyNames().stream()
-				.filter(filter)
-				.forEach(entry -> properties.setProperty(entry, dbProperties.getProperty(entry)));
-
-		return properties;
+		return SessionFactoryLoader.load(this.dataSource());
 	}
 
 	@Bean

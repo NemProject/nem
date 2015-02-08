@@ -27,6 +27,8 @@ public class BlockScorerTest {
 			(byte)0xC7, (byte)0xC6, (byte)0xC5, (byte)0xC4, (byte)0xC3, (byte)0xC2, (byte)0xC1, (byte)0xC0
 	};
 
+	//region calculateHit
+
 	@Test
 	public void hitIsCalculatedCorrectly() {
 		// Arrange:
@@ -40,6 +42,10 @@ public class BlockScorerTest {
 		// Assert:
 		Assert.assertThat(hit, IsEqual.equalTo(new BigInteger("20A80E8435E74", 16)));
 	}
+
+	//endregion
+
+	//region calculateTarget
 
 	@Test
 	public void targetIsZeroWhenBalanceIsZero() throws NoSuchFieldException, IllegalAccessException {
@@ -137,6 +143,8 @@ public class BlockScorerTest {
 		Assert.assertTrue(target1.compareTo(target2) < 0);
 	}
 
+	//endregion
+
 	//region calculateHarvesterBalance
 
 	@Test
@@ -185,6 +193,26 @@ public class BlockScorerTest {
 
 	//endregion
 
+	//region calculateBlockScore
+
+	@Test
+	public void blockScoreIsCalculatedCorrectly() throws Exception {
+		// Arrange:
+		final BlockScorer scorer = createScorer();
+		final Block parent = createBlock(Utils.generateRandomAccount(), 5567320, 97);
+		final Block current = createBlock(Utils.generateRandomAccount(), 5568532, 98);
+		current.setDifficulty(new BlockDifficulty(44_888_000_000_000L));
+
+		// Act:
+		final long score = scorer.calculateBlockScore(parent, current);
+
+		// Assert:
+		final long expectedScore = 44_888_000_000_000L - (5568532 - 5567320);
+		Assert.assertThat(score, IsEqual.equalTo(expectedScore));
+	}
+
+	//endregion
+
 	private static Block roundTripBlock(final AccountLookup accountLookup, final Block block) throws NoSuchFieldException, IllegalAccessException {
 		final VerifiableEntity.DeserializationOptions options = VerifiableEntity.DeserializationOptions.VERIFIABLE;
 
@@ -198,7 +226,6 @@ public class BlockScorerTest {
 		field = b.getClass().getDeclaredField("prevBlockHash");
 		field.setAccessible(true);
 		field.set(b, block.getPreviousBlockHash());
-
 		return b;
 	}
 

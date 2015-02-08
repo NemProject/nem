@@ -10,7 +10,6 @@ import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.*;
-import org.nem.nis.dbmodel.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
 import org.nem.nis.poi.*;
@@ -22,13 +21,12 @@ import org.nem.peer.connect.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate4.*;
+import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.function.Predicate;
 
 @Configuration
 @ComponentScan(
@@ -49,9 +47,6 @@ public class NisAppConfig {
 
 	@Autowired
 	private TransferDao transferDao;
-
-	@Autowired
-	private ImportanceTransferDao importanceTransferDao;
 
 	private static final int MAX_AUDIT_HISTORY_SIZE = 50;
 
@@ -102,31 +97,7 @@ public class NisAppConfig {
 	@Bean
 	@DependsOn("flyway")
 	public SessionFactory sessionFactory() throws IOException {
-		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(this.dataSource());
-		localSessionFactoryBuilder.addProperties(this.getDbProperties(entry -> entry.startsWith("hibernate")));
-		localSessionFactoryBuilder.addAnnotatedClasses(DbAccount.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbBlock.class);
-
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigModification.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSignatureTransaction.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigSend.class);
-		localSessionFactoryBuilder.addAnnotatedClasses(DbMultisigReceive.class);
-		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			localSessionFactoryBuilder.addAnnotatedClasses(entry.dbModelClass);
-		}
-
-		return localSessionFactoryBuilder.buildSessionFactory();
-	}
-
-	private Properties getDbProperties(final Predicate<String> filter) throws IOException {
-		final Properties dbProperties = new Properties();
-		final Properties properties = new Properties();
-		dbProperties.load(NisAppConfig.class.getClassLoader().getResourceAsStream("db.properties"));
-		dbProperties.stringPropertyNames().stream()
-				.filter(filter)
-				.forEach(entry -> properties.setProperty(entry, dbProperties.getProperty(entry)));
-
-		return properties;
+		return SessionFactoryLoader.load(this.dataSource());
 	}
 
 	@Bean

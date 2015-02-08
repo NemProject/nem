@@ -11,6 +11,19 @@ public class NodeMetaData implements SerializableEntity {
 	private final String platform;
 	private final String application;
 	private final NodeVersion version;
+	private final int featuresBitmask;
+
+	/**
+	 * Creates a new node meta data.
+	 *
+	 * @param platform The platform.
+	 * @param application The application.
+	 */
+	public NodeMetaData(
+			final String platform,
+			final String application) {
+		this(platform, application, null, 0);
+	}
 
 	/**
 	 * Creates a new node meta data.
@@ -18,14 +31,17 @@ public class NodeMetaData implements SerializableEntity {
 	 * @param platform The platform.
 	 * @param application The application.
 	 * @param version The version.
+	 * @param featuresBitmask A bitmask of enabled node features.
 	 */
 	public NodeMetaData(
 			final String platform,
 			final String application,
-			final NodeVersion version) {
+			final NodeVersion version,
+			final int featuresBitmask) {
 		this.platform = platform;
 		this.application = application;
 		this.version = null == version ? NodeVersion.ZERO : version;
+		this.featuresBitmask = featuresBitmask;
 	}
 
 	/**
@@ -37,6 +53,9 @@ public class NodeMetaData implements SerializableEntity {
 		this.version = NodeVersion.readFrom(deserializer, "version");
 		this.platform = deserializer.readOptionalString("platform");
 		this.application = deserializer.readOptionalString("application");
+		// TODO 20150207 J-J: should make this required in next release
+		final Integer bitmask = deserializer.readOptionalInt("features");
+		this.featuresBitmask = null == bitmask ? 0 : bitmask;
 	}
 
 	/**
@@ -66,11 +85,21 @@ public class NodeMetaData implements SerializableEntity {
 		return this.version;
 	}
 
+	/**
+	 * Gets the bitmask of enabled features.
+	 *
+	 * @return The bitmask of enabled features.
+	 */
+	public int getFeaturesBitmask() {
+		return this.featuresBitmask;
+	}
+
 	@Override
 	public void serialize(final Serializer serializer) {
 		NodeVersion.writeTo(serializer, "version", this.version);
 		serializer.writeString("platform", this.platform);
 		serializer.writeString("application", this.application);
+		serializer.writeInt("features", this.featuresBitmask);
 	}
 
 	@Override
@@ -92,7 +121,8 @@ public class NodeMetaData implements SerializableEntity {
 		return new Object[] {
 				this.platform,
 				this.application,
-				this.version
+				this.version,
+				this.featuresBitmask
 		};
 	}
 }

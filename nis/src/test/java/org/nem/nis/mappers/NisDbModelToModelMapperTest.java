@@ -4,7 +4,7 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
-import org.nem.core.test.IsEquivalent;
+import org.nem.core.test.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -32,14 +32,14 @@ public class NisDbModelToModelMapperTest {
 		final TestContext context = new TestContext();
 		final DbTransferTransaction dbTransferTransaction = new DbTransferTransaction();
 		final TransferTransaction transfer = Mockito.mock(TransferTransaction.class);
-		Mockito.when(context.mapper.map(dbTransferTransaction, TransferTransaction.class)).thenReturn(transfer);
+		Mockito.when(context.mapper.map(dbTransferTransaction, Transaction.class)).thenReturn(transfer);
 
 		// Act:
 		final Transaction result = context.nisMapper.map(dbTransferTransaction);
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(transfer));
-		Mockito.verify(context.mapper, Mockito.only()).map(dbTransferTransaction, TransferTransaction.class);
+		Mockito.verify(context.mapper, Mockito.only()).map(dbTransferTransaction, Transaction.class);
 	}
 
 	@Test
@@ -116,6 +116,7 @@ public class NisDbModelToModelMapperTest {
 			final List<TModel> transfers = new ArrayList<>();
 			for (int i = 0; i < num; ++i) {
 				final TDbModel dbTransfer = createDbModel.get();
+				dbTransfer.setSenderProof(Utils.generateRandomSignature().getBytes());
 				dbTransfers.add(dbTransfer);
 
 				final TModel transfer = Mockito.mock(modelClass);

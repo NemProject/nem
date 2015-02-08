@@ -70,7 +70,7 @@ public class LocalNodeDeserializerTest {
 		final Node node = new LocalNodeDeserializer().deserialize(builder.getDeserializer());
 
 		// Assert:
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, application, null)));
+		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, application)));
 	}
 
 	private static class TestDeserializerBuilder {

@@ -38,7 +38,7 @@ public class AccountInfoFactoryTest {
 	}
 
 	@Test
-	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSet() {
+	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSetButVestedBalanceIsNotSet() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
@@ -47,11 +47,11 @@ public class AccountInfoFactoryTest {
 		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		assertAccountInfo(info, context.address, 0.796);
+		assertAccountInfo(info, context.address, 0.796, 0);
 	}
 
 	@Test
-	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsUnset() {
+	public void factoryReturnsAppropriateInfoWhenNeitherAccountImportanceNorVestedBalanceIsSet() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -59,13 +59,28 @@ public class AccountInfoFactoryTest {
 		final AccountInfo info = context.factory.createInfo(context.address);
 
 		// Assert:
-		assertAccountInfo(info, context.address, 0.0);
+		assertAccountInfo(info, context.address, 0.0, 0);
 	}
 
-	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance) {
+	@Test
+	public void factoryReturnsAppropriateInfoWhenBothAccountImportanceAndVestedBalanceAreSet() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
+		context.accountState.getWeightedBalances().addFullyVested(new BlockHeight(123), new Amount(727));
+
+		// Act:
+		final AccountInfo info = context.factory.createInfo(context.address);
+
+		// Assert:
+		assertAccountInfo(info, context.address, 0.796, 727);
+	}
+
+	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance, final long expectedVestedBalance) {
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
+		Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(expectedVestedBalance)));
 		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));

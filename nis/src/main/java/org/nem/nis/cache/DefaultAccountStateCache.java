@@ -14,15 +14,10 @@ import java.util.function.Function;
  */
 public class DefaultAccountStateCache implements ExtendedAccountStateCache<DefaultAccountStateCache> {
 	private final Map<Address, AccountState> addressToStateMap = new ConcurrentHashMap<>();
-	private final StateFinder stateFinder = new StateFinder(
-			this.addressToStateMap,
-			address -> new AccountState(address));
-	// TODO 20141215 J-B: not sure what the best default action is; return a temporary state or throw an exception?
-	// TODO 20141222 BR -> J: I think i lost the overview over this cache stuff. We now have 14 interface and 12 classes implementing it.
-	// > I need to go through every findStateByAddress usage to decide if it is ok to throw if the address is unknown. At least in the past
-	// > there were places which relied on the cache to (secretly) create a new object.
-	// TODO 20141223 J-B: 'there were places which relied on the cache to (secretly) create a new object.' -
-	// > this is now happening automatically on all "writable" caches (so NisCache.copy() returns a writable copy that has auto-cache mode turned on)
+
+	// the default behavior is to return a new (non-cached) AccountState so that validators can inspect
+	// account states of all other accounts in a transaction (even if the other accounts are unknown)
+	private final StateFinder stateFinder = new StateFinder(this.addressToStateMap, AccountState::new);
 
 	@Override
 	public AccountState findStateByAddress(final Address address) {
@@ -97,7 +92,7 @@ public class DefaultAccountStateCache implements ExtendedAccountStateCache<Defau
 
 		public AccountState findStateByAddress(final Address address) {
 			if (!address.isValid()) {
-				throw new MissingResourceException("invalid address: ", Address.class.getName(), address.toString());
+				throw new MissingResourceException("invalid address", Address.class.getName(), address.toString());
 			}
 
 			final AccountState state = this.addressToStateMap.getOrDefault(address, null);

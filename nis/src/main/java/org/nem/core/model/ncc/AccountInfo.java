@@ -12,6 +12,7 @@ public class AccountInfo implements SerializableEntity {
 	private final Address address;
 	private final KeyPair keyPair;
 	private final Amount balance;
+	private final Amount vestedBalance;
 	private final BlockAmount numHarvestedBlocks;
 	private final String label;
 
@@ -22,6 +23,7 @@ public class AccountInfo implements SerializableEntity {
 	 *
 	 * @param address The address.
 	 * @param balance The balance.
+	 * @param vestedBalance The vested balance.
 	 * @param numHarvestedBlocks The number of harvested blocks.
 	 * @param label The label.
 	 * @param importance The importance.
@@ -29,12 +31,14 @@ public class AccountInfo implements SerializableEntity {
 	public AccountInfo(
 			final Address address,
 			final Amount balance,
+			final Amount vestedBalance,
 			final BlockAmount numHarvestedBlocks,
 			final String label,
 			final double importance) {
 		this.address = address;
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = balance;
+		this.vestedBalance = vestedBalance;
 		this.numHarvestedBlocks = numHarvestedBlocks;
 		this.label = label;
 		this.importance = importance;
@@ -49,6 +53,7 @@ public class AccountInfo implements SerializableEntity {
 		this.address = deserializeAddress(deserializer);
 		this.keyPair = null == this.address.getPublicKey() ? null : new KeyPair(this.address.getPublicKey());
 		this.balance = Amount.readFrom(deserializer, "balance");
+		this.vestedBalance = Amount.readFrom(deserializer, "vestedBalance");
 		this.numHarvestedBlocks = BlockAmount.readFrom(deserializer, "harvestedBlocks");
 		this.label = deserializer.readOptionalString("label");
 		this.importance = deserializer.readDouble("importance");
@@ -88,6 +93,15 @@ public class AccountInfo implements SerializableEntity {
 	}
 
 	/**
+	 * Gets the account's vested balance.
+	 *
+	 * @return This account's vested balance.
+	 */
+	public Amount getVestedBalance() {
+		return this.vestedBalance;
+	}
+
+	/**
 	 * Gets number of harvested blocks.
 	 *
 	 * @return Number of blocks harvested by this account.
@@ -120,6 +134,7 @@ public class AccountInfo implements SerializableEntity {
 		Address.writeTo(serializer, "publicKey", this.getAddress(), AddressEncoding.PUBLIC_KEY);
 
 		Amount.writeTo(serializer, "balance", this.getBalance());
+		Amount.writeTo(serializer, "vestedBalance", this.getVestedBalance());
 		BlockAmount.writeTo(serializer, "harvestedBlocks", this.getNumHarvestedBlocks());
 		serializer.writeString("label", this.getLabel());
 

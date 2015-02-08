@@ -204,7 +204,7 @@ public class ChainServicesTest {
 			return new Node(
 					new WeakNodeIdentity(name),
 					new NodeEndpoint("http", "10.10.10.12", 1234),
-					new NodeMetaData("platform", "FooBar", NodeVersion.ZERO));
+					new NodeMetaData("platform", "FooBar"));
 		}
 
 		public SerializableList<Node> createNodes() {

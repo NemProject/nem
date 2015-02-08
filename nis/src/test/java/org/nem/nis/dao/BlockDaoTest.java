@@ -122,7 +122,7 @@ public class BlockDaoTest {
 
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(0));
 		Assert.assertThat(entity.getBlockMultisigTransactions().size(), equalTo(1));
@@ -156,7 +156,7 @@ public class BlockDaoTest {
 		// Assert:
 		Assert.assertThat(entity.getId(), notNullValue());
 		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(2));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(1));
 		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());

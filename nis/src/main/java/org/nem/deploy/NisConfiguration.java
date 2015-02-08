@@ -2,8 +2,9 @@ package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.deploy.*;
+import org.nem.core.node.NodeFeature;
 
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Class responsible for holding all NIS configuration settings.
@@ -21,6 +22,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final int maxTransactions;
 	private final String[] additionalLocalIps;
 	private final int transactionHashRetentionTime;
+	private final NodeFeature[] optionalFeatures;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -65,6 +67,10 @@ public class NisConfiguration extends CommonConfiguration {
 		this.maxTransactions = properties.getOptionalInteger("nis.maxTransactions", 10000);
 		this.transactionHashRetentionTime = properties.getOptionalInteger("nis.transactionHashRetentionTime", 36);
 		this.additionalLocalIps = properties.getOptionalStringArray("nis.additionalLocalIps", "");
+
+		this.optionalFeatures = Arrays.stream(properties.getOptionalStringArray("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP"))
+				.map(s -> NodeFeature.fromString(s))
+				.toArray(size -> new NodeFeature[size]);
 	}
 
 	/**
@@ -166,5 +172,14 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public String[] getAdditionalLocalIps() {
 		return this.additionalLocalIps;
+	}
+
+	/**
+	 * Gets the optional node features.
+	 *
+	 * @return The optional features.
+	 */
+	public NodeFeature[] getOptionalFeatures() {
+		return this.optionalFeatures;
 	}
 }
