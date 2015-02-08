@@ -22,6 +22,7 @@ public class BlockChainLastBlockLayer {
 	private final NisModelToDbModelMapper mapper;
 
 	private DbBlock lastBlock;
+	private DbBlock currentBlock;
 
 	@Autowired(required = true)
 	public BlockChainLastBlockLayer(final BlockDao blockDao, final NisModelToDbModelMapper mapper) {
@@ -37,6 +38,12 @@ public class BlockChainLastBlockLayer {
 	public DbBlock getLastDbBlock() {
 		return this.lastBlock;
 	}
+
+
+	public DbBlock getCurrentDbBlock() {
+		return this.currentBlock;
+	}
+	public void setCurrentBlock(final DbBlock block) { this.currentBlock = block; }
 
 	/**
 	 * Returns height of last block in the db.

@@ -73,19 +73,23 @@ public class NisMain {
 		this.populateDb();
 
 		// analyze the blocks
-		this.analyzeBlocks();
 
-		final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
-		final String autoBootName = this.nisConfiguration.getAutoBootName();
-		if (null == autoBootKey) {
-			LOGGER.info("auto-boot is off");
-			return;
-		}
+		final Thread thread = new Thread(() -> {
+			this.analyzeBlocks();
 
-		final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey), autoBootName);
-		LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
-		this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
-		LOGGER.warning("auto-booted!");
+			final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
+			final String autoBootName = this.nisConfiguration.getAutoBootName();
+			if (null == autoBootKey) {
+				LOGGER.info("auto-boot is off");
+				return;
+			}
+
+			final NodeIdentity autoBootNodeIdentity = new NodeIdentity(new KeyPair(autoBootKey), autoBootName);
+			LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
+			this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
+			LOGGER.warning("auto-booted!");
+		});
+		thread.start();
 	}
 
 	private void logNemesisInformation() {
