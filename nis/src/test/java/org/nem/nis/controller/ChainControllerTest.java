@@ -155,13 +155,13 @@ public class ChainControllerTest {
 	@Test
 	public void chainHeightReturnsCurrentBlockHeightWhenLastBlockHeightIsNotAvailable() {
 		// Assert:
-		assertChainHeight(null, 111L, new BlockHeight(111));
+		assertChainHeight(111L, null, new BlockHeight(111));
 	}
 
 	@Test
 	public void chainHeightReturnsLastBlockHeightWhenLastBlockHeightIsAvailable() {
 		// Assert:
-		assertChainHeight(222L, 111L, new BlockHeight(222));
+		assertChainHeight(111L, 222L, new BlockHeight(222));
 	}
 
 	private static void assertChainHeight(
@@ -176,7 +176,7 @@ public class ChainControllerTest {
 			Mockito.when(context.blockChainLastBlockLayer.getCurrentDbBlock()).thenReturn(currentBlock);
 		}
 		if (null != lastHeight) {
-			Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(lastHeight);
+			context.setLastBlockHeight(lastHeight);
 		}
 
 		// Act:
@@ -222,7 +222,7 @@ public class ChainControllerTest {
 			final Function<TestContext, T> action,
 			final Function<T, BlockHeight> getChainHeight) {
 		// Arrange:
-		Mockito.when(context.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(1234L);
+		context.setLastBlockHeight(1234L);
 
 		// Act:
 		final T result = action.apply(context);
@@ -371,7 +371,7 @@ public class ChainControllerTest {
 		private final NisPeerNetworkHost host;
 		private final ChainController controller;
 
-		private TestContext() {
+		public TestContext() {
 			this.network = Mockito.mock(PeerNetwork.class);
 			Mockito.when(this.network.getLocalNode()).thenReturn(NodeUtils.createNodeWithName("l"));
 
@@ -384,6 +384,13 @@ public class ChainControllerTest {
 					this.blockChainScoreManager,
 					this.host,
 					MapperUtils.createDbModelToModelNisMapper(this.accountLookup));
+		}
+
+		public void setLastBlockHeight(final long height) {
+			final DbBlock lastBlock = new DbBlock();
+			lastBlock.setHeight(height);
+			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(lastBlock);
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(height);
 		}
 	}
 }
