@@ -38,7 +38,7 @@ public class AccountInfoFactoryTest {
 	}
 
 	@Test
-	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSet() {
+	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSetButVestedBalanceIsNotSet() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
@@ -51,7 +51,7 @@ public class AccountInfoFactoryTest {
 	}
 
 	@Test
-	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsUnset() {
+	public void factoryReturnsAppropriateInfoWhenNeitherAccountImportanceNorVestedBalanceIsSet() {
 		// Arrange:
 		final TestContext context = new TestContext();
 
@@ -63,7 +63,7 @@ public class AccountInfoFactoryTest {
 	}
 
 	@Test
-	public void factoryReturnsAppropriateInfoWhenAccountImportanceIsSetAndVestedBalanceIsSet() {
+	public void factoryReturnsAppropriateInfoWhenBothAccountImportanceAndVestedBalanceAreSet() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.accountState.getImportanceInfo().setImportance(new BlockHeight(123), 0.796);
@@ -76,11 +76,11 @@ public class AccountInfoFactoryTest {
 		assertAccountInfo(info, context.address, 0.796, 727);
 	}
 
-	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance, long vestedBalance) {
+	private static void assertAccountInfo(final AccountInfo info, final Address address, final double expectedImportance, long expectedVestedBalance) {
 		Assert.assertThat(info.getAddress(), IsEqual.equalTo(address));
 		Assert.assertThat(info.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 		Assert.assertThat(info.getBalance(), IsEqual.equalTo(Amount.fromMicroNem(747)));
-		Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(vestedBalance)));
+		Assert.assertThat(info.getVestedBalance(), IsEqual.equalTo(Amount.fromMicroNem(expectedVestedBalance)));
 		Assert.assertThat(info.getNumHarvestedBlocks(), IsEqual.equalTo(new BlockAmount(3)));
 		Assert.assertThat(info.getLabel(), IsEqual.equalTo("alpha gamma"));
 		Assert.assertThat(info.getImportance(), IsEqual.equalTo(expectedImportance));

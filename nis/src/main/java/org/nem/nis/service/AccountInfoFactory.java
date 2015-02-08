@@ -46,8 +46,7 @@ public class AccountInfoFactory {
 		return new AccountInfo(
 				account.getAddress(),
 				accountInfo.getBalance(),
-				// TODO 20150207 G-J,B: should be ok to pass ai.height, right?
-				ai.isSet() && accountState.getWeightedBalances().size() > 0 ? accountState.getWeightedBalances().getVested(ai.getHeight()) : Amount.ZERO,
+				ai.isSet() ? accountState.getWeightedBalances().getVested(ai.getHeight()) : Amount.ZERO,
 				accountInfo.getHarvestedBlocks(),
 				accountInfo.getLabel(),
 				!ai.isSet() ? 0.0 : ai.getImportance(ai.getHeight()));
