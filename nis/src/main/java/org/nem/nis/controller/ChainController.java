@@ -158,6 +158,7 @@ public class ChainController {
 			 final DbBlock block = this.blockChainLastBlockLayer.getCurrentDbBlock();
 			return new BlockHeight(block == null ? 1 :block.getHeight());
 		}
+
 		return new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
 	}
 

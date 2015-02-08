@@ -18,7 +18,8 @@ public class BlockChainLastBlockLayerTest {
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 
 		// Assert:
-		Assert.assertNull(lastBlockLayer.getLastDbBlock());
+		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
+		Assert.assertThat(lastBlockLayer.getCurrentDbBlock(), IsNull.nullValue());
 	}
 
 	@Test
@@ -32,6 +33,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		Assert.assertThat(lastBlockLayer.getCurrentDbBlock(), IsNull.nullValue());
 	}
 
 	@Test
@@ -56,6 +58,22 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsEqual.equalTo(blockDaoLastBlock));
+		Assert.assertThat(context.lastBlockLayer.getCurrentDbBlock(), IsNull.nullValue());
+	}
+
+	@Test
+	public void setCurrentBlockOnlySetsCurrentBlock() {
+		// Arrange:
+		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
+		final DbBlock block = createDbBlock(1);
+
+		// Act:
+		lastBlockLayer.setCurrentBlock(block);
+
+		// Assert:
+		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
+		Assert.assertThat(lastBlockLayer.getCurrentDbBlock(), IsSame.sameInstance(block));
+
 	}
 
 	private static org.nem.core.model.Block createBlock(final Account harvester) {

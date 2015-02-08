@@ -9,6 +9,7 @@ import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
 import org.nem.nis.NisPeerNetworkHost;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.PeerNetwork;
 
@@ -120,6 +121,19 @@ public class LocalControllerTest {
 		assertStatus(result, NemStatus.NO_REMOTE_NIS_AVAILABLE);
 	}
 
+	@Test
+	public void statusReturnsStatusLoadingWhenLastBlockIsNotAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		Mockito.when(context.lastBlockLayer.getLastDbBlock()).thenReturn(null);
+
+		// Act:
+		final NemRequestResult result = context.controller.status();
+
+		// Assert:
+		assertStatus(result, NemStatus.LOADING);
+	}
+
 	private static void assertStatus(final NemRequestResult result, final NemStatus expectedStatus) {
 		// Assert:
 		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_STATUS));
@@ -143,6 +157,8 @@ public class LocalControllerTest {
 			final NodeCollection nodes = new NodeCollection();
 			nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
 			Mockito.when(this.network.getNodes()).thenReturn(nodes);
+
+			Mockito.when(this.lastBlockLayer.getLastDbBlock()).thenReturn(new DbBlock());
 		}
 	}
 }

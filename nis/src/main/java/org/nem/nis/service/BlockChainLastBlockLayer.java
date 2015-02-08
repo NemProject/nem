@@ -39,10 +39,23 @@ public class BlockChainLastBlockLayer {
 		return this.lastBlock;
 	}
 
+	// TODO 20150208 J-G: might make sense to add an isLastDbBlockAvailable
 
+	/**
+	 * Gets the current block being analyzed.
+	 * TODO 20150208 J-G: might make sense to rename this since we have 'current' and 'last'
+	 *
+	 * @return The current block being analyzed.
+	 */
 	public DbBlock getCurrentDbBlock() {
 		return this.currentBlock;
 	}
+
+	/**
+	 * Sets the current block being analyzed.
+	 *
+	 * @param block The current block being analyzed.
+	 */
 	public void setCurrentBlock(final DbBlock block) { this.currentBlock = block; }
 
 	/**

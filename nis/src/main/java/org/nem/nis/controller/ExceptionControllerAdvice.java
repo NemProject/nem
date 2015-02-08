@@ -2,6 +2,7 @@ package org.nem.nis.controller;
 
 import org.nem.core.connect.ErrorResponse;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.controller.interceptors.UnauthorizedAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -60,6 +61,17 @@ public class ExceptionControllerAdvice {
 	@ExceptionHandler(UnauthorizedAccessException.class)
 	public ResponseEntity<ErrorResponse> handleUnauthorizedAccessException(final Exception e) {
 		return this.createResponse(e, HttpStatus.UNAUTHORIZED);
+	}
+
+	/**
+	 * Handler for NIS illegal state exceptions.
+	 *
+	 * @param e The exception.
+	 * @return The appropriate JSON indicating an error.
+	 */
+	@ExceptionHandler(NisIllegalStateException.class)
+	public ResponseEntity<ErrorResponse> handleNisIllegalStateException(final NisIllegalStateException e) {
+		return this.createResponse(e, HttpStatus.SERVICE_UNAVAILABLE);
 	}
 
 	/**

@@ -45,7 +45,7 @@ public enum NemStatus {
 	NO_REMOTE_NIS_AVAILABLE(7),
 
 	/**
-	 *
+	 * NIS is currently loading the block chain.
 	 */
 	LOADING(8);
 

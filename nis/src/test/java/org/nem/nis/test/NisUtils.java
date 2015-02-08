@@ -1,10 +1,13 @@
 package org.nem.nis.test;
 
+import org.hamcrest.core.IsEqual;
+import org.junit.Assert;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
+import org.nem.core.test.*;
 import org.nem.core.time.*;
+import org.nem.nis.NisIllegalStateException;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.nem.nis.poi.*;
@@ -14,6 +17,7 @@ import org.nem.nis.state.AccountLink;
 import org.nem.nis.validators.*;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Static class containing NIS test helper functions.
@@ -352,6 +356,25 @@ public class NisUtils {
 	 */
 	public static BlockNotificationContext createBlockNotificationContext(final BlockHeight height, final NotificationTrigger trigger) {
 		return new BlockNotificationContext(height, new TimeInstant(987), trigger);
+	}
+
+	//endregion
+
+	//region exception utils
+
+	/**
+	 * Asserts that the execution of consumer throws a NisIllegalStateException with the specified reason.
+	 *
+	 * @param consumer The consumer.
+	 * @param reason The expected reason.
+	 */
+	public static void assertThrowsNisIllegalStateException(
+			final Consumer<Void> consumer,
+			final NisIllegalStateException.Reason reason) {
+		ExceptionAssert.assertThrows(
+				consumer,
+				NisIllegalStateException.class,
+				ex -> Assert.assertThat(ex.getReason(), IsEqual.equalTo(reason)));
 	}
 
 	//endregion
