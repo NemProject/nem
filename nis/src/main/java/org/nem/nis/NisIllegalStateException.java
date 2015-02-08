@@ -18,7 +18,12 @@ public class NisIllegalStateException extends RuntimeException {
 		/**
 		 * The operation could not be performed because NIS is loading its block chain.
 		 */
-		NIS_ILLEGAL_STATE_LOADING_CHAIN
+		NIS_ILLEGAL_STATE_LOADING_CHAIN,
+
+		/**
+		 * The operation could not be performed because NIS has already been booted.
+		 */
+		NIS_ILLEGAL_STATE_ALREADY_BOOTED
 	}
 
 	/**

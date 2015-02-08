@@ -1,6 +1,7 @@
 package org.nem.nis.boot;
 
 import org.nem.deploy.IpDetectionMode;
+import org.nem.nis.NisIllegalStateException;
 import org.nem.peer.*;
 import org.nem.peer.services.PeerNetworkServicesFactory;
 
@@ -58,7 +59,7 @@ public class PeerNetworkBootstrapper {
 	 */
 	public CompletableFuture<PeerNetwork> boot() {
 		if (!this.canBoot.compareAndSet(true, false)) {
-			throw new IllegalStateException("network boot was already attempted");
+			throw new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_ALREADY_BOOTED);
 		}
 
 		final CompletableFuture<Boolean> future = IpDetectionMode.Disabled == this.ipDetectionMode
