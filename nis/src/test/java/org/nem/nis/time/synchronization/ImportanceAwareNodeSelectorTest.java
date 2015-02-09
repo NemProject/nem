@@ -182,13 +182,35 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 		// Assert:
 		// assert that it took the shortcut
-		// TODO 20150209 J-B: if you're going to use is equivalent, you can compare against context.nodes (also in other test)
 		// TODO 20150209 J-B: can you come up with a better test for the new behavior?
 		// > i think you had a scenario in mind that was failing with the old code, can you add a more direct test case for that?
+		// TODO 20150209 BR -> J: see test below.
 		Mockito.verify(random, Mockito.never()).nextDouble();
 		Assert.assertThat(
 				nodes,
-				IsEquivalent.equivalentTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
+				IsEquivalent.equivalentTo(context.nodes));
+	}
+
+	@Test
+	public void selectNodesReturnsCorrectNodesIfReturnedRandomNumbersAreVeryHighAndNonCandidatesAreAtTheEndOfTheArray() {
+		// Arrange:
+		final Random random = Mockito.mock(Random.class);
+		Mockito.when(random.nextDouble()).thenReturn(0.9);
+		final TestContext context = new TestContext(
+				2,
+				new ColumnVector(0.2, 0.2, 0.2, 0.2, 0.2),
+				new ColumnVector(0.2, 0.2, 0.2, 0.00001, 0.00001),
+				new ColumnVector(10, 10, 10, 10, 10),
+				random);
+
+		// Act:
+		final List<Node> nodes = context.selector.selectNodes();
+
+		// Assert:
+		// the old algorithm would have returned no nodes because 0.2 + 0.2 + 0.2 < 0.9 and thus it would have skipped all good candidates.
+		Assert.assertThat(
+				nodes,
+				IsEqual.equalTo(Arrays.asList(context.nodes[2], context.nodes[1])));
 	}
 
 	@Test

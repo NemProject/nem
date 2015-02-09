@@ -180,7 +180,7 @@ public abstract class NodeSelectorTest {
 		Mockito.verify(random, Mockito.never()).nextDouble();
 		Assert.assertThat(
 				nodes,
-				IsEquivalent.equivalentTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
+				IsEquivalent.equivalentTo(Arrays.asList(context.nodes)));
 	}
 
 	private class TestContext {

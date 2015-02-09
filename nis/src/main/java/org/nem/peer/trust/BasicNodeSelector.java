@@ -78,13 +78,12 @@ public class BasicNodeSelector implements NodeSelector {
 			double sum = 0;
 			final double rand = this.random.nextDouble() * remainingTrust;
 			for (int i = 0; i < pairs.size(); ++i) {
-				// skip nodes with zero trust and those that have already been used
-				// TODO 20150209 J-B: we probably don't need the 0 == trust check here anymore
-				final double trust = pairs.get(i).trust;
-				if (0 == trust || usedNodes[i]) {
+				// skip nodes that have already been used
+				if (usedNodes[i]) {
 					continue;
 				}
 
+				final double trust = pairs.get(i).trust;
 				sum += trust;
 				if (sum < rand) {
 					continue;
@@ -103,16 +102,15 @@ public class BasicNodeSelector implements NodeSelector {
 	}
 
 	private List<NodeTrustPair> filterNodes(final Node[] nodes, final ColumnVector trustVector) {
-		// TODO 20150209 J-B: why not filter out 0 == trust nodes here (since presumably we want all selectors to do that)
-		// > then you can remove that check from the isCandidate implementations
 		return IntStream.range(0, nodes.length)
+				.filter(i -> 0.0 != trustVector.getAt(i))
 				.filter(i -> isCandidate(nodes[i], trustVector.getAt(i)))
 				.mapToObj(i -> new NodeTrustPair(nodes[i], trustVector.getAt(i)))
 				.collect(Collectors.toList());
 	}
 
 	protected boolean isCandidate(final Node node, final double trust) {
-		return 0.0 != trust;
+		return true;
 	}
 
 	private static class NodeTrustPair {
