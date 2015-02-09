@@ -21,6 +21,7 @@ public interface BlockDao extends ReadOnlyBlockDao {
 	/**
 	 * Saves all blocks in the database, along with associated transactions, signers, etc.
 	 * TODO 20141206 J-G: we should use this
+	 * TODO 20150209 BR -> J: we used it in the multisig integration test but for me it was slower than saving the blocks one by one.
 	 *
 	 * @param blocks Blocks to save.
 	 */
