@@ -2,6 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -84,6 +85,7 @@ public class DefaultMapperFactory implements MapperFactory {
 			entry.addDbModelToModelMappers(accountLookup, mappingRepository);
 		}
 
+		mappingRepository.addMapping(DbBlock.class, ExplorerBlockViewModel.class, new BlockDbModelToExplorerViewModelMapping(mappingRepository));
 		return mappingRepository;
 	}
 }

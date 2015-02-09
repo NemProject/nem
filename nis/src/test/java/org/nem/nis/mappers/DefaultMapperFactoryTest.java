@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
+import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -73,7 +74,7 @@ public class DefaultMapperFactoryTest {
 
 		// Assert:
 		Assert.assertThat(mapper, IsNull.notNullValue());
-		Assert.assertThat(mapper.size(), IsEqual.equalTo(otherEntries.size() + transactionEntries.size() * 2));
+		Assert.assertThat(mapper.size(), IsEqual.equalTo(1 + otherEntries.size() + transactionEntries.size() * 2));
 
 		for (final Entry<?, ?> entry : otherEntries) {
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
@@ -83,5 +84,7 @@ public class DefaultMapperFactoryTest {
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, entry.modelClass), IsEqual.equalTo(true));
 			Assert.assertThat(mapper.isSupported(entry.dbModelClass, Transaction.class), IsEqual.equalTo(true));
 		}
+
+		Assert.assertThat(mapper.isSupported(DbBlock.class, ExplorerBlockViewModel.class), IsEqual.equalTo(true));
 	}
 }
