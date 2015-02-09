@@ -104,12 +104,12 @@ public class BasicNodeSelector implements NodeSelector {
 	private List<NodeTrustPair> filterNodes(final Node[] nodes, final ColumnVector trustVector) {
 		return IntStream.range(0, nodes.length)
 				.filter(i -> 0.0 != trustVector.getAt(i))
-				.filter(i -> isCandidate(nodes[i], trustVector.getAt(i)))
+				.filter(i -> isCandidate(nodes[i]))
 				.mapToObj(i -> new NodeTrustPair(nodes[i], trustVector.getAt(i)))
 				.collect(Collectors.toList());
 	}
 
-	protected boolean isCandidate(final Node node, final double trust) {
+	protected boolean isCandidate(final Node node) {
 		return true;
 	}
 
