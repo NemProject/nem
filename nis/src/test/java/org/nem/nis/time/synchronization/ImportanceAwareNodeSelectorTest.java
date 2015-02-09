@@ -182,6 +182,9 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 
 		// Assert:
 		// assert that it took the shortcut
+		// TODO 20150209 J-B: if you're going to use is equivalent, you can compare against context.nodes (also in other test)
+		// TODO 20150209 J-B: can you come up with a better test for the new behavior?
+		// > i think you had a scenario in mind that was failing with the old code, can you add a more direct test case for that?
 		Mockito.verify(random, Mockito.never()).nextDouble();
 		Assert.assertThat(
 				nodes,
