@@ -227,8 +227,6 @@ public class BlockDaoImpl implements BlockDao {
 		final String queryString = "((SELECT b.* FROM blocks b WHERE height<:height AND harvesterId=:accountId limit :limit) UNION " +
 				"(SELECT b.* FROM blocks b WHERE height<:height AND harvestedInName=:accountId limit :limit)) " +
 				"ORDER BY height DESC limit :limit";
-		// TODO 20150108 J-B: any reason you're using String.format instead of setting parameters on the query?
-		// TODO 20150209 BR -> J: no special reason.
 		final Query query = this.getCurrentSession()
 				.createSQLQuery(queryString)
 				.addEntity(DbBlock.class)
