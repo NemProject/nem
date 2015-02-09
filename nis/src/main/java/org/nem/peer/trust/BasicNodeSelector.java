@@ -5,6 +5,7 @@ import org.nem.core.node.Node;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * A basic node selector implementation.
@@ -61,26 +62,25 @@ public class BasicNodeSelector implements NodeSelector {
 	}
 
 	private List<Node> selectNodes(final int maxNodes) {
-		final Node[] nodes = this.context.getNodes();
-		final boolean[] usedNodes = new boolean[nodes.length];
+		final List<NodeTrustPair> pairs = this.filterNodes(this.context.getNodes(), this.trustVector);
+		if (maxNodes >= pairs.size()) {
+			return pairs.stream().map(p -> p.node).collect(Collectors.toList());
+		}
+
+		final boolean[] usedNodes = new boolean[pairs.size()];
 		final List<Node> partnerNodes = new ArrayList<>();
 
 		int numSelectedNodes;
-		double remainingTrust = 1.0;
+		double remainingTrust = pairs.stream().map(p -> p.trust).reduce(0.0, Double::sum);
 		do {
 			numSelectedNodes = partnerNodes.size();
 
 			double sum = 0;
 			final double rand = this.random.nextDouble() * remainingTrust;
-			for (int i = 0; i < nodes.length; ++i) {
+			for (int i = 0; i < pairs.size(); ++i) {
 				// skip nodes with zero trust and those that have already been used
-				final double trust = this.trustVector.getAt(i);
+				final double trust = pairs.get(i).trust;
 				if (0 == trust || usedNodes[i]) {
-					continue;
-				}
-
-				if (!this.isCandidate(nodes[i])) {
-					sum += trust;
 					continue;
 				}
 
@@ -91,7 +91,7 @@ public class BasicNodeSelector implements NodeSelector {
 
 				usedNodes[i] = true;
 				remainingTrust -= trust;
-				partnerNodes.add(nodes[i]);
+				partnerNodes.add(pairs.get(i).node);
 				break;
 			}
 
@@ -101,7 +101,24 @@ public class BasicNodeSelector implements NodeSelector {
 		return partnerNodes;
 	}
 
-	protected boolean isCandidate(final Node node) {
-		return true;
+	protected List<NodeTrustPair> filterNodes(final Node[] nodes, final ColumnVector trustVector) {
+		return IntStream.range(0, nodes.length)
+				.filter(i -> isCandidate(nodes[i], trustVector.getAt(i)))
+				.mapToObj(i -> new NodeTrustPair(nodes[i], trustVector.getAt(i)))
+				.collect(Collectors.toList());
+	}
+
+	protected boolean isCandidate(final Node node, final double trust) {
+		return 0.0 != trust;
+	}
+
+	protected class NodeTrustPair {
+		protected final Node node;
+		protected final double trust;
+
+		public NodeTrustPair(final Node node, final double trust) {
+			this.node = node;
+			this.trust = trust;
+		}
 	}
 }

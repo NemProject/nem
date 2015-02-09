@@ -7,6 +7,7 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
+import org.nem.core.test.IsEquivalent;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.state.*;
@@ -180,9 +181,11 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
+		// assert that it took the shortcut
+		Mockito.verify(random, Mockito.never()).nextDouble();
 		Assert.assertThat(
 				nodes,
-				IsEqual.equalTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
+				IsEquivalent.equivalentTo(Arrays.asList(context.nodes[0], context.nodes[2], context.nodes[1], context.nodes[3])));
 	}
 
 	@Test
