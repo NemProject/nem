@@ -1,6 +1,7 @@
 package org.nem.nis.validators;
 
 import org.nem.core.model.*;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 
 /**
@@ -25,6 +26,10 @@ public class RemoteNonOperationalValidator implements SingleTransactionValidator
 	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
 		if (this.isRemote(transaction.getSigner())) {
 			return ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE;
+		}
+
+		if (BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK > context.getBlockHeight().getRaw()) {
+			return ValidationResult.SUCCESS;
 		}
 
 		if (TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType()) {
