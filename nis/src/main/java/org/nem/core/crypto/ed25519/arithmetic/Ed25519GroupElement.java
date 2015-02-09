@@ -408,7 +408,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * <br>
 	 * r = (X'' : Y'' : Z'') where
 	 * X'' = X' * T' = ((X + Y)^2 - Y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
-	 * Y'' = Y' * Z' = (Y^2 + X^2) * (2 * Z^2 - (y^2 - X^2))
+	 * Y'' = Y' * Z' = (Y^2 + X^2) * (y^2 - X^2)
 	 * Z'' = Z' * T' = (y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
 	 * <br>
 	 * Formula for the P^2 coordinate system is in agreement with the formula given in [4] page 12 (with a = -1)
