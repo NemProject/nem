@@ -8,6 +8,7 @@ public class KeyPair {
 	/**
 	 * Creates a random key pair.
 	 * TODO 20141229 J-J: not sure if we should remove KeyPair.random since it is the same as this constructor
+	 * TODO 20150209 BR -> J: i deleted it since it was not used anywhere.
 	 */
 	public KeyPair() {
 		final KeyGenerator generator = CryptoEngines.defaultEngine().createKeyGenerator();
@@ -65,13 +66,6 @@ public class KeyPair {
 		if (!engine.createKeyAnalyzer().isKeyCompressed(this.publicKey)) {
 			throw new IllegalArgumentException("publicKey must be in compressed form");
 		}
-	}
-
-	/**
-	 * Creates a random key pair.
-	 */
-	public static KeyPair random() {
-		return random(CryptoEngines.defaultEngine());
 	}
 
 	/**

@@ -407,12 +407,12 @@ public class Ed25519GroupElement implements Serializable {
 	 * r converted from P x P to P^2 coordinate system:
 	 * <br>
 	 * r = (X'' : Y'' : Z'') where
-	 * X'' = X' * Z' = ((X + Y)^2 - Y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
-	 * Y'' = Y' * T' = (Y^2 + X^2) * (2 * Z^2 - (y^2 - X^2))
+	 * X'' = X' * T' = ((X + Y)^2 - Y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
+	 * Y'' = Y' * Z' = (Y^2 + X^2) * (2 * Z^2 - (y^2 - X^2))
 	 * Z'' = Z' * T' = (y^2 - X^2) * (2 * Z^2 - (y^2 - X^2))
 	 * <br>
 	 * Formula for the P^2 coordinate system is in agreement with the formula given in [4] page 12 (with a = -1)
-	 * up to a common factor -1 which does not matter:
+	 * (up to a common factor -1 which does not matter):
 	 * <br>
 	 * B = (X + Y)^2; C = X^2; D = Y^2; E = -C = -X^2; F := E + D = Y^2 - X^2; H = Z^2; J = F − 2 * H;
 	 * X3 = (B − C − D) · J = X' * (-T');
@@ -458,8 +458,8 @@ public class Ed25519GroupElement implements Serializable {
 	 * Z' = 2 * Z1 + T1 * g.Z = 2 * Z1 + T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 + 2 * d * T1 * T2) * 1/Z2
 	 * T' = 2 * Z1 - T1 * g.Z = 2 * Z1 - T1 * 2 * d * X2 * Y2 * 1/Z2^2 = (2 * Z1 * Z2 - 2 * d * T1 * T2) * 1/Z2
 	 * <br>
-	 * TODO-CR BR: Formula for the P x P coordinate system is in agreement with the formula given in
-	 * TODO-CR BR: file ge25519.c method add_p1p1() in ref implementation.
+	 * Formula for the P x P coordinate system is in agreement with the formula given in
+	 * file ge25519.c method add_p1p1() in ref implementation.
 	 * Setting A = (Y1 - X1) * (Y2 - X2), B = (Y1 + X1) * (Y2 + X2), C = 2 * d * T1 * T2, D = 2 * Z1 * Z2 we get
 	 * X' = (B - A) * 1/Z2
 	 * Y' = (B + A) * 1/Z2
@@ -469,14 +469,13 @@ public class Ed25519GroupElement implements Serializable {
 	 * r converted from P x P to P^2 coordinate system:
 	 * <br>
 	 * r = (X'' : Y'' : Z'' : T'') where
-	 * X'' = X' * Z' = (B - A) * (D + C) * 1/Z2^2
-	 * Y'' = Y' * T' = (B + A) * (D - C) * 1/Z2^2
+	 * X'' = X' * T' = (B - A) * (D - C) * 1/Z2^2
+	 * Y'' = Y' * Z' = (B + A) * (D + C) * 1/Z2^2
 	 * Z'' = Z' * T' = (D + C) * (D - C) * 1/Z2^2
 	 * T'' = X' * Y' = (B - A) * (B + A) * 1/Z2^2
 	 * <br>
-	 * TODO-CR BR: Formula above for the P^2 coordinate system is not in agreement with the formula given in [2] page 6
-	 * TODO-CR BR: (the common factor 1/Z2^2 does not matter)
-	 * TODO-CR BR: where is my mistake?
+	 * Formula above for the P^2 coordinate system is in agreement with the formula given in [2] page 6
+	 * (the common factor 1/Z2^2 does not matter)
 	 * E = B - A, F = D - C, G = D + C, H = B + A
 	 * X3 = E * F = (B - A) * (D - C);
 	 * Y3 = G * H = (D + C) * (B + A);
@@ -562,7 +561,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * Z' = (D + C)
 	 * T' = (D - C)
 	 * <br>
-	 * Same result as in madd() (up to a common factor which does not matter).
+	 * Same result as in precomputedAdd() (up to a common factor which does not matter).
 	 *
 	 * @param g The group element to add.
 	 * @return The result in the P x P coordinate system.
@@ -630,7 +629,7 @@ public class Ed25519GroupElement implements Serializable {
 
 	/**
 	 * Negates this group element by subtracting it from the neutral group element.
-	 * TODO-CR BR: why not simply negate the coordinates X and T?
+	 * (only used in MathUtils so it doesn't have to be fast)
 	 *
 	 * @return The negative of this group element.
 	 */
@@ -821,7 +820,7 @@ public class Ed25519GroupElement implements Serializable {
 	 * @param encoded The encoded field element.
 	 * @return The byte array r in the above described form.
 	 */
-	static byte[] slide(final Ed25519EncodedFieldElement encoded) {
+	private static byte[] slide(final Ed25519EncodedFieldElement encoded) {
 		final byte[] a = encoded.getRaw();
 		final byte[] r = new byte[256];
 
