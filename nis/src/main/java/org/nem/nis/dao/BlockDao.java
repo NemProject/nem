@@ -20,7 +20,6 @@ public interface BlockDao extends ReadOnlyBlockDao {
 
 	/**
 	 * Saves all blocks in the database, along with associated transactions, signers, etc.
-	 * TODO 20141206 J-G: we should use this
 	 *
 	 * @param blocks Blocks to save.
 	 */
