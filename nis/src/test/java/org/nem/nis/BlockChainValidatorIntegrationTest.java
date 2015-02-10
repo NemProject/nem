@@ -85,7 +85,7 @@ public class BlockChainValidatorIntegrationTest {
 		// Arrange:
 		final BlockChainValidatorFactory factory = createValidatorFactory();
 		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
