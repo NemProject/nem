@@ -1,7 +1,8 @@
 package org.nem.nis.dao;
 
 import org.hamcrest.core.IsEqual;
-import org.hibernate.LazyInitializationException;
+import org.hibernate.*;
+import org.hibernate.type.LongType;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.nem.core.crypto.*;
@@ -19,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.persistence.Entity;
+import java.lang.InstantiationException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -38,6 +40,9 @@ public class BlockDaoTest {
 
 	@Autowired
 	BlockDao blockDao;
+
+	@Autowired
+	SessionFactory sessionFactory;
 
 	//region save
 	@Test
@@ -497,6 +502,47 @@ public class BlockDaoTest {
 		Assert.assertThat(dbTransferTransaction2, nullValue());
 		Assert.assertThat(dbTransferTransaction3, nullValue());
 	}
+
+	@Test
+	public void deleteBlockRemovesEntriesFromAuxiliaryTables() {
+		// !!!
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
+		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
+
+		// Arrange:
+		final Account issuer = Utils.generateRandomAccount();
+		final Account multisig = Utils.generateRandomAccount();
+		final Account cosignatory = Utils.generateRandomAccount();
+		final Account recipient = Utils.generateRandomAccount();
+		final AccountDaoLookup accountDaoLookup = this.prepareMapping(issuer, multisig, cosignatory, recipient);
+		final org.nem.core.model.Block block = this.createTestEmptyBlock(issuer, 678, 0);
+		block.addTransaction(this.prepareMultisigTransferTransaction(issuer, multisig, cosignatory, recipient));
+		block.sign();
+		final DbBlock dbBlock = MapperUtils.toDbModel(block, accountDaoLookup);
+		this.blockDao.save(dbBlock);
+		Assert.assertThat(this.getScanCount("MultisigSends") > 0, IsEqual.equalTo(true));
+		Assert.assertThat(this.getScanCount("MultisigReceives") > 0, IsEqual.equalTo(true));
+
+		// Act:
+		this.blockDao.deleteBlocksAfterHeight(block.getHeight().prev());
+
+		// Assert:
+		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
+		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
+	}
+
+	private long getScanCount(final String tableName) {
+		final Session session = this.sessionFactory.openSession();
+		final Long count = (Long)session.createSQLQuery("SELECT COUNT(*) as count FROM " + tableName)
+				.addScalar("count", LongType.INSTANCE)
+				.uniqueResult();
+		session.flush();
+		session.clear();
+		session.close();
+		return count;
+	}
+
 	//endregion
 
 	//region getters
