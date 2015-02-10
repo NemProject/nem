@@ -7,6 +7,8 @@ import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.PoiOptions;
+import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
+import org.nem.nis.validators.unconfirmed.BatchUniqueHashTransactionValidator;
 
 import java.util.*;
 import java.util.function.Function;

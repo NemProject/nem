@@ -12,6 +12,8 @@ import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.validators.transaction.*;
+import org.nem.nis.validators.unconfirmed.TransactionDeadlineValidator;
 
 import java.security.SecureRandom;
 import java.util.*;

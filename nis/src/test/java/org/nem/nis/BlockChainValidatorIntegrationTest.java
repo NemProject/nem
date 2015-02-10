@@ -15,6 +15,7 @@ import org.nem.nis.state.*;
 import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.validators.transaction.*;
 
 import java.math.BigInteger;
 import java.util.*;
