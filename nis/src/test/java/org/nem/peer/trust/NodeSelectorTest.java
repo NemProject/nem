@@ -176,11 +176,12 @@ public abstract class NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		// assert that it took the shortcut
-		Mockito.verify(random, Mockito.never()).nextDouble();
 		Assert.assertThat(
 				nodes,
-				IsEquivalent.equivalentTo(Arrays.asList(context.nodes)));
+				IsEqual.equalTo(Arrays.asList(context.nodes)));
+
+		// - assert that it took the shortcut
+		Mockito.verify(random, Mockito.never()).nextDouble();
 	}
 
 	private class TestContext {

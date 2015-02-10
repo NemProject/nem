@@ -34,7 +34,7 @@ public class ImportanceAwareNodeSelector extends BasicNodeSelector {
 	}
 
 	@Override
-	protected boolean isCandidate(final Node node, final double trust) {
+	protected boolean isCandidate(final Node node) {
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(node.getIdentity().getAddress());
 		final ReadOnlyAccountImportance importanceInfo = accountState.getImportanceInfo();
 		if (!this.poiFacade.getLastPoiRecalculationHeight().equals(importanceInfo.getHeight())) {

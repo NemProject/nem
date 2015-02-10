@@ -181,14 +181,12 @@ public class ImportanceAwareNodeSelectorTest extends NodeSelectorTest {
 		final List<Node> nodes = context.selector.selectNodes();
 
 		// Assert:
-		// assert that it took the shortcut
-		// TODO 20150209 J-B: can you come up with a better test for the new behavior?
-		// > i think you had a scenario in mind that was failing with the old code, can you add a more direct test case for that?
-		// TODO 20150209 BR -> J: see test below.
-		Mockito.verify(random, Mockito.never()).nextDouble();
 		Assert.assertThat(
 				nodes,
-				IsEquivalent.equivalentTo(context.nodes));
+				IsEqual.equalTo(Arrays.asList(context.nodes)));
+
+		// - assert that it took the shortcut
+		Mockito.verify(random, Mockito.never()).nextDouble();
 	}
 
 	@Test

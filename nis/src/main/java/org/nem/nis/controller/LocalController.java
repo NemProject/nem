@@ -19,7 +19,7 @@ public class LocalController {
 	public LocalController(
 			final NisPeerNetworkHost host,
 			final CommonStarter starter,
-			BlockChainLastBlockLayer blockChainLastBlockLayer) {
+			final BlockChainLastBlockLayer blockChainLastBlockLayer) {
 		this.host = host;
 		this.starter = starter;
 		this.blockChainLastBlockLayer = blockChainLastBlockLayer;
