@@ -1,6 +1,8 @@
 package org.nem.nis.validators;
 
+import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
+import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.PoiOptions;
 
@@ -86,12 +88,15 @@ public class TransactionValidatorFactory {
 			final ReadOnlyAccountStateCache accountStateCache,
 			final boolean includeAllValidators) {
 		visitor.accept(new UniversalTransactionValidator());
-		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
+		visitor.accept(new TransactionNonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new NemesisSinkValidator());
 
 		visitor.accept(new TransferTransactionValidator());
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
-		visitor.accept(new RemoteNonOperationalValidator(accountStateCache));
+		visitor.accept(
+				new BlockHeightSingleTransactionValidatorDecorator(
+						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),
+						new RemoteNonOperationalValidator(accountStateCache)));
 
 		visitor.accept(new MultisigNonOperationalValidator(accountStateCache));
 		visitor.accept(new MultisigTransactionSignerValidator(accountStateCache));

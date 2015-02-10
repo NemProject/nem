@@ -5,9 +5,10 @@ import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
 
 /**
- * BlockValidator and TransactionValidator implementation that ensures entities are not too far in the future.
+ * Base class for validators that:
+ * - validates entities are not too far in the future
  */
-public class NonFutureEntityValidator implements BlockValidator, SingleTransactionValidator {
+public abstract class NonFutureEntityValidator {
 	private final TimeProvider timeProvider;
 
 	/**
@@ -19,19 +20,15 @@ public class NonFutureEntityValidator implements BlockValidator, SingleTransacti
 		this.timeProvider = timeProvider;
 	}
 
-	@Override
-	public ValidationResult validate(final Block block) {
-		return this.validateTimeStamp(block.getTimeStamp());
-	}
-
-	@Override
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		return this.validateTimeStamp(transaction.getTimeStamp());
-	}
-
-	private ValidationResult validateTimeStamp(final TimeInstant timeInstant) {
+	/**
+	 * Validates the specified time stamp.
+	 *
+	 * @param timeStamp The time stamp.
+	 * @return The validation result.
+	 */
+	protected ValidationResult validateTimeStamp(final TimeInstant timeStamp) {
 		final TimeInstant currentTime = this.timeProvider.getCurrentTime();
-		return timeInstant.compareTo(currentTime.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0
+		return timeStamp.compareTo(currentTime.addSeconds(BlockChainConstants.MAX_ALLOWED_SECONDS_AHEAD_OF_TIME)) > 0
 				? ValidationResult.FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE
 				: ValidationResult.SUCCESS;
 	}

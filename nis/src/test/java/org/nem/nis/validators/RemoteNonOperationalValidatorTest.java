@@ -9,14 +9,12 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.test.DebitPredicates;
 
 @RunWith(Enclosed.class)
 public class RemoteNonOperationalValidatorTest {
-	private static final long BETA_REMOTE_VALIDATION_FORK = BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK;
 
 	private static abstract class DefaultTransactionValidationTest {
 
@@ -76,49 +74,6 @@ public class RemoteNonOperationalValidatorTest {
 			// Act:
 			context.assertValidationResult(transaction, ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
 		}
-
-		//region beta fork
-
-		@Test
-		public void transferContainingRemoteAccountAsOtherIsValidBeforeForkHeight() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
-
-			// Act:
-			context.assertValidationResult(
-					transaction,
-					new BlockHeight(BETA_REMOTE_VALIDATION_FORK - 1),
-					ValidationResult.SUCCESS);
-		}
-
-		@Test
-		public void transferContainingRemoteAccountAsOtherIsNotValidAtForkHeight() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
-
-			// Act:
-			context.assertValidationResult(
-					transaction,
-					new BlockHeight(BETA_REMOTE_VALIDATION_FORK),
-					ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
-		}
-
-		@Test
-		public void transferContainingRemoteAccountAsOtherIsNotValidAfterForkHeight() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			final Transaction transaction = this.createTransfer(context.otherAccount1, context.remoteAccount);
-
-			// Act:
-			context.assertValidationResult(
-					transaction,
-					new BlockHeight(BETA_REMOTE_VALIDATION_FORK),
-					ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_REMOTE);
-		}
-
-		//endregion
 
 		@Override
 		protected Transaction createTransfer(final Account signer, final Account other) {
@@ -189,15 +144,11 @@ public class RemoteNonOperationalValidatorTest {
 		}
 
 		public void assertValidationResult(final Transaction transaction, final ValidationResult expectedResult) {
-			this.assertValidationResult(transaction, BlockHeight.MAX, expectedResult);
-		}
-
-		public void assertValidationResult(final Transaction transaction, final BlockHeight height, final ValidationResult expectedResult) {
 			// Arrange:
 			final SingleTransactionValidator validator = new RemoteNonOperationalValidator(this.accountStateCache);
 
 			// Act:
-			final ValidationResult result = validator.validate(transaction, new ValidationContext(height, DebitPredicates.Throw));
+			final ValidationResult result = validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 
 			// Assert:
 			Assert.assertThat(result, IsEqual.equalTo(expectedResult));

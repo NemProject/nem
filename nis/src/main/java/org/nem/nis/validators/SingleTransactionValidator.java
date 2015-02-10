@@ -8,6 +8,15 @@ import org.nem.core.model.*;
 public interface SingleTransactionValidator {
 
 	/**
+	 * Gets the name of the validator.
+	 *
+	 * @return The name of the validator.
+	 */
+	public default String getName() {
+		return this.getClass().getSimpleName();
+	}
+
+	/**
 	 * Checks the validity of the specified transaction.
 	 *
 	 * @param transaction The transaction.

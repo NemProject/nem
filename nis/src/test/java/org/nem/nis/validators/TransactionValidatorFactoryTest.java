@@ -73,11 +73,11 @@ public class TransactionValidatorFactoryTest {
 	@Test
 	public void createSingleAddsDesiredSingleValidators() {
 		// Arrange:
-		final List<Class<?>> expectedClasses = getCommonSingleValidators();
-		expectedClasses.add(MultisigSignaturesPresentValidator.class);
+		final List<String> expectedClasses = getCommonSingleValidators();
+		expectedClasses.add("MultisigSignaturesPresentValidator");
 
 		// Act:
-		final Collection<Class<?>> classes = getVisitedSingleSubValidators(true);
+		final Collection<String> classes = getVisitedSingleSubValidators(true);
 
 		// Assert:
 		Assert.assertThat(classes, IsEquivalent.equivalentTo(expectedClasses));
@@ -86,42 +86,42 @@ public class TransactionValidatorFactoryTest {
 	@Test
 	public void createIncompleteSingleAddsDesiredSingleValidators() {
 		// Arrange:
-		final List<Class<?>> expectedClasses = getCommonSingleValidators();
+		final List<String> expectedClasses = getCommonSingleValidators();
 
 		// Act:
-		final Collection<Class<?>> classes = getVisitedSingleSubValidators(false);
+		final Collection<String> classes = getVisitedSingleSubValidators(false);
 
 		// Assert:
 		Assert.assertThat(classes, IsEquivalent.equivalentTo(expectedClasses));
 	}
 
-	private static List<Class<?>> getCommonSingleValidators() {
-		return new ArrayList<Class<?>>() {
+	private static List<String> getCommonSingleValidators() {
+		return new ArrayList<String>() {
 			{
-				this.add(UniversalTransactionValidator.class);
-				this.add(NonFutureEntityValidator.class);
-				this.add(NemesisSinkValidator.class);
+				this.add("UniversalTransactionValidator");
+				this.add("TransactionNonFutureEntityValidator");
+				this.add("NemesisSinkValidator");
 
-				this.add(TransferTransactionValidator.class);
-				this.add(ImportanceTransferTransactionValidator.class);
-				this.add(RemoteNonOperationalValidator.class);
+				this.add("TransferTransactionValidator");
+				this.add("ImportanceTransferTransactionValidator");
+				this.add("RemoteNonOperationalValidator @ 15000");
 
-				this.add(MultisigNonOperationalValidator.class);
-				this.add(MultisigTransactionSignerValidator.class);
-				this.add(MaxCosignatoryValidator.class);
-				this.add(MultisigAggregateModificationTransactionValidator.class);
+				this.add("MultisigNonOperationalValidator");
+				this.add("MultisigTransactionSignerValidator");
+				this.add("MaxCosignatoryValidator");
+				this.add("MultisigAggregateModificationTransactionValidator");
 			}
 		};
 	}
 
-	private static Collection<Class<?>> getVisitedSingleSubValidators(final boolean includeAllValidators) {
+	private static Collection<String> getVisitedSingleSubValidators(final boolean includeAllValidators) {
 		// Arrange:
 		final TransactionValidatorFactory factory = createFactory();
 
 		// Act:
 		final List<SingleTransactionValidator> validators = new ArrayList<>();
 		factory.visitSingleSubValidators(validators::add, Mockito.mock(ReadOnlyAccountStateCache.class), includeAllValidators);
-		return validators.stream().map(Object::getClass).collect(Collectors.toList());
+		return validators.stream().map(SingleTransactionValidator::getName).collect(Collectors.toList());
 	}
 
 	@Test
