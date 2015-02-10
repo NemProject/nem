@@ -2,6 +2,7 @@ package org.nem.nis.validators;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
+import org.nem.nis.validators.block.MaxTransactionsBlockValidator;
 
 public class BlockValidatorTest {
 

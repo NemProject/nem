@@ -5,6 +5,8 @@ import org.nem.core.time.TimeProvider;
 import org.nem.nis.BlockMarkerConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.PoiOptions;
+import org.nem.nis.validators.transaction.*;
+import org.nem.nis.validators.unconfirmed.*;
 
 import java.util.function.Consumer;
 
