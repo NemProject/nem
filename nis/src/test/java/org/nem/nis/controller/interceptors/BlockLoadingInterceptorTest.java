@@ -14,14 +14,14 @@ import org.springframework.web.method.HandlerMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class LockDownInterceptorTest {
+public class BlockLoadingInterceptorTest {
 
 	//region without last block
 
 	@Test
 	public void preHandleAllowsIgnoredApiPathRequestsWithoutLastBlock() {
 		// Arrange:
-		final LockDownInterceptor interceptor = createInterceptorWithoutLastBlock();
+		final BlockLoadingInterceptor interceptor = createInterceptorWithoutLastBlock();
 
 		// Assert:
 		assertAccessGranted(interceptor, "/status");
@@ -31,7 +31,7 @@ public class LockDownInterceptorTest {
 	@Test
 	public void preHandleAllowsCaseInsensitiveIgnoredApiPathRequestsWithoutLastBlock() {
 		// Arrange:
-		final LockDownInterceptor interceptor = createInterceptorWithoutLastBlock();
+		final BlockLoadingInterceptor interceptor = createInterceptorWithoutLastBlock();
 
 		// Assert:
 		assertAccessGranted(interceptor, "/StaTus");
@@ -41,16 +41,16 @@ public class LockDownInterceptorTest {
 	@Test
 	public void preHandleBlocksNonIgnoredApiPathRequestsWithoutLastBlock() {
 		// Arrange:
-		final LockDownInterceptor interceptor = createInterceptorWithoutLastBlock();
+		final BlockLoadingInterceptor interceptor = createInterceptorWithoutLastBlock();
 
 		// Assert:
 		assertAccessDenied(interceptor, "/foobar");
 	}
 
-	private static LockDownInterceptor createInterceptorWithoutLastBlock() {
+	private static BlockLoadingInterceptor createInterceptorWithoutLastBlock() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		return new LockDownInterceptor(lastBlockLayer);
+		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
 	//endregion
@@ -60,7 +60,7 @@ public class LockDownInterceptorTest {
 	@Test
 	public void preHandleAllowsIgnoredApiPathRequestsWithLastBlock() {
 		// Arrange:
-		final LockDownInterceptor interceptor = createInterceptorWithLastBlock();
+		final BlockLoadingInterceptor interceptor = createInterceptorWithLastBlock();
 
 		// Assert:
 		assertAccessGranted(interceptor, "/status");
@@ -70,22 +70,22 @@ public class LockDownInterceptorTest {
 	@Test
 	public void preHandleAllowsNonIgnoredApiPathRequestsWithLastBlock() {
 		// Arrange:
-		final LockDownInterceptor interceptor = createInterceptorWithLastBlock();
+		final BlockLoadingInterceptor interceptor = createInterceptorWithLastBlock();
 
 		// Assert:
 		assertAccessGranted(interceptor, "/foobar");
 	}
 
-	private static LockDownInterceptor createInterceptorWithLastBlock() {
+	private static BlockLoadingInterceptor createInterceptorWithLastBlock() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		Mockito.when(lastBlockLayer.getLastDbBlock()).thenReturn(new DbBlock());
-		return new LockDownInterceptor(lastBlockLayer);
+		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
 	//endregion
 
-	private static void assertAccessGranted(final LockDownInterceptor interceptor, final String requestUri) {
+	private static void assertAccessGranted(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Act:
 		final boolean result = preHandle(interceptor, requestUri);
 
@@ -93,14 +93,14 @@ public class LockDownInterceptorTest {
 		Assert.assertThat(result, IsEqual.equalTo(true));
 	}
 
-	private static void assertAccessDenied(final LockDownInterceptor interceptor, final String requestUri) {
+	private static void assertAccessDenied(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Act / Assert:
 		NisUtils.assertThrowsNisIllegalStateException(
 				v -> preHandle(interceptor, requestUri),
 				NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_LOADING_CHAIN);
 	}
 
-	public static boolean preHandle(final LockDownInterceptor interceptor, final String requestUri) {
+	public static boolean preHandle(final BlockLoadingInterceptor interceptor, final String requestUri) {
 		// Arrange:
 		final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 		Mockito.when(request.getRequestURI()).thenReturn(requestUri);

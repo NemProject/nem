@@ -14,10 +14,9 @@ import java.util.logging.Logger;
 
 /**
  * An interceptor that prevents access to most NIS functions while the block chain is loading.
- * TODO 20150208 J-G: might want to rename this to something else like 'BlockLoadingInterceptor'
  */
-public class LockDownInterceptor extends HandlerInterceptorAdapter {
-	private static final Logger LOGGER = Logger.getLogger(LockDownInterceptor.class.getName());
+public class BlockLoadingInterceptor extends HandlerInterceptorAdapter {
+	private static final Logger LOGGER = Logger.getLogger(BlockLoadingInterceptor.class.getName());
 
 	private final BlockChainLastBlockLayer lastBlockLayer;
 	private final List<String> ignoredApiPaths = Arrays.asList("/chain/height", "/status");
@@ -28,7 +27,7 @@ public class LockDownInterceptor extends HandlerInterceptorAdapter {
 	 * @param lastBlockLayer The last block layer.
 	 */
 	@Autowired
-	public LockDownInterceptor(final BlockChainLastBlockLayer lastBlockLayer) {
+	public BlockLoadingInterceptor(final BlockChainLastBlockLayer lastBlockLayer) {
 		this.lastBlockLayer = lastBlockLayer;
 	}
 
