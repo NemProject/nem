@@ -39,7 +39,7 @@ public class BlockValidatorFactory {
 	 * @param nisCache The NIS cache.
 	 */
 	public void visitSubValidators(final Consumer<BlockValidator> visitor, final ReadOnlyNisCache nisCache) {
-		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
+		visitor.accept(new BlockNonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new TransactionDeadlineBlockValidator());
 		visitor.accept(new EligibleSignerBlockValidator(nisCache.getAccountStateCache()));
 		visitor.accept(new MaxTransactionsBlockValidator());

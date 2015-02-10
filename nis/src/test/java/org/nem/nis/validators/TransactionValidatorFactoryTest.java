@@ -99,7 +99,7 @@ public class TransactionValidatorFactoryTest {
 		return new ArrayList<String>() {
 			{
 				this.add("UniversalTransactionValidator");
-				this.add("NonFutureEntityValidator");
+				this.add("TransactionNonFutureEntityValidator");
 				this.add("NemesisSinkValidator");
 
 				this.add("TransferTransactionValidator");

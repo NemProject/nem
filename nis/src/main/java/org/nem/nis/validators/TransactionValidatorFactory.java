@@ -88,7 +88,7 @@ public class TransactionValidatorFactory {
 			final ReadOnlyAccountStateCache accountStateCache,
 			final boolean includeAllValidators) {
 		visitor.accept(new UniversalTransactionValidator());
-		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
+		visitor.accept(new TransactionNonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new NemesisSinkValidator());
 
 		visitor.accept(new TransferTransactionValidator());
