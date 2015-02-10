@@ -196,8 +196,6 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		final Collection<TransferBlockPair> pairs = new ArrayList<>();
-		// TODO 20150127 J-G: can we have a registry of sorts for this?
-		// TODO 20150210 BR -> J: yes.
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 			pairs.addAll(entry.getFromDb.apply(this, accountId, maxId, limit, transferType));
 		}
@@ -301,6 +299,7 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
+		// TODO 20150127 J-G: should we also have a registry of sorts for this?
 		final Collection<TransferBlockPair> pairs = this.getMultisigTransfersForAccount(accountId, maxId, limit, transferType);
 		pairs.addAll(this.getMultisigImportanceTransfersForAccount(accountId, maxId, limit, transferType));
 		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(accountId, maxId, limit, transferType));

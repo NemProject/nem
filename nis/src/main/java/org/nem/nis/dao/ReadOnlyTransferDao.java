@@ -48,7 +48,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final int limit);
 
 	/**
-	 * Retrieves limit Transfers from db for given account.
+	 * Retrieves limit transfers from db for given account.
 	 * These transfers can by of any type.
 	 *
 	 * @param account The account.
@@ -64,9 +64,9 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final int limit);
 
 	/**
-	 * Retrieves limit Transfers from db for given account.
+	 * Retrieves limit transfers from db for given account.
 	 *
-	 * @param accountId The account is.
+	 * @param accountId The account id.
 	 * @param maxId The id of "top-most" transfer.
 	 * @param limit The limit.
 	 * @param transferType Type of returned transfers.
@@ -77,19 +77,43 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final long maxId,
 			final int limit,
 			final TransferType transferType);
-
+	/**
+	 * Retrieves limit importance transfers from db for given account.
+	 *
+	 * @param accountId The account id.
+	 * @param maxId The id of "top-most" transfer.
+	 * @param limit The limit.
+	 * @param transferType Type of returned transfers.
+	 * @return Collection of transfer block pairs.
+	 */
 	public Collection<TransferBlockPair> getImportanceTransfersForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType);
-
+	/**
+	 * Retrieves limit multisig signer modification transfers from db for given account.
+	 *
+	 * @param accountId The account id.
+	 * @param maxId The id of "top-most" transfer.
+	 * @param limit The limit.
+	 * @param transferType Type of returned transfers.
+	 * @return Collection of transfer block pairs.
+	 */
 	public Collection<TransferBlockPair> getMultisigSignerModificationsForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType);
-
+	/**
+	 * Retrieves limit multisig transfers from db for given account.
+	 *
+	 * @param accountId The account id.
+	 * @param maxId The id of "top-most" transfer.
+	 * @param limit The limit.
+	 * @param transferType Type of returned transfers.
+	 * @return Collection of transfer block pairs.
+	 */
 	public Collection<TransferBlockPair> getMultisigTransactionsForAccount(
 			final long accountId,
 			final long maxId,

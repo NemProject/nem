@@ -49,7 +49,7 @@ public class TransactionRegistry {
 		public final Function<TDbModel, Collection<DbAccount>> getOtherAccounts;
 
 		/**
-		 * A function that will return transfer block pairs from the database
+		 * A function that will return transfer block pairs from the database.
 		 */
 		public final PentaFunction<TransferDao, Long, Long, Integer, ReadOnlyTransferDao.TransferType, Collection<TransferBlockPair>> getFromDb;
 
