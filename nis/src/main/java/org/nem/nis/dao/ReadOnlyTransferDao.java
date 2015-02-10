@@ -49,6 +49,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 
 	/**
 	 * Retrieves limit Transfers from db for given account.
+	 * These transfers can by of any type.
 	 *
 	 * @param account The account.
 	 * @param id The id of "top-most" transfer.
@@ -61,4 +62,37 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final Long id,
 			final TransferType transferType,
 			final int limit);
+
+	/**
+	 * Retrieves limit Transfers from db for given account.
+	 *
+	 * @param accountId The account is.
+	 * @param maxId The id of "top-most" transfer.
+	 * @param limit The limit.
+	 * @param transferType Type of returned transfers.
+	 * @return Collection of transfer block pairs.
+	 */
+	public Collection<TransferBlockPair> getTransfersForAccount(
+			final long accountId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType);
+
+	public Collection<TransferBlockPair> getImportanceTransfersForAccount(
+			final long accountId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType);
+
+	public Collection<TransferBlockPair> getMultisigSignerModificationsForAccount(
+			final long accountId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType);
+
+	public Collection<TransferBlockPair> getMultisigTransactionsForAccount(
+			final long accountId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType);
 }
