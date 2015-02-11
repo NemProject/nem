@@ -1351,9 +1351,7 @@ public class UnconfirmedTransactionsTest {
 		}
 
 		private TestContext(final TransferTransactionValidator singleValidator) {
-			this(
-					new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, singleValidator),
-					Mockito.mock(BatchTransactionValidator.class));
+			this(new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, singleValidator));
 		}
 
 		private TestContext(final SingleTransactionValidator singleValidator) {
