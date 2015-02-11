@@ -3,7 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.nem.core.model.*;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationContext;
 
 /**
  * A transaction validator that validates that:

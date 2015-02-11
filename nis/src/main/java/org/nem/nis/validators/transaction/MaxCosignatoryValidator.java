@@ -3,7 +3,7 @@ package org.nem.nis.validators.transaction;
 import org.nem.core.model.*;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationContext;
 
 /**
  * Single transaction validator that validates a multisig aggregate modification:

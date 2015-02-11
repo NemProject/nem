@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.messages.PlainMessage;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.core.test.*;
+import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;

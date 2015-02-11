@@ -25,7 +25,7 @@ public class BlockExplorerController {
 	@Autowired(required = true)
 	public BlockExplorerController(
 			final ReadOnlyBlockDao blockDao,
-	        final MapperFactory mapperFactory,
+			final MapperFactory mapperFactory,
 			final AccountLookup accountLookup) {
 		this.blockDao = blockDao;
 		this.mapper = mapperFactory.createDbModelToModelMapper(accountLookup);

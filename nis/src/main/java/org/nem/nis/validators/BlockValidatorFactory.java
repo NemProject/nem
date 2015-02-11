@@ -4,8 +4,6 @@ import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.validators.block.*;
 
-import java.util.function.Consumer;
-
 /**
  * Factory for creating BlockValidator objects.
  */

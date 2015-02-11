@@ -9,8 +9,6 @@ import org.nem.nis.poi.PoiOptions;
 import org.nem.nis.validators.transaction.*;
 import org.nem.nis.validators.unconfirmed.*;
 
-import java.util.function.Consumer;
-
 /**
  * Factory for creating TransactionValidator objects.
  */

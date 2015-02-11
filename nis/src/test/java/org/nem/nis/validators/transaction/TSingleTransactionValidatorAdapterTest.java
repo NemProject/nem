@@ -49,7 +49,6 @@ public class TSingleTransactionValidatorAdapterTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Mockito.verify(context.innerValidator, Mockito.never()).validate(Mockito.any(), Mockito.any());
-
 	}
 
 	private static class TestContext {

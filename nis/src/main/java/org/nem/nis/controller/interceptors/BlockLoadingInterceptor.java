@@ -1,14 +1,11 @@
 package org.nem.nis.controller.interceptors;
 
-import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.NisIllegalStateException;
-import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.util.*;
 import java.util.logging.Logger;
 

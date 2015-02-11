@@ -1,7 +1,7 @@
 package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationContext;
 
 /**
  * Interface for validating a strongly typed single transaction.

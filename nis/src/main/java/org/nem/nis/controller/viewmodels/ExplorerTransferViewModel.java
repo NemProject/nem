@@ -1,6 +1,6 @@
 package org.nem.nis.controller.viewmodels;
 
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.Transaction;
 import org.nem.core.serialization.*;
 

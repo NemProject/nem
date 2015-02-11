@@ -1,18 +1,15 @@
 package org.nem.nis.controller.interceptors;
 
 import org.hamcrest.core.IsEqual;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.utils.ExceptionUtils;
 import org.nem.nis.NisIllegalStateException;
-import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.NisUtils;
 import org.springframework.web.method.HandlerMethod;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 public class BlockLoadingInterceptorTest {
 

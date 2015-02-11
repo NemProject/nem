@@ -1,6 +1,6 @@
 package org.nem.nis.validators;
 
-import org.nem.core.model.*;
+import org.nem.core.model.ValidationResult;
 import org.nem.core.time.*;
 import org.nem.nis.BlockChainConstants;
 

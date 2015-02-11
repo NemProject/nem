@@ -4,12 +4,12 @@ import net.minidev.json.*;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.serialization.JsonSerializer;
 import org.nem.core.test.Utils;
-import org.nem.nis.controller.viewmodels.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
+import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.test.*;
 
 import java.util.*;

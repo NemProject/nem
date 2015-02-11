@@ -2,7 +2,7 @@ package org.nem.nis.mappers;
 
 import org.nem.core.model.*;
 import org.nem.nis.controller.viewmodels.*;
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbBlock;
 
 /**
  * A mapping that is able to map a db block to an explorer block view model.

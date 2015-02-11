@@ -7,7 +7,7 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationContext;
 import org.nem.nis.validators.transaction.*;
 
 import java.util.*;

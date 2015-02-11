@@ -2,7 +2,7 @@ package org.nem.nis.validators.transaction;
 
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.Amount;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationContext;
 
 /**
  * A TransferTransactionValidator implementation that applies to transfer transactions.
