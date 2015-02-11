@@ -312,7 +312,7 @@ public class AccountInfoControllerTest {
 		}
 
 		private void setRemoteStatus(final Address address, final AccountRemoteStatus accountRemoteStatus, final long blockHeight) {
-			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(blockHeight);
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(blockHeight));
 
 			final ReadOnlyRemoteLinks remoteLinks = Mockito.mock(RemoteLinks.class);
 			Mockito.when(remoteLinks.getRemoteStatus(new BlockHeight(blockHeight)))
@@ -346,7 +346,7 @@ public class AccountInfoControllerTest {
 
 		private void setUnlocked(final boolean isAccountUnlockedResult) {
 			Mockito.when(this.unlockedAccounts.isAccountUnlocked(this.address)).thenReturn(isAccountUnlockedResult);
-			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(17L);
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(17L));
 
 			// set the remote status to avoid NullPointerException
 			this.setRemoteStatus(AccountRemoteStatus.INACTIVE, 17L);

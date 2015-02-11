@@ -343,7 +343,7 @@ public class ChainControllerTest {
 			final DbBlock lastBlock = new DbBlock();
 			lastBlock.setHeight(height);
 			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(lastBlock);
-			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(height);
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(height));
 		}
 	}
 }

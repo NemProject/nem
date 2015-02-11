@@ -160,7 +160,7 @@ public class BlockChainUpdateContext {
 			final Set<Hash> transactionHashes,
 			final long wantedHeight,
 			final AccountLookup accountCache) {
-		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
+		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight().getRaw();
 
 		final NisDbModelToModelMapper mapper = this.services.createMapper(accountCache);
 		while (currentHeight != wantedHeight) {

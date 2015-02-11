@@ -84,9 +84,9 @@ public class AccountInfoController {
 	}
 
 	private AccountMetaData getMetaData(final Address address) {
-		final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
+		final BlockHeight height = this.blockChainLastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
-		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, new BlockHeight(height));
+		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, height);
 		if (this.hasPendingImportanceTransfer(address)) {
 			switch (remoteStatus) {
 				case INACTIVE:

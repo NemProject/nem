@@ -58,12 +58,11 @@ public class BlockChainLastBlockLayer {
 
 	/**
 	 * Gets the height of the last analyzed block.
-	 * TODO 20150210 J-J: change to return BlockHeight
 	 *
 	 * @return The height of last analyzed block.
 	 */
-	public Long getLastBlockHeight() {
-		return null == this.lastBlock ? 1 : this.lastBlock.getHeight();
+	public BlockHeight getLastBlockHeight() {
+		return null == this.lastBlock ? BlockHeight.ONE : new BlockHeight(this.lastBlock.getHeight());
 	}
 
 	/**

@@ -21,7 +21,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(1L));
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
 		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
@@ -36,7 +36,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(123L));
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
@@ -50,7 +50,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(1L));
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
 		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
@@ -66,7 +66,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(123L));
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
 		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
@@ -103,7 +103,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(dbBlock));
-		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(777L));
+		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
 		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
@@ -138,7 +138,7 @@ public class BlockChainLastBlockLayerTest {
 
 		// Assert:
 		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(777L));
+		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
 		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 

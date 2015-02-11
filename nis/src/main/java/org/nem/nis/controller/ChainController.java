@@ -154,7 +154,7 @@ public class ChainController {
 	@RequestMapping(value = "/chain/height", method = RequestMethod.GET)
 	@PublicApi
 	public BlockHeight chainHeight() {
-		return new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
+		return this.blockChainLastBlockLayer.getLastBlockHeight();
 	}
 
 	@RequestMapping(value = "/chain/height", method = RequestMethod.POST)
