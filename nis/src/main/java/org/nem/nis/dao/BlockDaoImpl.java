@@ -277,6 +277,20 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
+
+		// DbMultisigTransaction needs to dropped first because it has foreign key references to the other
+		// transaction tables; attempting to delete other transactions first will break referential integrity
+		this.dropTransfers(
+				blockHeight,
+				"DbMultisigTransaction",
+				"blockMultisigTransactions",
+				transactionsToDelete -> {
+					final Query preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+				});
+
 		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
 		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
 		this.dropTransfers(
@@ -286,18 +300,6 @@ public class BlockDaoImpl implements BlockDao {
 				transactionsToDelete -> {
 					final Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
-					preQuery.executeUpdate();
-				});
-
-		// must be last
-		this.dropTransfers(
-				blockHeight,
-				"DbMultisigTransaction",
-				"blockMultisigTransactions",
-				transactionsToDelete -> {
-					final Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 				});
