@@ -53,6 +53,7 @@ public class BlockChainLastBlockLayer {
 	 * Sets a value indicating that all blocks have been loaded.
 	 */
 	public void setLoaded() {
+		LOGGER.info(String.format("block loading completed; height %s", this.getLastBlockHeight()));
 		this.isLoading = false;
 	}
 
@@ -71,7 +72,10 @@ public class BlockChainLastBlockLayer {
 	 * @param curBlock The last block in the db.
 	 */
 	public void analyzeLastBlock(final DbBlock curBlock) {
-		LOGGER.info(String.format("analyzing last block: %s", curBlock.getShortId()));
+		if (!this.isLoading()) {
+			LOGGER.info(String.format("analyzing last block: %s", curBlock.getShortId()));
+		}
+
 		this.lastBlock = curBlock;
 	}
 

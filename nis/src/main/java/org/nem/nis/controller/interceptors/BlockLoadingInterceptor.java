@@ -43,7 +43,9 @@ public class BlockLoadingInterceptor extends HandlerInterceptorAdapter {
 				return true;
 			}
 
-			final String message = String.format("Can't perform any actions until db is fully loaded %s", this.lastBlockLayer.getLastBlockHeight());
+			final String message = String.format(
+					"Can't perform any actions until db is fully loaded; currently at height %s",
+					this.lastBlockLayer.getLastBlockHeight());
 			LOGGER.warning(message);
 			throw new NisIllegalStateException(NisIllegalStateException.Reason.NIS_ILLEGAL_STATE_LOADING_CHAIN);
 		}
