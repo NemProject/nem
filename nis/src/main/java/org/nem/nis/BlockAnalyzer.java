@@ -116,7 +116,7 @@ public class BlockAnalyzer {
 				this.blockChainScoreManager.updateScore(parentBlock, block);
 			}
 
-			executor.execute(block, observer);
+			//executor.execute(block, observer);
 
 			parentBlock = block;
 

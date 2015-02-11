@@ -8,6 +8,7 @@ import org.nem.nis.dbmodel.*;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -92,6 +93,11 @@ public class BlockLoader {
 				allDbModificationTransactions,
 				dbMultisigTransactions,
 				accountMap);
+		this.addTransactions(allDbTransfers, DbBlock::addTransferTransaction);
+		this.addTransactions(allDbImportanceTransfers, DbBlock::addImportanceTransferTransaction);
+		this.addTransactions(allDbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
+		this.addTransactions(dbMultisigTransactions, DbBlock::addMultisigTransaction);
+
 
 		return dbBlocks;
 	}
@@ -121,6 +127,10 @@ public class BlockLoader {
 		dbBlock.setHeight(castBigIntegerToLong((BigInteger)array[10]));
 		dbBlock.setTotalFee(castBigIntegerToLong((BigInteger)array[11]));
 		dbBlock.setDifficulty(castBigIntegerToLong((BigInteger)array[12]));
+		dbBlock.setBlockTransferTransactions(new ArrayList<>());
+		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
+		dbBlock.setBlockMultisigAggregateModificationTransactions(new ArrayList<>());
+		dbBlock.setBlockMultisigTransactions(new ArrayList<>());
 
 		return dbBlock;
 	}
@@ -464,6 +474,16 @@ public class BlockLoader {
 		allDbMultisigTransactions.stream().forEach(t -> {
 			t.setSender(accountMap.get(t.getSender().getId()));
 			t.getMultisigSignatureTransactions().stream().forEach(s -> s.setSender(accountMap.get(s.getSender().getId())));
+		});
+	}
+
+	private <TDbModel extends AbstractBlockTransfer> void addTransactions(
+			final List<TDbModel> transactions,
+			BiConsumer<DbBlock, TDbModel> transactionAdder) {
+		transactions.stream().forEach(t -> {
+			if (null != t.getSenderProof()) {
+				transactionAdder.accept(this.dbBlockMap.get(t.getBlock().getId()), t);
+			}
 		});
 	}
 }
