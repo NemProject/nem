@@ -22,7 +22,7 @@ public class MultisigSignaturesPresentValidatorTest {
 	private static void assertProperTransaction(final ValidationResult validationResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigTransferTransaction();
+		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
@@ -65,7 +65,7 @@ public class MultisigSignaturesPresentValidatorTest {
 	public void signaturesOfAllCosignatoriesAreRequired() {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigTransferTransaction();
+		final MultisigTransaction transaction = context.createMultisigTransferTransaction();
 		context.makeCosignatory(context.signer, context.multisig);
 		context.makeCosignatory(context.dummy, context.multisig);
 		context.addSignature(context.dummy, (MultisigTransaction)transaction);
@@ -190,7 +190,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// Arrange:
 		// - create a multisig transaction signed by signer that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigModificationTransaction(
+		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
 
 		context.makeCosignatory(context.signer, context.multisig);
@@ -208,7 +208,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// Arrange:
 		// - create a multisig transaction signed by signer that attempts to remove dummy
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigModificationTransaction(
+		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
 
 		context.makeCosignatory(context.signer, context.multisig);
@@ -253,7 +253,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - create a transaction to remove dummy
 		// - signer implicitly signed the transaction because it created it
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigModificationTransaction(
+		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.dummy)));
 
 		context.makeCosignatory(context.signer, context.multisig);
@@ -280,7 +280,7 @@ public class MultisigSignaturesPresentValidatorTest {
 		// - create a multisig account with a single account: signer
 		// - create a transaction to remove signer
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigModificationTransaction(
+		final MultisigTransaction transaction = context.createMultisigModificationTransaction(
 				Arrays.asList(new MultisigModification(MultisigModificationType.Del, context.signer)));
 		context.makeCosignatory(context.signer, context.multisig);
 
@@ -321,23 +321,6 @@ public class MultisigSignaturesPresentValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_MULTISIG_MODIFICATION_MULTIPLE_DELETES));
-	}
-
-	//endregion
-
-	//region other transactions
-
-	@Test
-	public void validatorCanValidateOtherTransactions() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = Mockito.mock(Transaction.class);
-
-		// Act:
-		final ValidationResult result = context.validateSignaturePresent(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion

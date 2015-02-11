@@ -32,7 +32,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	private static void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
 		transaction.setFee(Amount.fromNem(11));
 
 		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
@@ -54,7 +54,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	public void activateImportanceTransferIsValidAsFirstLink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -67,7 +67,7 @@ public class ImportanceTransferTransactionValidatorTest {
 	public void deactivateImportanceTransferIsNotValidAsFirstLink() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Deactivate);
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Deactivate);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -89,8 +89,8 @@ public class ImportanceTransferTransactionValidatorTest {
 	private static void assertActivateImportanceTransferIsInvalidWhenRecipientHasBalance(final long height, final ValidationResult validationResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
-		context.getAccountInfo(((ImportanceTransferTransaction)transaction).getRemote()).incrementBalance(Amount.fromNem(1));
+		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
+		context.getAccountInfo(transaction.getRemote()).incrementBalance(Amount.fromNem(1));
 
 		// Act:
 		final BlockHeight testedHeight = new BlockHeight(height);
@@ -325,7 +325,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		// - create another transaction around the dummy remote account set up previously
 		final Account furtherRemote = Utils.generateRandomAccount();
 		final Account remote = dummy.getRemote();
-		final Transaction transaction = new ImportanceTransferTransaction(
+		final ImportanceTransferTransaction transaction = new ImportanceTransferTransaction(
 				TimeInstant.ZERO,
 				remote,
 				ImportanceTransferTransaction.Mode.Activate,
@@ -353,7 +353,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		context.setLesseeRemoteState(dummy, TEST_HEIGHT, previous);
 
 		// - create another transaction around the dummy remote account set up previously
-		final Transaction transaction = context.createTransactionWithRemote(dummy.getRemote(), mode);
+		final ImportanceTransferTransaction transaction = context.createTransactionWithRemote(dummy.getRemote(), mode);
 
 		// Act:
 		final BlockHeight testedHeight = new BlockHeight(blockHeight.getRaw() + TEST_HEIGHT.getRaw());
@@ -361,25 +361,6 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
-	}
-
-	//endregion
-
-	//region other type
-
-	@Test
-	public void otherTransactionTypesPassValidation() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account = Utils.generateRandomAccount();
-		final MockTransaction transaction = new MockTransaction(account);
-		transaction.setFee(Amount.fromNem(200));
-
-		// Act:
-		final ValidationResult result = context.validate(transaction, BlockHeight.ONE);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
 	}
 
 	//endregion
@@ -437,15 +418,15 @@ public class ImportanceTransferTransactionValidatorTest {
 			return this.accountStateCache.findStateByAddress(account.getAddress()).getAccountInfo();
 		}
 
-		private ValidationResult validate(final Transaction transaction) {
+		private ValidationResult validate(final ImportanceTransferTransaction transaction) {
 			return this.validate(transaction, TEST_HEIGHT);
 		}
 
-		private ValidationResult validate(final Transaction transaction, final DebitPredicate debitPredicate) {
+		private ValidationResult validate(final ImportanceTransferTransaction transaction, final DebitPredicate debitPredicate) {
 			return this.validator.validate(transaction, new ValidationContext(TEST_HEIGHT, debitPredicate));
 		}
 
-		private ValidationResult validate(final Transaction transaction, final BlockHeight testHeight) {
+		private ValidationResult validate(final ImportanceTransferTransaction transaction, final BlockHeight testHeight) {
 			return this.validator.validate(transaction, new ValidationContext(testHeight, DebitPredicates.True));
 		}
 	}

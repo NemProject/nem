@@ -14,7 +14,7 @@ import java.util.HashSet;
  * - There are no duplicate add or delete modifications.
  * - A delete aggregate modification can delete at most one account.
  */
-public class MultisigAggregateModificationTransactionValidator implements SingleTransactionValidator {
+public class MultisigAggregateModificationTransactionValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
 
 	/**
@@ -27,15 +27,7 @@ public class MultisigAggregateModificationTransactionValidator implements Single
 	}
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION != transaction.getType()) {
-			return ValidationResult.SUCCESS;
-		}
-
-		return this.validate((MultisigAggregateModificationTransaction)transaction);
-	}
-
-	private ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {
+	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
 		final Address multisigAddress = transaction.getSigner().getAddress();
 
 		final HashSet<Address> accountsToAdd = new HashSet<>();

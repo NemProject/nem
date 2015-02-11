@@ -33,7 +33,7 @@ public class MultisigTransactionSignerValidatorTest {
 			final ValidationResult expectedResult) {
 		// Arrange:
 		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = context.createMultisigTransferTransaction(getMultisigSigner.apply(context));
+		final MultisigTransaction transaction = context.createMultisigTransferTransaction(getMultisigSigner.apply(context));
 		context.makeCosignatory(context.signer, context.multisig);
 
 		// Act:
@@ -42,21 +42,4 @@ public class MultisigTransactionSignerValidatorTest {
 		// Assert:
 		Assert.assertThat(result, IsEqual.equalTo(expectedResult));
 	}
-
-	//region other transactions
-
-	@Test
-	public void validatorCanValidateOtherTransactions() {
-		// Arrange:
-		final MultisigTestContext context = new MultisigTestContext();
-		final Transaction transaction = Mockito.mock(Transaction.class);
-
-		// Act:
-		final ValidationResult result = context.validateTransaction(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	//endregion
 }

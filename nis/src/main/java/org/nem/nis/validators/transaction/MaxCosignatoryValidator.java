@@ -9,7 +9,7 @@ import org.nem.nis.validators.*;
  * Single transaction validator that validates a multisig aggregate modification:
  * - will not cause a multisig account to have greater than MAX_ALLOWED_COSIGNATORIES_PER_ACCOUNT cosigners
  */
-public class MaxCosignatoryValidator implements SingleTransactionValidator {
+public class MaxCosignatoryValidator implements TSingleTransactionValidator<MultisigAggregateModificationTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
 
 	/**
@@ -22,15 +22,7 @@ public class MaxCosignatoryValidator implements SingleTransactionValidator {
 	}
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION != transaction.getType()) {
-			return ValidationResult.SUCCESS;
-		}
-
-		return this.validate((MultisigAggregateModificationTransaction)transaction);
-	}
-
-	private ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {
+	public ValidationResult validate(final MultisigAggregateModificationTransaction transaction, final ValidationContext context) {
 		final Address multisigAddress = transaction.getSigner().getAddress();
 		int numCosigners = this.stateCache.findStateByAddress(multisigAddress).getMultisigLinks().getCosignatories().size();
 

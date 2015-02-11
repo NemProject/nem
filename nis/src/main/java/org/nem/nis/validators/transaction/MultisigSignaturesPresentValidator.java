@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * <br>
  * This validator should only be used during block creation, or when receiving a block.
  */
-public class MultisigSignaturesPresentValidator implements SingleTransactionValidator {
+public class MultisigSignaturesPresentValidator implements TSingleTransactionValidator<MultisigTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
 
 	/**
@@ -30,15 +30,7 @@ public class MultisigSignaturesPresentValidator implements SingleTransactionVali
 	}
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.MULTISIG != transaction.getType()) {
-			return ValidationResult.SUCCESS;
-		}
-
-		return this.validate((MultisigTransaction)transaction);
-	}
-
-	private ValidationResult validate(final MultisigTransaction transaction) {
+	public ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
 		final ReadOnlyAccountState multisigAddress = this.stateCache.findStateByAddress(transaction.getOtherTransaction().getSigner().getAddress());
 
 		final HashSet<Address> signerAddresses = new HashSet<>();

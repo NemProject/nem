@@ -10,7 +10,7 @@ import org.nem.nis.validators.*;
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
-public class ImportanceTransferTransactionValidator implements SingleTransactionValidator {
+public class ImportanceTransferTransactionValidator implements TSingleTransactionValidator<ImportanceTransferTransaction> {
 	private final ReadOnlyAccountStateCache accountStateCache;
 	private final Amount minHarvesterBalance;
 
@@ -28,15 +28,7 @@ public class ImportanceTransferTransactionValidator implements SingleTransaction
 	}
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.IMPORTANCE_TRANSFER != transaction.getType()) {
-			return ValidationResult.SUCCESS;
-		}
-
-		return this.validate((ImportanceTransferTransaction)transaction, context);
-	}
-
-	private ValidationResult validate(final ImportanceTransferTransaction transaction, final ValidationContext context) {
+	public ValidationResult validate(final ImportanceTransferTransaction transaction, final ValidationContext context) {
 		final ValidationResult result = this.validateRemote(context.getBlockHeight(), transaction);
 		if (!result.isSuccess()) {
 			return result;

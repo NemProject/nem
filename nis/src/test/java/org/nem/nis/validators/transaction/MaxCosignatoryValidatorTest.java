@@ -40,7 +40,7 @@ public class MaxCosignatoryValidatorTest {
 	private static void assertNewMultisigAccountModificationValidation(final int numCosigners, final ValidationResult expectedResult) {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Transaction transaction = context.createModificationTransaction(numCosigners, 0);
+		final MultisigAggregateModificationTransaction transaction = context.createModificationTransaction(numCosigners, 0);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -75,7 +75,7 @@ public class MaxCosignatoryValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addNumCosigners(10);
-		final Transaction transaction = context.createModificationTransaction(numCosigners - 10, 0);
+		final MultisigAggregateModificationTransaction transaction = context.createModificationTransaction(numCosigners - 10, 0);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -116,7 +116,7 @@ public class MaxCosignatoryValidatorTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addNumCosigners(MAX_COSIGNERS);
-		final Transaction transaction = context.createModificationTransaction(numAdds, numDeletes);
+		final MultisigAggregateModificationTransaction transaction = context.createModificationTransaction(numAdds, numDeletes);
 
 		// Act:
 		final ValidationResult result = context.validate(transaction);
@@ -127,26 +127,9 @@ public class MaxCosignatoryValidatorTest {
 
 	//endregion
 
-	//region other transactions
-
-	@Test
-	public void canValidateOtherTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Transaction transaction = Mockito.mock(Transaction.class);
-
-		// Act:
-		final ValidationResult result = context.validate(transaction);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	//endregion
-
 	private static class TestContext {
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-		private final SingleTransactionValidator validator = new MaxCosignatoryValidator(this.accountStateCache);
+		private final TSingleTransactionValidator<MultisigAggregateModificationTransaction> validator = new MaxCosignatoryValidator(this.accountStateCache);
 		private final Account multisig = Utils.generateRandomAccount();
 		private final AccountState multisigAccountState = new AccountState(this.multisig.getAddress());
 
@@ -154,7 +137,7 @@ public class MaxCosignatoryValidatorTest {
 			Mockito.when(this.accountStateCache.findStateByAddress(this.multisig.getAddress())).thenReturn(multisigAccountState);
 		}
 
-		public ValidationResult validate(final Transaction transaction) {
+		public ValidationResult validate(final MultisigAggregateModificationTransaction transaction) {
 			return this.validator.validate(transaction, new ValidationContext(DebitPredicates.True));
 		}
 
@@ -164,7 +147,7 @@ public class MaxCosignatoryValidatorTest {
 			}
 		}
 
-		public Transaction createModificationTransaction(final int numAdds, final int numDeletes) {
+		public MultisigAggregateModificationTransaction createModificationTransaction(final int numAdds, final int numDeletes) {
 			final List<MultisigModification> modifications = new ArrayList<>();
 			for (int i = 0; i < numAdds; ++i) {
 				modifications.add(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount()));

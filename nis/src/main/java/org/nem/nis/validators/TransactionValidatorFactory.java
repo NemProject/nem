@@ -98,19 +98,36 @@ public class TransactionValidatorFactory {
 				new TSingleTransactionValidatorAdapter<>(
 						TransactionTypes.TRANSFER,
 						new TransferTransactionValidator()));
-		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
+		visitor.accept(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.IMPORTANCE_TRANSFER,
+						new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance())));
 		visitor.accept(
 				new BlockHeightSingleTransactionValidatorDecorator(
 						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),
 						new RemoteNonOperationalValidator(accountStateCache)));
 
 		visitor.accept(new MultisigNonOperationalValidator(accountStateCache));
-		visitor.accept(new MultisigTransactionSignerValidator(accountStateCache));
-		visitor.accept(new MultisigAggregateModificationTransactionValidator(accountStateCache));
-		visitor.accept(new MaxCosignatoryValidator(accountStateCache));
+
+		visitor.accept(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MULTISIG,
+						new MultisigTransactionSignerValidator(accountStateCache)));
+
+		visitor.accept(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+						new MultisigAggregateModificationTransactionValidator(accountStateCache)));
+		visitor.accept(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+						new MaxCosignatoryValidator(accountStateCache)));
 
 		if (includeAllValidators) {
-			visitor.accept(new MultisigSignaturesPresentValidator(accountStateCache));
+			visitor.accept(
+					new TSingleTransactionValidatorAdapter<>(
+							TransactionTypes.MULTISIG,
+							new MultisigSignaturesPresentValidator(accountStateCache)));
 		}
 	}
 

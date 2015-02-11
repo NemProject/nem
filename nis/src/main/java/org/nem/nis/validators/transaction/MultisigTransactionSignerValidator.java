@@ -9,7 +9,7 @@ import org.nem.nis.validators.*;
  * A transaction validator that validates that:
  * - A multisig signature transaction is signed by a cosigner of the multisig account.
  */
-public class MultisigTransactionSignerValidator implements SingleTransactionValidator {
+public class MultisigTransactionSignerValidator implements TSingleTransactionValidator<MultisigTransaction> {
 	private final ReadOnlyAccountStateCache stateCache;
 
 	/**
@@ -22,15 +22,7 @@ public class MultisigTransactionSignerValidator implements SingleTransactionVali
 	}
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.MULTISIG != transaction.getType()) {
-			return ValidationResult.SUCCESS;
-		}
-
-		return this.validate((MultisigTransaction)transaction);
-	}
-
-	private ValidationResult validate(final MultisigTransaction transaction) {
+	public ValidationResult validate(final MultisigTransaction transaction, final ValidationContext context) {
 		final ReadOnlyAccountState cosignerState = this.stateCache.findStateByAddress(transaction.getSigner().getAddress());
 
 		if (!cosignerState.getMultisigLinks().isCosignatoryOf(transaction.getOtherTransaction().getSigner().getAddress())) {
