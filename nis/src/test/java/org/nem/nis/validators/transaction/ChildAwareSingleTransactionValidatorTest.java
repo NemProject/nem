@@ -12,6 +12,25 @@ import java.util.*;
 
 public class ChildAwareSingleTransactionValidatorTest {
 
+	//region getName
+
+	@Test
+	public void getNameDelegatesToInnerValidator() {
+		// Arrange:
+		final SingleTransactionValidator innerValidator = Mockito.mock(SingleTransactionValidator.class);
+		final SingleTransactionValidator validator = new ChildAwareSingleTransactionValidator(innerValidator);
+		Mockito.when(innerValidator.getName()).thenReturn("inner");
+
+		// Act:
+		final String name = validator.getName();
+
+		// Assert:
+		Assert.assertThat(name, IsEqual.equalTo("inner"));
+		Mockito.verify(innerValidator, Mockito.only()).getName();
+	}
+
+	//endregion
+
 	//region transaction without child transactions
 
 	@Test
