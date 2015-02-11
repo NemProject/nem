@@ -73,7 +73,7 @@ public class NisMain {
 		this.populateDb();
 
 		// analyze the blocks
-		final Thread thread = new Thread(() -> {
+		//final Thread thread = new Thread(() -> {
 			this.analyzeBlocks();
 
 			final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
@@ -87,8 +87,8 @@ public class NisMain {
 			LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
 			this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
 			LOGGER.warning("auto-booted!");
-		});
-		thread.start();
+		//});
+		//thread.start();
 	}
 
 	private void logNemesisInformation() {

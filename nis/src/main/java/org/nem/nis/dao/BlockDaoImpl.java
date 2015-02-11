@@ -8,6 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
+import org.nem.nis.BlockLoader;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -249,6 +250,9 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		blockLoader.loadBlocks(new BlockHeight(500), new BlockHeight(600));
+
 		// whatever it takes : DO NOT ADD setMaxResults here!
 		final long blockHeight = height.getRaw();
 		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
