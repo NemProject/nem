@@ -3,152 +3,54 @@ package org.nem.nis.validators.transaction;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.*;
+import org.mockito.verification.VerificationMode;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
+import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
 import java.util.*;
 
-public class AggregateSingleTransactionValidatorBuilderTest {
+public class AggregateSingleTransactionValidatorBuilderTest extends AggregateValidatorBuilderTest<AggregateSingleTransactionValidatorBuilder, SingleTransactionValidator, Transaction> {
 
-	/**
-	 * Note that the delegation tests have a few more layers than necessary so that they
-	 * can be easily updated if an AggregateBatchTransactionValidatorBuilder is ever needed.
-	 */
+	//region AggregateValidatorBuilderTest
 
-	//region delegation
-
-	//region canAggregateOneValidator
-	@Test
-	public void canAggregateOneValidatorAndCallAsSingleValidator() {
-		// Assert:
-		assertCanAggregateOneValidator(new SingleValidationPolicy());
+	@Override
+	public AggregateSingleTransactionValidatorBuilder createBuilder() {
+		return new AggregateSingleTransactionValidatorBuilder();
 	}
 
-	private static void assertCanAggregateOneValidator(final ValidationPolicy policy) {
-		// Arrange:
-		final SingleTransactionValidator validator = createValidator(ValidationResult.FAILURE_FUTURE_DEADLINE);
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
+	@Override
+	public SingleTransactionValidator createValidator(final ValidationResult result) {
+		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
+		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
+		return validator;
+	}
 
-		// Act:
+	@Override
+	public Transaction createParam() {
+		return Mockito.mock(Transaction.class);
+	}
+
+	@Override
+	public void add(final AggregateSingleTransactionValidatorBuilder builder, final SingleTransactionValidator validator) {
 		builder.add(validator);
-		final SingleTransactionValidator aggregate = builder.build();
-		final ValidationResult result = policy.validate(aggregate);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_FUTURE_DEADLINE));
-		policy.assertCalledOnce(validator);
 	}
 
-	//endregion
-
-	//region canAggregateMultipleValidators
-
-	@Test
-	public void canAggregateMultipleValidatorsAndCallAsSingleValidator() {
-		// Assert:
-		assertCanAggregateMultipleValidators(new SingleValidationPolicy());
+	@Override
+	public SingleTransactionValidator build(final AggregateSingleTransactionValidatorBuilder builder) {
+		return builder.build();
 	}
 
-	private static void assertCanAggregateMultipleValidators(final ValidationPolicy policy) {
-		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				policy,
-				ValidationResult.SUCCESS,
-				ValidationResult.SUCCESS,
-				ValidationResult.SUCCESS);
-
-		// Act:
-		final SingleTransactionValidator aggregate = context.builder.build();
-		final ValidationResult result = policy.validate(aggregate);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
-		context.assertAllValidatorsCalledOnce();
+	@Override
+	public ValidationResult validate(final SingleTransactionValidator validator, final Transaction transaction) {
+		return validator.validate(transaction, new ValidationContext(DebitPredicates.Throw));
 	}
 
-	//endregion
-
-	//region aggregateShortCircuitsOnFirstSubValidatorFailure
-
-	@Test
-	public void aggregateShortCircuitsOnFirstSubValidatorFailureWhenCalledAsSingleValidator() {
-		// Assert:
-		assertAggregateShortCircuitsOnFirstSubValidatorFailure(new SingleValidationPolicy());
+	@Override
+	public void verifyValidate(final SingleTransactionValidator validator, final Transaction transaction, final VerificationMode verificationMode) {
+		Mockito.verify(validator, verificationMode).validate(Mockito.eq(transaction), Mockito.any());
 	}
-
-	private static void assertAggregateShortCircuitsOnFirstSubValidatorFailure(final ValidationPolicy policy) {
-		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				policy,
-				ValidationResult.SUCCESS,
-				ValidationResult.FAILURE_CHAIN_INVALID,
-				ValidationResult.SUCCESS);
-
-		// Act:
-		final SingleTransactionValidator aggregate = context.builder.build();
-		final ValidationResult result = policy.validate(aggregate);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
-		context.assertOnlyFirstTwoValidatorsCalledOnce();
-	}
-
-	//endregion
-
-	//region aggregateDoesNotShortCircuitOnFirstSubValidatorNeutralResult
-
-	@Test
-	public void aggregateDoesNotShortCircuitOnFirstSubValidatorNeutralResultWhenCalledAsSingleValidator() {
-		// Assert:
-		assertAggregateDoesNotShortCircuitOnFirstSubValidatorNeutralResult(new SingleValidationPolicy());
-	}
-
-	private static void assertAggregateDoesNotShortCircuitOnFirstSubValidatorNeutralResult(final ValidationPolicy policy) {
-		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				policy,
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
-				ValidationResult.SUCCESS);
-
-		// Act:
-		final SingleTransactionValidator aggregate = context.builder.build();
-		final ValidationResult result = policy.validate(aggregate);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.NEUTRAL));
-		context.assertAllValidatorsCalledOnce();
-	}
-
-	//endregion
-
-	//region aggregateGivesHigherPrecedenceToFailureResultThanNeutralResult
-
-	@Test
-	public void aggregateGivesHigherPrecedenceToFailureResultThanNeutralResultWhenCalledAsSingleValidator() {
-		// Assert:
-		assertAggregateGivesHigherPrecedenceToFailureResultThanNeutralResult(new SingleValidationPolicy());
-	}
-
-	private static void assertAggregateGivesHigherPrecedenceToFailureResultThanNeutralResult(final ValidationPolicy policy) {
-		// Arrange:
-		final ThreeSubValidatorTestContext context = new ThreeSubValidatorTestContext(
-				policy,
-				ValidationResult.SUCCESS,
-				ValidationResult.NEUTRAL,
-				ValidationResult.FAILURE_CHAIN_INVALID);
-
-		// Act:
-		final SingleTransactionValidator aggregate = context.builder.build();
-		final ValidationResult result = policy.validate(aggregate);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CHAIN_INVALID));
-		context.assertAllValidatorsCalledOnce();
-	}
-
-	//endregion
 
 	//endregion
 
@@ -161,7 +63,7 @@ public class AggregateSingleTransactionValidatorBuilderTest {
 		// Arrange:
 		final Transaction transaction = Mockito.mock(Transaction.class);
 		final ValidationContext validationContext = Mockito.mock(ValidationContext.class);
-		final SingleTransactionValidator validator = createValidator(ValidationResult.SUCCESS);
+		final SingleTransactionValidator validator = this.createValidator(ValidationResult.SUCCESS);
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
 
 		// Act:
@@ -211,86 +113,9 @@ public class AggregateSingleTransactionValidatorBuilderTest {
 
 	//endregion
 
-	private static SingleTransactionValidator createValidator(final ValidationResult result) {
-		final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
-		Mockito.when(validator.validate(Mockito.any(), Mockito.any())).thenReturn(result);
-		return validator;
-	}
-
 	private static BatchTransactionValidator createBatchValidator(final ValidationResult result) {
 		final BatchTransactionValidator validator = Mockito.mock(BatchTransactionValidator.class);
 		Mockito.when(validator.validate(Mockito.any())).thenReturn(result);
 		return validator;
 	}
-
-	//region ThreeSubValidatorTestContext
-
-	private static class ThreeSubValidatorTestContext {
-		private final ValidationPolicy policy;
-		private final SingleTransactionValidator validator1;
-		private final SingleTransactionValidator validator2;
-		private final SingleTransactionValidator validator3;
-		private final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-
-		private ThreeSubValidatorTestContext(
-				final ValidationPolicy policy,
-				final ValidationResult result1,
-				final ValidationResult result2,
-				final ValidationResult result3) {
-			this.policy = policy;
-			this.validator1 = createValidator(result1);
-			this.validator2 = createValidator(result2);
-			this.validator3 = createValidator(result3);
-
-			this.builder.add(this.validator1);
-			this.builder.add(this.validator2);
-			this.builder.add(this.validator3);
-		}
-
-		private void assertOnlyFirstTwoValidatorsCalledOnce() {
-			this.policy.assertCalledOnce(this.validator1);
-			this.policy.assertCalledOnce(this.validator2);
-			this.policy.assertCalledNever(this.validator3);
-		}
-
-		private void assertAllValidatorsCalledOnce() {
-			this.policy.assertCalledOnce(this.validator1);
-			this.policy.assertCalledOnce(this.validator2);
-			this.policy.assertCalledOnce(this.validator3);
-		}
-	}
-
-	//endregion
-
-	//region ValidationPolicy
-
-	private static interface ValidationPolicy {
-		public ValidationResult validate(final SingleTransactionValidator validator);
-
-		public void assertCalledOnce(final SingleTransactionValidator validator);
-
-		public void assertCalledNever(final SingleTransactionValidator validator);
-	}
-
-	private static class SingleValidationPolicy implements ValidationPolicy {
-		private final Transaction transaction = Mockito.mock(Transaction.class);
-		private final ValidationContext validationContext = Mockito.mock(ValidationContext.class);
-
-		@Override
-		public ValidationResult validate(final SingleTransactionValidator validator) {
-			return validator.validate(this.transaction, this.validationContext);
-		}
-
-		@Override
-		public void assertCalledOnce(final SingleTransactionValidator validator) {
-			Mockito.verify(validator, Mockito.only()).validate(this.transaction, this.validationContext);
-		}
-
-		@Override
-		public void assertCalledNever(final SingleTransactionValidator validator) {
-			Mockito.verify(validator, Mockito.never()).validate(this.transaction, this.validationContext);
-		}
-	}
-
-	//endregion
 }
