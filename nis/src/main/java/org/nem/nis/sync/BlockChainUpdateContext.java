@@ -150,8 +150,10 @@ public class BlockChainUpdateContext {
 		this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
 		this.peerChain.stream()
-				.filter(block -> this.blockChainLastBlockLayer.addBlockToDb(block))
-				.forEach(block -> this.unconfirmedTransactions.removeAll(block));
+				.forEach(block -> {
+					this.blockChainLastBlockLayer.addBlockToDb(block);
+					this.unconfirmedTransactions.removeAll(block);
+				});
 	}
 
 	private void addRevertedTransactionsAsUnconfirmed(

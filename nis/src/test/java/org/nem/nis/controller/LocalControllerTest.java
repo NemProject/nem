@@ -125,7 +125,7 @@ public class LocalControllerTest {
 	public void statusReturnsStatusLoadingWhenLastBlockIsNotAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.lastBlockLayer.getLastDbBlock()).thenReturn(null);
+		Mockito.when(context.lastBlockLayer.isLoading()).thenReturn(true);
 
 		// Act:
 		final NemRequestResult result = context.controller.status();
@@ -158,7 +158,7 @@ public class LocalControllerTest {
 			nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
 			Mockito.when(this.network.getNodes()).thenReturn(nodes);
 
-			Mockito.when(this.lastBlockLayer.getLastDbBlock()).thenReturn(new DbBlock());
+			Mockito.when(this.lastBlockLayer.isLoading()).thenReturn(false);
 		}
 	}
 }

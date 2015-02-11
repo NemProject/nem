@@ -50,6 +50,7 @@ public class BlockLoadingInterceptorTest {
 	private static BlockLoadingInterceptor createInterceptorWithoutLastBlock() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
+		Mockito.when(lastBlockLayer.isLoading()).thenReturn(true);
 		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
@@ -79,7 +80,7 @@ public class BlockLoadingInterceptorTest {
 	private static BlockLoadingInterceptor createInterceptorWithLastBlock() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
-		Mockito.when(lastBlockLayer.getLastDbBlock()).thenReturn(new DbBlock());
+		Mockito.when(lastBlockLayer.isLoading()).thenReturn(false);
 		return new BlockLoadingInterceptor(lastBlockLayer);
 	}
 
