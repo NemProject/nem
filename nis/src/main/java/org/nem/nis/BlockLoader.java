@@ -1,5 +1,6 @@
 package org.nem.nis;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
@@ -15,8 +16,31 @@ import java.util.stream.Collectors;
  */
 public class BlockLoader {
 	private static final Logger LOGGER = Logger.getLogger(BlockLoader.class.getName());
+	private final static String[] transfersColumns = {
+			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "recipientid",
+			"blkindex", "orderid", "amount", "referencedtransaction", "messagetype", "messagepayload" };
+	private final static String[] importanceTransfersColumns = {
+			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "remoteid",
+			"mode", "blkindex", "orderid", "referencedtransaction" };
+	private final static String[] multisigTransactionsColumns = {
+			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "blkindex", "orderid",
+			"referencedtransaction", "transferid", "importancetransferid", "multisigsignermodificationid" };
+	private final static String[] multisigSignerModificationsColumns = {
+			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "blkindex", "orderid",
+			"referencedtransaction"	};
+	private final static String[] multisigSignaturesColumns = {
+			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof"	};
+	private final static String[] multisigModificationsColumns = {
+			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
 
 	private final SessionFactory sessionFactory;
+	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
+	private final HashMap<Long, DbTransferTransaction> regularDbTransfers = new HashMap<>();
+	private final HashMap<Long, DbTransferTransaction> multisigDbTransfers = new HashMap<>();
+	private final HashMap<Long, DbImportanceTransferTransaction> regularDbImportanceTransfers = new HashMap<>();
+	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransfers = new HashMap<>();
+	private final HashMap<Long, DbMultisigAggregateModificationTransaction> regularDbModificationTransactions = new HashMap<>();
+	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactions = new HashMap<>();
 
 	/**
 	 * Creates a new block analyzer.
@@ -44,11 +68,30 @@ public class BlockLoader {
 			return new ArrayList<>();
 		}
 
-		final long minBlockId = dbBlocks.get(0).getId();
-		final long maxBlockId = dbBlocks.get(dbBlocks.size() - 1).getId();
-		final List<DbTransferTransaction> dbTransfers = this.getDbTransfers(minBlockId, maxBlockId);
-		final List<DbImportanceTransferTransaction> dbImportanceTransfers = this.getDbImportanceTransfers(minBlockId, maxBlockId);
-		final List<DbMultisigAggregateModificationTransaction> dbModificationTransactions = this.getDbModificationTransactions(minBlockId, maxBlockId);
+		dbBlocks.stream().forEach(b -> this.dbBlockMap.put(b.getId(), b));
+		final long minBlockId = dbBlocks.get(0).getId() - 1;
+		final long maxBlockId = dbBlocks.get(dbBlocks.size() - 1).getId() + 1;
+		final List<DbTransferTransaction> allDbTransfers = this.getDbTransfers(minBlockId, maxBlockId);
+		this.splitTransfers(allDbTransfers, this.regularDbTransfers, this.multisigDbTransfers);
+		final List<DbImportanceTransferTransaction> allDbImportanceTransfers = this.getDbImportanceTransfers(minBlockId, maxBlockId);
+		this.splitTransfers(allDbImportanceTransfers, this.regularDbImportanceTransfers, this.multisigDbImportanceTransfers);
+		final List<DbMultisigAggregateModificationTransaction> allDbModificationTransactions = this.getDbModificationTransactions(minBlockId, maxBlockId);
+		this.splitTransfers(allDbModificationTransactions, this.regularDbModificationTransactions, this.multisigDbModificationTransactions);
+		final List<DbMultisigTransaction> dbMultisigTransactions = this.getDbMultisigTransactions(minBlockId, maxBlockId);
+		final HashSet<Long> accountIds = this.collectAccountIds(
+				dbBlocks,
+				allDbTransfers,
+				allDbImportanceTransfers,
+				allDbModificationTransactions,
+				dbMultisigTransactions);
+		final HashMap<Long, DbAccount> accountMap = this.getAccountMap(accountIds);
+		this.updateAccounts(
+				dbBlocks,
+				allDbTransfers,
+				allDbImportanceTransfers,
+				allDbModificationTransactions,
+				dbMultisigTransactions,
+				accountMap);
 
 		return dbBlocks;
 	}
@@ -82,9 +125,14 @@ public class BlockLoader {
 		return dbBlock;
 	}
 
-	private List<DbTransferTransaction> getDbTransfers(final long minBlockId, final long maxBlockId) {
+	private List<DbTransferTransaction> getDbTransfers(
+			final long minBlockId,
+			final long maxBlockId) {
+		final String queryString = "SELECT t.* FROM transfers t " +
+				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
+				"ORDER BY blockid ASC";
 		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT t.* FROM transfers t WHERE blockid > :minBlockId AND blockid < :maxBlockId AND senderproof IS NOT NULL ORDER BY blockid ASC")
+				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = listAndCast(query);
@@ -113,9 +161,14 @@ public class BlockLoader {
 		return dbTransfer;
 	}
 
-	private List<DbImportanceTransferTransaction> getDbImportanceTransfers(final long minBlockId, final long maxBlockId) {
+	private List<DbImportanceTransferTransaction> getDbImportanceTransfers(
+			final long minBlockId,
+			final long maxBlockId) {
+		final String queryString = "SELECT t.* FROM importancetransfers t " +
+				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
+				"ORDER BY blockid ASC";
 		final Query query = this.getCurrentSession()
-				.createSQLQuery("SELECT t.* FROM importancetransfers t WHERE blockid > :minBlockId AND blockid < :maxBlockId AND senderproof IS NOT NULL ORDER BY blockid ASC")
+				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = listAndCast(query);
@@ -142,11 +195,14 @@ public class BlockLoader {
 		return dbImportanceTransfer;
 	}
 
-	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(final long minBlockId, final long maxBlockId) {
-		final String queryString = "SELECT msm.*, mm.multisigsignermodificationid as mmMultisigsignermodificationid, mm.id as mmId, " +
-				"mm.cosignatoryid as mmCosignatoryid, mm.modificationtype as mmModificationtype FROM multisigsignermodifications msm " +
+	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
+			final long minBlockId,
+			final long maxBlockId) {
+		final String columnList = this.createColumnList("mm", 1, multisigModificationsColumns);
+		final String queryString =
+				"SELECT msm.*, " + columnList + " FROM multisigsignermodifications msm " +
 				"LEFT OUTER JOIN multisigmodifications mm ON mm.multisigsignermodificationid = msm.id " +
-				"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId AND msm.senderproof IS NOT NULL " +
+				"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
 				"ORDER BY msm.blockid ASC";
 		final Query query = this.getCurrentSession()
 				.createSQLQuery(queryString)
@@ -163,13 +219,12 @@ public class BlockLoader {
 
 		final List<DbMultisigAggregateModificationTransaction> transactions = new ArrayList<>();
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
-		long curBlockId = 0L;
+		long curTxId = 0L;
 		for (Object[] array : arrays) {
 			final long txid = castBigIntegerToLong((BigInteger)array[12]);
-			if (curBlockId != txid) {
-				curBlockId = txid;
+			if (curTxId != txid) {
+				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
-				dbModificationTransaction.setMultisigModifications(new HashSet<>());
 				transactions.add(dbModificationTransaction);
 			}
 
@@ -193,6 +248,7 @@ public class BlockLoader {
 		dbModificationTransaction.setBlkIndex((Integer)array[9]);
 		dbModificationTransaction.setOrderId((Integer)array[10]);
 		dbModificationTransaction.setReferencedTransaction(castBigIntegerToLong((BigInteger)array[11]));
+		dbModificationTransaction.setMultisigModifications(new HashSet<>());
 
 		return dbModificationTransaction;
 	}
@@ -209,7 +265,104 @@ public class BlockLoader {
 		return dbModification;
 	}
 
+	private List<DbMultisigTransaction> getDbMultisigTransactions(final long minBlockId, final long maxBlockId) {
+		final String columnList = this.createColumnList("ms", 1, multisigSignaturesColumns);
+		final String queryString = "SELECT mt.*, " + columnList + " FROM MULTISIGTRANSACTIONS mt " +
+				"LEFT OUTER JOIN multisigsignatures ms on ms.multisigtransactionid = mt.id " +
+				"WHERE mt.blockid > :minBlockId and mt.blockid < :maxBlockId " +
+				"ORDER BY mt.blockid ASC";
+		final Query query = this.getCurrentSession()
+				.createSQLQuery(queryString)
+				.setParameter("minBlockId", minBlockId)
+				.setParameter("maxBlockId", maxBlockId);
+		final List<Object[]> objects = listAndCast(query);
+		return this.mapToDbMultisigTransactions(objects);
+	}
+
+	private List<DbMultisigTransaction> mapToDbMultisigTransactions(final List<Object[]> arrays) {
+		if (arrays.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		final List<DbMultisigTransaction> transactions = new ArrayList<>();
+		DbMultisigTransaction dbMultisigTransaction = null;
+		long curTxId = 0L;
+		for (Object[] array : arrays) {
+			final Long txid = castBigIntegerToLong((BigInteger)array[15]);
+			if (null == txid) {
+				// no cosignatories
+				dbMultisigTransaction = this.mapToDbMultsigTransaction(array);
+				transactions.add(dbMultisigTransaction);
+				continue;
+			}
+
+			if (curTxId != txid) {
+				curTxId = txid;
+				dbMultisigTransaction = this.mapToDbMultsigTransaction(array);
+				transactions.add(dbMultisigTransaction);
+			}
+
+			dbMultisigTransaction.getMultisigSignatureTransactions().add(this.mapToDbMulsigSignature(dbMultisigTransaction, array));
+		}
+
+		return transactions;
+	}
+
+	private DbMultisigTransaction mapToDbMultsigTransaction(final Object[] array) {
+		final DbMultisigTransaction dbMultsigTransaction = new DbMultisigTransaction();
+		dbMultsigTransaction.setBlock(createDbBlock(castBigIntegerToLong((BigInteger)array[0])));
+		dbMultsigTransaction.setId(castBigIntegerToLong((BigInteger)array[1]));
+		dbMultsigTransaction.setTransferHash(new Hash((byte[])array[2]));
+		dbMultsigTransaction.setVersion((Integer)array[3]);
+		dbMultsigTransaction.setFee(castBigIntegerToLong((BigInteger)array[4]));
+		dbMultsigTransaction.setTimeStamp((Integer)array[5]);
+		dbMultsigTransaction.setDeadline((Integer)array[6]);
+		dbMultsigTransaction.setSender(createDbAccount(castBigIntegerToLong((BigInteger)array[7])));
+		dbMultsigTransaction.setSenderProof((byte[])array[8]);
+		dbMultsigTransaction.setBlkIndex((Integer)array[9]);
+		dbMultsigTransaction.setOrderId((Integer)array[10]);
+		dbMultsigTransaction.setReferencedTransaction(castBigIntegerToLong((BigInteger)array[11]));
+		dbMultsigTransaction.setTransferTransaction(this.multisigDbTransfers.get(castBigIntegerToLong((BigInteger)array[12])));
+		dbMultsigTransaction.setImportanceTransferTransaction(this.multisigDbImportanceTransfers.get(castBigIntegerToLong((BigInteger)array[13])));
+		dbMultsigTransaction.setMultisigAggregateModificationTransaction(this.multisigDbModificationTransactions.get(castBigIntegerToLong((BigInteger)array[14])));
+		dbMultsigTransaction.setMultisigSignatureTransactions(new HashSet<>());
+
+		return dbMultsigTransaction;
+	}
+
+	private DbMultisigSignatureTransaction mapToDbMulsigSignature(
+			final DbMultisigTransaction dbMultisigTransaction,
+			final Object[] array) {
+		final DbMultisigSignatureTransaction dbMulsigSignature = new DbMultisigSignatureTransaction();
+		dbMulsigSignature.setMultisigTransaction(dbMultisigTransaction);
+		dbMulsigSignature.setId(castBigIntegerToLong((BigInteger)array[16]));
+		dbMulsigSignature.setTransferHash(new Hash((byte[])array[17]));
+		dbMulsigSignature.setVersion((Integer)array[18]);
+		dbMulsigSignature.setFee(castBigIntegerToLong((BigInteger)array[19]));
+		dbMulsigSignature.setTimeStamp((Integer)array[20]);
+		dbMulsigSignature.setDeadline((Integer)array[21]);
+		dbMulsigSignature.setSender(createDbAccount(castBigIntegerToLong((BigInteger)array[22])));
+		dbMulsigSignature.setSenderProof((byte[])array[23]);
+
+		return dbMulsigSignature;
+	}
+
+	private HashMap<Long, DbAccount> getAccountMap(final HashSet<Long> accountIds) {
+		final Query query = this.getCurrentSession()
+				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
+				.addEntity(DbAccount.class)
+				.setParameterList("ids", accountIds.stream().collect(Collectors.toList()));
+		final List<DbAccount> accounts = listAndCast(query);
+		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
+		accounts.stream().forEach(a -> accountMap.put(a.getId(), a));
+		return accountMap;
+	}
+
 	private DbAccount createDbAccount(final Long id) {
+		if (null == id) {
+			return null;
+		}
+
 		final DbAccount dbAccount = new DbAccount();
 		dbAccount.setId(id);
 		return dbAccount;
@@ -228,5 +381,89 @@ public class BlockLoader {
 	@SuppressWarnings("unchecked")
 	private static <T> List<T> listAndCast(final Query q) {
 		return q.list();
+	}
+
+	private String createColumnList(final String prefix, final int postfix, String[] columns) {
+		return StringUtils.join(
+				Arrays.stream(columns)
+						.map(col -> String.format("%s.%s as %s%d", prefix, col, col, postfix))
+						.collect(Collectors.toList()), ", ");
+	}
+
+	private <TDbModel extends AbstractTransfer> void splitTransfers(
+			final List<TDbModel> allTransfers,
+			final HashMap<Long, TDbModel> regularTransfers,
+			final HashMap<Long, TDbModel> multisigTransfers) {
+		allTransfers.stream().forEach(t -> {
+			if (null == t.getSenderProof()) {
+				multisigTransfers.put(t.getId(), t);
+			} else {
+				regularTransfers.put(t.getId(), t);
+			}
+		});
+	}
+
+	private HashSet<Long> collectAccountIds(
+			final List<DbBlock> dbBlocks,
+			final List<DbTransferTransaction> allDbTransfers,
+			final List<DbImportanceTransferTransaction> allDbImportanceTransfers,
+			final List<DbMultisigAggregateModificationTransaction> allDbModificationTransactions,
+			final List<DbMultisigTransaction> allDbMultisigTransactions) {
+		final HashSet<Long> accountIds = new HashSet<>();
+		dbBlocks.stream().forEach(b -> {
+			accountIds.add(b.getHarvester().getId());
+			if (null != b.getLessor()) {
+				accountIds.add(b.getLessor().getId());
+			}
+		});
+		allDbTransfers.stream().forEach(t -> {
+			accountIds.add(t.getSender().getId());
+			accountIds.add(t.getRecipient().getId());
+		});
+		allDbImportanceTransfers.stream().forEach(t -> {
+			accountIds.add(t.getSender().getId());
+			accountIds.add(t.getRemote().getId());
+		});
+		allDbModificationTransactions.stream().forEach(t -> {
+			accountIds.add(t.getSender().getId());
+			t.getOtherAccounts().stream().forEach(a -> accountIds.add(a.getId()));
+		});
+		allDbMultisigTransactions.stream().forEach(t -> {
+			accountIds.add(t.getSender().getId());
+			t.getMultisigSignatureTransactions().stream().forEach(s -> accountIds.add(s.getSender().getId()));
+		});
+
+		return accountIds;
+	}
+
+	private void updateAccounts(
+			final List<DbBlock> dbBlocks,
+			final List<DbTransferTransaction> allDbTransfers,
+			final List<DbImportanceTransferTransaction> allDbImportanceTransfers,
+			final List<DbMultisigAggregateModificationTransaction> allDbModificationTransactions,
+			final List<DbMultisigTransaction> allDbMultisigTransactions,
+			final HashMap<Long, DbAccount> accountMap) {
+		dbBlocks.stream().forEach(b -> {
+			b.setHarvester(accountMap.get(b.getHarvester().getId()));
+			if (null != b.getLessor()) {
+				b.setLessor(accountMap.get(b.getLessor().getId()));
+			}
+		});
+		allDbTransfers.stream().forEach(t -> {
+			t.setSender(accountMap.get(t.getSender().getId()));
+			t.setRecipient(accountMap.get(t.getRecipient().getId()));
+		});
+		allDbImportanceTransfers.stream().forEach(t -> {
+			t.setSender(accountMap.get(t.getSender().getId()));
+			t.setRemote(accountMap.get(t.getRemote().getId()));
+		});
+		allDbModificationTransactions.stream().forEach(t -> {
+			t.setSender(accountMap.get(t.getSender().getId()));
+			t.getMultisigModifications().stream().forEach(m -> m.setCosignatory(accountMap.get(m.getCosignatory().getId())));
+		});
+		allDbMultisigTransactions.stream().forEach(t -> {
+			t.setSender(accountMap.get(t.getSender().getId()));
+			t.getMultisigSignatureTransactions().stream().forEach(s -> s.setSender(accountMap.get(s.getSender().getId())));
+		});
 	}
 }
