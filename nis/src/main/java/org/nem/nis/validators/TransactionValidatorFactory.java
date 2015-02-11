@@ -49,8 +49,11 @@ public class TransactionValidatorFactory {
 	 * @return The builder.
 	 */
 	public AggregateSingleTransactionValidatorBuilder createSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
-		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, accountStateCache, true);
+		final AggregateSingleTransactionValidatorBuilder builder = this.createIncompleteSingleBuilder(accountStateCache);
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MULTISIG,
+						new MultisigSignaturesPresentValidator(accountStateCache)));
 		return builder;
 	}
 
@@ -63,7 +66,39 @@ public class TransactionValidatorFactory {
 	 */
 	public AggregateSingleTransactionValidatorBuilder createIncompleteSingleBuilder(final ReadOnlyAccountStateCache accountStateCache) {
 		final AggregateSingleTransactionValidatorBuilder builder = new AggregateSingleTransactionValidatorBuilder();
-		this.visitSingleSubValidators(builder::add, accountStateCache, false);
+
+		builder.add(new UniversalTransactionValidator());
+		builder.add(new TransactionNonFutureEntityValidator(this.timeProvider));
+		builder.add(new NemesisSinkValidator());
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.TRANSFER,
+						new TransferTransactionValidator()));
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.IMPORTANCE_TRANSFER,
+						new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance())));
+		builder.add(
+				new BlockHeightSingleTransactionValidatorDecorator(
+						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),
+						new RemoteNonOperationalValidator(accountStateCache)));
+
+		builder.add(new MultisigNonOperationalValidator(accountStateCache));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MULTISIG,
+						new MultisigTransactionSignerValidator(accountStateCache)));
+
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+						new MultisigAggregateModificationTransactionValidator(accountStateCache)));
+		builder.add(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
+						new MaxCosignatoryValidator(accountStateCache)));
 		return builder;
 	}
 
@@ -75,71 +110,7 @@ public class TransactionValidatorFactory {
 	 */
 	public BatchTransactionValidator createBatch(final ReadOnlyHashCache transactionHashCache) {
 		final AggregateBatchTransactionValidatorBuilder builder = new AggregateBatchTransactionValidatorBuilder();
-		this.visitBatchSubValidators(builder::add, transactionHashCache);
+		builder.add(new BatchUniqueHashTransactionValidator(transactionHashCache));
 		return builder.build();
-	}
-
-	/**
-	 * Visits all sub validators that comprise the validator returned by createSingle.
-	 *
-	 * @param visitor The visitor.
-	 * @param accountStateCache The account state cache.
-	 * @param includeAllValidators true if all validators should be included; false if transactions should not be validated for completeness.
-	 */
-	public void visitSingleSubValidators(
-			final Consumer<SingleTransactionValidator> visitor,
-			final ReadOnlyAccountStateCache accountStateCache,
-			final boolean includeAllValidators) {
-		visitor.accept(new UniversalTransactionValidator());
-		visitor.accept(new TransactionNonFutureEntityValidator(this.timeProvider));
-		visitor.accept(new NemesisSinkValidator());
-
-		visitor.accept(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.TRANSFER,
-						new TransferTransactionValidator()));
-		visitor.accept(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.IMPORTANCE_TRANSFER,
-						new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance())));
-		visitor.accept(
-				new BlockHeightSingleTransactionValidatorDecorator(
-						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),
-						new RemoteNonOperationalValidator(accountStateCache)));
-
-		visitor.accept(new MultisigNonOperationalValidator(accountStateCache));
-
-		visitor.accept(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MULTISIG,
-						new MultisigTransactionSignerValidator(accountStateCache)));
-
-		visitor.accept(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MultisigAggregateModificationTransactionValidator(accountStateCache)));
-		visitor.accept(
-				new TSingleTransactionValidatorAdapter<>(
-						TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
-						new MaxCosignatoryValidator(accountStateCache)));
-
-		if (includeAllValidators) {
-			visitor.accept(
-					new TSingleTransactionValidatorAdapter<>(
-							TransactionTypes.MULTISIG,
-							new MultisigSignaturesPresentValidator(accountStateCache)));
-		}
-	}
-
-	/**
-	 * Visits all sub validators that comprise the validator returned by createBatch.
-	 *
-	 * @param visitor The visitor.
-	 * @param transactionHashCache The cache of transaction hashes.
-	 */
-	public void visitBatchSubValidators(
-			final Consumer<BatchTransactionValidator> visitor,
-			final ReadOnlyHashCache transactionHashCache) {
-		visitor.accept(new BatchUniqueHashTransactionValidator(transactionHashCache));
 	}
 }
