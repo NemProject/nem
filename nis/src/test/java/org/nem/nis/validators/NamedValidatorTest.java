@@ -4,12 +4,12 @@ import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.nem.nis.validators.transaction.UniversalTransactionValidator;
 
-public class SingleTransactionValidatorTest {
+public class NamedValidatorTest {
 
 	@Test
 	public void defaultGetNameReturnsTypeName() {
 		// Arrange:
-		final SingleTransactionValidator validator = new UniversalTransactionValidator();
+		final NamedValidator validator = new UniversalTransactionValidator();
 
 		// Act:
 		final String name = validator.getName();

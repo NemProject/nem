@@ -1,9 +1,10 @@
 package org.nem.nis.validators.block;
 
 import org.nem.core.model.*;
-import org.nem.nis.validators.BlockValidator;
+import org.nem.nis.validators.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Builder for building an aggregate BlockValidator.
@@ -34,6 +35,13 @@ public class AggregateBlockValidatorBuilder {
 
 		public AggregateBlockValidator(final List<BlockValidator> validators) {
 			this.validators = validators;
+		}
+
+		@Override
+		public String getName() {
+			return this.validators.stream()
+					.map(NamedValidator::getName)
+					.collect(Collectors.joining(","));
 		}
 
 		@Override

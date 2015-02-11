@@ -4,6 +4,7 @@ import org.nem.core.model.ValidationResult;
 import org.nem.nis.validators.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Builder for building an aggregate BatchTransactionValidator.
@@ -34,6 +35,13 @@ public class AggregateBatchTransactionValidatorBuilder {
 
 		public AggregateBatchTransactionValidator(final List<BatchTransactionValidator> validators) {
 			this.validators = validators;
+		}
+
+		@Override
+		public String getName() {
+			return this.validators.stream()
+					.map(NamedValidator::getName)
+					.collect(Collectors.joining(","));
 		}
 
 		@Override

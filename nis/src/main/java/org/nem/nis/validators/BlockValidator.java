@@ -5,16 +5,7 @@ import org.nem.core.model.*;
 /**
  * Interface for validating a block.
  */
-public interface BlockValidator {
-
-	/**
-	 * Gets the name of the validator.
-	 *
-	 * @return The name of the validator.
-	 */
-	public default String getName() {
-		return this.getClass().getSimpleName();
-	}
+public interface BlockValidator extends NamedValidator {
 
 	/**
 	 * Checks the validity of the specified block.

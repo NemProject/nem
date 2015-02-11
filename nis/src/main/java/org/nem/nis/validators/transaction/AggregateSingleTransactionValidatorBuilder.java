@@ -4,6 +4,7 @@ import org.nem.core.model.*;
 import org.nem.nis.validators.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Builder for building an aggregate SingleTransactionValidator.
@@ -43,6 +44,13 @@ public class AggregateSingleTransactionValidatorBuilder {
 
 		public AggregateSingleTransactionValidator(final List<SingleTransactionValidator> validators) {
 			this.validators = validators;
+		}
+
+		@Override
+		public String getName() {
+			return this.validators.stream()
+					.map(NamedValidator::getName)
+					.collect(Collectors.joining(","));
 		}
 
 		@Override
