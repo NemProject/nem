@@ -87,7 +87,7 @@ public class BlockExplorerControllerTest {
 			this.controller = new BlockExplorerController(this.blockDao, mapperFactory, accountLookup);
 		}
 
-		public List<DbBlock> setBlocksWithHeight(final BlockHeight height, int... heights) {
+		public List<DbBlock> setBlocksWithHeight(final BlockHeight height, final int... heights) {
 			final List<DbBlock> dbBlocks = new ArrayList<>();
 			for (int i = 0; i < heights.length; ++i) {
 				dbBlocks.add(NisUtils.createDbBlockWithTimeStampAtHeight(i, heights[i]));
