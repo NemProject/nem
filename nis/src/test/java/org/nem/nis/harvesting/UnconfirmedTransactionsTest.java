@@ -1350,6 +1350,12 @@ public class UnconfirmedTransactionsTest {
 			this.setBatchValidationResult(ValidationResult.SUCCESS);
 		}
 
+		private TestContext(final TransferTransactionValidator singleValidator) {
+			this(
+					new TSingleTransactionValidatorAdapter<>(TransactionTypes.TRANSFER, singleValidator),
+					Mockito.mock(BatchTransactionValidator.class));
+		}
+
 		private TestContext(final SingleTransactionValidator singleValidator) {
 			this(singleValidator, Mockito.mock(BatchTransactionValidator.class));
 			this.setBatchValidationResult(ValidationResult.SUCCESS);

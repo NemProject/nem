@@ -12,7 +12,7 @@ import org.nem.nis.test.DebitPredicates;
 import org.nem.nis.validators.*;
 
 public class TransferTransactionValidatorTest {
-	private static final SingleTransactionValidator VALIDATOR = new TransferTransactionValidator();
+	private static final TSingleTransactionValidator<TransferTransaction> VALIDATOR = new TransferTransactionValidator();
 
 	//region predicate delegation
 
@@ -30,7 +30,7 @@ public class TransferTransactionValidatorTest {
 
 	private void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
 		// Arrange:
-		final Transaction transaction = createTransaction(12, 7);
+		final TransferTransaction transaction = createTransaction(12, 7);
 
 		final DebitPredicate debitPredicate = Mockito.mock(DebitPredicate.class);
 		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(predicateResult);
@@ -60,7 +60,7 @@ public class TransferTransactionValidatorTest {
 	@Test
 	public void transactionWithZeroAmountIsValid() {
 		// Arrange:
-		final Transaction transaction = createTransaction(0, 1);
+		final TransferTransaction transaction = createTransaction(0, 1);
 
 		// Act:
 		final ValidationResult result = validate(transaction);
@@ -103,30 +103,15 @@ public class TransferTransactionValidatorTest {
 
 	//endregion
 
-	//region other type
-
-	@Test
-	public void otherTransactionTypesPassValidation() {
-		// Arrange:
-		final Account account = Utils.generateRandomAccount();
-		final MockTransaction transaction = new MockTransaction(account);
-		transaction.setFee(Amount.fromNem(200));
-
-		// Assert:
-		Assert.assertThat(validate(transaction), IsEqual.equalTo(ValidationResult.SUCCESS));
-	}
-
-	//endregion
-
 	private static TransferTransaction createTransferTransaction(final Account sender, final Account recipient, final long amount, final Message message) {
 		return new TransferTransaction(TimeInstant.ZERO, sender, recipient, Amount.fromNem(amount), message);
 	}
 
-	private static ValidationResult validate(final Transaction transaction) {
+	private static ValidationResult validate(final TransferTransaction transaction) {
 		return VALIDATOR.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
-	private static ValidationResult validate(final Transaction transaction, final DebitPredicate debitPredicate) {
+	private static ValidationResult validate(final TransferTransaction transaction, final DebitPredicate debitPredicate) {
 		return VALIDATOR.validate(transaction, new ValidationContext(debitPredicate));
 	}
 }

@@ -1,5 +1,6 @@
 package org.nem.nis.validators;
 
+import org.nem.core.model.TransactionTypes;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.BlockMarkerConstants;
@@ -93,7 +94,10 @@ public class TransactionValidatorFactory {
 		visitor.accept(new TransactionNonFutureEntityValidator(this.timeProvider));
 		visitor.accept(new NemesisSinkValidator());
 
-		visitor.accept(new TransferTransactionValidator());
+		visitor.accept(
+				new TSingleTransactionValidatorAdapter<>(
+						TransactionTypes.TRANSFER,
+						new TransferTransactionValidator()));
 		visitor.accept(new ImportanceTransferTransactionValidator(accountStateCache, this.poiOptions.getMinHarvesterBalance()));
 		visitor.accept(
 				new BlockHeightSingleTransactionValidatorDecorator(

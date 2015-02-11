@@ -7,21 +7,13 @@ import org.nem.nis.validators.*;
 /**
  * A TransferTransactionValidator implementation that applies to transfer transactions.
  */
-public class TransferTransactionValidator implements SingleTransactionValidator {
+public class TransferTransactionValidator implements TSingleTransactionValidator<TransferTransaction> {
 	private static final int MAX_MESSAGE_SIZE = 96;
 
 	@Override
-	public ValidationResult validate(final Transaction transaction, final ValidationContext context) {
-		if (TransactionTypes.TRANSFER != transaction.getType()) {
-			return ValidationResult.SUCCESS;
-		}
-
-		return this.validate((TransferTransaction)transaction, context.getDebitPredicate());
-	}
-
-	private ValidationResult validate(final TransferTransaction transaction, final DebitPredicate predicate) {
+	public ValidationResult validate(final TransferTransaction transaction, final ValidationContext context) {
 		final Amount amount = transaction.getAmount().add(transaction.getFee());
-		if (!predicate.canDebit(transaction.getSigner(), amount)) {
+		if (!context.getDebitPredicate().canDebit(transaction.getSigner(), amount)) {
 			return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 		}
 
