@@ -60,6 +60,7 @@ public class BlockHeightSingleTransactionValidatorDecoratorTest {
 
 		// Assert:
 		Assert.assertThat(name, IsEqual.equalTo("inner @ 123"));
+		Mockito.verify(context.innerValidator, Mockito.only()).getName();
 	}
 
 	private static class TestContext {
