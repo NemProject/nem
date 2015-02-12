@@ -6,14 +6,12 @@ import org.nem.core.model.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 /**
  * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts
  * by their addresses.
  */
 public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountCache> {
-	private static final Logger LOGGER = Logger.getLogger(DefaultAccountCache.class.getName());
 
 	private final ConcurrentHashMap<Address, Account> addressToAccountMap = new ConcurrentHashMap<>();
 
@@ -53,6 +51,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 	}
 
 	private Account findByAddress(final Address address, final Supplier<Account> notFoundHandler) {
+		// TODO 20150212 BR -> J: do we really need this check, it is making the mapper very slow!
 		if (!address.isValid()) {
 			throw new MissingResourceException("invalid address", Address.class.getName(), address.toString());
 		}
@@ -77,7 +76,6 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public Account findByAddress(final Address address) {
-		LOGGER.finer(String.format("looking for [%s] %s", address, this.size()));
 		return this.findByAddress(address, () -> createAccount(address.getPublicKey(), address.getEncoded()));
 	}
 
