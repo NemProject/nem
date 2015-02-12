@@ -17,10 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Repository
 public class BlockDaoImpl implements BlockDao {
+	private static final Logger LOGGER = Logger.getLogger(BlockDaoImpl.class.getName());
 
 	private final SessionFactory sessionFactory;
 
@@ -254,18 +256,8 @@ public class BlockDaoImpl implements BlockDao {
 		final long start = System.currentTimeMillis();
 		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height, new BlockHeight(height.getRaw() + limit));
 		final long stop = System.currentTimeMillis();
-		System.out.println(String.format("loadBlocks needed %dms", stop - start));
+		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
 		return dbBlocks;
-
-		// whatever it takes : DO NOT ADD setMaxResults here!
-		/*final long blockHeight = height.getRaw();
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.setFetchMode("harvester", FetchMode.JOIN)
-				.add(Restrictions.gt("height", blockHeight))
-				.add(Restrictions.le("height", blockHeight + limit))
-				.addOrder(Order.asc("height"));
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return listAndCast(criteria);*/
 	}
 
 	@Override

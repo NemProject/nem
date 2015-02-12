@@ -108,7 +108,7 @@ public class BlockAnalyzer {
 			if ((block.getHeight().getRaw() % 512) == 0) {
 				this.blockChainLastBlockLayer.setCurrentBlock(dbBlock);
 			}
-			if ((block.getHeight().getRaw() % 5000) == 0) {
+			if ((block.getHeight().getRaw() % 500) == 0) {
 				LOGGER.info(String.format("%d", block.getHeight().getRaw()));
 			}
 
@@ -116,7 +116,7 @@ public class BlockAnalyzer {
 				this.blockChainScoreManager.updateScore(parentBlock, block);
 			}
 
-			//executor.execute(block, observer);
+			executor.execute(block, observer);
 
 			parentBlock = block;
 
@@ -164,7 +164,7 @@ public class BlockAnalyzer {
 			}
 
 			if (null == this.iterator || !this.iterator.hasNext()) {
-				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 2345).iterator();
+				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 500).iterator();
 				if (!this.iterator.hasNext()) {
 					this.finished = true;
 					return null;

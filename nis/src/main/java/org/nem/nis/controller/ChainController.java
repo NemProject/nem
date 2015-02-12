@@ -109,7 +109,11 @@ public class ChainController {
 			}
 
 			previousDbBlock = dbBlock;
-			numTransactions += dbBlock.getBlockImportanceTransferTransactions().size() + dbBlock.getBlockTransferTransactions().size();
+			numTransactions +=
+					dbBlock.getBlockImportanceTransferTransactions().size() +
+					dbBlock.getBlockTransferTransactions().size() +
+					dbBlock.getBlockMultisigAggregateModificationTransactions().size() +
+					dbBlock.getBlockMultisigTransactions().stream().mapToInt(t -> 2 + t.getMultisigSignatureTransactions().size()).sum();
 			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}

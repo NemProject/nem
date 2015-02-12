@@ -17,18 +17,6 @@ import java.util.stream.Collectors;
  */
 public class BlockLoader {
 	private static final Logger LOGGER = Logger.getLogger(BlockLoader.class.getName());
-	private final static String[] transfersColumns = {
-			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "recipientid",
-			"blkindex", "orderid", "amount", "referencedtransaction", "messagetype", "messagepayload" };
-	private final static String[] importanceTransfersColumns = {
-			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "remoteid",
-			"mode", "blkindex", "orderid", "referencedtransaction" };
-	private final static String[] multisigTransactionsColumns = {
-			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "blkindex", "orderid",
-			"referencedtransaction", "transferid", "importancetransferid", "multisigsignermodificationid" };
-	private final static String[] multisigSignerModificationsColumns = {
-			"blockid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof", "blkindex", "orderid",
-			"referencedtransaction"	};
 	private final static String[] multisigSignaturesColumns = {
 			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof"	};
 	private final static String[] multisigModificationsColumns = {
@@ -36,12 +24,11 @@ public class BlockLoader {
 
 	private final SessionFactory sessionFactory;
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
-	private final HashMap<Long, DbTransferTransaction> regularDbTransfers = new HashMap<>();
 	private final HashMap<Long, DbTransferTransaction> multisigDbTransfers = new HashMap<>();
-	private final HashMap<Long, DbImportanceTransferTransaction> regularDbImportanceTransfers = new HashMap<>();
 	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransfers = new HashMap<>();
-	private final HashMap<Long, DbMultisigAggregateModificationTransaction> regularDbModificationTransactions = new HashMap<>();
 	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactions = new HashMap<>();
+
+	private long start = 0L;
 
 	/**
 	 * Creates a new block analyzer.
@@ -73,11 +60,11 @@ public class BlockLoader {
 		final long minBlockId = dbBlocks.get(0).getId() - 1;
 		final long maxBlockId = dbBlocks.get(dbBlocks.size() - 1).getId() + 1;
 		final List<DbTransferTransaction> allDbTransfers = this.getDbTransfers(minBlockId, maxBlockId);
-		this.splitTransfers(allDbTransfers, this.regularDbTransfers, this.multisigDbTransfers);
+		this.extractMultisigTransfers(allDbTransfers, this.multisigDbTransfers);
 		final List<DbImportanceTransferTransaction> allDbImportanceTransfers = this.getDbImportanceTransfers(minBlockId, maxBlockId);
-		this.splitTransfers(allDbImportanceTransfers, this.regularDbImportanceTransfers, this.multisigDbImportanceTransfers);
+		this.extractMultisigTransfers(allDbImportanceTransfers, this.multisigDbImportanceTransfers);
 		final List<DbMultisigAggregateModificationTransaction> allDbModificationTransactions = this.getDbModificationTransactions(minBlockId, maxBlockId);
-		this.splitTransfers(allDbModificationTransactions, this.regularDbModificationTransactions, this.multisigDbModificationTransactions);
+		this.extractMultisigTransfers(allDbModificationTransactions, this.multisigDbModificationTransactions);
 		final List<DbMultisigTransaction> dbMultisigTransactions = this.getDbMultisigTransactions(minBlockId, maxBlockId);
 		final HashSet<Long> accountIds = this.collectAccountIds(
 				dbBlocks,
@@ -103,12 +90,14 @@ public class BlockLoader {
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
+		this.actionStarts();
 		final Query query = this.getCurrentSession()
 				.createSQLQuery("SELECT b.* FROM BLOCKS b WHERE height > :fromHeight AND height <= :toHeight ORDER BY height ASC LIMIT :limit")
 				.setParameter("fromHeight", fromHeight.getRaw())
 				.setParameter("toHeight", toHeight.getRaw())
 				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw());
 		final List<Object[]> objects = listAndCast(query);
+		this.actionEnds("getDbBlocks ");
 		return objects.stream().map(this::mapToDbBlock).collect(Collectors.toList());
 	}
 
@@ -138,6 +127,7 @@ public class BlockLoader {
 	private List<DbTransferTransaction> getDbTransfers(
 			final long minBlockId,
 			final long maxBlockId) {
+		this.actionStarts();
 		final String queryString = "SELECT t.* FROM transfers t " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
@@ -146,6 +136,7 @@ public class BlockLoader {
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = listAndCast(query);
+		this.actionEnds("getDbTransfers ");
 		return objects.stream().map(this::mapToDbTransfers).collect(Collectors.toList());
 	}
 
@@ -174,6 +165,7 @@ public class BlockLoader {
 	private List<DbImportanceTransferTransaction> getDbImportanceTransfers(
 			final long minBlockId,
 			final long maxBlockId) {
+		this.actionStarts();
 		final String queryString = "SELECT t.* FROM importancetransfers t " +
 				"WHERE blockid > :minBlockId AND blockid < :maxBlockId " +
 				"ORDER BY blockid ASC";
@@ -182,6 +174,7 @@ public class BlockLoader {
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = listAndCast(query);
+		this.actionEnds("getDbImportanceTransfers ");
 		return objects.stream().map(this::mapToDbImportanceTransfers).collect(Collectors.toList());
 	}
 
@@ -208,6 +201,7 @@ public class BlockLoader {
 	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
 			final long minBlockId,
 			final long maxBlockId) {
+		this.actionStarts();
 		final String columnList = this.createColumnList("mm", 1, multisigModificationsColumns);
 		final String queryString =
 				"SELECT msm.*, " + columnList + " FROM multisigsignermodifications msm " +
@@ -219,6 +213,7 @@ public class BlockLoader {
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = listAndCast(query);
+		this.actionEnds("getDbModificationTransactions ");
 		return this.mapToDbModificationTransactions(objects);
 	}
 
@@ -276,6 +271,7 @@ public class BlockLoader {
 	}
 
 	private List<DbMultisigTransaction> getDbMultisigTransactions(final long minBlockId, final long maxBlockId) {
+		this.actionStarts();
 		final String columnList = this.createColumnList("ms", 1, multisigSignaturesColumns);
 		final String queryString = "SELECT mt.*, " + columnList + " FROM MULTISIGTRANSACTIONS mt " +
 				"LEFT OUTER JOIN multisigsignatures ms on ms.multisigtransactionid = mt.id " +
@@ -286,6 +282,7 @@ public class BlockLoader {
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
 		final List<Object[]> objects = listAndCast(query);
+		this.actionEnds("getDbMultisigTransactions ");
 		return this.mapToDbMultisigTransactions(objects);
 	}
 
@@ -358,6 +355,7 @@ public class BlockLoader {
 	}
 
 	private HashMap<Long, DbAccount> getAccountMap(final HashSet<Long> accountIds) {
+		this.actionStarts();
 		final Query query = this.getCurrentSession()
 				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
 				.addEntity(DbAccount.class)
@@ -365,6 +363,7 @@ public class BlockLoader {
 		final List<DbAccount> accounts = listAndCast(query);
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
 		accounts.stream().forEach(a -> accountMap.put(a.getId(), a));
+		this.actionEnds("getAccountMap ");
 		return accountMap;
 	}
 
@@ -400,17 +399,12 @@ public class BlockLoader {
 						.collect(Collectors.toList()), ", ");
 	}
 
-	private <TDbModel extends AbstractTransfer> void splitTransfers(
+	private <TDbModel extends AbstractTransfer> void extractMultisigTransfers(
 			final List<TDbModel> allTransfers,
-			final HashMap<Long, TDbModel> regularTransfers,
 			final HashMap<Long, TDbModel> multisigTransfers) {
-		allTransfers.stream().forEach(t -> {
-			if (null == t.getSenderProof()) {
-				multisigTransfers.put(t.getId(), t);
-			} else {
-				regularTransfers.put(t.getId(), t);
-			}
-		});
+		allTransfers.stream()
+				.filter(t -> null == t.getSenderProof())
+				.forEach(t -> multisigTransfers.put(t.getId(), t));
 	}
 
 	private HashSet<Long> collectAccountIds(
@@ -485,5 +479,14 @@ public class BlockLoader {
 				transactionAdder.accept(this.dbBlockMap.get(t.getBlock().getId()), t);
 			}
 		});
+	}
+
+	private void actionStarts() {
+		this.start = System.currentTimeMillis();
+	}
+
+	private void actionEnds(final String prefix) {
+		final long stop = System.currentTimeMillis();
+		//LOGGER.info(String.format("%s needed %dms.", prefix, stop - this.start));
 	}
 }
