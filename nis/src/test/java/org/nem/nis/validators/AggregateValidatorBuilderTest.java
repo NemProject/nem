@@ -9,7 +9,7 @@ import org.nem.core.model.ValidationResult;
 /**
  * Base class for aggregate validator builder tests.
  */
-public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam> {
+public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator extends NamedValidator, TParam> {
 
 	//region protected abstract members
 
@@ -18,7 +18,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam
 	 *
 	 * @return The builder.
 	 */
-	public abstract TBuilder createBuilder();
+	protected abstract TBuilder createBuilder();
 
 	/**
 	 * Creates a validator with the specified result.
@@ -26,14 +26,14 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam
 	 * @param result The specified result.
 	 * @return The validator.
 	 */
-	public abstract TValidator createValidator(final ValidationResult result);
+	protected abstract TValidator createValidator(final ValidationResult result);
 
 	/**
 	 * Creates a validator parameter.
 	 *
 	 * @return The parameter.
 	 */
-	public abstract TParam createParam();
+	protected abstract TParam createParam();
 
 	/**
 	 * Adds a validator to a builder.
@@ -41,7 +41,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam
 	 * @param builder The builder.
 	 * @param validator The validator.
 	 */
-	public abstract void add(final TBuilder builder, final TValidator validator);
+	protected abstract void add(final TBuilder builder, final TValidator validator);
 
 	/**
 	 * Creates an aggregate validator using a builder.
@@ -49,7 +49,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam
 	 * @param builder The builder.
 	 * @return The aggregate validator.
 	 */
-	public abstract TValidator build(final TBuilder builder);
+	protected abstract TValidator build(final TBuilder builder);
 
 	/**
 	 * Calls validate on a validator.
@@ -58,7 +58,7 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam
 	 * @param param The parameter.
 	 * @return The validation result.
 	 */
-	public abstract ValidationResult validate(final TValidator validator, final TParam param);
+	protected abstract ValidationResult validate(final TValidator validator, final TParam param);
 
 	/**
 	 * Asserts validate was called on a validator.
@@ -67,9 +67,11 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam
 	 * @param param The parameter.
 	 * @param verificationMode The verification mode.
 	 */
-	public abstract void verifyValidate(final TValidator validator, final TParam param, final VerificationMode verificationMode);
+	protected abstract void verifyValidate(final TValidator validator, final TParam param, final VerificationMode verificationMode);
 
 	//endregion
+
+	//region basic aggregation
 
 	@Test
 	public void canAddSingleValidator() {
@@ -189,4 +191,32 @@ public abstract class AggregateValidatorBuilderTest<TBuilder, TValidator, TParam
 			this.parent.verifyValidate(this.validator3, this.param, Mockito.only());
 		}
 	}
+
+	//endregion
+
+	//region name aggregation
+
+	@Test
+	public void getNameReturnsCommaSeparatedListOfInnerValidators() {
+		// Arrange:
+		final TBuilder builder = this.createBuilder();
+		this.add(builder, this.createValidatorWithName("alpha"));
+		this.add(builder, this.createValidatorWithName("zeta"));
+		this.add(builder, this.createValidatorWithName("gamma"));
+		final TValidator validator = this.build(builder);
+
+		// Act:
+		final String name = validator.getName();
+
+		// Assert:
+		Assert.assertThat(name, IsEqual.equalTo("alpha,zeta,gamma"));
+	}
+
+	private TValidator createValidatorWithName(final String name) {
+		final TValidator validator = this.createValidator(ValidationResult.SUCCESS);
+		Mockito.when(validator.getName()).thenReturn(name);
+		return validator;
+	}
+
+	//endregion
 }

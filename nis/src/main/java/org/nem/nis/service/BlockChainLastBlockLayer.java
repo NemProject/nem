@@ -21,69 +21,70 @@ public class BlockChainLastBlockLayer {
 	private final BlockDao blockDao;
 	private final NisModelToDbModelMapper mapper;
 
+	private boolean isLoading;
 	private DbBlock lastBlock;
-	private DbBlock currentBlock;
 
 	@Autowired(required = true)
 	public BlockChainLastBlockLayer(final BlockDao blockDao, final NisModelToDbModelMapper mapper) {
 		this.blockDao = blockDao;
 		this.mapper = mapper;
+		this.isLoading = true;
 	}
 
 	/**
-	 * Returns last block in the db.
+	 * Gets the last block in the db.
 	 *
-	 * @return last block from db.
+	 * @return The last block in the db.
 	 */
 	public DbBlock getLastDbBlock() {
 		return this.lastBlock;
 	}
 
-	// TODO 20150208 J-G: might make sense to add an isLastDbBlockAvailable
-
 	/**
-	 * Gets the current block being analyzed.
-	 * TODO 20150208 J-G: might make sense to rename this since we have 'current' and 'last'
+	 * Gets a value indicating whether or not blocks are being loaded.
 	 *
-	 * @return The current block being analyzed.
+	 * @return true if blocks are being loaded; false if all blocks have been loaded.
 	 */
-	public DbBlock getCurrentDbBlock() {
-		return this.currentBlock;
+	public boolean isLoading() {
+		return this.isLoading;
 	}
 
 	/**
-	 * Sets the current block being analyzed.
-	 *
-	 * @param block The current block being analyzed.
+	 * Sets a value indicating that all blocks have been loaded.
 	 */
-	public void setCurrentBlock(final DbBlock block) { this.currentBlock = block; }
+	public void setLoaded() {
+		LOGGER.info(String.format("block loading completed; height %s", this.getLastBlockHeight()));
+		this.isLoading = false;
+	}
 
 	/**
-	 * Returns height of last block in the db.
+	 * Gets the height of the last analyzed block.
 	 *
-	 * @return height of last block in the db.
+	 * @return The height of last analyzed block.
 	 */
-	public Long getLastBlockHeight() {
-		return this.lastBlock.getHeight();
+	public BlockHeight getLastBlockHeight() {
+		return null == this.lastBlock ? BlockHeight.ONE : new BlockHeight(this.lastBlock.getHeight());
 	}
 
 	/**
 	 * Analyzes last block, used during initial initialization of blocks in blockchain.
 	 *
-	 * @param curBlock lastBlock in db.
+	 * @param curBlock The last block in the db.
 	 */
 	public void analyzeLastBlock(final DbBlock curBlock) {
-		LOGGER.info("analyzing last block: " + Long.toString(curBlock.getShortId()));
+		if (!this.isLoading()) {
+			LOGGER.info(String.format("analyzing last block: %s", curBlock.getShortId()));
+		}
+
 		this.lastBlock = curBlock;
 	}
 
 	/**
-	 * Adds new block into db
+	 * Adds new block to the db.
 	 *
-	 * @param block block to be added to db
-	 * @return always true
+	 * @param block The block to be added to the db.
 	 */
-	public boolean addBlockToDb(final Block block) {
+	public void addBlockToDb(final Block block) {
 		final DbBlock dbBlock = this.mapper.map(block);
 
 		// hibernate will save both block AND transactions
@@ -91,7 +92,6 @@ public class BlockChainLastBlockLayer {
 		// mind that there is NO cascade in transaction (near block field)
 		this.blockDao.save(dbBlock);
 		this.lastBlock = dbBlock;
-		return true;
 	}
 
 	/**

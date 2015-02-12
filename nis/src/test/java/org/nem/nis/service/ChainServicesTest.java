@@ -186,7 +186,7 @@ public class ChainServicesTest {
 
 		@SuppressWarnings("unchecked")
 		public TestContext(final long height) {
-			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(height);
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(height));
 			Mockito.when(this.connectorPool.getPeerConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connectorPool.getSyncConnector(Mockito.any())).thenReturn(this.connector);
 			Mockito.when(this.connector.getKnownPeers(Mockito.any())).thenReturn(this.createNodesFuture());

@@ -2,100 +2,158 @@ package org.nem.nis.service;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.nem.core.model.Account;
+import org.mockito.Mockito;
+import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
+import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.nem.nis.test.*;
 
 public class BlockChainLastBlockLayerTest {
 
+	//region basic operations
+
 	@Test
-	public void uninitializedLastBlockLayerReturnsNull() {
+	public void layerIsInitializedWithNoLastBlock() {
 		// Act:
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getCurrentDbBlock(), IsNull.nullValue());
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void afterAnalyzeLastBlockLayerReturnsBlock() {
+	public void analyzeLastBlockSetsBlockAsLastBlock() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
-		final DbBlock block = createDbBlock(1);
+		final DbBlock block = createDbBlock(123);
 
 		// Act:
 		lastBlockLayer.analyzeLastBlock(block);
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
-		Assert.assertThat(lastBlockLayer.getCurrentDbBlock(), IsNull.nullValue());
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(true));
 	}
 
 	@Test
-	public void addBlockToDbSetsBlockIdOfLastBlock() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		final DbBlock blockDaoLastBlock = context.addSingleBlockToDb();
-
-		// Assert:
-		Assert.assertThat(blockDaoLastBlock.getId(), IsEqual.equalTo(1L));
-	}
-
-	@Test
-	public void addBlockToDbSavesBlockInBlockDao() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		final DbBlock blockDaoLastBlock = context.addSingleBlockToDb();
-
-		// Assert:
-		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsEqual.equalTo(blockDaoLastBlock));
-		Assert.assertThat(context.lastBlockLayer.getCurrentDbBlock(), IsNull.nullValue());
-	}
-
-	@Test
-	public void setCurrentBlockOnlySetsCurrentBlock() {
+	public void setLoadedChangesIsLoadingStatusToFalse() {
 		// Arrange:
 		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
-		final DbBlock block = createDbBlock(1);
 
 		// Act:
-		lastBlockLayer.setCurrentBlock(block);
+		lastBlockLayer.setLoaded();
 
 		// Assert:
 		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsNull.nullValue());
-		Assert.assertThat(lastBlockLayer.getCurrentDbBlock(), IsSame.sameInstance(block));
-
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(BlockHeight.ONE));
+		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	private static org.nem.core.model.Block createBlock(final Account harvester) {
+	@Test
+	public void analyzeLastBlockSetsBlockAsLastBlockWhenIsLoadingIsFalse() {
 		// Arrange:
-		final org.nem.core.model.Block block = new org.nem.core.model.Block(
-				harvester,
-				Utils.generateRandomHash(),
-				Utils.generateRandomHash(),
-				new TimeInstant(7),
-				new BlockHeight(3));
-		block.sign();
-		return block;
+		final BlockChainLastBlockLayer lastBlockLayer = this.createBlockChainLastBlockLayer();
+		final DbBlock block = createDbBlock(123);
+
+		// Act:
+		lastBlockLayer.setLoaded();
+		lastBlockLayer.analyzeLastBlock(block);
+
+		// Assert:
+		Assert.assertThat(lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		Assert.assertThat(lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(123)));
+		Assert.assertThat(lastBlockLayer.isLoading(), IsEqual.equalTo(false));
 	}
 
-	private static org.nem.core.model.Block createBlock() {
+	//endregion
+
+	//region addBlockToDb
+
+	@Test
+	public void addBlockToDbDelegatesToBlockDaoAndMapper() {
 		// Arrange:
-		return createBlock(Utils.generateRandomAccount());
+		final Block block = createBlock(777);
+		final DbBlock dbBlock = createDbBlock(777);
+		final TestContext context = new TestContext();
+		Mockito.when(context.mapper.map(block)).thenReturn(dbBlock);
+
+		// Act:
+		context.lastBlockLayer.addBlockToDb(block);
+
+		// Assert:
+		Mockito.verify(context.mapper, Mockito.only()).map(block);
+		Mockito.verify(context.mockBlockDao, Mockito.only()).save(dbBlock);
 	}
 
-	private static DbBlock createDbBlock(final long i) {
+	@Test
+	public void addBlockToDbUpdatesLastBlock() {
+		// Arrange:
+		final Block block = createBlock(777);
+		final DbBlock dbBlock = createDbBlock(777);
+		final TestContext context = new TestContext();
+		Mockito.when(context.mapper.map(block)).thenReturn(dbBlock);
+
+		// Act:
+		context.lastBlockLayer.addBlockToDb(block);
+
+		// Assert:
+		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(dbBlock));
+		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
+		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region dropDbBlocksAfter
+
+	@Test
+	public void dropDbBlocksAfterDelegatesToBlockDao() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(777);
+		final TestContext context = new TestContext();
+
+		// Act:
+		context.lastBlockLayer.dropDbBlocksAfter(height);
+
+		// Assert:
+		Mockito.verify(context.mockBlockDao, Mockito.times(1)).deleteBlocksAfterHeight(height);
+		Mockito.verify(context.mockBlockDao, Mockito.times(1)).findByHeight(height);
+	}
+
+	@Test
+	public void dropDbBlocksAfterUpdatesLastBlock() {
+		// Arrange:
+		final BlockHeight height = new BlockHeight(777);
+		final DbBlock block = createDbBlock(777);
+		final TestContext context = new TestContext();
+		Mockito.when(context.mockBlockDao.findByHeight(height)).thenReturn(block);
+
+		// Act:
+		context.lastBlockLayer.dropDbBlocksAfter(height);
+
+		// Assert:
+		Assert.assertThat(context.lastBlockLayer.getLastDbBlock(), IsSame.sameInstance(block));
+		Assert.assertThat(context.lastBlockLayer.getLastBlockHeight(), IsEqual.equalTo(new BlockHeight(777)));
+		Assert.assertThat(context.lastBlockLayer.isLoading(), IsEqual.equalTo(false));
+	}
+
+	//endregion
+
+	//region helper functions
+
+	private static org.nem.core.model.Block createBlock(final long height) {
+		// Arrange:
+		return NisUtils.createRandomBlockWithHeight(height);
+	}
+
+	private static DbBlock createDbBlock(final long height) {
 		final DbBlock block = new DbBlock();
-		block.setShortId(i);
+		block.setHeight(height);
 		return block;
 	}
 
@@ -107,21 +165,16 @@ public class BlockChainLastBlockLayerTest {
 	}
 
 	private static class TestContext {
-		private final MockAccountDao accountDao = new MockAccountDao();
-		private final MockBlockDao mockBlockDao = new MockBlockDao(createDbBlock(0));
+		private final BlockDao mockBlockDao = Mockito.mock(BlockDao.class);
+		private final NisModelToDbModelMapper mapper = Mockito.mock(NisModelToDbModelMapper.class);
 		private final BlockChainLastBlockLayer lastBlockLayer = new BlockChainLastBlockLayer(
 				this.mockBlockDao,
-				MapperUtils.createModelToDbModelNisMapper(this.accountDao));
+				this.mapper);
 
-		private DbBlock addSingleBlockToDb() {
-			// Arrange:
-			final DbBlock lastBlockLayerLastBlock = createDbBlock(1);
-			this.lastBlockLayer.analyzeLastBlock(lastBlockLayerLastBlock);
-
-			// Act:
-			final org.nem.core.model.Block nextBlock = createBlock();
-			this.lastBlockLayer.addBlockToDb(nextBlock);
-			return this.mockBlockDao.getLastSavedBlock();
+		public TestContext() {
+			this.lastBlockLayer.setLoaded();
 		}
 	}
+
+	//endregion
 }

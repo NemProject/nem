@@ -7,7 +7,8 @@ import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.AccountStateCache;
 import org.nem.nis.state.AccountState;
-import org.nem.nis.validators.*;
+import org.nem.nis.validators.ValidationContext;
+import org.nem.nis.validators.transaction.*;
 
 import java.util.*;
 
@@ -45,6 +46,13 @@ public class MultisigTestContext {
 
 		this.transactionList.add(transaction);
 		return transaction;
+	}
+
+	public MultisigAggregateModificationTransaction createTypedMultisigModificationTransaction(final List<MultisigModification> modifications) {
+		return new MultisigAggregateModificationTransaction(
+				TimeInstant.ZERO,
+				this.multisig,
+				modifications);
 	}
 
 	public MultisigTransaction createMultisigTransferTransaction() {
@@ -91,7 +99,7 @@ public class MultisigTestContext {
 	}
 
 	// forward to validators
-	public ValidationResult validateSignaturePresent(final Transaction transaction) {
+	public ValidationResult validateSignaturePresent(final MultisigTransaction transaction) {
 		return this.multisigSignaturesPresentValidator.validate(transaction, new ValidationContext(this::debitPredicate));
 	}
 
@@ -99,11 +107,11 @@ public class MultisigTestContext {
 		return this.validator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
-	public ValidationResult validateMultisigModification(final Transaction transaction) {
+	public ValidationResult validateMultisigModification(final MultisigAggregateModificationTransaction transaction) {
 		return this.multisigAggregateModificationTransactionValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 
-	public ValidationResult validateTransaction(final Transaction transaction) {
+	public ValidationResult validateTransaction(final MultisigTransaction transaction) {
 		return this.multisigTransactionSignerValidator.validate(transaction, new ValidationContext(DebitPredicates.True));
 	}
 }

@@ -106,7 +106,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		}
 
 		final BlockHeight commonBlockHeight = new BlockHeight(result.getCommonBlockHeight());
-		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight() - commonBlockHeight.getRaw());
+		final int minBlocks = (int)(this.blockChainLastBlockLayer.getLastBlockHeight().subtract(commonBlockHeight));
 		final Collection<Block> peerChain = connector.getChainAfter(
 				node,
 				new ChainRequest(commonBlockHeight, minBlocks, this.configuration.getMaxTransactions()));
@@ -125,7 +125,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 			if (!result.areChainsConsistent()) {
 				LOGGER.info(String.format(
 						"synchronizeNodeInternal -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
-						this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
+						this.blockChainLastBlockLayer.getLastBlockHeight().getRaw() - dbParent.getHeight()));
 				ourScore = context.undoTxesAndGetScore(commonBlockHeight);
 			}
 
@@ -190,7 +190,7 @@ public class BlockChainUpdater implements BlockChainScoreManager {
 		if (this.blockDao.findByHeight(new BlockHeight(dbParent.getHeight() + 1)) != null) {
 			LOGGER.info(String.format(
 					"processBlock -> chain inconsistent: calling undoTxesAndGetScore() (%d blocks).",
-					this.blockChainLastBlockLayer.getLastBlockHeight() - dbParent.getHeight()));
+					this.blockChainLastBlockLayer.getLastBlockHeight().getRaw() - dbParent.getHeight()));
 			ourScore = context.undoTxesAndGetScore(new BlockHeight(dbParent.getHeight()));
 			hasOwnChain = true;
 		}

@@ -19,17 +19,17 @@ public class HarvesterTest {
 	//region harvest bypass
 
 	@Test
-	public void harvestedBlockIsNullIfLastDbBlockIsNull() {
+	public void harvestedBlockIsNullIfLastBlockLayerIsLoading() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(null);
+		Mockito.when(context.blockChainLastBlockLayer.isLoading()).thenReturn(true);
 
 		// Act:
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
 		Assert.assertThat(block, IsNull.nullValue());
-		Mockito.verify(context.blockChainLastBlockLayer, Mockito.only()).getLastDbBlock();
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.only()).isLoading();
 	}
 
 	@Test

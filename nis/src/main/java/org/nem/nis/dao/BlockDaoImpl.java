@@ -222,21 +222,20 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Collection<DbBlock> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
+		// note that since h2 is not very good in optimizing the execution plan we should limit the returned
+		// result set as early as possible or it will scan through the entire index.
+		// note also that it is better to use a union because otherwise we have an OR in the where clause which
+		// will prevent h2 from using an index to speed up the query.
 		final Long accountId = this.getAccountId(account);
-		final String preQueryString = "(SELECT b.* FROM blocks b WHERE height<%d AND harvesterId=%d UNION " +
-				"SELECT b.* FROM blocks b WHERE height<%d AND harvestedInName=%d) " +
-				"ORDER BY height DESC";
-		// TODO 20150108 J-B: any reason you're using String.format instead of setting parameters on the query?
-		final String queryString = String.format(
-				preQueryString,
-				height,
-				accountId,
-				height,
-				accountId);
+		final String queryString = "((SELECT b.* FROM blocks b WHERE height<:height AND harvesterId=:accountId limit :limit) UNION " +
+				"(SELECT b.* FROM blocks b WHERE height<:height AND harvestedInName=:accountId limit :limit)) " +
+				"ORDER BY height DESC limit :limit";
 		final Query query = this.getCurrentSession()
 				.createSQLQuery(queryString)
 				.addEntity(DbBlock.class)
-				.setMaxResults(limit);
+				.setParameter("height", height)
+				.setParameter("accountId", accountId)
+				.setParameter("limit", limit);
 		return listAndCast(query);
 	}
 

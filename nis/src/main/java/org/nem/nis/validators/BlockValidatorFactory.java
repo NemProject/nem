@@ -2,8 +2,7 @@ package org.nem.nis.validators;
 
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.ReadOnlyNisCache;
-
-import java.util.function.Consumer;
+import org.nem.nis.validators.block.*;
 
 /**
  * Factory for creating BlockValidator objects.
@@ -28,25 +27,15 @@ public class BlockValidatorFactory {
 	 */
 	public BlockValidator create(final ReadOnlyNisCache nisCache) {
 		final AggregateBlockValidatorBuilder builder = new AggregateBlockValidatorBuilder();
-		this.visitSubValidators(builder::add, nisCache);
+		builder.add(new BlockNonFutureEntityValidator(this.timeProvider));
+		builder.add(new TransactionDeadlineBlockValidator());
+		builder.add(new EligibleSignerBlockValidator(nisCache.getAccountStateCache()));
+		builder.add(new MaxTransactionsBlockValidator());
+		builder.add(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
+		builder.add(new BlockImportanceTransferValidator());
+		builder.add(new BlockImportanceTransferBalanceValidator());
+		builder.add(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
+		builder.add(new BlockMultisigAggregateModificationValidator());
 		return builder.build();
-	}
-
-	/**
-	 * Visits all sub validators that comprise the validator returned by create.
-	 *
-	 * @param visitor The visitor.
-	 * @param nisCache The NIS cache.
-	 */
-	public void visitSubValidators(final Consumer<BlockValidator> visitor, final ReadOnlyNisCache nisCache) {
-		visitor.accept(new NonFutureEntityValidator(this.timeProvider));
-		visitor.accept(new TransactionDeadlineBlockValidator());
-		visitor.accept(new EligibleSignerBlockValidator(nisCache.getAccountStateCache()));
-		visitor.accept(new MaxTransactionsBlockValidator());
-		visitor.accept(new NoSelfSignedTransactionsBlockValidator(nisCache.getAccountStateCache()));
-		visitor.accept(new BlockImportanceTransferValidator());
-		visitor.accept(new BlockImportanceTransferBalanceValidator());
-		visitor.accept(new BlockUniqueHashTransactionValidator(nisCache.getTransactionHashCache()));
-		visitor.accept(new BlockMultisigAggregateModificationValidator());
 	}
 }

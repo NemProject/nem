@@ -15,6 +15,7 @@ import org.nem.nis.state.*;
 import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
+import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -85,7 +86,7 @@ public class BlockChainValidatorIntegrationTest {
 		// Arrange:
 		final BlockChainValidatorFactory factory = createValidatorFactory();
 		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK);
 		parentBlock.sign();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
@@ -549,7 +550,6 @@ public class BlockChainValidatorIntegrationTest {
 		public BlockChainValidatorFactory() {
 			final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 			final AggregateSingleTransactionValidatorBuilder builder = transactionValidatorFactory.createSingleBuilder(this.accountStateCache);
-			builder.add(new MultisigSignaturesPresentValidator(accountStateCache));
 			this.transactionValidator = builder.build();
 
 			Mockito.when(this.transactionHashCache.anyHashExists(Mockito.any())).thenReturn(false);
