@@ -23,7 +23,116 @@ import java.util.stream.Collectors;
 @RunWith(Enclosed.class)
 public class AccountInfoControllerTest {
 
-	private static abstract class AccountGetTestBase {
+	private static abstract class AccountStatusTestBase {
+
+		//region account status
+
+		@Test
+		public void accountStatusDelegatesToUnlockedAccountsForUnlockedAccountStatus() {
+			this.assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
+		}
+
+		@Test
+		public void accountStatusDelegatesToUnlockedAccountsForLockedAccountStatus() {
+			this.assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
+		}
+
+		private void assertAccountStatusDelegatesToUnlockedAccounts(
+				final boolean isAccountUnlockedResult,
+				final AccountStatus expectedStatus) {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setUnlocked(isAccountUnlockedResult);
+
+			// Act:
+			final AccountMetaData accountMetaData = this.getAccountInfo(context);
+
+			// Assert:
+			context.assertUnlocked(accountMetaData, expectedStatus);
+		}
+
+		//endregion
+
+		//region remote status
+
+		@Test
+		public void accountStatusDelegatesToAccountInfoFactoryForRemoteStatus() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 17);
+
+			// Act:
+			final AccountMetaData accountMetaData = this.getAccountInfo(context);
+
+			// Assert:
+			context.assertRemoteStatus(accountMetaData, AccountRemoteStatus.ACTIVATING, 17);
+		}
+
+		@Test
+		public void accountStatusOverridesInactiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
+			// Assert:
+			assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+					AccountRemoteStatus.INACTIVE,
+					AccountRemoteStatus.ACTIVATING);
+		}
+
+		@Test
+		public void accountStatusOverridesActiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
+			// Assert:
+			assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+					AccountRemoteStatus.ACTIVE,
+					AccountRemoteStatus.DEACTIVATING);
+		}
+
+		private void assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+				final AccountRemoteStatus remoteStatus,
+				final AccountRemoteStatus expectedRemoteStatus) {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setRemoteStatus(remoteStatus, 17);
+			context.filteredTransactions.add(createImportanceTransfer(context.address));
+
+			// Act:
+			final AccountMetaData accountMetaData = this.getAccountInfo(context);
+
+			// Assert:
+			context.assertRemoteStatus(accountMetaData, expectedRemoteStatus, 17);
+		}
+
+		@Test
+		public void accountStatusDoesNotOverrideRemoteStatusIfOtherUnconfirmedTransferIsPending() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setRemoteStatus(AccountRemoteStatus.ACTIVE, 17);
+			context.filteredTransactions.add(createTransfer(context.address));
+
+			// Act:
+			final AccountMetaData accountMetaData = this.getAccountInfo(context);
+
+			// Assert:
+			context.assertRemoteStatus(accountMetaData, AccountRemoteStatus.ACTIVE, 17);
+		}
+
+		@Test
+		public void accountStatusFailsIfUnconfirmedImportanceTransferIsPendingWithUnexpectedRemoteStatus() {
+			// Arrange:
+			final TestContext context = new TestContext();
+			context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 17);
+			context.filteredTransactions.add(createImportanceTransfer(context.address));
+
+			// Act:
+			ExceptionAssert.assertThrows(
+					v -> this.getAccountInfo(context),
+					IllegalStateException.class);
+		}
+
+		//endregion
+
+		protected abstract AccountMetaData getAccountInfo(final TestContext context);
+	}
+
+
+	private static abstract class AccountGetTestBase extends AccountStatusTestBase {
 
 		@Test
 		public void accountGetDelegatesToAccountInfoFactoryForAccountInfo() {
@@ -34,60 +143,24 @@ public class AccountInfoControllerTest {
 			Mockito.when(context.accountInfoFactory.createInfo(context.address)).thenReturn(accountInfo);
 
 			// Act:
-			final AccountMetaDataPair metaDataPair = this.getAccountInfo(context);
+			final AccountMetaDataPair metaDataPair = this.getAccountMetaDataPair(context);
 
 			// Assert:
 			Assert.assertThat(metaDataPair.getAccount(), IsSame.sameInstance(accountInfo));
 			Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(context.address);
 		}
 
-		@Test
-		public void accountGetDelegatesToAccountInfoFactoryForRemoteStatus() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
-
-			// Act:
-			final AccountMetaDataPair metaDataPair = this.getAccountInfo(context);
-
-			// Assert:
-			context.assertRemoteStatus(metaDataPair.getMetaData(), AccountRemoteStatus.ACTIVATING, 1);
+		protected final AccountMetaData getAccountInfo(final TestContext context) {
+			return this.getAccountMetaDataPair(context).getMetaData();
 		}
 
-		@Test
-		public void accountGetDelegatesToUnlockedAccountsForOverriddenRemoteStatus() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setRemoteStatus(AccountRemoteStatus.ACTIVE, 1);
-			context.filteredTransactions.add(createImportanceTransfer(context.address));
-
-			// Act:
-			final AccountMetaDataPair metaDataPair = this.getAccountInfo(context);
-
-			// Assert:
-			context.assertRemoteStatus(metaDataPair.getMetaData(), AccountRemoteStatus.DEACTIVATING, 1);
-		}
-
-		@Test
-		public void accountGetDelegatesToUnlockedAccountsForAccountStatus() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setUnlocked(false);
-
-			// Act:
-			final AccountMetaDataPair metaDataPair = this.getAccountInfo(context);
-
-			// Assert:
-			context.assertUnlocked(metaDataPair.getMetaData(), AccountStatus.LOCKED);
-		}
-
-		protected abstract AccountMetaDataPair getAccountInfo(final TestContext context);
+		protected abstract AccountMetaDataPair getAccountMetaDataPair(final TestContext context);
 	}
 
 	public static class AccountGetTest extends AccountGetTestBase {
 
 		@Override
-		protected AccountMetaDataPair getAccountInfo(final TestContext context) {
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
 			return context.controller.accountGet(context.getBuilder());
 		}
 	}
@@ -95,7 +168,7 @@ public class AccountInfoControllerTest {
 	public static class AccountGetBatchTest extends AccountGetTestBase {
 
 		@Override
-		protected AccountMetaDataPair getAccountInfo(final TestContext context) {
+		protected AccountMetaDataPair getAccountMetaDataPair(final TestContext context) {
 			final SerializableList<AccountMetaDataPair> pairs = context.controller.accountGetBatch(context.getAccountIdListDeserializer());
 			Assert.assertThat(pairs.size(), IsEqual.equalTo(1));
 			return pairs.get(0);
@@ -129,101 +202,11 @@ public class AccountInfoControllerTest {
 		}
 	}
 
-	public static class AccountStatusTest {
+	public static class AccountStatusTest extends AccountStatusTestBase {
 
-		@Test
-		public void accountStatusDelegatesToUnlockedAccountsForUnlockedAccountStatus() {
-			assertAccountStatusDelegatesToUnlockedAccounts(true, AccountStatus.UNLOCKED);
-		}
-
-		@Test
-		public void accountStatusDelegatesToUnlockedAccountsForLockedAccountStatus() {
-			assertAccountStatusDelegatesToUnlockedAccounts(false, AccountStatus.LOCKED);
-		}
-
-		private static void assertAccountStatusDelegatesToUnlockedAccounts(
-				final boolean isAccountUnlockedResult,
-				final AccountStatus expectedStatus) {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setUnlocked(isAccountUnlockedResult);
-
-			// Act:
-			final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
-
-			// Assert:
-			context.assertUnlocked(accountMetaData, expectedStatus);
-		}
-
-		@Test
-		public void accountStatusDelegatesToAccountInfoFactoryForRemoteStatus() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 17);
-
-			// Act:
-			final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
-
-			// Assert:
-			context.assertRemoteStatus(accountMetaData, AccountRemoteStatus.ACTIVATING, 17);
-		}
-
-		@Test
-		public void accountStatusOverridesInactiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
-			// Assert:
-			assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
-					AccountRemoteStatus.INACTIVE,
-					AccountRemoteStatus.ACTIVATING);
-		}
-
-		@Test
-		public void accountStatusOverridesActiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
-			// Assert:
-			assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
-					AccountRemoteStatus.ACTIVE,
-					AccountRemoteStatus.DEACTIVATING);
-		}
-
-		private static void assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
-				final AccountRemoteStatus remoteStatus,
-				final AccountRemoteStatus expectedRemoteStatus) {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setRemoteStatus(remoteStatus, 17);
-			context.filteredTransactions.add(createImportanceTransfer(context.address));
-
-			// Act:
-			final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
-
-			// Assert:
-			context.assertRemoteStatus(accountMetaData, expectedRemoteStatus, 17);
-		}
-
-		@Test
-		public void accountStatusDoesNotOverrideRemoteStatusIfOtherUnconfirmedTransferIsPending() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setRemoteStatus(AccountRemoteStatus.ACTIVE, 17);
-			context.filteredTransactions.add(createTransfer(context.address));
-
-			// Act:
-			final AccountMetaData accountMetaData = context.controller.accountStatus(context.getBuilder());
-
-			// Assert:
-			context.assertRemoteStatus(accountMetaData, AccountRemoteStatus.ACTIVE, 17);
-		}
-
-		@Test
-		public void accountStatusFailsIfUnconfirmedImportanceTransferIsPendingWithUnexpectedRemoteStatus() {
-			// Arrange:
-			final TestContext context = new TestContext();
-			context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 17);
-			context.filteredTransactions.add(createImportanceTransfer(context.address));
-
-			// Act:
-			ExceptionAssert.assertThrows(
-					v -> context.controller.accountStatus(context.getBuilder()),
-					IllegalStateException.class);
+		@Override
+		protected AccountMetaData getAccountInfo(final TestContext context) {
+			return context.controller.accountStatus(context.getBuilder());
 		}
 	}
 
