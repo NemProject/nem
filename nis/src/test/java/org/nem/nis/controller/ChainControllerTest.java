@@ -147,53 +147,6 @@ public class ChainControllerTest {
 	//region chainHeight
 
 	@Test
-	public void chainHeightReturnsBlockHeightOneWhenNeitherLastBlockNorCurrentBlockIsAvailable() {
-		// Assert:
-		assertChainHeight(null, null, BlockHeight.ONE);
-	}
-
-	@Test
-	public void chainHeightReturnsCurrentBlockHeightWhenLastBlockHeightIsNotAvailable() {
-		// Assert:
-		assertChainHeight(111L, null, new BlockHeight(111));
-	}
-
-	@Test
-	public void chainHeightReturnsLastBlockHeightWhenLastBlockHeightIsAvailable() {
-		// Assert:
-		assertChainHeight(111L, 222L, new BlockHeight(222));
-	}
-
-	private static void assertChainHeight(
-			final Long currentHeight,
-			final Long lastHeight,
-			final BlockHeight expectedHeight) {
-		// Arrange:
-		final TestContext context = new TestContext();
-		if (null != currentHeight) {
-			final DbBlock currentBlock = new DbBlock();
-			currentBlock.setHeight(currentHeight);
-			Mockito.when(context.blockChainLastBlockLayer.getCurrentDbBlock()).thenReturn(currentBlock);
-		}
-		if (null != lastHeight) {
-			context.setLastBlockHeight(lastHeight);
-		}
-
-		// Act:
-		final BlockHeight height = context.controller.chainHeight();
-
-		// Assert:
-		Assert.assertThat(height, IsEqual.equalTo(expectedHeight));
-		Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastDbBlock();
-		if (null != lastHeight) {
-			Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getLastBlockHeight();
-		}
-		else {
-			Mockito.verify(context.blockChainLastBlockLayer, Mockito.times(1)).getCurrentDbBlock();
-		}
-	}
-
-	@Test
 	public void chainHeightReturnsHeight() {
 		// Arrange:
 		final TestContext context = new TestContext();
@@ -390,7 +343,7 @@ public class ChainControllerTest {
 			final DbBlock lastBlock = new DbBlock();
 			lastBlock.setHeight(height);
 			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(lastBlock);
-			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(height);
+			Mockito.when(this.blockChainLastBlockLayer.getLastBlockHeight()).thenReturn(new BlockHeight(height));
 		}
 	}
 }

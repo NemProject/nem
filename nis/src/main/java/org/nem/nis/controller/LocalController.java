@@ -57,7 +57,7 @@ public class LocalController {
 	}
 
 	private NemStatus getStatusFromHost() {
-		if (null == this.blockChainLastBlockLayer.getLastDbBlock()) {
+		if (this.blockChainLastBlockLayer.isLoading()) {
 			return NemStatus.LOADING;
 		}
 

@@ -84,9 +84,9 @@ public class AccountInfoController {
 	}
 
 	private AccountMetaData getMetaData(final Address address) {
-		final Long height = this.blockChainLastBlockLayer.getLastBlockHeight();
+		final BlockHeight height = this.blockChainLastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountState accountState = this.accountStateCache.findStateByAddress(address);
-		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, new BlockHeight(height));
+		AccountRemoteStatus remoteStatus = this.getRemoteStatus(accountState, height);
 		if (this.hasPendingImportanceTransfer(address)) {
 			switch (remoteStatus) {
 				case INACTIVE:
@@ -102,7 +102,6 @@ public class AccountInfoController {
 			}
 		}
 
-		// TODO 20150111 J-G: should add a test for this
 		final List<AccountInfo> cosignatoryOf = accountState.getMultisigLinks().getCosignatoriesOf().stream()
 				.map(multisigAddress -> this.accountInfoFactory.createInfo(multisigAddress))
 				.collect(Collectors.toList());
@@ -116,13 +115,7 @@ public class AccountInfoController {
 
 	private boolean hasPendingImportanceTransfer(final Address address) {
 		final List<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, Integer.MAX_VALUE);
-		for (final Transaction transaction : transactions) {
-			if (TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType()) {
-				return true;
-			}
-		}
-
-		return false;
+		return transactions.stream().anyMatch(transaction -> TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType());
 	}
 
 	private AccountStatus getAccountStatus(final Address address) {

@@ -80,7 +80,7 @@ public class TransactionController {
 	@RequestMapping(value = "/transaction/prepare-announce", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public NemRequestResult transactionPrepareAnnounce(@RequestBody final RequestPrepareAnnounce request) {
+	public NemAnnounceResult transactionPrepareAnnounce(@RequestBody final RequestPrepareAnnounce request) {
 		final Account account = new Account(new KeyPair(request.getPrivateKey()));
 		final Transaction transfer = request.getTransaction();
 		transfer.signBy(account);
@@ -95,23 +95,19 @@ public class TransactionController {
 	 */
 	@RequestMapping(value = "/transaction/announce", method = RequestMethod.POST)
 	@ClientApi
-	public NemRequestResult transactionAnnounce(@RequestBody final RequestAnnounce request) {
+	public NemAnnounceResult transactionAnnounce(@RequestBody final RequestAnnounce request) {
 		final Transaction transfer = this.deserializeTransaction(request.getData());
 		transfer.setSignature(new Signature(request.getSignature()));
 		return this.push(transfer);
 	}
 
-	private NemRequestResult push(final Transaction transaction) {
+	private NemAnnounceResult push(final Transaction transaction) {
 		final ValidationResult result = this.pushService.pushTransaction(transaction, null);
+		final Hash innerTransactionHash = TransactionTypes.MULTISIG == transaction.getType()
+				? ((MultisigTransaction)transaction).getOtherTransactionHash()
+				: null;
 
-		// TODO 20150108 J-G - i guess this is just for logging?
-		if ((transaction instanceof MultisigTransaction) && (result == ValidationResult.SUCCESS)) {
-			return new NemRequestResult(
-					NemRequestResult.TYPE_VALIDATION_RESULT,
-					result.getValue(),
-					result.toString() + ":" + HashUtils.calculateHash(((MultisigTransaction)transaction).getOtherTransaction()).toString());
-		}
-		return new NemRequestResult(result);
+		return new NemAnnounceResult(result, innerTransactionHash);
 	}
 
 	/**

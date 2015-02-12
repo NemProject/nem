@@ -216,13 +216,14 @@ public class UnlockedAccountsTest {
 		}
 
 		private void setCanForageAtHeight(final Account account, final long lastBlockHeight, final boolean canForage) {
-			Mockito.when(this.lastBlockLayer.getLastBlockHeight()).thenReturn(lastBlockHeight);
+			final BlockHeight height = new BlockHeight(lastBlockHeight);
+			Mockito.when(this.lastBlockLayer.getLastBlockHeight()).thenReturn(height);
 
 			final AccountState accountState = new AccountState(account.getAddress());
-			accountState.getWeightedBalances().addFullyVested(new BlockHeight(lastBlockHeight), Amount.fromNem(canForage ? 10000 : 1));
+			accountState.getWeightedBalances().addFullyVested(height, Amount.fromNem(canForage ? 10000 : 1));
 			Mockito.when(this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress())).thenReturn(accountState);
 
-			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, new BlockHeight(lastBlockHeight))).thenReturn(canForage);
+			Mockito.when(this.canHarvestPredicate.canHarvest(accountState, height)).thenReturn(canForage);
 		}
 
 		private List<Account> createServerLimitPlusOneAccounts() {

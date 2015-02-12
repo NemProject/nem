@@ -150,15 +150,17 @@ public class BlockChainUpdateContext {
 		this.blockChainLastBlockLayer.dropDbBlocksAfter(this.parentBlock.getHeight());
 
 		this.peerChain.stream()
-				.filter(block -> this.blockChainLastBlockLayer.addBlockToDb(block))
-				.forEach(block -> this.unconfirmedTransactions.removeAll(block));
+				.forEach(block -> {
+					this.blockChainLastBlockLayer.addBlockToDb(block);
+					this.unconfirmedTransactions.removeAll(block);
+				});
 	}
 
 	private void addRevertedTransactionsAsUnconfirmed(
 			final Set<Hash> transactionHashes,
 			final long wantedHeight,
 			final AccountLookup accountCache) {
-		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
+		long currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight().getRaw();
 
 		final NisDbModelToModelMapper mapper = this.services.createMapper(accountCache);
 		while (currentHeight != wantedHeight) {

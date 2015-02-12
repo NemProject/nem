@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.node.*;
-import org.nem.core.test.IsEquivalent;
 import org.nem.peer.trust.score.NodeExperiences;
 
 import java.security.SecureRandom;

@@ -6,8 +6,11 @@ import org.nem.core.model.primitive.BlockDifficulty;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 public class BlockDifficultyScorerTest {
+	private static final Logger LOGGER = Logger.getLogger(BlockDifficultyScorerTest.class.getName());
+
 	public static final BlockDifficulty BASE_DIFF = BlockDifficulty.INITIAL_DIFFICULTY;
 	public static final int TARGET_TIME = 60; // target time between blocks
 
@@ -87,25 +90,29 @@ public class BlockDifficultyScorerTest {
 
 	private static void assertDifficultyChangesDependingOnTimeChange(final int timeNeededForGeneratingBlock, final int comparisonResult) {
 		// Arrange:
+		// - initial block difficulties: BASE_DIFF, BASE_DIFF
+		// - initial time stamps: t, t + TIME_DIFF
+		final TimeInstant initialTime = new TimeInstant(100);
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
-		final List<BlockDifficulty> blockDifficulties = new ArrayList<>();
-		final List<TimeInstant> timeInstants = new ArrayList<>();
+		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(Arrays.asList(BASE_DIFF, BASE_DIFF));
+		final List<TimeInstant> timeInstants = new ArrayList<>(Arrays.asList(
+				initialTime,
+				initialTime.addSeconds(timeNeededForGeneratingBlock)));
 
-		final int time = 100;
-		blockDifficulties.add(BASE_DIFF);
-		blockDifficulties.add(BASE_DIFF);
-		timeInstants.add(new TimeInstant(time));
-		timeInstants.add(new TimeInstant(time + timeNeededForGeneratingBlock));
-
-		// Act + Assert
 		BlockDifficulty prevDifficulty = BASE_DIFF;
 		for (int i = 0; i < 60; ++i) {
+			// Act: calculate the difficulty using current information
 			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
+
+			// Assert: the difficulty changed in the expected direction
 			Assert.assertThat(diff.compareTo(prevDifficulty), IsEqual.equalTo(comparisonResult));
 
+			// Arrange: update
+			// - the difficulties (add current difficulty)
+			// - time-instants (add previous + TIME_DIFF)
+			// - previous difficulty (current difficulty)
 			blockDifficulties.add(diff);
-			// TODO 20150111 J-G: why (i+2) here?
-			timeInstants.add(new TimeInstant(time + timeNeededForGeneratingBlock * (i + 2)));
+			timeInstants.add(timeInstants.get(timeInstants.size() - 1).addSeconds(timeNeededForGeneratingBlock));
 			prevDifficulty = diff;
 		}
 	}
@@ -117,66 +124,77 @@ public class BlockDifficultyScorerTest {
 
 	@Test
 	public void whenTimeIsMuchAboveTargetTimeDifficultyDecreasesAtMostFivePercentPerBlock() {
-		// TODO 20150109 G-BR: 248 is the lowest value that this test pass with
-		// > should we allow bigger decrease, when going down?
+		// it is ok that a larger difference (248 - 60) is required for a 5% decrease
+		// than a 5% increase (60 - 2)
 		percentageChange(-1, 248, -5L);
 	}
 
-	private static void percentageChange(final int adjustment, final int timeNeededToGenerateABlock, final long expectedChange) {
+	private static void percentageChange(final int adjustment, final int timeNeededForGeneratingBlock, final long expectedChange) {
 		// Arrange:
+		// - initial block difficulties: BASE_DIFF, BASE_DIFF
+		// - initial time stamps: t, t + TIME_DIFF
+		final TimeInstant initialTime = new TimeInstant(100);
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
-		final List<BlockDifficulty> blockDifficulties = new ArrayList<>();
-		final List<TimeInstant> timeInstants = new ArrayList<>();
-
-		final int time = 100;
-		blockDifficulties.add(BASE_DIFF);
-		blockDifficulties.add(BASE_DIFF);
-		timeInstants.add(new TimeInstant(time));
-		timeInstants.add(new TimeInstant(time + timeNeededToGenerateABlock));
+		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(Arrays.asList(BASE_DIFF, BASE_DIFF));
+		final List<TimeInstant> timeInstants = new ArrayList<>(Arrays.asList(
+				initialTime,
+				initialTime.addSeconds(timeNeededForGeneratingBlock)));
 
 		// Act + Assert
 		BlockDifficulty prevDifficulty = blockDifficulties.get(1);
 		for (int i = 0; i < 100; ++i) {
+			// Act: calculate the difficulty using current information
 			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
+			final long percentageChange = (diff.getRaw() - prevDifficulty.getRaw() + adjustment) * 100 / prevDifficulty.getRaw();
 
-			// TODO 20150111 J-G: why are you breaking out of the loop? i think the test should be more deterministic
-			if (diff.getRaw() >= (10 * BASE_DIFF.getRaw()) || diff.getRaw() <= (BASE_DIFF.getRaw() / 10)) {
+			if (isClamped(diff)) {
+				LOGGER.info(String.format("difficulty is clamped after %d iterations", i));
+				Assert.assertThat(String.format("breaking after %d iterations", i), i > 40, IsEqual.equalTo(true));
 				break;
 			}
 
-			final long percentageChange = (diff.getRaw() - prevDifficulty.getRaw() + adjustment) * 100 / prevDifficulty.getRaw();
-			System.out.println(i + " " + percentageChange + " " + diff + " vs " + (BASE_DIFF.getRaw() / 10));
+			// Assert: the percentage change matches the expected change
+			LOGGER.info(String.format("%d %s %s vs %s", i, percentageChange, diff, BASE_DIFF.getRaw() / 10));
 			Assert.assertThat(percentageChange, IsEqual.equalTo(expectedChange));
 
+			// Arrange: update
+			// - the difficulties (add current difficulty)
+			// - time-instants (add previous + TIME_DIFF)
+			// - previous difficulty (current difficulty)
 			blockDifficulties.add(diff);
-			timeInstants.add(new TimeInstant(time + timeNeededToGenerateABlock * (i + 2)));
+			timeInstants.add(timeInstants.get(timeInstants.size() - 1).addSeconds(timeNeededForGeneratingBlock));
 			prevDifficulty = diff;
 		}
+	}
+
+	private static boolean isClamped(final BlockDifficulty diff) {
+		return 0 == diff.compareTo(new BlockDifficulty(diff.getRaw() + 1))
+				|| 0 == diff.compareTo(new BlockDifficulty(diff.getRaw() - 1));
 	}
 
 	@Test
 	public void whenTimeIsBelowTargetTimeDifficultyDoesNotChangeWhenItReachesMaximum() {
 		// Arrange:
+		// - initial block difficulties: MAX_DIFF, MAX_DIFF
+		// - initial time stamps: t, t + 2
+		final TimeInstant initialTime = new TimeInstant(100);
+		final BlockDifficulty maxDifficulty = new BlockDifficulty(Long.MAX_VALUE);
 		final BlockDifficultyScorer blockDifficultyScorer = new BlockDifficultyScorer();
-		final List<BlockDifficulty> blockDifficulties = new ArrayList<>();
-		final List<TimeInstant> timeInstants = new ArrayList<>();
+		final List<BlockDifficulty> blockDifficulties = new ArrayList<>(Arrays.asList(maxDifficulty, maxDifficulty));
+		final List<TimeInstant> timeInstants = new ArrayList<>(Arrays.asList(initialTime, initialTime.addSeconds(2)));
 
-		final int time = 100;
-		blockDifficulties.add(new BlockDifficulty(10 * BASE_DIFF.getRaw()));
-		blockDifficulties.add(new BlockDifficulty(10 * BASE_DIFF.getRaw()));
-		timeInstants.add(new TimeInstant(time));
-		timeInstants.add(new TimeInstant(time + 2));
-
-		// Act + Assert
-		BlockDifficulty prevDifficulty = blockDifficulties.get(0);
 		for (int i = 0; i < 100; ++i) {
+			// Act: calculate the difficulty using current information
 			final BlockDifficulty diff = blockDifficultyScorer.calculateDifficulty(blockDifficulties, timeInstants, 0);
-			Assert.assertThat(diff, IsEqual.equalTo(prevDifficulty));
 
+			// Assert: the difficulty does not change (it is clamped at max difficulty)
+			Assert.assertThat(diff, IsEqual.equalTo(maxDifficulty));
+
+			// Arrange: update
+			// - the difficulties (add current difficulty)
+			// - time-instants (add previous + 2)
 			blockDifficulties.add(diff);
-			// TODO 20150111 J-G: why 2 * (i+2)
-			timeInstants.add(new TimeInstant(time + 2 * (i + 2)));
-			prevDifficulty = diff;
+			timeInstants.add(timeInstants.get(timeInstants.size() - 1).addSeconds(2));
 		}
 	}
 }
