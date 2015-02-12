@@ -116,13 +116,7 @@ public class AccountInfoController {
 
 	private boolean hasPendingImportanceTransfer(final Address address) {
 		final List<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, Integer.MAX_VALUE);
-		for (final Transaction transaction : transactions) {
-			if (TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType()) {
-				return true;
-			}
-		}
-
-		return false;
+		return transactions.stream().anyMatch(transaction -> TransactionTypes.IMPORTANCE_TRANSFER == transaction.getType());
 	}
 
 	private AccountStatus getAccountStatus(final Address address) {
