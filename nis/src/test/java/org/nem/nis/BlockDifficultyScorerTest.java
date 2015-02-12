@@ -124,8 +124,8 @@ public class BlockDifficultyScorerTest {
 
 	@Test
 	public void whenTimeIsMuchAboveTargetTimeDifficultyDecreasesAtMostFivePercentPerBlock() {
-		// TODO 20150109 G-BR: 248 is the lowest value that this test pass with
-		// > should we allow bigger decrease, when going down?
+		// it is ok that a larger difference (248 - 60) is required for a 5% decrease
+		// than a 5% increase (60 - 2)
 		percentageChange(-1, 248, -5L);
 	}
 
