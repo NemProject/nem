@@ -13,6 +13,7 @@ import org.nem.nis.mappers.NisModelToDbModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 // TODO: we should really test this class ;)
@@ -73,7 +74,7 @@ public class NisMain {
 		this.populateDb();
 
 		// analyze the blocks
-		//final Thread thread = new Thread(() -> {
+		final CompletableFuture<java.lang.Void> future = CompletableFuture.runAsync(() -> {
 			this.analyzeBlocks();
 
 			final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
@@ -87,8 +88,11 @@ public class NisMain {
 			LOGGER.warning(String.format("auto-booting %s ... ", autoBootNodeIdentity.getAddress()));
 			this.networkHost.boot(new Node(autoBootNodeIdentity, this.nisConfiguration.getEndpoint()));
 			LOGGER.warning("auto-booted!");
-		//});
-		//thread.start();
+		});
+
+		if (!this.nisConfiguration.delayBlockLoading()) {
+			future.join();
+		}
 	}
 
 	private void logNemesisInformation() {

@@ -21,6 +21,7 @@ public interface AccountLookup {
 	 * Looks up an account by its id.
 	 *
 	 * @param id The account id.
+	 * @param validator The validator for validating the address.
 	 * @return The account with the specified id.
 	 */
 	public Account findByAddress(final Address id, Predicate<Address> validator);
