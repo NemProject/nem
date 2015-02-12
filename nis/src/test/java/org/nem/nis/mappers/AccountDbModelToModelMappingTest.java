@@ -34,7 +34,7 @@ public class AccountDbModelToModelMappingTest {
 		final DbAccount dbAccount = new DbAccount(encodedAddress, publicKey);
 		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		final Account accountReturnedByAccountLookup = Mockito.mock(Account.class);
-		Mockito.when(accountLookup.findByAddress(Mockito.any())).thenReturn(accountReturnedByAccountLookup);
+		Mockito.when(accountLookup.findByAddress(Mockito.any(), Mockito.any())).thenReturn(accountReturnedByAccountLookup);
 
 		final AccountDbModelToModelMapping mapping = new AccountDbModelToModelMapping(accountLookup);
 
@@ -45,7 +45,7 @@ public class AccountDbModelToModelMappingTest {
 		Assert.assertThat(account, IsEqual.equalTo(accountReturnedByAccountLookup));
 
 		final ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
-		Mockito.verify(accountLookup, Mockito.only()).findByAddress(addressCaptor.capture());
+		Mockito.verify(accountLookup, Mockito.only()).findByAddress(addressCaptor.capture(), Mockito.any());
 		Assert.assertThat(addressCaptor.getValue().getEncoded(), IsEqual.equalTo(encodedAddress));
 		Assert.assertThat(addressCaptor.getValue().getPublicKey(), IsEqual.equalTo(publicKey));
 	}

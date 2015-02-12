@@ -290,7 +290,7 @@ public class AccountIoAdapterTest {
 		}
 
 		private void addAccount(final Account account) {
-			Mockito.when(this.accountCache.findByAddress(account.getAddress())).thenReturn(account);
+			Mockito.when(this.accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
 		}
 
 		//endregion
@@ -461,6 +461,7 @@ public class AccountIoAdapterTest {
 	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
 		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
+		when(accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
 		when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
 	}
 }

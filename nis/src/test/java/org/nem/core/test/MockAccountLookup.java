@@ -3,7 +3,8 @@ package org.nem.core.test;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 
-import java.util.HashMap;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * A mock AccountLookup implementation.
@@ -69,6 +70,15 @@ public class MockAccountLookup implements AccountLookup {
 			default:
 				return new Account(id);
 		}
+	}
+
+	@Override
+	public Account findByAddress(final Address id, final Predicate<Address> validator) {
+		if (!validator.test(id)) {
+			throw new MissingResourceException("invalid address", Address.class.getName(), id.toString());
+		}
+
+		return this.findByAddress(id);
 	}
 
 	@Override

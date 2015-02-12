@@ -215,6 +215,16 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
+	@Test(expected = MissingResourceException.class)
+	public void findByAddressUsesCustomValidator() {
+		// Arrange:
+		final AccountCache cache = this.createAccountCache();
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		cache.findByAddress(address, a -> false);
+	}
+
 	//endregion
 
 	//region isKnownAddress

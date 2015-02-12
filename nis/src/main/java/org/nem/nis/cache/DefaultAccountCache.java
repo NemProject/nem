@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * A simple, in-memory account cache that implements AccountLookup and provides the lookup of accounts
@@ -38,11 +38,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public Account addAccountToCache(final Address address) {
-		return this.findByAddress(address, () -> {
-			final Account account = new Account(address);
-			this.addressToAccountMap.put(address, account);
-			return account;
-		});
+		return this.addAccountToCache(address, Address::isValid);
 	}
 
 	@Override
@@ -50,9 +46,16 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 		this.addressToAccountMap.remove(address);
 	}
 
-	private Account findByAddress(final Address address, final Supplier<Account> notFoundHandler) {
-		// TODO 20150212 BR -> J: do we really need this check, it is making the mapper very slow!
-		if (!address.isValid()) {
+	private Account addAccountToCache(final Address address, Predicate<Address> validator) {
+		return this.findByAddress(address, validator, () -> {
+			final Account account = new Account(address);
+			this.addressToAccountMap.put(address, account);
+			return account;
+		});
+	}
+
+	private Account findByAddress(final Address address, Predicate<Address> validator, final Supplier<Account> notFoundHandler) {
+		if (!validator.test(address)) {
 			throw new MissingResourceException("invalid address", Address.class.getName(), address.toString());
 		}
 
@@ -76,7 +79,12 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public Account findByAddress(final Address address) {
-		return this.findByAddress(address, () -> createAccount(address.getPublicKey(), address.getEncoded()));
+		return this.findByAddress(address, Address::isValid, ()  -> createAccount(address.getPublicKey(), address.getEncoded()));
+	}
+
+	@Override
+	public Account findByAddress(final Address address, Predicate<Address> validator) {
+		return this.findByAddress(address, validator, () -> createAccount(address.getPublicKey(), address.getEncoded()));
 	}
 
 	private static Account createAccount(final PublicKey publicKey, final String encodedAddress) {
@@ -110,6 +118,11 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 		@Override
 		public Account findByAddress(final Address id) {
 			return this.accountCache.addAccountToCache(id);
+		}
+
+		@Override
+		public Account findByAddress(final Address id, final Predicate<Address> validator) {
+			return this.accountCache.addAccountToCache(id, validator);
 		}
 
 		@Override
