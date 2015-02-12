@@ -128,9 +128,59 @@ public class AccountInfoControllerTest {
 
 		//endregion
 
+		//region multisig accounts
+
+		@Test
+		public void accountStatusCanReturnAccountWithNoAssociatedMultisigAccounts() {
+			// Arrange:
+			final TestContext context = new TestContext();
+
+			// Act:
+			final AccountMetaData accountMetaData = this.getAccountInfo(context);
+
+			// Assert:
+			Assert.assertThat(accountMetaData.getCosignatoryOf().size(), IsEqual.equalTo(0));
+		}
+
+		@Test
+		public void accountStatusDelegatesToAccountInfoFactoryForAccountInfoOfAssociatedMultisigAccounts() {
+			// Arrange:
+			final TestContext context = new TestContext();
+
+			// - set up three multisig accounts that the original account can cosign
+			final MultisigLinks multisigLinks = new MultisigLinks();
+			final List<Address> multisigAddresses = new ArrayList<>();
+			final List<AccountInfo> multisigAccountInfos = new ArrayList<>();
+			for (int i = 0; i < 3; ++i) {
+				final Address multisigAddress = Utils.generateRandomAddress();
+				final AccountInfo multisigAccountInfo = Mockito.mock(AccountInfo.class);
+				Mockito.when(context.accountInfoFactory.createInfo(multisigAddress)).thenReturn(multisigAccountInfo);
+
+				multisigLinks.addCosignatoryOf(multisigAddress);
+				multisigAddresses.add(multisigAddress);
+				multisigAccountInfos.add(multisigAccountInfo);
+			}
+
+			// - set the original account's multisig links
+			final ReadOnlyAccountState state = context.accountStateCache.findStateByAddress(context.address);
+			Mockito.when(state.getMultisigLinks()).thenReturn(multisigLinks);
+
+			// Act:
+			final AccountMetaData accountMetaData = this.getAccountInfo(context);
+
+			// Assert:
+			// - each multisig account was queried and returned
+			Assert.assertThat(accountMetaData.getCosignatoryOf().size(), IsEqual.equalTo(3));
+			Assert.assertThat(accountMetaData.getCosignatoryOf(), IsEquivalent.equivalentTo(multisigAccountInfos));
+			for (final Address multisigAddress : multisigAddresses) {
+				Mockito.verify(context.accountInfoFactory, Mockito.times(1)).createInfo(multisigAddress);
+			}
+		}
+
+		//endregion
+
 		protected abstract AccountMetaData getAccountInfo(final TestContext context);
 	}
-
 
 	private static abstract class AccountGetTestBase extends AccountStatusTestBase {
 
@@ -139,7 +189,6 @@ public class AccountInfoControllerTest {
 			// Arrange:
 			final AccountInfo accountInfo = Mockito.mock(AccountInfo.class);
 			final TestContext context = new TestContext();
-			context.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
 			Mockito.when(context.accountInfoFactory.createInfo(context.address)).thenReturn(accountInfo);
 
 			// Act:
@@ -243,6 +292,9 @@ public class AccountInfoControllerTest {
 			final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
 			Mockito.when(unconfirmedTransactions.getMostRecentTransactionsForAccount(Mockito.any(), Mockito.eq(Integer.MAX_VALUE)))
 					.thenReturn(this.filteredTransactions);
+
+			this.setRemoteStatus(AccountRemoteStatus.ACTIVATING, 1);
+			Mockito.when(this.accountInfoFactory.createInfo(this.address)).thenReturn(Mockito.mock(AccountInfo.class));
 
 			this.controller = new AccountInfoController(
 					this.unlockedAccounts,
