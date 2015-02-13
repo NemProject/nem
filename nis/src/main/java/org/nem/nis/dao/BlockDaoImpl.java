@@ -16,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Repository
 public class BlockDaoImpl implements BlockDao {
+	private static final Logger LOGGER = Logger.getLogger(BlockDaoImpl.class.getName());
 
 	private final SessionFactory sessionFactory;
 
@@ -248,15 +250,12 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
-		// whatever it takes : DO NOT ADD setMaxResults here!
-		final long blockHeight = height.getRaw();
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.setFetchMode("harvester", FetchMode.JOIN)
-				.add(Restrictions.gt("height", blockHeight))
-				.add(Restrictions.le("height", blockHeight + limit))
-				.addOrder(Order.asc("height"));
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return listAndCast(criteria);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final long start = System.currentTimeMillis();
+		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height, new BlockHeight(height.getRaw() + limit));
+		final long stop = System.currentTimeMillis();
+		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
+		return dbBlocks;
 	}
 
 	@Override
@@ -268,6 +267,20 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
+
+		// DbMultisigTransaction needs to dropped first because it has foreign key references to the other
+		// transaction tables; attempting to delete other transactions first will break referential integrity
+		this.dropTransfers(
+				blockHeight,
+				"DbMultisigTransaction",
+				"blockMultisigTransactions",
+				transactionsToDelete -> {
+					final Query preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+				});
+
 		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
 		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
 		this.dropTransfers(
@@ -277,18 +290,6 @@ public class BlockDaoImpl implements BlockDao {
 				transactionsToDelete -> {
 					final Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
-					preQuery.executeUpdate();
-				});
-
-		// must be last
-		this.dropTransfers(
-				blockHeight,
-				"DbMultisigTransaction",
-				"blockMultisigTransactions",
-				transactionsToDelete -> {
-					final Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 				});

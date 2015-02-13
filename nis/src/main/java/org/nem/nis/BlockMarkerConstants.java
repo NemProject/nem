@@ -10,5 +10,5 @@ public class BlockMarkerConstants {
 	 * <br/>
 	 * Targeting some day.
 	 */
-	public static final long BETA_REMOTE_VALIDATION_FORK = 15000;
+	public static final long BETA_REMOTE_VALIDATION_FORK = 17000;
 }

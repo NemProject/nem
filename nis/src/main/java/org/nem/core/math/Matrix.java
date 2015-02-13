@@ -437,6 +437,7 @@ public abstract class Matrix {
 	 *
 	 * @param numRows The number of rows.
 	 * @param numCols The number of columns.
+	 * @return Created matrix.
 	 */
 	protected abstract Matrix create(final int numRows, final int numCols);
 

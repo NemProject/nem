@@ -67,7 +67,7 @@ public class TransactionValidatorFactoryTest {
 
 				this.add("TransferTransactionValidator");
 				this.add("ImportanceTransferTransactionValidator");
-				this.add("RemoteNonOperationalValidator @ 15000");
+				this.add("RemoteNonOperationalValidator @ 17000");
 
 				this.add("MultisigNonOperationalValidator");
 				this.add("MultisigTransactionSignerValidator");

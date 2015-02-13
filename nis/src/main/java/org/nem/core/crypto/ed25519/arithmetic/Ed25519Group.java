@@ -15,7 +15,9 @@ public class Ed25519Group {
 	public static final BigInteger GROUP_ORDER = BigInteger.ONE.shiftLeft(252).add(new BigInteger("27742317777372353535851937790883648493"));
 
 	/**
+	 * <pre>{@code
 	 * (x, 4/5); x > 0
+	 * }</pre>
 	 */
 	public static Ed25519GroupElement BASE_POINT = getBasePoint();
 

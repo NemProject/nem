@@ -23,6 +23,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final String[] additionalLocalIps;
 	private final int transactionHashRetentionTime;
 	private final NodeFeature[] optionalFeatures;
+	private final boolean delayBlockLoading;
 
 	/**
 	 * Creates a new configuration object from the default properties.
@@ -71,6 +72,8 @@ public class NisConfiguration extends CommonConfiguration {
 		this.optionalFeatures = Arrays.stream(properties.getOptionalStringArray("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP"))
 				.map(s -> NodeFeature.fromString(s))
 				.toArray(size -> new NodeFeature[size]);
+
+		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 	}
 
 	/**
@@ -181,5 +184,14 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public NodeFeature[] getOptionalFeatures() {
 		return this.optionalFeatures;
+	}
+
+	/**
+	 * Gets a value indicating whether or not block loading should be delayed during startup.
+	 *
+	 * @return true if the block loading should be delayed.
+	 */
+	public boolean delayBlockLoading() {
+		return this.delayBlockLoading;
 	}
 }
