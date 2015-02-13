@@ -7,7 +7,7 @@ import org.nem.nis.mappers.*;
 import java.math.BigInteger;
 
 /**
- * Base class for mappings of transfer model types to transfer db model types.
+ * Base class for mappings of raw transfer db types to transfer db model types.
  *
  * @param <TDbModel> The db model type.
  */
@@ -16,7 +16,7 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	protected final IMapper mapper;
 
 	/**
-	 * Creates a mapper.
+	 * Creates a mapping.
 	 *
 	 * @param mapper The mapper.
 	 */
@@ -71,6 +71,12 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 		return dbBlock;
 	}
 
+	/**
+	 * Casts a BigInteger value to a Long value.
+	 *
+	 * @param value The BigInteger value.
+	 * @return The Long value.
+	 */
 	protected Long castBigIntegerToLong(final BigInteger value) {
 		return null == value ? null : value.longValue();
 	}

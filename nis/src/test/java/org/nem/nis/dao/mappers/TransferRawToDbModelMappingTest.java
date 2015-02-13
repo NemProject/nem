@@ -45,6 +45,7 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 	private void assertDbModelFields(final DbTransferTransaction dbModel, final DbAccount dbRecipient) {
 		// Assert:
 		// there is no sense in testing the order id since it is used nowhere in the classes
+		// TODO 20150213 J-B: i would probably still add an assert ^^
 		Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
 		Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
 		Assert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(dbRecipient));
