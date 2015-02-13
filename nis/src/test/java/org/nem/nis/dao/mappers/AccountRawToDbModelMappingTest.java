@@ -1,0 +1,29 @@
+package org.nem.nis.dao.mappers;
+
+import org.hamcrest.core.*;
+import org.junit.*;
+import org.nem.nis.dbmodel.DbAccount;
+
+public class AccountRawToDbModelMappingTest {
+
+	@Test
+	public void canMapIdToDbAccountIfIdIsNotNull() {
+		// Act:
+		final AccountRawToDbModelMapping mapping = new AccountRawToDbModelMapping();
+		final DbAccount dbAccount = mapping.map(123L);
+
+		// Assert:
+		Assert.assertThat(dbAccount, IsNull.notNullValue());
+		Assert.assertThat(dbAccount.getId(), IsEqual.equalTo(123L));
+	}
+
+	@Test
+	public void mapReturnsNullIfIdIsNull() {
+		// Act:
+		final AccountRawToDbModelMapping mapping = new AccountRawToDbModelMapping();
+		final DbAccount dbAccount = mapping.map(null);
+
+		// Assert:
+		Assert.assertThat(dbAccount, IsNull.nullValue());
+	}
+}
