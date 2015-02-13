@@ -4,10 +4,11 @@ import java.util.Arrays;
 
 /**
  * Represents a element of the finite field with p=2^255-19 elements.
- * values[0] ... values[9], represent the integer
- * values[0] + 2^26 * values[1] + 2^51 * values[2] + 2^77 * values[3] + 2^102 * values[4] + ... + 2^230 * values[9].
+ * <p>
+ * values[0] ... values[9], represent the integer <br>
+ * values[0] + 2^26 * values[1] + 2^51 * values[2] + 2^77 * values[3] + 2^102 * values[4] + ... + 2^230 * values[9]. <br>
  * Bounds on each values[i] vary depending on context.
- * <br>
+ * </p>
  * This implementation is based on the ref10 implementation of SUPERCOP.
  */
 public class Ed25519FieldElement {
@@ -784,7 +785,9 @@ public class Ed25519FieldElement {
 
 	/**
 	 * Calculates and returns one of the square roots of u / v.
+	 * <pre>{@code
 	 * x = (u * v^3) * (u * v^7)^((p - 5) / 8) ==> x^2 = +-(u / v).
+	 * }</pre>
 	 * Note that this means x can be sqrt(u / v), -sqrt(u / v), +i * sqrt(u / v), -i * sqrt(u / v).
 	 *
 	 * @param u The nominator of the fraction.
@@ -814,6 +817,7 @@ public class Ed25519FieldElement {
 	 * Reduce this field element modulo field size p = 2^255 - 19 and return the result.
 	 * The idea for the modulo p reduction algorithm is as follows:
 	 * <pre>
+	 * {@code
 	 * Assumption:
 	 * p = 2^255 - 19
 	 * h = h0 + 2^25 * h1 + 2^(26+25) * h2 + ... + 2^230 * h9 where 0 <= |hi| < 2^27 for all i=0,...,9.
@@ -836,6 +840,7 @@ public class Ed25519FieldElement {
 	 *       = h - q * 2^255 + 19 * q + 19 * 2^-255 * h - 19 * q + 19^2 * 2^-255 * q + 1/2 - 19^2 * 2^-255 * q - 19 * 2^-255 * h + 19 * 2^-25 * h9
 	 *       = h + 19 * 2^-25 * h9 + 1/2 - q^255.
 	 * Inserting the expression for x into (1) we get the desired expression for q.
+	 * }
 	 * </pre>
 	 *
 	 * @return The mod p reduced field element;
@@ -929,6 +934,8 @@ public class Ed25519FieldElement {
 	 * Encodes a given field element in its 32 byte 2^8 bit representation. This is done in two steps.
 	 * Step 1: Reduce the value of the field element modulo p.
 	 * Step 2: Convert the field element to the 32 byte representation.
+	 *
+	 * @return Encoded field element (32 bytes).
 	 */
 	public Ed25519EncodedFieldElement encode() {
 		// Step 1:

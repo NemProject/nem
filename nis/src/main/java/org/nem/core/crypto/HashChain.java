@@ -41,6 +41,7 @@ public class HashChain extends SerializableList<Hash> {
 	 * Creates new HashChain and initializes it with the passed list of raw hashes.
 	 *
 	 * @param rawHashList The list of raw hashes.
+	 * @return The HashChain.
 	 */
 	public static HashChain fromRawHashes(final List<byte[]> rawHashList) {
 		return new HashChain(rawHashList.stream().map(obj -> new Hash(obj)).collect(Collectors.toList()));

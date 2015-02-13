@@ -12,6 +12,7 @@ public class SecP256K1Utils {
 	/**
 	 * Gets the EC private key parameters.
 	 *
+	 * @param privateKey The private key.
 	 * @return The EC private key parameters.
 	 */
 	public static ECPrivateKeyParameters getPrivateKeyParameters(final PrivateKey privateKey) {
@@ -21,6 +22,7 @@ public class SecP256K1Utils {
 	/**
 	 * Gets the EC public key parameters.
 	 *
+	 * @param publicKey The public key.
 	 * @return The EC public key parameters.
 	 */
 	public static ECPublicKeyParameters getPublicKeyParameters(final PublicKey publicKey) {
