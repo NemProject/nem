@@ -106,7 +106,9 @@ public class HarvesterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
-		Mockito.when(context.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())))
+		// TODO 20150213 J-B: why did this file change? harvester is still doing the address validation, isn't it?
+		// TODO 20150213 BR -> J: Harvester calls mapper.map(dbLastBlock) in harvestBlock(). Why should it validate an address?
+		Mockito.when(context.accountLookup.findByAddress(Mockito.eq(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())), Mockito.any()))
 				.thenReturn(Utils.generateRandomAccount());
 
 		Mockito.when(context.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);
@@ -187,7 +189,7 @@ public class HarvesterTest {
 
 		private TestContext() {
 			final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
-			Mockito.when(this.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())))
+			Mockito.when(this.accountLookup.findByAddress(Mockito.eq(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())), Mockito.any()))
 					.thenReturn(Utils.generateRandomAccount());
 
 			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);

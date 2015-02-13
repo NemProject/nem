@@ -183,6 +183,7 @@ public class SparseMatrix extends Matrix {
 	/**
 	 * Gets the number of non zero columns of a row.
 	 *
+	 * @param row The row.
 	 * @return The number of non zero columns.
 	 */
 	public int getNonZeroColumnCount(final int row) {
@@ -192,6 +193,7 @@ public class SparseMatrix extends Matrix {
 	/**
 	 * Gets the capacity of a row.
 	 *
+	 * @param row The row.
 	 * @return The capacity of the row.
 	 */
 	public int getRowCapacity(final int row) {

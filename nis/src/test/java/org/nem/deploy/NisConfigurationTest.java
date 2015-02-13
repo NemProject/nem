@@ -38,7 +38,8 @@ public class NisConfigurationTest {
 			"nis.maxTransactions",
 			"nis.transactionHashRetentionTime",
 			"nis.additionalLocalIps",
-			"nis.optionalFeatures");
+			"nis.optionalFeatures",
+			"nis.delayBlockLoading");
 
 	@Test
 	public void canReadDefaultConfiguration() {
@@ -75,6 +76,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(config.getTransactionHashRetentionTime(), IsEqual.equalTo(36));
 		Assert.assertThat(config.getAdditionalLocalIps(), IsEqual.equalTo(new String[] { }));
 		Assert.assertThat(config.getOptionalFeatures(), IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP }));
+		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(true));
 	}
 
 	@Test
@@ -94,6 +96,7 @@ public class NisConfigurationTest {
 		properties.setProperty("nis.transactionHashRetentionTime", "567");
 		properties.setProperty("nis.additionalLocalIps", "10.0.0.10|10.0.0.20");
 		properties.setProperty("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP|PLACEHOLDER1");
+		properties.setProperty("nis.delayBlockLoading", "false");
 
 		// Act:
 		final NisConfiguration config = new NisConfiguration(properties);
@@ -115,6 +118,7 @@ public class NisConfigurationTest {
 		Assert.assertThat(
 				config.getOptionalFeatures(),
 				IsEqual.equalTo(new NodeFeature[] { NodeFeature.TRANSACTION_HASH_LOOKUP, NodeFeature.PLACEHOLDER1 }));
+		Assert.assertThat(config.delayBlockLoading(), IsEqual.equalTo(false));
 	}
 
 	//endregion

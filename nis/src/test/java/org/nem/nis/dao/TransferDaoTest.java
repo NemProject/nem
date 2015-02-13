@@ -46,12 +46,12 @@ public class TransferDaoTest {
 	@Before
 	public void before() {
 		this.session = this.sessionFactory.openSession();
+		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
+		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
 		session.createSQLQuery("delete from transfers").executeUpdate();
 		session.createSQLQuery("delete from importancetransfers").executeUpdate();
 		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
 		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
 		session.createSQLQuery("delete from multisigsends").executeUpdate();
 		session.createSQLQuery("delete from multisigreceives").executeUpdate();
 		session.createSQLQuery("delete from blocks").executeUpdate();

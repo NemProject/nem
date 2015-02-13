@@ -214,4 +214,20 @@ public class DbBlock {
 				.filter(t -> null != t.getSenderProof())
 				.collect(Collectors.toList());
 	}
+
+	public void addTransferTransaction(final DbTransferTransaction transaction) {
+		this.blockTransferTransactions.add(transaction);
+	}
+
+	public void addImportanceTransferTransaction(final DbImportanceTransferTransaction transaction) {
+		this.blockImportanceTransferTransactions.add(transaction);
+	}
+
+	public void addMultisigAggregateModificationTransaction(final DbMultisigAggregateModificationTransaction transaction) {
+		this.blockMultisigAggregateModificationTransactions.add(transaction);
+	}
+
+	public void addMultisigTransaction(final DbMultisigTransaction transaction) {
+		this.blockMultisigTransactions.add(transaction);
+	}
 }
