@@ -26,6 +26,7 @@ import java.util.logging.Logger;
  */
 public class BlockAnalyzer {
 	private static final Logger LOGGER = Logger.getLogger(BlockAnalyzer.class.getName());
+	private static final int NUM_BLOCKS_TO_PULL_AT_ONCE = 500;
 
 	private final BlockDao blockDao;
 	private final BlockChainScoreManager blockChainScoreManager;
@@ -103,10 +104,8 @@ public class BlockAnalyzer {
 		do {
 			final Block block = mapper.map(dbBlock);
 
-			if ((block.getHeight().getRaw() % 512) == 0) {
+			if ((block.getHeight().getRaw() % NUM_BLOCKS_TO_PULL_AT_ONCE) == 0) {
 				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
-			}
-			if ((block.getHeight().getRaw() % 500) == 0) {
 				LOGGER.info(String.format("%d", block.getHeight().getRaw()));
 			}
 
@@ -163,7 +162,7 @@ public class BlockAnalyzer {
 			}
 
 			if (null == this.iterator || !this.iterator.hasNext()) {
-				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 500).iterator();
+				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), NUM_BLOCKS_TO_PULL_AT_ONCE).iterator();
 				if (!this.iterator.hasNext()) {
 					this.finished = true;
 					return null;

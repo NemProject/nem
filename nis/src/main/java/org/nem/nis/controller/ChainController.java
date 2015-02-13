@@ -109,6 +109,8 @@ public class ChainController {
 			}
 
 			previousDbBlock = dbBlock;
+			// TODO 20150213 J-B: seems like a place to use the transaction registry
+			// TODO 20150213 J-B: also could add a test for this
 			numTransactions +=
 					dbBlock.getBlockImportanceTransferTransactions().size() +
 					dbBlock.getBlockTransferTransactions().size() +

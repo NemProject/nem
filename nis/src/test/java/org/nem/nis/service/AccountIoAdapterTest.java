@@ -290,6 +290,7 @@ public class AccountIoAdapterTest {
 		}
 
 		private void addAccount(final Account account) {
+			// TODO 20150213 J-B: why did this file change? account io is still doing the address validation, isn't it?
 			Mockito.when(this.accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
 		}
 

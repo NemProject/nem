@@ -74,7 +74,7 @@ public class NisMain {
 		this.populateDb();
 
 		// analyze the blocks
-		final CompletableFuture<java.lang.Void> future = CompletableFuture.runAsync(() -> {
+		final CompletableFuture<?> future = CompletableFuture.runAsync(() -> {
 			this.analyzeBlocks();
 
 			final PrivateKey autoBootKey = this.nisConfiguration.getAutoBootKey();
