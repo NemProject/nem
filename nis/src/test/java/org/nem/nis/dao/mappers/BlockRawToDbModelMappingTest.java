@@ -85,19 +85,19 @@ public class BlockRawToDbModelMappingTest {
 
 		private Object[] createRaw(final boolean useLessor) {
 			final Object[] raw = new Object[13];
-			raw[0] = BigInteger.valueOf(123L);								// id
-			raw[1] = BigInteger.valueOf(this.blockHash.getShortId());		// short id
-			raw[2] = 1;														// version
-			raw[3] = this.previousBlockHash.getRaw();						// raw previous block hash
-			raw[4] = this.blockHash.getRaw();								// raw block hash
-			raw[5] = this.generationHash.getRaw();							// raw generation hash
-			raw[6] = 345;													// timestamp
-			raw[7] = BigInteger.valueOf(this.harvesterId);					// harvester id
-			raw[8] = this.harvesterProof;									// harvester proof
-			raw[9] = useLessor ? BigInteger.valueOf(this.lessorId) : null;	// lessor id
-			raw[10] = BigInteger.valueOf(456L);								// height
-			raw[11] = BigInteger.valueOf(567L);								// total fee
-			raw[12] = BigInteger.valueOf(678L);								// difficulty
+			raw[0] = BigInteger.valueOf(123L);                              // id
+			raw[1] = BigInteger.valueOf(this.blockHash.getShortId());       // short id
+			raw[2] = 1;                                                     // version
+			raw[3] = this.previousBlockHash.getRaw();                       // raw previous block hash
+			raw[4] = this.blockHash.getRaw();                               // raw block hash
+			raw[5] = this.generationHash.getRaw();                          // raw generation hash
+			raw[6] = 345;                                                   // timestamp
+			raw[7] = BigInteger.valueOf(this.harvesterId);                  // harvester id
+			raw[8] = this.harvesterProof;                                   // harvester proof
+			raw[9] = useLessor ? BigInteger.valueOf(this.lessorId) : null;  // lessor id
+			raw[10] = BigInteger.valueOf(456L);                             // height
+			raw[11] = BigInteger.valueOf(567L);                             // total fee
+			raw[12] = BigInteger.valueOf(678L);                             // difficulty
 
 			return raw;
 		}

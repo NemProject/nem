@@ -112,21 +112,21 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 			final byte[] rawHash = Utils.generateRandomBytes(32);
 			final byte[] senderProof = Utils.generateRandomBytes(32);
 			final Object[] raw = new Object[15];
-			raw[0] = BigInteger.valueOf(123L);								// block id
-			raw[1] = BigInteger.valueOf(234L);								// id
-			raw[2] = rawHash;												// raw hash
-			raw[3] = 1;														// version
-			raw[4] = BigInteger.valueOf(345L);								// fee
-			raw[5] = 456;													// timestamp
-			raw[6] = 567;													// deadline
-			raw[7] = BigInteger.valueOf(this.senderId);						// sender id
-			raw[8] = senderProof;											// sender proof
-			raw[9] = 432;													// block index
-			raw[10] = 543;													// order id
-			raw[11] = BigInteger.valueOf(654L);								// referenced transaction
-			raw[12] = dbTransferId;											// db transfer id
-			raw[13] = dbImportanceTransferId;								// db importance transfer id
-			raw[14] = dbModificationTransactionId;							// db modification transaction id
+			raw[0] = BigInteger.valueOf(123L);                              // block id
+			raw[1] = BigInteger.valueOf(234L);                              // id
+			raw[2] = rawHash;                                               // raw hash
+			raw[3] = 1;                                                     // version
+			raw[4] = BigInteger.valueOf(345L);                              // fee
+			raw[5] = 456;                                                   // timestamp
+			raw[6] = 567;                                                   // deadline
+			raw[7] = BigInteger.valueOf(this.senderId);                     // sender id
+			raw[8] = senderProof;                                           // sender proof
+			raw[9] = 432;                                                   // block index
+			raw[10] = 543;                                                  // order id
+			raw[11] = BigInteger.valueOf(654L);                             // referenced transaction
+			raw[12] = dbTransferId;                                         // db transfer id
+			raw[13] = dbImportanceTransferId;                               // db importance transfer id
+			raw[14] = dbModificationTransactionId;                          // db modification transaction id
 
 			return raw;
 		}

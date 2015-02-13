@@ -40,9 +40,9 @@ public class MultisigModificationRawToDbModelMappingTest {
 
 		private Object[] createRaw() {
 			final Object[] raw = new Object[16];
-			raw[13] = BigInteger.valueOf(123L);								// id
-			raw[14] = BigInteger.valueOf(this.cosignatoryId);				// cosignatory id
-			raw[15] = 234;													// modification type
+			raw[13] = BigInteger.valueOf(123L);	                            // id
+			raw[14] = BigInteger.valueOf(this.cosignatoryId);               // cosignatory id
+			raw[15] = 234;                                                  // modification type
 
 			return raw;
 		}
