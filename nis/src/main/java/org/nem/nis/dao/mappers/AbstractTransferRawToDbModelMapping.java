@@ -42,7 +42,7 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	}
 
 	/**
-	 * Function overridden by derived classes to preform custom derived-mapping logic.
+	 * Function overridden by derived classes to perform custom derived-mapping logic.
 	 *
 	 * @param source The source object.
 	 * @return The target object.
