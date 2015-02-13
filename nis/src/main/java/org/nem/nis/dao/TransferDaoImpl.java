@@ -209,27 +209,13 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
-		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "sender" : "recipient";
-		final Criteria criteria = this.getCurrentSession().createCriteria(DbTransferTransaction.class)
-				.setFetchMode("blockId", FetchMode.JOIN)
-				.setFetchMode("sender", FetchMode.JOIN)
-				.setFetchMode("recipient", FetchMode.JOIN)
-				.add(Restrictions.eq(senderOrRecipient + ".id", accountId))
-				.add(Restrictions.isNotNull("senderProof"))
-				.add(Restrictions.lt("id", maxId))
-				.addOrder(Order.asc(senderOrRecipient))
-				.addOrder(Order.desc("id"))
-				.setMaxResults(limit);
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbTransferTransaction> list = criteria.list();
-		return list.stream()
-				.map(t -> {
-					// force lazy initialization
-					Hibernate.initialize(t.getBlock());
-					return new TransferBlockPair(t, t.getBlock());
-				})
-				.collect(Collectors.toList());
+		// TODO 20150212 J-J: this will come from the registry
+		return new TransferRetriever().getTransfersForAccount(
+				this.getCurrentSession(),
+				accountId,
+				maxId,
+				limit,
+				transferType);
 	}
 
 	@Override
