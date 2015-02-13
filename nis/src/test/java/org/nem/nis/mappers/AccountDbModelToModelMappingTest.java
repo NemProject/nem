@@ -29,6 +29,8 @@ public class AccountDbModelToModelMappingTest {
 		canMapDbAccountWithoutPublicKeyToAccount(address.getEncoded(), null);
 	}
 
+	// TODO 20150213 J-B: add a test for adding an invalid address (as a proxy that address isn't validated)
+
 	private static void canMapDbAccountWithoutPublicKeyToAccount(final String encodedAddress, final PublicKey publicKey) {
 		// Arrange:
 		final DbAccount dbAccount = new DbAccount(encodedAddress, publicKey);

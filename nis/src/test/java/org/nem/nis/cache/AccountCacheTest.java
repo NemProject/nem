@@ -215,6 +215,9 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
+	// TODO 20150213 J-B: can you add a test with custom validation true (and verify not cached)
+	// > also add same two tests in auto cached
+
 	@Test(expected = MissingResourceException.class)
 	public void findByAddressUsesCustomValidator() {
 		// Arrange:

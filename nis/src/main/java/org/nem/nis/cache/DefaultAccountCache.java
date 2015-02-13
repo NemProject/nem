@@ -41,17 +41,17 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 		return this.addAccountToCache(address, Address::isValid);
 	}
 
-	@Override
-	public void removeFromCache(final Address address) {
-		this.addressToAccountMap.remove(address);
-	}
-
 	private Account addAccountToCache(final Address address, Predicate<Address> validator) {
 		return this.findByAddress(address, validator, () -> {
 			final Account account = new Account(address);
 			this.addressToAccountMap.put(address, account);
 			return account;
 		});
+	}
+
+	@Override
+	public void removeFromCache(final Address address) {
+		this.addressToAccountMap.remove(address);
 	}
 
 	private Account findByAddress(final Address address, Predicate<Address> validator, final Supplier<Account> notFoundHandler) {
@@ -79,7 +79,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 
 	@Override
 	public Account findByAddress(final Address address) {
-		return this.findByAddress(address, Address::isValid, ()  -> createAccount(address.getPublicKey(), address.getEncoded()));
+		return this.findByAddress(address, Address::isValid);
 	}
 
 	@Override

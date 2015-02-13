@@ -106,6 +106,7 @@ public class HarvesterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
+		// TODO 20150213 J-B: why did this file change? harvester is still doing the address validation, isn't it?
 		Mockito.when(context.accountLookup.findByAddress(Mockito.eq(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())), Mockito.any()))
 				.thenReturn(Utils.generateRandomAccount());
 

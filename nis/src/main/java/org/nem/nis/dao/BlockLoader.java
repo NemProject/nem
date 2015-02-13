@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 /**
  * Class that loads blocks from the database.
+ * <br>
+ * This class is used as an implementation detail of BlockDao and is tested mainly through those tests.
  */
 public class BlockLoader {
 	private static final Logger LOGGER = Logger.getLogger(BlockLoader.class.getName());
@@ -481,6 +483,7 @@ public class BlockLoader {
 		});
 	}
 
+	// TODO 20150213: J-B i guess we can remove these?
 	private void actionStarts() {
 		this.start = System.currentTimeMillis();
 	}
