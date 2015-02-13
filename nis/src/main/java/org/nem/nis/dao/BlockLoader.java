@@ -1,4 +1,4 @@
-package org.nem.nis;
+package org.nem.nis.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;

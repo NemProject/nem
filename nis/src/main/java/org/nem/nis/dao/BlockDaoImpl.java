@@ -8,7 +8,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.core.utils.ByteUtils;
-import org.nem.nis.BlockLoader;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
