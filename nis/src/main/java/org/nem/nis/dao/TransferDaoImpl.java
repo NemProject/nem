@@ -7,6 +7,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,7 +174,8 @@ public class TransferDaoImpl implements TransferDao {
 			final int limit,
 			final TransferType transferType) {
 		if (TransferType.ALL == transferType) {
-			// TODO 20150127 J-G: this was the issue of hibernate doing a bad join from incoming and outcoming, right? can we add a comment to that effect?
+			// note that we have to do separate queries for incoming and outgoing transactions since otherwise h2
+			// is not able to use an index to speed up the query.
 			final Collection<TransferBlockPair> pairs =
 					this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.INCOMING);
 			pairs.addAll(this.getTransactionsForAccountUpToTransactionWithTransferType(accountId, maxId, limit, TransferType.OUTGOING));
@@ -188,48 +190,21 @@ public class TransferDaoImpl implements TransferDao {
 		}
 	}
 
-	private List<TransferBlockPair> getTransactionsForAccountUpToTransactionWithTransferType(
+	private Collection<TransferBlockPair> getTransactionsForAccountUpToTransactionWithTransferType(
 			final Long accountId,
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		final List<TransferBlockPair> pairs = new ArrayList<>();
-		// TODO 20150127 J-G: can we have a registry of sorts for this?
-		pairs.addAll(this.getTransfersForAccount(
-				accountId,
-				maxId,
-				limit,
-				transferType));
-		pairs.addAll(this.getImportanceTransfersForAccount(
-				accountId,
-				maxId,
-				limit,
-				transferType));
-		pairs.addAll(this.getMultisigSignerModificationsForAccount(
-				accountId,
-				maxId,
-				limit,
-				transferType));
-		pairs.addAll(this.getMultisigTransfersForAccount(
-				accountId,
-				maxId,
-				limit,
-				transferType));
-		pairs.addAll(this.getMultisigImportanceTransfersForAccount(
-				accountId,
-				maxId,
-				limit,
-				transferType));
-		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(
-				accountId,
-				maxId,
-				limit,
-				transferType));
+		final Collection<TransferBlockPair> pairs = new ArrayList<>();
+		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			pairs.addAll(entry.getFromDb.apply(this, accountId, maxId, limit, transferType));
+		}
 
 		return pairs;
 	}
 
-	private List<TransferBlockPair> getTransfersForAccount(
+	@Override
+	public Collection<TransferBlockPair> getTransfersForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
@@ -257,7 +232,8 @@ public class TransferDaoImpl implements TransferDao {
 				.collect(Collectors.toList());
 	}
 
-	private List<TransferBlockPair> getImportanceTransfersForAccount(
+	@Override
+	public Collection<TransferBlockPair> getImportanceTransfersForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
@@ -285,33 +261,52 @@ public class TransferDaoImpl implements TransferDao {
 				.collect(Collectors.toList());
 	}
 
-	private List<TransferBlockPair> getMultisigSignerModificationsForAccount(
+	@Override
+	public Collection<TransferBlockPair> getMultisigSignerModificationsForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
 			// TODO 20150127 J-G: transfer type is not being used?
 			final TransferType transferType) {
-		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigAggregateModificationTransaction.class)
-				.setFetchMode("blockId", FetchMode.JOIN)
-				.setFetchMode("sender", FetchMode.JOIN)
-				.add(Restrictions.eq("sender.id", accountId))
-				.add(Restrictions.isNotNull("senderProof"))
-				.add(Restrictions.lt("id", maxId))
-				.addOrder(Order.asc("sender"))
-				.addOrder(Order.desc("id"))
-				.setMaxResults(limit);
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbMultisigAggregateModificationTransaction> list = criteria.list();
-		return list.stream()
-				.map(t -> {
-					// force lazy initialization
-					Hibernate.initialize(t.getBlock());
-					return new TransferBlockPair(t, t.getBlock());
-				})
-				.collect(Collectors.toList());
+		if (TransferType.OUTGOING == transferType) {
+			final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigAggregateModificationTransaction.class)
+					.setFetchMode("blockId", FetchMode.JOIN)
+					.setFetchMode("sender", FetchMode.JOIN)
+					.add(Restrictions.eq("sender.id", accountId))
+					.add(Restrictions.isNotNull("senderProof"))
+					.add(Restrictions.lt("id", maxId))
+					.addOrder(Order.asc("sender"))
+					.addOrder(Order.desc("id"))
+					.setMaxResults(limit);
+			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			final List<DbMultisigAggregateModificationTransaction> list = criteria.list();
+			return list.stream()
+					.map(t -> {
+						// force lazy initialization
+						Hibernate.initialize(t.getBlock());
+						return new TransferBlockPair(t, t.getBlock());
+					})
+					.collect(Collectors.toList());
+		}
+
+		// TODO: INCOMING
+		return new ArrayList<>();
 	}
 
-	private List<TransferBlockPair> getMultisigTransfersForAccount(
+	@Override
+	public Collection<TransferBlockPair> getMultisigTransactionsForAccount(
+			final long accountId,
+			final long maxId,
+			final int limit,
+			final TransferType transferType) {
+		// TODO 20150127 J-G: should we also have a registry of sorts for this?
+		final Collection<TransferBlockPair> pairs = this.getMultisigTransfersForAccount(accountId, maxId, limit, transferType);
+		pairs.addAll(this.getMultisigImportanceTransfersForAccount(accountId, maxId, limit, transferType));
+		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(accountId, maxId, limit, transferType));
+		return pairs;
+	}
+
+	private Collection<TransferBlockPair> getMultisigTransfersForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
@@ -333,7 +328,7 @@ public class TransferDaoImpl implements TransferDao {
 				.collect(Collectors.toList());
 	}
 
-	private List<TransferBlockPair> getMultisigImportanceTransfersForAccount(
+	private Collection<TransferBlockPair> getMultisigImportanceTransfersForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
@@ -355,7 +350,7 @@ public class TransferDaoImpl implements TransferDao {
 				.collect(Collectors.toList());
 	}
 
-	private List<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
+	private Collection<TransferBlockPair> getMultisigMultisigSignerModificationsForAccount(
 			final long accountId,
 			final long maxId,
 			final int limit,
