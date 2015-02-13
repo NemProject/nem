@@ -222,7 +222,12 @@ public class AccountIoAdapterTest {
 		private final AccountCache accountCache = mock(AccountCache.class);
 		private final ReadOnlyBlockDao blockDao = mock(ReadOnlyBlockDao.class);
 		private final ReadOnlyTransferDao transferDao = mock(ReadOnlyTransferDao.class);
-		private final AccountIoAdapter accountIoAdapter = createAccountIoAdapter(this.transferDao, this.blockDao, this.accountCache);
+		private final NisDbModelToModelMapper mapper = mock(NisDbModelToModelMapper.class);
+		private final AccountIoAdapter accountIoAdapter = new AccountIoAdapter(
+				this.transferDao,
+				this.blockDao,
+				this.accountCache,
+				this.mapper);
 		private final Account account = Utils.generateRandomAccount();
 		private final Address address = this.account.getAddress();
 		private final List<TransferBlockPair> pairs = new ArrayList<>();
@@ -282,18 +287,9 @@ public class AccountIoAdapterTest {
 			final TransferTransaction transaction = new TransferTransaction(TimeInstant.ZERO, signer, recipient, Amount.fromNem(amount), null);
 			transaction.sign();
 
-			this.addAccount(signer);
-			this.addAccount(recipient);
-
-			return MapperUtils.createModelToDbModelMapper(new MockAccountDao())
-					.map(transaction, DbTransferTransaction.class);
-		}
-
-		private void addAccount(final Account account) {
-			// TODO 20150213 J-B: why did this file change? account io is still doing the address validation, isn't it?
-			// TODO 20150213 BR -> J: the account io uses accountCache.findByAddress(address) (86) but also mapper.map(pair.getTransfer()) (line 95)
-			// > The TestContext constructor handles the former and this part (as well as addMapping()) the latter.
-			Mockito.when(this.accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
+			final DbTransferTransaction dbTransferTransaction = new DbTransferTransaction();
+			Mockito.when(this.mapper.map(dbTransferTransaction)).thenReturn(transaction);
+			return dbTransferTransaction;
 		}
 
 		//endregion
@@ -305,6 +301,7 @@ public class AccountIoAdapterTest {
 			this.assertHeights(pairs, 12L, 12L, 15L);
 			this.assertIds(pairs, 7L, 8L, 9L);
 			this.assertAmounts(pairs, 111L, 222L, 333L);
+			Mockito.verify(this.mapper, Mockito.times(3)).map(Mockito.any(AbstractBlockTransfer.class));
 		}
 
 		public void assertAmounts(final SerializableList<TransactionMetaDataPair> pairs, final Long... expectedAmounts) {
