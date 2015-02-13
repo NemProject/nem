@@ -288,8 +288,16 @@ public class BlockDaoImpl implements BlockDao {
 				"DbMultisigAggregateModificationTransaction",
 				"blockMultisigAggregateModificationTransactions",
 				transactionsToDelete -> {
-					final Query preQuery = this.getCurrentSession()
+					Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+					preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigSend s where s.transactionId in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+					preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigReceive r where r.transactionId in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 				});
