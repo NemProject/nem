@@ -291,6 +291,8 @@ public class AccountIoAdapterTest {
 
 		private void addAccount(final Account account) {
 			// TODO 20150213 J-B: why did this file change? account io is still doing the address validation, isn't it?
+			// TODO 20150213 BR -> J: the account io uses accountCache.findByAddress(address) (86) but also mapper.map(pair.getTransfer()) (line 95)
+			// > The TestContext constructor handles the former and this part (as well as addMapping()) the latter.
 			Mockito.when(this.accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
 		}
 
