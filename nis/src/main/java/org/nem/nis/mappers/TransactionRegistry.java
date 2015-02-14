@@ -225,4 +225,14 @@ public class TransactionRegistry {
 
 		return null;
 	}
+
+	public static <TDbModel extends AbstractBlockTransfer> Entry<?, ?> findByDbModelClass(final Class<TDbModel> clazz) {
+		for (final Entry<?, ?> entry : entries) {
+			if (entry.dbModelClass.equals(clazz)) {
+				return entry;
+			}
+		}
+
+		return null;
+	}
 }

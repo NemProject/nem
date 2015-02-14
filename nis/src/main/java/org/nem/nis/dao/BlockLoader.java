@@ -94,15 +94,9 @@ public class BlockLoader {
 		final long maxBlockId = this.dbBlocks.get(this.dbBlocks.size() - 1).getId() + 1;
 		this.retrieveTransactions(minBlockId, maxBlockId);
 		this.addTransactionsToBlocks();
-		final HashSet<Long> accountIds = this.collectAccountIds();
-		final HashMap<Long, DbAccount> accountMap = this.getAccountMap(accountIds);
-		this.updateAccounts(
-				this.dbBlocks,
-				this.dbTransfers,
-				this.dbImportanceTransfers,
-				this.dbbModificationTransactions,
-				this.dbMultisigTransactions,
-				accountMap);
+		final HashSet<DbAccount> accounts = this.collectAccounts();
+		final HashMap<Long, DbAccount> accountMap = this.getAccounts(accounts);
+		this.copyAccounts(accountMap, accounts);
 
 
 		return this.dbBlocks;
@@ -271,14 +265,14 @@ public class BlockLoader {
 		return dbMultisigSignature;
 	}
 
-	private HashMap<Long, DbAccount> getAccountMap(final HashSet<Long> accountIds) {
+	private HashMap<Long, DbAccount> getAccounts(final HashSet<DbAccount> accounts) {
 		final Query query = this.getCurrentSession()
 				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
 				.addEntity(DbAccount.class)
-				.setParameterList("ids", accountIds.stream().collect(Collectors.toList()));
-		final List<DbAccount> accounts = listAndCast(query);
+				.setParameterList("ids", accounts.stream().map(DbAccount::getId).collect(Collectors.toList()));
+		List<DbAccount> realAccounts =  listAndCast(query);
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
-		accounts.stream().forEach(a -> accountMap.put(a.getId(), a));
+		realAccounts.stream().forEach(a -> accountMap.put(a.getId(), a));
 		return accountMap;
 	}
 
@@ -306,67 +300,45 @@ public class BlockLoader {
 				.forEach(t -> multisigTransfers.put(t.getId(), t));
 	}
 
-	private HashSet<Long> collectAccountIds() {
-		final HashSet<Long> accountIds = new HashSet<>();
+	private HashSet<DbAccount> collectAccounts() {
+		final HashSet<DbAccount> accounts = new HashSet<>();
 		this.dbBlocks.stream().forEach(b -> {
-			accountIds.add(b.getHarvester().getId());
+			accounts.add(b.getHarvester());
 			if (null != b.getLessor()) {
-				accountIds.add(b.getLessor().getId());
+				accounts.add(b.getLessor());
 			}
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
 				final List<AbstractBlockTransfer> transactions = theEntry.getFromBlock.apply(b);
 				transactions.stream().forEach(t -> {
-					accountIds.add(t.getSender().getId());
+					accounts.add(t.getSender());
 					final DbAccount recipient = theEntry.getRecipient.apply(t);
 					if (null != recipient) {
-						accountIds.add(recipient.getId());
+						accounts.add(recipient);
 					}
-					theEntry.getOtherAccounts.apply(t).stream()
-							.forEach(a -> accountIds.add(a.getId()));
+					theEntry.getOtherAccounts.apply(t).stream().forEach(accounts::add);
 					final AbstractBlockTransfer innerTransaction = theEntry.getInnerTransaction.apply(t);
 					if (null != innerTransaction) {
-						accountIds.add(innerTransaction.getSender().getId());
-						final DbAccount innerRecipient = theEntry.getRecipient.apply(innerTransaction);
+						accounts.add(innerTransaction.getSender());
+						final TransactionRegistry.Entry<AbstractBlockTransfer, ?> innerEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
+						final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
 						if (null != innerRecipient) {
-							accountIds.add(innerRecipient.getId());
+							accounts.add(innerRecipient);
 						}
+						innerEntry.getOtherAccounts.apply(innerTransaction).stream().forEach(accounts::add);
 					}
 				});
 			}
 		});
 
-		return accountIds;
+		return accounts;
 	}
 
-	private void updateAccounts(
-			final List<DbBlock> dbBlocks,
-			final List<DbTransferTransaction> allDbTransfers,
-			final List<DbImportanceTransferTransaction> allDbImportanceTransfers,
-			final List<DbMultisigAggregateModificationTransaction> allDbModificationTransactions,
-			final List<DbMultisigTransaction> allDbMultisigTransactions,
-			final HashMap<Long, DbAccount> accountMap) {
-		dbBlocks.stream().forEach(b -> {
-			b.setHarvester(accountMap.get(b.getHarvester().getId()));
-			if (null != b.getLessor()) {
-				b.setLessor(accountMap.get(b.getLessor().getId()));
-			}
-		});
-		allDbTransfers.stream().forEach(t -> {
-			t.setSender(accountMap.get(t.getSender().getId()));
-			t.setRecipient(accountMap.get(t.getRecipient().getId()));
-		});
-		allDbImportanceTransfers.stream().forEach(t -> {
-			t.setSender(accountMap.get(t.getSender().getId()));
-			t.setRemote(accountMap.get(t.getRemote().getId()));
-		});
-		allDbModificationTransactions.stream().forEach(t -> {
-			t.setSender(accountMap.get(t.getSender().getId()));
-			t.getMultisigModifications().stream().forEach(m -> m.setCosignatory(accountMap.get(m.getCosignatory().getId())));
-		});
-		allDbMultisigTransactions.stream().forEach(t -> {
-			t.setSender(accountMap.get(t.getSender().getId()));
-			t.getMultisigSignatureTransactions().stream().forEach(s -> s.setSender(accountMap.get(s.getSender().getId())));
+	private void copyAccounts(final HashMap<Long, DbAccount> accountMap, final HashSet<DbAccount> accounts) {
+		accounts.stream().forEach(a -> {
+			final DbAccount realAccount = accountMap.get(a.getId());
+			a.setPrintableKey(realAccount.getPrintableKey());
+			a.setPublicKey(realAccount.getPublicKey());
 		});
 	}
 
