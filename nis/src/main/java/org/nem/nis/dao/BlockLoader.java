@@ -93,7 +93,6 @@ public class BlockLoader {
 		final long minBlockId = this.dbBlocks.get(0).getId() - 1;
 		final long maxBlockId = this.dbBlocks.get(this.dbBlocks.size() - 1).getId() + 1;
 		this.retrieveTransactions(minBlockId, maxBlockId);
-		this.extractMultisigTransfers();
 		this.addTransactionsToBlocks();
 		final HashSet<Long> accountIds = this.collectAccountIds();
 		final HashMap<Long, DbAccount> accountMap = this.getAccountMap(accountIds);
@@ -111,15 +110,12 @@ public class BlockLoader {
 
 	private void retrieveTransactions(final long minBlockId, final long maxBlockId) {
 		this.dbTransfers.addAll(this.getDbTransfers(minBlockId, maxBlockId));
-		this.dbImportanceTransfers.addAll(this.getDbImportanceTransfers(minBlockId, maxBlockId));
-		this.dbbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
-		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
-	}
-
-	private void extractMultisigTransfers() {
 		this.extractMultisigTransfers(this.dbTransfers, this.multisigDbTransferMap);
+		this.dbImportanceTransfers.addAll(this.getDbImportanceTransfers(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
+		this.dbbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
 		this.extractMultisigTransfers(this.dbbModificationTransactions, this.multisigDbModificationTransactionMap);
+		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
 	}
 
 	private void addTransactionsToBlocks() {
@@ -310,7 +306,7 @@ public class BlockLoader {
 				.forEach(t -> multisigTransfers.put(t.getId(), t));
 	}
 
-	private <TDbModel extends AbstractBlockTransfer> HashSet<Long> collectAccountIds() {
+	private HashSet<Long> collectAccountIds() {
 		final HashSet<Long> accountIds = new HashSet<>();
 		this.dbBlocks.stream().forEach(b -> {
 			accountIds.add(b.getHarvester().getId());
@@ -318,8 +314,8 @@ public class BlockLoader {
 				accountIds.add(b.getLessor().getId());
 			}
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				final TransactionRegistry.Entry<TDbModel, ?> theEntry = (TransactionRegistry.Entry<TDbModel, ?>)entry;
-				final List<TDbModel> transactions = theEntry.getFromBlock.apply(b);
+				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
+				final List<AbstractBlockTransfer> transactions = theEntry.getFromBlock.apply(b);
 				transactions.stream().forEach(t -> {
 					accountIds.add(t.getSender().getId());
 					final DbAccount recipient = theEntry.getRecipient.apply(t);
@@ -328,6 +324,14 @@ public class BlockLoader {
 					}
 					theEntry.getOtherAccounts.apply(t).stream()
 							.forEach(a -> accountIds.add(a.getId()));
+					final AbstractBlockTransfer innerTransaction = theEntry.getInnerTransaction.apply(t);
+					if (null != innerTransaction) {
+						accountIds.add(innerTransaction.getSender().getId());
+						final DbAccount innerRecipient = theEntry.getRecipient.apply(innerTransaction);
+						if (null != innerRecipient) {
+							accountIds.add(innerRecipient.getId());
+						}
+					}
 				});
 			}
 		});
