@@ -2,6 +2,7 @@ package org.nem.deploy;
 
 import org.nem.core.crypto.PrivateKey;
 import org.nem.core.deploy.*;
+import org.nem.core.model.Address;
 import org.nem.core.node.NodeFeature;
 
 import java.util.*;
@@ -23,6 +24,7 @@ public class NisConfiguration extends CommonConfiguration {
 	private final String[] additionalLocalIps;
 	private final int transactionHashRetentionTime;
 	private final NodeFeature[] optionalFeatures;
+	private final Address[] allowedHarvesterAddresses;
 	private final boolean delayBlockLoading;
 
 	/**
@@ -72,6 +74,10 @@ public class NisConfiguration extends CommonConfiguration {
 		this.optionalFeatures = Arrays.stream(properties.getOptionalStringArray("nis.optionalFeatures", "TRANSACTION_HASH_LOOKUP"))
 				.map(s -> NodeFeature.fromString(s))
 				.toArray(size -> new NodeFeature[size]);
+
+		this.allowedHarvesterAddresses = Arrays.stream(properties.getOptionalStringArray("nis.allowedHarvesterAddresses", ""))
+				.map(a -> Address.fromEncoded(a))
+				.toArray(size -> new Address[size]);
 
 		this.delayBlockLoading = properties.getOptionalBoolean("nis.delayBlockLoading", true);
 	}
@@ -184,6 +190,15 @@ public class NisConfiguration extends CommonConfiguration {
 	 */
 	public NodeFeature[] getOptionalFeatures() {
 		return this.optionalFeatures;
+	}
+
+	/**
+	 * Gets the allowed harvester addresses.
+	 *
+	 * @return The allowed harvester addresses.
+	 */
+	public Address[] getAllowedHarvesterAddresses() {
+		return this.allowedHarvesterAddresses;
 	}
 
 	/**
