@@ -3,8 +3,6 @@ package org.nem.nis.dao.mappers;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
 
-import java.math.BigInteger;
-
 /**
  * A mapping that is able to map raw transfer transaction data to a db transfer.
  */

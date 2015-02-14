@@ -77,6 +77,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final long maxId,
 			final int limit,
 			final TransferType transferType);
+
 	/**
 	 * Retrieves limit importance transfers from db for given account.
 	 *
@@ -91,6 +92,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final long maxId,
 			final int limit,
 			final TransferType transferType);
+
 	/**
 	 * Retrieves limit multisig signer modification transfers from db for given account.
 	 *
@@ -105,6 +107,7 @@ public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransfe
 			final long maxId,
 			final int limit,
 			final TransferType transferType);
+
 	/**
 	 * Retrieves limit multisig transfers from db for given account.
 	 *

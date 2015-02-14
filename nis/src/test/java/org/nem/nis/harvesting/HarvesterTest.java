@@ -10,7 +10,7 @@ import org.nem.core.time.*;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;

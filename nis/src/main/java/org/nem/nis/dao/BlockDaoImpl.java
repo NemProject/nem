@@ -267,7 +267,6 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-
 		// DbMultisigTransaction needs to dropped first because it has foreign key references to the other
 		// transaction tables; attempting to delete other transactions first will break referential integrity
 		this.dropTransfers(

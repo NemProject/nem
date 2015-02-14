@@ -2,7 +2,6 @@ package org.nem.nis.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class BlockLoader {
 	private final static String[] multisigSignaturesColumns = {
-			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof"	};
+			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
 	private final static String[] multisigModificationsColumns = {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
 
@@ -114,7 +113,6 @@ public class BlockLoader {
 		this.addTransactions(allDbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
 		this.addTransactions(dbMultisigTransactions, DbBlock::addMultisigTransaction);
 
-
 		return dbBlocks;
 	}
 
@@ -164,9 +162,9 @@ public class BlockLoader {
 		final String columnList = this.createColumnList("mm", 1, multisigModificationsColumns);
 		final String queryString =
 				"SELECT msm.*, " + columnList + " FROM multisigsignermodifications msm " +
-				"LEFT OUTER JOIN multisigmodifications mm ON mm.multisigsignermodificationid = msm.id " +
-				"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
-				"ORDER BY msm.blockid ASC";
+						"LEFT OUTER JOIN multisigmodifications mm ON mm.multisigsignermodificationid = msm.id " +
+						"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
+						"ORDER BY msm.blockid ASC";
 		final Query query = this.getCurrentSession()
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)

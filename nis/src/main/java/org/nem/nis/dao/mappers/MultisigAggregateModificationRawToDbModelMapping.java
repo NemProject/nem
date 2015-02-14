@@ -3,7 +3,6 @@ package org.nem.nis.dao.mappers;
 import org.nem.nis.dbmodel.DbMultisigAggregateModificationTransaction;
 import org.nem.nis.mappers.IMapper;
 
-import java.math.BigInteger;
 import java.util.HashSet;
 
 /**
