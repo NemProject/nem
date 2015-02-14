@@ -16,6 +16,7 @@ import org.nem.peer.node.AuthenticatedResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -61,7 +62,11 @@ public class TransactionController {
 		final ValidationContext context = new ValidationContext(this.debitPredicate);
 		final ValidationResult validationResult = this.validator.validate(transfer, context);
 		if (!validationResult.isSuccess()) {
-			throw new IllegalArgumentException(validationResult.toString());
+			// TODO 20150214 G-J, I thought you've changed it, but seems not,
+			// > it would be good to have a way to /prepare transaction that doesn't have all cosignatures
+			if (validationResult != ValidationResult.FAILURE_MULTISIG_INVALID_COSIGNERS) {
+				throw new IllegalArgumentException(validationResult.toString());
+			}
 		}
 
 		final byte[] transferData = BinarySerializer.serializeToBytes(transfer.asNonVerifiable());
