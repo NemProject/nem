@@ -37,7 +37,7 @@ public class BlockLoader {
 	 * @param sessionFactory The session factory.
 	 */
 	public BlockLoader(final SessionFactory sessionFactory) {
-		this(sessionFactory, createDefaultMapper());
+		this(sessionFactory, null);
 	}
 
 	/**
@@ -48,10 +48,10 @@ public class BlockLoader {
 	 */
 	public BlockLoader(final SessionFactory sessionFactory, final IMapper mapper) {
 		this.sessionFactory = sessionFactory;
-		this.mapper = mapper;
+		this.mapper = null == mapper ? this.createDefaultMapper() : mapper;
 	}
 
-	private static IMapper createDefaultMapper() {
+	private IMapper createDefaultMapper() {
 		final MappingRepository mapper = new MappingRepository();
 		mapper.addMapping(Long.class, DbAccount.class, new AccountRawToDbModelMapping());
 		mapper.addMapping(Object[].class, DbBlock.class, new BlockRawToDbModelMapping(mapper));
@@ -61,9 +61,9 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbMultisigSignatureTransaction.class, new MultisigSignatureRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(
 				mapper,
-				raw -> mapper.map(raw, DbTransferTransaction.class),
-				raw -> mapper.map(raw, DbImportanceTransferTransaction.class),
-				raw -> mapper.map(raw, DbMultisigAggregateModificationTransaction.class)));
+				id -> null == id ? null : this.multisigDbTransfers.get(id),
+				id -> null == id ? null : this.multisigDbImportanceTransfers.get(id),
+				id -> null == id ? null : this.multisigDbModificationTransactions.get(id)));
 		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
 		return mapper;
 	}
@@ -198,33 +198,14 @@ public class BlockLoader {
 	}
 
 	private DbMultisigAggregateModificationTransaction mapToDbModificationTransaction(final Object[] array) {
-		final DbMultisigAggregateModificationTransaction dbModificationTransaction = new DbMultisigAggregateModificationTransaction();
-		dbModificationTransaction.setBlock(createDbBlock(castBigIntegerToLong((BigInteger)array[0])));
-		dbModificationTransaction.setId(castBigIntegerToLong((BigInteger)array[1]));
-		dbModificationTransaction.setTransferHash(new Hash((byte[])array[2]));
-		dbModificationTransaction.setVersion((Integer)array[3]);
-		dbModificationTransaction.setFee(castBigIntegerToLong((BigInteger)array[4]));
-		dbModificationTransaction.setTimeStamp((Integer)array[5]);
-		dbModificationTransaction.setDeadline((Integer)array[6]);
-		dbModificationTransaction.setSender(createDbAccount(castBigIntegerToLong((BigInteger)array[7])));
-		dbModificationTransaction.setSenderProof((byte[])array[8]);
-		dbModificationTransaction.setBlkIndex((Integer)array[9]);
-		dbModificationTransaction.setOrderId((Integer)array[10]);
-		dbModificationTransaction.setReferencedTransaction(castBigIntegerToLong((BigInteger)array[11]));
-		dbModificationTransaction.setMultisigModifications(new HashSet<>());
-
-		return dbModificationTransaction;
+		return this.mapper.map(array, DbMultisigAggregateModificationTransaction.class);
 	}
 
 	private DbMultisigModification mapToDbModification(
 			final DbMultisigAggregateModificationTransaction dbModificationTransaction,
 			final Object[] array) {
-		final DbMultisigModification dbModification = new DbMultisigModification();
+		final DbMultisigModification dbModification = this.mapper.map(array, DbMultisigModification.class);
 		dbModification.setMultisigAggregateModificationTransaction(dbModificationTransaction);
-		dbModification.setId(castBigIntegerToLong((BigInteger)array[13]));
-		dbModification.setCosignatory(createDbAccount(castBigIntegerToLong((BigInteger)array[14])));
-		dbModification.setModificationType((Integer)array[15]);
-
 		return dbModification;
 	}
 
@@ -254,60 +235,33 @@ public class BlockLoader {
 			final Long txid = castBigIntegerToLong((BigInteger)array[15]);
 			if (null == txid) {
 				// no cosignatories
-				dbMultisigTransaction = this.mapToDbMultsigTransaction(array);
+				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
 				transactions.add(dbMultisigTransaction);
 				continue;
 			}
 
 			if (curTxId != txid) {
 				curTxId = txid;
-				dbMultisigTransaction = this.mapToDbMultsigTransaction(array);
+				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
 				transactions.add(dbMultisigTransaction);
 			}
 
-			dbMultisigTransaction.getMultisigSignatureTransactions().add(this.mapToDbMulsigSignature(dbMultisigTransaction, array));
+			dbMultisigTransaction.getMultisigSignatureTransactions().add(this.mapToDbMultisigSignature(dbMultisigTransaction, array));
 		}
 
 		return transactions;
 	}
 
-	private DbMultisigTransaction mapToDbMultsigTransaction(final Object[] array) {
-		final DbMultisigTransaction dbMultsigTransaction = new DbMultisigTransaction();
-		dbMultsigTransaction.setBlock(createDbBlock(castBigIntegerToLong((BigInteger)array[0])));
-		dbMultsigTransaction.setId(castBigIntegerToLong((BigInteger)array[1]));
-		dbMultsigTransaction.setTransferHash(new Hash((byte[])array[2]));
-		dbMultsigTransaction.setVersion((Integer)array[3]);
-		dbMultsigTransaction.setFee(castBigIntegerToLong((BigInteger)array[4]));
-		dbMultsigTransaction.setTimeStamp((Integer)array[5]);
-		dbMultsigTransaction.setDeadline((Integer)array[6]);
-		dbMultsigTransaction.setSender(createDbAccount(castBigIntegerToLong((BigInteger)array[7])));
-		dbMultsigTransaction.setSenderProof((byte[])array[8]);
-		dbMultsigTransaction.setBlkIndex((Integer)array[9]);
-		dbMultsigTransaction.setOrderId((Integer)array[10]);
-		dbMultsigTransaction.setReferencedTransaction(castBigIntegerToLong((BigInteger)array[11]));
-		dbMultsigTransaction.setTransferTransaction(this.multisigDbTransfers.get(castBigIntegerToLong((BigInteger)array[12])));
-		dbMultsigTransaction.setImportanceTransferTransaction(this.multisigDbImportanceTransfers.get(castBigIntegerToLong((BigInteger)array[13])));
-		dbMultsigTransaction.setMultisigAggregateModificationTransaction(this.multisigDbModificationTransactions.get(castBigIntegerToLong((BigInteger)array[14])));
-		dbMultsigTransaction.setMultisigSignatureTransactions(new HashSet<>());
-
-		return dbMultsigTransaction;
+	private DbMultisigTransaction mapToDbMultisigTransaction(final Object[] array) {
+		return this.mapper.map(array, DbMultisigTransaction.class);
 	}
 
-	private DbMultisigSignatureTransaction mapToDbMulsigSignature(
+	private DbMultisigSignatureTransaction mapToDbMultisigSignature(
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
-		final DbMultisigSignatureTransaction dbMulsigSignature = new DbMultisigSignatureTransaction();
-		dbMulsigSignature.setMultisigTransaction(dbMultisigTransaction);
-		dbMulsigSignature.setId(castBigIntegerToLong((BigInteger)array[16]));
-		dbMulsigSignature.setTransferHash(new Hash((byte[])array[17]));
-		dbMulsigSignature.setVersion((Integer)array[18]);
-		dbMulsigSignature.setFee(castBigIntegerToLong((BigInteger)array[19]));
-		dbMulsigSignature.setTimeStamp((Integer)array[20]);
-		dbMulsigSignature.setDeadline((Integer)array[21]);
-		dbMulsigSignature.setSender(createDbAccount(castBigIntegerToLong((BigInteger)array[22])));
-		dbMulsigSignature.setSenderProof((byte[])array[23]);
-
-		return dbMulsigSignature;
+		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(array, DbMultisigSignatureTransaction.class);
+		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
+		return dbMultisigSignature;
 	}
 
 	private HashMap<Long, DbAccount> getAccountMap(final HashSet<Long> accountIds) {
@@ -319,22 +273,6 @@ public class BlockLoader {
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
 		accounts.stream().forEach(a -> accountMap.put(a.getId(), a));
 		return accountMap;
-	}
-
-	private DbAccount createDbAccount(final Long id) {
-		if (null == id) {
-			return null;
-		}
-
-		final DbAccount dbAccount = new DbAccount();
-		dbAccount.setId(id);
-		return dbAccount;
-	}
-
-	private DbBlock createDbBlock(final Long id) {
-		final DbBlock dbBlock = new DbBlock();
-		dbBlock.setId(id);
-		return dbBlock;
 	}
 
 	private Long castBigIntegerToLong(final BigInteger value) {
