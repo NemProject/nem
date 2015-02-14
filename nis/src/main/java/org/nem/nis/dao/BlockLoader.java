@@ -320,7 +320,7 @@ public class BlockLoader {
 					if (null != innerTransaction) {
 						accounts.add(innerTransaction.getSender());
 						final TransactionRegistry.Entry<AbstractBlockTransfer, ?> innerEntry =
-								(TransactionRegistry.Entry<AbstractBlockTransfer, ?>)TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
+								TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
 						final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
 						if (null != innerRecipient) {
 							accounts.add(innerRecipient);
