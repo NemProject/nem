@@ -2,7 +2,6 @@ package org.nem.nis.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
-import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
@@ -26,10 +25,15 @@ public class BlockLoader {
 
 	private final SessionFactory sessionFactory;
 	private final IMapper mapper;
+	private final List<DbBlock> dbBlocks = new ArrayList<>();
+	private final List<DbTransferTransaction> dbTransfers = new ArrayList<>();
+	private final List<DbImportanceTransferTransaction> dbImportanceTransfers = new ArrayList<>();
+	private final List<DbMultisigAggregateModificationTransaction> dbbModificationTransactions = new ArrayList<>();
+	private final List<DbMultisigTransaction> dbMultisigTransactions = new ArrayList<>();
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
-	private final HashMap<Long, DbTransferTransaction> multisigDbTransfers = new HashMap<>();
-	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransfers = new HashMap<>();
-	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactions = new HashMap<>();
+	private final HashMap<Long, DbTransferTransaction> multisigDbTransferMap = new HashMap<>();
+	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransferMap = new HashMap<>();
+	private final HashMap<Long, DbMultisigAggregateModificationTransaction> multisigDbModificationTransactionMap = new HashMap<>();
 
 	/**
 	 * Creates a new block analyzer.
@@ -61,9 +65,9 @@ public class BlockLoader {
 		mapper.addMapping(Object[].class, DbMultisigSignatureTransaction.class, new MultisigSignatureRawToDbModelMapping(mapper));
 		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(
 				mapper,
-				id -> null == id ? null : this.multisigDbTransfers.get(id),
-				id -> null == id ? null : this.multisigDbImportanceTransfers.get(id),
-				id -> null == id ? null : this.multisigDbModificationTransactions.get(id)));
+				id -> null == id ? null : this.multisigDbTransferMap.get(id),
+				id -> null == id ? null : this.multisigDbImportanceTransferMap.get(id),
+				id -> null == id ? null : this.multisigDbModificationTransactionMap.get(id)));
 		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
 		return mapper;
 	}
@@ -80,42 +84,49 @@ public class BlockLoader {
 	 * @return The list of db blocks.
 	 */
 	public List<DbBlock> loadBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
-		final List<DbBlock> dbBlocks = this.getDbBlocks(fromHeight, toHeight);
-		if (dbBlocks.isEmpty()) {
+		this.dbBlocks.addAll(this.getDbBlocks(fromHeight, toHeight));
+		if (this.dbBlocks.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		dbBlocks.stream().forEach(b -> this.dbBlockMap.put(b.getId(), b));
-		final long minBlockId = dbBlocks.get(0).getId() - 1;
-		final long maxBlockId = dbBlocks.get(dbBlocks.size() - 1).getId() + 1;
-		final List<DbTransferTransaction> allDbTransfers = this.getDbTransfers(minBlockId, maxBlockId);
-		this.extractMultisigTransfers(allDbTransfers, this.multisigDbTransfers);
-		final List<DbImportanceTransferTransaction> allDbImportanceTransfers = this.getDbImportanceTransfers(minBlockId, maxBlockId);
-		this.extractMultisigTransfers(allDbImportanceTransfers, this.multisigDbImportanceTransfers);
-		final List<DbMultisigAggregateModificationTransaction> allDbModificationTransactions = this.getDbModificationTransactions(minBlockId, maxBlockId);
-		this.extractMultisigTransfers(allDbModificationTransactions, this.multisigDbModificationTransactions);
-		final List<DbMultisigTransaction> dbMultisigTransactions = this.getDbMultisigTransactions(minBlockId, maxBlockId);
-		final HashSet<Long> accountIds = this.collectAccountIds(
-				dbBlocks,
-				allDbTransfers,
-				allDbImportanceTransfers,
-				allDbModificationTransactions,
-				dbMultisigTransactions);
+		this.dbBlocks.stream().forEach(b -> this.dbBlockMap.put(b.getId(), b));
+		final long minBlockId = this.dbBlocks.get(0).getId() - 1;
+		final long maxBlockId = this.dbBlocks.get(this.dbBlocks.size() - 1).getId() + 1;
+		this.retrieveTransactions(minBlockId, maxBlockId);
+		this.extractMultisigTransfers();
+		this.addTransactionsToBlocks();
+		final HashSet<Long> accountIds = this.collectAccountIds();
 		final HashMap<Long, DbAccount> accountMap = this.getAccountMap(accountIds);
 		this.updateAccounts(
-				dbBlocks,
-				allDbTransfers,
-				allDbImportanceTransfers,
-				allDbModificationTransactions,
-				dbMultisigTransactions,
+				this.dbBlocks,
+				this.dbTransfers,
+				this.dbImportanceTransfers,
+				this.dbbModificationTransactions,
+				this.dbMultisigTransactions,
 				accountMap);
-		this.addTransactions(allDbTransfers, DbBlock::addTransferTransaction);
-		this.addTransactions(allDbImportanceTransfers, DbBlock::addImportanceTransferTransaction);
-		this.addTransactions(allDbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
-		this.addTransactions(dbMultisigTransactions, DbBlock::addMultisigTransaction);
 
 
-		return dbBlocks;
+		return this.dbBlocks;
+	}
+
+	private void retrieveTransactions(final long minBlockId, final long maxBlockId) {
+		this.dbTransfers.addAll(this.getDbTransfers(minBlockId, maxBlockId));
+		this.dbImportanceTransfers.addAll(this.getDbImportanceTransfers(minBlockId, maxBlockId));
+		this.dbbModificationTransactions.addAll(this.getDbModificationTransactions(minBlockId, maxBlockId));
+		this.dbMultisigTransactions.addAll(this.getDbMultisigTransactions(minBlockId, maxBlockId));
+	}
+
+	private void extractMultisigTransfers() {
+		this.extractMultisigTransfers(this.dbTransfers, this.multisigDbTransferMap);
+		this.extractMultisigTransfers(this.dbImportanceTransfers, this.multisigDbImportanceTransferMap);
+		this.extractMultisigTransfers(this.dbbModificationTransactions, this.multisigDbModificationTransactionMap);
+	}
+
+	private void addTransactionsToBlocks() {
+		this.addTransactions(this.dbTransfers, DbBlock::addTransferTransaction);
+		this.addTransactions(this.dbImportanceTransfers, DbBlock::addImportanceTransferTransaction);
+		this.addTransactions(this.dbbModificationTransactions, DbBlock::addMultisigAggregateModificationTransaction);
+		this.addTransactions(this.dbMultisigTransactions, DbBlock::addMultisigTransaction);
 	}
 
 	private List<DbBlock> getDbBlocks(final BlockHeight fromHeight, final BlockHeight toHeight) {
@@ -164,9 +175,9 @@ public class BlockLoader {
 		final String columnList = this.createColumnList("mm", 1, multisigModificationsColumns);
 		final String queryString =
 				"SELECT msm.*, " + columnList + " FROM multisigsignermodifications msm " +
-				"LEFT OUTER JOIN multisigmodifications mm ON mm.multisigsignermodificationid = msm.id " +
-				"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
-				"ORDER BY msm.blockid ASC";
+						"LEFT OUTER JOIN multisigmodifications mm ON mm.multisigsignermodificationid = msm.id " +
+						"WHERE msm.blockid > :minBlockId AND msm.blockid < :maxBlockId " +
+						"ORDER BY msm.blockid ASC";
 		final Query query = this.getCurrentSession()
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
@@ -299,34 +310,26 @@ public class BlockLoader {
 				.forEach(t -> multisigTransfers.put(t.getId(), t));
 	}
 
-	private HashSet<Long> collectAccountIds(
-			final List<DbBlock> dbBlocks,
-			final List<DbTransferTransaction> allDbTransfers,
-			final List<DbImportanceTransferTransaction> allDbImportanceTransfers,
-			final List<DbMultisigAggregateModificationTransaction> allDbModificationTransactions,
-			final List<DbMultisigTransaction> allDbMultisigTransactions) {
+	private <TDbModel extends AbstractBlockTransfer> HashSet<Long> collectAccountIds() {
 		final HashSet<Long> accountIds = new HashSet<>();
-		dbBlocks.stream().forEach(b -> {
+		this.dbBlocks.stream().forEach(b -> {
 			accountIds.add(b.getHarvester().getId());
 			if (null != b.getLessor()) {
 				accountIds.add(b.getLessor().getId());
 			}
-		});
-		allDbTransfers.stream().forEach(t -> {
-			accountIds.add(t.getSender().getId());
-			accountIds.add(t.getRecipient().getId());
-		});
-		allDbImportanceTransfers.stream().forEach(t -> {
-			accountIds.add(t.getSender().getId());
-			accountIds.add(t.getRemote().getId());
-		});
-		allDbModificationTransactions.stream().forEach(t -> {
-			accountIds.add(t.getSender().getId());
-			t.getOtherAccounts().stream().forEach(a -> accountIds.add(a.getId()));
-		});
-		allDbMultisigTransactions.stream().forEach(t -> {
-			accountIds.add(t.getSender().getId());
-			t.getMultisigSignatureTransactions().stream().forEach(s -> accountIds.add(s.getSender().getId()));
+			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				final TransactionRegistry.Entry<TDbModel, ?> theEntry = (TransactionRegistry.Entry<TDbModel, ?>)entry;
+				final List<TDbModel> transactions = theEntry.getFromBlock.apply(b);
+				transactions.stream().forEach(t -> {
+					accountIds.add(t.getSender().getId());
+					final DbAccount recipient = theEntry.getRecipient.apply(t);
+					if (null != recipient) {
+						accountIds.add(recipient.getId());
+					}
+					theEntry.getOtherAccounts.apply(t).stream()
+							.forEach(a -> accountIds.add(a.getId()));
+				});
+			}
 		});
 
 		return accountIds;
