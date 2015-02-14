@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  * - remote requests with non-remote harvester private keys are blocked
  */
 public class InsecurePrivateKeyValidator implements Validator {
-	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(InsecurePrivateKeyValidator.class.getName());
 
 	private final LocalHostDetector localHostDetector;
 	private final ReadOnlyAccountStateCache accountStateCache;

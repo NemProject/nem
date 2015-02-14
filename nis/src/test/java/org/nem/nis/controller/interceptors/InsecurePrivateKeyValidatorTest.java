@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.test.ExceptionAssert;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
-import org.springframework.validation.Errors;
+import org.springframework.validation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,7 +20,7 @@ public class InsecurePrivateKeyValidatorTest {
 	@Test
 	public void privateKeyValidationIsSupported() {
 		// Arrange:
-		final InsecurePrivateKeyValidator validator = new TestContext().validator;
+		final Validator validator = new TestContext().validator;
 
 		// Act:
 		final boolean isSupported = validator.supports(PrivateKey.class);
@@ -32,7 +32,7 @@ public class InsecurePrivateKeyValidatorTest {
 	@Test
 	public void otherClassValidationIsNotSupported() {
 		// Arrange:
-		final InsecurePrivateKeyValidator validator = new TestContext().validator;
+		final Validator validator = new TestContext().validator;
 
 		// Act:
 		final boolean isSupported = validator.supports(PublicKey.class);
@@ -100,7 +100,7 @@ public class InsecurePrivateKeyValidatorTest {
 		private final LocalHostDetector localHostDetector = Mockito.mock(LocalHostDetector.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-		private final InsecurePrivateKeyValidator validator = new InsecurePrivateKeyValidator(
+		private final Validator validator = new InsecurePrivateKeyValidator(
 				this.localHostDetector,
 				this.accountStateCache,
 				this.request);
