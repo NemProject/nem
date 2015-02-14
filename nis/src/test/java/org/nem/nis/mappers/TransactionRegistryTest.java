@@ -2,8 +2,10 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
+import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -146,7 +148,7 @@ public class TransactionRegistryTest {
 
 	// endregion
 
-	// region gerRecipient
+	// region getOtherAccounts
 
 	@Test
 	@SuppressWarnings("unchecked")
@@ -231,6 +233,49 @@ public class TransactionRegistryTest {
 		final DbMultisigSignatureTransaction transaction = new DbMultisigSignatureTransaction();
 		transaction.setSender(account);
 		return transaction;
+	}
+
+	// endregion
+
+	// region getFromDb
+
+	@Test
+	public void getFromDbCallsGetTransfersForAccountForTransferType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.TRANSFER, 0x1);
+	}
+
+	@Test
+	public void getFromDbCallsGetImportanceTransfersForAccountForImportanceTransferType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.IMPORTANCE_TRANSFER, 0x2);
+	}
+
+	@Test
+	public void getFromDbCallsGetMultisigSignerModificationsForMultisigType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 0x4);
+	}
+
+	@Test
+	public void getFromDbCallsGetMultisigTransactionsForAccountForMultisigType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.MULTISIG, 0x8);
+	}
+
+	private static void assertGetFromDbCallsExpectedMethodForGivenType(final int type, final int callPattern) {
+		// Arrange:
+		final TransferDao transferDao = Mockito.mock(TransferDao.class);
+		final TransactionRegistry.Entry<?, ?> entry	= TransactionRegistry.findByType(type);
+
+		// Act:
+		entry.getFromDb.apply(transferDao, 1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
+
+		// Assert:
+		Mockito.verify(transferDao, Mockito.times(callPattern & 0x01))
+				.getTransfersForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
+		Mockito.verify(transferDao, Mockito.times((callPattern & 0x02) >> 1))
+				.getImportanceTransfersForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
+		Mockito.verify(transferDao, Mockito.times((callPattern & 0x04) >> 2))
+				.getMultisigSignerModificationsForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
+		Mockito.verify(transferDao, Mockito.times((callPattern & 0x08) >> 3))
+				.getMultisigTransactionsForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	// endregion

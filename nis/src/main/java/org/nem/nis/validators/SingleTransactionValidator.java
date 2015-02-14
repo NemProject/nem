@@ -5,7 +5,7 @@ import org.nem.core.model.*;
 /**
  * Interface for validating a single transaction.
  */
-public interface SingleTransactionValidator {
+public interface SingleTransactionValidator extends NamedValidator {
 
 	/**
 	 * Checks the validity of the specified transaction.

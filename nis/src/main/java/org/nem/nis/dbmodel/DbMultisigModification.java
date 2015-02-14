@@ -27,6 +27,14 @@ public class DbMultisigModification {
 	@JoinColumn(name = "multisigSignerModificationId")
 	private DbMultisigAggregateModificationTransaction multisigAggregateModificationTransaction;
 
+	public Long getId() {
+		return this.id;
+	}
+
+	public void setId(final Long id) {
+		this.id = id;
+	}
+
 	public DbMultisigAggregateModificationTransaction getMultisigAggregateModificationTransaction() {
 		return this.multisigAggregateModificationTransaction;
 	}

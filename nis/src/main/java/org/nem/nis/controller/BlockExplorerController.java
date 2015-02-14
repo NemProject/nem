@@ -1,43 +1,50 @@
 package org.nem.nis.controller;
 
-import org.nem.core.model.Block;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.core.serialization.SerializableList;
-import org.nem.nis.BlockChainConstants;
+import org.nem.core.serialization.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.viewmodels.ExplorerBlockViewModel;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.DbBlock;
-import org.nem.nis.mappers.BlockExplorerMapper;
-import org.nem.nis.mappers.NisDbModelToModelMapper;
+import org.nem.nis.mappers.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
+/**
+ * Controller used by NEM ecosystem services, including the block explorer.
+ */
 @RestController
 public class BlockExplorerController {
+	private static final int BLOCKS_LIMIT = 10;
+
 	private final ReadOnlyBlockDao blockDao;
-	private final NisDbModelToModelMapper mapper;
+	private final IMapper mapper;
 
 	@Autowired(required = true)
 	public BlockExplorerController(
 			final ReadOnlyBlockDao blockDao,
-	        final NisDbModelToModelMapper mapper) {
+			final MapperFactory mapperFactory,
+			final AccountLookup accountLookup) {
 		this.blockDao = blockDao;
-		this.mapper = mapper;
+		this.mapper = mapperFactory.createDbModelToModelMapper(accountLookup);
 	}
 
 	@RequestMapping(value = "/local/chain/blocks-after", method = RequestMethod.POST)
 	@ClientApi
 	@TrustedApi
+	// TODO 20150213 G-J: I actually don't  like ExplorerBlockViewModel and ExplorerTransferViewModel,
+	// > the only reason to have them, is so that nembex can have hash of transactions and blocks...
+	// > (and right now it doesn't even have that, as ExplorerTransferViewModel does not handle multisig
+	// >  transaction, so there won't be hash of inner transaction...)
+	// > can you think of some clever way, how could we do that in a different manner?
+	// (wrap Block and Transaction into BlockWithHashViewModel and TransactionWithHashViewModel)
 	public SerializableList<ExplorerBlockViewModel> localBlocksAfter(@RequestBody final BlockHeight height) {
-		// TODO 20150206 J-G: why are you not using BLOCKS_LIMIT or at least a constant instead of 10
-		final BlockExplorerMapper mapper = new BlockExplorerMapper(this.mapper);
-		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(10);
-		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, 10);
+		final SerializableList<ExplorerBlockViewModel> blockList = new SerializableList<>(BLOCKS_LIMIT);
+		final Collection<DbBlock> dbBlockList = this.blockDao.getBlocksAfter(height, BLOCKS_LIMIT);
 		dbBlockList.stream()
-				.map(dbBlock -> mapper.toExplorerViewModel(dbBlock))
+				.map(dbBlock -> this.mapper.map(dbBlock, ExplorerBlockViewModel.class))
 				.forEach(viewModel -> blockList.add(viewModel));
 		return blockList;
 	}

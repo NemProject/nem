@@ -9,7 +9,6 @@ import org.nem.core.model.ncc.NemRequestResult;
 import org.nem.core.node.*;
 import org.nem.core.test.NodeUtils;
 import org.nem.nis.NisPeerNetworkHost;
-import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.peer.PeerNetwork;
 
@@ -125,7 +124,7 @@ public class LocalControllerTest {
 	public void statusReturnsStatusLoadingWhenLastBlockIsNotAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.lastBlockLayer.getLastDbBlock()).thenReturn(null);
+		Mockito.when(context.lastBlockLayer.isLoading()).thenReturn(true);
 
 		// Act:
 		final NemRequestResult result = context.controller.status();
@@ -158,7 +157,7 @@ public class LocalControllerTest {
 			nodes.update(NodeUtils.createNodeWithName("a"), NodeStatus.ACTIVE);
 			Mockito.when(this.network.getNodes()).thenReturn(nodes);
 
-			Mockito.when(this.lastBlockLayer.getLastDbBlock()).thenReturn(new DbBlock());
+			Mockito.when(this.lastBlockLayer.isLoading()).thenReturn(false);
 		}
 	}
 }

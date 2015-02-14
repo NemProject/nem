@@ -8,6 +8,7 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.test.*;
 
@@ -19,17 +20,17 @@ public class HarvesterTest {
 	//region harvest bypass
 
 	@Test
-	public void harvestedBlockIsNullIfLastDbBlockIsNull() {
+	public void harvestedBlockIsNullIfLastBlockLayerIsLoading() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		Mockito.when(context.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(null);
+		Mockito.when(context.blockChainLastBlockLayer.isLoading()).thenReturn(true);
 
 		// Act:
 		final Block block = context.harvester.harvestBlock();
 
 		// Assert:
 		Assert.assertThat(block, IsNull.nullValue());
-		Mockito.verify(context.blockChainLastBlockLayer, Mockito.only()).getLastDbBlock();
+		Mockito.verify(context.blockChainLastBlockLayer, Mockito.only()).isLoading();
 	}
 
 	@Test
@@ -106,8 +107,8 @@ public class HarvesterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
-		Mockito.when(context.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())))
-				.thenReturn(Utils.generateRandomAccount());
+		final Block block = NisUtils.createRandomBlockWithTimeStamp(50);
+		Mockito.when(context.mapper.map(dbLastBlock)).thenReturn(block);
 
 		Mockito.when(context.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);
 
@@ -116,9 +117,10 @@ public class HarvesterTest {
 
 		// Assert:
 		final ArgumentCaptor<Block> blockCaptor = ArgumentCaptor.forClass(Block.class);
+		Mockito.verify(context.mapper, Mockito.only()).map(dbLastBlock);
 		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(blockCaptor.capture(), Mockito.any(), Mockito.any());
-		Assert.assertThat(blockCaptor.getValue().getTimeStamp(), IsEqual.equalTo(new TimeInstant(50)));
+		Assert.assertThat(blockCaptor.getValue(), IsEqual.equalTo(block));
 	}
 
 	//endregion
@@ -177,12 +179,13 @@ public class HarvesterTest {
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
+		final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
 		final BlockGenerator generator = Mockito.mock(BlockGenerator.class);
 		final Harvester harvester = new Harvester(
 				this.timeProvider,
 				this.blockChainLastBlockLayer,
 				this.unlockedAccounts,
-				MapperUtils.createDbModelToModelNisMapper(this.accountLookup),
+				this.mapper,
 				this.generator);
 
 		private TestContext() {

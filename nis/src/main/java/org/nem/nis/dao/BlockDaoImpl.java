@@ -16,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Repository
 public class BlockDaoImpl implements BlockDao {
+	private static final Logger LOGGER = Logger.getLogger(BlockDaoImpl.class.getName());
 
 	private final SessionFactory sessionFactory;
 
@@ -219,21 +221,20 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private Collection<DbBlock> getLatestBlocksForAccount(final Account account, final long height, final int limit) {
+		// note that since h2 is not very good in optimizing the execution plan we should limit the returned
+		// result set as early as possible or it will scan through the entire index.
+		// note also that it is better to use a union because otherwise we have an OR in the where clause which
+		// will prevent h2 from using an index to speed up the query.
 		final Long accountId = this.getAccountId(account);
-		final String preQueryString = "(SELECT b.* FROM blocks b WHERE height<%d AND harvesterId=%d UNION " +
-				"SELECT b.* FROM blocks b WHERE height<%d AND harvestedInName=%d) " +
-				"ORDER BY height DESC";
-		// TODO 20150108 J-B: any reason you're using String.format instead of setting parameters on the query?
-		final String queryString = String.format(
-				preQueryString,
-				height,
-				accountId,
-				height,
-				accountId);
+		final String queryString = "((SELECT b.* FROM blocks b WHERE height<:height AND harvesterId=:accountId limit :limit) UNION " +
+				"(SELECT b.* FROM blocks b WHERE height<:height AND harvestedInName=:accountId limit :limit)) " +
+				"ORDER BY height DESC limit :limit";
 		final Query query = this.getCurrentSession()
 				.createSQLQuery(queryString)
 				.addEntity(DbBlock.class)
-				.setMaxResults(limit);
+				.setParameter("height", height)
+				.setParameter("accountId", accountId)
+				.setParameter("limit", limit);
 		return listAndCast(query);
 	}
 
@@ -249,15 +250,12 @@ public class BlockDaoImpl implements BlockDao {
 	@Override
 	@Transactional
 	public Collection<DbBlock> getBlocksAfter(final BlockHeight height, final int limit) {
-		// whatever it takes : DO NOT ADD setMaxResults here!
-		final long blockHeight = height.getRaw();
-		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
-				.setFetchMode("harvester", FetchMode.JOIN)
-				.add(Restrictions.gt("height", blockHeight))
-				.add(Restrictions.le("height", blockHeight + limit))
-				.addOrder(Order.asc("height"));
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return listAndCast(criteria);
+		final BlockLoader blockLoader = new BlockLoader(this.sessionFactory);
+		final long start = System.currentTimeMillis();
+		final List<DbBlock> dbBlocks = blockLoader.loadBlocks(height, new BlockHeight(height.getRaw() + limit));
+		final long stop = System.currentTimeMillis();
+		LOGGER.info(String.format("loadBlocks (from height %d to height %d) needed %dms", height.getRaw() + 1, height.getRaw() + limit, stop - start));
+		return dbBlocks;
 	}
 
 	@Override
@@ -269,20 +267,9 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
-		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
-		this.dropTransfers(
-				blockHeight,
-				"DbMultisigAggregateModificationTransaction",
-				"blockMultisigAggregateModificationTransactions",
-				transactionsToDelete -> {
-					final Query preQuery = this.getCurrentSession()
-							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
-							.setParameterList("ids", transactionsToDelete);
-					preQuery.executeUpdate();
-				});
 
-		// must be last
+		// DbMultisigTransaction needs to dropped first because it has foreign key references to the other
+		// transaction tables; attempting to delete other transactions first will break referential integrity
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigTransaction",
@@ -290,6 +277,27 @@ public class BlockDaoImpl implements BlockDao {
 				transactionsToDelete -> {
 					final Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+				});
+
+		this.dropTransfers(blockHeight, "DbTransferTransaction", "blockTransferTransactions", v -> {});
+		this.dropTransfers(blockHeight, "DbImportanceTransferTransaction", "blockImportanceTransferTransactions", v -> {});
+		this.dropTransfers(
+				blockHeight,
+				"DbMultisigAggregateModificationTransaction",
+				"blockMultisigAggregateModificationTransactions",
+				transactionsToDelete -> {
+					Query preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigModification m where m.multisigAggregateModificationTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+					preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigSend s where s.transactionId in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+					preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigReceive r where r.transactionId in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 				});

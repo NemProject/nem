@@ -37,7 +37,7 @@ public class ChainServices {
 	public CompletableFuture<Boolean> isChainSynchronized(final Collection<Node> nodes) {
 		return this.getMaxChainHeightAsync(nodes)
 				.thenApply(maxHeight -> {
-					final BlockHeight localBlockHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
+					final BlockHeight localBlockHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 					return localBlockHeight.compareTo(maxHeight) >= 0;
 				});
 	}

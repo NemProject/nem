@@ -26,6 +26,7 @@ import java.util.logging.Logger;
  */
 public class BlockAnalyzer {
 	private static final Logger LOGGER = Logger.getLogger(BlockAnalyzer.class.getName());
+	private static final int NUM_BLOCKS_TO_PULL_AT_ONCE = 500;
 
 	private final BlockDao blockDao;
 	private final BlockChainScoreManager blockChainScoreManager;
@@ -82,8 +83,6 @@ public class BlockAnalyzer {
 			return false;
 		}
 
-		this.blockChainLastBlockLayer.setCurrentBlock(dbBlock);
-
 		LOGGER.info(String.format("first block generation hash: %s", dbBlock.getGenerationHash()));
 		if (!dbBlock.getGenerationHash().equals(NemesisBlock.GENERATION_HASH)) {
 			LOGGER.severe("couldn't find nemesis block, you're probably using developer's build, drop the db and rerun");
@@ -105,10 +104,8 @@ public class BlockAnalyzer {
 		do {
 			final Block block = mapper.map(dbBlock);
 
-			if ((block.getHeight().getRaw() % 512) == 0) {
-				this.blockChainLastBlockLayer.setCurrentBlock(dbBlock);
-			}
-			if ((block.getHeight().getRaw() % 5000) == 0) {
+			if ((block.getHeight().getRaw() % NUM_BLOCKS_TO_PULL_AT_ONCE) == 0) {
+				this.blockChainLastBlockLayer.analyzeLastBlock(dbBlock);
 				LOGGER.info(String.format("%d", block.getHeight().getRaw()));
 			}
 
@@ -136,6 +133,7 @@ public class BlockAnalyzer {
 
 		// note that curBlockHeight is one greater than the height of our last block
 		recalculateImportancesAtHeight(nisCache, new BlockHeight(curBlockHeight - 1));
+		this.blockChainLastBlockLayer.setLoaded();
 		return true;
 	}
 
@@ -164,7 +162,7 @@ public class BlockAnalyzer {
 			}
 
 			if (null == this.iterator || !this.iterator.hasNext()) {
-				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), 2345).iterator();
+				this.iterator = this.blockDao.getBlocksAfter(new BlockHeight(this.curHeight), NUM_BLOCKS_TO_PULL_AT_ONCE).iterator();
 				if (!this.iterator.hasNext()) {
 					this.finished = true;
 					return null;

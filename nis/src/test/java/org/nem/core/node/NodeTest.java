@@ -27,7 +27,7 @@ public class NodeTest {
 		// Assert:
 		Assert.assertThat(node.getIdentity(), IsSame.sameInstance(identity));
 		Assert.assertThat(node.getEndpoint(), IsSame.sameInstance(endpoint));
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData("?", "?")));
+		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, null)));
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class NodeTest {
 		// Assert:
 		Assert.assertThat(node.getIdentity(), IsEqual.equalTo(identity));
 		Assert.assertThat(node.getEndpoint(), IsEqual.equalTo(endpoint));
-		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData("?", "?")));
+		Assert.assertThat(node.getMetaData(), IsEqual.equalTo(new NodeMetaData(null, null)));
 	}
 
 	@Test

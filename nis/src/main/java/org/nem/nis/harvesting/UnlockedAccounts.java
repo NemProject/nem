@@ -53,7 +53,7 @@ public class UnlockedAccounts implements Iterable<Account> {
 		}
 
 		// use the latest forwarded state so that remote harvesters that aren't active yet can be unlocked
-		final BlockHeight currentHeight = new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
+		final BlockHeight currentHeight = this.blockChainLastBlockLayer.getLastBlockHeight();
 		final ReadOnlyAccountState accountState = this.accountStateCache.findLatestForwardedStateByAddress(account.getAddress());
 		if (!this.canHarvestPredicate.canHarvest(accountState, currentHeight)) {
 			return UnlockResult.FAILURE_HARVESTING_INELIGIBLE;

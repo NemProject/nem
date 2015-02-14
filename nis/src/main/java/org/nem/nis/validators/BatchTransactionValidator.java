@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Interface for validating batches of transactions.
  */
-public interface BatchTransactionValidator {
+public interface BatchTransactionValidator extends NamedValidator {
 
 	/**
 	 * Checks the validity of the specified transactions.

@@ -9,6 +9,8 @@ import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
+import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
+import org.nem.nis.validators.unconfirmed.*;
 
 import java.util.*;
 import java.util.function.Supplier;

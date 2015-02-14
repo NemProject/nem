@@ -1,6 +1,8 @@
 package org.nem.nis.mappers;
 
+import org.nem.core.function.PentaFunction;
 import org.nem.core.model.*;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -47,6 +49,11 @@ public class TransactionRegistry {
 		public final Function<TDbModel, Collection<DbAccount>> getOtherAccounts;
 
 		/**
+		 * A function that will return transfer block pairs from the database.
+		 */
+		public final PentaFunction<TransferDao, Long, Long, Integer, ReadOnlyTransferDao.TransferType, Collection<TransferBlockPair>> getFromDb;
+
+		/**
 		 * The db model transaction class.
 		 */
 		public final Class<TDbModel> dbModelClass;
@@ -66,6 +73,7 @@ public class TransactionRegistry {
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
 				final Function<TDbModel, DbAccount> getRecipient,
 				final Function<TDbModel, Collection<DbAccount>> getOtherAccounts,
+				final PentaFunction<TransferDao, Long, Long, Integer, ReadOnlyTransferDao.TransferType, Collection<TransferBlockPair>> getFromDb,
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
 				final Class<TDbModel> dbModelClass,
@@ -79,6 +87,8 @@ public class TransactionRegistry {
 
 			this.getRecipient = getRecipient;
 			this.getOtherAccounts = getOtherAccounts;
+
+			this.getFromDb = getFromDb;
 
 			this.createModelToDbModelMapper = createModelToDbModelMapper;
 			this.createDbModelToModelMapper = createDbModelToModelMapper;
@@ -111,10 +121,11 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					TransactionTypes.TRANSFER,
 					DbBlock::getBlockTransferTransactions,
-					(block, transfers) -> block.setBlockTransferTransactions(transfers),
+					DbBlock::setBlockTransferTransactions,
 					DbMultisigTransaction::getTransferTransaction,
 					DbTransferTransaction::getRecipient,
 					transfer -> new ArrayList<>(),
+					ReadOnlyTransferDao::getTransfersForAccount,
 					TransferModelToDbModelMapping::new,
 					TransferDbModelToModelMapping::new,
 					DbTransferTransaction.class,
@@ -123,10 +134,11 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					TransactionTypes.IMPORTANCE_TRANSFER,
 					DbBlock::getBlockImportanceTransferTransactions,
-					(block, transfers) -> block.setBlockImportanceTransferTransactions(transfers),
+					DbBlock::setBlockImportanceTransferTransactions,
 					DbMultisigTransaction::getImportanceTransferTransaction,
 					DbImportanceTransferTransaction::getRemote,
 					transfer -> new ArrayList<>(),
+					ReadOnlyTransferDao::getImportanceTransfersForAccount,
 					ImportanceTransferModelToDbModelMapping::new,
 					ImportanceTransferDbModelToModelMapping::new,
 					DbImportanceTransferTransaction.class,
@@ -135,10 +147,11 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION,
 					DbBlock::getBlockMultisigAggregateModificationTransactions,
-					(block, transfers) -> block.setBlockMultisigAggregateModificationTransactions(transfers),
+					DbBlock::setBlockMultisigAggregateModificationTransactions,
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
 					transfer -> null,
 					DbMultisigAggregateModificationTransaction::getOtherAccounts,
+					ReadOnlyTransferDao::getMultisigSignerModificationsForAccount,
 					MultisigAggregateModificationModelToDbModelMapping::new,
 					MultisigAggregateModificationDbModelToModelMapping::new,
 					DbMultisigAggregateModificationTransaction.class,
@@ -147,10 +160,11 @@ public class TransactionRegistry {
 			this.add(new Entry<>(
 					TransactionTypes.MULTISIG,
 					DbBlock::getBlockMultisigTransactions,
-					(block, transfers) -> block.setBlockMultisigTransactions(transfers),
+					DbBlock::setBlockMultisigTransactions,
 					multisig -> null,
 					multisig -> null,
 					DbMultisigTransaction::getOtherAccounts,
+					ReadOnlyTransferDao::getMultisigTransactionsForAccount,
 					MultisigTransactionModelToDbModelMapping::new,
 					MultisigTransactionDbModelToModelMapping::new,
 					DbMultisigTransaction.class,

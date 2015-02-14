@@ -25,7 +25,9 @@ public class AccountDbModelToModelMapping implements IMapping<DbAccount, Account
 		final Address address = null == dbAccount.getPublicKey()
 				? Address.fromEncoded(dbAccount.getPrintableKey())
 				: new AddressWithoutEncodedAddressGeneration(dbAccount.getPublicKey(), dbAccount.getPrintableKey());
-		return this.accountLookup.findByAddress(address);
+
+		// since the address comes from the db, we don't need validation
+		return this.accountLookup.findByAddress(address, a -> true);
 	}
 
 	private static class AddressWithoutEncodedAddressGeneration extends Address {

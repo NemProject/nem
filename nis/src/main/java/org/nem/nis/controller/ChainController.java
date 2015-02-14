@@ -109,7 +109,13 @@ public class ChainController {
 			}
 
 			previousDbBlock = dbBlock;
-			numTransactions += dbBlock.getBlockImportanceTransferTransactions().size() + dbBlock.getBlockTransferTransactions().size();
+			// TODO 20150213 J-B: seems like a place to use the transaction registry
+			// TODO 20150213 J-B: also could add a test for this
+			numTransactions +=
+					dbBlock.getBlockImportanceTransferTransactions().size() +
+					dbBlock.getBlockTransferTransactions().size() +
+					dbBlock.getBlockMultisigAggregateModificationTransactions().size() +
+					dbBlock.getBlockMultisigTransactions().stream().mapToInt(t -> 2 + t.getMultisigSignatureTransactions().size()).sum();
 			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}
@@ -154,12 +160,7 @@ public class ChainController {
 	@RequestMapping(value = "/chain/height", method = RequestMethod.GET)
 	@PublicApi
 	public BlockHeight chainHeight() {
-		if (this.blockChainLastBlockLayer.getLastDbBlock() == null) {
-			 final DbBlock block = this.blockChainLastBlockLayer.getCurrentDbBlock();
-			return new BlockHeight(block == null ? 1 :block.getHeight());
-		}
-
-		return new BlockHeight(this.blockChainLastBlockLayer.getLastBlockHeight());
+		return this.blockChainLastBlockLayer.getLastBlockHeight();
 	}
 
 	@RequestMapping(value = "/chain/height", method = RequestMethod.POST)

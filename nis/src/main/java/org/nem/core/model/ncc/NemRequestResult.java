@@ -37,7 +37,7 @@ public class NemRequestResult implements SerializableEntity {
 	private final String message;
 
 	/**
-	 * Creates a NIS request result.
+	 * Creates a NEM request result.
 	 *
 	 * @param type The result type.
 	 * @param code The result code.
@@ -50,7 +50,7 @@ public class NemRequestResult implements SerializableEntity {
 	}
 
 	/**
-	 * Creates a NIS request result from a validation result.
+	 * Creates a NEM request result from a validation result.
 	 *
 	 * @param result The validation result.
 	 */
@@ -59,7 +59,7 @@ public class NemRequestResult implements SerializableEntity {
 	}
 
 	/**
-	 * Deserializes a NIS request result.
+	 * Deserializes a NEM request result.
 	 *
 	 * @param deserializer The deserializer.
 	 */

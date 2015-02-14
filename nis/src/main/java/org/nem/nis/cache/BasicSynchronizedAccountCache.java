@@ -2,6 +2,8 @@ package org.nem.nis.cache;
 
 import org.nem.core.model.*;
 
+import java.util.function.Predicate;
+
 /**
  * A synchronized AccountCache implementation.
  */
@@ -61,6 +63,13 @@ public class BasicSynchronizedAccountCache implements AccountCache {
 	public Account findByAddress(final Address id) {
 		synchronized (this.lock) {
 			return this.accountCache.findByAddress(id);
+		}
+	}
+
+	@Override
+	public Account findByAddress(final Address id, final Predicate<Address> validator) {
+		synchronized (this.lock) {
+			return this.accountCache.findByAddress(id, validator);
 		}
 	}
 

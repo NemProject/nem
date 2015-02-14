@@ -142,7 +142,8 @@ public class Ed25519EncodedFieldElement {
 
 	/**
 	 * Reduces this encoded field element (64 bytes) modulo the group order q.
-	 * The output is an encoded field element (32 bytes)
+	 *
+	 * @return Encoded field element (32 bytes).
 	 */
 	public Ed25519EncodedFieldElement modQ() {
 		// s0, ..., s22 have 21 bits, s23 has 29 bits
@@ -498,12 +499,12 @@ public class Ed25519EncodedFieldElement {
 	/**
 	 * Multiplies this encoded field element with another and adds a third.
 	 * The result is reduced modulo the group order.
-	 * The output is a 32 byte encoded filed element.
 	 * <br>
 	 * See the comments in the method modQ() for an explanation of the algorithm.
 	 *
 	 * @param b The encoded field element which is multiplied with this.
 	 * @param c The third encoded field element which is added.
+	 * @return The encoded field element (32 bytes).
 	 */
 	public Ed25519EncodedFieldElement multiplyAndAddModQ(final Ed25519EncodedFieldElement b, final Ed25519EncodedFieldElement c) {
 		final long a0 = 0x1FFFFF & threeBytesToLong(this.values, 0);

@@ -89,33 +89,68 @@ public class TransactionControllerTest {
 	//region transactionPrepareAnnounce
 
 	@Test
-	public void transactionPrepareAnnounceSignsAndPushesTransactionIfTransactionPassesValidation() {
+	public void transactionPrepareAnnounceSignsAndPushesNonMultisigTransactionIfTransactionPassesValidation() {
 		// Assert:
-		assertTransactionPrepareAnnounceSignsAndPushesTransaction(ValidationResult.SUCCESS);
+		assertTransactionPrepareAnnounceSignsAndPushesNonMultisigTransaction(ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void transactionPrepareAnnounceSignsAndPushesTransactionIfTransactionFailsValidation() {
+	public void transactionPrepareAnnounceSignsAndPushesNonMultisigTransactionIfTransactionFailsValidation() {
 		// Assert:
-		assertTransactionPrepareAnnounceSignsAndPushesTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
+		assertTransactionPrepareAnnounceSignsAndPushesNonMultisigTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
 	}
 
-	private static void assertTransactionPrepareAnnounceSignsAndPushesTransaction(final ValidationResult validationResult) {
+	private static void assertTransactionPrepareAnnounceSignsAndPushesNonMultisigTransaction(final ValidationResult validationResult) {
+		// Assert:
+		assertTransactionPrepareAnnounceSignsAndPushesTransaction(
+				validationResult,
+				TransactionControllerTest::createTransactionWithSender,
+				null);
+	}
+
+	@Test
+	public void transactionPrepareAnnounceSignsAndPushesMultisigTransactionIfTransactionPassesValidation() {
+		// Assert:
+		assertTransactionPrepareAnnounceSignsAndPushesMultisigTransaction(ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionPrepareAnnounceSignsAndPushesMultisigTransactionIfTransactionFailsValidation() {
+		// Assert:
+		assertTransactionPrepareAnnounceSignsAndPushesMultisigTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
+	}
+
+	private static void assertTransactionPrepareAnnounceSignsAndPushesMultisigTransaction(final ValidationResult validationResult) {
+		// Arrange:
+		final Transaction innerTransaction = createTransaction();
+
+		// Assert:
+		assertTransactionPrepareAnnounceSignsAndPushesTransaction(
+				validationResult,
+				signer -> new MultisigTransaction(TimeInstant.ZERO, signer, innerTransaction),
+				HashUtils.calculateHash(innerTransaction));
+	}
+
+	private static void assertTransactionPrepareAnnounceSignsAndPushesTransaction(
+			final ValidationResult validationResult,
+			final Function<Account, Transaction> createTransaction,
+			final Hash expectedInnerTransactionHash) {
 		final TestContext context = new TestContext();
 		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any()))
 				.thenReturn(validationResult);
 
 		final KeyPair keyPair = new KeyPair();
 		final Account account = new Account(keyPair);
-		final Transaction transaction = createTransactionWithSender(account);
+		final Transaction transaction = createTransaction.apply(account);
 		final RequestPrepareAnnounce request = new RequestPrepareAnnounce(transaction, keyPair.getPrivateKey());
 
 		// Act:
-		final NemRequestResult result = context.controller.transactionPrepareAnnounce(request);
+		final NemAnnounceResult result = context.controller.transactionPrepareAnnounce(request);
 
 		// Assert:
 		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
 		Assert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
+		Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(expectedInnerTransactionHash));
 
 		final ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
 		Mockito.verify(context.pushService, Mockito.only()).pushTransaction(transactionCaptor.capture(), Mockito.eq(null));
@@ -130,34 +165,67 @@ public class TransactionControllerTest {
 	//region transactionAnnounce
 
 	@Test
-	public void transactionAnnounceSignsAndPushesTransactionIfTransactionPassesValidation() {
+	public void transactionAnnounceSignsAndPushesNonMultisigTransactionIfTransactionPassesValidation() {
 		// Assert:
-		assertTransactionAnnounceSignsAndPushesTransaction(ValidationResult.SUCCESS);
+		assertTransactionAnnounceSignsAndPushesNonMultisigTransaction(ValidationResult.SUCCESS);
 	}
 
 	@Test
-	public void transactionAnnounceSignsAndPushesTransactionIfTransactionFailsValidation() {
+	public void transactionAnnounceSignsAndPushesNonMultisigTransactionIfTransactionFailsValidation() {
 		// Assert:
-		assertTransactionAnnounceSignsAndPushesTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
+		assertTransactionAnnounceSignsAndPushesNonMultisigTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
 	}
 
-	private static void assertTransactionAnnounceSignsAndPushesTransaction(final ValidationResult validationResult) {
+	private static void assertTransactionAnnounceSignsAndPushesNonMultisigTransaction(final ValidationResult validationResult) {		// Assert:
+		assertTransactionAnnounceSignsAndPushesTransaction(
+				validationResult,
+				createTransaction(),
+				null);
+	}
+
+	@Test
+	public void transactionAnnounceSignsAndPushesMultisigTransactionIfTransactionPassesValidation() {
+		// Assert:
+		assertTransactionAnnounceSignsAndPushesMultisigTransaction(ValidationResult.SUCCESS);
+	}
+
+	@Test
+	public void transactionAnnounceSignsAndPushesMultisigTransactionIfTransactionFailsValidation() {
+		// Assert:
+		assertTransactionAnnounceSignsAndPushesMultisigTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
+	}
+
+	private static void assertTransactionAnnounceSignsAndPushesMultisigTransaction(final ValidationResult validationResult) {
+		// Arrange:
+		final Transaction innerTransaction = createTransaction();
+
+		// Assert:
+		assertTransactionAnnounceSignsAndPushesTransaction(
+				validationResult,
+				new MultisigTransaction(TimeInstant.ZERO, Utils.generateRandomAccount(), innerTransaction),
+				HashUtils.calculateHash(innerTransaction));
+	}
+
+	private static void assertTransactionAnnounceSignsAndPushesTransaction(
+			final ValidationResult validationResult,
+			final Transaction transaction,
+			final Hash expectedInnerTransactionHash) {
 		final TestContext context = new TestContext();
 		Mockito.when(context.pushService.pushTransaction(Mockito.any(), Mockito.any()))
 				.thenReturn(validationResult);
 
-		final Transaction transaction = createTransaction();
 		final Signature signature = new Signature(Utils.generateRandomBytes(64));
 		final RequestAnnounce requestAnnounce = new RequestAnnounce(
 				BinarySerializer.serializeToBytes(transaction.asNonVerifiable()),
 				signature.getBytes());
 
 		// Act:
-		final NemRequestResult result = context.controller.transactionAnnounce(requestAnnounce);
+		final NemAnnounceResult result = context.controller.transactionAnnounce(requestAnnounce);
 
 		// Assert:
 		Assert.assertThat(result.getType(), IsEqual.equalTo(NemRequestResult.TYPE_VALIDATION_RESULT));
 		Assert.assertThat(result.getCode(), IsEqual.equalTo(validationResult.getValue()));
+		Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(expectedInnerTransactionHash));
 
 		final ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);
 		Mockito.verify(context.pushService, Mockito.only()).pushTransaction(transactionCaptor.capture(), Mockito.eq(null));
@@ -234,6 +302,9 @@ public class TransactionControllerTest {
 
 			this.host = Mockito.mock(NisPeerNetworkHost.class);
 			Mockito.when(this.host.getNetwork()).thenReturn(this.network);
+
+			Mockito.when(this.accountLookup.findByAddress(Mockito.any()))
+					.thenAnswer(invocationOnMock -> new Account((Address)invocationOnMock.getArguments()[0]));
 
 			this.controller = new TransactionController(
 					this.accountLookup,

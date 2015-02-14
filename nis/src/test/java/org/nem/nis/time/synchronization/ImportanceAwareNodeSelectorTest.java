@@ -7,7 +7,6 @@ import org.nem.core.crypto.KeyPair;
 import org.nem.core.math.ColumnVector;
 import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.node.*;
-import org.nem.core.test.IsEquivalent;
 import org.nem.nis.cache.*;
 import org.nem.nis.poi.ImportanceCalculator;
 import org.nem.nis.state.*;
