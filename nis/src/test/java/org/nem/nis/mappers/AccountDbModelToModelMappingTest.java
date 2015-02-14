@@ -7,6 +7,7 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.*;
 import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
+import org.nem.nis.cache.DefaultAccountCache;
 import org.nem.nis.dbmodel.DbAccount;
 
 public class AccountDbModelToModelMappingTest {
@@ -17,21 +18,38 @@ public class AccountDbModelToModelMappingTest {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Assert:
-		canMapDbAccountWithoutPublicKeyToAccount(address.getEncoded(), address.getPublicKey());
+		canMapDbAccountToAccount(address.getEncoded(), address.getPublicKey());
 	}
 
 	@Test
 	public void canMapDbAccountWithoutPublicKeyToAccount() {
 		// Arrange:
-		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final Address address = Utils.generateRandomAddress();
 
 		// Assert:
-		canMapDbAccountWithoutPublicKeyToAccount(address.getEncoded(), null);
+		canMapDbAccountToAccount(address.getEncoded(), null);
 	}
 
-	// TODO 20150213 J-B: add a test for adding an invalid address (as a proxy that address isn't validated)
+	@Test
+	public void canMapDbAccountWithInvalidAddressToAccount() {
+		// Arrange:
+		// - this is a proxy that the address isn't validated by the mapper
+		final Address address = Address.fromEncoded("BLAH");
+		final DbAccount dbAccount = new DbAccount(address.getEncoded(), null);
 
-	private static void canMapDbAccountWithoutPublicKeyToAccount(final String encodedAddress, final PublicKey publicKey) {
+		// - use the real default account cache because that is what did the validation
+		final AccountLookup accountLookup = new DefaultAccountCache();
+		final AccountDbModelToModelMapping mapping = new AccountDbModelToModelMapping(accountLookup);
+
+		// Act:
+		final Account account = mapping.map(dbAccount);
+
+		// Assert:
+		Assert.assertThat(account.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(account.getAddress().isValid(), IsEqual.equalTo(false));
+	}
+
+	private static void canMapDbAccountToAccount(final String encodedAddress, final PublicKey publicKey) {
 		// Arrange:
 		final DbAccount dbAccount = new DbAccount(encodedAddress, publicKey);
 		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
