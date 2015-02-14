@@ -12,6 +12,7 @@ import javax.servlet.http.*;
 import java.lang.reflect.Method;
 
 public class LocalHostInterceptorTest {
+	private static final String LOCAL_ADDRESS = "127.0.0.1";
 
 	@Test
 	public void remoteAccessIsAllowedForUnannotatedMethod() {
@@ -23,47 +24,24 @@ public class LocalHostInterceptorTest {
 	public void remoteAccessIsNotAllowedForTrustedApi() {
 		// Assert:
 		assertAccessDenied("trustedMethod", "194.66.82.11");
-		assertAccessDenied("trustedMethod", "127.0.0.10");
-		assertAccessDenied("trustedMethod", "0:0:0:0:0:0:0:10");
 	}
 
 	@Test
-	public void localIpv4AccessIsAllowedForTrustedApi() {
+	public void localAccessIsAllowedForUnannotatedMethod() {
 		// Assert:
-		assertAccessGranted("trustedMethod", "127.0.0.1");
+		assertAccessGranted("unannotatedMethod", LOCAL_ADDRESS);
 	}
 
 	@Test
-	public void localIpv6AccessIsAllowedForTrustedApi() {
+	public void localAccessIsAllowedForTrustedApi() {
 		// Assert:
-		assertAccessGranted("trustedMethod", "0:0:0:0:0:0:0:1");
-	}
-
-	@Test
-	public void interceptorCannotBeCreatedAroundInvalidAdditionalLocalIpAddresses() {
-		// Act:
-		ExceptionAssert.assertThrows(
-				v -> new LocalHostInterceptor(new String[] { "not a host" }),
-				IllegalArgumentException.class);
-	}
-
-	@Test
-	public void interceptorCanBeCreatedWithAdditionalLocalIpAddresses() {
-		// Act:
-		final LocalHostInterceptor interceptor = new LocalHostInterceptor(new String[] { "194.66.82.11", "0:0:0:0:0:0:0:10" });
-
-		// Assert:
-		assertAccessGranted(interceptor, "trustedMethod", "194.66.82.11");
-		assertAccessDenied(interceptor, "trustedMethod", "127.0.0.10");
-		assertAccessGranted(interceptor, "trustedMethod", "0:0:0:0:0:0:0:10");
+		assertAccessGranted("trustedMethod", LOCAL_ADDRESS);
 	}
 
 	private static void assertAccessGranted(final String methodName, final String remoteAddress) {
-		// Assert:
-		assertAccessGranted(new LocalHostInterceptor(), methodName, remoteAddress);
-	}
+		// Arrange:
+		final LocalHostInterceptor interceptor = createInterceptor();
 
-	private static void assertAccessGranted(final LocalHostInterceptor interceptor, final String methodName, final String remoteAddress) {
 		// Act:
 		final boolean result = preHandle(interceptor, methodName, remoteAddress);
 
@@ -72,13 +50,22 @@ public class LocalHostInterceptorTest {
 	}
 
 	private static void assertAccessDenied(final String methodName, final String remoteAddress) {
-		// Assert:
-		assertAccessDenied(new LocalHostInterceptor(), methodName, remoteAddress);
-	}
+		// Arrange:
+		final LocalHostInterceptor interceptor = createInterceptor();
 
-	private static void assertAccessDenied(final LocalHostInterceptor interceptor, final String methodName, final String remoteAddress) {
 		// Act / Assert:
 		ExceptionAssert.assertThrows(v -> preHandle(interceptor, methodName, remoteAddress), UnauthorizedAccessException.class);
+	}
+
+	private static LocalHostInterceptor createInterceptor() {
+		// Arrange:
+		final LocalHostDetector detector = Mockito.mock(LocalHostDetector.class);
+		Mockito.when(detector.isLocal(Mockito.any()))
+				.thenAnswer(invocationOnMock -> {
+					final HttpServletRequest request = (HttpServletRequest)invocationOnMock.getArguments()[0];
+					return request.getRemoteAddr().equals(LOCAL_ADDRESS);
+				});
+		return new LocalHostInterceptor(detector);
 	}
 
 	public static boolean preHandle(final LocalHostInterceptor interceptor, final String methodName, final String remoteAddress) {
