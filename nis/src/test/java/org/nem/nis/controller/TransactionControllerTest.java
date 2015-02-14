@@ -176,7 +176,8 @@ public class TransactionControllerTest {
 		assertTransactionAnnounceSignsAndPushesNonMultisigTransaction(ValidationResult.FAILURE_FUTURE_DEADLINE);
 	}
 
-	private static void assertTransactionAnnounceSignsAndPushesNonMultisigTransaction(final ValidationResult validationResult) {		// Assert:
+	private static void assertTransactionAnnounceSignsAndPushesNonMultisigTransaction(final ValidationResult validationResult) {
+		// Assert:
 		assertTransactionAnnounceSignsAndPushesTransaction(
 				validationResult,
 				createTransaction(),

@@ -262,7 +262,7 @@ public class TransactionRegistryTest {
 	private static void assertGetFromDbCallsExpectedMethodForGivenType(final int type, final int callPattern) {
 		// Arrange:
 		final TransferDao transferDao = Mockito.mock(TransferDao.class);
-		final TransactionRegistry.Entry<?, ?> entry	= TransactionRegistry.findByType(type);
+		final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
 
 		// Act:
 		entry.getFromDb.apply(transferDao, 1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);

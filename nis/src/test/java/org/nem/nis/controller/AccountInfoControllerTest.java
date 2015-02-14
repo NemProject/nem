@@ -71,7 +71,7 @@ public class AccountInfoControllerTest {
 		@Test
 		public void accountStatusOverridesInactiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
 			// Assert:
-			assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+			this.assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
 					AccountRemoteStatus.INACTIVE,
 					AccountRemoteStatus.ACTIVATING);
 		}
@@ -79,7 +79,7 @@ public class AccountInfoControllerTest {
 		@Test
 		public void accountStatusOverridesActiveRemoteStatusIfUnconfirmedImportanceTransferIsPending() {
 			// Assert:
-			assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
+			this.assertUnconfirmedImportanceTransferOverridesAccountRemoteStatus(
 					AccountRemoteStatus.ACTIVE,
 					AccountRemoteStatus.DEACTIVATING);
 		}

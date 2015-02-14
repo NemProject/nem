@@ -64,7 +64,7 @@
       },
       "identity": {
         "name": "san",
-        "public-key": "8fe59fe88b25b9b202843755200974a0509057c0ed3f8684fad91a0da6549d76"
+        "public-key": "4a25bf65646c8c3df87179bcb5ff7c4c3176ea02153a82d14615d53cf448ed83"
       }
     },
     {
@@ -75,7 +75,7 @@
       },
       "identity": {
         "name": "go",
-        "public-key": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
+        "public-key": "f973d58cd550da293e52764d431edd5a04b28baa2b7b83b2e8fb7a5d3a7c398b"
       }
     },
     {
@@ -86,7 +86,7 @@
       },
       "identity": {
         "name": "hachi",
-        "public-key": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"
+        "public-key": "09ae29b40e95d4d65a4b4e65fa4582c0c4040ed15a0cabba4bf50f4c76287844"
       }
     },
     {
@@ -97,7 +97,7 @@
       },
       "identity": {
         "name": "jusan",
-        "public-key": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
+        "public-key": "1cf373a7391bd179865904dfb6e6e4a427927ac90530b0396ad69392863e1b52"
       }
     },
     {
@@ -108,29 +108,7 @@
       },
       "identity": {
         "name": "nijuichi",
-        "public-key": "f8a02001a36b0ffa8fd8f753cab0e513b76d4e9ceea45536493fc2df83af5f65"
-      }
-    },
-    {
-      "endpoint": {
-        "host": "chain.nem.ninja",
-        "port": 7890,
-        "protocol": "http"
-      },
-      "identity": {
-        "name": "pat",
-        "public-key": "b13e6fde0178dd7d32017ee4f932b329d8bcaf3f2cf186b3bb10a43182c417b1"
-      }
-    },
-    {
-      "endpoint": {
-        "protocol": "http",
-        "port": 7890,
-        "host": "46.28.202.213"
-      },
-      "identity": {
-        "name": "rigel3",
-        "public-key": "9a59c94e8fe73dbe4bca79deb9b11476e65c4ccf944155a3d9ea8ed2022d800e"
+        "public-key": "9c95a96be8a319d77eb71dec3c841afc687d1b039007813fd83a10fabcdb21f7"
       }
     },
     {
@@ -141,18 +119,7 @@
       },
       "identity": {
         "name": "jabo38",
-        "public-key": "3800de1304f392369fe21d7e5e3747c55976be4760aae65dae561c60967bd3ed"
-      }
-    },
-    {
-      "endpoint": {
-        "protocol": "http",
-        "port": 7890,
-        "host": "5.79.193.164"
-      },
-      "identity": {
-        "name": "Elena82",
-        "public-key": "5c0797a67c59c91ab2f73b99c7eaed4df760bf8c9099b6b6f564cec5571da3fb"
+        "public-key": "84afa1bbc993b7f5536344914dde86141e61f8cbecaf8c9cefc07391f3287cf5"
       }
     },
   ]

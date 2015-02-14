@@ -1,6 +1,6 @@
 package org.nem.nis.dao.mappers;
 
-import org.nem.nis.dbmodel.*;
+import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.mappers.IMapper;
 
 import java.math.BigInteger;

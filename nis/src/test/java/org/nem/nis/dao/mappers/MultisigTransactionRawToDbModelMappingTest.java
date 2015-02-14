@@ -35,7 +35,7 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 		final DbMultisigTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		assertDbModelFields(dbModel);
+		this.assertDbModelFields(dbModel);
 		Assert.assertThat(dbModel.getTransferTransaction(), IsEqual.equalTo(dbTransfer));
 		Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsNull.nullValue());
@@ -54,7 +54,7 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 		final DbMultisigTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		assertDbModelFields(dbModel);
+		this.assertDbModelFields(dbModel);
 		Assert.assertThat(dbModel.getTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsEqual.equalTo(dbImportanceTransfer));
 		Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsNull.nullValue());
@@ -73,7 +73,7 @@ public class MultisigTransactionRawToDbModelMappingTest extends AbstractTransfer
 		final DbMultisigTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		assertDbModelFields(dbModel);
+		this.assertDbModelFields(dbModel);
 		Assert.assertThat(dbModel.getTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getImportanceTransferTransaction(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getMultisigAggregateModificationTransaction(), IsEqual.equalTo(dbModificationTransaction));

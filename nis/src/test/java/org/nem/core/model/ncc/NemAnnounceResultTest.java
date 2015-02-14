@@ -1,6 +1,6 @@
 package org.nem.core.model.ncc;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -23,6 +23,7 @@ public class NemAnnounceResultTest {
 			assertNemRequestResult(result);
 			Assert.assertThat(result.getInnerTransactionHash(), IsEqual.equalTo(this.getExpectedHash()));
 		}
+
 		@Test
 		public void canRoundtripResult() {
 			// Act:
