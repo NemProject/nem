@@ -13,6 +13,7 @@ import org.nem.nis.service.AccountIo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,7 @@ public class AccountController {
 	// TODO 20141010 J-G actually, i don't think this api is good enough as-is ... in its current form, i can "borrow"
 	// > any nis for my harvesting purposes ... i think we need a ticket / token to allow a NIS to reject unauthorized harvesters
 	// TODO 20141214 G-J: I think comment above can already be removed...
-	public void accountUnlock(@RequestBody final PrivateKey privateKey) {
+	public void accountUnlock(@Valid @RequestBody final PrivateKey privateKey) {
 		final KeyPair keyPair = new KeyPair(privateKey);
 		final Account account = new Account(keyPair);
 		final UnlockResult result = this.unlockedAccounts.addUnlockedAccount(account);
@@ -67,7 +68,7 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/lock", method = RequestMethod.POST)
 	@ClientApi
-	public void accountLock(@RequestBody final PrivateKey privateKey) {
+	public void accountLock(@Valid @RequestBody final PrivateKey privateKey) {
 		final Account account = new Account(new KeyPair(privateKey));
 		this.unlockedAccounts.removeUnlockedAccount(account);
 	}
@@ -96,7 +97,7 @@ public class AccountController {
 	@RequestMapping(value = "/local/account/isunlocked", method = RequestMethod.POST)
 	@TrustedApi
 	@ClientApi
-	public String isAccountUnlocked(@RequestBody final PrivateKey privateKey) {
+	public String isAccountUnlocked(@Valid @RequestBody final PrivateKey privateKey) {
 		return this.isAccountUnlocked(Address.fromPublicKey(new KeyPair(privateKey).getPublicKey()));
 	}
 
