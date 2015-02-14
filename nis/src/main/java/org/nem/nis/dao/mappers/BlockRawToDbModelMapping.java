@@ -50,10 +50,10 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 	}
 
 	private DbAccount mapAccount(final Long id) {
-		return this.mapper.map(id, DbAccount.class);
+		return RawMapperUtils.mapAccount(this.mapper, id);
 	}
 
 	private Long castBigIntegerToLong(final BigInteger value) {
-		return null == value ? null : value.longValue();
+		return RawMapperUtils.castBigIntegerToLong(value);
 	}
 }

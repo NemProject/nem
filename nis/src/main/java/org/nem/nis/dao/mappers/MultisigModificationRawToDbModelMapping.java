@@ -34,10 +34,10 @@ public class MultisigModificationRawToDbModelMapping implements IMapping<Object[
 	}
 
 	private DbAccount mapAccount(final Long id) {
-		return this.mapper.map(id, DbAccount.class);
+		return RawMapperUtils.mapAccount(this.mapper, id);
 	}
 
 	private Long castBigIntegerToLong(final BigInteger value) {
-		return null == value ? null : value.longValue();
+		return RawMapperUtils.castBigIntegerToLong(value);
 	}
 }

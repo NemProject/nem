@@ -4,7 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.*;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.*;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -23,6 +25,7 @@ public class BlockLoader {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
 
 	private final SessionFactory sessionFactory;
+	private final IMapper mapper;
 	private final HashMap<Long, DbBlock> dbBlockMap = new HashMap<>();
 	private final HashMap<Long, DbTransferTransaction> multisigDbTransfers = new HashMap<>();
 	private final HashMap<Long, DbImportanceTransferTransaction> multisigDbImportanceTransfers = new HashMap<>();
@@ -34,7 +37,35 @@ public class BlockLoader {
 	 * @param sessionFactory The session factory.
 	 */
 	public BlockLoader(final SessionFactory sessionFactory) {
+		this(sessionFactory, createDefaultMapper());
+	}
+
+	/**
+	 * Creates a new block analyzer.
+	 *
+	 * @param sessionFactory The session factory.
+	 * @param mapper The mapper.
+	 */
+	public BlockLoader(final SessionFactory sessionFactory, final IMapper mapper) {
 		this.sessionFactory = sessionFactory;
+		this.mapper = mapper;
+	}
+
+	private static IMapper createDefaultMapper() {
+		final MappingRepository mapper = new MappingRepository();
+		mapper.addMapping(Long.class, DbAccount.class, new AccountRawToDbModelMapping());
+		mapper.addMapping(Object[].class, DbBlock.class, new BlockRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbImportanceTransferTransaction.class, new ImportanceTransferRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMultisigAggregateModificationTransaction.class, new MultisigAggregateModificationRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMultisigModification.class, new MultisigModificationRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMultisigSignatureTransaction.class, new MultisigSignatureRawToDbModelMapping(mapper));
+		mapper.addMapping(Object[].class, DbMultisigTransaction.class, new MultisigTransactionRawToDbModelMapping(
+				mapper,
+				raw -> mapper.map(raw, DbTransferTransaction.class),
+				raw -> mapper.map(raw, DbImportanceTransferTransaction.class),
+				raw -> mapper.map(raw, DbMultisigAggregateModificationTransaction.class)));
+		mapper.addMapping(Object[].class, DbTransferTransaction.class, new TransferRawToDbModelMapping(mapper));
+		return mapper;
 	}
 
 	private Session getCurrentSession() {
@@ -93,31 +124,7 @@ public class BlockLoader {
 				.setParameter("fromHeight", fromHeight.getRaw())
 				.setParameter("toHeight", toHeight.getRaw())
 				.setParameter("limit", toHeight.getRaw() - fromHeight.getRaw());
-		final List<Object[]> objects = listAndCast(query);
-		return objects.stream().map(this::mapToDbBlock).collect(Collectors.toList());
-	}
-
-	private DbBlock mapToDbBlock(final Object[] array) {
-		final DbBlock dbBlock = new DbBlock();
-		dbBlock.setId(castBigIntegerToLong((BigInteger)array[0]));
-		dbBlock.setShortId(castBigIntegerToLong((BigInteger)array[1]));
-		dbBlock.setVersion((Integer)array[2]);
-		dbBlock.setPrevBlockHash(new Hash((byte[])array[3]));
-		dbBlock.setBlockHash(new Hash((byte[])array[4]));
-		dbBlock.setGenerationHash(new Hash((byte[])array[5]));
-		dbBlock.setTimeStamp((Integer)array[6]);
-		dbBlock.setHarvester(createDbAccount(castBigIntegerToLong((BigInteger)array[7])));
-		dbBlock.setHarvesterProof((byte[])array[8]);
-		dbBlock.setLessor(createDbAccount(castBigIntegerToLong((BigInteger)array[9])));
-		dbBlock.setHeight(castBigIntegerToLong((BigInteger)array[10]));
-		dbBlock.setTotalFee(castBigIntegerToLong((BigInteger)array[11]));
-		dbBlock.setDifficulty(castBigIntegerToLong((BigInteger)array[12]));
-		dbBlock.setBlockTransferTransactions(new ArrayList<>());
-		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
-		dbBlock.setBlockMultisigAggregateModificationTransactions(new ArrayList<>());
-		dbBlock.setBlockMultisigTransactions(new ArrayList<>());
-
-		return dbBlock;
+		return this.executeAndMapAll(query, DbBlock.class);
 	}
 
 	private List<DbTransferTransaction> getDbTransfers(
@@ -130,30 +137,7 @@ public class BlockLoader {
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		final List<Object[]> objects = listAndCast(query);
-		return objects.stream().map(this::mapToDbTransfers).collect(Collectors.toList());
-	}
-
-	private DbTransferTransaction mapToDbTransfers(final Object[] array) {
-		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
-		dbTransfer.setBlock(createDbBlock(castBigIntegerToLong((BigInteger)array[0])));
-		dbTransfer.setId(castBigIntegerToLong((BigInteger)array[1]));
-		dbTransfer.setTransferHash(new Hash((byte[])array[2]));
-		dbTransfer.setVersion((Integer)array[3]);
-		dbTransfer.setFee(castBigIntegerToLong((BigInteger)array[4]));
-		dbTransfer.setTimeStamp((Integer)array[5]);
-		dbTransfer.setDeadline((Integer)array[6]);
-		dbTransfer.setSender(createDbAccount(castBigIntegerToLong((BigInteger)array[7])));
-		dbTransfer.setSenderProof((byte[])array[8]);
-		dbTransfer.setRecipient(createDbAccount(castBigIntegerToLong((BigInteger)array[9])));
-		dbTransfer.setBlkIndex((Integer)array[10]);
-		dbTransfer.setOrderId((Integer)array[11]);
-		dbTransfer.setAmount(castBigIntegerToLong((BigInteger)array[12]));
-		dbTransfer.setReferencedTransaction(castBigIntegerToLong((BigInteger)array[13]));
-		dbTransfer.setMessageType((Integer)array[14]);
-		dbTransfer.setMessagePayload((byte[])array[15]);
-
-		return dbTransfer;
+		return this.executeAndMapAll(query, DbTransferTransaction.class);
 	}
 
 	private List<DbImportanceTransferTransaction> getDbImportanceTransfers(
@@ -166,28 +150,12 @@ public class BlockLoader {
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		final List<Object[]> objects = listAndCast(query);
-		return objects.stream().map(this::mapToDbImportanceTransfers).collect(Collectors.toList());
+		return this.executeAndMapAll(query, DbImportanceTransferTransaction.class);
 	}
 
-	private DbImportanceTransferTransaction mapToDbImportanceTransfers(final Object[] array) {
-		final DbImportanceTransferTransaction dbImportanceTransfer = new DbImportanceTransferTransaction();
-		dbImportanceTransfer.setBlock(createDbBlock(castBigIntegerToLong((BigInteger)array[0])));
-		dbImportanceTransfer.setId(castBigIntegerToLong((BigInteger)array[1]));
-		dbImportanceTransfer.setTransferHash(new Hash((byte[])array[2]));
-		dbImportanceTransfer.setVersion((Integer)array[3]);
-		dbImportanceTransfer.setFee(castBigIntegerToLong((BigInteger)array[4]));
-		dbImportanceTransfer.setTimeStamp((Integer)array[5]);
-		dbImportanceTransfer.setDeadline((Integer)array[6]);
-		dbImportanceTransfer.setSender(createDbAccount(castBigIntegerToLong((BigInteger)array[7])));
-		dbImportanceTransfer.setSenderProof((byte[])array[8]);
-		dbImportanceTransfer.setRemote(createDbAccount(castBigIntegerToLong((BigInteger)array[9])));
-		dbImportanceTransfer.setMode((Integer)array[10]);
-		dbImportanceTransfer.setBlkIndex((Integer)array[11]);
-		dbImportanceTransfer.setOrderId((Integer)array[12]);
-		dbImportanceTransfer.setReferencedTransaction(castBigIntegerToLong((BigInteger)array[13]));
-
-		return dbImportanceTransfer;
+	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {
+		final List<Object[]> objects = listAndCast(query);
+		return objects.stream().map(raw -> this.mapper.map(raw, targetClass)).collect(Collectors.toList());
 	}
 
 	private List<DbMultisigAggregateModificationTransaction> getDbModificationTransactions(
