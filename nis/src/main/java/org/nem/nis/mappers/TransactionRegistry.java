@@ -226,7 +226,6 @@ public class TransactionRegistry {
 		return null;
 	}
 
-	// TODO  20140214 J-B: should test this
 	public static <TDbModel extends AbstractBlockTransfer> Entry<?, ?> findByDbModelClass(final Class<TDbModel> clazz) {
 		for (final Entry<?, ?> entry : entries) {
 			if (entry.dbModelClass.equals(clazz)) {
