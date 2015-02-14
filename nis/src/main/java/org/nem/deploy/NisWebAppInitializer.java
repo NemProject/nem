@@ -32,6 +32,9 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 	@Autowired
 	private BlockChainLastBlockLayer lastBlockLayer;
 
+	@Autowired
+	private LocalHostDetector localHostDetector;
+
 	@Override
 	protected void configureMessageConverters(final List<HttpMessageConverter<?>> converters) {
 		addConvertersForPolicy(converters, new JsonSerializationPolicy(this.accountLookup));
@@ -49,7 +52,7 @@ public class NisWebAppInitializer extends WebMvcConfigurationSupport {
 
 	@Override
 	protected void addInterceptors(final InterceptorRegistry registry) {
-		registry.addInterceptor(new LocalHostInterceptor(this.nisConfiguration.getAdditionalLocalIps()));
+		registry.addInterceptor(new LocalHostInterceptor(this.localHostDetector));
 		registry.addInterceptor(this.createAuditInterceptor());
 		registry.addInterceptor(new BlockLoadingInterceptor(this.lastBlockLayer));
 		super.addInterceptors(registry);
