@@ -24,12 +24,12 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 
 	@Override
 	public DbBlock map(final Object[] source) {
-		final DbAccount harvester = this.mapAccount(castBigIntegerToLong((BigInteger)source[7]));
-		final DbAccount lessor = this.mapAccount(castBigIntegerToLong((BigInteger)source[9]));
+		final DbAccount harvester = this.mapAccount(source[7]);
+		final DbAccount lessor = this.mapAccount(source[9]);
 
 		final DbBlock dbBlock = new DbBlock();
-		dbBlock.setId(castBigIntegerToLong((BigInteger)source[0]));
-		dbBlock.setShortId(castBigIntegerToLong((BigInteger)source[1]));
+		dbBlock.setId(castBigIntegerToLong(source[0]));
+		dbBlock.setShortId(castBigIntegerToLong(source[1]));
 		dbBlock.setVersion((Integer)source[2]);
 		dbBlock.setPrevBlockHash(new Hash((byte[])source[3]));
 		dbBlock.setBlockHash(new Hash((byte[])source[4]));
@@ -38,9 +38,9 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 		dbBlock.setHarvester(harvester);
 		dbBlock.setHarvesterProof((byte[])source[8]);
 		dbBlock.setLessor(lessor);
-		dbBlock.setHeight(castBigIntegerToLong((BigInteger)source[10]));
-		dbBlock.setTotalFee(castBigIntegerToLong((BigInteger)source[11]));
-		dbBlock.setDifficulty(castBigIntegerToLong((BigInteger)source[12]));
+		dbBlock.setHeight(castBigIntegerToLong(source[10]));
+		dbBlock.setTotalFee(castBigIntegerToLong(source[11]));
+		dbBlock.setDifficulty(castBigIntegerToLong(source[12]));
 		dbBlock.setBlockTransferTransactions(new ArrayList<>());
 		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
 		dbBlock.setBlockMultisigAggregateModificationTransactions(new ArrayList<>());
@@ -49,11 +49,11 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 		return dbBlock;
 	}
 
-	private DbAccount mapAccount(final Long id) {
-		return this.mapper.map(id, DbAccount.class);
+	private DbAccount mapAccount(final Object id) {
+		return RawMapperUtils.mapAccount(this.mapper, castBigIntegerToLong(id));
 	}
 
-	private Long castBigIntegerToLong(final BigInteger value) {
-		return null == value ? null : value.longValue();
+	private static Long castBigIntegerToLong(final Object value) {
+		return RawMapperUtils.castBigIntegerToLong((BigInteger)value);
 	}
 }

@@ -21,7 +21,7 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 		final DbTransferTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		assertDbModelFields(dbModel, context.dbRecipient);
+		this.assertDbModelFields(dbModel, context.dbRecipient);
 		Assert.assertThat(dbModel.getMessageType(), IsNull.nullValue());
 		Assert.assertThat(dbModel.getMessagePayload(), IsNull.nullValue());
 	}
@@ -37,7 +37,7 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 		final DbTransferTransaction dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		assertDbModelFields(dbModel, context.dbRecipient);
+		this.assertDbModelFields(dbModel, context.dbRecipient);
 		Assert.assertThat(dbModel.getMessageType(), IsEqual.equalTo(765));
 		Assert.assertThat(dbModel.getMessagePayload(), IsEqual.equalTo(message));
 	}

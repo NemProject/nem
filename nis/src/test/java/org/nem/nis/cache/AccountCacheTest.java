@@ -6,6 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 
@@ -156,47 +157,35 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 	}
 
 	@Test
-	public void findByAddressReturnsCachedAddressIfAvailable() {
+	public void findByAddressReturnsCachedAccountIfAvailable() {
 		// Arrange:
 		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
 		// Act:
-		final Account cachedAccount1 = cache.addAccountToCache(address);
+		final Account cachedAccount = cache.addAccountToCache(address);
 		final Account foundAddress = cache.findByAddress(address);
 
 		// Assert:
-		Assert.assertThat(foundAddress, IsSame.sameInstance(cachedAccount1));
+		Assert.assertThat(foundAddress, IsSame.sameInstance(cachedAccount));
 	}
 
 	@Test
-	public void findByAddressReturnsNonCachedAddressIfPublicKeyIsNotFound() {
+	public void findByAddressReturnsNonCachedAccountIfPublicKeyIsNotFound() {
 		// Arrange:
-		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
-		// Act:
-		final Account foundAccount = cache.findByAddress(address);
-
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+		this.assertFindByAddressReturnsNonCachedAccount(address, cache -> cache.findByAddress(address));
 	}
 
 	@Test
-	public void findByAddressReturnsNonCachedAddressIfEncodedAddressIsNotFound() {
+	public void findByAddressReturnsNonCachedAccountIfEncodedAddressIsNotFound() {
 		// Arrange:
-		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
-		// Act:
-		final Account foundAccount = cache.findByAddress(address);
-
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
-		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
-		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsNull.nullValue());
+		this.assertFindByAddressReturnsNonCachedAccount(address, cache -> cache.findByAddress(address));
 	}
 
 	@Test
@@ -207,25 +196,48 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 		final Address addressWithoutPublicKey = Address.fromEncoded(address.getEncoded());
 
 		// Act:
-		final Account cachedAccount1 = cache.addAccountToCache(addressWithoutPublicKey);
+		final Account cachedAccount = cache.addAccountToCache(addressWithoutPublicKey);
 		final Account foundAccount = cache.findByAddress(address);
 
 		// Assert:
-		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(cachedAccount1.getAddress()));
+		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(cachedAccount.getAddress()));
 		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
-	// TODO 20150213 J-B: can you add a test with custom validation true (and verify not cached)
-	// > also add same two tests in auto cached
+	@Test
+	public void findByAddressReturnsNonCachedAccountIfEncodedAddressIsNotFoundAndCustomValidatorSucceeds() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		this.assertFindByAddressReturnsNonCachedAccount(
+				address,
+				cache -> cache.findByAddress(address, a -> true));
+	}
 
 	@Test(expected = MissingResourceException.class)
-	public void findByAddressUsesCustomValidator() {
+	public void findByAddressFailsIfEncodedAddressIsNotFoundAndCustomValidatorFails() {
 		// Arrange:
 		final AccountCache cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
 		// Assert:
 		cache.findByAddress(address, a -> false);
+	}
+
+	private void assertFindByAddressReturnsNonCachedAccount(
+			final Address address,
+			final Function<AccountCache, Account> findByAddress) {
+		// Arrange:
+		final AccountCache cache = this.createAccountCache();
+
+		// Act:
+		final Account foundAccount = findByAddress.apply(cache);
+
+		// Assert:
+		Assert.assertThat(cache.size(), IsEqual.equalTo(0));
+		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
 	//endregion
@@ -264,31 +276,57 @@ public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 	//region asAutoCache
 
 	@Test
-	public void asAutoCacheFindByAddressReturnsCachedAddressIfPublicKeyIsNotFound() {
+	public void asAutoCacheFindByAddressReturnsCachedAccountIfPublicKeyIsNotFound() {
 		// Arrange:
-		final T cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 
-		// Act:
-		final Account foundAccount = cache.asAutoCache().findByAddress(address);
-
 		// Assert:
-		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
-		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
+		this.assertAsAutoCacheFindByAddressReturnsCachedAccount(address, cache -> cache.findByAddress(address));
 	}
 
 	@Test
-	public void asAutoCacheFindByAddressReturnsCachedAddressIfEncodedAddressIsNotFound() {
+	public void asAutoCacheFindByAddressReturnsCachedAccountIfEncodedAddressIsNotFound() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		this.assertAsAutoCacheFindByAddressReturnsCachedAccount(address, cache -> cache.findByAddress(address));
+	}
+
+	@Test
+	public void asAutoCacheFindByAddressReturnsCachedAccountIfEncodedAddressIsNotFoundAndCustomValidatorSucceeds() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+
+		// Assert:
+		this.assertAsAutoCacheFindByAddressReturnsCachedAccount(
+				address,
+				cache -> cache.findByAddress(address, a -> true));
+	}
+
+	@Test(expected = MissingResourceException.class)
+	public void asAutoCacheFindByAddressFailsIfEncodedAddressIsNotFoundAndCustomValidatorFails() {
 		// Arrange:
 		final T cache = this.createAccountCache();
 		final Address address = Utils.generateRandomAddress();
 
+		// Assert:
+		cache.asAutoCache().findByAddress(address, a -> false);
+	}
+
+	private void assertAsAutoCacheFindByAddressReturnsCachedAccount(
+			final Address address,
+			final Function<AccountCache, Account> findByAddress) {
+		// Arrange:
+		final T cache = this.createAccountCache();
+
 		// Act:
-		final Account foundAccount = cache.asAutoCache().findByAddress(address);
+		final Account foundAccount = findByAddress.apply(cache.asAutoCache());
 
 		// Assert:
 		Assert.assertThat(cache.size(), IsEqual.equalTo(1));
 		Assert.assertThat(foundAccount.getAddress(), IsEqual.equalTo(address));
+		Assert.assertThat(foundAccount.getAddress().getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
 	}
 
 	//endregion

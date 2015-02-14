@@ -80,6 +80,42 @@ public class TransactionRegistryTest {
 		Assert.assertThat(entry, IsNull.nullValue());
 	}
 
+	@Test
+	public void findByDbModelClassCanReturnAllRegisteredTypes() {
+		// Arrange:
+		final List<Class> expectedRegisteredClasses = Arrays.asList(
+				DbTransferTransaction.class,
+				DbImportanceTransferTransaction.class,
+				DbMultisigAggregateModificationTransaction.class,
+				DbMultisigTransaction.class);
+
+		// Act:
+		for (final Class clazz : expectedRegisteredClasses) {
+			// Act:
+			final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByDbModelClass(clazz);
+
+			// Assert:
+			Assert.assertThat(entry.dbModelClass, IsEqual.equalTo(clazz));
+		}
+
+		Assert.assertThat(expectedRegisteredClasses.size(), IsEqual.equalTo(TransactionRegistry.size()));
+	}
+
+	@Test
+	public void findByDbModelClassReturnsNullForUnregisteredType() {
+		// Act:
+		final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByDbModelClass(MyDbModelClass.class);
+
+		// Assert:
+		Assert.assertThat(entry, IsNull.nullValue());
+	}
+
+	private class MyDbModelClass extends AbstractBlockTransfer<MyDbModelClass> {
+		private MyDbModelClass() {
+			super(null);
+		}
+	}
+
 	// region getRecipient
 
 	@Test
@@ -262,7 +298,7 @@ public class TransactionRegistryTest {
 	private static void assertGetFromDbCallsExpectedMethodForGivenType(final int type, final int callPattern) {
 		// Arrange:
 		final TransferDao transferDao = Mockito.mock(TransferDao.class);
-		final TransactionRegistry.Entry<?, ?> entry	= TransactionRegistry.findByType(type);
+		final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
 
 		// Act:
 		entry.getFromDb.apply(transferDao, 1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);

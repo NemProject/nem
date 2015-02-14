@@ -8,8 +8,9 @@ import org.nem.core.serialization.AccountLookup;
 import org.nem.core.test.Utils;
 import org.nem.core.time.*;
 import org.nem.nis.dbmodel.DbBlock;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
-import org.nem.nis.test.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -106,10 +107,8 @@ public class HarvesterTest {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
-		// TODO 20150213 J-B: why did this file change? harvester is still doing the address validation, isn't it?
-		// TODO 20150213 BR -> J: Harvester calls mapper.map(dbLastBlock) in harvestBlock(). Why should it validate an address?
-		Mockito.when(context.accountLookup.findByAddress(Mockito.eq(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())), Mockito.any()))
-				.thenReturn(Utils.generateRandomAccount());
+		final Block block = NisUtils.createRandomBlockWithTimeStamp(50);
+		Mockito.when(context.mapper.map(dbLastBlock)).thenReturn(block);
 
 		Mockito.when(context.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);
 
@@ -118,9 +117,10 @@ public class HarvesterTest {
 
 		// Assert:
 		final ArgumentCaptor<Block> blockCaptor = ArgumentCaptor.forClass(Block.class);
+		Mockito.verify(context.mapper, Mockito.only()).map(dbLastBlock);
 		Mockito.verify(context.generator, Mockito.times(1))
 				.generateNextBlock(blockCaptor.capture(), Mockito.any(), Mockito.any());
-		Assert.assertThat(blockCaptor.getValue().getTimeStamp(), IsEqual.equalTo(new TimeInstant(50)));
+		Assert.assertThat(blockCaptor.getValue(), IsEqual.equalTo(block));
 	}
 
 	//endregion
@@ -179,17 +179,18 @@ public class HarvesterTest {
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);
 		final BlockChainLastBlockLayer blockChainLastBlockLayer = Mockito.mock(BlockChainLastBlockLayer.class);
 		final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
+		final NisDbModelToModelMapper mapper = Mockito.mock(NisDbModelToModelMapper.class);
 		final BlockGenerator generator = Mockito.mock(BlockGenerator.class);
 		final Harvester harvester = new Harvester(
 				this.timeProvider,
 				this.blockChainLastBlockLayer,
 				this.unlockedAccounts,
-				MapperUtils.createDbModelToModelNisMapper(this.accountLookup),
+				this.mapper,
 				this.generator);
 
 		private TestContext() {
 			final DbBlock dbLastBlock = NisUtils.createDbBlockWithTimeStamp(50);
-			Mockito.when(this.accountLookup.findByAddress(Mockito.eq(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())), Mockito.any()))
+			Mockito.when(this.accountLookup.findByAddress(Address.fromPublicKey(dbLastBlock.getHarvester().getPublicKey())))
 					.thenReturn(Utils.generateRandomAccount());
 
 			Mockito.when(this.blockChainLastBlockLayer.getLastDbBlock()).thenReturn(dbLastBlock);

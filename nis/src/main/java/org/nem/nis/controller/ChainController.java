@@ -113,9 +113,9 @@ public class ChainController {
 			// TODO 20150213 J-B: also could add a test for this
 			numTransactions +=
 					dbBlock.getBlockImportanceTransferTransactions().size() +
-					dbBlock.getBlockTransferTransactions().size() +
-					dbBlock.getBlockMultisigAggregateModificationTransactions().size() +
-					dbBlock.getBlockMultisigTransactions().stream().mapToInt(t -> 2 + t.getMultisigSignatureTransactions().size()).sum();
+							dbBlock.getBlockTransferTransactions().size() +
+							dbBlock.getBlockMultisigAggregateModificationTransactions().size() +
+							dbBlock.getBlockMultisigTransactions().stream().mapToInt(t -> 2 + t.getMultisigSignatureTransactions().size()).sum();
 			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}

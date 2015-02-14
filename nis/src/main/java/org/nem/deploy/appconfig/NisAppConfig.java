@@ -9,6 +9,7 @@ import org.nem.nis.*;
 import org.nem.nis.audit.AuditCollection;
 import org.nem.nis.boot.PeerNetworkScheduler;
 import org.nem.nis.cache.*;
+import org.nem.nis.controller.interceptors.LocalHostDetector;
 import org.nem.nis.dao.*;
 import org.nem.nis.harvesting.*;
 import org.nem.nis.mappers.*;
@@ -350,5 +351,10 @@ public class NisAppConfig {
 	@Bean
 	public DebitPredicate debitPredicate() {
 		return new DefaultDebitPredicate(this.accountStateCache());
+	}
+
+	@Bean
+	public LocalHostDetector localHostDetector() {
+		return new LocalHostDetector(this.nisConfiguration().getAdditionalLocalIps());
 	}
 }

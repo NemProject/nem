@@ -22,12 +22,12 @@ public abstract class AbstractTransferRawToDbModelMappingTest<TDbModel extends A
 
 	@Test
 	public void rawCanBeMappedToDbModelWithNullSenderProof() {
-		assertRawCanBeMappedToDbModel(null);
+		this.assertRawCanBeMappedToDbModel(null);
 	}
 
 	@Test
 	public void rawCanBeMappedToDbModelWithNotNullSenderProof() {
-		assertRawCanBeMappedToDbModel(Utils.generateRandomBytes(64));
+		this.assertRawCanBeMappedToDbModel(Utils.generateRandomBytes(64));
 	}
 
 	private void assertRawCanBeMappedToDbModel(final byte[] senderProof) {

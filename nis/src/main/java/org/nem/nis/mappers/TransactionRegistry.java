@@ -39,6 +39,11 @@ public class TransactionRegistry {
 		public final Function<DbMultisigTransaction, TDbModel> getFromMultisig;
 
 		/**
+		 * A function that will get the inner transaction or null if none is available.
+		 */
+		public final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction;
+
+		/**
 		 * A function that will get the recipient (if any) given an abstract block transfer.
 		 */
 		public final Function<TDbModel, DbAccount> getRecipient;
@@ -71,6 +76,7 @@ public class TransactionRegistry {
 				final Function<DbBlock, List<TDbModel>> getFromBlock,
 				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
+				final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction,
 				final Function<TDbModel, DbAccount> getRecipient,
 				final Function<TDbModel, Collection<DbAccount>> getOtherAccounts,
 				final PentaFunction<TransferDao, Long, Long, Integer, ReadOnlyTransferDao.TransferType, Collection<TransferBlockPair>> getFromDb,
@@ -84,6 +90,7 @@ public class TransactionRegistry {
 			this.setInBlock = setInBlock;
 
 			this.getFromMultisig = getFromMultisig;
+			this.getInnerTransaction = getInnerTransaction;
 
 			this.getRecipient = getRecipient;
 			this.getOtherAccounts = getOtherAccounts;
@@ -123,6 +130,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockTransferTransactions,
 					DbBlock::setBlockTransferTransactions,
 					DbMultisigTransaction::getTransferTransaction,
+					transfer -> null,
 					DbTransferTransaction::getRecipient,
 					transfer -> new ArrayList<>(),
 					ReadOnlyTransferDao::getTransfersForAccount,
@@ -136,6 +144,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockImportanceTransferTransactions,
 					DbBlock::setBlockImportanceTransferTransactions,
 					DbMultisigTransaction::getImportanceTransferTransaction,
+					transfer -> null,
 					DbImportanceTransferTransaction::getRemote,
 					transfer -> new ArrayList<>(),
 					ReadOnlyTransferDao::getImportanceTransfersForAccount,
@@ -150,6 +159,7 @@ public class TransactionRegistry {
 					DbBlock::setBlockMultisigAggregateModificationTransactions,
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
 					transfer -> null,
+					transfer -> null,
 					DbMultisigAggregateModificationTransaction::getOtherAccounts,
 					ReadOnlyTransferDao::getMultisigSignerModificationsForAccount,
 					MultisigAggregateModificationModelToDbModelMapping::new,
@@ -162,6 +172,7 @@ public class TransactionRegistry {
 					DbBlock::getBlockMultisigTransactions,
 					DbBlock::setBlockMultisigTransactions,
 					multisig -> null,
+					DbModelUtils::getInnerTransaction,
 					multisig -> null,
 					DbMultisigTransaction::getOtherAccounts,
 					ReadOnlyTransferDao::getMultisigTransactionsForAccount,
@@ -209,6 +220,22 @@ public class TransactionRegistry {
 		for (final Entry<?, ?> entry : entries) {
 			if (entry.type == type) {
 				return entry;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Finds an entry given a transaction db model class.
+	 *
+	 * @param clazz The db model class.
+	 * @return The entry.
+	 */
+	public static <TDbModel extends AbstractBlockTransfer> Entry<AbstractBlockTransfer, ?> findByDbModelClass(final Class<TDbModel> clazz) {
+		for (final Entry<?, ?> entry : entries) {
+			if (entry.dbModelClass.equals(clazz)) {
+				return (Entry<AbstractBlockTransfer, ?>)entry;
 			}
 		}
 

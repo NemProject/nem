@@ -267,16 +267,25 @@ public class BlockDaoImpl implements BlockDao {
 		// "A delete operation only applies to entities of the specified class and its subclasses.
 		//  It does not cascade to related entities."
 
-
 		// DbMultisigTransaction needs to dropped first because it has foreign key references to the other
 		// transaction tables; attempting to delete other transactions first will break referential integrity
+		// Be sure to delete the entries from the auxiliary tables when deleting the db multisig transactions
+		// because it depends on the multisig transaction ids.
 		this.dropTransfers(
 				blockHeight,
 				"DbMultisigTransaction",
 				"blockMultisigTransactions",
 				transactionsToDelete -> {
-					final Query preQuery = this.getCurrentSession()
+					Query preQuery = this.getCurrentSession()
 							.createQuery("delete from DbMultisigSignatureTransaction m where m.multisigTransaction.id in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+					preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigSend s where s.transactionId in (:ids)")
+							.setParameterList("ids", transactionsToDelete);
+					preQuery.executeUpdate();
+					preQuery = this.getCurrentSession()
+							.createQuery("delete from DbMultisigReceive r where r.transactionId in (:ids)")
 							.setParameterList("ids", transactionsToDelete);
 					preQuery.executeUpdate();
 				});

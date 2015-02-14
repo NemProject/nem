@@ -41,7 +41,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 		return this.addAccountToCache(address, Address::isValid);
 	}
 
-	private Account addAccountToCache(final Address address, Predicate<Address> validator) {
+	private Account addAccountToCache(final Address address, final Predicate<Address> validator) {
 		return this.findByAddress(address, validator, () -> {
 			final Account account = new Account(address);
 			this.addressToAccountMap.put(address, account);
@@ -54,7 +54,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 		this.addressToAccountMap.remove(address);
 	}
 
-	private Account findByAddress(final Address address, Predicate<Address> validator, final Supplier<Account> notFoundHandler) {
+	private Account findByAddress(final Address address, final Predicate<Address> validator, final Supplier<Account> notFoundHandler) {
 		if (!validator.test(address)) {
 			throw new MissingResourceException("invalid address", Address.class.getName(), address.toString());
 		}
@@ -83,7 +83,7 @@ public class DefaultAccountCache implements ExtendedAccountCache<DefaultAccountC
 	}
 
 	@Override
-	public Account findByAddress(final Address address, Predicate<Address> validator) {
+	public Account findByAddress(final Address address, final Predicate<Address> validator) {
 		return this.findByAddress(address, validator, () -> createAccount(address.getPublicKey(), address.getEncoded()));
 	}
 
