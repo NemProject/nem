@@ -5,7 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.test.ExceptionAssert;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
 
 public class LocalHostDetectorTest {
 

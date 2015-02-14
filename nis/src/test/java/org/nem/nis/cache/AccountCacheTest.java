@@ -6,7 +6,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.*;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 
 public abstract class AccountCacheTest<T extends ExtendedAccountCache<T>> {
 

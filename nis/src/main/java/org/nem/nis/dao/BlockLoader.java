@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class BlockLoader {
 	private final static String[] multisigSignaturesColumns = {
-			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof"	};
+			"multisigtransactionid", "id", "transferhash", "version", "fee", "timestamp", "deadline", "senderid", "senderproof" };
 	private final static String[] multisigModificationsColumns = {
 			"multisigsignermodificationid", "id", "cosignatoryid", "modificationtype" };
 
@@ -97,7 +97,6 @@ public class BlockLoader {
 		final HashSet<DbAccount> accounts = this.collectAccounts();
 		final HashMap<Long, DbAccount> accountMap = this.getAccounts(accounts);
 		this.copyAccounts(accountMap, accounts);
-
 
 		return this.dbBlocks;
 	}
@@ -270,7 +269,7 @@ public class BlockLoader {
 				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
 				.addEntity(DbAccount.class)
 				.setParameterList("ids", accounts.stream().map(DbAccount::getId).collect(Collectors.toList()));
-		final List<DbAccount> realAccounts =  listAndCast(query);
+		final List<DbAccount> realAccounts = listAndCast(query);
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
 		realAccounts.stream().forEach(a -> accountMap.put(a.getId(), a));
 		return accountMap;
@@ -320,7 +319,8 @@ public class BlockLoader {
 					final AbstractBlockTransfer innerTransaction = theEntry.getInnerTransaction.apply(t);
 					if (null != innerTransaction) {
 						accounts.add(innerTransaction.getSender());
-						final TransactionRegistry.Entry<AbstractBlockTransfer, ?> innerEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
+						final TransactionRegistry.Entry<AbstractBlockTransfer, ?> innerEntry =
+								(TransactionRegistry.Entry<AbstractBlockTransfer, ?>)TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
 						final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
 						if (null != innerRecipient) {
 							accounts.add(innerRecipient);
