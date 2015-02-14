@@ -13,14 +13,14 @@ import org.springframework.validation.Errors;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class PrivateKeyValidatorTest {
+public class InsecurePrivateKeyValidatorTest {
 
 	//region supports
 
 	@Test
 	public void privateKeyValidationIsSupported() {
 		// Arrange:
-		final PrivateKeyValidator validator = new TestContext().validator;
+		final InsecurePrivateKeyValidator validator = new TestContext().validator;
 
 		// Act:
 		final boolean isSupported = validator.supports(PrivateKey.class);
@@ -32,7 +32,7 @@ public class PrivateKeyValidatorTest {
 	@Test
 	public void otherClassValidationIsNotSupported() {
 		// Arrange:
-		final PrivateKeyValidator validator = new TestContext().validator;
+		final InsecurePrivateKeyValidator validator = new TestContext().validator;
 
 		// Act:
 		final boolean isSupported = validator.supports(PublicKey.class);
@@ -100,7 +100,7 @@ public class PrivateKeyValidatorTest {
 		private final LocalHostDetector localHostDetector = Mockito.mock(LocalHostDetector.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
 		private final HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-		private final PrivateKeyValidator validator = new PrivateKeyValidator(
+		private final InsecurePrivateKeyValidator validator = new InsecurePrivateKeyValidator(
 				this.localHostDetector,
 				this.accountStateCache,
 				this.request);

@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.junit.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.controller.interceptors.PrivateKeyValidator;
+import org.nem.nis.controller.interceptors.InsecurePrivateKeyValidator;
 import org.springframework.web.bind.WebDataBinder;
 
 import java.util.stream.Collectors;
@@ -20,7 +20,7 @@ public class BinderControllerAdviceTest {
 
 		// Assert:
 		final Class<?>[] expectedValidatorClasses = new Class<?>[] {
-				PrivateKeyValidator.class
+				InsecurePrivateKeyValidator.class
 		};
 		Assert.assertThat(
 				binder.getValidators().stream().map(v -> v.getClass()).collect(Collectors.toList()),

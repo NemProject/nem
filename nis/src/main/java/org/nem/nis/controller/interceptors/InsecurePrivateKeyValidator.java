@@ -10,9 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Logger;
 
 /**
- * A spring validator used to lock down private key request arguments.
+ * A spring validator used to lock down private key request arguments:
+ * - remote requests with non-remote harvester private keys are blocked
  */
-public class PrivateKeyValidator implements Validator {
+public class InsecurePrivateKeyValidator implements Validator {
 	private static final Logger LOGGER = Logger.getLogger(AuditInterceptor.class.getName());
 
 	private final LocalHostDetector localHostDetector;
@@ -26,7 +27,7 @@ public class PrivateKeyValidator implements Validator {
 	 * @param accountStateCache The readonly account state cache.
 	 * @param request The request.
 	 */
-	public PrivateKeyValidator(
+	public InsecurePrivateKeyValidator(
 			final LocalHostDetector localHostDetector,
 			final ReadOnlyAccountStateCache accountStateCache,
 			final HttpServletRequest request) {

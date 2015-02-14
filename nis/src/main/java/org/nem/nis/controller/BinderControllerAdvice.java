@@ -32,6 +32,6 @@ public class BinderControllerAdvice {
 
 	@InitBinder
 	public void addBinders(final WebDataBinder binder, final HttpServletRequest request) {
-		binder.addValidators(new PrivateKeyValidator(this.localHostDetector, this.accountStateCache, request));
+		binder.addValidators(new InsecurePrivateKeyValidator(this.localHostDetector, this.accountStateCache, request));
 	}
 }
