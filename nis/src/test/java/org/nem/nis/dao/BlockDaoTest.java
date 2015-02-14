@@ -528,7 +528,6 @@ public class BlockDaoTest {
 		this.blockDao.deleteBlocksAfterHeight(block.getHeight().prev());
 
 		// Assert:
-		// TODO 20150213 J-B: this test is failing
 		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
 		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
 	}
