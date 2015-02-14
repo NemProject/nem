@@ -27,12 +27,12 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	@Override
 	public TDbModel map(final Object[] source) {
 		final TDbModel dbModel = this.mapImpl(source);
-		final DbAccount sender = this.mapAccount(castBigIntegerToLong((BigInteger)source[7]));
+		final DbAccount sender = this.mapAccount(source[7]);
 
-		dbModel.setId(castBigIntegerToLong((BigInteger)source[1]));
+		dbModel.setId(this.castBigIntegerToLong(source[1]));
 		dbModel.setTransferHash(new Hash((byte[])source[2]));
 		dbModel.setVersion((Integer)source[3]);
-		dbModel.setFee(castBigIntegerToLong((BigInteger)source[4]));
+		dbModel.setFee(this.castBigIntegerToLong(source[4]));
 		dbModel.setTimeStamp((Integer)source[5]);
 		dbModel.setDeadline((Integer)source[6]);
 		dbModel.setSender(sender);
@@ -49,14 +49,16 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	 */
 	protected abstract TDbModel mapImpl(final Object[] source);
 
+	// TODO 20150213 J-B: since we have up two three occurrences of these functions, we might want to move them all to RawMapperUtils
+
 	/**
 	 * Maps an account id to a db model account.
 	 *
 	 * @param id The account id.
 	 * @return The db model account.
 	 */
-	protected DbAccount mapAccount(final Long id) {
-		return RawMapperUtils.mapAccount(this.mapper, id);
+	protected DbAccount mapAccount(final Object id) {
+		return RawMapperUtils.mapAccount(this.mapper, this.castBigIntegerToLong(id));
 	}
 
 	/**
@@ -65,9 +67,9 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	 * @param id The block id.
 	 * @return The db block.
 	 */
-	protected DbBlock mapBlock(final Long id) {
+	protected DbBlock mapBlock(final Object id) {
 		final DbBlock dbBlock = new DbBlock();
-		dbBlock.setId(id);
+		dbBlock.setId(this.castBigIntegerToLong(id));
 		return dbBlock;
 	}
 
@@ -77,7 +79,7 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	 * @param value The BigInteger value.
 	 * @return The Long value.
 	 */
-	protected Long castBigIntegerToLong(final BigInteger value) {
-		return RawMapperUtils.castBigIntegerToLong(value);
+	protected Long castBigIntegerToLong(final Object value) {
+		return RawMapperUtils.castBigIntegerToLong((BigInteger)value);
 	}
 }

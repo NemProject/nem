@@ -35,13 +35,13 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	@Override
 	protected DbMultisigTransaction mapImpl(final Object[] source) {
 		final DbMultisigTransaction dbMultisigTransaction = new DbMultisigTransaction();
-		dbMultisigTransaction.setBlock(mapBlock(castBigIntegerToLong((BigInteger)source[0])));
+		dbMultisigTransaction.setBlock(this.mapBlock(source[0]));
 		dbMultisigTransaction.setBlkIndex((Integer)source[9]);
 		dbMultisigTransaction.setOrderId((Integer)source[10]);
-		dbMultisigTransaction.setReferencedTransaction(castBigIntegerToLong((BigInteger)source[11]));
-		dbMultisigTransaction.setTransferTransaction(this.transferSupplier.apply(castBigIntegerToLong((BigInteger)source[12])));
-		dbMultisigTransaction.setImportanceTransferTransaction(this.importanceTransferSupplier.apply(castBigIntegerToLong((BigInteger)source[13])));
-		dbMultisigTransaction.setMultisigAggregateModificationTransaction(this.multisigModificationTransactionSupplier.apply(castBigIntegerToLong((BigInteger)source[14])));
+		dbMultisigTransaction.setReferencedTransaction(this.castBigIntegerToLong(source[11]));
+		dbMultisigTransaction.setTransferTransaction(this.transferSupplier.apply(this.castBigIntegerToLong(source[12])));
+		dbMultisigTransaction.setImportanceTransferTransaction(this.importanceTransferSupplier.apply(this.castBigIntegerToLong(source[13])));
+		dbMultisigTransaction.setMultisigAggregateModificationTransaction(this.multisigModificationTransactionSupplier.apply(this.castBigIntegerToLong(source[14])));
 		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 
 		return dbMultisigTransaction;

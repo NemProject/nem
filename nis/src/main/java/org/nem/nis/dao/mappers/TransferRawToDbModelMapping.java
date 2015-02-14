@@ -21,15 +21,15 @@ public class TransferRawToDbModelMapping extends AbstractTransferRawToDbModelMap
 
 	@Override
 	protected DbTransferTransaction mapImpl(final Object[] source) {
-		final DbAccount recipient = this.mapAccount(castBigIntegerToLong((BigInteger)source[9]));
+		final DbAccount recipient = this.mapAccount(source[9]);
 
 		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
-		dbTransfer.setBlock(mapBlock(castBigIntegerToLong((BigInteger)source[0])));
+		dbTransfer.setBlock(this.mapBlock(source[0]));
 		dbTransfer.setRecipient(recipient);
 		dbTransfer.setBlkIndex((Integer)source[10]);
 		dbTransfer.setOrderId((Integer)source[11]);
-		dbTransfer.setAmount(castBigIntegerToLong((BigInteger)source[12]));
-		dbTransfer.setReferencedTransaction(castBigIntegerToLong((BigInteger)source[13]));
+		dbTransfer.setAmount(this.castBigIntegerToLong(source[12]));
+		dbTransfer.setReferencedTransaction(this.castBigIntegerToLong(source[13]));
 		dbTransfer.setMessageType((Integer)source[14]);
 		dbTransfer.setMessagePayload((byte[])source[15]);
 
