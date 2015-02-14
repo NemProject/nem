@@ -183,8 +183,8 @@ public class BlockLoader {
 		final List<DbMultisigAggregateModificationTransaction> transactions = new ArrayList<>();
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
-		for (Object[] array : arrays) {
-			final long txid = castBigIntegerToLong((BigInteger)array[12]);
+		for (final Object[] array : arrays) {
+			final long txid = this.castBigIntegerToLong((BigInteger)array[12]);
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
@@ -231,8 +231,8 @@ public class BlockLoader {
 		final List<DbMultisigTransaction> transactions = new ArrayList<>();
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
-		for (Object[] array : arrays) {
-			final Long txid = castBigIntegerToLong((BigInteger)array[15]);
+		for (final Object[] array : arrays) {
+			final Long txid = this.castBigIntegerToLong((BigInteger)array[15]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -284,7 +284,7 @@ public class BlockLoader {
 		return q.list();
 	}
 
-	private String createColumnList(final String prefix, final int postfix, String[] columns) {
+	private String createColumnList(final String prefix, final int postfix, final String[] columns) {
 		return StringUtils.join(
 				Arrays.stream(columns)
 						.map(col -> String.format("%s.%s as %s%d", prefix, col, col, postfix))
@@ -365,7 +365,7 @@ public class BlockLoader {
 
 	private <TDbModel extends AbstractBlockTransfer> void addTransactions(
 			final List<TDbModel> transactions,
-			BiConsumer<DbBlock, TDbModel> transactionAdder) {
+			final BiConsumer<DbBlock, TDbModel> transactionAdder) {
 		transactions.stream().forEach(t -> {
 			if (null != t.getSenderProof()) {
 				transactionAdder.accept(this.dbBlockMap.get(t.getBlock().getId()), t);

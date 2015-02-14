@@ -22,7 +22,7 @@ public class BlockRawToDbModelMappingTest {
 		final DbBlock dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		assertDbModelFields(context, dbModel, null);
+		this.assertDbModelFields(context, dbModel, null);
 	}
 
 	@Test
@@ -35,7 +35,7 @@ public class BlockRawToDbModelMappingTest {
 		final DbBlock dbModel = this.createMapping(context.mapper).map(raw);
 
 		// Assert:
-		assertDbModelFields(context, dbModel, context.dbLessor);
+		this.assertDbModelFields(context, dbModel, context.dbLessor);
 	}
 
 	private void assertDbModelFields(
