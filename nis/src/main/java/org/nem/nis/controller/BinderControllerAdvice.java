@@ -34,9 +34,11 @@ public class BinderControllerAdvice {
 		this.nisConfiguration = nisConfiguration;
 	}
 
-	@InitBinder
+	@InitBinder("privateKey")
 	public void addBinders(final WebDataBinder binder, final HttpServletRequest request) {
-		binder.addValidators(new InsecurePrivateKeyValidator(this.localHostDetector, this.accountStateCache, request));
-		binder.addValidators(new ConfiguredPrivateKeyValidator(this.nisConfiguration.getAllowedHarvesterAddresses()));
+		binder.addValidators(
+				new InsecurePrivateKeyValidator(this.localHostDetector, this.accountStateCache, request),
+				new ConfiguredPrivateKeyValidator(this.nisConfiguration.getAllowedHarvesterAddresses())
+		);
 	}
 }
