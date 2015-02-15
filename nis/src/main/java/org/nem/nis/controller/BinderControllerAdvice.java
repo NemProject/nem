@@ -4,10 +4,12 @@ import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.controller.interceptors.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.Validator;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 
 /**
  * ControllerAdvice-annotated class that initializes request parameter validators.
@@ -34,11 +36,17 @@ public class BinderControllerAdvice {
 		this.nisConfiguration = nisConfiguration;
 	}
 
-	@InitBinder("privateKey")
+	@InitBinder
 	public void addBinders(final WebDataBinder binder, final HttpServletRequest request) {
-		binder.addValidators(
+		final Validator[] validators = new Validator[] {
 				new InsecurePrivateKeyValidator(this.localHostDetector, this.accountStateCache, request),
 				new ConfiguredPrivateKeyValidator(this.nisConfiguration.getAllowedHarvesterAddresses())
-		);
+		};
+
+		final Validator[] filteredValidators = Arrays.stream(validators)
+				.filter(validator -> validator.supports(binder.getTarget().getClass()))
+				.toArray(Validator[]::new);
+
+		binder.addValidators(filteredValidators);
 	}
 }
