@@ -866,7 +866,7 @@ public class UnconfirmedTransactionsTest {
 	//region getTransactions
 
 	@Test
-	public void getMostImportantTransactionsReturnsAllTransactionsIfLessThanMaximumTransactionsAreAvailable() {
+	public void getMostImportantTransactionsReturnsAllTransactionsWhenLessThanMaximumTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.addMockTransactions(context.transactions, 6, 9);
@@ -880,10 +880,36 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void getMostImportantTransactionsReturnsAtMostMaximumTransactionsIfMoreThanMaximumTransactionsAreAvailable() {
+	public void getMostImportantTransactionsReturnsMaximumTransactionsWhenMoreThanMaximumTransactionsAreAvailable() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMockTransactionsWithChildren(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 5, 6);
+		context.addMockTransactions(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+
+		// Act:
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+
+		// Assert:
+		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
+	}
+
+	@Test
+	public void getMostImportantTransactionsReturnsMaximumTransactionsWhenExactlyMaximumTransactionsAreAvailable() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMockTransactions(context.transactions, 6, 6 + MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1);
+
+		// Act:
+		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+
+		// Assert:
+		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
+	}
+
+	@Test
+	public void getMostImportantTransactionsReturnsLessThanMaximumTransactionsWhenLastTransactionAndChildrenCannotFit() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMockTransactionsWithChildren(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 6);
 
 		// Act:
 		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
@@ -892,13 +918,14 @@ public class UnconfirmedTransactionsTest {
 		// 6 child transactions per transaction in the list, 120 is not divisible by 7
 		final int count = transactions.stream().mapToInt(t -> 1 + t.getChildTransactions().size()).sum();
 		Assert.assertThat(count <= MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, IsEqual.equalTo(true));
+		Assert.assertThat(count, IsEqual.equalTo(7 * 17));
 	}
 
 	@Test
-	public void getMostImportantTransactionsReturnsAtMostMaximumTransactionsIfMaximumTransactionsAreAvailable() {
+	public void getMostImportantTransactionsReturnsMaximumTransactionsWhenLastTransactionAndChildrenCanFit() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		context.addMockTransactionsWithChildren(context.transactions, 6, 6 + MAX_ALLOWED_TRANSACTIONS_PER_BLOCK / 8 - 1, 7);
+		context.addMockTransactionsWithChildren(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 7);
 
 		// Act:
 		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
@@ -906,7 +933,7 @@ public class UnconfirmedTransactionsTest {
 		// Assert:
 		// 7 child transactions per transaction in the list, 120 is divisible by 8
 		final int count = transactions.stream().mapToInt(t -> 1 + t.getChildTransactions().size()).sum();
-		Assert.assertThat(count == MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, IsEqual.equalTo(true));
+		Assert.assertThat(count, IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
 	}
 
 	@Test
@@ -1504,7 +1531,6 @@ public class UnconfirmedTransactionsTest {
 				t.sign();
 				unconfirmedTransactions.addExisting(t);
 			});
-			transactions.forEach(unconfirmedTransactions::addExisting);
 			return transactions;
 		}
 
