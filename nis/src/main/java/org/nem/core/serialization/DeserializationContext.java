@@ -6,15 +6,14 @@ import org.nem.core.model.*;
  * Class that contains external state necessary for deserialization of some objects.
  */
 public class DeserializationContext {
-
-	private final AccountLookup accountLookup;
+	private final SimpleAccountLookup accountLookup;
 
 	/**
 	 * Creates a new DeserializationContext around the specified parameters.
 	 *
 	 * @param accountLookup The account lookup policy.
 	 */
-	public DeserializationContext(final AccountLookup accountLookup) {
+	public DeserializationContext(final SimpleAccountLookup accountLookup) {
 		this.accountLookup = accountLookup;
 	}
 

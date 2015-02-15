@@ -37,7 +37,7 @@ public class DefaultAsyncNemConnector<TApiId> implements AsyncNemConnector<TApiI
 	 *
 	 * @param accountLookup The account lookup to use.
 	 */
-	public void setAccountLookup(final AccountLookup accountLookup) {
+	public void setAccountLookup(final SimpleAccountLookup accountLookup) {
 		this.httpDeserializerResponseStrategy = new HttpErrorResponseDeserializerUnionStrategy(
 				new DeserializationContext(accountLookup));
 	}
