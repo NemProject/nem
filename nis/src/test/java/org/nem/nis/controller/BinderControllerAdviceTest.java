@@ -2,7 +2,7 @@ package org.nem.nis.controller;
 
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.core.crypto.*;
+import org.nem.core.crypto.KeyPair;
 import org.nem.core.test.IsEquivalent;
 import org.nem.deploy.NisConfiguration;
 import org.nem.nis.cache.ReadOnlyAccountStateCache;
