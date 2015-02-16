@@ -12,15 +12,14 @@ import java.io.InputStream;
  * A json serialization policy.
  */
 public class JsonSerializationPolicy implements SerializationPolicy {
-
-	private final AccountLookup accountLookup;
+	private final SimpleAccountLookup accountLookup;
 
 	/**
 	 * Creates a new json serialization policy.
 	 *
 	 * @param accountLookup The account lookup to use.
 	 */
-	public JsonSerializationPolicy(final AccountLookup accountLookup) {
+	public JsonSerializationPolicy(final SimpleAccountLookup accountLookup) {
 		this.accountLookup = accountLookup;
 	}
 
