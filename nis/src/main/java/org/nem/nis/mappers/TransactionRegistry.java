@@ -230,6 +230,7 @@ public class TransactionRegistry {
 	 * Finds an entry given a transaction db model class.
 	 *
 	 * @param clazz The db model class.
+	 * @param <TDbModel> The db model type.
 	 * @return The entry.
 	 */
 	public static <TDbModel extends AbstractBlockTransfer> Entry<AbstractBlockTransfer, ?> findByDbModelClass(final Class<TDbModel> clazz) {

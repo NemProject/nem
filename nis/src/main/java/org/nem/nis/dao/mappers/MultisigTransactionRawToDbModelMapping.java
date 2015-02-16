@@ -19,6 +19,9 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	 * Creates a new mapping.
 	 *
 	 * @param mapper The mapper.
+	 * @param transferSupplier
+	 * @param importanceTransferSupplier
+	 * @param multisigModificationTransactionSupplier
 	 */
 	public MultisigTransactionRawToDbModelMapping(
 			final IMapper mapper,
