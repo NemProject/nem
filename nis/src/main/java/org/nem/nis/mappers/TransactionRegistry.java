@@ -230,8 +230,10 @@ public class TransactionRegistry {
 	 * Finds an entry given a transaction db model class.
 	 *
 	 * @param clazz The db model class.
+	 * @param <TDbModel> The type derived from AbstractBlockTransfer
 	 * @return The entry.
 	 */
+	@SuppressWarnings("unchecked")
 	public static <TDbModel extends AbstractBlockTransfer> Entry<AbstractBlockTransfer, ?> findByDbModelClass(final Class<TDbModel> clazz) {
 		for (final Entry<?, ?> entry : entries) {
 			if (entry.dbModelClass.equals(clazz)) {

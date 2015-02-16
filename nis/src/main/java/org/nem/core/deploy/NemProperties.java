@@ -48,6 +48,7 @@ public class NemProperties {
 	 * Gets the value of an optional string property.
 	 *
 	 * @param name The property name.
+	 * @param defaultValue The default value to use in case there is no property value.
 	 * @return The property value.
 	 */
 	public String getOptionalString(final String name, final String defaultValue) {
@@ -59,6 +60,7 @@ public class NemProperties {
 	 * Gets the value of an optional integer property.
 	 *
 	 * @param name The property name.
+	 * @param defaultValue The default value to use in case there is no property value.
 	 * @return The property value.
 	 */
 	public int getOptionalInteger(final String name, final Integer defaultValue) {
@@ -70,6 +72,7 @@ public class NemProperties {
 	 * Gets the value of an optional boolean property.
 	 *
 	 * @param name The property name.
+	 * @param defaultValue The default value to use in case there is no property value.
 	 * @return The property value.
 	 */
 	public boolean getOptionalBoolean(final String name, final Boolean defaultValue) {
@@ -81,6 +84,7 @@ public class NemProperties {
 	 * Gets the value of an optional string array property.
 	 *
 	 * @param name The property name.
+	 * @param defaultValue The default value to use in case there is no property value.
 	 * @return The property value.
 	 */
 	public String[] getOptionalStringArray(final String name, final String defaultValue) {

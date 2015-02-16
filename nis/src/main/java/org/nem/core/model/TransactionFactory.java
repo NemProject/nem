@@ -44,6 +44,7 @@ public class TransactionFactory {
 	/**
 	 * Gets a value indicating whether or not the specific transaction type is supported.
 	 *
+	 * @param type The type.
 	 * @return true if the transaction type is supported.
 	 */
 	public static boolean isSupported(final int type) {

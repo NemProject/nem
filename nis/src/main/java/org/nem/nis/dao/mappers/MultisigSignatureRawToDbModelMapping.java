@@ -10,6 +10,8 @@ public class MultisigSignatureRawToDbModelMapping extends AbstractTransferRawToD
 
 	/**
 	 * Creates a new mapping.
+	 *
+	 * @param mapper The mapper.
 	 */
 	public MultisigSignatureRawToDbModelMapping(final IMapper mapper) {
 		super(mapper);

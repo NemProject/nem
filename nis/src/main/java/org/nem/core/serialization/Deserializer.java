@@ -191,6 +191,7 @@ public abstract class Deserializer {
 	 *
 	 * @param label The optional name of the value.
 	 * @param activator The activator that should be used to create the SerializableEntity values.
+	 * @param <T> The type of SerializableEntity object.
 	 * @return The read array.
 	 */
 	public final <T> List<T> readObjectArray(final String label, final ObjectDeserializer<T> activator) {
@@ -202,6 +203,7 @@ public abstract class Deserializer {
 	 *
 	 * @param label The optional name of the value.
 	 * @param activator The activator that should be used to create the SerializableEntity values.
+	 * @param <T> The type of SerializableEntity object.
 	 * @return The read array.
 	 */
 	public abstract <T> List<T> readOptionalObjectArray(final String label, final ObjectDeserializer<T> activator);
