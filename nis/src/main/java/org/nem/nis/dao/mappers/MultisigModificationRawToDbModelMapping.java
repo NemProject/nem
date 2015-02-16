@@ -23,21 +23,13 @@ public class MultisigModificationRawToDbModelMapping implements IMapping<Object[
 
 	@Override
 	public DbMultisigModification map(final Object[] source) {
-		final DbAccount cosignatory = this.mapAccount(source[14]);
+		final DbAccount cosignatory = RawMapperUtils.mapAccount(this.mapper, (BigInteger)source[14]);
 
 		final DbMultisigModification dbModification = new DbMultisigModification();
-		dbModification.setId(castBigIntegerToLong(source[13]));
+		dbModification.setId(RawMapperUtils.castBigIntegerToLong((BigInteger)source[13]));
 		dbModification.setCosignatory(cosignatory);
 		dbModification.setModificationType((Integer)source[15]);
 
 		return dbModification;
-	}
-
-	private DbAccount mapAccount(final Object id) {
-		return RawMapperUtils.mapAccount(this.mapper, castBigIntegerToLong(id));
-	}
-
-	private static Long castBigIntegerToLong(final Object value) {
-		return RawMapperUtils.castBigIntegerToLong((BigInteger)value);
 	}
 }

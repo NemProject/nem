@@ -1,6 +1,6 @@
 package org.nem.nis.dao.mappers;
 
-import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
 
 import java.math.BigInteger;
@@ -21,6 +21,29 @@ public final class RawMapperUtils {
 		return null == id
 				? null
 				: mapper.map(id, DbAccount.class);
+	}
+
+	/**
+	 * Maps an account id to a db model account using the specified mapper.
+	 *
+	 * @param mapper The mapper.
+	 * @param id The account id.
+	 * @return The db model account.
+	 */
+	public static DbAccount mapAccount(final IMapper mapper, final BigInteger id) {
+		return mapAccount(mapper, castBigIntegerToLong(id));
+	}
+
+	/**
+	 * Maps a block id to a db block.
+	 *
+	 * @param id The block id.
+	 * @return The db block.
+	 */
+	protected static DbBlock mapBlock(final BigInteger id) {
+		final DbBlock dbBlock = new DbBlock();
+		dbBlock.setId(castBigIntegerToLong(id));
+		return dbBlock;
 	}
 
 	/**
