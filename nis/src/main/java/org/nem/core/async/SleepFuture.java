@@ -4,7 +4,7 @@ import java.util.concurrent.*;
 
 /**
  * Static class containing methods for creating a delayed future.
-  */
+ */
 public class SleepFuture {
 
 	private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
