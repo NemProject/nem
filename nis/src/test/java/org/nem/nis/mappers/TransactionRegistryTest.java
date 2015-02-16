@@ -116,6 +116,103 @@ public class TransactionRegistryTest {
 		}
 	}
 
+	// region getInnerTransaction
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getInnerTransactionReturnsNullForNonMultisgTransactions() {
+		// Arrange:
+		final DbTransferTransaction t1 = new DbTransferTransaction();
+		final DbImportanceTransferTransaction t2 = new DbImportanceTransferTransaction();
+		final DbMultisigAggregateModificationTransaction t3 = new DbMultisigAggregateModificationTransaction();
+		final TransactionRegistry.Entry<DbTransferTransaction, ?> entry1
+				= (TransactionRegistry.Entry<DbTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.TRANSFER);
+		final TransactionRegistry.Entry<DbImportanceTransferTransaction, ?> entry2
+				= (TransactionRegistry.Entry<DbImportanceTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.IMPORTANCE_TRANSFER);
+		final TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?> entry3
+				= (TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
+
+		// Act:
+		final AbstractBlockTransfer inner1 = entry1.getInnerTransaction.apply(t1);
+		final AbstractBlockTransfer inner2 = entry2.getInnerTransaction.apply(t2);
+		final AbstractBlockTransfer inner3 = entry3.getInnerTransaction.apply(t3);
+
+		// Assert:
+		Assert.assertThat(inner1, IsNull.nullValue());
+		Assert.assertThat(inner2, IsNull.nullValue());
+		Assert.assertThat(inner3, IsNull.nullValue());
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getInnerTransactionReturnsInnerTransactionForMultisgTransaction() {
+		// Arrange:
+		final DbTransferTransaction t = new DbTransferTransaction();
+		final DbMultisigTransaction multisig = new DbMultisigTransaction();
+		multisig.setTransferTransaction(t);
+		final TransactionRegistry.Entry<DbMultisigTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
+
+		// Act:
+		final AbstractBlockTransfer inner = entry.getInnerTransaction.apply(multisig);
+
+		// Assert:
+		Assert.assertThat(inner, IsSame.sameInstance(t));
+	}
+
+	// endregion
+
+	// region getTransactionCount
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getTransactionCountReturnsOneForNonMultisgTransactions() {
+		final DbTransferTransaction t1 = new DbTransferTransaction();
+		final DbImportanceTransferTransaction t2 = new DbImportanceTransferTransaction();
+		final DbMultisigAggregateModificationTransaction t3 = new DbMultisigAggregateModificationTransaction();
+		final TransactionRegistry.Entry<DbTransferTransaction, ?> entry1
+				= (TransactionRegistry.Entry<DbTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.TRANSFER);
+		final TransactionRegistry.Entry<DbImportanceTransferTransaction, ?> entry2
+				= (TransactionRegistry.Entry<DbImportanceTransferTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.IMPORTANCE_TRANSFER);
+		final TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?> entry3
+				= (TransactionRegistry.Entry<DbMultisigAggregateModificationTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION);
+
+		// Act:
+		final int count1 = entry1.getTransactionCount.apply(t1);
+		final int count2 = entry2.getTransactionCount.apply(t2);
+		final int count3 = entry3.getTransactionCount.apply(t3);
+
+		// Assert:
+		Assert.assertThat(count1, IsEqual.equalTo(1));
+		Assert.assertThat(count2, IsEqual.equalTo(1));
+		Assert.assertThat(count3, IsEqual.equalTo(1));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void getInnerTransactionReturnsTwoPlusSignatureCountForMultisgTransaction() {
+		// Arrange:
+		final DbTransferTransaction t = new DbTransferTransaction();
+		final DbAccount signer1 = new DbAccount();
+		final DbAccount signer2 = new DbAccount();
+		final Set<DbMultisigSignatureTransaction> signatureTransactions = new HashSet<>();
+		signatureTransactions.add(this.createMultisigSignatureTransaction(signer1));
+		signatureTransactions.add(this.createMultisigSignatureTransaction(signer2));
+		final DbMultisigTransaction multisig = new DbMultisigTransaction();
+		multisig.setTransferTransaction(t);
+		multisig.setMultisigSignatureTransactions(signatureTransactions);
+		final TransactionRegistry.Entry<DbMultisigTransaction, ?> entry
+				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
+
+		// Act:
+		final int count = entry.getTransactionCount.apply(multisig);
+
+		// Assert:
+		Assert.assertThat(count, IsEqual.equalTo(2 + 2));
+	}
+
+	// endregion
+
 	// region getRecipient
 
 	@Test
