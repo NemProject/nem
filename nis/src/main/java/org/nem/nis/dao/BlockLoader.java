@@ -316,32 +316,50 @@ public class BlockLoader {
 				accounts.add(b.getLessor());
 			}
 			for (final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
-				@SuppressWarnings("unchecked")
-				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
-				final List<AbstractBlockTransfer> transactions = theEntry.getFromBlock.apply(b);
-				transactions.stream().forEach(t -> {
-					accounts.add(t.getSender());
-					final DbAccount recipient = theEntry.getRecipient.apply(t);
-					if (null != recipient) {
-						accounts.add(recipient);
-					}
-					theEntry.getOtherAccounts.apply(t).stream().forEach(accounts::add);
-					final AbstractBlockTransfer innerTransaction = theEntry.getInnerTransaction.apply(t);
-					if (null != innerTransaction) {
-						accounts.add(innerTransaction.getSender());
-						final TransactionRegistry.Entry<AbstractBlockTransfer, ?> innerEntry =
-								TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
-						final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
-						if (null != innerRecipient) {
-							accounts.add(innerRecipient);
-						}
-						innerEntry.getOtherAccounts.apply(innerTransaction).stream().forEach(accounts::add);
-					}
-				});
+				collectAccountsFromTransaction(b, entry, accounts);
 			}
 		});
 
 		return accounts;
+	}
+
+	private static <TDbModel extends AbstractBlockTransfer> void collectAccountsFromTransaction(
+			final DbBlock block,
+			final TransactionRegistry.Entry<TDbModel, ?> theEntry,
+			final Set<DbAccount> accounts) {
+		final List<TDbModel> transactions = theEntry.getFromBlock.apply(block);
+		transactions.stream().forEach(t -> {
+			accounts.add(t.getSender());
+			final DbAccount recipient = theEntry.getRecipient.apply(t);
+			if (null != recipient) {
+				accounts.add(recipient);
+			}
+			theEntry.getOtherAccounts.apply(t).stream().forEach(accounts::add);
+
+			collectAccountsFromInnerTransaction(
+					theEntry.getInnerTransaction.apply(t),
+					accounts);
+		});
+	}
+
+	private static <TDbModel extends AbstractBlockTransfer> void collectAccountsFromInnerTransaction(
+			final TDbModel innerTransaction,
+			final Set<DbAccount> accounts) {
+		if (null == innerTransaction) {
+			return;
+		}
+
+		accounts.add(innerTransaction.getSender());
+
+		@SuppressWarnings("unchecked")
+		final TransactionRegistry.Entry<TDbModel, ?> innerEntry =
+				TransactionRegistry.findByDbModelClass((Class<TDbModel>)innerTransaction.getClass());
+
+		final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
+		if (null != innerRecipient) {
+			accounts.add(innerRecipient);
+		}
+		innerEntry.getOtherAccounts.apply(innerTransaction).stream().forEach(accounts::add);
 	}
 
 	private void copyAccounts(final HashMap<Long, DbAccount> accountMap, final HashSet<DbAccount> accounts) {

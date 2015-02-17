@@ -34,7 +34,7 @@ public class BlockDaoImpl implements BlockDao {
 		return this.sessionFactory.getCurrentSession();
 	}
 
-	private <TDbModel extends AbstractBlockTransfer> void saveSingleBlock(final DbBlock block) {
+	private void saveSingleBlock(final DbBlock block) {
 		this.getCurrentSession().saveOrUpdate(block);
 		final ArrayList<DbMultisigSend> sendList = new ArrayList<>(100);
 		final ArrayList<DbMultisigReceive> receiveList = new ArrayList<>(100);
@@ -52,26 +52,19 @@ public class BlockDaoImpl implements BlockDao {
 		for (final DbMultisigTransaction transaction : multisigTransactions) {
 			final Long height = block.getHeight();
 			final Long id = transaction.getId();
-			int txType = 0;
-			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				@SuppressWarnings("unchecked")
-				final TransactionRegistry.Entry<TDbModel, ?> theEntry = (TransactionRegistry.Entry<TDbModel, ?>)entry;
+			Integer txType = 0;
+			for (final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
+				txType = this.processInnerTransaction(
+						transaction,
+						entry,
+						height,
+						id,
+						sendList,
+						receiveList);
 
-				final TDbModel transfer = theEntry.getFromMultisig.apply(transaction);
-				if (null == transfer) {
-					continue;
+				if (0 != txType) {
+					break;
 				}
-
-				txType = theEntry.type;
-				sendList.add(this.createSend(transfer.getSender().getId(), theEntry.type, height, id));
-
-				final DbAccount recipient = theEntry.getRecipient.apply(transfer);
-				if (null != recipient) {
-					receiveList.add(this.createReceive(recipient.getId(), theEntry.type, height, id));
-				}
-
-				theEntry.getOtherAccounts.apply(transfer).stream()
-						.forEach(a -> receiveList.add(this.createReceive(a.getId(), theEntry.type, height, id)));
 			}
 
 			sendList.add(0, this.createSend(transaction.getSender().getId(), txType, height, id));
@@ -87,6 +80,31 @@ public class BlockDaoImpl implements BlockDao {
 		for (final DbMultisigReceive receive : receiveList) {
 			this.getCurrentSession().saveOrUpdate(receive);
 		}
+	}
+
+	private <TDbModel extends AbstractBlockTransfer> int processInnerTransaction(
+			final DbMultisigTransaction transaction,
+			final TransactionRegistry.Entry<TDbModel, ?> theEntry,
+			final Long height,
+			final Long id,
+			final ArrayList<DbMultisigSend> sendList,
+			final ArrayList<DbMultisigReceive> receiveList) {
+		final TDbModel transfer = theEntry.getFromMultisig.apply(transaction);
+		if (null == transfer) {
+			return 0;
+		}
+
+		sendList.add(this.createSend(transfer.getSender().getId(), theEntry.type, height, id));
+
+		final DbAccount recipient = theEntry.getRecipient.apply(transfer);
+		if (null != recipient) {
+			receiveList.add(this.createReceive(recipient.getId(), theEntry.type, height, id));
+		}
+
+		theEntry.getOtherAccounts.apply(transfer).stream()
+				.forEach(a -> receiveList.add(this.createReceive(a.getId(), theEntry.type, height, id)));
+
+		return theEntry.type;
 	}
 
 	private DbMultisigSend createSend(
