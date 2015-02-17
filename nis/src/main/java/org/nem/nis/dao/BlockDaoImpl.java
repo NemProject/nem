@@ -44,15 +44,19 @@ public class BlockDaoImpl implements BlockDao {
 			return;
 		}
 
+		@SuppressWarnings("unchecked")
 		final TransactionRegistry.Entry<DbMultisigTransaction, ?> multisigEntry
 				= (TransactionRegistry.Entry<DbMultisigTransaction, ?>)TransactionRegistry.findByType(TransactionTypes.MULTISIG);
+
 		final List<DbMultisigTransaction> multisigTransactions = multisigEntry.getFromBlock.apply(block);
 		for (final DbMultisigTransaction transaction : multisigTransactions) {
 			final Long height = block.getHeight();
 			final Long id = transaction.getId();
 			int txType = 0;
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				@SuppressWarnings("unchecked")
 				final TransactionRegistry.Entry<TDbModel, ?> theEntry = (TransactionRegistry.Entry<TDbModel, ?>)entry;
+
 				final TDbModel transfer = theEntry.getFromMultisig.apply(transaction);
 				if (null == transfer) {
 					continue;

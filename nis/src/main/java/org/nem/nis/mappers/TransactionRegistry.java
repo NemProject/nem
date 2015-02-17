@@ -41,7 +41,7 @@ public class TransactionRegistry {
 		/**
 		 * A function that will get the inner transaction or null if none is available.
 		 */
-		public final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction;
+		public final Function<TDbModel, ? extends AbstractBlockTransfer> getInnerTransaction;
 
 		/**
 		 * A function that will get the recipient (if any) given an abstract block transfer.
@@ -206,7 +206,7 @@ public class TransactionRegistry {
 	 *
 	 * @return The entries.
 	 */
-	public static Iterable<Entry<?, ?>> iterate() {
+	public static Iterable<Entry<? extends AbstractBlockTransfer, ? extends Transaction>> iterate() {
 		return entries;
 	}
 
@@ -216,7 +216,7 @@ public class TransactionRegistry {
 	 * @param type The transaction type.
 	 * @return The entry.
 	 */
-	public static Entry<?, ?> findByType(final Integer type) {
+	public static Entry<? extends AbstractBlockTransfer, ? extends Transaction> findByType(final Integer type) {
 		for (final Entry<?, ?> entry : entries) {
 			if (entry.type == type) {
 				return entry;

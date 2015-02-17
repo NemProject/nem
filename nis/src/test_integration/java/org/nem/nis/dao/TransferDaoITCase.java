@@ -191,7 +191,7 @@ public class TransferDaoITCase {
 		LOGGER.warning("reading accounts");
 		final Session session = this.sessionFactory.openSession();
 		final Query query = session.createQuery("from DbAccount a");
-		final List<DbAccount> dbAccounts = query.list();
+		final List<DbAccount> dbAccounts = listAndCast(query);
 		session.flush();
 		session.clear();
 		session.close();
@@ -204,6 +204,11 @@ public class TransferDaoITCase {
 				.collect(Collectors.toList());
 		LOGGER.warning("reading accounts finishes");
 		return accounts;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Query query) {
+		return (List<T>)query.list();
 	}
 
 	private List<Account> createAccounts(final int numAccounts, final MockAccountDao mockAccountDao) {

@@ -181,19 +181,28 @@ public class BlockLoader {
 		}
 
 		final List<DbMultisigAggregateModificationTransaction> transactions = new ArrayList<>();
+		final Set<DbMultisigModification> modifications = new HashSet<>();
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
 			final long txid = this.castBigIntegerToLong((BigInteger)array[12]);
+
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
 				transactions.add(dbModificationTransaction);
 			}
 
-			dbModificationTransaction.getMultisigModifications().add(this.mapToDbModification(dbModificationTransaction, array));
+			// TODO 20150216 J-B: if curTxId == txid, do we still want to add the modification?
+			// > probably not; we should probably error or continue
+			modifications.add(this.mapToDbModification(dbModificationTransaction, array));
 		}
 
+		if (null == dbModificationTransaction) {
+			return new ArrayList<>();
+		}
+
+		dbModificationTransaction.setMultisigModifications(modifications);
 		return transactions;
 	}
 
@@ -306,7 +315,8 @@ public class BlockLoader {
 			if (null != b.getLessor()) {
 				accounts.add(b.getLessor());
 			}
-			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			for (final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
+				@SuppressWarnings("unchecked")
 				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
 				final List<AbstractBlockTransfer> transactions = theEntry.getFromBlock.apply(b);
 				transactions.stream().forEach(t -> {
