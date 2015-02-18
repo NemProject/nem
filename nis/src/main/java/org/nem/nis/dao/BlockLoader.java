@@ -268,7 +268,7 @@ public class BlockLoader {
 	private DbMultisigSignatureTransaction mapToDbMultisigSignature(
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
-		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(array, DbMultisigSignatureTransaction.class);
+		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(Arrays.copyOfRange(array, 15, array.length), DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;
 	}
