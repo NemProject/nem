@@ -37,14 +37,13 @@ public class TransferDaoITCase {
 	public void getTransactionsForAccountItCase() {
 		// Arrange:
 		final int numRounds = 10;
-	 	this.database.load();
-		final List<Account> accounts = this.database.getAccounts();
+		this.database.load();
 
 		// Act:
-		this.getTransactionsForAccountSpeedTest(accounts, numRounds);
+		this.getTransactionsForAccountSpeedTest(numRounds);
 	}
 
-	private void getTransactionsForAccountSpeedTest(final List<Account> accounts, final int numRounds) {
+	private void getTransactionsForAccountSpeedTest(final int numRounds) {
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < numRounds; i++) {
 			this.transferDao.getTransactionsForAccountUsingId(
