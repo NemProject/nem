@@ -181,28 +181,20 @@ public class BlockLoader {
 		}
 
 		final List<DbMultisigAggregateModificationTransaction> transactions = new ArrayList<>();
-		final Set<DbMultisigModification> modifications = new HashSet<>();
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final long txid = this.castBigIntegerToLong((BigInteger)array[12]);
-
+			final long txid = castBigIntegerToLong(array[12]);
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
 				transactions.add(dbModificationTransaction);
 			}
 
-			// TODO 20150216 J-B: if curTxId == txid, do we still want to add the modification?
-			// > probably not; we should probably error or continue
-			modifications.add(this.mapToDbModification(dbModificationTransaction, array));
+			assert null != dbModificationTransaction;
+			dbModificationTransaction.getMultisigModifications().add(this.mapToDbModification(dbModificationTransaction, array));
 		}
 
-		if (null == dbModificationTransaction) {
-			return new ArrayList<>();
-		}
-
-		dbModificationTransaction.setMultisigModifications(modifications);
 		return transactions;
 	}
 
@@ -241,7 +233,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = this.castBigIntegerToLong((BigInteger)array[15]);
+			final Long txid = castBigIntegerToLong(array[15]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -255,6 +247,7 @@ public class BlockLoader {
 				transactions.add(dbMultisigTransaction);
 			}
 
+			assert null != dbMultisigTransaction;
 			dbMultisigTransaction.getMultisigSignatureTransactions().add(this.mapToDbMultisigSignature(dbMultisigTransaction, array));
 		}
 
@@ -284,8 +277,8 @@ public class BlockLoader {
 		return accountMap;
 	}
 
-	private Long castBigIntegerToLong(final BigInteger value) {
-		return null == value ? null : value.longValue();
+	private static Long castBigIntegerToLong(final Object obj) {
+		return null == obj ? null : ((BigInteger)obj).longValue();
 	}
 
 	@SuppressWarnings("unchecked")
