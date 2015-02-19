@@ -122,5 +122,16 @@
         "public-key": "84afa1bbc993b7f5536344914dde86141e61f8cbecaf8c9cefc07391f3287cf5"
       }
     },
+    {
+      "endpoint": {
+        "protocol": "http",
+        "port": 7890,
+        "host": "108.61.223.23"
+      },
+      "identity": {
+        "name": "makoto",
+        "public-key": "a18b9cdf30a85868d74772985f322aa20b5fe601626c43077ba1351579f66dab"
+      }
+    },
   ]
 }
