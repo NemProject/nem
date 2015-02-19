@@ -25,6 +25,7 @@ public class BinderControllerAdvice {
 	 *
 	 * @param localHostDetector The local host detector.
 	 * @param accountStateCache The account state cache.
+	 * @param nisConfiguration The NIS configuration.
 	 */
 	@Autowired(required = true)
 	public BinderControllerAdvice(

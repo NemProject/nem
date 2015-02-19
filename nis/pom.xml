@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.nis</groupId>
 	<artifactId>nem-infrastructure-server</artifactId>
-	<version>0.5.9-BETA</version>
+	<version>0.5.12-BETA</version>
 	<name>NEM Infrastructure Server</name>
 	<organization>
 		<name>NEM - New Economy Movement</name>
@@ -330,6 +330,7 @@
 					<source>1.8</source>
 					<target>1.8</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
 				</configuration>
 			</plugin>
 

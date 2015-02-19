@@ -18,6 +18,7 @@ public abstract class AbstractPrimitive<
 	 * Creates a new primitive.
 	 *
 	 * @param value The primitive value.
+	 * @param derivedClass The derived class.
 	 */
 	protected AbstractPrimitive(final TValue value, final Class<TDerived> derivedClass) {
 		this.value = value;

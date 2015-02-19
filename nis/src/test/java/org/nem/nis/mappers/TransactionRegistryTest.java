@@ -83,16 +83,16 @@ public class TransactionRegistryTest {
 	@Test
 	public void findByDbModelClassCanReturnAllRegisteredTypes() {
 		// Arrange:
-		final List<Class> expectedRegisteredClasses = Arrays.asList(
+		final List<Class<? extends AbstractBlockTransfer>> expectedRegisteredClasses = Arrays.asList(
 				DbTransferTransaction.class,
 				DbImportanceTransferTransaction.class,
 				DbMultisigAggregateModificationTransaction.class,
 				DbMultisigTransaction.class);
 
 		// Act:
-		for (final Class clazz : expectedRegisteredClasses) {
+		for (final Class<? extends AbstractBlockTransfer> clazz : expectedRegisteredClasses) {
 			// Act:
-			final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByDbModelClass(clazz);
+			final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry = TransactionRegistry.findByDbModelClass(clazz);
 
 			// Assert:
 			Assert.assertThat(entry.dbModelClass, IsEqual.equalTo(clazz));

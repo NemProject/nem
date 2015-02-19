@@ -184,13 +184,14 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final long txid = this.castBigIntegerToLong((BigInteger)array[12]);
+			final long txid = castBigIntegerToLong(array[12]);
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
 				transactions.add(dbModificationTransaction);
 			}
 
+			assert null != dbModificationTransaction;
 			dbModificationTransaction.getMultisigModifications().add(this.mapToDbModification(dbModificationTransaction, array));
 		}
 
@@ -232,7 +233,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = this.castBigIntegerToLong((BigInteger)array[15]);
+			final Long txid = castBigIntegerToLong(array[15]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -246,6 +247,7 @@ public class BlockLoader {
 				transactions.add(dbMultisigTransaction);
 			}
 
+			assert null != dbMultisigTransaction;
 			dbMultisigTransaction.getMultisigSignatureTransactions().add(this.mapToDbMultisigSignature(dbMultisigTransaction, array));
 		}
 
@@ -259,7 +261,7 @@ public class BlockLoader {
 	private DbMultisigSignatureTransaction mapToDbMultisigSignature(
 			final DbMultisigTransaction dbMultisigTransaction,
 			final Object[] array) {
-		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(array, DbMultisigSignatureTransaction.class);
+		final DbMultisigSignatureTransaction dbMultisigSignature = this.mapper.map(Arrays.copyOfRange(array, 15, array.length), DbMultisigSignatureTransaction.class);
 		dbMultisigSignature.setMultisigTransaction(dbMultisigTransaction);
 		return dbMultisigSignature;
 	}
@@ -275,8 +277,8 @@ public class BlockLoader {
 		return accountMap;
 	}
 
-	private Long castBigIntegerToLong(final BigInteger value) {
-		return null == value ? null : value.longValue();
+	private static Long castBigIntegerToLong(final Object obj) {
+		return null == obj ? null : ((BigInteger)obj).longValue();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -306,32 +308,51 @@ public class BlockLoader {
 			if (null != b.getLessor()) {
 				accounts.add(b.getLessor());
 			}
-			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
-				final List<AbstractBlockTransfer> transactions = theEntry.getFromBlock.apply(b);
-				transactions.stream().forEach(t -> {
-					accounts.add(t.getSender());
-					final DbAccount recipient = theEntry.getRecipient.apply(t);
-					if (null != recipient) {
-						accounts.add(recipient);
-					}
-					theEntry.getOtherAccounts.apply(t).stream().forEach(accounts::add);
-					final AbstractBlockTransfer innerTransaction = theEntry.getInnerTransaction.apply(t);
-					if (null != innerTransaction) {
-						accounts.add(innerTransaction.getSender());
-						final TransactionRegistry.Entry<AbstractBlockTransfer, ?> innerEntry =
-								TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
-						final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
-						if (null != innerRecipient) {
-							accounts.add(innerRecipient);
-						}
-						innerEntry.getOtherAccounts.apply(innerTransaction).stream().forEach(accounts::add);
-					}
-				});
+			for (final TransactionRegistry.Entry<? extends AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
+				collectAccountsFromTransaction(b, entry, accounts);
 			}
 		});
 
 		return accounts;
+	}
+
+	private static <TDbModel extends AbstractBlockTransfer> void collectAccountsFromTransaction(
+			final DbBlock block,
+			final TransactionRegistry.Entry<TDbModel, ?> theEntry,
+			final Set<DbAccount> accounts) {
+		final List<TDbModel> transactions = theEntry.getFromBlock.apply(block);
+		transactions.stream().forEach(t -> {
+			accounts.add(t.getSender());
+			final DbAccount recipient = theEntry.getRecipient.apply(t);
+			if (null != recipient) {
+				accounts.add(recipient);
+			}
+			theEntry.getOtherAccounts.apply(t).stream().forEach(accounts::add);
+
+			collectAccountsFromInnerTransaction(
+					theEntry.getInnerTransaction.apply(t),
+					accounts);
+		});
+	}
+
+	private static <TDbModel extends AbstractBlockTransfer> void collectAccountsFromInnerTransaction(
+			final TDbModel innerTransaction,
+			final Set<DbAccount> accounts) {
+		if (null == innerTransaction) {
+			return;
+		}
+
+		accounts.add(innerTransaction.getSender());
+
+		@SuppressWarnings("unchecked")
+		final TransactionRegistry.Entry<TDbModel, ?> innerEntry =
+				TransactionRegistry.findByDbModelClass((Class<TDbModel>)innerTransaction.getClass());
+
+		final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
+		if (null != innerRecipient) {
+			accounts.add(innerRecipient);
+		}
+		innerEntry.getOtherAccounts.apply(innerTransaction).stream().forEach(accounts::add);
 	}
 
 	private void copyAccounts(final HashMap<Long, DbAccount> accountMap, final HashSet<DbAccount> accounts) {

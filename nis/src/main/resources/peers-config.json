@@ -63,7 +63,7 @@
         "protocol": "http"
       },
       "identity": {
-        "name": "san",
+        "name": "[color=#dfa82f]s[/color][color=#8e8e8e]a[color][color=#41ce7b]n[/color]",
         "public-key": "4a25bf65646c8c3df87179bcb5ff7c4c3176ea02153a82d14615d53cf448ed83"
       }
     },
@@ -74,7 +74,7 @@
         "protocol": "http"
       },
       "identity": {
-        "name": "go",
+        "name": "[color=#41ce7b]g[/color][color=#dfa82f]o[color]",
         "public-key": "f973d58cd550da293e52764d431edd5a04b28baa2b7b83b2e8fb7a5d3a7c398b"
       }
     },
@@ -85,7 +85,7 @@
         "protocol": "http"
       },
       "identity": {
-        "name": "hachi",
+        "name": "[color=#41ce7b]h[/color][color=#8e8e8e]ac[color][color=#41ce7b]hi[/color]",
         "public-key": "09ae29b40e95d4d65a4b4e65fa4582c0c4040ed15a0cabba4bf50f4c76287844"
       }
     },
@@ -96,7 +96,7 @@
         "protocol": "http"
       },
       "identity": {
-        "name": "jusan",
+        "name": "[color=#dfa82f]ju[/color][color=#8e8e8e]s[color][color=#41ce7b]an[/color]",
         "public-key": "1cf373a7391bd179865904dfb6e6e4a427927ac90530b0396ad69392863e1b52"
       }
     },
@@ -107,7 +107,7 @@
         "protocol": "http"
       },
       "identity": {
-        "name": "nijuichi",
+        "name": "[color=#dfa82f]ni[/color][color=#8e8e8e]ju[color][color=#41ce7b]ichi[/color]",
         "public-key": "9c95a96be8a319d77eb71dec3c841afc687d1b039007813fd83a10fabcdb21f7"
       }
     },
@@ -120,6 +120,17 @@
       "identity": {
         "name": "jabo38",
         "public-key": "84afa1bbc993b7f5536344914dde86141e61f8cbecaf8c9cefc07391f3287cf5"
+      }
+    },
+    {
+      "endpoint": {
+        "protocol": "http",
+        "port": 7890,
+        "host": "108.61.223.23"
+      },
+      "identity": {
+        "name": "makoto",
+        "public-key": "a18b9cdf30a85868d74772985f322aa20b5fe601626c43077ba1351579f66dab"
       }
     },
   ]

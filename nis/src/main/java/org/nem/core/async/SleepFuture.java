@@ -13,6 +13,8 @@ public class SleepFuture {
 	 * Creates a new future that fires at the specified time in the future.
 	 *
 	 * @param delay The delay (in milliseconds).
+	 * @param <T> Any type.
+	 * @return The future.
 	 */
 	public static <T> CompletableFuture<T> create(final int delay) {
 		final CompletableFuture<T> future = new CompletableFuture<>();

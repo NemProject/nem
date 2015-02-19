@@ -24,6 +24,7 @@ public class SecureMessage extends Message {
 	 * @param sender The message sender.
 	 * @param recipient The message recipient.
 	 * @param payload The unencrypted payload.
+	 * @return The secure message.
 	 */
 	public static SecureMessage fromDecodedPayload(final Account sender, final Account recipient, final byte[] payload) {
 		if (!sender.hasPrivateKey()) {
@@ -40,6 +41,7 @@ public class SecureMessage extends Message {
 	 * @param sender The message sender.
 	 * @param recipient The message recipient.
 	 * @param payload The encrypted payload.
+	 * @return The secure message.
 	 */
 	public static SecureMessage fromEncodedPayload(final Account sender, final Account recipient, final byte[] payload) {
 		return new SecureMessage(sender, recipient, payload);

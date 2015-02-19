@@ -10,9 +10,10 @@ import java.security.CodeSource;
 public class MetaDataFactory {
 
 	/**
-	 * Loads ApplicationMetaData given a class.
+	 * Loads ApplicationMetaData given a class and a time provider.
 	 *
 	 * @param clazz The class.
+	 * @param provider The time provider.
 	 * @return The application meta data.
 	 */
 	public static ApplicationMetaData loadApplicationMetaData(final Class clazz, final TimeProvider provider) {
@@ -20,9 +21,10 @@ public class MetaDataFactory {
 	}
 
 	/**
-	 * Loads ApplicationMetaData given a CodeSource.
+	 * Loads ApplicationMetaData given a CodeSource and a time provider.
 	 *
 	 * @param codeSource The code source.
+	 * @param provider The time provider.
 	 * @return The application meta data.
 	 */
 	public static ApplicationMetaData loadApplicationMetaData(final CodeSource codeSource, final TimeProvider provider) {

@@ -36,6 +36,7 @@ public class NemCommandLine {
 	 * Parses the command line arguments.
 	 *
 	 * @param parameters The command line arguments.
+	 * @return true if the command line could be parsed, false otherwise.
 	 */
 	public boolean parse(final String[] parameters) {
 		final CommandLineParser parser = new BasicParser();

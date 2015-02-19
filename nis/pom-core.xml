@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nem.core</groupId>
 	<artifactId>nem-core</artifactId>
-	<version>0.5.9-BETA</version>
+	<version>0.5.12-BETA</version>
 	<name>NEM Core</name>
 
 	<properties>
@@ -203,6 +203,8 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
 					<includes>
 						<include>org/nem/core/**/*.java</include>
 					</includes>

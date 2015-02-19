@@ -41,6 +41,7 @@ public abstract class HttpDeserializerResponseStrategy implements HttpResponseSt
 	 * Coerces the raw response bytes into a deserializer.
 	 *
 	 * @param responseBytes The raw response bytes.
+	 * @return The deserializer.
 	 */
 	protected abstract Deserializer coerce(final byte[] responseBytes);
 }
