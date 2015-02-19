@@ -355,11 +355,6 @@ public class BlockLoader {
 		innerEntry.getOtherAccounts.apply(innerTransaction).stream().forEach(accounts::add);
 	}
 
-	private void copyAccounts(final HashMap<Long, DbAccount> accountMap, final HashSet<DbAccount> accounts) {
-		accounts.stream().forEach(a -> {
-			final DbAccount realAccount = accountMap.get(a.getId());
-			a.setPrintableKey(realAccount.getPrintableKey());
-			a.setPublicKey(realAccount.getPublicKey());
 	private void updateAccounts(final HashMap<Long, DbAccount> accountMap) {
 		this.dbBlocks.stream().forEach(b -> {
 			this.updateAccount(b.getHarvester(),accountMap);
