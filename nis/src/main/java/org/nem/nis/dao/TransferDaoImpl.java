@@ -222,7 +222,7 @@ public class TransferDaoImpl implements TransferDao {
 				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbTransferTransaction> list = criteria.list();
+		final List<DbTransferTransaction> list = listAndCast(criteria);
 		return list.stream()
 				.map(t -> {
 					// force lazy initialization
@@ -251,7 +251,7 @@ public class TransferDaoImpl implements TransferDao {
 				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbImportanceTransferTransaction> list = criteria.list();
+		final List<DbImportanceTransferTransaction> list = listAndCast(criteria);
 		return list.stream()
 				.map(t -> {
 					// force lazy initialization
@@ -279,7 +279,7 @@ public class TransferDaoImpl implements TransferDao {
 					.addOrder(Order.desc("id"))
 					.setMaxResults(limit);
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-			final List<DbMultisigAggregateModificationTransaction> list = criteria.list();
+			final List<DbMultisigAggregateModificationTransaction> list = listAndCast(criteria);
 			return list.stream()
 					.map(t -> {
 						// force lazy initialization
@@ -372,7 +372,6 @@ public class TransferDaoImpl implements TransferDao {
 				.collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<TransactionIdBlockHeightPair> getMultisigIds(
 			final TransferType transferType,
 			final long accountId,
@@ -390,7 +389,7 @@ public class TransferDaoImpl implements TransferDao {
 				.addScalar("transactionId", LongType.INSTANCE)
 				.addScalar("height", LongType.INSTANCE)
 				.setMaxResults(limit);
-		final List<Object[]> list = preQuery.list();
+		final List<Object[]> list = listAndCast(preQuery);
 		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long)o[0], (Long)o[1])).collect(Collectors.toList());
 	}
 
@@ -401,6 +400,15 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Query query) {
+		return (List<T>)query.list();
+	}
+
+	@SuppressWarnings("unchecked")
+ 	private static <T> List<T> listAndCast(final Criteria criteria) {
+		return (List<T>)criteria.list();
+	}
+
 	private List<DbMultisigTransaction> getMultisigTransactions(final List<TransactionIdBlockHeightPair> pairs, final String joinEntity) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigTransaction.class)
 				.setFetchMode(joinEntity, FetchMode.JOIN)
@@ -408,16 +416,15 @@ public class TransferDaoImpl implements TransferDao {
 				.add(Restrictions.isNotNull(joinEntity))
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return criteria.list();
+		return listAndCast(criteria);
 	}
 
-	@SuppressWarnings("unchecked")
 	private HashMap<Long, DbBlock> getBlockMap(final List<TransactionIdBlockHeightPair> pairs) {
 		final HashMap<Long, DbBlock> blockMap = new HashMap<>();
 		final Criteria criteria = this.getCurrentSession().createCriteria(DbBlock.class)
 				.add(Restrictions.in("height", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList())))
 				.addOrder(Order.desc("height"));
-		final List<DbBlock> blocks = criteria.list();
+		final List<DbBlock> blocks = listAndCast(criteria);
 		blocks.stream().forEach(b -> blockMap.put(b.getHeight(), b));
 		return blockMap;
 	}

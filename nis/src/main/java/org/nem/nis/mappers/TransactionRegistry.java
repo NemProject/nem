@@ -41,17 +41,17 @@ public class TransactionRegistry {
 		/**
 		 * A function that will get the inner transaction or null if none is available.
 		 */
-		public final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction;
+		public final Function<? super TDbModel, ? extends AbstractBlockTransfer> getInnerTransaction;
 
 		/**
 		 * A function that will get the recipient (if any) given an abstract block transfer.
 		 */
-		public final Function<TDbModel, DbAccount> getRecipient;
+		public final Function<? super TDbModel, DbAccount> getRecipient;
 
 		/**
 		 * A function that will get a list of db accounts (if any) given an abstract block transfer.
 		 */
-		public final Function<TDbModel, Collection<DbAccount>> getOtherAccounts;
+		public final Function<? super TDbModel, Collection<DbAccount>> getOtherAccounts;
 
 		/**
 		 * A function that will return transfer block pairs from the database.
@@ -206,7 +206,7 @@ public class TransactionRegistry {
 	 *
 	 * @return The entries.
 	 */
-	public static Iterable<Entry<?, ?>> iterate() {
+	public static Iterable<Entry<? extends AbstractBlockTransfer, ? extends Transaction>> iterate() {
 		return entries;
 	}
 
@@ -216,7 +216,7 @@ public class TransactionRegistry {
 	 * @param type The transaction type.
 	 * @return The entry.
 	 */
-	public static Entry<?, ?> findByType(final Integer type) {
+	public static Entry<? extends AbstractBlockTransfer, ? extends Transaction> findByType(final Integer type) {
 		for (final Entry<?, ?> entry : entries) {
 			if (entry.type == type) {
 				return entry;
@@ -234,10 +234,10 @@ public class TransactionRegistry {
 	 * @return The entry.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <TDbModel extends AbstractBlockTransfer> Entry<AbstractBlockTransfer, ?> findByDbModelClass(final Class<TDbModel> clazz) {
+	public static <TDbModel extends AbstractBlockTransfer> Entry<TDbModel, ?> findByDbModelClass(final Class<? extends TDbModel> clazz) {
 		for (final Entry<?, ?> entry : entries) {
 			if (entry.dbModelClass.equals(clazz)) {
-				return (Entry<AbstractBlockTransfer, ?>)entry;
+				return (Entry<TDbModel, ?>)entry;
 			}
 		}
 

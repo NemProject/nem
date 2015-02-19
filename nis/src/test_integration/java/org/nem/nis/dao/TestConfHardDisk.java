@@ -21,6 +21,11 @@ public class TestConfHardDisk extends TestConf {
 		return dataSource;
 	}
 
+	@Bean
+	TestDatabase testDatabase() {
+		return new TestDatabase();
+	}
+
 	private String getDefaultFolder() {
 		return System.getProperty("user.home");
 	}

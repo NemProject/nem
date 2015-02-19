@@ -42,7 +42,8 @@ public class MockAccountDao implements AccountDao {
 	}
 
 	private ReferenceCount incrementReferenceCount(final DbAccount dbAccount) {
-		final ReferenceCount referenceCount = this.refCounts.get(dbAccount).increment();
+		ReferenceCount referenceCount = this.refCounts.get(dbAccount);
+		referenceCount = referenceCount.increment();
 		this.refCounts.put(dbAccount, referenceCount);
 		return referenceCount;
 	}
