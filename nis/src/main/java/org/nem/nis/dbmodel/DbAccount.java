@@ -58,4 +58,19 @@ public class DbAccount {
 			this.publicKey = publicKey.getRaw();
 		}
 	}
+
+	@Override
+	public int hashCode() {
+		return null == this.printableKey ? this.id.hashCode() : this.printableKey.hashCode();
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (!this.getClass().isInstance(obj)) {
+			return false;
+		}
+
+		final DbAccount rhs = (DbAccount)obj;
+		return null == this.printableKey ? 0 == this.id.compareTo(rhs.id) : this.printableKey.equals(rhs.printableKey);
+	}
 }
