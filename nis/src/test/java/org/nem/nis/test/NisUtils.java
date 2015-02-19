@@ -2,7 +2,7 @@ package org.nem.nis.test;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.Assert;
-import org.nem.core.crypto.Hash;
+import org.nem.core.crypto.*;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
@@ -24,6 +24,32 @@ import java.util.function.Consumer;
  */
 public class NisUtils {
 	private static final PoiOptions DEFAULT_POI_OPTIONS = new PoiOptionsBuilder().create();
+
+	/**
+	 * Creates a db account with given id.
+	 *
+	 * @param id The id.
+	 * @return The db account.
+	 */
+	public static DbAccount createDbAccount(final long id) {
+		final DbAccount dbAccount = new DbAccount();
+		dbAccount.setId(id);
+		return dbAccount;
+	}
+
+	/**
+	 * Creates a db account with given encoded address and public key.
+	 *
+	 * @param encodedAddress The encoded address.
+	 * @param publicKey The public key.
+	 * @return The db account.
+	 */
+	public static DbAccount createDbAccount(final String encodedAddress, final PublicKey publicKey) {
+		final DbAccount dbAccount = new DbAccount();
+		dbAccount.setPrintableKey(encodedAddress);
+		dbAccount.setPublicKey(publicKey);
+		return dbAccount;
+	}
 
 	/**
 	 * Creates a dummy DbBlock.

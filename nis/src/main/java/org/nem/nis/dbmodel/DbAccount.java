@@ -3,7 +3,6 @@ package org.nem.nis.dbmodel;
 import org.nem.core.crypto.PublicKey;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 /**
  * DbAccount entity.
@@ -60,20 +59,18 @@ public class DbAccount {
 		}
 	}
 
-	//TODO 20150219 J-B: please add tests for hashCode/equals
-
 	@Override
 	public int hashCode() {
-		return null == this.printableKey ? 0 : this.printableKey.hashCode();
+		return null == this.printableKey ? this.id.hashCode() : this.printableKey.hashCode();
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (!(obj instanceof DbAccount)) {
+		if (!this.getClass().isInstance(obj)) {
 			return false;
 		}
 
 		final DbAccount rhs = (DbAccount)obj;
-		return Objects.equals(this.printableKey, rhs.printableKey);
+		return null == this.printableKey ? 0 == this.id.compareTo(rhs.id) : this.printableKey.equals(rhs.printableKey);
 	}
 }
