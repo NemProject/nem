@@ -13,6 +13,7 @@ public class RawMapperUtilsTest {
 
 	//region RawMapperUtils
 
+	// TODO 20150219 J-B: consider a separate test for each overload
 	@Test
 	public void mapAccountMapsNullIdToNullAccount() {
 		// Arrange:
@@ -62,6 +63,7 @@ public class RawMapperUtilsTest {
 
 	//region mapBlock
 
+	// TODO 20150219 J-B: consider two tests
 	@Test
 	public void mapBlockMapsAnyBigIntegerToNonNullBlock() {
 		// Act:

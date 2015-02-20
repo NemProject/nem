@@ -121,7 +121,7 @@ public class TransactionRegistryTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getInnerTransactionReturnsNullForNonMultisgTransactions() {
+	public void getInnerTransactionReturnsNullForNonMultisigTransactions() {
 		// Arrange:
 		final DbTransferTransaction t1 = new DbTransferTransaction();
 		final DbImportanceTransferTransaction t2 = new DbImportanceTransferTransaction();
@@ -146,7 +146,7 @@ public class TransactionRegistryTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getInnerTransactionReturnsInnerTransactionForMultisgTransaction() {
+	public void getInnerTransactionReturnsInnerTransactionForMultiisgTransaction() {
 		// Arrange:
 		final DbTransferTransaction t = new DbTransferTransaction();
 		final DbMultisigTransaction multisig = new DbMultisigTransaction();
@@ -167,7 +167,7 @@ public class TransactionRegistryTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getTransactionCountReturnsOneForNonMultisgTransactions() {
+	public void getTransactionCountReturnsOneForNonMultisigTransactions() {
 		final DbTransferTransaction t1 = new DbTransferTransaction();
 		final DbImportanceTransferTransaction t2 = new DbImportanceTransferTransaction();
 		final DbMultisigAggregateModificationTransaction t3 = new DbMultisigAggregateModificationTransaction();
@@ -191,7 +191,7 @@ public class TransactionRegistryTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getInnerTransactionReturnsTwoPlusSignatureCountForMultisgTransaction() {
+	public void getInnerTransactionReturnsTwoPlusSignatureCountForMultisigTransaction() {
 		// Arrange:
 		final DbTransferTransaction t = new DbTransferTransaction();
 		final DbAccount signer1 = new DbAccount();

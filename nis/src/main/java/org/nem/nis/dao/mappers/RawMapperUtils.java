@@ -23,6 +23,9 @@ public final class RawMapperUtils {
 				: mapper.map(id, DbAccount.class);
 	}
 
+	// TODO 20150219 J-B: also can use these in the blockloader
+	// > any reason not to use Object id instead of BigIntegerId (so the casts are inside the helpers instead of outside in every call)
+
 	/**
 	 * Maps an account id to a db model account using the specified mapper.
 	 *

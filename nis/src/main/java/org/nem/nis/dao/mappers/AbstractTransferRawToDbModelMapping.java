@@ -48,7 +48,4 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	 * @return The target object.
 	 */
 	protected abstract TDbModel mapImpl(final Object[] source);
-
-	// TODO 20150213 J-B: since we have up two three occurrences of these functions, we might want to move them all to RawMapperUtils
-	// TODO 20150216 BR -> ok.
 }
