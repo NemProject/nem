@@ -313,9 +313,7 @@ public class ChainControllerTest {
 	private static DbMultisigTransaction createMultisigDbTransferWithTimeStamp(final int timeStamp) {
 		final DbTransferTransaction dbTransfer = createDbTransferWithTimeStamp(timeStamp);
 		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final DbAccount account = new DbAccount();
-		account.setPrintableKey(address.getEncoded());
-		account.setPublicKey(address.getPublicKey());
+		final DbAccount account = new DbAccount(address);
 		final DbMultisigTransaction dbMultisig = new DbMultisigTransaction();
 		dbMultisig.setTransferTransaction(dbTransfer);
 		dbMultisig.setMultisigSignatureTransactions(new HashSet<>());

@@ -110,6 +110,7 @@ public class ChainController {
 
 			previousDbBlock = dbBlock;
 			// TODO 20150220 J-J need to fix iterate to better avoid unchecked warnings
+			// TODO 20150220 J-J consider adding db block extensions
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
 				@SuppressWarnings("unchecked")
 				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
