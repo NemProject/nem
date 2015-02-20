@@ -357,51 +357,47 @@ public class BlockLoader {
 
 	private void updateAccounts(final HashMap<Long, DbAccount> accountMap) {
 		this.dbBlocks.stream().forEach(b -> {
-			updateAccount(b.getHarvester(), accountMap);
-			if (null != b.getLessor()) {
-				updateAccount(b.getLessor(), accountMap);
-			}
+			addAccount(b.getHarvester(), accountMap);
+			addAccount(b.getLessor(), accountMap);
 
-			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+			// TODO 20150219: J-J iterate should probably return Entry<AbstractBlockTransfer, ?>
+			for (final TransactionRegistry.Entry<?, ?> untypedEntry : TransactionRegistry.iterate()) {
 				@SuppressWarnings("unchecked")
-				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
-				theEntry.getFromBlock.apply(b).stream().forEach(t -> updateTransactionAccounts(t, theEntry, accountMap));
+				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)untypedEntry;
+				entry.getFromBlock.apply(b).stream().forEach(transaction -> {
+					addAccounts(transaction, entry, accountMap);
+					addInnerAccounts(entry.getInnerTransaction.apply(transaction), accountMap);
+				});
 			}
 		});
 	}
 
-	private static <TDbModel extends AbstractBlockTransfer> void updateTransactionAccounts(
-			final TDbModel transaction,
-			final TransactionRegistry.Entry<TDbModel, ?> theEntry,
-			final HashMap<Long, DbAccount> accountMap) {
-		updateAccount(transaction.getSender(), accountMap);
-		final DbAccount recipient = theEntry.getRecipient.apply(transaction);
-		if (null != recipient) {
-			updateAccount(recipient, accountMap);
-		}
-
-		theEntry.getOtherAccounts.apply(transaction).stream().forEach(a -> updateAccount(a, accountMap));
-		updateTransactionAccounts(theEntry.getInnerTransaction.apply(transaction), accountMap);
-	}
-
-	private static <TDbModel extends AbstractBlockTransfer> void updateTransactionAccounts(
+	private static <TDbModel extends AbstractBlockTransfer> void addInnerAccounts(
 			final TDbModel innerTransaction,
 			final HashMap<Long, DbAccount> accountMap) {
 		if (null == innerTransaction) {
 			return;
 		}
 
-		updateAccount(innerTransaction.getSender(),accountMap);
 		final TransactionRegistry.Entry<AbstractBlockTransfer, ?> innerEntry =
 				TransactionRegistry.findByDbModelClass(innerTransaction.getClass());
-		final DbAccount innerRecipient = innerEntry.getRecipient.apply(innerTransaction);
-		if (null != innerRecipient) {
-			updateAccount(innerRecipient, accountMap);
+		addAccounts(innerTransaction, innerEntry, accountMap);
+	}
+
+	private static <TDbModel extends AbstractBlockTransfer> void addAccounts(
+			final TDbModel transaction,
+			final TransactionRegistry.Entry<TDbModel, ?> theEntry,
+			final HashMap<Long, DbAccount> accountMap) {
+		addAccount(transaction.getSender(), accountMap);
+		addAccount(theEntry.getRecipient.apply(transaction), accountMap);
+		theEntry.getOtherAccounts.apply(transaction).stream().forEach(a -> addAccount(a, accountMap));
+	}
+
+	private static void addAccount(final DbAccount dbAccount, final HashMap<Long, DbAccount> accountMap) {
+		if (null == dbAccount) {
+			return;
 		}
 
-		innerEntry.getOtherAccounts.apply(innerTransaction).stream().forEach(a -> updateAccount(a, accountMap));
-	}
-	private static void updateAccount(final DbAccount dbAccount, final HashMap<Long, DbAccount> accountMap) {
 		final DbAccount realAccount = accountMap.get(dbAccount.getId());
 		dbAccount.setPrintableKey(realAccount.getPrintableKey());
 		dbAccount.setPublicKey(realAccount.getPublicKey());
