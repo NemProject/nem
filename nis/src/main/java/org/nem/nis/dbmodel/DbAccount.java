@@ -81,9 +81,7 @@ public class DbAccount {
 
 	@Override
 	public int hashCode() {
-		return null != this.printableKey
-				? this.printableKey.hashCode()
-				: null == this.id ? 0 : this.id.hashCode();
+		return null == this.id ? 0 : this.id.hashCode();
 	}
 
 	@Override
@@ -93,10 +91,6 @@ public class DbAccount {
 		}
 
 		final DbAccount rhs = (DbAccount)obj;
-		if (null != this.printableKey && null != rhs.printableKey) {
-			return Objects.equals(this.printableKey, rhs.printableKey);
-		}
-
 		return Objects.equals(this.id, rhs.id);
 	}
 }
