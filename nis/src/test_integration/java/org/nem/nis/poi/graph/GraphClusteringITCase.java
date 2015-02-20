@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 /**
  * Abstract class for testing POI. Specific implementations should load data
  * from varous blockchains (e.g., Nem, Btc, Nxt).
- * TODO H261228: M->M: move test results in comments below to .md files for documentation
  */
 public abstract class GraphClusteringITCase {
 	protected static final Logger LOGGER = Logger.getLogger(NxtGraphClusteringITCase.class.getName());
@@ -205,6 +204,7 @@ public abstract class GraphClusteringITCase {
 	//region sensitivity tests
 
 	/**
+	 *
 	 * TODO 20141016 BR -> J: here are the values when using PageRankScorer (see comment below):
 	 * <pre>
 	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |

@@ -10,10 +10,11 @@ import java.util.*;
  * Integration test class for analysis the Proof-of-Importance algorithm with the Bitcoin transaction graph.
  */
 public class BtcGraphClusteringITCase extends GraphClusteringITCase {
-	private static final int DEFAULT_END_HEIGHT = 20000;//150000;//TODO: look up the bitcoin blockchain height we should use
+	private static final int DEFAULT_END_HEIGHT = 20000; // This end height is set assuming that we only process block files blk00148.dat to blk00152.dat (inclusive)
 	private static final String BLOCKCHAIN_TYPE = "Btc";
-	private static final double SUPPLY_NORMALIZATION_FACTOR = 8999999999.0 / 1300000000.0; // Convert from Satoshis (10^8 precision); current BTC supply is 13,721,025, so let's just say 13 mil
+	private static final double SUPPLY_NORMALIZATION_FACTOR = 8999999999.0 / 1300000000.0; // Convert from Satoshis (10^8 precision); current BTC supply is about 13 mil
 	private static final double MKT_CAP_NORMALIZATION_FACTOR =  3235636400.0 / 4000000.0; // BTC mkt cap / NEM mkt cap (in USD)
+	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
 	final static Map<Address, AccountState> accountStateMap = new HashMap<>(); //TODO: remove static
 
@@ -25,18 +26,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 		super(DEFAULT_END_HEIGHT, BLOCKCHAIN_TYPE, new BtcDatabaseRepository());
 	}
 
-	//TODO: Add some tests here to verify that BtcTransactions are read in and created correctly
-
-	@Ignore
-	@Test //TODO: this is temporary
-	public void canBuildBtcTransactionGraph() {
-		// Act:
-		final Collection<GraphClusteringTransaction> transactions = loadTransactionData(0, 0);
-		System.out.println("num returned transactions: " + transactions.size());
-
-		// Assert:
-		//Assert.assertThat(transactions.size(), IsEqual.equalTo(73));
-	}
+	//TODO: Add some tests here to verify that BtcTransactions are read in and created correctly?
 
 	protected Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<GraphClusteringTransaction> transactions) {
 		LOGGER.info("Creating PoiAccountStates from Btc transaction data...");
@@ -69,7 +59,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 				// We need to add some balance sometimes because the transactions don't account for fees and coins earned from mined blocks
 				final long remainingBalance = balance - amount.getNumMicroNem();
 				if (remainingBalance < 0) {
-					if (Math.random() < 0.5) {
+					if (USE_RANDOMNESS && Math.random() < 0.5) {
 						senderAccountState.getWeightedBalances().addReceive(new BlockHeight(blockHeight.getRaw()),
 								Amount.fromMicroNem(amount.getNumMicroNem()));
 					} else {
