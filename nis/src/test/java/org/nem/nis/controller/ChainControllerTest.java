@@ -298,7 +298,6 @@ public class ChainControllerTest {
 	private static DbTransferTransaction createDbTransferWithTimeStamp(final int timeStamp) {
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final DbAccount account = new DbAccount(address);
-		account.setPublicKey(address.getPublicKey());
 		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
 		dbTransfer.setTransferHash(Utils.generateRandomHash());
 		dbTransfer.setSender(account);
