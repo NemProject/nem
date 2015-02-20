@@ -11,6 +11,7 @@ import java.io.*;
 import java.security.SecureRandom;
 import java.util.*;
 
+//TODO H261227: M->M: move this NEM graph analysis code to a new class that extends from GraphClusteringITCase
 public class GraphClustererImplITCase {
 	private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
 	private static final File TEST_FILE_DIRECTORY = new File(WORKING_DIRECTORY, "test_files");
