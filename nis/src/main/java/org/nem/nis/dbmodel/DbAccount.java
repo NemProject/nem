@@ -77,6 +77,7 @@ public class DbAccount {
 	//      In that case hashCode()/equals() has to use those fields.
 	// TODO 20150219 J-B: is #2 only a requirement for the tests or are there production cases where we want
 	// > equality based on addresses?
+	// TODO 20150220 BR -> J: i think right now only the tests use 2)
 
 	@Override
 	public int hashCode() {
