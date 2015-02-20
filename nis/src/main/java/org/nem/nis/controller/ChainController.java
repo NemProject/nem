@@ -113,7 +113,9 @@ public class ChainController {
 			// TODO 20150216 BR -> J: yea. What kind of test do you want? This is a private method.
 			// TODO 20150219 J-B: i imagine you could have a blocksAfter test that has blocks with all transaction types
 			// > before the change too many blocks would be returned, but after the right amount would be returned.
+			// TODO 20150220 BR -> J: changed blocksAfterAuthenticatedReturnsAtMostMaxTransactionsTransactionsInBlocksFromDatabase.
 			for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
+				@SuppressWarnings("unchecked")
 				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> theEntry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)entry;
 				final List<AbstractBlockTransfer> transactions = theEntry.getFromBlock.apply(dbBlock);
 				numTransactions += transactions.stream().mapToInt(theEntry.getTransactionCount::apply).sum();
