@@ -6,7 +6,7 @@ import org.nem.core.crypto.PublicKey;
 import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.DbAccount;
-import org.nem.nis.test.*;
+import org.nem.nis.test.MockAccountDao;
 
 public class AccountDaoLookupAdapterTest {
 
@@ -52,7 +52,7 @@ public class AccountDaoLookupAdapterTest {
 		// Arrange:
 		final Address address = Utils.generateRandomAddressWithPublicKey();
 		final MockAccountDao accountDao = new MockAccountDao();
-		final DbAccount dbAccountFromDao = NisUtils.createDbAccount(1L);
+		final DbAccount dbAccountFromDao = new DbAccount(1);
 		accountDao.addMapping(address, dbAccountFromDao);
 		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
 
@@ -70,7 +70,7 @@ public class AccountDaoLookupAdapterTest {
 		// Arrange:
 		final Address address = Utils.generateRandomAddress();
 		final MockAccountDao accountDao = new MockAccountDao();
-		final DbAccount dbAccountFromDao = NisUtils.createDbAccount(1L);
+		final DbAccount dbAccountFromDao = new DbAccount(1);
 		accountDao.addMapping(address, dbAccountFromDao);
 		final AccountDaoLookupAdapter accountDaoLookup = new AccountDaoLookupAdapter(accountDao);
 

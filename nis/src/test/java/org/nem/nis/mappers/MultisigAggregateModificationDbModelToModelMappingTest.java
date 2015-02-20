@@ -58,7 +58,7 @@ public class MultisigAggregateModificationDbModelToModelMappingTest extends Abst
 	protected DbMultisigAggregateModificationTransaction createDbModel() {
 		final DbMultisigAggregateModificationTransaction transfer = new DbMultisigAggregateModificationTransaction();
 		final Set<DbMultisigModification> modifications = new HashSet<>();
-		modifications.add(createModification(new DbAccount(), 1));
+		modifications.add(createModification(new DbAccount(1), 1));
 		transfer.setMultisigModifications(modifications);
 		return transfer;
 	}

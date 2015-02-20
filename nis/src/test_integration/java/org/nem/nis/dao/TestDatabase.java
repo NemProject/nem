@@ -184,7 +184,7 @@ public class TestDatabase {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 
