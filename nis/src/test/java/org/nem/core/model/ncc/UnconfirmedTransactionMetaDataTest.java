@@ -27,7 +27,7 @@ public class UnconfirmedTransactionMetaDataTest {
 	}
 
 	@Test
-	public void canRoundTripTransactionMetaDataWithNonNullHash() {
+	public void canRoundTripUnconfirmedTransactionMetaDataWithNonNullHash() {
 		// Arrange:
 		final Hash hash = Utils.generateRandomHash();
 		final UnconfirmedTransactionMetaData metaData = createRoundTrippedUnconfirmedTransactionMetaData(hash);
@@ -37,7 +37,7 @@ public class UnconfirmedTransactionMetaDataTest {
 	}
 
 	@Test
-	public void canRoundTripTransactionMetaDataWithNullHash() {
+	public void canRoundTripUnconfirmedTransactionMetaDataWithNullHash() {
 		// Arrange:
 		final UnconfirmedTransactionMetaData metaData = createRoundTrippedUnconfirmedTransactionMetaData(null);
 
