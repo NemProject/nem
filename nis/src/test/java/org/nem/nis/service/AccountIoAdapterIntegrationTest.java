@@ -159,7 +159,7 @@ public class AccountIoAdapterIntegrationTest {
 	}
 
 	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
-		final DbAccount dbSender = NisUtils.createDbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress());
 		mockAccountDao.addMapping(account, dbSender);
 		Mockito.when(accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
 		Mockito.when(accountCache.findByAddress(account.getAddress())).thenReturn(account);
