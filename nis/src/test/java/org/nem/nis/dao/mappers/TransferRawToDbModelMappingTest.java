@@ -46,6 +46,8 @@ public class TransferRawToDbModelMappingTest extends AbstractTransferRawToDbMode
 		// Assert:
 		// there is no sense in testing the order id since it is used nowhere in the classes
 		// TODO 20150213 J-B: i would probably still add an assert ^^
+		// TODO 20150215 BR -> J: getOrderId() resolves to "this.getListFromBlock.apply(this.block).indexOf(this);"
+		// > so i would have to set up a lot more to test it.
 		Assert.assertThat(dbModel.getBlock(), IsNull.notNullValue());
 		Assert.assertThat(dbModel.getBlock().getId(), IsEqual.equalTo(123L));
 		Assert.assertThat(dbModel.getRecipient(), IsEqual.equalTo(dbRecipient));

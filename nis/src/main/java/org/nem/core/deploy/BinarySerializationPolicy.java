@@ -11,15 +11,14 @@ import java.io.InputStream;
  * A binary serialization policy.
  */
 public class BinarySerializationPolicy implements SerializationPolicy {
-
-	private final AccountLookup accountLookup;
+	private final SimpleAccountLookup accountLookup;
 
 	/**
 	 * Creates a new binary serialization policy.
 	 *
 	 * @param accountLookup The account lookup to use.
 	 */
-	public BinarySerializationPolicy(final AccountLookup accountLookup) {
+	public BinarySerializationPolicy(final SimpleAccountLookup accountLookup) {
 		this.accountLookup = accountLookup;
 	}
 

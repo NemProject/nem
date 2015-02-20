@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class BlockAnalyzer {
 	private static final Logger LOGGER = Logger.getLogger(BlockAnalyzer.class.getName());
-	private static final int NUM_BLOCKS_TO_PULL_AT_ONCE = 500;
+	private static final int NUM_BLOCKS_TO_PULL_AT_ONCE = 100;
 
 	private final BlockDao blockDao;
 	private final BlockChainScoreManager blockChainScoreManager;

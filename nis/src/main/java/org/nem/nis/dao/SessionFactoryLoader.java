@@ -21,6 +21,7 @@ public class SessionFactoryLoader {
 	 *
 	 * @param dataSource The data source.
 	 * @return The session factory.
+	 * @throws java.io.IOException if properties could not be loaded.
 	 */
 	public static SessionFactory load(final DataSource dataSource) throws IOException {
 		final LocalSessionFactoryBuilder localSessionFactoryBuilder = new LocalSessionFactoryBuilder(dataSource);

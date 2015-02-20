@@ -5,6 +5,7 @@ import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.nis.dbmodel.DbAccount;
 import org.nem.nis.mappers.IMapper;
+import org.nem.nis.test.NisUtils;
 
 import java.math.BigInteger;
 
@@ -28,7 +29,7 @@ public class RawMapperUtilsTest {
 	@Test
 	public void mapAccountMapsNonNullIdToNonNullAccount() {
 		// Arrange:
-		final DbAccount originalAccount = new DbAccount();
+		final DbAccount originalAccount = NisUtils.createDbAccount(1L);
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(8L, DbAccount.class)).thenReturn(originalAccount);
 

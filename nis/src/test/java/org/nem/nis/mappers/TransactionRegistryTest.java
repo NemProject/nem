@@ -7,6 +7,7 @@ import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
+import org.nem.nis.test.NisUtils;
 
 import java.util.*;
 import java.util.stream.*;
@@ -83,16 +84,16 @@ public class TransactionRegistryTest {
 	@Test
 	public void findByDbModelClassCanReturnAllRegisteredTypes() {
 		// Arrange:
-		final List<Class> expectedRegisteredClasses = Arrays.asList(
+		final List<Class<? extends AbstractBlockTransfer>> expectedRegisteredClasses = Arrays.asList(
 				DbTransferTransaction.class,
 				DbImportanceTransferTransaction.class,
 				DbMultisigAggregateModificationTransaction.class,
 				DbMultisigTransaction.class);
 
 		// Act:
-		for (final Class clazz : expectedRegisteredClasses) {
+		for (final Class<? extends AbstractBlockTransfer> clazz : expectedRegisteredClasses) {
 			// Act:
-			final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByDbModelClass(clazz);
+			final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry = TransactionRegistry.findByDbModelClass(clazz);
 
 			// Assert:
 			Assert.assertThat(entry.dbModelClass, IsEqual.equalTo(clazz));
@@ -221,8 +222,8 @@ public class TransactionRegistryTest {
 	public void getOtherAccountsReturnsAffectedCosignatoriesForMultisigAggregateModificationTransaction() {
 		// Arrange:
 		final DbMultisigAggregateModificationTransaction t = new DbMultisigAggregateModificationTransaction();
-		final DbAccount cosignatory1 = new DbAccount();
-		final DbAccount cosignatory2 = new DbAccount();
+		final DbAccount cosignatory1 = NisUtils.createDbAccount(1L);
+		final DbAccount cosignatory2 = NisUtils.createDbAccount(2L);
 		final Set<DbMultisigModification> modifications = new HashSet<>();
 		modifications.add(this.createMultisigModification(cosignatory1));
 		modifications.add(this.createMultisigModification(cosignatory2));
@@ -242,8 +243,8 @@ public class TransactionRegistryTest {
 	public void getOtherAccountsReturnsMultisigSignatureTransactionSignersForMultisigTransaction() {
 		// Arrange:
 		final DbMultisigTransaction t = new DbMultisigTransaction();
-		final DbAccount signer1 = new DbAccount();
-		final DbAccount signer2 = new DbAccount();
+		final DbAccount signer1 = NisUtils.createDbAccount(1L);
+		final DbAccount signer2 = NisUtils.createDbAccount(2L);
 		final Set<DbMultisigSignatureTransaction> signatureTransactions = new HashSet<>();
 		signatureTransactions.add(this.createMultisigSignatureTransaction(signer1));
 		signatureTransactions.add(this.createMultisigSignatureTransaction(signer2));

@@ -28,6 +28,7 @@ public class DeserializableList<T> {
 	 * Creates a new list with the specified capacity and custom label.
 	 *
 	 * @param initialCapacity The initial capacity.
+	 * @param label The label for (de)serialization.
 	 */
 	public DeserializableList(final int initialCapacity, final String label) {
 		this.list = new ArrayList<>(initialCapacity);

@@ -2,12 +2,12 @@ package org.nem.core.connect;
 
 import net.minidev.json.JSONObject;
 import org.nem.core.serialization.*;
-import org.springframework.http.HttpStatus;
 
 /**
  * A union that will either contain an error response or a deserializer.
  */
 public class ErrorResponseDeserializerUnion {
+	private final static int HTTP_OK = 200;
 
 	private final int status;
 	private final Object body;
@@ -44,7 +44,7 @@ public class ErrorResponseDeserializerUnion {
 	 * @return true if this contains an error.
 	 */
 	public boolean hasError() {
-		return HttpStatus.OK.value() != this.status;
+		return HTTP_OK != this.status;
 	}
 
 	/**

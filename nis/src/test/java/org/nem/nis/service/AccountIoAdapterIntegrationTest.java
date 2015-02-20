@@ -23,7 +23,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class AccountIoAdapterIntegrationTest {
-
 	@Autowired
 	TransferDao transferDao;
 
@@ -160,7 +159,7 @@ public class AccountIoAdapterIntegrationTest {
 	}
 
 	private void addMapping(final AccountCache accountCache, final MockAccountDao mockAccountDao, final Account account) {
-		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = NisUtils.createDbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
 		mockAccountDao.addMapping(account, dbSender);
 		Mockito.when(accountCache.findByAddress(Mockito.eq(account.getAddress()), Mockito.any())).thenReturn(account);
 		Mockito.when(accountCache.findByAddress(account.getAddress())).thenReturn(account);

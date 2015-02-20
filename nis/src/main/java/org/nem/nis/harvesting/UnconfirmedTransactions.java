@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.state.ReadOnlyAccountState;
@@ -368,9 +369,13 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
 		synchronized (this.lock) {
+			final int[] txCount = new int[1];
 			return this.transactions.stream()
 					.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
-					.limit(maxTransactions)
+					.filter(t -> {
+						txCount[0] += 1 + t.getChildTransactions().size();
+						return BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK >= txCount[0];
+					})
 					.collect(Collectors.toList());
 		}
 	}

@@ -46,6 +46,7 @@ public interface AsyncNemConnector<TApiId> {
 	 * @param endpoint The NIS endpoint.
 	 * @param apiId The api to call.
 	 * @param postRequest The request data.
+	 * @return The future.
 	 */
 	public CompletableFuture<Void> postVoidAsync(
 			final NodeEndpoint endpoint,

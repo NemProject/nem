@@ -22,6 +22,7 @@ public class SerializableList<T extends SerializableEntity> extends Deserializab
 	 * Creates a new list with the specified capacity and custom label.
 	 *
 	 * @param initialCapacity The initial capacity.
+	 * @param label The label for (de)serialization.
 	 */
 	public SerializableList(final int initialCapacity, final String label) {
 		super(initialCapacity, label);
