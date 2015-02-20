@@ -69,16 +69,6 @@ public class DbAccount {
 		}
 	}
 
-	// TODO 20150219 J-B: please add tests for hashCode/equals
-	// TODO 20150219 BR -> J: done. But your version won't work for the following reason:
-	// > 1) If we come from the database side (like in block loader) the created db accounts only have ids, nothing else.
-	//      Therefore to be able to put it in a hash map hashCode()/equals() have to use the id.
-	//   2) If we come from the model side the created db accounts (like in most tests) have no id yet but a printable key.
-	//      In that case hashCode()/equals() has to use those fields.
-	// TODO 20150219 J-B: is #2 only a requirement for the tests or are there production cases where we want
-	// > equality based on addresses?
-	// TODO 20150220 BR -> J: i think right now only the tests use 2)
-
 	@Override
 	public int hashCode() {
 		return null == this.id ? 0 : this.id.hashCode();

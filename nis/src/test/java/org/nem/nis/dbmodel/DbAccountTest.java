@@ -1,26 +1,89 @@
 package org.nem.nis.dbmodel;
 
+import org.hamcrest.Matcher;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.nem.core.crypto.PublicKey;
-import org.nem.nis.test.NisUtils;
+import org.nem.core.model.Address;
+import org.nem.core.test.Utils;
 
 import java.util.*;
 public class DbAccountTest {
 
+	//region constructor
+
 	@Test
-	public void hashCodesAreEqualForEquivalentObjects() {
-		// Arrange:
-		final int hashCode = DESC_TO_DB_ACCOUNT_MAP.get("default").hashCode();
+	public void canCreateAccountUsingDefaultConstructor() {
+		// Act:
+		final DbAccount account = new DbAccount();
 
 		// Assert:
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("copy").hashCode(), IsEqual.equalTo(hashCode));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("uninitialized").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-id").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-address").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-address-and-pubKey").hashCode(), IsNot.not(IsEqual.equalTo(hashCode)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-address").hashCode(), IsEqual.equalTo(DESC_TO_DB_ACCOUNT_MAP.get("diff-address-and-pubKey").hashCode()));
+		Assert.assertThat(account.getId(), IsNull.nullValue());
+		Assert.assertThat(account.getPrintableKey(), IsNull.nullValue());
+		Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
 	}
+
+	@Test
+	public void canCreateAccountFromId() {
+		// Act:
+		final DbAccount account = new DbAccount(7);
+
+		// Assert:
+		Assert.assertThat(account.getId(), IsEqual.equalTo(7L));
+		Assert.assertThat(account.getPrintableKey(), IsNull.nullValue());
+		Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
+	}
+
+	@Test
+	public void canCreateAccountFromPrintableKey() {
+		// Act:
+		final DbAccount account = new DbAccount("TALICE", null);
+
+		// Assert:
+		Assert.assertThat(account.getId(), IsNull.nullValue());
+		Assert.assertThat(account.getPrintableKey(), IsEqual.equalTo("TALICE"));
+		Assert.assertThat(account.getPublicKey(), IsNull.nullValue());
+	}
+
+	@Test
+	public void canCreateAccountFromPrintableKeyAndPublicKey() {
+		// Act:
+		final PublicKey publicKey = Utils.generateRandomPublicKey();
+		final DbAccount account = new DbAccount("TALICE", publicKey);
+
+		// Assert:
+		Assert.assertThat(account.getId(), IsNull.nullValue());
+		Assert.assertThat(account.getPrintableKey(), IsEqual.equalTo("TALICE"));
+		Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(publicKey));
+	}
+
+	@Test
+	public void canCreateAccountFromAddress() {
+		// Act:
+		final Address address = Utils.generateRandomAddress();
+		final DbAccount account = new DbAccount(address);
+
+		// Assert:
+		Assert.assertThat(account.getId(), IsNull.nullValue());
+		Assert.assertThat(account.getPrintableKey(), IsEqual.equalTo(address.getEncoded()));
+		Assert.assertThat(account.getPublicKey(), IsEqual.equalTo(address.getPublicKey()));
+	}
+
+	//endregion
+
+	//region equals / hashCode
+
+	private static final Map<String, DbAccount> DESC_TO_DB_ACCOUNT_MAP = new HashMap<String, DbAccount>() {
+		{
+			final PublicKey publicKey = Utils.generateRandomPublicKey();
+			this.put("default", createDbAccount(1L, "TALICE", publicKey));
+			this.put("copy", createDbAccount(1L, "TALICE", publicKey));
+			this.put("uninitialized", new DbAccount());
+			this.put("diff-id", createDbAccount(2L, "TALICE", publicKey));
+			this.put("diff-address", createDbAccount(1L, "TBOB", publicKey));
+			this.put("diff-pubKey", createDbAccount(1L, "TALICE", Utils.generateRandomPublicKey()));
+		}
+	};
 
 	@Test
 	public void equalsOnlyReturnsTrueForEquivalentObjects() {
@@ -28,24 +91,37 @@ public class DbAccountTest {
 		final DbAccount dbAccount = DESC_TO_DB_ACCOUNT_MAP.get("default");
 
 		// Assert:
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("copy"), IsEqual.equalTo(dbAccount));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("uninitialized"), IsNot.not(IsEqual.equalTo(dbAccount)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-id"), IsNot.not(IsEqual.equalTo(dbAccount)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-address"), IsNot.not(IsEqual.equalTo(dbAccount)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-address-and-pubKey"), IsNot.not(IsEqual.equalTo(dbAccount)));
-		Assert.assertThat(DESC_TO_DB_ACCOUNT_MAP.get("diff-address"), IsEqual.equalTo(DESC_TO_DB_ACCOUNT_MAP.get("diff-address-and-pubKey")));
-		Assert.assertThat(null, IsNot.not(IsEqual.equalTo(dbAccount)));
-		Assert.assertThat(1L, IsNot.not(IsEqual.equalTo(dbAccount)));
+		final List<String> differentKeys = Arrays.asList("uninitialized", "diff-id");
+		for (final Map.Entry<String, DbAccount> entry : DESC_TO_DB_ACCOUNT_MAP.entrySet()) {
+			final Matcher<DbAccount> matcher = differentKeys.contains(entry.getKey())
+					? IsNot.not(IsEqual.equalTo(dbAccount))
+					: IsEqual.equalTo(dbAccount);
+
+			Assert.assertThat(entry.getValue(), matcher);
+		}
 	}
 
-	private static final Map<String, DbAccount> DESC_TO_DB_ACCOUNT_MAP = new HashMap<String, DbAccount>() {
-		{
-			this.put("default", new DbAccount(1L));
-			this.put("copy", new DbAccount(1L));
-			this.put("uninitialized", new DbAccount());
-			this.put("diff-id", new DbAccount(2L));
-			this.put("diff-address", new DbAccount("TALICE", new PublicKey(new byte[32])));
-			this.put("diff-address-and-pubKey", new DbAccount("TALICE", new PublicKey(new byte[33])));
+	@Test
+	public void hashCodesAreEqualForEquivalentObjects() {
+		// Arrange:
+		final int hashCode = DESC_TO_DB_ACCOUNT_MAP.get("default").hashCode();
+
+		// Assert:
+		final List<String> differentKeys = Arrays.asList("uninitialized", "diff-id");
+		for (final Map.Entry<String, DbAccount> entry : DESC_TO_DB_ACCOUNT_MAP.entrySet()) {
+			final Matcher<Integer> matcher = differentKeys.contains(entry.getKey())
+					? IsNot.not(IsEqual.equalTo(hashCode))
+					: IsEqual.equalTo(hashCode);
+
+			Assert.assertThat(entry.getValue().hashCode(), matcher);
 		}
-	};
+	}
+
+	//endregion
+
+	private static DbAccount createDbAccount(final Long id, final String printableKey, final PublicKey publicKey) {
+		final DbAccount account = new DbAccount(printableKey, publicKey);
+		account.setId(id);
+		return account;
+	}
 }
