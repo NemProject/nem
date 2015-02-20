@@ -4,7 +4,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 
 /**
@@ -24,12 +23,12 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 
 	@Override
 	public DbBlock map(final Object[] source) {
-		final DbAccount harvester = RawMapperUtils.mapAccount(this.mapper, (BigInteger)source[7]);
-		final DbAccount lessor = RawMapperUtils.mapAccount(this.mapper, (BigInteger)source[9]);
+		final DbAccount harvester = RawMapperUtils.mapAccount(this.mapper, source[7]);
+		final DbAccount lessor = RawMapperUtils.mapAccount(this.mapper, source[9]);
 
 		final DbBlock dbBlock = new DbBlock();
-		dbBlock.setId(RawMapperUtils.castBigIntegerToLong((BigInteger)source[0]));
-		dbBlock.setShortId(RawMapperUtils.castBigIntegerToLong((BigInteger)source[1]));
+		dbBlock.setId(RawMapperUtils.castToLong(source[0]));
+		dbBlock.setShortId(RawMapperUtils.castToLong(source[1]));
 		dbBlock.setVersion((Integer)source[2]);
 		dbBlock.setPrevBlockHash(new Hash((byte[])source[3]));
 		dbBlock.setBlockHash(new Hash((byte[])source[4]));
@@ -38,9 +37,9 @@ public class BlockRawToDbModelMapping implements IMapping<Object[], DbBlock> {
 		dbBlock.setHarvester(harvester);
 		dbBlock.setHarvesterProof((byte[])source[8]);
 		dbBlock.setLessor(lessor);
-		dbBlock.setHeight(RawMapperUtils.castBigIntegerToLong((BigInteger)source[10]));
-		dbBlock.setTotalFee(RawMapperUtils.castBigIntegerToLong((BigInteger)source[11]));
-		dbBlock.setDifficulty(RawMapperUtils.castBigIntegerToLong((BigInteger)source[12]));
+		dbBlock.setHeight(RawMapperUtils.castToLong(source[10]));
+		dbBlock.setTotalFee(RawMapperUtils.castToLong(source[11]));
+		dbBlock.setDifficulty(RawMapperUtils.castToLong(source[12]));
 		dbBlock.setBlockTransferTransactions(new ArrayList<>());
 		dbBlock.setBlockImportanceTransferTransactions(new ArrayList<>());
 		dbBlock.setBlockMultisigAggregateModificationTransactions(new ArrayList<>());

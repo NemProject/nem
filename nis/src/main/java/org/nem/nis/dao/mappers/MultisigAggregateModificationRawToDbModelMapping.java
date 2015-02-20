@@ -3,7 +3,6 @@ package org.nem.nis.dao.mappers;
 import org.nem.nis.dbmodel.DbMultisigAggregateModificationTransaction;
 import org.nem.nis.mappers.IMapper;
 
-import java.math.BigInteger;
 import java.util.HashSet;
 
 /**
@@ -23,10 +22,10 @@ public class MultisigAggregateModificationRawToDbModelMapping extends AbstractTr
 	@Override
 	protected DbMultisigAggregateModificationTransaction mapImpl(final Object[] source) {
 		final DbMultisigAggregateModificationTransaction dbModificationTransaction = new DbMultisigAggregateModificationTransaction();
-		dbModificationTransaction.setBlock(RawMapperUtils.mapBlock((BigInteger)source[0]));
+		dbModificationTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbModificationTransaction.setBlkIndex((Integer)source[9]);
 		dbModificationTransaction.setOrderId((Integer)source[10]);
-		dbModificationTransaction.setReferencedTransaction(RawMapperUtils.castBigIntegerToLong((BigInteger)source[11]));
+		dbModificationTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[11]));
 		dbModificationTransaction.setMultisigModifications(new HashSet<>());
 
 		return dbModificationTransaction;

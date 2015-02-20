@@ -28,6 +28,10 @@ public class DbAccount {
 	public DbAccount() {
 	}
 
+	public DbAccount(final long id) {
+		this.id = id;
+	}
+
 	public DbAccount(final String printableKey, final PublicKey publicKey) {
 		this.printableKey = printableKey;
 		this.setPublicKey(publicKey);

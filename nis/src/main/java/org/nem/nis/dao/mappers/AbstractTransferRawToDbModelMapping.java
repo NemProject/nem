@@ -4,8 +4,6 @@ import org.nem.core.crypto.Hash;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 
-import java.math.BigInteger;
-
 /**
  * Base class for mappings of raw transfer db types to transfer db model types.
  *
@@ -27,12 +25,12 @@ public abstract class AbstractTransferRawToDbModelMapping<TDbModel extends Abstr
 	@Override
 	public TDbModel map(final Object[] source) {
 		final TDbModel dbModel = this.mapImpl(source);
-		final DbAccount sender = RawMapperUtils.mapAccount(this.mapper, (BigInteger)source[7]);
+		final DbAccount sender = RawMapperUtils.mapAccount(this.mapper, source[7]);
 
-		dbModel.setId(RawMapperUtils.castBigIntegerToLong((BigInteger)source[1]));
+		dbModel.setId(RawMapperUtils.castToLong(source[1]));
 		dbModel.setTransferHash(new Hash((byte[])source[2]));
 		dbModel.setVersion((Integer)source[3]);
-		dbModel.setFee(RawMapperUtils.castBigIntegerToLong((BigInteger)source[4]));
+		dbModel.setFee(RawMapperUtils.castToLong(source[4]));
 		dbModel.setTimeStamp((Integer)source[5]);
 		dbModel.setDeadline((Integer)source[6]);
 		dbModel.setSender(sender);

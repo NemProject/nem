@@ -25,6 +25,7 @@ public final class RawMapperUtils {
 
 	// TODO 20150219 J-B: also can use these in the blockloader
 	// > any reason not to use Object id instead of BigIntegerId (so the casts are inside the helpers instead of outside in every call)
+	// TODO 20150220 BR _> J: no good reason i guess.
 
 	/**
 	 * Maps an account id to a db model account using the specified mapper.
@@ -33,8 +34,8 @@ public final class RawMapperUtils {
 	 * @param id The account id.
 	 * @return The db model account.
 	 */
-	public static DbAccount mapAccount(final IMapper mapper, final BigInteger id) {
-		return mapAccount(mapper, castBigIntegerToLong(id));
+	public static DbAccount mapAccount(final IMapper mapper, final Object id) {
+		return mapAccount(mapper, castToLong(id));
 	}
 
 	/**
@@ -43,19 +44,23 @@ public final class RawMapperUtils {
 	 * @param id The block id.
 	 * @return The db block.
 	 */
-	protected static DbBlock mapBlock(final BigInteger id) {
+	protected static DbBlock mapBlock(final Object id) {
 		final DbBlock dbBlock = new DbBlock();
-		dbBlock.setId(castBigIntegerToLong(id));
+		dbBlock.setId(castToLong(id));
 		return dbBlock;
 	}
 
 	/**
-	 * Casts a BigInteger value to a Long value.
+	 * Casts an object value to a Long value.
 	 *
-	 * @param value The BigInteger value.
+	 * @param value The object value.
 	 * @return The Long value.
 	 */
-	public static Long castBigIntegerToLong(final BigInteger value) {
+	public static Long castToLong(final Object value) {
+		return castBigIntegerToLong((BigInteger)value);
+	}
+
+	private static Long castBigIntegerToLong(final BigInteger value) {
 		return null == value ? null : value.longValue();
 	}
 }

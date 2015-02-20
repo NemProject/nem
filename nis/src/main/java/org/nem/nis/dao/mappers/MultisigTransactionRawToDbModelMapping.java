@@ -3,7 +3,6 @@ package org.nem.nis.dao.mappers;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
 
-import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.function.Function;
 
@@ -38,16 +37,16 @@ public class MultisigTransactionRawToDbModelMapping extends AbstractTransferRawT
 	@Override
 	protected DbMultisigTransaction mapImpl(final Object[] source) {
 		final DbMultisigTransaction dbMultisigTransaction = new DbMultisigTransaction();
-		dbMultisigTransaction.setBlock(RawMapperUtils.mapBlock((BigInteger)source[0]));
+		dbMultisigTransaction.setBlock(RawMapperUtils.mapBlock(source[0]));
 		dbMultisigTransaction.setBlkIndex((Integer)source[9]);
 		dbMultisigTransaction.setOrderId((Integer)source[10]);
-		dbMultisigTransaction.setReferencedTransaction(RawMapperUtils.castBigIntegerToLong((BigInteger)source[11]));
+		dbMultisigTransaction.setReferencedTransaction(RawMapperUtils.castToLong(source[11]));
 		dbMultisigTransaction.setTransferTransaction(
-				this.transferSupplier.apply(RawMapperUtils.castBigIntegerToLong((BigInteger)source[12])));
+				this.transferSupplier.apply(RawMapperUtils.castToLong(source[12])));
 		dbMultisigTransaction.setImportanceTransferTransaction(
-				this.importanceTransferSupplier.apply(RawMapperUtils.castBigIntegerToLong((BigInteger)source[13])));
+				this.importanceTransferSupplier.apply(RawMapperUtils.castToLong(source[13])));
 		dbMultisigTransaction.setMultisigAggregateModificationTransaction(
-				this.multisigModificationTransactionSupplier.apply(RawMapperUtils.castBigIntegerToLong((BigInteger)source[14])));
+				this.multisigModificationTransactionSupplier.apply(RawMapperUtils.castToLong(source[14])));
 		dbMultisigTransaction.setMultisigSignatureTransactions(new HashSet<>());
 
 		return dbMultisigTransaction;

@@ -14,18 +14,30 @@ public class RawMapperUtilsTest {
 	//region RawMapperUtils
 
 	// TODO 20150219 J-B: consider a separate test for each overload
+	// TODO 20150220 BR -> J: sure
 	@Test
-	public void mapAccountMapsNullIdToNullAccount() {
+	public void mapAccountMapsNullLongToNullAccount() {
 		// Arrange:
 		final IMapper mapper = Mockito.mock(IMapper.class);
 
 		// Act:
 		final DbAccount account = RawMapperUtils.mapAccount(mapper, (Long)null);
-		final DbAccount account2 = RawMapperUtils.mapAccount(mapper, (BigInteger)null);
 
 		// Assert:
 		Assert.assertThat(account, IsNull.nullValue());
-		Assert.assertThat(account2, IsNull.nullValue());
+		Mockito.verify(mapper, Mockito.never()).map(Mockito.any(), Mockito.any());
+	}
+
+	@Test
+	public void mapAccountMapsNullObjectToNullAccount() {
+		// Arrange:
+		final IMapper mapper = Mockito.mock(IMapper.class);
+
+		// Act:
+		final DbAccount account = RawMapperUtils.mapAccount(mapper, (Object)null);
+
+		// Assert:
+		Assert.assertThat(account, IsNull.nullValue());
 		Mockito.verify(mapper, Mockito.never()).map(Mockito.any(), Mockito.any());
 	}
 
@@ -47,7 +59,7 @@ public class RawMapperUtilsTest {
 	@Test
 	public void mapAccountMapsNonNullBigIntegerIdToNonNullAccount() {
 		// Arrange:
-		final DbAccount originalAccount = new DbAccount();
+		final DbAccount originalAccount = new DbAccount(8L);
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(8L, DbAccount.class)).thenReturn(originalAccount);
 
@@ -64,34 +76,42 @@ public class RawMapperUtilsTest {
 	//region mapBlock
 
 	// TODO 20150219 J-B: consider two tests
+	// TODO 20150220 BR -> J: sure
 	@Test
-	public void mapBlockMapsAnyBigIntegerToNonNullBlock() {
+	public void mapBlockMapsNullObjectToNonNullBlock() {
 		// Act:
-		final DbBlock block = RawMapperUtils.mapBlock(BigInteger.valueOf(8L));
-		final DbBlock block2 = RawMapperUtils.mapBlock(null);
+		final DbBlock block = RawMapperUtils.mapBlock(null);
 
 		// Assert:
 		Assert.assertThat(block, IsNull.notNullValue());
-		Assert.assertThat(block2, IsNull.notNullValue());
+	}
+
+	@Test
+	public void mapBlockMapsNonNullObjectToNonNullBlock() {
+		// Act:
+		final DbBlock block = RawMapperUtils.mapBlock(BigInteger.valueOf(8L));
+
+		// Assert:
+		Assert.assertThat(block, IsNull.notNullValue());
 	}
 
 	//endregion
 
-	//region castBigIntegerToLong
+	//region castToLong
 
 	@Test
-	public void castBigIntegerToLongMapsNullLongToNullBigInteger() {
+	public void castToLongMapsNullObjectToNullLong() {
 		// Act:
-		final Long value = RawMapperUtils.castBigIntegerToLong(null);
+		final Long value = RawMapperUtils.castToLong(null);
 
 		// Assert:
 		Assert.assertThat(value, IsNull.nullValue());
 	}
 
 	@Test
-	public void castBigIntegerToLongMapsNonNullLongToNonNullBigInteger() {
+	public void castToLongMapsNonNullObjectToNonNullLong() {
 		// Act:
-		final Long value = RawMapperUtils.castBigIntegerToLong(BigInteger.valueOf(5L));
+		final Long value = RawMapperUtils.castToLong(BigInteger.valueOf(5L));
 
 		// Assert:
 		Assert.assertThat(value, IsEqual.equalTo(5L));
