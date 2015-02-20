@@ -146,7 +146,7 @@ public class TransactionRegistryTest {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void getInnerTransactionReturnsInnerTransactionForMultiisgTransaction() {
+	public void getInnerTransactionReturnsInnerTransactionForMultisigTransaction() {
 		// Arrange:
 		final DbTransferTransaction t = new DbTransferTransaction();
 		final DbMultisigTransaction multisig = new DbMultisigTransaction();
