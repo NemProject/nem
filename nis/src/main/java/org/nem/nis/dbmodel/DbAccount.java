@@ -27,6 +27,9 @@ public class DbAccount {
 	// public key, might be null
 	private byte[] publicKey;
 
+	public DbAccount() {
+	}
+
 	public DbAccount(final long id) {
 		this.id = id;
 	}

@@ -42,7 +42,7 @@ public class DbAccountTest {
 		{
 			this.put("default", new DbAccount(1L));
 			this.put("copy", new DbAccount(1L));
-			this.put("uninitialized", new DbAccount(null, null));
+			this.put("uninitialized", new DbAccount());
 			this.put("diff-id", new DbAccount(2L));
 			this.put("diff-address", new DbAccount("TALICE", new PublicKey(new byte[32])));
 			this.put("diff-address-and-pubKey", new DbAccount("TALICE", new PublicKey(new byte[33])));
