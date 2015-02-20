@@ -222,13 +222,11 @@ public class ChainControllerTest {
 
 		// Assert:
 		ExceptionAssert.assertThrows(
-				v -> {
-					runBlocksAfterTest(
-							context,
-							c -> c.controller.blocksAfter(request),
-							r -> r.getEntity(localNode.getIdentity(), challenge),
-							blockList);
-				},
+				v -> runBlocksAfterTest(
+						context,
+						c -> c.controller.blocksAfter(request),
+						r -> r.getEntity(localNode.getIdentity(), challenge),
+						blockList),
 				RuntimeException.class);
 	}
 
@@ -248,8 +246,8 @@ public class ChainControllerTest {
 				createDbBlockList(11, 150));
 		Assert.assertThat(response.getSignature(), IsNull.notNullValue());
 
-		// (1 transaction per block)
-		Assert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130));
+		// (1 transfer + 1 multisig transaction containing 1 transfer  per block)
+		Assert.assertThat(response.getEntity(localNode.getIdentity(), challenge).size(), IsEqual.equalTo(130 / 3));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -289,6 +287,7 @@ public class ChainControllerTest {
 			final DbBlock dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
 			dbBlock.setId((long)(height + i));
 			dbBlock.setBlockTransferTransactions(Arrays.asList(createDbTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockMultisigTransactions(Arrays.asList(createMultisigDbTransferWithTimeStamp(400 + i)));
 			dbBlockList.add(dbBlock);
 		}
 
@@ -309,6 +308,25 @@ public class ChainControllerTest {
 		dbTransfer.setDeadline(0);
 		dbTransfer.setBlkIndex(0);
 		return dbTransfer;
+	}
+
+	private static DbMultisigTransaction createMultisigDbTransferWithTimeStamp(final int timeStamp) {
+		final DbTransferTransaction dbTransfer = createDbTransferWithTimeStamp(timeStamp);
+		final Address address = Utils.generateRandomAddressWithPublicKey();
+		final DbAccount account = new DbAccount();
+		account.setPrintableKey(address.getEncoded());
+		account.setPublicKey(address.getPublicKey());
+		final DbMultisigTransaction dbMultisig = new DbMultisigTransaction();
+		dbMultisig.setTransferTransaction(dbTransfer);
+		dbMultisig.setMultisigSignatureTransactions(new HashSet<>());
+		dbMultisig.setTransferHash(Utils.generateRandomHash());
+		dbMultisig.setSender(account);
+		dbMultisig.setSenderProof(Utils.generateRandomBytes(64));
+		dbMultisig.setTimeStamp(timeStamp);
+		dbMultisig.setFee(0L);
+		dbMultisig.setDeadline(0);
+		dbMultisig.setBlkIndex(0);
+		return dbMultisig;
 	}
 
 	//endregion

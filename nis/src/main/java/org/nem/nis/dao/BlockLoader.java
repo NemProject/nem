@@ -7,7 +7,6 @@ import org.nem.nis.dao.mappers.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.*;
 
-import java.math.BigInteger;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -184,7 +183,7 @@ public class BlockLoader {
 		DbMultisigAggregateModificationTransaction dbModificationTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final long txid = castBigIntegerToLong(array[12]);
+			final long txid = RawMapperUtils.castToLong(array[12]);
 			if (curTxId != txid) {
 				curTxId = txid;
 				dbModificationTransaction = this.mapToDbModificationTransaction(array);
@@ -233,7 +232,7 @@ public class BlockLoader {
 		DbMultisigTransaction dbMultisigTransaction = null;
 		long curTxId = 0L;
 		for (final Object[] array : arrays) {
-			final Long txid = castBigIntegerToLong(array[15]);
+			final Long txid = RawMapperUtils.castToLong(array[15]);
 			if (null == txid) {
 				// no cosignatories
 				dbMultisigTransaction = this.mapToDbMultisigTransaction(array);
@@ -275,10 +274,6 @@ public class BlockLoader {
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
 		realAccounts.stream().forEach(a -> accountMap.put(a.getId(), a));
 		return accountMap;
-	}
-
-	private static Long castBigIntegerToLong(final Object obj) {
-		return null == obj ? null : ((BigInteger)obj).longValue();
 	}
 
 	@SuppressWarnings("unchecked")
