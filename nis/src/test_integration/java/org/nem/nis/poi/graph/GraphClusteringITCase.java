@@ -204,24 +204,8 @@ public abstract class GraphClusteringITCase {
 	//region sensitivity tests
 
 	/**
-	 *
-	 * TODO 20141016 BR -> J: here are the values when using PageRankScorer (see comment below):
-	 * <pre>
-	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
-	 * STK  | 1.0000 |        |        |        |        |        |
-	 * 10^0 | 0.0250 | 1.0000 |        |        |        |        |
-	 * 10^2 | 0.0250 | 1.0000 | 1.0000 |        |        |        |
-	 * 10^3 | 0.0250 | 1.0000 | 1.0000 | 1.0000 |        |        |
-	 * 10^4 | 0.1193 | 0.2411 | 0.2411 | 0.2411 | 1.0000 |        |
-	 * 10^5 | 0.2375 | 0.1791 | 0.1791 | 0.1791 | 0.6107 | 1.0000 |
-	 * <br/>
-	 * TODO 20141018 M->BR,J: These are the results on my machine:
-	 * 10^0 | 0.0709 |  50139 |
-	 * 10^2 | 0.0194 |   8178 |
-	 * 10^3 | 0.0258 |   4970 |
-	 * 10^4 | 0.0601 |   2483 |
-	 * 10^5 | 0.0712 |    797 |
-	 * </pre>
+	 * This test prints out a table of correlations between balances and NcdAwareRank scores, at
+	 * various minimum harvesting balance settings.
 	 */
 	@Test
 	public void minHarvestingBalancePageRankVariance() {
@@ -230,35 +214,8 @@ public abstract class GraphClusteringITCase {
 	}
 
 	/**
-	 * Using correlation as a proxy for importance sensitivity to min harvesting balance.
-	 * TODO 20141014 J-J: recalculate differences using pearson r
-	 * TODO 20141015 BR -> J: nice test. I agree to raise the min harvest balance to the suggested value.
-	 * TODO 20141016 M -> BR, J: If possible we should try to keep the min balance low so that more people can
-	 * ->participate in harvesting NEM. None of these correlations are really so different, so I wouldn't go over 1000.
-	 * ->Also, I get different numbers when I run the test (it could because I am using a newer NXT DB with more blocks).
-	 * <pre>
-	 *      |  STK   |  10^0  |  10^2  |  10^3  |  10^4  |  10^5  |
-	 * STK  | 1.0000 |        |        |        |        |        |
-	 * 10^0 | 0.9990 | 1.0000 |        |        |        |        |
-	 * 10^2 | 0.9990 | 1.0000 | 1.0000 |        |        |        |
-	 * 10^3 | 0.9990 | 1.0000 | 1.0000 | 1.0000 |        |        |
-	 * 10^4 | 0.9992 | 0.9992 | 0.9992 | 0.9992 | 1.0000 |        |
-	 * 10^5 | 0.9984 | 0.9984 | 0.9984 | 0.9984 | 0.9990 | 1.0000 |
-	 * <br/>
-	 * TODO 20141018 M-J: These are the results printed out on my machine:
-	 * 10^0 | 0.9581 |  50139 |
-	 * 10^2 | 0.9559 |   8178 |
-	 * 10^3 | 0.9557 |   4970 |
-	 * 10^4 | 0.9553 |   2483 |
-	 * 10^5 | 0.9606 |    797 |
-	 * ->
-	 * ->and for trivia, here are the results I get if I include both vested and unvested balances for pos:
-	 * 10^0 | 0.9508 |  50139 |
-	 * 10^2 | 0.9459 |   8178 |
-	 * 10^3 | 0.9456 |   4970 |
-	 * 10^4 | 0.9452 |   2483 |
-	 * 10^5 | 0.9504 |    797 |
-	 * </pre>
+	 * This test prints out a table of correlations between balances and importance scores, at
+	 * various minimum harvesting balance settings.
 	 */
 	@Test
 	public void minHarvestingBalanceImportanceVariance() {
@@ -397,27 +354,10 @@ public abstract class GraphClusteringITCase {
 	}
 
 	/**
-	 * <pre>
-	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
-	 * STK  | 1.0000 |        |        |        |        |        |        |        |
-	 * 10^0 | 0.0230 | 1.0000 |        |        |        |        |        |        |
-	 * 10^1 | 0.0141 | 0.9713 | 1.0000 |        |        |        |        |        |
-	 * 10^2 | 0.0082 | 0.9110 | 0.9500 | 1.0000 |        |        |        |        |
-	 * 10^3 | 0.0085 | 0.7620 | 0.7971 | 0.8535 | 1.0000 |        |        |        |
-	 * 10^4 | 0.0228 | 0.2798 | 0.3292 | 0.3869 | 0.4881 | 1.0000 |        |        |
-	 * 10^5 | 0.0141 | 0.0223 | 0.0338 | 0.0611 | 0.0886 | 0.2691 | 1.0000 |        |
-	 * 10^6 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 0.0000 | 1.0000 |
-	 * TODO M: These are the results when I run this:
-	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
-	 * STK  | 1.0000 |        |        |        |        |        |        |        |
-	 * 10^0 | 0.0227 | 1.0000 |        |        |        |        |        |        |
-	 * 10^1 | 0.0131 | 0.9744 | 1.0000 |        |        |        |        |        |
-	 * 10^2 | 0.0160 | 0.8852 | 0.9433 | 1.0000 |        |        |        |        |
-	 * 10^3 | 0.0230 | 0.6816 | 0.7691 | 0.8904 | 1.0000 |        |        |        |
-	 * 10^4 | 0.0419 | 0.3125 | 0.4007 | 0.5446 | 0.7383 | 1.0000 |        |        |
-	 * 10^5 | 0.0503 | 0.2173 | 0.2850 | 0.4043 | 0.5668 | 0.8268 | 1.0000 |        |
-	 * 10^6 | 0.0511 | 0.1817 | 0.2414 | 0.3551 | 0.5066 | 0.7426 | 0.9283 | 1.0000 |
-	 * </pre>
+	 * This test prints out a table of correlations between account balances (stake) and
+	 * NcdAwareRank scores, for various minimum outlink weights (below the threshold, outlinks
+	 * are not included in the outlink matrix). The tables also shows the correlations between the
+	 * NcdAwareRank scores at various minimum outlink weights.
 	 */
 	@Test
 	public void minOutlinkWeightPageRankVariance() {
@@ -426,28 +366,10 @@ public abstract class GraphClusteringITCase {
 	}
 
 	/**
-	 * Using correlation as a proxy for importance sensitivity to min outlink balance.
-	 * <pre>
-	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
-	 * STK  | 1.0000 |        |        |        |        |        |        |        |
-	 * 10^0 | 0.9994 | 1.0000 |        |        |        |        |        |        |
-	 * 10^1 | 0.9995 | 1.0000 | 1.0000 |        |        |        |        |        |
-	 * 10^2 | 0.9996 | 0.9999 | 1.0000 | 1.0000 |        |        |        |        |
-	 * 10^3 | 0.9996 | 0.9999 | 0.9999 | 1.0000 | 1.0000 |        |        |        |
-	 * 10^4 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 |        |        |
-	 * 10^5 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |        |
-	 * 10^6 | 0.9996 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-	 * TODO M: These are the results when I run this:
-	 *      |  STK   |  10^0  |  10^1  |  10^2  |  10^3  |  10^4  |  10^5  |  10^6  |
-	 * STK  | 1.0000 |        |        |        |        |        |        |        |
-	 * 10^0 | 0.9561 | 1.0000 |        |        |        |        |        |        |
-	 * 10^1 | 0.9561 | 1.0000 | 1.0000 |        |        |        |        |        |
-	 * 10^2 | 0.9562 | 0.9999 | 1.0000 | 1.0000 |        |        |        |        |
-	 * 10^3 | 0.9563 | 0.9999 | 0.9999 | 1.0000 | 1.0000 |        |        |        |
-	 * 10^4 | 0.9563 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 |        |        |
-	 * 10^5 | 0.9563 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |        |
-	 * 10^6 | 0.9563 | 0.9998 | 0.9999 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-	 * </pre>
+	 * This test prints out a table of correlations between account balances (stake) and
+	 * importance scores, for various minimum outlink weights (below the threshold, outlinks
+	 * are not included in the outlink matrix). The tables also shows the correlations between the
+	 * importances at various minimum outlink weights.
 	 */
 	@Test
 	public void minOutlinkWeightImportanceVariance() {
@@ -660,7 +582,8 @@ public abstract class GraphClusteringITCase {
 		// Assert:
 		assertDifference("FastScan vs SingleClusterScan", fastScanImportances, singleClusterScanImportances);
 		assertDifference("FastScan vs OutlierScan", fastScanImportances, outlierScanImportances);
-		assertDifference("SingleClusterScan vs OutlierScan", singleClusterScanImportances, outlierScanImportances); //TODO-M: I am not convinced that we should expect these two to be so different. At any rate, this assert is making the test fail.
+		// Note: it is not reasonable to expect SingleClusterScan and OutlierScan to be different;
+		// it is not interesting if they are similar or different
 	}
 
 	private static void assertDifference(final String message, final ColumnVector lhs, final ColumnVector rhs) {
@@ -857,21 +780,13 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void graphViewTest() throws SQLException, IOException {
 		final long startHeight = 0;
-		final long stopHeight = 30000;//TODO: was 200000
+		final long stopHeight = defaultEndHeight;
 
 		final PoiOptionsBuilder builder = new PoiOptionsBuilder();
 		builder.setEpsilonClusteringValue(0.40);
 		builder.setMinOutlinkWeight(Amount.fromNem(100));
 		builder.setMinHarvesterBalance(Amount.fromNem(100));
 		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, stopHeight, builder);
-		//TODO:for testing
-		for (final AccountState as : eligibleAccountStates) {
-			System.out.println(as.getAddress());
-			System.out.println("outlinks: " + as.getImportanceInfo().getOutlinksSize(new BlockHeight(stopHeight)));
-			System.out.println("vested: " + as.getWeightedBalances().getVested(new BlockHeight(stopHeight)));
-			System.out.println("unvested: " + as.getWeightedBalances().getUnvested(new BlockHeight(stopHeight)));
-		}
-//		//TODO:end for testing
 		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(stopHeight), builder.create());
 		final SparseMatrix outlinkMatrix = poiContext.getOutlinkMatrix();
 		final ClusteringResult result = poiContext.getClusteringResult();
