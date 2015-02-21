@@ -9,7 +9,6 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.Utils;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.test.NisUtils;
 
 public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends Transaction, TDbModel extends AbstractTransfer> {
 
@@ -54,7 +53,7 @@ public abstract class AbstractTransferModelToDbModelMappingTest<TModel extends T
 
 		final Hash modelHash = HashUtils.calculateHash(model);
 
-		final DbAccount dbAccount = NisUtils.createDbAccount(1L);
+		final DbAccount dbAccount = new DbAccount(1);
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(sender, DbAccount.class)).thenReturn(dbAccount);
 

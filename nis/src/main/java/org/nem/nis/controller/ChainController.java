@@ -9,15 +9,15 @@ import org.nem.nis.*;
 import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
-import org.nem.nis.dbmodel.DbBlock;
-import org.nem.nis.mappers.NisDbModelToModelMapper;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.*;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
+import java.util.*;
 import java.util.logging.Logger;
 
 @RestController
@@ -109,13 +109,8 @@ public class ChainController {
 			}
 
 			previousDbBlock = dbBlock;
-			// TODO 20150213 J-B: seems like a place to use the transaction registry
-			// TODO 20150213 J-B: also could add a test for this
-			numTransactions +=
-					dbBlock.getBlockImportanceTransferTransactions().size() +
-							dbBlock.getBlockTransferTransactions().size() +
-							dbBlock.getBlockMultisigAggregateModificationTransactions().size() +
-							dbBlock.getBlockMultisigTransactions().stream().mapToInt(t -> 2 + t.getMultisigSignatureTransactions().size()).sum();
+			numTransactions += DbBlockExtensions.countTransactions(dbBlock);
+
 			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}

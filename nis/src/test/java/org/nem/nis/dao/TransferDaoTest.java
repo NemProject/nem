@@ -1154,17 +1154,15 @@ public class TransferDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 
 	private AccountDaoLookup prepareMapping(final Account sender, final Account recipient) {
 		// Arrange:
 		final MockAccountDao mockAccountDao = new MockAccountDao();
-		final DbAccount dbSender = new DbAccount(sender.getAddress().getEncoded(), sender.getAddress().getPublicKey());
-		final DbAccount dbRecipient = new DbAccount(
-				recipient.getAddress().getEncoded(),
-				recipient.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(sender.getAddress());
+		final DbAccount dbRecipient = new DbAccount(recipient.getAddress());
 		mockAccountDao.addMapping(sender, dbSender);
 		mockAccountDao.addMapping(recipient, dbRecipient);
 		return new AccountDaoLookupAdapter(mockAccountDao);

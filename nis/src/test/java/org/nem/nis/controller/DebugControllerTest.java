@@ -110,7 +110,7 @@ public class DebugControllerTest {
 		final DbBlock dbBlock = new DbBlock();
 		dbBlock.setPrevBlockHash(block.getPreviousBlockHash());
 		dbBlock.setGenerationHash(block.getGenerationHash());
-		dbBlock.setHarvester(new DbAccount(signerAddress.getEncoded(), signerAddress.getPublicKey()));
+		dbBlock.setHarvester(new DbAccount(signerAddress));
 		dbBlock.setDifficulty(block.getDifficulty().getRaw());
 		dbBlock.setHeight(block.getHeight().getRaw());
 		dbBlock.setTimeStamp(block.getTimeStamp().getRawTime());
