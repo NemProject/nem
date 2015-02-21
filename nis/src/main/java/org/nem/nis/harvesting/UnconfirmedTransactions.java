@@ -25,6 +25,7 @@ public class UnconfirmedTransactions {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
 	private final UnconfirmedTransactionsCache transactions;
+	private final UnconfirmedTransactionsFilter transactionsFilter;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
@@ -93,6 +94,7 @@ public class UnconfirmedTransactions {
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
+		this.transactionsFilter = new UnconfirmedTransactionsFilter(this.transactions);
 		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 
 		for (final Transaction transaction : transactions) {
@@ -319,9 +321,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getAll() {
 		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.stream()
-					.collect(Collectors.toList());
-			return this.sortTransactions(transactions);
+			return this.transactionsFilter.getAll();
 		}
 	}
 
@@ -334,11 +334,7 @@ public class UnconfirmedTransactions {
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
 		// probably faster to use hash map than collection
 		synchronized (this.lock) {
-			final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
-			this.transactions.stream()
-					.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
-			knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
-			return unknownHashShortIds.values().stream().collect(Collectors.toList());
+			return this.transactionsFilter.getUnknownTransactions(knownHashShortIds);
 		}
 	}
 
@@ -351,11 +347,8 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		synchronized (this.lock) {
-			return this.transactions.stream()
-					// TODO 20140115 J-G: should add test for filter
-					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
+			return this.transactionsFilter.getMostRecentTransactionsForAccount(address, maxTransactions).stream()
 					.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
-					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
 					.limit(maxTransactions)
 					.collect(Collectors.toList());
 		}
@@ -368,16 +361,7 @@ public class UnconfirmedTransactions {
 	 * @return The list of unconfirmed transactions.
 	 */
 	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
-		synchronized (this.lock) {
-			final int[] txCount = new int[1];
-			return this.transactions.stream()
-					.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
-					.filter(t -> {
-						txCount[0] += 1 + t.getChildTransactions().size();
-						return BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK >= txCount[0];
-					})
-					.collect(Collectors.toList());
-		}
+		return this.transactionsFilter.getMostImportantTransactions(maxTransactions);
 	}
 
 	/**
@@ -387,20 +371,7 @@ public class UnconfirmedTransactions {
 	 * @return The sorted list of all transactions before the specified time.
 	 */
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.stream()
-					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-							// filter out signatures because we don't want them to be directly inside a block
-					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-					.collect(Collectors.toList());
-
-			return this.sortTransactions(transactions);
-		}
-	}
-
-	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
-		Collections.sort(transactions, (lhs, rhs) -> -1 * lhs.compareTo(rhs));
-		return transactions;
+		return this.transactionsFilter.getTransactionsBefore(time);
 	}
 
 	/**

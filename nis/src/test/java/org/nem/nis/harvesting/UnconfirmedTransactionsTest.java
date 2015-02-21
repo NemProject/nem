@@ -863,7 +863,7 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	//region getTransactions
+	//region getMostImportantTransactions
 
 	@Test
 	public void getMostImportantTransactionsReturnsAllTransactionsWhenLessThanMaximumTransactionsAreAvailable() {
