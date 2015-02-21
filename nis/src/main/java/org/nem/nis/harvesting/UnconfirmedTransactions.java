@@ -401,22 +401,6 @@ public class UnconfirmedTransactions {
 		transactions.stream().forEach(t -> this.addNew(t));
 	}
 
-	/**
-	 * Gets all transactions for the specified account.
-	 *
-	 * @param address The account address.
-	 * @return The filtered list of transactions.
-	 */
-	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-		synchronized (this.lock) {
-			return this.filter(
-					this.getAll().stream()
-							.filter(tx -> matchAddress(tx, address))
-							.collect(Collectors.toList()),
-					BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
-		}
-	}
-
 	private static boolean matchAddress(final Transaction transaction, final Address address) {
 		return transaction.getAccounts().stream()
 				.map(account -> account.getAddress())
