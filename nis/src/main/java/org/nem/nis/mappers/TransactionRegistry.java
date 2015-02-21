@@ -44,6 +44,11 @@ public class TransactionRegistry {
 		public final Function<? super TDbModel, ? extends AbstractBlockTransfer> getInnerTransaction;
 
 		/**
+		 * A function that will get the number of transactions involved in the given transaction.
+		 */
+		public final Function<TDbModel, Integer> getTransactionCount;
+
+		/**
 		 * A function that will get the recipient (if any) given an abstract block transfer.
 		 */
 		public final Function<? super TDbModel, DbAccount> getRecipient;
@@ -77,6 +82,7 @@ public class TransactionRegistry {
 				final BiConsumer<DbBlock, List<TDbModel>> setInBlock,
 				final Function<DbMultisigTransaction, TDbModel> getFromMultisig,
 				final Function<TDbModel, AbstractBlockTransfer> getInnerTransaction,
+				final Function<TDbModel, Integer> getTransactionCount,
 				final Function<TDbModel, DbAccount> getRecipient,
 				final Function<TDbModel, Collection<DbAccount>> getOtherAccounts,
 				final PentaFunction<TransferDao, Long, Long, Integer, ReadOnlyTransferDao.TransferType, Collection<TransferBlockPair>> getFromDb,
@@ -91,6 +97,7 @@ public class TransactionRegistry {
 
 			this.getFromMultisig = getFromMultisig;
 			this.getInnerTransaction = getInnerTransaction;
+			this.getTransactionCount = getTransactionCount;
 
 			this.getRecipient = getRecipient;
 			this.getOtherAccounts = getOtherAccounts;
@@ -123,7 +130,7 @@ public class TransactionRegistry {
 		}
 	}
 
-	private static final List<Entry<?, ?>> entries = new ArrayList<Entry<?, ?>>() {
+	private static final List<Entry<?, ?>> ENTRIES = new ArrayList<Entry<?, ?>>() {
 		{
 			this.add(new Entry<>(
 					TransactionTypes.TRANSFER,
@@ -131,6 +138,7 @@ public class TransactionRegistry {
 					DbBlock::setBlockTransferTransactions,
 					DbMultisigTransaction::getTransferTransaction,
 					transfer -> null,
+					transfer -> 1,
 					DbTransferTransaction::getRecipient,
 					transfer -> new ArrayList<>(),
 					ReadOnlyTransferDao::getTransfersForAccount,
@@ -145,6 +153,7 @@ public class TransactionRegistry {
 					DbBlock::setBlockImportanceTransferTransactions,
 					DbMultisigTransaction::getImportanceTransferTransaction,
 					transfer -> null,
+					transfer -> 1,
 					DbImportanceTransferTransaction::getRemote,
 					transfer -> new ArrayList<>(),
 					ReadOnlyTransferDao::getImportanceTransfersForAccount,
@@ -159,6 +168,7 @@ public class TransactionRegistry {
 					DbBlock::setBlockMultisigAggregateModificationTransactions,
 					DbMultisigTransaction::getMultisigAggregateModificationTransaction,
 					transfer -> null,
+					transfer -> 1,
 					transfer -> null,
 					DbMultisigAggregateModificationTransaction::getOtherAccounts,
 					ReadOnlyTransferDao::getMultisigSignerModificationsForAccount,
@@ -173,6 +183,7 @@ public class TransactionRegistry {
 					DbBlock::setBlockMultisigTransactions,
 					multisig -> null,
 					DbModelUtils::getInnerTransaction,
+					multisig -> 2 + multisig.getMultisigSignatureTransactions().size(),
 					multisig -> null,
 					DbMultisigTransaction::getOtherAccounts,
 					ReadOnlyTransferDao::getMultisigTransactionsForAccount,
@@ -189,7 +200,7 @@ public class TransactionRegistry {
 	 * @return The number of entries.
 	 */
 	public static int size() {
-		return entries.size();
+		return ENTRIES.size();
 	}
 
 	/**
@@ -206,8 +217,9 @@ public class TransactionRegistry {
 	 *
 	 * @return The entries.
 	 */
-	public static Iterable<Entry<? extends AbstractBlockTransfer, ? extends Transaction>> iterate() {
-		return entries;
+	@SuppressWarnings("unchecked")
+	public static Iterable<Entry<AbstractBlockTransfer, Transaction>> iterate() {
+		return () -> ENTRIES.stream().map(e -> (Entry<AbstractBlockTransfer, Transaction>)e).iterator();
 	}
 
 	/**
@@ -217,7 +229,7 @@ public class TransactionRegistry {
 	 * @return The entry.
 	 */
 	public static Entry<? extends AbstractBlockTransfer, ? extends Transaction> findByType(final Integer type) {
-		for (final Entry<?, ?> entry : entries) {
+		for (final Entry<?, ?> entry : ENTRIES) {
 			if (entry.type == type) {
 				return entry;
 			}
@@ -235,7 +247,7 @@ public class TransactionRegistry {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <TDbModel extends AbstractBlockTransfer> Entry<TDbModel, ?> findByDbModelClass(final Class<? extends TDbModel> clazz) {
-		for (final Entry<?, ?> entry : entries) {
+		for (final Entry<?, ?> entry : ENTRIES) {
 			if (entry.dbModelClass.equals(clazz)) {
 				return (Entry<TDbModel, ?>)entry;
 			}

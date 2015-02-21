@@ -523,9 +523,7 @@ public class BlockMapperTest {
 			this.model.setDifficulty(new BlockDifficulty(79_876_543_211_237L));
 			this.signModel();
 
-			this.dbHarvester = new DbAccount();
-			this.dbHarvester.setPrintableKey(this.model.getSigner().getAddress().getEncoded());
-			this.dbHarvester.setPublicKey(this.model.getSigner().getAddress().getPublicKey());
+			this.dbHarvester = this.createDbAccount(this.model.getSigner());
 
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbHarvester);
@@ -550,10 +548,7 @@ public class BlockMapperTest {
 		}
 
 		private DbAccount createDbAccount(final Account account) {
-			final DbAccount dbAccount = new DbAccount();
-			dbAccount.setPublicKey(account.getAddress().getPublicKey());
-			dbAccount.setPrintableKey(account.getAddress().getEncoded());
-			return dbAccount;
+			return new DbAccount(account.getAddress());
 		}
 
 		public Block getModel() {

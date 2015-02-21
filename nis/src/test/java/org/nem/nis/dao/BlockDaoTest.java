@@ -821,7 +821,7 @@ public class BlockDaoTest {
 		for (final Object o : accounts) {
 			final Account a = (Account)o;
 			final Address address = a.getAddress();
-			final DbAccount dbA = new DbAccount(address.getEncoded(), address.getPublicKey());
+			final DbAccount dbA = new DbAccount(address);
 			mockAccountDao.addMapping(a, dbA);
 		}
 		return new AccountDaoLookupAdapter(mockAccountDao);
@@ -962,7 +962,7 @@ public class BlockDaoTest {
 	}
 
 	private void addMapping(final MockAccountDao mockAccountDao, final Account account) {
-		final DbAccount dbSender = new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey());
+		final DbAccount dbSender = new DbAccount(account.getAddress());
 		mockAccountDao.addMapping(account, dbSender);
 	}
 

@@ -11,10 +11,8 @@ import java.util.*;
  * A mock AccountDao implementation.
  */
 public class MockAccountDao implements AccountDao {
-
 	private int numGetAccountByPrintableAddressCalls;
-	private final Map<String, DbAccount> knownAccounts = new HashMap<>();
-	private final Map<DbAccount, ReferenceCount> refCounts = new HashMap<>();
+	private final Map<Address, AccountState> knownAccounts = new HashMap<>();
 	private Long id = 1L;
 
 	/**
@@ -33,30 +31,20 @@ public class MockAccountDao implements AccountDao {
 	 * @param dbAccount The db-model account.
 	 */
 	public void addMapping(final Address address, final DbAccount dbAccount) {
-		if (null == this.knownAccounts.putIfAbsent(address.getEncoded(), dbAccount)) {
+		if (!this.knownAccounts.containsKey(address)) {
 			this.id++;
-			this.refCounts.put(dbAccount, ReferenceCount.ZERO);
+			this.knownAccounts.put(address, new AccountState(dbAccount));
 		}
 
-		this.incrementReferenceCount(this.knownAccounts.get(address.getEncoded()));
-	}
-
-	private ReferenceCount incrementReferenceCount(final DbAccount dbAccount) {
-		ReferenceCount referenceCount = this.refCounts.get(dbAccount);
-		referenceCount = referenceCount.increment();
-		this.refCounts.put(dbAccount, referenceCount);
-		return referenceCount;
+		this.knownAccounts.get(address).incrementReferenceCount();
 	}
 
 	private ReferenceCount decrementReferenceCount(final DbAccount dbAccount) {
-		final ReferenceCount referenceCount = this.refCounts.get(dbAccount).decrement();
+		final ReferenceCount referenceCount = this.getAccount(dbAccount).decrementReferenceCount();
 		if (ReferenceCount.ZERO.equals(referenceCount)) {
-			this.refCounts.remove(dbAccount);
-			this.knownAccounts.remove(dbAccount.getPrintableKey());
+			this.knownAccounts.remove(Address.fromEncoded(dbAccount.getPrintableKey()));
 			// this will work because block deletion is always deletion of all blocks after a certain height.
 			this.id--;
-		} else {
-			this.refCounts.put(dbAccount, referenceCount);
 		}
 
 		return referenceCount;
@@ -77,19 +65,21 @@ public class MockAccountDao implements AccountDao {
 		copy.numGetAccountByPrintableAddressCalls = this.numGetAccountByPrintableAddressCalls;
 		copy.id = this.id;
 		copy.knownAccounts.putAll(this.knownAccounts);
-		copy.refCounts.putAll(this.refCounts);
 		return copy;
 	}
 
 	// Not exactly what equals should look like but good enough for us.
 	public boolean equals(final MockAccountDao rhs) {
-		if (this.knownAccounts.size() != rhs.knownAccounts.size() || !this.id.equals(rhs.id)) {
-			return false;
-		}
+		return this.knownAccounts.size() == rhs.knownAccounts.size()
+				&& this.id.equals(rhs.id)
+				&& this.areKnownAccountsEquivalent(rhs);
+	}
 
+	private boolean areKnownAccountsEquivalent(final MockAccountDao rhs) {
 		return 0 == this.knownAccounts.values().stream()
-				.mapToInt(a1 -> {
-					final DbAccount a2 = rhs.knownAccounts.get(a1.getPrintableKey());
+				.mapToInt(state -> {
+					final DbAccount a1 = state.dbAccount;
+					final DbAccount a2 = rhs.getAccount(a1).dbAccount;
 					if (!a1.getPrintableKey().equals(a2.getPrintableKey()) ||
 							(null != a1.getPublicKey() && !a1.getPublicKey().equals(a2.getPublicKey()))) {
 						return 1;
@@ -119,7 +109,7 @@ public class MockAccountDao implements AccountDao {
 	}
 
 	public Iterator<DbAccount> iterator() {
-		return this.knownAccounts.values().iterator();
+		return this.knownAccounts.values().stream().map(state -> state.dbAccount).iterator();
 	}
 
 	@Override
@@ -130,11 +120,40 @@ public class MockAccountDao implements AccountDao {
 	@Override
 	public DbAccount getAccountByPrintableAddress(final String printableAddress) {
 		++this.numGetAccountByPrintableAddressCalls;
-		return this.knownAccounts.get(printableAddress);
+		final AccountState state = this.getAccount(printableAddress);
+		return null == state ? null : state.dbAccount;
 	}
 
 	@Override
 	public void save(final DbAccount dbAccount) {
 		this.addMapping(Address.fromEncoded(dbAccount.getPrintableKey()), dbAccount);
+	}
+
+	private AccountState getAccount(final String printableAddress) {
+		return this.knownAccounts.get(Address.fromEncoded(printableAddress));
+	}
+
+	private AccountState getAccount(final DbAccount dbAccount) {
+		return this.getAccount(dbAccount.getPrintableKey());
+	}
+
+	private static class AccountState {
+		final DbAccount dbAccount;
+		ReferenceCount refCount;
+
+		public AccountState(final DbAccount dbAccount) {
+			this.dbAccount = dbAccount;
+			this.refCount = ReferenceCount.ZERO;
+		}
+
+		public ReferenceCount incrementReferenceCount() {
+			this.refCount = this.refCount.increment();
+			return this.refCount;
+		}
+
+		public ReferenceCount decrementReferenceCount() {
+			this.refCount = this.refCount.decrement();
+			return this.refCount;
+		}
 	}
 }

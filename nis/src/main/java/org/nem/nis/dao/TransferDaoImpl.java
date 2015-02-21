@@ -405,7 +405,7 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@SuppressWarnings("unchecked")
- 	private static <T> List<T> listAndCast(final Criteria criteria) {
+	private static <T> List<T> listAndCast(final Criteria criteria) {
 		return (List<T>)criteria.list();
 	}
 

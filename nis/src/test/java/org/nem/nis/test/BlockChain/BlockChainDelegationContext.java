@@ -126,9 +126,9 @@ public class BlockChainDelegationContext {
 
 	private void prepareAccountDao() {
 		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.blockHarvester.getAddress().getEncoded()))
-				.thenReturn(new DbAccount(this.blockHarvester.getAddress().getEncoded(), this.blockHarvester.getAddress().getPublicKey()));
+				.thenReturn(new DbAccount(this.blockHarvester.getAddress()));
 		Mockito.when(this.accountDao.getAccountByPrintableAddress(this.parentHarvester.getAddress().getEncoded()))
-				.thenReturn(new DbAccount(this.parentHarvester.getAddress().getEncoded(), this.parentHarvester.getAddress().getPublicKey()));
+				.thenReturn(new DbAccount(this.parentHarvester.getAddress()));
 	}
 
 	private void prepareBlockDao() {

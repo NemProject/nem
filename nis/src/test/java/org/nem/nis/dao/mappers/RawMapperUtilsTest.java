@@ -3,23 +3,34 @@ package org.nem.nis.dao.mappers;
 import org.hamcrest.core.*;
 import org.junit.*;
 import org.mockito.Mockito;
-import org.nem.nis.dbmodel.DbAccount;
+import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.IMapper;
-import org.nem.nis.test.NisUtils;
 
 import java.math.BigInteger;
+import java.util.function.*;
 
 public class RawMapperUtilsTest {
 
 	//region RawMapperUtils
 
 	@Test
-	public void mapAccountMapsNullIdToNullAccount() {
+	public void mapAccountMapsNullLongToNullAccount() {
+		// Assert:
+		assertNullAccountIdIsMappedToNullAccount(mapper -> RawMapperUtils.mapAccount(mapper, (Long)null));
+	}
+
+	@Test
+	public void mapAccountMapsNullObjectToNullAccount() {
+		// Assert:
+		assertNullAccountIdIsMappedToNullAccount(mapper -> RawMapperUtils.mapAccount(mapper, (Object)null));
+	}
+
+	private static void assertNullAccountIdIsMappedToNullAccount(final Function<IMapper, DbAccount> mapAccount) {
 		// Arrange:
 		final IMapper mapper = Mockito.mock(IMapper.class);
 
 		// Act:
-		final DbAccount account = RawMapperUtils.mapAccount(mapper, null);
+		final DbAccount account = mapAccount.apply(mapper);
 
 		// Assert:
 		Assert.assertThat(account, IsNull.nullValue());
@@ -27,14 +38,25 @@ public class RawMapperUtilsTest {
 	}
 
 	@Test
-	public void mapAccountMapsNonNullIdToNonNullAccount() {
+	public void mapAccountMapsNonNullLongIdToNonNullAccount() {
+		// Assert:
+		assertNonNullAccountIdIsMappedToNonNullAccount((mapper, id) -> RawMapperUtils.mapAccount(mapper, 8L));
+	}
+
+	@Test
+	public void mapAccountMapsNonNullBigIntegerIdToNonNullAccount() {
+		// Assert:
+		assertNonNullAccountIdIsMappedToNonNullAccount((mapper, id) -> RawMapperUtils.mapAccount(mapper, BigInteger.valueOf(8L)));
+	}
+
+	private static void assertNonNullAccountIdIsMappedToNonNullAccount(final BiFunction<IMapper, Long, DbAccount> mapAccount) {
 		// Arrange:
-		final DbAccount originalAccount = NisUtils.createDbAccount(1L);
+		final DbAccount originalAccount = new DbAccount(8L);
 		final IMapper mapper = Mockito.mock(IMapper.class);
 		Mockito.when(mapper.map(8L, DbAccount.class)).thenReturn(originalAccount);
 
 		// Act:
-		final DbAccount account = RawMapperUtils.mapAccount(mapper, 8L);
+		final DbAccount account = mapAccount.apply(mapper, 8L);
 
 		// Assert:
 		Assert.assertThat(account, IsEqual.equalTo(originalAccount));
@@ -43,21 +65,45 @@ public class RawMapperUtilsTest {
 
 	//endregion
 
-	//region castBigIntegerToLong
+	//region mapBlock
 
 	@Test
-	public void castBigIntegerToLongMapsNullLongToNullBigInteger() {
+	public void mapBlockMapsNullObjectToBlockWithNullId() {
 		// Act:
-		final Long value = RawMapperUtils.castBigIntegerToLong(null);
+		final DbBlock block = RawMapperUtils.mapBlock(null);
+
+		// Assert:
+		Assert.assertThat(block, IsNull.notNullValue());
+		Assert.assertThat(block.getId(), IsNull.nullValue());
+	}
+
+	@Test
+	public void mapBlockMapsNonNullObjectToBlockWithNonNullId() {
+		// Act:
+		final DbBlock block = RawMapperUtils.mapBlock(BigInteger.valueOf(8L));
+
+		// Assert:
+		Assert.assertThat(block, IsNull.notNullValue());
+		Assert.assertThat(block.getId(), IsEqual.equalTo(8L));
+	}
+
+	//endregion
+
+	//region castToLong
+
+	@Test
+	public void castToLongMapsNullObjectToNullLong() {
+		// Act:
+		final Long value = RawMapperUtils.castToLong(null);
 
 		// Assert:
 		Assert.assertThat(value, IsNull.nullValue());
 	}
 
 	@Test
-	public void castBigIntegerToLongMapsNonNullLongToNonNullBigInteger() {
+	public void castToLongMapsNonNullObjectToNonNullLong() {
 		// Act:
-		final Long value = RawMapperUtils.castBigIntegerToLong(BigInteger.valueOf(5L));
+		final Long value = RawMapperUtils.castToLong(BigInteger.valueOf(5L));
 
 		// Assert:
 		Assert.assertThat(value, IsEqual.equalTo(5L));
