@@ -11,7 +11,7 @@ public class H2Database implements AutoCloseable {
 	public H2Database() {
 		this.conn = ExceptionUtils.propagate(() -> {
 			Class.forName(JDBC_DRIVER);
-			return DriverManager.getConnection(getDbPath(), "", "");
+			return DriverManager.getConnection(this.getDbPath(), "", "");
 		});
 	}
 
@@ -30,9 +30,9 @@ public class H2Database implements AutoCloseable {
 
 	public ResultSet executeQuery(final String sql) {
 		try {
-			Statement stmt = this.conn.createStatement();
+			final Statement stmt = this.conn.createStatement();
 			return stmt.executeQuery(sql);
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			throw new RuntimeException("h2 query failed.");
 		}
 	}

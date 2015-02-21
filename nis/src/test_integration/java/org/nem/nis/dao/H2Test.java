@@ -29,7 +29,7 @@ public class H2Test {
 				rs.beforeFirst();
 				rs.last();
 				final int size = rs.getRow();
-			} catch (SQLException e) {
+			} catch (final SQLException e) {
 				throw new RuntimeException("problem with result set in h2MemoryTest");
 			}
 		}

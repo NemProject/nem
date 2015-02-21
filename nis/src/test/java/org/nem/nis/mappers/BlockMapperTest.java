@@ -523,7 +523,7 @@ public class BlockMapperTest {
 			this.model.setDifficulty(new BlockDifficulty(79_876_543_211_237L));
 			this.signModel();
 
-			this.dbHarvester = createDbAccount(this.model.getSigner());
+			this.dbHarvester = this.createDbAccount(this.model.getSigner());
 
 			this.accountDao = new MockAccountDao();
 			this.accountDao.addMapping(this.model.getSigner(), this.dbHarvester);
