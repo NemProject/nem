@@ -1,8 +1,7 @@
 package org.nem.nis.mappers;
 
-import org.nem.core.function.PentaFunction;
 import org.nem.core.model.*;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.retrievers.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -59,9 +58,9 @@ public class TransactionRegistry {
 		public final Function<? super TDbModel, Collection<DbAccount>> getOtherAccounts;
 
 		/**
-		 * A function that will return transfer block pairs from the database.
+		 * A supplier for transaction retrievers.
 		 */
-		public final PentaFunction<TransferDao, Long, Long, Integer, ReadOnlyTransferDao.TransferType, Collection<TransferBlockPair>> getFromDb;
+		public final Supplier<TransactionRetriever> getTransactionRetriever;
 
 		/**
 		 * The db model transaction class.
@@ -85,7 +84,7 @@ public class TransactionRegistry {
 				final Function<TDbModel, Integer> getTransactionCount,
 				final Function<TDbModel, DbAccount> getRecipient,
 				final Function<TDbModel, Collection<DbAccount>> getOtherAccounts,
-				final PentaFunction<TransferDao, Long, Long, Integer, ReadOnlyTransferDao.TransferType, Collection<TransferBlockPair>> getFromDb,
+				final Supplier<TransactionRetriever> getTransactionRetriever,
 				final Function<IMapper, IMapping<TModel, TDbModel>> createModelToDbModelMapper,
 				final Function<IMapper, IMapping<TDbModel, TModel>> createDbModelToModelMapper,
 				final Class<TDbModel> dbModelClass,
@@ -102,7 +101,7 @@ public class TransactionRegistry {
 			this.getRecipient = getRecipient;
 			this.getOtherAccounts = getOtherAccounts;
 
-			this.getFromDb = getFromDb;
+			this.getTransactionRetriever = getTransactionRetriever;
 
 			this.createModelToDbModelMapper = createModelToDbModelMapper;
 			this.createDbModelToModelMapper = createDbModelToModelMapper;
@@ -141,7 +140,7 @@ public class TransactionRegistry {
 					transfer -> 1,
 					DbTransferTransaction::getRecipient,
 					transfer -> new ArrayList<>(),
-					ReadOnlyTransferDao::getTransfersForAccount,
+					TransferRetriever::new,
 					TransferModelToDbModelMapping::new,
 					TransferDbModelToModelMapping::new,
 					DbTransferTransaction.class,
@@ -156,7 +155,7 @@ public class TransactionRegistry {
 					transfer -> 1,
 					DbImportanceTransferTransaction::getRemote,
 					transfer -> new ArrayList<>(),
-					ReadOnlyTransferDao::getImportanceTransfersForAccount,
+					ImportanceTransferRetriever::new,
 					ImportanceTransferModelToDbModelMapping::new,
 					ImportanceTransferDbModelToModelMapping::new,
 					DbImportanceTransferTransaction.class,
@@ -171,7 +170,7 @@ public class TransactionRegistry {
 					transfer -> 1,
 					transfer -> null,
 					DbMultisigAggregateModificationTransaction::getOtherAccounts,
-					ReadOnlyTransferDao::getMultisigSignerModificationsForAccount,
+					MultisigModificationRetriever::new,
 					MultisigAggregateModificationModelToDbModelMapping::new,
 					MultisigAggregateModificationDbModelToModelMapping::new,
 					DbMultisigAggregateModificationTransaction.class,
@@ -186,7 +185,7 @@ public class TransactionRegistry {
 					multisig -> 2 + multisig.getMultisigSignatureTransactions().size(),
 					multisig -> null,
 					DbMultisigTransaction::getOtherAccounts,
-					ReadOnlyTransferDao::getMultisigTransactionsForAccount,
+					MultisigTransactionRetriever::new,
 					MultisigTransactionModelToDbModelMapping::new,
 					MultisigTransactionDbModelToModelMapping::new,
 					DbMultisigTransaction.class,

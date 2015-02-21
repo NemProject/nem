@@ -5,7 +5,6 @@ import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.dao.retrievers.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,67 +196,10 @@ public class TransferDaoImpl implements TransferDao {
 			final TransferType transferType) {
 		final Collection<TransferBlockPair> pairs = new ArrayList<>();
 		for (final TransactionRegistry.Entry<?, ?> entry : TransactionRegistry.iterate()) {
-			pairs.addAll(entry.getFromDb.apply(this, accountId, maxId, limit, transferType));
+			pairs.addAll(entry.getTransactionRetriever.get().getTransfersForAccount(this.getCurrentSession(), accountId, maxId, limit, transferType));
 		}
 
 		return pairs;
-	}
-
-	@Override
-	public Collection<TransferBlockPair> getTransfersForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType) {
-		// TODO 20150212 J-J: this will come from the registry
-		return new TransferRetriever().getTransfersForAccount(
-				this.getCurrentSession(),
-				accountId,
-				maxId,
-				limit,
-				transferType);
-	}
-
-	@Override
-	public Collection<TransferBlockPair> getImportanceTransfersForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType) {
-		return new ImportanceTransferRetriever().getTransfersForAccount(
-				this.getCurrentSession(),
-				accountId,
-				maxId,
-				limit,
-				transferType);
-	}
-
-	@Override
-	public Collection<TransferBlockPair> getMultisigSignerModificationsForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType) {
-		return new MultisigModificationRetriever().getTransfersForAccount(
-				this.getCurrentSession(),
-				accountId,
-				maxId,
-				limit,
-				transferType);
-	}
-
-	@Override
-	public Collection<TransferBlockPair> getMultisigTransactionsForAccount(
-			final long accountId,
-			final long maxId,
-			final int limit,
-			final TransferType transferType) {
-		return new MultisigTransactionRetriever().getTransfersForAccount(
-				this.getCurrentSession(),
-				accountId,
-				maxId,
-				limit,
-				transferType);
 	}
 
 	@SuppressWarnings("unchecked")
