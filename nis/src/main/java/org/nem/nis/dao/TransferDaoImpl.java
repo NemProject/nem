@@ -6,6 +6,7 @@ import org.hibernate.type.LongType;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.dao.retrievers.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.TransactionRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,27 +225,12 @@ public class TransferDaoImpl implements TransferDao {
 			final long maxId,
 			final int limit,
 			final TransferType transferType) {
-		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
-		final String senderOrRecipient = TransferType.OUTGOING.equals(transferType) ? "sender" : "remote";
-		final Criteria criteria = this.getCurrentSession().createCriteria(DbImportanceTransferTransaction.class)
-				.setFetchMode("blockId", FetchMode.JOIN)
-				.setFetchMode("sender", FetchMode.JOIN)
-				.setFetchMode("remote", FetchMode.JOIN)
-				.add(Restrictions.eq(senderOrRecipient + ".id", accountId))
-				.add(Restrictions.isNotNull("senderProof"))
-				.add(Restrictions.lt("id", maxId))
-				.addOrder(Order.asc(senderOrRecipient))
-				.addOrder(Order.desc("id"))
-				.setMaxResults(limit);
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbImportanceTransferTransaction> list = listAndCast(criteria);
-		return list.stream()
-				.map(t -> {
-					// force lazy initialization
-					Hibernate.initialize(t.getBlock());
-					return new TransferBlockPair(t, t.getBlock());
-				})
-				.collect(Collectors.toList());
+		return new ImportanceTransferRetriever().getTransfersForAccount(
+				this.getCurrentSession(),
+				accountId,
+				maxId,
+				limit,
+				transferType);
 	}
 
 	@Override

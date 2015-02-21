@@ -1,16 +1,17 @@
-package org.nem.nis.dao;
+package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Class for for retrieving transfer transactions.
+ * Class for for retrieving importance transfer transactions.
  */
-public class TransferRetriever implements TransactionRetriever {
+public class ImportanceTransferRetriever implements TransactionRetriever {
 
 	@Override
 	public Collection<TransferBlockPair> getTransfersForAccount(
@@ -20,11 +21,11 @@ public class TransferRetriever implements TransactionRetriever {
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
-		final String senderOrRecipient = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "recipient";
-		final Criteria criteria = session.createCriteria(DbTransferTransaction.class)
+		final String senderOrRecipient = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "remote";
+		final Criteria criteria = session.createCriteria(DbImportanceTransferTransaction.class)
 				.setFetchMode("blockId", FetchMode.JOIN)
 				.setFetchMode("sender", FetchMode.JOIN)
-				.setFetchMode("recipient", FetchMode.JOIN)
+				.setFetchMode("remote", FetchMode.JOIN)
 				.add(Restrictions.eq(senderOrRecipient + ".id", accountId))
 				.add(Restrictions.isNotNull("senderProof"))
 				.add(Restrictions.lt("id", maxId))
@@ -32,7 +33,7 @@ public class TransferRetriever implements TransactionRetriever {
 				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbTransferTransaction> list = criteria.list();
+		final List<DbImportanceTransferTransaction> list = criteria.list();
 		return list.stream()
 				.map(t -> {
 					// force lazy initialization

@@ -1,6 +1,7 @@
-package org.nem.nis.dao;
+package org.nem.nis.dao.retrievers;
 
 import org.hibernate.Session;
+import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.TransferBlockPair;
 
 import java.util.Collection;

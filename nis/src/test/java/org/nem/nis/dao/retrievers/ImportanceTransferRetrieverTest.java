@@ -1,13 +1,13 @@
-package org.nem.nis.dao;
+package org.nem.nis.dao.retrievers;
 
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
-public class TransferRetrieverTest extends TransactionRetrieverTest {
+public class ImportanceTransferRetrieverTest extends TransactionRetrieverTest {
 
 	@Override
 	protected TransactionRetriever getTransactionRetriever() {
-		return new TransferRetriever();
+		return new ImportanceTransferRetriever();
 	}
 
 	@Override
@@ -18,15 +18,13 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 			case 0:
 				return pairs;
 			case 1:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 2));
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw()));
+				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 4));
 				return pairs;
 			case 2:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 7));
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 1));
+				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 8));
 				return pairs;
 			case 3:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 3));
+				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 5));
 				return pairs;
 			default:
 				throw new RuntimeException("unknown account id.");
@@ -39,22 +37,18 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 		final ArrayList<ComparablePair> pairs = new ArrayList<>();
 		switch (accountIndex) {
 			case 0:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 1));
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw()));
+				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 4));
 				return pairs;
 			case 1:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 7));
+				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 8));
 				return pairs;
 			case 2:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 2));
+				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 5));
 				return pairs;
 			case 3:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 3));
 				return pairs;
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
 	}
-
-	// TODO: add more tests
 }

@@ -1,4 +1,4 @@
-package org.nem.nis.dao;
+package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
 import org.hibernate.type.LongType;
@@ -10,6 +10,7 @@ import org.nem.core.model.Transaction;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -117,7 +118,7 @@ public abstract class TransactionRetrieverTest {
 
 	private void assertCanRetrieveOutgoingTransactions(final int accountIndex, final long topMostId) {
 		// Arrange:
-		final TransactionRetriever retriever = new TransferRetriever();
+		final TransactionRetriever retriever = getTransactionRetriever();
 
 		// Act:
 		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
