@@ -86,9 +86,9 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 					final SparseBitmap inputs = SparseBitmap.createFromUnsortedData(
 							trans.getInputs()
 									.stream()
-									.map(i ->
+									.map(input ->
 									{
-										final String currAddress = i.getFromAddress().toString();
+										final String currAddress = input.getFromAddress().toString();
 										Integer curr = uniqueAddresses.get(currAddress);
 										if (null == curr) {
 											curr = nextAddress;
@@ -96,7 +96,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 										}
 
 										return curr;
-									}).mapToInt(i -> i)
+									}).mapToInt(input -> input)
 							.toArray());
 
 					// 2. Handle transaction outputs

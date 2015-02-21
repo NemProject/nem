@@ -16,7 +16,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	private static final double MKT_CAP_NORMALIZATION_FACTOR =  3235636400.0 / 4000000.0; // BTC mkt cap / NEM mkt cap (in USD)
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
-	final static Map<Address, AccountState> accountStateMap = new HashMap<>(); //TODO: remove static
+	private final static Map<Address, AccountState> accountStateMap = new HashMap<>(); //TODO: remove static
 
 	/**
 	 * Default contructor - where we set the parameters for
