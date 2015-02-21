@@ -7,10 +7,6 @@ import java.util.Collection;
 
 /**
  * Interface for retrieving transfers of a specific type.
- * TODO 20150212 J-B: not sure if this is a good idea ... trying to test the TransferDao as-is was pretty difficult
- * > due to all the reasons you mentioned in IRC (and self-delegation tests are usually not a good idea)
- * > my natural inclination was to break things up more so that they're more easily testable
- * > so, this is what i came up with
  */
 public interface TransactionRetriever {
 

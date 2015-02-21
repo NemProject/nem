@@ -20,6 +20,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 import java.util.stream.*;
 
+// TODO 20150220 J-B: i like how you refactored the tests; good job :)
+
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {
