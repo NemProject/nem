@@ -355,10 +355,7 @@ public class BlockLoader {
 			addAccount(b.getHarvester(), accountMap);
 			addAccount(b.getLessor(), accountMap);
 
-			// TODO 20150219: J-J iterate should probably return Entry<AbstractBlockTransfer, ?>
-			for (final TransactionRegistry.Entry<?, ?> untypedEntry : TransactionRegistry.iterate()) {
-				@SuppressWarnings("unchecked")
-				final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry = (TransactionRegistry.Entry<AbstractBlockTransfer, ?>)untypedEntry;
+			for (final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
 				entry.getFromBlock.apply(b).stream().forEach(transaction -> {
 					addAccounts(transaction, entry, accountMap);
 					addInnerAccounts(entry.getInnerTransaction.apply(transaction), accountMap);
