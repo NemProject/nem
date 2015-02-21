@@ -56,7 +56,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void canPrintStakes() {
 		// Act:
-		final Collection<GraphClusteringTransaction> transactionData = loadTransactionData(0, this.defaultEndHeight);
+		final Collection<GraphClusteringTransaction> transactionData = this.loadTransactionData(0, this.defaultEndHeight);
 		final HashMap<Long, Long> stakes = this.getStakes(transactionData);
 		LOGGER.info(stakes.toString());
 	}
@@ -81,10 +81,10 @@ public abstract class GraphClusteringITCase {
 		// Arrange:
 		final int endHeight = this.defaultEndHeight;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-		final Collection<AccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+		final Collection<AccountState> dbAccountStates = this.loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		// Act:
-		outputImportancesCsv(
+		this.outputImportancesCsv(
 				DEFAULT_POI_OPTIONS_BUILDER,
 				copy(dbAccountStates),
 				endBlockHeight);
@@ -111,7 +111,7 @@ public abstract class GraphClusteringITCase {
 		// load account states from the database
 		final int endHeight = this.defaultEndHeight;
 		final BlockHeight endBlockHeight = new BlockHeight(endHeight);
-		final Collection<AccountState> dbAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+		final Collection<AccountState> dbAccountStates = this.loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		// how I learned to stop worrying and love the loop
 		for (final long minHarvesterBalance : minHarvesterBalances) {
@@ -130,7 +130,7 @@ public abstract class GraphClusteringITCase {
 											epsilon,
 											teleporationPair.teleporationProb,
 											teleporationPair.interLevelTeleporationProb);
-									outputImportancesCsv(
+									this.outputImportancesCsv(
 											optionsBuilder,
 											copy(dbAccountStates),
 											endBlockHeight);
@@ -208,7 +208,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void minHarvestingBalancePageRankVariance() {
 		// Act:
-		runMinHarvestingBalanceVariance(PAGE_RANK_SCORER);
+		this.runMinHarvestingBalanceVariance(PAGE_RANK_SCORER);
 	}
 
 	/**
@@ -218,7 +218,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void minHarvestingBalanceImportanceVariance() {
 		// Act:
-		runMinHarvestingBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
+		this.runMinHarvestingBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private void runMinHarvestingBalanceVariance(final ImportanceScorer scorer) {
@@ -237,7 +237,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void outlierWeightImportanceVariance() {
 		// Act:
-		runOutlierWeightImportanceVariance(DEFAULT_IMPORTANCE_SCORER);
+		this.runOutlierWeightImportanceVariance(DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private void runOutlierWeightImportanceVariance(final ImportanceScorer scorer) {
@@ -258,7 +258,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void clusteringOptionsImportanceVariance() {
 		// Act:
-		runClusteringOptionsImportanceVariance(DEFAULT_IMPORTANCE_SCORER);
+		this.runClusteringOptionsImportanceVariance(DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private void runClusteringOptionsImportanceVariance(final ImportanceScorer scorer) {
@@ -287,7 +287,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void teleportationProbabilityImportanceVariance() {
 		// Act:
-		runTeleportationProbabilityImportanceVariance(DEFAULT_IMPORTANCE_SCORER);
+		this.runTeleportationProbabilityImportanceVariance(DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private void runTeleportationProbabilityImportanceVariance(final ImportanceScorer scorer) {
@@ -333,7 +333,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void negOutlinkWeightBalanceImportanceVariance() {
 		// Act:
-		runNegOutlinkWeightBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
+		this.runNegOutlinkWeightBalanceVariance(DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private void runNegOutlinkWeightBalanceVariance(final ImportanceScorer scorer) {
@@ -360,7 +360,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void minOutlinkWeightPageRankVariance() {
 		// Act:
-		runMinOutlinkWeightVariance(PAGE_RANK_SCORER);
+		this.runMinOutlinkWeightVariance(PAGE_RANK_SCORER);
 	}
 
 	/**
@@ -372,7 +372,7 @@ public abstract class GraphClusteringITCase {
 	@Test
 	public void minOutlinkWeightImportanceVariance() {
 		// Act:
-		runMinOutlinkWeightVariance(DEFAULT_IMPORTANCE_SCORER);
+		this.runMinOutlinkWeightVariance(DEFAULT_IMPORTANCE_SCORER);
 	}
 
 	private void runMinOutlinkWeightVariance(final ImportanceScorer scorer) {
@@ -397,7 +397,7 @@ public abstract class GraphClusteringITCase {
 
 		public SensitivityTestHarness() {
 			// load account states
-			this.dbAccountStates = loadEligibleHarvestingAccountStates(0, this.endHeight, Amount.ZERO);
+			this.dbAccountStates = GraphClusteringITCase.this.loadEligibleHarvestingAccountStates(0, this.endHeight, Amount.ZERO);
 		}
 
 		public void mapValuesToImportanceVectors(
@@ -563,13 +563,13 @@ public abstract class GraphClusteringITCase {
 		final int endHeight = this.defaultEndHeight;
 
 		// a) This is the warm up phase.
-		getAccountImportances(endHeight, new OutlierScan(), "WARM UP");
+		this.getAccountImportances(endHeight, new OutlierScan(), "WARM UP");
 
 		// Act:
 		// b) these are actual importances
-		final ColumnVector fastScanImportances = getAccountImportances(endHeight, new FastScanClusteringStrategy(), "FastScan");
-		final ColumnVector outlierScanImportances = getAccountImportances(endHeight, new OutlierScan(), "OutlierScan");
-		final ColumnVector singleClusterScanImportances = getAccountImportances(endHeight, new SingleClusterScan(), "SingleClusterScan");
+		final ColumnVector fastScanImportances = this.getAccountImportances(endHeight, new FastScanClusteringStrategy(), "FastScan");
+		final ColumnVector outlierScanImportances = this.getAccountImportances(endHeight, new OutlierScan(), "OutlierScan");
+		final ColumnVector singleClusterScanImportances = this.getAccountImportances(endHeight, new SingleClusterScan(), "SingleClusterScan");
 
 		// Assert:
 		assertDifference("FastScan vs SingleClusterScan", fastScanImportances, singleClusterScanImportances);
@@ -590,7 +590,7 @@ public abstract class GraphClusteringITCase {
 			final GraphClusteringStrategy clusteringStrategy,
 			final String name) {
 		// 0. Load transactions.
-		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
+		final Collection<AccountState> eligibleAccountStates = this.loadEligibleHarvestingAccountStates(0, endHeight, DEFAULT_POI_OPTIONS_BUILDER);
 
 		LOGGER.info(String.format("*** Poi calculation: %s **", name));
 		final long start = System.currentTimeMillis();
@@ -702,7 +702,7 @@ public abstract class GraphClusteringITCase {
 		optionsBuilder.setEpsilonClusteringValue(0.20);
 
 		// Act:
-		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(0, this.defaultEndHeight, optionsBuilder);
+		final Collection<AccountState> eligibleAccountStates = this.loadEligibleHarvestingAccountStates(0, this.defaultEndHeight, optionsBuilder);
 		getAccountImportances(endBlockHeight, eligibleAccountStates, optionsBuilder, DEFAULT_IMPORTANCE_SCORER);
 	}
 
@@ -712,15 +712,15 @@ public abstract class GraphClusteringITCase {
 			final long startHeight,
 			final long endHeight,
 			final PoiOptionsBuilder optionsBuilder) {
-		return loadEligibleHarvestingAccountStates(startHeight, endHeight, optionsBuilder.create().getMinHarvesterBalance());
+		return this.loadEligibleHarvestingAccountStates(startHeight, endHeight, optionsBuilder.create().getMinHarvesterBalance());
 	}
 
 	private Collection<AccountState> loadEligibleHarvestingAccountStates(
 			final long startHeight,
 			final long endHeight,
 			final Amount minHarvesterBalance) {
-		final Collection<GraphClusteringTransaction> transactionData = loadTransactionData(startHeight, endHeight);
-		final Map<Address, AccountState> accountStateMap = createAccountStatesFromTransactionData(transactionData);
+		final Collection<GraphClusteringTransaction> transactionData = this.loadTransactionData(startHeight, endHeight);
+		final Map<Address, AccountState> accountStateMap = this.createAccountStatesFromTransactionData(transactionData);
 		return selectHarvestingEligibleAccounts(accountStateMap, new BlockHeight(endHeight), minHarvesterBalance);
 	}
 
@@ -782,7 +782,7 @@ public abstract class GraphClusteringITCase {
 		builder.setEpsilonClusteringValue(0.40);
 		builder.setMinOutlinkWeight(Amount.fromNem(100));
 		builder.setMinHarvesterBalance(Amount.fromNem(100));
-		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, stopHeight, builder);
+		final Collection<AccountState> eligibleAccountStates = this.loadEligibleHarvestingAccountStates(startHeight, stopHeight, builder);
 		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(stopHeight), builder.create());
 		final SparseMatrix outlinkMatrix = poiContext.getOutlinkMatrix();
 		final ClusteringResult result = poiContext.getClusteringResult();
@@ -808,7 +808,7 @@ public abstract class GraphClusteringITCase {
 	}
 
 	private SparseMatrix createNetOutlinkMatrix(final long startHeight, final long endHeight, final PoiOptionsBuilder builder) {
-		final Collection<AccountState> eligibleAccountStates = loadEligibleHarvestingAccountStates(startHeight, endHeight, builder);
+		final Collection<AccountState> eligibleAccountStates = this.loadEligibleHarvestingAccountStates(startHeight, endHeight, builder);
 		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(endHeight), builder.create());
 		return poiContext.getOutlinkMatrix();
 	}
