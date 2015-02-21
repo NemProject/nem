@@ -387,6 +387,15 @@ public class TransferDaoImpl implements TransferDao {
 	}
 
 	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Query query) {
+		return (List<T>)query.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Criteria criteria) {
+		return (List<T>)criteria.list();
+	}
+
 	private List<DbMultisigTransaction> getMultisigTransactions(final List<TransactionIdBlockHeightPair> pairs, final String joinEntity) {
 		final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigTransaction.class)
 				.setFetchMode(joinEntity, FetchMode.JOIN)

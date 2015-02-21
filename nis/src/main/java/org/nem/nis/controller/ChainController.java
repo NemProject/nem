@@ -10,14 +10,14 @@ import org.nem.nis.controller.annotations.*;
 import org.nem.nis.controller.requests.*;
 import org.nem.nis.dao.ReadOnlyBlockDao;
 import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.*;
+import org.nem.nis.mappers.NisDbModelToModelMapper;
 import org.nem.nis.service.BlockChainLastBlockLayer;
 import org.nem.nis.sync.BlockChainScoreManager;
 import org.nem.peer.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Collection;
 import java.util.logging.Logger;
 
 @RestController

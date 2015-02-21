@@ -8,6 +8,7 @@ import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
 
 import java.util.*;
+
 public class DbAccountTest {
 
 	//region constructor
