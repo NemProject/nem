@@ -43,6 +43,8 @@ public class UnconfirmedTransactionMetaData implements SerializableEntity {
 	public void serialize(final Serializer serializer) {
 		if (null != this.innerTransactionHash) {
 			this.innerTransactionHash.serialize(serializer);
+		} else {
+			serializer.writeBytes("data", null);
 		}
 	}
 }
