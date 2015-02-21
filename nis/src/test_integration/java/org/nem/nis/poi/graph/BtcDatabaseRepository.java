@@ -137,7 +137,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 		}
 
 		// merge accts in transactions
-		System.out.println(transactions.size());
+		LOGGER.info(transactions.size() + " BTC transactions loaded");
 		mergeAccts(transactions);
 		transactions
 				.stream()

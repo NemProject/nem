@@ -188,13 +188,11 @@ public abstract class GraphClusteringITCase {
 				})
 				.collect(Collectors.toList());
 
-		System.out.println("ready to create string");
 		String output = "'address', 'stake', 'importance', 'outlinkCount', 'outlinkSum'\n";
 		for (int i = 0; i < importances.size(); ++i) {
 			output += addresses.get(i) + "," + stakes.get(i) + "," + importances.getAt(i) + "," + outlinkCounts.get(i) + "," +
 					outlinkSums.get(i) + "\n";
 		}
-		System.out.println("done creating string");
 
 		FileUtils.writeStringToFile(new File(String.format("kaiseki/" + this.blockchainType + "importances%s.csv", optionsDescription)), output);
 	}
@@ -427,7 +425,6 @@ public abstract class GraphClusteringITCase {
 				final PoiOptions options = optionsBuilder.create();
 
 				final Collection<AccountState> eligibleAccountStates = this.copyAndFilter(options.getMinHarvesterBalance());
-				System.out.println(Long.parseLong("" + ((int) (value.mu)) + ((int) (value.epsilon * 100))));
 				final ColumnVector importances = getAccountImportances(this.endBlockHeight, eligibleAccountStates, optionsBuilder, scorer);
 				this.parameterToImportanceMap.put(Long.parseLong("" + ((int) (value.mu)) + ((int) (value.epsilon * 100))), importances);
 			}
@@ -441,14 +438,9 @@ public abstract class GraphClusteringITCase {
 			for (final TeleportationProbabilities value : values) {
 				final PoiOptionsBuilder optionsBuilder = createOptionsBuilder.apply(value);
 				final PoiOptions options = optionsBuilder.create();
-				System.out.println("options.getMinHarvesterBalance(): " + options.getMinHarvesterBalance());
-				System.out.println("options.getTeleportationProbability(): " + options.getTeleportationProbability());
-				System.out.println("options.getInterLevelTeleportationProbability(): " + options.getInterLevelTeleportationProbability());
 
 				final Collection<AccountState> eligibleAccountStates = this.copyAndFilter(options.getMinHarvesterBalance());
 				final ColumnVector importances = getAccountImportances(this.endBlockHeight, eligibleAccountStates, optionsBuilder, scorer);
-				System.out.println("key: " + Long.parseLong("" + ((int) (value.teleporationProb * 100)) + ((int) (value.interLevelTeleporationProb * 100))));
-				System.out.println("importances.size: " + importances.size());
 				this.parameterToImportanceMap.put(Long.parseLong("" + ((int) (value.teleporationProb * 100)) + ((int) (value.interLevelTeleporationProb * 100))), importances);
 			}
 		}
