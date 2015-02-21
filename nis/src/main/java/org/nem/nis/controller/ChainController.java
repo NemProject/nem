@@ -109,11 +109,8 @@ public class ChainController {
 			}
 
 			previousDbBlock = dbBlock;
-			// TODO 20150220 J-J consider adding db block extensions
-			for (final TransactionRegistry.Entry<AbstractBlockTransfer, ?> entry : TransactionRegistry.iterate()) {
-				final List<AbstractBlockTransfer> transactions = entry.getFromBlock.apply(dbBlock);
-				numTransactions += transactions.stream().mapToInt(entry.getTransactionCount::apply).sum();
-			}
+			numTransactions += DbBlockExtensions.countTransactions(dbBlock);
+
 			if (numTransactions > maxTransactions || BlockChainConstants.BLOCKS_LIMIT <= blockList.size()) {
 				return true;
 			}

@@ -286,45 +286,12 @@ public class ChainControllerTest {
 		for (int i = 0; i < count; i++) {
 			final DbBlock dbBlock = NisUtils.createDbBlockWithTimeStampAtHeight(400 + i, height + i);
 			dbBlock.setId((long)(height + i));
-			dbBlock.setBlockTransferTransactions(Arrays.asList(createDbTransferWithTimeStamp(400 + i)));
-			dbBlock.setBlockMultisigTransactions(Arrays.asList(createMultisigDbTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockTransferTransactions(Arrays.asList(RandomDbTransactionFactory.createTransferWithTimeStamp(400 + i)));
+			dbBlock.setBlockMultisigTransactions(Arrays.asList(RandomDbTransactionFactory.createMultisigTransferWithTimeStamp(400 + i)));
 			dbBlockList.add(dbBlock);
 		}
 
 		return dbBlockList;
-	}
-
-	private static DbTransferTransaction createDbTransferWithTimeStamp(final int timeStamp) {
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final DbAccount account = new DbAccount(address);
-		final DbTransferTransaction dbTransfer = new DbTransferTransaction();
-		dbTransfer.setTransferHash(Utils.generateRandomHash());
-		dbTransfer.setSender(account);
-		dbTransfer.setSenderProof(Utils.generateRandomBytes(64));
-		dbTransfer.setRecipient(account);
-		dbTransfer.setTimeStamp(timeStamp);
-		dbTransfer.setAmount(0L);
-		dbTransfer.setFee(0L);
-		dbTransfer.setDeadline(0);
-		dbTransfer.setBlkIndex(0);
-		return dbTransfer;
-	}
-
-	private static DbMultisigTransaction createMultisigDbTransferWithTimeStamp(final int timeStamp) {
-		final DbTransferTransaction dbTransfer = createDbTransferWithTimeStamp(timeStamp);
-		final Address address = Utils.generateRandomAddressWithPublicKey();
-		final DbAccount account = new DbAccount(address);
-		final DbMultisigTransaction dbMultisig = new DbMultisigTransaction();
-		dbMultisig.setTransferTransaction(dbTransfer);
-		dbMultisig.setMultisigSignatureTransactions(new HashSet<>());
-		dbMultisig.setTransferHash(Utils.generateRandomHash());
-		dbMultisig.setSender(account);
-		dbMultisig.setSenderProof(Utils.generateRandomBytes(64));
-		dbMultisig.setTimeStamp(timeStamp);
-		dbMultisig.setFee(0L);
-		dbMultisig.setDeadline(0);
-		dbMultisig.setBlkIndex(0);
-		return dbMultisig;
 	}
 
 	//endregion
