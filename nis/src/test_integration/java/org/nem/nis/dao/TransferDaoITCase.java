@@ -1,26 +1,12 @@
 package org.nem.nis.dao;
 
-import org.hibernate.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.nem.core.crypto.*;
-import org.nem.core.deploy.CommonStarter;
-import org.nem.core.model.*;
-import org.nem.core.model.primitive.*;
-import org.nem.core.test.Utils;
-import org.nem.core.time.TimeInstant;
-import org.nem.nis.dbmodel.*;
-import org.nem.nis.mappers.*;
-import org.nem.nis.test.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.*;
-import java.security.SecureRandom;
-import java.util.*;
-import java.util.logging.*;
-import java.util.stream.Collectors;
+import java.util.logging.Logger;
 
 @ContextConfiguration(classes = TestConfHardDisk.class)
 @RunWith(SpringJUnit4ClassRunner.class)

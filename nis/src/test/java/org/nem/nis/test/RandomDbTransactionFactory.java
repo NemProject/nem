@@ -1,6 +1,6 @@
 package org.nem.nis.test;
 
-import org.nem.core.model.*;
+import org.nem.core.model.Address;
 import org.nem.core.test.Utils;
 import org.nem.nis.dbmodel.*;
 

@@ -15,7 +15,7 @@ public class H2Test {
 	public void h2MemoryTest() {
 		final H2Database db = new H2Database();
 		final int range = 1000;
-		for (int j=0; j<10000; j++) {
+		for (int j = 0; j < 10000; j++) {
 			if (j % 100 == 0) {
 				LOGGER.info(String.format("round %d", j + 1));
 			}
