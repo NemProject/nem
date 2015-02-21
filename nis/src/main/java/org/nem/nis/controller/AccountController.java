@@ -107,12 +107,22 @@ public class AccountController {
 	 */
 	@RequestMapping(value = "/account/unconfirmedTransactions", method = RequestMethod.GET)
 	@ClientApi
-	public SerializableList<Transaction> transactionsUnconfirmed(final AccountIdBuilder builder) {
+	public SerializableList<UnconfirmedTransactionMetaDataPair> transactionsUnconfirmed(final AccountIdBuilder builder) {
 		final Address address = builder.build().getAddress();
 		final Collection<Transaction> transactions = this.unconfirmedTransactions.getMostRecentTransactionsForAccount(
 				address,
 				MAX_UNCONFIRMED_TRANSACTIONS);
-		return new SerializableList<>(transactions);
+		final Collection<UnconfirmedTransactionMetaDataPair> pairs = transactions.stream()
+				.map(t -> {
+					if (TransactionTypes.MULTISIG == t.getType()) {
+						final MultisigTransaction multisig = (MultisigTransaction)t;
+						return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData(multisig.getOtherTransactionHash()));
+					} else {
+						return new UnconfirmedTransactionMetaDataPair(t, new UnconfirmedTransactionMetaData((Hash)null));
+					}
+				})
+				.collect(Collectors.toList());
+		return new SerializableList<>(pairs);
 	}
 
 	/**

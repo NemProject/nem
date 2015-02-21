@@ -173,13 +173,43 @@ public class AccountControllerTest {
 				.thenReturn(originalTransactions);
 
 		// Act:
-		final SerializableList<Transaction> transactions = context.controller.transactionsUnconfirmed(builder);
+		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
 
 		// Assert:
 		Assert.assertThat(
-				transactions.asCollection().stream().map(t -> ((MockTransaction)t).getCustomField()).collect(Collectors.toList()),
+				pairs.asCollection().stream().map(p -> ((MockTransaction)(p.getTransaction())).getCustomField()).collect(Collectors.toList()),
 				IsEqual.equalTo(Arrays.asList(7, 11, 5)));
 		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).getMostRecentTransactionsForAccount(address, 25);
+	}
+
+	@Test
+	public void transactionsUnconfirmedSuppliesHashesOfInnerTransactions() {
+		// Arrange:
+		final Address address = Utils.generateRandomAddress();
+		final AccountIdBuilder builder = new AccountIdBuilder();
+		builder.setAddress(address.getEncoded());
+
+		final List<Transaction> originalTransactions = Arrays.asList(
+				createTransferTransaction(),
+				createMultisigTransaction(),
+				createTransferTransaction(),
+				createMultisigTransaction(),
+				createMultisigTransaction());
+		final List<Hash> expectedHashes = originalTransactions.stream()
+				.map(t -> TransactionTypes.MULTISIG == t.getType() ? ((MultisigTransaction)t).getOtherTransactionHash() : null)
+				.collect(Collectors.toList());
+		final TestContext context = new TestContext();
+
+		Mockito.when(context.unconfirmedTransactions.getMostRecentTransactionsForAccount(address, 25))
+				.thenReturn(originalTransactions);
+
+		// Act:
+		final SerializableList<UnconfirmedTransactionMetaDataPair> pairs = context.controller.transactionsUnconfirmed(builder);
+
+		// Assert:
+		Assert.assertThat(
+				pairs.asCollection().stream().map(p -> p.getMetaData().getInnerTransactionHash()).collect(Collectors.toList()),
+				IsEqual.equalTo(expectedHashes));
 	}
 
 	//endregion
@@ -260,6 +290,27 @@ public class AccountControllerTest {
 	}
 
 	//endregion
+
+	private static TransferTransaction createTransferTransaction() {
+		final TransferTransaction transaction = new TransferTransaction(
+				Utils.generateRandomTimeStamp(),
+				Utils.generateRandomAccount(),
+				Utils.generateRandomAccount(),
+				Amount.fromNem(123L),
+				null);
+		transaction.sign();
+		return transaction;
+	}
+
+	private static MultisigTransaction createMultisigTransaction() {
+		final TransferTransaction innerTransaction = createTransferTransaction();
+		final MultisigTransaction multisig = new MultisigTransaction(
+				Utils.generateRandomTimeStamp(),
+				Utils.generateRandomAccount(),
+				innerTransaction);
+		multisig.sign();
+		return multisig;
+	}
 
 	private static class TestContext {
 		private final AccountController controller;
