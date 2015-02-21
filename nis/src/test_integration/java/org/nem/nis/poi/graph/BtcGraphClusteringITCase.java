@@ -16,7 +16,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	private static final double MKT_CAP_NORMALIZATION_FACTOR =  3235636400.0 / 4000000.0; // BTC mkt cap / NEM mkt cap (in USD)
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
-	private final static Map<Address, AccountState> accountStateMap = new HashMap<>(); //TODO: remove static
+	private final static Map<Integer, Map<Address, AccountState>> accountStateMapCache = new HashMap<>();
 
 	/**
 	 * Default contructor - where we set the parameters for
@@ -31,7 +31,8 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	protected Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<GraphClusteringTransaction> transactions) {
 		LOGGER.info("Creating PoiAccountStates from Btc transaction data...");
 
-		if (accountStateMap.size() < 1) { //TODO: Hack to speed this up
+		if (!accountStateMapCache.containsKey(transactions.hashCode())) {
+			final Map<Address, AccountState> accountStateMap = new HashMap<>();
 			long maxBlockHeight = 0;
 			// Iterate through transactions, creating new accounts as needed.
 			for (final GraphClusteringTransaction trans : transactions) {
@@ -75,10 +76,11 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 				recipientAccountState.getWeightedBalances().addReceive(blockHeight, amount);
 			}
 
-			LOGGER.info("Max blockheight: " + maxBlockHeight);
+			LOGGER.info("Max blockheight processed: " + maxBlockHeight);
+			accountStateMapCache.put(transactions.hashCode(), accountStateMap);
 		}
-
-		return accountStateMap;
+		
+		return accountStateMapCache.get(transactions.hashCode());
 	}
 
 	private long normalizeBtcToNemSupply(final long amt) {
