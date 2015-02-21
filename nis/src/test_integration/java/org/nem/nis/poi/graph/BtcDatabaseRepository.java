@@ -1,16 +1,15 @@
 package org.nem.nis.poi.graph;
 
-import java.io.File;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import org.apache.commons.io.FileUtils;
 import org.bitcoinj.core.*;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.utils.BlockFileLoader;
 import org.nem.core.math.SparseBitmap;
+
+import java.io.File;
+import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * A repository class for loading the transactions from the Bitcoin blockchain.
@@ -56,7 +55,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 
 		final NetworkParameters networkParams = new MainNetParams();
 		final List<File> blockChainFiles = new ArrayList<>();
-		FileUtils.listFiles(new File(this.databasePath), new String[]{ "dat" }, false)
+		FileUtils.listFiles(new File(this.databasePath), new String[] { "dat" }, false)
 				.stream()
 				.forEach(
 						i -> {
@@ -97,7 +96,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 
 										return curr;
 									}).mapToInt(input -> input)
-							.toArray());
+									.toArray());
 
 					// 2. Handle transaction outputs
 					trans.getOutputs()
@@ -121,7 +120,6 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 											uniqueAddresses.put(outputAddress, output);
 										}
 										transactions.add(new BTCTransaction(currBlockHeight, inputs, output, value));
-
 									} else { // If there is an uneven amount sent, it is going to be the change transaction in most cases
 										if (!uniqueAddresses.containsKey(outputAddress)) {
 											uniqueAddresses.put(outputAddress, nextAddress);
@@ -142,10 +140,10 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 		transactions
 				.stream()
 				.forEach(btcTrans -> transactionData.add(new GraphClusteringTransaction(
-									btcTrans.blockHeight,
-									btcTrans.inputAddress,
-									btcTrans.outputAddress,
-									btcTrans.value)));
+						btcTrans.blockHeight,
+						btcTrans.inputAddress,
+						btcTrans.outputAddress,
+						btcTrans.value)));
 
 		this.transactionCache.put(transCacheKey, transactionData);
 

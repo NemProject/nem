@@ -1,19 +1,20 @@
 package org.nem.nis.poi.graph;
 
-import org.junit.*;
 import org.nem.core.model.Address;
 import org.nem.core.model.primitive.*;
 import org.nem.nis.state.*;
 
 import java.util.*;
+
 /**
  * Integration test class for analysis the Proof-of-Importance algorithm with the Bitcoin transaction graph.
  */
 public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	private static final int DEFAULT_END_HEIGHT = 20000; // This end height is set assuming that we only process block files blk00148.dat to blk00152.dat (inclusive)
 	private static final String BLOCKCHAIN_TYPE = "Btc";
-	private static final double SUPPLY_NORMALIZATION_FACTOR = 8999999999.0 / 1300000000.0; // Convert from Satoshis (10^8 precision); current BTC supply is about 13 mil
-	private static final double MKT_CAP_NORMALIZATION_FACTOR =  3235636400.0 / 4000000.0; // BTC mkt cap / NEM mkt cap (in USD)
+	private static final double SUPPLY_NORMALIZATION_FACTOR =
+			8999999999.0 / 1300000000.0; // Convert from Satoshis (10^8 precision); current BTC supply is about 13 mil
+	private static final double MKT_CAP_NORMALIZATION_FACTOR = 3235636400.0 / 4000000.0; // BTC mkt cap / NEM mkt cap (in USD)
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
 	private final static Map<Integer, Map<Address, AccountState>> accountStateMapCache = new HashMap<>();

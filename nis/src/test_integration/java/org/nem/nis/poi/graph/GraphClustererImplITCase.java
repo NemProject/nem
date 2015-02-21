@@ -57,7 +57,6 @@ public class GraphClustererImplITCase {
 		final Cluster cluster1 = new Cluster(new ClusterId(0), NisUtils.toNodeIdList(0, 1, 2, 3, 4, 5));
 		//viewer.setCluster(cluster1);
 		viewer.showGraph();
-
 	}
 
 	@Test

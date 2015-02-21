@@ -10,7 +10,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.utils.*;
 import org.nem.nis.harvesting.CanHarvestPredicate;
 import org.nem.nis.poi.*;
-import org.nem.nis.state.*;
+import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 
 import java.io.*;
@@ -37,7 +37,6 @@ public abstract class GraphClusteringITCase {
 	private final int defaultEndHeight;
 	private final String blockchainType;
 	private final DatabaseRepository repository;
-
 
 	protected GraphClusteringITCase(final int defaultEndHeight, final String blockchainType, final DatabaseRepository repository) {
 		this.defaultEndHeight = defaultEndHeight;
@@ -426,7 +425,7 @@ public abstract class GraphClusteringITCase {
 
 				final Collection<AccountState> eligibleAccountStates = this.copyAndFilter(options.getMinHarvesterBalance());
 				final ColumnVector importances = getAccountImportances(this.endBlockHeight, eligibleAccountStates, optionsBuilder, scorer);
-				this.parameterToImportanceMap.put(Long.parseLong("" + ((int) (value.mu)) + ((int) (value.epsilon * 100))), importances);
+				this.parameterToImportanceMap.put(Long.parseLong("" + ((int)(value.mu)) + ((int)(value.epsilon * 100))), importances);
 			}
 		}
 
@@ -441,7 +440,9 @@ public abstract class GraphClusteringITCase {
 
 				final Collection<AccountState> eligibleAccountStates = this.copyAndFilter(options.getMinHarvesterBalance());
 				final ColumnVector importances = getAccountImportances(this.endBlockHeight, eligibleAccountStates, optionsBuilder, scorer);
-				this.parameterToImportanceMap.put(Long.parseLong("" + ((int) (value.teleporationProb * 100)) + ((int) (value.interLevelTeleporationProb * 100))), importances);
+				this.parameterToImportanceMap.put(
+						Long.parseLong("" + ((int)(value.teleporationProb * 100)) + ((int)(value.interLevelTeleporationProb * 100))),
+						importances);
 			}
 		}
 
@@ -753,7 +754,7 @@ public abstract class GraphClusteringITCase {
 
 			maxRatio = ratios.getAt(i) > maxRatio ? ratios.getAt(i) : maxRatio;
 			if (ratios.getAt(i) > 1.001 || ratios.getAt(i) < 0.999) {
-//				LOGGER.info("Account " + i + " importance ratio is " + ratios.getAt(i));
+				// LOGGER.info("Account " + i + " importance ratio is " + ratios.getAt(i));
 			}
 		}
 
