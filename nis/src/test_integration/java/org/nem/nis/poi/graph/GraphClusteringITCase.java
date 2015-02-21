@@ -778,6 +778,10 @@ public abstract class GraphClusteringITCase {
 
 	@Ignore
 	@Test
+	/**
+	 * This is a useful function for viewing what the graphs look like. With many transactions, it becomes unmeaningful, however,
+	 * so use with caution.
+	 */
 	public void graphViewTest() throws SQLException, IOException {
 		final long startHeight = 0;
 		final long stopHeight = defaultEndHeight;
@@ -790,18 +794,10 @@ public abstract class GraphClusteringITCase {
 		final PoiContext poiContext = new PoiContext(eligibleAccountStates, new BlockHeight(stopHeight), builder.create());
 		final SparseMatrix outlinkMatrix = poiContext.getOutlinkMatrix();
 		final ClusteringResult result = poiContext.getClusteringResult();
-//		System.out.println("Clusters:");
-//		result.getClusters().stream().forEach(cluster -> System.out.println(cluster.toString()));
-//		System.out.println("Hubs:");
-//		result.getHubs().stream().forEach(hub -> System.out.println(hub.toString()));
 		final PoiGraphParameters params = PoiGraphParameters.getDefaultParams();
 		params.set("layout", Integer.toString(PoiGraphViewer.KAMADA_KAWAI_LAYOUT));
 		final PoiGraphViewer viewer = new PoiGraphViewer(outlinkMatrix, params, result);
 		viewer.saveGraph();
-
-//		final ColumnVector fastScanImportances = getAccountImportances(stopHeight, new FastScanClusteringStrategy(), "FastScan");
-//		System.out.println("acct importances: " + fastScanImportances);
-//		viewer.showGraph();
 	}
 
 	@Ignore
