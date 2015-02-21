@@ -238,31 +238,13 @@ public class TransferDaoImpl implements TransferDao {
 			final long accountId,
 			final long maxId,
 			final int limit,
-			// TODO 20150127 J-G: transfer type is not being used?
 			final TransferType transferType) {
-		if (TransferType.OUTGOING == transferType) {
-			final Criteria criteria = this.getCurrentSession().createCriteria(DbMultisigAggregateModificationTransaction.class)
-					.setFetchMode("blockId", FetchMode.JOIN)
-					.setFetchMode("sender", FetchMode.JOIN)
-					.add(Restrictions.eq("sender.id", accountId))
-					.add(Restrictions.isNotNull("senderProof"))
-					.add(Restrictions.lt("id", maxId))
-					.addOrder(Order.asc("sender"))
-					.addOrder(Order.desc("id"))
-					.setMaxResults(limit);
-			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-			final List<DbMultisigAggregateModificationTransaction> list = listAndCast(criteria);
-			return list.stream()
-					.map(t -> {
-						// force lazy initialization
-						Hibernate.initialize(t.getBlock());
-						return new TransferBlockPair(t, t.getBlock());
-					})
-					.collect(Collectors.toList());
-		}
-
-		// TODO: INCOMING
-		return new ArrayList<>();
+		return new MultisigModificationRetriever().getTransfersForAccount(
+				this.getCurrentSession(),
+				accountId,
+				maxId,
+				limit,
+				transferType);
 	}
 
 	@Override
