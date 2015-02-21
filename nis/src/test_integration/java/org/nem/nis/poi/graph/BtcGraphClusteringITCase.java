@@ -79,7 +79,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 			LOGGER.info("Max blockheight processed: " + maxBlockHeight);
 			accountStateMapCache.put(transactions.hashCode(), accountStateMap);
 		}
-		
+
 		return accountStateMapCache.get(transactions.hashCode());
 	}
 
