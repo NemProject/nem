@@ -5,6 +5,7 @@ import org.nem.core.model.primitive.HashShortId;
 import org.nem.core.time.TimeInstant;
 
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 /**
@@ -12,14 +13,18 @@ import java.util.stream.Collectors;
  */
 public class UnconfirmedTransactionsFilter {
 	private final UnconfirmedTransactionsCache transactions;
+	private final BiPredicate<Address, Transaction> matchesPredicate;
 
 	/**
 	 * Creates a new filter.
 	 *
 	 * @param transactions The transactions to filter.
 	 */
-	public UnconfirmedTransactionsFilter(final UnconfirmedTransactionsCache transactions) {
+	public UnconfirmedTransactionsFilter(
+			final UnconfirmedTransactionsCache transactions,
+			final BiPredicate<Address, Transaction> matchesPredicate) {
 		this.transactions = transactions;
+		this.matchesPredicate = matchesPredicate;
 	}
 
 	/**
@@ -32,7 +37,6 @@ public class UnconfirmedTransactionsFilter {
 				.collect(Collectors.toList());
 		return this.sortTransactions(transactions);
 	}
-
 
 	/**
 	 * Gets the transactions for which the hash short id is not in the given collection.
@@ -58,9 +62,8 @@ public class UnconfirmedTransactionsFilter {
 	 */
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		return this.transactions.stream()
-				// TODO 20140115 J-G: should add test for filter
 				.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-// TODO:				.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
+				.filter(tx -> this.matchesPredicate.test(address, tx))
 				.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
 				.limit(maxTransactions)
 				.collect(Collectors.toList());

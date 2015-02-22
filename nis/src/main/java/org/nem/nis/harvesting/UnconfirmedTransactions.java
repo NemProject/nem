@@ -5,10 +5,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
-import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.*;
@@ -94,7 +92,7 @@ public class UnconfirmedTransactions {
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
-		this.transactionsFilter = new UnconfirmedTransactionsFilter(this.transactions);
+		this.transactionsFilter = new UnconfirmedTransactionsFilter(this.transactions, new ImpactfulTransactionPredicate(this.nisCache.getAccountStateCache()));
 		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 
 		for (final Transaction transaction : transactions) {
@@ -347,10 +345,7 @@ public class UnconfirmedTransactions {
 	 */
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		synchronized (this.lock) {
-			return this.transactionsFilter.getMostRecentTransactionsForAccount(address, maxTransactions).stream()
-					.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
-					.limit(maxTransactions)
-					.collect(Collectors.toList());
+			return this.transactionsFilter.getMostRecentTransactionsForAccount(address, maxTransactions);
 		}
 	}
 
@@ -399,22 +394,6 @@ public class UnconfirmedTransactions {
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
 		transactions.stream().forEach(t -> this.addNew(t));
-	}
-
-	private static boolean matchAddress(final Transaction transaction, final Address address) {
-		return transaction.getAccounts().stream()
-				.map(account -> account.getAddress())
-				.anyMatch(transactionAddress -> transactionAddress.equals(address));
-	}
-
-	// TODO 20140113 J-G: why don't we just include this in matchAddress
-	// > are there cases where we call matchAddress where we don't want to include these transactions?
-	private boolean isCosignatory(final Transaction transaction, final Address address) {
-		if (TransactionTypes.MULTISIG != transaction.getType()) {
-			return false;
-		}
-		final ReadOnlyAccountState state = this.nisCache.getAccountStateCache().findStateByAddress(address);
-		return state.getMultisigLinks().isCosignatoryOf(((MultisigTransaction)transaction).getOtherTransaction().getSigner().getAddress());
 	}
 
 	/**

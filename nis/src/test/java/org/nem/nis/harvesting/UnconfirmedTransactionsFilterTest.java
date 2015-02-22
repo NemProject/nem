@@ -10,6 +10,7 @@ import org.nem.core.time.TimeInstant;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsFilterTest {
@@ -103,24 +104,24 @@ public class UnconfirmedTransactionsFilterTest {
 	//region getMostRecentTransactionsForAccount
 
 	@Test
-	public void getMostRecentTransactionsReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
+	public void getMostRecentTransactionsForAccountReturnsAllTransactionsIfLessThanGivenLimitTransactionsAreAvailable() {
 		// Assert:
-		assertNumMostRecentTransactions(10, 20, 10);
+		assertNumMostRecentTransactionsForAccount(10, 20, 10);
 	}
 
 	@Test
-	public void getMostRecentTransactionsReturnsMaximumTransactionsIfMoreThanGivenLimitTransactionsAreAvailable() {
+	public void getMostRecentTransactionsForAccountReturnsMaximumTransactionsIfMoreThanGivenLimitTransactionsAreAvailable() {
 		// Assert:
-		assertNumMostRecentTransactions(20, 10, 10);
+		assertNumMostRecentTransactionsForAccount(20, 10, 10);
 	}
 
 	@Test
-	public void getMostRecentTransactionsReturnsMaximumTransactionsIfGivenLimitTransactionsAreAvailable() {
+	public void getMostRecentTransactionsForAccountReturnsMaximumTransactionsIfGivenLimitTransactionsAreAvailable() {
 		// Assert:
-		assertNumMostRecentTransactions(10, 10, 10);
+		assertNumMostRecentTransactionsForAccount(10, 10, 10);
 	}
 
-	private static void assertNumMostRecentTransactions(final int numTotal, final int numRequested, final int numExpected) {
+	private static void assertNumMostRecentTransactionsForAccount(final int numTotal, final int numRequested, final int numExpected) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
@@ -134,7 +135,52 @@ public class UnconfirmedTransactionsFilterTest {
 	}
 
 	@Test
-	public void getMostRecentTransactionsReturnsTransactionsSortedByTimeInDescendingOrder() {
+	public void getMostRecentTransactionsForAccountDoesNotCountChildTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account = Utils.generateRandomAccount();
+		context.addMockTransactionsWithChildren(6, 20, 7);
+
+		// Act:
+		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 10);
+
+		// Assert:
+		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(10));
+	}
+
+	@Test
+	public void getMostRecentTransactionsForAccountExcludesSignatureTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account account = Utils.generateRandomAccount();
+		context.addMockTransactions(12, 16);
+		context.addSignatureTransactions(1, 10);
+
+		// Act:
+		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
+
+		// Assert:
+		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(5));
+		Assert.assertThat(getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(12, 13, 14, 15, 16));
+	}
+
+	@Test
+	public void getMostRecentTransactionsForAccountExcludesNonMatchingTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext((account, transaction) -> 0 == ((MockTransaction)transaction).getCustomField() % 3);
+		final Account account = Utils.generateRandomAccount();
+		context.addMockTransactions(1, 10);
+
+		// Act:
+		final List<Transaction> mostRecentTransactions = context.filter.getMostRecentTransactionsForAccount(account.getAddress(), 20);
+
+		// Assert:
+		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(3));
+		Assert.assertThat(getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(3, 6, 9));
+	}
+
+	@Test
+	public void getMostRecentTransactionsForAccountReturnsTransactionsSortedByTimeInDescendingOrder() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final Account account = Utils.generateRandomAccount();
@@ -272,6 +318,20 @@ public class UnconfirmedTransactionsFilterTest {
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
 	}
 
+	@Test
+	public void getTransactionsBeforeExcludesSignatureTransactions() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		context.addMockTransactions(6, 9);
+		context.addSignatureTransactions(2, 5);
+
+		// Act:
+		final List<Integer> customFieldValues = getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
+
+		// Assert:
+		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
+	}
+
 	//endregion
 
 	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
@@ -283,15 +343,26 @@ public class UnconfirmedTransactionsFilterTest {
 	private static class TestContext {
 		private final List<Transaction> transactions = new ArrayList<>();
 		private final UnconfirmedTransactionsCache cache = Mockito.mock(UnconfirmedTransactionsCache.class);
-		private final UnconfirmedTransactionsFilter filter = new UnconfirmedTransactionsFilter(this.cache);
+		private final UnconfirmedTransactionsFilter filter;
 
 		public TestContext() {
+			this((address, transaction) -> true);
+		}
+
+		public TestContext(final BiPredicate<Address, Transaction> matchesPredicate) {
+			this.filter = new UnconfirmedTransactionsFilter(this.cache, matchesPredicate);
 			Mockito.when(this.cache.stream()).thenReturn(this.transactions.stream());
 		}
 
 		private void addMockTransactions(final int startCustomField, final int endCustomField) {
 			for (int i = startCustomField; i <= endCustomField; ++i) {
 				this.transactions.add(createMockTransaction(Utils.generateRandomAccount(), new TimeInstant(i), i));
+			}
+		}
+
+		private void addSignatureTransactions(final int startCustomField, final int endCustomField) {
+			for (int i = startCustomField; i <= endCustomField; ++i) {
+				this.transactions.add(new MockTransaction(TransactionTypes.MULTISIG_SIGNATURE, i, new TimeInstant(i)));
 			}
 		}
 
