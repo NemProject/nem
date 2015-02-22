@@ -103,7 +103,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		}
 	}
 
-	private UnconfirmedTransactions filter(
+	private UnconfirmedTransactionsFilter filter(
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options) {
 		synchronized (this.lock) {

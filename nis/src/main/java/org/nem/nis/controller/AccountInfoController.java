@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 public class AccountInfoController {
 	private final UnlockedAccounts unlockedAccounts;
-	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
 	private final BlockChainLastBlockLayer blockChainLastBlockLayer;
 	private final AccountInfoFactory accountInfoFactory;
 	private final ReadOnlyAccountStateCache accountStateCache;
@@ -30,7 +30,7 @@ public class AccountInfoController {
 	@Autowired(required = true)
 	AccountInfoController(
 			final UnlockedAccounts unlockedAccounts,
-			final UnconfirmedTransactions unconfirmedTransactions,
+			final UnconfirmedTransactionsFilter unconfirmedTransactions,
 			final BlockChainLastBlockLayer blockChainLastBlockLayer,
 			final AccountInfoFactory accountInfoFactory,
 			final ReadOnlyAccountStateCache accountStateCache) {
