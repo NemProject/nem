@@ -19,16 +19,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.*;
-
-// TODO 20150220 J-B: i like how you refactored the tests; good job :)
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {
-	private static final long TRANSACTIONS_PER_BLOCK = 16L;
+	protected static final long TRANSACTIONS_PER_BLOCK = 16L;
 	private static final int LIMIT = 10;
+	private AtomicInteger counter = new AtomicInteger(0);
 	private static final MockAccountDao ACCOUNT_DAO = new MockAccountDao();
 	private static final Account[] ACCOUNTS = {
 			Utils.generateRandomAccount(),
@@ -46,14 +46,18 @@ public abstract class TransactionRetrieverTest {
 	private Session session;
 
 	@Before
-	public void beforeClass() {
-		this.session = this.sessionFactory.openSession();
-		this.setupBlocks();
+	public void createDb() {
+		if (0 == this.counter.getAndIncrement()) {
+			this.session = this.sessionFactory.openSession();
+			setupBlocks();
+		}
 	}
 
 	@After
-	public void afterClass() {
-		this.session.close();
+	public void destroyDb() {
+		if (0 == this.counter.decrementAndGet()) {
+			this.session.close();
+		}
 	}
 
 	/**
@@ -65,31 +69,51 @@ public abstract class TransactionRetrieverTest {
 	protected abstract TransactionRetriever getTransactionRetriever();
 
 	/**
-	 * Gets the list of expected comparable pairs for incoming transfers.
+	 * Gets the list of expected ids for incoming transfers.
 	 *
 	 * @param height The block height.
 	 * @param accountIndex The account index in the array.
-	 * @return The expected pairs.
+	 * @return The expected ids.
 	 */
-	protected abstract List<ComparablePair> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex);
+	protected abstract List<Integer> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex);
 
 	/**
-	 * Gets the list of expected comparable pairs for outgoing transfers.
+	 * Gets the list of expected ids for outgoing transfers.
 	 *
 	 * @param height The block height.
 	 * @param accountIndex The account index in the array.
-	 * @return The expected pairs.
+	 * @return The expected ids.
 	 */
-	protected abstract List<ComparablePair> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex);
+	protected abstract List<Integer> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex);
 
 	@Test
-	public void canRetrieveIncomingTransactions() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 33));
+	public void canRetrieveIncomingTransactionsFromBeginning() {
+		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 34));
 	}
 
 	@Test
-	public void canRetrieveOutgoingTransactions() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 33));
+	public void canRetrieveOutgoingTransactionsFromBeginning() {
+		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 34));
+	}
+
+	@Test
+	public void canRetrieveIncomingTransactionsFromMiddle() {
+		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 234));
+	}
+
+	@Test
+	public void canRetrieveOutgoingTransactionsFromMiddle() {
+		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 234));
+	}
+
+	@Test
+	public void canRetrieveIncomingTransactionsFromEnd() {
+		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, Long.MAX_VALUE));
+	}
+
+	@Test
+	public void canRetrieveOutgoingTransactionsFromEnd() {
+		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, Long.MAX_VALUE));
 	}
 
 	private void assertCanRetrieveIncomingTransactions(final int accountIndex, final long topMostId) {
@@ -103,17 +127,17 @@ public abstract class TransactionRetrieverTest {
 				topMostId,
 				LIMIT,
 				ReadOnlyTransferDao.TransferType.INCOMING);
-		final Collection<ComparablePair> comparablePairs = pairs.stream()
-				.map(ComparablePair::new)
+		final Collection<Integer> ids = pairs.stream()
+				.map(p -> (int)p.getTransfer().getId().longValue())
 				.collect(Collectors.toList());
 
 		// Assert:
-		final Collection<ComparablePair> expectedComparablePairs = getExpectedComparablePairsForTransactions(
+		final Collection<Integer> expectedIds = getExpectedIdsForTransactions(
 				this::getExpectedComparablePairsForIncomingTransactions,
 				accountIndex,
 				topMostId,
 				LIMIT) ;
-		Assert.assertThat(comparablePairs, IsEquivalent.equivalentTo(expectedComparablePairs));
+		Assert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
 	}
 
 	private void assertCanRetrieveOutgoingTransactions(final int accountIndex, final long topMostId) {
@@ -127,32 +151,34 @@ public abstract class TransactionRetrieverTest {
 				topMostId,
 				LIMIT,
 				ReadOnlyTransferDao.TransferType.OUTGOING);
-		final Collection<ComparablePair> comparablePairs = pairs.stream()
-				.map(ComparablePair::new)
+		final Collection<Integer> ids = pairs.stream()
+				.map(p -> (int)p.getTransfer().getId().longValue())
 				.collect(Collectors.toList());
 
 		// Assert:
-		final Collection<ComparablePair> expectedComparablePairs = getExpectedComparablePairsForTransactions(
+		final Collection<Integer> expectedIds = getExpectedIdsForTransactions(
 				this::getExpectedComparablePairsForOutgoingTransactions,
 				accountIndex,
 				topMostId,
-				LIMIT) ;
-		Assert.assertThat(comparablePairs, IsEquivalent.equivalentTo(expectedComparablePairs));
+				LIMIT);
+		Assert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
 	}
 
-	private List<ComparablePair> getExpectedComparablePairsForTransactions(
-			final BiFunction<BlockHeight, Integer, List<ComparablePair>> expectedComparablePairsSupplier,
+	private List<Integer> getExpectedIdsForTransactions(
+			final BiFunction<BlockHeight, Integer, List<Integer>> expectedIdsSupplier,
 			final int accountIndex,
 			final long topMostTransactionId,
 			final int limit) {
-		final List<ComparablePair> pairs = new ArrayList<>();
-		long height = Math.min(Math.max(((topMostTransactionId - 2) / TRANSACTIONS_PER_BLOCK + 1) * 2, 1), 50);
-		while (limit > pairs.size() && height > 0) {
-			pairs.addAll(expectedComparablePairsSupplier.apply(new BlockHeight(height), accountIndex));
+		List<Integer> ids = new ArrayList<>();
+		final long adjustedId = Math.max(topMostTransactionId - 2, 0);
+		long height = Math.min(Math.max((adjustedId / TRANSACTIONS_PER_BLOCK + 1) * 2, 1), 50);
+		while (limit > ids.size() && height > 0) {
+			ids.addAll(expectedIdsSupplier.apply(new BlockHeight(height), accountIndex));
 			height -= 2L;
+			ids = ids.stream().filter(id -> id < topMostTransactionId).collect(Collectors.toList());
 		}
 
-		return pairs.subList(0, limit > pairs.size() ? pairs.size() : limit);
+		return ids.subList(0, limit > ids.size() ? ids.size() : limit);
 	}
 
 	protected void setupBlocks() {
@@ -160,6 +186,29 @@ public abstract class TransactionRetrieverTest {
 		// first block starts with transaction id 1
 		// second block starts with transaction id 1 + 4 + 2 + 1 + 3 * 3 = 1 + 16 = 17
 		// third block starts with transaction id 1 + 2 * 16 = 33 and so on
+		// unfortunately hibernate inserts the transaction in alphabetical order of the list names in DbBlock.
+		// Thus the ids for the transactions in a block are (x being a non negative multiple of TRANSACTIONS_PER_BLOCK):
+		// x + 1:  regular importance transfer 1
+		// x + 2:  regular importance transfer 2
+		// x + 3:  multisig importance transfer
+		// x + 4:  regular modification transaction
+		// x + 5:  multisig modification transaction
+		// x + 6:  multisig transaction 1
+		// x + 7:  multisig transfer transaction
+		// x + 8:  multisig signature transaction 1
+		// x + 9:  multisig transaction 2
+		// x + 10: multisig signature transaction 2
+		// x + 11: multisig transaction 3
+		// x + 12: multisig signature transaction 3
+		// x + 13: regular transfer 1
+		// x + 14: regular transfer 2
+		// x + 15: regular transfer 3
+		// x + 16: regular transfer 4
+
+		if (0 < this.blockDao.count()) {
+			return;
+		}
+
 		for (int i = 1; i <= 25; i++) {
 			final Block block = NisUtils.createRandomBlockWithHeight(2 * i);
 
@@ -171,7 +220,7 @@ public abstract class TransactionRetrieverTest {
 			// Arrange: sign and map the blocks
 			block.sign();
 			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(ACCOUNT_DAO));
-			this.blockDao.save(dbBlock);
+			blockDao.save(dbBlock);
 		}
 	}
 
@@ -330,40 +379,5 @@ public abstract class TransactionRetrieverTest {
 				.addScalar("accountId", LongType.INSTANCE)
 				.setParameter("address", address.getEncoded());
 		return (Long)query.uniqueResult();
-	}
-
-	protected class ComparablePair {
-		public final long blockHeight;
-		public final int transactionTimeStamp;
-
-		public ComparablePair(final long blockHeight, final int transactionTimeStamp) {
-			this.blockHeight = blockHeight;
-			this.transactionTimeStamp = transactionTimeStamp;
-		}
-
-		public ComparablePair(final TransferBlockPair pair) {
-			this.blockHeight = pair.getDbBlock().getHeight();
-			this.transactionTimeStamp = pair.getTransfer().getTimeStamp();
-		}
-
-		@Override
-		public int hashCode() {
-			return Long.valueOf(this.blockHeight).hashCode() ^ this.transactionTimeStamp;
-		}
-
-		@Override
-		public boolean equals(final Object obj) {
-			if (!(obj instanceof ComparablePair)) {
-				return false;
-			}
-
-			final ComparablePair rhs = (ComparablePair)obj;
-			return this.blockHeight == rhs.blockHeight && this.transactionTimeStamp == rhs.transactionTimeStamp;
-		}
-
-		@Override
-		public String toString() {
-			return String.format("B: %s; T: %d", this.blockHeight, this.transactionTimeStamp);
-		}
 	}
 }

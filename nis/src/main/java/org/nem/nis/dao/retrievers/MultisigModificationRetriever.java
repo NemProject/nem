@@ -1,8 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
-import org.hibernate.criterion.*;
-import org.hibernate.sql.JoinType;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.*;
 
@@ -22,36 +20,71 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if (ReadOnlyTransferDao.TransferType.OUTGOING == transferType) {
-			final Criteria criteria = session.createCriteria(DbMultisigAggregateModificationTransaction.class)
-					.setFetchMode("block", FetchMode.JOIN)
-					.setFetchMode("sender", FetchMode.JOIN)
-					.add(Restrictions.eq("sender.id", accountId))
-					.add(Restrictions.isNotNull("senderProof"))
-					.add(Restrictions.lt("id", maxId))
-					.addOrder(Order.asc("sender"))
-					.addOrder(Order.desc("id"))
-					.setMaxResults(limit);
-			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-			final List<DbMultisigAggregateModificationTransaction> list = criteria.list();
-			return list.stream()
-					.map(t -> new TransferBlockPair(t, t.getBlock()))
+			// can't do it with criteria :/
+			final List<DbMultisigAggregateModificationTransaction> transactions = getOutgoingDbModificationTransactions(
+					session,
+					accountId,
+					maxId,
+					limit);
+			return transactions.stream()
+					.map(t -> {
+						Hibernate.initialize(t.getBlock());
+						return new TransferBlockPair(t, t.getBlock());
+					})
 					.collect(Collectors.toList());
 		}
 
-		final Criteria criteria = session.createCriteria(DbMultisigModification.class)
-				.setFetchMode("cosignatory", FetchMode.JOIN)
-				.createAlias("multisigAggregateModificationTransaction", "multisig", JoinType.LEFT_OUTER_JOIN)
-				.add(Restrictions.eq("cosignatory.id", accountId))
-				.add(Restrictions.lt("multisigAggregateModificationTransaction.id", maxId))
-				.add(Restrictions.isNotNull("multisig.senderProof"))
-				.addOrder(Order.asc("cosignatory"))
-				.addOrder(Order.desc("multisigAggregateModificationTransaction.id"))
-				.setMaxResults(limit);
-
-		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbMultisigModification> list = criteria.list();
-		return list.stream()
-				.map(m -> new TransferBlockPair(m.getMultisigAggregateModificationTransaction(), m.getMultisigAggregateModificationTransaction().getBlock()))
+		// can't do it with criteria :/
+		final List<DbMultisigAggregateModificationTransaction> transactions = getIncomingDbModificationTransactions(
+				session,
+				accountId,
+				maxId,
+				limit);
+		return transactions.stream()
+				.map(t -> {
+					Hibernate.initialize(t.getBlock());
+					return new TransferBlockPair(t, t.getBlock());
+				})
 				.collect(Collectors.toList());
 	}
+
+	@SuppressWarnings("unchecked")
+	private List<DbMultisigAggregateModificationTransaction> getIncomingDbModificationTransactions(
+			final Session session,
+			final long cosignatoryId,
+			final long maxId,
+			final int limit) {
+		final String queryString =
+				"SELECT mm.multisigsignermodificationid, mm.id as mmId, mm.cosignatoryid, mm.modificationtype, msm.* FROM multisigmodifications mm " +
+				"LEFT OUTER JOIN multisigsignermodifications msm on msm.id = mm.multisigsignermodificationid AND msm.senderproof IS NOT NULL " +
+				"WHERE mm.multisigsignermodificationid < :maxId AND mm.cosignatoryid = :cosignatoryId AND msm.senderproof IS NOT NULL " +
+				"ORDER BY mm.cosignatoryid ASC, mm.multisigsignermodificationid DESC limit :limit";
+		final Query query = session
+				.createSQLQuery(queryString)
+				.addEntity(DbMultisigAggregateModificationTransaction.class)
+				.setParameter("maxId", maxId)
+				.setParameter("cosignatoryId", cosignatoryId)
+				.setParameter("limit", limit);
+		return (List<DbMultisigAggregateModificationTransaction>)query.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<DbMultisigAggregateModificationTransaction> getOutgoingDbModificationTransactions(
+			final Session session,
+			final long senderId,
+			final long maxId,
+			final int limit) {
+		final String queryString =
+				"SELECT msm.* FROM multisigsignermodifications msm " +
+				"WHERE msm.id < :maxId AND msm.senderid = :senderId AND msm.senderproof IS NOT NULL " +
+				"ORDER BY msm.senderid ASC, msm.id DESC limit :limit";
+		final Query query = session
+				.createSQLQuery(queryString)
+				.addEntity(DbMultisigAggregateModificationTransaction.class)
+				.setParameter("maxId", maxId)
+				.setParameter("senderId", senderId)
+				.setParameter("limit", limit);
+		return (List<DbMultisigAggregateModificationTransaction>)query.list();
+	}
+
 }

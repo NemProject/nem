@@ -11,44 +11,36 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 	}
 
 	@Override
-	protected List<ComparablePair> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex) {
-		// you have to supply the pairs in descending order of timestamps!!!
-		final ArrayList<ComparablePair> pairs = new ArrayList<>();
+	protected List<Integer> getExpectedComparablePairsForIncomingTransactions(final BlockHeight height, final int accountIndex) {
+		// returned list must be sorted in descending order of ids!
+		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				return pairs;
+				return new ArrayList<>();
 			case 1:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 2));
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw()));
-				return pairs;
+				return Arrays.asList(baseId + 15, baseId + 13);
 			case 2:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 1));
-				return pairs;
+				return Arrays.asList(baseId + 14);
 			case 3:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 3));
-				return pairs;
+				return Arrays.asList(baseId + 16);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}
 	}
 
 	@Override
-	protected List<ComparablePair> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex) {
-		// you have to supply the pairs in descending order of timestamps!!!
-		final ArrayList<ComparablePair> pairs = new ArrayList<>();
+	protected List<Integer> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex) {
+		// returned list must be sorted in descending order of ids!
+		final int baseId = (int)((height.getRaw() / 2 - 1) * TRANSACTIONS_PER_BLOCK);
 		switch (accountIndex) {
 			case 0:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 1));
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw()));
-				return pairs;
+				return Arrays.asList(baseId + 14, baseId + 13);
 			case 1:
-				return pairs;
+				return new ArrayList<>();
 			case 2:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 2));
-				return pairs;
+				return Arrays.asList(baseId + 15);
 			case 3:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 3));
-				return pairs;
+				return Arrays.asList(baseId + 16);
 			default:
 				throw new RuntimeException("unknown account id.");
 		}

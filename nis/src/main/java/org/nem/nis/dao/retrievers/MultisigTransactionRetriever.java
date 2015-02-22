@@ -26,7 +26,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		final Collection<TransferBlockPair> pairs = this.getMultisigTransfersForAccount(session, accountId, maxId, limit, transferType);
 		pairs.addAll(this.getMultisigImportanceTransfersForAccount(session, accountId, maxId, limit, transferType));
 		pairs.addAll(this.getMultisigMultisigSignerModificationsForAccount(session, accountId, maxId, limit, transferType));
-		return pairs;
+		return this.sortAndLimit(pairs, limit);
 	}
 
 	private Collection<TransferBlockPair> getMultisigTransfersForAccount(
@@ -144,6 +144,29 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		final List<DbBlock> blocks = criteria.list();
 		blocks.stream().forEach(b -> blockMap.put(b.getHeight(), b));
 		return blockMap;
+	}
+
+	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
+		final List<TransferBlockPair> list = pairs.stream()
+				.sorted(this::comparePair)
+				.collect(Collectors.toList());
+		TransferBlockPair curPair = null;
+		final Collection<TransferBlockPair> result = new ArrayList<>();
+		for (final TransferBlockPair pair : list) {
+			if (null == curPair || !(curPair.getTransfer().getId().equals(pair.getTransfer().getId()))) {
+				result.add(pair);
+				if (limit == result.size()) {
+					break;
+				}
+			}
+			curPair = pair;
+		}
+
+		return result;
+	}
+
+	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
+		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
 	}
 
 	private class TransactionIdBlockHeightPair {
