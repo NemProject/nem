@@ -19,7 +19,6 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final long accountId,
 			final long maxId,
 			final int limit,
-			// TODO 20150127 J-G: transfer type is not being used?
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if (ReadOnlyTransferDao.TransferType.OUTGOING == transferType) {
 			final Criteria criteria = session.createCriteria(DbMultisigAggregateModificationTransaction.class)
@@ -42,7 +41,23 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 					.collect(Collectors.toList());
 		}
 
-		// TODO: INCOMING
-		return new ArrayList<>();
+		final Criteria criteria = session.createCriteria(DbMultisigModification.class)
+				.setFetchMode("multisigAggregateModificationTransaction", FetchMode.JOIN)
+				.setFetchMode("cosignatory", FetchMode.JOIN)
+				.add(Restrictions.eq("cosignatory.id", accountId))
+				.add(Restrictions.lt("multisigAggregateModificationTransaction.id", maxId))
+				.addOrder(Order.asc("cosignatory"))
+				.addOrder(Order.desc("multisigAggregateModificationTransaction.id"))
+				.setMaxResults(limit);
+
+		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+		final List<DbMultisigModification> list = criteria.list();
+		return list.stream()
+				.map(m -> {
+					Hibernate.initialize(m.getMultisigAggregateModificationTransaction());
+					Hibernate.initialize(m.getMultisigAggregateModificationTransaction().getBlock());
+					return new TransferBlockPair(m.getMultisigAggregateModificationTransaction(), m.getMultisigAggregateModificationTransaction().getBlock());
+				})
+				.collect(Collectors.toList());
 	}
 }
