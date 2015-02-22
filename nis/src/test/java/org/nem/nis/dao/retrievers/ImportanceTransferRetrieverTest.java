@@ -21,7 +21,6 @@ public class ImportanceTransferRetrieverTest extends TransactionRetrieverTest {
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 4));
 				return pairs;
 			case 2:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 8));
 				return pairs;
 			case 3:
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 5));
@@ -40,7 +39,6 @@ public class ImportanceTransferRetrieverTest extends TransactionRetrieverTest {
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 4));
 				return pairs;
 			case 1:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 8));
 				return pairs;
 			case 2:
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 5));

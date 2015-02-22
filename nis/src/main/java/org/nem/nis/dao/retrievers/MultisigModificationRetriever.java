@@ -2,6 +2,7 @@ package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
+import org.hibernate.sql.JoinType;
 import org.nem.nis.dao.ReadOnlyTransferDao;
 import org.nem.nis.dbmodel.*;
 
@@ -22,7 +23,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if (ReadOnlyTransferDao.TransferType.OUTGOING == transferType) {
 			final Criteria criteria = session.createCriteria(DbMultisigAggregateModificationTransaction.class)
-					.setFetchMode("blockId", FetchMode.JOIN)
+					.setFetchMode("block", FetchMode.JOIN)
 					.setFetchMode("sender", FetchMode.JOIN)
 					.add(Restrictions.eq("sender.id", accountId))
 					.add(Restrictions.isNotNull("senderProof"))
@@ -33,19 +34,16 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 			final List<DbMultisigAggregateModificationTransaction> list = criteria.list();
 			return list.stream()
-					.map(t -> {
-						// force lazy initialization
-						Hibernate.initialize(t.getBlock());
-						return new TransferBlockPair(t, t.getBlock());
-					})
+					.map(t -> new TransferBlockPair(t, t.getBlock()))
 					.collect(Collectors.toList());
 		}
 
 		final Criteria criteria = session.createCriteria(DbMultisigModification.class)
-				.setFetchMode("multisigAggregateModificationTransaction", FetchMode.JOIN)
 				.setFetchMode("cosignatory", FetchMode.JOIN)
+				.createAlias("multisigAggregateModificationTransaction", "multisig", JoinType.LEFT_OUTER_JOIN)
 				.add(Restrictions.eq("cosignatory.id", accountId))
 				.add(Restrictions.lt("multisigAggregateModificationTransaction.id", maxId))
+				.add(Restrictions.isNotNull("multisig.senderProof"))
 				.addOrder(Order.asc("cosignatory"))
 				.addOrder(Order.desc("multisigAggregateModificationTransaction.id"))
 				.setMaxResults(limit);
@@ -53,11 +51,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		final List<DbMultisigModification> list = criteria.list();
 		return list.stream()
-				.map(m -> {
-					Hibernate.initialize(m.getMultisigAggregateModificationTransaction());
-					Hibernate.initialize(m.getMultisigAggregateModificationTransaction().getBlock());
-					return new TransferBlockPair(m.getMultisigAggregateModificationTransaction(), m.getMultisigAggregateModificationTransaction().getBlock());
-				})
+				.map(m -> new TransferBlockPair(m.getMultisigAggregateModificationTransaction(), m.getMultisigAggregateModificationTransaction().getBlock()))
 				.collect(Collectors.toList());
 	}
 }

@@ -180,17 +180,17 @@ public abstract class TransactionRetrieverTest {
 		// account 1 appears only as receiver
 		// account 2 appears as sender and receiver in different transactions
 		// account 3 has one self transaction
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100), ACCOUNTS[0], ACCOUNTS[1]));
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 1), ACCOUNTS[0], ACCOUNTS[2]));
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 2), ACCOUNTS[2], ACCOUNTS[1]));
-		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 3), ACCOUNTS[3], ACCOUNTS[3]));
+		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100), ACCOUNTS[0], ACCOUNTS[1], true));
+		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 1), ACCOUNTS[0], ACCOUNTS[2], true));
+		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 2), ACCOUNTS[2], ACCOUNTS[1], true));
+		block.addTransaction(createTransfer((int)(block.getHeight().getRaw() * 100 + 3), ACCOUNTS[3], ACCOUNTS[3], true));
 	}
 
 	private static void addImportanceTransferTransactions(final Block block) {
 		// account 0 + 2 appears only as sender
 		// account 1 + 3 appears only as remote
-		block.addTransaction(createImportanceTransfer((int)(block.getHeight().getRaw() * 100 + 4), ACCOUNTS[0], ACCOUNTS[1]));
-		block.addTransaction(createImportanceTransfer((int)(block.getHeight().getRaw() * 100 + 5), ACCOUNTS[2], ACCOUNTS[3]));
+		block.addTransaction(createImportanceTransfer((int)(block.getHeight().getRaw() * 100 + 4), ACCOUNTS[0], ACCOUNTS[1], true));
+		block.addTransaction(createImportanceTransfer((int)(block.getHeight().getRaw() * 100 + 5), ACCOUNTS[2], ACCOUNTS[3], true));
 	}
 
 	private static void addAggregateModificationTransaction(final Block block) {
@@ -199,7 +199,8 @@ public abstract class TransactionRetrieverTest {
 		block.addTransaction(createAggregateModificationTransaction(
 				(int)(block.getHeight().getRaw() * 100 + 6),
 				ACCOUNTS[0],
-				Arrays.asList(ACCOUNTS[1], ACCOUNTS[2], ACCOUNTS[3])));
+				Arrays.asList(ACCOUNTS[1], ACCOUNTS[2], ACCOUNTS[3]),
+				true));
 	}
 
 	private static void addMultigTransactions(final Block block) {
@@ -216,7 +217,11 @@ public abstract class TransactionRetrieverTest {
 		accountDao.addMapping(account, new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey()));
 	}
 
-	private static Transaction createTransfer(final int timeStamp, final Account sender, final Account recipient) {
+	private static Transaction createTransfer(
+			final int timeStamp,
+			final Account sender,
+			final Account recipient,
+			final boolean signTransaction) {
 		addMapping(ACCOUNT_DAO, sender);
 		addMapping(ACCOUNT_DAO, recipient);
 		final Transaction transaction = new TransferTransaction(
@@ -225,14 +230,18 @@ public abstract class TransactionRetrieverTest {
 				recipient,
 				Amount.fromNem(8),
 				null);
-		transaction.sign();
+		if (signTransaction) {
+			transaction.sign();
+		}
+
 		return transaction;
 	}
 
 	private static Transaction createImportanceTransfer(
 			final int timeStamp,
 			final Account sender,
-			final Account remote) {
+			final Account remote,
+			final boolean signTransaction) {
 		addMapping(ACCOUNT_DAO, sender);
 		addMapping(ACCOUNT_DAO, remote);
 		final Transaction transaction = new ImportanceTransferTransaction(
@@ -240,14 +249,18 @@ public abstract class TransactionRetrieverTest {
 				sender,
 				ImportanceTransferTransaction.Mode.Activate,
 				remote);
-		transaction.sign();
+		if (signTransaction) {
+			transaction.sign();
+		}
+
 		return transaction;
 	}
 
 	private static Transaction createAggregateModificationTransaction(
 			final int timeStamp,
 			final Account sender,
-			final Collection<Account> cosignatories) {
+			final Collection<Account> cosignatories,
+			final boolean signTransaction) {
 		final List<MultisigModification> modifications = cosignatories.stream()
 				.map(c -> createModification(MultisigModificationType.Add, c))
 				.collect(Collectors.toList());
@@ -257,7 +270,10 @@ public abstract class TransactionRetrieverTest {
 				new TimeInstant(timeStamp),
 				sender,
 				modifications);
-		transaction.sign();
+		if (signTransaction) {
+			transaction.sign();
+		}
+
 		return transaction;
 	}
 
@@ -267,13 +283,13 @@ public abstract class TransactionRetrieverTest {
 		Transaction innerTransaction;
 		switch (innerType) {
 			case TransactionTypes.TRANSFER:
-				innerTransaction = createTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2]);
+				innerTransaction = createTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
 				break;
 			case TransactionTypes.IMPORTANCE_TRANSFER:
-				innerTransaction = createImportanceTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2]);
+				innerTransaction = createImportanceTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);
 				break;
 			case TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION:
-				innerTransaction = createAggregateModificationTransaction(timeStamp, ACCOUNTS[1], Arrays.asList(ACCOUNTS[2]));
+				innerTransaction = createAggregateModificationTransaction(timeStamp, ACCOUNTS[1], Arrays.asList(ACCOUNTS[2]), false);
 				break;
 			default:
 				throw new RuntimeException("invalid inner transaction type.");

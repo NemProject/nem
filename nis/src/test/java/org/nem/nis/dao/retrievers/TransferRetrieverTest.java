@@ -22,7 +22,6 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw()));
 				return pairs;
 			case 2:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 7));
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 1));
 				return pairs;
 			case 3:
@@ -43,7 +42,6 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw()));
 				return pairs;
 			case 1:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 7));
 				return pairs;
 			case 2:
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 2));

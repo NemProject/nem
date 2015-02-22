@@ -21,7 +21,6 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 6));
 				return pairs;
 			case 2:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 9));
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 6));
 				return pairs;
 			case 3:
@@ -41,7 +40,6 @@ public class MultisigModificationRetrieverTest extends TransactionRetrieverTest 
 				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 6));
 				return pairs;
 			case 1:
-				pairs.add(new ComparablePair(height.getRaw(), 100 * (int)height.getRaw() + 9));
 				return pairs;
 			case 2:
 				return pairs;

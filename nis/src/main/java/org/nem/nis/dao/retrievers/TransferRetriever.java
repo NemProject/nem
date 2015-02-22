@@ -23,7 +23,7 @@ public class TransferRetriever implements TransactionRetriever {
 		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
 		final String senderOrRecipient = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "recipient";
 		final Criteria criteria = session.createCriteria(DbTransferTransaction.class)
-				.setFetchMode("blockId", FetchMode.JOIN)
+				.setFetchMode("block", FetchMode.JOIN)
 				.setFetchMode("sender", FetchMode.JOIN)
 				.setFetchMode("recipient", FetchMode.JOIN)
 				.add(Restrictions.eq(senderOrRecipient + ".id", accountId))
@@ -35,11 +35,7 @@ public class TransferRetriever implements TransactionRetriever {
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
 		final List<DbTransferTransaction> list = criteria.list();
 		return list.stream()
-				.map(t -> {
-					// force lazy initialization
-					Hibernate.initialize(t.getBlock());
-					return new TransferBlockPair(t, t.getBlock());
-				})
+				.map(t -> new TransferBlockPair(t, t.getBlock()))
 				.collect(Collectors.toList());
 	}
 }
