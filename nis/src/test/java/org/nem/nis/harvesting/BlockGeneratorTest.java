@@ -353,10 +353,7 @@ public class BlockGeneratorTest {
 		}
 
 		private void setBlockTransactions(final List<Transaction> transactions) {
-			final UnconfirmedTransactions filteredTransactions = Mockito.mock(UnconfirmedTransactions.class);
-			Mockito.when(this.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(filteredTransactions);
-			Mockito.when(filteredTransactions.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK))
-					.thenReturn(transactions);
+			Mockito.when(this.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(transactions);
 		}
 	}
 }

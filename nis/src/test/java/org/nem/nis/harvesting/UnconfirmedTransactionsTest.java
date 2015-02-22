@@ -1066,8 +1066,8 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(6));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
+		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(6));
+		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2)));
@@ -1087,8 +1087,8 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(10));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
+		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(10));
+		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(2, 4)));
@@ -1107,10 +1107,10 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(
+		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(
 				Utils.generateRandomAddress(),
 				new TimeInstant(10));
-		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions.getAll());
+		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(1))));
@@ -1134,8 +1134,8 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddExisting(transaction);
 
 		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(3601));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
+		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(3601));
+		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
@@ -1177,7 +1177,7 @@ public class UnconfirmedTransactionsTest {
 
 		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
 				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1)).getAll();
+				currentTime.addSeconds(1));
 
 		// Assert:
 		// note: this checks that both TXes have been added and that returned TXes are in proper order
@@ -1213,7 +1213,7 @@ public class UnconfirmedTransactionsTest {
 
 		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
 				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1)).getAll();
+				currentTime.addSeconds(1));
 
 		// Assert:
 		// - this checks that both TXes have been added and that returned TXes are in proper order

@@ -97,8 +97,7 @@ public class BlockGenerator {
 		final Account ownerAccount = this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 
 		final Collection<Transaction> transactions = this.unconfirmedTransactions
-				.getTransactionsForNewBlock(ownerAccount.getAddress(), blockTime)
-				.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+				.getTransactionsForNewBlock(ownerAccount.getAddress(), blockTime);
 		final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock.getHeight());
 
 		// it's the remote harvester that generates a block NOT owner, we won't have owner's key here!

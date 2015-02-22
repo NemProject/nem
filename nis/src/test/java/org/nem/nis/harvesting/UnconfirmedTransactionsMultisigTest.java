@@ -13,7 +13,7 @@ import org.nem.nis.state.AccountState;
 import org.nem.nis.test.*;
 import org.nem.nis.validators.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Those test are similar to those that can be found in BlockChainServices.
@@ -77,7 +77,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result1 = context.transactions.addExisting(multisigTransaction);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
+		final List<Transaction> blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -111,13 +111,13 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result2 = context.transactions.addExisting(signatureTransaction);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
+		final List<Transaction> blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
-		final MultisigTransaction transaction = (MultisigTransaction)blockTransactions.getAll().get(0);
+		final MultisigTransaction transaction = (MultisigTransaction)blockTransactions.get(0);
 		Assert.assertThat(transaction.getCosignerSignatures().size(), IsEqual.equalTo(1));
 		Assert.assertThat(transaction.getCosignerSignatures().iterator().next(), IsSame.sameInstance(signatureTransaction));
 	}
@@ -241,7 +241,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result2 = context.transactions.addExisting(multisigTransaction2);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
+		final List<Transaction> blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -268,7 +268,7 @@ public class UnconfirmedTransactionsMultisigTest {
 		final ValidationResult result2 = context.transactions.addExisting(multisigTransaction2);
 
 		// Act:
-		final UnconfirmedTransactions blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
+		final List<Transaction> blockTransactions = context.getTransactionsForNewBlock(CURRENT_TIME);
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
@@ -336,7 +336,7 @@ public class UnconfirmedTransactionsMultisigTest {
 			return transaction;
 		}
 
-		private UnconfirmedTransactions getTransactionsForNewBlock(final TimeInstant currentTime) {
+		private List<Transaction> getTransactionsForNewBlock(final TimeInstant currentTime) {
 			return this.transactions.getTransactionsForNewBlock(
 					Utils.generateRandomAddress(),
 					currentTime.addMinutes(10));

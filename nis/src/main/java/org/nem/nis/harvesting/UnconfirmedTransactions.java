@@ -5,6 +5,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
+import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
 import org.nem.nis.validators.*;
@@ -383,7 +384,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	 * @param blockTime The block time.
 	 * @return The filtered list of transactions.
 	 */
-	public UnconfirmedTransactions getTransactionsForNewBlock(final Address harvesterAddress, final TimeInstant blockTime) {
+	public List<Transaction> getTransactionsForNewBlock(final Address harvesterAddress, final TimeInstant blockTime) {
 		// in order for a transaction to be eligible for inclusion in a block, it must
 		// (1) occur at or before the block time
 		// (2) be signed by an account other than the harvester
@@ -405,7 +406,8 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 							.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
 							.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
 							.collect(Collectors.toList()),
-					BalanceValidationOptions.ValidateAgainstConfirmedBalance);
+					BalanceValidationOptions.ValidateAgainstConfirmedBalance)
+					.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
 		}
 	}
 }
