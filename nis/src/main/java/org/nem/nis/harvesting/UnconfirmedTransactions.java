@@ -19,7 +19,7 @@ import java.util.stream.*;
 /**
  * A collection of unconfirmed transactions.
  */
-public class UnconfirmedTransactions {
+public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
 	private final UnconfirmedTransactionsCache transactions;
@@ -92,7 +92,9 @@ public class UnconfirmedTransactions {
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
-		this.transactionsFilter = new UnconfirmedTransactionsFilter(this.transactions, new ImpactfulTransactionPredicate(this.nisCache.getAccountStateCache()));
+		this.transactionsFilter = new DefaultUnconfirmedTransactionsFilter(
+				this.transactions,
+				new ImpactfulTransactionPredicate(this.nisCache.getAccountStateCache()));
 		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 
 		for (final Transaction transaction : transactions) {
@@ -312,62 +314,40 @@ public class UnconfirmedTransactions {
 		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
 
-	/**
-	 * Gets all transactions.
-	 *
-	 * @return All transaction from this unconfirmed transactions.
-	 */
+	//region UnconfirmedTransactionsFilter
+
+	@Override
 	public List<Transaction> getAll() {
 		synchronized (this.lock) {
 			return this.transactionsFilter.getAll();
 		}
 	}
 
-	/**
-	 * Gets the transactions for which the hash short id is not in the given collection.
-	 *
-	 * @param knownHashShortIds The collection of known hashes.
-	 * @return The unknown transactions.
-	 */
+	@Override
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
-		// probably faster to use hash map than collection
 		synchronized (this.lock) {
 			return this.transactionsFilter.getUnknownTransactions(knownHashShortIds);
 		}
 	}
 
-	/**
-	 * Gets the most recent transactions of an account up to a given limit.
-	 *
-	 * @param address The address of an account.
-	 * @param maxTransactions The maximum number of transactions.
-	 * @return The most recent transactions from this unconfirmed transactions.
-	 */
+	@Override
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		synchronized (this.lock) {
 			return this.transactionsFilter.getMostRecentTransactionsForAccount(address, maxTransactions);
 		}
 	}
 
-	/**
-	 * Gets all transactions up to a given limit of transactions.
-	 *
-	 * @param maxTransactions The maximum number of transactions.
-	 * @return The list of unconfirmed transactions.
-	 */
+	@Override
 	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
 		return this.transactionsFilter.getMostImportantTransactions(maxTransactions);
 	}
 
-	/**
-	 * Gets all transactions before the specified time. Returned list is sorted.
-	 *
-	 * @param time The specified time.
-	 * @return The sorted list of all transactions before the specified time.
-	 */
+	@Override
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		return this.transactionsFilter.getTransactionsBefore(time);
 	}
+
+	//endregion
 
 	/**
 	 * Drops transactions that have already expired.

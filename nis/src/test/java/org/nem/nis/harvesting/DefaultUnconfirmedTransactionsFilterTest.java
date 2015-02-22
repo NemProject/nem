@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
-public class UnconfirmedTransactionsFilterTest {
+public class DefaultUnconfirmedTransactionsFilterTest {
 	private final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 64;
 
 	//region getAll
@@ -350,7 +350,7 @@ public class UnconfirmedTransactionsFilterTest {
 		}
 
 		public TestContext(final BiPredicate<Address, Transaction> matchesPredicate) {
-			this.filter = new UnconfirmedTransactionsFilter(this.cache, matchesPredicate);
+			this.filter = new DefaultUnconfirmedTransactionsFilter(this.cache, matchesPredicate);
 			Mockito.when(this.cache.stream()).thenReturn(this.transactions.stream());
 		}
 
