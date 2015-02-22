@@ -876,6 +876,9 @@ public abstract class GraphClusteringITCase {
 		return builder;
 	}
 
+	/**
+	 * Simple class to encapsulate mu and epsilon values.
+	 */
 	private class ClusteringOptions {
 		final int mu;
 		final double epsilon;
@@ -886,6 +889,9 @@ public abstract class GraphClusteringITCase {
 		}
 	}
 
+	/**
+	 * Simple class to encapsulate teleportation and interlevel teleportation probabilities.
+	 */
 	private class TeleportationProbabilities {
 		final double teleporationProb;
 		final double interLevelTeleporationProb;

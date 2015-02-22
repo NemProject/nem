@@ -115,7 +115,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 									if (value > 10000 && (value % 10000 != 0 || uniqueAddresses.containsKey(outputAddress))) {
 										Integer output = uniqueAddresses.get(outputAddress);
 										if (null == output) {
-											output = uniqueAddresses.size() + 1;
+											output = 1 + uniqueAddresses.size();
 											uniqueAddresses.put(outputAddress, output);
 										}
 										transactions.add(new BTCTransaction(currBlockHeight, inputs, output, value));
@@ -132,9 +132,8 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 			}
 			++blockHeight;
 		}
-
-		// merge accts in transactions
 		LOGGER.info(transactions.size() + " BTC transactions loaded");
+		// merge accts in transactions
 		this.mergeAccts(transactions);
 		transactions
 				.stream()
@@ -185,7 +184,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	private class BTCTransaction {
 		final int blockHeight;
 		final SparseBitmap inputs;
-		Integer output; //TODO: Making this final would complicate things a bit...
+		Integer output; // Making this final would complicate things a bit...
 		final long value;
 
 		long inputAddress;
