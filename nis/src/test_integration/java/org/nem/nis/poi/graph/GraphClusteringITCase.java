@@ -311,23 +311,10 @@ public abstract class GraphClusteringITCase {
 	}
 
 	/**
+	 * This test prints out a table showing the correlation between account balance (stake) and
+	 * importance scores, for various values of negative outlink weights.
+	 *
 	 * Using correlation as a proxy for importance sensitivity to negOutlinkWeight.
-	 * <pre>
-	 * 0.0 | 0.9566 |   4970 |
-	 * 0.2 | 0.9557 |   4970 |
-	 * 0.4 | 0.9541 |   4970 |
-	 * 0.6 | 0.9521 |   4970 |
-	 * 0.8 | 0.9495 |   4970 |
-	 * 1.0 | 0.9463 |   4970 |
-	 * <br/>
-	 * results for blockheight up to 150000:
-	 * 0.0 | 0.9743 |   3849 |
-	 * 0.2 | 0.9742 |   3849 |
-	 * 0.4 | 0.9742 |   3849 |
-	 * 0.6 | 0.9740 |   3849 |
-	 * 0.8 | 0.9738 |   3849 |
-	 * 1.0 | 0.9736 |   3849 |
-	 * </pre>
 	 */
 	@Test
 	public void negOutlinkWeightBalanceImportanceVariance() {

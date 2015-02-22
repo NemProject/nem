@@ -29,6 +29,12 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 
 	//TODO: Add some tests here to verify that BtcTransactions are read in and created correctly?
 
+	/**
+	 * Creates account states from transaction data, which are then used for running various importance score calculation tests.
+	 *
+	 * @param transactions - list of transactions
+	 * @return list of account states, with each account having its own state
+	 */
 	protected Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<GraphClusteringTransaction> transactions) {
 		LOGGER.info("Creating PoiAccountStates from Btc transaction data...");
 
@@ -43,13 +49,12 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 				final BlockHeight blockHeight = new BlockHeight(this.normalizeBtcBlockHeightsToNem(trans.getHeight()));
 
 				if (maxBlockHeight < trans.getHeight()) {
-					maxBlockHeight = trans.getHeight();
+					maxBlockHeight = trans.getHeight(); // This is used to keep track of the maximum height found, for logging purposes
 				}
 
 				if (!accountStateMap.containsKey(sender)) {
 					accountStateMap.put(sender, new AccountState(sender));
 				}
-
 				if (!accountStateMap.containsKey(recipient)) {
 					accountStateMap.put(recipient, new AccountState(recipient));
 				}
@@ -60,8 +65,8 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 
 				// We need to add some balance sometimes because the transactions don't account for fees and coins earned from mined blocks
 				final long remainingBalance = balance - amount.getNumMicroNem();
-				if (remainingBalance < 0) {
-					if (USE_RANDOMNESS && Math.random() < 0.5) {
+				if (0 > remainingBalance) {
+					if (USE_RANDOMNESS && 0.5 > Math.random()) {
 						senderAccountState.getWeightedBalances().addReceive(new BlockHeight(blockHeight.getRaw()),
 								Amount.fromMicroNem(amount.getNumMicroNem()));
 					} else {

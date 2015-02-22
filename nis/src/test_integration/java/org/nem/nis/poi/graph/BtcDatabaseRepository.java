@@ -65,7 +65,6 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 		final BlockFileLoader blockFileLoader = new BlockFileLoader(networkParams, blockChainFiles);
 		final List<BTCTransaction> transactions = new ArrayList<>();
 		final HashMap<String, Integer> uniqueAddresses = new HashMap<>();
-		final List<SparseBitmap> inputsToMerge = new ArrayList<>();
 
 		// Iterate over the blocks and build the transaction graph
 		int blockHeight = 1; // Start at block height of 1, so it matches NEM's convention
@@ -186,7 +185,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	private class BTCTransaction {
 		final int blockHeight;
 		final SparseBitmap inputs;
-		Integer output; //TODO: Making this final complicated things a bit...
+		Integer output; //TODO: Making this final would complicate things a bit...
 		final long value;
 
 		long inputAddress;
