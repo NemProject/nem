@@ -1,11 +1,9 @@
 package org.nem.nis.boot;
 
 import org.nem.core.async.*;
-import org.nem.core.model.Block;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.BlockChain;
-import org.nem.nis.harvesting.Harvester;
+import org.nem.nis.harvesting.*;
 import org.nem.peer.*;
 
 import java.util.*;
@@ -44,8 +42,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private static final int CHECK_CHAIN_SYNC_INTERVAL = 30 * ONE_SECOND;
 
 	private final TimeProvider timeProvider;
-	private final BlockChain blockChain;
-	private final Harvester harvester;
+	private final HarvestingTask harvestingTask;
 	private final List<NemAsyncTimerVisitor> timerVisitors = new ArrayList<>();
 	private final List<AsyncTimer> timers = new ArrayList<>();
 	private final Executor executor = Executors.newCachedThreadPool();
@@ -54,16 +51,13 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	 * Creates a new scheduler.
 	 *
 	 * @param timeProvider The time provider.
-	 * @param blockChain The block chain.
-	 * @param harvester The harvester.
+	 * @param harvestingTask The harvesting task.
 	 */
 	public PeerNetworkScheduler(
 			final TimeProvider timeProvider,
-			final BlockChain blockChain,
-			final Harvester harvester) {
+			final HarvestingTask harvestingTask) {
 		this.timeProvider = timeProvider;
-		this.blockChain = blockChain;
-		this.harvester = harvester;
+		this.harvestingTask = harvestingTask;
 	}
 
 	/**
@@ -102,18 +96,7 @@ public class PeerNetworkScheduler implements AutoCloseable {
 	private void addForagingTask(final PeerNetwork network) {
 		final AsyncTimerVisitor timerVisitor = this.createNamedVisitor("FORAGING");
 		final AsyncTimerOptions options = new AsyncTimerOptionsBuilder()
-				.setRecurringFutureSupplier(
-						this.runnableToFutureSupplier(() -> {
-							final Block block = this.harvester.harvestBlock();
-							if (null == block || !this.blockChain.processBlock(block).isSuccess()) {
-								return;
-							}
-
-							final SecureSerializableEntity<?> secureBlock = new SecureSerializableEntity<>(
-									block,
-									network.getLocalNode().getIdentity());
-							network.broadcast(NisPeerId.REST_PUSH_BLOCK, secureBlock);
-						}))
+				.setRecurringFutureSupplier(this.runnableToFutureSupplier(() -> this.harvestingTask.harvest(network, this.timeProvider.getCurrentTime())))
 				.setInitialDelay(FORAGING_INITIAL_DELAY)
 				.setDelayStrategy(new UniformDelayStrategy(FORAGING_INTERVAL))
 				.setVisitor(timerVisitor)
