@@ -158,22 +158,6 @@ public class HarvesterTest {
 
 	//endregion
 
-	// side effect: dropping expired transactions
-
-	@Test
-	public void harvestBlockCallsDropExpiredTransactionOnGenerator() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.harvester.harvestBlock();
-
-		// Assert:
-		Mockito.verify(context.generator, Mockito.times(1)).dropExpireTransactions(Mockito.any());
-	}
-
-	// endregion
-
 	private static class TestContext {
 		final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		final TimeProvider timeProvider = Mockito.mock(TimeProvider.class);

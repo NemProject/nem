@@ -120,13 +120,4 @@ public class BlockGenerator {
 		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 		return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps, lastBlockHeight.getRaw() + 1);
 	}
-
-	/**
-	 * Drops transactions that have already expired.
-	 *
-	 * @param time The current time.
-	 */
-	public void dropExpireTransactions(final TimeInstant time) {
-		this.unconfirmedTransactions.dropExpiredTransactions(time);
-	}
 }

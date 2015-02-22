@@ -293,22 +293,6 @@ public class BlockGeneratorTest {
 
 	//endregion
 
-	//region dropExpireTransactions
-
-	@Test
-	public void dropExpiredTransactionsDelegatesToUnconfirmedTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext();
-
-		// Act:
-		context.generator.dropExpireTransactions(new TimeInstant(22));
-
-		// Assert:
-		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1)).dropExpiredTransactions(new TimeInstant(22));
-	}
-
-	//endregion
-
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
