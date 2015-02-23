@@ -1,5 +1,6 @@
 package org.nem.nis.harvesting;
 
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
@@ -8,12 +9,15 @@ import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.validators.*;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
  * Provider of transactions for a new block.
  */
 public class NewBlockTransactionsProvider {
+	private static final Logger LOGGER = Logger.getLogger(NewBlockTransactionsProvider.class.getName());
+
 	private final ReadOnlyNisCache nisCache;
 	private final SingleTransactionValidator singleTransactionValidator;
 	private final UnconfirmedTransactionsFilter unconfirmedTransactions;
@@ -30,8 +34,7 @@ public class NewBlockTransactionsProvider {
 			final TransactionValidatorFactory validatorFactory,
 			final UnconfirmedTransactionsFilter unconfirmedTransactions) {
 		this.nisCache = nisCache;
-		// TODO - temporarily calling build to pass UT tests!
-		this.singleTransactionValidator = validatorFactory.createSingleBuilder(nisCache.getAccountStateCache()).build();
+		this.singleTransactionValidator = validatorFactory.createSingle(nisCache.getAccountStateCache());
 		this.unconfirmedTransactions = unconfirmedTransactions;
 	}
 
@@ -64,13 +67,17 @@ public class NewBlockTransactionsProvider {
 		int numTransactions = 0;
 		final List<Transaction> blockTransactions = new ArrayList<>();
 		for (final Transaction transaction : candidateTransactions) {
-			if (this.validateSingle(transaction).isSuccess()) {
+			final ValidationResult validationResult = this.validateSingle(transaction);
+			if (validationResult.isSuccess()) {
 				numTransactions += 1 + transaction.getChildTransactions().size();
 				if (numTransactions > maxTransactions) {
 					break;
 				}
 
 				blockTransactions.add(transaction);
+			} else {
+				final Hash transactionHash = HashUtils.calculateHash(transaction);
+				LOGGER.info(String.format("transaction '%s' left out of block '%s'", transactionHash, validationResult));
 			}
 		}
 

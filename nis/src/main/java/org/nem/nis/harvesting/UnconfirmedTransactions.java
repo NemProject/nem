@@ -373,36 +373,4 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
 		transactions.stream().forEach(t -> this.addNew(t));
 	}
-
-	/**
-	 * Gets all the unconfirmed transactions that are eligible for inclusion into the next block.
-	 *
-	 * @param harvesterAddress The harvester's address.
-	 * @param blockTime The block time.
-	 * @return The filtered list of transactions.
-	 */
-	public List<Transaction> getTransactionsForNewBlock(final Address harvesterAddress, final TimeInstant blockTime) {
-		// in order for a transaction to be eligible for inclusion in a block, it must
-		// (1) occur at or before the block time
-		// (2) be signed by an account other than the harvester
-		// (3) not already be expired (relative to the block time):
-		// - BlockGenerator.generateNextBlock() calls dropExpiredTransactions() and later getTransactionsForNewBlock().
-		// - In-between it is possible that unconfirmed transactions are polled and thus expired (relative to the block time)
-		// - transactions are in our cache when we call getTransactionsForNewBlock().
-		// (4) pass validation against the *confirmed* balance
-
-		// this filter validates all transactions against confirmed balance:
-		// a) we need to use unconfirmed balance to avoid some stupid situations (and spamming).
-		// b) B has 0 balance, A->B 10nems, B->X 5nems with 2nem fee, since we check unconfirmed balance,
-		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
-		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
-		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
-		synchronized (this.lock) {
-			return new NewBlockTransactionsProvider(
-					this.nisCache,
-					this.validatorFactory,
-					this)
-					.getBlockTransactions(harvesterAddress, blockTime);
-		}
-	}
 }

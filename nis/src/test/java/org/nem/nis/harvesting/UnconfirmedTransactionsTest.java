@@ -7,7 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
@@ -21,7 +20,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	//region size
 
@@ -959,177 +957,7 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	//region getTransactionsForNewBlock
-
-	@Test
-	public void getTransactionsForNewBlockIncludesTransactionsBeforeSpecifiedTimeInstant() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account2, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account2, 3, new TimeInstant(6)),
-				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(6));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2)));
-	}
-
-	@Test
-	public void getTransactionsForNewBlockExcludesTransactionsSignedByHarvesterAddress() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account1, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account1, 3, new TimeInstant(6)),
-				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(10));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(2, 4)));
-	}
-
-	@Test
-	public void getTransactionsForNewBlockExcludesConflictingTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext(new TransferTransactionValidator());
-		final Account account1 = context.addAccount(Amount.fromNem(5));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(10), null),
-				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(6), null));
-		transactions.forEach(t -> t.setDeadline(new TimeInstant(3600)));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				new TimeInstant(10));
-		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions);
-
-		// Assert:
-		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(1))));
-	}
-
-	@Test
-	public void getTransactionsForNewBlockDoesNotIncludeExpiredTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account2, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account2, 3, new TimeInstant(6)),
-				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context::signAndAddExisting);
-		final MockTransaction transaction = new MockTransaction(account2, 5, new TimeInstant(1));
-		transaction.setDeadline(new TimeInstant(3600));
-		transaction.sign();
-		context.signAndAddExisting(transaction);
-
-		// Act:
-		final List<Transaction> filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(3601));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
-	}
-
-	//endregion
-
 	//region tests with real validator
-
-	@Test
-	public void getTransactionsForNewBlockFiltersOutConflictingTransactions() {
-		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final Account sender = context.addAccount(Amount.fromNem(20));
-		final Account recipient = context.addAccount(Amount.fromNem(10));
-		final UnconfirmedTransactions transactions = context.transactions;
-		final TimeInstant currentTime = new TimeInstant(11);
-
-		// Act:
-		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 20, R = 10
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 3, R = 25, 2 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 15, R = 10, 5 Fee
-		//   - getTransactionsBefore() returns SORTED transactions, so R->S is ordered before S->R because it has a greater fee
-		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough balance
-		//
-		// However, this and test and one I'm gonna add below, should reject R's transaction for the following reason:
-		// R doesn't have funds on the account, we don't want such TX because this would lead to creation
-		// of a block that would get discarded (TXes are validated first, and then executed)
-
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
-		t1.setFee(Amount.fromNem(2));
-		t1.sign();
-		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(12));
-		t2.setFee(Amount.fromNem(3));
-		t2.sign();
-		transactions.addExisting(t2);
-
-		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1));
-
-		// Assert:
-		// note: this checks that both TXes have been added and that returned TXes are in proper order
-		// - the filtered transactions only contain first because transaction validation uses real "confirmed" balance
-		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t2, t1)));
-		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t1)));
-	}
-
-	@Test
-	public void transactionIsExcludedFromNextBlockIfConfirmedBalanceIsInsufficient() {
-		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final UnconfirmedTransactions transactions = context.transactions;
-		final Account sender = context.addAccount(Amount.fromNem(20));
-		final Account recipient = context.addAccount(Amount.fromNem(10));
-		final TimeInstant currentTime = new TimeInstant(11);
-
-		// Act:
-		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 20, R = 10
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 25, 3 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 24, R = 1, 5 Fee
-		//   - getTransactionsBefore() returns SORTED transactions, so S->R is ordered before R->S because it has a greater fee
-		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough *confirmed* balance
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
-		t1.setFee(Amount.fromNem(3));
-		t1.sign();
-		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(22));
-		t2.setFee(Amount.fromNem(2));
-		t2.sign();
-		transactions.addExisting(t2);
-
-		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1));
-
-		// Assert:
-		// - this checks that both TXes have been added and that returned TXes are in proper order
-		// - the filtered transactions only contain first because transaction validation uses real "confirmed" balance
-		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1, t2)));
-		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t1)));
-	}
 
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
@@ -1179,12 +1007,6 @@ public class UnconfirmedTransactionsTest {
 	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
 		return transactions.stream()
 				.map(transaction -> ((MockTransaction)transaction).getCustomField())
-				.collect(Collectors.toList());
-	}
-
-	private static List<TimeInstant> getTimeInstantsAsList(final Collection<Transaction> transactions) {
-		return transactions.stream()
-				.map(Transaction::getTimeStamp)
 				.collect(Collectors.toList());
 	}
 
@@ -1339,24 +1161,6 @@ public class UnconfirmedTransactionsTest {
 			transactions.forEach(Transaction::sign);
 			transactions.forEach(unconfirmedTransactions::addExisting);
 			return transactions;
-		}
-
-		private List<MockTransaction> addMockTransactionsWithChildren(
-				final UnconfirmedTransactions unconfirmedTransactions,
-				final int startCustomField,
-				final int endCustomField,
-				final int numChildren) {
-			final List<MockTransaction> transactions = this.createMockTransactions(startCustomField, endCustomField);
-			transactions.forEach(t -> {
-				t.setChildTransactions(this.createChildren(numChildren));
-				t.sign();
-				unconfirmedTransactions.addExisting(t);
-			});
-			return transactions;
-		}
-
-		private Collection<Transaction> createChildren(final int count) {
-			return this.createMockTransactionsAsBatch(1, count);
 		}
 
 		public TransferTransaction createTransferTransaction(
