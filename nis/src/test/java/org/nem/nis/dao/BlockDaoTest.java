@@ -44,6 +44,10 @@ public class BlockDaoTest {
 	@Autowired
 	SessionFactory sessionFactory;
 
+	@After
+	public void after() {
+		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
+	}
 	//region save
 	@Test
 	public void savingBlockSavesAccounts() {

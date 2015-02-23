@@ -44,8 +44,12 @@ public class TransferDaoTest {
 	private Session session;
 
 	@Before
-	public void before() {
+	public  void before() {
 		this.session = this.sessionFactory.openSession();
+	}
+
+	@After
+	public void after() {
 		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
 		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
 		session.createSQLQuery("delete from transfers").executeUpdate();
@@ -64,10 +68,7 @@ public class TransferDaoTest {
 		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
 		this.session.flush();
 		this.session.clear();
-	}
 
-	@After
-	public void after() {
 		this.session.close();
 	}
 

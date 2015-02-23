@@ -23,19 +23,22 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.*;
 
+@Ignore
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {
 	protected static final long TRANSACTIONS_PER_BLOCK = 16L;
 	private static final int LIMIT = 10;
 	private AtomicInteger counter = new AtomicInteger(0);
-	private static final MockAccountDao ACCOUNT_DAO = new MockAccountDao();
 	private static final Account[] ACCOUNTS = {
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount()
 	};
+
+	@Autowired
+	AccountDao accountDao;
 
 	@Autowired
 	BlockDao blockDao;
@@ -47,17 +50,32 @@ public abstract class TransactionRetrieverTest {
 
 	@Before
 	public void createDb() {
-		if (0 == this.counter.getAndIncrement()) {
-			this.session = this.sessionFactory.openSession();
-			setupBlocks();
-		}
+		this.session = this.sessionFactory.openSession();
+		setupBlocks();
 	}
 
 	@After
 	public void destroyDb() {
-		if (0 == this.counter.decrementAndGet()) {
-			this.session.close();
-		}
+		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
+		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
+		session.createSQLQuery("delete from transfers").executeUpdate();
+		session.createSQLQuery("delete from importancetransfers").executeUpdate();
+		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
+		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
+		session.createSQLQuery("delete from multisigsends").executeUpdate();
+		session.createSQLQuery("delete from multisigreceives").executeUpdate();
+		session.createSQLQuery("delete from blocks").executeUpdate();
+		session.createSQLQuery("delete from accounts").executeUpdate();
+		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
+		this.session.flush();
+		this.session.clear();
+
+		this.session.close();
 	}
 
 	/**
@@ -219,7 +237,7 @@ public abstract class TransactionRetrieverTest {
 
 			// Arrange: sign and map the blocks
 			block.sign();
-			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(ACCOUNT_DAO));
+			final DbBlock dbBlock = MapperUtils.toDbModel(block, new AccountDaoLookupAdapter(accountDao));
 			blockDao.save(dbBlock);
 		}
 	}
@@ -262,17 +280,11 @@ public abstract class TransactionRetrieverTest {
 		block.addTransaction(createMultisigTransaction((int)(block.getHeight().getRaw() * 100 + 9), TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION));
 	}
 
-	private static void addMapping(final MockAccountDao accountDao, final Account account) {
-		accountDao.addMapping(account, new DbAccount(account.getAddress().getEncoded(), account.getAddress().getPublicKey()));
-	}
-
 	private static Transaction createTransfer(
 			final int timeStamp,
 			final Account sender,
 			final Account recipient,
 			final boolean signTransaction) {
-		addMapping(ACCOUNT_DAO, sender);
-		addMapping(ACCOUNT_DAO, recipient);
 		final Transaction transaction = new TransferTransaction(
 				new TimeInstant(timeStamp),
 				sender,
@@ -291,8 +303,6 @@ public abstract class TransactionRetrieverTest {
 			final Account sender,
 			final Account remote,
 			final boolean signTransaction) {
-		addMapping(ACCOUNT_DAO, sender);
-		addMapping(ACCOUNT_DAO, remote);
 		final Transaction transaction = new ImportanceTransferTransaction(
 				new TimeInstant(timeStamp),
 				sender,
@@ -313,8 +323,6 @@ public abstract class TransactionRetrieverTest {
 		final List<MultisigModification> modifications = cosignatories.stream()
 				.map(c -> createModification(MultisigModificationType.Add, c))
 				.collect(Collectors.toList());
-		addMapping(ACCOUNT_DAO, sender);
-		modifications.forEach(m -> addMapping(ACCOUNT_DAO, m.getCosignatory()));
 		final Transaction transaction = new MultisigAggregateModificationTransaction(
 				new TimeInstant(timeStamp),
 				sender,
