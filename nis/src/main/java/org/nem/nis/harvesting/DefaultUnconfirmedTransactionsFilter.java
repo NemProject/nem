@@ -55,18 +55,6 @@ public class DefaultUnconfirmedTransactionsFilter implements UnconfirmedTransact
 	}
 
 	@Override
-	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
-		final int[] txCount = new int[1];
-		return this.transactions.stream()
-				.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
-				.filter(t -> {
-					txCount[0] += 1 + t.getChildTransactions().size();
-					return maxTransactions >= txCount[0];
-				})
-				.collect(Collectors.toList());
-	}
-
-	@Override
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		final List<Transaction> transactions = this.transactions.stream()
 				.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)

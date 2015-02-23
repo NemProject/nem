@@ -339,13 +339,10 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	}
 
 	@Override
-	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
-		return this.transactionsFilter.getMostImportantTransactions(maxTransactions);
-	}
-
-	@Override
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
-		return this.transactionsFilter.getTransactionsBefore(time);
+		synchronized (this.lock) {
+			return this.transactionsFilter.getTransactionsBefore(time);
+		}
 	}
 
 	//endregion

@@ -36,14 +36,6 @@ public interface UnconfirmedTransactionsFilter {
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions);
 
 	/**
-	 * Gets all transactions up to a given limit of transactions.
-	 *
-	 * @param maxTransactions The maximum number of transactions.
-	 * @return The list of unconfirmed transactions.
-	 */
-	public List<Transaction> getMostImportantTransactions(final int maxTransactions);
-
-	/**
 	 * Gets all transactions before the specified time. Returned list is sorted.
 	 *
 	 * @param time The specified time.
