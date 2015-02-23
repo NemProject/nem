@@ -19,17 +19,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.stream.*;
 
-@Ignore
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class TransactionRetrieverTest {
 	protected static final long TRANSACTIONS_PER_BLOCK = 16L;
 	private static final int LIMIT = 10;
-	private AtomicInteger counter = new AtomicInteger(0);
 	private static final Account[] ACCOUNTS = {
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
