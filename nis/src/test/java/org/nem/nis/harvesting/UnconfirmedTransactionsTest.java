@@ -542,7 +542,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final boolean isRemoved = context.transactions.remove(toRemove);
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(isRemoved, IsEqual.equalTo(true));
@@ -561,7 +561,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddExisting(new MockTransaction(sender, 9));
 
 		final boolean isRemoved = context.transactions.remove(toRemove);
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(isRemoved, IsEqual.equalTo(false));
@@ -616,7 +616,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		context.transactions.removeAll(block);
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
@@ -711,7 +711,7 @@ public class UnconfirmedTransactionsTest {
 		context.addMockTransactions(context.transactions, 6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
@@ -727,7 +727,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
@@ -870,7 +870,7 @@ public class UnconfirmedTransactionsTest {
 		context.addMockTransactions(context.transactions, 6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
@@ -886,7 +886,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
@@ -909,7 +909,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(7, 9)));
@@ -1002,12 +1002,6 @@ public class UnconfirmedTransactionsTest {
 		final TransferTransaction transferTransaction = new TransferTransaction(timeStamp, sender, recipient, amount, null);
 		transferTransaction.setDeadline(timeStamp.addSeconds(1));
 		return transferTransaction;
-	}
-
-	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
-		return transactions.stream()
-				.map(transaction -> ((MockTransaction)transaction).getCustomField())
-				.collect(Collectors.toList());
 	}
 
 	private static class TestContext {

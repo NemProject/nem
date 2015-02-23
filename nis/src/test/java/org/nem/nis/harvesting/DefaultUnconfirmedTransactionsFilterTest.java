@@ -14,7 +14,6 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class DefaultUnconfirmedTransactionsFilterTest {
-	private final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 64;
 
 	//region getAll
 
@@ -25,7 +24,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactions(6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.filter.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
@@ -39,7 +38,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.transactions.get(2).setFee(Amount.fromNem(11));
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.filter.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
@@ -161,7 +160,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(5));
-		Assert.assertThat(getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(12, 13, 14, 15, 16));
+		Assert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(12, 13, 14, 15, 16));
 	}
 
 	@Test
@@ -176,7 +175,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 
 		// Assert:
 		Assert.assertThat(mostRecentTransactions.size(), IsEqual.equalTo(3));
-		Assert.assertThat(getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(3, 6, 9));
+		Assert.assertThat(MockTransactionUtils.getCustomFieldValues(mostRecentTransactions), IsEquivalent.equivalentTo(3, 6, 9));
 	}
 
 	@Test
@@ -208,7 +207,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addMockTransactions(6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
@@ -222,7 +221,7 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.transactions.get(1).setFee(Amount.fromNem(11));
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
@@ -236,19 +235,13 @@ public class DefaultUnconfirmedTransactionsFilterTest {
 		context.addSignatureTransactions(2, 5);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.filter.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
 	}
 
 	//endregion
-
-	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
-		return transactions.stream()
-				.map(transaction -> ((MockTransaction)transaction).getCustomField())
-				.collect(Collectors.toList());
-	}
 
 	private static class TestContext {
 		private final List<Transaction> transactions = new ArrayList<>();

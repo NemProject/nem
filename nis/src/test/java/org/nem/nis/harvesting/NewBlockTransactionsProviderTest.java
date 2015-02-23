@@ -38,7 +38,7 @@ public class NewBlockTransactionsProviderTest {
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(6));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1)));
@@ -60,7 +60,7 @@ public class NewBlockTransactionsProviderTest {
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(10));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(2, 4)));
@@ -84,7 +84,7 @@ public class NewBlockTransactionsProviderTest {
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3601));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
@@ -144,7 +144,7 @@ public class NewBlockTransactionsProviderTest {
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3000));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 3)));
@@ -183,7 +183,7 @@ public class NewBlockTransactionsProviderTest {
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3000));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues.size(), IsEqual.equalTo(numFilteredTransactions));
@@ -216,7 +216,7 @@ public class NewBlockTransactionsProviderTest {
 
 		// Act:
 		final List<Transaction> filteredTransactions = context.provider.getBlockTransactions(account1.getAddress(), new TimeInstant(3000));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions);
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(filteredTransactions);
 
 		// Assert:
 		Assert.assertThat(customFieldValues.size(), IsEqual.equalTo(numFilteredTransactions));
@@ -391,16 +391,9 @@ public class NewBlockTransactionsProviderTest {
 
 	//endregion
 
-	// TODO 20150222 J-J: refactor to MockTransaction!
 	private static List<TimeInstant> getTimeInstantsAsList(final Collection<Transaction> transactions) {
 		return transactions.stream()
 				.map(Transaction::getTimeStamp)
-				.collect(Collectors.toList());
-	}
-
-	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
-		return transactions.stream()
-				.map(transaction -> ((MockTransaction)transaction).getCustomField())
 				.collect(Collectors.toList());
 	}
 
