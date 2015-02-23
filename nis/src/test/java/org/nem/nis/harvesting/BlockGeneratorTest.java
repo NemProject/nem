@@ -151,8 +151,8 @@ public class BlockGeneratorTest {
 		// Assert:
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(3));
 		Assert.assertThat(block.getTransactions(), IsEqual.equalTo(transactions));
-		Mockito.verify(context.unconfirmedTransactions, Mockito.times(1))
-				.getTransactionsForNewBlock(ownerAccount.getAddress(), new TimeInstant(11));
+		Mockito.verify(context.transactionsProvider, Mockito.only())
+				.getBlockTransactions(ownerAccount.getAddress(), new TimeInstant(11));
 	}
 
 	@Test
@@ -296,14 +296,14 @@ public class BlockGeneratorTest {
 	private static class TestContext {
 		private final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		private final ReadOnlyAccountStateCache accountStateCache = Mockito.mock(ReadOnlyAccountStateCache.class);
-		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
+		private final NewBlockTransactionsProvider transactionsProvider = Mockito.mock(NewBlockTransactionsProvider.class);
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final BlockDifficultyScorer difficultyScorer = Mockito.mock(BlockDifficultyScorer.class);
 		private final BlockScorer scorer = Mockito.mock(BlockScorer.class);
 		private final BlockValidator validator = Mockito.mock(BlockValidator.class);
 		private final BlockGenerator generator = new BlockGenerator(
 				NisCacheFactory.createReadOnly(this.accountCache, this.accountStateCache),
-				this.unconfirmedTransactions,
+				this.transactionsProvider,
 				this.blockDao,
 				this.scorer,
 				this.validator);
@@ -337,7 +337,7 @@ public class BlockGeneratorTest {
 		}
 
 		private void setBlockTransactions(final List<Transaction> transactions) {
-			Mockito.when(this.unconfirmedTransactions.getTransactionsForNewBlock(Mockito.any(), Mockito.any())).thenReturn(transactions);
+			Mockito.when(this.transactionsProvider.getBlockTransactions(Mockito.any(), Mockito.any())).thenReturn(transactions);
 		}
 	}
 }

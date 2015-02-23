@@ -401,13 +401,11 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
 		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
 		synchronized (this.lock) {
-			return this.filter(
-					this.getTransactionsBefore(blockTime).stream()
-							.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
-							.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
-							.collect(Collectors.toList()),
-					BalanceValidationOptions.ValidateAgainstConfirmedBalance)
-					.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+			return new NewBlockTransactionsProvider(
+					this.nisCache,
+					this.validatorFactory,
+					this)
+					.getBlockTransactions(harvesterAddress, blockTime);
 		}
 	}
 }
