@@ -11,6 +11,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
+import org.nem.nis.dao.DbUtils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -53,24 +54,7 @@ public abstract class TransactionRetrieverTest {
 
 	@After
 	public void destroyDb() {
-		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
-		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
-		session.createSQLQuery("delete from transfers").executeUpdate();
-		session.createSQLQuery("delete from importancetransfers").executeUpdate();
-		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigsends").executeUpdate();
-		session.createSQLQuery("delete from multisigreceives").executeUpdate();
-		session.createSQLQuery("delete from blocks").executeUpdate();
-		session.createSQLQuery("delete from accounts").executeUpdate();
-		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		this.session.flush();
-		this.session.clear();
+		DbUtils.dbCleanup(session);
 
 		this.session.close();
 	}
