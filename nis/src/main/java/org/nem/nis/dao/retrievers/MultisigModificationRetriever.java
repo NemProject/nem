@@ -20,7 +20,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if ( ReadOnlyTransferDao.TransferType.ALL == transferType) {
-			throw new RuntimeException("transfer type ALL not supported by transaction retriever classes");
+			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
 		if (ReadOnlyTransferDao.TransferType.OUTGOING == transferType) {

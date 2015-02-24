@@ -20,10 +20,8 @@ public class TransferRetriever implements TransactionRetriever {
 			final long maxId,
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
-		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
-		// TODO 20150224 BR -> J done.
 		if ( ReadOnlyTransferDao.TransferType.ALL == transferType) {
-			throw new RuntimeException("transfer type ALL not supported by transaction retriever classes");
+			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
 		final String senderOrRecipient = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "recipient";

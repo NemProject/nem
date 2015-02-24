@@ -147,7 +147,7 @@ public abstract class TransactionRetrieverTest {
 		// Act:
 		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
 				this.session,
-				this.getAccountId(ACCOUNTS[accountIndex]), // TODO 20150223 J-G: this seems to fail sporadically with a NullPointerException :/
+				this.getAccountId(ACCOUNTS[accountIndex]),
 				topMostId,
 				LIMIT,
 				ReadOnlyTransferDao.TransferType.OUTGOING);
@@ -183,30 +183,57 @@ public abstract class TransactionRetrieverTest {
 
 	// endregion
 
-	// Arrange:
-	final TransactionRetriever retriever = getTransactionRetriever();
-
 	// region signature check
 
 	@Test
-	public void outerTransactionsHaveNonNullSignatures() {
+	public void incomingOuterTransactionsHaveNonNullSignatures() {
+		// Assert:
+		assertOuterTransactionsHaveNonNullSignatures(ReadOnlyTransferDao.TransferType.INCOMING);
+	}
+
+	@Test
+	public void outgoingOuterTransactionsHaveNonNullSignatures() {
+		// Assert:
+		assertOuterTransactionsHaveNonNullSignatures(ReadOnlyTransferDao.TransferType.OUTGOING);
+	}
+
+	private void assertOuterTransactionsHaveNonNullSignatures(final ReadOnlyTransferDao.TransferType transferType) {
+		// Arrange:
+		final TransactionRetriever retriever = this.getTransactionRetriever();
 		for (final Account ACCOUNT : ACCOUNTS) {
 			// Act:
-			final Collection<TransferBlockPair> outgoingPairs = retriever.getTransfersForAccount(
+			final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
 					this.session,
 					this.getAccountId(ACCOUNT),
 					Long.MAX_VALUE,
 					100,
-					ReadOnlyTransferDao.TransferType.OUTGOING);
-			final Collection<TransferBlockPair> incomingPairs = retriever.getTransfersForAccount(
-					this.session,
-					this.getAccountId(ACCOUNT),
-					Long.MAX_VALUE,
-					100,
-					ReadOnlyTransferDao.TransferType.INCOMING);
-			outgoingPairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
-			incomingPairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
+					transferType);
+
+			// Assert:
+			pairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
 		}
+	}
+
+	// endregion
+
+	// region all
+
+	@Test
+	public void cannotRetrieveAllTransactions() {
+		// Arrange:
+		final TransactionRetriever retriever = this.getTransactionRetriever();
+
+		// Act:
+		IntStream.range(0, ACCOUNTS.length).forEach(i ->
+				ExceptionAssert.assertThrows(v -> {
+					// Act:
+					retriever.getTransfersForAccount(
+							this.session,
+							this.getAccountId(ACCOUNTS[i]),
+							34,
+							LIMIT,
+							ReadOnlyTransferDao.TransferType.ALL);
+				}, IllegalArgumentException.class));
 	}
 
 	// endregion

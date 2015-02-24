@@ -56,25 +56,31 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 	// region signature check
 
 	@Test
-	public void innerTransactionsHaveNullSignatures() {
+	public void incomingInnerTransactionsHaveNullSignatures() {
+		// Assert:
+		assertInnerTransactionsHaveNullSignatures(ReadOnlyTransferDao.TransferType.INCOMING);
+	}
+
+	@Test
+	public void outgoingInnerTransactionsHaveNullSignatures() {
+		// Assert:
+		assertInnerTransactionsHaveNullSignatures(ReadOnlyTransferDao.TransferType.OUTGOING);
+	}
+
+	private void assertInnerTransactionsHaveNullSignatures(final ReadOnlyTransferDao.TransferType transferType) {
+		// Arrange:
+		final TransactionRetriever retriever = this.getTransactionRetriever();
 		for (final Account ACCOUNT : ACCOUNTS) {
 			// Act:
-			final Collection<TransferBlockPair> outgoingPairs = retriever.getTransfersForAccount(
+			final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
 					this.session,
 					this.getAccountId(ACCOUNT),
 					Long.MAX_VALUE,
 					100,
-					ReadOnlyTransferDao.TransferType.OUTGOING);
-			final Collection<TransferBlockPair> incomingPairs = retriever.getTransfersForAccount(
-					this.session,
-					this.getAccountId(ACCOUNT),
-					Long.MAX_VALUE,
-					100,
-					ReadOnlyTransferDao.TransferType.INCOMING);
-			outgoingPairs.stream().forEach(p -> Assert.assertThat(
-					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
-					IsNull.nullValue()));
-			incomingPairs.stream().forEach(p -> Assert.assertThat(
+					transferType);
+
+			// Assert:
+			pairs.stream().forEach(p -> Assert.assertThat(
 					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
 					IsNull.nullValue()));
 		}
