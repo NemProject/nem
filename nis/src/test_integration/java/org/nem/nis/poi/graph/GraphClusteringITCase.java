@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 
 /**
  * Abstract class for testing POI. Specific implementations should load data
- * from varous blockchains (e.g., Nem, Btc, Nxt).
+ * from various blockchains (e.g., Nem, Btc, Nxt).
  */
 public abstract class GraphClusteringITCase {
-	protected static final Logger LOGGER = Logger.getLogger(NxtGraphClusteringITCase.class.getName());
+	protected static final Logger LOGGER = Logger.getLogger(GraphClusteringITCase.class.getName());
 
 	private static final PoiOptionsBuilder DEFAULT_POI_OPTIONS_BUILDER = new PoiOptionsBuilder();
 	private static final PoiOptions DEFAULT_POI_OPTIONS = DEFAULT_POI_OPTIONS_BUILDER.create();
@@ -595,6 +595,7 @@ public abstract class GraphClusteringITCase {
 
 	//region influence of epsilon
 
+	// TODO 20150223 J-M: did you extract this to the text file? if so, we can remove it here
 	/**
 	 * Analyzes the influence of the value of epsilon on the number of clusters, the average cluster size and the number of hubs.
 	 * The minimum harvester balance is set to 10000.
@@ -741,7 +742,7 @@ public abstract class GraphClusteringITCase {
 
 			maxRatio = ratios.getAt(i) > maxRatio ? ratios.getAt(i) : maxRatio;
 			if (ratios.getAt(i) > 1.001 || ratios.getAt(i) < 0.999) {
-				// LOGGER.info("Account " + i + " importance ratio is " + ratios.getAt(i));
+				LOGGER.info("Account " + i + " importance ratio is " + ratios.getAt(i));
 			}
 		}
 

@@ -20,7 +20,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	private final static Map<Integer, Map<Address, AccountState>> accountStateMapCache = new HashMap<>();
 
 	/**
-	 * Default contructor - where we set the parameters for
+	 * Default constructor - where we set the parameters for
 	 * analyzing the Bitcoin blockchain.
 	 */
 	public BtcGraphClusteringITCase() {
@@ -28,6 +28,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	}
 
 	//TODO: Add some tests here to verify that BtcTransactions are read in and created correctly?
+	// TODO 20150223 J-M: i guess we can close this TODO?
 
 	/**
 	 * Creates account states from transaction data, which are then used for running various importance score calculation tests.
@@ -82,13 +83,14 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 				recipientAccountState.getWeightedBalances().addReceive(blockHeight, amount);
 			}
 
-			LOGGER.info("Max blockheight processed: " + maxBlockHeight);
+			LOGGER.info("Max block height processed: " + maxBlockHeight);
 			accountStateMapCache.put(transactions.hashCode(), accountStateMap);
 		}
 
 		return accountStateMapCache.get(transactions.hashCode());
 	}
 
+	// TODO 20150223 J-M: i noticed you're not calling this; is that intentional?
 	private long normalizeBtcToNemSupply(final long amt) {
 		return (long)(amt * SUPPLY_NORMALIZATION_FACTOR);
 	}

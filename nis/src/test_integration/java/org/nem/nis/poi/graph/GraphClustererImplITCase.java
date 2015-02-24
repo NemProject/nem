@@ -11,9 +11,6 @@ import java.io.*;
 import java.security.SecureRandom;
 import java.util.*;
 
-/**
- *
- */
 public class GraphClustererImplITCase {
 	private static final String WORKING_DIRECTORY = System.getProperty("user.dir");
 	private static final File TEST_FILE_DIRECTORY = new File(WORKING_DIRECTORY, "test_files");

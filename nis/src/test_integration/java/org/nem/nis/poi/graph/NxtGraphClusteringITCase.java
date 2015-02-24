@@ -73,6 +73,9 @@ public class NxtGraphClusteringITCase extends GraphClusteringITCase {
 		return accountStateMap;
 	}
 
+	// TODO 20150223 J-M i noticed you're not calling this; is that intentional
+	// TODO 20150223 J-M: i would rather these be abstract in the base class + a non-abstract normalize
+	// > that should be called for normalizing amounts (so changing that single function will impact all derived tests)
 	private long normalizeNxtToNemSupply(final long amt) {
 		return amt * SUPPLY_NORMALIZATION_FACTOR;
 	}

@@ -10,6 +10,7 @@ import org.nem.core.math.SparseBitmap;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * A repository class for loading the transactions from the Bitcoin blockchain.
@@ -18,7 +19,8 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	private static final Logger LOGGER = Logger.getLogger(BtcDatabaseRepository.class.getName());
 
 	private final String databasePath;
-	private static final Map<String, Collection<GraphClusteringTransaction>> transactionCache = new HashMap<>();
+	// TODO 20150223 J-M: fyi, the cache in the NXT repository is not static; probably both should be static or non-static
+	private static final Map<String, Collection<GraphClusteringTransaction>> TRANSACTION_CACHE = new HashMap<>();
 
 	/**
 	 * Creates a new BTC repository.
@@ -47,20 +49,15 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 		LOGGER.info(String.format("loading transactions in blocks [%d, %d]...", startHeight, stopHeight));
 
 		final String transCacheKey = startHeight + "_" + stopHeight;
-		if (this.transactionCache.containsKey(transCacheKey)) {
-			return this.transactionCache.get(transCacheKey);
+		if (TRANSACTION_CACHE.containsKey(transCacheKey)) {
+			return TRANSACTION_CACHE.get(transCacheKey);
 		}
 
 		final List<GraphClusteringTransaction> transactionData = new ArrayList<>();
 
 		final NetworkParameters networkParams = new MainNetParams();
-		final List<File> blockChainFiles = new ArrayList<>();
-		FileUtils.listFiles(new File(this.databasePath), new String[] { "dat" }, false)
-				.stream()
-				.forEach(
-						i -> {
-							blockChainFiles.add(i);
-						});
+		final List<File> blockChainFiles = FileUtils.listFiles(new File(this.databasePath), new String[] { "dat" }, false).stream()
+				.collect(Collectors.toList());
 
 		final BlockFileLoader blockFileLoader = new BlockFileLoader(networkParams, blockChainFiles);
 		final List<BTCTransaction> transactions = new ArrayList<>();
@@ -86,6 +83,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 									.stream()
 									.map(input ->
 									{
+										@SuppressWarnings("deprecation")
 										final String currAddress = input.getFromAddress().toString();
 										Integer curr = uniqueAddresses.get(currAddress);
 										if (null == curr) {
@@ -134,7 +132,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 		}
 		LOGGER.info(transactions.size() + " BTC transactions loaded");
 		// merge accts in transactions
-		this.mergeAccts(transactions);
+		this.mergeAccounts(transactions);
 		transactions
 				.stream()
 				.forEach(btcTrans -> transactionData.add(new GraphClusteringTransaction(
@@ -143,12 +141,12 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 						btcTrans.outputAddress,
 						btcTrans.value)));
 
-		this.transactionCache.put(transCacheKey, transactionData);
+		TRANSACTION_CACHE.put(transCacheKey, transactionData);
 
 		return transactionData;
 	}
 
-	private void mergeAccts(final List<BTCTransaction> transactions) {
+	private void mergeAccounts(final List<BTCTransaction> transactions) {
 		final Map<Integer, Integer> remapping = new HashMap<>();
 		transactions
 				.stream()
@@ -182,13 +180,13 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	}
 
 	private class BTCTransaction {
-		final int blockHeight;
-		final SparseBitmap inputs;
-		Integer output; // Making this final would complicate things a bit...
-		final long value;
+		public final int blockHeight;
+		public final SparseBitmap inputs;
+		public final Integer output;
+		public final long value;
 
-		long inputAddress;
-		long outputAddress;
+		public long inputAddress;
+		public long outputAddress;
 
 		BTCTransaction(final int blockHeight, final SparseBitmap inputs, final Integer output, final long value) {
 			this.blockHeight = blockHeight;
