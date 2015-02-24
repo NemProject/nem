@@ -59,13 +59,22 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 	public void innerTransactionsHaveNullSignatures() {
 		for (final Account ACCOUNT : ACCOUNTS) {
 			// Act:
-			final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
+			final Collection<TransferBlockPair> outgoingPairs = retriever.getTransfersForAccount(
 					this.session,
 					this.getAccountId(ACCOUNT),
 					Long.MAX_VALUE,
 					100,
-					ReadOnlyTransferDao.TransferType.ALL);
-			pairs.stream().forEach(p -> Assert.assertThat(
+					ReadOnlyTransferDao.TransferType.OUTGOING);
+			final Collection<TransferBlockPair> incomingPairs = retriever.getTransfersForAccount(
+					this.session,
+					this.getAccountId(ACCOUNT),
+					Long.MAX_VALUE,
+					100,
+					ReadOnlyTransferDao.TransferType.INCOMING);
+			outgoingPairs.stream().forEach(p -> Assert.assertThat(
+					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
+					IsNull.nullValue()));
+			incomingPairs.stream().forEach(p -> Assert.assertThat(
 					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
 					IsNull.nullValue()));
 		}

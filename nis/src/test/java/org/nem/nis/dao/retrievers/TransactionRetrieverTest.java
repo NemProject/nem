@@ -192,13 +192,20 @@ public abstract class TransactionRetrieverTest {
 	public void outerTransactionsHaveNonNullSignatures() {
 		for (final Account ACCOUNT : ACCOUNTS) {
 			// Act:
-			final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
+			final Collection<TransferBlockPair> outgoingPairs = retriever.getTransfersForAccount(
 					this.session,
 					this.getAccountId(ACCOUNT),
 					Long.MAX_VALUE,
 					100,
-					ReadOnlyTransferDao.TransferType.ALL);
-			pairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
+					ReadOnlyTransferDao.TransferType.OUTGOING);
+			final Collection<TransferBlockPair> incomingPairs = retriever.getTransfersForAccount(
+					this.session,
+					this.getAccountId(ACCOUNT),
+					Long.MAX_VALUE,
+					100,
+					ReadOnlyTransferDao.TransferType.INCOMING);
+			outgoingPairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
+			incomingPairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
 		}
 	}
 
