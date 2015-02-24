@@ -1,5 +1,6 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.core.IsNull;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.junit.*;
@@ -11,7 +12,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
-import org.nem.nis.dao.DbUtils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -28,7 +28,7 @@ import java.util.stream.*;
 public abstract class TransactionRetrieverTest {
 	protected static final long TRANSACTIONS_PER_BLOCK = 16L;
 	private static final int LIMIT = 10;
-	private static final Account[] ACCOUNTS = {
+	protected static final Account[] ACCOUNTS = {
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
 			Utils.generateRandomAccount(),
@@ -44,7 +44,7 @@ public abstract class TransactionRetrieverTest {
 	@Autowired
 	SessionFactory sessionFactory;
 
-	private Session session;
+	protected Session session;
 
 	@Before
 	public void createDb() {
@@ -84,34 +84,36 @@ public abstract class TransactionRetrieverTest {
 	 */
 	protected abstract List<Integer> getExpectedComparablePairsForOutgoingTransactions(final BlockHeight height, final int accountIndex);
 
+	// region retrieval
+
 	@Test
 	public void canRetrieveIncomingTransactionsFromBeginning() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 34));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 34));
 	}
 
 	@Test
 	public void canRetrieveOutgoingTransactionsFromBeginning() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 34));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 34));
 	}
 
 	@Test
 	public void canRetrieveIncomingTransactionsFromMiddle() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 234));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, 234));
 	}
 
 	@Test
 	public void canRetrieveOutgoingTransactionsFromMiddle() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 234));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, 234));
 	}
 
 	@Test
 	public void canRetrieveIncomingTransactionsFromEnd() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, Long.MAX_VALUE));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveIncomingTransactions(i, Long.MAX_VALUE));
 	}
 
 	@Test
 	public void canRetrieveOutgoingTransactionsFromEnd() {
-		IntStream.range(0, 4).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, Long.MAX_VALUE));
+		IntStream.range(0, ACCOUNTS.length).forEach(i -> this.assertCanRetrieveOutgoingTransactions(i, Long.MAX_VALUE));
 	}
 
 	private void assertCanRetrieveIncomingTransactions(final int accountIndex, final long topMostId) {
@@ -178,6 +180,29 @@ public abstract class TransactionRetrieverTest {
 
 		return ids.subList(0, limit > ids.size() ? ids.size() : limit);
 	}
+
+	// endregion
+
+	// Arrange:
+	final TransactionRetriever retriever = getTransactionRetriever();
+
+	// region signature check
+
+	@Test
+	public void outerTransactionsHaveNonNullSignatures() {
+		for (final Account ACCOUNT : ACCOUNTS) {
+			// Act:
+			final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
+					this.session,
+					this.getAccountId(ACCOUNT),
+					Long.MAX_VALUE,
+					100,
+					ReadOnlyTransferDao.TransferType.ALL);
+			pairs.stream().forEach(p -> Assert.assertThat(p.getTransfer().getSenderProof(), IsNull.notNullValue()));
+		}
+	}
+
+	// endregion
 
 	protected void setupBlocks() {
 		// Arrange: create 25 blocks (use height as the id)
