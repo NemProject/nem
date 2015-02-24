@@ -499,21 +499,16 @@ public class BlockDaoTest {
 		emptyBlock.sign();
 		final DbBlock dbBlock = MapperUtils.toDbModel(emptyBlock, accountDaoLookup);
 
-		// Act:
 		this.blockDao.save(dbBlock);
+		final int numTransfersBeforeDelete = this.transferDao.getTransactionsForAccount(emptyBlock.getSigner(), 0, 100).size();
+
+		// Act:
 		this.blockDao.deleteBlocksAfterHeight(emptyBlock.getHeight().prev());
-		final DbAccount entity = this.accountDao.getAccount(dbBlock.getHarvester().getId());
-		final DbTransferTransaction dbTransferTransaction1 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(0)).getRaw());
-		final DbTransferTransaction dbTransferTransaction2 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(1)).getRaw());
-		final DbTransferTransaction dbTransferTransaction3 = this.transferDao.findByHash(HashUtils.calculateHash(emptyBlock.getTransactions().get(2)).getRaw());
+		final int numTransfersAfterDelete = this.transferDao.getTransactionsForAccount(emptyBlock.getSigner(), 0, 100).size();
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbBlock.getHarvester().getId()));
-		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
-		Assert.assertThat(dbTransferTransaction1, nullValue());
-		Assert.assertThat(dbTransferTransaction2, nullValue());
-		Assert.assertThat(dbTransferTransaction3, nullValue());
+		Assert.assertThat(numTransfersBeforeDelete, IsEqual.equalTo(3));
+		Assert.assertThat(numTransfersAfterDelete, IsEqual.equalTo(0));
 	}
 
 	@Test
