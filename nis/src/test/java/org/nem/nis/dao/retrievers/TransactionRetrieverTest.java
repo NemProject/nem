@@ -188,13 +188,13 @@ public abstract class TransactionRetrieverTest {
 	@Test
 	public void incomingOuterTransactionsHaveNonNullSignatures() {
 		// Assert:
-		assertOuterTransactionsHaveNonNullSignatures(ReadOnlyTransferDao.TransferType.INCOMING);
+		this.assertOuterTransactionsHaveNonNullSignatures(ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	@Test
 	public void outgoingOuterTransactionsHaveNonNullSignatures() {
 		// Assert:
-		assertOuterTransactionsHaveNonNullSignatures(ReadOnlyTransferDao.TransferType.OUTGOING);
+		this.assertOuterTransactionsHaveNonNullSignatures(ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	private void assertOuterTransactionsHaveNonNullSignatures(final ReadOnlyTransferDao.TransferType transferType) {

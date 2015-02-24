@@ -58,13 +58,13 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 	@Test
 	public void incomingInnerTransactionsHaveNullSignatures() {
 		// Assert:
-		assertInnerTransactionsHaveNullSignatures(ReadOnlyTransferDao.TransferType.INCOMING);
+		this.assertInnerTransactionsHaveNullSignatures(ReadOnlyTransferDao.TransferType.INCOMING);
 	}
 
 	@Test
 	public void outgoingInnerTransactionsHaveNullSignatures() {
 		// Assert:
-		assertInnerTransactionsHaveNullSignatures(ReadOnlyTransferDao.TransferType.OUTGOING);
+		this.assertInnerTransactionsHaveNullSignatures(ReadOnlyTransferDao.TransferType.OUTGOING);
 	}
 
 	private void assertInnerTransactionsHaveNullSignatures(final ReadOnlyTransferDao.TransferType transferType) {
