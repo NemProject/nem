@@ -44,6 +44,19 @@ public class BlockDaoTest {
 	@Autowired
 	SessionFactory sessionFactory;
 
+	private Session session;
+
+	@Before
+	public void before() {
+		this.session = this.sessionFactory.openSession();
+	}
+
+	@After
+	public void after() {
+		DbUtils.dbCleanup(this.session);
+		this.session.close();
+	}
+
 	//region save
 	@Test
 	public void savingBlockSavesAccounts() {
@@ -505,8 +518,6 @@ public class BlockDaoTest {
 
 	@Test
 	public void deleteBlockRemovesEntriesFromAuxiliaryTables() {
-		// !!!
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 		Assert.assertThat(this.getScanCount("MultisigSends"), IsEqual.equalTo(0L));
 		Assert.assertThat(this.getScanCount("MultisigReceives"), IsEqual.equalTo(0L));
 
@@ -552,9 +563,6 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		// !!!
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
-
 		final ArrayList<Hash> expectedHashes = new ArrayList<>(30);
 		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
@@ -583,9 +591,6 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
-
-		// !!!
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
 		final TreeMap<Integer, Hash> expectedHashes = new TreeMap<>();
 		for (int i = 0; i < 30; i++) {
@@ -617,9 +622,6 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		// !!!
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
-
 		final ArrayList<Long> expectedDifficulties = new ArrayList<>(30);
 		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
@@ -649,9 +651,6 @@ public class BlockDaoTest {
 		// Arrange:
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
-
-		// !!!
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 
 		final TreeMap<Integer, Long> expectedDifficulties = new TreeMap<>();
 		for (int i = 0; i < 30; i++) {
@@ -683,9 +682,6 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		// !!!
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
-
 		final ArrayList<Integer> expectedTimestamps = new ArrayList<>(30);
 		for (int i = 0; i < 30; i++) {
 			final org.nem.core.model.Block emptyBlock = this.createTestEmptyBlock(signer, 456 + i, i * 5);
@@ -715,9 +711,6 @@ public class BlockDaoTest {
 		final Account signer = Utils.generateRandomAccount();
 		final AccountDaoLookup accountDaoLookup = this.prepareMapping(signer, Utils.generateRandomAccount());
 
-		// !!!
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
-
 		final TreeMap<Integer, Integer> expectedTimeStamps = new TreeMap<>();
 		for (int i = 0; i < 30; i++) {
 			// mind that time is linear, so blocks are totally mixed when it comes to timestamp...
@@ -745,7 +738,6 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsCorrectNumberOfBlocksIfEnoughBlocksAreAvailable() {
 		// Arrange:
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 		this.createBlocksInDatabase(10);
 
 		// Act:
@@ -758,7 +750,6 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsAllBlocksAfterGivenHeightIfNotEnoughBlocksAreAvailable() {
 		// Arrange:
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 		this.createBlocksInDatabase(10);
 
 		// Act:
@@ -771,7 +762,6 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsBlocksWithTransactions() throws Exception {
 		// Arrange:
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 		this.createBlocksInDatabaseWithTransactions();
 
 		// Act:
@@ -784,7 +774,6 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsBlocksAfterGivenHeight() {
 		// Arrange:
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 		this.createBlocksInDatabase(10);
 
 		// Act:
@@ -797,7 +786,6 @@ public class BlockDaoTest {
 	@Test
 	public void getBlocksAfterReturnsBlocksInAscendingOrderOfHeights() {
 		// Arrange:
-		this.blockDao.deleteBlocksAfterHeight(BlockHeight.ONE);
 		this.createBlocksInDatabase(10);
 
 		// Act:

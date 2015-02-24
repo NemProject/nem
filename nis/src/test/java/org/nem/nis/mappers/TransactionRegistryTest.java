@@ -2,10 +2,9 @@ package org.nem.nis.mappers;
 
 import org.hamcrest.core.*;
 import org.junit.*;
-import org.mockito.Mockito;
 import org.nem.core.model.*;
 import org.nem.core.test.IsEquivalent;
-import org.nem.nis.dao.*;
+import org.nem.nis.dao.retrievers.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -370,45 +369,34 @@ public class TransactionRegistryTest {
 
 	// endregion
 
-	// region getFromDb
+	// region getTransactionRetriever
 
 	@Test
-	public void getFromDbCallsGetTransfersForAccountForTransferType() {
-		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.TRANSFER, 0x1);
+	public void getTransactionRetrieverGetsTransferRetrieverForTransferType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.TRANSFER, TransferRetriever.class);
 	}
 
 	@Test
-	public void getFromDbCallsGetImportanceTransfersForAccountForImportanceTransferType() {
-		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.IMPORTANCE_TRANSFER, 0x2);
+	public void getTransactionRetrieverGetsTransferRetrieverForImportanceTransferType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.IMPORTANCE_TRANSFER, ImportanceTransferRetriever.class);
 	}
 
 	@Test
-	public void getFromDbCallsGetMultisigSignerModificationsForMultisigType() {
-		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, 0x4);
+	public void getTransactionRetrieverGetsMultisigModificationRetrieverForMultisigModificationType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.MULTISIG_AGGREGATE_MODIFICATION, MultisigModificationRetriever.class);
 	}
 
 	@Test
-	public void getFromDbCallsGetMultisigTransactionsForAccountForMultisigType() {
-		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.MULTISIG, 0x8);
+	public void getTransactionRetrieverGetsMultisigTransactionRetrieverForMultisigTransactionType() {
+		assertGetFromDbCallsExpectedMethodForGivenType(TransactionTypes.MULTISIG, MultisigTransactionRetriever.class);
 	}
 
-	private static void assertGetFromDbCallsExpectedMethodForGivenType(final int type, final int callPattern) {
+	private static void assertGetFromDbCallsExpectedMethodForGivenType(final int type, final Class retrieverClass) {
 		// Arrange:
-		final TransferDao transferDao = Mockito.mock(TransferDao.class);
 		final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
 
-		// Act:
-		entry.getFromDb.apply(transferDao, 1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
-
 		// Assert:
-		Mockito.verify(transferDao, Mockito.times(callPattern & 0x01))
-				.getTransfersForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
-		Mockito.verify(transferDao, Mockito.times((callPattern & 0x02) >> 1))
-				.getImportanceTransfersForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
-		Mockito.verify(transferDao, Mockito.times((callPattern & 0x04) >> 2))
-				.getMultisigSignerModificationsForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
-		Mockito.verify(transferDao, Mockito.times((callPattern & 0x08) >> 3))
-				.getMultisigTransactionsForAccount(1L, 2L, 3, ReadOnlyTransferDao.TransferType.OUTGOING);
+		Assert.assertThat(entry.getTransactionRetriever.get(), IsInstanceOf.instanceOf(retrieverClass));
 	}
 
 	// endregion

@@ -116,24 +116,7 @@ public class TestDatabase {
 
 	private void resetDatabase() {
 		final Session session = this.sessionFactory.openSession();
-		session.createSQLQuery("delete from multisigsignatures").executeUpdate();
-		session.createSQLQuery("delete from multisigtransactions").executeUpdate();
-		session.createSQLQuery("delete from transfers").executeUpdate();
-		session.createSQLQuery("delete from importancetransfers").executeUpdate();
-		session.createSQLQuery("delete from multisigmodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigsignermodifications").executeUpdate();
-		session.createSQLQuery("delete from multisigsends").executeUpdate();
-		session.createSQLQuery("delete from multisigreceives").executeUpdate();
-		session.createSQLQuery("delete from blocks").executeUpdate();
-		session.createSQLQuery("delete from accounts").executeUpdate();
-		session.createSQLQuery("ALTER SEQUENCE transaction_id_seq RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigmodifications ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigsends ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE multisigreceives ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE blocks ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.createSQLQuery("ALTER TABLE accounts ALTER COLUMN id RESTART WITH 1").executeUpdate();
-		session.flush();
-		session.clear();
+		DbUtils.dbCleanup(session);
 		session.close();
 	}
 
@@ -192,7 +175,7 @@ public class TestDatabase {
 		LOGGER.warning("reading accounts");
 		final Session session = this.sessionFactory.openSession();
 		final Query query = session.createQuery("from DbAccount a");
-		final List<DbAccount> dbAccounts = listAndCast(query);
+		final List<DbAccount> dbAccounts = HibernateUtils.listAndCast(query);
 		session.flush();
 		session.clear();
 		session.close();
@@ -205,11 +188,6 @@ public class TestDatabase {
 				.collect(Collectors.toList());
 		LOGGER.warning("reading accounts finishes");
 		return accounts;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Query query) {
-		return (List<T>)query.list();
 	}
 
 	private List<Account> createAccounts(final int numAccounts, final MockAccountDao mockAccountDao) {

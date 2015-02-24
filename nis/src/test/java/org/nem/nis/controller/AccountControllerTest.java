@@ -263,7 +263,7 @@ public class AccountControllerTest {
 
 	private static class TestContext {
 		private final AccountController controller;
-		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
+		private final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
 		private final UnlockedAccounts unlockedAccounts = Mockito.mock(UnlockedAccounts.class);
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 

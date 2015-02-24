@@ -42,7 +42,6 @@ public class Harvester {
 	 */
 	public Block harvestBlock() {
 		final TimeInstant blockTime = this.timeProvider.getCurrentTime();
-		this.generator.dropExpireTransactions(blockTime);
 		if (this.blockChainLastBlockLayer.isLoading() || this.unlockedAccounts.size() == 0) {
 			return null;
 		}

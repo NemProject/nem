@@ -153,7 +153,7 @@ public class BlockLoader {
 	}
 
 	private <T> List<T> executeAndMapAll(final Query query, final Class<T> targetClass) {
-		final List<Object[]> objects = listAndCast(query);
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
 		return objects.stream().map(raw -> this.mapper.map(raw, targetClass)).collect(Collectors.toList());
 	}
 
@@ -170,7 +170,7 @@ public class BlockLoader {
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		final List<Object[]> objects = listAndCast(query);
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
 		return this.mapToDbModificationTransactions(objects);
 	}
 
@@ -219,7 +219,7 @@ public class BlockLoader {
 				.createSQLQuery(queryString)
 				.setParameter("minBlockId", minBlockId)
 				.setParameter("maxBlockId", maxBlockId);
-		final List<Object[]> objects = listAndCast(query);
+		final List<Object[]> objects = HibernateUtils.listAndCast(query);
 		return this.mapToDbMultisigTransactions(objects);
 	}
 
@@ -272,15 +272,10 @@ public class BlockLoader {
 				.createSQLQuery("SELECT a.* FROM accounts a WHERE a.id in (:ids)")
 				.addEntity(DbAccount.class)
 				.setParameterList("ids", accounts.stream().map(DbAccount::getId).collect(Collectors.toList()));
-		final List<DbAccount> realAccounts = listAndCast(query);
+		final List<DbAccount> realAccounts = HibernateUtils.listAndCast(query);
 		final HashMap<Long, DbAccount> accountMap = new HashMap<>();
 		realAccounts.stream().forEach(a -> accountMap.put(a.getId(), a));
 		return accountMap;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Query q) {
-		return q.list();
 	}
 
 	private String createColumnList(final String prefix, final int postfix, final String[] columns) {

@@ -32,7 +32,7 @@ public class Utils {
 	 * @return A random hash.
 	 */
 	public static Hash generateRandomHash() {
-		final byte[] bytes = Utils.generateRandomBytes(64);
+		final byte[] bytes = Utils.generateRandomBytes(32);
 		return new Hash(bytes);
 	}
 

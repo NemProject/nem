@@ -7,7 +7,6 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.state.*;
 import org.nem.nis.test.*;
@@ -21,7 +20,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class UnconfirmedTransactionsTest {
-	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 
 	//region size
 
@@ -544,7 +542,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		final boolean isRemoved = context.transactions.remove(toRemove);
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(isRemoved, IsEqual.equalTo(true));
@@ -563,7 +561,7 @@ public class UnconfirmedTransactionsTest {
 		context.signAndAddExisting(new MockTransaction(sender, 9));
 
 		final boolean isRemoved = context.transactions.remove(toRemove);
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(isRemoved, IsEqual.equalTo(false));
@@ -618,7 +616,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		context.transactions.removeAll(block);
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 8)));
@@ -713,7 +711,7 @@ public class UnconfirmedTransactionsTest {
 		context.addMockTransactions(context.transactions, 6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
@@ -729,7 +727,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
@@ -863,97 +861,6 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	//region getTransactions
-
-	@Test
-	public void getMostImportantTransactionsReturnsAllTransactionsWhenLessThanMaximumTransactionsAreAvailable() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addMockTransactions(context.transactions, 6, 9);
-
-		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-		final List<Integer> customFieldValues = getCustomFieldValues(transactions);
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7, 8, 9)));
-	}
-
-	@Test
-	public void getMostImportantTransactionsReturnsMaximumTransactionsWhenMoreThanMaximumTransactionsAreAvailable() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addMockTransactions(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-
-		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-
-		// Assert:
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
-	}
-
-	@Test
-	public void getMostImportantTransactionsReturnsMaximumTransactionsWhenExactlyMaximumTransactionsAreAvailable() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addMockTransactions(context.transactions, 6, 6 + MAX_ALLOWED_TRANSACTIONS_PER_BLOCK - 1);
-
-		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-
-		// Assert:
-		Assert.assertThat(transactions.size(), IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
-	}
-
-	@Test
-	public void getMostImportantTransactionsReturnsLessThanMaximumTransactionsWhenLastTransactionAndChildrenCannotFit() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addMockTransactionsWithChildren(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 6);
-
-		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-
-		// Assert:
-		// 6 child transactions per transaction in the list, 120 is not divisible by 7
-		final int count = transactions.stream().mapToInt(t -> 1 + t.getChildTransactions().size()).sum();
-		Assert.assertThat(count <= MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, IsEqual.equalTo(true));
-		Assert.assertThat(count, IsEqual.equalTo(7 * 17));
-	}
-
-	@Test
-	public void getMostImportantTransactionsReturnsMaximumTransactionsWhenLastTransactionAndChildrenCanFit() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		context.addMockTransactionsWithChildren(context.transactions, 6, 2 * MAX_ALLOWED_TRANSACTIONS_PER_BLOCK, 7);
-
-		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-
-		// Assert:
-		// 7 child transactions per transaction in the list, 120 is divisible by 8
-		final int count = transactions.stream().mapToInt(t -> 1 + t.getChildTransactions().size()).sum();
-		Assert.assertThat(count, IsEqual.equalTo(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK));
-	}
-
-	@Test
-	public void getMostImportantTransactionsReturnsTransactionsInSortedOrder() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final List<MockTransaction> originalTransactions = context.createMockTransactions(6, 9);
-		originalTransactions.get(2).setFee(Amount.fromNem(11));
-		originalTransactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final List<Transaction> transactions = context.transactions.getMostImportantTransactions(MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
-		final List<Integer> customFieldValues = getCustomFieldValues(transactions);
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(8, 9, 7, 6)));
-	}
-
-	//endregion
-
 	//region getTransactionsBefore
 
 	@Test
@@ -963,7 +870,7 @@ public class UnconfirmedTransactionsTest {
 		context.addMockTransactions(context.transactions, 6, 9);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(6, 7)));
@@ -979,7 +886,7 @@ public class UnconfirmedTransactionsTest {
 		transactions.forEach(context::signAndAddExisting);
 
 		// Act:
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getTransactionsBefore(new TimeInstant(8)));
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEqual.equalTo(Arrays.asList(7, 6)));
@@ -1002,7 +909,7 @@ public class UnconfirmedTransactionsTest {
 
 		// Act:
 		context.transactions.dropExpiredTransactions(new TimeInstant(7));
-		final List<Integer> customFieldValues = getCustomFieldValues(context.transactions.getAll());
+		final List<Integer> customFieldValues = MockTransactionUtils.getCustomFieldValues(context.transactions.getAll());
 
 		// Assert:
 		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(7, 9)));
@@ -1050,264 +957,7 @@ public class UnconfirmedTransactionsTest {
 
 	//endregion
 
-	//region getTransactionsForAccount
-
-	@Test
-	public void getTransactionsForAccountIncludesAllAccountsWithAccountAsSigner() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account1, 1),
-				new MockTransaction(account2, 2),
-				new MockTransaction(account1, 3),
-				new MockTransaction(account2, 4));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account1.getAddress());
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 3)));
-	}
-
-	@Test
-	public void getTransactionsForAccountIncludesAllAccountsWithAccountAsTransferRecipient() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final Account account3 = context.addAccount(Amount.fromNem(100));
-		final List<TransferTransaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account1, account2, Amount.ZERO, null),
-				new TransferTransaction(new TimeInstant(2), account2, account1, Amount.ZERO, null),
-				new TransferTransaction(new TimeInstant(3), account1, account3, Amount.ZERO, null));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account3.getAddress());
-		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(3))));
-	}
-
-	@Test
-	public void getTransactionsForAccountIncludesAllAccountsWithAffectingAccount() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final Account account3 = context.addAccount(Amount.fromNem(100));
-		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account1, account2, Amount.ZERO, null),
-				new TransferTransaction(new TimeInstant(2), account2, account1, Amount.ZERO, null),
-				new TransferTransaction(new TimeInstant(3), account1, account3, Amount.ZERO, null),
-				new MockTransaction(account2, 1, new TimeInstant(4)));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account2.getAddress());
-		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(1), new TimeInstant(2), new TimeInstant(4))));
-	}
-
-	@Test
-	public void getTransactionsForAccountIncludesConflictingTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext(new TransferTransactionValidator());
-		final Account account1 = context.addAccount(Amount.fromNem(15));
-		final Account account2 = context.addAccount(Amount.fromNem(110));
-		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(20), null),
-				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(16), null));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForAccount(account2.getAddress());
-		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(1), new TimeInstant(2))));
-	}
-
-	//endregion
-
-	//region getTransactionsForNewBlock
-
-	@Test
-	public void getTransactionsForNewBlockIncludesTransactionsBeforeSpecifiedTimeInstant() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account2, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account2, 3, new TimeInstant(6)),
-				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(6));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2)));
-	}
-
-	@Test
-	public void getTransactionsForNewBlockExcludesTransactionsSignedByHarvesterAddress() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account1, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account1, 3, new TimeInstant(6)),
-				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(10));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(2, 4)));
-	}
-
-	@Test
-	public void getTransactionsForNewBlockExcludesConflictingTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext(new TransferTransactionValidator());
-		final Account account1 = context.addAccount(Amount.fromNem(5));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<Transaction> transactions = Arrays.asList(
-				new TransferTransaction(new TimeInstant(1), account2, account1, Amount.fromNem(10), null),
-				new TransferTransaction(new TimeInstant(2), account1, account2, Amount.fromNem(6), null));
-		transactions.forEach(t -> t.setDeadline(new TimeInstant(3600)));
-		transactions.forEach(context::signAndAddExisting);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				new TimeInstant(10));
-		final List<TimeInstant> timeInstants = getTimeInstantsAsList(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(timeInstants, IsEquivalent.equivalentTo(Arrays.asList(new TimeInstant(1))));
-	}
-
-	@Test
-	public void getTransactionsForNewBlockDoesNotIncludeExpiredTransactions() {
-		// Arrange:
-		final TestContext context = new TestContext();
-		final Account account1 = context.addAccount(Amount.fromNem(100));
-		final Account account2 = context.addAccount(Amount.fromNem(100));
-		final List<MockTransaction> transactions = Arrays.asList(
-				new MockTransaction(account2, 1, new TimeInstant(2)),
-				new MockTransaction(account2, 2, new TimeInstant(4)),
-				new MockTransaction(account2, 3, new TimeInstant(6)),
-				new MockTransaction(account2, 4, new TimeInstant(8)));
-		transactions.forEach(context::signAndAddExisting);
-		final MockTransaction transaction = new MockTransaction(account2, 5, new TimeInstant(1));
-		transaction.setDeadline(new TimeInstant(3600));
-		transaction.sign();
-		context.signAndAddExisting(transaction);
-
-		// Act:
-		final UnconfirmedTransactions filteredTransactions = context.transactions.getTransactionsForNewBlock(account1.getAddress(), new TimeInstant(3601));
-		final List<Integer> customFieldValues = getCustomFieldValues(filteredTransactions.getAll());
-
-		// Assert:
-		Assert.assertThat(customFieldValues, IsEquivalent.equivalentTo(Arrays.asList(1, 2, 3, 4)));
-	}
-
-	//endregion
-
 	//region tests with real validator
-
-	@Test
-	public void getTransactionsForNewBlockFiltersOutConflictingTransactions() {
-		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final Account sender = context.addAccount(Amount.fromNem(20));
-		final Account recipient = context.addAccount(Amount.fromNem(10));
-		final UnconfirmedTransactions transactions = context.transactions;
-		final TimeInstant currentTime = new TimeInstant(11);
-
-		// Act:
-		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 20, R = 10
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 3, R = 25, 2 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 15, R = 10, 5 Fee
-		//   - getTransactionsBefore() returns SORTED transactions, so R->S is ordered before S->R because it has a greater fee
-		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough balance
-		//
-		// However, this and test and one I'm gonna add below, should reject R's transaction for the following reason:
-		// R doesn't have funds on the account, we don't want such TX because this would lead to creation
-		// of a block that would get discarded (TXes are validated first, and then executed)
-
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
-		t1.setFee(Amount.fromNem(2));
-		t1.sign();
-		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(12));
-		t2.setFee(Amount.fromNem(3));
-		t2.sign();
-		transactions.addExisting(t2);
-
-		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1)).getAll();
-
-		// Assert:
-		// note: this checks that both TXes have been added and that returned TXes are in proper order
-		// - the filtered transactions only contain first because transaction validation uses real "confirmed" balance
-		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t2, t1)));
-		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t1)));
-	}
-
-	@Test
-	public void transactionIsExcludedFromNextBlockIfConfirmedBalanceIsInsufficient() {
-		// Arrange:
-		final TestContext context = createUnconfirmedTransactionsWithRealValidator();
-		final UnconfirmedTransactions transactions = context.transactions;
-		final Account sender = context.addAccount(Amount.fromNem(20));
-		final Account recipient = context.addAccount(Amount.fromNem(10));
-		final TimeInstant currentTime = new TimeInstant(11);
-
-		// Act:
-		//   - add two txes, S->R, R->S, adding should succeed as it is done in proper order
-		// 		- initially the balances are: S = 20, R = 10
-		// 		- after "first" transaction is added, the (unconfirmed) balances are: S = 2, R = 25, 3 Fee
-		// 		- after the "second" transaction is added, the (unconfirmed) balances are: S = 24, R = 1, 5 Fee
-		//   - getTransactionsBefore() returns SORTED transactions, so S->R is ordered before R->S because it has a greater fee
-		//   - than during removal, R->S should be rejected, BECAUSE R doesn't have enough *confirmed* balance
-		final Transaction t1 = createTransferTransaction(currentTime, sender, recipient, Amount.fromNem(15));
-		t1.setFee(Amount.fromNem(3));
-		t1.sign();
-		transactions.addExisting(t1);
-		final Transaction t2 = createTransferTransaction(currentTime, recipient, sender, Amount.fromNem(22));
-		t2.setFee(Amount.fromNem(2));
-		t2.sign();
-		transactions.addExisting(t2);
-
-		final List<Transaction> filtered = transactions.getTransactionsForNewBlock(
-				Utils.generateRandomAddress(),
-				currentTime.addSeconds(1)).getAll();
-
-		// Assert:
-		// - this checks that both TXes have been added and that returned TXes are in proper order
-		// - the filtered transactions only contain first because transaction validation uses real "confirmed" balance
-		Assert.assertThat(transactions.getAll(), IsEqual.equalTo(Arrays.asList(t1, t2)));
-		Assert.assertThat(filtered, IsEqual.equalTo(Arrays.asList(t1)));
-	}
 
 	@Test
 	public void checkingUnconfirmedTransactionsDisallowsAddingDoubleSpendTransactions() {
@@ -1354,19 +1004,6 @@ public class UnconfirmedTransactionsTest {
 		return transferTransaction;
 	}
 
-	private static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
-		return transactions.stream()
-				.map(transaction -> ((MockTransaction)transaction).getCustomField())
-				.collect(Collectors.toList());
-	}
-
-	private static List<TimeInstant> getTimeInstantsAsList(final Collection<Transaction> transactions) {
-		return transactions.stream()
-				.map(Transaction::getTimeStamp)
-				.collect(Collectors.toList());
-	}
-
-	// TODO 20150106 J-G: should we share the same test context between this class and the multisig variant?
 	private static class TestContext {
 		private final SingleTransactionValidator singleValidator;
 		private final BatchTransactionValidator batchValidator;
@@ -1518,24 +1155,6 @@ public class UnconfirmedTransactionsTest {
 			transactions.forEach(Transaction::sign);
 			transactions.forEach(unconfirmedTransactions::addExisting);
 			return transactions;
-		}
-
-		private List<MockTransaction> addMockTransactionsWithChildren(
-				final UnconfirmedTransactions unconfirmedTransactions,
-				final int startCustomField,
-				final int endCustomField,
-				final int numChildren) {
-			final List<MockTransaction> transactions = this.createMockTransactions(startCustomField, endCustomField);
-			transactions.forEach(t -> {
-				t.setChildTransactions(this.createChildren(numChildren));
-				t.sign();
-				unconfirmedTransactions.addExisting(t);
-			});
-			return transactions;
-		}
-
-		private Collection<Transaction> createChildren(final int count) {
-			return this.createMockTransactionsAsBatch(1, count);
 		}
 
 		public TransferTransaction createTransferTransaction(

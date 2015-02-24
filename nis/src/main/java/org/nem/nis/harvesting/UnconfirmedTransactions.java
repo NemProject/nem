@@ -5,10 +5,8 @@ import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.*;
-import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.UnconfirmedBalancesObserver;
-import org.nem.nis.state.ReadOnlyAccountState;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBuilder;
 import org.nem.nis.validators.unconfirmed.*;
@@ -21,10 +19,11 @@ import java.util.stream.*;
 /**
  * A collection of unconfirmed transactions.
  */
-public class UnconfirmedTransactions {
+public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	private static final Logger LOGGER = Logger.getLogger(UnconfirmedTransactions.class.getName());
 
 	private final UnconfirmedTransactionsCache transactions;
+	private final UnconfirmedTransactionsFilter transactionsFilter;
 	private final UnconfirmedBalancesObserver unconfirmedBalances;
 	private final TransactionObserver transferObserver;
 	private final TransactionValidatorFactory validatorFactory;
@@ -93,6 +92,9 @@ public class UnconfirmedTransactions {
 
 		final MultisigSignatureMatchPredicate matchPredicate = new MultisigSignatureMatchPredicate(this.nisCache.getAccountStateCache());
 		this.transactions = new UnconfirmedTransactionsCache(this::verifyAndValidate, matchPredicate::isMatch);
+		this.transactionsFilter = new DefaultUnconfirmedTransactionsFilter(
+				this.transactions,
+				new ImpactfulTransactionPredicate(this.nisCache.getAccountStateCache()));
 		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
 
 		for (final Transaction transaction : transactions) {
@@ -100,7 +102,7 @@ public class UnconfirmedTransactions {
 		}
 	}
 
-	private UnconfirmedTransactions filter(
+	private UnconfirmedTransactionsFilter filter(
 			final List<Transaction> transactions,
 			final BalanceValidationOptions options) {
 		synchronized (this.lock) {
@@ -312,96 +314,37 @@ public class UnconfirmedTransactions {
 		return () -> new ReverseListIterator<>(block.getTransactions());
 	}
 
-	/**
-	 * Gets all transactions.
-	 *
-	 * @return All transaction from this unconfirmed transactions.
-	 */
+	//region UnconfirmedTransactionsFilter
+
+	@Override
 	public List<Transaction> getAll() {
 		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.stream()
-					.collect(Collectors.toList());
-			return this.sortTransactions(transactions);
+			return this.transactionsFilter.getAll();
 		}
 	}
 
-	/**
-	 * Gets the transactions for which the hash short id is not in the given collection.
-	 *
-	 * @param knownHashShortIds The collection of known hashes.
-	 * @return The unknown transactions.
-	 */
+	@Override
 	public List<Transaction> getUnknownTransactions(final Collection<HashShortId> knownHashShortIds) {
-		// probably faster to use hash map than collection
 		synchronized (this.lock) {
-			final HashMap<HashShortId, Transaction> unknownHashShortIds = new HashMap<>(this.transactions.size());
-			this.transactions.stream()
-					.forEach(t -> unknownHashShortIds.put(new HashShortId(HashUtils.calculateHash(t).getShortId()), t));
-			knownHashShortIds.stream().forEach(unknownHashShortIds::remove);
-			return unknownHashShortIds.values().stream().collect(Collectors.toList());
+			return this.transactionsFilter.getUnknownTransactions(knownHashShortIds);
 		}
 	}
 
-	/**
-	 * Gets the most recent transactions of an account up to a given limit.
-	 *
-	 * @param address The address of an account.
-	 * @param maxTransactions The maximum number of transactions.
-	 * @return The most recent transactions from this unconfirmed transactions.
-	 */
+	@Override
 	public List<Transaction> getMostRecentTransactionsForAccount(final Address address, final int maxTransactions) {
 		synchronized (this.lock) {
-			return this.transactions.stream()
-					// TODO 20140115 J-G: should add test for filter
-					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-					.filter(tx -> matchAddress(tx, address) || this.isCosignatory(tx, address))
-					.sorted((t1, t2) -> -t1.getTimeStamp().compareTo(t2.getTimeStamp()))
-					.limit(maxTransactions)
-					.collect(Collectors.toList());
+			return this.transactionsFilter.getMostRecentTransactionsForAccount(address, maxTransactions);
 		}
 	}
 
-	/**
-	 * Gets all transactions up to a given limit of transactions.
-	 *
-	 * @param maxTransactions The maximum number of transactions.
-	 * @return The list of unconfirmed transactions.
-	 */
-	public List<Transaction> getMostImportantTransactions(final int maxTransactions) {
-		synchronized (this.lock) {
-			final int[] txCount = new int[1];
-			return this.transactions.stream()
-					.sorted((lhs, rhs) -> -1 * lhs.compareTo(rhs))
-					.filter(t -> {
-						txCount[0] += 1 + t.getChildTransactions().size();
-						return BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK >= txCount[0];
-					})
-					.collect(Collectors.toList());
-		}
-	}
-
-	/**
-	 * Gets all transactions before the specified time. Returned list is sorted.
-	 *
-	 * @param time The specified time.
-	 * @return The sorted list of all transactions before the specified time.
-	 */
+	@Override
 	public List<Transaction> getTransactionsBefore(final TimeInstant time) {
 		synchronized (this.lock) {
-			final List<Transaction> transactions = this.transactions.stream()
-					.filter(tx -> tx.getTimeStamp().compareTo(time) < 0)
-							// filter out signatures because we don't want them to be directly inside a block
-					.filter(tx -> tx.getType() != TransactionTypes.MULTISIG_SIGNATURE)
-					.collect(Collectors.toList());
-
-			return this.sortTransactions(transactions);
+			return this.transactionsFilter.getTransactionsBefore(time);
 		}
 	}
 
-	private List<Transaction> sortTransactions(final List<Transaction> transactions) {
-		Collections.sort(transactions, (lhs, rhs) -> -1 * lhs.compareTo(rhs));
-		return transactions;
-	}
+	//endregion
 
 	/**
 	 * Drops transactions that have already expired.
@@ -428,70 +371,5 @@ public class UnconfirmedTransactions {
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
 		transactions.stream().forEach(t -> this.addNew(t));
-	}
-
-	/**
-	 * Gets all transactions for the specified account.
-	 *
-	 * @param address The account address.
-	 * @return The filtered list of transactions.
-	 */
-	public UnconfirmedTransactions getTransactionsForAccount(final Address address) {
-		synchronized (this.lock) {
-			return this.filter(
-					this.getAll().stream()
-							.filter(tx -> matchAddress(tx, address))
-							.collect(Collectors.toList()),
-					BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
-		}
-	}
-
-	private static boolean matchAddress(final Transaction transaction, final Address address) {
-		return transaction.getAccounts().stream()
-				.map(account -> account.getAddress())
-				.anyMatch(transactionAddress -> transactionAddress.equals(address));
-	}
-
-	// TODO 20140113 J-G: why don't we just include this in matchAddress
-	// > are there cases where we call matchAddress where we don't want to include these transactions?
-	private boolean isCosignatory(final Transaction transaction, final Address address) {
-		if (TransactionTypes.MULTISIG != transaction.getType()) {
-			return false;
-		}
-		final ReadOnlyAccountState state = this.nisCache.getAccountStateCache().findStateByAddress(address);
-		return state.getMultisigLinks().isCosignatoryOf(((MultisigTransaction)transaction).getOtherTransaction().getSigner().getAddress());
-	}
-
-	/**
-	 * Gets all the unconfirmed transactions that are eligible for inclusion into the next block.
-	 *
-	 * @param harvesterAddress The harvester's address.
-	 * @param blockTime The block time.
-	 * @return The filtered list of transactions.
-	 */
-	public UnconfirmedTransactions getTransactionsForNewBlock(final Address harvesterAddress, final TimeInstant blockTime) {
-		// in order for a transaction to be eligible for inclusion in a block, it must
-		// (1) occur at or before the block time
-		// (2) be signed by an account other than the harvester
-		// (3) not already be expired (relative to the block time):
-		// - BlockGenerator.generateNextBlock() calls dropExpiredTransactions() and later getTransactionsForNewBlock().
-		// - In-between it is possible that unconfirmed transactions are polled and thus expired (relative to the block time)
-		// - transactions are in our cache when we call getTransactionsForNewBlock().
-		// (4) pass validation against the *confirmed* balance
-
-		// this filter validates all transactions against confirmed balance:
-		// a) we need to use unconfirmed balance to avoid some stupid situations (and spamming).
-		// b) B has 0 balance, A->B 10nems, B->X 5nems with 2nem fee, since we check unconfirmed balance,
-		//    both this TXes will get added, when creating a block, TXes are sorted by FEE,
-		//    so B's TX will get on list before A's, and ofc it is invalid, and must get removed
-		// c) we're leaving it in unconfirmedTxes, so it should be included in next block
-		synchronized (this.lock) {
-			return this.filter(
-					this.getTransactionsBefore(blockTime).stream()
-							.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
-							.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
-							.collect(Collectors.toList()),
-					BalanceValidationOptions.ValidateAgainstConfirmedBalance);
-		}
 	}
 }
