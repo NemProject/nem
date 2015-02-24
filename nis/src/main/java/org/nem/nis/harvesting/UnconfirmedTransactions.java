@@ -33,29 +33,6 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	private final TimeProvider timeProvider;
 	private final Object lock = new Object();
 
-	private enum BalanceValidationOptions {
-		/**
-		 * The confirmed balance check occurs as part of the single transaction validator.
-		 * This is used to exclude conflicting transactions when generating a block.
-		 * This is accomplished by bypassing the execution of the UnconfirmedBalancesObserver
-		 * (so that all balance validations are against the current account balances).
-		 */
-		ValidateAgainstConfirmedBalance,
-
-		/**
-		 * The unconfirmed balance check occurs as part of the execution of the UnconfirmedBalancesObserver.
-		 * This is the default setting and is used when adding new transactions and
-		 * when getting the unconfirmed transactions for an account.
-		 * <br>
-		 * This improves the user experience:
-		 * A user complained that if the GUI shows a balance of 1k NEM he can initiate many
-		 * transactions with 800 NEM. All transactions were displayed in the GUI as unconfirmed giving the user the feeling he
-		 * can spend more than he has. Furthermore, a new block included one of the transactions leaving the
-		 * the other transaction still being displayed as unconfirmed in the GUI forever (until deadline was exceeded).
-		 */
-		ValidateAgainstUnconfirmedBalance,
-	}
-
 	/**
 	 * Creates a new unconfirmed transactions collection.
 	 *
@@ -67,26 +44,10 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 			final TransactionValidatorFactory validatorFactory,
 			final ReadOnlyNisCache nisCache,
 			final TimeProvider timeProvider) {
-		this(
-				new ArrayList<>(),
-				BalanceValidationOptions.ValidateAgainstConfirmedBalance,
-				validatorFactory,
-				nisCache,
-				timeProvider,
-				false);
-	}
-
-	private UnconfirmedTransactions(
-			final List<Transaction> transactions,
-			final BalanceValidationOptions options,
-			final TransactionValidatorFactory validatorFactory,
-			final ReadOnlyNisCache nisCache,
-			final TimeProvider timeProvider,
-			final boolean blockVerification) {
 		this.validatorFactory = validatorFactory;
 		this.nisCache = nisCache;
 		this.timeProvider = timeProvider;
-		this.singleValidator = this.createSingleValidator(blockVerification);
+		this.singleValidator = this.createSingleValidator();
 		this.unconfirmedBalances = new UnconfirmedBalancesObserver(nisCache.getAccountStateCache());
 		this.transferObserver = new TransferObserverToTransactionObserverAdapter(this.unconfirmedBalances);
 
@@ -96,24 +57,6 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 				this.transactions,
 				new ImpactfulTransactionPredicate(this.nisCache.getAccountStateCache()));
 		this.spamFilter = new TransactionSpamFilter(this.nisCache, this.transactions);
-
-		for (final Transaction transaction : transactions) {
-			this.add(transaction, options == BalanceValidationOptions.ValidateAgainstUnconfirmedBalance);
-		}
-	}
-
-	private UnconfirmedTransactionsFilter filter(
-			final List<Transaction> transactions,
-			final BalanceValidationOptions options) {
-		synchronized (this.lock) {
-			return new UnconfirmedTransactions(
-					transactions,
-					options,
-					this.validatorFactory,
-					this.nisCache,
-					this.timeProvider,
-					true);
-		}
 	}
 
 	/**
@@ -153,7 +96,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 				return transactionValidationResult;
 			}
 
-			return ValidationResult.aggregate(filteredTransactions.stream().map(transaction -> this.add(transaction, true)).iterator());
+			return ValidationResult.aggregate(filteredTransactions.stream().map(this::add).iterator());
 		}
 	}
 
@@ -177,7 +120,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 
 			final ValidationResult transactionValidationResult = this.validateBatch(filteredTransactions);
 			return transactionValidationResult.isSuccess()
-					? this.add(transaction, true)
+					? this.add(transaction)
 					: transactionValidationResult;
 		}
 	}
@@ -189,7 +132,7 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 	 * @return true if the transaction was added.
 	 */
 	public ValidationResult addExisting(final Transaction transaction) {
-		return this.add(transaction, true);
+		return this.add(transaction);
 	}
 
 	private ValidationResult verifyAndValidate(final Transaction transaction) {
@@ -206,10 +149,10 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		return ValidationResult.SUCCESS;
 	}
 
-	private ValidationResult add(final Transaction transaction, final boolean execute) {
+	private ValidationResult add(final Transaction transaction) {
 		synchronized (this.lock) {
 			final ValidationResult validationResult = this.transactions.add(transaction);
-			if (validationResult.isSuccess() && execute) {
+			if (validationResult.isSuccess()) {
 				transaction.execute(this.transferObserver);
 			}
 
@@ -230,11 +173,9 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		return new ValidationContext((account, amount) -> this.getUnconfirmedBalance(account).compareTo(amount) >= 0);
 	}
 
-	private SingleTransactionValidator createSingleValidator(final boolean blockVerification) {
+	private SingleTransactionValidator createSingleValidator() {
 		final ReadOnlyAccountStateCache accountStateCache = this.nisCache.getAccountStateCache();
-		final AggregateSingleTransactionValidatorBuilder builder = blockVerification
-				? this.validatorFactory.createSingleBuilder(accountStateCache)
-				: this.validatorFactory.createIncompleteSingleBuilder(accountStateCache);
+		final AggregateSingleTransactionValidatorBuilder builder = this.validatorFactory.createIncompleteSingleBuilder(accountStateCache);
 		builder.add(new NonConflictingImportanceTransferTransactionValidator(this.getTransactionsSupplier()));
 		builder.add(new NonConflictingMultisigAggregateModificationValidator(this.getTransactionsSupplier()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
@@ -370,6 +311,6 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		this.unconfirmedBalances.clearCache();
 
 		// don't add as batch since this would fail fast and we want to keep as many transactions as possible.
-		transactions.stream().forEach(t -> this.addNew(t));
+		transactions.stream().forEach(this::addNew);
 	}
 }
