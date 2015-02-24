@@ -197,7 +197,7 @@ public class BlockDaoImpl implements BlockDao {
 
 		final Criteria criteria = setTransfersToJoin(this.getCurrentSession().createCriteria(DbBlock.class))
 				.add(Restrictions.eq("shortId", blockId));
-		final List<DbBlock> blockList = listAndCast(criteria);
+		final List<DbBlock> blockList = HibernateUtils.listAndCast(criteria);
 
 		for (final Object blockObject : blockList) {
 			final DbBlock block = (DbBlock)blockObject;
@@ -257,7 +257,7 @@ public class BlockDaoImpl implements BlockDao {
 				.setParameter("height", height)
 				.setParameter("accountId", accountId)
 				.setParameter("limit", limit);
-		return listAndCast(query);
+		return HibernateUtils.listAndCast(query);
 	}
 
 	private Long getAccountId(final Account account) {
@@ -335,7 +335,7 @@ public class BlockDaoImpl implements BlockDao {
 		final Query getTransactionIdsQuery = this.getCurrentSession()
 				.createQuery("select tx.id from DbBlock b join b." + transfersName + " tx where b.height > :height")
 				.setParameter("height", blockHeight.getRaw());
-		final List<Long> transactionsToDelete = listAndCast(getTransactionIdsQuery);
+		final List<Long> transactionsToDelete = HibernateUtils.listAndCast(getTransactionIdsQuery);
 
 		if (!transactionsToDelete.isEmpty()) {
 			preQuery.accept(transactionsToDelete);
@@ -348,7 +348,7 @@ public class BlockDaoImpl implements BlockDao {
 	}
 
 	private <T> T executeSingleQuery(final Criteria criteria) {
-		final List<T> blockList = listAndCast(criteria);
+		final List<T> blockList = HibernateUtils.listAndCast(criteria);
 		return !blockList.isEmpty() ? blockList.get(0) : null;
 	}
 
@@ -358,16 +358,6 @@ public class BlockDaoImpl implements BlockDao {
 				.add(Restrictions.ge("height", height.getRaw())) // >=
 				.setProjection(Projections.property(name))
 				.addOrder(Order.asc("height"));
-		return listAndCast(criteria);
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Query q) {
-		return q.list();
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Criteria criteria) {
-		return criteria.list();
+		return HibernateUtils.listAndCast(criteria);
 	}
 }

@@ -1,7 +1,7 @@
 package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
-import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -64,7 +64,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 				.setParameter("maxId", maxId)
 				.setParameter("cosignatoryId", cosignatoryId)
 				.setParameter("limit", limit);
-		return listAndCast(query);
+		return HibernateUtils.listAndCast(query);
 	}
 
 	private List<DbMultisigAggregateModificationTransaction> getOutgoingDbModificationTransactions(
@@ -82,11 +82,6 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 				.setParameter("maxId", maxId)
 				.setParameter("senderId", senderId)
 				.setParameter("limit", limit);
-		return listAndCast(query);
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Query query) {
-		return (List<T>)query.list();
+		return HibernateUtils.listAndCast(query);
 	}
 }

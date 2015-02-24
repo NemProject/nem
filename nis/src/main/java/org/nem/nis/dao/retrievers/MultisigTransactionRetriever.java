@@ -4,7 +4,7 @@ import org.hibernate.*;
 import org.hibernate.criterion.*;
 import org.hibernate.type.LongType;
 import org.nem.core.model.TransactionTypes;
-import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -119,7 +119,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				.addScalar("transactionId", LongType.INSTANCE)
 				.addScalar("height", LongType.INSTANCE)
 				.setMaxResults(limit);
-		final List<Object[]> list = listAndCast(preQuery);
+		final List<Object[]> list = HibernateUtils.listAndCast(preQuery);
 		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long)o[0], (Long)o[1])).collect(Collectors.toList());
 	}
 
@@ -133,7 +133,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				.add(Restrictions.isNotNull(joinEntity))
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return listAndCast(criteria);
+		return HibernateUtils.listAndCast(criteria);
 	}
 
 	private HashMap<Long, DbBlock> getBlockMap(final Session session, final List<TransactionIdBlockHeightPair> pairs) {
@@ -141,7 +141,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		final Criteria criteria = session.createCriteria(DbBlock.class)
 				.add(Restrictions.in("height", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList())))
 				.addOrder(Order.desc("height"));
-		final List<DbBlock> blocks = listAndCast(criteria);
+		final List<DbBlock> blocks = HibernateUtils.listAndCast(criteria);
 		blocks.stream().forEach(b -> blockMap.put(b.getHeight(), b));
 		return blockMap;
 	}
@@ -163,16 +163,6 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		}
 
 		return result;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Query query) {
-		return (List<T>)query.list();
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> List<T> listAndCast(final Criteria criteria) {
-		return (List<T>)criteria.list();
 	}
 
 	private class TransactionIdBlockHeightPair {
