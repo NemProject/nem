@@ -55,9 +55,9 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final int limit) {
 		final String queryString =
 				"SELECT mm.multisigsignermodificationid, mm.id as mmId, mm.cosignatoryid, mm.modificationtype, msm.* FROM multisigmodifications mm " +
-				"LEFT OUTER JOIN multisigsignermodifications msm on msm.id = mm.multisigsignermodificationid AND msm.senderproof IS NOT NULL " +
-				"WHERE mm.multisigsignermodificationid < :maxId AND mm.cosignatoryid = :cosignatoryId AND msm.senderproof IS NOT NULL " +
-				"ORDER BY mm.cosignatoryid ASC, mm.multisigsignermodificationid DESC limit :limit";
+						"LEFT OUTER JOIN multisigsignermodifications msm on msm.id = mm.multisigsignermodificationid AND msm.senderproof IS NOT NULL " +
+						"WHERE mm.multisigsignermodificationid < :maxId AND mm.cosignatoryid = :cosignatoryId AND msm.senderproof IS NOT NULL " +
+						"ORDER BY mm.cosignatoryid ASC, mm.multisigsignermodificationid DESC limit :limit";
 		final Query query = session
 				.createSQLQuery(queryString)
 				.addEntity(DbMultisigAggregateModificationTransaction.class)
@@ -74,8 +74,8 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final int limit) {
 		final String queryString =
 				"SELECT msm.* FROM multisigsignermodifications msm " +
-				"WHERE msm.id < :maxId AND msm.senderid = :senderId AND msm.senderproof IS NOT NULL " +
-				"ORDER BY msm.senderid ASC, msm.id DESC limit :limit";
+						"WHERE msm.id < :maxId AND msm.senderid = :senderId AND msm.senderproof IS NOT NULL " +
+						"ORDER BY msm.senderid ASC, msm.id DESC limit :limit";
 		final Query query = session
 				.createSQLQuery(queryString)
 				.addEntity(DbMultisigAggregateModificationTransaction.class)

@@ -4,7 +4,7 @@ import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.validators.*;
 
@@ -59,9 +59,9 @@ public class NewBlockTransactionsProvider {
 
 		final List<Transaction> candidateTransactions = this.unconfirmedTransactions
 				.getTransactionsBefore(blockTime).stream()
-						.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
-						.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
-						.collect(Collectors.toList());
+				.filter(tx -> !tx.getSigner().getAddress().equals(harvesterAddress))
+				.filter(tx -> tx.getDeadline().compareTo(blockTime) >= 0)
+				.collect(Collectors.toList());
 
 		final int maxTransactions = BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK;
 		int numTransactions = 0;

@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.nem.core.async.NemAsyncTimerVisitor;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.harvesting.*;
+import org.nem.nis.harvesting.HarvestingTask;
 import org.nem.peer.PeerNetwork;
 
 import java.util.*;

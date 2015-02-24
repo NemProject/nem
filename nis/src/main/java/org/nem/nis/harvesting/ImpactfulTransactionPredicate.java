@@ -1,7 +1,7 @@
 package org.nem.nis.harvesting;
 
 import org.nem.core.model.*;
-import org.nem.nis.cache.*;
+import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.ReadOnlyAccountState;
 
 import java.util.function.BiPredicate;

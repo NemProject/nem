@@ -9,7 +9,7 @@ public class DbUtils {
 
 	/**
 	 * Cleans up the database.
-	 * 
+	 *
 	 * @param session The session.
 	 */
 	public static void dbCleanup(final Session session) {

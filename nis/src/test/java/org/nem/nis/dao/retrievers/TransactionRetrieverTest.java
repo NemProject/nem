@@ -11,7 +11,6 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.dao.*;
-import org.nem.nis.dao.DbUtils;
 import org.nem.nis.dbmodel.*;
 import org.nem.nis.mappers.AccountDaoLookupAdapter;
 import org.nem.nis.test.*;
@@ -134,7 +133,7 @@ public abstract class TransactionRetrieverTest {
 				this::getExpectedComparablePairsForIncomingTransactions,
 				accountIndex,
 				topMostId,
-				LIMIT) ;
+				LIMIT);
 		Assert.assertThat(ids, IsEquivalent.equivalentTo(expectedIds));
 	}
 

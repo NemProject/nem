@@ -44,7 +44,7 @@ public class TransferDaoTest {
 	private Session session;
 
 	@Before
-	public  void before() {
+	public void before() {
 		this.session = this.sessionFactory.openSession();
 	}
 

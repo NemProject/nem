@@ -3,6 +3,7 @@ package org.nem.nis.dao.retrievers;
 import org.nem.core.model.primitive.BlockHeight;
 
 import java.util.*;
+
 public class TransferRetrieverTest extends TransactionRetrieverTest {
 
 	@Override

@@ -3,7 +3,7 @@ package org.nem.nis.harvesting;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.*;
+import org.nem.nis.BlockScorer;
 import org.nem.nis.cache.ReadOnlyNisCache;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.state.ReadOnlyAccountState;

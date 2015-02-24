@@ -1,6 +1,6 @@
 package org.nem.nis.harvesting;
 
-import org.hamcrest.core.*;
+import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.Mockito;
 import org.nem.core.model.*;
@@ -8,8 +8,8 @@ import org.nem.core.model.primitive.Amount;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.state.*;
-import org.nem.nis.test.*;
+import org.nem.nis.state.AccountState;
+import org.nem.nis.test.NisUtils;
 import org.nem.nis.validators.*;
 import org.nem.nis.validators.transaction.*;
 

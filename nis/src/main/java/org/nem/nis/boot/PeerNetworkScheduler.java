@@ -3,8 +3,8 @@ package org.nem.nis.boot;
 import org.nem.core.async.*;
 import org.nem.core.node.NisPeerId;
 import org.nem.core.time.TimeProvider;
-import org.nem.nis.harvesting.*;
-import org.nem.peer.*;
+import org.nem.nis.harvesting.HarvestingTask;
+import org.nem.peer.PeerNetwork;
 
 import java.util.*;
 import java.util.concurrent.*;
