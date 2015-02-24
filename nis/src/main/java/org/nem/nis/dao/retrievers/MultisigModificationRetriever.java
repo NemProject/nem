@@ -21,7 +21,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final ReadOnlyTransferDao.TransferType transferType) {
 		if (ReadOnlyTransferDao.TransferType.OUTGOING == transferType) {
 			// can't do it with criteria :/
-			final List<DbMultisigAggregateModificationTransaction> transactions = getOutgoingDbModificationTransactions(
+			final List<DbMultisigAggregateModificationTransaction> transactions = this.getOutgoingDbModificationTransactions(
 					session,
 					accountId,
 					maxId,
@@ -35,7 +35,7 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 		}
 
 		// can't do it with criteria :/
-		final List<DbMultisigAggregateModificationTransaction> transactions = getIncomingDbModificationTransactions(
+		final List<DbMultisigAggregateModificationTransaction> transactions = this.getIncomingDbModificationTransactions(
 				session,
 				accountId,
 				maxId,

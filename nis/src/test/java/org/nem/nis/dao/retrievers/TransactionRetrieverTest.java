@@ -49,7 +49,7 @@ public abstract class TransactionRetrieverTest {
 	@Before
 	public void createDb() {
 		this.session = this.sessionFactory.openSession();
-		setupBlocks();
+		this.setupBlocks();
 	}
 
 	@After
@@ -116,7 +116,7 @@ public abstract class TransactionRetrieverTest {
 
 	private void assertCanRetrieveIncomingTransactions(final int accountIndex, final long topMostId) {
 		// Arrange:
-		final TransactionRetriever retriever = getTransactionRetriever();
+		final TransactionRetriever retriever = this.getTransactionRetriever();
 
 		// Act:
 		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
@@ -130,7 +130,7 @@ public abstract class TransactionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		final Collection<Integer> expectedIds = getExpectedIdsForTransactions(
+		final Collection<Integer> expectedIds = this.getExpectedIdsForTransactions(
 				this::getExpectedComparablePairsForIncomingTransactions,
 				accountIndex,
 				topMostId,
@@ -140,7 +140,7 @@ public abstract class TransactionRetrieverTest {
 
 	private void assertCanRetrieveOutgoingTransactions(final int accountIndex, final long topMostId) {
 		// Arrange:
-		final TransactionRetriever retriever = getTransactionRetriever();
+		final TransactionRetriever retriever = this.getTransactionRetriever();
 
 		// Act:
 		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
@@ -154,7 +154,7 @@ public abstract class TransactionRetrieverTest {
 				.collect(Collectors.toList());
 
 		// Assert:
-		final Collection<Integer> expectedIds = getExpectedIdsForTransactions(
+		final Collection<Integer> expectedIds = this.getExpectedIdsForTransactions(
 				this::getExpectedComparablePairsForOutgoingTransactions,
 				accountIndex,
 				topMostId,
