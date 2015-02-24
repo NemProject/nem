@@ -22,6 +22,10 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 			final long maxId,
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
+		if ( ReadOnlyTransferDao.TransferType.ALL == transferType) {
+			throw new RuntimeException("transfer type ALL not supported by transaction retriever classes");
+		}
+
 		// TODO 20150127 J-G: should we also have a registry of sorts for this?
 		final Collection<TransferBlockPair> pairs = this.getMultisigTransfersForAccount(session, accountId, maxId, limit, transferType);
 		pairs.addAll(this.getMultisigImportanceTransfersForAccount(session, accountId, maxId, limit, transferType));

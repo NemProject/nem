@@ -1,6 +1,12 @@
 package org.nem.nis.dao.retrievers;
 
+import org.hamcrest.core.IsNull;
+import org.junit.*;
+import org.nem.core.model.Account;
 import org.nem.core.model.primitive.BlockHeight;
+import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.dbmodel.*;
+import org.nem.nis.mappers.DbModelUtils;
 
 import java.util.*;
 
@@ -46,4 +52,33 @@ public class MultisigTransactionRetrieverTest extends TransactionRetrieverTest {
 				throw new RuntimeException("unknown account id.");
 		}
 	}
+
+	// region signature check
+
+	@Test
+	public void innerTransactionsHaveNullSignatures() {
+		for (final Account ACCOUNT : ACCOUNTS) {
+			// Act:
+			final Collection<TransferBlockPair> outgoingPairs = retriever.getTransfersForAccount(
+					this.session,
+					this.getAccountId(ACCOUNT),
+					Long.MAX_VALUE,
+					100,
+					ReadOnlyTransferDao.TransferType.OUTGOING);
+			final Collection<TransferBlockPair> incomingPairs = retriever.getTransfersForAccount(
+					this.session,
+					this.getAccountId(ACCOUNT),
+					Long.MAX_VALUE,
+					100,
+					ReadOnlyTransferDao.TransferType.INCOMING);
+			outgoingPairs.stream().forEach(p -> Assert.assertThat(
+					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
+					IsNull.nullValue()));
+			incomingPairs.stream().forEach(p -> Assert.assertThat(
+					DbModelUtils.getInnerTransaction((DbMultisigTransaction)p.getTransfer()).getSenderProof(),
+					IsNull.nullValue()));
+		}
+	}
+
+	// endregion
 }

@@ -20,7 +20,10 @@ public class ImportanceTransferRetriever implements TransactionRetriever {
 			final long maxId,
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
-		// TODO 20150111 J-G: should probably add test with senderProof NULL to test that it's being filtered (here and one other place too)
+		if ( ReadOnlyTransferDao.TransferType.ALL == transferType) {
+			throw new RuntimeException("transfer type ALL not supported by transaction retriever classes");
+		}
+
 		final String senderOrRecipient = ReadOnlyTransferDao.TransferType.OUTGOING.equals(transferType) ? "sender" : "remote";
 		final Criteria criteria = session.createCriteria(DbImportanceTransferTransaction.class)
 				.setFetchMode("block", FetchMode.JOIN)
