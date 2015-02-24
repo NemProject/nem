@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class BlockGenerator {
 	private static final Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	private final ReadOnlyNisCache nisCache;
-	private final UnconfirmedTransactions unconfirmedTransactions;
+	private final NewBlockTransactionsProvider transactionsProvider;
 	private final BlockDao blockDao;
 	private final BlockScorer blockScorer;
 	private final BlockValidator blockValidator;
@@ -28,19 +28,19 @@ public class BlockGenerator {
 	 * Creates a new block generator.
 	 *
 	 * @param nisCache The NIS cache.
-	 * @param unconfirmedTransactions The unconfirmed transactions.
+	 * @param transactionsProvider The new block transactions provider.
 	 * @param blockDao The block dao.
 	 * @param blockScorer The block scorer.
 	 * @param blockValidator The block validator.
 	 */
 	public BlockGenerator(
 			final ReadOnlyNisCache nisCache,
-			final UnconfirmedTransactions unconfirmedTransactions,
+			final NewBlockTransactionsProvider transactionsProvider,
 			final BlockDao blockDao,
 			final BlockScorer blockScorer,
 			final BlockValidator blockValidator) {
 		this.nisCache = nisCache;
-		this.unconfirmedTransactions = unconfirmedTransactions;
+		this.transactionsProvider = transactionsProvider;
 		this.blockDao = blockDao;
 		this.blockScorer = blockScorer;
 		this.blockValidator = blockValidator;
@@ -96,9 +96,7 @@ public class BlockGenerator {
 				harvestedBlockHeight);
 		final Account ownerAccount = this.nisCache.getAccountCache().findByAddress(ownerState.getAddress());
 
-		final Collection<Transaction> transactions = this.unconfirmedTransactions
-				.getTransactionsForNewBlock(ownerAccount.getAddress(), blockTime)
-				.getMostImportantTransactions(BlockChainConstants.MAX_ALLOWED_TRANSACTIONS_PER_BLOCK);
+		final Collection<Transaction> transactions = this.transactionsProvider.getBlockTransactions(ownerAccount.getAddress(), blockTime);
 		final BlockDifficulty difficulty = this.calculateDifficulty(blockScorer, lastBlock.getHeight());
 
 		// it's the remote harvester that generates a block NOT owner, we won't have owner's key here!
@@ -120,14 +118,5 @@ public class BlockGenerator {
 		final List<TimeInstant> timeStamps = this.blockDao.getTimeStampsFrom(blockHeight, limit);
 		final List<BlockDifficulty> difficulties = this.blockDao.getDifficultiesFrom(blockHeight, limit);
 		return scorer.getDifficultyScorer().calculateDifficulty(difficulties, timeStamps, lastBlockHeight.getRaw() + 1);
-	}
-
-	/**
-	 * Drops transactions that have already expired.
-	 *
-	 * @param time The current time.
-	 */
-	public void dropExpireTransactions(final TimeInstant time) {
-		this.unconfirmedTransactions.dropExpiredTransactions(time);
 	}
 }

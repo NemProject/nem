@@ -23,6 +23,16 @@ public class MockTransactionUtils {
 	}
 
 	/**
+	 * Given a collection of mock transactions, returns a list of the corresponding custom fields.
+	 *
+	 * @param transactions The transactions.
+	 * @return The custom fields.
+	 */
+	public static List<Integer> getCustomFieldValues(final Collection<Transaction> transactions) {
+		return getCustomFields(transactions.stream());
+	}
+
+	/**
 	 * Creates a mock transaction with nested children.
 	 * Root - seed
 	 * Level 1 - seed + 10, seed + 20, seed + 30

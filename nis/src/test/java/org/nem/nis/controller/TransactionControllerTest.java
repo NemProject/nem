@@ -13,7 +13,7 @@ import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.NisPeerNetworkHost;
 import org.nem.nis.controller.requests.AuthenticatedUnconfirmedTransactionsRequest;
-import org.nem.nis.harvesting.UnconfirmedTransactions;
+import org.nem.nis.harvesting.*;
 import org.nem.nis.service.PushService;
 import org.nem.nis.validators.*;
 import org.nem.peer.PeerNetwork;
@@ -290,7 +290,7 @@ public class TransactionControllerTest {
 	private static class TestContext {
 		private final AccountLookup accountLookup = Mockito.mock(AccountLookup.class);
 		private final PushService pushService = Mockito.mock(PushService.class);
-		private final UnconfirmedTransactions unconfirmedTransactions = Mockito.mock(UnconfirmedTransactions.class);
+		private final UnconfirmedTransactionsFilter unconfirmedTransactions = Mockito.mock(UnconfirmedTransactionsFilter.class);
 		private final SingleTransactionValidator validator = Mockito.mock(SingleTransactionValidator.class);
 		private final PeerNetwork network;
 		private final NisPeerNetworkHost host;

@@ -198,9 +198,14 @@ public class NisAppConfig {
 
 	@Bean
 	public Harvester harvester() {
+		final NewBlockTransactionsProvider transactionsProvider = new NewBlockTransactionsProvider(
+				this.nisCache(),
+				this.transactionValidatorFactory(),
+				this.unconfirmedTransactions());
+
 		final BlockGenerator generator = new BlockGenerator(
 				this.nisCache(),
-				this.unconfirmedTransactions(),
+				transactionsProvider,
 				this.blockDao,
 				new BlockScorer(this.accountStateCache()),
 				this.blockValidatorFactory().create(this.nisCache()));
@@ -309,7 +314,13 @@ public class NisAppConfig {
 
 	@Bean
 	public NisPeerNetworkHost nisPeerNetworkHost() {
-		final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(this.timeProvider(), this.blockChain(), this.harvester());
+		final HarvestingTask harvestingTask = new HarvestingTask(
+				this.blockChain(),
+				this.harvester(),
+				this.unconfirmedTransactions());
+
+		final PeerNetworkScheduler scheduler = new PeerNetworkScheduler(this.timeProvider(), harvestingTask);
+
 		final CountingBlockSynchronizer synchronizer = new CountingBlockSynchronizer(this.blockChain());
 
 		return new NisPeerNetworkHost(
