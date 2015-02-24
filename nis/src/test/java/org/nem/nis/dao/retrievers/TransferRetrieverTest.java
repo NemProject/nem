@@ -45,6 +45,4 @@ public class TransferRetrieverTest extends TransactionRetrieverTest {
 				throw new RuntimeException("unknown account id.");
 		}
 	}
-
-	// TODO: add more tests
 }

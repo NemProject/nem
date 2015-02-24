@@ -55,7 +55,6 @@ public abstract class TransactionRetrieverTest {
 	@After
 	public void destroyDb() {
 		DbUtils.dbCleanup(session);
-
 		this.session.close();
 	}
 
@@ -214,7 +213,7 @@ public abstract class TransactionRetrieverTest {
 			addTransferTransactions(block);
 			addImportanceTransferTransactions(block);
 			addAggregateModificationTransaction(block);
-			addMultigTransactions(block);
+			addMultisigTransactions(block);
 
 			// Arrange: sign and map the blocks
 			block.sign();
@@ -251,7 +250,7 @@ public abstract class TransactionRetrieverTest {
 				true));
 	}
 
-	private static void addMultigTransactions(final Block block) {
+	private static void addMultisigTransactions(final Block block) {
 		// account 0 is outer transaction sender
 		// account 1 is inner transaction sender
 		// account 2 is recipient/remote/added cosignatory
@@ -318,7 +317,7 @@ public abstract class TransactionRetrieverTest {
 	private static Transaction createMultisigTransaction(
 			final int timeStamp,
 			final int innerType) {
-		Transaction innerTransaction;
+		final Transaction innerTransaction;
 		switch (innerType) {
 			case TransactionTypes.TRANSFER:
 				innerTransaction = createTransfer(timeStamp, ACCOUNTS[1], ACCOUNTS[2], false);

@@ -48,7 +48,6 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 				.collect(Collectors.toList());
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<DbMultisigAggregateModificationTransaction> getIncomingDbModificationTransactions(
 			final Session session,
 			final long cosignatoryId,
@@ -65,10 +64,9 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 				.setParameter("maxId", maxId)
 				.setParameter("cosignatoryId", cosignatoryId)
 				.setParameter("limit", limit);
-		return (List<DbMultisigAggregateModificationTransaction>)query.list();
+		return listAndCast(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<DbMultisigAggregateModificationTransaction> getOutgoingDbModificationTransactions(
 			final Session session,
 			final long senderId,
@@ -84,7 +82,11 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 				.setParameter("maxId", maxId)
 				.setParameter("senderId", senderId)
 				.setParameter("limit", limit);
-		return (List<DbMultisigAggregateModificationTransaction>)query.list();
+		return listAndCast(query);
 	}
 
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Query query) {
+		return (List<T>)query.list();
+	}
 }

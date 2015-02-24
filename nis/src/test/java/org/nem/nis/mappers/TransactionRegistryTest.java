@@ -396,7 +396,7 @@ public class TransactionRegistryTest {
 		final TransactionRegistry.Entry<?, ?> entry = TransactionRegistry.findByType(type);
 
 		// Assert:
-		Assert.assertThat(entry.getTransactionRetriever.get().getClass(), IsEqual.equalTo(retrieverClass));
+		Assert.assertThat(entry.getTransactionRetriever.get(), IsInstanceOf.instanceOf(retrieverClass));
 	}
 
 	// endregion

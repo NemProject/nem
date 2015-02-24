@@ -210,7 +210,7 @@ public class TransferDaoImpl implements TransferDao {
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
 		final List<TransferBlockPair> list = pairs.stream()
-				.sorted(this::comparePair)
+				.sorted()
 				.collect(Collectors.toList());
 		TransferBlockPair curPair = null;
 		final Collection<TransferBlockPair> result = new ArrayList<>();
@@ -225,9 +225,5 @@ public class TransferDaoImpl implements TransferDao {
 		}
 
 		return result;
-	}
-
-	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
-		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
 	}
 }

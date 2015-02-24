@@ -119,7 +119,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				.addScalar("transactionId", LongType.INSTANCE)
 				.addScalar("height", LongType.INSTANCE)
 				.setMaxResults(limit);
-		final List<Object[]> list = preQuery.list();
+		final List<Object[]> list = listAndCast(preQuery);
 		return list.stream().map(o -> new TransactionIdBlockHeightPair((Long)o[0], (Long)o[1])).collect(Collectors.toList());
 	}
 
@@ -133,7 +133,7 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 				.add(Restrictions.isNotNull(joinEntity))
 				.addOrder(Order.desc("id"));
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return criteria.list();
+		return listAndCast(criteria);
 	}
 
 	private HashMap<Long, DbBlock> getBlockMap(final Session session, final List<TransactionIdBlockHeightPair> pairs) {
@@ -141,14 +141,14 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		final Criteria criteria = session.createCriteria(DbBlock.class)
 				.add(Restrictions.in("height", pairs.stream().map(p -> p.blockHeight).collect(Collectors.toList())))
 				.addOrder(Order.desc("height"));
-		final List<DbBlock> blocks = criteria.list();
+		final List<DbBlock> blocks = listAndCast(criteria);
 		blocks.stream().forEach(b -> blockMap.put(b.getHeight(), b));
 		return blockMap;
 	}
 
 	private Collection<TransferBlockPair> sortAndLimit(final Collection<TransferBlockPair> pairs, final int limit) {
 		final List<TransferBlockPair> list = pairs.stream()
-				.sorted(this::comparePair)
+				.sorted()
 				.collect(Collectors.toList());
 		TransferBlockPair curPair = null;
 		final Collection<TransferBlockPair> result = new ArrayList<>();
@@ -165,8 +165,14 @@ public class MultisigTransactionRetriever implements TransactionRetriever {
 		return result;
 	}
 
-	private int comparePair(final TransferBlockPair lhs, final TransferBlockPair rhs) {
-		return -lhs.getTransfer().getId().compareTo(rhs.getTransfer().getId());
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Query query) {
+		return (List<T>)query.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> listAndCast(final Criteria criteria) {
+		return (List<T>)criteria.list();
 	}
 
 	private class TransactionIdBlockHeightPair {
