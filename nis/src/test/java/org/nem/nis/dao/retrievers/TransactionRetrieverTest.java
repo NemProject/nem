@@ -144,7 +144,7 @@ public abstract class TransactionRetrieverTest {
 		// Act:
 		final Collection<TransferBlockPair> pairs = retriever.getTransfersForAccount(
 				this.session,
-				this.getAccountId(ACCOUNTS[accountIndex]),
+				this.getAccountId(ACCOUNTS[accountIndex]), // TODO 20150223 J-G: this seems to fail sporadically with a NullPointerException :/
 				topMostId,
 				LIMIT,
 				ReadOnlyTransferDao.TransferType.OUTGOING);
