@@ -12,7 +12,6 @@ import org.nem.nis.validators.transaction.AggregateSingleTransactionValidatorBui
 import org.nem.nis.validators.unconfirmed.*;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.*;
 
@@ -235,14 +234,8 @@ public class UnconfirmedTransactions implements UnconfirmedTransactionsFilter {
 		final AggregateSingleTransactionValidatorBuilder builder = blockVerification
 				? this.validatorFactory.createSingleBuilder(accountStateCache)
 				: this.validatorFactory.createIncompleteSingleBuilder(accountStateCache);
-		builder.add(new NonConflictingImportanceTransferTransactionValidator(this.getTransactionsSupplier()));
-		builder.add(new NonConflictingMultisigAggregateModificationValidator(this.getTransactionsSupplier()));
 		builder.add(new TransactionDeadlineValidator(this.timeProvider));
 		return builder.build();
-	}
-
-	private Supplier<Stream<Transaction>> getTransactionsSupplier() {
-		return () -> this.transactions.streamFlat();
 	}
 
 	/**

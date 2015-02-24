@@ -20,8 +20,6 @@ public class BlockValidatorFactoryTest {
 				"EligibleSignerBlockValidator",
 				"MaxTransactionsBlockValidator",
 				"NoSelfSignedTransactionsBlockValidator",
-				"BlockImportanceTransferValidator",
-				"BlockImportanceTransferBalanceValidator",
 				"BlockUniqueHashTransactionValidator",
 				"BlockMultisigAggregateModificationValidator");
 
