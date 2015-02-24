@@ -20,7 +20,7 @@ public class TransferRetriever implements TransactionRetriever {
 			final long maxId,
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
-		if ( ReadOnlyTransferDao.TransferType.ALL == transferType) {
+		if (ReadOnlyTransferDao.TransferType.ALL == transferType) {
 			throw new IllegalArgumentException("transfer type ALL not supported by transaction retriever classes");
 		}
 
