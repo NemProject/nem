@@ -1,6 +1,7 @@
 package org.nem.nis.service;
 
 import org.hamcrest.core.IsEqual;
+import org.hibernate.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -28,6 +29,16 @@ public class AccountIoAdapterIntegrationTest {
 
 	@Autowired
 	BlockDao blockDao;
+
+	@Autowired
+	SessionFactory sessionFactory;
+
+	@After
+	public void destroyDb() {
+		final Session session = this.sessionFactory.openSession();
+		DbUtils.dbCleanup(session);
+		session.close();
+	}
 
 	@Test
 	public void getAccountTransfersReturnsTransfersSortedByTimestamp() {
