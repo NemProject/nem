@@ -217,6 +217,7 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	/**
+	 * TODO 20150223 J-M: is this comment still applicable or can it be closed?
 	 * TODO 20141013 BR -> J: what we are really interested in is the importance calculated by the page rank part. Here are the (unweighted) numbers:
 	 * TODO                   In your scenario 0, 1 and 6 are outliers, 2, 3, 4, 5 and 7, 8, 9, 10 build a cluster each.
 	 * 0.117 0.103 0.069 0.081 0.091 0.098 0.103 0.069 0.081 0.091 0.098 original importance

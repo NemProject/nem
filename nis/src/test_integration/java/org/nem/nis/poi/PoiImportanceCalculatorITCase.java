@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
  * some tests we should consider: - Sybil attack (master node creates a ton of
  * other nodes and transacts with them (and maybe some other nodes) to try to
  * boost score)</br>
+ *  TODO 20150223 J-M: do you want to elaborate on these?
  * - infinite loop attack (sending XEM around in a loop to boost their score)<br/>
  * - closed loop attack (TODO M-M: explain this)<br/>
  * - small transaction spam attack (TODO M-M: is this still relevant?)<br/>
