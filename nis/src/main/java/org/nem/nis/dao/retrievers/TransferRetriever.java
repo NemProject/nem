@@ -2,7 +2,7 @@ package org.nem.nis.dao.retrievers;
 
 import org.hibernate.*;
 import org.hibernate.criterion.*;
-import org.nem.nis.dao.ReadOnlyTransferDao;
+import org.nem.nis.dao.*;
 import org.nem.nis.dbmodel.*;
 
 import java.util.*;
@@ -33,7 +33,7 @@ public class TransferRetriever implements TransactionRetriever {
 				.addOrder(Order.desc("id"))
 				.setMaxResults(limit);
 		criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		final List<DbTransferTransaction> list = criteria.list();
+		final List<DbTransferTransaction> list = HibernateUtils.listAndCast(criteria);
 		return list.stream()
 				.map(t -> new TransferBlockPair(t, t.getBlock()))
 				.collect(Collectors.toList());
