@@ -19,6 +19,10 @@ public class MultisigModificationRetriever implements TransactionRetriever {
 			final long maxId,
 			final int limit,
 			final ReadOnlyTransferDao.TransferType transferType) {
+		if ( ReadOnlyTransferDao.TransferType.ALL == transferType) {
+			throw new RuntimeException("transfer type ALL not supported by transaction retriever classes");
+		}
+
 		if (ReadOnlyTransferDao.TransferType.OUTGOING == transferType) {
 			// can't do it with criteria :/
 			final List<DbMultisigAggregateModificationTransaction> transactions = getOutgoingDbModificationTransactions(
