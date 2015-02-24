@@ -1,6 +1,6 @@
 package org.nem.nis.dao;
 
-import org.hamcrest.core.IsEqual;
+import org.hamcrest.core.*;
 import org.hibernate.*;
 import org.hibernate.type.LongType;
 import org.junit.*;
@@ -24,10 +24,6 @@ import java.lang.InstantiationException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.BiConsumer;
-
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 
 @ContextConfiguration(classes = TestConf.class)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -70,8 +66,8 @@ public class BlockDaoTest {
 		this.blockDao.save(entity);
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -90,11 +86,11 @@ public class BlockDaoTest {
 		this.blockDao.save(entity);
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -113,11 +109,11 @@ public class BlockDaoTest {
 		this.blockDao.save(entity);
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), IsNull.notNullValue());
 	}
 
 	@Test
@@ -138,12 +134,12 @@ public class BlockDaoTest {
 		// Act:
 		this.blockDao.save(entity);
 
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockMultisigTransactions().size(), equalTo(1));
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getBlockMultisigTransactions().size(), IsEqual.equalTo(1));
 	}
 
 	@Test
@@ -172,14 +168,14 @@ public class BlockDaoTest {
 		final DbBlock entity = this.blockDao.findByHeight(block.getHeight());
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), equalTo(1));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), notNullValue());
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), notNullValue());
-		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().get(0).getId(), notNullValue());
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().size(), IsEqual.equalTo(1));
+		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getBlockMultisigAggregateModificationTransactions().get(0).getId(), IsNull.notNullValue());
 	}
 
 	// TODO 20141005 - since i imagine these tests will apply to all transaction types, it might make sense
@@ -208,8 +204,8 @@ public class BlockDaoTest {
 		this.blockDao.save(dbBlock);
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
+		Assert.assertThat(dbBlock.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
 	}
 
 	@Test
@@ -237,10 +233,10 @@ public class BlockDaoTest {
 
 		// Assert:
 		// TODO 20141010 J-G: you don't need to revalidate getBlkIndex here; do you have a test like this for importance transfer?
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getOrderId(), equalTo(0));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getOrderId(), equalTo(1));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getOrderId(), IsEqual.equalTo(0));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getOrderId(), IsEqual.equalTo(1));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
 	}
 	//endregion
 
@@ -258,14 +254,14 @@ public class BlockDaoTest {
 		final DbBlock entity = this.blockDao.findByHeight(emptyBlock.getHeight());
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
-		Assert.assertThat(entity.getHeight(), equalTo(emptyBlock.getHeight().getRaw()));
-		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
-		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getHarvester().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
-		Assert.assertThat(entity.getHarvesterProof(), equalTo(emptyBlock.getSignature().getBytes()));
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
+		Assert.assertThat(entity.getHeight(), IsEqual.equalTo(emptyBlock.getHeight().getRaw()));
+		Assert.assertThat(entity.getBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(emptyBlock)));
+		Assert.assertThat(entity.getGenerationHash(), IsEqual.equalTo(emptyBlock.getGenerationHash()));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getHarvester().getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
+		Assert.assertThat(entity.getHarvesterProof(), IsEqual.equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
 	@Test
@@ -281,14 +277,14 @@ public class BlockDaoTest {
 		final DbBlock entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
-		Assert.assertThat(entity.getHeight(), equalTo(emptyBlock.getHeight().getRaw()));
-		Assert.assertThat(entity.getBlockHash(), equalTo(HashUtils.calculateHash(emptyBlock)));
-		Assert.assertThat(entity.getGenerationHash(), equalTo(emptyBlock.getGenerationHash()));
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getHarvester().getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
-		Assert.assertThat(entity.getHarvesterProof(), equalTo(emptyBlock.getSignature().getBytes()));
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
+		Assert.assertThat(entity.getHeight(), IsEqual.equalTo(emptyBlock.getHeight().getRaw()));
+		Assert.assertThat(entity.getBlockHash(), IsEqual.equalTo(HashUtils.calculateHash(emptyBlock)));
+		Assert.assertThat(entity.getGenerationHash(), IsEqual.equalTo(emptyBlock.getGenerationHash()));
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getHarvester().getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
+		Assert.assertThat(entity.getHarvesterProof(), IsEqual.equalTo(emptyBlock.getSignature().getBytes()));
 	}
 
 	@Test
@@ -315,10 +311,10 @@ public class BlockDaoTest {
 		final DbBlock entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
 
 		// Assert:
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), equalTo(12));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(entity.getBlockTransferTransactions().get(1).getBlkIndex(), equalTo(12));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
+		Assert.assertThat(dbBlock.getBlockTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
+		Assert.assertThat(entity.getBlockTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
+		Assert.assertThat(entity.getBlockTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
 		// TODO 20151005 J-G i guess you're assuming the entity transactions are sorted?
 		// > it might be better to check the hashes like in the following test
 	}
@@ -346,17 +342,17 @@ public class BlockDaoTest {
 		final DbBlock entity = this.blockDao.findByHash(HashUtils.calculateHash(emptyBlock));
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getHarvester().getId(), notNullValue());
-		Assert.assertThat(entity.getBlockTransferTransactions().size(), equalTo(0));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), equalTo(2));
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getHarvester().getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getBlockTransferTransactions().size(), IsEqual.equalTo(0));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().size(), IsEqual.equalTo(2));
 
 		final Hash h1 = entity.getBlockImportanceTransferTransactions().get(0).getTransferHash();
 		final Hash h2 = entity.getBlockImportanceTransferTransactions().get(1).getTransferHash();
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), equalTo(24));
-		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), equalTo(12));
-		Assert.assertThat(h1, equalTo(HashUtils.calculateHash(importanceTransfer1)));
-		Assert.assertThat(h2, equalTo(HashUtils.calculateHash(importanceTransfer2)));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(0).getBlkIndex(), IsEqual.equalTo(24));
+		Assert.assertThat(entity.getBlockImportanceTransferTransactions().get(1).getBlkIndex(), IsEqual.equalTo(12));
+		Assert.assertThat(h1, IsEqual.equalTo(HashUtils.calculateHash(importanceTransfer1)));
+		Assert.assertThat(h2, IsEqual.equalTo(HashUtils.calculateHash(importanceTransfer2)));
 	}
 
 	@Test
@@ -372,11 +368,11 @@ public class BlockDaoTest {
 		final Collection<DbBlock> entities = this.blockDao.getBlocksForAccount(signer, null, 25);
 
 		// Assert:
-		Assert.assertThat(entities.size(), equalTo(1));
+		Assert.assertThat(entities.size(), IsEqual.equalTo(1));
 		final DbBlock entity = entities.iterator().next();
 
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbBlock.getId()));
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getId()));
 
 		ExceptionAssert.assertThrows(v -> entity.getBlockTransferTransactions().size(), LazyInitializationException.class);
 	}
@@ -405,7 +401,7 @@ public class BlockDaoTest {
 
 		// Assert:
 		// TODO 20151010 J-G can you add a comment explaining why 25 is expected?
-		Assert.assertThat(entities1.size(), equalTo(25));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
 	}
 
 	@Test
@@ -427,8 +423,8 @@ public class BlockDaoTest {
 		final Collection<DbBlock> entities2 = this.blockDao.getBlocksForAccount(signer, hashes.get(0), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(0));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(0));
 	}
 
 	@Test
@@ -452,17 +448,17 @@ public class BlockDaoTest {
 
 		// Assert:
 		final BiConsumer<Collection<DbBlock>, Long> assertCollectionContainsBlocksStartingAtHeight = (entities, startHeight) -> {
-			Assert.assertThat(entities.size(), equalTo(25));
+			Assert.assertThat(entities.size(), IsEqual.equalTo(25));
 
 			long lastHeight = startHeight;
 			for (final DbBlock entity : entities) {
-				Assert.assertThat(entity.getHeight(), equalTo(lastHeight--));
+				Assert.assertThat(entity.getHeight(), IsEqual.equalTo(lastHeight--));
 			}
 		};
 
 		assertCollectionContainsBlocksStartingAtHeight.accept(entities1, 456L + 29);
 		assertCollectionContainsBlocksStartingAtHeight.accept(entities2, 456L + 28);
-		Assert.assertThat(entities3.size(), equalTo(0));
+		Assert.assertThat(entities3.size(), IsEqual.equalTo(0));
 	}
 	//endregion
 
@@ -481,9 +477,9 @@ public class BlockDaoTest {
 		final DbAccount entity = this.accountDao.getAccount(dbBlock.getHarvester().getId());
 
 		// Assert:
-		Assert.assertThat(entity.getId(), notNullValue());
-		Assert.assertThat(entity.getId(), equalTo(dbBlock.getHarvester().getId()));
-		Assert.assertThat(entity.getPublicKey(), equalTo(signer.getAddress().getPublicKey()));
+		Assert.assertThat(entity.getId(), IsNull.notNullValue());
+		Assert.assertThat(entity.getId(), IsEqual.equalTo(dbBlock.getHarvester().getId()));
+		Assert.assertThat(entity.getPublicKey(), IsEqual.equalTo(signer.getAddress().getPublicKey()));
 	}
 
 	@Test
@@ -571,12 +567,12 @@ public class BlockDaoTest {
 		final HashChain entities2 = this.blockDao.getHashesFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(10));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 		int i = 0;
 		for (final Hash entity : entities1.asCollection()) {
-			Assert.assertThat(entity, equalTo(expectedHashes.get(i)));
+			Assert.assertThat(entity, IsEqual.equalTo(expectedHashes.get(i)));
 			i = i + 1;
 		}
 	}
@@ -601,12 +597,12 @@ public class BlockDaoTest {
 		final HashChain entities2 = this.blockDao.getHashesFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(10));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 		int i = 0;
 		for (final Hash entity : entities1.asCollection()) {
-			Assert.assertThat(entity, equalTo(expectedHashes.get(i)));
+			Assert.assertThat(entity, IsEqual.equalTo(expectedHashes.get(i)));
 			i = i + 1;
 		}
 	}
@@ -631,12 +627,12 @@ public class BlockDaoTest {
 		final List<BlockDifficulty> entities2 = this.blockDao.getDifficultiesFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(10));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 		int i = 0;
 		for (final BlockDifficulty entity : entities1) {
-			Assert.assertThat(entity.getRaw(), equalTo(expectedDifficulties.get(i)));
+			Assert.assertThat(entity.getRaw(), IsEqual.equalTo(expectedDifficulties.get(i)));
 			i = i + 1;
 		}
 	}
@@ -661,12 +657,12 @@ public class BlockDaoTest {
 		final List<BlockDifficulty> entities2 = this.blockDao.getDifficultiesFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(10));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 		int i = 0;
 		for (final BlockDifficulty entity : entities1) {
-			Assert.assertThat(entity.getRaw(), equalTo(expectedDifficulties.get(i)));
+			Assert.assertThat(entity.getRaw(), IsEqual.equalTo(expectedDifficulties.get(i)));
 			i = i + 1;
 		}
 	}
@@ -690,12 +686,12 @@ public class BlockDaoTest {
 		final List<TimeInstant> entities2 = this.blockDao.getTimeStampsFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(10));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 		int i = 0;
 		for (final TimeInstant entity : entities1) {
-			Assert.assertThat(entity.getRawTime(), equalTo(expectedTimestamps.get(i)));
+			Assert.assertThat(entity.getRawTime(), IsEqual.equalTo(expectedTimestamps.get(i)));
 			i = i + 1;
 		}
 	}
@@ -720,12 +716,12 @@ public class BlockDaoTest {
 		final List<TimeInstant> entities2 = this.blockDao.getTimeStampsFrom(new BlockHeight(456 + 20), 25);
 
 		// Assert:
-		Assert.assertThat(entities1.size(), equalTo(25));
-		Assert.assertThat(entities2.size(), equalTo(10));
+		Assert.assertThat(entities1.size(), IsEqual.equalTo(25));
+		Assert.assertThat(entities2.size(), IsEqual.equalTo(10));
 
 		int i = 0;
 		for (final TimeInstant entity : entities1) {
-			Assert.assertThat(entity.getRawTime(), equalTo(expectedTimeStamps.get(i)));
+			Assert.assertThat(entity.getRawTime(), IsEqual.equalTo(expectedTimeStamps.get(i)));
 			i = i + 1;
 		}
 	}
