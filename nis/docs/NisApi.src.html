@@ -1,0 +1,4700 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+
+<body>
+
+<div class=document>
+
+	<p class=NemTitle style='margin-bottom:88.0pt;'><img src="image002.png"></p>
+	
+	<p class=NemTitleText>NEM NIS API Documentation</p>
+
+	<p class=NemSubtitle>Version 1.5</p>
+	<p id="timedate" class=NemSubtitle>08:41, February 24, 2015 FILLED AUTOMATICALLY</p>
+	<p style='page-break-before:always'></p>
+
+	<p class=NemTocHeading>Contents</p>
+	<div id="toc">FILLED AUTOMATICALLY</div>
+
+	<hr>
+
+	<h1>Introduction</h1>
+
+	<h2>General Information</h2>
+
+	<p>The NEM Infrastructure Server (short: NIS) was written in Java. It needs Java 8 to run. It can run with at least 512MB memory for the java virtual machine but we recommend at least 1GB.</p>
+
+	<h2>Installation</h2>
+
+	<p>NIS can be installed either via installer using the URL <a href="http://bob.nem.ninja/installer/">NEM Infrastructure Server</a> or as stand-alone package which is hosted on <a href="http://bob.nem.ninja/">http://bob.nem.ninja/</a>. The installer only supports 64 bit versions of Java. The current stand-alone version as of this writing is <a href="http://bob.nem.ninja/nis-ncc-0.5.13.tgz">nis-ncc-0.5.13.tgz</a>. When using the installer both installation and the start-up of the software is automatic. The stand-alone version needs to be unzipped to a directory of your choice. It is then started by running runNis.bat (windows) or nix.runNis.sh (linux) from the command prompt.</p>
+
+	<h2>Requests</h2>
+
+	<p>NIS uses port 7890 to communicate with its clients. It accepts both HTTP GET and POST requests.</p>
+
+	<p>Assuming that the NIS is running locally, HTTP GET requests can be executed from a browser and have the form:</p>
+
+	<p><a href="http://127.0.0.1:7890/">http://127.0.0.1:7890</a>&lt;path to API request&gt;?&lt;parameters&gt; for example:</p>
+
+	<p><a href="http://127.0.0.1:7890/account/get?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS">http://127.0.0.1:7890/account/get?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS</a></p>
+
+	<p>HTTP POST request usually cannot be executed with a browser unless you use a plugin which is able to do it. HTTP POST requests use JSON structures in the request body to supply data to NIS.</p>
+
+	<p>Both request types return (if any data is returned) data using JSON structures. <a href="#appendix-A:-description-of-the-JSON-structures">Appendix A: Description of the JSON Structures</a> explains all JSON structures used in this document.</p>
+
+	<h1>NIS status related requests</h1>
+
+	<p>There are two requests by which you can get information about the status of NIS. The /heartbeat request gives you information if the node is up and responsive. The /status request gives more detailed information about the state of NIS. Both requests return a NemRequestResult object. See <b>Appendix A</b> <a href="#nemRequestResult">NemRequestResult</a> for more details on the interpretation of a NemRequestResult.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Heart beat request</h2>
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/heartbeat</td>
+		</tr>
+	</table>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Determines if NIS is up and responsive.</p>
+
+	<h4>No Parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/heartbeat">http://127.0.0.1:7890/heartbeat</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{
+	       "code": 1,
+	       "type": 2,
+	       "message": "ok"
+	}
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If there is no response to this request,
+	NIS is either not running or is in a state where it can't serve requests.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Status Request</h2>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/status</td>
+		</tr>
+	</table>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Determines the status of NIS.</p>
+
+	<h4>No Parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/status">http://127.0.0.1:7890/status</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "code": 6, 
+	       "type": 4, 
+	       "message": "status" 
+	} 
+	</samp></pre>
+
+	<p class=NemNoSpacing>The code can be interpreted as follows:</p>
+	<p class='NemNoSpacing FakeList'>0:<span class='sep'> </span>Unknown status.</p>
+	<p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>NIS is stopped.</p>
+	<p class='NemNoSpacing FakeList'>2:<span class='sep'> </span>NIS is starting.</p>
+	<p class='NemNoSpacing FakeList'>3:<span class='sep'> </span>NIS is running.</p>
+	<p class='NemNoSpacing FakeList'>4:<span class='sep'> </span>NIS is booting the local node (implies NIS is running).</p>
+	<p class='NemNoSpacing FakeList'>5:<span class='sep'> </span>The local node is booted (implies NIS is running).</p>
+	<p class='NemNoSpacing FakeList'>6:<span class='sep'> </span>The local node is synchronized (implies NIS is running and the local node is booted).</p>
+	<p class='NemNoSpacing FakeList'>7:<span class='sep'> </span>NIS local node does not see any remote NIS node (implies running and booted).</p>
+	<p class='NemNoSpacing FakeList'>8:<span class='sep'> </span>NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests.</p>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If there is no response to this request,
+	NIS is either not running or is in a state where it can't serve requests.</p>
+
+	<h1>Account related requests</h1>
+
+	<p>This chapter will guide you through the
+	process of retrieving account information from a NEM Infrastructure Server. The
+	information that can be retrieved is the durable account data, its meta data
+	and information about transactions and harvested blocks.</p>
+
+	<h4>Normal accounts:</h4>
+
+	<p>Normal accounts are created and controlled
+	by a private key. Any action for the account like sending NEM to another
+	account via a transfer transaction is signed with this private key. If an
+	attacker gains knowledge of the private key, he/she can rob the account. The
+	private key must therefore be kept secret by all means.</p>
+
+	<h4>Multisig accounts:</h4>
+
+	<p>Multisig accounts can be created by
+	converting a normal account to a multisig account via a multisig aggregate
+	modification transaction. This adds cosignatories to the account. After that
+	modification, only the cosignatories can initiate an action for the account.
+	Any action must be signed by all cosignatories. This makes a multisig account
+	significantly more secure than a normal account. When a single cosignatory
+	private key is gained by an attacker, the attacker still can't initiate any
+	action on the account since <b>all</b> cosignatories must sign. It is strongly
+	recommended to convert any account holding a significantly high amount of NEM
+	into a multisig account with at least 3 cosignatories. Once converted to a
+	multisig account, the original private key for the account plays no role any
+	more.</p>
+
+	<p>Durable data is either stored in the
+	database or can be calculated from other database data. The corresponding JSON
+	object is described in Appendix A: <a href="#account">Account</a>. It has the fields:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p>Each account has a unique address. First letter of an address indicate
+				the network the account belongs to. Currently two networks are defined: the
+				test network whose account addresses start with a capital T and the main
+				network whose account addresses always start with a capital N. Addresses have
+				always a length of 40 characters and are base 32 encoded.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>balance</p>
+			</td>
+			<td>
+				<p>Each account has a balance which is an integer greater or equal to
+				zero and denotes the number of micro NEMs which the account owns. Thus a
+				balance of 123456789 means the account owns 123.456789 NEM. A balance is
+				split into its vested and unvested part. Only the vested part is relevant for
+				the importance calculation. For transfers from one account to another only
+				the balance itself is relevant.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>importance</p>
+			</td>
+			<td>
+				<p>Each account is assigned an importance. The importance is a
+				decimal number between 0 and 1. It denotes the probability of an account to
+				harvest the next block in case the account has harvesting turned on and all
+				other accounts are harvesting too. The exact formula for calculating the
+				importance is not public yet. Accounts need at least 10k vested NEM to be
+				included in the importance calculation.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>publicKey</p>
+			</td>
+			<td>
+				<p>The public key of an account can be used
+				to verify signatures of the account. Only accounts that have already
+				published a transaction have a public key assigned to the account. Otherwise
+				the field is null.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>label</p>
+			</td>
+			<td>
+				<p>This field is not used yet and is always null.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>harvestedBlocks</p>
+			</td>
+			<td>
+				<p>Harvesting is the process of generating new blocks. The field
+				denotes the number of blocks that the account harvested so far. For a new
+				account the number is 0.</p>
+			</td>
+		</tr>
+	</table>
+
+
+	<p>The meta data for an account describes the
+	harvesting status of an account, and in case that the account is a cosignatory
+	of at least one multisig account, the list of those multisig accounts. An
+	account can either harvest with its current importance or delegate the
+	harvesting to a so called remote account. In the latter case the remote account
+	uses the importance of the original account to harvest. The corresponding JSON
+	object and the possible values for the status/remoteStatus are described in
+	Appendix A: <a href="#accountMetaDataPair">AccountMetaDataPair</a>. The meta
+	data consists of the following fields:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>status</p>
+			</td>
+			<td>
+				<p>This field describes the harvesting status of an account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>remoteStatus</p>
+			</td>
+			<td>
+				<p>The field describes the status of remote harvesting.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>cosignatoryOf</p>
+			</td>
+			<td>
+				<p>Array of AccountInfo structures that describe the multisig
+				accounts that this account is cosignatory of.</p>
+			</td>
+		</tr>
+	</table>
+
+
+	<p>Known accounts have at least one incoming
+	transaction. The corresponding JSON objects are described in Appendix A: <a href="#transaction">Transaction</a><b>,</b> <a href="#transactionMetaData">TransactionMetaData</a> and <a href="#transactionMetaDataPair">TransactionMetaDataPair</a>.</p>
+
+	<p>A transaction has the following fields:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The number of seconds elapsed since the creation of the nemesis
+				block. Future timestamps are not allowed. Transaction validation detects
+				future timestamps and returns an error in that case. Network time
+				synchronization ensures that any NEM software component will use valid timestamps
+				when creating transactions.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signature</p>
+			</td>
+			<td>
+				<p>The transaction signature. The transaction signature is validated
+				using the supplied public key in the field signer. If the signature is not
+				valid, an error is returned from validation.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>fee</p>
+			</td>
+			<td>
+				<p>The fee for the transaction. The higher the fee, the higher is the
+				priority of the transaction. Transactions with high priority get included in
+				a block before transactions with lower priority. If the sender does not have
+				enough funds the validation will result in an error</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>The transaction type. Currently the following types of
+				transactions are supported:</p>
+				<p class='FakeList'>0x101:<span class='sep'> </span> Transfer of NEM from sender to recipient.</p>
+				<p class='FakeList'>0x801:<span class='sep'> </span> Transfer of importance from sender to recipient.</p>
+				<p class='FakeList'>0x1001:<span class='sep'> </span> An aggregate modification transaction, which converts a normal account into a multisig account.</p>
+				<p class='FakeList'>0x1002:<span class='sep'> </span> A multisig signature transaction which is used to sign a multisig transaction.</p>
+				<p class='FakeList'>0x1003:<span class='sep'> </span> A multisig transaction, which is used for multisig accounts.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>deadline</p>
+			</td>
+			<td>
+				<p>The deadline of the transaction. The deadline is given as the
+				number of seconds elapsed since the creation of the nemesis block. If a
+				transaction does not get included in a block before the deadline is reached,
+				it is deleted.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>version</p>
+			</td>
+			<td>
+				<p>The version of the structure. Currently the version is always 1.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signer</p>
+			</td>
+			<td>
+				<p>The public key of the account that created the transaction. The
+				public key is encoded as hexadecimal string.</p>
+			</td>
+		</tr>
+	</table>
+
+	<p>Depending on the type of the transaction,
+	there are additional fields which are specific to this type. For instance a
+	transfer transaction will have the additional fields.</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>recipient</p>
+			</td>
+			<td>
+				<p>The address of the recipient. If the address is not valid an error
+				is returned from validation.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>message</p>
+			</td>
+			<td>
+				<p>Optionally a transfer transaction can contain a message.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>payload</p>
+			</td>
+			<td>
+				<p>Optional field in case the transaction contains a message. The
+				payload is the actual (possibly encrypted) message data. The payload is
+				allowed to have a maximal size of 512 bytes. Transaction validation detects
+				if the limit is exceeded and returns an error in this case.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>Optional field in case the transaction contains a message. The
+				field holds the message type information. Possible message types are:</p>
+				<p class='FakeList'>1:<span class='sep'> </span> The message is not encrypted.</p>
+				<p class='FakeList'>2:<span class='sep'> </span> The message is encrypted.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the block in which the transaction was included.</p>
+			</td>
+		</tr>
+	</table>
+
+	<p>Please refer to <a href="#appendix-A:-description-of-the-JSON-structures">Appendix A</a> for detailed information on the various transactions types and
+	their additional fields.</p>
+
+	<p>Transaction meta data contains only
+	following field:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the block in which the transaction was included.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>id</p>
+			</td>
+			<td>
+				<p>The id of the transaction.</p>
+			</td>
+		</tr>
+	</table>
+
+	<p></p>
+
+	<p>Accounts can harvest (i.e. generate new)
+	blocks if they are lucky. The account which harvests a block collects the fees
+	which are included in the transactions in the block. The information which
+	blocks were harvested by an account can be requested. The request returns an
+	array of HarvestInfo JSON objects. For an example see Appendix A: <a href="#harvestInfo">HarvestInfo</a></p>
+
+	<p>A harvest info object has the following fields:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The number of seconds elapsed since the creation of the nemesis
+				block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>blockHash</p>
+			</td>
+			<td>
+				<p>Substructure containing the hash of the harvested block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>data</p>
+			</td>
+			<td>
+				<p>The block hash as hexadecimal string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>totalFee</p>
+			</td>
+			<td>
+				<p>The total fee collected by harvesting the block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the harvested block.</p>
+			</td>
+		</tr>
+	</table>
+
+	<p></p>
+
+	<p>It is possible to request an array with the
+	importance information for all accounts. The request returns an array of
+	AccountImportanceViewModel JSON objects. For an example see Appendix A:
+	<a href="#accountImportanceViewModel">AccountImportanceViewModel</a>.</p>
+
+	<p>An account importance view model has the following fields:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>importance</p>
+			</td>
+			<td>
+				<p>Substructure that describes the importance of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>isSet</p>
+			</td>
+			<td>
+				<p>Indicates if the fields &quot;score&quot;, &quot;ev&quot; and &quot;height&quot; are available.</p>
+				<p>isSet can have the values 0 or 1. In case isSet is 0 the following fields are not available.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>score</p>
+			</td>
+			<td>
+				<p>The importance of the account. The importance ranges between 0 and 1.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>ev</p>
+			</td>
+			<td>
+				<p>The page rank portion of the importance. The page rank ranges between 0 and 1.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height at which the importance calculation was performed.</p>
+			</td>
+		</tr>
+	</table>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Retrieving account data</h2>
+
+	<h3>Requesting the account data</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/get</td>
+		</tr>
+	</table>
+
+	<p class=NemNoSpacing>Description:</p>
+
+	<p class=NemNoSpacing>Gets an <a href="#accountMetaDataPair">AccountMetaDataPair</a> for an account.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The address of the account.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/get?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS">http://127.0.0.1:7890/account/get?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "account": 
+	       {
+	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	       "balance": 124446551689680, 
+	       "importance": 0.010263666447108395, 
+	       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a", 
+	       "label": null,  
+	       "foragedBlocks": 645 
+	       }, 
+	       "meta": 
+	       { 
+	              "cosignatoryOf": [ ], 
+	              "status": "LOCKED", 
+	              "remoteStatus": "ACTIVE" 
+	       } 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Requesting the account status</h3>
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/status</td>
+		</tr>
+	</table>
+
+	<p class=NemNoSpacing>Description:</p>
+
+	<p class=NemNoSpacing>Gets the <a href="#accountMetaData">AccountMetaData</a> from an account.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>Address</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The address of the account.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/status?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS">http://127.0.0.1:7890/account/status?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "status": "LOCKED", 
+	       "remoteStatus": "ACTIVE" 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid,
+	NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+
+	<h3>Requesting transaction data for an account</h3>
+
+	<p>A transaction is said to be incoming with
+	respect to an account if the account is the recipient of the transaction. In
+	the same way outgoing transaction are the transactions where the account is the
+	sender of the transaction. Unconfirmed transactions are those transactions that
+	have not yet been included in a block. Unconfirmed transactions are <b>not</b>
+	guaranteed to be included in any block.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h4>Incoming transactions</h4>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/transfers/incoming</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of transaction meta data
+	pairs where the recipient has the address given as parameter to the request. A
+	maximum of 25 transaction meta data pairs is returned. The returned transaction
+	meta data pairs are sorted in descending order in which they were written to
+	the database. The second parameter is optional. When it’s not present, the
+	request will return newest transactions according to the above criteria. When hash
+	is supplied as second parameter, the request will return up to 25 transactions
+	that appeared directly before the transaction that has the supplied hash sorted
+	according to the above criteria.</p>
+
+	<p class=NemNoSpacing>The third parameter is optional. When an
+	id is supplied as third parameter, the request will return up to 25
+	transactions that appeared directly before the transaction that has the
+	supplied id sorted according to the above criteria.</p>
+
+	<p class=NemNoSpacing>If less than 25 transactions fulfill the
+	requirements, only those transactions are returned.</p>
+
+	<p class=NemNoSpacing></p>
+
+	<h4>Parameters:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p> </td>
+			<td>
+				<p class=NemNoSpacing>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>hash</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The 256 bit sha3 hash of the
+				transaction up to which transactions are returned.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>id </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The transaction id up to which
+				transactions are returned.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4></h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/transfers/incoming?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2">http://127.0.0.1:7890/account/transfers/incoming?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a2</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	       { 
+	              "meta": 
+	              { 
+	                     "id": 71245, 
+	                     "height": 40706 
+	              }, 
+	              "transaction": 
+	              { 
+	                     "timeStamp": 9106400, 
+	                     "amount": 1000000000, 
+	                     "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105", 
+	                     "fee": 3000000, 
+	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	                     "type": 257, 
+	                     "deadline": 9149600, 
+	                     "message": 
+	                     { 
+	                           "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4", 
+	                           "type": 2 
+	                     }, 
+	                     "version": 1, 
+	                     "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6" 
+	              } 
+	       }, 
+	       { 
+	              "meta": 
+	              { 
+	                     "id": 71356, 
+	                     "height": 40629 
+	              }, 
+	              "transaction": 
+	              { 
+	                     "timeStamp": 9101541, 
+	                     "amount": 49997995000000, 
+	                     "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b", 
+	                     "fee": 2005000000, 
+	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	                     "type": 257, 
+	                     "deadline": 9144741, 
+	                     "message": 
+	                     { 
+	                           "payload": "526f6262657279212121", 
+	                           "type": 1 
+	                     }, 
+	                     "version": 1, 
+	                     "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24" 
+	              } 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid or
+	the id cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h4>Outgoing transactions</h4>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/transfers/outgoing</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of transaction meta data
+	pairs where the recipient has the address given as parameter to the request. A
+	maximum of 25 transaction meta data pairs is returned. For details about
+	sorting and discussion of the second parameter see <a href="#incoming-transactions">Incoming transactions</a>.</p>
+
+	<h4>Parameters:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>hash</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The 256 bit sha3 hash of the
+				transaction up to which transactions are returned.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>id </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The transaction id up to which
+				transactions are returned.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4></h4>
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing><a href="http://127.0.0.1:7890/account/transfers/outgoing?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a22">http://127.0.0.1:7890/account/transfers/outgoing?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a22</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	       { 
+	              "meta": 
+	              { 
+	                     "id": 70498, 
+	                     "height": 40803 
+	              }, 
+	              "transaction": 
+	              { 
+	                     "timeStamp": 9111526, 
+	                     "amount": 1000000000, 
+	                     "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
+	                     "fee": 3000000, 
+	                     "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+	                     "type": 257, 
+	                     "deadline": 9154726, 
+	                     "message": 
+	                     { 
+	                           "payload": "74657374207472616e73616374696f6e", 
+	                           "type": 1 
+	                     }, 
+	                     "version": 1, 
+	                     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              } 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid or
+	the id cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h4>All transactions</h4>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/transfers/all</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of transaction meta data
+	pairs for which an account is the sender or receiver. A maximum of 25
+	transaction meta data pairs is returned. For details about sorting and
+	discussion of the second parameter see <a href="#incoming-transactions">Incoming transactions</a>.</p>
+
+	<h4>Parameters:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>hash</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The 256 bit sha3 hash of the
+				transaction up to which transactions are returned.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>id </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The transaction id up to which
+				transactions are returned.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4></h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/transfers/all?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a22">http://127.0.0.1:7890/account/transfers/all?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=949583a20ebdfdcb58277eb42fef3e66e9e6bbfc47304d8741a82c68f7c53a22</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<p class=NemNoSpacing>See example for <a href="#incoming-transactions">Incoming transactions</a> or <a href="#outgoing-transactions">Outgoing transactions</a>.</p>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid or
+	the id cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h4>Unconfirmed transactions</h4>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/unconfirmedTransactions</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets the array of transactions for which
+	an account is the sender or receiver and which have not yet been included in a
+	block. The returned structure is UnconfirmedTransactionMetaDataPair see
+	Appendix A</p>
+
+	<h4>Parameters:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The address of the account.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/unconfirmedTransactions?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS">http://127.0.0.1:7890/account/unconfirmedTransactions?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "meta": { 
+			"data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873" 
+	       }, 
+	       "data": [ 
+	       { 
+	              "timeStamp": 9131839, 
+	              "amount": 1000000000, 
+	              "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904", 
+	              "fee": 2000000, 
+	              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+	              "type": 257, 
+	              "deadline": 9175039, 
+	              "message": { 
+	                     "payload": "", 
+	                     "type": 1 
+	              }, 
+	              "version": 1, 
+	              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid,
+	NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix
+		B: NIS Errors</a> Errors for details about errors.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Requesting harvest info data for an account</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/harvests</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of harvest info objects
+	for an account.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>Address</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>hash </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The 256 bit sha3 hash of the block up
+				to which harvested blocks are returned.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/harvests?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8">http://127.0.0.1:7890/account/harvests?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS&amp;hash=81d52a7df4abba8bb1613bcc42b6b93cf3114524939035d88ae8e864cd2c34c8</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	       { 
+	              "timeStamp": 8879051, 
+	              "blockHash": { 
+	                     "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3" 
+	              }, 
+	              "totalFee": 102585065, 
+	              "height": 37015 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the address parameter is not valid or
+	the hash cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> Errors for details about errors.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Retrieving account importances for accounts</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/importances</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of account importance view
+	model objects.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/account/importances">http://127.0.0.1:7890/account/importances</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	       { 
+	              "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T", 
+	              "importance": { 
+	                     "isSet": 0 
+	              } 
+	       }, 
+	       { 
+	              "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG", 
+	              "importance": { 
+	                     "score": 0.001222376902598832, 
+	                     "ev": 0.004252356221747241, 
+	                     "isSet": 1, 
+	                     "height": 40926 
+	              } 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+	<h3>Locking and unlocking accounts</h3>
+
+	<p>Accounts that have at least 10000 vested
+	NEM balance are allowed to harvest blocks. To do that the account must be
+	unlocked. After start-up of NIS all accounts are locked by default.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h4>Unlocking the account (enables harvesting)</h4>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/unlock</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Unlocks an account (starts harvesting).</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON><b><span style='color:#C00000'>privateKey</span></b></p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>A PrivateKey JSON object as described in Appendix A: <a href="#privateKey">PrivateKey</a></p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing>Request cannot be performed in a browser.</p>
+
+	<h4>No return value</h4>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h4>Locking the account (stops harvesting)</h4>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/account/lock</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Locks an account (stops harvesting).</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON><b><span style='color:#C00000'>privateKey</span></b></p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>A PrivateKey JSON object as described in Appendix A: <a href="#privateKey">PrivateKey</a></p>
+			</td>
+		</tr>
+	</table>
+
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing>Request cannot be performed in a browser.</p>
+
+	<h4>No return value</h4>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>Both requests return an error if the
+	private key does not correspond to a known account or the account is not
+	allowed to harvest. See <a href="#appendix-B:-NIS-errors">Appendix B NIS Errors</a> for details about errors.</p>
+
+
+	<h1>Block chain related requests</h1>
+
+	<p>NEM builds a block chain which contains every
+	bit of information needed. Subsequent blocks in the block chain have increasing
+	heights that differ by one. Each block can contain transactions. Transactions
+	build the basis of all account activity. It is therefore important to
+	understand the concept and the structures of blocks and transactions.</p>
+
+	<p>Blocks are generated by accounts. If an
+	account generates a block and the block gets included in the block chain, the
+	generating account, called the harvester, gets all the transaction fees for
+	transactions that are included in the block. A harvester will therefore usually
+	include as many transactions as possible.</p>
+
+	<p>Transactions reflect all account
+	activities. In order for a client to have an up to date balance for every
+	account it is crucial to know about every transaction that occurred and
+	therefore the client must have knowledge about every single block in the chain
+	(one says: the client must be synchronized with the block chain).</p>
+
+	<p>Whenever timestamps are used, the time
+	reflects the network time. NEM has a time synchronization mechanism which lets
+	all node agree on how many seconds since the nemesis have elapsed. This common
+	time is called network time.</p>
+
+	<p>The following chapters will first introduce
+	the fields used in the block and transaction structure and then explain how a
+	client can request parts of the block chain.</p>
+
+	<p>Blocks are transferred using a JSON Block
+	object. <b>Appendix A: </b><a href="#block">Block</a> has more information and an example JSON Block object. The
+	following fields are in the structure:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The network time when the block was created.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signature</p>
+			</td>
+			<td>
+				<p>The signature of the block. All blocks in the chain are signed by
+				the harvesters.</p>
+				<p>This way any node can check if the block has been altered by some
+				evil entity.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>prevBlockHash</p>
+			</td>
+			<td>
+				<p>The sha3-256 hash of the previous block as hexadecimal string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>The block type. There are currently two block types used:</p>
+				<p>-1:        Nemesis block type. This block type appears only once
+				in the chain.</p>
+				<p>1:         Regular block type. All blocks with height &gt; 1 have
+				this type.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>transactions</p>
+			</td>
+			<td>
+				<p>The array of transactions. See Appendix A: <a
+					href="#transaction">Transaction</a>
+				for more details. A block can contain up to 120 transactions.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>version</p>
+			</td>
+			<td>
+				<p>The block version. Only version 1 is used.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signer</p>
+			</td>
+			<td>
+				<p>The public key of the harvester of the block as hexadecimal
+				string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the block. Each block has a unique height.
+				Subsequent blocks differ in height by 1.</p>
+			</td>
+		</tr>
+	</table>
+
+	<p>Transactions were already discussed in
+	chapter 2 <a href="#account-related-requests">Account related requests</a>. See also <b>Appendix A: </b><a href="#transaction">Transaction</a>
+	for an example JSON transaction object.</p>
+
+	<h2>Requesting the block chain status information</h2>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Block chain height</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/chain/height</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets the current height of the block
+	chain.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/chain/height">http://127.0.0.1:7890/chain/height</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "height": 42799 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Block chain score</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/chain/score</td>
+		</tr>
+	</table>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets the current score of the block
+	chain. The higher the score, the better the chain. During synchronization,
+	nodes try to get the best block chain in the network.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/chain/score">http://127.0.0.1:7890/chain/score</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "score": "18722d5a7d590deb" 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Last block of the block chain score</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/chain/last-block</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets the current last block of the
+	chain.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/chain/last-block">http://127.0.0.1:7890/chain/last-block</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "timeStamp": 9232968, 
+	       "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05", 
+	       "prevBlockHash": { 
+	              "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	       ], 
+	       "version": 1, 
+	       "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7", 
+	       "height": 42804 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+	<h2>Requesting parts of the block chain</h2>
+
+	<p>NIS can supply either individual blocks
+	identified by block height or block hash or can supply up to 400 blocks
+	beginning at a certain height.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Getting a block with a given hash</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/block/get</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets a block from the chain that has a
+	given hash.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>blockHash </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>The 256 bit sha3 hash of the block.
+				The hash must be supplied as hexadecimal string.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6">http://127.0.0.1:7890/block/get?blockHash=58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6</a></p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "timeStamp": 9232942, 
+	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
+	       "prevBlockHash": { 
+	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	       ], 
+	       "version": 1, 
+	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
+	       "height": 42803 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the block hash is not found in the
+	database, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Getting a block with a given height</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/block/at/public</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets a block from the chain that has the
+	given height.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>blockHeight </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>A BlockHeight JSON object as described
+				in <b>Appendix A: </b><a href="#blockHeight">BlockHeight</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing>Request cannot be performed in a
+	browser.</p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "timeStamp": 9232942, 
+	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
+	       "prevBlockHash": { 
+	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	       ], 
+	       "version": 1, 
+	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
+	       "height": 42803 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the block with the specified height
+	cannot be found in the database, NIS will return a JSON error object. See <b>Appendix
+		A: </b><a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Getting part of a chain</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/local/chain/blocks-after</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets up to 400 blocks after given block
+	height from the chain. If the database contains less than 400 block after the
+	given height, then less blocks are returned. The returned data is an array of <a href="#explorerBlockViewModel">ExplorerBlockViewModel</a> JSON objects.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>blockHeight </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>A BlockHeight JSON object as described
+				in <b>Appendix A: </b><a href="#blockHeight">BlockHeight</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing>Request cannot be performed in a
+	browser.</p>
+
+	<h4>Example of returned JSON object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data":[ 
+	       { 
+	              "harvester":"TCRIGEL6TUKDGDVBXIVY3HQNADAV6JZMGKNPL23Y", 
+	              "timeStamp":1416395006000, 
+	              "harvesterPk":"f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56", 
+	              "txes":[ 
+	              { 
+	                     "timeStamp":1416394995000, 
+	                     "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
+	                     "amount":1000000000000, 
+	                     "msgType":1, 
+	                     "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	                     "signature":"d27a29b294d51e10ca4d11174718269838b71eeb170649655c42ebba12464fdbdd757610858675ab5fa642c856bab1067c9c473df5e697053298a8173a6f8001", 
+	                     "fee":44000000, 
+	                     "recipient":"TAKKKC5SHLKVJNCAMRKLI3564NMQELMW5H4HFOJC", 
+	                     "type":257, 
+	                     "message": 
+	                     "48656c6c6f20746f20536f757468204b6f726561", 
+	                     "hash":"2fde712c00a6751ee560b49a0271a881ef5e8c3a3d2226b326f7d53f84798c25" 
+	              }], 
+	              "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49", 
+	              "height":43666 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>If the block height supplied is not
+	positive, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
+
+	<h1>Node related requests</h1>
+
+	<p>Nodes are the entities that exchange data
+	in a network. A node is essentially a NIS instance running on a computer. To be
+	able to communicate with the network, a node needs to be booted. Through node
+	requests it is possible to discover other nodes in the network, learn about
+	other nodes experiences and get information about their current chain height.</p>
+
+	<p>Node structure consists of 3 parts:
+	identity, endpoint and meta data:</p>
+
+	<p>Every node is tied to an identity which is
+	represented by an account. That way nodes are easier to identify. A node is
+	given an identity during the boot process.</p>
+
+	<p>The endpoint of a node holds information
+	about the IP address, the port and the protocol used for communication.</p>
+
+	<p>The meta data holds additional information
+	about the NIS version and the platform NIS is running on.</p>
+
+	<p>A node groups the set of neighbor nodes
+	into several subsets by assigning a status to each node. The possible statuses
+	are:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>active</p>
+			</td>
+			<td>
+				<p>Nodes that have this status can be successfully communicated with.
+				Whenever a node is selecting a node for communication, it will pick a node
+				from the set of active nodes.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>inactive</p>
+			</td>
+			<td>
+				<p>Inactive nodes are nodes with which it is not possible to
+				establish a connection.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>busy</p>
+			</td>
+			<td>
+				<p>A node is set to status 'busy' if a connection can be established
+				but the node did not answer a request within a certain time limit.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>failure</p>
+			</td>
+			<td>
+				<p>The status failure is assigned to a remote node in case there is
+				severe error during communication. This can for instance be due to the remote
+				node using a different protocol or the remote node using an identity
+				different from what was expected.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>unknown</p>
+			</td>
+			<td>
+				<p>This status is given to a node if there is no information about
+				the status available.</p>
+			</td>
+		</tr>
+	</table>
+
+	<p><b>Appendix A: </b><a href="#node">Node</a> has more information and an example JSON Node object. A node object has the following fields:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>name</p>
+			</td>
+			<td>
+				<p>The name of the node. This can be any string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>public-key</p>
+			</td>
+			<td>
+				<p>The public key used to identify the node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>protocol</p>
+			</td>
+			<td>
+				<p>The protocol used for the communication (currently only HTTP is
+				supported).</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>port</p>
+			</td>
+			<td>
+				<p>The port used for the communication.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>host</p>
+			</td>
+			<td>
+				<p>The IP address of the endpoint.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>application</p>
+			</td>
+			<td>
+				<p>The name of the application that is running the node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>version</p>
+			</td>
+			<td>
+				<p>The version of the application.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>platform</p>
+			</td>
+			<td>
+				<p>The underlying platform (OS, java version).</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>Requesting information about a node</h2>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Basic node information</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/info</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets basic information about a node.
+	Using IP 127.0.0.1 gets information about the local node.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/node/info">http://127.0.0.1:7890/node/info</a></p>
+
+	<h4>Example of returned JSON <a href="#node">Node</a></h4>
+
+	<pre><samp class=JSON>
+	{
+	       "metaData": 
+	       { 
+	              "application": "NIS", 
+	              "version": "0.4.33-BETA", 
+	              "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	       }, 
+	       "endpoint": 
+	       { 
+	              "protocol": "http", 
+	              "port": 7890, 
+	              "host": "81.224.224.156" 
+	       }, 
+	       "identity": 
+	       { 
+	              "name": "Alice", 
+	              "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	       } 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Extended node information</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/extended-info</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets extended information about a node.
+	Using IP 127.0.0.1 gets extended information about the local node.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/node/extended-info">http://127.0.0.1:7890/node/extended-info</a></p>
+
+	<h4>Example of returned JSON <a href="#nisNodeInfo">NisNodeInfo</a> object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "node": { 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              } 
+	       }, 
+	       "nisInfo": 
+	       { 
+	              "currentTime": 9288341, 
+	              "application": "NEM Infrastructure Server", 
+	              "startTime": 9238484, 
+	              "version": "0.4.33-BETA", 
+	              "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US" 
+	       }       
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<h2>Request for discovering the neighborhood of a node</h2>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Complete neighborhood</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/peer-list/all</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of all known nodes in the
+	neighborhood.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/node/peer-list/all">http://127.0.0.1:7890/node/peer-list/all</a></p>
+
+	<h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
+		denotes a <a href="#node">Node</a> object):</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "inactive": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ], 
+	       "active": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ], 
+	       "busy": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ], 
+	       "failure": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Reachable neighborhood</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/peer-list/reachable</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p>Gets an array of all nodes with status 'active' in the neighborhood.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/node/peer-list/reachable">http://127.0.0.1:7890/node/peer-list/reachable</a></p>
+
+	<h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
+		denotes a <a href="#node">Node</a> object):</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              }, 
+	       ] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Active neighborhood</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/peer-list/active</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of active nodes in the
+	neighborhood that are selected for broadcasts.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/node/peer-list/active">http://127.0.0.1:7890/node/peer-list/active</a></p>
+
+	<h4>Example of returned JSON <a href="#nodeCollection">NodeCollection</a> object (&lt;Node&gt;
+		denotes a <a href="#node">Node</a> object):</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              }, 
+	       ] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h3>Maximum chain height in the active neighborhood</h3>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/active-peers/max-chain-height</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Requests the chain height from every
+	node in the active node list (described in <a href="#active-neighborhood">Active neighborhood</a>) and returns the maximum height seen.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/node/active-peers/max-chain-height">http://127.0.0.1:7890/node/active-peers/max-chain-height</a></p>
+
+	<h4>Example of returned JSON <a href="#blockHeight">BlockHeight</a> object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "height": 43920 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Requesting node experiences</h2>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/experiences</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of node experiences from
+	another node. Each node saves its experiences with other nodes in an internal
+	map. Sharing experiences helps nodes to select honest nodes for communication.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/node/experiences">http://127.0.0.1:7890/node/experiences</a></p>
+
+	<h4>Example of returned array of JSON <a href="#extendedNodeExperiencePair">ExtendedNodeExperiencePair</a> objects:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	       { 
+	              "node": 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              }, 
+	              "syncs": 3, 
+	              "experience": 
+	              { 
+	                     "s": 1, 
+	                     "f": 0 
+	              } 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Booting a local node</h2>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/node/boot</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Boots a local node.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>bootNodeRequest </p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>A BootNodeRequest JSON object as
+				described in <b>Appendix A: </b><a href="#bootNodeRequest">BootNodeRequest</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing>Request cannot be performed in a
+	browser.</p>
+
+	<h4>No return value</h4>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>In case the node has not been booted
+	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
+
+	<h1>Initiating transactions</h1>
+
+	<p>Transactions are the way of transferring
+	NEM and/or messages from one account to another. Once a transaction is initiated,
+	it is still unconfirmed and thus not yet accepted by the network. At this point
+	it is not yet clear if it will get included in a block. Never rely on a
+	transaction which has the state 'unconfirmed'. Once it is included in a block,
+	the transaction gets processed and the amount stated in the transaction gets
+	transferred from the sender's account to the recipient's account. Additionally
+	the transaction fee is deducted from the sender's account. The transaction is
+	said to have 0 confirmations at this point. When another block is added to the
+	block chain the transaction has 1 confirmation. The next block added to the
+	chain will give it 2 confirmations and so on.</p>
+
+	<p>Crypto currencies have the ability to roll
+	back part the block chain. This is essential for being able to resolve forks of
+	the block chain. There is however a maximum number of blocks that can be rolled
+	back, this is called the rewrite limit. Hence forks can only be resolved up to
+	a certain depth too. NEM has a rewrite limit of 360 blocks. Once a transaction
+	has more than 360 confirmations, it cannot be reversed. In real life, forks
+	that are deeper than 20 blocks do not happen, unless there was some severe
+	problem with the block chain due to a bug in the code or an attack of some
+	kind.</p>
+
+	<p>A client can initiate a transaction by
+	sending a RequestPrepareAnnounce JSON object to its local NIS. See <b>Appendix
+		A </b><a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a> for more details.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Initiating a transaction</h2>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/transaction/prepare-announce</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Creates and broadcasts a transaction.
+	Since this request involves the private key of an account, it should only be
+	sent to a <b>local</b> NIS.</p>
+
+	<h4>Parameter:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>requestPrepareAnnounce</p>
+			</td>
+			<td>
+				<p class=NemNoSpacing>A RequestPrepareAnnounce JSON object as described in <b>Appendix A: </b><a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>Example:</h4>
+
+	<p class=NemNoSpacing>Request cannot be performed in a
+	browser.</p>
+
+	<h4>Example of returned JSON <a href="#nemRequestResult">NemRequestResult</a> object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "type": 1, 
+	       "code": 1, 
+	       "message": "SUCCESS" 
+	}  
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p>There are various errors that can occur due
+	to failure of transaction validation See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+		Errors</a> for the error message.</p>
+
+	<p>The most common errors are:</p>
+
+	<ul>
+		<li>The sender account has not enough funds.</li>
+		<li>The timestamp is invalid because it lies too far in the future.</li>
+		<li>The deadline is invalid because it has already been passed.</li>
+		<li>The attached message is too large.</li>
+		<li>The transaction is already known.</li>
+		<li>There is another transaction conflicting with this transaction. This can happen when trying to transfer the importance to another account.</li>
+	</ul>
+
+	<h1>Requests for additional information from NIS</h1>
+
+	<p>Several requests supply additional
+	information about the internal status of NIS. Those requests may get dropped in
+	future versions of NIS without further notice, you should not rely on their
+	existence.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Monitoring the network time</h2>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/debug/time-synchronization</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of time synchronization
+	results as described in <b>Appendix A: </b><a href="#timeSynchronizationResult">TimeSynchronizationResult</a>. You can monitor the change in network time with this information.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/debug/time-synchronization">http://127.0.0.1:7890/debug/time-synchronization</a></p>
+
+	<h4>Example of returned array of JSON <a href="#timeSynchronizationResult">TimeSynchronizationResult</a> objects:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	       { 
+	              "dateTime": "2014-11-19 19:23:04", 
+	              "currentTimeOffset": 1747, 
+	              "change": 57 
+	       }, 
+	       { 
+	              "dateTime": "2014-11-19 19:24:17", 
+	              "currentTimeOffset": 1776, 
+	              "change": 29 
+	       }, 
+	       { 
+	              "dateTime": "2014-11-19 19:25:18", 
+	              "currentTimeOffset": 1729, 
+	              "change": -47 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Monitoring incoming and outgoing calls</h2>
+
+	<!-- ---- ---- ---- ---- ---- ---- -->
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/debug/connections/incoming</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an audit collection of incoming
+	calls as described in <b>Appendix A: </b><a href="#auditCollection">AuditCollection</a>. You can monitor the
+	outstanding and recent incoming requests with this information.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/debug/connections/incoming">http://127.0.0.1:7890/debug/connections/incoming</a></p>
+
+	<h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "outstanding": [ 
+	       { 
+	              "path": "/debug/connections/incoming", 
+	              "start-time": 9317306, 
+	              "host": "127.0.0.1", 
+	              "elapsed-time": 0, 
+	              "id": 4070 
+	       }], 
+	       "most-recent": [ 
+	       { 
+	              "path": "/debug/connections/incoming", 
+	              "start-time": 9317306, 
+	              "host": "127.0.0.1", 
+	              "elapsed-time": 0, 
+	              "id": 4070 
+	       }, 
+	       { 
+	              "path": "/chain/score", 
+	              "start-time": 9317303, 
+	              "host": "95.16.203.168", 
+	              "elapsed-time": 3, 
+	              "id": 4069 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- -->
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/debug/connections/outgoing</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an audit collection of outgoing
+	calls as described in <b>Appendix A: </b><a href="#auditCollection">AuditCollection</a>. You can monitor the
+	outstanding and recent outgoing requests with this information.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/debug/connections/outgoing">http://127.0.0.1:7890/debug/connections/outgoing</a></p>
+
+	<h4>Example of returned JSON <a href="#auditCollection">AuditCollection</a> object:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "outstanding": [ 
+	       { 
+	              "path": "/chain/blocks-after", 
+	              "start-time": 9317511, 
+	              "host": "88.12.55.125", 
+	              "elapsed-time": 6, 
+	              "id": 6452 
+	       }], 
+	       "most-recent": [ 
+	       { 
+	              "path": "/chain/blocks-after", 
+	              "start-time": 9317511, 
+	              "host": "88.12.55.125", 
+	              "elapsed-time": 6, 
+	              "id": 6452 
+	       }, 
+	       { 
+	              "path": "/chain/hashes-from", 
+	              "start-time": 9317511, 
+	              "host": "88.12.55.125", 
+	              "elapsed-time": 6, 
+	              "id": 6451 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
+	<h2>Monitoring timers</h2>
+
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/debug/connections/timers</td>
+		</tr>
+	</table>
+
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Gets an array of task monitor structures
+	as described in <b>Appendix A: </b><a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a>. You can monitor
+	the statistics for periodic tasks with this information.</p>
+
+	<h4>No parameter:</h4>
+
+	<h4>Example:</h4>
+
+	<p><a href="http://127.0.0.1:7890/debug/timers">http://127.0.0.1:7890/debug/timers</a></p>
+
+	<h4>Example of returned array of JSON <a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a> objects:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "data": [ 
+	       { 
+	              "last-delay-time": 3000, 
+	              "executions": 1024, 
+	              "failures": 0, 
+	              "successes": 1024, 
+	              "last-operation-start-time": 9317695, 
+	              "is-executing": 0, 
+	              "name": "FORAGING", 
+	              "average-operation-time": 0, 
+	              "last-operation-time": 0 
+	       }, 
+	       { 
+	              "last-delay-time": 74181, 
+	              "executions": 71, 
+	              "failures": 0, 
+	              "successes": 71, 
+	              "last-operation-start-time": 9317654, 
+	              "is-executing": 0, 
+	              "name": "REFRESH", 
+	              "average-operation-time": 6, 
+	              "last-operation-time": 7 
+	       }] 
+	} 
+	</samp></pre>
+
+	<h4>Possible Errors:</h4>
+
+	<p class=NemNoSpacing>None.</p>
+
+
+	<h1>Appendix A: Description of the JSON Structures</h1>
+
+	<h2>AccountImportanceViewModel</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Each account is assigned an importance
+	in the NEM network. The ability of an account to generate new blocks is
+	proportional to its importance. The importance is a number between 0 and 1.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp>
+	{ 
+	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS" 
+	       "importance": 
+	       { 
+		       "isSet": 1, 
+		       "score": 0.0011561555164258449, 
+		       "ev": 0.004367936531009263, 
+		       "height": 38413 
+	       } 
+	}
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>importance</p>
+			</td>
+			<td>
+				<p>Substructure that describes the importance of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>isSet</p>
+			</td>
+			<td>
+				<p>Indicates if the fields &quot;score&quot;, &quot;ev&quot; and &quot;height&quot; are available.</p>
+				<p>isSet can have the values 0 or 1. In case isSet is 0 the fields are not available.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>score</p>
+			</td>
+			<td>
+				<p>The importance of the account. The importance ranges between 0 and 1.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>ev</p>
+			</td>
+			<td>
+				<p>The page rank portion of the importance. The page rank ranges between 0 and 1.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height at which the importance calculation was performed.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>Account</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The account structure describes basic
+	information for an account.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	       "balance": 124446551689680, 
+	       "importance": 0.010263666447108395, 
+	       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a", 
+	       "label": null,  
+	       "foragedBlocks": 645 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>address</p>
+			</td>
+			<td>
+				<p>The address of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>balance</p>
+			</td>
+			<td>
+				<p>The balance of the account in micro NEM.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>importance</p>
+			</td>
+			<td>
+				<p>The importance of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>publicKey</p>
+			</td>
+			<td>
+				<p>The public key of the account.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>label</p>
+			</td>
+			<td>
+				<p>The label of the account (not used, always null).</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>foragedBlocks</p>
+			</td>
+			<td>
+				<p>The number blocks that the account already harvested.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>AccountMetaData</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The account meta data describes
+	additional information for the account. See <a href="#account-related-requests">Account related requests</a> for details.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "status": "LOCKED", 
+	       "remoteStatus": "ACTIVE" 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>status</p>
+			</td>
+			<td>
+				<p>The harvesting status of a queried account.</p>
+				<p>The harvesting status can be one of the following values:</p>
+				<p>&quot;UNKNOWN&quot;: The harvesting status of the account is not
+				known.</p>
+				<p>&quot;LOCKED&quot;: The account is not harvesting.</p>
+				<p>&quot;UNLOCKED&quot;:  The account is harvesting.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>remoteStatus</p>
+			</td>
+			<td>
+				<p>The status of remote harvesting of a queried account.</p>
+				<p>The remote harvesting status can be one of the following values:</p>
+				<p>&quot;REMOTE&quot;: The account is a remote account and therefore
+				remoteStatus is not applicable for it.</p>
+				<p>&quot;ACTIVATING&quot;: The account has activated remote
+				harvesting but it is not yet active.</p>
+				<p>&quot;ACTIVE&quot;: The account has activated remote harvesting
+				and remote harvesting is active.</p>
+				<p>&quot;DEACTIVATING&quot;: The account has deactivated remote
+				harvesting but remote harvesting is still active.</p>
+				<p>&quot;INACTIVE&quot;: The account has inactive remote harvesting,
+				or it has deactivated remote harvesting and deactivation is operational.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>AccountMetaDataPair</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The account meta data pair includes
+	durable information for an account and additional information about its state.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "account": 
+	       &lt;Account&gt;, 
+	       "meta": 
+	              &lt;AccountMetaData&gt; 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>account</p>
+			</td>
+			<td>
+				<p>contains the account object.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;Account&gt;</p>
+			</td>
+			<td>
+				<p>The account object as described in <a href="#account">Account</a>.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>meta</p>
+			</td>
+			<td>
+				<p>contains the account meta data object.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;AccountMetaData&gt;</p>
+			</td>
+			<td>
+				<p>The account meta data object as described in <a href="#accountMetaData">AccountMetaDataPair</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>ApplicationMetaData</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The application meta data object
+	supplies additional information about the application running on a node.</p>
+
+	<h4> JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "currentTime": 9189086, 
+	       "application": "NEM Infrastructure Server", 
+	       "startTime": 9060202, 
+	       "version": "0.4.30-BETA", 
+	       "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD" 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>currentTime</p>
+			</td>
+			<td>
+				<p>The current network time, i.e. the number of seconds that have
+				elapsed since the creation of the nemesis block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>Application</p>
+			</td>
+			<td>
+				<p>The name of the application running on the node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>startTime</p>
+			</td>
+			<td>
+				<p>The network time when the application was started.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>version</p>
+			</td>
+			<td>
+				<p>The application version.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signer</p>
+			</td>
+			<td>
+				<p>The signer of the certificate used by the application.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>AuditCollection</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>An audit collection consists of two
+	arrays, containing information about incoming requests from other nodes. The
+	first array contains information about outstanding (i.e. not yet processed
+	requests) and the second array contains information about the most recent
+	requests. The audit collection is for debug purposes.</p>
+
+	<h4>JSON structure by example:</h4>
+	<pre><samp class=JSON>
+	{ 
+	       "outstanding": [ 
+	       { 
+	              "path": "/chain/score", 
+	              "start-time": 9020618, 
+	              "host": "86.124.91.183", 
+	              "elapsed-time": 5, 
+	              "id": 797725 
+	       }], 
+	       "most-recent": [ 
+	       { 
+	              "path": "/push/transaction", 
+	              "start-time": 9020621, 
+	              "host": "hachi.nem.ninja", 
+	              "elapsed-time": 2, 
+	              id": 797750 
+	       }] 
+	}
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<p>Both list contain substructures which have
+	the following fields:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>path</p>
+			</td>
+			<td>
+				<p>The relative URL path.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>start-time</p>
+			</td>
+			<td>
+				<p>The number of seconds elapsed since the creation of the nemesis
+				block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>host</p>
+			</td>
+			<td>
+				<p>The host which initiated the request.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>elapsed-time</p>
+			</td>
+			<td>
+				<p>The time in seconds that has elapsed since the request was
+				received.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>id</p>
+			</td>
+			<td>
+				<p>The unique id of the request.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>Block</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>A block is the structure that contains
+	the transaction information. A block can contain up to 120 transactions. Blocks
+	are generated and signed by accounts and are the instrument by which
+	information is spread in the network.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "timeStamp": 9022656, 
+	       "signature":                                    "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804", 
+	       "prevBlockHash": 
+	       { 
+	              "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	              Transaction1, Transaction2, …, Transaction11 
+	       ], 
+	       "version": 1, 
+	       "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
+	       "height": 39324 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The number of seconds elapsed since the creation of the nemesis
+				block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>Signature</p>
+			</td>
+			<td>
+				<p>The signature of the block. The signature was generated by the
+				signer and can be used to validate that the block data was not modified by a
+				node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>prevBlockHash</p>
+			</td>
+			<td>
+				<p>The sha3-256 hash of the last block as hex-string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>The block type. There are currently two block types used:</p>
+				<p>-1: Only the nemesis block has this type.</p>
+				<p>1: Regular block type.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>transactions</p>
+			</td>
+			<td>
+				<p>The array of transaction structures. See Appendix A: Transaction
+				for more details             about this structure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>version</p>
+			</td>
+			<td>
+				<p>The block version. Only version 1 is used.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signer</p>
+			</td>
+			<td>
+				<p>The public key of the harvester of the block as hexadecimal
+				number.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the block. Each block has a unique height.
+				Subsequent blocks differ in height by 1.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>BlockChainScore</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The block chain score is a measure how
+	good the block chain is. The higher the score, the better the block chain is.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "score": "17a3077c927d9a7e" 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>score</p>
+			</td>
+			<td>
+				<p>The score is an integer greater or equal to zero. It is submitted
+				in hexadecimal format.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>BlockHeight</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The block height describes the position
+	of the block within the block chain. The first block of the chain has height
+	one. Each subsequent block has a height which is one higher than the previous
+	block.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "height": 2649 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height is an integer greater than zero.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>BootNodeRequest</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The BootNodeRequest JSNON object is used
+	to transfer the relevant data for booting a local node to NIS. With the boot
+	data NIS can create the local node object and connect to the network.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "metaData": 
+	       { 
+	              "application":"NIS" 
+	       }, 
+	       "endpoint": 
+	       { 
+	              "protocol":"http", 
+	              "port":7890, 
+	              "host":"localhost" 
+	       }, 
+	       "identity": 
+	       { 
+	              "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f", 
+	              "name":"Alice" 
+	       } 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>metaData</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the metaData substructure..</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>application</p>
+			</td>
+			<td>
+				<p>The network time at the moment the reply was sent.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>endpoint</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the endpoint substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>protocol</p>
+			</td>
+			<td>
+				<p>The protocol to use (only HTTP supported as for now).</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>port</p>
+			</td>
+			<td>
+				<p>The port to use (only 7890 supported as for now).</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>host</p>
+			</td>
+			<td>
+				<p>The IP address to use.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>identity</p>
+			</td>
+			<td>
+				<p>Denotes the fof the identity substructure</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>private-key</p>
+			</td>
+			<td>
+				<p>The private key used for creating the identity.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>name</p>
+			</td>
+			<td>
+				<p>The name of the node (can be anything).</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>CommunicationTimeStamps</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Communication timestamps contain
+	information about the network time of a remote NIS. NEM uses a time
+	synchronization mechanism to synchronize time across the network. Each node
+	maintains a network time which is the time of the computer clock plus an offset
+	which compensates for the deviation from the computer clocks of other nodes.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "sendTimeStamp": 9145477789, 
+	       "receiveTimeStamp": 9145477789 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>sendTimeStamp</p>
+			</td>
+			<td>
+				<p>The network time at the moment the reply was sent.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>receiveTimeStamp</p>
+			</td>
+			<td>
+				<p>The network time at the moment the request was received.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>ExplorerBlockViewModel</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The following structure is used by the
+	NEM block chain explorer for convenience reason. The data is similar but not
+	identical to that of a <a href="#block">Block</a>.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "harvester":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS ", 
+	       "timeStamp":1413748321000, 
+	       "harvesterPk":"6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
+	       "txes":[ 
+	              &lt;ExplorerTransferViewModel&gt;, 
+	              &lt;ExplorerTransferViewModel&gt; 
+	       ], 
+	       "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce", 
+	       "height":159 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>harvester</p>
+			</td>
+			<td>
+				<p>The address of the harvester of the block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The network time when the block was created.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>harvesterPK</p>
+			</td>
+			<td>
+				<p>The harvester's public key as hexadecimal string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>txes</p>
+			</td>
+			<td>
+				<p>Array containing the transactions of the block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;ExplorerTransferViewModel&gt;</p>
+			</td>
+			<td>
+				<p>The ExplorerBlockViewModel object as described in <a
+					href="#explorerTransferViewModel">ExplorerTransferViewModel</a></p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>hash</p>
+			</td>
+			<td>
+				<p>The hash of the block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the block.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>ExplorerTransferViewModel</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The following structure is used by the
+	NEM block chain explorer for convenience reason. The data is similar but not
+	identical to that of a <a href="#transaction">Transaction</a> structure.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+	{ 
+	       "timeStamp":1413748311000, 
+	       "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
+	       "amount":1000000000, 
+	       "msgType":1, 
+	       "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	       "signature":"4ef64f7b2b04f954d04d6e019c368af9233cdb6c9094f74a1641d4ef6346cb566ff4cebdd221925b373eabd69f7053c7afb37d0e87be55a32193524e5ba3b10b", 
+	       "fee":3000000, 
+	       "recipient":"TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+	       "type":257, 
+	       "message":"4e454d2062657461206e6574776f726b206973207570", 
+	       "hash":"5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d" 
+	} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The network time when the transaction was created.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>senderPK</p>
+			</td>
+			<td>
+				<p>The sender's public key as hexadecimal string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>amount</p>
+			</td>
+			<td>
+				<p>The amount in micro NEM.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>msgType</p>
+			</td>
+			<td>
+				<p>The message type.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>sender</p>
+			</td>
+			<td>
+				<p>The sender's address.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signature</p>
+			</td>
+			<td>
+				<p>The signature of the transaction.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>fee</p>
+			</td>
+			<td>
+				<p>The transaction fee in micro NEM.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>recipient</p>
+			</td>
+			<td>
+				<p>The recipient's address.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>The transaction type.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>message</p>
+			</td>
+			<td>
+				<p>The message contained in the transaction.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>hash</p>
+			</td>
+			<td>
+				<p>The hash of the transaction.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>ExtendedNodeExperiencePair</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>When exchanging data with other nodes
+	the result of the communication is divided into three different outcomes:
+	success, neutral and failure. In the cases of success and failure the result is
+	saved to be able to judge the quality of a node. This has influence on the
+	probability that a certain node is selected as partner.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "node": 
+       { 
+              &lt;Node&gt; 
+       }, 
+       "syncs": 822, 
+       "experience": 
+       { 
+              "s": 357, 
+              "f": 0 
+       } 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>node</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the of the Node substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;Node&gt;</p>
+			</td>
+			<td>
+				<p>The remote Node object as described in <a href="#node">Node</a>.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>syncs</p>
+			</td>
+			<td>
+				<p>The number of synchronization attempts the node had with the
+				remote node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>experience</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the of the NodeExperience substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>s</p>
+			</td>
+			<td>
+				<p>The number of successful communications with the remote node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>f</p>
+			</td>
+			<td>
+				<p>The number of failed communications with the remote node.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>HarvestInfo</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>A HarvestInfo object contains
+	information about a block that an account harvested.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "timeStamp": 8963798, 
+       "blockHash": { 
+              "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039" 
+       }, 
+       "totalFee": 2041299054, 
+       "height": 38453 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The number of seconds elapsed since the creation of the nemesis
+				block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>blockHash</p>
+			</td>
+			<td>
+				<p>Substructure containing the hash of the harvested block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>data</p>
+			</td>
+			<td>
+				<p>The block hash as hexadecimal string.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>totalFee</p>
+			</td>
+			<td>
+				<p>The total fee collected by harvesting the block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the harvested block.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>NemAsyncTimerVisitor</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>NIS uses timers to schedule periodic
+	tasks. Those tasks are monitored and their result is memorized. The
+	NemAsyncTimeVisitor structure holds  the information.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "last-delay-time": 3000, 
+       "executions": 1024, 
+       "failures": 0, 
+       "successes": 1024, 
+       "last-operation-start-time": 9317695, 
+       "is-executing": 0, 
+       "name": "FORAGING", 
+       "average-operation-time": 0, 
+       "last-operation-time": 0 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>last-delay-time</p>
+			</td>
+			<td>
+				<p>The number of milliseconds since the last execution of the timer.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>executions</p>
+			</td>
+			<td>
+				<p>The number of times the task was executed.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>failures</p>
+			</td>
+			<td>
+				<p>The number times the task failed.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>successes</p>
+			</td>
+			<td>
+				<p>The number times the task was successful.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>last-operation-start-time</p>
+			</td>
+			<td>
+				<p>The time at which the task started last time.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>is-executing</p>
+			</td>
+			<td>
+				<p>True if the task is executing, false otherwise.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>name</p>
+			</td>
+			<td>
+				<p>The name of the task.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>average-operation-time</p>
+			</td>
+			<td>
+				<p>The number of seconds the task needed on average.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>last-operation-time</p>
+			</td>
+			<td>
+				<p>The number of seconds the task needed the last time.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>NemRequestResult</h2>
+
+	<p>Some requests such as announcing a new
+	transaction return detailed information about the outcome of the request. In
+	those cases the result of the request is returned in a special JSON object
+	called NemRequestResult. The structure is typically used for requests that
+	perform validation or return a status.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "type": 4, 
+       "code": 6, 
+       "message": "status" 
+}  
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>The type is dependent on the request which was answered. The
+				interpretation of the code field depends on the type. Currently the following
+				types are supported:</p>
+				<p>1:         The result is a validation result.</p>
+				<p>2:         The result is a heart beat result.</p>
+				<p>4:         The result indicates a status.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>code</p>
+			</td>
+			<td>
+				<p>The meaning of the code is dependent on the type.</p>
+				<p>For type 1 (validation result) only 0 and 1 mean there was no
+				failure. The following codes are supported:</p>
+				<p>0:         Neutral result. A typical example would be that a node
+				validates an incoming transaction and realizes that it already knows about
+				the transaction. In this case it is            neither a success (meaning the
+				node has a new transaction) nor a failure (because the transaction itself is
+				valid).</p>
+				<p>1:         Success result. A typical example would be that a node
+				validates a new valid transaction.</p>
+				<p>2:         Unknown failure. The validation failed for unknown
+				reasons.</p>
+				<p>3:         The entity that was validated has already past its
+				deadline.</p>
+				<p>4:         The entity used a deadline which lies too far in the
+				future.</p>
+				<p>5:         There was an account involved which had an insufficient
+				balance to perform the operation.</p>
+				<p>6:         The message supplied with the transaction is too large.</p>
+				<p>7:         The hash of the entity which got validated is already
+				in the database.</p>
+				<p>8:         The signature of the entity could not be validated.</p>
+				<p>9:         The entity used a timestamp that lies too far in the
+				past.</p>
+				<p>10:       The entity used a timestamp that lies in the future
+				which is not acceptable.</p>
+				<p>11:       The entity is unusable.</p>
+				<p>12:       The score of the remote block chain is inferior (although
+				a superior score was promised).</p>
+				<p>13:       The remote block chain failed validation.</p>
+				<p>14:       There was a conflicting importance transfer detected.</p>
+				<p>15:       There were too many transaction in the supplied block.</p>
+				<p>16:       The block contains a transaction that was signed by the
+				harvester.</p>
+				<p>17:       A previous importance transaction conflicts with a new
+				transaction.</p>
+				<p>18:       An importance transfer activation was attempted while
+				previous one is active.</p>
+				<p>19:       An importance transfer deactivation was attempted but is
+				not active.</p>
+				<p>            </p>
+				<p>For type 2 the following codes are supported:</p>
+				<p>1:         Successful heart beat detected.</p>
+				<p></p>
+				<p>For type 3 the following codes are supported:</p>
+				<p>0:         Unknown status.</p>
+				<p>1:         NIS is stopped.</p>
+				<p>2:         NIS is starting.</p>
+				<p>3:         NIS is running.</p>
+				<p>4:         NIS is booting the local node (implies NIS is running).</p>
+				<p>5:         The local node is booted (implies NIS is running).</p>
+				<p>6:         The local node is synchronized (implies NIS is running
+				and the local node is booted)</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>NisNodeInfo</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>The NisNodeInfo object provides detailed
+	information about a node.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "node": { 
+              &lt;Node&gt; 
+       }, 
+       "nisInfo": { 
+              &lt;ApplicationMetaData&gt; 
+       } 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>node</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the node substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;Node&gt;</p>
+			</td>
+			<td>
+				<p>The Node object as described in <a href="#node">Node</a>.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>nisInfo</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the application meta data substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;ApplicationMetaData&gt;</p>
+			</td>
+			<td>
+				<p>The ApplicationMetaData object as described in <a
+					href="#applicationMetaData">ApplicationMetaData</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>Node</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Nodes are the entities that perform
+	communication in the network like sending and receiving data. A node has an
+	identity which is tied to an account through which the node can identify itself
+	to the network. The communication is done through the endpoint of the node.
+	Additionally a node provides meta data information.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "metaData": 
+       { 
+              "application": "NIS", 
+              "version": "0.4.30-BETA", 
+              "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1" 
+       }, 
+       "endpoint": 
+       { 
+              "protocol": "http", 
+              "port": 7890, 
+              "host": "85.25.36.97" 
+       }, 
+       "identity": 
+       { 
+              "name": "Hi, I am Alice2", 
+              "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350" 
+       } 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>metaData</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the meta data substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>application</p>
+			</td>
+			<td>
+				<p>The name of the application that is running the node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>version</p>
+			</td>
+			<td>
+				<p>The version of the application.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>platform</p>
+			</td>
+			<td>
+				<p>The underlying platform (OS, java version).</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>endpoint</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the endpoint substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>protocol</p>
+			</td>
+			<td>
+				<p>The protocol used for the communication (HTTP or HTTPS).</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>port</p>
+			</td>
+			<td>
+				<p>The port used for the communication.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>host</p>
+			</td>
+			<td>
+				<p>The IP address of the endpoint.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>identity</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the identity substructure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>name</p>
+			</td>
+			<td>
+				<p>The name of the node.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>public-key</p>
+			</td>
+			<td>
+				<p>The public key used to identify the node.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>NodeCollection</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>A NodeCollection object holds arrays of nodes
+	with different statuses. The following statuses are supported:</p>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>inactive</p>
+			</td>
+			<td>
+				<p>A connection to the node cannot be established.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>active</p>
+			</td>
+			<td>
+				<p>A connection can be established and the remote node responds in a
+				timely manner.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>busy</p>
+			</td>
+			<td>
+				<p>A connection can be established but the node cannot provide
+				information within the timeout limits.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>failure</p>
+			</td>
+			<td>
+				<p>A fatal error occurs when trying to establish a connection or the
+				node couldn't authenticate itself correctly.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>data</p>
+			</td>
+			<td>
+				<p>Generic status indicating the node collection just lists nodes without
+				saying anything about the status of the node.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "inactive": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "active": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "busy": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "failure": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>inactive</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the array of inactive nodes.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>active</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the array of active nodes.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>busy</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the array of busy nodes.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>failure</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the array of failing nodes.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;Node&gt;</p>
+			</td>
+			<td>
+				<p>The Node object as described in <a href="#node">Node</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>PrivateKey</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>A private key is a key to an account.
+	Anyone having the private key to an account can initiate any account related
+	action. <strong>Therefore a private key must be kept secret at all costs.</strong></p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{
+	"value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0",
+}
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>value</p>
+			</td>
+			<td>
+				<p>The 256 bit value of the private key as hexadecimal string.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>RequestPrepareAnnounce</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>A RequestPrepareAnnounce object is used
+	to transfer transaction data and a private key to NIS in order to initiate and
+	broadcast a transaction.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "transaction": 
+       { 
+              "timeStamp": 9111526, 
+              "amount": 1000000000, 
+              "fee": 3000000, 
+              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+              "type": 257, 
+              "deadline": 9154726, 
+              "message": 
+              { 
+                     "payload": "74657374207472616e73616374696f6e", 
+                     "type": 1 
+              }, 
+              "version": 1, 
+              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+       }, 
+       "privateKey": 
+       { 
+              "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0", 
+       } 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>transaction</p>
+			</td>
+			<td>
+				<p>Denotes the beginning of the transaction data part. The
+				transaction data is described in Appendix A: <a href="#transaction">Transaction</a>. The field 'signature is
+				missing since the transaction is not signed at this point.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>privateKey</p>
+			</td>
+			<td>
+				<p>The private key which NIS will use to sign the transaction.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>Transaction</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Transactions contain data about account
+	activity. They are collected and stored in blocks.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "timeStamp": 9111526, 
+       "amount": 1000000000, 
+       "signature":         "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
+       "fee": 3000000, 
+       "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+       "type": 257, 
+       "deadline": 9154726, 
+       "message": 
+       { 
+              "payload": "74657374207472616e73616374696f6e", 
+              "type": 1 
+       }, 
+       "version": 1, 
+       "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The number of seconds elapsed since the creation of the nemesis
+				block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>amount</p>
+			</td>
+			<td>
+				<p>The amount of micro NEM that is transferred from sender to
+				recipient.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>signature</p>
+			</td>
+			<td>
+				<p>The transaction signature.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>fee</p>
+			</td>
+			<td>
+				<p>The fee for the transaction. The higher the fee, the higher the
+				priority of the transaction. Transactions with high priority get included in
+				a block before transactions with lower priority.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>recipient</p>
+			</td>
+			<td>
+				<p>The address of the recipient.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>The transaction type.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>deadline</p>
+			</td>
+			<td>
+				<p>The deadline of the transaction. The deadline is given as the
+				number of seconds elapsed since the creation of the nemesis block. If a
+				transaction does not get included in a block before the deadline is reached, it
+				is deleted.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>message</p>
+			</td>
+			<td>
+				<p>Optionally a transaction can contain a message. In this case the
+				transaction contains a message substructure. If not the field is null.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>payload</p>
+			</td>
+			<td>
+				<p>Optional field in case the transaction contains a message. The
+				payload is the actual (possibly encrypted) message data.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>type</p>
+			</td>
+			<td>
+				<p>Optional field in case the transaction contains a message. The
+				field holds the message type information. Possible message types are:</p>
+				<p>1: The message is not encrypted.</p>
+				<p>2: The message is encrypted.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>version</p>
+			</td>
+			<td>
+				<p>The version of the structure.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>Signer</p>
+			</td>
+			<td>
+				<p>The public key of the account that created the transaction.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>TimeSynchronizationResult</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>A time synchronization result is the
+	outcome of the network time synchronization of a node with other remote nodes.
+	To agree upon a common time nodes need to synchronize time every hour.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "dateTime": "2014-11-16 20:47:06", 
+       "currentTimeOffset": 2786, 
+       "change": 36 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>dateTime</p>
+			</td>
+			<td>
+				<p>The date and time when the synchronization was performed.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>currentTimeOffset</p>
+			</td>
+			<td>
+				<p>The current offset to the local computer clock in milliseconds.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>change</p>
+			</td>
+			<td>
+				<p>The change in milliseconds compared to the last synchronization.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>TransactionMetaData</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Transactions meta data object contains
+	additional information about the transaction.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "height": 40706 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>height</p>
+			</td>
+			<td>
+				<p>The height of the block in which the transaction was included.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>TransactionMetaDataPair</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>Transactions meta data object contains
+	additional information about the transaction.</p>
+
+	<h4>JSON structure by example:</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "meta": 
+              &lt;TransactionMetaData&gt;, 
+       "transaction": 
+              &lt;Transaction&gt; 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>meta</p>
+			</td>
+			<td>
+				<p>Contains the transaction meta data object.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;TransactionMetaData&gt;</p>
+			</td>
+			<td>
+				<p>The transaction meta data object as described in <a
+					href="#transactionMetaData">TransactionMetaData</a>.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>Transaction</p>
+			</td>
+			<td>
+				<p>Contains the transaction object.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>&lt;Transaction&gt;</p>
+			</td>
+			<td>
+				<p>The transaction object as described in <a
+					href="#transaction">Transaction</a>.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h2>Error object</h2>
+
+	<h4>Description:</h4>
+
+	<p class=NemNoSpacing>If NIS encounters an error due to either
+	invalid requests or internal problems, it returns a JSON error object. The
+	interpretation of the error object is dependant on the context. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for detailed information about possible errors.</p>
+
+	<h4>JSON structure by example</h4>
+
+	<pre><samp class=JSON>
+{ 
+       "timeStamp": 9108808, 
+       "error": "Bad Request", 
+       "message": "address must be valid", 
+       "status": 400 
+} 
+	</samp></pre>
+
+	<h4>Description of the fields:</h4>
+
+	<table class=NemTableGrid>
+		<tr>
+			<td>
+				<p class=JSON>timeStamp</p>
+			</td>
+			<td>
+				<p>The number of seconds elapsed since the creation of the nemesis
+				block.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>error</p>
+			</td>
+			<td>
+				<p>The general description of the error.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>Message</p>
+			</td>
+			<td>
+				<p>The detailed error message.</p>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<p class=JSON>Status</p>
+			</td>
+			<td>
+				<p>The HTTP status.</p>
+			</td>
+		</tr>
+	</table>
+
+	<h1>Appendix B: NIS Errors</h1>
+
+	<p>In case NIS encounters an error while
+	processing a request it returns a JSON error object whose structure is
+	described in <b>Appendix A: </b><a href="#error-object">Error object</a>. This chapter describes the
+	errors messages that can be returned from NIS.</p>
+
+	<h2>Error messages</h2>
+
+	<dl>
+		<dt>Request method 'GET' not supported</dt>
+		<dd>The request was performed as GET request but was expected to be a POST request.</dd>
+
+		<dt>address must be valid:</dt>
+		<dd>At least one address supplied in the request was invalid. Addresses are validated before processing a request. If validation fails, an error containing this message is returned.</dd>
+
+		<dt>FAILURE_SERVER_LIMIT:</dt>
+		<dd>The number of accounts that are allowed to harvest on NIS was exceeded.</dd>
+
+		<dt>JSON Object was expected:</dt>
+		<dd>A parameter is missing in the request.</dd>
+
+		<dt>FAILURE_UNKNOWN_ACCOUNT:</dt>
+		<dd>The account specified in the request is not known.</dd>
+
+		<dt>block not found in the db</dt>
+		<dd>The block that was requested could not be found in the database.</dd>
+
+		<dt>height must be positive</dt>
+		<dd>The block height supplied in a request was zero or negative. Block height must always be greater than zero.</dd>
+
+		<dt>network has not been booted yet</dt>
+		<dd>Most requests need the node that should answer the request to be already booted. If node is not booted yet, this error message will be returned.</dd>
+
+		<dt>network boot was already attempted</dt>
+		<dd>It was attempted to boot an already booted node. Nodes can only be booted once.</dd>
+
+		<dt>remote 123.45.67.89 attempted to call local /node/boot</dt>
+		<dd>It was attempted to boot a remote node.  Only local node can be booted.</dd>
+
+		<dt>FAILURE_PAST_DEADLINE</dt>
+		<dd>The deadline for the entity has already expired. The deadline must always lie in the future.</dd>
+
+		<dt>FAILURE_FUTURE_DEADLINE</dt>
+		<dd>The deadline lies too far in the future.  Deadlines are only allowed to lie up to 24 hours in the future.</dd>
+
+		<dt>FAILURE_INSUFFICIENT_BALANCE</dt>
+		<dd>The account does not have enough funds.</dd>
+
+		<dt>FAILURE_MESSAGE_TOO_LARGE</dt>
+		<dd>The message for the transaction exceeds the limit of 512 bytes.</dd>
+
+		<dt>FAILURE_HASH_EXISTS</dt>
+		<dd>The hash of the entity already exists either in the cache or in the database.</dd>
+
+		<dt>FAILURE_SIGNATURE_NOT_VERIFIABLE</dt>
+		<dd>The signature of the entity failed upon verification.</dd>
+
+		<dt>FAILURE_TIMESTAMP_TOO_FAR_IN_PAST</dt>
+		<dd>The timestamp of the entity lies to far in the past.</dd>
+
+		<dt>FAILURE_TIMESTAMP_TOO_FAR_IN_FUTURE</dt>
+		<dd>The timestamp of the entity lies too far in the future.</dd>
+
+		<dt>FAILURE_ENTITY_UNUSABLE</dt>
+		<dd>The entity cannot be processed. For example, if processed entity is a block, this error can occur when the block is neither a child nor a sibling of the current last block.</dd>
+
+		<dt>FAILURE_CONFLICTING_IMPORTANCE_TRANSFER</dt>
+		<dd>There is at least one other importance transfer that is in conflict with this entity.</dd>
+
+		<dt>FAILURE_DESTINATION_ACCOUNT_HAS_NONZERO_BALANCE</dt>
+		<dd>The importance cannot be transferred to an account with nonzero balance.</dd>
+
+		<dt>FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS</dt>
+		<dd>The transaction is conflicting because there is already a transfer of importance in progress.</dd>
+
+		<dt>FAILURE_IMPORTANCE_TRANSFER_NEEDS_TO_BE_DEACTIVATED</dt>
+		<dd>The transaction is conflicting because the importance was already transferred.</dd>
+
+		<dt>FAILURE_IMPORTANCE_TRANSFER_IS_NOT_ACTIVE</dt>
+		<dd>The transaction is conflicting because no importance has been transferred yet.</dd>
+	</dl>
+
+</div>
+
+</body>
+
+</html>
