@@ -8,7 +8,7 @@ import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
@@ -96,6 +96,7 @@ public class BlockChainValidator {
 					return ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE;
 				}
 
+				// TODO BR -> J,G: should add hashes of child transactions as well I guess (or remove chainHashes and let the executor below throw)
 				final Hash hash = HashUtils.calculateHash(transaction);
 				if (chainHashes.contains(hash)) {
 					LOGGER.info("received block with duplicate transaction");

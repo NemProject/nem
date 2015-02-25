@@ -316,7 +316,7 @@ public class NewBlockTransactionsProviderTest {
 		context.addTransactions(Arrays.asList(t1, t2));
 
 		// Act:
-		final List<Transaction> blockTransactions = context.getBlockTransaction();
+		final List<Transaction> blockTransactions = context.getBlockTransactions();
 
 		// Assert:
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
@@ -348,7 +348,7 @@ public class NewBlockTransactionsProviderTest {
 		context.addTransactions(Arrays.asList(t1, t2));
 
 		// Act:
-		final List<Transaction> blockTransactions = context.getBlockTransaction();
+		final List<Transaction> blockTransactions = context.getBlockTransactions();
 
 		// Assert:
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
@@ -388,7 +388,7 @@ public class NewBlockTransactionsProviderTest {
 		context.addTransaction(mt1);
 
 		// Act:
-		final List<Transaction> blockTransactions = context.getBlockTransaction();
+		final List<Transaction> blockTransactions = context.getBlockTransactions();
 
 		// Assert:
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(0));
@@ -412,7 +412,7 @@ public class NewBlockTransactionsProviderTest {
 		context.addTransaction(mt1);
 
 		// Act:
-		final List<Transaction> blockTransactions = context.getBlockTransaction();
+		final List<Transaction> blockTransactions = context.getBlockTransactions();
 
 		// Assert:
 		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
@@ -513,7 +513,7 @@ public class NewBlockTransactionsProviderTest {
 					this.unconfirmedTransactions);
 		}
 
-		public List<Transaction> getBlockTransaction() {
+		public List<Transaction> getBlockTransactions() {
 			return this.provider.getBlockTransactions(Utils.generateRandomAddress(), TimeInstant.ZERO);
 		}
 
