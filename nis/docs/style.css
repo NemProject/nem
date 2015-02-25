@@ -210,12 +210,24 @@ p.NemTocHeading
 	font-family:"Roboto Light","sans-serif";
 	color:#2E74B5;}
 
-p.JSON, span.JSON
+p.JSON, samp.JSON
 	{
 	margin:0cm;
 	margin-bottom:.0001pt;
 	font-size:10.0pt;
 	font-family:Consolas;}
+
+pre {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+
+    background-color: #eee;
+    white-space: pre-line;
+    width: 90%;
+}
 
 table.NemApiGrid, table.NemTableGrid {
 	border: 1px solid #111;

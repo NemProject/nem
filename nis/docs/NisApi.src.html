@@ -286,7 +286,7 @@
 	<p>Known accounts have at least one incoming
 	transaction. The corresponding JSON objects are described in <em>Appendix A:</em> <a href="#transaction">Transaction</a><b>,</b> <a href="#transactionMetaData">TransactionMetaData</a> and <a href="#transactionMetaDataPair">TransactionMetaDataPair</a>.</p>
 
-	<p>A transaction has the following fields:</p>
+	<p>A transaction has always the following fields:</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -330,7 +330,7 @@
 				<p>The transaction type. Currently the following types of
 				transactions are supported:</p>
 				<p class='FakeList'>0x101:<span class='sep'> </span> Transfer of NEM from sender to recipient.</p>
-				<p class='FakeList'>0x801:<span class='sep'> </span> Transfer of importance from sender to recipient.</p>
+				<p class='FakeList'>0x801:<span class='sep'> </span> Transfer of importance from sender to remote account.</p>
 				<p class='FakeList'>0x1001:<span class='sep'> </span> An aggregate modification transaction, which converts a normal account into a multisig account.</p>
 				<p class='FakeList'>0x1002:<span class='sep'> </span> A multisig signature transaction which is used to sign a multisig transaction.</p>
 				<p class='FakeList'>0x1003:<span class='sep'> </span> A multisig transaction, which is used for multisig accounts.</p>
@@ -366,9 +366,8 @@
 		</tr>
 	</table>
 
-	<p>Depending on the type of the transaction,
-	there are additional fields which are specific to this type. For instance a
-	transfer transaction will have the additional fields.</p>
+	<p>Depending on the type of the transaction, there are additional fields which are specific to given type.
+        For instance a transfer transaction will have the additional fields.</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -408,14 +407,6 @@
 				field holds the message type information. Possible message types are:</p>
 				<p class='FakeList'>1:<span class='sep'> </span> The message is not encrypted.</p>
 				<p class='FakeList'>2:<span class='sep'> </span> The message is encrypted.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>height</p>
-			</td>
-			<td>
-				<p>The height of the block in which the transaction was included.</p>
 			</td>
 		</tr>
 	</table>
@@ -461,8 +452,7 @@
 				<p class=JSON>timeStamp</p>
 			</td>
 			<td>
-				<p>The number of seconds elapsed since the creation of the nemesis
-				block.</p>
+				<p>The number of seconds elapsed since the creation of the nemesis block.</p>
 			</td>
 		</tr>
 		<tr>
@@ -599,23 +589,23 @@
 	<h4>Example of returned JSON object:</h4>
 
 	<pre><samp class=JSON>
-	{ 
-	       "account": 
-	       {
-	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	       "balance": 124446551689680, 
-	       "importance": 0.010263666447108395, 
-	       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a", 
-	       "label": null,  
-	       "foragedBlocks": 645 
-	       }, 
-	       "meta": 
-	       { 
-	              "cosignatoryOf": [ ], 
-	              "status": "LOCKED", 
-	              "remoteStatus": "ACTIVE" 
-	       } 
-	} 
+    {
+        "account":
+        {
+            "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
+            "balance": 124446551689680,
+            "importance": 0.010263666447108395,
+            "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
+            "label": null,
+            "foragedBlocks": 645
+        },
+        "meta":
+        {
+            "cosignatoryOf": [ ],
+            "status": "LOCKED",
+            "remoteStatus": "ACTIVE"
+        }
+    }
 	</samp></pre>
 
 	<h4>Possible Errors:</h4>
@@ -658,10 +648,11 @@
 	<h4>Example of returned JSON object:</h4>
 
 	<pre><samp class=JSON>
-	{ 
-	       "status": "LOCKED", 
-	       "remoteStatus": "ACTIVE" 
-	} 
+    {
+        "cosignatoryOf": [ ],
+        "status": "LOCKED",
+        "remoteStatus": "ACTIVE"
+    }
 	</samp></pre>
 
 	<h4>Possible Errors:</h4>
@@ -698,7 +689,9 @@
 	pairs where the recipient has the address given as parameter to the request. A
 	maximum of 25 transaction meta data pairs is returned. The returned transaction
 	meta data pairs are sorted in descending order in which they were written to
-	the database. The second parameter is optional. When it’s not present, the
+	the database.</p>
+
+    <p class=NemNoSpacing> The second parameter is optional. When it’s not present, the
 	request will return newest transactions according to the above criteria. When hash
 	is supplied as second parameter, the request will return up to 25 transactions
 	that appeared directly before the transaction that has the supplied hash sorted
@@ -1043,6 +1036,74 @@
 	NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix
 		B: NIS Errors</a> Errors for details about errors.</p>
 
+    <h3>Transaction data with decoded messages</h3>
+
+    <p>All the requests for retrieving transaction data for an account which were described in previous part
+        do not decode any message contained in a transaction.
+        The following requests are similar to the ones above but are able to return transaction data with decoded messages.
+        Decoding requires the private key of an account for which transactions are requested.
+    Therefore the following requests <b>should only be done when NIS is running locally</b>.</p>
+
+    <h4>Incoming/outgoing/all transactions with decoded messages</h4>
+    <table class=NemApiGrid>
+        <tr>
+            <td> API path: </td>
+            <td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+        </tr>
+        <tr>
+            <td class='path'>/local/account/transfers/incoming</td>
+        </tr>
+
+        <tr>
+            <td> API path: </td>
+            <td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+        </tr>
+        <tr>
+            <td class='path'>/local/account/transfers/outgoing</td>
+        </tr>
+
+        <tr>
+            <td> API path: </td>
+            <td rowspan='2' class='post'> Request type: <b>POST</b> </td>
+        </tr>
+        <tr>
+            <td class='path'>/local/account/transfers/all</td>
+        </tr>
+    </table>
+
+    <h4>Description:</h4>
+
+    <p class=NemNoSpacing>The request returns incoming/outgoing/all transactions as described in the previous chapter.
+        The only difference is that if a transaction contains an encoded message, this message will be decoded before it is
+        sent to the requester.</p>
+
+    <h4>Parameters:</h4>
+
+    <table class=NemTableGrid>
+        <tr>
+            <td>
+                <p class=JSON>page</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>An AccountPrivateKeyTransactionsPage
+                    JSON object as described in <em>Appendix A:</em> <a href="#accountPrivateKeyTransactionsPage">AccountPrivateKeyTransactionsPage</a></p>
+            </td>
+        </tr>
+    </table>
+
+    <h4>Example:</h4>
+
+    <p>Request cannot be performed in a browser.</p>
+
+    <h4>Example of returned JSON object:</h4>
+
+	<p>See section: <a href="#requesting-transaction-data-for-an-account">Requesting transaction data for an account</a></p>
+
+    <h4>Possible Errors:</h4>
+
+    <p class=NemNoSpacing>If the private key is not supplied, NIS returns an error.
+        See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Requesting harvest info data for an account</h3>
 
@@ -1067,7 +1128,7 @@
 	<table class=NemTableGrid>
 		<tr>
 			<td>
-				<p class=JSON>Address</p>
+				<p class=JSON>address</p>
 			</td>
 			<td>
 				<p class=NemNoSpacing>The address of the account.</p>
@@ -1078,8 +1139,7 @@
 				<p class=JSON>hash </p>
 			</td>
 			<td>
-				<p class=NemNoSpacing>The 256 bit sha3 hash of the block up
-				to which harvested blocks are returned.</p>
+				<p class=NemNoSpacing>The 256 bit sha3 hash of the block up to which harvested blocks are returned.</p>
 			</td>
 		</tr>
 	</table>
@@ -1125,8 +1185,7 @@
 
 	<h4>Description:</h4>
 
-	<p class=NemNoSpacing>Gets an array of account importance view
-	model objects.</p>
+	<p class=NemNoSpacing>Gets an array of account importance view model objects.</p>
 
 	<h4>No parameter:</h4>
 
