@@ -43,13 +43,13 @@
 
 	<p><a href="http://127.0.0.1:7890/account/get?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS">http://127.0.0.1:7890/account/get?address=TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS</a></p>
 
-	<p>HTTP POST request usually cannot be executed with a browser unless you use a plugin which is able to do it. HTTP POST requests use JSON structures in the request body to supply data to NIS.</p>
+	<p>HTTP POST request usually cannot be executed from within the browser unless you use a plugin which is able to do it. HTTP POST requests use JSON structures in the request body to supply data to NIS.</p>
 
 	<p>Both request types return (if any data is returned) data using JSON structures. <a href="#appendix-A:-description-of-the-JSON-structures">Appendix A: Description of the JSON Structures</a> explains all JSON structures used in this document.</p>
 
 	<h1>NIS status related requests</h1>
 
-	<p>There are two requests by which you can get information about the status of NIS. The /heartbeat request gives you information if the node is up and responsive. The /status request gives more detailed information about the state of NIS. Both requests return a NemRequestResult object. See <b>Appendix A</b> <a href="#nemRequestResult">NemRequestResult</a> for more details on the interpretation of a NemRequestResult.</p>
+	<p>There are two requests by which you can get information about the status of NIS. The /heartbeat request gives you information if the node is up and responsive. The /status request gives more detailed information about the state of NIS. Both requests return a NemRequestResult object. See <em>Appendix A:</em> <a href="#nemRequestResult">NemRequestResult</a> for more details on the interpretation of a NemRequestResult.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Heart beat request</h2>
@@ -144,6 +144,8 @@
 	information that can be retrieved is the durable account data, its meta data
 	and information about transactions and harvested blocks.</p>
 
+    <p>NIS supports two different kind of accounts: normal accounts and multsig (short for: multi signature) accounts:</p>
+
 	<h4>Normal accounts:</h4>
 
 	<p>Normal accounts are created and controlled
@@ -155,8 +157,8 @@
 	<h4>Multisig accounts:</h4>
 
 	<p>Multisig accounts can be created by
-	converting a normal account to a multisig account via a multisig aggregate
-	modification transaction. This adds cosignatories to the account. After that
+	converting a normal account to a multisig account via a <b>aggregate
+	modification transaction</b>. This adds cosignatories to the account. After that
 	modification, only the cosignatories can initiate an action for the account.
 	Any action must be signed by all cosignatories. This makes a multisig account
 	significantly more secure than a normal account. When a single cosignatory
@@ -169,7 +171,7 @@
 
 	<p>Durable data is either stored in the
 	database or can be calculated from other database data. The corresponding JSON
-	object is described in Appendix A: <a href="#account">Account</a>. It has the fields:</p>
+	object is described in <em>Appendix A:</em> <a href="#account">Account</a>. It has the fields:</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -179,9 +181,9 @@
 			<td>
 				<p>Each account has a unique address. First letter of an address indicate
 				the network the account belongs to. Currently two networks are defined: the
-				test network whose account addresses start with a capital T and the main
-				network whose account addresses always start with a capital N. Addresses have
-				always a length of 40 characters and are base 32 encoded.</p>
+				test network whose account addresses start with a capital <b>T</b> and the main
+				network whose account addresses always start with a capital <b>N</b>. Addresses have
+				always a length of 40 characters and are <a href="http://en.wikipedia.org/wiki/Base32">base-32</a> encoded.</p>
 			</td>
 		</tr>
 		<tr>
@@ -190,7 +192,7 @@
 			</td>
 			<td>
 				<p>Each account has a balance which is an integer greater or equal to
-				zero and denotes the number of micro NEMs which the account owns. Thus a
+				zero and denotes the number of <b>micro</b> NEMs which the account owns. Thus a
 				balance of 123456789 means the account owns 123.456789 NEM. A balance is
 				split into its vested and unvested part. Only the vested part is relevant for
 				the importance calculation. For transfers from one account to another only
@@ -206,7 +208,7 @@
 				decimal number between 0 and 1. It denotes the probability of an account to
 				harvest the next block in case the account has harvesting turned on and all
 				other accounts are harvesting too. The exact formula for calculating the
-				importance is not public yet. Accounts need at least 10k vested NEM to be
+				importance is not public yet. Accounts need at least 10k <b>vested</b> NEM to be
 				included in the importance calculation.</p>
 			</td>
 		</tr>
@@ -249,7 +251,7 @@
 	harvesting to a so called remote account. In the latter case the remote account
 	uses the importance of the original account to harvest. The corresponding JSON
 	object and the possible values for the status/remoteStatus are described in
-	Appendix A: <a href="#accountMetaDataPair">AccountMetaDataPair</a>. The meta
+	<em>Appendix A:</em> <a href="#accountMetaDataPair">AccountMetaDataPair</a>. The meta
 	data consists of the following fields:</p>
 
 	<table class=NemTableGrid>
@@ -282,7 +284,7 @@
 
 
 	<p>Known accounts have at least one incoming
-	transaction. The corresponding JSON objects are described in Appendix A: <a href="#transaction">Transaction</a><b>,</b> <a href="#transactionMetaData">TransactionMetaData</a> and <a href="#transactionMetaDataPair">TransactionMetaDataPair</a>.</p>
+	transaction. The corresponding JSON objects are described in <em>Appendix A:</em> <a href="#transaction">Transaction</a><b>,</b> <a href="#transactionMetaData">TransactionMetaData</a> and <a href="#transactionMetaDataPair">TransactionMetaDataPair</a>.</p>
 
 	<p>A transaction has the following fields:</p>
 
@@ -449,7 +451,7 @@
 	blocks if they are lucky. The account which harvests a block collects the fees
 	which are included in the transactions in the block. The information which
 	blocks were harvested by an account can be requested. The request returns an
-	array of HarvestInfo JSON objects. For an example see Appendix A: <a href="#harvestInfo">HarvestInfo</a></p>
+	array of HarvestInfo JSON objects. For an example see <em>Appendix A:</em> <a href="#harvestInfo">HarvestInfo</a></p>
 
 	<p>A harvest info object has the following fields:</p>
 
@@ -501,7 +503,7 @@
 
 	<p>It is possible to request an array with the
 	importance information for all accounts. The request returns an array of
-	AccountImportanceViewModel JSON objects. For an example see Appendix A:
+	AccountImportanceViewModel JSON objects. For an example see <em>Appendix A:</em>
 	<a href="#accountImportanceViewModel">AccountImportanceViewModel</a>.</p>
 
 	<p>An account importance view model has the following fields:</p>
@@ -990,7 +992,7 @@
 	<p class=NemNoSpacing>Gets the array of transactions for which
 	an account is the sender or receiver and which have not yet been included in a
 	block. The returned structure is UnconfirmedTransactionMetaDataPair see
-	Appendix A</p>
+	<em>Appendix A</em></p>
 
 	<h4>Parameters:</h4>
 
@@ -1191,7 +1193,7 @@
 				<p class=JSON><b><span style='color:#C00000'>privateKey</span></b></p>
 			</td>
 			<td>
-				<p class=NemNoSpacing>A PrivateKey JSON object as described in Appendix A: <a href="#privateKey">PrivateKey</a></p>
+				<p class=NemNoSpacing>A PrivateKey JSON object as described in <em>Appendix A:</em> <a href="#privateKey">PrivateKey</a></p>
 			</td>
 		</tr>
 	</table>
@@ -1228,7 +1230,7 @@
 				<p class=JSON><b><span style='color:#C00000'>privateKey</span></b></p>
 			</td>
 			<td>
-				<p class=NemNoSpacing>A PrivateKey JSON object as described in Appendix A: <a href="#privateKey">PrivateKey</a></p>
+				<p class=NemNoSpacing>A PrivateKey JSON object as described in <em>Appendix A:</em> <a href="#privateKey">PrivateKey</a></p>
 			</td>
 		</tr>
 	</table>
@@ -1277,7 +1279,7 @@
 	client can request parts of the block chain.</p>
 
 	<p>Blocks are transferred using a JSON Block
-	object. <b>Appendix A: </b><a href="#block">Block</a> has more information and an example JSON Block object. The
+	object. <em>Appendix A:</em> <a href="#block">Block</a> has more information and an example JSON Block object. The
 	following fields are in the structure:</p>
 
 	<table class=NemTableGrid>
@@ -1325,7 +1327,7 @@
 				<p class=JSON>transactions</p>
 			</td>
 			<td>
-				<p>The array of transactions. See Appendix A: <a
+				<p>The array of transactions. See <em>Appendix A:</em> <a
 					href="#transaction">Transaction</a>
 				for more details. A block can contain up to 120 transactions.</p>
 			</td>
@@ -1359,7 +1361,7 @@
 	</table>
 
 	<p>Transactions were already discussed in
-	chapter 2 <a href="#account-related-requests">Account related requests</a>. See also <b>Appendix A: </b><a href="#transaction">Transaction</a>
+	chapter 2 <a href="#account-related-requests">Account related requests</a>. See also <em>Appendix A:</em> <a href="#transaction">Transaction</a>
 	for an example JSON transaction object.</p>
 
 	<h2>Requesting the block chain status information</h2>
@@ -1549,7 +1551,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the block hash is not found in the
-	database, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
+	database, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Getting a block with a given height</h3>
@@ -1579,7 +1581,7 @@
 			</td>
 			<td>
 				<p class=NemNoSpacing>A BlockHeight JSON object as described
-				in <b>Appendix A: </b><a href="#blockHeight">BlockHeight</a>.</p>
+				in <em>Appendix A:</em> <a href="#blockHeight">BlockHeight</a>.</p>
 			</td>
 		</tr>
 	</table>
@@ -1642,7 +1644,7 @@
 			</td>
 			<td>
 				<p class=NemNoSpacing>A BlockHeight JSON object as described
-				in <b>Appendix A: </b><a href="#blockHeight">BlockHeight</a>.</p>
+				in <em>Appendix A:</em> <a href="#blockHeight">BlockHeight</a>.</p>
 			</td>
 		</tr>
 	</table>
@@ -1685,7 +1687,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the block height supplied is not
-	positive, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	positive, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
 
 	<h1>Node related requests</h1>
@@ -1764,7 +1766,7 @@
 		</tr>
 	</table>
 
-	<p><b>Appendix A: </b><a href="#node">Node</a> has more information and an example JSON Node object. A node object has the following fields:</p>
+	<p><em>Appendix A:</em> <a href="#node">Node</a> has more information and an example JSON Node object. A node object has the following fields:</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -1888,7 +1890,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -1954,7 +1956,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -2012,7 +2014,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -2070,7 +2072,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -2129,7 +2131,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -2169,7 +2171,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -2236,7 +2238,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -2267,7 +2269,7 @@
 			</td>
 			<td>
 				<p class=NemNoSpacing>A BootNodeRequest JSON object as
-				described in <b>Appendix A: </b><a href="#bootNodeRequest">BootNodeRequest</a>.</p>
+				described in <em>Appendix A:</em> <a href="#bootNodeRequest">BootNodeRequest</a>.</p>
 			</td>
 		</tr>
 	</table>
@@ -2282,7 +2284,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
 
 	<h1>Initiating transactions</h1>
@@ -2341,7 +2343,7 @@
 				<p class=JSON>requestPrepareAnnounce</p>
 			</td>
 			<td>
-				<p class=NemNoSpacing>A RequestPrepareAnnounce JSON object as described in <b>Appendix A: </b><a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a>.</p>
+				<p class=NemNoSpacing>A RequestPrepareAnnounce JSON object as described in <em>Appendix A:</em> <a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a>.</p>
 			</td>
 		</tr>
 	</table>
@@ -2364,7 +2366,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p>There are various errors that can occur due
-	to failure of transaction validation See <b>Appendix A: </b><a href="#error-object">Error object</a><b> </b>for more information of the error
+	to failure of transaction validation See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
 	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
 		Errors</a> for the error message.</p>
 
@@ -2403,7 +2405,7 @@
 	<h4>Description:</h4>
 
 	<p class=NemNoSpacing>Gets an array of time synchronization
-	results as described in <b>Appendix A: </b><a href="#timeSynchronizationResult">TimeSynchronizationResult</a>. You can monitor the change in network time with this information.</p>
+	results as described in <em>Appendix A:</em> <a href="#timeSynchronizationResult">TimeSynchronizationResult</a>. You can monitor the change in network time with this information.</p>
 
 	<h4>No parameter:</h4>
 
@@ -2456,7 +2458,7 @@
 	<h4>Description:</h4>
 
 	<p class=NemNoSpacing>Gets an audit collection of incoming
-	calls as described in <b>Appendix A: </b><a href="#auditCollection">AuditCollection</a>. You can monitor the
+	calls as described in <em>Appendix A:</em> <a href="#auditCollection">AuditCollection</a>. You can monitor the
 	outstanding and recent incoming requests with this information.</p>
 
 	<h4>No parameter:</h4>
@@ -2514,7 +2516,7 @@
 	<h4>Description:</h4>
 
 	<p class=NemNoSpacing>Gets an audit collection of outgoing
-	calls as described in <b>Appendix A: </b><a href="#auditCollection">AuditCollection</a>. You can monitor the
+	calls as described in <em>Appendix A:</em> <a href="#auditCollection">AuditCollection</a>. You can monitor the
 	outstanding and recent outgoing requests with this information.</p>
 
 	<h4>No parameter:</h4>
@@ -2574,7 +2576,7 @@
 	<h4>Description:</h4>
 
 	<p class=NemNoSpacing>Gets an array of task monitor structures
-	as described in <b>Appendix A: </b><a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a>. You can monitor
+	as described in <em>Appendix A:</em> <a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a>. You can monitor
 	the statistics for periodic tasks with this information.</p>
 
 	<h4>No parameter:</h4>
@@ -3099,7 +3101,7 @@
 				<p class=JSON>transactions</p>
 			</td>
 			<td>
-				<p>The array of transaction structures. See Appendix A: Transaction
+				<p>The array of transaction structures. See <em>Appendix A:</em> Transaction
 				for more details             about this structure.</p>
 			</td>
 		</tr>
@@ -4266,7 +4268,7 @@
 			</td>
 			<td>
 				<p>Denotes the beginning of the transaction data part. The
-				transaction data is described in Appendix A: <a href="#transaction">Transaction</a>. The field 'signature is
+				transaction data is described in <em>Appendix A:</em> <a href="#transaction">Transaction</a>. The field 'signature is
 				missing since the transaction is not signed at this point.</p>
 			</td>
 		</tr>
@@ -4614,7 +4616,7 @@
 
 	<p>In case NIS encounters an error while
 	processing a request it returns a JSON error object whose structure is
-	described in <b>Appendix A: </b><a href="#error-object">Error object</a>. This chapter describes the
+	described in <em>Appendix A:</em> <a href="#error-object">Error object</a>. This chapter describes the
 	errors messages that can be returned from NIS.</p>
 
 	<h2>Error messages</h2>

@@ -186,6 +186,14 @@ a:link, span.NemHyperlink
 a:visited, span.NemHyperlinkFollowed
 	{color:#954F72;
 	text-decoration:underline;}
+
+a[href^="http://en.wikipedia"]:after {
+    content: "\1d42";
+    padding:0 3px 0 3px;
+    display:inline-block;
+    text-decoration: none;
+}
+
 strong
 	{font-family:Roboto,"serif";
 	font-weight:bold;}
@@ -212,6 +220,8 @@ p.JSON, span.JSON
 table.NemApiGrid, table.NemTableGrid {
 	border: 1px solid #111;
 	border-collapse: collapse;
+	margin-bottom: 8pt;
+    margin-top: 5pt;
 }
 
 table.NemTableGrid {
