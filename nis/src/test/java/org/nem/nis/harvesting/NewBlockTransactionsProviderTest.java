@@ -228,6 +228,8 @@ public class NewBlockTransactionsProviderTest {
 
 	//endregion
 
+	//endregion
+
 	//region real validators
 
 	//region transfers
@@ -307,6 +309,71 @@ public class NewBlockTransactionsProviderTest {
 
 	//endregion
 
+	//region importance transfer
+
+	@Test
+	public void conflictingImportanceTransfersCannotBeInSingleBlock() {
+		// Arrange:
+		final TestContext context = new TestContext();
+		final Account sender = context.addAccount(Amount.fromNem(50000));
+		final Account remote = context.addAccount(Amount.ZERO);
+
+		final Transaction t1 = createActivateImportanceTransfer(sender, remote);
+		final Transaction t2 = createActivateImportanceTransfer(sender, remote);
+		context.addTransactions(Arrays.asList(t1, t2));
+
+		// Act:
+		final List<Transaction> blockTransactions = context.getBlockTransaction();
+
+		// Assert:
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+		Assert.assertThat(blockTransactions, IsEqual.equalTo(Arrays.asList(t1)));
+	}
+
+	private static Transaction createActivateImportanceTransfer(final Account sender, final Account remote) {
+		return new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
+	}
+
+	//endregion
+
+	//region multisig modification
+
+	@Test
+	public void multipleMultisigModificationsForSameAccountCannotBeInSingleBlock() {
+		// Arrange:
+		final MultisigTestContext context = new MultisigTestContext();
+		final Account multisig = context.addAccount(Amount.fromNem(2000));
+		final Account cosigner1 = context.addAccount(Amount.ZERO);
+		final Account cosigner2 = context.addAccount(Amount.ZERO);
+		final Account cosigner3 = context.addAccount(Amount.ZERO);
+		context.makeCosignatory(cosigner1, multisig);
+
+		final Transaction t1 = createModification(cosigner1, multisig, cosigner2);
+		final Transaction t2 = createModification(cosigner1, multisig, cosigner3);
+		context.addTransactions(Arrays.asList(t1, t2));
+
+		// Act:
+		final List<Transaction> blockTransactions = context.getBlockTransaction();
+
+		// Assert:
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+		Assert.assertThat(blockTransactions, IsEqual.equalTo(Arrays.asList(t1)));
+	}
+
+	private static Transaction createModification(
+			final Account cosigner,
+			final Account multisig,
+			final Account newCosigner) {
+		final Transaction transaction = new MultisigAggregateModificationTransaction(
+				TimeInstant.ZERO,
+				multisig,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, newCosigner)));
+		transaction.setDeadline(TimeInstant.ZERO.addMinutes(1));
+		return createMultisig(cosigner, transaction);
+	}
+
+	//endregion
+
 	//region multisig
 
 	@Test
@@ -379,10 +446,6 @@ public class NewBlockTransactionsProviderTest {
 			this.accountStateCache.findStateByAddress(cosigner.getAddress()).getMultisigLinks().addCosignatoryOf(multisig.getAddress());
 			this.accountStateCache.findStateByAddress(multisig.getAddress()).getMultisigLinks().addCosignatory(cosigner.getAddress());
 		}
-
-		public List<Transaction> getBlockTransaction() {
-			return this.provider.getBlockTransactions(Utils.generateRandomAddress(), TimeInstant.ZERO);
-		}
 	}
 
 	//endregion
@@ -390,6 +453,8 @@ public class NewBlockTransactionsProviderTest {
 	//endregion
 
 	//endregion
+
+	//region test utils
 
 	private static List<TimeInstant> getTimeInstantsAsList(final Collection<Transaction> transactions) {
 		return transactions.stream()
@@ -445,6 +510,10 @@ public class NewBlockTransactionsProviderTest {
 					this.unconfirmedTransactions);
 		}
 
+		public List<Transaction> getBlockTransaction() {
+			return this.provider.getBlockTransactions(Utils.generateRandomAddress(), TimeInstant.ZERO);
+		}
+
 		//region addAccount
 
 		public Account addAccount(final Amount amount) {
@@ -491,4 +560,6 @@ public class NewBlockTransactionsProviderTest {
 
 		//endregion
 	}
+
+	//endregion
 }

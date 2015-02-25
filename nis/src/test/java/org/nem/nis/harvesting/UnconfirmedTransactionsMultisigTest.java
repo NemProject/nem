@@ -191,7 +191,7 @@ public class UnconfirmedTransactionsMultisigTest {
 	}
 
 	@Test
-	public void filterRemovesMultisigModificationTransactionThatHasMultipleMultisigAggregateModificationTransactions() {
+	public void addAllowsConflictingAggregateMultisigModificationTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
 		context.makeCosignatory(context.cosigner1, context.multisig);
@@ -212,9 +212,9 @@ public class UnconfirmedTransactionsMultisigTest {
 
 		// Assert:
 		Assert.assertThat(result1, IsEqual.equalTo(ValidationResult.SUCCESS));
-		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION));
+		Assert.assertThat(result2, IsEqual.equalTo(ValidationResult.SUCCESS));
 
-		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(1));
+		Assert.assertThat(blockTransactions.size(), IsEqual.equalTo(2));
 	}
 
 	private static class TestContext {

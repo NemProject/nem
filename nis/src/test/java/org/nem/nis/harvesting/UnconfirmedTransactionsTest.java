@@ -322,10 +322,10 @@ public class UnconfirmedTransactionsTest {
 	}
 
 	@Test
-	public void addFailsIfTransactionConflictsWithExistingImportanceTransferTransaction() {
+	public void addAllowsConflictingImportanceTransferTransactions() {
 		// Arrange:
 		final TestContext context = new TestContext();
-		final Account sender = context.addAccount(Amount.fromNem(10));
+		final Account sender = context.addAccount(Amount.fromNem(50000));
 		final Account remote = context.addAccount(Amount.fromNem(100));
 
 		final Transaction t1 = new ImportanceTransferTransaction(TimeInstant.ZERO, sender, ImportanceTransferTransaction.Mode.Activate, remote);
@@ -336,8 +336,8 @@ public class UnconfirmedTransactionsTest {
 		final ValidationResult result = context.signAndAddExisting(t2);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
-		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(1));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+		Assert.assertThat(context.transactions.size(), IsEqual.equalTo(2));
 	}
 
 	@Test
