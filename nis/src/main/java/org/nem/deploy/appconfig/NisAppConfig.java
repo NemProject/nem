@@ -201,6 +201,8 @@ public class NisAppConfig {
 		final NewBlockTransactionsProvider transactionsProvider = new NewBlockTransactionsProvider(
 				this.nisCache(),
 				this.transactionValidatorFactory(),
+				this.blockValidatorFactory(),
+				this.blockTransactionObserverFactory(),
 				this.unconfirmedTransactions());
 
 		final BlockGenerator generator = new BlockGenerator(
