@@ -12,8 +12,6 @@ import java.util.*;
 public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	private static final int DEFAULT_END_HEIGHT = 20000; // This end height is set assuming that we only process block files blk00148.dat to blk00152.dat (inclusive)
 	private static final String BLOCKCHAIN_TYPE = "Btc";
-	private static final double SUPPLY_NORMALIZATION_FACTOR =
-			8999999999.0 / 1300000000.0; // Convert from Satoshis (10^8 precision); current BTC supply is about 13 mil
 	private static final double MKT_CAP_NORMALIZATION_FACTOR = 3235636400.0 / 4000000.0; // BTC mkt cap / NEM mkt cap (in USD)
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
@@ -26,9 +24,6 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	public BtcGraphClusteringITCase() {
 		super(DEFAULT_END_HEIGHT, BLOCKCHAIN_TYPE, new BtcDatabaseRepository());
 	}
-
-	//TODO: Add some tests here to verify that BtcTransactions are read in and created correctly?
-	// TODO 20150223 J-M: i guess we can close this TODO?
 
 	/**
 	 * Creates account states from transaction data, which are then used for running various importance score calculation tests.
@@ -88,11 +83,6 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 		}
 
 		return accountStateMapCache.get(transactions.hashCode());
-	}
-
-	// TODO 20150223 J-M: i noticed you're not calling this; is that intentional?
-	private long normalizeBtcToNemSupply(final long amt) {
-		return (long)(amt * SUPPLY_NORMALIZATION_FACTOR);
 	}
 
 	private long normalizeBtcToNemMktCap(final long amt) {
