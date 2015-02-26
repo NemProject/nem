@@ -2376,7 +2376,7 @@
 		A </b><a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a> for more details.</p>
 
     <div class="warning">
-        WARNING: The <span class="JSON">/transaction/prepare-announce</span> API
+        The <span class="JSON">/transaction/prepare-announce</span> API
         should be <br> used only on <strong>TRUSTED</strong> and <strong>LOCAL</strong> nodes!
     </div>
 
@@ -2505,19 +2505,19 @@
     <p>into a multisig account with 3 cosignatories:</p>
 
     <ol>
-        <li> Cosignatory 'BOB':
+        <li> Cosignatory <b>'BOB'</b>:
             <ul>
                 <li>address: <span class="JSON">TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562</span></li>
                 <li>public key: <span class="JSON">6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958</span></li>
             </ul>
         </li>
-        <li>Cosignatory 'jusan':
+        <li>Cosignatory <b>'jusan'</b>:
             <ul>
                 <li>address: <span class="JSON">TBJUSANZ63AKNJ57XMK6Y2IBH55UNNRXJFZRDTRW</span></li>
                 <li>public key: <span class="JSON">0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70</span></li>
             </ul>
         </li>
-        <li>Cosignatory 'go':
+        <li>Cosignatory <b>'go'</b>:
             <ul>
                 <li>address: <span class="JSON">TDGOGOGOWZJ3HU4F6CUM5IKE7GHG4FFTF5BZ7JPW</span></li>
                 <li>public key: <span class="JSON">cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099</span></li>
@@ -2626,9 +2626,11 @@
 
     <p>At this point the transaction cannot (and will not) be included in a block
         because the other cosignatories - <em>Jusan</em> and <em>Go</em> - have
-        not signed the transaction yet.</p>
+        not signed the transaction yet &hellip;</p>
 
-    <p>To do so, <em>Jusan</em> and <em>Go</em> must initiate a multisig signature transaction
+    <h3>Cosigning multisig transaction</h3>
+
+    <p>&hellip; to do so, <em>Jusan</em> and <em>Go</em> must initiate a multisig signature transaction
         (see <em>Appendix A:</em> <a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a>).
         <em>Jusan</em> has to create a RequestPrepareAnnounce JSON object that looks similar to this:</p>
 
@@ -2653,7 +2655,7 @@
     }</code></pre>
 
     <p>Note that <em>Jusan</em> used the hash ('otherHash') returned by NIS
-        from Bob's request.</p>
+        from <em>Bob's</em> request.</p>
 
     <p>After NIS has signed the transaction and sent it to the network,
         the signature transaction will be attached to the multisig transaction.<br>
@@ -2662,67 +2664,134 @@
         multisig transaction can be included in a block.
     </p>
 
-    <h4>Description:</h4>
+    <h2>Adding and removing cosignatories</h2>
 
-    <p class=NemNoSpacing>Creates and broadcasts a transaction.
-        Since this request involves the private key of an account, it should only be
-        sent to a <b>local</b> NIS.</p>
+    <p>It is possible to modify the list of cosignatories for a multisig account. This is
+        done via a aggregate modification transaction wrapped in a multisig transaction.</p>
 
-    <h4>Parameter:</h4>
+    <p>Suppose you want to add the cosignatory <em>Hachi</em> to the multisig
+        account <em>Alice.</em></p>
 
-    <table class=NemTableGrid>
-        <tr>
-            <td>
-                <p class=JSON>requestPrepareAnnounce</p>
-            </td>
-            <td>
-                <p class=NemNoSpacing>A RequestPrepareAnnounce JSON object as described in <em>Appendix A:</em> <a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a>.</p>
-            </td>
-        </tr>
-    </table>
+    <ol start="4">
+        <li> Cosignatory <b>'hachi'</b>:
+            <ul>
+                <li>address: <span class="JSON">TDHACHIMHRBBRHR57SR3BDBFFWDTYVSLGMFKIDOR</span></li>
+                <li>public key: <span class="JSON">6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb</span></li>
+            </ul>
+        </li>
+    </ol>
 
-    <h4>Example:</h4>
-
-    <p class=NemNoSpacing>Request cannot be performed in a
-        browser.</p>
-
-    <h4>Example of returned JSON <a href="#nemRequestResult">NemRequestResult</a> object:</h4>
-
-	<pre><samp class=JSON>
+    <p>To do that, one of the existing cosignatories (assuming here it is <em>Jusan</em>)
+        must initiate the corresponding multisig transaction:</p>
+    
+    <pre><code class="JSON">{
+        "transaction":
         {
-        "type": 1,
-        "code": 1,
-        "message": "SUCCESS",
-        "innerTransactionHash": {
-        "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
+            "timeStamp": 9111526,
+            "fee": 6000000,
+            "type": 4100,
+            "deadline": 9154726,
+            "version": 1,
+            "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
+            "otherTrans": {
+                "timeStamp": 9111526,
+                "fee": 16000000,
+                "type": 4097,
+                "deadline": 9154726,
+                "version": 1,
+                "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+                "modifications": [
+                    {
+                    "modificationType": 1,
+                    <b>"cosignatoryAccount": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb"</b>
+                    }
+                ]
+            },
+            "signatures":[
+            ]
+        },
+        "privateKey":
+        {
+            "value": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1",
         }
-        }
-    </samp></pre>
+    }</code> </pre>
 
-    <h4>Possible Errors:</h4>
+    <p>After NIS has signed and broadcasted the transaction to the network, the other
+        two cosignatories need to sign the transaction as well as explained in
+        <a href="#initiating-a-multisig-transaction">Initiating a multisig transaction</a>.</p>
 
-    <p>There are various errors that can occur due
-        to failure of transaction validation See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-        object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-            Errors</a> for the error message.</p>
+    <p>If at some later time <em>Bob, Jusan and Go</em> want to remove the
+        cosignatory <em>Hachi</em> again one of cosignatories could initiate similar
+        transaction as above but this time with <span class="JSON">"modificationType"</span>
+        set to <b>2</b> (which means remove).<br>
+        Once approved by the network <em>Hachi</em> is no longer cosignatory of the multisig account <em>Alice.</em></p>
 
-    <p>The most common errors are:</p>
+    <div class="warning">
+        Removal of accounts is <strong>NOT</strong> final and might be subject of change
+    </div>
 
-    <ul>
-        <li>The sender account has not enough funds.</li>
-        <li>The timestamp is invalid because it lies too far in the future.</li>
-        <li>The deadline is invalid because it has already been passed.</li>
-        <li>The attached message is too large.</li>
-        <li>The transaction is already known.</li>
-        <li>There is another transaction conflicting with this transaction. This can happen when trying to transfer the importance to another account.</li>
-    </ul>
+    <h2>How to use a multisig account</h2>
+
+    <p>The purpose of multisig accounts is to make accounts safer. But this relies
+        on the user not making mistakes when using multisig accounts.<br>
+        If for instance all private keys of the cosignatories of a multisig account
+        reside on a single computer then the multisig account is essentially as good
+        as a normal account because if that computer gets compromised all private
+        keys are disclosed to the attacks at once.</p>
+
+    <p>It is therefore essential to have the private key of the cosignatories on
+        different computer preferably in different locations.</p>
+
+    <p>If you have read
+        "<a href="#initiating-a-multisig-transaction">Initiating a multisig transaction</a>"
+        you know that the cosignatories of a multisig transaction must know the hash
+        of the inner transaction in order to be able to sign the multisig transaction.
+        There are two ways of gaining knowledge of that hash:</p>
+
+    <ol>
+        <li>The initiator of the multisig transaction writes down the hash (which is
+            included in the returned JSON object by NIS) and sends the hash to the cosignatories.</li>
+        <li>The cosignatories poll the unconfirmed transactions using their local NIS.
+            As described in chapter
+            <a href="#unconfirmed-transactions">Unconfirmed transactions</a>,
+            the meta data part of an unconfirmed transaction JSON object contains
+            the hash of the inner transaction in case of a multisig transaction.</li>
+    </ol>
+
+    <p>In first case the implementer of the client side software is responsible for
+        transferring the hash to the cosignatories while in second case the NEM network
+        will do it for you.</p>
+
+    <p>The standard client NCC uses the second method. It lets you handle multisig accounts in a convenient way.</p>
+
+    <p>
+        Currently, we recommend to use at least three cosignatories in different locations when
+        using the multisig account feature. If one of the cosignatory's private key gets
+        compromised you should immediately remove that account from the list of
+        cosignatories and afterwards add a new cosignatory
+        (see chapter <a href="#adding-and-removing-cosignatories">Adding and removing cosignatories</a>
+        on how to do this).</p>
+
+    <p><b>If a private key is stored on a computer that computer should not be used
+        for surfing the internet or doing other unsafe things.</b></p>
+
+    <h2>Transaction fees</h2>
+
+    <p>In order for the harvesters to have an incentive to run a node that is harvesting blocks,
+        users have to pay a fee for every transaction that is going to be included in a block chain.</p>
+
+    <p>Different transaction types have different fees. In order to get a transaction
+        validated by a NIS, the fee provided must be at least the minimum fee.</p>
+
+    <p>The following chart summarizes the minimum fees for each transaction type.
+        All calculation are done with rounded amounts of NEM (i.e. micro nem are ignored):</p>
 
     <h1>Requests for additional information from NIS</h1>
 
-	<p>Several requests supply additional
-	information about the internal status of NIS. Those requests may get dropped in
-	future versions of NIS without further notice, you should not rely on their
-	existence.</p>
+    <p>Several requests supply additional information about the internal status of NIS.</p>
+
+    <div class="warning">Those requests may get dropped in future versions of NIS
+        without further notice, you should not rely on their existence.</div>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Monitoring the network time</h2>
