@@ -210,7 +210,7 @@ p.NemTocHeading
 	font-family:"Roboto Light","sans-serif";
 	color:#2E74B5;}
 
-p.JSON, samp.JSON
+p.JSON, span.JSON, samp.JSON, code.JSON
 	{
 	margin:0cm;
 	margin-bottom:.0001pt;
@@ -225,7 +225,7 @@ pre {
     word-wrap: break-word;
 
     background-color: #eee;
-    white-space: pre-line;
+    white-space: pre-wrap;
     width: 90%;
 }
 
@@ -263,3 +263,13 @@ table.NemTableGrid td:first-child {
 .post { background:#ECD9C3 }
 .path { font-weight: bold; }
 
+div.warning {
+    background-color: #ffe0e0;
+    font-size: 13pt;
+    width: 70%;
+    margin: 30pt auto 30pt auto;
+    padding: 5px;
+    text-align: center;
+    border: 1px solid #444;
+
+}

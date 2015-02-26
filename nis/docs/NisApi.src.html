@@ -19,7 +19,14 @@
 	<p style='page-break-before:always'></p>
 
 	<p class=NemTocHeading>Contents</p>
-	<div id="toc">FILLED AUTOMATICALLY</div>
+	<div id="toc">FILLED AUTOMATICALLY
+
+        NOTES:
+
+        use samp+pre for OUTPUTS (nis answers)
+        use code+pre for INPUTS (requests
+
+    </div>
 
 	<hr>
 
@@ -77,9 +84,9 @@
 
 	<pre><samp class=JSON>
 	{
-	       "code": 1,
-	       "type": 2,
-	       "message": "ok"
+	       "code": 1,
+	       "type": 2,
+	       "message": "ok"
 	}
 	</samp></pre>
 
@@ -115,9 +122,9 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "code": 6, 
-	       "type": 4, 
-	       "message": "status" 
+	       "code": 6, 
+	       "type": 4, 
+	       "message": "status" 
 	} 
 	</samp></pre>
 
@@ -414,8 +421,7 @@
 	<p>Please refer to <a href="#appendix-A:-description-of-the-JSON-structures">Appendix A</a> for detailed information on the various transactions types and
 	their additional fields.</p>
 
-	<p>Transaction meta data contains only
-	following field:</p>
+	<p>Transaction meta data contains only following field:</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -747,55 +753,55 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	       { 
-	              "meta": 
-	              { 
-	                     "id": 71245, 
-	                     "height": 40706 
-	              }, 
-	              "transaction": 
-	              { 
-	                     "timeStamp": 9106400, 
-	                     "amount": 1000000000, 
-	                     "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105", 
-	                     "fee": 3000000, 
-	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	                     "type": 257, 
-	                     "deadline": 9149600, 
-	                     "message": 
-	                     { 
-	                           "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4", 
-	                           "type": 2 
-	                     }, 
-	                     "version": 1, 
-	                     "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6" 
-	              } 
-	       }, 
-	       { 
-	              "meta": 
-	              { 
-	                     "id": 71356, 
-	                     "height": 40629 
-	              }, 
-	              "transaction": 
-	              { 
-	                     "timeStamp": 9101541, 
-	                     "amount": 49997995000000, 
-	                     "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b", 
-	                     "fee": 2005000000, 
-	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	                     "type": 257, 
-	                     "deadline": 9144741, 
-	                     "message": 
-	                     { 
-	                           "payload": "526f6262657279212121", 
-	                           "type": 1 
-	                     }, 
-	                     "version": 1, 
-	                     "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24" 
-	              } 
-	       }] 
+	       "data": [ 
+	       { 
+	              "meta": 
+	              { 
+	                     "id": 71245, 
+	                     "height": 40706 
+	              }, 
+	              "transaction": 
+	              { 
+	                     "timeStamp": 9106400, 
+	                     "amount": 1000000000, 
+	                     "signature": "449cd76ea8bda2220b3d6ad6f8db5f81d4e68ad3d4b0c3db9a3c267355657639eabed3dbcef8e0cc22953ae2b36a22ee7dc6327484c9649cccd686a511eca105", 
+	                     "fee": 3000000, 
+	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	                     "type": 257, 
+	                     "deadline": 9149600, 
+	                     "message": 
+	                     { 
+	                           "payload": "280000005444334b32493543524850595634425a5a5a4c335850454e4", 
+	                           "type": 2 
+	                     }, 
+	                     "version": 1, 
+	                     "signer": "c20a1dffe699c7a68328986273265e33fceebe074f274240ef890dd80ad55ed6" 
+	              } 
+	       }, 
+	       { 
+	              "meta": 
+	              { 
+	                     "id": 71356, 
+	                     "height": 40629 
+	              }, 
+	              "transaction": 
+	              { 
+	                     "timeStamp": 9101541, 
+	                     "amount": 49997995000000, 
+	                     "signature": "57c3c48d2ae8b24240b57d72493f498cfeb61e2ab87237dc0e08c51007d5c7f15847d0e08c0286e68a72028925db5fa809ca9d57e2cb6eebe11822176a834c0b", 
+	                     "fee": 2005000000, 
+	                     "recipient": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	                     "type": 257, 
+	                     "deadline": 9144741, 
+	                     "message": 
+	                     { 
+	                           "payload": "526f6262657279212121", 
+	                           "type": 1 
+	                     }, 
+	                     "version": 1, 
+	                     "signer": "546e4fb9c81db84e04d8e9e67380db0fe1f540df09a527fb995b589b5695ae24" 
+	              } 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -866,31 +872,31 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	       { 
-	              "meta": 
-	              { 
-	                     "id": 70498, 
-	                     "height": 40803 
-	              }, 
-	              "transaction": 
-	              { 
-	                     "timeStamp": 9111526, 
-	                     "amount": 1000000000, 
-	                     "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
-	                     "fee": 3000000, 
-	                     "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	                     "type": 257, 
-	                     "deadline": 9154726, 
-	                     "message": 
-	                     { 
-	                           "payload": "74657374207472616e73616374696f6e", 
-	                           "type": 1 
-	                     }, 
-	                     "version": 1, 
-	                     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              } 
-	       }] 
+	       "data": [ 
+	       { 
+	              "meta": 
+	              { 
+	                     "id": 70498, 
+	                     "height": 40803 
+	              }, 
+	              "transaction": 
+	              { 
+	                     "timeStamp": 9111526, 
+	                     "amount": 1000000000, 
+	                     "signature": "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
+	                     "fee": 3000000, 
+	                     "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+	                     "type": 257, 
+	                     "deadline": 9154726, 
+	                     "message": 
+	                     { 
+	                           "payload": "74657374207472616e73616374696f6e", 
+	                           "type": 1 
+	                     }, 
+	                     "version": 1, 
+	                     "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              } 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -1008,25 +1014,25 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "meta": { 
+	       "meta": { 
 			"data": "d7c9e33421e43bf4a5d6e21304c8096c599142755d581bd6e9037f41545a5873" 
-	       }, 
-	       "data": [ 
-	       { 
-	              "timeStamp": 9131839, 
-	              "amount": 1000000000, 
-	              "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904", 
-	              "fee": 2000000, 
-	              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	              "type": 257, 
-	              "deadline": 9175039, 
-	              "message": { 
-	                     "payload": "", 
-	                     "type": 1 
-	              }, 
-	              "version": 1, 
-	              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	       }] 
+	       }, 
+	       "data": [ 
+	       { 
+	              "timeStamp": 9131839, 
+	              "amount": 1000000000, 
+	              "signature": "0acface77696a54340a7da8592750ea0410f62717d07e4df30e09718092521262465df5c4d98d32cd9d6e8699d66e016ec8db716d20090ad99cc16f7a6d13904", 
+	              "fee": 2000000, 
+	              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+	              "type": 257, 
+	              "deadline": 9175039, 
+	              "message": { 
+	                     "payload": "", 
+	                     "type": 1 
+	              }, 
+	              "version": 1, 
+	              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -1152,15 +1158,15 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	       { 
-	              "timeStamp": 8879051, 
-	              "blockHash": { 
-	                     "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3" 
-	              }, 
-	              "totalFee": 102585065, 
-	              "height": 37015 
-	       }] 
+	       "data": [ 
+	       { 
+	              "timeStamp": 8879051, 
+	              "blockHash": { 
+	                     "data": "be3bb308ce33625f0dab64fd31b9ebe1c50dd4b94b43b03c228f481ab82458c3" 
+	              }, 
+	              "totalFee": 102585065, 
+	              "height": 37015 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -1197,22 +1203,22 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	       { 
-	              "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T", 
-	              "importance": { 
-	                     "isSet": 0 
-	              } 
-	       }, 
-	       { 
-	              "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG", 
-	              "importance": { 
-	                     "score": 0.001222376902598832, 
-	                     "ev": 0.004252356221747241, 
-	                     "isSet": 1, 
-	                     "height": 40926 
-	              } 
-	       }] 
+	       "data": [ 
+	       { 
+	              "address": "TCYGT6GHZPNASMAXV7YCFCU5R5XTJKNNT66R4A4T", 
+	              "importance": { 
+	                     "isSet": 0 
+	              } 
+	       }, 
+	       { 
+	              "address": "TD2JJJVPKDZFXWK3N3ZJLN7A5TGNOTM3J5EVSTIG", 
+	              "importance": { 
+	                     "score": 0.001222376902598832, 
+	                     "ev": 0.004252356221747241, 
+	                     "isSet": 1, 
+	                     "height": 40926 
+	              } 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -1375,9 +1381,9 @@
 			</td>
 			<td>
 				<p>The block type. There are currently two block types used:</p>
-				<p>-1:        Nemesis block type. This block type appears only once
+				<p>-1:        Nemesis block type. This block type appears only once
 				in the chain.</p>
-				<p>1:         Regular block type. All blocks with height &gt; 1 have
+				<p>1:         Regular block type. All blocks with height &gt; 1 have
 				this type.</p>
 			</td>
 		</tr>
@@ -1454,7 +1460,7 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "height": 42799 
+	       "height": 42799 
 	} 
 	</samp></pre>
 
@@ -1491,7 +1497,7 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "score": "18722d5a7d590deb" 
+	       "score": "18722d5a7d590deb" 
 	} 
 	</samp></pre>
 
@@ -1528,17 +1534,17 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "timeStamp": 9232968, 
-	       "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05", 
-	       "prevBlockHash": { 
-	              "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	       ], 
-	       "version": 1, 
-	       "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7", 
-	       "height": 42804 
+	       "timeStamp": 9232968, 
+	       "signature": "0a1351ef3e9b19c601e804a6d329c9ade662051d1da2c12c3aec9934353e421c79de7d8e59b127a8ca9b9d764e3ca67daefcf1952f71bc36f747c8a738036b05", 
+	       "prevBlockHash": { 
+	              "data": "58efa578aea719b644e8d7c731852bb26d8505257e03a897c8102e8c894a99d6" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	       ], 
+	       "version": 1, 
+	       "signer": "2afca04d2cb8d16cf3656274bc55b95e60be823cfb7230d82f791ed42a309ee7", 
+	       "height": 42804 
 	} 
 	</samp></pre>
 
@@ -1549,7 +1555,7 @@
 	<h2>Requesting parts of the block chain</h2>
 
 	<p>NIS can supply either individual blocks
-	identified by block height or block hash or can supply up to 400 blocks
+	identified by block height or block hash or can supply up to 10 blocks
 	beginning at a certain height.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
@@ -1593,17 +1599,17 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "timeStamp": 9232942, 
-	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
-	       "prevBlockHash": { 
-	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	       ], 
-	       "version": 1, 
-	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
-	       "height": 42803 
+	       "timeStamp": 9232942, 
+	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
+	       "prevBlockHash": { 
+	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	       ], 
+	       "version": 1, 
+	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
+	       "height": 42803 
 	} 
 	</samp></pre>
 
@@ -1628,8 +1634,7 @@
 
 	<h4>Description:</h4>
 
-	<p class=NemNoSpacing>Gets a block from the chain that has the
-	given height.</p>
+	<p class=NemNoSpacing>Gets a block from the chain that has the given height.</p>
 
 	<h4>Parameter:</h4>
 
@@ -1647,32 +1652,30 @@
 
 	<h4>Example:</h4>
 
-	<p class=NemNoSpacing>Request cannot be performed in a
-	browser.</p>
+	<p class=NemNoSpacing>Request cannot be performed in a browser.</p>
 
 	<h4>Example of returned JSON object:</h4>
 
 	<pre><samp class=JSON>
 	{ 
-	       "timeStamp": 9232942, 
-	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
-	       "prevBlockHash": { 
-	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	       ], 
-	       "version": 1, 
-	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
-	       "height": 42803 
+	       "timeStamp": 9232942, 
+	       "signature": "005f91b8908fc173a428ff8e8c4a0ee0d69e4004aed0d08f27690b6b6672ef74ccc6b89695bed5f29b0f4a812cb84bfa459f52a4e14a11e574793969f0e1a30f", 
+	       "prevBlockHash": { 
+	              "data": "f721e563b4431594c5af6f6be0a913f47f0aca6c3b8ee6a703bfe175ee54babf" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	       ], 
+	       "version": 1, 
+	       "signer": "78e121cc1cf63424651ec64251e78efda81386c9f5e9eb4cb08b2a2192c9dce5", 
+	       "height": 42803 
 	} 
 	</samp></pre>
 
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the block with the specified height
-	cannot be found in the database, NIS will return a JSON error object. See <b>Appendix
-		A: </b><a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> the error message.</p>
+	cannot be found in the database, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Getting part of a chain</h3>
@@ -1690,9 +1693,9 @@
 
 	<h4>Description:</h4>
 
-	<p class=NemNoSpacing>Gets up to 400 blocks after given block
-	height from the chain. If the database contains less than 400 block after the
-	given height, then less blocks are returned. The returned data is an array of <a href="#explorerBlockViewModel">ExplorerBlockViewModel</a> JSON objects.</p>
+	<p class=NemNoSpacing>Gets up to 10 blocks after given block height from the chain.
+        If the database contains less than 10 block after the given height, then less blocks are returned.
+        The returned data is an array of <a href="#explorerBlockViewModel">ExplorerBlockViewModel</a> JSON objects.</p>
 
 	<h4>Parameter:</h4>
 
@@ -1710,36 +1713,35 @@
 
 	<h4>Example:</h4>
 
-	<p class=NemNoSpacing>Request cannot be performed in a
-	browser.</p>
+	<p class=NemNoSpacing>Request cannot be performed in a browser.</p>
 
 	<h4>Example of returned JSON object:</h4>
 
 	<pre><samp class=JSON>
 	{ 
-	       "data":[ 
-	       { 
-	              "harvester":"TCRIGEL6TUKDGDVBXIVY3HQNADAV6JZMGKNPL23Y", 
-	              "timeStamp":1416395006000, 
-	              "harvesterPk":"f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56", 
-	              "txes":[ 
-	              { 
-	                     "timeStamp":1416394995000, 
-	                     "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
-	                     "amount":1000000000000, 
-	                     "msgType":1, 
-	                     "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	                     "signature":"d27a29b294d51e10ca4d11174718269838b71eeb170649655c42ebba12464fdbdd757610858675ab5fa642c856bab1067c9c473df5e697053298a8173a6f8001", 
-	                     "fee":44000000, 
-	                     "recipient":"TAKKKC5SHLKVJNCAMRKLI3564NMQELMW5H4HFOJC", 
-	                     "type":257, 
-	                     "message": 
-	                     "48656c6c6f20746f20536f757468204b6f726561", 
-	                     "hash":"2fde712c00a6751ee560b49a0271a881ef5e8c3a3d2226b326f7d53f84798c25" 
-	              }], 
-	              "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49", 
-	              "height":43666 
-	       }] 
+	       "data":[ 
+	       { 
+	              "harvester":"TCRIGEL6TUKDGDVBXIVY3HQNADAV6JZMGKNPL23Y", 
+	              "timeStamp":1416395006000, 
+	              "harvesterPk":"f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56", 
+	              "txes":[ 
+	              { 
+	                     "timeStamp":1416394995000, 
+	                     "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
+	                     "amount":1000000000000, 
+	                     "msgType":1, 
+	                     "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	                     "signature":"d27a29b294d51e10ca4d11174718269838b71eeb170649655c42ebba12464fdbdd757610858675ab5fa642c856bab1067c9c473df5e697053298a8173a6f8001", 
+	                     "fee":44000000, 
+	                     "recipient":"TAKKKC5SHLKVJNCAMRKLI3564NMQELMW5H4HFOJC", 
+	                     "type":257, 
+	                     "message": 
+	                     "48656c6c6f20746f20536f757468204b6f726561", 
+	                     "hash":"2fde712c00a6751ee560b49a0271a881ef5e8c3a3d2226b326f7d53f84798c25" 
+	              }], 
+	              "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49", 
+	              "height":43666 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -1926,23 +1928,23 @@
 
 	<pre><samp class=JSON>
 	{
-	       "metaData": 
-	       { 
-	              "application": "NIS", 
-	              "version": "0.4.33-BETA", 
-	              "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	       }, 
-	       "endpoint": 
-	       { 
-	              "protocol": "http", 
-	              "port": 7890, 
-	              "host": "81.224.224.156" 
-	       }, 
-	       "identity": 
-	       { 
-	              "name": "Alice", 
-	              "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	       } 
+	       "metaData": 
+	       { 
+	              "application": "NIS", 
+	              "version": "0.4.33-BETA", 
+	              "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	       }, 
+	       "endpoint": 
+	       { 
+	              "protocol": "http", 
+	              "port": 7890, 
+	              "host": "81.224.224.156" 
+	       }, 
+	       "identity": 
+	       { 
+	              "name": "Alice", 
+	              "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	       } 
 	} 
 	</samp></pre>
 
@@ -1982,33 +1984,33 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "node": { 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              } 
-	       }, 
-	       "nisInfo": 
-	       { 
-	              "currentTime": 9288341, 
-	              "application": "NEM Infrastructure Server", 
-	              "startTime": 9238484, 
-	              "version": "0.4.33-BETA", 
-	              "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US" 
-	       }       
+	       "node": { 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              } 
+	       }, 
+	       "nisInfo": 
+	       { 
+	              "currentTime": 9288341, 
+	              "application": "NEM Infrastructure Server", 
+	              "startTime": 9238484, 
+	              "version": "0.4.33-BETA", 
+	              "signer": "CN=VeriSign Class 3 Code Signing 2010 CA,OU=Terms of use at https://www.verisign.com/rpa (c)10,OU=VeriSign Trust Network,O=VeriSign\\, Inc.,C=US" 
+	       }       
 	} 
 	</samp></pre>
 
@@ -2051,22 +2053,22 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "inactive": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ], 
-	       "active": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ], 
-	       "busy": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ], 
-	       "failure": [ 
-	              &lt;Node&gt;, 
-	              &lt;Node&gt; 
-	       ] 
+	       "inactive": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ], 
+	       "active": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ], 
+	       "busy": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ], 
+	       "failure": [ 
+	              &lt;Node&gt;, 
+	              &lt;Node&gt; 
+	       ] 
 	} 
 	</samp></pre>
 
@@ -2106,25 +2108,25 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              }, 
-	       ] 
+	       "data": [ 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              }, 
+	       ] 
 	} 
 	</samp></pre>
 
@@ -2165,25 +2167,25 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              }, 
-	       ] 
+	       "data": [ 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              }, 
+	       ] 
 	} 
 	</samp></pre>
 
@@ -2223,7 +2225,7 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "height": 43920 
+	       "height": 43920 
 	} 
 	</samp></pre>
 
@@ -2264,33 +2266,33 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	       { 
-	              "node": 
-	              "metaData": 
-	              { 
-	                     "application": "NIS", 
-	                     "version": "0.4.33-BETA", 
-	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
-	              }, 
-	              "endpoint": 
-	              { 
-	                     "protocol": "http", 
-	                     "port": 7890, 
-	                     "host": "81.224.224.156" 
-	              }, 
-	              "identity": 
-	              { 
-	                     "name": "Alice", 
-	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-	              }, 
-	              "syncs": 3, 
-	              "experience": 
-	              { 
-	                     "s": 1, 
-	                     "f": 0 
-	              } 
-	       }] 
+	       "data": [ 
+	       { 
+	              "node": 
+	              "metaData": 
+	              { 
+	                     "application": "NIS", 
+	                     "version": "0.4.33-BETA", 
+	                     "platform": "Oracle Corporation (1.8.0_25) on Windows 8" 
+	              }, 
+	              "endpoint": 
+	              { 
+	                     "protocol": "http", 
+	                     "port": 7890, 
+	                     "host": "81.224.224.156" 
+	              }, 
+	              "identity": 
+	              { 
+	                     "name": "Alice", 
+	                     "public-key": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+	              }, 
+	              "syncs": 3, 
+	              "experience": 
+	              { 
+	                     "s": 1, 
+	                     "f": 0 
+	              } 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -2302,7 +2304,7 @@
 		Errors</a> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
-	<h2>Booting a local node</h2>
+	<h2>Booting the local node</h2>
 
 	<table class=NemApiGrid>
 		<tr>
@@ -2317,7 +2319,7 @@
 
 	<h4>Description:</h4>
 
-	<p class=NemNoSpacing>Boots a local node.</p>
+	<p class=NemNoSpacing>Boots the local node and thus assign an account (the identity) to the local node.</p>
 
 	<h4>Parameter:</h4>
 
@@ -2348,31 +2350,39 @@
 
 	<h1>Initiating transactions</h1>
 
-	<p>Transactions are the way of transferring
-	NEM and/or messages from one account to another. Once a transaction is initiated,
-	it is still unconfirmed and thus not yet accepted by the network. At this point
-	it is not yet clear if it will get included in a block. Never rely on a
-	transaction which has the state 'unconfirmed'. Once it is included in a block,
-	the transaction gets processed and the amount stated in the transaction gets
-	transferred from the sender's account to the recipient's account. Additionally
-	the transaction fee is deducted from the sender's account. The transaction is
-	said to have 0 confirmations at this point. When another block is added to the
-	block chain the transaction has 1 confirmation. The next block added to the
-	chain will give it 2 confirmations and so on.</p>
+	<p>Transactions are the way of transferring NEM and/or messages from one
+        account to another. Once a transaction is initiated, it is still unconfirmed and
+        thus not yet accepted by the network. At this point it is not yet clear if it will
+        get included in a block. Never rely on a transaction which has the state
+        'unconfirmed'. Once it is included in a block, the transaction gets processed and,
+        in case of a transfer transaction, the amount stated in the transaction gets
+        transferred from the sender's account to the recipient's account. Additionally
+        the transaction fee is deducted from the sender's account. The transaction is
+        said to have 0 confirmations at this point. When another block is added to the
+        block chain the transaction has 1 confirmation. The next block added to the
+        chain will give it 2 confirmations and so on.</p>
 
-	<p>Crypto currencies have the ability to roll
-	back part the block chain. This is essential for being able to resolve forks of
-	the block chain. There is however a maximum number of blocks that can be rolled
-	back, this is called the rewrite limit. Hence forks can only be resolved up to
-	a certain depth too. NEM has a rewrite limit of 360 blocks. Once a transaction
-	has more than 360 confirmations, it cannot be reversed. In real life, forks
-	that are deeper than 20 blocks do not happen, unless there was some severe
-	problem with the block chain due to a bug in the code or an attack of some
-	kind.</p>
+    <p>Crypto currencies have the ability to roll back part the block chain. This is
+        essential for being able to resolve forks of the block chain. There is however
+        a maximum number of blocks that can be rolled back, this is called the rewrite
+        limit. Hence forks can only be resolved up to a certain depth too. NEM has
+        a rewrite limit of 360 blocks. Once a transaction has more than 360
+        confirmations, it cannot be reversed. In real life, forks that are deeper than
+        20 blocks do not happen, unless there was some severe problem with the
+        block chain due to a bug in the code or an attack of some kind.</p>
 
 	<p>A client can initiate a transaction by
 	sending a RequestPrepareAnnounce JSON object to its local NIS. See <b>Appendix
 		A </b><a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a> for more details.</p>
+
+    <div class="warning">
+        WARNING: The <span class="JSON">/transaction/prepare-announce</span> API
+        should be <br> used only on <strong>TRUSTED</strong> and <strong>LOCAL</strong> nodes!
+    </div>
+
+    <p>Note: keep in mind, that NCC does <strong>NOT</strong>
+        use this API. And it does all the transaction signing on it's own.
+    </p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Initiating a transaction</h2>
@@ -2386,7 +2396,6 @@
 			<td class='path'>/transaction/prepare-announce</td>
 		</tr>
 	</table>
-
 
 	<h4>Description:</h4>
 
@@ -2415,11 +2424,14 @@
 	<h4>Example of returned JSON <a href="#nemRequestResult">NemRequestResult</a> object:</h4>
 
 	<pre><samp class=JSON>
-	{ 
-	       "type": 1, 
-	       "code": 1, 
-	       "message": "SUCCESS" 
-	}  
+    {
+        "type": 1,
+        "code": 1,
+        "message": "SUCCESS",
+        "innerTransactionHash": {
+            "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
+        }
+    }
 	</samp></pre>
 
 	<h4>Possible Errors:</h4>
@@ -2440,7 +2452,272 @@
 		<li>There is another transaction conflicting with this transaction. This can happen when trying to transfer the importance to another account.</li>
 	</ul>
 
-	<h1>Requests for additional information from NIS</h1>
+    <h2>Initiating a transfer transaction</h2>
+
+    <p>Suppose you want to send 1000 NEM from sender account (referred hereafter as <em><b>'Alice'</b></em>):</p>
+    <p class="JSON">TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS</p>
+    <p>to recipient account: </p>
+    <p class="JSON">TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562</p>
+
+    <p>The RequestPrepareAnnounce JSON object you have to send to NIS via a POST request would look similar to this:</p>
+
+    <pre><code class="JSON">    {
+        "transaction":
+        {
+            "timeStamp": 9111526,
+            "amount": 1000000000,
+            "fee": 3000000,
+            "recipient": "TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562",
+            "type": 257,
+            "deadline": 9154726,
+            "message":
+            {
+                "payload": "",
+                "type": 1
+            },
+            "version": 1,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+        },
+        "privateKey":
+        {
+            "value": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda",
+        }
+    }</code></pre>
+
+    <p>Note that there is no signature in the transaction part of the object since NIS
+        will create the signature for you. If the sender account has enough funds for
+        the transaction NIS would respond with the JSON object</p>
+
+    <pre><samp class="JSON">    {
+        "type": 1,
+        "code": 1,
+        "message": "SUCCESS"
+        "innerTransactionHash": null
+    }</samp></pre>
+
+    <h2>Converting an account to a multisig account</h2>
+
+    <p>To convert a normal account to a multisig account an aggregate modification transaction
+        (see <em>Appendix A:</em> <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a>) must be sent to the network.
+        Assuming you want to convert <em>Alice</em> with public key:</p>
+    <p class="JSON">a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a</p>
+
+    <p>into a multisig account with 3 cosignatories:</p>
+
+    <ol>
+        <li> Cosignatory 'BOB':
+            <ul>
+                <li>address: <span class="JSON">TBOBBSXX7BESJXDWGLP5Z7FM5HSTKUH5WIMPW562</span></li>
+                <li>public key: <span class="JSON">6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958</span></li>
+            </ul>
+        </li>
+        <li>Cosignatory 'jusan':
+            <ul>
+                <li>address: <span class="JSON">TBJUSANZ63AKNJ57XMK6Y2IBH55UNNRXJFZRDTRW</span></li>
+                <li>public key: <span class="JSON">0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70</span></li>
+            </ul>
+        </li>
+        <li>Cosignatory 'go':
+            <ul>
+                <li>address: <span class="JSON">TDGOGOGOWZJ3HU4F6CUM5IKE7GHG4FFTF5BZ7JPW</span></li>
+                <li>public key: <span class="JSON">cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099</span></li>
+            </ul>
+        </li>
+    </ol>
+
+    <p>you would have to create a JSON object that looks similar to this:</p>
+
+    <pre><code class="JSON">    {
+        "transaction":
+        {
+            "timeStamp": 9111526,
+            "fee": 28000000,
+            "type": 4097,
+            "deadline": 9154726,
+            "version": 1,
+            "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
+            "modifications": [
+                {
+                    "modificationType": 1,
+                    "cosignatoryAccount": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958"
+                },{
+                    "modificationType": 1,
+                    "cosignatoryAccount": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70"
+                },{
+                    "modificationType": 1,
+                    "cosignatoryAccount": "cc61676a4275abcffd10a9ea1081091ff054a1a8a720429256aebf8034aab099"
+                }
+            ]
+        },
+        "privateKey":
+        {
+            "value": "00983bb01d05edecfaef55df9486c111abb6299c754a002069b1d0ef4537441bda",
+        }
+    }</code></pre>
+
+    <p>Note again that there is no signature since the transaction will be signed by NIS.</p>
+
+    <p>After the transaction is signed by NIS and is accepted by the network by
+        including it into a block, the account Alice is now a multisig account.
+        From this point on, only the cosignatories can initiate a transaction for the
+        account <em>Alice</em>. Also, any transaction from account <em>Alice</em>
+        must be a multisig transaction.</p>
+
+    <h2>Initiating a multisig transaction</h2>
+
+    <p>As stated above, only one of the cosignatories (<em>Bob, Jusan and Go</em>)
+        can create a transaction for the account <em>Alice</em>.</p>
+
+    <p>Lets assume <em>Bob</em> wants to start a transfer transaction which transfers
+        1000 NEM from account <em>Alice</em> to account <em>Jusan</em>.<br>
+        Since the account <em>Alice</em> is a multisig account the transfer transaction
+        (in the JSON object the "otherTrans" structure) must be wrapped in
+        a multisig transaction (see <em>Appendix A:</em> <a href="#multisigTransaction">MultisigTransaction</a>).
+        The corresponding RequestPrepareAnnounce object would look similar to this:</p>
+
+    <pre><code class="JSON">    {
+        "transaction":
+        {
+            "timeStamp": 9111526,
+            "fee": 3000000,
+            "type": 4100,
+            "deadline": 9154726,
+            "version": 1,
+            "signer": "6083df7119d43e815ed2967c795f806f6b73f8f92a56a7611e3848816ec50958",
+            "otherTrans": {
+                "timeStamp": 9111526,
+                "amount": 1000000000,
+                "fee": 4000000,
+                "recipient": "TBJUSANZ63AKNJ57XMK6Y2IBH55UNNRXJFZRDTRW",
+                "type": 257,
+                "deadline": 9154726,
+                "message":
+                {
+                    "payload": "",
+                    "type": 1
+                },
+                "version": 1,
+                "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a"
+            },
+            "signatures":[
+            ]
+        },
+        "privateKey":
+        {
+            "value": "00a6e2526b5cc84f9174c4ff050ca352623061115951c649b36b08409c4ccb7b2e",
+        }
+    }</code></pre>
+
+    <p>NIS will sign the transaction and publish it. The returned
+        <a href="#NemAnnounceResult">NemAnnounceResult</a> object this time
+        contains the hash of the inner transaction (<i>otherTrans</i> in the above structure):</p>
+
+    <pre><span class="JSON">    {
+        "type": 1,
+        "code": 1,
+        "message": "SUCCESS"
+        "innerTransactionHash": {
+            <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
+        }
+    }</span></pre>
+
+    <p>The hash is needed by the nodes that will create multisig signature transactions
+        for the above transaction.</p>
+
+    <p>At this point the transaction cannot (and will not) be included in a block
+        because the other cosignatories - <em>Jusan</em> and <em>Go</em> - have
+        not signed the transaction yet.</p>
+
+    <p>To do so, <em>Jusan</em> and <em>Go</em> must initiate a multisig signature transaction
+        (see <em>Appendix A:</em> <a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a>).
+        <em>Jusan</em> has to create a RequestPrepareAnnounce JSON object that looks similar to this:</p>
+
+    <pre><code class="JSON">    {
+        "transaction":
+        {
+            "timeStamp": 9111526,
+            "fee": 6000000,
+            "type": 4098,
+            "deadline": 9157365,
+            "version": 1,
+            "signer": "0662ed29cbfa7038530fb7f52df865eed6708d51bc7a24bcd05db35185b53c70",
+            "otherHash": {
+                <b>"data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"</b>
+            },
+            <b>"otherAccount": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS"</b>
+        },
+        "privateKey":
+        {
+            "value": "00be34fdb20a9f6fed51376f0bab9f25ea7a48d610324588a6b203d0a1a6db4bc1",
+        }
+    }</code></pre>
+
+    <p>Note that <em>Jusan</em> used the hash ('otherHash') returned by NIS
+        from Bob's request.</p>
+
+    <p>After NIS has signed the transaction and sent it to the network,
+        the signature transaction will be attached to the multisig transaction.<br>
+        After account <em>Go</em> has initiated his signature transaction as well,
+        all three cosignatories have signed the inner transfer transaction and thus the
+        multisig transaction can be included in a block.
+    </p>
+
+    <h4>Description:</h4>
+
+    <p class=NemNoSpacing>Creates and broadcasts a transaction.
+        Since this request involves the private key of an account, it should only be
+        sent to a <b>local</b> NIS.</p>
+
+    <h4>Parameter:</h4>
+
+    <table class=NemTableGrid>
+        <tr>
+            <td>
+                <p class=JSON>requestPrepareAnnounce</p>
+            </td>
+            <td>
+                <p class=NemNoSpacing>A RequestPrepareAnnounce JSON object as described in <em>Appendix A:</em> <a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a>.</p>
+            </td>
+        </tr>
+    </table>
+
+    <h4>Example:</h4>
+
+    <p class=NemNoSpacing>Request cannot be performed in a
+        browser.</p>
+
+    <h4>Example of returned JSON <a href="#nemRequestResult">NemRequestResult</a> object:</h4>
+
+	<pre><samp class=JSON>
+        {
+        "type": 1,
+        "code": 1,
+        "message": "SUCCESS",
+        "innerTransactionHash": {
+        "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039"
+        }
+        }
+    </samp></pre>
+
+    <h4>Possible Errors:</h4>
+
+    <p>There are various errors that can occur due
+        to failure of transaction validation See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
+        object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
+            Errors</a> for the error message.</p>
+
+    <p>The most common errors are:</p>
+
+    <ul>
+        <li>The sender account has not enough funds.</li>
+        <li>The timestamp is invalid because it lies too far in the future.</li>
+        <li>The deadline is invalid because it has already been passed.</li>
+        <li>The attached message is too large.</li>
+        <li>The transaction is already known.</li>
+        <li>There is another transaction conflicting with this transaction. This can happen when trying to transfer the importance to another account.</li>
+    </ul>
+
+    <h1>Requests for additional information from NIS</h1>
 
 	<p>Several requests supply additional
 	information about the internal status of NIS. Those requests may get dropped in
@@ -2476,22 +2753,22 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	       { 
-	              "dateTime": "2014-11-19 19:23:04", 
-	              "currentTimeOffset": 1747, 
-	              "change": 57 
-	       }, 
-	       { 
-	              "dateTime": "2014-11-19 19:24:17", 
-	              "currentTimeOffset": 1776, 
-	              "change": 29 
-	       }, 
-	       { 
-	              "dateTime": "2014-11-19 19:25:18", 
-	              "currentTimeOffset": 1729, 
-	              "change": -47 
-	       }] 
+	       "data": [ 
+	       { 
+	              "dateTime": "2014-11-19 19:23:04", 
+	              "currentTimeOffset": 1747, 
+	              "change": 57 
+	       }, 
+	       { 
+	              "dateTime": "2014-11-19 19:24:17", 
+	              "currentTimeOffset": 1776, 
+	              "change": 29 
+	       }, 
+	       { 
+	              "dateTime": "2014-11-19 19:25:18", 
+	              "currentTimeOffset": 1729, 
+	              "change": -47 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -2530,29 +2807,29 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "outstanding": [ 
-	       { 
-	              "path": "/debug/connections/incoming", 
-	              "start-time": 9317306, 
-	              "host": "127.0.0.1", 
-	              "elapsed-time": 0, 
-	              "id": 4070 
-	       }], 
-	       "most-recent": [ 
-	       { 
-	              "path": "/debug/connections/incoming", 
-	              "start-time": 9317306, 
-	              "host": "127.0.0.1", 
-	              "elapsed-time": 0, 
-	              "id": 4070 
-	       }, 
-	       { 
-	              "path": "/chain/score", 
-	              "start-time": 9317303, 
-	              "host": "95.16.203.168", 
-	              "elapsed-time": 3, 
-	              "id": 4069 
-	       }] 
+	       "outstanding": [ 
+	       { 
+	              "path": "/debug/connections/incoming", 
+	              "start-time": 9317306, 
+	              "host": "127.0.0.1", 
+	              "elapsed-time": 0, 
+	              "id": 4070 
+	       }], 
+	       "most-recent": [ 
+	       { 
+	              "path": "/debug/connections/incoming", 
+	              "start-time": 9317306, 
+	              "host": "127.0.0.1", 
+	              "elapsed-time": 0, 
+	              "id": 4070 
+	       }, 
+	       { 
+	              "path": "/chain/score", 
+	              "start-time": 9317303, 
+	              "host": "95.16.203.168", 
+	              "elapsed-time": 3, 
+	              "id": 4069 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -2588,29 +2865,29 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "outstanding": [ 
-	       { 
-	              "path": "/chain/blocks-after", 
-	              "start-time": 9317511, 
-	              "host": "88.12.55.125", 
-	              "elapsed-time": 6, 
-	              "id": 6452 
-	       }], 
-	       "most-recent": [ 
-	       { 
-	              "path": "/chain/blocks-after", 
-	              "start-time": 9317511, 
-	              "host": "88.12.55.125", 
-	              "elapsed-time": 6, 
-	              "id": 6452 
-	       }, 
-	       { 
-	              "path": "/chain/hashes-from", 
-	              "start-time": 9317511, 
-	              "host": "88.12.55.125", 
-	              "elapsed-time": 6, 
-	              "id": 6451 
-	       }] 
+	       "outstanding": [ 
+	       { 
+	              "path": "/chain/blocks-after", 
+	              "start-time": 9317511, 
+	              "host": "88.12.55.125", 
+	              "elapsed-time": 6, 
+	              "id": 6452 
+	       }], 
+	       "most-recent": [ 
+	       { 
+	              "path": "/chain/blocks-after", 
+	              "start-time": 9317511, 
+	              "host": "88.12.55.125", 
+	              "elapsed-time": 6, 
+	              "id": 6452 
+	       }, 
+	       { 
+	              "path": "/chain/hashes-from", 
+	              "start-time": 9317511, 
+	              "host": "88.12.55.125", 
+	              "elapsed-time": 6, 
+	              "id": 6451 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -2648,29 +2925,29 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "data": [ 
-	       { 
-	              "last-delay-time": 3000, 
-	              "executions": 1024, 
-	              "failures": 0, 
-	              "successes": 1024, 
-	              "last-operation-start-time": 9317695, 
-	              "is-executing": 0, 
-	              "name": "FORAGING", 
-	              "average-operation-time": 0, 
-	              "last-operation-time": 0 
-	       }, 
-	       { 
-	              "last-delay-time": 74181, 
-	              "executions": 71, 
-	              "failures": 0, 
-	              "successes": 71, 
-	              "last-operation-start-time": 9317654, 
-	              "is-executing": 0, 
-	              "name": "REFRESH", 
-	              "average-operation-time": 6, 
-	              "last-operation-time": 7 
-	       }] 
+	       "data": [ 
+	       { 
+	              "last-delay-time": 3000, 
+	              "executions": 1024, 
+	              "failures": 0, 
+	              "successes": 1024, 
+	              "last-operation-start-time": 9317695, 
+	              "is-executing": 0, 
+	              "name": "FORAGING", 
+	              "average-operation-time": 0, 
+	              "last-operation-time": 0 
+	       }, 
+	       { 
+	              "last-delay-time": 74181, 
+	              "executions": 71, 
+	              "failures": 0, 
+	              "successes": 71, 
+	              "last-operation-start-time": 9317654, 
+	              "is-executing": 0, 
+	              "name": "REFRESH", 
+	              "average-operation-time": 6, 
+	              "last-operation-time": 7 
+	       }] 
 	} 
 	</samp></pre>
 
@@ -2693,14 +2970,14 @@
 
 	<pre><samp>
 	{ 
-	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS" 
-	       "importance": 
-	       { 
-		       "isSet": 1, 
-		       "score": 0.0011561555164258449, 
-		       "ev": 0.004367936531009263, 
-		       "height": 38413 
-	       } 
+	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS" 
+	       "importance": 
+	       { 
+		       "isSet": 1, 
+		       "score": 0.0011561555164258449, 
+		       "ev": 0.004367936531009263, 
+		       "height": 38413 
+	       } 
 	}
 	</samp></pre>
 
@@ -2769,12 +3046,12 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	       "balance": 124446551689680, 
-	       "importance": 0.010263666447108395, 
-	       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a", 
-	       "label": null,  
-	       "foragedBlocks": 645 
+	       "address": "TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	       "balance": 124446551689680, 
+	       "importance": 0.010263666447108395, 
+	       "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a", 
+	       "label": null,  
+	       "foragedBlocks": 645 
 	} 
 	</samp></pre>
 
@@ -2842,8 +3119,8 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "status": "LOCKED", 
-	       "remoteStatus": "ACTIVE" 
+	       "status": "LOCKED", 
+	       "remoteStatus": "ACTIVE" 
 	} 
 	</samp></pre>
 
@@ -2895,10 +3172,10 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "account": 
-	       &lt;Account&gt;, 
-	       "meta": 
-	              &lt;AccountMetaData&gt; 
+	       "account": 
+	       &lt;Account&gt;, 
+	       "meta": 
+	              &lt;AccountMetaData&gt; 
 	} 
 	</samp></pre>
 
@@ -2946,15 +3223,15 @@
 	<p class=NemNoSpacing>The application meta data object
 	supplies additional information about the application running on a node.</p>
 
-	<h4> JSON structure by example:</h4>
+	<h4> JSON structure by example:</h4>
 
 	<pre><samp class=JSON>
 	{ 
-	       "currentTime": 9189086, 
-	       "application": "NEM Infrastructure Server", 
-	       "startTime": 9060202, 
-	       "version": "0.4.30-BETA", 
-	       "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD" 
+	       "currentTime": 9189086, 
+	       "application": "NEM Infrastructure Server", 
+	       "startTime": 9060202, 
+	       "version": "0.4.30-BETA", 
+	       "signer": "CN=NEM Community,OU=Development Team,O=NEM,L=Internet,ST=web,C=WD" 
 	} 
 	</samp></pre>
 
@@ -3017,22 +3294,22 @@
 	<h4>JSON structure by example:</h4>
 	<pre><samp class=JSON>
 	{ 
-	       "outstanding": [ 
-	       { 
-	              "path": "/chain/score", 
-	              "start-time": 9020618, 
-	              "host": "86.124.91.183", 
-	              "elapsed-time": 5, 
-	              "id": 797725 
-	       }], 
-	       "most-recent": [ 
-	       { 
-	              "path": "/push/transaction", 
-	              "start-time": 9020621, 
-	              "host": "hachi.nem.ninja", 
-	              "elapsed-time": 2, 
-	              id": 797750 
-	       }] 
+	       "outstanding": [ 
+	       { 
+	              "path": "/chain/score", 
+	              "start-time": 9020618, 
+	              "host": "86.124.91.183", 
+	              "elapsed-time": 5, 
+	              "id": 797725 
+	       }], 
+	       "most-recent": [ 
+	       { 
+	              "path": "/push/transaction", 
+	              "start-time": 9020621, 
+	              "host": "hachi.nem.ninja", 
+	              "elapsed-time": 2, 
+	              id": 797750 
+	       }] 
 	}
 	</samp></pre>
 
@@ -3099,19 +3376,19 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "timeStamp": 9022656, 
-	       "signature":                                    "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804", 
-	       "prevBlockHash": 
-	       { 
-	              "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b" 
-	       }, 
-	       "type": 1, 
-	       "transactions": [ 
-	              Transaction1, Transaction2, …, Transaction11 
-	       ], 
-	       "version": 1, 
-	       "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
-	       "height": 39324 
+	       "timeStamp": 9022656, 
+	       "signature":                                    "256ebcfa4f92e2881963359c51095a390b9f4d1b3fee75ae19f96d5e6bcf055abbcaae3e55bcc17e6214924e4e6a9ebbe77357236b1a235e944950b851bda804", 
+	       "prevBlockHash": 
+	       { 
+	              "data": "0a3d6bea020bb1a503364c37d57392342f368389bb23b05799c54d536d94749b" 
+	       }, 
+	       "type": 1, 
+	       "transactions": [ 
+	              Transaction1, Transaction2, …, Transaction11 
+	       ], 
+	       "version": 1, 
+	       "signer": "6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
+	       "height": 39324 
 	} 
 	</samp></pre>
 
@@ -3161,7 +3438,7 @@
 			</td>
 			<td>
 				<p>The array of transaction structures. See <em>Appendix A:</em> Transaction
-				for more details             about this structure.</p>
+				for more details             about this structure.</p>
 			</td>
 		</tr>
 		<tr>
@@ -3203,7 +3480,7 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "score": "17a3077c927d9a7e" 
+	       "score": "17a3077c927d9a7e" 
 	} 
 	</samp></pre>
 
@@ -3234,7 +3511,7 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "height": 2649 
+	       "height": 2649 
 	} 
 	</samp></pre>
 
@@ -3263,21 +3540,21 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "metaData": 
-	       { 
-	              "application":"NIS" 
-	       }, 
-	       "endpoint": 
-	       { 
-	              "protocol":"http", 
-	              "port":7890, 
-	              "host":"localhost" 
-	       }, 
-	       "identity": 
-	       { 
-	              "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f", 
-	              "name":"Alice" 
-	       } 
+	       "metaData": 
+	       { 
+	              "application":"NIS" 
+	       }, 
+	       "endpoint": 
+	       { 
+	              "protocol":"http", 
+	              "port":7890, 
+	              "host":"localhost" 
+	       }, 
+	       "identity": 
+	       { 
+	              "private-key":"a6cbd01d04edecfaef51df9486c111abb6299c764a00206eb1d01f4587491b3f", 
+	              "name":"Alice" 
+	       } 
 	} 
 	</samp></pre>
 
@@ -3372,8 +3649,8 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "sendTimeStamp": 9145477789, 
-	       "receiveTimeStamp": 9145477789 
+	       "sendTimeStamp": 9145477789, 
+	       "receiveTimeStamp": 9145477789 
 	} 
 	</samp></pre>
 
@@ -3410,15 +3687,15 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "harvester":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS ", 
-	       "timeStamp":1413748321000, 
-	       "harvesterPk":"6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
-	       "txes":[ 
-	              &lt;ExplorerTransferViewModel&gt;, 
-	              &lt;ExplorerTransferViewModel&gt; 
-	       ], 
-	       "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce", 
-	       "height":159 
+	       "harvester":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS ", 
+	       "timeStamp":1413748321000, 
+	       "harvesterPk":"6c66ea288522990db7a0a63c9c20f532cdcb68dc3c9544fb20f7322c92ceadbb", 
+	       "txes":[ 
+	              &lt;ExplorerTransferViewModel&gt;, 
+	              &lt;ExplorerTransferViewModel&gt; 
+	       ], 
+	       "hash":"a6f62c62eedf4fafe6991e5cf31eae440963577c919f4eae86b4db8f8e572dce", 
+	       "height":159 
 	} 
 	</samp></pre>
 
@@ -3496,17 +3773,17 @@
 
 	<pre><samp class=JSON>
 	{ 
-	       "timeStamp":1413748311000, 
-	       "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
-	       "amount":1000000000, 
-	       "msgType":1, 
-	       "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
-	       "signature":"4ef64f7b2b04f954d04d6e019c368af9233cdb6c9094f74a1641d4ef6346cb566ff4cebdd221925b373eabd69f7053c7afb37d0e87be55a32193524e5ba3b10b", 
-	       "fee":3000000, 
-	       "recipient":"TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-	       "type":257, 
-	       "message":"4e454d2062657461206e6574776f726b206973207570", 
-	       "hash":"5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d" 
+	       "timeStamp":1413748311000, 
+	       "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a", 
+	       "amount":1000000000, 
+	       "msgType":1, 
+	       "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS", 
+	       "signature":"4ef64f7b2b04f954d04d6e019c368af9233cdb6c9094f74a1641d4ef6346cb566ff4cebdd221925b373eabd69f7053c7afb37d0e87be55a32193524e5ba3b10b", 
+	       "fee":3000000, 
+	       "recipient":"TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+	       "type":257, 
+	       "message":"4e454d2062657461206e6574776f726b206973207570", 
+	       "hash":"5cba4614e52af19417fb53c4bdf442a57b9f558aee17ece530a5220da55cf47d" 
 	} 
 	</samp></pre>
 
@@ -3617,16 +3894,16 @@
 
 	<pre><samp class=JSON>
 { 
-       "node": 
-       { 
-              &lt;Node&gt; 
-       }, 
-       "syncs": 822, 
-       "experience": 
-       { 
-              "s": 357, 
-              "f": 0 
-       } 
+       "node": 
+       { 
+              &lt;Node&gt; 
+       }, 
+       "syncs": 822, 
+       "experience": 
+       { 
+              "s": 357, 
+              "f": 0 
+       } 
 } 
 	</samp></pre>
 
@@ -3695,12 +3972,12 @@
 
 	<pre><samp class=JSON>
 { 
-       "timeStamp": 8963798, 
-       "blockHash": { 
-              "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039" 
-       }, 
-       "totalFee": 2041299054, 
-       "height": 38453 
+       "timeStamp": 8963798, 
+       "blockHash": { 
+              "data": "44e4968e5aa35fe182d4def5958e23cf941c4bf809364afb4431ebbf6a18c039" 
+       }, 
+       "totalFee": 2041299054, 
+       "height": 38453 
 } 
 	</samp></pre>
 
@@ -3756,21 +4033,21 @@
 
 	<p class=NemNoSpacing>NIS uses timers to schedule periodic
 	tasks. Those tasks are monitored and their result is memorized. The
-	NemAsyncTimeVisitor structure holds  the information.</p>
+	NemAsyncTimeVisitor structure holds  the information.</p>
 
 	<h4>JSON structure by example:</h4>
 
 	<pre><samp class=JSON>
 { 
-       "last-delay-time": 3000, 
-       "executions": 1024, 
-       "failures": 0, 
-       "successes": 1024, 
-       "last-operation-start-time": 9317695, 
-       "is-executing": 0, 
-       "name": "FORAGING", 
-       "average-operation-time": 0, 
-       "last-operation-time": 0 
+       "last-delay-time": 3000, 
+       "executions": 1024, 
+       "failures": 0, 
+       "successes": 1024, 
+       "last-operation-start-time": 9317695, 
+       "is-executing": 0, 
+       "name": "FORAGING", 
+       "average-operation-time": 0, 
+       "last-operation-time": 0 
 } 
 	</samp></pre>
 
@@ -3863,9 +4140,9 @@
 
 	<pre><samp class=JSON>
 { 
-       "type": 4, 
-       "code": 6, 
-       "message": "status" 
+       "type": 4, 
+       "code": 6, 
+       "message": "status" 
 }  
 	</samp></pre>
 
@@ -3880,9 +4157,9 @@
 				<p>The type is dependent on the request which was answered. The
 				interpretation of the code field depends on the type. Currently the following
 				types are supported:</p>
-				<p>1:         The result is a validation result.</p>
-				<p>2:         The result is a heart beat result.</p>
-				<p>4:         The result indicates a status.</p>
+				<p>1:         The result is a validation result.</p>
+				<p>2:         The result is a heart beat result.</p>
+				<p>4:         The result indicates a status.</p>
 			</td>
 		</tr>
 		<tr>
@@ -3893,55 +4170,55 @@
 				<p>The meaning of the code is dependent on the type.</p>
 				<p>For type 1 (validation result) only 0 and 1 mean there was no
 				failure. The following codes are supported:</p>
-				<p>0:         Neutral result. A typical example would be that a node
+				<p>0:         Neutral result. A typical example would be that a node
 				validates an incoming transaction and realizes that it already knows about
-				the transaction. In this case it is            neither a success (meaning the
+				the transaction. In this case it is            neither a success (meaning the
 				node has a new transaction) nor a failure (because the transaction itself is
 				valid).</p>
-				<p>1:         Success result. A typical example would be that a node
+				<p>1:         Success result. A typical example would be that a node
 				validates a new valid transaction.</p>
-				<p>2:         Unknown failure. The validation failed for unknown
+				<p>2:         Unknown failure. The validation failed for unknown
 				reasons.</p>
-				<p>3:         The entity that was validated has already past its
+				<p>3:         The entity that was validated has already past its
 				deadline.</p>
-				<p>4:         The entity used a deadline which lies too far in the
+				<p>4:         The entity used a deadline which lies too far in the
 				future.</p>
-				<p>5:         There was an account involved which had an insufficient
+				<p>5:         There was an account involved which had an insufficient
 				balance to perform the operation.</p>
-				<p>6:         The message supplied with the transaction is too large.</p>
-				<p>7:         The hash of the entity which got validated is already
+				<p>6:         The message supplied with the transaction is too large.</p>
+				<p>7:         The hash of the entity which got validated is already
 				in the database.</p>
-				<p>8:         The signature of the entity could not be validated.</p>
-				<p>9:         The entity used a timestamp that lies too far in the
+				<p>8:         The signature of the entity could not be validated.</p>
+				<p>9:         The entity used a timestamp that lies too far in the
 				past.</p>
-				<p>10:       The entity used a timestamp that lies in the future
+				<p>10:       The entity used a timestamp that lies in the future
 				which is not acceptable.</p>
-				<p>11:       The entity is unusable.</p>
-				<p>12:       The score of the remote block chain is inferior (although
+				<p>11:       The entity is unusable.</p>
+				<p>12:       The score of the remote block chain is inferior (although
 				a superior score was promised).</p>
-				<p>13:       The remote block chain failed validation.</p>
-				<p>14:       There was a conflicting importance transfer detected.</p>
-				<p>15:       There were too many transaction in the supplied block.</p>
-				<p>16:       The block contains a transaction that was signed by the
+				<p>13:       The remote block chain failed validation.</p>
+				<p>14:       There was a conflicting importance transfer detected.</p>
+				<p>15:       There were too many transaction in the supplied block.</p>
+				<p>16:       The block contains a transaction that was signed by the
 				harvester.</p>
-				<p>17:       A previous importance transaction conflicts with a new
+				<p>17:       A previous importance transaction conflicts with a new
 				transaction.</p>
-				<p>18:       An importance transfer activation was attempted while
+				<p>18:       An importance transfer activation was attempted while
 				previous one is active.</p>
-				<p>19:       An importance transfer deactivation was attempted but is
+				<p>19:       An importance transfer deactivation was attempted but is
 				not active.</p>
-				<p>            </p>
+				<p>            </p>
 				<p>For type 2 the following codes are supported:</p>
-				<p>1:         Successful heart beat detected.</p>
+				<p>1:         Successful heart beat detected.</p>
 				<p></p>
 				<p>For type 3 the following codes are supported:</p>
-				<p>0:         Unknown status.</p>
-				<p>1:         NIS is stopped.</p>
-				<p>2:         NIS is starting.</p>
-				<p>3:         NIS is running.</p>
-				<p>4:         NIS is booting the local node (implies NIS is running).</p>
-				<p>5:         The local node is booted (implies NIS is running).</p>
-				<p>6:         The local node is synchronized (implies NIS is running
+				<p>0:         Unknown status.</p>
+				<p>1:         NIS is stopped.</p>
+				<p>2:         NIS is starting.</p>
+				<p>3:         NIS is running.</p>
+				<p>4:         NIS is booting the local node (implies NIS is running).</p>
+				<p>5:         The local node is booted (implies NIS is running).</p>
+				<p>6:         The local node is synchronized (implies NIS is running
 				and the local node is booted)</p>
 			</td>
 		</tr>
@@ -3958,12 +4235,12 @@
 
 	<pre><samp class=JSON>
 { 
-       "node": { 
-              &lt;Node&gt; 
-       }, 
-       "nisInfo": { 
-              &lt;ApplicationMetaData&gt; 
-       } 
+       "node": { 
+              &lt;Node&gt; 
+       }, 
+       "nisInfo": { 
+              &lt;ApplicationMetaData&gt; 
+       } 
 } 
 	</samp></pre>
 
@@ -4019,23 +4296,23 @@
 
 	<pre><samp class=JSON>
 { 
-       "metaData": 
-       { 
-              "application": "NIS", 
-              "version": "0.4.30-BETA", 
-              "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1" 
-       }, 
-       "endpoint": 
-       { 
-              "protocol": "http", 
-              "port": 7890, 
-              "host": "85.25.36.97" 
-       }, 
-       "identity": 
-       { 
-              "name": "Hi, I am Alice2", 
-              "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350" 
-       } 
+       "metaData": 
+       { 
+              "application": "NIS", 
+              "version": "0.4.30-BETA", 
+              "platform": "Oracle Corporation (1.8.0_05) on Windows 8.1" 
+       }, 
+       "endpoint": 
+       { 
+              "protocol": "http", 
+              "port": 7890, 
+              "host": "85.25.36.97" 
+       }, 
+       "identity": 
+       { 
+              "name": "Hi, I am Alice2", 
+              "public-key": "3302e7703ee9f364c25bbfebb9c12ac91fa9dcd69e09a5d4f3830d71505a2350" 
+       } 
 } 
 	</samp></pre>
 
@@ -4190,22 +4467,22 @@
 
 	<pre><samp class=JSON>
 { 
-       "inactive": [ 
-              &lt;Node&gt;, 
-              &lt;Node&gt; 
-       ], 
-       "active": [ 
-              &lt;Node&gt;, 
-              &lt;Node&gt; 
-       ], 
-       "busy": [ 
-              &lt;Node&gt;, 
-              &lt;Node&gt; 
-       ], 
-       "failure": [ 
-              &lt;Node&gt;, 
-              &lt;Node&gt; 
-       ], 
+       "inactive": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "active": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "busy": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
+       "failure": [ 
+              &lt;Node&gt;, 
+              &lt;Node&gt; 
+       ], 
 } 
 	</samp></pre>
 
@@ -4295,26 +4572,26 @@
 
 	<pre><samp class=JSON>
 { 
-       "transaction": 
-       { 
-              "timeStamp": 9111526, 
-              "amount": 1000000000, 
-              "fee": 3000000, 
-              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-              "type": 257, 
-              "deadline": 9154726, 
-              "message": 
-              { 
-                     "payload": "74657374207472616e73616374696f6e", 
-                     "type": 1 
-              }, 
-              "version": 1, 
-              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
-       }, 
-       "privateKey": 
-       { 
-              "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0", 
-       } 
+       "transaction": 
+       { 
+              "timeStamp": 9111526, 
+              "amount": 1000000000, 
+              "fee": 3000000, 
+              "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+              "type": 257, 
+              "deadline": 9154726, 
+              "message": 
+              { 
+                     "payload": "74657374207472616e73616374696f6e", 
+                     "type": 1 
+              }, 
+              "version": 1, 
+              "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+       }, 
+       "privateKey": 
+       { 
+              "value": "68e4f79f886927de698df4f857de2aada41ccca6617e56bb0d61623b35b08cc0", 
+       } 
 } 
 	</samp></pre>
 
@@ -4352,20 +4629,20 @@
 
 	<pre><samp class=JSON>
 { 
-       "timeStamp": 9111526, 
-       "amount": 1000000000, 
-       "signature":         "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
-       "fee": 3000000, 
-       "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
-       "type": 257, 
-       "deadline": 9154726, 
-       "message": 
-       { 
-              "payload": "74657374207472616e73616374696f6e", 
-              "type": 1 
-       }, 
-       "version": 1, 
-       "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
+       "timeStamp": 9111526, 
+       "amount": 1000000000, 
+       "signature":         "651a19ccd09c1e0f8b25f6a0aac5825b0a20f158ca4e0d78f2abd904a3966b6e3599a47b9ff199a3a6e1152231116fa4639fec684a56909c22cbf6db66613901", 
+       "fee": 3000000, 
+       "recipient": "TDGIMREMR5NSRFUOMPI5OOHLDATCABNPC5ID2SVA", 
+       "type": 257, 
+       "deadline": 9154726, 
+       "message": 
+       { 
+              "payload": "74657374207472616e73616374696f6e", 
+              "type": 1 
+       }, 
+       "version": 1, 
+       "signer": "a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a" 
 } 
 	</samp></pre>
 
@@ -4494,9 +4771,9 @@
 
 	<pre><samp class=JSON>
 { 
-       "dateTime": "2014-11-16 20:47:06", 
-       "currentTimeOffset": 2786, 
-       "change": 36 
+       "dateTime": "2014-11-16 20:47:06", 
+       "currentTimeOffset": 2786, 
+       "change": 36 
 } 
 	</samp></pre>
 
@@ -4540,7 +4817,7 @@
 
 	<pre><samp class=JSON>
 { 
-       "height": 40706 
+       "height": 40706 
 } 
 	</samp></pre>
 
@@ -4568,10 +4845,10 @@
 
 	<pre><samp class=JSON>
 { 
-       "meta": 
-              &lt;TransactionMetaData&gt;, 
-       "transaction": 
-              &lt;Transaction&gt; 
+       "meta": 
+              &lt;TransactionMetaData&gt;, 
+       "transaction": 
+              &lt;Transaction&gt; 
 } 
 	</samp></pre>
 
@@ -4626,10 +4903,10 @@
 
 	<pre><samp class=JSON>
 { 
-       "timeStamp": 9108808, 
-       "error": "Bad Request", 
-       "message": "address must be valid", 
-       "status": 400 
+       "timeStamp": 9108808, 
+       "error": "Bad Request", 
+       "message": "address must be valid", 
+       "status": 400 
 } 
 	</samp></pre>
 
