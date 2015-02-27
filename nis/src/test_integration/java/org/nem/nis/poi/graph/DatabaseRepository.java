@@ -1,11 +1,13 @@
 package org.nem.nis.poi.graph;
 
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Interface for database repositories of blockchain data.
  */
 public interface DatabaseRepository {
+
+	static final Map<String, Collection<GraphClusteringTransaction>> transactionCache = new HashMap<>();
 
 	/**
 	 * Loads a subset of transactions.

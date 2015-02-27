@@ -39,7 +39,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 			long maxBlockHeight = 0;
 			// Iterate through transactions, creating new accounts as needed.
 			for (final GraphClusteringTransaction trans : transactions) {
-				final Amount amount = Amount.fromMicroNem(this.normalizeBtcToNemMktCap(trans.getAmount()));
+				final Amount amount = Amount.fromMicroNem(this.normalizeToNemMktCap(trans.getAmount()));
 				final Address sender = Address.fromEncoded(Long.toString(trans.getSenderId()));
 				final Address recipient = Address.fromEncoded(Long.toString(trans.getRecipientId()));
 				final BlockHeight blockHeight = new BlockHeight(this.normalizeBtcBlockHeightsToNem(trans.getHeight()));
@@ -85,7 +85,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 		return accountStateMapCache.get(transactions.hashCode());
 	}
 
-	private long normalizeBtcToNemMktCap(final long amt) {
+	protected long normalizeToNemMktCap(final long amt) {
 		return (long)(amt * MKT_CAP_NORMALIZATION_FACTOR);
 	}
 

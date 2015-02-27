@@ -715,6 +715,8 @@ public abstract class GraphClusteringITCase {
 
 	protected abstract Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<GraphClusteringTransaction> transactions);
 
+	protected abstract long normalizeToNemMktCap(final long amt);
+
 	private static Collection<AccountState> selectHarvestingEligibleAccounts(
 			final Map<Address, AccountState> accountStateMap,
 			final BlockHeight height,

@@ -14,7 +14,6 @@ public class NxtDatabaseRepository implements AutoCloseable, DatabaseRepository 
 	private static final String JDBC_DRIVER = "org.h2.Driver";
 
 	private final Connection conn;
-	private static final Map<String, Collection<GraphClusteringTransaction>> transactionCache = new HashMap<>();
 
 	/**
 	 * Creates a new repository.
@@ -54,7 +53,6 @@ public class NxtDatabaseRepository implements AutoCloseable, DatabaseRepository 
 	public Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
 		LOGGER.info(String.format("loading transactions in blocks [%d, %d]...", startHeight, stopHeight));
 
-		// TODO 20150223 J-M: i would move the caching into a decorator since you are doing it both here and in the BTC repository
 		final String transCacheKey = startHeight + "_" + stopHeight;
 		if (this.transactionCache.containsKey(transCacheKey)) {
 			return this.transactionCache.get(transCacheKey);
