@@ -3,10 +3,12 @@ package org.nem.nis.chain;
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
 import org.mockito.*;
+import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.observers.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
+import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.AccountState;
@@ -144,25 +146,6 @@ public abstract class AbstractBlockProcessorTest {
 		}
 	}
 
-	//endregion
-
-	//region helpers
-
-	private void processTransaction(final ExecutorTestContext context) {
-		this.process(
-				context.block.getTransactions().get(0),
-				context.block,
-				context.nisCache,
-				context.observer);
-	}
-
-	private void processBlock(final ExecutorTestContext context) {
-		this.process(
-				context.block,
-				context.nisCache,
-				context.observer);
-	}
-
 	private static class UndoExecuteNotificationTestContext extends ExecutorTestContext {
 		// Arrange:
 		private final Account account1 = this.addAccount();
@@ -185,18 +168,63 @@ public abstract class AbstractBlockProcessorTest {
 					new HashMetaData(this.height, transaction.getTimeStamp()));
 			this.transactionHashPairs = Arrays.asList(pair);
 		}
+	}
 
-		public ArgumentCaptor<Notification> captureNotifications(final int numExpectedNotifications) {
-			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(this.observer, Mockito.times(numExpectedNotifications)).notify(notificationCaptor.capture(), Mockito.any());
-			return notificationCaptor;
-		}
+	//endregion
 
-		public ArgumentCaptor<BlockNotificationContext> captureNotificationContexts(final int numExpectedNotifications) {
-			final ArgumentCaptor<BlockNotificationContext> contextCaptor = ArgumentCaptor.forClass(BlockNotificationContext.class);
-			Mockito.verify(this.observer, Mockito.times(numExpectedNotifications)).notify(Mockito.any(), contextCaptor.capture());
-			return contextCaptor;
+	//region REMOTE harvest notifications
+
+	@Test
+	public void processPropagatesHarvestNotificationsFromRemoteAsEndowedToSubscribedObserver() {
+		// Arrange:
+		final ExecutorTestContext context = new ExecutorTestContext();
+		final Account remoteSigner = context.addAccount();
+		final Account realAccount = context.addAccount();
+		final Account transactionSigner = context.addAccount();
+
+		// Arrange: create a block signed by the remote (remoteSigner) and have remoteSigner forward to realAccount
+		context.block = new Block(remoteSigner, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, context.height);
+		final MockTransaction transaction = new MockTransaction(transactionSigner, 1);
+		transaction.setFee(Amount.fromNem(5));
+		context.block.addTransaction(transaction);
+		context.setForwardingAccount(remoteSigner, realAccount);
+
+		// Act:
+		this.processBlock(context);
+
+		// Assert:
+		final int expectedNotifications = (this.supportsTransactionExecution() ? 0 : 1) + 3;
+		final ArgumentCaptor<Notification> notificationCaptor = context.captureNotifications(expectedNotifications);
+		final List<Notification> values = notificationCaptor.getAllValues();
+
+		// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
+		if (NotificationTrigger.Execute == this.getTrigger()) {
+			final int start = expectedNotifications - 2;
+			NotificationUtils.assertBlockHarvestNotification(values.get(start), realAccount, Amount.fromNem(5));
+			NotificationUtils.assertBalanceCreditNotification(values.get(start - 1), realAccount, Amount.fromNem(5));
+		} else {
+			NotificationUtils.assertBlockHarvestNotification(values.get(0), realAccount, Amount.fromNem(5));
+			NotificationUtils.assertBalanceDebitNotification(values.get(1), realAccount, Amount.fromNem(5));
 		}
+	}
+
+	//endregion
+
+	//region helpers
+
+	private void processTransaction(final ExecutorTestContext context) {
+		this.process(
+				context.block.getTransactions().get(0),
+				context.block,
+				context.nisCache,
+				context.observer);
+	}
+
+	private void processBlock(final ExecutorTestContext context) {
+		this.process(
+				context.block,
+				context.nisCache,
+				context.observer);
 	}
 
 	private static class ExecutorTestContext {
@@ -233,6 +261,18 @@ public abstract class AbstractBlockProcessorTest {
 			final AccountState accountState = new AccountState(forwardAccount.getAddress());
 			Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(forwardingAccount.getAddress()), Mockito.any()))
 					.thenReturn(accountState);
+		}
+
+		public ArgumentCaptor<Notification> captureNotifications(final int numExpectedNotifications) {
+			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
+			Mockito.verify(this.observer, Mockito.times(numExpectedNotifications)).notify(notificationCaptor.capture(), Mockito.any());
+			return notificationCaptor;
+		}
+
+		public ArgumentCaptor<BlockNotificationContext> captureNotificationContexts(final int numExpectedNotifications) {
+			final ArgumentCaptor<BlockNotificationContext> contextCaptor = ArgumentCaptor.forClass(BlockNotificationContext.class);
+			Mockito.verify(this.observer, Mockito.times(numExpectedNotifications)).notify(Mockito.any(), contextCaptor.capture());
+			return contextCaptor;
 		}
 	}
 
