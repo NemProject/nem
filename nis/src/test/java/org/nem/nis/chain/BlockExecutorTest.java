@@ -152,77 +152,6 @@ public class BlockExecutorTest {
 
 		//endregion
 
-		//region execute / undo REMOTE harvest notifications
-
-		@Test
-		public void executePropagatesHarvestNotificationsFromRemoteAsEndowedToSubscribedObserver() {
-			// Arrange:
-			final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
-			final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
-
-			// Act:
-			context.execute(observer);
-
-			// Assert:
-			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
-
-			// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
-			NotificationUtils.assertBlockHarvestNotification(notificationCaptor.getAllValues().get(2), context.realAccount, Amount.fromNem(5));
-			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(0), context.transactionSigner, Amount.fromNem(5));
-		}
-
-		@Test
-		public void undoPropagatesHarvestNotificationsFromRemoteAsEndowedToSubscribedObserver() {
-			// Arrange:
-			final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
-			final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
-
-			// Act:
-			context.execute(Mockito.mock(BlockTransactionObserver.class));
-			context.undo(observer);
-
-			// Assert:
-			final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-			Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
-
-			// check notifications - all harvest related notifications should contain the forwarded account (realAccount)
-			NotificationUtils.assertBlockHarvestNotification(notificationCaptor.getAllValues().get(0), context.realAccount, Amount.fromNem(5));
-			NotificationUtils.assertBalanceDebitNotification(notificationCaptor.getAllValues().get(1), context.realAccount, Amount.fromNem(5));
-			NotificationUtils.assertBalanceCreditNotification(notificationCaptor.getAllValues().get(3), context.transactionSigner, Amount.fromNem(5));
-		}
-
-		private static class UndoExecuteRemoteHarvestingNotificationTestContext {
-			private final ExecutorTestContext context = new ExecutorTestContext();
-			private final Account remoteSigner = this.context.addAccount();
-			private final Account realAccount = this.context.addAccount();
-			private final Account transactionSigner = this.context.addAccount();
-
-			private final BlockHeight height = new BlockHeight(11);
-			private final Block block;
-
-			public UndoExecuteRemoteHarvestingNotificationTestContext() {
-				// Arrange: create a block signed by the remote (remoteSigner) and have remoteSigner forward to realAccount
-				this.block = new Block(this.remoteSigner, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, this.height);
-				final MockTransaction transaction = new MockTransaction(this.transactionSigner, 1);
-				transaction.setFee(Amount.fromNem(5));
-				this.block.addTransaction(transaction);
-
-				this.context.setForwardingAccount(this.remoteSigner, this.realAccount);
-			}
-
-			private void execute(final BlockTransactionObserver observer) {
-				this.context.executor.execute(this.block, observer);
-			}
-
-			private void undo(final BlockTransactionObserver observer) {
-				this.context.executor.undo(this.block, observer);
-			}
-		}
-
-		//endregion
-
 		//region execute / undo CHILD transaction hashes notifications
 
 		@Test
@@ -295,35 +224,6 @@ public class BlockExecutorTest {
 				Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
 				return (TransactionHashesNotification)notificationCaptor.getAllValues().get(2);
 			}
-		}
-
-		//endregion
-
-		//region delegation
-
-		@Test
-		public void executorDelegatesStateLookupToPoiFacade() {
-			// Arrange:
-			final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
-
-			// Act:
-			context.execute(Mockito.mock(BlockTransactionObserver.class));
-
-			// Assert:
-			Mockito.verify(context.context.accountStateCache, Mockito.times(1))
-					.findForwardedStateByAddress(context.remoteSigner.getAddress(), context.height);
-		}
-
-		@Test
-		public void executorDelegatesAccountLookupToAccountCache() {
-			// Arrange:
-			final UndoExecuteRemoteHarvestingNotificationTestContext context = new UndoExecuteRemoteHarvestingNotificationTestContext();
-
-			// Act:
-			context.execute(Mockito.mock(BlockTransactionObserver.class));
-
-			// Assert:
-			Mockito.verify(context.context.accountCache, Mockito.times(1)).findByAddress(context.realAccount.getAddress());
 		}
 
 		//endregion

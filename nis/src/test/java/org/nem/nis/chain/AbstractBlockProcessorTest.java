@@ -177,17 +177,9 @@ public abstract class AbstractBlockProcessorTest {
 	@Test
 	public void processPropagatesHarvestNotificationsFromRemoteAsEndowedToSubscribedObserver() {
 		// Arrange:
-		final ExecutorTestContext context = new ExecutorTestContext();
-		final Account remoteSigner = context.addAccount();
-		final Account realAccount = context.addAccount();
-		final Account transactionSigner = context.addAccount();
-
-		// Arrange: create a block signed by the remote (remoteSigner) and have remoteSigner forward to realAccount
-		context.block = new Block(remoteSigner, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, context.height);
-		final MockTransaction transaction = new MockTransaction(transactionSigner, 1);
-		transaction.setFee(Amount.fromNem(5));
-		context.block.addTransaction(transaction);
-		context.setForwardingAccount(remoteSigner, realAccount);
+		final Account realAccount = Utils.generateRandomAccount();
+		final Account remoteSigner = Utils.generateRandomAccount();
+		final ExecutorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);;
 
 		// Act:
 		this.processBlock(context);
@@ -206,6 +198,51 @@ public abstract class AbstractBlockProcessorTest {
 			NotificationUtils.assertBlockHarvestNotification(values.get(0), realAccount, Amount.fromNem(5));
 			NotificationUtils.assertBalanceDebitNotification(values.get(1), realAccount, Amount.fromNem(5));
 		}
+	}
+
+	@Test
+	public void processorDelegatesStateLookupToPoiFacade() {
+		// Arrange:
+		final Account realAccount = Utils.generateRandomAccount();
+		final Account remoteSigner = Utils.generateRandomAccount();
+		final ExecutorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);
+
+		// Act:
+		this.processBlock(context);
+
+		// Assert:
+		Mockito.verify(context.accountStateCache, Mockito.times(1))
+				.findForwardedStateByAddress(remoteSigner.getAddress(), context.height);
+	}
+
+	@Test
+	public void processorDelegatesAccountLookupToAccountCache() {
+		// Arrange:
+		final Account realAccount = Utils.generateRandomAccount();
+		final Account remoteSigner = Utils.generateRandomAccount();
+		final ExecutorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);
+
+		// Act:
+		this.processBlock(context);
+
+		// Assert:
+		Mockito.verify(context.accountCache, Mockito.times(1)).findByAddress(realAccount.getAddress());
+	}
+
+	private static ExecutorTestContext createTestContextForRemoteHarvestingTests(final Account realAccount, final Account remoteSigner) {
+		// Arrange:
+		final ExecutorTestContext context = new ExecutorTestContext();
+		context.hookAccount(realAccount);
+		context.hookAccount(remoteSigner);
+		final Account transactionSigner = context.addAccount();
+
+		// Arrange: create a block signed by the remote (remoteSigner) and have remoteSigner forward to realAccount
+		context.block = new Block(remoteSigner, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, context.height);
+		final MockTransaction transaction = new MockTransaction(transactionSigner, 1);
+		transaction.setFee(Amount.fromNem(5));
+		context.block.addTransaction(transaction);
+		context.setForwardingAccount(remoteSigner, realAccount);
+		return context;
 	}
 
 	//endregion
