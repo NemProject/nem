@@ -21,13 +21,12 @@ import java.util.stream.Collectors;
  * be chosen to harvest, then things like double-spend attacks become possible.
  * Thus the tests considered here focus on verifying that a user cannot
  * arbitrarily manipulate their importance to cause them to be chosen to harvest.
- * some tests we should consider: - Sybil attack (master node creates a ton of
+ *
+ * Some tests we consider:
+ * - Sybil attack (master node creates a ton of
  * other nodes and transacts with them (and maybe some other nodes) to try to
  * boost score)</br>
- *  TODO 20150223 J-M: do you want to elaborate on these?
  * - infinite loop attack (sending XEM around in a loop to boost their score)<br/>
- * - closed loop attack (TODO M-M: explain this)<br/>
- * - small transaction spam attack (TODO M-M: is this still relevant?)<br/>
  */
 public class PoiImportanceCalculatorITCase {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorITCase.class.getName());
@@ -508,7 +507,7 @@ public class PoiImportanceCalculatorITCase {
 
 		for (int i = 0; i < numAccounts; ++i) {
 			if (outlinkStrategy == OUTLINK_STRATEGY_ALL_TO_ONE) {
-				if (i == 0) {
+				if (0 == i) {
 					accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight, totalVestedBalance - totalOutlinkStrength - numAccounts + 1));
 				} else {
 					accounts.add(createAccountWithBalance(String.valueOf(i), blockHeight, 1));
