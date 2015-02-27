@@ -595,92 +595,10 @@ public abstract class GraphClusteringITCase {
 
 	//region influence of epsilon
 
-	// TODO 20150223 J-M: did you extract this to the text file? if so, we can remove it here
 	/**
 	 * Analyzes the influence of the value of epsilon on the number of clusters, the average cluster size and the number of hubs.
 	 * The minimum harvester balance is set to 10000.
 	 * (unfortunately cluster information is only internally available, so it is only logged. You have to look for the entries yourself).
-	 * <pre>
-	 * epsilon = 0.75
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     1    |    3.00   |          1.00           |  0
-	 *   50000   |     6    |    3.00   |          1.20           |  0
-	 *  100000   |     8    |    3.12   |          0.80           |  5
-	 *  150000   |     9    |    3.11   |          0.60           |  5
-	 *  200000   |    13    |    3.15   |          0.65           |  5
-	 * <br/>
-	 * epsilon = 0.65 (standard value)
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     2    |    3.00   |          3.00           |  0
-	 *   50000   |    14    |    3.29   |          2.80           |  3
-	 *  100000   |    16    |    3.19   |          1.60           |  8
-	 *  150000   |    24    |    3.33   |          1.60           |  5
-	 *  200000   |    33    |    3.33   |          1.65           |  8
-	 * <br/>
-	 * epsilon = 0.55
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     6    |    3.67   |          6.00           |  1
-	 *   50000   |    26    |    3.73   |          5.20           |  9
-	 *  100000   |    29    |    3.45   |          2.90           | 10
-	 *  150000   |    44    |    3.70   |          2.93           | 13
-	 *  200000   |    53    |    2.65   |          2.65           | 19
-	 * <br/>
-	 * epsilon = 0.45
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |    10    |    4.70   |         10.00           |  5
-	 *   50000   |    37    |    4.03   |          7.40           | 17
-	 *  100000   |    47    |    3.96   |          4.70           | 24
-	 *  150000   |    64    |    4.25   |          4.26           | 39
-	 *  200000   |    77    |    3.86   |          3.85           | 47
-	 * <br/>
-	 * epsilon = 0.35
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     8    |    8.88   |          8.00           |  5
-	 *   50000   |    38    |    6.03   |          7.60           | 18
-	 *  100000   |    44    |    6.98   |          4.40           | 30
-	 *  150000   |    63    |    6.52   |          4.26           | 29
-	 *  200000   |    81    |    5.91   |          4.05           | 48
-	 * <br/>
-	 * epsilon = 0.30
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     6    |   13.67   |          6.00           |  3
-	 *   50000   |    22    |   11.45   |          4.40           |  6
-	 *  100000   |    33    |   11.18   |          3.30           | 54
-	 *  150000   |    48    |    9.77   |          3.20           | 16
-	 *  200000   |    58    |    9.91   |          2.90           | 27
-	 * <br/>
-	 * epsilon = 0.25
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     4    |   21.00   |          4.00           |  0
-	 *   50000   |    16    |   17.44   |          3.20           |  4
-	 *  100000   |    22    |   18.86   |          2.20           | 38
-	 *  150000   |    28    |   18.61   |          1.87           | 12
-	 *  200000   |    38    |   17.63   |          1.90           |  9
-	 * <br/>
-	 * epsilon = 0.20
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     3    |   34.67   |          3.00           |  0
-	 *   50000   |    12    |   28.83   |          2.40           |  1
-	 *  100000   |    17    |   27.71   |          1.70           |  0
-	 *  150000   |    20    |   31.15   |          1.33           |  5
-	 *  200000   |    28    |   26.64   |          1.40           |  5
-	 * <br/>
-	 * epsilon = 0.15
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     3    |   37.33   |          3.00           |  0
-	 *   50000   |    10    |   39.00   |          2.00           |  0
-	 *  100000   |    13    |   40.77   |          1.30           |  0
-	 *  150000   |    14    |   49.29   |          0.93           |  0
-	 *  200000   |    20    |   39.60   |          1.00           |  0
-	 * <br/>
-	 * epsilon = 0.05
-	 * endheight | clusters | avg. size | new clusters/10k blocks | hubs
-	 *   10000   |     2    |   56.00   |          2.00           |  0
-	 *   50000   |     8    |   55.62   |          1.60           |  0
-	 *  100000   |     2    |  485.50   |          0.20           |  0
-	 *  150000   |     7    |  175.14   |          0.47           |  0
-	 *  200000   |    10    |  110.60   |          0.50           |  0
-	 * </pre>
 	 */
 	@Test
 	public void epsilonInfluenceOnNumberOfClustersAndClusterSize() {

@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
  * - infinite loop attack (sending XEM around in a loop to boost their score)<br/>
  * - closed loop attack (TODO M-M: explain this)<br/>
  * - small transaction spam attack (TODO M-M: is this still relevant?)<br/>
- * -
  */
 public class PoiImportanceCalculatorITCase {
 	private static final Logger LOGGER = Logger.getLogger(PoiImportanceCalculatorITCase.class.getName());
