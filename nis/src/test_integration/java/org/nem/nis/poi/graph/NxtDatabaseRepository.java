@@ -14,7 +14,7 @@ public class NxtDatabaseRepository implements AutoCloseable, DatabaseRepository 
 	private static final String JDBC_DRIVER = "org.h2.Driver";
 
 	private final Connection conn;
-	private final Map<String, Collection<GraphClusteringTransaction>> transactionCache = new HashMap<>();
+	private static final Map<String, Collection<GraphClusteringTransaction>> transactionCache = new HashMap<>();
 
 	/**
 	 * Creates a new repository.

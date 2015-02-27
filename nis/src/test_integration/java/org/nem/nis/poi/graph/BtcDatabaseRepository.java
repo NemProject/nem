@@ -19,7 +19,6 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	private static final Logger LOGGER = Logger.getLogger(BtcDatabaseRepository.class.getName());
 
 	private final String databasePath;
-	// TODO 20150223 J-M: fyi, the cache in the NXT repository is not static; probably both should be static or non-static
 	private static final Map<String, Collection<GraphClusteringTransaction>> TRANSACTION_CACHE = new HashMap<>();
 
 	/**
