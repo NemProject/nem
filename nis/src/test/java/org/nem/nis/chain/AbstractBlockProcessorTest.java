@@ -146,7 +146,7 @@ public abstract class AbstractBlockProcessorTest {
 		}
 	}
 
-	private static class UndoExecuteNotificationTestContext extends ExecutorTestContext {
+	private static class UndoExecuteNotificationTestContext extends ProcessorTestContext {
 		// Arrange:
 		private final Account account1 = this.addAccount();
 		private final Account account2 = this.addAccount();
@@ -179,7 +179,7 @@ public abstract class AbstractBlockProcessorTest {
 		// Arrange:
 		final Account realAccount = Utils.generateRandomAccount();
 		final Account remoteSigner = Utils.generateRandomAccount();
-		final ExecutorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);;
+		final ProcessorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);;
 
 		// Act:
 		this.processBlock(context);
@@ -205,7 +205,7 @@ public abstract class AbstractBlockProcessorTest {
 		// Arrange:
 		final Account realAccount = Utils.generateRandomAccount();
 		final Account remoteSigner = Utils.generateRandomAccount();
-		final ExecutorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);
+		final ProcessorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);
 
 		// Act:
 		this.processBlock(context);
@@ -220,7 +220,7 @@ public abstract class AbstractBlockProcessorTest {
 		// Arrange:
 		final Account realAccount = Utils.generateRandomAccount();
 		final Account remoteSigner = Utils.generateRandomAccount();
-		final ExecutorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);
+		final ProcessorTestContext context = createTestContextForRemoteHarvestingTests(realAccount, remoteSigner);
 
 		// Act:
 		this.processBlock(context);
@@ -229,9 +229,9 @@ public abstract class AbstractBlockProcessorTest {
 		Mockito.verify(context.accountCache, Mockito.times(1)).findByAddress(realAccount.getAddress());
 	}
 
-	private static ExecutorTestContext createTestContextForRemoteHarvestingTests(final Account realAccount, final Account remoteSigner) {
+	private static ProcessorTestContext createTestContextForRemoteHarvestingTests(final Account realAccount, final Account remoteSigner) {
 		// Arrange:
-		final ExecutorTestContext context = new ExecutorTestContext();
+		final ProcessorTestContext context = new ProcessorTestContext();
 		context.hookAccount(realAccount);
 		context.hookAccount(remoteSigner);
 		final Account transactionSigner = context.addAccount();
@@ -249,7 +249,7 @@ public abstract class AbstractBlockProcessorTest {
 
 	//region helpers
 
-	private void processTransaction(final ExecutorTestContext context) {
+	private void processTransaction(final ProcessorTestContext context) {
 		this.process(
 				context.block.getTransactions().get(0),
 				context.block,
@@ -257,14 +257,14 @@ public abstract class AbstractBlockProcessorTest {
 				context.observer);
 	}
 
-	private void processBlock(final ExecutorTestContext context) {
+	private void processBlock(final ProcessorTestContext context) {
 		this.process(
 				context.block,
 				context.nisCache,
 				context.observer);
 	}
 
-	private static class ExecutorTestContext {
+	private static class ProcessorTestContext {
 		public final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		public final AccountCache accountCache = Mockito.mock(AccountCache.class);
 		public final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.accountStateCache);
