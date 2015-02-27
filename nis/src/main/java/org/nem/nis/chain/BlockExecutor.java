@@ -1,4 +1,4 @@
-package org.nem.nis.service;
+package org.nem.nis.chain;
 
 import org.apache.commons.collections4.iterators.ReverseListIterator;
 import org.nem.core.model.*;

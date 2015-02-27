@@ -10,7 +10,7 @@ import org.nem.nis.chain.SingleBlockExecutor;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.mappers.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.service.BlockExecutor;
+import org.nem.nis.chain.BlockExecutor;
 import org.nem.nis.validators.*;
 import org.nem.nis.visitors.*;
 

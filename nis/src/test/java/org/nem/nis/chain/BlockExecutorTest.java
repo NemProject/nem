@@ -1,4 +1,4 @@
-package org.nem.nis.service;
+package org.nem.nis.chain;
 
 import org.hamcrest.core.IsEqual;
 import org.junit.*;
