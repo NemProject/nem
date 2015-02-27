@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Read-only DAO for accessing DbTransferTransaction objects.
  */
-public interface ReadOnlyTransferDao extends SimpleReadOnlyTransferDao<DbTransferTransaction> {
+public interface ReadOnlyTransferDao {
 	/*
 	 * Types of transfers that can be requested.
 	 */

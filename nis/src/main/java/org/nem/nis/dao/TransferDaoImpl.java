@@ -16,56 +16,21 @@ import java.util.stream.Collectors;
 
 @Repository
 public class TransferDaoImpl implements TransferDao {
-	private final SimpleTransferDaoImpl<DbTransferTransaction> impl;
+	private final SessionFactory sessionFactory;
 
+	/**
+	 * Creates a transfer dao implementation.
+	 *
+	 * @param sessionFactory The session factory.
+	 */
 	@Autowired(required = true)
 	public TransferDaoImpl(final SessionFactory sessionFactory) {
-		this.impl = new SimpleTransferDaoImpl<>("DbTransferTransaction", sessionFactory);
+		this.sessionFactory = sessionFactory;
 	}
 
 	private Session getCurrentSession() {
-		return this.impl.getCurrentSession();
+		return this.sessionFactory.getCurrentSession();
 	}
-
-	//region SimpleTransferDao
-
-	@Override
-	@Transactional(readOnly = true)
-	public Long count() {
-		return this.impl.count();
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public DbTransferTransaction findByHash(final byte[] txHash) {
-		return this.impl.findByHash(txHash);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public DbTransferTransaction findByHash(final byte[] txHash, final long maxBlockHeight) {
-		return this.impl.findByHash(txHash, maxBlockHeight);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public boolean anyHashExists(final Collection<Hash> hashes, final BlockHeight maxBlockHeight) {
-		return this.impl.anyHashExists(hashes, maxBlockHeight);
-	}
-
-	@Override
-	@Transactional
-	public void save(final DbTransferTransaction entity) {
-		this.impl.save(entity);
-	}
-
-	@Override
-	@Transactional
-	public void saveMulti(final List<DbTransferTransaction> dbTransferTransactions) {
-		this.impl.saveMulti(dbTransferTransactions);
-	}
-
-	//endregion
 
 	// NOTE: this query will also ask for accounts of senders and recipients!
 	@Override
