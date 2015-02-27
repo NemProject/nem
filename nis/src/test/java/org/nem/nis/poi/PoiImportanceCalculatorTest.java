@@ -217,12 +217,8 @@ public class PoiImportanceCalculatorTest {
 	}
 
 	/**
-	 * TODO 20150223 J-M: is this comment still applicable or can it be closed?
-	 * TODO 20141013 BR -> J: what we are really interested in is the importance calculated by the page rank part. Here are the (unweighted) numbers:
-	 * TODO                   In your scenario 0, 1 and 6 are outliers, 2, 3, 4, 5 and 7, 8, 9, 10 build a cluster each.
-	 * 0.117 0.103 0.069 0.081 0.091 0.098 0.103 0.069 0.081 0.091 0.098 original importance
-	 * I must say I don't really understand why the importances rise from node 2 onwards: 2 < 3 < 4 < 5 < 1
-	 * 1 should transfer more importance to 2 than 4 transfers to 5.
+	 * Importances rise from node 2 onwards, such that 2 < 3 < 4 < 5 < 1 because the PageRank of each node increases. Nodes 1 and 6 have a lower PageRank
+	 * because they have outlinks to two nodes, thus lowering their ranks.
 	 *
 	 * Variation of the teleportation probabilities shows this behavior (TP = teleportation prob., ITLP = inter level teleportation prob.):
 	 *
@@ -253,7 +249,7 @@ public class PoiImportanceCalculatorTest {
 	 *
 	 * Here are the values for SingleClusterScan (should be the same as normal page rank):
 	 * 0.108 0.104 0.069 0.082 0.092 0.099 0.104 0.069 0.082 0.092 0.099 original importance
-	 * The ncd-aware algorithm pushes 0 which is good. Again I don't understand why 2 has such a low importance.
+	 * The ncd-aware algorithm pushes 0 which is good. Node 2 has a lower importance than 3, 4, or 5, because node 1 contributes less PageRank to node 2.
 	 */
 	/**
 	 * <pre>
@@ -270,7 +266,7 @@ public class PoiImportanceCalculatorTest {
 		// - accounts 2-5 and 7-10 start with 2100 NEM
 		// - accounts 1 and 6 start with 2200 NEM
 		// - account 1-5 and 2-10 send around NEM in a loop (100 NEM each)
-		// - account 1-6 send NEM to 0 (100 NEM each)
+		// - account 1 and 6 send NEM to 0 (100 NEM each)
 		final List<AccountState> accountStates = new ArrayList<>();
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2000)));
 		accountStates.add(createAccountStateWithBalance(Amount.fromNem(2200)));
