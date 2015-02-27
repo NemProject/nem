@@ -21,6 +21,8 @@ import java.util.*;
 @RunWith(Enclosed.class)
 public class BlockExecutorTest {
 
+	//region ExecutorAsExecuteProcessorTests / ExecutorAsUndoProcessorTests
+
 	public static class ExecutorAsExecuteProcessorTests extends AbstractBlockProcessorTest {
 
 		@Override
@@ -71,9 +73,9 @@ public class BlockExecutorTest {
 		}
 	}
 
-	public static class LegacyTests {
+	//endregion
 
-		//region execute / undo basic transaction order
+	public static class UndoExecuteTransactionOrderTests {
 
 		@Test
 		public void executeCallsExecuteOnAllTransactionsInForwardOrder() {
@@ -147,118 +149,6 @@ public class BlockExecutorTest {
 
 			private MockTransaction createTransaction(final int customField, final long fee) {
 				return BlockUtils.createTransactionWithFee(customField, fee);
-			}
-		}
-
-		//endregion
-
-		//region execute / undo CHILD transaction hashes notifications
-
-		@Test
-		public void executePropagatesChildTransactionHashesToSubscribedObserver() {
-			// Arrange:
-			final UndoExecuteChildTransactionHashesTestContext context = new UndoExecuteChildTransactionHashesTestContext();
-			final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
-
-			// Act:
-			final TransactionHashesNotification notification = context.execute(observer);
-
-			// check notification
-			Assert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));
-			NotificationUtils.assertTransactionHashesNotification(notification, context.transactionHashPairs);
-		}
-
-		@Test
-		public void undoPropagatesChildTransactionHashesToSubscribedObserver() {
-			// Arrange:
-			final UndoExecuteChildTransactionHashesTestContext context = new UndoExecuteChildTransactionHashesTestContext();
-			final BlockTransactionObserver observer = Mockito.mock(BlockTransactionObserver.class);
-
-			// Act:
-			final TransactionHashesNotification notification = context.undo(observer);
-
-			// check notification
-			Assert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));
-			NotificationUtils.assertTransactionHashesNotification(notification, context.transactionHashPairs);
-		}
-
-		private static class UndoExecuteChildTransactionHashesTestContext {
-			private final ExecutorTestContext context = new ExecutorTestContext();
-			private final Account signer = this.context.addAccount();
-			private final Account transactionSigner = this.context.addAccount();
-
-			private final BlockHeight height = new BlockHeight(11);
-			private final Block block;
-
-			private final List<HashMetaDataPair> transactionHashPairs = new ArrayList<>();
-
-			public UndoExecuteChildTransactionHashesTestContext() {
-				// Arrange: create a block with two child transactions
-				this.block = new Block(this.signer, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, this.height);
-
-				final MockTransaction childTransaction1 = new MockTransaction(Utils.generateRandomAccount(), 2);
-				final MockTransaction childTransaction2 = new MockTransaction(Utils.generateRandomAccount(), 4);
-
-				final MockTransaction transaction = new MockTransaction(this.transactionSigner, 1);
-				transaction.setChildTransactions(Arrays.asList(childTransaction1, childTransaction2));
-				this.block.addTransaction(transaction);
-
-				final HashMetaData metaData = new HashMetaData(this.height, MockTransaction.TIMESTAMP);
-				this.transactionHashPairs.add(new HashMetaDataPair(HashUtils.calculateHash(childTransaction1), metaData));
-				this.transactionHashPairs.add(new HashMetaDataPair(HashUtils.calculateHash(childTransaction2), metaData));
-				this.transactionHashPairs.add(new HashMetaDataPair(HashUtils.calculateHash(transaction), metaData));
-			}
-
-			private TransactionHashesNotification execute(final BlockTransactionObserver observer) {
-				this.context.executor.execute(this.block, observer);
-
-				final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-				Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
-				return (TransactionHashesNotification)notificationCaptor.getAllValues().get(3);
-			}
-
-			private TransactionHashesNotification undo(final BlockTransactionObserver observer) {
-				this.context.executor.undo(this.block, observer);
-
-				final ArgumentCaptor<Notification> notificationCaptor = ArgumentCaptor.forClass(Notification.class);
-				Mockito.verify(observer, Mockito.times(4)).notify(notificationCaptor.capture(), Mockito.any());
-				return (TransactionHashesNotification)notificationCaptor.getAllValues().get(2);
-			}
-		}
-
-		//endregion
-
-		private static class ExecutorTestContext {
-			private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
-			private final AccountCache accountCache = Mockito.mock(AccountCache.class);
-			private final NisCache nisCache = NisCacheFactory.create(this.accountCache, this.accountStateCache);
-			private final BlockExecutor executor = new BlockExecutor(this.nisCache);
-
-			private Account addAccount() {
-				final Account account = Utils.generateRandomAccount();
-				this.hookAccount(account);
-				return account;
-			}
-
-			private Block createBlockWithTransaction(final BlockHeight height, final Transaction transaction) {
-				final Block block = BlockUtils.createBlockWithHeight(height);
-				this.hookAccount(block.getSigner());
-				block.addTransaction(transaction);
-				return block;
-			}
-
-			private void hookAccount(final Account account) {
-				final AccountState accountState = new AccountState(account.getAddress());
-				Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(account.getAddress()), Mockito.any()))
-						.thenReturn(accountState);
-			}
-
-			private void setForwardingAccount(final Account forwardingAccount, final Account forwardAccount) {
-				Mockito.when(this.accountCache.findByAddress(forwardAccount.getAddress())).thenReturn(forwardAccount);
-
-				final AccountState accountState = new AccountState(forwardAccount.getAddress());
-				Mockito.when(this.accountStateCache.findForwardedStateByAddress(Mockito.eq(forwardingAccount.getAddress()), Mockito.any()))
-						.thenReturn(accountState);
 			}
 		}
 	}

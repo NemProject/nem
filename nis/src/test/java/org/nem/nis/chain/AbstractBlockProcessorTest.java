@@ -101,13 +101,8 @@ public abstract class AbstractBlockProcessorTest {
 		final ArgumentCaptor<Notification> notificationCaptor = context.captureNotifications(this.numExpectedBlockNotifications);
 
 		// check notification
-		// when executed, transaction hashes are notified last; when undone they are second (after block harvest)
-		// TODO 20150227 J-B: is there a reason we aren't consistent (i mean why not last and first)?
-		final int start = NotificationTrigger.Execute == this.getTrigger()
-				? this.numExpectedBlockNotifications - 1
-				: 2;
-		final List<Notification> values = notificationCaptor.getAllValues();
-		NotificationUtils.assertTransactionHashesNotification(values.get(start), context.transactionHashPairs);
+		final Notification notification = this.getTransactionHashesNotification(notificationCaptor.getAllValues(), this.numExpectedBlockNotifications);
+		NotificationUtils.assertTransactionHashesNotification(notification, context.transactionHashPairs);
 	}
 
 	@Test
@@ -247,7 +242,57 @@ public abstract class AbstractBlockProcessorTest {
 
 	//endregion
 
+	//region CHILD transaction hashes notifications
+
+	@Test
+	public void processPropagatesChildTransactionHashesToSubscribedObserver() {
+		// Arrange:
+		final ProcessorTestContext context = new ProcessorTestContext();
+		final Account signer = context.addAccount();
+		final Account transactionSigner = context.addAccount();
+
+		// Arrange: create a block with two child transactions
+		context.block = new Block(signer, Hash.ZERO, Hash.ZERO, TimeInstant.ZERO, context.height);
+
+		final MockTransaction childTransaction1 = new MockTransaction(Utils.generateRandomAccount(), 2);
+		final MockTransaction childTransaction2 = new MockTransaction(Utils.generateRandomAccount(), 4);
+
+		final MockTransaction transaction = new MockTransaction(transactionSigner, 1);
+		transaction.setChildTransactions(Arrays.asList(childTransaction1, childTransaction2));
+		context.block.addTransaction(transaction);
+
+		final HashMetaData metaData = new HashMetaData(context.height, MockTransaction.TIMESTAMP);
+		final List<HashMetaDataPair> transactionHashPairs = new ArrayList<>();
+		transactionHashPairs.add(new HashMetaDataPair(HashUtils.calculateHash(childTransaction1), metaData));
+		transactionHashPairs.add(new HashMetaDataPair(HashUtils.calculateHash(childTransaction2), metaData));
+		transactionHashPairs.add(new HashMetaDataPair(HashUtils.calculateHash(transaction), metaData));
+
+		// Act:
+		this.processBlock(context);
+
+		// Assert:
+		final int expectedNotifications = (this.supportsTransactionExecution() ? 0 : 1) + 3;
+		final ArgumentCaptor<Notification> notificationCaptor = context.captureNotifications(expectedNotifications);
+
+		// check notification
+		final TransactionHashesNotification notification = this.getTransactionHashesNotification(notificationCaptor.getAllValues(), expectedNotifications);
+		Assert.assertThat(notification.getPairs().size(), IsEqual.equalTo(3));
+		NotificationUtils.assertTransactionHashesNotification(notification, transactionHashPairs);
+	}
+
+	//endregion
+
 	//region helpers
+
+	private TransactionHashesNotification getTransactionHashesNotification(final List<Notification> notifications, final int expectedNotifications) {
+		// when executed, transaction hashes are notified last; when undone they are second (after block harvest)
+		// TODO 20150227 J-B: is there a reason we aren't consistent (i mean why not last and first)?
+		final int start = NotificationTrigger.Execute == this.getTrigger()
+				? expectedNotifications - 1
+				: 2;
+		return (TransactionHashesNotification)notifications.get(start);
+
+	}
 
 	private void processTransaction(final ProcessorTestContext context) {
 		this.process(
