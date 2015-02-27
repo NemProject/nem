@@ -16,7 +16,7 @@ public class BlockExecuteProcessor extends AbstractBlockProcessor {
 	 * @param block The block.
 	 * @param observer The block observer.
 	 */
-	protected BlockExecuteProcessor(final ReadOnlyNisCache nisCache, final Block block, final BlockTransactionObserver observer) {
+	public BlockExecuteProcessor(final ReadOnlyNisCache nisCache, final Block block, final BlockTransactionObserver observer) {
 		super(nisCache, block, observer, NotificationTrigger.Execute);
 	}
 

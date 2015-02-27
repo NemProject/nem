@@ -16,7 +16,7 @@ public class BlockUndoProcessor extends AbstractBlockProcessor {
 	 * @param block The block.
 	 * @param observer The block observer.
 	 */
-	protected BlockUndoProcessor(final ReadOnlyNisCache nisCache, final Block block, final BlockTransactionObserver observer) {
+	public BlockUndoProcessor(final ReadOnlyNisCache nisCache, final Block block, final BlockTransactionObserver observer) {
 		super(nisCache, block, observer, NotificationTrigger.Undo);
 	}
 

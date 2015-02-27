@@ -9,7 +9,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
-import org.nem.nis.chain.SingleBlockExecutor;
+import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.DefaultDebitPredicate;
@@ -682,7 +682,7 @@ public class BlockChainValidatorIntegrationTest {
 			final NisCache nisCache = NisCacheFactory.create(this.accountStateCache);
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 			return new BlockChainValidator(
-					block -> new SingleBlockExecutor(nisCache, observer, block),
+					block -> new BlockExecuteProcessor(nisCache, block, observer),
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,

@@ -3,7 +3,7 @@ package org.nem.nis;
 import org.nem.core.crypto.Hash;
 import org.nem.core.model.*;
 import org.nem.core.model.primitive.BlockHeight;
-import org.nem.nis.chain.SingleBlockExecutor;
+import org.nem.nis.chain.BlockProcessor;
 import org.nem.nis.validators.*;
 
 import java.math.BigInteger;
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class BlockChainValidator {
 	private static final Logger LOGGER = Logger.getLogger(BlockChainValidator.class.getName());
 
-	private final Function<Block, SingleBlockExecutor> executorFactory;
+	private final Function<Block, BlockProcessor> processorFactory;
 	private final BlockScorer scorer;
 	private final int maxChainSize;
 	private final BlockValidator blockValidator;
@@ -27,7 +27,7 @@ public class BlockChainValidator {
 	/**
 	 * Creates a new block chain validator.
 	 *
-	 * @param executorFactory A factory for creating block executors.
+	 * @param processorFactory A factory for creating block processors.
 	 * @param scorer The block scorer to use.
 	 * @param maxChainSize The maximum chain size.
 	 * @param blockValidator The validator to use for validating blocks.
@@ -35,13 +35,13 @@ public class BlockChainValidator {
 	 * @param debitPredicate The debit predicate to use for validating transactions.
 	 */
 	public BlockChainValidator(
-			final Function<Block, SingleBlockExecutor> executorFactory,
+			final Function<Block, BlockProcessor> processorFactory,
 			final BlockScorer scorer,
 			final int maxChainSize,
 			final BlockValidator blockValidator,
 			final SingleTransactionValidator transactionValidator,
 			final DebitPredicate debitPredicate) {
-		this.executorFactory = executorFactory;
+		this.processorFactory = processorFactory;
 		this.scorer = scorer;
 		this.maxChainSize = maxChainSize;
 		this.blockValidator = blockValidator;
@@ -66,7 +66,7 @@ public class BlockChainValidator {
 		final Set<Hash> chainHashes = new HashSet<>();
 		BlockHeight expectedHeight = parentBlock.getHeight().next();
 		for (final Block block : blocks) {
-			final SingleBlockExecutor executor = this.executorFactory.apply(block);
+			final BlockProcessor processor = this.processorFactory.apply(block);
 			block.setPrevious(parentBlock);
 			if (!expectedHeight.equals(block.getHeight())) {
 				LOGGER.info("received block with unexpected height");
@@ -109,11 +109,11 @@ public class BlockChainValidator {
 					return transactionValidationResult;
 				}
 
-				executor.execute(transaction);
+				processor.process(transaction);
 				chainHashes.add(hash);
 			}
 
-			executor.execute();
+			processor.process();
 
 			parentBlock = block;
 			expectedHeight = expectedHeight.next();

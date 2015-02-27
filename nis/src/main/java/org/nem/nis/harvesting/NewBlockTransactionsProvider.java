@@ -6,7 +6,7 @@ import org.nem.core.model.primitive.BlockHeight;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.BlockChainConstants;
 import org.nem.nis.cache.*;
-import org.nem.nis.chain.SingleBlockExecutor;
+import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
 import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.validators.*;
@@ -121,7 +121,7 @@ public class NewBlockTransactionsProvider {
 		final BlockValidator blockValidator = this.blockValidatorFactory.createTransactionOnly(nisCache);
 		final SingleTransactionValidator transactionValidator = this.validatorFactory.createSingle(nisCache.getAccountStateCache());
 		final BlockTransactionObserver observer = this.observerFactory.createExecuteCommitObserver(nisCache);
-		final SingleBlockExecutor executor = new SingleBlockExecutor(nisCache, observer, tempBlock);
+		final BlockProcessor processor = new BlockExecuteProcessor(nisCache, tempBlock, observer);
 
 		for (final Transaction transaction : candidateTransactions) {
 			final ValidationContext validationContext = new ValidationContext(new DefaultDebitPredicate(this.nisCache.getAccountStateCache()));
@@ -133,7 +133,7 @@ public class NewBlockTransactionsProvider {
 					continue;
 				}
 
-				executor.execute(transaction);
+				processor.process(transaction);
 
 				numTransactions += 1 + transaction.getChildTransactions().size();
 				if (numTransactions > maxTransactions) {
