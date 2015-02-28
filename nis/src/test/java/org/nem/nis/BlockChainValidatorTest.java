@@ -176,32 +176,6 @@ public class BlockChainValidatorTest {
 		Mockito.verify(blockValidator, Mockito.times(2)).validate(Mockito.any());
 	}
 
-	// TODO 20150227 J-B: i guess we can delete this one since it seems to be the same as chainIsInvalidIfTwoBlocksContainTheSameTransaction?
-	@Test
-	public void chainIsInvalidIfSameTransactionIsInDifferentBlocks() {
-		// Arrange:
-		final BlockChainValidatorFactory factory = new BlockChainValidatorFactory();
-		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 11);
-		parentBlock.sign();
-
-		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
-		final Transaction transaction = createValidSignedTransaction();
-		final Block middleBlock = blocks.get(1);
-		middleBlock.addTransaction(transaction);
-		middleBlock.sign();
-		final Block lastBlock = blocks.get(2);
-		lastBlock.addTransaction(transaction);
-		lastBlock.setPrevious(middleBlock);
-		lastBlock.sign();
-
-		// Act:
-		final ValidationResult result = validator.isValid(parentBlock, blocks);
-
-		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
-	}
-
 	@Test
 	public void allBlocksInChainMustHit() {
 		// Arrange:
