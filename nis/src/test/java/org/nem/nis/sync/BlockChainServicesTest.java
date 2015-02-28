@@ -431,9 +431,7 @@ public class BlockChainServicesTest {
 		private final BlockDao blockDao = Mockito.mock(BlockDao.class);
 		private final BlockTransactionObserverFactory observerFactory = new BlockTransactionObserverFactory();
 		private final BlockValidatorFactory blockValidatorFactory = new BlockValidatorFactory(NisMain.TIME_PROVIDER);
-		private final TransactionValidatorFactory transactionValidatorFactory = new TransactionValidatorFactory(
-				NisMain.TIME_PROVIDER,
-				new PoiOptionsBuilder().create());
+		private final TransactionValidatorFactory transactionValidatorFactory = NisUtils.createTransactionValidatorFactory();
 
 		private final NisCache nisCache;
 
@@ -441,7 +439,7 @@ public class BlockChainServicesTest {
 			this.nisCache = new DefaultNisCache(
 					new SynchronizedAccountCache(new DefaultAccountCache()),
 					new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
-					new SynchronizedPoiFacade(new DefaultPoiFacade(new PoiImportanceCalculator(new PoiScorer(), new PoiOptionsBuilder().create()))),
+					new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
 					new SynchronizedHashCache(new DefaultHashCache())).copy();
 
 			this.blockChainServices = new BlockChainServices(

@@ -14,22 +14,29 @@ import org.nem.nis.validators.*;
 
 public class ImportanceTransferTransactionValidatorTest {
 	private static final BlockHeight TEST_HEIGHT = new BlockHeight(123);
+	private static final BlockHeight TEST_FORK_HEIGHT = new BlockHeight(456);
 
 	//region signer balance
 
 	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndMinBalanceAndUsesResultWhenDebitPredicateSucceeds() {
+	public void validatorDelegatesToDebitPredicateWithFeeAndHeightDependentMinBalanceAndUsesResultWhenDebitPredicateSucceeds() {
 		// Assert:
-		assertDebitPredicateDelegation(true, ValidationResult.SUCCESS);
+		assertDebitPredicateDelegation(TEST_HEIGHT, true, ValidationResult.SUCCESS, Amount.fromNem(2011));
+		assertDebitPredicateDelegation(TEST_FORK_HEIGHT, true, ValidationResult.SUCCESS, Amount.fromNem(4011));
 	}
 
 	@Test
-	public void validatorDelegatesToDebitPredicateWithFeeAndMinBalanceAndUsesResultWhenDebitPredicateFails() {
+	public void validatorDelegatesToDebitPredicateWithFeeAndHeightDependentMinBalanceAndUsesResultWhenDebitPredicateFails() {
 		// Assert:
-		assertDebitPredicateDelegation(false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE);
+		assertDebitPredicateDelegation(TEST_HEIGHT, false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE, Amount.fromNem(2011));
+		assertDebitPredicateDelegation(TEST_FORK_HEIGHT, false, ValidationResult.FAILURE_INSUFFICIENT_BALANCE, Amount.fromNem(4011));
 	}
 
-	private static void assertDebitPredicateDelegation(final boolean predicateResult, final ValidationResult expectedValidationResult) {
+	private static void assertDebitPredicateDelegation(
+			final BlockHeight height,
+			final boolean predicateResult,
+			final ValidationResult expectedValidationResult,
+			final Amount expectedAmount) {
 		// Arrange:
 		final TestContext context = new TestContext();
 		final ImportanceTransferTransaction transaction = context.createTransaction(ImportanceTransferTransaction.Mode.Activate);
@@ -39,10 +46,10 @@ public class ImportanceTransferTransactionValidatorTest {
 		Mockito.when(debitPredicate.canDebit(Mockito.any(), Mockito.any())).thenReturn(predicateResult);
 
 		// Act:
-		final ValidationResult result = context.validate(transaction, debitPredicate);
+		final ValidationResult result = context.validator.validate(transaction, new ValidationContext(height, debitPredicate));
 
 		// Assert:
-		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), Amount.fromNem(2011));
+		Mockito.verify(debitPredicate, Mockito.only()).canDebit(transaction.getSigner(), expectedAmount);
 		Assert.assertThat(result, IsEqual.equalTo(expectedValidationResult));
 	}
 
@@ -369,7 +376,7 @@ public class ImportanceTransferTransactionValidatorTest {
 		private final AccountStateCache accountStateCache = Mockito.mock(AccountStateCache.class);
 		private final ImportanceTransferTransactionValidator validator = new ImportanceTransferTransactionValidator(
 				this.accountStateCache,
-				Amount.fromNem(2000));
+				height -> height.compareTo(TEST_FORK_HEIGHT) >= 0 ? Amount.fromNem(4000) : Amount.fromNem(2000));
 
 		private ImportanceTransferTransaction createTransaction(final ImportanceTransferTransaction.Mode mode) {
 			final Account signer = Utils.generateRandomAccount();
@@ -420,10 +427,6 @@ public class ImportanceTransferTransactionValidatorTest {
 
 		private ValidationResult validate(final ImportanceTransferTransaction transaction) {
 			return this.validate(transaction, TEST_HEIGHT);
-		}
-
-		private ValidationResult validate(final ImportanceTransferTransaction transaction, final DebitPredicate debitPredicate) {
-			return this.validator.validate(transaction, new ValidationContext(TEST_HEIGHT, debitPredicate));
 		}
 
 		private ValidationResult validate(final ImportanceTransferTransaction transaction, final BlockHeight testHeight) {

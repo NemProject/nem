@@ -251,7 +251,7 @@ public class NisUtils {
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
 		return new TransactionValidatorFactory(
 				timeProvider,
-				DEFAULT_POI_OPTIONS);
+				height -> DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
 	}
 
 	/**
@@ -269,7 +269,7 @@ public class NisUtils {
 	 * @return The calculator.
 	 */
 	public static ImportanceCalculator createImportanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), DEFAULT_POI_OPTIONS);
+		return new PoiImportanceCalculator(new PoiScorer(), height -> DEFAULT_POI_OPTIONS);
 	}
 
 	/**

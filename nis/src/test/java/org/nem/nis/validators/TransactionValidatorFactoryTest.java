@@ -2,10 +2,10 @@ package org.nem.nis.validators;
 
 import org.junit.*;
 import org.mockito.Mockito;
+import org.nem.core.model.primitive.*;
 import org.nem.core.test.IsEquivalent;
 import org.nem.core.time.TimeProvider;
 import org.nem.nis.cache.*;
-import org.nem.nis.poi.PoiOptions;
 
 import java.util.*;
 
@@ -107,6 +107,6 @@ public class TransactionValidatorFactoryTest {
 	private static TransactionValidatorFactory createFactory() {
 		return new TransactionValidatorFactory(
 				Mockito.mock(TimeProvider.class),
-				Mockito.mock(PoiOptions.class));
+				height -> Amount.ZERO);
 	}
 }
