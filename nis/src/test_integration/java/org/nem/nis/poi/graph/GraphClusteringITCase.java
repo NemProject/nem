@@ -660,10 +660,20 @@ public abstract class GraphClusteringITCase {
 	 * @return The normalized amount.
 	 */
 	protected long normalizeAmount(final long amt) {
-		// TODO 20150228 J-M: i'm assuming this is being called with NXT / BTC amounts
-		// > but if so, i think your market cap rations were inverse before?
+		// this really isn't market cap normalization
+		// for BTC, the idea is to multiply each BTC by ~ 3500M / 4M = 875
+		// because 1 BTC is more valuable than 1 NEM
 		final double nemMarketCap = 4000000.0;
-		return (long)(amt * (nemMarketCap / this.getMarketCap()));
+		return (long)(amt * this.getMarketCap() / nemMarketCap);
+
+		// TODO 20150228 J-M,B: i thought about this some more, and i'm still not convinced it's what we want
+		// (1) it's assuming that poi changes with market cap, which i don't think is true
+		// > the poi constants aren't indexed to price; only amount
+		// > poi behaves the same whether 1 NEM is $0.0001 or $1000
+		// (2) it's not actually dollar-normalizing because it's ignoring supply (14M BTC; 8000M NEM)
+		// > 1 BTC ~ $250 ~ 500K NEM
+		// > USD Equiv: BTC $250 (3500M / 14M); NEM $0.0005 (4M / 8000M)
+		// > but, we're just multiplying by 875
 	}
 
 	private static Collection<AccountState> selectHarvestingEligibleAccounts(
