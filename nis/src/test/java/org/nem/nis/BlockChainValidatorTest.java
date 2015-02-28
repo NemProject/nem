@@ -176,6 +176,7 @@ public class BlockChainValidatorTest {
 		Mockito.verify(blockValidator, Mockito.times(2)).validate(Mockito.any());
 	}
 
+	// TODO 20150227 J-B: i guess we can delete this one since it seems to be the same as chainIsInvalidIfTwoBlocksContainTheSameTransaction?
 	@Test
 	public void chainIsInvalidIfSameTransactionIsInDifferentBlocks() {
 		// Arrange:
@@ -333,6 +334,37 @@ public class BlockChainValidatorTest {
 		final Block block2 = blocks.get(2);
 		block2.setPrevious(block1);
 		block2.addTransaction(tx);
+		NisUtils.signAllBlocks(blocks);
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN));
+	}
+
+	@Test
+	public void chainIsInvalidIfTwoBlocksContainTheSameChildTransaction() {
+		// Arrange:
+		final BlockChainValidator validator = createValidator();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		parentBlock.sign();
+
+		final MockTransaction childTx = createValidSignedTransaction();
+		final MockTransaction tx1 = createValidSignedTransaction();
+		tx1.setChildTransactions(Arrays.asList(childTx));
+		tx1.sign();
+
+		final MockTransaction tx2 = createValidSignedTransaction();
+		tx2.setChildTransactions(Arrays.asList(childTx));
+		tx2.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 3);
+		final Block block1 = blocks.get(1);
+		block1.addTransaction(tx1);
+		final Block block2 = blocks.get(2);
+		block2.setPrevious(block1);
+		block2.addTransaction(tx2);
 		NisUtils.signAllBlocks(blocks);
 
 		// Act:

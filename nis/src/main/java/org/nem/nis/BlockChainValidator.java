@@ -10,6 +10,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.*;
 
 /**
  * Helper class for validating a block chain.
@@ -96,9 +97,8 @@ public class BlockChainValidator {
 					return ValidationResult.FAILURE_TRANSACTION_UNVERIFIABLE;
 				}
 
-				// TODO BR -> J,G: should add hashes of child transactions as well I guess (or remove chainHashes and let the executor below throw)
-				final Hash hash = HashUtils.calculateHash(transaction);
-				if (chainHashes.contains(hash)) {
+				final List<Hash> hashes = getHashes(transaction);
+				if (hashes.stream().anyMatch(chainHashes::contains) ){
 					LOGGER.info("received block with duplicate transaction");
 					return ValidationResult.FAILURE_TRANSACTION_DUPLICATE_IN_CHAIN;
 				}
@@ -110,7 +110,7 @@ public class BlockChainValidator {
 				}
 
 				processor.process(transaction);
-				chainHashes.add(hash);
+				chainHashes.addAll(hashes);
 			}
 
 			processor.process();
@@ -120,6 +120,10 @@ public class BlockChainValidator {
 		}
 
 		return ValidationResult.SUCCESS;
+	}
+
+	private static List<Hash> getHashes(final Transaction transaction) {
+		return TransactionExtensions.streamDefault(transaction).map(HashUtils::calculateHash).collect(Collectors.toList());
 	}
 
 	private boolean isBlockHit(final Block parentBlock, final Block block) {
