@@ -36,6 +36,53 @@ def printToc(toc, indent=0):
 	r += "\t"*indent + "</ol>\n"
 	return r
 
+def convertApi(s):
+	"""
+	<table class=NemApiGrid>
+		<tr>
+			<td> API path: </td>
+			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
+		</tr>
+		<tr>
+			<td class='path'>/heartbeat</td>
+		</tr>
+	</table>
+	"""
+	apiGroups = [f for f in s.findAll('api')]
+	for api in apiGroups:
+		t = s.new_tag('table')
+		t['class'] = 'NemApiGrid'
+		tr1 = s.new_tag('tr')
+		td11 = s.new_tag('td')
+		td12 = s.new_tag('td')
+		tr2 = s.new_tag('tr') 
+		td21 = s.new_tag('td') 
+		b = s.new_tag('b')
+
+		td11.append('API path:')
+		td12['rowspan'] = 2
+		if 'get' in api.attrs:
+			td12['class'] = 'get'
+		elif 'post' in api.attrs:
+			td12['class'] = 'post'
+		else:
+			td12['class'] = 'error'
+
+		b.append(td12['class'].upper())
+		td12.append('Request type: ')
+		td12.append(b)
+
+		td21['class'] = 'path'
+		td21.append(api.string)
+
+		tr1.append(td11)
+		tr1.append(td12)
+		tr2.append(td21)
+
+		t.append(tr1)
+		t.append(tr2)
+		api.replace_with(t)
+
 def convertDesc(s):
 	descGroups = [f for f in s.findAll('desc')]
 	for descGroup in descGroups:
@@ -50,11 +97,11 @@ def convertDesc(s):
 			prev.insert_after(elem)
 			prev = elem
 
-def convertVals(s, f):
-	valGroups = [i for i in f.findAll('vals')]
+def convertVals(s):
+	valGroups = [i for i in s.findAll('vals')]
 	for valGroup in valGroups:
 		div = s.new_tag('div')
-		continue
+		div['class'] = 'FakeList'
 		for elem in filter(lambda s: len(s)>0, map(lambda s: s.strip(), valGroup.string.split('\n'))):
 			data = elem.split(':', 1)
 			sep = s.new_tag('span')
@@ -62,7 +109,7 @@ def convertVals(s, f):
 			sep.append(' ')
 
 			p = s.new_tag('p')
-			p['class'] = 'NemNoSpacing FakeList'
+			p['class'] = 'NemNoSpacing'
 			p.append(data[0] + ":")
 			p.append(sep)
 			p.append(data[1])
@@ -83,7 +130,6 @@ def convertFields(s):
 			desc = s.new_tag('td')
 
 			param.append(f['name'])
-			convertVals(s, f)
 			data = [temp for temp in f.contents]
 			for elem in data:
 				desc.append(elem)
@@ -109,7 +155,30 @@ def convertJson(s):
 			data[0].replace_with(data[0].lstrip())
 			data[-1].replace_with(data[-1].rstrip())
 		samp.contents = data
-	
+
+def convertAppa(s):
+	"""
+	<span><em>Appendix A:</em> <a href="#accountMetaDataPair">AccountMetaDataPair</a></span>
+	"""
+	allE = [e for e in s.findAll(['appa', 'alnk'])]
+	for e in allE:
+		em = s.new_tag('em')
+		em.append('Appendix A:')
+		
+		a = s.new_tag('a')
+		a['href'] = '#' + prettyName(e.string)
+		a.append(e.string)
+
+		if e.name == 'appa':
+			span = s.new_tag('span')
+			span.append(em)
+			span.append(' ')
+			span.append(a)
+			e.replace_with(span)
+		elif e.name == 'alnk':
+			e.replace_with(a)
+
+
 def main():
 	o = OrderedDict()
 	toc = OrderedDict({'root':o})
@@ -153,9 +222,12 @@ def main():
 		d.clear()
 		d.append( curTime.strftime('%H:%M, %B %d, %Y') )
 	
+	convertVals(soup)
+	convertApi(soup)
 	convertDesc(soup)
 	convertFields(soup)
 	convertJson(soup)
+	convertAppa(soup)
 	
 	open('index.html', 'w').write(soupTab(soup, 'utf-8'))
 

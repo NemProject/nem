@@ -89,7 +89,7 @@ h1
 	{
 	line-height:150%;
 	font-size:16.0pt;
-	font-family:"Roboto Medium";
+	font-family:"Roboto Black";
 	color:#2E74B5;
 	font-weight:normal;
 	counter-reset: hl2;
@@ -99,7 +99,7 @@ h2
 	line-height:150%;
 	page-break-after:avoid;
 	font-size:13.0pt;
-	font-family:Roboto;
+	font-family:"Roboto Medium";
 	color:#2E74B5;
 	font-weight:normal;
 	counter-reset: hl3;
@@ -109,7 +109,7 @@ h3
 	line-height:150%;
 	page-break-after:avoid;
 	font-size:13.0pt;
-	font-family:"Roboto Thin";
+	font-family:Roboto;
 	color:#1F4D78;
 	font-weight:normal;
 	counter-reset: hl4;
@@ -147,7 +147,7 @@ p.NemNoSpacing, li.NemNoSpacing, div.NemNoSpacing, p.NemNoSpacingList
 	font-family:Roboto;}
 
 .FakeList {
-	margin-left: 30pt;
+	padding-left: 30pt;
 }
 
 p.NemTitle
@@ -268,6 +268,7 @@ table.NemParamsGrid td:first-child {
 
 .get { background:#C8E4D5; }
 .post { background:#ECD9C3 }
+.error { background:#a00000; }
 .path { font-weight: bold; }
 
 div.warning {

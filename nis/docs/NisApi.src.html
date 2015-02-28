@@ -56,23 +56,15 @@
 
 	<h1>NIS status related requests</h1>
 
-	<p>There are two requests by which you can get information about the status of NIS. The /heartbeat request gives you information if the node is up and responsive. The /status request gives more detailed information about the state of NIS. Both requests return a NemRequestResult object. See <em>Appendix A:</em> <a href="#nemRequestResult">NemRequestResult</a> for more details on the interpretation of a NemRequestResult.</p>
+	<p>There are two requests by which you can get information about the status of NIS. The /heartbeat request gives you information if the node is up and responsive. The /status request gives more detailed information about the state of NIS. Both requests return a NemRequestResult object. See <appa>NemRequestResult</appa> for more details on the interpretation of a NemRequestResult.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Heart beat request</h2>
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/heartbeat</td>
-		</tr>
-	</table>
+	<api get>/heartbeat</api>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Determines if NIS is up and responsive.</p>
+	</desc>
 
 	<h4>No Parameter:</h4>
 
@@ -97,20 +89,11 @@
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Status Request</h2>
+	<api get>/status</api>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/status</td>
-		</tr>
-	</table>
-
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Determines the status of NIS.</p>
+	</desc>
 
 	<h4>No Parameter:</h4>
 
@@ -129,15 +112,17 @@
 	</resp>
 
 	<p class=NemNoSpacing>The code can be interpreted as follows:</p>
-	<p class='NemNoSpacing FakeList'>0:<span class='sep'> </span>Unknown status.</p>
-	<p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>NIS is stopped.</p>
-	<p class='NemNoSpacing FakeList'>2:<span class='sep'> </span>NIS is starting.</p>
-	<p class='NemNoSpacing FakeList'>3:<span class='sep'> </span>NIS is running.</p>
-	<p class='NemNoSpacing FakeList'>4:<span class='sep'> </span>NIS is booting the local node (implies NIS is running).</p>
-	<p class='NemNoSpacing FakeList'>5:<span class='sep'> </span>The local node is booted (implies NIS is running).</p>
-	<p class='NemNoSpacing FakeList'>6:<span class='sep'> </span>The local node is synchronized (implies NIS is running and the local node is booted).</p>
-	<p class='NemNoSpacing FakeList'>7:<span class='sep'> </span>NIS local node does not see any remote NIS node (implies running and booted).</p>
-	<p class='NemNoSpacing FakeList'>8:<span class='sep'> </span>NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests.</p>
+	<vals>
+	0: Unknown status.
+	1: NIS is stopped.
+	2: NIS is starting.
+	3: NIS is running.
+	4: NIS is booting the local node (implies NIS is running).
+	5: The local node is booted (implies NIS is running).
+	6: The local node is synchronized (implies NIS is running and the local node is booted).
+	7: NIS local node does not see any remote NIS node (implies running and booted).
+	8: NIS is currently loading the block chain from the database. In this state NIS cannot serve any requests.
+	</vals>
 
 	<h4>Possible Errors:</h4>
 
@@ -178,7 +163,7 @@
 
 	<p>Durable data is either stored in the
 	database or can be calculated from other database data. The corresponding JSON
-	object is described in <em>Appendix A:</em> <a href="#accountInfo">AccountInfo</a>. It has the fields:</p>
+	object is described in <appa>AccountInfo</appa>. It has the fields:</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -258,7 +243,7 @@
 	harvesting to a so called remote account. In the latter case the remote account
 	uses the importance of the original account to harvest. The corresponding JSON
 	object and the possible values for the status/remoteStatus are described in
-	<em>Appendix A:</em> <a href="#accountMetaDataPair">AccountMetaDataPair</a>. The meta
+	<appa>AccountMetaDataPair</appa>. The meta
 	data consists of the following fields:</p>
 
 	<table class=NemTableGrid>
@@ -291,7 +276,7 @@
 
 
 	<p>Known accounts have at least one incoming
-	transaction. The corresponding JSON objects are described in <em>Appendix A:</em> <a href="#transaction">Transaction</a><b>,</b> <a href="#transactionMetaData">TransactionMetaData</a> and <a href="#transactionMetaDataPair">TransactionMetaDataPair</a>.</p>
+	transaction. The corresponding JSON objects are described in <appa>Transaction</appa>, <alnk>TransactionMetaData</alnk> and <alnk>TransactionMetaDataPair</alnk>.</p>
 
 	<p>A transaction has always the following fields:</p>
 
@@ -336,11 +321,13 @@
 			<td>
 				<p>The transaction type. Currently the following types of
 				transactions are supported:</p>
-				<p class='FakeList'>0x101:<span class='sep'> </span> Transfer of NEM from sender to recipient.</p>
-				<p class='FakeList'>0x801:<span class='sep'> </span> Transfer of importance from sender to remote account.</p>
-				<p class='FakeList'>0x1001:<span class='sep'> </span> An aggregate modification transaction, which converts a normal account into a multisig account.</p>
-				<p class='FakeList'>0x1002:<span class='sep'> </span> A multisig signature transaction which is used to sign a multisig transaction.</p>
-				<p class='FakeList'>0x1003:<span class='sep'> </span> A multisig transaction, which is used for multisig accounts.</p>
+				<vals>
+				0x101: Transfer of NEM from sender to recipient.
+				0x801: Transfer of importance from sender to remote account.
+				0x1001: An aggregate modification transaction, which converts a normal account into a multisig account.
+				0x1002: A multisig signature transaction which is used to sign a multisig transaction.
+				0x1003: A multisig transaction, which is used for multisig accounts.
+				</vals>
 			</td>
 		</tr>
 		<tr>
@@ -412,8 +399,10 @@
 			<td>
 				<p>Optional field in case the transaction contains a message. The
 				field holds the message type information. Possible message types are:</p>
-				<p class='FakeList'>1:<span class='sep'> </span> The message is not encrypted.</p>
-				<p class='FakeList'>2:<span class='sep'> </span> The message is encrypted.</p>
+				<vals>
+				1: The message is not encrypted.
+				2: The message is encrypted.
+				</vals>
 			</td>
 		</tr>
 	</table>
@@ -448,7 +437,7 @@
 	blocks if they are lucky. The account which harvests a block collects the fees
 	which are included in the transactions in the block. The information which
 	blocks were harvested by an account can be requested. The request returns an
-	array of HarvestInfo JSON objects. For an example see <em>Appendix A:</em> <a href="#harvestInfo">HarvestInfo</a></p>
+	array of HarvestInfo JSON objects. For an example see <appa>HarvestInfo</appa></p>
 
 	<p>A harvest info object has the following fields:</p>
 
@@ -499,8 +488,8 @@
 
 	<p>It is possible to request an array with the
 	importance information for all accounts. The request returns an array of
-	AccountImportanceViewModel JSON objects. For an example see <em>Appendix A:</em>
-	<a href="#accountImportanceViewModel">AccountImportanceViewModel</a>.</p>
+	AccountImportanceViewModel JSON objects. For an example see
+	<appa>AccountImportanceViewModel</appa>.</p>
 
 	<p>An account importance view model has the following fields:</p>
 
@@ -560,20 +549,11 @@
 	<h2>Retrieving account data</h2>
 
 	<h3>Requesting the account data</h3>
+	<api get>/account/get</api>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/get</td>
-		</tr>
-	</table>
-
-	<p class=NemNoSpacing>Description:</p>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an <a href="#accountMetaDataPair">AccountMetaDataPair</a> for an account.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -603,7 +583,7 @@
         "importance": 0.010263666447108395,
         "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
         "label": null,
-        "foragedBlocks": 645
+        "harvestedBlocks": 645
     },
     "meta":
     {
@@ -616,23 +596,15 @@
 
 	<h4>Possible Errors:</h4>
 
-	<p class=NemNoSpacing>If the address parameter is not valid, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+	<p class=NemNoSpacing>If the address parameter is not valid, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Requesting the account status</h3>
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/status</td>
-		</tr>
-	</table>
+	<api get>/account/status</api>
 
-	<p class=NemNoSpacing>Description:</p>
-
+	<desc>
 	<p class=NemNoSpacing>Gets the <a href="#accountMetaData">AccountMetaData</a> from an account.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -664,7 +636,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the address parameter is not valid,
-	NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+	NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 	<h3>Requesting transaction data for an account</h3>
 
@@ -677,20 +649,9 @@
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h4>Incoming transactions</h4>
+	<api get>/account/transfers/incoming</api>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/transfers/incoming</td>
-		</tr>
-	</table>
-
-
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of transaction meta data
 	pairs where the recipient has the address given as parameter to the request. A
 	maximum of 25 transaction meta data pairs is returned. The returned transaction
@@ -712,6 +673,7 @@
 	requirements, only those transactions are returned.</p>
 
 	<p class=NemNoSpacing></p>
+	</desc>
 
 	<h4>Parameters:</h4>
 
@@ -808,29 +770,18 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the address parameter is not valid or
-	the id cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+	the id cannot be found in the database, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h4>Outgoing transactions</h4>
+	<api get>/account/transfers/outgoing</api>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/transfers/outgoing</td>
-		</tr>
-	</table>
-
-
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of transaction meta data
 	pairs where the recipient has the address given as parameter to the request. A
 	maximum of 25 transaction meta data pairs is returned. For details about
 	sorting and discussion of the second parameter see <a href="#incoming-transactions">Incoming transactions</a>.</p>
-
+	</desc>
 	<h4>Parameters:</h4>
 
 	<table class=NemTableGrid>
@@ -903,28 +854,18 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the address parameter is not valid or
-	the id cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+	the id cannot be found in the database, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h4>All transactions</h4>
+	<api get>/account/transfers/all</api>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/transfers/all</td>
-		</tr>
-	</table>
-
-
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of transaction meta data
 	pairs for which an account is the sender or receiver. A maximum of 25
 	transaction meta data pairs is returned. For details about sorting and
 	discussion of the second parameter see <a href="#incoming-transactions">Incoming transactions</a>.</p>
+	</desc>
 
 	<h4>Parameters:</h4>
 
@@ -970,28 +911,20 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the address parameter is not valid or
-	the id cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+	the id cannot be found in the database, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h4>Unconfirmed transactions</h4>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/unconfirmedTransactions</td>
-		</tr>
-	</table>
+	<api get>/account/unconfirmedTransactions</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets the array of transactions for which
 	an account is the sender or receiver and which have not yet been included in a
 	block. The returned structure is UnconfirmedTransactionMetaDataPair see
-	<em>Appendix A</em></p>
+	<appa>UnconfirmedTransactionMetaDataPair</appa></p>
+	</desc>
 
 	<h4>Parameters:</h4>
 
@@ -1039,8 +972,7 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the address parameter is not valid,
-	NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix
-		B: NIS Errors</a> Errors for details about errors.</p>
+	NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> Errors for details about errors.</p>
 
     <h3>Transaction data with decoded messages</h3>
 
@@ -1051,37 +983,15 @@
     Therefore the following requests <b>should only be done when NIS is running locally</b>.</p>
 
     <h4>Incoming/outgoing/all transactions with decoded messages</h4>
-    <table class=NemApiGrid>
-        <tr>
-            <td> API path: </td>
-            <td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-        </tr>
-        <tr>
-            <td class='path'>/local/account/transfers/incoming</td>
-        </tr>
+    <api post>/local/account/transfers/incoming</api>
+    <api post>/local/account/transfers/outgoing</api>
+    <api post>/local/account/transfers/all</api>
 
-        <tr>
-            <td> API path: </td>
-            <td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-        </tr>
-        <tr>
-            <td class='path'>/local/account/transfers/outgoing</td>
-        </tr>
-
-        <tr>
-            <td> API path: </td>
-            <td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-        </tr>
-        <tr>
-            <td class='path'>/local/account/transfers/all</td>
-        </tr>
-    </table>
-
-    <h4>Description:</h4>
-
+    <desc>
     <p class=NemNoSpacing>The request returns incoming/outgoing/all transactions as described in the previous chapter.
         The only difference is that if a transaction contains an encoded message, this message will be decoded before it is
         sent to the requester.</p>
+	</desc>
 
     <h4>Parameters:</h4>
 
@@ -1092,7 +1002,7 @@
             </td>
             <td>
                 <p class=NemNoSpacing>An AccountPrivateKeyTransactionsPage
-                    JSON object as described in <em>Appendix A:</em> <a href="#accountPrivateKeyTransactionsPage">AccountPrivateKeyTransactionsPage</a></p>
+                    JSON object as described in <appa>AccountPrivateKeyTransactionsPage</appa></p>
             </td>
         </tr>
     </table>
@@ -1108,26 +1018,18 @@
     <h4>Possible Errors:</h4>
 
     <p class=NemNoSpacing>If the private key is not supplied, NIS returns an error.
-        See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for details about errors.</p>
+        See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Requesting harvest info data for an account</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/harvests</td>
-		</tr>
-	</table>
+	<api get>/account/harvests</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of harvest info objects
 	for an account.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -1173,25 +1075,17 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the address parameter is not valid or
-	the hash cannot be found in the database, NIS returns an error. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> Errors for details about errors.</p>
+	the hash cannot be found in the database, NIS returns an error. See <alnk>Appendix B: NIS Errors</alnk> Errors for details about errors.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Retrieving account importances for accounts</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/importances</td>
-		</tr>
-	</table>
+	<api get>/account/importances</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of account importance view model objects.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -1235,20 +1129,12 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h4>Unlocking the account (enables harvesting)</h4>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/unlock</td>
-		</tr>
-	</table>
+	<api post>/account/unlock</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Unlocks an account (starts harvesting).</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -1258,7 +1144,7 @@
 				<p class=JSON><b><span style='color:#C00000'>privateKey</span></b></p>
 			</td>
 			<td>
-				<p class=NemNoSpacing>A PrivateKey JSON object as described in <em>Appendix A:</em> <a href="#privateKey">PrivateKey</a></p>
+				<p class=NemNoSpacing>A PrivateKey JSON object as described in <appa>PrivateKey</appa></p>
 			</td>
 		</tr>
 	</table>
@@ -1272,20 +1158,12 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h4>Locking the account (stops harvesting)</h4>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/account/lock</td>
-		</tr>
-	</table>
+	<api post>/account/lock</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Locks an account (stops harvesting).</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -1295,7 +1173,7 @@
 				<p class=JSON><b><span style='color:#C00000'>privateKey</span></b></p>
 			</td>
 			<td>
-				<p class=NemNoSpacing>A PrivateKey JSON object as described in <em>Appendix A:</em> <a href="#privateKey">PrivateKey</a></p>
+				<p class=NemNoSpacing>A PrivateKey JSON object as described in <appa>PrivateKey</appa></p>
 			</td>
 		</tr>
 	</table>
@@ -1311,7 +1189,7 @@
 
 	<p class=NemNoSpacing>Both requests return an error if the
 	private key does not correspond to a known account or the account is not
-	allowed to harvest. See <a href="#appendix-B:-NIS-errors">Appendix B NIS Errors</a> for details about errors.</p>
+	allowed to harvest. See <alnk>Appendix B: NIS Errors</alnk> for details about errors.</p>
 
 
 	<h1>Block chain related requests</h1>
@@ -1344,7 +1222,7 @@
 	client can request parts of the block chain.</p>
 
 	<p>Blocks are transferred using a JSON Block
-	object. <em>Appendix A:</em> <a href="#block">Block</a> has more information and an example JSON Block object. The
+	object. <appa>Block</appa> has more information and an example JSON Block object. The
 	following fields are in the structure:</p>
 
 	<table class=NemTableGrid>
@@ -1381,8 +1259,10 @@
 			</td>
 			<td>
 				<p>The block type. There are currently two block types used:</p>
-                <p class='NemNoSpacing FakeList'>-1:<span class='sep'> </span> Nemesis block type. This block type appears only once in the chain.</p>
-                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span> Regular block type. All blocks with height &gt; 1 have this type.</p>
+				<vals>
+				-1: Nemesis block type. This block type appears only once in the chain.
+				1: Regular block type. All blocks with height &gt; 1 have this type.
+				</vals>
 			</td>
 		</tr>
 		<tr>
@@ -1390,7 +1270,7 @@
 				<p class=JSON>transactions</p>
 			</td>
 			<td>
-				<p>The array of transactions. See <em>Appendix A:</em> <a href="#transaction">Transaction</a>
+				<p>The array of transactions. See <appa>Transaction</appa>
 				for more details. A block can contain up to 120 transactions.</p>
 			</td>
 		</tr>
@@ -1423,7 +1303,7 @@
 	</table>
 
 	<p>Transactions were already discussed in
-	chapter 2 <a href="#account-related-requests">Account related requests</a>. See also <em>Appendix A:</em> <a href="#transaction">Transaction</a>
+	chapter 2 <a href="#account-related-requests">Account related requests</a>. See also <appa>Transaction</appa>
 	for an example JSON transaction object.</p>
 
 	<h2>Requesting the block chain status information</h2>
@@ -1431,21 +1311,12 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Block chain height</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/chain/height</td>
-		</tr>
-	</table>
+	<api get>/chain/height</api>
 
 
-	<h4>Description:</h4>
-
-	<p class=NemNoSpacing>Gets the current height of the block
-	chain.</p>
+	<desc>
+	<p class=NemNoSpacing>Gets the current height of the block chain.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -1468,21 +1339,13 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Block chain score</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/chain/score</td>
-		</tr>
-	</table>
+	<api get>/chain/score</api>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets the current score of the block
 	chain. The higher the score, the better the chain. During synchronization,
 	nodes try to get the best block chain in the network.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -1505,21 +1368,13 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Last block of the block chain score</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/chain/last-block</td>
-		</tr>
-	</table>
+	<api get>/chain/last-block</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets the current last block of the
 	chain.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -1558,21 +1413,13 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Getting a block with a given hash</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/block/get</td>
-		</tr>
-	</table>
+	<api get>/block/get</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets a block from the chain that has a
 	given hash.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -1613,25 +1460,17 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the block hash is not found in the
-	database, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
+	database, NIS will return a JSON error object. See <appa>Error object</appa> or more information of the error object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Getting a block with a given height</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/block/at/public</td>
-		</tr>
-	</table>
+	<api post>/block/at/public</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets a block from the chain that has the given height.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -1642,7 +1481,7 @@
 			</td>
 			<td>
 				<p class=NemNoSpacing>A BlockHeight JSON object as described
-				in <em>Appendix A:</em> <a href="#blockHeight">BlockHeight</a>.</p>
+				in <appa>BlockHeight</appa>.</p>
 			</td>
 		</tr>
 	</table>
@@ -1672,27 +1511,19 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the block with the specified height
-	cannot be found in the database, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a> or more information of the error object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> the error message.</p>
+	cannot be found in the database, NIS will return a JSON error object. See <appa>Error object</appa> or more information of the error object and <alnk>Appendix B: NIS Errors</alnk> the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Getting part of a chain</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/local/chain/blocks-after</td>
-		</tr>
-	</table>
+	<api post>/local/chain/blocks-after</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets up to 10 blocks after given block height from the chain.
         If the database contains less than 10 block after the given height, then less blocks are returned.
         The returned data is an array of <a href="#explorerBlockViewModel">ExplorerBlockViewModel</a> JSON objects.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -1703,7 +1534,7 @@
 			</td>
 			<td>
 				<p class=NemNoSpacing>A BlockHeight JSON object as described
-				in <em>Appendix A:</em> <a href="#blockHeight">BlockHeight</a>.</p>
+				in <appa>BlockHeight</appa>.</p>
 			</td>
 		</tr>
 	</table>
@@ -1713,40 +1544,27 @@
 	<p class=NemNoSpacing>Request cannot be performed in a browser.</p>
 
 	<h4>Example of returned JSON object:</h4>
-
+	
 	<resp>
 {
-       "data":[
-       {
-              "harvester":"TCRIGEL6TUKDGDVBXIVY3HQNADAV6JZMGKNPL23Y",
-              "timeStamp":1416395006000,
-              "harvesterPk":"f76e87942a5ad9797e658ea084ec4af8418b6aa5d8015d1afe469f9ed09e5c56",
-              "txes":[
-              {
-                     "timeStamp":1416394995000,
-                     "senderPk":"a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a",
-                     "amount":1000000000000,
-                     "msgType":1,
-                     "sender":"TALICELCD3XPH4FFI5STGGNSNSWPOTG5E4DS2TOS",
-                     "signature":"d27a29b294d51e10ca4d11174718269838b71eeb170649655c42ebba12464fdbdd757610858675ab5fa642c856bab1067c9c473df5e697053298a8173a6f8001",
-                     "fee":44000000,
-                     "recipient":"TAKKKC5SHLKVJNCAMRKLI3564NMQELMW5H4HFOJC",
-                     "type":257,
-                     "message":
-                     "48656c6c6f20746f20536f757468204b6f726561",
-                     "hash":"2fde712c00a6751ee560b49a0271a881ef5e8c3a3d2226b326f7d53f84798c25"
-              }],
-              "hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49",
-              "height":43666
-       }]
+	"data":[
+	{
+		"txes":[
+		{
+			"tx": &lt;ExplorerViewModelTransaction&gt;
+			"tx": &lt;ExplorerViewModelTransaction&gt;
+		}],
+		"block": &lt;Block&gt;
+		"hash":"8ca8a3e01ac0eb482e668fda74141984ba118b027fc5f1f67d2d36a38bf48c49"
+	}]
 }
 	</resp>
 
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>If the block height supplied is not
-	positive, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
+	positive, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<h1>Node related requests</h1>
 
@@ -1824,7 +1642,7 @@
 		</tr>
 	</table>
 
-	<p><em>Appendix A:</em> <a href="#node">Node</a> has more information and an example JSON Node object. A node object has the following fields:</p>
+	<p><appa>Node</appa> has more information and an example JSON Node object. A node object has the following fields:</p>
 
 	<table class=NemTableGrid>
 		<tr>
@@ -1899,21 +1717,13 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Basic node information</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/info</td>
-		</tr>
-	</table>
+	<api get>/node/info</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets basic information about a node.
 	Using IP 127.0.0.1 gets information about the local node.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -1948,28 +1758,19 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	yet, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Extended node information</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/extended-info</td>
-		</tr>
-	</table>
+	<api get>/node/extended-info</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets extended information about a node.
 	Using IP 127.0.0.1 gets extended information about the local node.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2014,30 +1815,21 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	yet, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<h2>Request for discovering the neighborhood of a node</h2>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Complete neighborhood</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/peer-list/all</td>
-		</tr>
-	</table>
+	<api get>/node/peer-list/all</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of all known nodes in the
 	neighborhood.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2072,27 +1864,18 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	yet, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Reachable neighborhood</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/peer-list/reachable</td>
-		</tr>
-	</table>
+	<api get>/node/peer-list/reachable</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p>Gets an array of all nodes with status 'active' in the neighborhood.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2130,28 +1913,19 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	yet, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Active neighborhood</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/peer-list/active</td>
-		</tr>
-	</table>
+	<api get>/node/peer-list/active</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of active nodes in the
 	neighborhood that are selected for broadcasts.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2189,28 +1963,19 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	yet, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h3>Maximum chain height in the active neighborhood</h3>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/active-peers/max-chain-height</td>
-		</tr>
-	</table>
+	<api get>/node/active-peers/max-chain-height</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Requests the chain height from every
 	node in the active node list (described in <a href="#active-neighborhood">Active neighborhood</a>) and returns the maximum height seen.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2229,29 +1994,20 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	yet, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Requesting node experiences</h2>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/experiences</td>
-		</tr>
-	</table>
+	<api get>/node/experiences</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of node experiences from
 	another node. Each node saves its experiences with other nodes in an internal
 	map. Sharing experiences helps nodes to select honest nodes for communication.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2296,27 +2052,17 @@
 	<h4>Possible Errors:</h4>
 
 	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	yet, NIS will return a JSON error object. See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Booting the local node</h2>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/node/boot</td>
-		</tr>
-	</table>
+	<api post>/node/boot</api>
 
-
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Boots the local node and thus assign an account (the identity) to the local node.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -2327,7 +2073,7 @@
 			</td>
 			<td>
 				<p class=NemNoSpacing>A BootNodeRequest JSON object as
-				described in <em>Appendix A:</em> <a href="#bootNodeRequest">BootNodeRequest</a>.</p>
+				described in <appa>BootNodeRequest</appa>.</p>
 			</td>
 		</tr>
 	</table>
@@ -2341,9 +2087,8 @@
 
 	<h4>Possible Errors:</h4>
 
-	<p class=NemNoSpacing>In case the node has not been booted
-	yet, NIS will return a JSON error object. See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for the error message.</p>
+	<p class=NemNoSpacing>In case the node has already been booted, NIS will return a JSON error object. See <appa>Error object</appa> for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<h1>Initiating transactions</h1>
 
@@ -2369,8 +2114,8 @@
         block chain due to a bug in the code or an attack of some kind.</p>
 
 	<p>A client can initiate a transaction by
-	sending a RequestPrepareAnnounce JSON object to its local NIS. See <b>Appendix
-		A </b><a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a> for more details.</p>
+	sending a RequestPrepareAnnounce JSON object to its local NIS. See
+		<appa>RequestPrepareAnnounce</appa> for more details.</p>
 
     <div class="warning">
         The <span class="JSON">/transaction/prepare-announce</span> API
@@ -2378,27 +2123,19 @@
     </div>
 
     <p>Note: keep in mind, that NCC does <strong>NOT</strong>
-        use this API. And it does all the transaction signing on it's own.
+        use this API. It does all the transaction signing on it's own.
     </p>
 
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Initiating a transaction</h2>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='post'> Request type: <b>POST</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/transaction/prepare-announce</td>
-		</tr>
-	</table>
+	<api post>/transaction/prepare-announce</api>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Creates and broadcasts a transaction.
 	Since this request involves the private key of an account, it should only be
 	sent to a <b>local</b> NIS.</p>
+	</desc>
 
 	<h4>Parameter:</h4>
 
@@ -2408,7 +2145,7 @@
 				<p class=JSON>requestPrepareAnnounce</p>
 			</td>
 			<td>
-				<p class=NemNoSpacing>A RequestPrepareAnnounce JSON object as described in <em>Appendix A:</em> <a href="#requestPrepareAnnounce">RequestPrepareAnnounce</a>.</p>
+				<p class=NemNoSpacing>A RequestPrepareAnnounce JSON object as described in <appa>RequestPrepareAnnounce</appa>.</p>
 			</td>
 		</tr>
 	</table>
@@ -2434,9 +2171,8 @@
 	<h4>Possible Errors:</h4>
 
 	<p>There are various errors that can occur due
-	to failure of transaction validation See <em>Appendix A:</em> <a href="#error-object">Error object</a><b> </b>for more information of the error
-	object and <a href="#appendix-B:-NIS-errors">Appendix B: NIS
-		Errors</a> for the error message.</p>
+	to failure of transaction validation See <appa>Error object</appa><b> </b>for more information of the error
+	object and <alnk>Appendix B: NIS Errors</alnk> for the error message.</p>
 
 	<p>The most common errors are:</p>
 
@@ -2497,7 +2233,7 @@
     <h2>Converting an account to a multisig account</h2>
 
     <p>To convert a normal account to a multisig account an aggregate modification transaction
-        (see <em>Appendix A:</em> <a href="#multisigAggregateModificationTransaction">MultisigAggregateModificationTransaction</a>) must be sent to the network.
+        (see <appa>MultisigAggregateModificationTransaction</appa>) must be sent to the network.
         Assuming you want to convert <em>Alice</em> with public key:</p>
     <p class="JSON">a1aaca6c17a24252e674d155713cdf55996ad00175be4af02a20c67b59f9fe8a</p>
 
@@ -2571,7 +2307,7 @@
         1000 NEM from account <em>Alice</em> to account <em>Jusan</em>.<br>
         Since the account <em>Alice</em> is a multisig account the transfer transaction
         (in the JSON object the "otherTrans" structure) must be wrapped in
-        a multisig transaction (see <em>Appendix A:</em> <a href="#multisigTransaction">MultisigTransaction</a>).
+        a multisig transaction (see <appa>MultisigTransaction</appa>).
         The corresponding RequestPrepareAnnounce object would look similar to this:</p>
 
     <pre><code class="JSON">    {
@@ -2630,7 +2366,7 @@
     <h3>Cosigning multisig transaction</h3>
 
     <p>&hellip; to do so, <em>Jusan</em> and <em>Go</em> must initiate a multisig signature transaction
-        (see <em>Appendix A:</em> <a href="#multisigSignatureTransaction">MultisigSignatureTransaction</a>).
+        (see <appa>MultisigSignatureTransaction</appa>).
         <em>Jusan</em> has to create a RequestPrepareAnnounce JSON object that looks similar to this:</p>
 
     <pre><code class="JSON">    {
@@ -2795,21 +2531,13 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Monitoring the network time</h2>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/debug/time-synchronization</td>
-		</tr>
-	</table>
+	<api get>/debug/time-synchronization</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of time synchronization
-	results as described in <em>Appendix A:</em> <a href="#timeSynchronizationResult">TimeSynchronizationResult</a>. You can monitor the change in network time with this information.</p>
+	results as described in <appa>TimeSynchronizationResult</appa>. You can monitor the change in network time with this information.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2848,22 +2576,14 @@
 	<h2>Monitoring incoming and outgoing calls</h2>
 
 	<!-- ---- ---- ---- ---- ---- ---- -->
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/debug/connections/incoming</td>
-		</tr>
-	</table>
+	<api get>/debug/connections/incoming</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an audit collection of incoming
-	calls as described in <em>Appendix A:</em> <a href="#auditCollection">AuditCollection</a>. You can monitor the
+	calls as described in <appa>AuditCollection</appa>. You can monitor the
 	outstanding and recent incoming requests with this information.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2906,22 +2626,14 @@
 	<p class=NemNoSpacing>None.</p>
 
 	<!-- ---- ---- ---- ---- ---- ---- -->
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/debug/connections/outgoing</td>
-		</tr>
-	</table>
+	<api get>/debug/connections/outgoing</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an audit collection of outgoing
-	calls as described in <em>Appendix A:</em> <a href="#auditCollection">AuditCollection</a>. You can monitor the
+	calls as described in <appa>AuditCollection</appa>. You can monitor the
 	outstanding and recent outgoing requests with this information.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -2966,22 +2678,14 @@
 	<!-- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- -->
 	<h2>Monitoring timers</h2>
 
-	<table class=NemApiGrid>
-		<tr>
-			<td> API path: </td>
-			<td rowspan='2' class='get'> Request type: <b>GET</b> </td>
-		</tr>
-		<tr>
-			<td class='path'>/debug/connections/timers</td>
-		</tr>
-	</table>
+	<api get>/debug/connections/timers</api>
 
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Gets an array of task monitor structures
-	as described in <em>Appendix A:</em> <a href="#nemAsyncTimerVisitor">NemAsyncTimerVisitor</a>. You can monitor
+	as described in <appa>NemAsyncTimerVisitor</appa>. You can monitor
 	the statistics for periodic tasks with this information.</p>
+	</desc>
 
 	<h4>No parameter:</h4>
 
@@ -3028,11 +2732,11 @@
 
 	<h2>AccountImportanceViewModel</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Each account is assigned an importance
 	in the NEM network. The ability of an account to generate new blocks is
 	proportional to its importance. The importance is a number between 0 and 1.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3105,9 +2809,9 @@
 
 	<h2>AccountInfo</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The account structure describes basic information for an account.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3118,69 +2822,25 @@
        "importance": 0.010263666447108395,
        "publicKey": "a11a1a6c17a24252e674d151713cdf51991ad101751e4af02a20c61b59f1fe1a",
        "label": null,
-       "foragedBlocks": 645
+       "harvestedBlocks": 645
 }
 	</resp>
 
-	<h4>Description of the fields:</h4>
-
-	<table class=NemTableGrid>
-		<tr>
-			<td>
-				<p class=JSON>address</p>
-			</td>
-			<td>
-				<p>The address of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>balance</p>
-			</td>
-			<td>
-				<p>The balance of the account in micro NEM.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>importance</p>
-			</td>
-			<td>
-				<p>The importance of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>publicKey</p>
-			</td>
-			<td>
-				<p>The public key of the account.</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>label</p>
-			</td>
-			<td>
-				<p>The label of the account (not used, always null).</p>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<p class=JSON>foragedBlocks</p>
-			</td>
-			<td>
-				<p>The number blocks that the account already harvested.</p>
-			</td>
-		</tr>
-	</table>
+	<desc>
+		<f name="address"> The address of the account.</f>
+		<f name="balance"> The balance of the account in micro NEM.</f>
+		<f name="importance"> The importance of the account.</f>
+		<f name="publicKey"> The public key of the account.</f>
+		<f name="label"> The label of the account (not used, always null).</f>
+		<f name="harvestedBlocks"> The number blocks that the account already harvested.</f>
+	</desc>
 
 	<h2>AccountMetaData</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The account meta data describes
 	additional information for the account. See <a href="#account-related-requests">Account related requests</a> for details.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3205,10 +2865,11 @@
 			<td>
 				<p>The harvesting status of a queried account.</p>
 				<p>The harvesting status can be one of the following values:</p>
-
-                <p class='NemNoSpacing FakeList'>&quot;UNKNOWN&quot;:<span class='sep'> </span> The harvesting status of the account is not known.</p>
-                <p class='NemNoSpacing FakeList'>&quot;LOCKED&quot;:<span class='sep'> </span> The account is not harvesting.</p>
-                <p class='NemNoSpacing FakeList'>&quot;UNLOCKED&quot;:<span class='sep'> </span> The account is harvesting.</p>
+				<vals>
+				&quot;UNKNOWN&quot;: The harvesting status of the account is not known.
+				&quot;LOCKED&quot;: The account is not harvesting.
+				&quot;UNLOCKED&quot;: The account is harvesting.
+				</vals>
 			</td>
 		</tr>
 		<tr>
@@ -3218,12 +2879,13 @@
 			<td>
 				<p>The status of remote harvesting of a queried account.</p>
 				<p>The remote harvesting status can be one of the following values:</p>
-
-                <p class='NemNoSpacing FakeList'>&quot;REMOTE&quot;:<span class='sep'> </span> The account is a remote account and therefore remoteStatus is not applicable for it.</p>
-                <p class='NemNoSpacing FakeList'>&quot;ACTIVATING&quot;:<span class='sep'> </span> The account has activated remote harvesting but it is not yet active.</p>
-                <p class='NemNoSpacing FakeList'>&quot;ACTIVE&quot;:<span class='sep'> </span> The account has activated remote harvesting and remote harvesting is active.</p>
-                <p class='NemNoSpacing FakeList'>&quot;DEACTIVATING&quot;:<span class='sep'> </span> The account has deactivated remote harvesting but remote harvesting is still active.</p>
-                <p class='NemNoSpacing FakeList'>&quot;INACTIVE&quot;:<span class='sep'> </span> The account has inactive remote harvesting, or it has deactivated remote harvesting and deactivation is operational.</p>
+				<vals>
+				&quot;REMOTE&quot;: The account is a remote account and therefore remoteStatus is not applicable for it.
+				&quot;ACTIVATING&quot;: The account has activated remote harvesting but it is not yet active.
+				&quot;ACTIVE&quot;: The account has activated remote harvesting and remote harvesting is active.
+				&quot;DEACTIVATING&quot;: The account has deactivated remote harvesting but remote harvesting is still active.
+				&quot;INACTIVE&quot;: The account has inactive remote harvesting, or it has deactivated remote harvesting and deactivation is operational.
+				</vals>
 			</td>
 		</tr>
         <tr>
@@ -3236,10 +2898,10 @@
 
 	<h2>AccountMetaDataPair</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The account meta data pair includes
 	durable information for an account and additional information about its state.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3291,13 +2953,13 @@
 
     <h2>AccountPrivateKeyTransactionsPage</h2>
 
-    <h4>Description:</h4>
-
+    <desc>
     <p>The account private key transactions page contains data that NIS needs to
         retrieve a set of transactions from the database. The data includes the private
         key of the account for which transactions are retrieved. Use requests that use
         this structure only when NIS is running locally.</p>
     <p>The fields "hash" and "id" are optional.</p>
+	</desc>
 
     <h4>JSON structure by example:</h4>
     <resp>
@@ -3338,10 +3000,10 @@
 
 	<h2>ApplicationMetaData</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The application meta data object
 	supplies additional information about the application running on a node.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3403,13 +3065,13 @@
 
 	<h2>AuditCollection</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>An audit collection consists of two
 	arrays, containing information about incoming requests from other nodes. The
 	first array contains information about outstanding (i.e. not yet processed
 	requests) and the second array contains information about the most recent
 	requests. The audit collection is for debug purposes.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 	<resp>
@@ -3485,12 +3147,12 @@
 
 	<h2>Block</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>A block is the structure that contains
 	the transaction information. A block can contain up to 120 transactions. Blocks
 	are generated and signed by accounts and are the instrument by which
 	information is spread in the network.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3548,8 +3210,10 @@
 			</td>
 			<td>
 				<p>The block type. There are currently two block types used:</p>
-                <p class='NemNoSpacing FakeList'>-1:<span class='sep'> </span> Only the nemesis block has this type.</p>
-                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span> Regular block type.</p>
+				<vals>
+				-1: Only the nemesis block has this type.
+				1: Regular block type.
+				</vals>
 			</td>
 		</tr>
 		<tr>
@@ -3557,8 +3221,7 @@
 				<p class=JSON>transactions</p>
 			</td>
 			<td>
-				<p>The array of transaction structures. See <em>Appendix A:</em> Transaction
-				for more details             about this structure.</p>
+				<p>The array of transaction structures. See <appa>Transaction</appa> for more details about this structure.</p>
 			</td>
 		</tr>
 		<tr>
@@ -3591,10 +3254,10 @@
 
 	<h2>BlockChainScore</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The block chain score is a measure how
 	good the block chain is. The higher the score, the better the block chain is.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3620,12 +3283,12 @@
 
 	<h2>BlockHeight</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The block height describes the position
 	of the block within the block chain. The first block of the chain has height
 	one. Each subsequent block has a height which is one higher than the previous
 	block.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3650,11 +3313,11 @@
 
 	<h2>BootNodeRequest</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The BootNodeRequest JSNON object is used
 	to transfer the relevant data for booting a local node to NIS. With the boot
 	data NIS can create the local node object and connect to the network.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3757,13 +3420,13 @@
 
 	<h2>CommunicationTimeStamps</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Communication timestamps contain
 	information about the network time of a remote NIS. NEM uses a time
 	synchronization mechanism to synchronize time across the network. Each node
 	maintains a network time which is the time of the computer clock plus an offset
 	which compensates for the deviation from the computer clocks of other nodes.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3797,11 +3460,11 @@
 
 	<h2>ExplorerBlockViewModel</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The following structure is used by the
 	NEM block chain explorer for convenience reason. The data is similar but not
 	identical to that of a <a href="#block">Block</a>.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3855,7 +3518,7 @@
                 <p class=JSON>&lt;Block&gt;</p>
             </td>
             <td>
-                <p>The Block object as described in <em>Appendix A:</em> <a href="#block">Block</a></p>
+                <p>The Block object as described in <appa>Block</appa></p>
             </td>
         </tr>
 		<tr>
@@ -3870,11 +3533,11 @@
 
 	<h2>ExplorerTransferViewModel</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>The following structure is used by the
 	NEM block chain explorer for convenience reason. The data is similar but not
 	identical to that of a <a href="#transaction">Transaction</a> structure.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3902,7 +3565,7 @@
 			</td>
 			<td>
 				<p>The Transaction object. Depending on the type of the transaction the structure will look different.
-                    See <em>Appendix A</em> for the different transaction types.</p>
+				See <appa>Transaction objects</appa> for the different transaction types.</p>
 			</td>
 		</tr>
 		<tr>
@@ -3917,13 +3580,13 @@
 
 	<h2>ExtendedNodeExperiencePair</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>When exchanging data with other nodes
 	the result of the communication is divided into three different outcomes:
 	success, neutral and failure. In the cases of success and failure the result is
 	saved to be able to judge the quality of a node. This has influence on the
 	probability that a certain node is selected as partner.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -3998,10 +3661,10 @@
 
 	<h2>HarvestInfo</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>A HarvestInfo object contains
 	information about a block that an account harvested.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 	<resp>
@@ -4063,12 +3726,13 @@
     <h2>Transaction objects</h2>
 
     <h3>Importance Transfer Transaction</h3>
-    <h4>Description:</h4>
-    <p class=NemNoSpacing>NIS has the ability to transfer the importance of one
+    <desc>
+	<p class=NemNoSpacing>NIS has the ability to transfer the importance of one
         account to another account for harvesting. The account receiving the
         importance is called the remote account. Importance transfer transactions
         are part of the secure harvesting feature of NEM. Once an importance
         transaction has been included in a block it needs 24 hours to become active.</p>
+	</desc>
 
     <h4>JSON structure by example:</h4>
     <resp>
@@ -4431,9 +4095,11 @@
 				<p>The type is dependent on the request which was answered. The
 				interpretation of the code field depends on the type. Currently the following
 				types are supported:</p>
-                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span> The result is a validation result.</p>
-                <p class='NemNoSpacing FakeList'>2:<span class='sep'> </span> The result is a heart beat result.</p>
-                <p class='NemNoSpacing FakeList'>4:<span class='sep'> </span> The result indicates a status.</p>
+				<vals>
+				1: The result is a validation result.
+				2: The result is a heart beat result.
+				4: The result indicates a status.
+				</vals>
 			</td>
 		</tr>
 		<tr>
@@ -4444,52 +4110,53 @@
 				<p>The meaning of the code is dependent on the type.</p>
 				<p>For type 1 (validation result) only 0 and 1 mean there was no
 				failure. The following codes are supported:</p>
-				<p class='NemNoSpacing FakeList'>0:<span class='sep'> </span>Neutral result. A typical example would be that a node
-				validates an incoming transaction and realizes that it already knows about
-				the transaction. In this case it is            neither a success (meaning the
-				node has a new transaction) nor a failure (because the transaction itself is
-				valid).</p>
-                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>Success result. A typical example would be that a node validates a new valid transaction.</p>
-                <p class='NemNoSpacing FakeList'>2:<span class='sep'> </span>Unknown failure. The validation failed for unknown reasons.</p>
-                <p class='NemNoSpacing FakeList'>3:<span class='sep'> </span>The entity that was validated has already past its deadline.</p>
-                <p class='NemNoSpacing FakeList'>4:<span class='sep'> </span>The entity used a deadline which lies too far in the future.</p>
-                <p class='NemNoSpacing FakeList'>5:<span class='sep'> </span>There was an account involved which had an insufficient balance to perform the operation.</p>
-                <p class='NemNoSpacing FakeList'>6:<span class='sep'> </span>The message supplied with the transaction is too large.</p>
-                <p class='NemNoSpacing FakeList'>7:<span class='sep'> </span>The hash of the entity which got validated is already in the database.</p>
-                <p class='NemNoSpacing FakeList'>8:<span class='sep'> </span>The signature of the entity could not be validated.</p>
-                <p class='NemNoSpacing FakeList'>9:<span class='sep'> </span>The entity used a timestamp that lies too far in the past.</p>
-                <p class='NemNoSpacing FakeList'>10:<span class='sep'> </span>The entity used a timestamp that lies in the future which is not acceptable.</p>
-                <p class='NemNoSpacing FakeList'>11:<span class='sep'> </span>The entity is unusable.</p>
-                <p class='NemNoSpacing FakeList'>12:<span class='sep'> </span>The score of the remote block chain is inferior (although a superior score was promised).</p>
-                <p class='NemNoSpacing FakeList'>13:<span class='sep'> </span>The remote block chain failed validation.</p>
-                <p class='NemNoSpacing FakeList'>14:<span class='sep'> </span>There was a conflicting importance transfer detected.</p>
-                <p class='NemNoSpacing FakeList'>15:<span class='sep'> </span>There were too many transaction in the supplied block.</p>
-                <p class='NemNoSpacing FakeList'>16:<span class='sep'> </span>The block contains a transaction that was signed by the harvester.</p>
-                <p class='NemNoSpacing FakeList'>17:<span class='sep'> </span>A previous importance transaction conflicts with a new transaction.</p>
-                <p class='NemNoSpacing FakeList'>18:<span class='sep'> </span>An importance transfer activation was attempted while previous one is active.</p>
-                <p class='NemNoSpacing FakeList'>19:<span class='sep'> </span>An importance transfer deactivation was attempted but is not active.</p>
+				<vals>
+				0:Neutral result. A typical example would be that a node validates an incoming transaction and realizes that it already knows about the transaction. In this case it is neither a success (meaning the node has a new transaction) nor a failure (because the transaction itself is valid).
+				1:Success result. A typical example would be that a node validates a new valid transaction.
+				2:Unknown failure. The validation failed for unknown reasons.
+				3:The entity that was validated has already past its deadline.
+				4:The entity used a deadline which lies too far in the future.
+				5:There was an account involved which had an insufficient balance to perform the operation.
+				6:The message supplied with the transaction is too large.
+				7:The hash of the entity which got validated is already in the database.
+				8:The signature of the entity could not be validated.
+				9:The entity used a timestamp that lies too far in the past.
+				10:The entity used a timestamp that lies in the future which is not acceptable.
+				11:The entity is unusable.
+				12:The score of the remote block chain is inferior (although a superior score was promised).
+				13:The remote block chain failed validation.
+				14:There was a conflicting importance transfer detected.
+				15:There were too many transaction in the supplied block.
+				16:The block contains a transaction that was signed by the harvester.
+				17:A previous importance transaction conflicts with a new transaction.
+				18:An importance transfer activation was attempted while previous one is active.
+				19:An importance transfer deactivation was attempted but is not active.
+				</vals>
 				<p>            </p>
 				<p>For type 2 the following codes are supported:</p>
-                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>Successful heart beat detected.</p>
+				<vals>
+				1:Successful heart beat detected.
+				</vals>
 				<p></p>
 				<p>For type 3 the following codes are supported:</p>
-                <p class='NemNoSpacing FakeList'>0:<span class='sep'> </span>Unknown status.</p>
-                <p class='NemNoSpacing FakeList'>1:<span class='sep'> </span>NIS is stopped.</p>
-                <p class='NemNoSpacing FakeList'>2:<span class='sep'> </span>NIS is starting.</p>
-                <p class='NemNoSpacing FakeList'>3:<span class='sep'> </span>NIS is running.</p>
-                <p class='NemNoSpacing FakeList'>4:<span class='sep'> </span>NIS is booting the local node (implies NIS is running).</p>
-                <p class='NemNoSpacing FakeList'>5:<span class='sep'> </span>The local node is booted (implies NIS is running).</p>
-                <p class='NemNoSpacing FakeList'>6:<span class='sep'> </span>The local node is synchronized (implies NIS is running and the local node is booted)</p>
+				<vals>
+				0:Unknown status.
+				1:NIS is stopped.
+				2:NIS is starting.
+				3:NIS is running.
+				4:NIS is booting the local node (implies NIS is running).
+				5:The local node is booted (implies NIS is running).
+				6:The local node is synchronized (implies NIS is running and the local node is booted)
+				</vals>
 			</td>
 		</tr>
 	</table>
 
 	<h2>NisNodeInfo</h2>
 
-	<h4>Description:</h4>
-
-	<p class=NemNoSpacing>The NisNodeInfo object provides detailed
-	information about a node.</p>
+	<desc>
+	<p class=NemNoSpacing>The NisNodeInfo object provides detailed information about a node.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -4543,13 +4210,13 @@
 
 	<h2>Node</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Nodes are the entities that perform
 	communication in the network like sending and receiving data. A node has an
 	identity which is tied to an account through which the node can identify itself
 	to the network. The communication is done through the endpoint of the node.
 	Additionally a node provides meta data information.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -4670,10 +4337,10 @@
 
 	<h2>NodeCollection</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>A NodeCollection object holds arrays of nodes
 	with different statuses. The following statuses are supported:</p>
+	</desc>
 
 	<h4>Description of the fields:</h4>
 
@@ -4794,11 +4461,11 @@
 
 	<h2>PrivateKey</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>A private key is a key to an account.
 	Anyone having the private key to an account can initiate any account related
 	action. <strong>Therefore a private key must be kept secret at all costs.</strong></p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -4823,11 +4490,11 @@
 
 	<h2>RequestPrepareAnnounce</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>A RequestPrepareAnnounce object is used
 	to transfer transaction data and a private key to NIS in order to initiate and
 	broadcast a transaction.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -4865,7 +4532,7 @@
 			</td>
 			<td>
 				<p>Denotes the beginning of the transaction data part. The
-				transaction data is described in <em>Appendix A:</em> <a href="#transaction">Transaction</a>. The field 'signature is
+				transaction data is described in <appa>Transaction</appa>. The field 'signature is
 				missing since the transaction is not signed at this point.</p>
 			</td>
 		</tr>
@@ -4880,11 +4547,11 @@
 	</table>
 	<h2>TimeSynchronizationResult</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>A time synchronization result is the
 	outcome of the network time synchronization of a node with other remote nodes.
 	To agree upon a common time nodes need to synchronize time every hour.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -4927,10 +4594,10 @@
 
 	<h2>TransactionMetaData</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Transactions meta data object contains
 	additional information about the transaction.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -4955,10 +4622,10 @@
 
 	<h2>TransactionMetaDataPair</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>Transactions meta data object contains
 	additional information about the transaction.</p>
+	</desc>
 
 	<h4>JSON structure by example:</h4>
 
@@ -5044,11 +4711,11 @@
 
 	<h2>Error object</h2>
 
-	<h4>Description:</h4>
-
+	<desc>
 	<p class=NemNoSpacing>If NIS encounters an error due to either
 	invalid requests or internal problems, it returns a JSON error object. The
-	interpretation of the error object is dependant on the context. See <a href="#appendix-B:-NIS-errors">Appendix B: NIS Errors</a> for detailed information about possible errors.</p>
+	interpretation of the error object is dependant on the context. See <alnk>Appendix B: NIS Errors</alnk> for detailed information about possible errors.</p>
+	</desc>
 
 	<h4>JSON structure by example</h4>
 
@@ -5103,7 +4770,7 @@
 
 	<p>In case NIS encounters an error while
 	processing a request it returns a JSON error object whose structure is
-	described in <em>Appendix A:</em> <a href="#error-object">Error object</a>. This chapter describes the
+	described in <appa>Error object</appa>. This chapter describes the
 	errors messages that can be returned from NIS.</p>
 
 	<h2>Error messages</h2>
