@@ -17,7 +17,7 @@ import org.nem.nis.validators.transaction.*;
 import java.util.*;
 import java.util.stream.*;
 
-public class NewBlockTransactionsProviderTest {
+public class DefaultNewBlockTransactionsProviderTest {
 	private static final int MAX_ALLOWED_TRANSACTIONS_PER_BLOCK = 120;
 
 	//region candidate filtering
@@ -505,7 +505,7 @@ public class NewBlockTransactionsProviderTest {
 			Mockito.when(nisCacheCopy.getAccountStateCache()).thenReturn(this.accountStateCache);
 			Mockito.when(this.nisCache.copy()).thenReturn(nisCacheCopy);
 
-			this.provider = new NewBlockTransactionsProvider(
+			this.provider = new DefaultNewBlockTransactionsProvider(
 					this.nisCache,
 					this.validatorFactory,
 					NisUtils.createBlockValidatorFactory(),
