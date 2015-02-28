@@ -6,6 +6,7 @@ import org.nem.nis.poi.graph.InterLevelProximityMatrix;
 import org.nem.nis.state.AccountState;
 
 import java.util.Collection;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 /**
@@ -24,19 +25,19 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 	private static final double DEFAULT_POWER_ITERATION_TOL = 1.0e-3;
 
 	private final ImportanceScorer scorer;
-	private final PoiOptions options;
+	private final Function<BlockHeight, PoiOptions> getPoiOptions;
 
 	/**
 	 * Creates a new generator with custom options.
 	 *
 	 * @param scorer The poi scorer to use.
-	 * @param options The poi options.
+	 * @param getPoiOptions A function that returns the poi options given a block height.
 	 */
 	public PoiImportanceCalculator(
 			final ImportanceScorer scorer,
-			final PoiOptions options) {
+			final Function<BlockHeight, PoiOptions> getPoiOptions) {
 		this.scorer = scorer;
-		this.options = options;
+		this.getPoiOptions = getPoiOptions;
 	}
 
 	@Override
@@ -45,14 +46,15 @@ public class PoiImportanceCalculator implements ImportanceCalculator {
 			final Collection<AccountState> accountStates) {
 		// This is the draft implementation for calculating proof-of-importance
 		// (1) set up the matrices and vectors
-		final PoiContext context = new PoiContext(accountStates, blockHeight, this.options);
+		final PoiOptions options = this.getPoiOptions.apply(blockHeight);
+		final PoiContext context = new PoiContext(accountStates, blockHeight, options);
 
 		// (2) run the power iteration algorithm
 		final PowerIterator iterator = new PoiPowerIterator(
 				context,
-				this.options,
+				options,
 				accountStates.size(),
-				this.options.isClusteringEnabled());
+				options.isClusteringEnabled());
 
 		final long start = System.currentTimeMillis();
 		iterator.run();

@@ -269,7 +269,7 @@ public class NisUtils {
 	 * @return The calculator.
 	 */
 	public static ImportanceCalculator createImportanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), DEFAULT_POI_OPTIONS);
+		return new PoiImportanceCalculator(new PoiScorer(), height -> DEFAULT_POI_OPTIONS);
 	}
 
 	/**

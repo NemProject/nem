@@ -439,7 +439,7 @@ public class BlockChainServicesTest {
 			this.nisCache = new DefaultNisCache(
 					new SynchronizedAccountCache(new DefaultAccountCache()),
 					new SynchronizedAccountStateCache(new DefaultAccountStateCache()),
-					new SynchronizedPoiFacade(new DefaultPoiFacade(new PoiImportanceCalculator(new PoiScorer(), new PoiOptionsBuilder().create()))),
+					new SynchronizedPoiFacade(new DefaultPoiFacade(NisUtils.createImportanceCalculator())),
 					new SynchronizedHashCache(new DefaultHashCache())).copy();
 
 			this.blockChainServices = new BlockChainServices(

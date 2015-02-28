@@ -718,9 +718,7 @@ public class PoiImportanceCalculatorTest {
 			final BlockHeight importanceBlockHeight,
 			final Collection<AccountState> accountStates,
 			final ImportanceScorer scorer) {
-		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(
-				scorer,
-				options);
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(scorer, height -> options);
 		importanceCalculator.recalculate(importanceBlockHeight, accountStates);
 		return getImportances(importanceBlockHeight, accountStates);
 	}

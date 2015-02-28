@@ -249,7 +249,7 @@ public class NisAppConfig {
 
 	@Bean
 	public ImportanceCalculator importanceCalculator() {
-		return new PoiImportanceCalculator(new PoiScorer(), this.poiOptions());
+		return new PoiImportanceCalculator(new PoiScorer(), this::getBlockDependentPoiOptions);
 	}
 
 	@Bean
@@ -265,11 +265,6 @@ public class NisAppConfig {
 	@Bean
 	public CanHarvestPredicate canHarvestPredicate() {
 		return new CanHarvestPredicate(this::getBlockDependentMinHarvesterBalance);
-	}
-
-	@Bean
-	public PoiOptions poiOptions() {
-		return new PoiOptionsBuilder().create();
 	}
 
 	private Amount getBlockDependentMinHarvesterBalance(final BlockHeight height) {
