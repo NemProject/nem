@@ -124,7 +124,8 @@ public class BlockAwareNewBlockTransactionsProviderTest {
 		}
 
 		public List<Transaction> getBlockTransactions(final BlockHeight blockHeight) {
-			return this.provider.getBlockTransactions(Utils.generateRandomAddress(), TimeInstant.ZERO, blockHeight);
+			final Account harvester = Utils.generateRandomAccount();
+			return this.provider.getBlockTransactions(harvester.getAddress(), TimeInstant.ZERO, blockHeight);
 		}
 
 		//region addAccount
