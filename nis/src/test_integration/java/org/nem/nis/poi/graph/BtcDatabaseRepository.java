@@ -19,6 +19,7 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	private static final Logger LOGGER = Logger.getLogger(BtcDatabaseRepository.class.getName());
 
 	private final String databasePath;
+
 	/**
 	 * Creates a new BTC repository.
 	 */
@@ -44,11 +45,6 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 	 */
 	public Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
 		LOGGER.info(String.format("loading transactions in blocks [%d, %d]...", startHeight, stopHeight));
-
-		final String transCacheKey = startHeight + "_" + stopHeight;
-		if (transactionCache.containsKey(transCacheKey)) {
-			return transactionCache.get(transCacheKey);
-		}
 
 		final List<GraphClusteringTransaction> transactionData = new ArrayList<>();
 
@@ -137,8 +133,6 @@ public class BtcDatabaseRepository implements DatabaseRepository {
 						btcTrans.inputAddress,
 						btcTrans.outputAddress,
 						btcTrans.value)));
-
-		transactionCache.put(transCacheKey, transactionData);
 
 		return transactionData;
 	}

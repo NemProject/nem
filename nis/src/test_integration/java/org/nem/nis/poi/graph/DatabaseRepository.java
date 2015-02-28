@@ -7,8 +7,6 @@ import java.util.*;
  */
 public interface DatabaseRepository {
 
-	static final Map<String, Collection<GraphClusteringTransaction>> transactionCache = new HashMap<>();
-
 	/**
 	 * Loads a subset of transactions.
 	 *

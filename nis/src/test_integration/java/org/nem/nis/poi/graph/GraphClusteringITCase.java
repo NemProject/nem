@@ -41,7 +41,7 @@ public abstract class GraphClusteringITCase {
 	protected GraphClusteringITCase(final int defaultEndHeight, final String blockchainType, final DatabaseRepository repository) {
 		this.defaultEndHeight = defaultEndHeight;
 		this.blockchainType = blockchainType;
-		this.repository = repository;
+		this.repository = new CachedDatabaseRepository(repository);
 	}
 
 	private enum BalanceComparisonType {
@@ -631,9 +631,40 @@ public abstract class GraphClusteringITCase {
 		return selectHarvestingEligibleAccounts(accountStateMap, new BlockHeight(endHeight), minHarvesterBalance);
 	}
 
+	/**
+	 * Creates account states from transaction data.
+	 *
+	 * @param transactions The transaction data.
+	 * @return The account states.
+	 */
 	protected abstract Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<GraphClusteringTransaction> transactions);
 
-	protected abstract long normalizeToNemMktCap(final long amt);
+	/**
+	 * Gets the number of units of the implementation-specific currency.
+	 *
+	 * @return The number of units.
+	 */
+	protected abstract long getSupplyUnits();
+
+	/**
+	 * Gets the market cap of the implementation-specific currency.
+	 *
+	 * @return The market cap.
+	 */
+	protected abstract long getMarketCap();
+
+	/**
+	 * Normalizes an implementation-specific amount.
+	 *
+	 * @param amt The implementation-specific amount.
+	 * @return The normalized amount.
+	 */
+	protected long normalizeAmount(final long amt) {
+		// TODO 20150228 J-M: i'm assuming this is being called with NXT / BTC amounts
+		// > but if so, i think your market cap rations were inverse before?
+		final double nemMarketCap = 4000000.0;
+		return (long)(amt * (nemMarketCap / this.getMarketCap()));
+	}
 
 	private static Collection<AccountState> selectHarvestingEligibleAccounts(
 			final Map<Address, AccountState> accountStateMap,

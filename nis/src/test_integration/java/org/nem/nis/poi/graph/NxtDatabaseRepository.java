@@ -53,11 +53,6 @@ public class NxtDatabaseRepository implements AutoCloseable, DatabaseRepository 
 	public Collection<GraphClusteringTransaction> loadTransactionData(final long startHeight, final long stopHeight) {
 		LOGGER.info(String.format("loading transactions in blocks [%d, %d]...", startHeight, stopHeight));
 
-		final String transCacheKey = startHeight + "_" + stopHeight;
-		if (this.transactionCache.containsKey(transCacheKey)) {
-			return this.transactionCache.get(transCacheKey);
-		}
-
 		final List<GraphClusteringTransaction> transactionData = new ArrayList<>();
 		ExceptionUtils.propagateVoid(() -> {
 			try (final Statement stmt = this.conn.createStatement()) {
@@ -76,8 +71,6 @@ public class NxtDatabaseRepository implements AutoCloseable, DatabaseRepository 
 				}
 			}
 		});
-
-		this.transactionCache.put(transCacheKey, transactionData);
 
 		LOGGER.info(String.format("%d transactions found!", transactionData.size()));
 		return transactionData;

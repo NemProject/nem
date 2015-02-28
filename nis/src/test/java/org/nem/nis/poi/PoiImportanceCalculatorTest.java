@@ -221,35 +221,6 @@ public class PoiImportanceCalculatorTest {
 	 * because they have outlinks to two nodes, thus lowering their ranks.
 	 *
 	 * Variation of the teleportation probabilities shows this behavior (TP = teleportation prob., ITLP = inter level teleportation prob.):
-	 *
-	 * with beta POI settings (and Mockito to guarantee clusters of {1,2,3,4,5}, {6,7,8,9,10}, with a hub as {0}):
-	 *  TP   ILTP
-	 * 0.8  | 0.1  | 0.090 0.097 0.088 0.089 0.090 0.091 0.097 0.088 0.089 0.090 0.091
-	 * 0.6  | 0.3  | 0.093 0.096 0.088 0.089 0.090 0.090 0.096 0.088 0.089 0.090 0.090
-	 * 0.45 | 0.45 | 0.096 0.095 0.088 0.089 0.090 0.090 0.095 0.088 0.089 0.090 0.090
-	 * 0.3  | 0.6  | 0.102 0.094 0.088 0.089 0.089 0.089 0.094 0.088 0.089 0.089 0.089
-	 * 0.1  | 0.8  | 0.117 0.092 0.087 0.087 0.087 0.087 0.092 0.087 0.087 0.087 0.087
-	 *
-	 * with beta POI settings without Mockito and everything is just one big cluster:
-	 *  TP   ILTP
-	 * 0.8  | 0.1  | 0.089 0.097 0.088 0.089 0.090 0.091 0.097 0.088 0.089 0.090 0.091
-	 * 0.6  | 0.3  | 0.088 0.097 0.088 0.090 0.091 0.091 0.097 0.088 0.090 0.091 0.091
-	 * 0.45 | 0.45 | 0.087 0.096 0.089 0.090 0.091 0.091 0.096 0.089 0.090 0.091 0.091
-	 * 0.3  | 0.6  | 0.087 0.096 0.089 0.090 0.091 0.091 0.096 0.089 0.090 0.091 0.091
-	 * 0.1  | 0.8  | 0.086 0.095 0.090 0.090 0.091 0.090 0.095 0.090 0.090 0.091 0.090
-	 *
-	 * with old (pre-beta) POI settings:
-	 *  TP   ILTP
-	 * 0.8  | 0.1  | 0.120 0.104 0.068 0.080 0.090 0.098 0.104 0.068 0.080 0.090 0.098
-	 * 0.6  | 0.3  | 0.131 0.097 0.070 0.083 0.090 0.094 0.097 0.070 0.083 0.090 0.094
-	 * 0.45 | 0.45 | 0.144 0.090 0.073 0.084 0.089 0.091 0.090 0.073 0.084 0.089 0.091
-	 * 0.3  | 0.6  | 0.163 0.084 0.075 0.085 0.087 0.088 0.084 0.075 0.085 0.087 0.088
-	 * 0.1  | 0.8  | 0.201 0.075 0.078 0.082 0.082 0.082 0.075 0.078 0.082 0.082 0.082
-	 * 0 gets more and more important and the nodes within a cluster get more and more equal.
-	 *
-	 * Here are the values for SingleClusterScan (should be the same as normal page rank):
-	 * 0.108 0.104 0.069 0.082 0.092 0.099 0.104 0.069 0.082 0.092 0.099 original importance
-	 * The ncd-aware algorithm pushes 0 which is good. Node 2 has a lower importance than 3, 4, or 5, because node 1 contributes less PageRank to node 2.
 	 */
 	/**
 	 * <pre>

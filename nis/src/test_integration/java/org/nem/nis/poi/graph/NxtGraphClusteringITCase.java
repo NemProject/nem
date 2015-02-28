@@ -15,8 +15,6 @@ public class NxtGraphClusteringITCase extends GraphClusteringITCase {
 	private static final int DEFAULT_END_HEIGHT = 300000;
 	private static final String BLOCKCHAIN_TYPE = "Nxt";
 
-	private static final long MKT_CAP_NORMALIZATION_FACTOR = (long)(12000000.0 / 4000000.0); // Nxt mkt cap / Nem mkt cap (in USD)
-
 	public NxtGraphClusteringITCase() {
 		super(DEFAULT_END_HEIGHT, BLOCKCHAIN_TYPE, new NxtDatabaseRepository());
 	}
@@ -30,19 +28,20 @@ public class NxtGraphClusteringITCase extends GraphClusteringITCase {
 		Assert.assertThat(transactions.size(), IsEqual.equalTo(73));
 	}
 
+	@Override
 	protected Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<GraphClusteringTransaction> transactions) {
 		LOGGER.info("Creating PoiAccountStates from Nxt transaction data...");
 
 		final Map<Address, AccountState> accountStateMap = new HashMap<>();
 
 		// 1. Create accounts in the genesis block.
-		final Amount genesisAmount = Amount.fromNem(this.normalizeToNemMktCap(1000000000)); // normalize w.r.t. market cap
+		final Amount genesisAmount = Amount.fromNem(this.normalizeAmount(1000000000));
 		final AccountState genesis = createAccountWithBalance(Address.fromEncoded("1739068987193023818"), 1, genesisAmount);
 		accountStateMap.put(genesis.getAddress(), genesis);
 
 		// 2. Iterate through transactions, creating new accounts as needed.
 		for (final GraphClusteringTransaction trans : transactions) {
-			final Amount amount = Amount.fromMicroNem(this.normalizeToNemMktCap(trans.getAmount())); // normalize w.r.t. market cap
+			final Amount amount = Amount.fromMicroNem(this.normalizeAmount(trans.getAmount()));
 			final Address sender = Address.fromEncoded(Long.toString(trans.getSenderId()));
 			final Address recipient = Address.fromEncoded(Long.toString(trans.getRecipientId()));
 			final BlockHeight blockHeight = new BlockHeight(trans.getHeight() + 1); // NXT blocks start at 0 but NEM blocks start at 1
@@ -72,7 +71,13 @@ public class NxtGraphClusteringITCase extends GraphClusteringITCase {
 		return accountStateMap;
 	}
 
-	protected long normalizeToNemMktCap(final long amt) {
-		return amt * MKT_CAP_NORMALIZATION_FACTOR;
+	@Override
+	protected long getSupplyUnits() {
+		return 100000000000L; // Convert from 1 billion Nxt (10^8 precision);
+	}
+
+	@Override
+	protected long getMarketCap() {
+		return 12000000; // Nxt mkt cap
 	}
 }

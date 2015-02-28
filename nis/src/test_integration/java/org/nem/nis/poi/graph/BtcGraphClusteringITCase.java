@@ -12,7 +12,6 @@ import java.util.*;
 public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 	private static final int DEFAULT_END_HEIGHT = 20000; // This end height is set assuming that we only process block files blk00148.dat to blk00152.dat (inclusive)
 	private static final String BLOCKCHAIN_TYPE = "Btc";
-	private static final double MKT_CAP_NORMALIZATION_FACTOR = 3235636400.0 / 4000000.0; // BTC mkt cap / NEM mkt cap (in USD)
 	private static final boolean USE_RANDOMNESS = false; // Create random connections to make the transaction graph more interesting
 
 	private final static Map<Integer, Map<Address, AccountState>> accountStateMapCache = new HashMap<>();
@@ -25,12 +24,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 		super(DEFAULT_END_HEIGHT, BLOCKCHAIN_TYPE, new BtcDatabaseRepository());
 	}
 
-	/**
-	 * Creates account states from transaction data, which are then used for running various importance score calculation tests.
-	 *
-	 * @param transactions - list of transactions
-	 * @return list of account states, with each account having its own state
-	 */
+	@Override
 	protected Map<Address, AccountState> createAccountStatesFromTransactionData(final Collection<GraphClusteringTransaction> transactions) {
 		LOGGER.info("Creating PoiAccountStates from Btc transaction data...");
 
@@ -39,7 +33,7 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 			long maxBlockHeight = 0;
 			// Iterate through transactions, creating new accounts as needed.
 			for (final GraphClusteringTransaction trans : transactions) {
-				final Amount amount = Amount.fromMicroNem(this.normalizeToNemMktCap(trans.getAmount()));
+				final Amount amount = Amount.fromMicroNem(this.normalizeAmount(trans.getAmount()));
 				final Address sender = Address.fromEncoded(Long.toString(trans.getSenderId()));
 				final Address recipient = Address.fromEncoded(Long.toString(trans.getRecipientId()));
 				final BlockHeight blockHeight = new BlockHeight(this.normalizeBtcBlockHeightsToNem(trans.getHeight()));
@@ -85,8 +79,14 @@ public class BtcGraphClusteringITCase extends GraphClusteringITCase {
 		return accountStateMapCache.get(transactions.hashCode());
 	}
 
-	protected long normalizeToNemMktCap(final long amt) {
-		return (long)(amt * MKT_CAP_NORMALIZATION_FACTOR);
+	@Override
+	protected long getSupplyUnits() {
+		return 1300000000; // Convert from Satoshis (10^8 precision); current BTC supply is about 13 mil;
+	}
+
+	@Override
+	protected long getMarketCap() {
+		return 3235636400L;
 	}
 
 	private long normalizeBtcBlockHeightsToNem(final long btcBlockHeight) {
