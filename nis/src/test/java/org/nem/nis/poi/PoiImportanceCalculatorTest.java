@@ -12,6 +12,7 @@ import org.nem.nis.test.*;
 
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,36 @@ public class PoiImportanceCalculatorTest {
 	 * While it might look weird to multiply an initial balance by this constant, it is correct.
 	 */
 	private static final long MIN_OUTLINK_WEIGHT = DEFAULT_OPTIONS.getMinOutlinkWeight().getNumMicroNem();
+
+	@Test
+	public void poiOptionsAreRequestedEachTimeRecalculateIsCalled() {
+		// Arrange:
+		final int numIterations = 3;
+		final List<BlockHeight> heights = new ArrayList<>();
+		final List<AccountState> accountStates = Arrays.asList(createAccountStateWithBalance(Amount.fromNem(101000)));
+		final Function<BlockHeight, PoiOptions> getPoiOptions = height -> {
+			heights.add(height);
+			return DEFAULT_OPTIONS;
+		};
+
+		// Act:
+		final ImportanceCalculator importanceCalculator = new PoiImportanceCalculator(DEFAULT_IMPORTANCE_SCORER, getPoiOptions);
+		Assert.assertThat(heights.size(), IsEqual.equalTo(0));
+
+		for (int i = 0; i < numIterations; ++i) {
+			// Act:
+			importanceCalculator.recalculate(new BlockHeight(100 + i), accountStates);
+
+			// Assert:
+			Assert.assertThat(heights.size(), IsEqual.equalTo(1 + i));
+		}
+
+		// Assert:
+		Assert.assertThat(heights.size(), IsEqual.equalTo(numIterations));
+		Assert.assertThat(
+				heights,
+				IsEqual.equalTo(Arrays.asList(new BlockHeight(100), new BlockHeight(101), new BlockHeight(102))));
+	}
 
 	@Test
 	public void fastScanClusteringResultsInSameImportancesAsScan() {
