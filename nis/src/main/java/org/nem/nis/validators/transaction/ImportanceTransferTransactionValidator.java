@@ -7,24 +7,26 @@ import org.nem.nis.cache.ReadOnlyAccountStateCache;
 import org.nem.nis.state.*;
 import org.nem.nis.validators.*;
 
+import java.util.function.Function;
+
 /**
  * A TransferTransactionValidator implementation that applies to importance transfer transactions.
  */
 public class ImportanceTransferTransactionValidator implements TSingleTransactionValidator<ImportanceTransferTransaction> {
 	private final ReadOnlyAccountStateCache accountStateCache;
-	private final Amount minHarvesterBalance;
+	private final Function<BlockHeight, Amount> getMinHarvesterBalance;
 
 	/**
 	 * Creates a new validator.
 	 *
 	 * @param accountStateCache The account state cache.
-	 * @param minHarvesterBalance The minimum balance required for a harvester.
+	 * @param getMinHarvesterBalance A function that returns the min harvester balance given a block height.
 	 */
 	public ImportanceTransferTransactionValidator(
 			final ReadOnlyAccountStateCache accountStateCache,
-			final Amount minHarvesterBalance) {
+			final Function<BlockHeight, Amount> getMinHarvesterBalance) {
 		this.accountStateCache = accountStateCache;
-		this.minHarvesterBalance = minHarvesterBalance;
+		this.getMinHarvesterBalance = getMinHarvesterBalance;
 	}
 
 	@Override
@@ -57,7 +59,8 @@ public class ImportanceTransferTransactionValidator implements TSingleTransactio
 
 		switch (transaction.getMode()) {
 			case Activate:
-				if (!predicate.canDebit(transaction.getSigner(), this.minHarvesterBalance.add(transaction.getFee()))) {
+				final Amount minHarvesterBalance = this.getMinHarvesterBalance.apply(height);
+				if (!predicate.canDebit(transaction.getSigner(), minHarvesterBalance.add(transaction.getFee()))) {
 					return ValidationResult.FAILURE_INSUFFICIENT_BALANCE;
 				}
 

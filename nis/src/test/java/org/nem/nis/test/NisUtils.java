@@ -251,7 +251,7 @@ public class NisUtils {
 	public static TransactionValidatorFactory createTransactionValidatorFactory(final TimeProvider timeProvider) {
 		return new TransactionValidatorFactory(
 				timeProvider,
-				DEFAULT_POI_OPTIONS);
+				height -> DEFAULT_POI_OPTIONS.getMinHarvesterBalance());
 	}
 
 	/**

@@ -180,7 +180,7 @@ public class NisAppConfig {
 
 	@Bean
 	public TransactionValidatorFactory transactionValidatorFactory() {
-		return new TransactionValidatorFactory(this.timeProvider(), this.poiOptions());
+		return new TransactionValidatorFactory(this.timeProvider(), this::getBlockDependentMinHarvesterBalance);
 	}
 
 	@Bean
@@ -273,7 +273,11 @@ public class NisAppConfig {
 	}
 
 	private Amount getBlockDependentMinHarvesterBalance(final BlockHeight height) {
-		return new PoiOptionsBuilder(height).create().getMinHarvesterBalance();
+		return this.getBlockDependentPoiOptions(height).getMinHarvesterBalance();
+	}
+
+	private PoiOptions getBlockDependentPoiOptions(final BlockHeight height) {
+		return new PoiOptionsBuilder(height).create();
 	}
 
 	@Bean
