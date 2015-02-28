@@ -597,7 +597,7 @@ public class BlockChainValidatorIntegrationTest {
 		// Arrange:
 		final BlockChainValidatorFactory factory = createValidatorFactory();
 		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK);
 		parentBlock.sign();
 
 		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();

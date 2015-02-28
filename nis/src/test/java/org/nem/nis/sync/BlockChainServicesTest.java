@@ -8,7 +8,7 @@ import org.nem.core.model.*;
 import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
-import org.nem.nis.NisMain;
+import org.nem.nis.*;
 import org.nem.nis.cache.*;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.poi.*;
@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockChainServicesTest {
-	private final static long TEST_HEIGHT = 123;
+	private final static long TEST_HEIGHT = BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK;
 
 	@Test
 	public void chainWithMultisigTransactionsIssuedByNotCosignatoryIsInvalid() {

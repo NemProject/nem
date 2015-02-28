@@ -83,7 +83,12 @@ public class TransactionValidatorFactory {
 						new BlockHeight(BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK),
 						new RemoteNonOperationalValidator(accountStateCache)));
 
-		builder.add(new MultisigNonOperationalValidator(accountStateCache));
+		// the execution change causes some previously accepted block transactions to fail validation
+		// because they are invalid (but were not caught by the previous execution process)
+		builder.add(
+				new BlockHeightSingleTransactionValidatorDecorator(
+						new BlockHeight(BlockMarkerConstants.BETA_EXECUTION_CHANGE_FORK),
+						new MultisigNonOperationalValidator(accountStateCache)));
 
 		builder.add(
 				new TSingleTransactionValidatorAdapter<>(
