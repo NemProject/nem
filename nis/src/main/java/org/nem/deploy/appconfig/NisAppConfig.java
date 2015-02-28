@@ -198,7 +198,7 @@ public class NisAppConfig {
 
 	@Bean
 	public Harvester harvester() {
-		final NewBlockTransactionsProvider transactionsProvider = new DefaultNewBlockTransactionsProvider(
+		final NewBlockTransactionsProvider transactionsProvider = new BlockAwareNewBlockTransactionsProvider(
 				this.nisCache(),
 				this.transactionValidatorFactory(),
 				this.blockValidatorFactory(),
