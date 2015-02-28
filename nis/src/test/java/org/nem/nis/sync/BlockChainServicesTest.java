@@ -87,10 +87,10 @@ public class BlockChainServicesTest {
 		block.sign();
 
 		// Act:
-		// (the HashCache throws when attempting to add the duplicate transaction)
-		ExceptionAssert.assertThrows(
-				v -> context.isValid(blocks),
-				IllegalArgumentException.class);
+		final boolean result = context.isValid(blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test
@@ -108,10 +108,10 @@ public class BlockChainServicesTest {
 		block2.sign();
 
 		// Act:
-		// (the HashCache throws when attempting to add the duplicate transaction)
-		ExceptionAssert.assertThrows(
-				v -> context.isValid(blocks),
-				IllegalArgumentException.class);
+		final boolean result = context.isValid(blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(false));
 	}
 
 	@Test

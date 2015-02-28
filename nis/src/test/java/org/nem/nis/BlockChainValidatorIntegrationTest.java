@@ -9,8 +9,8 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.test.*;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
+import org.nem.nis.chain.*;
 import org.nem.nis.secret.*;
-import org.nem.nis.service.BlockExecutor;
 import org.nem.nis.state.*;
 import org.nem.nis.sync.DefaultDebitPredicate;
 import org.nem.nis.test.*;
@@ -132,27 +132,15 @@ public class BlockChainValidatorIntegrationTest {
 		// Arrange:
 		final BlockChainValidatorFactory factory = createValidatorFactory();
 		final BlockChainValidator validator = factory.create();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK);
 		parentBlock.sign();
 
-		final Account account1 = Utils.generateRandomAccount();
-		factory.getAccountInfo(account1).incrementBalance(Amount.fromNem(12345));
-		final Account account2 = Utils.generateRandomAccount();
+		final Account account1 = factory.createAccountWithBalance(Amount.fromNem(100000));
+		final Account account2 = factory.createAccountWithBalance(Amount.fromNem(100000));
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
-		final Transaction transaction1 = new TransferTransaction(new TimeInstant(100), account1, account2, new Amount(7), null);
-		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
-		transaction1.sign();
-		block.addTransaction(transaction1);
-		final Transaction transaction2 = new ImportanceTransferTransaction(
-				new TimeInstant(150),
-				account1,
-				ImportanceTransferTransaction.Mode.Activate,
-				account2);
-		transaction2.setDeadline(transaction2.getTimeStamp().addHours(1));
-		transaction2.sign();
-		block.addTransaction(transaction2);
+		block.addTransaction(createActivateImportanceTransfer(account1, account2));
 		block.sign();
 
 		// Act:
@@ -163,42 +151,66 @@ public class BlockChainValidatorIntegrationTest {
 	}
 
 	@Test
-	public void chainWithConflictingImportanceTransfersIsInvalid() {
+	public void chainWithImportanceTransferAndTransferToRemoteInSameBlockIsInvalid() {
 		// Arrange:
-		final BlockChainValidator validator = createValidator();
-		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), BlockMarkerConstants.BETA_REMOTE_VALIDATION_FORK);
 		parentBlock.sign();
 
-		final Account account1 = Utils.generateRandomAccount();
+		final Account account1 = factory.createAccountWithBalance(Amount.fromNem(100000));
 		final Account account2 = Utils.generateRandomAccount();
-		final Account accountX = Utils.generateRandomAccount();
 
 		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
 		final Block block = blocks.get(1);
-		final Transaction transaction1 = new ImportanceTransferTransaction(
-				new TimeInstant(150),
-				account1,
-				ImportanceTransferTransaction.Mode.Activate,
-				accountX);
+		final Transaction transaction1 = new TransferTransaction(new TimeInstant(100), account1, account2, new Amount(7), null);
 		transaction1.setDeadline(transaction1.getTimeStamp().addHours(1));
 		transaction1.sign();
 		block.addTransaction(transaction1);
-
-		final Transaction transaction2 = new ImportanceTransferTransaction(
-				new TimeInstant(150),
-				account2,
-				ImportanceTransferTransaction.Mode.Activate,
-				accountX);
-		transaction2.setDeadline(transaction2.getTimeStamp().addHours(1));
-		transaction2.sign();
-		block.addTransaction(transaction2);
+		block.addTransaction(createActivateImportanceTransfer(account1, account2));
 		block.sign();
 
 		// Act:
 		final ValidationResult result = validator.isValid(parentBlock, blocks);
 
 		// Assert:
-		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_IMPORTANCE_TRANSFER));
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_DESTINATION_ACCOUNT_HAS_PREEXISTING_BALANCE_TRANSFER));
+	}
+
+	@Test
+	public void chainWithConflictingImportanceTransfersInSameBlockIsInvalid() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
+		parentBlock.sign();
+
+		final Account account1 = factory.createAccountWithBalance(Amount.fromNem(20000));
+		final Account account2 = factory.createAccountWithBalance(Amount.fromNem(20000));
+		final Account accountX = Utils.generateRandomAccount();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+		block.addTransaction(createActivateImportanceTransfer(account1, accountX));
+		block.addTransaction(createActivateImportanceTransfer(account2, accountX));
+		block.sign();
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_IMPORTANCE_TRANSFER_IN_PROGRESS));
+	}
+
+	private static Transaction createActivateImportanceTransfer(final Account account1, final Account account2) {
+		final Transaction transaction = new ImportanceTransferTransaction(
+				new TimeInstant(150),
+				account1,
+				ImportanceTransferTransaction.Mode.Activate,
+				account2);
+		transaction.setDeadline(transaction.getTimeStamp().addHours(1));
+		transaction.sign();
+		return transaction;
 	}
 
 	@Test
@@ -365,11 +377,83 @@ public class BlockChainValidatorIntegrationTest {
 		block.addTransaction(createTransfer(signer, Amount.fromNem(11), Amount.fromNem(5)));
 		block.sign();
 
-		// Assert: block execution fails
-		// TODO 20141210: probably should update BlockChainValidator to handle this correctly
-		ExceptionAssert.assertThrows(
-				v -> validator.isValid(parentBlock, blocks),
-				IllegalArgumentException.class);
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_INSUFFICIENT_BALANCE));
+	}
+
+	//endregion
+
+	//region multisig modification tests
+
+	@Test
+	public void blockCanContainMultipleMultisigModificationsForDifferentAccounts() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
+		final Account multisig1 = factory.createAccountWithBalance(Amount.fromNem(1000));
+		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
+		factory.setCosigner(multisig1, cosigner1);
+
+		final Account multisig2 = factory.createAccountWithBalance(Amount.fromNem(1000));
+		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+		factory.setCosigner(multisig2, cosigner2);
+
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
+		blocks.get(0).addTransaction(createMultisigModification(multisig1, cosigner1));
+		blocks.get(0).addTransaction(createMultisigModification(multisig2, cosigner2));
+		resignBlocks(blocks);
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.SUCCESS));
+	}
+
+	@Test
+	public void blockCannotContainMultipleMultisigModificationsForSameAccount() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
+		final Account multisig1 = factory.createAccountWithBalance(Amount.fromNem(1000));
+		final Account cosigner1 = factory.createAccountWithBalance(Amount.ZERO);
+		final Account cosigner2 = factory.createAccountWithBalance(Amount.ZERO);
+		factory.setCosigner(multisig1, cosigner1);
+		factory.setCosigner(multisig1, cosigner2);
+
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 10);
+		parentBlock.sign();
+
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 1);
+		blocks.get(0).addTransaction(createMultisigModification(multisig1, cosigner1));
+		blocks.get(0).addTransaction(createMultisigModification(multisig1, cosigner2));
+		resignBlocks(blocks);
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_CONFLICTING_MULTISIG_MODIFICATION));
+	}
+
+	private static Transaction createMultisigModification(final Account multisig, final Account cosigner) {
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		Transaction transfer = new MultisigAggregateModificationTransaction(
+				currentTime,
+				multisig,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, Utils.generateRandomAccount())));
+		transfer = prepareTransaction(transfer);
+		transfer.setSignature(null);
+
+		final MultisigTransaction msTransaction = new MultisigTransaction(currentTime, cosigner, transfer);
+		msTransaction.setFee(Amount.fromNem(200));
+		return prepareTransaction(msTransaction);
 	}
 
 	//endregion
@@ -383,6 +467,7 @@ public class BlockChainValidatorIntegrationTest {
 		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(1000));
 		final Account cosigner = factory.createAccountWithBalance(Amount.ZERO);
 		final Account recipient = factory.createAccountWithBalance(Amount.ZERO);
+
 		// Act:
 		final ValidationResult result = runMultisigTransferTest(factory, multisig, cosigner, recipient);
 
@@ -507,6 +592,42 @@ public class BlockChainValidatorIntegrationTest {
 		return validator.isValid(parentBlock, blocks);
 	}
 
+	@Test
+	public void blockConvertingAccountToMultisigCannotAlsoMakeOtherTransactionsFromThatAccountInSameBlock() {
+		// Arrange:
+		final BlockChainValidatorFactory factory = createValidatorFactory();
+		final BlockChainValidator validator = factory.create();
+		final Block parentBlock = createParentBlock(Utils.generateRandomAccount(), 123);
+		parentBlock.sign();
+
+		final TimeInstant currentTime = NisMain.TIME_PROVIDER.getCurrentTime();
+		final Account multisig = factory.createAccountWithBalance(Amount.fromNem(10000));
+		final Account cosigner = factory.createAccountWithBalance(Amount.fromNem(10000));
+
+		// - make the account multisig
+		final List<Block> blocks = NisUtils.createBlockList(parentBlock, 2);
+		final Block block = blocks.get(1);
+		final Transaction transaction1 = new MultisigAggregateModificationTransaction(
+				currentTime,
+				multisig,
+				Arrays.asList(new MultisigModification(MultisigModificationType.Add, cosigner)));
+		block.addTransaction(prepareTransaction(transaction1));
+
+		// - create a transfer transaction from the multisig account
+		final Transaction transaction2 = createTransfer(
+				multisig,
+				Utils.generateRandomAccount(),
+				Amount.fromNem(100));
+		block.addTransaction(prepareTransaction(transaction2));
+		block.sign();
+
+		// Act:
+		final ValidationResult result = validator.isValid(parentBlock, blocks);
+
+		// Assert:
+		Assert.assertThat(result, IsEqual.equalTo(ValidationResult.FAILURE_TRANSACTION_NOT_ALLOWED_FOR_MULTISIG));
+	}
+
 	//endregion
 
 	//region helper functions
@@ -559,10 +680,9 @@ public class BlockChainValidatorIntegrationTest {
 
 		public BlockChainValidator create() {
 			final NisCache nisCache = NisCacheFactory.create(this.accountStateCache);
-			final BlockExecutor executor = new BlockExecutor(nisCache);
 			final BlockTransactionObserver observer = new BlockTransactionObserverFactory().createExecuteCommitObserver(nisCache);
 			return new BlockChainValidator(
-					block -> executor.execute(block, observer),
+					block -> new BlockExecuteProcessor(nisCache, block, observer),
 					this.scorer,
 					this.maxChainSize,
 					this.blockValidator,

@@ -152,7 +152,7 @@ public class BlockGeneratorTest {
 		Assert.assertThat(block.getTransactions().size(), IsEqual.equalTo(3));
 		Assert.assertThat(block.getTransactions(), IsEqual.equalTo(transactions));
 		Mockito.verify(context.transactionsProvider, Mockito.only())
-				.getBlockTransactions(ownerAccount.getAddress(), new TimeInstant(11));
+				.getBlockTransactions(ownerAccount.getAddress(), new TimeInstant(11), new BlockHeight(124));
 	}
 
 	@Test
@@ -337,7 +337,7 @@ public class BlockGeneratorTest {
 		}
 
 		private void setBlockTransactions(final List<Transaction> transactions) {
-			Mockito.when(this.transactionsProvider.getBlockTransactions(Mockito.any(), Mockito.any())).thenReturn(transactions);
+			Mockito.when(this.transactionsProvider.getBlockTransactions(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(transactions);
 		}
 	}
 }

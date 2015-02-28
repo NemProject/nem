@@ -7,6 +7,7 @@ import org.nem.core.model.primitive.*;
 import org.nem.core.serialization.DeserializationContext;
 import org.nem.core.time.TimeInstant;
 import org.nem.nis.cache.*;
+import org.nem.nis.chain.BlockExecutor;
 import org.nem.nis.dao.BlockDao;
 import org.nem.nis.dbmodel.DbBlock;
 import org.nem.nis.mappers.*;
